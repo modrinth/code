@@ -1,0 +1,341 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Programista modo ebligita."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Aspekto"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Defaŭltaj agordoj de aperoj"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Trajtoflagoj"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Instaloj de Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privateco"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Aldoni kaj ludi"
+  },
+  "instance.add-server.add-server": {
+    "message": "Aldoni servilon"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Neebligita"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Ebligita"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Petu"
+  },
+  "instance.add-server.title": {
+    "message": "Aldoni servilon"
+  },
+  "instance.edit-server.title": {
+    "message": "Redakti servilon"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Kaŝi el la Hejma paĝo"
+  },
+  "instance.edit-world.name": {
+    "message": "Nomo"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Mondo de Minecraft"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Restarigi simbolon"
+  },
+  "instance.edit-world.title": {
+    "message": "Redakti mondon"
+  },
+  "instance.filter.disabled": {
+    "message": "Neebligitaj projektoj"
+  },
+  "instance.filter.updates-available": {
+    "message": "Ĝisdatigoj disponeblas"
+  },
+  "instance.server-modal.address": {
+    "message": "Adreso"
+  },
+  "instance.server-modal.name": {
+    "message": "Nomo"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Servilo de Minecraft"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Rimedo-pako"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Ĝeneralo"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Forigo de apero"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Forigi aperon"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Porĉiame forigas aperon de via aparato, inkluzivo de mondoj, kaj ĉiu instaligita enhavon. Estu zorgema ĉar kiam oni forigus aperon, ĝi ne estus restaŭrebla."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Forigado..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Duobligi"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Ne povas duobligi dum instalado."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Duobligo de apero"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Kopias la aperon, inkluzivo de mondoj, agordoj, modifoj, ktp."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Redakti simbolon"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Forigi simbolon"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Ŝanĝi simbolon"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Elekti simbolon"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Grupoj de la biblioteko"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Krei novan grupon"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Grupoj de la biblioteko ebligas vin organizi la aperojn en fakojn en la biblioteko."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Entajpu nomon de grupo"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Nomo"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Lanĉaj hokoj"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Propraj lanĉaj hokoj"
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Post fermo"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Plenumata post kiam ludo fermas."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Entajpu komandon de post fermo..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Antaŭ malfermo"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Plenumata antaŭ kiam ludo malfermas."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Entajpu komandon de antaŭ malfermo..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Hokoj de luda lanĉo"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Instalo"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Ŝanĝi version"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Instali"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Instalado"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Elŝutado de modifo-pakaĵaj versioj"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Instalado de nova versio"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Nune instalata"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Luda versio"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Instali"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Instalado okazas"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "Versio de {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Ne povas elŝuti detalojn de ligita modifo-pakaĵo. Bonvolu kontroli la konekton de interreto."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Platformo"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Reinstali modifo-pakaĵon"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Reinstalado de modifo-pakaĵo"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Ĉu vi certas, ke vi volas reinstali la aperon?"
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Reinstalo de modifo-pakaĵo"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Ripari"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Riparado"
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Ĉu riparu aperon?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Riparo okazas"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Restarigi al nuna"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Montri ĉiun version"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "ŝanĝi version"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "instali"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "reinstali"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "ripari"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Ne povas {action} dum instalado"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Ne povas {action} kiam neenreta"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Ne povas {action} dum riparado"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(nekonata versio)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Malligi aperon"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Se vi daŭrus, vi ne povus re-ligi ĝin sen kreado de nova aperon. Vi ne daŭre ricevos ĝisdatigojn de modifo-pakaĵoj kaj ĝi normaliĝos."
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java kaj memoro"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Hokoj"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Argumentoj de Java"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Instalo de Java"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Asigno de memoro"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Fenestro"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Propraj agordoj de fenestro"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Tutekrano"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Ludo lanĉiĝos tutekrane (uzante na options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Alto"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Alto de la luda fenestro kiam lanĉata."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Entajpu alton..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Larĝo"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Larĝo de la luda fenestro kiam lanĉata."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Entajpu larĝon..."
+  },
+  "instance.settings.title": {
+    "message": "Agordoj"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Servilo de Minecraft"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Ne povas konektiĝi kun servilo"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Kopii adreson"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Ne montri en Hejmo"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Disponeblaj"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Apero jam estas malferma"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Ludi en apero"
+  },
+  "instance.worlds.type.server": {
+    "message": "Servilo"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Unu ludanto"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Vidi aperon"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Mondo nune uzata"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Sinkroni kun apero"
+  }
+}

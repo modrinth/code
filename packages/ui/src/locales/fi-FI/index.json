@@ -1,0 +1,441 @@
+{
+  "badge.new": {
+    "defaultMessage": "Uusi"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analytiikat"
+  },
+  "button.back": {
+    "defaultMessage": "Takaisin"
+  },
+  "button.cancel": {
+    "defaultMessage": "Peruuta"
+  },
+  "button.continue": {
+    "defaultMessage": "Jatka"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Kopioi ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Kopioi pysyvä linkki"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Luo projekti"
+  },
+  "button.download": {
+    "defaultMessage": "Lataa"
+  },
+  "button.downloading": {
+    "defaultMessage": "Ladataan"
+  },
+  "button.edit": {
+    "defaultMessage": "Muokkaa"
+  },
+  "button.follow": {
+    "defaultMessage": "Seuraa"
+  },
+  "button.more-options": {
+    "defaultMessage": "Lisää asetuksia"
+  },
+  "button.next": {
+    "defaultMessage": "Seuraava"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Avaa kansio"
+  },
+  "button.play": {
+    "defaultMessage": "Pelaa"
+  },
+  "button.remove": {
+    "defaultMessage": "Poista"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Poista kuva"
+  },
+  "button.report": {
+    "defaultMessage": "Ilmoita"
+  },
+  "button.reset": {
+    "defaultMessage": "Nollaa"
+  },
+  "button.save": {
+    "defaultMessage": "Tallenna"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Tallenna muutokset"
+  },
+  "button.saving": {
+    "defaultMessage": "Tallennetaan"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Kirjaudu sisään"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Kirjaudu ulos"
+  },
+  "button.stop": {
+    "defaultMessage": "Pysäytä"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Lopeta seuraaminen"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Lataa kuva"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Juuri nyt"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Sovellus"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Palvelimet"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Nettisivu"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Yksityinen"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Muokkaa kuvaketta"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Poista kuvake"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Korvaa kuvake"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Valitse kuvake"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Hae..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Gallerianäkymä"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Ruudukkonäkymä"
+  },
+  "input.view.list": {
+    "defaultMessage": "Rivinäkymä"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Seikkailutila"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Luovuustila"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Katsojatila"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Selviytymistila"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Tuntematon pelitila"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Muutokset tallennettu"
+  },
+  "label.collections": {
+    "defaultMessage": "Kokoelmat"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Luotu {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Hallintapaneeli"
+  },
+  "label.delete": {
+    "defaultMessage": "Poista"
+  },
+  "label.description": {
+    "defaultMessage": "Kuvaus"
+  },
+  "label.error": {
+    "defaultMessage": "Virhe"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Seuratut projektit"
+  },
+  "label.loading": {
+    "defaultMessage": "Ladataan..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderaatio"
+  },
+  "label.notifications": {
+    "defaultMessage": "Ilmoitukset"
+  },
+  "label.password": {
+    "defaultMessage": "Salasana"
+  },
+  "label.played": {
+    "defaultMessage": "Pelattu {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Julkinen"
+  },
+  "label.rejected": {
+    "defaultMessage": "Hylätty"
+  },
+  "label.saved": {
+    "defaultMessage": "Tallennettu"
+  },
+  "label.server": {
+    "defaultMessage": "Palvelin"
+  },
+  "label.servers": {
+    "defaultMessage": "Palvelimet"
+  },
+  "label.settings": {
+    "defaultMessage": "Asetukset"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Yksinpeli"
+  },
+  "label.title": {
+    "defaultMessage": "Otsikko"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Piilotettu"
+  },
+  "label.visibility": {
+    "defaultMessage": "Näkyvyys"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Käy profiilissasi"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Lisää maksutapa"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Tapahtui virhe"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Hyväksytty"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Hyväksytty"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Arkistoitu"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Suljettu"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Luoja"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Luonnos"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderaattori"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinthin Tiimi"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Odottaa"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Yksityinen"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Prosessoitu"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Hylätty"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Palautettu"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Aikataulutettu"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Tarkastelussa"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Piilotettu"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Pidätetty"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kopioi koodi leikepöydälle"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Palvelin"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Ei tuettu"
+  },
+  "project-type.all": {
+    "defaultMessage": "Kaikki"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Julkaistu {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Yksityiskohdat"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Päivitetty {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Liity Discord palvelimelle"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Lahjoita"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponsoroi Githubissa"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Lahjoita Patreonissa"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Raportoi ongelmista"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Linkit"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Käy wikissä"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Analytiikat"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Kuvaus"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Ympäristö"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Galleria"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "Lisenssi"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Linkit"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Jäsenet"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "Sinulla ei ole lupaa muokata tätä."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "Ei lupaa"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Tagit"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Lataa"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Versiot"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "J"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Arkistoitu"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Luonnos"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Kriittinen"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Kysely"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Varoitus"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "Sinua ei vielä veloiteta."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Valitse maksutapa"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Maksutapa"
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Suosituin"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "Täydellinen 1–5 kaverille muutamalla kevyellä modilla."
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Alue"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Keski-Eurooppa"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Pohjois-Amerikka"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Missä haluaisit palvelimesi sijaitsevan?"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Länsi-Eurooppa"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Tili ja turvallisuus"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Ulkonäkö"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Sovelluksesi"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Valtuutetut sovellukset"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Tumma"
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Vaalea"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Väriteema"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Kieli"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Julkinen profiili"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Istunnot"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Sinulla on tallentamattomia muutoksia."
+  }
+}
+

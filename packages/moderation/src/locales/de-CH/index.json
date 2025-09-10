@@ -1,0 +1,216 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Eine Beschreibung, die den Zweck und die Funktion des Projekts klar beschreibt, ist erforderlich."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Beschreibung hinzufügen"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Das hinzufügen eines einzigartigen, relevanten und ansprechenden Icon macht dein Project unverwechselbar und hilt es, sich von anderen abzuheben."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Icon hinzufügen"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Füge relevante links, welche ausserhalb von Modrinth liegen, hinzu, wie z. B. Quellcode, einen Issue-Tracker oder eine Discord Einladung."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Externe Links hinzufügen"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Du hast alle {totalAvailableTags} verfügbaren Tags ausgewählt. Dies zerstört den Zweck von Tags, welche dem Benutzer helfen sollen, relevante Projecte zu finden. Bitte wähle nur Tags aus, welche für dein Projekt relevant sind."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Wähle akkurate Tags aus"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Deine Beschreibung is {length} lesbare Zeichen lang. Mindestens {minChars} lesbare Zeichen sind empfohlen, um eine klare und informative Beschreibung zu erstellen."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Beschreibung erweitern"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Beschreibung bearbeiten"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Lizens bearbeiten"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Zusammenfassung bearbeiten"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Tags bearbeiten"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Titel bearbeiten"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "Das vorgestellte Galleriebild ist oftmals wie dein Projekt einen ersten Eindruck machen."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Ein Galleriebild vorstellen"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "Gallerie-Seite besuchen"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Dein {projectType} verwendet eine Lizenz, welche das bereitstellen des Quellcodes verlangt. Bitte stelle für jede weitere Version einen Link zum Quellcode oder eine Quelldatei bereit, oder verwende einenandere Lizenz."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Quellcode bereitstellen"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "Deine Beschreibung sollte genügend normalen Text und Alt-Text für Bilder enthalten, damit es für Benutzer mit Bildschirmleseprogrammen oder langsamen Internet verfügbar ist."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "Barrierefreiheit sicherstellen"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "Lizenz-URL ist ungültig."
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "Deine Lizenz-URL verweist auf {domain}, welche für Lizenzinformationen nicht geeignet ist. Lizenz-URLs sollten direkt auf deine Lizenzdatei verlinken, und nicht auf Socialmedia, Gaming-Platformen o. ä."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "Deine Lizenz-URL scheint fehlerhaft zu sein. Bitte gib eine gültige URL zu deinem Lizenztext an."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Gültigen Lizenzlink hinzufügen"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "Das verwenden von Linkverkürzern oder anderen Methoden, welche das Ziel eines Links verschleiern, ist nicht erlaubt. Bitte verwende nur geeignete Links in voller länge."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "Verwende keine Linkverkürzer"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, one {# Überschrift} other {# Überschriften}} in deiner Beschreibung {count, plural, one {ist} other {sind}} zu lang. Überschriften sollten kurz und prägnant sein und als Abschnittstitel dienen, nicht als vollständige Sätze."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "Überschriften kürzen"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "Projekte dürfen weder Markenzeichen von Minecraft verwenden noch \"Minecraft\" als einen signifikanten Teil des Namens verwenden."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Vermeide Markenrechtsverletzungen"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "Einige deiner Bilder haben keinen Alt-Text, welcher wichtig für die Barrierefreiheit ist, insbesondere für sehbehinderte Benutzer."
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "Bild-Alt-text hinzufügen"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Einladungslinks für Discord können nicht für andere Link-Typen verwendet werden. Bitte füge deinen Einladungslink nur in das Discord-Einladungslink\" Feld ein."
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Verschiebe Discord-Einladungslink"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "Moderations-Seite ansehen"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "Überprüfe und behandle alle Bedenken des Moderationsteams, befor du das Projekt erneut einreichst."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Moderatoren-Feedback ansehen"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Du hast {count} Auflösungs-Tags ({tags}) ausgewählt. Ressourcenpakete sollten in der Regel nur einen Auflösungs-Tag haben, welches Ihre hauptauflösung entspricht."
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Richtige Auflösung auswählen"
+  },
+  "nags.select-environments.description": {
+    "defaultMessage": "Wähle die Umgebungen aus, in welcher dein {projectType} funktioniert."
+  },
+  "nags.select-environments.title": {
+    "defaultMessage": "Umbgebung auswählen"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Wähle die Lizenz, unter welche dein {projectType} vertrieben wird."
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Lizenz auswählen"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "Wähle Tags aus, welche auf dein Projekt zutreffen, damit es die richtigen Nutzer finden können."
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Tags auswählen"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Beschreibungseinstellungen ansehen"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "Umgebungseinstellungen ansehen"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Lizenzeinstellungen ansehen"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Linkeinstellungen ansehen"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Tageinstellungen ansehen"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Allgemeine Einstellungen ansehen"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Deine Zusammenfassung kann nicht die selbe sein wie dein Projektname. Es ist wichtig eine informative und passende Zusammenfassung zu erstellen."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "Mach die Zusammenfassung einzigartig"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Deine Zusammenfassung sollte keine Formatierungen, Zeilenumbrüche, spezielle Zeichen oder links enthalten, da sie nur als Klartext anzeigt wird."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Zusammenfassung bereinigen"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Deine Zusammenfassung ist {length} Zeichen lang. Mindestens {minChars} sind empfohlen, um eine informative und anregende Zusammenfassung zu erstellen."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "Zusammenfassung erweitern"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Halte den Namen deines Projekts übersichtlich und einprägsam, damit es leichter zu finden ist. Versionen und Loader werden automatisch neben deinem Projekt angezeigt."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "Namen bereinigen"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Du hast {tagCount} tags ausgewählt. Erwäge die Anzahl auf {maxTagCount} oder weniger zu reduzieren, damit dein Projekt in relevanten Suchanfragen erscheint."
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "Wähle akkurate Tags aus"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Mindestens ein Galleriebild wird benötigt, um den Inhalt deines {type}{resourcepackMessage} zu präsentieren."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Lade ein Galleriebild hoch"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "Mindestens eine Version wird für das Projekt benötigt, um es zur Überprüfung einzureichen."
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Version hochladen"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "Einige deiner externen Links verwenden eventual Domains, welche für diese Art von Link ungeeignet sind."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Externe Links überprüfen"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "Versions-Seite ansehen"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Linkeinstellungen ansehen"
+  }
+}
+
