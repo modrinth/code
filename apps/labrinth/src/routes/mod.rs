@@ -119,6 +119,8 @@ pub enum ApiError {
     Payments(String),
     #[error("Discord Error: {0}")]
     Discord(String),
+    #[error("Slack Webhook Error: {0}")]
+    Slack(String),
     #[error("Captcha Error. Try resubmitting the form.")]
     Turnstile,
     #[error("Error while decoding Base62: {0}")]
@@ -182,6 +184,7 @@ impl ApiError {
                 ApiError::Io(..) => "io_error",
                 ApiError::RateLimitError(..) => "ratelimit_error",
                 ApiError::Stripe(..) => "stripe_error",
+                ApiError::Slack(..) => "slack_error",
             },
             description: self.to_string(),
         }
@@ -220,6 +223,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Io(..) => StatusCode::BAD_REQUEST,
             ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
             ApiError::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
+            ApiError::Slack(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
