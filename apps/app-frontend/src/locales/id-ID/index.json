@@ -1,0 +1,419 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Mode pengembang dihidupkan."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Tampilan"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Pilihan wujud asali"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Bendera fitur"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Pemasangan Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privasi"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Manajemen sumber"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Tambah dan mainkan"
+  },
+  "instance.add-server.add-server": {
+    "message": "Tambah peladen"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Dimatikan"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Dihidupkan"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Konfirmasi"
+  },
+  "instance.add-server.title": {
+    "message": "Tambah peladen"
+  },
+  "instance.edit-server.title": {
+    "message": "Sunting peladen"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Sembunyikan dari Beranda"
+  },
+  "instance.edit-world.name": {
+    "message": "Nama"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Dunia Minecraft"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Atur ulang ikon"
+  },
+  "instance.edit-world.title": {
+    "message": "Sunting dunia"
+  },
+  "instance.filter.disabled": {
+    "message": "Proyek takaktif"
+  },
+  "instance.filter.updates-available": {
+    "message": "Pembaruan tersedia"
+  },
+  "instance.server-modal.address": {
+    "message": "Alamat"
+  },
+  "instance.server-modal.name": {
+    "message": "Nama"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Peladen Minecraft"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Paket sumber"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Umum"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Hapus wujud"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Hapus wujud"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Menghapus wujud secara permanen dari perangkat Anda, termasuk dunia, konfigurasi, dan konten terpasang Anda. Berhati-hatilah, karena Anda tidak dapat memulihkan wujud yang telah dihapus."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Menghapus..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Gandakan"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Tidak dapat menggandakan saat memasang."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Gandakan wujud"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Membuat salinan dari wujud ini, termasuk dunia, konfig, modifikasi, dsb."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Sunting ikon"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Hapus ikon"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Ganti ikon"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Pilih ikon"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Pengelompokan koleksi"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Buat kelompok baru"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Pengelompokan koleksi membolehkan Anda mengorganisasi wujud ke dalam bagian-bagian berbeda dalam koleksi Anda."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Masukkan nama kelompok"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Nama"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Luncurkan kait"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Luncurkan kait ubah suaian"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Kait membolehkan pengguna ahli untuk menjalankan beberapa perintah sistem sebelum dan setelah meluncurkan permainan."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Pascakeluar"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Berjalan setelah permainan tertutup."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Masukkan perintah pascakeluar..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Praluncur"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Berjalan sebelum wujud diluncurkan."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Masukkan perintah praluncur..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Kait peluncuran permainan"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Pembungkus"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Perintah pembungkus untuk meluncurkan Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Masukkan perintah pembungkus..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Pemasangan"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} untuk Minecraft {game_version} sudah terpasang"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "{game_version} murni sudah terpasang"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Ubah versi"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Pasang"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Memasang"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Memperoleh versi paket modifikasi"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Memasang versi baru"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Saat ini terpasang"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Informasi awakutu:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Memperoleh perincian paket modifikasi"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Versi permainan"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Pasang"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Pemasangan sedang berjalan"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "Versi {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Tidak dapat memperoleh perincian paket modifikasi terkait. Mohon periksa sambungan internet Anda."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} tidak tersedia untuk Minecraft {version}. Mohon coba peluncur modifikasi yang lain."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Wujud ini berkaitan dengan paket modifikasi, tetapi paket modifikasi tersebut tidak dapat ditemukan pada Modrinth."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Platform"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Pasang ulang paket modifikasi"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Memasang ulang paket modifikasi"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Memasang ulang akan mengatur ulang semua konten yang terpasang atau termodifikasi pada apa yang telah disediakan oleh paket modifikasi, menghapus modifikasi atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal. Hal ini dapat memperbaiki perilaku tidak terduga bila ada perubahan pada wujud, tetapi bila dunia Anda sekarang bergantung pada konten terpasang tambahan, hal ini dapat merusak dunia yang ada."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Apakah Anda yakin ingin memasang ulang wujud ini?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Mengatur ulang konten wujud menjadi keadaan awal, menghapus modifikasi atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Pasang ulang paket modifikasi"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Perbaiki"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Memperbaiki"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Memperbaiki akan memasangkan ulang pustaka dependen dan memeriksa kerusakan. Ini dapat memecahkan masalah bila permainan Anda tidak memulai sebab kesalahan pada peluncur, tetapi tidak akan memecahkan masalah atau kemogokan yang disebabkan oleh modifikasi terpasang."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Perbaiki wujud?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Perbaikan sedang berlangsung"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Atur ulang ke saat ini"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Tampilkan semua versi"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "mengubah versi"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "memasang"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "memasang ulang"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "memperbaiki"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Tidak dapat {action} saat memasang"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Tidak dapat {action} saat luring"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Tidak dapat {action} saat memperbaiki"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(versi tidak dikenal)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Lepas kaitan wujud"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Bila Anda melanjutkan, Anda tidak akan dapat mengaitkannya lagi tanpa membuat wujud baru. Anda tidak akan mendapatkan pembaruan paket modifikasi dan menjadi wujud normal."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Apakah Anda yakin ingin melepas kaitan wujud ini?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Wujud ini berkaitan dengan paket modifikasi, yang berarti modifikasi tidak dapat diperbarui dan Anda tidak dapat mengubah versi peluncur modifikasi atau Minecraft. Melepas kaitan akan memutuskan wujud ini dari paket modifikasi secara permanen."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Lepas kaitan dari paket modifikasi"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java dan memori"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Variabel lingkungan"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Kait"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Argumen Java"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Pemasangan Java"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Memori yang teralokasikan"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Jendela"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Pengaturan jendela ubah suaian"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Layar penuh"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Permainan berada dalam layar penuh ketika diluncurkan (menggunakan options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Tinggi"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Tinggi jendela permainan ketika diluncurkan."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Masukkan tinggi..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Lebar"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Lebar jendela permainan ketika diluncurkan."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Masukkan lebar..."
+  },
+  "instance.settings.title": {
+    "message": "Pengaturan"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Peladen Minecraft"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Tidak dapat menghubungkan ke peladen"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Salin alamat"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Jangan tampilkan di Beranda"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Tersedia"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Wujud telah dibuka"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Mode Menantang"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Peladen tidak cocok"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Peladen tidak dapat dihubungi"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Anda hanya dapat memasuki peladen secara langsung pada Minecraft versi Alpha 1.0.5 ke atas"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Anda hanya dapat memasuki dunia bermain sendiri secara langsung pada Minecraft versi Alpha 1.20 ke atas"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Mainkan wujud"
+  },
+  "instance.worlds.type.server": {
+    "message": "Peladen"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Bermain sendiri"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Lihat wujud"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Dunia sedang dimainkan"
+  },
+  "search.filter.locked.instance": {
+    "message": "Disediakan oleh wujud"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Versi permainan disediakan oleh wujud"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Pemuat disediakan oleh wujud"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Sinkronkan dengan wujud"
+  }
+}

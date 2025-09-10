@@ -1,0 +1,77 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Utviklermodus aktivert."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Utseende"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java installasjoner"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Personvern"
+  },
+  "instance.add-server.add-server": {
+    "message": "Legg til server"
+  },
+  "instance.edit-server.title": {
+    "message": "Rediger server"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Sjul fra hjemside"
+  },
+  "instance.edit-world.name": {
+    "message": "Navn"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft Verden"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Reset ikon"
+  },
+  "instance.edit-world.title": {
+    "message": "Rediger verden"
+  },
+  "instance.server-modal.address": {
+    "message": "Adresse"
+  },
+  "instance.server-modal.name": {
+    "message": "Navn"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Server"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resurspakke"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Generelt"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Slett instans"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Slett instans"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Permanent sletter en instans fra enheten din, inkludert verdener, konfigurasjoner og alt installert innhold. Vær forsiktig, når du sletter en instans er det ingen måte å få den tilbake."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Sletter..."
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Lag ny gruppe"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Navn"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} er ikke tilgjengelig for Minecraft {version}. Prøv en annen mod laster."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Platform"
+  }
+}

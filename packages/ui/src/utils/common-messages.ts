@@ -9,6 +9,10 @@ export const commonMessages = defineMessages({
 		id: 'badge.beta-release',
 		defaultMessage: 'Beta Release',
 	},
+	beta: {
+		id: 'badge.beta',
+		defaultMessage: 'Beta',
+	},
 	allProjectType: {
 		id: 'project-type.all',
 		defaultMessage: 'All',

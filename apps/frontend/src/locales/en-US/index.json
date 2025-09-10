@@ -1910,6 +1910,9 @@
   "settings.language.languages.search.no-results": {
     "message": "No languages match your search."
   },
+  "settings.language.warning": {
+    "message": "Changing the site language may cause some content to appear in English if a translation is not available. The site is not yet fully translated, so some content may remain in English for certain languages. We are still working on improving our localization system, so occasionally content may appear broken."
+  },
   "settings.pats.action.create": {
     "message": "Create a PAT"
   },

@@ -1,0 +1,18 @@
+{
+  "nags.add-description.title": {
+    "defaultMessage": "เพิ่มคำอธิบาย"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "เพิ่มไอคอน"
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "เพิ่มลิงก์ภายนอก"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "แก้ไขคำอธิบาย"
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "ห้ามใช้ตัวย่อลิงก์"
+  }
+}
+
