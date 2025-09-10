@@ -94,6 +94,7 @@ pub enum LegacyNotificationBody {
     },
     PaymentFailed {
         amount: String,
+        service: String,
     },
     Unknown,
 }
@@ -246,8 +247,8 @@ impl LegacyNotification {
                 new_email,
                 to_email,
             },
-            NotificationBody::PaymentFailed { amount } => {
-                LegacyNotificationBody::PaymentFailed { amount }
+            NotificationBody::PaymentFailed { amount, service } => {
+                LegacyNotificationBody::PaymentFailed { amount, service }
             }
             NotificationBody::Unknown => LegacyNotificationBody::Unknown,
         };
