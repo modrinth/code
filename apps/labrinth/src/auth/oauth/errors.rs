@@ -167,7 +167,7 @@ pub enum OAuthErrorType {
 // and 5.2 (https://datatracker.ietf.org/doc/html/rfc6749#section-5.2)
 i18n_enum!(
     OAuthErrorType,
-    root_key: "error.oauth",
+    root_key: "labrinth.error.oauth",
     AuthenticationError(transparent cause) => "server_error",
     ClientMissingRedirectURI { client_id } => "invalid_uri.none_specified",
     RedirectUriNotConfigured(..) => "invalid_uri.none_configured",

@@ -24,7 +24,7 @@ pub enum FileHostingError {
 
 i18n_enum!(
     FileHostingError,
-    root_key: "error.file_hosting_error",
+    root_key: "labrinth.error.file_hosting_error",
     S3Error(action, cause) => "s3",
     FileSystemError(cause) => "file_system",
     InvalidFilename! => "invalid_filename",

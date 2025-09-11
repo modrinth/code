@@ -21,7 +21,7 @@ pub enum MailError {
 
 i18n_enum!(
     MailError,
-    root_key: "error.mail",
+    root_key: "labrinth.error.mail",
     Env(..) => "environment",
     Mail(cause) => "email",
     Address(cause) => "address",

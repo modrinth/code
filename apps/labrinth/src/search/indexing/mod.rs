@@ -35,7 +35,7 @@ pub enum IndexingError {
 
 i18n_enum!(
     IndexingError,
-    root_key: "error.indexing",
+    root_key: "labrinth.error.indexing",
     Indexing(..) => "meilisearch",
     Serde(cause) => "serialization",
     Sqlx(cause) => "sqlx",

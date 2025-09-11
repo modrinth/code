@@ -66,7 +66,7 @@ pub enum CreateError {
     FileHostingError(#[from] FileHostingError),
     #[error("Error while validating uploaded file: {0}")]
     FileValidationError(#[from] crate::validate::ValidationError),
-    #[error("{}", .0)]
+    #[error("{0}")]
     MissingValueError(String), // TODO: Use an I18nEnum instead of a String
     #[error("Invalid format for image: {0}")]
     InvalidIconFormat(ApiError),
@@ -90,7 +90,7 @@ pub enum CreateError {
 
 i18n_enum!(
     CreateError,
-    root_key: "error.project_creation",
+    root_key: "labrinth.error.project_creation",
     EnvError(..) => "environment_error",
     SqlxDatabaseError(..) => "database_error.unknown",
     DatabaseError(cause) => "database_error",

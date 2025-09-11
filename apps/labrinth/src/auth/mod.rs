@@ -56,7 +56,7 @@ pub enum AuthenticationError {
 
 i18n_enum!(
     AuthenticationError,
-    root_key: "error.unauthorized",
+    root_key: "labrinth.error.unauthorized",
     Env(..) => "environment_error",
     Sqlx(cause) => "database_error.unknown",
     Database(cause) => "database_error",

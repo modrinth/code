@@ -57,7 +57,7 @@ pub enum ValidationError {
 
 i18n_enum!(
     ValidationError,
-    root_key: "error.file_validation",
+    root_key: "labrinth.error.file_validation",
     Zip(cause) => "zip",
     Io(cause) => "io",
     SerDe(cause) => "serialization",

@@ -62,7 +62,7 @@ pub enum DatabaseError {
 
 i18n_enum!(
     DatabaseError,
-    root_key: "error.database",
+    root_key: "labrinth.error.database",
     Database(cause) => "sqlx",
     RandomId! => "random_id",
     CacheError(cause) => "cache",

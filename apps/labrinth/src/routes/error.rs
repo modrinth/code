@@ -108,7 +108,7 @@ pub enum ApiError {
 
 i18n_enum!(
     ApiError,
-    root_key: "error",
+    root_key: "labrinth.error",
     Env(..) => "environment_error",
     FileHosting(cause) => "file_hosting_error",
     Database(cause) => "database_error",

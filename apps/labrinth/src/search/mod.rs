@@ -33,7 +33,7 @@ pub enum SearchError {
 
 i18n_enum!(
     SearchError,
-    root_key: "error.search",
+    root_key: "labrinth.error.search",
     MeiliSearch(cause) => "meilisearch_error",
     Serde(cause) => "invalid_input.serialization",
     IntParsing(cause) => "invalid_input.int_parsing",
