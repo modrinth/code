@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { Button, Heading, Link as VLink, Text } from '@vue-email/components'
+import { Button, Heading, Text, Link as VLink } from '@vue-email/components'
 
-import StyledEmail from '../shared/StyledEmail.vue'
+import StyledEmail from '@/emails/shared/StyledEmail.vue'
 </script>
 
 <template>
-	<StyledEmail title="Reset your Modrinth password">
+	<StyledEmail
+		title="Reset your Modrinth password"
+		:manual-links="[{ link: '{resetpassword.url}', label: 'Password reset link' }]"
+	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold"> Verify your email </Heading>
 
 		<Text class="text-muted text-base">Hi {user.name},</Text>
@@ -17,7 +20,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		<Button
 			href="{resetpassword.url}"
 			target="_blank"
-			class="text-accentContrast inline-block rounded-[12px] bg-brand px-4 py-3 text-[14px] font-bold"
+			class="text-accentContrast inline-block rounded-[12px] bg-brand pb-3 pl-4 pr-4 pt-3 text-[14px] font-bold"
 		>
 			Reset Password
 		</Button>

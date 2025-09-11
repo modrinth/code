@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { Heading, Link as VLink, Text } from '@vue-email/components'
+import { Heading, Text, Link as VLink } from '@vue-email/components'
 
-import StyledEmail from '../shared/StyledEmail.vue'
+import StyledEmail from '@/emails/shared/StyledEmail.vue'
 </script>
 
 <template>
-	<StyledEmail title="Your Modrinth password was removed">
+	<StyledEmail
+		title="Your Modrinth password was removed"
+		:manual-links="[{ link: 'https://support.modrinth.com', label: 'Support Portal' }]"
+	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold"> Your Modrinth password was removed </Heading>
 
 		<Text class="text-muted text-base">Hi {user.name},</Text>

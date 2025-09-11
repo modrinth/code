@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { Button, Heading, Link as VLink, Text } from '@vue-email/components'
+import { Button, Heading, Text, Link as VLink } from '@vue-email/components'
 
-import StyledEmail from '../shared/StyledEmail.vue'
+import StyledEmail from '@/emails/shared/StyledEmail.vue'
 </script>
 
 <template>
-	<StyledEmail title="Payment failed for {paymentfailed.service}">
+	<StyledEmail
+		title="Payment failed for {paymentfailed.service}"
+		:manual-links="[{ link: '{billing.url}', label: 'Billing settings' }]"
+	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold">
 			Payment failed for {paymentfailed.service}
 		</Heading>
@@ -18,7 +21,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		<Button
 			href="{billing.url}"
 			target="_blank"
-			class="text-accentContrast inline-block rounded-[12px] bg-brand px-4 py-3 text-[14px] font-bold"
+			class="text-accentContrast inline-block rounded-[12px] bg-brand pb-3 pl-4 pr-4 pt-3 text-[14px] font-bold"
 		>
 			Update billing settings
 		</Button>

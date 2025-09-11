@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import {
+	Body,
 	Column,
 	Container,
 	Head,
 	Html,
 	Img,
-	Link as VLink,
 	Row,
 	Section,
 	Tailwind,
 	Text,
+	Link as VLink,
 } from '@vue-email/components'
 
 defineProps<{
 	title?: string
+	manualLinks?: { link: string; label?: string }[]
 }>()
 </script>
 
@@ -29,152 +31,198 @@ defineProps<{
 				rel="stylesheet"
 				type="text/css"
 			/>
+			<Style>
+				/* Outlook.com centering + line-height fixes */ .ExternalClass { width:100%; }
+				.ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td {
+				line-height:100%; } table { border-collapse:separate; } a, a:link, a:visited {
+				text-decoration:none; color:#1f68c0; } a:hover { text-decoration:underline; }
+				h1,h2,h3,h4,h5,h6 { color:#000 !important; margin:0; mso-line-height-rule:exactly; }
+			</Style>
 		</Head>
 
-		<Tailwind
-			:config="{
-				theme: {
-					extend: {
-						colors: {
-							bg: { DEFAULT: '#ebebeb', raised: '#ffffff', super: '#e9e9e9' },
-							divider: { DEFAULT: '#babfc5', dark: '#c8cdd3' },
-							base: '#2c2e31',
-							secondary: '#484d54',
-							contrast: '#1a202c',
-							accentContrast: '#ffffff',
-							red: '#cb2245',
-							orange: '#e08325',
-							green: '#00af5c',
-							blue: '#1f68c0',
-							purple: '#8e32f3',
-							gray: '#595b61',
-							brand: {
-								DEFAULT: '#00af5c',
-								highlight: 'rgba(0, 175, 92, 0.25)',
-								shadow: 'rgba(0, 175, 92, 0.7)',
+		<Body>
+			<Tailwind
+				:config="{
+					theme: {
+						extend: {
+							colors: {
+								bg: { DEFAULT: '#ebebeb', raised: '#ffffff', super: '#e9e9e9' },
+								divider: { DEFAULT: '#babfc5', dark: '#c8cdd3' },
+								base: '#2c2e31',
+								secondary: '#484d54',
+								contrast: '#1a202c',
+								accentContrast: '#ffffff',
+								red: '#cb2245',
+								orange: '#e08325',
+								green: '#00af5c',
+								blue: '#1f68c0',
+								purple: '#8e32f3',
+								gray: '#595b61',
+								brand: {
+									DEFAULT: '#00af5c',
+									highlight: 'rgba(0, 175, 92, 0.25)',
+									shadow: 'rgba(0, 175, 92, 0.7)',
+								},
+								highlight: {
+									red: 'rgba(203, 34, 69, 0.25)',
+									orange: 'rgba(224, 131, 37, 0.25)',
+									green: 'rgba(0, 175, 92, 0.25)',
+									blue: 'rgba(31, 104, 192, 0.25)',
+									purple: 'rgba(142, 50, 243, 0.25)',
+									gray: 'rgba(89, 91, 97, 0.25)',
+								},
+								tint: {
+									red: 'rgba(203, 34, 69, 0.1)',
+									orange: 'rgba(224, 131, 37, 0.1)',
+									green: 'rgba(0, 175, 92, 0.1)',
+									blue: 'rgba(31, 104, 192, 0.1)',
+									purple: 'rgba(142, 50, 243, 0.1)',
+								},
+								link: { DEFAULT: '#1f68c0', hover: '#1f68c0', active: '#1f68c0' },
+								muted: '#777777',
+								footerText: '#4d4d4d',
 							},
-							highlight: {
-								red: 'rgba(203, 34, 69, 0.25)',
-								orange: 'rgba(224, 131, 37, 0.25)',
-								green: 'rgba(0, 175, 92, 0.25)',
-								blue: 'rgba(31, 104, 192, 0.25)',
-								purple: 'rgba(142, 50, 243, 0.25)',
-								gray: 'rgba(89, 91, 97, 0.25)',
+							fontSize: {
+								base: ['16px', { lineHeight: '24px' }],
+								'2xl': ['28px', { lineHeight: '32px' }],
+								xs: ['13px', { lineHeight: '16px' }],
+								'2xs': ['11px', { lineHeight: '16px' }],
 							},
-							tint: {
-								red: 'rgba(203, 34, 69, 0.1)',
-								orange: 'rgba(224, 131, 37, 0.1)',
-								green: 'rgba(0, 175, 92, 0.1)',
-								blue: 'rgba(31, 104, 192, 0.1)',
-								purple: 'rgba(142, 50, 243, 0.1)',
+							fontFamily: {
+								sans: ['Inter', 'Arial', 'sans-serif'],
 							},
-							link: { DEFAULT: '#1f68c0', hover: '#1f68c0', active: '#1f68c0' },
-							muted: '#777777',
-							footerText: '#4d4d4d',
-						},
-						fontSize: {
-							base: ['16px', { lineHeight: '24px' }],
-							'2xl': ['28px', { lineHeight: '32px' }],
-							xs: ['13px', { lineHeight: '16px' }],
-						},
-						fontFamily: {
-							sans: ['Inter', 'Arial', 'sans-serif'],
 						},
 					},
-				},
-			}"
-		>
-			<div class="font-sans">
-				<Section class="bg-bg px-4 py-4">
-					<Container class="max-w-[600px]">
-						<Row>
-							<Column>
-								<Img
-									src="https://cdn.modrinth.com/email/f740e2decee8764a4629bff677a284f9.png"
-									width="29"
-									alt=""
-									class="block h-auto"
-								/>
-							</Column>
-						</Row>
-					</Container>
-				</Section>
-
-				<Section class="bg-white px-8 py-8">
-					<Container class="max-w-[600px]">
-						<slot />
-					</Container>
-				</Section>
-
-				<Section class="bg-bg px-4 py-4">
-					<Container class="max-w-[600px]">
-						<Row>
-							<Column class="align-middle">
-								<VLink href="https://modrinth.com" aria-label="Modrinth">
+				}"
+			>
+				<Section class="m-0 pb-0 pl-0 pr-0 pt-0 font-sans">
+					<Section class="bg-bg pb-4 pl-4 pr-4 pt-4">
+						<Container class="max-w-[600px]">
+							<Row>
+								<Column>
 									<Img
-										src="https://cdn.modrinth.com/email/bd3357dfae4b1d266250372db3a0988f.png"
-										width="102"
-										alt="modrinth logo"
+										src="https://cdn.modrinth.com/email/f740e2decee8764a4629bff677a284f9.png"
+										width="29"
+										alt=""
 										class="block h-auto"
 									/>
-								</VLink>
+								</Column>
+							</Row>
+						</Container>
+					</Section>
 
-								<Row class="text-right align-middle">
-									<div class="inline-block">
-										<VLink href="https://discord.modrinth.com" class="mr-4 inline-block">
-											<Img
-												width="20"
-												height="20"
-												alt="Discord"
-												src="https://cdn.modrinth.com/email/e089a3a07be91c2940beff1fb191b247.png"
-											/>
-										</VLink>
-										<VLink href="https://twitter.com/modrinth" class="mr-4 inline-block">
-											<Img
-												width="20"
-												height="20"
-												alt="Twitter/X"
-												src="https://cdn.modrinth.com/email/363985aad91cab53854276e12f267b0b.png"
-											/>
-										</VLink>
-										<VLink href="https://floss.social/@modrinth" class="mr-4 inline-block">
-											<Img
-												width="20"
-												height="20"
-												alt="Mastodon"
-												src="https://cdn.modrinth.com/email/e25c30d5707744f31dcf18651a67d3d5.png"
-											/>
-										</VLink>
-										<VLink href="https://github.com/modrinth/" class="mr-4 inline-block">
-											<Img
-												width="20"
-												height="20"
-												alt="GitHub"
-												src="https://cdn.modrinth.com/email/45993023966d64e6138fd65a530a5d03.png"
-											/>
-										</VLink>
-										<VLink href="https://www.youtube.com/@modrinth" class="inline-block">
-											<Img
-												width="20"
-												height="20"
-												alt="YouTube"
-												src="https://cdn.modrinth.com/email/a15afae9fc94e105caeb1bb4d33a0a13.png"
-											/>
-										</VLink>
-									</div>
-								</Row>
+					<Section class="bg-white pb-8 pl-8 pr-8 pt-8">
+						<Container class="max-w-[600px]">
+							<slot />
+						</Container>
+					</Section>
 
-								<Text class="mb-0 mt-2 text-xs" :style="{ color: '#4d4d4d' }"> Rinth, Inc. </Text>
-								<div>
-									<Text class="m-0 text-xs text-secondary">410 N Scottsdale Road</Text>
-									<Text class="m-0 text-xs text-secondary">Suite 1000</Text>
-									<Text class="m-0 text-xs text-secondary">Tempe, AZ 85281</Text>
-								</div>
-							</Column>
-						</Row>
-					</Container>
+					<Section class="mb-4 bg-bg pb-4 pl-4 pr-4 pt-4">
+						<Container class="max-w-[600px]">
+							<Row>
+								<Column class="align-middle">
+									<VLink href="https://modrinth.com" aria-label="Modrinth">
+										<Img
+											src="https://cdn.modrinth.com/email/bd3357dfae4b1d266250372db3a0988f.png"
+											width="102"
+											alt="modrinth logo"
+											class="block h-auto"
+										/>
+									</VLink>
+
+									<Row class="text-right align-middle">
+										<Section class="m-0 inline-block pb-0 pl-0 pr-0 pt-0">
+											<VLink href="https://discord.modrinth.com" class="mr-4 inline-block">
+												<Img
+													width="20"
+													height="20"
+													alt="Discord"
+													src="https://cdn.modrinth.com/email/e089a3a07be91c2940beff1fb191b247.png"
+												/>
+											</VLink>
+											<VLink href="https://twitter.com/modrinth" class="mr-4 inline-block">
+												<Img
+													width="20"
+													height="20"
+													alt="Twitter/X"
+													src="https://cdn.modrinth.com/email/363985aad91cab53854276e12f267b0b.png"
+												/>
+											</VLink>
+											<VLink href="https://floss.social/@modrinth" class="mr-4 inline-block">
+												<Img
+													width="20"
+													height="20"
+													alt="Mastodon"
+													src="https://cdn.modrinth.com/email/e25c30d5707744f31dcf18651a67d3d5.png"
+												/>
+											</VLink>
+											<VLink href="https://github.com/modrinth/" class="mr-4 inline-block">
+												<Img
+													width="20"
+													height="20"
+													alt="GitHub"
+													src="https://cdn.modrinth.com/email/45993023966d64e6138fd65a530a5d03.png"
+												/>
+											</VLink>
+											<VLink href="https://www.youtube.com/@modrinth" class="inline-block">
+												<Img
+													width="20"
+													height="20"
+													alt="YouTube"
+													src="https://cdn.modrinth.com/email/a15afae9fc94e105caeb1bb4d33a0a13.png"
+												/>
+											</VLink>
+										</Section>
+									</Row>
+
+									<Text class="mb-0 mt-2 text-xs" :style="{ color: '#4d4d4d' }"> Rinth, Inc. </Text>
+									<Section class="m-0 pb-0 pl-0 pr-0 pt-0">
+										<Text class="m-0 text-xs text-secondary">410 N Scottsdale Road</Text>
+										<Text class="m-0 text-xs text-secondary">Suite 1000</Text>
+										<Text class="m-0 text-xs text-secondary">Tempe, AZ 85281</Text>
+									</Section>
+								</Column>
+							</Row>
+						</Container>
+					</Section>
+
+					<Text
+						class="text-footerText text-2xs mb-4 mt-0 pb-0 pl-4 pr-4 pt-0 text-center font-sans"
+					>
+						This email was sent to you as a registered user of Modrinth. You can customize the
+						emails you recieve in your
+						<VLink
+							href="https://modrinth.com/user/settings/notifications"
+							class="text-green underline"
+							>notification settings</VLink
+						>. Some emails are required to keep your account secure and cannot be disabled.
+					</Text>
+
+					<hr />
+
+					<Section
+						v-if="manualLinks && manualLinks.length"
+						class="text-footerText text-2xs mb-4 mt-4 pb-0 pl-4 pr-4 pt-0 font-sans"
+					>
+						<small class="text-muted text-2xs"
+							>If you're having trouble with the links above, copy and paste these URLs into your
+							web browser:</small
+						>
+						<Text class="text-2xs text-muted mt-0">
+							<span v-for="(item, index) in manualLinks" :key="index" class="block break-words">
+								<span v-if="item.label">
+									<b>{{ item.label }}:</b><br />
+								</span>
+								{{ item.link }}
+							</span>
+							<span class="block break-words">
+								<span> <b>Notification settings:</b><br /> </span>
+								https://modrinth.com/user/settings/notifications
+							</span>
+						</Text>
+					</Section>
 				</Section>
-			</div>
-		</Tailwind>
+			</Tailwind>
+		</Body>
 	</Html>
 </template>
