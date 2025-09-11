@@ -13,12 +13,20 @@ export default {
 	'two-factor-removed': () => import('./templates/account/TwoFactorRemoved.vue'),
 	'verify-email': () => import('./templates/account/VerifyEmail.vue'),
 	'login-new-device': () => import('./templates/account/LoginNewDevice.vue'),
+	'payout-available': () => import('./templates/account/PayoutAvailable.vue'),
 	'personal-access-token-created': () => import('./templates/account/PATCreated.vue'),
 
 	// Moderation
 	'report-submitted': () => import('./templates/moderation/ReportSubmitted.vue'),
 	'report-status-updated': () => import('./templates/moderation/ReportStatusUpdated.vue'),
-	'project-status-updated': () => import('./templates/moderation/ProjectStatusUpdated.vue'),
 	'moderation-thread-message-received': () =>
 		import('./templates/moderation/ModerationThreadMessageReceived.vue'),
+
+	// Project
+	'project-status-updated': () => import('./templates/project/ProjectStatusUpdated.vue'),
+	'project-invited': () => import('./templates/project/ProjectInvited.vue'),
+	'project-transferred': () => import('./templates/project/ProjectTransferred.vue'),
+
+	// Organization
+	'organization-invited': () => import('./templates/organization/OrganizationInvited.vue'),
 } as Record<string, () => Promise<{ default: Component }>>

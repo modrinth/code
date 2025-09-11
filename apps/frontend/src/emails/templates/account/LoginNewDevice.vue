@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Column, Heading, Img, Row, Section, Text, Link as VLink } from '@vue-email/components'
+import { Column, Heading, Img, Link as VLink, Row, Section, Text } from '@vue-email/components'
 
 import StyledEmail from '@/emails/shared/StyledEmail.vue'
 </script>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Heading, Section, Text, Link as VLink } from '@vue-email/components'
+import { Heading, Link as VLink, Section, Text } from '@vue-email/components'
 
 import StyledEmail from '@/emails/shared/StyledEmail.vue'
 </script>
@@ -20,7 +20,7 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 		<Text class="text-base">Hi {user.name},</Text>
 
-		<Text class="text-base">Your report from {report.date} has been updated.</Text>
+		<Text class="text-base">Your report, {report.id}, from {report.date} has been updated.</Text>
 
 		<Section class="bg-bg-super mb-4 mt-4 rounded-lg border border-divider pb-4 pl-4 pr-4 pt-4">
 			<Text class="m-0 text-base">{report.update}</Text>
@@ -32,9 +32,9 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 				>view the full report thread</VLink
 			>
 			to see all messages. If you have more information to add, reply in the dashboard thread so our
-			team can review it in context. For other questions you can
-			<VLink href="https://support.modrinth.com" class="text-green underline">contact support</VLink
-			>.
+			team can review it in context. For other questions you can contact support through our
+			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink>
+			or by replying to this email.
 		</Text>
 
 		<Text class="text-base"

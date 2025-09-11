@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Heading, Text, Link as VLink } from '@vue-email/components'
+import { Heading, Link as VLink, Text } from '@vue-email/components'
 
 import StyledEmail from '@/emails/shared/StyledEmail.vue'
 </script>
@@ -21,8 +21,8 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 		<Text class="text-base">Hi {user.name},</Text>
 
 		<Text class="text-base">
-			Thank you for reporting content on Modrinth. We've received your report and our moderation
-			team will review it shortly.
+			Thank you for reporting content on Modrinth. We've received your report, {newreport.id}, and
+			our moderation team will review it shortly.
 		</Text>
 
 		<Text class="text-base">
@@ -39,10 +39,9 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 				class="text-green underline"
 				>view it in your dashboard</VLink
 			>
-			or
-			<VLink href="https://support.modrinth.com" class="text-green underline"
-				>contact our support team</VLink
-			>.
+			or contact our support team through the
+			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink>
+			or by replying to this email.
 		</Text>
 
 		<Text class="text-base">

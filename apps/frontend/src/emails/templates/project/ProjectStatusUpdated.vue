@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Button, Heading, Img, Link as VLink, Section, Text } from '@vue-email/components'
+
 import StyledEmail from '@/emails/shared/StyledEmail.vue'
-import { Heading, Img, Section, Text, Link as VLink } from '@vue-email/components'
 </script>
 
 <template>
@@ -45,11 +46,19 @@ import { Heading, Img, Section, Text, Link as VLink } from '@vue-email/component
 			</Text>
 		</Section>
 
+		<Button
+			href="https://modrinth.com/project/{project.id}"
+			target="_blank"
+			class="text-accentContrast inline-block rounded-[12px] bg-brand pb-3 pl-4 pr-4 pt-3 text-[14px] font-bold"
+		>
+			View project
+		</Button>
+
 		<Text class="text-base">
 			If you believe this status was applied in error, you can reply in the moderation thread or
-			<VLink href="https://support.modrinth.com" class="text-green underline"
-				>contact our support team</VLink
-			>.
+			contact support through our
+			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink>
+			or by replying to this email.
 		</Text>
 
 		<Text class="text-base">Thank you for publishing on Modrinth!</Text>
