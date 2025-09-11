@@ -488,6 +488,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "ariadne-extract"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "proc-macro2",
+ "serde",
+ "serde_json",
+ "syn 2.0.106",
+ "thiserror 2.0.12",
+ "walkdir",
+]
+
+[[package]]
 name = "arrayvec"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"

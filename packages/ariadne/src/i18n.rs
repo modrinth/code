@@ -22,9 +22,10 @@ pub enum TranslationData {
     },
 }
 
+// The extractor in ariadne_extract::extractor needs to be kept up-to-date with this macro definition
 #[macro_export]
 macro_rules! i18n_enum {
-    (transparent $for_enum:ty[$field:ident: $field_type:ty]) => {
+    (transparent $for_enum:ident[$field:ident: $field_type:ty]) => {
         impl $crate::i18n::I18nEnum for $for_enum {
             const ROOT_TRANSLATION_ID: &'static str = <$field_type as $crate::i18n::I18nEnum>::ROOT_TRANSLATION_ID;
 
@@ -43,29 +44,7 @@ macro_rules! i18n_enum {
     };
 
     (
-        $for_enum:ty,
-        root_key: $root_key:literal,
-        _ => $key:literal,
-    ) => {
-        impl $crate::i18n::I18nEnum for $for_enum {
-            const ROOT_TRANSLATION_ID: &'static str = $root_key;
-
-            fn translation_id(&self) -> &'static str {
-                $key
-            }
-
-            fn full_translation_id(&self) -> &'static str {
-                ::core::concat!($root_key, ".", $key)
-            }
-
-            fn translation_data(&self) -> $crate::i18n::TranslationData {
-                $crate::__i18n_enum_variant_values!($root_key, $key, !)
-            }
-        }
-    };
-
-    (
-        $for_enum:ty,
+        $for_enum:ident,
         root_key: $root_key:literal,
         $($variant_name:ident$variant_pat:tt => $key:literal,)*
     ) => {
@@ -185,20 +164,42 @@ macro_rules! __i18n_enum_variant_values {
 pub mod test {
     use super::*;
     use serde_json::json;
+    use thiserror::Error;
 
+    #[derive(Debug, Error)]
+    #[error("Unit Translatable")]
     struct UnitTranslatable;
 
-    i18n_enum!(
-        UnitTranslatable,
-        root_key: "unit_translatable",
-        _ => "unit",
-    );
+    impl I18nEnum for UnitTranslatable {
+        const ROOT_TRANSLATION_ID: &'static str = "unit_translatable";
 
+        fn translation_id(&self) -> &'static str {
+            "unit"
+        }
+
+        fn full_translation_id(&self) -> &'static str {
+            "unit_translatable.unit"
+        }
+
+        fn translation_data(&self) -> TranslationData {
+            TranslationData::Translatable {
+                key: self.full_translation_id(),
+                values: HashMap::new(),
+            }
+        }
+    }
+
+    #[derive(Debug, Error)]
     enum TestEnum {
+        #[error("Unit")]
         Unit,
+        #[error("Tuple: {0}")]
         Tuple(&'static str),
+        #[error("Translatable Tuple: {0}")]
         TranslatableTuple(UnitTranslatable),
+        #[error("Named: {subfield}")]
         Named { subfield: &'static str },
+        #[error(transparent)]
         DirectUnit(UnitTranslatable),
     }
 

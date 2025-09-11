@@ -11,7 +11,7 @@
       <sourceFolder url="file://$MODULE_DIR$/apps/labrinth/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/packages/app-lib/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/packages/ariadne/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/packages/ariadne-macros/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/apps/ariadne-extract/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

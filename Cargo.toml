@@ -3,6 +3,7 @@ resolver = "2"
 members = [
 	"apps/app",
 	"apps/app-playground",
+	"apps/ariadne-extract",
 	"apps/daedalus_client",
 	"apps/labrinth",
 	"packages/app-lib",
@@ -40,7 +41,7 @@ bytes = "1.10.1"
 censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.41"
-clap = "4.5.43"
+clap = { version = "4.5.43", features = ["derive"] }
 clickhouse = "0.13.3"
 color-thief = "0.2.2"
 console-subscriber = "0.4.1"
@@ -102,7 +103,6 @@ proc-macro2 = "1.0.101"
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
 quick-xml = "0.38.1"
-quote = "1.0.40"
 rand = "=0.8.5" # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1" # Locked on 0.3 until we can update rand to 0.9
 redis = "0.32.4"
@@ -126,7 +126,7 @@ sentry = { version = "0.42.0", default-features = false, features = [
 	"rustls",
 ] }
 sentry-actix = "0.42.0"
-serde = "1.0.219"
+serde = { version = "1.0.219", features = ["derive"] }
 serde_bytes = "0.11.17"
 serde_cbor = "0.11.2"
 serde_ini = "0.2.0"
@@ -171,6 +171,7 @@ url = "2.5.4"
 urlencoding = "2.1.3"
 uuid = "1.17.0"
 validator = "0.20.0"
+walkdir = "2.5.0"
 webp = { version = "0.3.0", default-features = false }
 whoami = "1.6.0"
 winreg = "0.55.0"

@@ -1,0 +1,18 @@
+[package]
+name = "ariadne-extract"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+clap.workspace = true
+thiserror.workspace = true
+
+serde_json.workspace = true
+serde.workspace = true
+
+syn = { workspace = true, features = ["visit"] }
+proc-macro2 = { workspace = true, features = ["span-locations"] }
+walkdir.workspace = true
+
+[lints]
+workspace = true
