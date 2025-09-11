@@ -31,14 +31,14 @@ use sqlx::{PgPool, Postgres, Transaction};
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 use stripe::{
-    CreateCustomer, CreatePaymentIntent, CreateRefund, CreateSetupIntent,
+    CreateCustomer, CreateRefund, CreateSetupIntent,
     CreateSetupIntentAutomaticPaymentMethods,
     CreateSetupIntentAutomaticPaymentMethodsAllowRedirects, Currency,
     CustomerId, CustomerInvoiceSettings, CustomerPaymentMethodRetrieval,
-    EventObject, EventType, PaymentIntentId, PaymentIntentOffSession,
-    PaymentMethodId, SetupIntent, UpdateCustomer, Webhook,
+    EventObject, EventType, PaymentIntentId, PaymentMethodId, SetupIntent,
+    UpdateCustomer, Webhook,
 };
-use tracing::{info, warn};
+use tracing::{error, info, warn};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -2645,6 +2645,7 @@ pub async fn try_process_user_redeemal(
 
 pub async fn index_billing(
     stripe_client: stripe::Client,
+    anrok_client: anrok::Client,
     pool: PgPool,
     redis: RedisPool,
 ) {
@@ -2699,100 +2700,76 @@ pub async fn index_billing(
                 continue;
             };
 
-            let price = match &product_price.prices {
-                Price::OneTime { price } => Some(price),
-                Price::Recurring { intervals } => {
-                    if let Some(ref interval) = charge.subscription_interval {
-                        intervals.get(interval)
+            let Ok(currency) =
+                Currency::from_str(&product_price.currency_code.to_lowercase())
+            else {
+                warn!(
+                    "Could not find currency for {}",
+                    product_price.currency_code
+                );
+                continue;
+            };
+
+            let user = user.clone().into();
+
+            let result = payments::create_or_update_payment_intent(
+                &pool,
+                &redis,
+                &stripe_client,
+                &anrok_client,
+                payments::PaymentBootstrapOptions {
+                    user: &user,
+                    existing_payment_intent: None,
+                    payment_session: payments::PaymentSession::AutomatedRenewal,
+                    attached_charge: payments::AttachedCharge::UseExisting {
+                        charge: charge.clone(),
+                    },
+                    currency_mode: payments::CurrencyMode::UseSpecified(
+                        currency,
+                    ),
+                    attach_payment_metadata: None,
+                    change_region: None,
+                },
+            )
+            .await;
+
+            charge.status = ChargeStatus::Processing;
+            charge.last_attempt = Some(Utc::now());
+
+            let mut failure = false;
+
+            match result {
+                Ok(payments::PaymentBootstrapResults {
+                    new_payment_intent,
+                    payment_method: _,
+                    price_id: _,
+                    subtotal,
+                    tax,
+                }) => {
+                    if new_payment_intent.is_some() {
+                        // The PI will automatically be confirmed
+                        charge.amount = subtotal;
+                        charge.tax_amount = tax;
+                        charge.payment_platform = PaymentPlatform::Stripe;
                     } else {
-                        warn!(
-                            "Could not find subscription for charge {:?}",
-                            charge.id
-                        );
-                        continue;
+                        error!("Payment bootstrap succeeded but no payment intent was created");
+                        failure = true;
                     }
+                }
+
+                Err(error) => {
+                    error!(%error, "Failed to bootstrap payment for renewal");
+                    failure = true;
                 }
             };
 
-            if let Some(price) = price {
-                let customer_id = get_or_create_customer(
-                    user.id.into(),
-                    user.stripe_customer_id.as_deref(),
-                    user.email.as_deref(),
-                    &stripe_client,
-                    &pool,
-                    &redis,
-                )
-                .await?;
-
-                let customer = stripe::Customer::retrieve(
-                    &stripe_client,
-                    &customer_id,
-                    &[],
-                )
-                .await?;
-
-                let Ok(currency) = Currency::from_str(
-                    &product_price.currency_code.to_lowercase(),
-                ) else {
-                    warn!(
-                        "Could not find currency for {}",
-                        product_price.currency_code
-                    );
-                    continue;
-                };
-
-                let mut intent =
-                    CreatePaymentIntent::new(*price as i64, currency);
-
-                let mut metadata = HashMap::new();
-                metadata.insert(
-                    "modrinth_user_id".to_string(),
-                    to_base62(charge.user_id.0 as u64),
-                );
-                metadata.insert(
-                    "modrinth_charge_id".to_string(),
-                    to_base62(charge.id.0 as u64),
-                );
-                metadata.insert(
-                    "modrinth_charge_type".to_string(),
-                    charge.type_.as_str().to_string(),
-                );
-
-                intent.metadata = Some(metadata);
-                intent.customer = Some(customer.id);
-
-                if let Some(payment_method) = customer
-                    .invoice_settings
-                    .and_then(|x| x.default_payment_method.map(|x| x.id()))
-                {
-                    intent.payment_method = Some(payment_method);
-                    intent.confirm = Some(true);
-                    intent.off_session =
-                        Some(PaymentIntentOffSession::Exists(true));
-
-                    charge.status = ChargeStatus::Processing;
-
-                    if let Err(e) =
-                        stripe::PaymentIntent::create(&stripe_client, intent)
-                            .await
-                    {
-                        tracing::error!(
-                            "Failed to create payment intent: {:?}",
-                            e
-                        );
-                        charge.status = ChargeStatus::Failed;
-                        charge.last_attempt = Some(Utc::now());
-                    }
-                } else {
-                    charge.status = ChargeStatus::Failed;
-                    charge.last_attempt = Some(Utc::now());
-                }
-
-                let mut transaction = pool.begin().await?;
-                charge.upsert(&mut transaction).await?;
-                transaction.commit().await?;
+            if failure {
+                charge.status = ChargeStatus::Failed;
             }
+
+            let mut transaction = pool.begin().await?;
+            charge.upsert(&mut transaction).await?;
+            transaction.commit().await?;
         }
 
         Ok::<(), ApiError>(())

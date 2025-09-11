@@ -16,6 +16,7 @@ use util::cors::default_cors;
 
 use crate::background_task::update_versions;
 use crate::queue::moderation::AutomatedModerationQueue;
+use crate::util::anrok;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
@@ -56,6 +57,7 @@ pub struct LabrinthConfig {
     pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
     pub rate_limiter: web::Data<AsyncRateLimiter>,
     pub stripe_client: stripe::Client,
+    pub anrok_client: anrok::Client,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -67,6 +69,7 @@ pub fn app_setup(
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     maxmind: Arc<queue::maxmind::MaxMindIndexer>,
     stripe_client: stripe::Client,
+    anrok_client: anrok::Client,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!(
@@ -154,10 +157,12 @@ pub fn app_setup(
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
         let stripe_client_ref = stripe_client.clone();
+        let anrok_client_ref = anrok_client.clone();
         actix_rt::spawn(async move {
             loop {
                 routes::internal::billing::index_billing(
                     stripe_client_ref.clone(),
+                    anrok_client_ref.clone(),
                     pool_ref.clone(),
                     redis_ref.clone(),
                 )
@@ -279,6 +284,7 @@ pub fn app_setup(
         automated_moderation_queue,
         rate_limiter: limiter,
         stripe_client,
+        anrok_client,
     }
 }
 
@@ -311,6 +317,7 @@ pub fn app_config(
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
+    .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
     .configure({
         #[cfg(target_os = "linux")]

@@ -41,7 +41,6 @@ pub const MODRINTH_PAYMENT_METADATA: &str = "modrinth_payment_metadata";
 // TODO: CHECKLIST
 // - Check callsites of create_or_update_payment_intent if they handle the charge properly (update it when needed etc)
 // - Preinsert products_tax_identifiers rows
-// - Use create_or_update_payment_intent in index_billing
 // - Use create_or_update_payment_intent in refunds
 
 pub enum AttachedCharge {
@@ -112,15 +111,17 @@ pub enum PaymentSession {
 }
 
 impl PaymentSession {
-    pub fn set_payment_intent_off_session_options(
+    pub fn set_payment_intent_session_options(
         &self,
         intent: &mut CreatePaymentIntent,
     ) {
         if matches!(self, PaymentSession::AutomatedRenewal) {
-            intent.off_session = Some(PaymentIntentOffSession::Exists(true));
-            intent.confirm = Some(true);
+            intent.off_session = Some(PaymentIntentOffSession::Exists(true)); // Mark as the customer isn't able to perform manual verification/isn't on-session
+            intent.confirm = Some(true); // Immediately confirm the PI
         } else {
             intent.off_session = None;
+            intent.setup_future_usage =
+                Some(PaymentIntentSetupFutureUsage::OffSession);
         }
     }
 }
@@ -454,25 +455,14 @@ pub async fn create_or_update_payment_intent(
     }
 
     if let Some(payment_intent_id) = existing_payment_intent {
-        let mut update_payment_intent = stripe::UpdatePaymentIntent {
+        let update_payment_intent = stripe::UpdatePaymentIntent {
             amount: Some(charge_data.amount + tax_amount),
             currency: Some(inferred_stripe_currency),
             customer: Some(customer_id),
             metadata: Some(metadata),
+            payment_method: Some(payment_method.id.clone()),
             ..Default::default()
         };
-
-        if let PaymentSession::Interactive {
-            payment_request_type: PaymentRequestType::PaymentMethod { id },
-        } = &payment_session
-        {
-            update_payment_intent.payment_method =
-                Some(PaymentMethodId::from_str(id).map_err(|_| {
-                    ApiError::InvalidInput(
-                        "Invalid payment method id".to_string(),
-                    )
-                })?);
-        }
 
         stripe::PaymentIntent::update(
             stripe_client,
@@ -497,20 +487,9 @@ pub async fn create_or_update_payment_intent(
         intent.customer = Some(customer_id);
         intent.metadata = Some(metadata);
         intent.receipt_email = user.email.as_deref();
-        intent.setup_future_usage =
-            Some(PaymentIntentSetupFutureUsage::OffSession);
+        intent.payment_method = Some(payment_method.id.clone());
 
-        if let PaymentSession::Interactive {
-            payment_request_type: PaymentRequestType::PaymentMethod { id },
-        } = &payment_session
-        {
-            intent.payment_method =
-                Some(PaymentMethodId::from_str(id).map_err(|_| {
-                    ApiError::InvalidInput(
-                        "Invalid payment method id".to_string(),
-                    )
-                })?);
-        }
+        payment_session.set_payment_intent_session_options(&mut intent);
 
         let payment_intent =
             stripe::PaymentIntent::create(stripe_client, intent).await?;
