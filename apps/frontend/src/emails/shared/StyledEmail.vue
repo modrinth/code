@@ -177,9 +177,9 @@ defineProps<{
 
 									<Text class="mb-0 mt-2 text-xs" :style="{ color: '#4d4d4d' }"> Rinth, Inc. </Text>
 									<Section class="m-0 pb-0 pl-0 pr-0 pt-0">
-										<Text class="m-0 text-xs text-secondary">410 N Scottsdale Road</Text>
-										<Text class="m-0 text-xs text-secondary">Suite 1000</Text>
-										<Text class="m-0 text-xs text-secondary">Tempe, AZ 85281</Text>
+										<Text class="m-0 text-xs text-secondary">800 N King St</Text>
+										<Text class="m-0 text-xs text-secondary">Suite 304 #3133</Text>
+										<Text class="m-0 text-xs text-secondary">Wilmington, DE 19801</Text>
 									</Section>
 								</Column>
 							</Row>
