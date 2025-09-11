@@ -1,10 +1,12 @@
 use crate::error::Result;
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
+use std::fmt::Display;
 use std::fs;
 use std::path::Path;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
 use syn::visit::Visit;
 use syn::{
     Attribute, File, Ident, ItemEnum, ItemMod, LitStr, Macro, Meta, Token,
@@ -66,8 +68,10 @@ impl Extractor {
         let file_contents = fs::read_to_string(file.path())?;
         let mut file_extractor = FileExtractor {
             extractor: self,
-            path: file.path(),
-            source: &file_contents,
+            file: FileInfo {
+                path: file.path(),
+                source: &file_contents,
+            },
             enum_messages: HashMap::new(),
         };
         let parsed = match syn::parse_file(&file_contents) {
@@ -125,22 +129,30 @@ impl Extractor {
             .iter()
             .all(|x| include_from_attr(x, self.include_tests))
     }
+
+    fn add_error(&mut self, file: &FileInfo, error: syn::Error) {
+        self.errors.push(syn_miette::Error::new_named(
+            error,
+            file.source,
+            file.path.display(),
+        ));
+    }
 }
 
 struct FileExtractor<'a> {
     extractor: &'a mut Extractor,
+    file: FileInfo<'a>,
+    enum_messages: HashMap<Ident, HashMap<Ident, LitStr>>,
+}
+
+struct FileInfo<'a> {
     path: &'a Path,
     source: &'a str,
-    enum_messages: HashMap<Ident, HashMap<Ident, LitStr>>,
 }
 
 impl FileExtractor<'_> {
     fn add_error(&mut self, error: syn::Error) {
-        self.extractor.errors.push(syn_miette::Error::new_named(
-            error,
-            self.source,
-            self.path.display(),
-        ));
+        self.extractor.add_error(&self.file, error);
     }
 }
 
@@ -154,14 +166,34 @@ impl Visit<'_> for FileExtractor<'_> {
     fn visit_item_enum(&mut self, i: &ItemEnum) {
         let mut variants = HashMap::new();
         for variant in &i.variants {
-            let error_message = variant.attrs.iter().find_map(|x| {
-                if !x.path().is_ident("error") {
-                    return None;
+            let Some(error_attr) =
+                variant.attrs.iter().find(|x| x.path().is_ident("error"))
+            else {
+                continue;
+            };
+            let error_message = error_attr
+                .parse_args_with(|input: ParseStream| {
+                    if input.peek(kw::transparent) {
+                        input.parse::<kw::transparent>()?;
+                        Ok(None)
+                    } else {
+                        Ok(Some(input.parse::<LitStr>()?))
+                    }
+                })
+                .transpose();
+            match error_message {
+                Some(Ok(message)) => {
+                    variants.insert(variant.ident.clone(), message);
                 }
-                x.parse_args().ok()
-            });
-            if let Some(error_message) = error_message {
-                variants.insert(variant.ident.clone(), error_message);
+                Some(Err(err)) => {
+                    let mut true_error = syn::Error::new(
+                        error_attr.meta.span(),
+                        "only #[error(transparent)] and #[error(\"lone format string\")] syntaxes are supported",
+                    );
+                    true_error.combine(err);
+                    self.add_error(true_error);
+                }
+                None => {}
             }
         }
         if !variants.is_empty() {
@@ -193,21 +225,33 @@ impl Visit<'_> for FileExtractor<'_> {
                 root_key,
                 variants,
             } => {
-                let messages = self.enum_messages.get(&for_enum);
+                let Some(messages) = self.enum_messages.get(&for_enum) else {
+                    return;
+                };
                 let root_key = root_key.value();
                 for variant in variants {
                     if variant.transparent.is_some() {
                         continue;
                     }
+                    let message_literal = messages.get(&variant.variant_name);
+                    let (message, errors) = message_literal
+                        .map(LitStr::value)
+                        .map(|x| variant.transform_format_string(x))
+                        .map(|(x, errors)| (TranslationEntry::new(x), errors))
+                        .unwrap_or_default();
                     self.extractor.output.insert(
                         format!("{}.{}", root_key, variant.key.value()),
-                        messages
-                            .and_then(|x| x.get(&variant.variant_name))
-                            .map(LitStr::value)
-                            .map(|x| variant.transform_format_string(x))
-                            .map(TranslationEntry::new)
-                            .unwrap_or_default(),
+                        message,
                     );
+                    for error in errors {
+                        self.extractor.add_error(
+                            &self.file,
+                            syn::Error::new(
+                                message_literal.unwrap().span(),
+                                error,
+                            ),
+                        );
+                    }
                 }
             }
         }
@@ -315,15 +359,19 @@ impl Parse for I18nEnumVariant {
 }
 
 impl I18nEnumVariant {
-    fn transform_format_string(&self, format_string: String) -> String {
-        if !format_string.contains('{') || self.fields.is_empty() {
-            return format_string;
+    fn transform_format_string(
+        &self,
+        format_string: String,
+    ) -> (String, Vec<impl Display>) {
+        let mut errors = vec![];
+        if !format_string.contains(['\'', '{', '}']) {
+            return (format_string, errors);
         }
 
-        let name_transforms = if matches!(self.fields_type, FieldsType::Tuple) {
+        let known_names = if matches!(self.fields_type, FieldsType::Named) {
             self.fields.iter().map(Ident::to_string).collect()
         } else {
-            vec![]
+            HashSet::new()
         };
 
         let mut result = String::new();
@@ -331,8 +379,7 @@ impl I18nEnumVariant {
         let mut prev_push_index = 0;
         let mut format_start = None;
         let mut extra_format_layers = 0usize;
-        let mut format_index = 0;
-        let mut iter = format_string.bytes().enumerate();
+        let mut iter = format_string.bytes().enumerate().peekable();
         while let Some((index, char)) = iter.next() {
             if char == b'\'' {
                 result.push_str(&format_string[prev_push_index..index + 1]);
@@ -345,7 +392,8 @@ impl I18nEnumVariant {
                     continue;
                 }
                 result.push_str(&format_string[prev_push_index..index]);
-                if matches!(iter.next(), Some((_, b'{'))) {
+                if matches!(iter.peek(), Some((_, b'{'))) {
+                    iter.next();
                     result.push_str("'{'");
                     prev_push_index = index + 2;
                 } else {
@@ -362,25 +410,61 @@ impl I18nEnumVariant {
                 }
                 if let Some(prev_start) = format_start {
                     let format_variable = &format_string[prev_start..index];
-                    let format_variable = name_transforms
-                        .get(format_index)
-                        .map_or(format_variable, String::as_str);
+                    let format_variable = match format_variable.split_once(':')
+                    {
+                        Some((real_variable, _)) => {
+                            errors.push("format specifiers not allowed".into());
+                            real_variable
+                        }
+                        None => format_variable,
+                    };
+                    let format_variable = match self.fields_type {
+                        FieldsType::Unit => {
+                            errors.push(
+                                "formatting not supported for unit variants"
+                                    .into(),
+                            );
+                            format_variable
+                        }
+                        FieldsType::Tuple => match format_variable
+                            .parse()
+                            .map(|x| self.fields.get(x))
+                        {
+                            Ok(Some(field)) => &field.to_string(),
+                            Ok(None) => {
+                                errors.push(format!("index format variable {{{format_variable}}} out of bounds"));
+                                format_variable
+                            }
+                            Err(_) => {
+                                errors.push(format!("invalid index format variable {{{format_variable}}} (must be usize)"));
+                                format_variable
+                            }
+                        },
+                        FieldsType::Named => {
+                            if !known_names.contains(format_variable) {
+                                errors.push(format!("unknown format variable {{{format_variable}}}"))
+                            }
+                            format_variable
+                        }
+                    };
                     result.push_str(format_variable);
-                    format_index += 1;
                     format_start = None;
                     prev_push_index = index;
                     continue;
-                } else if matches!(iter.next(), Some((_, b'}'))) {
+                } else if matches!(iter.peek(), Some((_, b'}'))) {
+                    iter.next();
                     result.push_str(&format_string[prev_push_index..index]);
                     result.push_str("'}'");
                     prev_push_index = index + 2;
                     continue;
+                } else {
+                    errors.push("unmatched } in format string".into());
                 }
             }
         }
         result.push_str(&format_string[prev_push_index..]);
 
-        result
+        (result, errors)
     }
 }
 

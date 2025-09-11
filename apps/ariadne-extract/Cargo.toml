@@ -11,9 +11,8 @@ serde_json.workspace = true
 serde.workspace = true
 
 syn = { workspace = true, features = ["visit"] }
-proc-macro2 = { workspace = true, features = ["span-locations"] }
 syn-miette.workspace = true
-miette.workspace = true
+miette = { workspace = true, features = ["syntect-highlighter"] }
 walkdir.workspace = true
 
 [lints]

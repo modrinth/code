@@ -26,13 +26,16 @@ struct Args {
 }
 
 fn main() {
-    if let Err(err) = run(Args::parse()) {
-        eprintln!("Failed to run extractor:\n{err}");
-        exit(1);
+    match run(Args::parse()) {
+        Ok(exit_code) => exit(exit_code),
+        Err(err) => {
+            eprintln!("Failed to run extractor:\n{err}");
+            exit(1);
+        }
     }
 }
 
-fn run(args: Args) -> Result<()> {
+fn run(args: Args) -> Result<i32> {
     let mut extractor = Extractor::new(args.include_tests);
     for package in args.packages {
         extractor.process_package(&package)?;
@@ -45,7 +48,6 @@ fn run(args: Args) -> Result<()> {
                 .unwrap();
             eprintln!("{}", error.render());
         }
-        exit(extractor.errors().len().try_into().unwrap_or(i32::MAX));
     }
 
     if let Some(parent) = args.out_file.parent() {
@@ -53,5 +55,6 @@ fn run(args: Args) -> Result<()> {
     }
     let writer = File::create(args.out_file)?;
     serde_json::to_writer_pretty(writer, &extractor.output())?;
-    Ok(())
+
+    Ok(extractor.errors().len().try_into().unwrap_or(i32::MAX))
 }
