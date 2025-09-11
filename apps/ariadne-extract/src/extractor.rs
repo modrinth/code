@@ -49,7 +49,7 @@ impl Extractor {
 
 impl Extractor {
     pub fn process_package(&mut self, package_path: &Path) -> Result<()> {
-        for file in WalkDir::new(package_path).min_depth(1) {
+        for file in WalkDir::new(package_path.join("src")).min_depth(1) {
             let result = self.process_file(file);
             result?;
         }
