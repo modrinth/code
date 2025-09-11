@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Column, Heading, Img, Link as VLink, Row, Section, Text } from '@vue-email/components'
+import { Column, Heading, Img, Row, Section, Text, Link as VLink } from '@vue-email/components'
 
 import StyledEmail from '@/emails/shared/StyledEmail.vue'
 </script>
@@ -22,17 +22,27 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 				<Column class="w-full">
 					<Row class="mb-2 mt-0">
 						<Column class="w-8">
-							<Img width="20" height="20" alt="Time icon" src="TODO: add icon" />
+							<Img
+								width="20"
+								height="20"
+								alt="Time icon"
+								src="https://cdn-raw.modrinth.com/email/earth.png"
+							/>
 						</Column>
 						<Column>
-							<Text class="m-0 text-sm font-semibold text-secondary">Location</Text>
+							<Text class="m-0 text-sm font-semibold text-secondary">Approximate location</Text>
 							<Text class="m-0 text-base">{newdevice.location}</Text>
 						</Column>
 					</Row>
 
 					<Row class="mb-2">
 						<Column class="w-8">
-							<Img width="20" height="20" alt="Time icon" src="TODO: ICON" />
+							<Img
+								width="20"
+								height="20"
+								alt="Time icon"
+								src="https://cdn-raw.modrinth.com/email/monitor-smartphone.png"
+							/>
 						</Column>
 						<Column>
 							<Text class="m-0 text-sm font-semibold text-secondary">IP Address</Text>
@@ -42,7 +52,12 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 					<Row>
 						<Column class="w-8">
-							<Img width="20" height="20" alt="Time icon" src="TODO: ICON" />
+							<Img
+								width="20"
+								height="20"
+								alt="Time icon"
+								src="https://cdn-raw.modrinth.com/email/clock.png"
+							/>
 						</Column>
 						<Column>
 							<Text class="m-0 text-sm font-semibold text-secondary">Time</Text>
