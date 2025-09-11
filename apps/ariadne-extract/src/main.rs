@@ -4,6 +4,7 @@ mod extractor;
 use crate::extractor::Extractor;
 use clap::Parser;
 use error::Result;
+use miette::GraphicalReportHandler;
 use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
@@ -38,7 +39,11 @@ fn run(args: Args) -> Result<()> {
     }
     if !extractor.errors().is_empty() {
         for error in extractor.errors() {
-            eprintln!("{}", error.pretty_print());
+            let mut error_message = String::new();
+            GraphicalReportHandler::new()
+                .render_report(&mut error_message, error)
+                .unwrap();
+            eprintln!("{}", error.render());
         }
         exit(extractor.errors().len().try_into().unwrap_or(i32::MAX));
     }

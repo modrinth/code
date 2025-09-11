@@ -1,9 +1,8 @@
 use crate::error::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
-use std::fmt::Write;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::visit::Visit;
@@ -24,46 +23,10 @@ impl TranslationEntry {
     }
 }
 
-pub struct ParseError {
-    pub error: syn::Error,
-    pub file_path: PathBuf,
-    pub line: String,
-}
-
-impl ParseError {
-    pub fn pretty_print(&self) -> String {
-        let mut result = String::new();
-        let span = self.error.span();
-        let span_start = span.start();
-        let span_end = span.end();
-        let _ = writeln!(
-            result,
-            "Error at {}:{}:{} through {}:{}",
-            self.file_path.display(),
-            span_start.line,
-            span_start.column + 1,
-            span_end.line,
-            span_end.column + 1,
-        );
-        let _ = writeln!(result, "  {}", self.error);
-        let _ = writeln!(result, "    {}", self.line);
-        result.push_str(&" ".repeat(span_start.column + 4));
-        result.push('^');
-        if span_end.line == span_start.line {
-            result.push_str(&"~".repeat(span_end.column - span_start.column));
-        } else {
-            result
-                .push_str(&"~".repeat(self.line.len() - span_start.column - 1));
-            result.push('v');
-        }
-        result
-    }
-}
-
 pub struct Extractor {
     include_tests: bool,
     output: BTreeMap<String, TranslationEntry>,
-    errors: Vec<ParseError>,
+    errors: Vec<syn_miette::Error>,
 }
 
 impl Extractor {
@@ -79,7 +42,7 @@ impl Extractor {
         &self.output
     }
 
-    pub fn errors(&self) -> &Vec<ParseError> {
+    pub fn errors(&self) -> &Vec<syn_miette::Error> {
         &self.errors
     }
 }
@@ -103,8 +66,8 @@ impl Extractor {
         let file_contents = fs::read_to_string(file.path())?;
         let mut file_extractor = FileExtractor {
             extractor: self,
-            path: file.path().to_path_buf(),
-            lines: file_contents.lines().map(str::to_string).collect(),
+            path: file.path(),
+            source: &file_contents,
             enum_messages: HashMap::new(),
         };
         let parsed = match syn::parse_file(&file_contents) {
@@ -166,20 +129,18 @@ impl Extractor {
 
 struct FileExtractor<'a> {
     extractor: &'a mut Extractor,
-    path: PathBuf,
-    lines: Vec<String>,
+    path: &'a Path,
+    source: &'a str,
     enum_messages: HashMap<Ident, HashMap<Ident, LitStr>>,
 }
 
 impl FileExtractor<'_> {
     fn add_error(&mut self, error: syn::Error) {
-        for error in error {
-            self.extractor.errors.push(ParseError {
-                file_path: self.path.clone(),
-                line: self.lines[error.span().start().line - 1].clone(),
-                error,
-            });
-        }
+        self.extractor.errors.push(syn_miette::Error::new_named(
+            error,
+            self.source,
+            self.path.display(),
+        ));
     }
 }
 

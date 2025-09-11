@@ -91,6 +91,7 @@ lettre = { version = "0.11.18", default-features = false, features = [
 ] }
 maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.29.1", default-features = false }
+miette = "7.6.0"
 murmur2 = "0.1.0"
 native-dialog = "0.9.0"
 notify = { version = "8.2.0", default-features = false }
@@ -139,6 +140,7 @@ sha2 = "0.10.9"
 spdx = "0.10.9"
 sqlx = { version = "0.8.6", default-features = false }
 syn = { version = "2.0.106", features = ["full"] }
+syn-miette = "0.3.0"
 sysinfo = { version = "0.36.1", default-features = false }
 tar = "0.4.44"
 tauri = "2.7.0"
