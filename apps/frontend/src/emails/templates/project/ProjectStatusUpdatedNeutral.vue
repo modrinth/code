@@ -35,8 +35,7 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 		<Section class="bg-bg-super mb-4 mt-4 rounded-lg border border-divider pb-4 pl-4 pr-4 pt-4">
 			<Text class="m-0 text-base">
-				If your project status is <b>approved</b>, it should now appear publicly in search and
-				listings. If it is <b>withheld</b> or <b>rejected</b>, please
+				If it is <b>withheld</b> or <b>rejected</b>, please
 				<VLink
 					href="https://modrinth.com/project/{project.id}/moderation"
 					class="text-green underline"

@@ -23,7 +23,9 @@ export default {
 		import('./templates/moderation/ModerationThreadMessageReceived.vue'),
 
 	// Project
-	'project-status-updated': () => import('./templates/project/ProjectStatusUpdated.vue'),
+	'project-status-updated-neutral': () =>
+		import('./templates/project/ProjectStatusUpdatedNeutral.vue'),
+	'project-status-approved': () => import('./templates/project/ProjectStatusApproved.vue'),
 	'project-invited': () => import('./templates/project/ProjectInvited.vue'),
 	'project-transferred': () => import('./templates/project/ProjectTransferred.vue'),
 

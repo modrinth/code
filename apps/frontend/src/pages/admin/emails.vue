@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import emails from '@/emails'
 import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, Card } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
+
+import emails from '@/emails'
 
 const allTemplates = Object.keys(emails).sort()
 const query = ref('')

@@ -18,6 +18,50 @@ defineProps<{
 	title?: string
 	manualLinks?: { link: string; label?: string }[]
 }>()
+
+interface SocialLink {
+	href: string
+	alt: string
+	src: string
+}
+
+const socialLinks = Object.freeze<readonly SocialLink[]>([
+	{
+		href: 'https://discord.modrinth.com',
+		alt: 'Discord',
+		src: 'https://cdn-raw.modrinth.com/email/discord.png',
+	},
+	{
+		href: 'https://bsky.app/profile/modrinth.com',
+		alt: 'Bluesky',
+		src: 'https://cdn-raw.modrinth.com/email/bluesky.png',
+	},
+	{
+		href: 'https://floss.social/@modrinth',
+		alt: 'Mastodon',
+		src: 'https://cdn-raw.modrinth.com/email/mastodon.png',
+	},
+	{
+		href: 'https://x.com/modrinth',
+		alt: 'X (Twitter)',
+		src: 'https://cdn-raw.modrinth.com/email/x.png',
+	},
+	{
+		href: 'https://www.instagram.com/modrinth/',
+		alt: 'Instagram',
+		src: 'https://cdn-raw.modrinth.com/email/instagram.png',
+	},
+	{
+		href: 'https://www.youtube.com/@modrinth',
+		alt: 'YouTube',
+		src: 'https://cdn-raw.modrinth.com/email/youtube.png',
+	},
+	{
+		href: 'https://github.com/modrinth',
+		alt: 'GitHub',
+		src: 'https://cdn-raw.modrinth.com/email/github.png',
+	},
+])
 </script>
 
 <template>
@@ -125,7 +169,7 @@ defineProps<{
 									<VLink href="https://modrinth.com" aria-label="Modrinth">
 										<Img
 											src="https://cdn.modrinth.com/email/bd3357dfae4b1d266250372db3a0988f.png"
-											width="102"
+											width="175"
 											alt="modrinth logo"
 											class="block h-auto"
 										/>
@@ -133,46 +177,14 @@ defineProps<{
 
 									<Row class="text-right align-middle">
 										<Section class="m-0 inline-block pb-0 pl-0 pr-0 pt-0">
-											<VLink href="https://discord.modrinth.com" class="mr-4 inline-block">
-												<Img
-													width="20"
-													height="20"
-													alt="Discord"
-													src="https://cdn.modrinth.com/email/e089a3a07be91c2940beff1fb191b247.png"
-												/>
-											</VLink>
-											<VLink href="https://twitter.com/modrinth" class="mr-4 inline-block">
-												<Img
-													width="20"
-													height="20"
-													alt="Twitter/X"
-													src="https://cdn.modrinth.com/email/363985aad91cab53854276e12f267b0b.png"
-												/>
-											</VLink>
-											<VLink href="https://floss.social/@modrinth" class="mr-4 inline-block">
-												<Img
-													width="20"
-													height="20"
-													alt="Mastodon"
-													src="https://cdn.modrinth.com/email/e25c30d5707744f31dcf18651a67d3d5.png"
-												/>
-											</VLink>
-											<VLink href="https://github.com/modrinth/" class="mr-4 inline-block">
-												<Img
-													width="20"
-													height="20"
-													alt="GitHub"
-													src="https://cdn.modrinth.com/email/45993023966d64e6138fd65a530a5d03.png"
-												/>
-											</VLink>
-											<VLink href="https://www.youtube.com/@modrinth" class="inline-block">
-												<Img
-													width="20"
-													height="20"
-													alt="YouTube"
-													src="https://cdn.modrinth.com/email/a15afae9fc94e105caeb1bb4d33a0a13.png"
-												/>
-											</VLink>
+											<template v-for="(item, index) in socialLinks" :key="item.href">
+												<VLink
+													:href="item.href"
+													:class="['inline-block', index !== socialLinks.length - 1 ? 'mr-4' : '']"
+												>
+													<Img width="20" height="20" :alt="item.alt" :src="item.src" />
+												</VLink>
+											</template>
 										</Section>
 									</Row>
 
@@ -187,17 +199,15 @@ defineProps<{
 						</Container>
 					</Section>
 
-					<Text
+					<!-- <Text
 						class="text-footerText text-2xs mb-4 mt-0 pb-0 pl-4 pr-4 pt-0 text-center font-sans"
 					>
 						This email was sent to you as a registered user of Modrinth. You can customize the
 						emails you recieve in your
-						<VLink
-							href="https://modrinth.com/user/settings/notifications"
-							class="text-green underline"
+						<VLink href="https://modrinth.com/settings/notifications" class="text-green underline"
 							>notification settings</VLink
 						>. Some emails are required to keep your account secure and cannot be disabled.
-					</Text>
+					</Text> -->
 
 					<hr />
 
@@ -216,10 +226,10 @@ defineProps<{
 								</span>
 								{{ item.link }}
 							</span>
-							<span class="block break-words">
+							<!-- <span class="block break-words">
 								<span> <b>Notification settings:</b><br /> </span>
-								https://modrinth.com/user/settings/notifications
-							</span>
+								https://modrinth.com/settings/notifications
+							</span> -->
 						</Text>
 					</Section>
 				</Section>
