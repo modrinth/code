@@ -4394,6 +4394,7 @@ dependencies = [
  "console-subscriber",
  "dashmap",
  "deadpool-redis",
+ "derive_more 2.0.1",
  "dotenv-build",
  "dotenvy",
  "either",

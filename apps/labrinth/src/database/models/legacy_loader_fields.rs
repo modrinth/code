@@ -12,7 +12,7 @@ use serde_json::json;
 use crate::database::redis::RedisPool;
 
 use super::{
-    DatabaseError, LoaderFieldEnumValueId,
+    DatabaseError, LoaderFieldEnumValueId, SchemaError,
     loader_fields::{
         LoaderFieldEnum, LoaderFieldEnumValue, VersionField, VersionFieldValue,
     },
@@ -49,11 +49,7 @@ impl MinecraftGameVersion {
         let game_version_enum =
             LoaderFieldEnum::get(Self::FIELD_NAME, &mut *exec, redis)
                 .await?
-                .ok_or_else(|| {
-                    DatabaseError::SchemaError(
-                        "Could not find game version enum.".to_string(),
-                    )
-                })?;
+                .ok_or(SchemaError::MissingGameVersionEnum)?;
         let game_version_enum_values =
             LoaderFieldEnumValue::list(game_version_enum.id, &mut *exec, redis)
                 .await?;
@@ -81,16 +77,16 @@ impl MinecraftGameVersion {
     // Tries to create a MinecraftGameVersion from a VersionField
     // Clones on success
     pub fn try_from_version_field(
-        version_field: &VersionField,
+        version_field: VersionField,
     ) -> Result<Vec<Self>, DatabaseError> {
         if version_field.field_name != Self::FIELD_NAME {
-            return Err(DatabaseError::SchemaError(format!(
-                "Field name {} is not {}",
+            return Err(SchemaError::FieldNameMismatch(
                 version_field.field_name,
-                Self::FIELD_NAME
-            )));
+                Self::FIELD_NAME,
+            )
+            .into());
         }
-        let game_versions = match version_field.clone() {
+        let game_versions = match version_field {
             VersionField {
                 value: VersionFieldValue::ArrayEnum(_, values),
                 ..
@@ -102,9 +98,10 @@ impl MinecraftGameVersion {
                 vec![Self::from_enum_value(value)]
             }
             _ => {
-                return Err(DatabaseError::SchemaError(format!(
-                    "Game version requires field value to be an enum: {version_field:?}"
-                )));
+                return Err(SchemaError::GameVersionFieldNotEnum(
+                    version_field,
+                )
+                .into());
             }
         };
         Ok(game_versions)
@@ -185,9 +182,7 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
         let game_versions_enum =
             LoaderFieldEnum::get("game_versions", exec, redis)
                 .await?
-                .ok_or(DatabaseError::SchemaError(
-                    "Missing loaders field: 'game_versions'".to_string(),
-                ))?;
+                .ok_or(SchemaError::MissingGameVersionEnum)?;
 
         // Get enum id for game versions
         let metadata = json!({
@@ -205,7 +200,7 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
                 ON CONFLICT (enum_id, value) DO UPDATE
                     SET metadata = jsonb_set(
                         COALESCE(loader_field_enum_values.metadata, $4),
-                        '{type}', 
+                        '{type}',
                         COALESCE($4->'type', loader_field_enum_values.metadata->'type')
                     ),
                     created = COALESCE($3, loader_field_enum_values.created)

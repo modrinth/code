@@ -8,7 +8,7 @@ use ariadne::i18n_enum;
 use ariadne::ids::DecodingError;
 
 #[derive(thiserror::Error, Debug)]
-#[error("{}", .error_type)]
+#[error("{error_type}")]
 pub struct OAuthError {
     #[source]
     pub error_type: Box<OAuthErrorType>,
@@ -117,7 +117,6 @@ impl actix_web::ResponseError for OAuthError {
     }
 }
 
-// TODO: Reference in an ApiError variant
 #[derive(thiserror::Error, Debug)]
 pub enum OAuthErrorType {
     #[error(transparent)]

@@ -74,6 +74,7 @@ spdx = { workspace = true, features = ["text"] }
 dotenvy.workspace = true
 thiserror.workspace = true
 either.workspace = true
+derive_more.workspace = true
 
 sqlx = { workspace = true, features = [
 	"runtime-tokio",

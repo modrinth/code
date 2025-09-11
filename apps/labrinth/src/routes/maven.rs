@@ -215,7 +215,7 @@ async fn find_version(
             if !game_versions.is_empty() {
                 let version_game_versions =
                     x.version_fields.clone().into_iter().find_map(|v| {
-                        MinecraftGameVersion::try_from_version_field(&v).ok()
+                        MinecraftGameVersion::try_from_version_field(v).ok()
                     });
                 if let Some(version_game_versions) = version_game_versions {
                     bool &= version_game_versions

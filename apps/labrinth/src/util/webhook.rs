@@ -113,7 +113,7 @@ async fn get_webhook_metadata(
             .clone()
             .into_iter()
             .find_map(|vf| {
-                MinecraftGameVersion::try_from_version_field(&vf).ok()
+                MinecraftGameVersion::try_from_version_field(vf).ok()
             })
             .unwrap_or_default();
 

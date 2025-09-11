@@ -194,7 +194,7 @@ pub async fn validate_file(
 ) -> Result<ValidationResult, ValidationError> {
     let game_versions = version_fields
         .into_iter()
-        .find_map(|v| MinecraftGameVersion::try_from_version_field(&v).ok())
+        .find_map(|v| MinecraftGameVersion::try_from_version_field(v).ok())
         .unwrap_or_default();
     let all_game_versions =
         MinecraftGameVersion::list(None, None, &mut *transaction, redis)
