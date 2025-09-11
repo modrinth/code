@@ -30,7 +30,8 @@ const DEFAULT_USER_COUNTRY: &str = "US";
 
 pub const MODRINTH_SUBSCRIPTION_ID: &str = "modrinth_subscription_id";
 pub const MODRINTH_PRICE_ID: &str = "modrinth_price_id";
-pub const MODRINTH_INTERVAL: &str = "modrinth_interval";
+pub const MODRINTH_SUBSCRIPTION_INTERVAL: &str =
+    "modrinth_subscription_interval";
 pub const MODRINTH_CHARGE_TYPE: &str = "modrinth_charge_type";
 pub const MODRINTH_NEW_REGION: &str = "modrinth_new_region";
 pub const MODRINTH_USER_ID: &str = "modrinth_user_id";
@@ -41,13 +42,13 @@ pub const MODRINTH_PAYMENT_METADATA: &str = "modrinth_payment_metadata";
 // TODO: CHECKLIST
 // - Check callsites of create_or_update_payment_intent if they handle the charge properly (update it when needed etc)
 // - Preinsert products_tax_identifiers rows
-// - Use create_or_update_payment_intent in refunds
 
 pub enum AttachedCharge {
     /// Create a proration charge.
     Proration {
         next_product_id: ProductId,
         next_interval: PriceDuration,
+        current_subscription: UserSubscriptionId,
         amount: i64,
     },
     /// Base the payment intent amount and tax on the product's price at this interval,
@@ -312,6 +313,7 @@ pub async fn create_or_update_payment_intent(
             amount,
             next_product_id,
             next_interval,
+            current_subscription: _,
         } => {
             // Use the same data as we would use when basing the charge data on
             // a product/interval pair, except override the amount and charge type
@@ -364,7 +366,7 @@ pub async fn create_or_update_payment_intent(
             )
         })?;
 
-    let address =
+    let _address =
         payment_method
             .billing_details
             .address
@@ -378,15 +380,10 @@ pub async fn create_or_update_payment_intent(
 
     let ephemeral_invoice = anrok_client
         .create_ephemeral_txn(&anrok::TransactionFields {
-            customer_address: anrok::Address {
-                line1: address.line1,
-                city: address.city,
-                region: address.state,
-                postal_code: address.postal_code,
-                country: address.country,
-            },
+            customer_address: anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&address),
             currency_code: charge_data.currency_code.clone(),
-            accounting_date: chrono::Utc::now(),
+            accounting_time: chrono::Utc::now(),
+            accounting_time_zone: anrok::AccountingTimeZone::Utc,
             line_items: vec![anrok::LineItem::new(
                 product_info.tax_identifier.tax_processor_id,
                 charge_data.amount,
@@ -403,6 +400,7 @@ pub async fn create_or_update_payment_intent(
         MODRINTH_CHARGE_TYPE.to_owned(),
         charge_data.charge_type.as_str().to_owned(),
     );
+    metadata.insert(MODRINTH_TAX_AMOUNT.to_owned(), tax_amount.to_string());
 
     if let Some(change_region) = change_region {
         metadata.insert(MODRINTH_NEW_REGION.to_owned(), change_region);
@@ -424,8 +422,36 @@ pub async fn create_or_update_payment_intent(
         // These are only used to post-create the charge in the stripe webhook, so
         // unset them.
         metadata.insert(MODRINTH_PRICE_ID.to_owned(), String::new());
-        metadata.insert(MODRINTH_INTERVAL.to_owned(), String::new());
+        metadata
+            .insert(MODRINTH_SUBSCRIPTION_INTERVAL.to_owned(), String::new());
         metadata.insert(MODRINTH_SUBSCRIPTION_ID.to_owned(), String::new());
+    } else if let AttachedCharge::Proration {
+        amount: _,
+        next_product_id: _,
+        next_interval,
+        current_subscription,
+    } = attached_charge
+    {
+        let mut transaction = pg.begin().await?;
+        let charge_id = generate_charge_id(&mut transaction).await?;
+
+        metadata.insert(
+            MODRINTH_CHARGE_ID.to_owned(),
+            to_base62(charge_id.0 as u64),
+        );
+
+        metadata.insert(
+            MODRINTH_PRICE_ID.to_owned(),
+            charge_data.price_id.to_string(),
+        );
+        metadata.insert(
+            MODRINTH_SUBSCRIPTION_INTERVAL.to_owned(),
+            next_interval.as_str().to_owned(),
+        );
+        metadata.insert(
+            MODRINTH_SUBSCRIPTION_ID.to_owned(),
+            current_subscription.to_string(),
+        );
     } else {
         let mut transaction = pg.begin().await?;
         let charge_id = generate_charge_id(&mut transaction).await?;
@@ -443,12 +469,12 @@ pub async fn create_or_update_payment_intent(
 
         metadata.insert(
             MODRINTH_PRICE_ID.to_owned(),
-            to_base62(charge_data.price_id.0 as u64),
+            charge_data.price_id.to_string(),
         );
 
         if let Some(interval) = charge_data.interval {
             metadata.insert(
-                MODRINTH_INTERVAL.to_owned(),
+                MODRINTH_SUBSCRIPTION_INTERVAL.to_owned(),
                 interval.as_str().to_owned(),
             );
         }

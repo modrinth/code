@@ -250,7 +250,7 @@ pub async fn refund_charge(
                         )
                         .await?;
 
-                        let Some(billing_address) = pi
+                        let Some(_billing_address) = pi
                             .payment_method
                             .and_then(|x| x.into_object())
                             .and_then(|x| x.billing_details.address)
@@ -293,15 +293,10 @@ pub async fn refund_charge(
                             &anrok::Transaction {
                                 id: anrok::transaction_id_stripe_pyr(&refund.id),
                                 fields: anrok::TransactionFields {
-                                    customer_address: anrok::Address {
-                                        country: billing_address.country,
-                                        line1: billing_address.line1,
-                                        city: billing_address.city,
-                                        region: billing_address.state,
-                                        postal_code: billing_address.postal_code,
-                                    },
+                                    customer_address: anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&billing_address),
                                     currency_code: charge.currency_code.clone(),
-                                    accounting_date: Utc::now(),
+                                    accounting_time: Utc::now(),
+                                    accounting_time_zone: anrok::AccountingTimeZone::Utc,
                                     line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, refund_amount)],
                                 }
                             }
@@ -798,6 +793,7 @@ pub async fn edit_subscription(
                                         amount: proration as i64,
                                         next_product_id: new_product_price.product_id.into(),
                                         next_interval,
+                                        current_subscription: subscription.id.into(),
                                     },
                                 currency_mode:
                                     payments::CurrencyMode::UseSpecified(currency),
@@ -1464,10 +1460,57 @@ pub async fn stripe_webhook(
             pub next_tax_amount: i64,
         }
 
+        struct CommittedAnrokTxnId {
+            pub anrok_id: Option<String>,
+            pub version: Option<i32>,
+            anrok_client: anrok::Client,
+        }
+
+        impl CommittedAnrokTxnId {
+            pub fn new(anrok_client: anrok::Client) -> Self {
+                Self {
+                    anrok_id: None,
+                    version: None,
+                    anrok_client,
+                }
+            }
+
+            pub fn set(&mut self, anrok_id: String, version: Option<i32>) {
+                self.anrok_id = Some(anrok_id);
+                self.version = version;
+            }
+
+            pub fn confirm(mut self) {
+                self.anrok_id = None;
+            }
+        }
+
+        // Because Anrok doesn't have proper transactional capabilities (and we rely on
+        // other APIs which don't have proper transactional capabilities either, like
+        // Archon) this is the best thing we can do to ensure we don't leave orphaned
+        // transactions in Anrok.
+        //
+        // The alternative is to use a queue worker to synchronize Anrok and charges here,
+        // we should do that eventually, alongside doing that for Archon.
+        impl Drop for CommittedAnrokTxnId {
+            fn drop(&mut self) {
+                if let Some((id, version)) =
+                    self.anrok_id.take().zip(self.version.take())
+                {
+                    let client = self.anrok_client.clone();
+                    tokio::spawn(async move {
+                        if let Err(error) = client.void_txn(id, version).await {
+                            error!(%error, "Failed to void Anrok transaction");
+                        }
+                    });
+                }
+            }
+        }
+
         #[allow(clippy::too_many_arguments)]
         async fn get_payment_intent_metadata(
             payment_intent_id: PaymentIntentId,
-            amount: i64,
+            payment_intent_amount: i64,
             currency: String,
             metadata: HashMap<String, String>,
             pool: &PgPool,
@@ -1476,6 +1519,7 @@ pub async fn stripe_webhook(
             transaction: &mut Transaction<'_, Postgres>,
             stripe_client: &stripe::Client,
             anrok_client: &anrok::Client,
+            committed_anrok_txn_id: &mut CommittedAnrokTxnId,
         ) -> Result<PaymentIntentMetadata, ApiError> {
             'metadata: {
                 let pi = stripe::PaymentIntent::retrieve(
@@ -1531,10 +1575,12 @@ pub async fn stripe_webhook(
                     .and_then(|x| x.parse::<i64>().ok())
                     .unwrap_or(0);
 
+                let subtotal_amount = payment_intent_amount - tax_amount;
+
                 async fn generate_anrok_transaction(
                     anrok_client: &anrok::Client,
                     payment_intent_id: &PaymentIntentId,
-                    customer_address: stripe::Address,
+                    _customer_address: stripe::Address,
                     currency: String,
                     line_item: anrok::LineItem,
                 ) -> Result<(String, anrok::InvoiceResponse), ApiError>
@@ -1545,15 +1591,12 @@ pub async fn stripe_webhook(
                         .create_or_update_txn(&anrok::Transaction {
                             id: id.clone(),
                             fields: anrok::TransactionFields {
-                                customer_address: anrok::Address {
-                                    line1: customer_address.line1,
-                                    city: customer_address.city,
-                                    region: customer_address.state,
-                                    postal_code: customer_address.postal_code,
-                                    country: customer_address.country,
-                                },
+                                customer_address:
+                                    anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&customer_address),
                                 currency_code: currency,
-                                accounting_date: Utc::now(),
+                                accounting_time: Utc::now(),
+                                accounting_time_zone:
+                                    anrok::AccountingTimeZone::Utc,
                                 line_items: vec![line_item],
                             },
                         })
@@ -1615,6 +1658,7 @@ pub async fn stripe_webhook(
                         anrok_id,
                         anrok::InvoiceResponse {
                             tax_amount_to_collect,
+                            version,
                         },
                     ) = generate_anrok_transaction(
                         anrok_client,
@@ -1623,10 +1667,12 @@ pub async fn stripe_webhook(
                         currency.clone(),
                         anrok::LineItem::new(
                             tax_identifier.tax_processor_id,
-                            amount,
+                            subtotal_amount,
                         ),
                     )
                     .await?;
+
+                    committed_anrok_txn_id.set(anrok_id.clone(), version);
 
                     charge.status = charge_status;
                     charge.last_attempt = Some(Utc::now());
@@ -1726,31 +1772,31 @@ pub async fn stripe_webhook(
 
                             if intervals.get(&interval).is_some() {
                                 let Some(subscription_id) = metadata
-                                        .get("modrinth_subscription_id")
-                                        .and_then(|x| parse_base62(x).ok())
-                                        .map(|x| {
-                                            crate::database::models::ids::DBUserSubscriptionId(x as i64)
-                                        }) else {
-                                        break 'metadata;
-                                    };
+                                    .get("modrinth_subscription_id")
+                                    .and_then(|x| parse_base62(x).ok())
+                                    .map(|x| {
+                                        crate::database::models::ids::DBUserSubscriptionId(x as i64)
+                                    }) else {
+                                    break 'metadata;
+                                };
 
                                 let subscription = if let Some(mut subscription) = user_subscription_item::DBUserSubscription::get(subscription_id, pool).await? {
-                                        subscription.status = SubscriptionStatus::Unprovisioned;
-                                        subscription.price_id = price_id;
-                                        subscription.interval = interval;
+                                    subscription.status = SubscriptionStatus::Unprovisioned;
+                                    subscription.price_id = price_id;
+                                    subscription.interval = interval;
 
-                                        subscription
-                                    } else {
-                                        user_subscription_item::DBUserSubscription {
-                                            id: subscription_id,
-                                            user_id,
-                                            price_id,
-                                            interval,
-                                            created: Utc::now(),
-                                            status: SubscriptionStatus::Unprovisioned,
-                                            metadata: None,
-                                        }
-                                    };
+                                    subscription
+                                } else {
+                                    user_subscription_item::DBUserSubscription {
+                                        id: subscription_id,
+                                        user_id,
+                                        price_id,
+                                        interval,
+                                        created: Utc::now(),
+                                        status: SubscriptionStatus::Unprovisioned,
+                                        metadata: None,
+                                    }
+                                };
 
                                 if charge_status != ChargeStatus::Failed {
                                     subscription.upsert(transaction).await?;
@@ -1777,6 +1823,7 @@ pub async fn stripe_webhook(
                         anrok_id,
                         anrok::InvoiceResponse {
                             tax_amount_to_collect,
+                            version,
                         },
                     ) = generate_anrok_transaction(
                         anrok_client,
@@ -1785,16 +1832,18 @@ pub async fn stripe_webhook(
                         currency.clone(),
                         anrok::LineItem::new(
                             tax_identifier.tax_processor_id,
-                            amount,
+                            subtotal_amount,
                         ),
                     )
                     .await?;
+
+                    committed_anrok_txn_id.set(anrok_id.clone(), version);
 
                     let charge = DBCharge {
                         id: charge_id,
                         user_id,
                         price_id,
-                        amount,
+                        amount: subtotal_amount,
                         currency_code: currency,
                         status: charge_status,
                         due: Utc::now(),
@@ -1852,6 +1901,10 @@ pub async fn stripe_webhook(
                 {
                     let mut transaction = pool.begin().await?;
 
+                    let mut committed_anrok_txn_id = CommittedAnrokTxnId::new(
+                        anrok_client.get_ref().clone(),
+                    );
+
                     let mut metadata = get_payment_intent_metadata(
                         payment_intent.id,
                         payment_intent.amount,
@@ -1863,6 +1916,7 @@ pub async fn stripe_webhook(
                         &mut transaction,
                         &stripe_client,
                         &anrok_client,
+                        &mut committed_anrok_txn_id,
                     )
                     .await?;
 
@@ -2196,12 +2250,17 @@ pub async fn stripe_webhook(
                         &redis,
                     )
                     .await?;
+                    committed_anrok_txn_id.confirm();
                 }
             }
             EventType::PaymentIntentProcessing => {
                 if let EventObject::PaymentIntent(payment_intent) =
                     event.data.object
                 {
+                    let mut committed_anrok_txn_id = CommittedAnrokTxnId::new(
+                        anrok_client.get_ref().clone(),
+                    );
+
                     let mut transaction = pool.begin().await?;
                     get_payment_intent_metadata(
                         payment_intent.id,
@@ -2214,9 +2273,11 @@ pub async fn stripe_webhook(
                         &mut transaction,
                         &stripe_client,
                         &anrok_client,
+                        &mut committed_anrok_txn_id,
                     )
                     .await?;
                     transaction.commit().await?;
+                    committed_anrok_txn_id.confirm();
                 }
             }
             EventType::PaymentIntentPaymentFailed => {
@@ -2224,6 +2285,10 @@ pub async fn stripe_webhook(
                     event.data.object
                 {
                     let mut transaction = pool.begin().await?;
+
+                    let mut committed_anrok_txn_id = CommittedAnrokTxnId::new(
+                        anrok_client.get_ref().clone(),
+                    );
 
                     let metadata = get_payment_intent_metadata(
                         payment_intent.id,
@@ -2236,6 +2301,7 @@ pub async fn stripe_webhook(
                         &mut transaction,
                         &stripe_client,
                         &anrok_client,
+                        &mut committed_anrok_txn_id,
                     )
                     .await?;
 
@@ -2274,6 +2340,7 @@ pub async fn stripe_webhook(
                     }
 
                     transaction.commit().await?;
+                    committed_anrok_txn_id.confirm();
                 }
             }
             EventType::PaymentMethodAttached => {
