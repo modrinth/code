@@ -5,6 +5,7 @@ use crate::queue::payouts::{
     insert_bank_balances_and_webhook, process_payout,
 };
 use crate::search::indexing::index_projects;
+use crate::util::anrok;
 use crate::{database, search};
 use clap::ValueEnum;
 use sqlx::Postgres;
@@ -32,6 +33,7 @@ impl BackgroundTask {
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         email_queue: EmailQueue,
+        anrok_client: anrok::Client,
     ) {
         use BackgroundTask::*;
         match self {
@@ -43,6 +45,7 @@ impl BackgroundTask {
             IndexBilling => {
                 crate::routes::internal::billing::index_billing(
                     stripe_client,
+                    anrok_client,
                     pool.clone(),
                     redis_pool,
                 )
