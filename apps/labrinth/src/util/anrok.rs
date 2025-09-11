@@ -4,6 +4,7 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_with::{DisplayFromStr, serde_as};
 use thiserror::Error;
+use tracing::trace;
 
 pub fn transaction_id_stripe_pi(pi: &stripe::PaymentIntentId) -> String {
     format!("stripe:charge:{pi}")
@@ -17,6 +18,7 @@ pub fn transaction_id_stripe_pyr(charge: &stripe::RefundId) -> String {
 #[serde(rename_all = "camelCase")]
 pub struct InvoiceResponse {
     pub tax_amount_to_collect: i64,
+    pub version: Option<i32>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -32,6 +34,42 @@ pub struct Address {
     pub region: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none", default)]
     pub postal_code: Option<String>,
+}
+
+impl Address {
+    pub fn from_stripe_address(address: &stripe::Address) -> Self {
+        Self {
+            country: address.country.clone(),
+            line1: address.line1.clone(),
+            city: address.city.clone(),
+            region: address.state.clone(),
+            postal_code: address.postal_code.clone(),
+        }
+    }
+
+    #[allow(unused)]
+    #[cfg(debug_assertions)]
+    pub fn default_remitting() -> Self {
+        Self {
+            country: Some("US".to_owned()),
+            line1: Some("1100 Congress Ave.".to_owned()),
+            city: Some("Austin".to_owned()),
+            region: Some("TX".to_owned()),
+            postal_code: Some("78701".to_owned()),
+        }
+    }
+
+    #[allow(unused)]
+    #[cfg(debug_assertions)]
+    pub fn default_exempt() -> Self {
+        Self {
+            country: Some("US".to_owned()),
+            line1: Some("1315 10th St".to_owned()),
+            city: Some("Sacramento".to_owned()),
+            region: Some("CA".to_owned()),
+            postal_code: Some("95814".to_owned()),
+        }
+    }
 }
 
 #[serde_as]
@@ -76,12 +114,20 @@ impl LineItem {
     }
 }
 
+#[derive(Serialize, Deserialize, Default, Clone, Debug, Eq, PartialEq)]
+pub enum AccountingTimeZone {
+    #[default]
+    #[serde(rename = "UTC")]
+    Utc,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionFields {
     pub customer_address: Address,
     pub currency_code: String,
-    pub accounting_date: DateTime<Utc>,
+    pub accounting_time: DateTime<Utc>,
+    pub accounting_time_zone: AccountingTimeZone,
     pub line_items: Vec<LineItem>,
 }
 
@@ -153,12 +199,35 @@ impl Client {
         .await
     }
 
+    pub async fn void_txn(
+        &self,
+        id: String,
+        version: i32,
+    ) -> Result<(), AnrokError> {
+        #[derive(Serialize)]
+        #[serde(rename_all = "camelCase")]
+        struct Body {
+            transaction_expected_version: i32,
+        }
+
+        self.make_request(
+            Method::POST,
+            &format!("/v1/seller/transactions/id:{id}/void"),
+            Some(&Body {
+                transaction_expected_version: version,
+            }),
+        )
+        .await
+    }
+
     async fn make_request<T: Serialize, R: DeserializeOwned>(
         &self,
         method: Method,
         path: &str,
         body: Option<&T>,
     ) -> Result<R, AnrokError> {
+        let then = std::time::Instant::now();
+
         #[derive(Deserialize)]
         struct ConflictResponse {
             #[serde(rename = "type")]
@@ -167,7 +236,7 @@ impl Client {
 
         let mut builder = self
             .client
-            .request(method, format!("{}/{}", self.api_url, path))
+            .request(method.clone(), format!("{}/{}", self.api_url, path))
             .bearer_auth(&self.api_key);
 
         if let Some(body) = body {
@@ -175,6 +244,14 @@ impl Client {
         }
 
         let response = builder.send().await?;
+
+        trace!(
+            http.status = %response.status().as_u16(),
+            http.method = %method,
+            http.path = %path,
+            duration = format!("{}ms", then.elapsed().as_millis()),
+            "Received Anrok response",
+        );
 
         match response.status() {
             StatusCode::CONFLICT => {

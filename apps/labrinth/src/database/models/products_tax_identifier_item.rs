@@ -43,8 +43,8 @@ pub async fn product_info_by_product_price_id(
           products_tax_identifiers.*,
           products.metadata product_metadata
         FROM products_prices
-        LEFT JOIN products ON products.id = products_prices.product_id
-        LEFT JOIN products_tax_identifiers ON products_tax_identifiers.product_id = products.id
+        INNER JOIN products ON products.id = products_prices.product_id
+        INNER JOIN products_tax_identifiers ON products_tax_identifiers.product_id = products.id
         WHERE products_prices.id = $1
         "#,
         product_price_id.0 as i64,
