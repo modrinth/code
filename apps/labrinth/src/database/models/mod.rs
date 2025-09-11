@@ -79,7 +79,7 @@ pub enum SchemaError {
     #[error("Field name {0} is not {1}")]
     FieldNameMismatch(String, &'static str),
     #[error("Game version requires field value to be an enum: {0}")]
-    GameVersionFieldNotEnum(loader_fields::VersionField),
+    GameVersionFieldNotEnum(Box<loader_fields::VersionField>),
     #[error("Multiple fields for field {0}")]
     MultipleFields(&'static str),
     #[error("No version fields for field {0}")]

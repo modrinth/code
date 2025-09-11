@@ -98,9 +98,9 @@ impl MinecraftGameVersion {
                 vec![Self::from_enum_value(value)]
             }
             _ => {
-                return Err(SchemaError::GameVersionFieldNotEnum(
+                return Err(SchemaError::GameVersionFieldNotEnum(Box::new(
                     version_field,
-                )
+                ))
                 .into());
             }
         };
