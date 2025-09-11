@@ -1115,13 +1115,13 @@ pub async fn insert_bank_balances_and_webhook(
     };
 
     if let Ok(Some(ref paypal)) = paypal_result {
-        add_balance("paypal", &paypal);
+        add_balance("paypal", paypal);
     }
     if let Ok(Some(ref brex)) = brex_result {
-        add_balance("brex", &brex);
+        add_balance("brex", brex);
     }
     if let Ok(Some(ref tremendous)) = tremendous_result {
-        add_balance("tremendous", &tremendous);
+        add_balance("tremendous", tremendous);
     }
 
     let inserted = sqlx::query_scalar!(
