@@ -332,20 +332,20 @@ impl I18nEnumVariant {
         let mut format_start = None;
         let mut extra_format_layers = 0usize;
         let mut format_index = 0;
-        let mut iter = format_string.chars().enumerate();
+        let mut iter = format_string.bytes().enumerate();
         while let Some((index, char)) = iter.next() {
-            if char == '\'' {
+            if char == b'\'' {
                 result.push_str(&format_string[prev_push_index..index + 1]);
                 result.push('\'');
                 prev_push_index = index + 1;
             }
-            if char == '{' {
+            if char == b'{' {
                 if format_start.is_some() {
                     extra_format_layers += 1;
                     continue;
                 }
                 result.push_str(&format_string[prev_push_index..index]);
-                if matches!(iter.next(), Some((_, '{'))) {
+                if matches!(iter.next(), Some((_, b'{'))) {
                     result.push_str("'{'");
                     prev_push_index = index + 2;
                 } else {
@@ -355,7 +355,7 @@ impl I18nEnumVariant {
                 }
                 continue;
             }
-            if char == '}' {
+            if char == b'}' {
                 if extra_format_layers > 0 {
                     extra_format_layers -= 1;
                     continue;
@@ -370,7 +370,7 @@ impl I18nEnumVariant {
                     format_start = None;
                     prev_push_index = index;
                     continue;
-                } else if matches!(iter.next(), Some((_, '}'))) {
+                } else if matches!(iter.next(), Some((_, b'}'))) {
                     result.push_str(&format_string[prev_push_index..index]);
                     result.push_str("'}'");
                     prev_push_index = index + 2;
