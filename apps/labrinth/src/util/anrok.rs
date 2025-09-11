@@ -45,6 +45,7 @@ pub struct LineItem {
     pub quantity: u32,
     #[serde(rename = "amount")]
     pub amount_in_smallest_denominations: i64,
+    pub is_tax_included_in_amount: bool,
 }
 
 impl LineItem {
@@ -57,6 +58,20 @@ impl LineItem {
             product_external_id,
             quantity: 1,
             amount_in_smallest_denominations,
+            is_tax_included_in_amount: false,
+        }
+    }
+
+    pub const fn new_including_tax_amount(
+        product_external_id: String,
+        amount_in_smallest_denominations: i64,
+    ) -> Self {
+        Self {
+            id: None,
+            product_external_id,
+            quantity: 1,
+            amount_in_smallest_denominations,
+            is_tax_included_in_amount: true,
         }
     }
 }

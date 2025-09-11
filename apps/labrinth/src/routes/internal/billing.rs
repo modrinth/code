@@ -1,6 +1,8 @@
 use crate::auth::{get_user_from_headers, send_email};
 use crate::database::models::charge_item::DBCharge;
-use crate::database::models::products_tax_identifier_item::DBProductsTaxIdentifier;
+use crate::database::models::products_tax_identifier_item::{
+    DBProductsTaxIdentifier, product_info_by_product_price_id,
+};
 use crate::database::models::user_item::DBUser;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::users_redeemals::{self, UserRedeemal};
@@ -162,6 +164,7 @@ pub async fn refund_charge(
     info: web::Path<(crate::models::ids::ChargeId,)>,
     body: web::Json<ChargeRefund>,
     stripe_client: web::Data<stripe::Client>,
+    anrok_client: web::Data<anrok::Client>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -188,14 +191,14 @@ pub async fn refund_charge(
             .filter_map(|x| match x.status {
                 ChargeStatus::Open
                 | ChargeStatus::Processing
-                | ChargeStatus::Succeeded => Some(x.amount),
+                | ChargeStatus::Succeeded => Some(x.amount + x.tax_amount),
                 ChargeStatus::Failed
                 | ChargeStatus::Cancelled
                 | ChargeStatus::Expiring => None,
             })
             .sum::<i64>();
 
-        let refundable = charge.amount - refunds;
+        let refundable = charge.amount + charge.tax_amount - refunds;
 
         let refund_amount = match body.0.amount {
             ChargeRefundAmount::Full => refundable,
@@ -216,8 +219,8 @@ pub async fn refund_charge(
             ));
         }
 
-        let (id, net) = if refund_amount == 0 {
-            (None, None)
+        let (id, net, anrok_result) = if refund_amount == 0 {
+            (None, None, None)
         } else {
             match charge.payment_platform {
                 PaymentPlatform::Stripe => {
@@ -237,6 +240,38 @@ pub async fn refund_charge(
                             to_base62(charge.id.0 as u64),
                         );
 
+                        let pi = stripe::PaymentIntent::retrieve(
+                            &stripe_client,
+                            &payment_platform_id,
+                            &["payment_method"],
+                        )
+                        .await?;
+
+                        let Some(billing_address) = pi
+                            .payment_method
+                            .and_then(|x| x.into_object())
+                            .and_then(|x| x.billing_details.address)
+                        else {
+                            return Err(ApiError::InvalidInput(
+                                "Couldn't retrieve billing address for payment method!"
+                                    .to_owned(),
+                            ));
+                        };
+
+                        let tax_id = product_info_by_product_price_id(
+                            charge.price_id,
+                            &**pool,
+                        )
+                        .await?
+                        .ok_or_else(|| {
+                            ApiError::InvalidInput(
+                                "Could not find product tax info for price ID!"
+                                    .to_owned(),
+                            )
+                        })?
+                        .tax_identifier
+                        .tax_processor_id;
+
                         let refund = stripe::Refund::create(
                             &stripe_client,
                             CreateRefund {
@@ -251,12 +286,31 @@ pub async fn refund_charge(
                         )
                         .await?;
 
+                        let anrok_txn_result = anrok_client.create_or_update_txn(
+                            &anrok::Transaction {
+                                id: anrok::transaction_id_stripe_pyr(&refund.id),
+                                fields: anrok::TransactionFields {
+                                    customer_address: anrok::Address {
+                                        country: billing_address.country,
+                                        line1: billing_address.line1,
+                                        city: billing_address.city,
+                                        region: billing_address.state,
+                                        postal_code: billing_address.postal_code,
+                                    },
+                                    currency_code: charge.currency_code.clone(),
+                                    accounting_date: Utc::now(),
+                                    line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, refund_amount)],
+                                }
+                            }
+                        ).await;
+
                         (
-                            Some(refund.id.to_string()),
+                            Some(refund.id),
                             refund
                                 .balance_transaction
                                 .and_then(|x| x.into_object())
                                 .map(|x| x.net),
+                            Some(anrok_txn_result),
                         )
                     } else {
                         return Err(ApiError::InvalidInput(
@@ -282,7 +336,7 @@ pub async fn refund_charge(
             user_id: charge.user_id,
             price_id: charge.price_id,
             amount: -refund_amount,
-            currency_code: charge.currency_code,
+            tax_amount: charge.tax_amount,
             status: ChargeStatus::Succeeded,
             due: Utc::now(),
             last_attempt: None,
@@ -290,15 +344,15 @@ pub async fn refund_charge(
             subscription_id: charge.subscription_id,
             subscription_interval: charge.subscription_interval,
             payment_platform: charge.payment_platform,
-            payment_platform_id: id,
-            tax_amount: charge.tax_amount,
-            tax_platform_id: None,
+            tax_platform_id: id.as_ref().map(anrok::transaction_id_stripe_pyr),
+            payment_platform_id: id.as_ref().map(|x| x.to_string()),
             parent_charge_id: if refund_amount != 0 {
                 Some(charge.id)
             } else {
                 None
             },
             net,
+            currency_code: charge.currency_code,
         }
         .upsert(&mut transaction)
         .await?;
@@ -318,9 +372,16 @@ pub async fn refund_charge(
         }
 
         transaction.commit().await?;
+
+        if let Some(Err(error)) = anrok_result {
+            return Ok(HttpResponse::InternalServerError().json(serde_json::json!({
+                "error": "partial_failure",
+                "description": &format!("This refund was not processed by the tax processing system. It was still processed on Stripe's end. Manual intervention is required to add a tax record for the refund charge. This will not impact the customer. Tax API Error: {error}")
+            })));
+        }
     }
 
-    Ok(HttpResponse::NoContent().body(""))
+    Ok(HttpResponse::NoContent().finish())
 }
 
 #[derive(Deserialize)]
