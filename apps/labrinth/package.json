@@ -11,6 +11,7 @@
 		"//": "runners we must remove useless development tools from the base image, which frees up ~20 GiB.",
 		"//": "The command commented out below can be used in CI to debug what is taking up space:",
 		"//": "sudo du -xh --max-depth=4 / | sort -rh | curl -X POST --data-urlencode content@/dev/fd/0 https://api.mclo.gs/1/log",
+		"intl:extract": "cargo run --package ariadne-extract -- --out-file ../frontend/src/locales/en-US/labrinth.json .",
 		"test": "if-ci sudo rm -rf /usr/local/lib/android /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/share/swift && cargo nextest run --all-targets --no-fail-fast"
 	},
 	"prettier": "@modrinth/tooling-config/labrinth.prettier.config.cjs"

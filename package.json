@@ -8,8 +8,9 @@
 		"web:build": "turbo run build --filter=@modrinth/frontend",
 		"web:fix": "turbo run fix --filter=@modrinth/frontend",
 		"web:intl:extract": "pnpm run --filter=@modrinth/frontend intl:extract",
-		"app:dev": "turbo run dev --filter=@modrinth/app",
+		"labrinth:intl:extract": "pnpm run --filter=@modrinth/labrinth intl:extract",
 		"docs:dev": "turbo run dev --filter=@modrinth/docs",
+		"app:dev": "turbo run dev --filter=@modrinth/app",
 		"app:build": "turbo run build --filter=@modrinth/app",
 		"app:fix": "turbo run fix --filter=@modrinth/app",
 		"app:intl:extract": "pnpm run --filter=@modrinth/app-frontend intl:extract",
@@ -24,7 +25,7 @@
 		"fix": "turbo run fix fix:ancillary --continue",
 		"fix:ancillary": "prettier --write .github *.*",
 		"ci": "turbo run lint test --continue",
-		"intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm app:intl:extract && pnpm moderation:intl:extract"
+		"intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm labrinth:intl:extract && pnpm app:intl:extract && pnpm moderation:intl:extract"
 	},
 	"devDependencies": {
 		"@modrinth/tooling-config": "workspace:*",

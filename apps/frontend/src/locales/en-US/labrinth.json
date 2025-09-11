@@ -1,0 +1,308 @@
+{
+  "labrinth.error.clickhouse_error": {
+    "message": "Clickhouse Error: {cause}"
+  },
+  "labrinth.error.conflict": {
+    "message": "Conflict: {cause}"
+  },
+  "labrinth.error.database.cache": {
+    "message": "Error while interacting with the cache: {cause}"
+  },
+  "labrinth.error.database.cache_serialization": {
+    "message": "Error while serializing with the cache: {cause}"
+  },
+  "labrinth.error.database.cache_timeout": {
+    "message": "Timeout when waiting for cache subscriber"
+  },
+  "labrinth.error.database.random_id": {
+    "message": "Error while trying to generate random ID"
+  },
+  "labrinth.error.database.redis_pool": {
+    "message": "Redis Pool Error: {cause}"
+  },
+  "labrinth.error.database.schema": {
+    "message": "Schema error: {cause}"
+  },
+  "labrinth.error.database.sqlx": {
+    "message": "Error while interacting with the database: {cause}"
+  },
+  "labrinth.error.database_error": {
+    "message": "Database Error: {cause}"
+  },
+  "labrinth.error.decoding_error": {
+    "message": "Error while decoding Base62: {cause}"
+  },
+  "labrinth.error.discord_error": {
+    "message": "Discord Error: {cause}"
+  },
+  "labrinth.error.environment_error": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.file_hosting_error": {
+    "message": "Error while uploading file: {cause}"
+  },
+  "labrinth.error.file_hosting_error.file_system": {
+    "message": "File system error in file hosting: {cause}"
+  },
+  "labrinth.error.file_hosting_error.invalid_filename": {
+    "message": "Invalid Filename"
+  },
+  "labrinth.error.file_hosting_error.s3": {
+    "message": "S3 error when {action}: {cause}"
+  },
+  "labrinth.error.file_validation.blocking": {
+    "message": "Error while managing threads"
+  },
+  "labrinth.error.file_validation.database": {
+    "message": "Error while querying database"
+  },
+  "labrinth.error.file_validation.invalid_input": {
+    "message": "Invalid Input: {cause}"
+  },
+  "labrinth.error.file_validation.io": {
+    "message": "IO Error: {cause}"
+  },
+  "labrinth.error.file_validation.serialization": {
+    "message": "Error while validating JSON for uploaded file: {cause}"
+  },
+  "labrinth.error.file_validation.zip": {
+    "message": "Unable to read Zip Archive: {cause}"
+  },
+  "labrinth.error.indexing.database": {
+    "message": "Database Error: {cause}"
+  },
+  "labrinth.error.indexing.environment": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.indexing.meilisearch": {
+    "message": "Error while connecting to the MeiliSearch database"
+  },
+  "labrinth.error.indexing.serialization": {
+    "message": "Error while serializing or deserializing JSON: {cause}"
+  },
+  "labrinth.error.indexing.sqlx": {
+    "message": "Database Error: {cause}"
+  },
+  "labrinth.error.indexing.task": {
+    "message": "Error while awaiting index creation task"
+  },
+  "labrinth.error.indexing_error": {
+    "message": "Indexing Error: {cause}"
+  },
+  "labrinth.error.invalid_image": {
+    "message": "Image Parsing Error: {cause}"
+  },
+  "labrinth.error.invalid_input": {
+    "message": "Invalid Input: {cause}"
+  },
+  "labrinth.error.invalid_input.validation": {
+    "message": "Error while validating input: {cause}"
+  },
+  "labrinth.error.io_error": {
+    "message": "IO Error: {cause}"
+  },
+  "labrinth.error.json_error": {
+    "message": "Deserialization error: {cause}"
+  },
+  "labrinth.error.mail.address": {
+    "message": "Address Parse Error: {cause}"
+  },
+  "labrinth.error.mail.email": {
+    "message": "Mail Error: {cause}"
+  },
+  "labrinth.error.mail.environment": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.mail.smtp": {
+    "message": "SMTP Error: {cause}"
+  },
+  "labrinth.error.not_found": {
+    "message": "Resource not found"
+  },
+  "labrinth.error.not_found.route": {
+    "message": "The requested route does not exist"
+  },
+  "labrinth.error.oauth.access_denied": {
+    "message": "The resource owner denied the request"
+  },
+  "labrinth.error.oauth.invalid_client.auth_failed": {
+    "message": "Failed to authenticate client"
+  },
+  "labrinth.error.oauth.invalid_client.invalid_id": {
+    "message": "The provided client id was invalid"
+  },
+  "labrinth.error.oauth.invalid_grant.invalid_auth_code": {
+    "message": "The provided authorization grant code was invalid"
+  },
+  "labrinth.error.oauth.invalid_grant.invalid_grant_type": {
+    "message": "The provided grant type ({grant_type}) must be \"authorization_code\""
+  },
+  "labrinth.error.oauth.invalid_request.malformed_id": {
+    "message": "The provided ID could not be decoded: {cause}"
+  },
+  "labrinth.error.oauth.invalid_request.redirect_uri_mismatch": {
+    "message": "The provided redirect URI did not exactly match the uri originally provided when this flow began"
+  },
+  "labrinth.error.oauth.invalid_scope.parse": {
+    "message": "The provided scope was malformed or did not correspond to known scopes ({cause})"
+  },
+  "labrinth.error.oauth.invalid_scope.too_broad": {
+    "message": "The provided scope requested scopes broader than the developer app is configured with"
+  },
+  "labrinth.error.oauth.invalid_uri.none_configured": {
+    "message": "The provided redirect URI did not match any configured in the client"
+  },
+  "labrinth.error.oauth.invalid_uri.none_specified": {
+    "message": "Client {client_id} has no redirect URIs specified"
+  },
+  "labrinth.error.oauth.server_error.invalid_flow_id": {
+    "message": "The provided flow id was invalid"
+  },
+  "labrinth.error.oauth.unauthorized_client": {
+    "message": "The provided client id did not match the id this authorization code was granted to"
+  },
+  "labrinth.error.password_hashing_error": {
+    "message": "Password Hashing Error: {cause}"
+  },
+  "labrinth.error.payments_error": {
+    "message": "Payments Error: {cause}"
+  },
+  "labrinth.error.project_creation.database_error": {
+    "message": "Database Error: {cause}"
+  },
+  "labrinth.error.project_creation.database_error.unknown": {
+    "message": "An unknown database error occurred"
+  },
+  "labrinth.error.project_creation.environment_error": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.project_creation.file_hosting_error": {
+    "message": "Error while uploading file: {cause}"
+  },
+  "labrinth.error.project_creation.indexing_error": {
+    "message": "Indexing Error: {cause}"
+  },
+  "labrinth.error.project_creation.invalid_image": {
+    "message": "Image Parsing Error: {cause}"
+  },
+  "labrinth.error.project_creation.invalid_input": {
+    "message": "Error with multipart data: {cause}"
+  },
+  "labrinth.error.project_creation.invalid_input.category": {
+    "message": "Invalid category: {category}"
+  },
+  "labrinth.error.project_creation.invalid_input.file": {
+    "message": "Error while validating uploaded file: {cause}"
+  },
+  "labrinth.error.project_creation.invalid_input.file_type": {
+    "message": "Invalid file type for version file: {extension}"
+  },
+  "labrinth.error.project_creation.invalid_input.icon": {
+    "message": "Invalid format for image: {cause}"
+  },
+  "labrinth.error.project_creation.invalid_input.loader": {
+    "message": "Invalid loader: {loader}"
+  },
+  "labrinth.error.project_creation.invalid_input.multipart": {
+    "message": "Error while parsing multipart payload: {cause}"
+  },
+  "labrinth.error.project_creation.invalid_input.parsing": {
+    "message": "Error while parsing JSON: {cause}"
+  },
+  "labrinth.error.project_creation.invalid_input.slug_collision": {
+    "message": "Slug is already taken!"
+  },
+  "labrinth.error.project_creation.invalid_input.validation": {
+    "message": "Error while validating input: {cause}"
+  },
+  "labrinth.error.project_creation.unauthorized": {
+    "message": "Authentication Error: {cause}"
+  },
+  "labrinth.error.project_creation.unauthorized.custom": {
+    "message": "Authentication Error: {reason}"
+  },
+  "labrinth.error.ratelimit_error": {
+    "message": "You are being rate-limited. Please wait {wait_ms} milliseconds. 0/{total_allowed_requests} remaining."
+  },
+  "labrinth.error.reroute_error": {
+    "message": "Error while rerouting request: {cause}"
+  },
+  "labrinth.error.search.environment_error": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.search.invalid_input.formatting": {
+    "message": "Error while formatting strings: {cause}"
+  },
+  "labrinth.error.search.invalid_input.index": {
+    "message": "Invalid index to sort by: {index}"
+  },
+  "labrinth.error.search.invalid_input.int_parsing": {
+    "message": "Error while parsing an integer: {cause}"
+  },
+  "labrinth.error.search.invalid_input.serialization": {
+    "message": "Error while serializing or deserializing JSON: {cause}"
+  },
+  "labrinth.error.search.meilisearch_error": {
+    "message": "MeiliSearch Error: {cause}"
+  },
+  "labrinth.error.search_error": {
+    "message": "Search Error: {cause}"
+  },
+  "labrinth.error.stripe_error": {
+    "message": "Error while interacting with payment processor: {cause}"
+  },
+  "labrinth.error.tax_compliance_api_error": {
+    "message": "External tax compliance API Error"
+  },
+  "labrinth.error.turnstile_error": {
+    "message": "Captcha Error. Try resubmitting the form."
+  },
+  "labrinth.error.unauthorized": {
+    "message": "Authentication Error: {cause}"
+  },
+  "labrinth.error.unauthorized.database_error": {
+    "message": "Database Error: {cause}"
+  },
+  "labrinth.error.unauthorized.database_error.unknown": {
+    "message": "An unknown database error occurred: {cause}"
+  },
+  "labrinth.error.unauthorized.decoding_error": {
+    "message": "Error while decoding PAT: {cause}"
+  },
+  "labrinth.error.unauthorized.duplicate_user": {
+    "message": "User email is already registered on Modrinth. Try ''Forgot password'' to access your account."
+  },
+  "labrinth.error.unauthorized.environment_error": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.unauthorized.file_hosting": {
+    "message": "Error uploading user profile picture"
+  },
+  "labrinth.error.unauthorized.invalid_auth_method": {
+    "message": "Authentication method was not valid"
+  },
+  "labrinth.error.unauthorized.invalid_client_id": {
+    "message": "GitHub Token from incorrect Client ID"
+  },
+  "labrinth.error.unauthorized.invalid_credentials": {
+    "message": "Invalid Authentication Credentials"
+  },
+  "labrinth.error.unauthorized.invalid_input": {
+    "message": "Error while parsing JSON: {cause}"
+  },
+  "labrinth.error.unauthorized.network_error": {
+    "message": "Error while communicating to external provider"
+  },
+  "labrinth.error.unauthorized.socket": {
+    "message": "Invalid state sent, you probably need to get a new websocket"
+  },
+  "labrinth.error.unauthorized.url_error": {
+    "message": "Invalid callback URL specified"
+  },
+  "labrinth.error.xml_error": {
+    "message": "Internal server error: {cause}"
+  },
+  "labrinth.error.zip_error": {
+    "message": "Unable to read Zip Archive: {cause}"
+  }
+}
