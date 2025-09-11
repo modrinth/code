@@ -129,7 +129,7 @@ i18n_enum!(
     Decoding(cause) => "decoding_error",
     ImageParse(cause) => "invalid_image",
     PasswordHashing(cause) => "password_hashing_error",
-    Mail(cause) => "mail_error",
+    Mail(transparent cause) => "mail_error",
     Reroute(cause) => "reroute_error",
     Zip(cause) => "zip_error",
     Io(cause) => "io_error",

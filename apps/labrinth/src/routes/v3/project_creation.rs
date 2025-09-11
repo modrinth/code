@@ -100,7 +100,7 @@ i18n_enum!(
     ValidationError(cause) => "invalid_input.validation",
     FileHostingError(cause) => "file_hosting_error",
     FileValidationError(cause) => "invalid_input.file",
-    MissingValueError(cause) => "invalid_input.missing_value",
+    MissingValueError(transparent cause) => "invalid_input.missing_value",
     InvalidIconFormat(cause) => "invalid_input.icon",
     InvalidInput(cause) => "invalid_input",
     InvalidLoader(loader) => "invalid_input.loader",

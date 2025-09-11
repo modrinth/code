@@ -64,7 +64,7 @@ i18n_enum!(
     Reqwest(..) => "network_error",
     FileHosting(..) => "file_hosting",
     Decoding(cause) => "decoding_error",
-    Mail(cause) => "mail_error",
+    Mail(transparent cause) => "mail_error",
     InvalidCredentials! => "invalid_credentials",
     InvalidAuthMethod! => "invalid_auth_method",
     InvalidClientId! => "invalid_client_id",
