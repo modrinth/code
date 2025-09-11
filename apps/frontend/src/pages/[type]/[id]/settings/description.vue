@@ -4,7 +4,7 @@
 			<div class="markdown-disclaimer">
 				<h2>Description</h2>
 				<span class="label__description">
-					You can type an extended description of your mod here.
+					You can type an extended description of your project here.
 					<span class="label__subdescription">
 						The description must clearly and honestly describe the purpose and function of the
 						project. See section 2.1 of the

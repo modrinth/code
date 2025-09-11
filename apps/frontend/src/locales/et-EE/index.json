@@ -1,0 +1,56 @@
+{
+  "collection.label.created-at": {
+    "message": "Loodud {ago}"
+  },
+  "collection.label.updated-at": {
+    "message": "Uuendatud {ago}"
+  },
+  "layout.action.change-theme": {
+    "message": "Muuda teemat"
+  },
+  "layout.footer.about": {
+    "message": "Teave"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Muudatuste logi"
+  },
+  "layout.footer.legal": {
+    "message": "Legaalne"
+  },
+  "layout.footer.resources": {
+    "message": "Ressursid"
+  },
+  "profile.user-id": {
+    "message": "Kasutaja ID: {id}"
+  },
+  "project-type.mod.plural": {
+    "message": "Modid"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modipakid"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modipakk"
+  },
+  "project.about.details.created": {
+    "message": "Loodud {date}"
+  },
+  "project.about.details.updated": {
+    "message": "Uuendatud {date}"
+  },
+  "project.description.title": {
+    "message": "Kirjeldus"
+  },
+  "project.gallery.title": {
+    "message": "Galerii"
+  },
+  "project.moderation.title": {
+    "message": "Haldus"
+  },
+  "project.versions.title": {
+    "message": "Versioonid"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Loodud {ago}"
+  }
+}

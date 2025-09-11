@@ -67,14 +67,16 @@ function setRegion() {
 				{{ title }}
 				<span v-if="outOfStock" class="text-sm text-secondary">(Out of stock)</span>
 			</span>
-			<span class="text-xs flex items-center gap-1 text-secondary font-medium">
+			<span
+				class="text-xs flex items-center flex-wrap justify-center gap-1 text-secondary font-medium"
+			>
 				<template v-if="locationSubtitle">
 					<span>
 						{{ locationSubtitle }}
 					</span>
 					<span v-if="ping !== -1">•</span>
 				</template>
-				<template v-if="ping !== -1">
+				<span v-if="ping !== -1" class="flex gap-1 items-center">
 					<SignalIcon
 						v-if="ping"
 						aria-hidden="true"
@@ -85,7 +87,7 @@ function setRegion() {
 					<SpinnerIcon v-else class="animate-spin" />
 					<template v-if="ping"> {{ ping }}ms </template>
 					<span v-else> Testing connection... </span>
-				</template>
+				</span>
 			</span>
 		</span>
 	</button>

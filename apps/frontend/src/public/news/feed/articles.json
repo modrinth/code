@@ -1,6 +1,20 @@
 {
 	"articles": [
 		{
+			"title": "Modrinth Servers Launches in Asia",
+			"summary": "Our latest Modrinth Servers datacenter is in Singapore.",
+			"thumbnail": "https://modrinth.com/news/article/modrinth-servers-asia/thumbnail.webp",
+			"date": "2025-09-08T21:45:00.000Z",
+			"link": "https://modrinth.com/news/article/modrinth-servers-asia"
+		},
+		{
+			"title": "Creators: Verify Your Environment Metadata",
+			"summary": "We've overhauled the environment metadata on Modrinth, and all creators must verify their settings.",
+			"thumbnail": "https://modrinth.com/news/article/new-environments/thumbnail.webp",
+			"date": "2025-08-28T23:50:00.000Z",
+			"link": "https://modrinth.com/news/article/new-environments"
+		},
+		{
 			"title": "Get a Free Modrinth Server",
 			"summary": "In partnership with Medal.tv, get a 5-day free trial for Modrinth Servers",
 			"thumbnail": "https://modrinth.com/news/article/free-server-medal/thumbnail.webp",

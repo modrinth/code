@@ -2,6 +2,195 @@
   "admin.billing.error.not-found": {
     "message": "User not found"
   },
+  "app-marketing.download.description": {
+    "message": "Our desktop app is available across all platforms, choose your desired version."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Download the AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Download the beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Download the DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Download the RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "The Linux versions of Modrinth App are <issues-link>known to have issues</issues-link> on certain systems and configurations. If Modrinth App is unstable on your system, we encourage you to try other apps like <prism-link>Prism Launcher</prism-link> to easily install Modrinth content."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Download options"
+  },
+  "app-marketing.download.terms": {
+    "message": "By downloading Modrinth App you agree to our <terms-link>Terms</terms-link> and <privacy-link>Privacy Policy</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Third-party packages"
+  },
+  "app-marketing.download.title": {
+    "message": "Download Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Save content you love and receive updates with one click."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Follow projects"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Import all your favorite profiles from the launcher you were using before, and get started with Modrinth App in seconds!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Profile importing"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Actions"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "by {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth makes it easy to manage all your mods in one place. You can install, uninstall, and update mods with a single click."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Installed mods"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Name"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Search mods"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Mod management"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Version"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Play your mods, whether you are connected to the internet, or not."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Offline mode"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth's launcher is fully open source. You can view the source code on our <github-link>GitHub</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Open source"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Activity monitor"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App performs better than many of the leading mod managers, using just 150mb of RAM!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Good performance"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 billion %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Process name"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Small"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Performant"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Use Modrinth App to download and play with your favorite mods and modpacks."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Play with your favorite mods"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Build, share, and play modpacks with any of the thousands of mods and modpacks hosted here on Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpack"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Share"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Share modpacks"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Unlike any launcher"
+  },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App is fully integrated with the website, so you can access all your favorite projects from the app!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Website integration"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "you've used before"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Screenshot of Modrinth App with a Cobblemon instance opened to the 'Content' page."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Download Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Download Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Download Modrinth App for {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Screenshot of the Cobblemon instance's main menu screen."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "More Download Options"
+  },
   "auth.authorize.action.authorize": {
     "message": "Authorize"
   },
@@ -159,7 +348,7 @@
     "message": "Subscribe to updates about Modrinth"
   },
   "auth.welcome.description": {
-    "message": "You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with awazing mods."
+    "message": "You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with amazing mods."
   },
   "auth.welcome.label.tos": {
     "message": "By creating an account, you have agreed to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
@@ -331,6 +520,147 @@
   },
   "frog.title": {
     "message": "Frog"
+  },
+  "landing.button.discover-mods": {
+    "message": "Discover mods"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Go to dashboard"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Get the best modding experience possible with constant updates from the Modrinth team"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "Constantly Evolving"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Get detailed reports on page views, download counts, and revenue"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Data and Statistics"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "Get your project discovered by thousands of users through search, our home page, Discord server, and more ways to come in the future!"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Discovery"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Integrate with your build tools through Minotaur for automatic uploads right when you release a new version"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Diverse Ecosystem"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Get paid ad revenue from your project pages and withdraw your funds at any time"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Monetization"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Invite your teammates and manage roles and permissions with ease"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Team Management"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Failed to load random projects :("
+  },
+  "landing.feature.follow.description": {
+    "message": "Get notified every time your favorite projects update and stay in the loop"
+  },
+  "landing.feature.follow.heading": {
+    "message": "Follow projects you love"
+  },
+  "landing.feature.launcher.description": {
+    "message": "Modrinth's open-source API lets launchers add deep integration with Modrinth. You can use Modrinth through <link>our own app</link> and some of the most popular launchers like ATLauncher, MultiMC, and Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Play with your favorite launcher"
+  },
+  "landing.feature.search.description": {
+    "message": "Modrinth's lightning-fast search and powerful filters let you find what you want as you type."
+  },
+  "landing.feature.search.heading": {
+    "message": "Find what you want, quickly and easily"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "The place for Minecraft {content}"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "data packs"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "modpacks"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "mods"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "plugins"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "resource packs"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "servers"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "shaders"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "A simplified representation of a Minecraft window, with the Mojang Studios logo in Modrinth green."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} has been updated!"
+  },
+  "landing.notifications.heading": {
+    "message": "Notifications"
+  },
+  "landing.notifications.received-time": {
+    "message": "Received {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "Version {version} has been released for {gameVersion}"
+  },
+  "landing.search.label": {
+    "message": "Search"
+  },
+  "landing.search.placeholder": {
+    "message": "Search..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Sort by"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Give an online home to your creations and reach a massive audience of dedicated players"
+  },
+  "landing.section.for-creators.label": {
+    "message": "For Creators"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Share your content with the world"
+  },
+  "landing.section.for-players.description": {
+    "message": "From magical biomes to cursed dungeons, you can be sure to find content to bring your gameplay to the next level."
+  },
+  "landing.section.for-players.label": {
+    "message": "For Players"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Discover over {count} creations"
+  },
+  "landing.subheading": {
+    "message": "Discover, play, and share Minecraft content through our open-source platform built for the community."
   },
   "layout.action.change-theme": {
     "message": "Change theme"
@@ -557,9 +887,6 @@
   "project-member-header.accept": {
     "message": "Accept"
   },
-  "project-member-header.action": {
-    "message": "Action"
-  },
   "project-member-header.decline": {
     "message": "Decline"
   },
@@ -581,33 +908,6 @@
   "project-member-header.invitation-with-role": {
     "message": "You've been invited be a member of this project with the role of '{role}'."
   },
-  "project-member-header.key-title": {
-    "message": "Status Key"
-  },
-  "project-member-header.publishing-checklist": {
-    "message": "Publishing checklist"
-  },
-  "project-member-header.required": {
-    "message": "Required"
-  },
-  "project-member-header.resubmit-for-review": {
-    "message": "Resubmit for review"
-  },
-  "project-member-header.resubmit-for-review-desc": {
-    "message": "Your project has been {status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message."
-  },
-  "project-member-header.show-key": {
-    "message": "Toggle key"
-  },
-  "project-member-header.submit-checklist-tooltip": {
-    "message": "You must complete the required steps in the publishing checklist!"
-  },
-  "project-member-header.submit-for-review": {
-    "message": "Submit for review"
-  },
-  "project-member-header.submit-for-review-desc": {
-    "message": "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published."
-  },
   "project-member-header.success": {
     "message": "Success"
   },
@@ -617,13 +917,34 @@
   "project-member-header.success-join": {
     "message": "You have joined the project team"
   },
-  "project-member-header.suggestion": {
+  "project-moderation-nags.publishing-checklist": {
+    "message": "Publishing checklist"
+  },
+  "project-moderation-nags.required": {
+    "message": "Required"
+  },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "Resubmit for review"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Your project has been {status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message."
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "You must complete the required steps in the publishing checklist!"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "Submit for review"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published."
+  },
+  "project-moderation-nags.suggestion": {
     "message": "Suggestion"
   },
-  "project-member-header.visit-moderation-page": {
+  "project-moderation-nags.visit-moderation-page": {
     "message": "Visit moderation page"
   },
-  "project-member-header.warning": {
+  "project-moderation-nags.warning": {
     "message": "Warning"
   },
   "project-type.collection.plural": {
@@ -692,20 +1013,239 @@
   "project.about.details.updated": {
     "message": "Updated {date}"
   },
+  "project.actions.create-server": {
+    "message": "Create a server"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "Create a server"
+  },
+  "project.actions.dont-show-again": {
+    "message": "Don't show again"
+  },
+  "project.actions.review-project": {
+    "message": "Review project"
+  },
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Servers is the easiest way to play with your friends without hassle!"
+  },
+  "project.actions.servers-promo.monthly": {
+    "message": " / month"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "Starting at $5{monthly}"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "Create a server"
+  },
+  "project.collections.create-new": {
+    "message": "Create new collection"
+  },
+  "project.collections.none-found": {
+    "message": "No collections found."
+  },
   "project.description.title": {
     "message": "Description"
+  },
+  "project.details.licensed": {
+    "message": "Licensed"
+  },
+  "project.download.game-version": {
+    "message": "Game version: {version}"
+  },
+  "project.download.game-version-error": {
+    "message": "Error: no game versions found"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{title} is only available for {version}"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{title} does not support {gameVersion} for {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Install with Modrinth App"
+  },
+  "project.download.no-app": {
+    "message": "Don't have Modrinth App?"
+  },
+  "project.download.no-versions-available": {
+    "message": "No versions available for {gameVersion} and {platform}."
+  },
+  "project.download.platform": {
+    "message": "Platform: {platform}"
+  },
+  "project.download.platform-error": {
+    "message": "Error: no platforms found"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title} is only available for {platform}"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{title} does not support {platform} for {gameVersion}"
+  },
+  "project.download.search-game-versions": {
+    "message": "Search game versions..."
+  },
+  "project.download.search-game-versions-label": {
+    "message": "Search game versions..."
+  },
+  "project.download.select-game-version": {
+    "message": "Select game version"
+  },
+  "project.download.select-platform": {
+    "message": "Select platform"
+  },
+  "project.download.show-all-versions": {
+    "message": "Show all versions"
+  },
+  "project.download.title": {
+    "message": "Download {title}"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Environment metadata needs to be reviewed"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "Learn more about this change"
+  },
+  "project.environment.migration.message": {
+    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please visit your project's settings and verify that the metadata is correct."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Review environment settings"
+  },
+  "project.environment.migration.title": {
+    "message": "Please review environment metadata"
+  },
+  "project.error.loading": {
+    "message": "Error loading project data{message}"
+  },
+  "project.error.page-not-found": {
+    "message": "The page could not be found"
+  },
+  "project.error.project-not-found": {
+    "message": "Project not found"
   },
   "project.gallery.title": {
     "message": "Gallery"
   },
+  "project.license.error": {
+    "message": "License text could not be retrieved."
+  },
+  "project.license.loading": {
+    "message": "Loading license text..."
+  },
+  "project.license.title": {
+    "message": "License"
+  },
   "project.moderation.title": {
     "message": "Moderation"
+  },
+  "project.navigation.changelog": {
+    "message": "Changelog"
+  },
+  "project.notification.icon-updated.message": {
+    "message": "Your project's icon has been updated."
+  },
+  "project.notification.icon-updated.title": {
+    "message": "Project icon updated"
+  },
+  "project.notification.updated.message": {
+    "message": "Your project has been updated."
+  },
+  "project.notification.updated.title": {
+    "message": "Project updated"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Your project is missing environment metadata, please select the appropriate option below."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Please select an environment for your project"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "message": "Different versions of your project have different environments selected, so you can't edit them globally at this time."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "Your project has multiple environments"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "message": "Please review the options below"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "message": "Only mod or modpack projects can have environment metadata."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "message": "This project type does not support environment metadata"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "message": "Verify"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "message": "Verify that this project's environment is set correctly."
+  },
+  "project.settings.general.name.description": {
+    "message": "Avoid prefixes, suffixes, parentheticals, or added descriptions—just the project's actual name."
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "e.g. Nether Overhaul 2"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "e.g. Construction Equipment"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "e.g. Better than Caving"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "e.g. Enhanced Portals"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "e.g. Dangerous Mobs"
+  },
+  "project.settings.general.name.title": {
+    "message": "Name"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "Summarize your project in no more than one sentence."
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "e.g. Overhauls game progression to revolve around the Nether."
+  },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "e.g. Adds wearable construction gear."
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "e.g. Adds realistic mineshaft-building mechanics."
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "e.g. Improves how Nether portals link to each other."
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "e.g. Adds powerful boss versions of the normal mobs to encounter in the night."
+  },
+  "project.settings.general.tagline.title": {
+    "message": "Tagline"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.title": {
+    "message": "Settings"
+  },
+  "project.settings.visit-dashboard": {
+    "message": "Visit projects dashboard"
   },
   "project.stats.downloads-label": {
     "message": "download{count, plural, one {} other {s}}"
   },
   "project.stats.followers-label": {
     "message": "follower{count, plural, one {} other {s}}"
+  },
+  "project.status.archived.message": {
+    "message": "{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project."
   },
   "project.version.all-versions": {
     "message": "All versions"
@@ -1370,6 +1910,9 @@
   "settings.language.languages.search.no-results": {
     "message": "No languages match your search."
   },
+  "settings.language.warning": {
+    "message": "Changing the site language may cause some content to appear in English if a translation is not available. The site is not yet fully translated, so some content may remain in English for certain languages. We are still working on improving our localization system, so occasionally content may appear broken."
+  },
   "settings.pats.action.create": {
     "message": "Create a PAT"
   },
@@ -1465,5 +2008,11 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Unknown platform"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Latest news from Modrinth"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "View all news"
   }
 }

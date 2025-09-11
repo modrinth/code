@@ -9204,6 +9204,7 @@ dependencies = [
  "daedalus",
  "dashmap",
  "data-url",
+ "derive_more 2.0.1",
  "dirs",
  "discord-rich-presence",
  "dotenvy",

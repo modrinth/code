@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IssuesIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
-import { commonSettingsMessages } from '@modrinth/ui'
+import { Admonition, commonSettingsMessages } from '@modrinth/ui'
 import { IntlFormatted } from '@vintl/vintl/components'
 import Fuse from 'fuse.js/dist/fuse.basic'
 
@@ -47,6 +47,11 @@ const messages = defineMessages({
 	languageLabelError: {
 		id: 'settings.language.languages.language-label-error',
 		defaultMessage: '{label}. Error',
+	},
+	languageWarning: {
+		id: 'settings.language.warning',
+		defaultMessage:
+			'Changing the site language may cause some content to appear in English if a translation is not available. The site is not yet fully translated, so some content may remain in English for certain languages. We are still working on improving our localization system, so occasionally content may appear broken.',
 	},
 })
 
@@ -287,7 +292,11 @@ function getItemLabel(locale: Locale) {
 		<section class="universal-card">
 			<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.language) }}</h2>
 
-			<div class="card-description">
+			<Admonition type="warning">
+				{{ formatMessage(messages.languageWarning) }}
+			</Admonition>
+
+			<div class="card-description mt-4">
 				<IntlFormatted :message-id="messages.languagesDescription">
 					<template #crowdin-link="{ children }">
 						<a href="https://translate.modrinth.com">

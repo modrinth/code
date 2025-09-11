@@ -123,10 +123,10 @@
     "defaultMessage": "Select correct resolution"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "Select if the {projectType} functions on the client-side and/or server-side."
+    "defaultMessage": "Select the environments your {projectType} functions on."
   },
   "nags.select-environments.title": {
-    "defaultMessage": "Select supported environments"
+    "defaultMessage": "Select environments"
   },
   "nags.select-license.description": {
     "defaultMessage": "Select the license your {projectType} is distributed under."
@@ -144,7 +144,7 @@
     "defaultMessage": "Visit description settings"
   },
   "nags.settings.environments.title": {
-    "defaultMessage": "Visit general settings"
+    "defaultMessage": "Visit environment settings"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Visit license settings"

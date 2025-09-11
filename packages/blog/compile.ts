@@ -3,6 +3,9 @@ import { promises as fs } from 'fs'
 import { glob } from 'glob'
 import matter from 'gray-matter'
 import { minify } from 'html-minifier-terser'
+import type { Options } from 'markdown-it'
+import type Renderer from 'markdown-it/lib/renderer.mjs'
+import type Token from 'markdown-it/lib/token.mjs'
 import * as path from 'path'
 import RSS from 'rss'
 import { parseStringPromise } from 'xml2js'
@@ -65,15 +68,41 @@ async function compileArticles() {
 			process.exit(1)
 		}
 
-		const html = md().render(content)
-		const minifiedHtml = await minify(html, {
+		const mdIt = md()
+		const slug = frontSlug || path.basename(file, '.md')
+
+		// Normalizes relative URL resolution to occur in the context of the article's directory.
+		// This prevents user agents from resolving relative URLs differently based on whether
+		// the current document URL has a trailing slash or not.
+		function normalizeRendererHtmlUriAttribute(ruleName: string, attrName: string) {
+			const defaultRenderer =
+				mdIt.renderer.rules[ruleName] ||
+				function (tokens, idx, options, _env, self) {
+					return self.renderToken(tokens, idx, options)
+				}
+
+			return (tokens: Token[], idx: number, options: Options, env: object, self: Renderer) => {
+				const attrUrlValue = tokens[idx].attrGet(attrName)
+				if (attrUrlValue) {
+					tokens[idx].attrSet(
+						attrName,
+						new URL(attrUrlValue, `${SITE_URL}/news/article/${slug}/`).href.replace(SITE_URL, ''),
+					)
+				}
+				return defaultRenderer(tokens, idx, options, env, self)
+			}
+		}
+
+		mdIt.renderer.rules.image = normalizeRendererHtmlUriAttribute('image', 'src')
+		mdIt.renderer.rules.link_open = normalizeRendererHtmlUriAttribute('link_open', 'href')
+
+		const minifiedHtml = await minify(mdIt.render(content), {
 			collapseWhitespace: true,
 			removeComments: true,
 		})
 
 		const authors = authorsData ? authorsData : []
 
-		const slug = frontSlug || path.basename(file, '.md')
 		const varName = toVarName(slug)
 		const exportFile = path.posix.join(COMPILED_DIR, `${varName}.ts`)
 		const contentFile = path.posix.join(COMPILED_DIR, `${varName}.content.ts`)

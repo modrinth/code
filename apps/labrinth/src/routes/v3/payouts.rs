@@ -876,6 +876,16 @@ pub struct MethodFilter {
     pub country: Option<String>,
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum FormCompletionStatus {
+    Unknown,
+    Unrequested,
+    Unsigned,
+    TinMismatch,
+    Complete,
+}
+
 #[get("methods")]
 pub async fn payment_methods(
     payouts_queue: web::Data<PayoutsQueue>,
@@ -925,15 +935,53 @@ pub async fn get_balance(
     .await?
     .1;
 
+    #[derive(Serialize)]
+    struct Response {
+        #[serde(flatten)]
+        balance: UserBalance,
+        requested_form_type: Option<users_compliance::FormType>,
+        form_completion_status: Option<FormCompletionStatus>,
+    }
+
     let balance = get_user_balance(user.id.into(), &pool).await?;
 
-    Ok(HttpResponse::Ok().json(balance))
+    let mut requested_form_type = None;
+    let mut form_completion_status = None;
+
+    // Only check compliance status if the compliance check is enabled (by having a value set for it)
+    if tax_compliance_payout_threshold().is_some() {
+        form_completion_status = Some(
+            update_compliance_status(&pool, user.id.into())
+                .await?
+                .map_or(FormCompletionStatus::Unrequested, |compliance| {
+                    requested_form_type = Some(compliance.model.form_type);
+
+                    if compliance.compliance_api_check_failed {
+                        FormCompletionStatus::Unknown
+                    } else if compliance.model.signed.is_some() {
+                        if compliance.model.tin_matched {
+                            FormCompletionStatus::Complete
+                        } else {
+                            FormCompletionStatus::TinMismatch
+                        }
+                    } else {
+                        FormCompletionStatus::Unsigned
+                    }
+                }),
+        );
+    }
+
+    Ok(HttpResponse::Ok().json(Response {
+        balance,
+        requested_form_type,
+        form_completion_status,
+    }))
 }
 
 async fn get_user_balance(
     user_id: crate::database::models::ids::DBUserId,
     pool: &PgPool,
-) -> Result<UserBalance, sqlx::Error> {
+) -> Result<UserBalance, ApiError> {
     let payouts = sqlx::query!(
         "
         SELECT date_available, SUM(amount) sum
@@ -980,7 +1028,9 @@ async fn get_user_balance(
         });
 
     Ok(UserBalance {
-        available: (available - withdrawn - fees).round_dp(16),
+        available: available.round_dp(16)
+            - withdrawn.round_dp(16)
+            - fees.round_dp(16),
         withdrawn_lifetime: withdrawn.round_dp(16),
         withdrawn_ytd: withdrawn_this_year.round_dp(16),
         pending,
@@ -1007,7 +1057,7 @@ async fn update_compliance_status(
         return Ok(None);
     };
 
-    if compliance.signed.is_some()
+    if (compliance.signed.is_some() && compliance.tin_matched)
         || Utc::now().signed_duration_since(compliance.last_checked)
             < COMPLIANCE_CHECK_DEBOUNCE
     {

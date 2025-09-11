@@ -60,6 +60,9 @@ pub enum ApiError {
     #[error("Discord Error: {0}")]
     Discord(String),
 
+    #[error("Slack Webhook Error: Error while sending projects webhook")]
+    Slack,
+
     #[error("Captcha Error. Try resubmitting the form.")]
     Turnstile,
 
@@ -125,6 +128,7 @@ i18n_enum!(
     Indexing(cause) => "indexing_error",
     Payments(cause) => "payments_error",
     Discord(cause) => "discord_error",
+    Slack! => "slack_error",
     Turnstile! => "turnstile_error",
     Decoding(cause) => "decoding_error",
     ImageParse(cause) => "invalid_image",
@@ -174,6 +178,7 @@ impl ResponseError for ApiError {
             ApiError::Io(..) => StatusCode::BAD_REQUEST,
             ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
             ApiError::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
+            ApiError::Slack => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

@@ -15,7 +15,7 @@
 							class="iconified-button raised-button"
 							prompt="Replace"
 							:accept="acceptFileTypes"
-							:max-size="524288000"
+							:max-size="5242880"
 							should-always-reset
 							aria-label="Replace image"
 							@change="
@@ -197,7 +197,7 @@
 		</div>
 		<div v-if="currentMember" class="card header-buttons">
 			<FileInput
-				:max-size="524288000"
+				:max-size="5242880"
 				:accept="acceptFileTypes"
 				prompt="Upload an image"
 				aria-label="Upload an image"
@@ -295,11 +295,14 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ConfirmModal, injectNotificationManager } from '@modrinth/ui'
+import {
+	ConfirmModal,
+	DropArea,
+	FileInput,
+	injectNotificationManager,
+	NewModal as Modal,
+} from '@modrinth/ui'
 
-import DropArea from '~/components/ui/DropArea.vue'
-import FileInput from '~/components/ui/FileInput.vue'
-import Modal from '~/components/ui/Modal.vue'
 import { isPermission } from '~/utils/permissions.ts'
 
 const props = defineProps({
@@ -765,7 +768,6 @@ export default defineNuxtComponent({
 }
 
 .modal-gallery {
-	padding: var(--spacing-card-bg);
 	display: flex;
 	flex-direction: column;
 

@@ -42,13 +42,14 @@
 	padding: 0 1.5rem;
 
 	grid-template:
+		'header'
 		'sidebar'
 		'content'
 		'info'
 		/ 100%;
 
 	@media screen and (max-width: 1024px) {
-		margin-top: var(--spacing-card-md);
+		margin-top: 1.5rem;
 	}
 
 	.normal-page__sidebar {

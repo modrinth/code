@@ -12,6 +12,7 @@ import {
 	type ServerRegion,
 	type ServerStockRequest,
 } from '../../utils/billing'
+import { regionOverrides } from '../../utils/regions.ts'
 import Slider from '../base/Slider.vue'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import type { RegionPing } from './ModrinthServersPurchaseModal.vue'
@@ -41,12 +42,25 @@ const selectedPrice = computed(() => {
 	return amount ? amount / monthsInInterval[props.interval] : undefined
 })
 
-const regionOrder: string[] = ['us-vin', 'eu-cov', 'eu-lim']
+const regionOrder: string[] = Object.keys(regionOverrides)
 
 const sortedRegions = computed(() => {
 	return props.regions.slice().sort((a, b) => {
 		return regionOrder.indexOf(a.shortcode) - regionOrder.indexOf(b.shortcode)
 	})
+})
+
+const visibleRegions = computed(() => {
+	if (!loading.value) {
+		return sortedRegions.value.filter((region) => {
+			// only show eu-lim if it has stock because we're not restocking it.
+			if (region.shortcode === 'eu-lim') {
+				return currentStock.value[region.shortcode] > 0
+			}
+			return true
+		})
+	}
+	return sortedRegions.value
 })
 
 const selectedRam = ref<number>(-1)
@@ -203,7 +217,7 @@ onMounted(() => {
 		</h2>
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 			<ServersRegionButton
-				v-for="region in sortedRegions"
+				v-for="region in visibleRegions"
 				:key="region.shortcode"
 				v-model="selectedRegion"
 				:region="region"

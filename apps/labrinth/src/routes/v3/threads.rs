@@ -382,6 +382,8 @@ pub async fn thread_send_message(
 
     let string: database::models::DBThreadId = info.into_inner().0.into();
 
+    let is_private: bool;
+
     if let MessageBody::Text {
         body,
         replying_to,
@@ -421,6 +423,8 @@ pub async fn thread_send_message(
                 ));
             }
         }
+
+        is_private = *private;
     } else {
         return Err(ApiError::InvalidInput(
             "You may only send text messages through this route!".to_string(),
@@ -454,6 +458,7 @@ pub async fn thread_send_message(
             if let Some(project) = project
                 && project.inner.status != ProjectStatus::Processing
                 && user.role.is_mod()
+                && !is_private
             {
                 let members =
                     database::models::DBTeamMember::get_from_team_full(
@@ -491,7 +496,7 @@ pub async fn thread_send_message(
                     ));
                 }
 
-                if user.id != report.reporter.into() {
+                if user.id != report.reporter.into() && !is_private {
                     NotificationBuilder {
                         body: NotificationBody::ModeratorMessage {
                             thread_id: thread.id.into(),

@@ -304,6 +304,13 @@
 							},
 							{
 								divider: true,
+							},
+							{
+								id: 'file-lookup',
+								link: '/admin/file_lookup',
+							},
+							{
+								divider: true,
 								shown: isAdmin(auth.user),
 							},
 							{
@@ -325,6 +332,7 @@
 						<template #review-projects> <ScaleIcon aria-hidden="true" /> Review projects </template>
 						<template #review-reports> <ReportIcon aria-hidden="true" /> Reports </template>
 						<template #user-lookup> <UserIcon aria-hidden="true" /> Lookup by email </template>
+						<template #file-lookup> <FileIcon aria-hidden="true" /> File lookup </template>
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> Manage server notices
 						</template>
@@ -679,6 +687,7 @@ import {
 	DiscordIcon,
 	DownloadIcon,
 	DropdownIcon,
+	FileIcon,
 	GithubIcon,
 	GlassesIcon,
 	HamburgerIcon,

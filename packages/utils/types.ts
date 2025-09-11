@@ -112,12 +112,10 @@ export interface ProjectV3 {
 	color?: number
 	thread_id: ModrinthId
 	monetization_status: MonetizationStatus
-	side_types_migration_review_status: 'reviewed' | 'pending'
+	side_types_migration_review_status: EnvironmentMigrationReviewStatus
 
 	[key: string]: unknown
 }
-
-export type SideTypesMigrationReviewStatus = 'reviewed' | 'pending'
 
 export interface Project {
 	id: ModrinthId
@@ -170,6 +168,26 @@ export interface Project {
 		name: string
 		url?: string
 	}
+}
+
+export type EnvironmentMigrationReviewStatus = 'reviewed' | 'pending'
+export type EnvironmentV3 =
+	| 'client_and_server'
+	| 'client_only'
+	| 'client_only_server_optional'
+	| 'singleplayer_only'
+	| 'server_only'
+	| 'server_only_client_optional'
+	| 'dedicated_server_only'
+	| 'client_or_server'
+	| 'client_or_server_prefers_both'
+	| 'unknown'
+
+// This is only the fields we care about from v3, since we use v2 for the vast majority of project metadata.
+export interface ProjectV3Partial {
+	side_types_migration_review_status: EnvironmentMigrationReviewStatus
+	environment: EnvironmentV3[]
+	project_types: ProjectType[]
 }
 
 export interface SearchResult {

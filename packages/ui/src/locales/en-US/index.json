@@ -1,4 +1,16 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Beta Release"
+  },
+  "badge.new": {
+    "defaultMessage": "New"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analytics"
+  },
   "button.back": {
     "defaultMessage": "Back"
   },
@@ -26,6 +38,12 @@
   "button.edit": {
     "defaultMessage": "Edit"
   },
+  "button.follow": {
+    "defaultMessage": "Follow"
+  },
+  "button.more-options": {
+    "defaultMessage": "More options"
+  },
   "button.next": {
     "defaultMessage": "Next"
   },
@@ -47,11 +65,17 @@
   "button.report": {
     "defaultMessage": "Report"
   },
+  "button.reset": {
+    "defaultMessage": "Reset"
+  },
   "button.save": {
     "defaultMessage": "Save"
   },
   "button.save-changes": {
     "defaultMessage": "Save changes"
+  },
+  "button.saving": {
+    "defaultMessage": "Saving"
   },
   "button.sign-in": {
     "defaultMessage": "Sign in"
@@ -59,8 +83,14 @@
   "button.sign-out": {
     "defaultMessage": "Sign out"
   },
+  "button.sign-up": {
+    "defaultMessage": "Sign up"
+  },
   "button.stop": {
     "defaultMessage": "Stop"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Unfollow"
   },
   "button.upload-image": {
     "defaultMessage": "Upload image"
@@ -82,6 +112,21 @@
   },
   "collection.label.private": {
     "defaultMessage": "Private"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Edit icon"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Remove icon"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Replace icon"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Select icon"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Search..."
   },
   "input.view.gallery": {
     "defaultMessage": "Gallery view"
@@ -140,6 +185,9 @@
   "label.notifications": {
     "defaultMessage": "Notifications"
   },
+  "label.or": {
+    "defaultMessage": "or"
+  },
   "label.password": {
     "defaultMessage": "Password"
   },
@@ -151,6 +199,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Rejected"
+  },
+  "label.saved": {
+    "defaultMessage": "Saved"
   },
   "label.scopes": {
     "defaultMessage": "Scopes"
@@ -311,6 +362,24 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "Supported environments"
   },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Client and server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Client-side"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Dedicated servers only"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Server-side"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Singleplayer"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Singleplayer only"
+  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -376,6 +445,99 @@
   },
   "project.about.links.wiki": {
     "defaultMessage": "Visit wiki"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Analytics"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Description"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Optional on both, works the same if installed on either side"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Optional on both, works best when installed on both sides"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Optional on client"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Optional on server"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Required on both"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Client and server"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "All functionality is done client-side and is compatible with vanilla servers."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Client-side only"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Dedicated server only"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Works in singleplayer too"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Server-side only"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Only functions in Singleplayer or when not connected to a Multiplayer server."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Singleplayer only"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Suboptions of {option}"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Environment"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Gallery"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "General"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "License"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Links"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Members"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "You don't have permission to edit this."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "No permission"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Tags"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Upload"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Versions"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "View"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -560,6 +722,9 @@
   "servers.region.region-unsupported": {
     "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Servers next!</link>"
   },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Southeast Asia"
+  },
   "servers.region.western-europe": {
     "defaultMessage": "Western Europe"
   },
@@ -619,5 +784,8 @@
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} at {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "You have unsaved changes."
   }
 }

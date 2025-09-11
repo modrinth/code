@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::emit_friend;
@@ -322,7 +323,7 @@ impl FriendsSocket {
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
         semaphore: &FetchSemaphore,
     ) -> crate::Result<()> {
-        fetch_advanced(
+        let result = fetch_advanced(
             Method::POST,
             &format!("{}friend/{user_id}", env!("MODRINTH_API_URL_V3")),
             None,
@@ -332,7 +333,18 @@ impl FriendsSocket {
             semaphore,
             exec,
         )
-        .await?;
+        .await;
+
+        if let Err(ref e) = result
+            && let ErrorKind::LabrinthError(e) = &*e.raw
+            && e.error == "not_found"
+        {
+            return Err(ErrorKind::OtherError(format!(
+                "No user found with username \"{user_id}\""
+            ))
+            .into());
+        }
+        result?;
 
         Ok(())
     }

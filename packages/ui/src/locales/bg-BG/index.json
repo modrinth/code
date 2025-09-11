@@ -1,0 +1,57 @@
+{
+  "button.back": {
+    "defaultMessage": "Назад"
+  },
+  "button.cancel": {
+    "defaultMessage": "Откажи"
+  },
+  "button.continue": {
+    "defaultMessage": "Продължи"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Копирай ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Копирай перманентна връзка"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Създай проект"
+  },
+  "button.download": {
+    "defaultMessage": "Изтегли"
+  },
+  "button.downloading": {
+    "defaultMessage": "Изтегляне"
+  },
+  "button.edit": {
+    "defaultMessage": "Редактирай"
+  },
+  "button.next": {
+    "defaultMessage": "Следващо"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Отвори папка"
+  },
+  "button.play": {
+    "defaultMessage": "Играй"
+  },
+  "button.refresh": {
+    "defaultMessage": "Обнови"
+  },
+  "button.remove": {
+    "defaultMessage": "Премахни"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Премахни снимка"
+  },
+  "button.report": {
+    "defaultMessage": "Докладвай"
+  },
+  "button.save": {
+    "defaultMessage": "Запази"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Външен вид"
+  }
+}
+

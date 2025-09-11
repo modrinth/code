@@ -91,7 +91,6 @@ const router = useRouter()
 const props = defineProps<{
 	project: Project
 	versions: Version[]
-	featuredVersions: Version[]
 	members: User[]
 	currentMember: User
 	dependencies: Dependency[]

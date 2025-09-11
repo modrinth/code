@@ -77,6 +77,7 @@ export const initUserProjects = async () => {
 	if (auth.user && auth.user.id) {
 		try {
 			user.projects = await useBaseFetch(`user/${auth.user.id}/projects`)
+			user.projectsV3 = await useBaseFetch(`user/${auth.user.id}/projects`, { apiVersion: 3 })
 		} catch (err) {
 			console.error(err)
 		}
