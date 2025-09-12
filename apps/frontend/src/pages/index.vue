@@ -1285,6 +1285,7 @@ const creatorFeatureMessages = defineMessages({
 	font-weight: 600;
 	line-height: 100%;
 	margin: 0 0 0.25rem;
+	width: 100%;
 }
 
 .main-header-strong {
@@ -1296,6 +1297,7 @@ const creatorFeatureMessages = defineMessages({
 	-webkit-text-fill-color: transparent;
 	-moz-text-fill-color: transparent;
 	color: transparent;
+	white-space: nowrap;
 }
 
 .animate-strong {
