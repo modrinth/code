@@ -5,77 +5,77 @@
 		</div>
 		<div class="normal-page">
 			<div class="normal-page__sidebar">
-        <NavStack
-          :items="
-            [
-              { type: 'heading', label: 'Display' },
-              {
-                link: '/settings',
-                label: formatMessage(commonSettingsMessages.appearance),
-                icon: PaintbrushIcon,
-              },
-              isStaging
-                ? {
-                    link: '/settings/language',
-                    label: formatMessage(commonSettingsMessages.language),
-                    icon: LanguagesIcon,
-                    badge: `${formatMessage(commonMessages.beta)}`,
-                  }
-                : null,
-              auth.user ? { type: 'heading', label: 'Account' } : null,
-              auth.user
-                ? {
-                    link: '/settings/profile',
-                    label: formatMessage(commonSettingsMessages.profile),
-                    icon: UserIcon,
-                  }
-                : null,
-              auth.user
-                ? {
-                    link: '/settings/account',
-                    label: formatMessage(commonSettingsMessages.account),
-                    icon: ShieldIcon,
-                  }
-                : null,
-              auth.user
-                ? {
-                    link: '/settings/authorizations',
-                    label: formatMessage(commonSettingsMessages.authorizedApps),
-                    icon: GridIcon,
-                  }
-                : null,
-              auth.user
-                ? {
-                    link: '/settings/sessions',
-                    label: formatMessage(commonSettingsMessages.sessions),
-                    icon: MonitorSmartphoneIcon,
-                  }
-                : null,
-              auth.user
-                ? {
-                    link: '/settings/billing',
-                    label: formatMessage(commonSettingsMessages.billing),
-                    icon: CardIcon,
-                  }
-                : null,
-              auth.user ? { type: 'heading', label: 'Developer' } : null,
-              auth.user
-                ? {
-                    link: '/settings/pats',
-                    label: formatMessage(commonSettingsMessages.pats),
-                    icon: KeyIcon,
-                  }
-                : null,
-              auth.user
-                ? {
-                    link: '/settings/applications',
-                    label: formatMessage(commonSettingsMessages.applications),
-                    icon: ServerIcon,
-                  }
-                : null,
-            ].filter(Boolean)
-          "
-        />
+				<NavStack
+					:items="
+						[
+							{ type: 'heading', label: 'Display' },
+							{
+								link: '/settings',
+								label: formatMessage(commonSettingsMessages.appearance),
+								icon: PaintbrushIcon,
+							},
+							isStaging
+								? {
+										link: '/settings/language',
+										label: formatMessage(commonSettingsMessages.language),
+										icon: LanguagesIcon,
+										badge: `${formatMessage(commonMessages.beta)}`,
+									}
+								: null,
+							auth.user ? { type: 'heading', label: 'Account' } : null,
+							auth.user
+								? {
+										link: '/settings/profile',
+										label: formatMessage(commonSettingsMessages.profile),
+										icon: UserIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/account',
+										label: formatMessage(commonSettingsMessages.account),
+										icon: ShieldIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/authorizations',
+										label: formatMessage(commonSettingsMessages.authorizedApps),
+										icon: GridIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/sessions',
+										label: formatMessage(commonSettingsMessages.sessions),
+										icon: MonitorSmartphoneIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/billing',
+										label: formatMessage(commonSettingsMessages.billing),
+										icon: CardIcon,
+									}
+								: null,
+							auth.user ? { type: 'heading', label: 'Developer' } : null,
+							auth.user
+								? {
+										link: '/settings/pats',
+										label: formatMessage(commonSettingsMessages.pats),
+										icon: KeyIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/applications',
+										label: formatMessage(commonSettingsMessages.applications),
+										icon: ServerIcon,
+									}
+								: null,
+						].filter(Boolean)
+					"
+				/>
 			</div>
 			<div class="normal-page__content">
 				<NuxtPage :route="route" />

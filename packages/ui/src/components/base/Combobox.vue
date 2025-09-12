@@ -121,12 +121,21 @@
 <script setup lang="ts" generic="T">
 import { ChevronLeftIcon, SearchIcon } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
-import { computed, nextTick, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
+import {
+	type Component,
+	computed,
+	nextTick,
+	onMounted,
+	onUnmounted,
+	ref,
+	useSlots,
+	watch,
+} from 'vue'
 
 export interface DropdownOption<T> {
 	value: T
 	label: string
-	icon?: any
+	icon?: Component
 	disabled?: boolean
 	class?: string
 	type?: 'button' | 'link' | 'divider'
@@ -203,9 +212,8 @@ const triggerClasses = computed(() => {
 
 const selectedOption = computed<DropdownOption<T> | undefined>(() => {
 	return props.options.find(
-		(opt) =>
-			(opt as any).type !== 'divider' && (opt as DropdownOption<T>).value === props.modelValue,
-	) as DropdownOption<T> | undefined
+		(opt): opt is DropdownOption<T> => 'value' in opt && opt.value === props.modelValue,
+	)
 })
 
 const triggerText = computed(() => {

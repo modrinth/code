@@ -69,7 +69,7 @@
 							:class="[date.stripeClass, date.highlightClass]"
 						></span>
 						Estimated {{ date.date ? dayjs(date.date).format('MMM D, YYYY') : '' }}
-						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" noAutoFocus>
+						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
 							<nuxt-link
 								class="inline-flex items-center justify-center text-link"
 								to="/legal/cmp-info#pending"
@@ -103,7 +103,7 @@
 							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg opacity-90"
 						></span>
 						Processing
-						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" noAutoFocus>
+						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
 							<InProgressIcon class="inline-block size-5 align-middle" />
 							<template #popper>
 								<div class="w-[250px] font-semibold text-contrast">
@@ -186,7 +186,11 @@
 				>
 			</div>
 			<div v-if="sortedPayouts.length > 0">
-				<div v-for="transaction in sortedPayouts.slice(0, 3)" class="flex flex-row gap-3">
+				<div
+					v-for="transaction in sortedPayouts.slice(0, 3)"
+					:key="transaction.id || transaction.created"
+					class="flex flex-row gap-3"
+				>
 					<div
 						class="flex size-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised shadow-md"
 					>
@@ -333,7 +337,7 @@ const { data: payouts, refresh: refreshPayouts } = await useAsyncData<PayoutList
 const sortedPayouts = computed<PayoutList>(() => {
 	if (!payouts.value) return []
 
-	return payouts.value.sort((a, b) => {
+	return [...payouts.value].sort((a, b) => {
 		return new Date(b.created).getTime() - new Date(a.created).getTime()
 	})
 })

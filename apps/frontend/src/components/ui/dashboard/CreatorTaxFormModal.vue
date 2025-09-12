@@ -84,6 +84,15 @@ import { type FormRequestResponse, useAvalara1099 } from '~/composables/avalara1
 const { addNotification } = injectNotificationManager()
 
 const taxFormModal = ref<InstanceType<typeof NewModal> | null>(null)
+
+async function startTaxForm(e: MouseEvent) {
+	taxFormModal.value?.show(e)
+}
+
+defineExpose({
+	startTaxForm,
+})
+
 const auth = await useAuth()
 
 const isUSCitizen = ref<'yes' | 'no' | null>(null)
@@ -119,17 +128,8 @@ const canContinue = computed(() => {
 	return false
 })
 
-async function startTaxForm(e: MouseEvent) {
-	taxFormModal.value?.show(e)
-}
-
-defineExpose({
-	startTaxForm,
-})
-
 const emit = defineEmits<{
-	(event: 'success'): void
-	(event: 'cancelled'): void
+	(event: 'success' | 'cancelled'): void
 }>()
 
 const avalaraState = ref<ReturnType<typeof useAvalara1099> | null>(null)

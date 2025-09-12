@@ -146,20 +146,12 @@
 
 <script lang="ts" setup>
 import { ChevronRightIcon, FileTextIcon, TransferIcon, UnknownIcon, XIcon } from '@modrinth/assets'
-import {
-	Admonition,
-	ButtonStyled,
-	Combobox,
-	injectNotificationManager,
-	NewModal,
-} from '@modrinth/ui'
+import { Admonition, ButtonStyled, Combobox, NewModal } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { all } from 'iso-3166-1'
 import { nextTick } from 'vue'
 
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
-
-const { addNotification } = injectNotificationManager()
 
 type Stage = 'withdraw-limit' | 'withdraw-details' | 'confirmation'
 
@@ -320,13 +312,6 @@ const canProceedToWithdraw = computed(() => {
 		paymentMethod.value !== null &&
 		countryProxy.value !== null
 	)
-})
-
-const showPaymentDetails = computed(() => {
-	if (!paymentMethod.value) return false
-	if (paymentMethod.value.type === 'paypal') return !!props.userPayoutData?.paypal_address
-	if (paymentMethod.value.type === 'venmo') return !!props.userPayoutData?.venmo_handle
-	return false
 })
 
 function formatPaymentMethodName(method: PayoutMethod | null): string {

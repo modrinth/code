@@ -5,7 +5,7 @@
 			typeClasses[type],
 		]"
 	>
-		<slot name="icon" :iconClass="['hidden h-8 w-8 flex-none sm:block', iconClasses[type]]">
+		<slot name="icon" :icon-class="['hidden h-8 w-8 flex-none sm:block', iconClasses[type]]">
 			<component
 				:is="icons[type]"
 				:class="['hidden h-8 w-8 flex-none sm:block', iconClasses[type]]"
