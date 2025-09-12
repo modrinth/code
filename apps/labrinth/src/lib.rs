@@ -4,8 +4,8 @@ use std::time::Duration;
 use actix_web::web;
 use database::redis::RedisPool;
 use queue::{
-    analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
-    socket::ActiveSockets,
+    analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
+    session::AuthQueue, socket::ActiveSockets,
 };
 use sqlx::Postgres;
 use tracing::{info, warn};
@@ -88,7 +88,7 @@ pub fn app_setup(
         });
     }
 
-    let mut scheduler = scheduler::Scheduler::new();
+    let scheduler = scheduler::Scheduler::new();
 
     let limiter = web::Data::new(AsyncRateLimiter::new(
         redis_pool.clone(),
@@ -246,6 +246,15 @@ pub fn app_setup(
         });
     }
 
+    {
+        let pool_ref = pool.clone();
+        let redis_ref = redis_pool.clone();
+
+        let email_queue = EmailQueue::init(pool_ref, redis_ref);
+        scheduler
+            .run(Duration::from_secs(5), move || email_queue.clone().index());
+    }
+
     let ip_salt = Pepper {
         pepper: ariadne::ids::Base62Id(ariadne::ids::random_base62(11))
             .to_string(),
@@ -348,6 +357,7 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("SITE_URL");
     failed |= check_var::<String>("CDN_URL");
     failed |= check_var::<String>("LABRINTH_ADMIN_KEY");
+    failed |= check_var::<String>("LABRINTH_EXTERNAL_NOTIFICATION_KEY");
     failed |= check_var::<String>("RATE_LIMIT_IGNORE_KEY");
     failed |= check_var::<String>("DATABASE_URL");
     failed |= check_var::<String>("MEILISEARCH_ADDR");
