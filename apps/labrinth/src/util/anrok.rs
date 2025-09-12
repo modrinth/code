@@ -22,6 +22,9 @@ pub struct InvoiceResponse {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct EmptyResponse {}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {
     #[serde(skip_serializing_if = "Option::is_none", default)]
@@ -203,7 +206,7 @@ impl Client {
         &self,
         id: String,
         version: i32,
-    ) -> Result<(), AnrokError> {
+    ) -> Result<EmptyResponse, AnrokError> {
         #[derive(Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body {

@@ -51,6 +51,13 @@ pub enum AttachedCharge {
         current_subscription: UserSubscriptionId,
         amount: i64,
     },
+    /// Create a promotion charge.
+    Promotion {
+        product_id: ProductId,
+        interval: PriceDuration,
+        current_subscription: UserSubscriptionId,
+        new_region: String,
+    },
     /// Base the payment intent amount and tax on the product's price at this interval,
     /// but don't actually create a charge item until the payment intent is confirmed.
     ///
@@ -128,14 +135,14 @@ impl PaymentSession {
 }
 
 pub enum CurrencyMode {
-    UseSpecified(Currency),
-    InferFromBillingDetails,
+    Set(Currency),
+    Infer,
 }
 
 pub struct PaymentBootstrapOptions<'a> {
     pub user: &'a User,
     /// Update this payment intent instead of creating a new intent.
-    pub existing_payment_intent: Option<stripe::PaymentIntentId>,
+    pub payment_intent: Option<stripe::PaymentIntentId>,
     /// The status of the current payment session. This is used to derive the payment
     /// method as well as set the appropriate parameters on the payment intent.
     ///
@@ -154,12 +161,10 @@ pub struct PaymentBootstrapOptions<'a> {
     /// The charge the payment intent on should be based upon.
     pub attached_charge: AttachedCharge,
     /// The currency used for the payment amount.
-    pub currency_mode: CurrencyMode,
+    pub currency: CurrencyMode,
     /// Some products have additional provisioning metadata that should be attached to the payment
     /// intent.
     pub attach_payment_metadata: Option<PaymentRequestMetadata>,
-    /// Attach the modrinth_new_region field to payment intent for region switching
-    pub change_region: Option<String>,
 }
 
 pub struct PaymentBootstrapResults {
@@ -187,12 +192,11 @@ pub async fn create_or_update_payment_intent(
     anrok_client: &anrok::Client,
     PaymentBootstrapOptions {
         user,
-        existing_payment_intent,
+        payment_intent: existing_payment_intent,
         payment_session,
         attached_charge,
-        currency_mode,
+        currency: currency_mode,
         attach_payment_metadata,
-        change_region,
     }: PaymentBootstrapOptions<'_>,
 ) -> Result<PaymentBootstrapResults, ApiError> {
     let customer_id = get_or_create_customer(
@@ -284,15 +288,13 @@ pub async fn create_or_update_payment_intent(
         .unwrap_or(DEFAULT_USER_COUNTRY);
 
     let inferred_stripe_currency = match currency_mode {
-        CurrencyMode::UseSpecified(currency) => currency,
-        CurrencyMode::InferFromBillingDetails => {
-            infer_currency_code(user_country)
-                .to_lowercase()
-                .parse::<Currency>()
-                .map_err(|_| {
-                    ApiError::InvalidInput("Invalid currency code".to_string())
-                })?
-        }
+        CurrencyMode::Set(currency) => currency,
+        CurrencyMode::Infer => infer_currency_code(user_country)
+            .to_lowercase()
+            .parse::<Currency>()
+            .map_err(|_| {
+                ApiError::InvalidInput("Invalid currency code".to_string())
+            })?,
     };
 
     let charge_data = match attached_charge {
@@ -329,6 +331,21 @@ pub async fn create_or_update_payment_intent(
             charge_data.amount = amount;
             charge_data.charge_type = ChargeType::Proration;
             charge_data
+        }
+        AttachedCharge::Promotion {
+            product_id,
+            interval,
+            current_subscription: _,
+            new_region: _,
+        } => {
+            derive_charge_data_from_product_selector(
+                pg,
+                user.id,
+                product_id,
+                Some(interval),
+                inferred_stripe_currency,
+            )
+            .await?
         }
         AttachedCharge::BaseUpon {
             product_id,
@@ -374,7 +391,7 @@ pub async fn create_or_update_payment_intent(
 
     let ephemeral_invoice = anrok_client
         .create_ephemeral_txn(&anrok::TransactionFields {
-            customer_address: anrok::Address::default_exempt(), // anrok::Address::from_stripe_address(&address),
+            customer_address: anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&address),
             currency_code: charge_data.currency_code.clone(),
             accounting_time: chrono::Utc::now(),
             accounting_time_zone: anrok::AccountingTimeZone::Utc,
@@ -395,10 +412,6 @@ pub async fn create_or_update_payment_intent(
         charge_data.charge_type.as_str().to_owned(),
     );
     metadata.insert(MODRINTH_TAX_AMOUNT.to_owned(), tax_amount.to_string());
-
-    if let Some(change_region) = change_region {
-        metadata.insert(MODRINTH_NEW_REGION.to_owned(), change_region);
-    }
 
     if let Some(payment_metadata) = attach_payment_metadata {
         metadata.insert(
@@ -446,6 +459,34 @@ pub async fn create_or_update_payment_intent(
             MODRINTH_SUBSCRIPTION_ID.to_owned(),
             current_subscription.to_string(),
         );
+    } else if let AttachedCharge::Promotion {
+        product_id: _,
+        interval,
+        current_subscription,
+        new_region,
+    } = attached_charge
+    {
+        let mut transaction = pg.begin().await?;
+        let charge_id = generate_charge_id(&mut transaction).await?;
+
+        metadata.insert(
+            MODRINTH_CHARGE_ID.to_owned(),
+            to_base62(charge_id.0 as u64),
+        );
+
+        metadata.insert(
+            MODRINTH_PRICE_ID.to_owned(),
+            charge_data.price_id.to_string(),
+        );
+        metadata.insert(
+            MODRINTH_SUBSCRIPTION_INTERVAL.to_owned(),
+            interval.as_str().to_owned(),
+        );
+        metadata.insert(
+            MODRINTH_SUBSCRIPTION_ID.to_owned(),
+            current_subscription.to_string(),
+        );
+        metadata.insert(MODRINTH_NEW_REGION.to_owned(), new_region);
     } else {
         let mut transaction = pg.begin().await?;
         let charge_id = generate_charge_id(&mut transaction).await?;
