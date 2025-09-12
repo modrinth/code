@@ -3,18 +3,19 @@
 		<div class="normal-page__sidebar">
 			<NavStack
 				:items="[
+					{ type: 'heading', label: 'Dashboard' },
 					{ link: '/dashboard', label: 'Overview', icon: DashboardIcon },
 					{ link: '/dashboard/notifications', label: 'Notifications', icon: NotificationsIcon },
 					{ link: '/dashboard/reports', label: 'Active reports', icon: ReportIcon },
-					{ link: '/dashboard/analytics', label: 'Analytics', icon: ChartIcon },
-					{ type: 'separator' },
-					{ link: '/dashboard/projects', label: 'Projects', icon: ListIcon },
-					{ link: '/dashboard/organizations', label: 'Organizations', icon: OrganizationIcon },
 					{
 						link: '/dashboard/collections',
 						label: formatMessage(commonMessages.collectionsLabel),
 						icon: LibraryIcon,
 					},
+					{ type: 'heading', label: 'Creators' },
+					{ link: '/dashboard/projects', label: 'Projects', icon: ListIcon },
+					{ link: '/dashboard/organizations', label: 'Organizations', icon: OrganizationIcon },
+					{ link: '/dashboard/analytics', label: 'Analytics', icon: ChartIcon },
 					{ link: '/dashboard/revenue', label: 'Revenue', icon: CurrencyIcon },
 				]"
 			/>
@@ -26,12 +27,12 @@
 </template>
 <script setup>
 import {
-	BellIcon as NotificationsIcon,
 	ChartIcon,
 	CurrencyIcon,
 	DashboardIcon,
 	LibraryIcon,
 	ListIcon,
+	BellIcon as NotificationsIcon,
 	OrganizationIcon,
 	ReportIcon,
 } from '@modrinth/assets'
