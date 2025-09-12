@@ -1,4 +1,5 @@
 use crate::auth::email::send_email;
+use crate::auth::templates::ErrorPage;
 use crate::auth::validate::{
     get_full_user_from_headers, get_user_record_from_bearer_token,
 };
@@ -10,7 +11,7 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::routes::internal::session::issue_session;
 use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;
@@ -1109,29 +1110,29 @@ pub async fn auth_callback(
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     redis: Data<RedisPool>,
-) -> Result<HttpResponse, crate::auth::templates::ErrorPage> {
-    let state_string = query
-        .get("state")
-        .ok_or_else(|| AuthenticationError::InvalidCredentials)?
-        .clone();
+) -> Result<HttpResponse, ErrorPage> {
+    let res = async || {
+        let state = query
+            .get("state")
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)?
+            .clone();
 
-    let state = state_string.clone();
-    let res: Result<HttpResponse, AuthenticationError> = async move {
         let flow = DBFlow::get(&state, &redis).await?;
 
         // Extract cookie header from request
         if let Some(DBFlow::OAuth {
-                        user_id,
-                        provider,
-                        url,
-                    }) = flow
+            user_id,
+            provider,
+            url,
+        }) = flow
         {
             DBFlow::remove(&state, &redis).await?;
 
             let token = provider.get_token(query).await?;
             let oauth_user = provider.get_user(&token).await?;
 
-            let user_id_opt = provider.get_user_id(&oauth_user.id, &**client).await?;
+            let user_id_opt =
+                provider.get_user_id(&oauth_user.id, &**client).await?;
 
             let mut transaction = client.begin().await?;
             if let Some(id) = user_id {
@@ -1143,9 +1144,12 @@ pub async fn auth_callback(
                     .update_user_id(id, Some(&oauth_user.id), &mut transaction)
                     .await?;
 
-                let user = crate::database::models::DBUser::get_id(id, &**client, &redis).await?;
+                let user = crate::database::models::DBUser::get_id(
+                    id, &**client, &redis,
+                )
+                .await?;
 
-                if provider == AuthProvider::PayPal  {
+                if provider == AuthProvider::PayPal {
                     sqlx::query!(
                         "
                         UPDATE users
@@ -1163,23 +1167,32 @@ pub async fn auth_callback(
                     send_email(
                         email,
                         "Authentication method added",
-                        &format!("When logging into Modrinth, you can now log in using the {} authentication provider.", provider.as_str()),
+                        &format!(
+                            "When logging into Modrinth, you can now log in using the {} authentication provider.",
+                            provider.as_str()
+                        ),
                         "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
                         None,
                     )?;
                 }
 
                 transaction.commit().await?;
-                crate::database::models::DBUser::clear_caches(&[(id, None)], &redis).await?;
+                crate::database::models::DBUser::clear_caches(
+                    &[(id, None)],
+                    &redis,
+                )
+                .await?;
 
                 Ok(HttpResponse::TemporaryRedirect()
                     .append_header(("Location", &*url))
                     .json(serde_json::json!({ "url": url })))
             } else {
                 let user_id = if let Some(user_id) = user_id_opt {
-                    let user = crate::database::models::DBUser::get_id(user_id, &**client, &redis)
-                        .await?
-                        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+                    let user = crate::database::models::DBUser::get_id(
+                        user_id, &**client, &redis,
+                    )
+                    .await?
+                    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
                     if user.totp_secret.is_some() {
                         let flow = DBFlow::Login2FA { user_id: user.id }
@@ -1200,10 +1213,20 @@ pub async fn auth_callback(
 
                     user_id
                 } else {
-                    oauth_user.create_account(provider, &mut transaction, &client, &file_host, &redis).await?
+                    oauth_user
+                        .create_account(
+                            provider,
+                            &mut transaction,
+                            &client,
+                            &file_host,
+                            &redis,
+                        )
+                        .await?
                 };
 
-                let session = issue_session(req, user_id, &mut transaction, &redis).await?;
+                let session =
+                    issue_session(&req, user_id, &mut transaction, &redis)
+                        .await?;
                 transaction.commit().await?;
 
                 let redirect_url = format!(
@@ -1223,11 +1246,13 @@ pub async fn auth_callback(
                     .json(serde_json::json!({ "url": redirect_url })))
             }
         } else {
-            Err::<HttpResponse, AuthenticationError>(AuthenticationError::InvalidCredentials)
+            Err::<HttpResponse, AuthenticationError>(
+                AuthenticationError::InvalidCredentials,
+            )
         }
-    }.await;
+    };
 
-    Ok(res?)
+    Ok(res().await?)
 }
 
 #[derive(Deserialize)]
@@ -1434,7 +1459,8 @@ pub async fn create_account_with_password(
     .insert(&mut transaction)
     .await?;
 
-    let session = issue_session(req, user_id, &mut transaction, &redis).await?;
+    let session =
+        issue_session(&req, user_id, &mut transaction, &redis).await?;
     let res = crate::models::sessions::Session::from(session, true, None);
 
     let flow = DBFlow::ConfirmEmail {
@@ -1520,7 +1546,7 @@ pub async fn login_password(
     } else {
         let mut transaction = pool.begin().await?;
         let session =
-            issue_session(req, user.id, &mut transaction, &redis).await?;
+            issue_session(&req, user.id, &mut transaction, &redis).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 
@@ -1650,7 +1676,7 @@ pub async fn login_2fa(
         DBFlow::remove(&login.flow, &redis).await?;
 
         let session =
-            issue_session(req, user_id, &mut transaction, &redis).await?;
+            issue_session(&req, user_id, &mut transaction, &redis).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 

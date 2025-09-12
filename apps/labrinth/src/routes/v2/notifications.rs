@@ -3,7 +3,7 @@ use crate::models::ids::NotificationId;
 use crate::models::notifications::Notification;
 use crate::models::v2::notifications::LegacyNotification;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::routes::v2_reroute;
 use crate::routes::v3;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};

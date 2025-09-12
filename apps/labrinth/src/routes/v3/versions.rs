@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use super::ApiError;
 use crate::auth::checks::{
     filter_visible_versions, is_visible_project, is_visible_version,
 };
@@ -24,6 +23,7 @@ use crate::models::projects::{
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
+use crate::routes::error::ApiError;
 use crate::search::SearchConfig;
 use crate::search::indexing::remove_documents;
 use crate::util::img;

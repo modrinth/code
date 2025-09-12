@@ -2,7 +2,7 @@ use reqwest::header::HeaderName;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 
 const X_MASTER_KEY: HeaderName = HeaderName::from_static("x-master-key");
 

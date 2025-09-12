@@ -5,7 +5,7 @@ use crate::database::models::version_item::VersionQueryResult;
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
 use crate::models::users::User;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use itertools::Itertools;
 use sqlx::PgPool;
 

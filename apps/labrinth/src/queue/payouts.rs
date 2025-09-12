@@ -3,7 +3,7 @@ use crate::models::payouts::{
     PayoutMethodType,
 };
 use crate::models::projects::MonetizationStatus;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
 };

@@ -12,7 +12,7 @@ use crate::models::pats::Scopes;
 use crate::models::reports::{ItemType, Report};
 use crate::models::threads::{MessageBody, ThreadType};
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::img;
 use crate::util::routes::read_typed_from_payload;
 use actix_web::{HttpRequest, HttpResponse, web};

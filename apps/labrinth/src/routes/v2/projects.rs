@@ -11,8 +11,9 @@ use crate::models::v2::projects::{
 use crate::models::v2::search::LegacySearchResults;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
+use crate::routes::error::ApiError;
 use crate::routes::v3::projects::ProjectIds;
-use crate::routes::{ApiError, v2_reroute, v3};
+use crate::routes::{v2_reroute, v3};
 use crate::search::{SearchConfig, SearchError, search_for_project};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::{Deserialize, Serialize};

@@ -1,4 +1,4 @@
-pub use super::ApiError;
+pub use crate::routes::error::ApiError;
 use crate::util::cors::default_cors;
 use actix_web::{HttpResponse, web};
 use serde_json::json;

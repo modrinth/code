@@ -15,7 +15,7 @@ use crate::models::shared_instances::{
 };
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::routes::read_typed_from_payload;
 use actix_web::web::{Data, Redirect};
 use actix_web::{HttpRequest, HttpResponse, web};

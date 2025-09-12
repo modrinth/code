@@ -1,7 +1,7 @@
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::{Download, PageView, Playtime};
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use dashmap::{DashMap, DashSet};
 use redis::cmd;
 use sqlx::PgPool;

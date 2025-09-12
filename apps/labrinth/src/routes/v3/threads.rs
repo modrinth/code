@@ -15,7 +15,7 @@ use crate::models::projects::ProjectStatus;
 use crate::models::threads::{MessageBody, Thread, ThreadType};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use actix_web::{HttpRequest, HttpResponse, web};
 use futures::TryStreamExt;
 use serde::Deserialize;

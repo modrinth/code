@@ -1,9 +1,9 @@
-use super::ApiError;
 use crate::database;
 use crate::database::redis::RedisPool;
 use crate::models::projects::ProjectStatus;
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
+use crate::routes::error::ApiError;
 use crate::{auth::check_is_moderator_from_headers, models::pats::Scopes};
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::random_base62;

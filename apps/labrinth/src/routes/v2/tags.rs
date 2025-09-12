@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use super::ApiError;
 use crate::database::models::loader_fields::LoaderFieldEnumValue;
 use crate::database::redis::RedisPool;
 use crate::models::v2::projects::LegacySideType;
+use crate::routes::error::ApiError;
 use crate::routes::v2_reroute::capitalize_first;
 use crate::routes::v3::tags::{LinkPlatformQueryData, LoaderFieldsEnumQuery};
 use crate::routes::{v2_reroute, v3};

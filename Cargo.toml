@@ -3,6 +3,7 @@ resolver = "2"
 members = [
 	"apps/app",
 	"apps/app-playground",
+	"apps/ariadne-extract",
 	"apps/daedalus_client",
 	"apps/labrinth",
 	"packages/app-lib",
@@ -40,7 +41,7 @@ bytes = "1.10.1"
 censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.41"
-clap = "4.5.43"
+clap = { version = "4.5.43", features = ["derive"] }
 clickhouse = "0.13.3"
 color-thief = "0.2.2"
 console-subscriber = "0.4.1"
@@ -91,6 +92,7 @@ lettre = { version = "0.11.18", default-features = false, features = [
 ] }
 maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.29.1", default-features = false }
+miette = "7.6.0"
 murmur2 = "0.1.0"
 native-dialog = "0.9.0"
 notify = { version = "8.2.0", default-features = false }
@@ -125,7 +127,7 @@ sentry = { version = "0.42.0", default-features = false, features = [
 	"rustls",
 ] }
 sentry-actix = "0.42.0"
-serde = "1.0.219"
+serde = { version = "1.0.219", features = ["derive"] }
 serde_bytes = "0.11.17"
 serde_cbor = "0.11.2"
 serde_ini = "0.2.0"
@@ -137,6 +139,8 @@ sha1_smol = { version = "1.0.1", features = ["std"] }
 sha2 = "0.10.9"
 spdx = "0.10.9"
 sqlx = { version = "0.8.6", default-features = false }
+syn = { version = "2.0.106", features = ["full"] }
+syn-miette = "0.3.0"
 sysinfo = { version = "0.36.1", default-features = false }
 tar = "0.4.44"
 tauri = "2.7.0"
@@ -169,6 +173,7 @@ url = "2.5.4"
 urlencoding = "2.1.3"
 uuid = "1.17.0"
 validator = "0.20.0"
+walkdir = "2.5.0"
 webp = { version = "0.3.0", default-features = false }
 whoami = "1.6.0"
 winreg = "0.55.0"

@@ -8,7 +8,7 @@ use crate::models::pats::Scopes;
 use crate::models::payouts::{PayoutMethodType, PayoutStatus};
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::avalara1099;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use chrono::{DateTime, Duration, Utc};

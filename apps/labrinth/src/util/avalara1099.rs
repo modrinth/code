@@ -1,5 +1,5 @@
 use crate::database::models::{DBUserId, users_compliance::FormType};
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{Datelike, NaiveDateTime};
 use serde::{Deserialize, Serialize};

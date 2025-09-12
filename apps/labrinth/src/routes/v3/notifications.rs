@@ -5,7 +5,7 @@ use crate::models::ids::NotificationId;
 use crate::models::notifications::Notification;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use actix_web::{HttpRequest, HttpResponse, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;

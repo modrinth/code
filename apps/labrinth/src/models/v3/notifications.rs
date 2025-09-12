@@ -66,6 +66,7 @@ pub enum NotificationBody {
 }
 
 impl From<DBNotification> for Notification {
+    // TODO: Should be translatable
     fn from(notif: DBNotification) -> Self {
         let (name, text, link, actions) = {
             match &notif.body {

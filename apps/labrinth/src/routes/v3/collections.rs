@@ -9,7 +9,7 @@ use crate::models::collections::{Collection, CollectionStatus};
 use crate::models::ids::{CollectionId, ProjectId};
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::routes::v3::project_creation::CreateError;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;

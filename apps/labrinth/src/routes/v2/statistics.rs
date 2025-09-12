@@ -1,5 +1,6 @@
+use crate::routes::error::ApiError;
 use crate::routes::{
-    ApiError, v2_reroute,
+    v2_reroute,
     v3::{self, statistics::V3Stats},
 };
 use actix_web::{HttpResponse, get, web};

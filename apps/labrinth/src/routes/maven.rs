@@ -9,7 +9,7 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::{auth::get_user_from_headers, database};
 use actix_web::{HttpRequest, HttpResponse, get, route, web};
 use sqlx::PgPool;
@@ -215,7 +215,7 @@ async fn find_version(
             if !game_versions.is_empty() {
                 let version_game_versions =
                     x.version_fields.clone().into_iter().find_map(|v| {
-                        MinecraftGameVersion::try_from_version_field(&v).ok()
+                        MinecraftGameVersion::try_from_version_field(v).ok()
                     });
                 if let Some(version_game_versions) = version_game_versions {
                     bool &= version_game_versions
