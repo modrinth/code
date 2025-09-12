@@ -2,8 +2,9 @@
 	<div ref="containerRef" class="relative inline-block w-full">
 		<span
 			ref="triggerRef"
-			type="button"
-			class="relative cursor-pointer flex h-11 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left outline outline-1 outline-offset-[-1px] outline-button-border transition-all duration-200"
+			role="button"
+			tabindex="0"
+			class="relative cursor-pointer flex h-11 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left outline outline-1 outline-offset-[-1px] outline-button-border transition-all duration-200 text-button-text hover:bg-button-bgHover active:bg-button-bgActive"
 			:class="[
 				triggerClasses,
 				{
@@ -15,13 +16,13 @@
 			]"
 			:aria-expanded="isOpen"
 			:aria-haspopup="listbox ? 'listbox' : 'menu'"
-			:disabled="disabled"
+			:aria-disabled="disabled || undefined"
 			@click="handleTriggerClick"
 			@keydown="handleTriggerKeydown"
 		>
 			<div class="flex items-center gap-2">
 				<slot name="prefix"></slot>
-				<span class="text-base font-semibold leading-tight text-contrast">
+				<span class="text-base font-semibold leading-tight">
 					<slot name="selected">{{ triggerText }}</slot>
 				</span>
 			</div>
@@ -39,7 +40,7 @@
 			<div
 				v-if="isOpen"
 				ref="dropdownRef"
-				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-button-bg outline outline-1 outline-offset-[-1px] outline-button-border"
+				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-dropdown-bg outline outline-1 outline-offset-[-1px] outline-button-border"
 				:class="openDirection === 'down' ? 'rounded-t-none' : 'rounded-b-none'"
 				:style="dropdownStyle"
 				:role="listbox ? 'listbox' : 'menu'"
@@ -48,7 +49,7 @@
 			>
 				<div v-if="searchable" class="p-4">
 					<div
-						class="flex items-center gap-2 overflow-hidden rounded-xl bg-bg-raised px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-button-border focus-within:shadow-[0px_0px_0px_2px_rgba(52,54,60,1.00)]"
+						class="flex items-center gap-2 overflow-hidden rounded-xl bg-bg-raised px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-button-border focus-within:outline-2 focus-within:outline-contrast"
 					>
 						<SearchIcon class="size-5" />
 						<input
@@ -56,13 +57,13 @@
 							v-model="searchQuery"
 							type="text"
 							:placeholder="searchPlaceholder"
-							class="flex-1 !bg-bg-raised text-sm font-medium leading-[18px] text-contrast placeholder-secondary !shadow-none !outline-none"
+							class="flex-1 !bg-bg-raised text-sm font-medium leading-[18px] text-dropdown-text placeholder-secondary !shadow-none !outline-none"
 							@keydown.stop="handleSearchKeydown"
 						/>
 					</div>
 				</div>
 
-				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-button-bg"></div>
+				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-divider"></div>
 
 				<div
 					v-if="filteredOptions.length > 0"
@@ -71,33 +72,36 @@
 					:style="{ maxHeight: `${maxHeight}px` }"
 				>
 					<template v-for="(item, index) in filteredOptions" :key="item.key">
-						<div v-if="item.type === 'divider'" class="h-px bg-button-border"></div>
+						<div v-if="item.type === 'divider'" class="h-px bg-divider"></div>
 						<component
 							:is="item.type === 'link' ? 'a' : 'span'"
 							v-else
 							:ref="(el: HTMLElement) => setOptionRef(el as HTMLElement, index)"
-							:href="item.type === 'link' ? item.href : undefined"
-							:target="item.type === 'link' ? item.target : undefined"
-							type="button"
+							:href="item.type === 'link' && !item.disabled ? item.href : undefined"
+							:target="item.type === 'link' && !item.disabled ? item.target : undefined"
 							:role="listbox ? 'option' : 'menuitem'"
 							:aria-selected="listbox && item.value === modelValue"
+							:aria-disabled="item.disabled || undefined"
 							:data-focused="focusedIndex === index"
-							class="flex items-center gap-2.5 cursor-pointer rounded-xl bg-transparent px-4 py-3 text-left transition-colors duration-150"
+							class="flex items-center gap-2.5 cursor-pointer rounded-xl px-4 py-3 text-left transition-colors duration-150 text-dropdown-text hover:bg-button-bgHover focus:bg-button-bgHover"
 							:class="[
 								item.class,
 								{
-									'bg-[#42444a]': focusedIndex === index || (listbox && item.value === modelValue),
-									'cursor-not-allowed opacity-50': item.disabled,
+									'bg-button-bgSelected text-button-textSelected':
+										listbox && item.value === modelValue,
+									'bg-button-bgHover':
+										focusedIndex === index && !(listbox && item.value === modelValue),
+									'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
 								},
 							]"
-							:disabled="item.disabled"
+							tabindex="-1"
 							@click="handleOptionClick(item, index)"
-							@mouseenter="focusedIndex = index"
+							@mouseenter="!item.disabled && (focusedIndex = index)"
 						>
 							<slot :name="`option-${item.value}`" :item="item">
 								<div class="flex items-center gap-2">
 									<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
-									<span class="text-base font-semibold leading-tight text-contrast">
+									<span class="text-base font-semibold leading-tight">
 										{{ item.label }}
 									</span>
 								</div>
