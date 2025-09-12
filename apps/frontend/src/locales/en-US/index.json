@@ -567,7 +567,7 @@
     "message": "Failed to load random projects :("
   },
   "landing.feature.follow.description": {
-    "message": "Get notified every time your favorite projects update and stay in the loop"
+    "message": "Get notified every time your favorite projects update and stay in the loop."
   },
   "landing.feature.follow.heading": {
     "message": "Follow projects you love"
@@ -642,7 +642,7 @@
     "message": "Sort by"
   },
   "landing.section.for-creators.description": {
-    "message": "Give an online home to your creations and reach a massive audience of dedicated players"
+    "message": "Give an online home to your creations and reach a massive audience of dedicated players."
   },
   "landing.section.for-creators.label": {
     "message": "For Creators"
