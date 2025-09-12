@@ -23,6 +23,27 @@
   "labrinth.error.database.schema": {
     "message": "Schema error: {cause}"
   },
+  "labrinth.error.database.schema.field_name_does_not_exist": {
+    "message": "Field name {field_name} for field {field} in does not exist"
+  },
+  "labrinth.error.database.schema.field_name_mismatch": {
+    "message": "Field name {expected} is not {actual}"
+  },
+  "labrinth.error.database.schema.game_version_field_not_enum": {
+    "message": "Game version requires field value to be an enum: {field}"
+  },
+  "labrinth.error.database.schema.missing_game_version_enum": {
+    "message": "Could not find game version enum."
+  },
+  "labrinth.error.database.schema.multiple_fields": {
+    "message": "Multiple fields for field {field}"
+  },
+  "labrinth.error.database.schema.multiple_ids_for_field": {
+    "message": "Multiple field ids for field {field}"
+  },
+  "labrinth.error.database.schema.no_version_fields": {
+    "message": "No version fields for field {field}"
+  },
   "labrinth.error.database.sqlx": {
     "message": "Error while interacting with the database: {cause}"
   },
@@ -247,6 +268,9 @@
   },
   "labrinth.error.search_error": {
     "message": "Search Error: {cause}"
+  },
+  "labrinth.error.slack_error": {
+    "message": "Slack Webhook Error: Error while sending projects webhook"
   },
   "labrinth.error.stripe_error": {
     "message": "Error while interacting with payment processor: {cause}"
