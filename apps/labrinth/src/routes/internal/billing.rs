@@ -293,7 +293,7 @@ pub async fn refund_charge(
                             &anrok::Transaction {
                                 id: anrok::transaction_id_stripe_pyr(&refund.id),
                                 fields: anrok::TransactionFields {
-                                    customer_address: anrok::Address::default_exempt(), // anrok::Address::from_stripe_address(&billing_address),
+                                    customer_address: anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&billing_address),
                                     currency_code: charge.currency_code.clone(),
                                     accounting_time: Utc::now(),
                                     accounting_time_zone: anrok::AccountingTimeZone::Utc,
@@ -700,7 +700,7 @@ pub async fn edit_subscription(
                         &anrok_client,
                         payments::PaymentBootstrapOptions {
                             user: &user,
-                            existing_payment_intent: None,
+                            payment_intent: None,
                             payment_session:
                                 payments::PaymentSession::Interactive {
                                     payment_request_type:
@@ -709,23 +709,34 @@ pub async fn edit_subscription(
                                         },
                                 },
                             attached_charge:
-                                payments::AttachedCharge::BaseUpon {
+                                payments::AttachedCharge::Promotion {
                                     product_id: new_product_price
                                         .product_id
                                         .into(),
-                                    interval: Some(new_interval),
+                                    interval: new_interval,
+                                    current_subscription: subscription
+                                        .id
+                                        .into(),
+                                    new_region,
                                 },
-                            currency_mode: payments::CurrencyMode::UseSpecified(
-                                currency,
-                            ),
+                            currency: payments::CurrencyMode::Set(currency),
                             attach_payment_metadata: None,
-                            change_region: Some(new_region),
                         },
                     )
                     .await?;
 
                     Some(results)
                 } else {
+                    /*
+                    open_charge.status = ChargeStatus::Open;
+                    open_charge.payment_platform = PaymentPlatform::Stripe;
+                    open_charge.amount = new_product_price.prices.get_interval(new_interval).ok_or_else(|| ApiError::InvalidInput("Could not find a valid price for the user's duration".to_owned()))?;
+                    open_charge.currency_code = new_product_price.currency_code;
+                    open_charge.subscription_interval = Some(new_interval);
+                    open_charge.price_id = new_product_price.id;
+                    open_charge.type_ = ChargeType::Subscription;
+                    */
+
                     None
                 }
             } else {
@@ -780,7 +791,7 @@ pub async fn edit_subscription(
                             &anrok_client,
                             payments::PaymentBootstrapOptions {
                                 user: &user,
-                                existing_payment_intent: None,
+                                payment_intent: None,
                                 payment_session:
                                     payments::PaymentSession::Interactive {
                                         payment_request_type:
@@ -795,10 +806,9 @@ pub async fn edit_subscription(
                                         next_interval,
                                         current_subscription: subscription.id.into(),
                                     },
-                                currency_mode:
-                                    payments::CurrencyMode::UseSpecified(currency),
+                                currency:
+                                    payments::CurrencyMode::Set(currency),
                                 attach_payment_metadata: None,
-                                change_region: None, // We don't support region switch here yet
                             },
                         )
                         .await?;
@@ -1391,7 +1401,7 @@ pub async fn initiate_payment(
         &anrok_client,
         payments::PaymentBootstrapOptions {
             user: &user,
-            existing_payment_intent: payment_request.existing_payment_intent,
+            payment_intent: payment_request.existing_payment_intent,
             payment_session: payments::PaymentSession::Interactive {
                 payment_request_type: payment_request.type_,
             },
@@ -1401,9 +1411,8 @@ pub async fn initiate_payment(
                     payment_request.charge,
                 )
                 .await?,
-            currency_mode: payments::CurrencyMode::InferFromBillingDetails,
+            currency: payments::CurrencyMode::Infer,
             attach_payment_metadata: payment_request.metadata,
-            change_region: None,
         },
     )
     .await?;
@@ -1592,7 +1601,7 @@ pub async fn stripe_webhook(
                             id: id.clone(),
                             fields: anrok::TransactionFields {
                                 customer_address:
-                                    anrok::Address::default_exempt(), // anrok::Address::from_stripe_address(&customer_address),
+                                    anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&customer_address),
                                 currency_code: currency,
                                 accounting_time: Utc::now(),
                                 accounting_time_zone:
@@ -2857,16 +2866,15 @@ pub async fn index_billing(
                 &anrok_client,
                 payments::PaymentBootstrapOptions {
                     user: &user,
-                    existing_payment_intent: None,
+                    payment_intent: None,
                     payment_session: payments::PaymentSession::AutomatedRenewal,
                     attached_charge: payments::AttachedCharge::UseExisting {
                         charge: charge.clone(),
                     },
-                    currency_mode: payments::CurrencyMode::UseSpecified(
+                    currency: payments::CurrencyMode::Set(
                         currency,
                     ),
                     attach_payment_metadata: None,
-                    change_region: None,
                 },
             )
             .await;

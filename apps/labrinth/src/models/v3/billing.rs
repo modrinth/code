@@ -66,6 +66,15 @@ pub enum Price {
     },
 }
 
+impl Price {
+    pub fn get_interval(&self, interval: PriceDuration) -> Option<i32> {
+        match self {
+            Price::OneTime { .. } => None,
+            Price::Recurring { intervals } => intervals.get(&interval).copied(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Debug, Copy, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub enum PriceDuration {
