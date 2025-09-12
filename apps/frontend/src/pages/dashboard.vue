@@ -1,5 +1,5 @@
 <template>
-	<div class="normal-page">
+	<div class="normal-page !mt-8">
 		<div class="normal-page__sidebar">
 			<NavStack
 				:items="[

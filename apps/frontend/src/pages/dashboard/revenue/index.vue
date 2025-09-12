@@ -9,7 +9,7 @@
 		@withdraw="handleWithdraw"
 		@refresh-data="refreshData"
 	/>
-	<div class="mb-6 flex flex-col gap-8 p-8">
+	<div class="mb-6 flex flex-col gap-8 p-12 py-0">
 		<div class="flex flex-col gap-5">
 			<div class="flex flex-col">
 				<span class="text-2xl font-semibold text-contrast">Balance</span>
@@ -19,39 +19,51 @@
 				>
 			</div>
 			<div class="flex h-3 w-full gap-2 overflow-hidden rounded-full bg-bg-raised">
-				<template v-for="seg in segments" :key="seg.key">
-					<span
-						v-tooltip="formatMoney(seg.amount)"
-						class="block h-full"
-						:class="seg.class"
-						:style="{ width: seg.widthPct }"
-					></span>
-				</template>
+				<div v-for="seg in segments" :key="seg.key" class="h-full" :style="{ width: seg.widthPct }">
+					<Tooltip
+						theme="dismissable-prompt"
+						:triggers="['hover', 'focus']"
+						noAutoFocus
+						placement="top"
+						class="block h-full w-full"
+					>
+						<span
+							class="block h-full w-full transition duration-150 hover:brightness-150"
+							:class="seg.class"
+						></span>
+						<template #popper>
+							<div class="font-semibold text-contrast">{{ formatMoney(seg.amount) }}</div>
+						</template>
+					</Tooltip>
+				</div>
 			</div>
 			<div class="flex flex-col">
 				<div
 					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
 				>
-					<span class="text-md flex flex-row gap-2 align-middle"
+					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
 						><span class="my-auto block size-4 rounded-full bg-brand-green"></span> Available
 						now</span
 					>
-					<span class="text-md font-bold text-contrast">{{ formatMoney(totalAvailable) }}</span>
+					<span class="text-2xl font-bold text-contrast">{{ formatMoney(totalAvailable) }}</span>
 				</div>
 				<div
 					v-for="date in dateSegments"
 					:key="date.date"
 					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
 				>
-					<span class="text-md flex flex-row gap-2 align-middle"
+					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
 						><span
 							class="zone--striped-small my-auto block size-4 rounded-full"
 							:class="[date.stripeClass, date.highlightClass]"
 						></span>
 						Estimated {{ date.date ? dayjs(date.date).format('MMM D, YYYY') : '' }}
-						<Tooltip :triggers="['hover', 'focus']">
-							<nuxt-link class="align-middle text-link" to="/legal/cmp-info#pending">
-								<UnknownIcon />
+						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" noAutoFocus>
+							<nuxt-link
+								class="inline-flex items-center justify-center text-link"
+								to="/legal/cmp-info#pending"
+							>
+								<UnknownIcon class="inline-block size-5 align-middle" />
 							</nuxt-link>
 							<template #popper>
 								<div class="w-[250px] font-semibold text-contrast">
@@ -61,18 +73,16 @@
 							</template>
 						</Tooltip>
 					</span>
-					<span class="text-md font-bold text-contrast">{{ formatMoney(date?.amount ?? 0) }}</span>
+					<span class="text-2xl font-bold text-contrast">{{ formatMoney(date?.amount ?? 0) }}</span>
 				</div>
-				<div
-					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
-				>
-					<span class="text-md flex flex-row gap-2 align-middle"
+				<div class="flex flex-row justify-between p-2">
+					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
 						><span
-							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg"
+							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg opacity-90"
 						></span>
 						Processing
-						<Tooltip :triggers="['hover', 'focus']">
-							<InProgressIcon class="my-auto" />
+						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" noAutoFocus>
+							<InProgressIcon class="inline-block size-5 align-middle" />
 							<template #popper>
 								<div class="w-[250px] font-semibold text-contrast">
 									Revenue stays in processing until the end of the month, then becomes available 60
@@ -81,29 +91,29 @@
 							</template>
 						</Tooltip>
 					</span>
-					<span class="text-md font-bold text-contrast">{{
+					<span class="text-2xl font-bold text-contrast">{{
 						formatMoney(processingDate?.amount ?? 0)
 					}}</span>
 				</div>
 			</div>
 		</div>
 		<div class="flex flex-col gap-4">
-			<span class="text-3xl font-semibold text-contrast">Withdraw</span>
+			<span class="text-2xl font-semibold text-contrast">Withdraw</span>
 			<div class="grid grid-cols-3 gap-x-4 gap-y-2">
 				<button
-					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-800 p-5 text-inverted shadow-md transition-all duration-200 hover:brightness-110"
+					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-700 p-5 text-inverted shadow-md transition-all duration-200 hover:brightness-110"
 					@click="openWithdrawModal"
 				>
 					<div class="relative z-10 flex flex-row justify-between">
-						<span class="text-lg font-semibold">Withdraw</span>
-						<ArrowUpRightIcon class="my-auto size-4" />
+						<span class="text-md font-semibold">Withdraw</span>
+						<ArrowUpRightIcon class="my-auto size-6" />
 					</div>
-					<div class="relative z-10 text-left">
+					<div class="relative z-10 text-left text-sm font-medium">
 						Withdraw from your available balance to any payout method.
 					</div>
 					<svg
 						aria-hidden="true"
-						class="pointer-events-none absolute bottom-0 right-0 z-0 h-[105px] w-[271px]"
+						class="pointer-events-none absolute bottom-0 right-0 z-0 h-full w-auto"
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 266 100"
 						fill="none"
@@ -140,7 +150,7 @@
 				<nuxt-link class="text-link" to="/legal/cmp-info">Reward Program</nuxt-link>.</span
 			>
 		</div>
-		<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-4">
+		<div class="flex flex-col gap-4">
 			<div class="flex flex-row justify-between">
 				<span class="text-3xl font-semibold text-contrast">Transactions</span>
 				<nuxt-link
@@ -149,26 +159,31 @@
 					>See all</nuxt-link
 				>
 			</div>
-			<div v-for="transaction in sortedPayouts.slice(0, 3)" class="flex flex-row gap-3">
-				<div
-					class="flex size-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised shadow-md"
-				>
-					<ArrowUpIcon class="my-auto size-8 text-contrast" />
-				</div>
-				<div class="flex w-full flex-row justify-between">
-					<div class="flex flex-col">
-						<span class="text-lg font-semibold text-contrast">{{
-							formatMethodName(transaction.method)
-						}}</span>
-						<span class="text-secondary"
-							>{{ formatTransactionStatus(transaction.status) }} |
-							{{ dayjs(transaction.created).format('MMM DD YYYY') }}</span
-						>
+			<div v-if="sortedPayouts.length > 0">
+				<div v-for="transaction in sortedPayouts.slice(0, 3)" class="flex flex-row gap-3">
+					<div
+						class="flex size-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised shadow-md"
+					>
+						<ArrowUpIcon class="my-auto size-8 text-contrast" />
 					</div>
-					<span class="my-auto text-2xl font-bold text-contrast">{{
-						formatMoney(transaction.amount)
-					}}</span>
+					<div class="flex w-full flex-row justify-between">
+						<div class="flex flex-col">
+							<span class="text-lg font-semibold text-contrast">{{
+								formatMethodName(transaction.method)
+							}}</span>
+							<span class="text-secondary"
+								>{{ formatTransactionStatus(transaction.status) }} |
+								{{ dayjs(transaction.created).format('MMM DD YYYY') }}</span
+							>
+						</div>
+						<span class="my-auto text-2xl font-bold text-contrast">{{
+							formatMoney(transaction.amount)
+						}}</span>
+					</div>
 				</div>
+			</div>
+			<div v-else class="rounded-xl border border-button-bg p-4 text-secondary">
+				No transactions found
 			</div>
 		</div>
 	</div>
@@ -208,7 +223,6 @@ interface UserBalanceResponse {
 	form_completion_status: FormCompletionStatus | null
 }
 
-// Types for payout methods and related shapes
 type PayoutInterval = { fixed: { values: number[] } } | { standard: { min: number; max: number } }
 interface PayoutMethodFee {
 	percentage: number
@@ -500,11 +514,11 @@ $striped-colors: 'green', 'blue', 'purple', 'orange', 'red';
 	@extend %zone--striped-common;
 	background-image: linear-gradient(
 		135deg,
-		var(--color-button-bg-hover) 11.54%,
+		var(--color-divider-dark) 11.54%,
 		transparent 11.54%,
 		transparent 50%,
-		var(--color-button-bg-hover) 50%,
-		var(--color-button-bg-hover) 61.54%,
+		var(--color-divider-dark) 50%,
+		var(--color-divider-dark) 61.54%,
 		transparent 61.54%,
 		transparent 100%
 	);
@@ -514,5 +528,16 @@ $striped-colors: 'green', 'blue', 'purple', 'orange', 'red';
 	background-size: 6.19px 6.19px !important;
 	background-position: unset !important;
 	background-attachment: unset !important;
+}
+</style>
+
+<style>
+.v-popper--theme-dismissable-prompt .v-popper__inner {
+	border-color: transparent !important;
+}
+
+.v-popper--theme-dismissable-prompt .v-popper__arrow-outer,
+.v-popper--theme-dismissable-prompt .v-popper__arrow-inner {
+	border-color: transparent !important;
 }
 </style>
