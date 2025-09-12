@@ -248,6 +248,21 @@
   "labrinth.error.project_creation.invalid_input.validation": {
     "message": "Error while validating input: {cause}"
   },
+  "labrinth.error.project_creation.missing_value.content_file_extension": {
+    "message": "Missing content file extension"
+  },
+  "labrinth.error.project_creation.missing_value.content_file_name": {
+    "message": "Missing content file name"
+  },
+  "labrinth.error.project_creation.missing_value.content_name": {
+    "message": "Missing content name"
+  },
+  "labrinth.error.project_creation.missing_value.data_field": {
+    "message": "No `data` field in multipart upload"
+  },
+  "labrinth.error.project_creation.missing_value.project_id": {
+    "message": "Missing project id"
+  },
   "labrinth.error.project_creation.unauthorized": {
     "message": "Authentication Error: {cause}"
   },

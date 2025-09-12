@@ -31,6 +31,7 @@ use ariadne::i18n_enum;
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
+use derive_more::Display;
 use futures::stream::StreamExt;
 use image::ImageError;
 use itertools::Itertools;
@@ -67,7 +68,7 @@ pub enum CreateError {
     #[error("Error while validating uploaded file: {0}")]
     FileValidationError(#[from] crate::validate::ValidationError),
     #[error("{0}")]
-    MissingValueError(String), // TODO: Use an I18nEnum instead of a String
+    MissingValueError(MissingValuePart),
     #[error("Invalid format for image: {0}")]
     InvalidIconFormat(ApiError),
     #[error("Error with multipart data: {0}")]
@@ -110,6 +111,30 @@ i18n_enum!(
     Unauthorized(cause) => "unauthorized",
     CustomAuthenticationError(reason) => "unauthorized.custom",
     ImageError(cause) => "invalid_image",
+);
+
+#[derive(Copy, Clone, Debug, Display)]
+pub enum MissingValuePart {
+    #[display("No `data` field in multipart upload")]
+    DataField,
+    #[display("Missing content name")]
+    ContentName,
+    #[display("Missing content file name")]
+    ContentFileName,
+    #[display("Missing content file extension")]
+    ContentFileExtension,
+    #[display("Missing project id")]
+    ProjectId,
+}
+
+i18n_enum!(
+    MissingValuePart,
+    root_key: "labrinth.error.project_creation.missing_value",
+    DataField! => "data_field",
+    ContentName! => "content_name",
+    ContentFileName! => "content_file_name",
+    ContentFileExtension! => "content_file_extension",
+    ProjectId! => "project_id",
 );
 
 impl actix_web::ResponseError for CreateError {
@@ -347,28 +372,23 @@ async fn project_create_inner(
 
     let project_id: ProjectId =
         models::generate_project_id(transaction).await?.into();
-    let all_loaders =
-        models::loader_fields::Loader::list(&mut **transaction, redis).await?;
+    let all_loaders = Loader::list(&mut **transaction, redis).await?;
 
     let project_create_data: ProjectCreateData;
     let mut versions;
-    let mut versions_map = std::collections::HashMap::new();
+    let mut versions_map = HashMap::new();
     let mut gallery_urls = Vec::new();
     {
         // The first multipart field must be named "data" and contain a
         // JSON `ProjectCreateData` object.
 
         let mut field = payload.next().await.map_or_else(
-            || {
-                Err(CreateError::MissingValueError(String::from(
-                    "No `data` field in multipart upload",
-                )))
-            },
+            || Err(CreateError::MissingValueError(MissingValuePart::DataField)),
             |m| m.map_err(CreateError::MultipartError),
         )?;
 
         let name = field.name().ok_or_else(|| {
-            CreateError::MissingValueError(String::from("Missing content name"))
+            CreateError::MissingValueError(MissingValuePart::ContentName)
         })?;
 
         if name != "data" {
@@ -468,7 +488,7 @@ async fn project_create_inner(
             let content_disposition = field.content_disposition().unwrap().clone();
 
             let name = content_disposition.get_name().ok_or_else(|| {
-                CreateError::MissingValueError("Missing content name".to_string())
+                CreateError::MissingValueError(MissingValuePart::ContentName)
             })?;
 
             let (file_name, file_extension) =
@@ -914,7 +934,7 @@ async fn create_initial_version(
     version_data: &InitialVersionData,
     project_id: ProjectId,
     author: UserId,
-    all_loaders: &[models::loader_fields::Loader],
+    all_loaders: &[Loader],
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     redis: &RedisPool,
 ) -> Result<models::version_item::VersionBuilder, CreateError> {
@@ -1006,7 +1026,7 @@ async fn process_icon_upload(
         "Icons must be smaller than 256KiB",
     )
     .await?;
-    let upload_result = crate::util::img::upload_image_optimized(
+    let upload_result = upload_image_optimized(
         &format!("data/{}", to_base62(id)),
         FileHostPublicity::Public,
         data.freeze(),
