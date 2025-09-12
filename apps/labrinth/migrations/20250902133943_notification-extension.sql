@@ -5,7 +5,7 @@ CREATE TABLE notifications_deliveries (
     user_id BIGINT NOT NULL REFERENCES users(id),
     delivery_priority INTEGER NOT NULL,
     status VARCHAR(32) NOT NULL,
-    next_attempt TIMESTAMP WITH TIME ZONE NOT NULL,
+    next_attempt timestamptz NOT NULL,
     attempt_count INTEGER NOT NULL,
 
     UNIQUE (notification_id, channel)
