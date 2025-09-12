@@ -280,7 +280,7 @@ impl DBUser {
     {
         let ids = user_ids.iter().map(|x| x.0).collect::<Vec<_>>();
         let count = sqlx::query_scalar!(
-            r#"SELECT COUNT(1) "count!" FROM users WHERE id = ANY($1)"#,
+            r#"SELECT COUNT(*) "count!" FROM users WHERE id = ANY($1)"#,
             &ids
         )
         .fetch_one(exec)
