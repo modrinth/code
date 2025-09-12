@@ -1,4 +1,5 @@
 use crate::database::redis::RedisPool;
+use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::payouts::{
     PayoutsQueue, insert_bank_balances, process_payout,
 };
@@ -39,7 +40,7 @@ impl BackgroundTask {
             UpdateVersions => update_versions(pool, redis_pool).await,
             Payouts => payouts(pool, clickhouse).await,
             IndexBilling => {
-                crate::routes::internal::billing::index_billing(
+                index_billing(
                     stripe_client,
                     anrok_client,
                     pool.clone(),
@@ -49,12 +50,7 @@ impl BackgroundTask {
 
                 update_bank_balances(pool).await;
             }
-            IndexSubscriptions => {
-                crate::routes::internal::billing::index_subscriptions(
-                    pool, redis_pool,
-                )
-                .await
-            }
+            IndexSubscriptions => index_subscriptions(pool, redis_pool).await,
         }
     }
 }

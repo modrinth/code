@@ -17,13 +17,14 @@ use sqlx::PgPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use stripe::{
-    self, CreatePaymentIntent, Currency, PaymentIntentOffSession,
-    PaymentIntentSetupFutureUsage, PaymentMethod, PaymentMethodId,
+    self, CreateCustomer, CreatePaymentIntent, Currency, CustomerId,
+    PaymentIntentOffSession, PaymentIntentSetupFutureUsage, PaymentMethod,
+    PaymentMethodId,
 };
 
 use super::{
     ChargeRequestType, ChargeType, PaymentRequestMetadata, PaymentRequestType,
-    Price, PriceDuration, get_or_create_customer, infer_currency_code,
+    Price, PriceDuration,
 };
 
 const DEFAULT_USER_COUNTRY: &str = "US";
@@ -559,6 +560,116 @@ pub async fn create_or_update_payment_intent(
             tax: tax_amount,
         })
     }
+}
+
+pub async fn get_or_create_customer(
+    user_id: ariadne::ids::UserId,
+    stripe_customer_id: Option<&str>,
+    user_email: Option<&str>,
+    client: &stripe::Client,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<CustomerId, ApiError> {
+    if let Some(customer_id) =
+        stripe_customer_id.and_then(|x| stripe::CustomerId::from_str(x).ok())
+    {
+        Ok(customer_id)
+    } else {
+        let mut metadata = HashMap::new();
+        metadata.insert(MODRINTH_USER_ID.to_owned(), to_base62(user_id.0));
+
+        let customer = stripe::Customer::create(
+            client,
+            CreateCustomer {
+                email: user_email,
+                metadata: Some(metadata),
+                ..Default::default()
+            },
+        )
+        .await?;
+
+        sqlx::query!(
+            "
+            UPDATE users
+            SET stripe_customer_id = $1
+            WHERE id = $2
+            ",
+            customer.id.as_str(),
+            user_id.0 as i64
+        )
+        .execute(pool)
+        .await?;
+
+        crate::database::models::user_item::DBUser::clear_caches(
+            &[(user_id.into(), None)],
+            redis,
+        )
+        .await?;
+
+        Ok(customer.id)
+    }
+}
+
+pub fn infer_currency_code(country: &str) -> String {
+    match country {
+        "US" => "USD",
+        "GB" => "GBP",
+        "EU" => "EUR",
+        "AT" => "EUR",
+        "BE" => "EUR",
+        "CY" => "EUR",
+        "EE" => "EUR",
+        "ES" => "EUR",
+        "FI" => "EUR",
+        "FR" => "EUR",
+        "DE" => "EUR",
+        "GR" => "EUR",
+        "IE" => "EUR",
+        "IT" => "EUR",
+        "LV" => "EUR",
+        "LT" => "EUR",
+        "LU" => "EUR",
+        "MT" => "EUR",
+        "NL" => "EUR",
+        "PT" => "EUR",
+        "SK" => "EUR",
+        "SI" => "EUR",
+        "RU" => "RUB",
+        "BR" => "BRL",
+        "JP" => "JPY",
+        "ID" => "IDR",
+        "MY" => "MYR",
+        "PH" => "PHP",
+        "TH" => "THB",
+        "VN" => "VND",
+        "KR" => "KRW",
+        "TR" => "TRY",
+        "UA" => "UAH",
+        "MX" => "MXN",
+        "CA" => "CAD",
+        "NZ" => "NZD",
+        "NO" => "NOK",
+        "PL" => "PLN",
+        "CH" => "CHF",
+        "LI" => "CHF",
+        "IN" => "INR",
+        "CL" => "CLP",
+        "PE" => "PEN",
+        "CO" => "COP",
+        "ZA" => "ZAR",
+        "HK" => "HKD",
+        "AR" => "ARS",
+        "KZ" => "KZT",
+        "UY" => "UYU",
+        "CN" => "CNY",
+        "AU" => "AUD",
+        "TW" => "TWD",
+        "SA" => "SAR",
+        "QA" => "QAR",
+        "SG" => "SGD",
+        _ => "USD",
+    }
+    .to_string()
 }
 
 struct ChargeData {
