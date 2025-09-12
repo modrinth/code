@@ -8,3 +8,18 @@ CREATE TABLE products_tax_identifiers (
     tax_processor_id TEXT NOT NULL,
     product_id BIGINT REFERENCES products(id) NOT NULL
 );
+
+INSERT INTO products_tax_identifiers (tax_processor_id, product_id)
+SELECT
+  'modrinth-servers' tax_processor_id,
+  id product_id
+FROM products
+WHERE metadata ->> 'type' = 'pyro';
+
+INSERT INTO products_tax_identifiers (tax_processor_id, product_id)
+SELECT
+  'modrinth-plus' tax_processor_id,
+  id product_id
+FROM products
+WHERE metadata ->> 'type' = 'midas';
+
