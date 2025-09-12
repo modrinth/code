@@ -270,7 +270,7 @@ impl DBUser {
         Ok(users)
     }
 
-    // Returns `false` if any of the specified user IDs do not exist.
+    /// Returns `false` if any of the specified user IDs do not exist.
     pub async fn exists_many<'a, E>(
         user_ids: &[DBUserId],
         exec: E,
