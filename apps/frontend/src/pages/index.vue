@@ -531,7 +531,7 @@ const messages = defineMessages({
 	creatorsDescription: {
 		id: 'landing.section.for-creators.description',
 		defaultMessage:
-			'Give an online home to your creations and reach a massive audience of dedicated players',
+			'Give an online home to your creations and reach a massive audience of dedicated players.',
 	},
 	findWhatYouWantHeading: {
 		id: 'landing.feature.search.heading',
@@ -548,7 +548,7 @@ const messages = defineMessages({
 	},
 	followProjectsDescription: {
 		id: 'landing.feature.follow.description',
-		defaultMessage: 'Get notified every time your favorite projects update and stay in the loop',
+		defaultMessage: 'Get notified every time your favorite projects update and stay in the loop.',
 	},
 	playWithLauncherHeading: {
 		id: 'landing.feature.launcher.heading',
