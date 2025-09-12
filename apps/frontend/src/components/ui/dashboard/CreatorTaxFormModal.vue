@@ -2,8 +2,8 @@
 	<NewModal
 		ref="taxFormModal"
 		header="Submitting tax form"
-		@on-hide="emit('onHide')"
 		:closable="false"
+		@on-hide="emit('onHide')"
 	>
 		<div class="max-w-[40rem]">
 			<Admonition

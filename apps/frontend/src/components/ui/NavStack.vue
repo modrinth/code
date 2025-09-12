@@ -20,8 +20,8 @@
 						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 text-nowrap rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
 					>
 						<component
-							v-if="item.icon"
 							:is="item.icon"
+							v-if="item.icon"
 							aria-hidden="true"
 							class="h-5 w-5 shrink-0"
 						/>
@@ -42,8 +42,8 @@
 						@click="item.action"
 					>
 						<component
-							v-if="item.icon"
 							:is="item.icon"
+							v-if="item.icon"
 							aria-hidden="true"
 							class="h-5 w-5 shrink-0"
 						/>
@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon } from '@modrinth/assets'
-import { computed, useSlots, type Component } from 'vue'
+import { type Component,computed, useSlots } from 'vue'
 
 type NavStackBaseItem = {
 	label: string

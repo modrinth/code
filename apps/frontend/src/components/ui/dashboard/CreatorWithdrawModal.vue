@@ -5,7 +5,7 @@
 		:noblur="true"
 		:closable="currentStage !== 'confirmation'"
 		:merge-header="!currentStageLabel"
-		@onHide="currentStage = undefined"
+		@on-hide="currentStage = undefined"
 	>
 		<div class="flex w-full flex-col gap-4 sm:w-[540px]">
 			<template v-if="currentStage === 'withdraw-limit'">
@@ -29,7 +29,7 @@
 						To withdraw your full <b>{{ formatMoney(balance?.available) }}</b> available balance
 						please complete the form below. It is required for tax reporting and only needs to be
 						done once.
-						<template v-slot:icon="{ iconClass }">
+						<template #icon="{ iconClass }">
 							<FileTextIcon :class="iconClass" />
 						</template>
 						<template #actions>
@@ -55,7 +55,7 @@
 						<button @click="withdrawModal?.hide()"><XIcon />Cancel</button>
 					</ButtonStyled>
 					<ButtonStyled color="standard">
-						<button @click="currentStage = 'withdraw-details'" :disabled="remainingLimit <= 0">
+						<button :disabled="remainingLimit <= 0" @click="currentStage = 'withdraw-details'">
 							Continue with limit<ChevronRightIcon />
 						</button>
 					</ButtonStyled>
@@ -77,12 +77,12 @@
 					/>
 				</div>
 				<Combobox
+					v-model="countryId"
 					:listbox="true"
 					:searchable="true"
-					v-model="countryId"
 					:options="countryOptions"
 					placeholder="Select country..."
-					:displayValue="countryProxy?.name ?? 'Select country...'"
+					:display-value="countryProxy?.name ?? 'Select country...'"
 				/>
 
 				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
@@ -90,12 +90,12 @@
 				</div>
 				<div class="relative">
 					<Combobox
-						:listbox="true"
 						v-model="paymentMethodId"
+						:listbox="true"
 						class="payment-method-select w-full"
 						:options="paymentMethodOptions"
 						placeholder="Select method..."
-						:displayValue="
+						:display-value="
 							paymentMethod ? formatPaymentMethodName(paymentMethod) : 'Select method...'
 						"
 					/>
@@ -191,13 +191,15 @@ import {
 	Admonition,
 	ButtonStyled,
 	Combobox,
-	NewModal,
 	injectNotificationManager,
+	NewModal,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { all } from 'iso-3166-1'
 import type { CSSProperties } from 'vue'
+
 import { getAuthUrl } from '~/composables/auth.js'
+
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
 
 const { addNotification, handleError } = injectNotificationManager()

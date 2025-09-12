@@ -26,12 +26,12 @@
 </template>
 <script setup>
 import {
+	BellIcon as NotificationsIcon,
 	ChartIcon,
 	CurrencyIcon,
 	DashboardIcon,
 	LibraryIcon,
 	ListIcon,
-	BellIcon as NotificationsIcon,
 	OrganizationIcon,
 	ReportIcon,
 } from '@modrinth/assets'

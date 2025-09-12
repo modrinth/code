@@ -1,9 +1,9 @@
 <template>
 	<CreatorWithdrawModal
 		ref="withdrawModal"
+		v-model:country="withdrawCountry"
 		:auth="auth"
 		:balance="userBalance"
-		v-model:country="withdrawCountry"
 		:payout-methods="paymentMethods"
 		:payout-methods-pending="payoutMethodsPending"
 	/>
@@ -37,9 +37,9 @@
 					<span class="text-md font-bold text-contrast">{{ formatMoney(totalAvailable) }}</span>
 				</div>
 				<div
-					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
 					v-for="date in dateSegments"
 					:key="date.date"
+					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
 				>
 					<span class="text-md flex flex-row gap-2 align-middle"
 						><span
@@ -89,8 +89,8 @@
 			<span class="text-3xl font-semibold text-contrast">Withdraw</span>
 			<div class="grid grid-cols-3 gap-x-4 gap-y-2">
 				<button
-					@click="openWithdrawModal"
 					class="flex flex-col rounded-2xl bg-brand p-5 text-inverted shadow-xl brightness-90 transition-all duration-200 hover:brightness-105"
+					@click="openWithdrawModal"
 				>
 					<div class="flex flex-row justify-between">
 						<span class="text-lg font-semibold">Withdraw</span>
@@ -117,7 +117,7 @@
 				<nuxt-link class="text-link" to="/legal/cmp-info">Reward Program</nuxt-link>.</span
 			>
 		</div>
-		<div class="flex flex-col gap-4" v-if="sortedPayouts.length > 0">
+		<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-4">
 			<div class="flex flex-row justify-between">
 				<span class="text-3xl font-semibold text-contrast">Transactions</span>
 				<nuxt-link
@@ -162,6 +162,7 @@ import {
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 import { all } from 'iso-3166-1'
+
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
 
 // TODO: Deduplicate in @modrinth/api-client PR.
