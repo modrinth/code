@@ -39,10 +39,6 @@ pub const MODRINTH_CHARGE_ID: &str = "modrinth_charge_id";
 pub const MODRINTH_TAX_AMOUNT: &str = "modrinth_tax_amount";
 pub const MODRINTH_PAYMENT_METADATA: &str = "modrinth_payment_metadata";
 
-// TODO: CHECKLIST
-// - Check callsites of create_or_update_payment_intent if they handle the charge properly (update it when needed etc)
-// - Preinsert products_tax_identifiers rows
-
 pub enum AttachedCharge {
     /// Create a proration charge.
     Proration {
