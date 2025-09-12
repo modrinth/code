@@ -1,3 +1,4 @@
+use self::payments::*;
 use crate::auth::{get_user_from_headers, send_email};
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::products_tax_identifier_item::{
@@ -232,11 +233,11 @@ pub async fn refund_charge(
                         let mut metadata = HashMap::new();
 
                         metadata.insert(
-                            "modrinth_user_id".to_string(),
+                            MODRINTH_USER_ID.to_owned(),
                             to_base62(user.id.0),
                         );
                         metadata.insert(
-                            "modrinth_charge_id".to_string(),
+                            MODRINTH_CHARGE_ID.to_owned(),
                             to_base62(charge.id.0 as u64),
                         );
 
@@ -690,33 +691,27 @@ pub async fn edit_subscription(
                 }
 
                 if req == PaymentRequirement::RequiresPayment {
-                    let results = payments::create_or_update_payment_intent(
+                    let results = create_or_update_payment_intent(
                         &pool,
                         &redis,
                         &stripe_client,
                         &anrok_client,
-                        payments::PaymentBootstrapOptions {
+                        PaymentBootstrapOptions {
                             user: &user,
                             payment_intent: None,
-                            payment_session:
-                                payments::PaymentSession::Interactive {
-                                    payment_request_type:
-                                        PaymentRequestType::PaymentMethod {
-                                            id: payment_method,
-                                        },
-                                },
-                            attached_charge:
-                                payments::AttachedCharge::Promotion {
-                                    product_id: new_product_price
-                                        .product_id
-                                        .into(),
-                                    interval: new_interval,
-                                    current_subscription: subscription
-                                        .id
-                                        .into(),
-                                    new_region,
-                                },
-                            currency: payments::CurrencyMode::Set(currency),
+                            payment_session: PaymentSession::Interactive {
+                                payment_request_type:
+                                    PaymentRequestType::PaymentMethod {
+                                        id: payment_method,
+                                    },
+                            },
+                            attached_charge: AttachedCharge::Promotion {
+                                product_id: new_product_price.product_id.into(),
+                                interval: new_interval,
+                                current_subscription: subscription.id.into(),
+                                new_region,
+                            },
+                            currency: CurrencyMode::Set(currency),
                             attach_payment_metadata: None,
                         },
                     )
@@ -781,30 +776,31 @@ pub async fn edit_subscription(
                             .or(open_charge.subscription_interval)
                             .unwrap_or(PriceDuration::Monthly);
 
-                        let results = payments::create_or_update_payment_intent(
+                        let results = create_or_update_payment_intent(
                             &pool,
                             &redis,
                             &stripe_client,
                             &anrok_client,
-                            payments::PaymentBootstrapOptions {
+                            PaymentBootstrapOptions {
                                 user: &user,
                                 payment_intent: None,
-                                payment_session:
-                                    payments::PaymentSession::Interactive {
-                                        payment_request_type:
-                                            PaymentRequestType::PaymentMethod {
-                                                id: payment_method,
-                                            },
-                                    },
-                                attached_charge:
-                                    payments::AttachedCharge::Proration {
-                                        amount: proration as i64,
-                                        next_product_id: new_product_price.product_id.into(),
-                                        next_interval,
-                                        current_subscription: subscription.id.into(),
-                                    },
-                                currency:
-                                    payments::CurrencyMode::Set(currency),
+                                payment_session: PaymentSession::Interactive {
+                                    payment_request_type:
+                                        PaymentRequestType::PaymentMethod {
+                                            id: payment_method,
+                                        },
+                                },
+                                attached_charge: AttachedCharge::Proration {
+                                    amount: proration as i64,
+                                    next_product_id: new_product_price
+                                        .product_id
+                                        .into(),
+                                    next_interval,
+                                    current_subscription: subscription
+                                        .id
+                                        .into(),
+                                },
+                                currency: CurrencyMode::Set(currency),
                                 attach_payment_metadata: None,
                             },
                         )
@@ -854,7 +850,7 @@ pub async fn edit_subscription(
         transaction.commit().await?;
     }
 
-    if let Some(payments::PaymentBootstrapResults {
+    if let Some(PaymentBootstrapResults {
         new_payment_intent: Some(pi),
         subtotal,
         tax,
@@ -1391,24 +1387,23 @@ pub async fn initiate_payment(
 
     let payment_request = payment_request.into_inner();
 
-    let results = payments::create_or_update_payment_intent(
+    let results = create_or_update_payment_intent(
         &pool,
         &redis,
         &stripe_client,
         &anrok_client,
-        payments::PaymentBootstrapOptions {
+        PaymentBootstrapOptions {
             user: &user,
             payment_intent: payment_request.existing_payment_intent,
-            payment_session: payments::PaymentSession::Interactive {
+            payment_session: PaymentSession::Interactive {
                 payment_request_type: payment_request.type_,
             },
-            attached_charge:
-                payments::AttachedCharge::from_charge_request_type(
-                    &**pool,
-                    payment_request.charge,
-                )
-                .await?,
-            currency: payments::CurrencyMode::Infer,
+            attached_charge: AttachedCharge::from_charge_request_type(
+                &**pool,
+                payment_request.charge,
+            )
+            .await?,
+            currency: CurrencyMode::Infer,
             attach_payment_metadata: payment_request.metadata,
         },
     )
@@ -1546,7 +1541,7 @@ pub async fn stripe_webhook(
                 };
 
                 let Some(user_id) = metadata
-                    .get("modrinth_user_id")
+                    .get(MODRINTH_USER_ID)
                     .and_then(|x| parse_base62(x).ok())
                     .map(|x| crate::database::models::ids::DBUserId(x as i64))
                 else {
@@ -1563,11 +1558,11 @@ pub async fn stripe_webhook(
                 };
 
                 let payment_metadata = metadata
-                    .get("modrinth_payment_metadata")
+                    .get(MODRINTH_PAYMENT_METADATA)
                     .and_then(|x| serde_json::from_str(x).ok());
 
                 let Some(charge_id) = metadata
-                    .get("modrinth_charge_id")
+                    .get(MODRINTH_CHARGE_ID)
                     .and_then(|x| parse_base62(x).ok())
                     .map(|x| {
                         crate::database::models::ids::DBChargeId(x as i64)
@@ -1577,7 +1572,7 @@ pub async fn stripe_webhook(
                 };
 
                 let tax_amount = metadata
-                    .get("modrinth_tax_amount")
+                    .get(MODRINTH_TAX_AMOUNT)
                     .and_then(|x| x.parse::<i64>().ok())
                     .unwrap_or(0);
 
@@ -1612,14 +1607,14 @@ pub async fn stripe_webhook(
                 }
 
                 let Some(charge_type) = metadata
-                    .get("modrinth_charge_type")
+                    .get(MODRINTH_CHARGE_TYPE)
                     .map(|x| ChargeType::from_string(x))
                 else {
                     break 'metadata;
                 };
 
                 let new_region =
-                    metadata.get("modrinth_new_region").map(String::to_owned);
+                    metadata.get(MODRINTH_NEW_REGION).map(String::to_owned);
 
                 let (
                     charge,
@@ -1740,7 +1735,7 @@ pub async fn stripe_webhook(
                     }
                 } else {
                     let Some(price_id) = metadata
-                        .get("modrinth_price_id")
+                        .get(MODRINTH_PRICE_ID)
                         .and_then(|x| parse_base62(x).ok())
                         .map(|x| {
                             crate::database::models::ids::DBProductPriceId(
@@ -1770,7 +1765,7 @@ pub async fn stripe_webhook(
                         Price::OneTime { .. } => None,
                         Price::Recurring { intervals } => {
                             let Some(interval) = metadata
-                                .get("modrinth_subscription_interval")
+                                .get(MODRINTH_SUBSCRIPTION_INTERVAL)
                                 .map(|x| PriceDuration::from_string(x))
                             else {
                                 break 'metadata;
@@ -1778,7 +1773,7 @@ pub async fn stripe_webhook(
 
                             if intervals.get(&interval).is_some() {
                                 let Some(subscription_id) = metadata
-                                    .get("modrinth_subscription_id")
+                                    .get(MODRINTH_SUBSCRIPTION_ID)
                                     .and_then(|x| parse_base62(x).ok())
                                     .map(|x| {
                                         crate::database::models::ids::DBUserSubscriptionId(x as i64)
@@ -2403,7 +2398,7 @@ async fn get_or_create_customer(
         Ok(customer_id)
     } else {
         let mut metadata = HashMap::new();
-        metadata.insert("modrinth_user_id".to_string(), to_base62(user_id.0));
+        metadata.insert(MODRINTH_USER_ID.to_owned(), to_base62(user_id.0));
 
         let customer = stripe::Customer::create(
             client,
@@ -2849,19 +2844,19 @@ pub async fn index_billing(
 
             let user = User::from_full(user.clone());
 
-            let result = payments::create_or_update_payment_intent(
+            let result = create_or_update_payment_intent(
                 &pool,
                 &redis,
                 &stripe_client,
                 &anrok_client,
-                payments::PaymentBootstrapOptions {
+                PaymentBootstrapOptions {
                     user: &user,
                     payment_intent: None,
-                    payment_session: payments::PaymentSession::AutomatedRenewal,
-                    attached_charge: payments::AttachedCharge::UseExisting {
+                    payment_session: PaymentSession::AutomatedRenewal,
+                    attached_charge: AttachedCharge::UseExisting {
                         charge: charge.clone(),
                     },
-                    currency: payments::CurrencyMode::Set(
+                    currency: CurrencyMode::Set(
                         currency,
                     ),
                     attach_payment_metadata: None,
@@ -2875,7 +2870,7 @@ pub async fn index_billing(
             let mut failure = false;
 
             match result {
-                Ok(payments::PaymentBootstrapResults {
+                Ok(PaymentBootstrapResults {
                     new_payment_intent,
                     payment_method: _,
                     price_id: _,
