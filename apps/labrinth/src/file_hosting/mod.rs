@@ -6,18 +6,16 @@ mod s3_host;
 
 use ariadne::i18n_enum;
 use bytes::Bytes;
+use derive_more::Display;
 pub use mock::MockHost;
 pub use s3_host::{S3BucketConfig, S3Host};
 
 #[derive(Error, Debug)]
 pub enum FileHostingError {
-    // TODO: Use an I18nEnum instead of a String
-    #[error("S3 error when {0}: {1}")]
-    S3Error(&'static str, s3::error::S3Error),
-
+    #[error("{0}: {1}")]
+    S3Error(S3ErrorAction, s3::error::S3Error),
     #[error("File system error in file hosting: {0}")]
     FileSystemError(#[from] std::io::Error),
-
     #[error("Invalid Filename")]
     InvalidFilename,
 }
@@ -28,6 +26,27 @@ i18n_enum!(
     S3Error(action, cause) => "s3",
     FileSystemError(cause) => "file_system",
     InvalidFilename! => "invalid_filename",
+);
+
+#[derive(Copy, Clone, Debug, Display)]
+pub enum S3ErrorAction {
+    #[display("S3 error when creating bucket instance")]
+    CreatingBucketInstance,
+    #[display("S3 error when uploading file")]
+    UploadingFile,
+    #[display("S3 error when generating presigned URL")]
+    GeneratingPresignedUrl,
+    #[display("S3 error when deleting file")]
+    DeletingFile,
+}
+
+i18n_enum!(
+    S3ErrorAction,
+    root_key: "labrinth.error.file_hosting_error.s3",
+    CreatingBucketInstance! => "creating_bucket_instance",
+    UploadingFile! => "uploading_file",
+    GeneratingPresignedUrl! => "generating_presigned_url",
+    DeletingFile! => "deleting_file",
 );
 
 #[derive(Debug, Clone)]

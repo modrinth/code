@@ -142,12 +142,24 @@ impl Extractor {
 struct FileExtractor<'a> {
     extractor: &'a mut Extractor,
     file: FileInfo<'a>,
-    enum_messages: HashMap<Ident, HashMap<Ident, LitStr>>,
+    enum_messages: HashMap<Ident, HashMap<Ident, EnumMessage>>,
 }
 
 struct FileInfo<'a> {
     path: &'a Path,
     source: &'a str,
+}
+
+#[derive(Clone)]
+struct EnumMessage {
+    message: LitStr,
+    display_attribute_type: DisplayAttributeType,
+}
+
+#[derive(PartialEq, Eq, Copy, Clone)]
+enum DisplayAttributeType {
+    ThiserrorError,
+    DeriveMoreDisplay,
 }
 
 impl FileExtractor<'_> {
@@ -166,14 +178,23 @@ impl Visit<'_> for FileExtractor<'_> {
     fn visit_item_enum(&mut self, i: &ItemEnum) {
         let mut variants = HashMap::new();
         for variant in &i.variants {
-            let Some(error_attr) =
-                variant.attrs.iter().find(|x| x.path().is_ident("error"))
-            else {
+            let Some(error_attr) = variant.attrs.iter().find(|x| {
+                x.path().is_ident("error") || x.path().is_ident("display")
+            }) else {
                 continue;
+            };
+            let display_attribute_type = if error_attr.path().is_ident("error")
+            {
+                DisplayAttributeType::ThiserrorError
+            } else {
+                DisplayAttributeType::DeriveMoreDisplay
             };
             let error_message = error_attr
                 .parse_args_with(|input: ParseStream| {
-                    if input.peek(kw::transparent) {
+                    if display_attribute_type
+                        == DisplayAttributeType::ThiserrorError
+                        && input.peek(kw::transparent)
+                    {
                         input.parse::<kw::transparent>()?;
                         Ok(None)
                     } else {
@@ -183,12 +204,25 @@ impl Visit<'_> for FileExtractor<'_> {
                 .transpose();
             match error_message {
                 Some(Ok(message)) => {
-                    variants.insert(variant.ident.clone(), message);
+                    variants.insert(
+                        variant.ident.clone(),
+                        EnumMessage {
+                            message,
+                            display_attribute_type,
+                        },
+                    );
                 }
                 Some(Err(err)) => {
                     let mut true_error = syn::Error::new(
                         error_attr.meta.span(),
-                        "only #[error(transparent)] and #[error(\"lone format string\")] syntaxes are supported",
+                        match display_attribute_type {
+                            DisplayAttributeType::ThiserrorError => {
+                                "only #[error(transparent)] and #[error(\"lone format string\")] syntaxes are supported"
+                            }
+                            DisplayAttributeType::DeriveMoreDisplay => {
+                                "only #[display(\"lone format string\")] syntax is supported"
+                            }
+                        },
                     );
                     true_error.combine(err);
                     self.add_error(true_error);
@@ -235,8 +269,12 @@ impl Visit<'_> for FileExtractor<'_> {
                     }
                     let message_literal = messages.get(&variant.variant_name);
                     let (message, errors) = message_literal
-                        .map(LitStr::value)
-                        .map(|x| variant.transform_format_string(x))
+                        .map(|x| {
+                            variant.transform_format_string(
+                                x.message.value(),
+                                x.display_attribute_type,
+                            )
+                        })
                         .map(|(x, errors)| (TranslationEntry::new(x), errors))
                         .unwrap_or_default();
                     self.extractor.output.insert(
@@ -247,7 +285,7 @@ impl Visit<'_> for FileExtractor<'_> {
                         self.extractor.add_error(
                             &self.file,
                             syn::Error::new(
-                                message_literal.unwrap().span(),
+                                message_literal.unwrap().message.span(),
                                 error,
                             ),
                         );
@@ -313,7 +351,8 @@ impl Parse for I18nEnumVariant {
 
         let mut transparent = None;
         let fields_type;
-        let fields = if input.peek(Token![!]) {
+        let fields = if input.peek(Token![!]) || input.peek(Token![=>]) {
+            // Immediate => also flows into this case for a better error message
             fields_type = FieldsType::Unit;
             input.parse::<Token![!]>()?;
             Punctuated::new()
@@ -362,6 +401,7 @@ impl I18nEnumVariant {
     fn transform_format_string(
         &self,
         format_string: String,
+        display_attribute_type: DisplayAttributeType,
     ) -> (String, Vec<impl Display>) {
         let mut errors = vec![];
         if !format_string.contains(['\'', '{', '}']) {
@@ -426,20 +466,36 @@ impl I18nEnumVariant {
                             );
                             format_variable
                         }
-                        FieldsType::Tuple => match format_variable
-                            .parse()
-                            .map(|x| self.fields.get(x))
-                        {
-                            Ok(Some(field)) => &field.to_string(),
-                            Ok(None) => {
-                                errors.push(format!("index format variable {{{format_variable}}} out of bounds"));
-                                format_variable
+                        FieldsType::Tuple => {
+                            let format_variable = match display_attribute_type {
+                                DisplayAttributeType::ThiserrorError => {
+                                    format_variable
+                                }
+                                DisplayAttributeType::DeriveMoreDisplay => {
+                                    match format_variable.strip_prefix('_') {
+                                        Some(stripped) => stripped,
+                                        None => {
+                                            errors.push(format!("index format variable in #[display] must be prefixed with '_': {{_{format_variable}}}"));
+                                            format_variable
+                                        }
+                                    }
+                                }
+                            };
+                            match format_variable
+                                .parse()
+                                .map(|x| self.fields.get(x))
+                            {
+                                Ok(Some(field)) => &field.to_string(),
+                                Ok(None) => {
+                                    errors.push(format!("index format variable {{{format_variable}}} out of bounds"));
+                                    format_variable
+                                }
+                                Err(_) => {
+                                    errors.push(format!("invalid index format variable {{{format_variable}}} (must be usize)"));
+                                    format_variable
+                                }
                             }
-                            Err(_) => {
-                                errors.push(format!("invalid index format variable {{{format_variable}}} (must be usize)"));
-                                format_variable
-                            }
-                        },
+                        }
                         FieldsType::Named => {
                             if !known_names.contains(format_variable) {
                                 errors.push(format!("unknown format variable {{{format_variable}}}"))

@@ -69,7 +69,19 @@
     "message": "Invalid Filename"
   },
   "labrinth.error.file_hosting_error.s3": {
-    "message": "S3 error when {action}: {cause}"
+    "message": "{action}: {cause}"
+  },
+  "labrinth.error.file_hosting_error.s3.creating_bucket_instance": {
+    "message": "S3 error when creating bucket instance"
+  },
+  "labrinth.error.file_hosting_error.s3.deleting_file": {
+    "message": "S3 error when deleting file"
+  },
+  "labrinth.error.file_hosting_error.s3.generating_presigned_url": {
+    "message": "S3 error when generating presigned URL"
+  },
+  "labrinth.error.file_hosting_error.s3.uploading_file": {
+    "message": "S3 error when uploading file"
   },
   "labrinth.error.file_validation.blocking": {
     "message": "Error while managing threads"
