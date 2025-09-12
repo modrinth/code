@@ -1,10 +1,5 @@
 <template>
-	<NewModal
-		ref="taxFormModal"
-		header="Submitting tax form"
-		:closable="false"
-		@on-hide="emit('onHide')"
-	>
+	<NewModal ref="taxFormModal" header="Submitting tax form" :closable="false">
 		<div class="max-w-[40rem]">
 			<Admonition
 				type="info"
@@ -66,8 +61,8 @@
 				</div>
 			</Transition>
 			<div class="mt-4 flex w-full flex-row justify-between gap-2">
-				<ButtonStyled @click="emit('close')">
-					<button @click="hideModal"><XIcon /> Cancel</button>
+				<ButtonStyled @click="handleCancel">
+					<button><XIcon /> Cancel</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button :disabled="!canContinue || loading" @click="continueForm">
@@ -90,13 +85,18 @@ const { addNotification } = injectNotificationManager()
 
 const taxFormModal = ref<InstanceType<typeof NewModal> | null>(null)
 const auth = await useAuth()
-console.log(auth.value.user)
 
 const isUSCitizen = ref<'yes' | 'no' | null>(null)
 const entityType = ref<'private-individual' | 'foreign-entity' | null>(null)
 
 function hideModal() {
+	manualLoading.value = false
 	taxFormModal.value?.hide()
+}
+
+function handleCancel() {
+	emit('cancelled')
+	hideModal()
 }
 
 const determinedFormType = computed(() => {
@@ -128,18 +128,23 @@ defineExpose({
 })
 
 const emit = defineEmits<{
-	(event: 'onHide'): void
-	(event: 'close'): void
+	(event: 'success'): void
+	(event: 'cancelled'): void
 }>()
 
 const avalaraState = ref<ReturnType<typeof useAvalara1099> | null>(null)
-const loading = computed(() =>
-	avalaraState.value ? ((avalaraState.value as any).loading?.value ?? false) : false,
+const manualLoading = ref(false)
+const loading = computed(
+	() =>
+		manualLoading.value ||
+		(avalaraState.value ? ((avalaraState.value as any).loading?.value ?? false) : false),
 )
 
 async function continueForm() {
 	if (!import.meta.client) return
 	if (!determinedFormType.value) return
+
+	manualLoading.value = true
 
 	const response = (await useBaseFetch('payout/compliance', {
 		apiVersion: 3,
@@ -162,8 +167,13 @@ async function continueForm() {
 		if (avalaraState.value) {
 			await avalaraState.value.start()
 			if (avalaraState.value.status === 'signed') {
+				addNotification({
+					title: 'Tax form submitted',
+					text: 'You can now withdraw your full balance.',
+					type: 'success',
+				})
+				emit('success')
 				hideModal()
-				emit('close')
 				return
 			}
 
@@ -180,6 +190,9 @@ async function continueForm() {
 			text: error instanceof Error ? error.message : String(error),
 			type: 'error',
 		})
+	} finally {
+		// Clear manual spinner when control returns to the app
+		manualLoading.value = false
 	}
 }
 

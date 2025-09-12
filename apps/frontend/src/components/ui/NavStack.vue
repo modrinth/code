@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon } from '@modrinth/assets'
-import { type Component,computed, useSlots } from 'vue'
+import { type Component, computed, useSlots } from 'vue'
 
 type NavStackBaseItem = {
 	label: string
@@ -122,6 +122,9 @@ li {
 }
 .router-link-exact-active.nav-item {
 	background: var(--color-button-bg-selected);
+	color: var(--color-button-text-selected);
+}
+.router-link-exact-active.nav-item .text-contrast {
 	color: var(--color-button-text-selected);
 }
 </style>
