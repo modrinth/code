@@ -256,29 +256,23 @@ pub async fn create_or_update_payment_intent(
                 ));
             }
 
-            let customer =
-                stripe::Customer::retrieve(stripe_client, &customer_id, &[])
-                    .await?;
+            let customer = stripe::Customer::retrieve(
+                stripe_client,
+                &customer_id,
+                &["invoice_settings.default_payment_method"],
+            )
+            .await?;
 
-            let maybe_payment_method_id = customer
+            customer
                 .invoice_settings
-                .and_then(|x| x.default_payment_method.map(|x| x.id()));
-
-            match maybe_payment_method_id {
-                Some(payment_method_id) => {
-                    stripe::PaymentMethod::retrieve(
-                        stripe_client,
-                        &payment_method_id,
-                        &[],
-                    )
-                    .await?
-                }
-                None => {
-                    return Err(ApiError::InvalidInput(
+                .and_then(|x| {
+                    x.default_payment_method.and_then(|x| x.into_object())
+                })
+                .ok_or_else(|| {
+                    ApiError::InvalidInput(
                         "Customer has no default payment method!".to_string(),
-                    ));
-                }
-            }
+                    )
+                })?
         }
     };
 

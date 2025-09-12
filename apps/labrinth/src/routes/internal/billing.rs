@@ -20,7 +20,7 @@ use crate::models::billing::{
 };
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
-use crate::models::users::Badges;
+use crate::models::users::{Badges, User};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::anrok;
@@ -2848,7 +2848,7 @@ pub async fn index_billing(
                 continue;
             };
 
-            let user = user.clone().into();
+            let user = User::from_full(user.clone());
 
             let result = payments::create_or_update_payment_intent(
                 &pool,
