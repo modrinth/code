@@ -76,7 +76,7 @@
 						class="my-auto size-4 text-secondary"
 					/>
 				</div>
-				<FancyDropdown
+				<Combobox
 					:listbox="true"
 					:searchable="true"
 					v-model="countryId"
@@ -89,7 +89,7 @@
 					<span>Withdraw to</span><span class="text-brand-red">*</span>
 				</div>
 				<div class="relative">
-					<FancyDropdown
+					<Combobox
 						:listbox="true"
 						v-model="paymentMethodId"
 						class="payment-method-select w-full"
@@ -98,75 +98,7 @@
 						:displayValue="
 							paymentMethod ? formatPaymentMethodName(paymentMethod) : 'Select method...'
 						"
-					>
-						<template #extra>
-							<div v-if="paymentMethod && showPaymentDetails" class="w-full">
-								<div class="flex items-center justify-between text-sm">
-									<span class="text-primary">{{ paymentAccountDisplay }}</span>
-									<button
-										@click="editPaymentMethod"
-										class="flex items-center gap-1 text-primary hover:text-contrast"
-									>
-										<span>Change</span>
-										<EditIcon class="h-4 w-4" />
-									</button>
-								</div>
-							</div>
-
-							<div v-else-if="paymentMethod && isPayPalSelected" class="flex w-full flex-col gap-2">
-								<div class="flex items-center gap-2">
-									<ButtonStyled color="brand">
-										<button @click="verifyPayPal" :disabled="isVerifying">
-											Sign in with PayPal
-										</button>
-									</ButtonStyled>
-									<button
-										v-if="hasLinkedPayPal"
-										class="text-sm text-secondary underline-offset-2 hover:underline"
-										@click="cancelEditingLink"
-									>
-										Cancel
-									</button>
-								</div>
-								<p class="text-xs text-secondary">
-									We'll redirect you to PayPal to connect your account.
-								</p>
-							</div>
-
-							<div v-else-if="paymentMethod && isVenmoSelected" class="flex w-full flex-col gap-2">
-								<label for="venmo-handle" class="text-sm text-primary">Venmo username</label>
-								<input
-									id="venmo-handle"
-									v-model="venmoHandle"
-									type="text"
-									autocomplete="off"
-									placeholder="@username"
-									class="rounded-xl border border-divider bg-button-bg px-3 py-2 text-sm focus:outline-none"
-								/>
-								<div class="flex items-center gap-2">
-									<ButtonStyled color="standard">
-										<button @click="verifyVenmo" :disabled="isVerifying || !venmoHandleValid">
-											Verify
-										</button>
-									</ButtonStyled>
-									<button
-										v-if="hasLinkedVenmo"
-										class="text-sm text-secondary underline-offset-2 hover:underline"
-										@click="cancelEditingLink"
-									>
-										Cancel
-									</button>
-								</div>
-								<p class="text-xs text-secondary">
-									Enter your Venmo username. We'll save it to your account.
-								</p>
-							</div>
-
-							<div v-else class="text-sm text-secondary">
-								Tremendous™️ will contact you with redeem instructions using your Modrinth email.
-							</div>
-						</template>
-					</FancyDropdown>
+					/>
 				</div>
 
 				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
@@ -250,19 +182,23 @@
 import {
 	CheckIcon,
 	ChevronRightIcon,
-	EditIcon,
 	FileTextIcon,
 	TransferIcon,
 	UnknownIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Admonition, ButtonStyled, NewModal, injectNotificationManager } from '@modrinth/ui'
+import {
+	Admonition,
+	ButtonStyled,
+	Combobox,
+	NewModal,
+	injectNotificationManager,
+} from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { all } from 'iso-3166-1'
 import type { CSSProperties } from 'vue'
 import { getAuthUrl } from '~/composables/auth.js'
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
-import FancyDropdown from './FancyDropdown.vue'
 
 const { addNotification, handleError } = injectNotificationManager()
 

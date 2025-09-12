@@ -1,26 +1,15 @@
 <template>
-	<div ref="containerRef" class="relative inline-block w-full max-w-[496px]">
-		<div
-			v-if="$slots.extra && isOpen"
-			class="absolute left-0 right-0 z-[9998] px-4 pb-2.5 pt-10"
-			:class="extraPosition === 'top' ? 'bottom-full' : 'top-full'"
-		>
-			<div
-				class="flex items-end justify-between rounded-b-xl bg-[#1d1f23] px-4 py-2.5"
-				@mousedown.stop
-			>
-				<slot name="extra"></slot>
-			</div>
-		</div>
-
-		<button
+	<div ref="containerRef" class="relative inline-block w-full">
+		<span
 			ref="triggerRef"
 			type="button"
-			class="relative flex h-11 w-full items-center justify-between overflow-hidden rounded-xl bg-[#34363c] px-4 py-2.5 text-left outline outline-1 outline-offset-[-1px] outline-[#42444a] transition-all duration-200"
+			class="relative cursor-pointer flex h-11 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left outline outline-1 outline-offset-[-1px] outline-button-border transition-all duration-200"
 			:class="[
 				triggerClasses,
 				{
-					'z-[9999] rounded-b-none': isOpen,
+					'z-[9999]': isOpen,
+					'rounded-b-none': isOpen && openDirection === 'down',
+					'rounded-t-none': isOpen && openDirection === 'up',
 					'cursor-not-allowed opacity-50': disabled,
 				},
 			]"
@@ -32,38 +21,26 @@
 		>
 			<div class="flex items-center gap-2">
 				<slot name="prefix"></slot>
-				<span class="text-base font-semibold leading-tight text-white">
-					<slot name="selected">{{ displayValue }}</slot>
+				<span class="text-base font-semibold leading-tight text-contrast">
+					<slot name="selected">{{ triggerText }}</slot>
 				</span>
 			</div>
 			<div class="flex items-center gap-1">
 				<slot name="suffix"></slot>
-				<svg
+				<ChevronLeftIcon
 					v-if="showChevron"
-					width="20"
-					height="20"
-					viewBox="0 0 20 20"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					class="transition-transform duration-200"
-					:class="{ 'rotate-180': isOpen }"
-				>
-					<path
-						d="M5 7.5L10 12.5L15 7.5"
-						stroke="#B0BAC5"
-						stroke-width="1.5"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-				</svg>
+					class="size-5 shrink-0 rotate-90 transition-transform duration-200"
+					:class="{ '-rotate-90': isOpen }"
+				/>
 			</div>
-		</button>
+		</span>
 
 		<Teleport to="#teleports">
 			<div
 				v-if="isOpen"
 				ref="dropdownRef"
-				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] rounded-t-none bg-[#34363c] outline outline-1 outline-offset-[-1px] outline-[#42444a]"
+				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-button-bg outline outline-1 outline-offset-[-1px] outline-button-border"
+				:class="openDirection === 'down' ? 'rounded-t-none' : 'rounded-b-none'"
 				:style="dropdownStyle"
 				:role="listbox ? 'listbox' : 'menu'"
 				@mousedown.stop
@@ -71,7 +48,7 @@
 			>
 				<div v-if="searchable" class="p-4">
 					<div
-						class="flex items-center gap-2 overflow-hidden rounded-xl bg-[#34363c] px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-[#42444a] focus-within:shadow-[0px_0px_0px_2px_rgba(52,54,60,1.00)] focus-within:shadow-[0px_0px_0px_4px_rgba(27,217,106,1.00)]"
+						class="flex items-center gap-2 overflow-hidden rounded-xl bg-bg-raised px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-button-border focus-within:shadow-[0px_0px_0px_2px_rgba(52,54,60,1.00)]"
 					>
 						<SearchIcon class="size-5" />
 						<input
@@ -79,13 +56,13 @@
 							v-model="searchQuery"
 							type="text"
 							:placeholder="searchPlaceholder"
-							class="flex-1 bg-transparent text-sm font-medium leading-[18px] text-white placeholder-[#7e868e] !shadow-none !outline-none"
+							class="flex-1 !bg-bg-raised text-sm font-medium leading-[18px] text-contrast placeholder-secondary !shadow-none !outline-none"
 							@keydown.stop="handleSearchKeydown"
 						/>
 					</div>
 				</div>
 
-				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-[#4b4f59]"></div>
+				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-button-bg"></div>
 
 				<div
 					v-if="filteredOptions.length > 0"
@@ -94,9 +71,9 @@
 					:style="{ maxHeight: `${maxHeight}px` }"
 				>
 					<template v-for="(item, index) in filteredOptions" :key="item.key">
-						<div v-if="item.type === 'divider'" class="h-px bg-[#4b4f59]"></div>
+						<div v-if="item.type === 'divider'" class="h-px bg-button-border"></div>
 						<component
-							:is="item.type === 'link' ? 'a' : 'button'"
+							:is="item.type === 'link' ? 'a' : 'span'"
 							v-else
 							:ref="(el: HTMLElement) => setOptionRef(el as HTMLElement, index)"
 							:href="item.type === 'link' ? item.href : undefined"
@@ -105,7 +82,7 @@
 							:role="listbox ? 'option' : 'menuitem'"
 							:aria-selected="listbox && item.value === modelValue"
 							:data-focused="focusedIndex === index"
-							class="flex items-center gap-2.5 rounded-xl bg-transparent px-4 py-3 text-left transition-colors duration-150"
+							class="flex items-center gap-2.5 cursor-pointer rounded-xl bg-transparent px-4 py-3 text-left transition-colors duration-150"
 							:class="[
 								item.class,
 								{
@@ -120,7 +97,7 @@
 							<slot :name="`option-${item.value}`" :item="item">
 								<div class="flex items-center gap-2">
 									<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
-									<span class="text-base font-semibold leading-tight text-white">
+									<span class="text-base font-semibold leading-tight text-contrast">
 										{{ item.label }}
 									</span>
 								</div>
@@ -129,7 +106,7 @@
 					</template>
 				</div>
 
-				<div v-else-if="searchQuery" class="p-4 text-center text-sm text-[#7e868e]">
+				<div v-else-if="searchQuery" class="p-4 text-center text-sm text-secondary">
 					No results found
 				</div>
 			</div>
@@ -138,7 +115,7 @@
 </template>
 
 <script setup lang="ts" generic="T">
-import { SearchIcon } from '@modrinth/assets'
+import { ChevronLeftIcon, SearchIcon } from '@modrinth/assets'
 import { onClickOutside } from '@vueuse/core'
 import { computed, nextTick, onMounted, onUnmounted, ref, useSlots, watch } from 'vue'
 
@@ -154,31 +131,32 @@ export interface DropdownOption<T> {
 	action?: () => void
 }
 
-interface Props {
-	modelValue?: T
-	options: (DropdownOption<T> | { type: 'divider' })[]
-	placeholder?: string
-	disabled?: boolean
-	searchable?: boolean
-	searchPlaceholder?: string
-	listbox?: boolean
-	showChevron?: boolean
-	maxHeight?: number
-	displayValue?: string
-	extraPosition?: 'top' | 'bottom'
-	triggerClass?: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
-	placeholder: 'Select an option',
-	disabled: false,
-	searchable: false,
-	searchPlaceholder: 'Search...',
-	listbox: true,
-	showChevron: true,
-	maxHeight: 300,
-	extraPosition: 'bottom',
-})
+const props = withDefaults(
+	defineProps<{
+		modelValue?: T
+		options: (DropdownOption<T> | { type: 'divider' })[]
+		placeholder?: string
+		disabled?: boolean
+		searchable?: boolean
+		searchPlaceholder?: string
+		listbox?: boolean
+		showChevron?: boolean
+		maxHeight?: number
+		displayValue?: string
+		extraPosition?: 'top' | 'bottom'
+		triggerClass?: string
+	}>(),
+	{
+		placeholder: 'Select an option',
+		disabled: false,
+		searchable: false,
+		searchPlaceholder: 'Search...',
+		listbox: true,
+		showChevron: true,
+		maxHeight: 300,
+		extraPosition: 'bottom',
+	},
+)
 
 const emit = defineEmits<{
 	'update:modelValue': [value: T]
@@ -205,6 +183,8 @@ const dropdownStyle = ref({
 	width: '0px',
 })
 
+const openDirection = ref<'down' | 'up'>('down')
+
 const triggerClasses = computed(() => {
 	const classes = [props.triggerClass]
 	if (isOpen.value) {
@@ -215,6 +195,19 @@ const triggerClasses = computed(() => {
 		}
 	}
 	return classes
+})
+
+const selectedOption = computed<DropdownOption<T> | undefined>(() => {
+	return props.options.find(
+		(opt) =>
+			(opt as any).type !== 'divider' && (opt as DropdownOption<T>).value === props.modelValue,
+	) as DropdownOption<T> | undefined
+})
+
+const triggerText = computed(() => {
+	if (props.displayValue !== undefined) return props.displayValue
+	if (selectedOption.value) return selectedOption.value.label
+	return props.placeholder
 })
 
 const filteredOptions = computed(() => {
@@ -251,10 +244,12 @@ async function updateDropdownPosition() {
 
 	let top = triggerRect.bottom
 	let left = triggerRect.left
+	let opensUp = false
 
 	if (triggerRect.bottom + dropdownRect.height + margin > viewportHeight) {
 		if (triggerRect.top - dropdownRect.height - margin > 0) {
 			top = triggerRect.top - dropdownRect.height
+			opensUp = true
 		}
 	}
 
@@ -267,6 +262,8 @@ async function updateDropdownPosition() {
 		left: `${left}px`,
 		width: `${triggerRect.width}px`,
 	}
+
+	openDirection.value = opensUp ? 'up' : 'down'
 }
 
 async function open() {

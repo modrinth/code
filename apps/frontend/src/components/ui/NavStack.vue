@@ -1,13 +1,11 @@
 <template>
 	<nav :aria-label="ariaLabel" class="w-full">
-		<ul
-			class="border-surface-4 bg-surface-1 m-0 flex list-none flex-col items-start gap-1.5 rounded-2xl border border-solid p-4"
-		>
+		<ul class="m-0 flex list-none flex-col items-start gap-1.5 rounded-2xl bg-bg-raised p-4">
 			<slot v-if="hasSlotContent" />
 
 			<template v-else>
 				<li v-for="(item, idx) in items" :key="getKey(item, idx)" class="contents">
-					<hr v-if="isSeparator(item)" class="border-surface-4 my-1 w-full border-t border-solid" />
+					<hr v-if="isSeparator(item)" class="my-1 w-full border-t border-solid" />
 
 					<div
 						v-else-if="isHeading(item)"
@@ -27,7 +25,7 @@
 							aria-hidden="true"
 							class="h-5 w-5 shrink-0"
 						/>
-						<span>{{ item.label }}</span>
+						<span class="text-contrast">{{ item.label }}</span>
 						<span
 							v-if="item.badge != null"
 							class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
@@ -49,7 +47,7 @@
 							aria-hidden="true"
 							class="h-5 w-5 shrink-0"
 						/>
-						<span>{{ item.label }}</span>
+						<span class="text-contrast">{{ item.label }}</span>
 						<span
 							v-if="item.badge != null"
 							class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
