@@ -204,8 +204,10 @@
 						<h3>{{ formatMessage(messages.playWithLauncherHeading) }}</h3>
 						<p>
 							<IntlFormatted :message-id="messages.playWithLauncherDescription">
-								<template #link>
-									<nuxt-link class="title-link" to="/app">our own app</nuxt-link>
+								<template #link="{ children }">
+									<nuxt-link class="title-link" to="/app">
+										<component :is="() => children"/>
+									</nuxt-link>
 								</template>
 							</IntlFormatted>
 						</p>
