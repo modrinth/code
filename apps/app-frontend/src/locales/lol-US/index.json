@@ -1,0 +1,419 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Dev mode iz on."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Lookz"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Defawlt instanz opshuns"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Feeechurrr flaaagz"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Jawa installz"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Pwiwacy"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Managez da stuffz"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Plop n’ playz"
+  },
+  "instance.add-server.add-server": {
+    "message": "Gimme servah"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Off’d modez"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "On’d modez"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Askz"
+  },
+  "instance.add-server.title": {
+    "message": "Addin' new servah"
+  },
+  "instance.edit-server.title": {
+    "message": "Tweak servah"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Hush on da frontie"
+  },
+  "instance.edit-world.name": {
+    "message": "Naem"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecwaft wrold"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Resetz iconz"
+  },
+  "instance.edit-world.title": {
+    "message": "Tweak da landz"
+  },
+  "instance.filter.disabled": {
+    "message": "No worky projectz"
+  },
+  "instance.filter.updates-available": {
+    "message": "Fun patchez here"
+  },
+  "instance.server-modal.address": {
+    "message": "Placey"
+  },
+  "instance.server-modal.name": {
+    "message": "Naem"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecwaft servah"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resource Packz"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Generulz"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Shoo away instansh"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Shoo away instansh"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Fur-ever zaps da instansh frum ur device, inkluding all ur worldz, configz, n’ shiny stuffz. Be careful hooman, once u zapp it, no can haz it back."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Deletin'..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Cloney"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "No can haz cloney while installin'."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Cloney instansh"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Makez a cloney-clone of dis instansh, inkluding worldz, configz, tweakiez, n’ all da shiny stuffz."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Tweak iconz"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Shoo away iconz"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Swap iconz"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Choose da iconz"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Bookz gang"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Makez bookz gang"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Bookz gang lets u sort ur instansh into diff’nt sectionz in ur library."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Type gang namez"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Naem"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Hooky thingz"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Purrsonal hookz thingz"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Hookz lets smrt hoomanz run special system thingz befur n’ after startin’ da game."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Aftah leevin"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Did a runny-run aftah da game go bye-bye."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Type aftah-game magic thingy..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Before game go"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Did a runny-run befurr da instansh go zoom."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Type runny-run befurr magic thingy..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Gaem hooky thingz"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Wrappah"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Wrappah magic thingy to blast-off Minecwaft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Type Wrappah thingy..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Setupzy"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} fur Minecwaft {game_version} iz already snug in da box"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} iz already snug in da box"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Flip flop verzhun"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Setupzy time"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Setupzy in progress"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Grabbin’ modpackz verzhun"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Setupzy da fresh verzhun"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Right meow setupzy"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Trouble sniffin’ info:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Grabbin’ modpack deetz"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Gamey verzhun"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Setupzy time"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Setupzy goin’ on"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} verzhun"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecwaft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "No can haz linked modpack deetz. Check ur shiny hooman webz."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} iz no can haz fur Minecwaft {version}. Try anudda mody-loady thingy."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Dis instansh iz linked to a modpackz, but da modpackz iz no can haz on Modrinth."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Platfurrm"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Snuggly modpackz redo"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Snuggly modpackz redo in progress"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Redoing da snuggly tweakie bundlez will reset all da stuffz u added or changed back to what da tweakie bundle givz, removin’ any extra modz or shiny contentz u plopped on top. It may fix da oopsies if da instansh iz borked, but if ur worldz need ur extra stuffz, it might break dem."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Iz u sure u wanna reinstall dis instansh?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "I iz gonna reset mah stuffz bak to da way it wuz! All ur fancy add-onz? Gone! Just da original tweakie bundle againz."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Snuggly modpackz redo"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Fixy-fix"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Fixy-fixin"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Fixy-fixin’ reinstalls all da Minecwaft stuffz it needs and checks if anythin’ iz borked. It may fix da oopsies if da game no start ‘cause of launcher stuff, but it won’t fix borked modz or crashy gamez."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Fixy-fix dis instansh?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Fixy-fixin’ goin’ on"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Go bakk to right meow"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Show all da verzhun"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "pick new shiny verzhun"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "setupzy"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "snuggly redo"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "fixy-fix"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "No can haz {action} while setupzy goin’ on"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "No can haz {action} while hooman webz iz sleepin’"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "No can haz {action} while fixy-fixin’"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(kitteh dunno verzhun)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Break da instansh link"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "If u go furder, no can haz re-link ‘til u make a brand new instansh. U won’t get shiny modpack updatez no more, n’ it will become a plain ol’ instansh."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "R u sure u wanna break da instansh link?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Dis instansh iz linked to a tweakie bundlez, which means modz no can haz updates and u no can change da mod loader or Minecwaft version. Unlinkin’ will fur-ever disconnect dis instansh from da tweakie bundle."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Break modpack tie"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Jawa and memowy"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Env pawramz"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Hooky thingz"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Jawa spellz"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Jawa setupzy"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Memowy assigned"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Shiny frame"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Purrsonal shiny frame tweaks"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Big shiny frame"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Make da game go big when startin’ (using shiny options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Tallness"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "How tall da shiny frame iz when da game go zoom."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Type tallness..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Wideness"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "How wide da shiny frame iz when da game go zoom."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Enter wideness..."
+  },
+  "instance.settings.title": {
+    "message": "Tweaks"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "A blocky hooman hangout"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "No can haz connect to servah"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Snag hooman placey"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Shush on da homez"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Can haz now"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Instansh iz already openz"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Hawd inside mode"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Servah iz borked wif dis"
+  },
+  "instance.worlds.no_contact": {
+    "message": "No can haz talk to servah"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "U can only jumpz straight into servahz on Minecwaft Alpha 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "U can only jumpz straight into loneleh kitteh worldz on Minecwaft 1.20+"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Startz da thingy"
+  },
+  "instance.worlds.type.server": {
+    "message": "Servah"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Loneleh kitteh"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Peek at instansh"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "World iz busy playin'"
+  },
+  "search.filter.locked.instance": {
+    "message": "Instansh gived me dis"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Da gamez verzhun iz gived by da instansh, iz rite"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Loadar iz gived by teh instansh"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Syncz wif da instansh"
+  }
+}

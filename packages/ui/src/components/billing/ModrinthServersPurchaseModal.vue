@@ -297,13 +297,13 @@ function goToBreadcrumbStep(id: string) {
 	<NewModal ref="modal" @hide="$emit('hide')">
 		<template #title>
 			<div class="flex items-center gap-1 font-bold text-secondary">
-				<template v-for="(title, id, index) in titles" :key="id">
+				<template v-for="(step, index) in steps" :key="step">
 					<button
 						v-if="index < currentStepIndex"
 						class="bg-transparent active:scale-95 font-bold text-secondary p-0"
-						@click="goToBreadcrumbStep(id as string)"
+						@click="goToBreadcrumbStep(step)"
 					>
-						{{ formatMessage(title) }}
+						{{ formatMessage(titles[step]) }}
 					</button>
 					<span
 						v-else
@@ -311,7 +311,7 @@ function goToBreadcrumbStep(id: string) {
 							'text-contrast': index === currentStepIndex,
 						}"
 					>
-						{{ formatMessage(title) }}
+						{{ formatMessage(titles[step]) }}
 					</span>
 					<ChevronRightIcon
 						v-if="index < steps.length - 1"

@@ -50,6 +50,19 @@ const sortedRegions = computed(() => {
 	})
 })
 
+const visibleRegions = computed(() => {
+	if (!loading.value) {
+		return sortedRegions.value.filter((region) => {
+			// only show eu-lim if it has stock because we're not restocking it.
+			if (region.shortcode === 'eu-lim') {
+				return currentStock.value[region.shortcode] > 0
+			}
+			return true
+		})
+	}
+	return sortedRegions.value
+})
+
 const selectedRam = ref<number>(-1)
 
 const ramOptions = computed(() => {
@@ -204,7 +217,7 @@ onMounted(() => {
 		</h2>
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 			<ServersRegionButton
-				v-for="region in sortedRegions"
+				v-for="region in visibleRegions"
 				:key="region.shortcode"
 				v-model="selectedRegion"
 				:region="region"

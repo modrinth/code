@@ -1,0 +1,90 @@
+{
+  "badge.new": {
+    "defaultMessage": "جديد"
+  },
+  "button.analytics": {
+    "defaultMessage": "تحليل"
+  },
+  "button.back": {
+    "defaultMessage": "رجوع"
+  },
+  "button.cancel": {
+    "defaultMessage": "إلغاء"
+  },
+  "button.continue": {
+    "defaultMessage": "استمر"
+  },
+  "button.copy-id": {
+    "defaultMessage": "نسخ المعرف"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "نسخ الرابط الدائم"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "إنشاء مشروع"
+  },
+  "button.download": {
+    "defaultMessage": "تنزيل"
+  },
+  "button.downloading": {
+    "defaultMessage": "جاري التنزيل"
+  },
+  "button.edit": {
+    "defaultMessage": "تعديل"
+  },
+  "button.follow": {
+    "defaultMessage": "متابعة"
+  },
+  "button.more-options": {
+    "defaultMessage": "مزيد من الخيارات"
+  },
+  "button.next": {
+    "defaultMessage": "التالي"
+  },
+  "button.open-folder": {
+    "defaultMessage": "فتح المجلد"
+  },
+  "button.play": {
+    "defaultMessage": "لعب"
+  },
+  "button.refresh": {
+    "defaultMessage": "تحديث"
+  },
+  "button.remove": {
+    "defaultMessage": "إزالة"
+  },
+  "button.remove-image": {
+    "defaultMessage": "إزالة الصورة"
+  },
+  "button.report": {
+    "defaultMessage": "إبلاغ"
+  },
+  "button.reset": {
+    "defaultMessage": "إعادة ضبط"
+  },
+  "button.save": {
+    "defaultMessage": "حفظ"
+  },
+  "button.save-changes": {
+    "defaultMessage": "حفظ التغييرات"
+  },
+  "button.saving": {
+    "defaultMessage": "جاري الحفظ"
+  },
+  "button.sign-in": {
+    "defaultMessage": "تسجيل الدخول"
+  },
+  "button.sign-out": {
+    "defaultMessage": "تسجيل الخروج"
+  },
+  "button.stop": {
+    "defaultMessage": "إيقاف"
+  },
+  "button.unfollow": {
+    "defaultMessage": "إلغاء المتابعة"
+  },
+  "button.upload-image": {
+    "defaultMessage": "رفع صورة"
+  }
+}
+
