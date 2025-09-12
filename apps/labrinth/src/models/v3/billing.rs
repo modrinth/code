@@ -161,6 +161,16 @@ pub enum SubscriptionMetadata {
     Medal { id: String },
 }
 
+impl SubscriptionMetadata {
+    pub fn is_medal(&self) -> bool {
+        matches!(self, SubscriptionMetadata::Medal { .. })
+    }
+
+    pub fn is_pyro(&self) -> bool {
+        matches!(self, SubscriptionMetadata::Pyro { .. })
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct Charge {
     pub id: ChargeId,
