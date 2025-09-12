@@ -698,6 +698,7 @@ impl AutomatedModerationQueue {
                                         project.inner.id,
                                         project.inner.slug.clone(),
                                         None,
+                                        None,
                                         &redis,
                                     )
                                         .await?;
