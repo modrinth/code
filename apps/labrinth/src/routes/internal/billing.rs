@@ -293,7 +293,7 @@ pub async fn refund_charge(
                             &anrok::Transaction {
                                 id: anrok::transaction_id_stripe_pyr(&refund.id),
                                 fields: anrok::TransactionFields {
-                                    customer_address: anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&billing_address),
+                                    customer_address: anrok::Address::default_exempt(), // anrok::Address::from_stripe_address(&billing_address),
                                     currency_code: charge.currency_code.clone(),
                                     accounting_time: Utc::now(),
                                     accounting_time_zone: anrok::AccountingTimeZone::Utc,
@@ -1592,7 +1592,7 @@ pub async fn stripe_webhook(
                             id: id.clone(),
                             fields: anrok::TransactionFields {
                                 customer_address:
-                                    anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&customer_address),
+                                    anrok::Address::default_exempt(), // anrok::Address::from_stripe_address(&customer_address),
                                 currency_code: currency,
                                 accounting_time: Utc::now(),
                                 accounting_time_zone:
@@ -2017,7 +2017,7 @@ pub async fn stripe_webhook(
                                         cpu,
                                         swap_mb: swap,
                                         storage_mb: storage,
-                                        force_move: region.is_some().then_some(true),
+                                        force_move: (region.is_some() && subscription_metadata.is_medal()).then_some(true),
                                         region: region.as_deref(),
                                     };
 

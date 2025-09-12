@@ -380,7 +380,7 @@ pub async fn create_or_update_payment_intent(
 
     let ephemeral_invoice = anrok_client
         .create_ephemeral_txn(&anrok::TransactionFields {
-            customer_address: anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&address),
+            customer_address: anrok::Address::default_exempt(), // anrok::Address::from_stripe_address(&address),
             currency_code: charge_data.currency_code.clone(),
             accounting_time: chrono::Utc::now(),
             accounting_time_zone: anrok::AccountingTimeZone::Utc,
