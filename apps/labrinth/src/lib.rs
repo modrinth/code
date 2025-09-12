@@ -16,6 +16,7 @@ use util::cors::default_cors;
 
 use crate::background_task::update_versions;
 use crate::database::ReadOnlyPgPool;
+use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::anrok;
 use crate::util::env::{parse_strings_from_var, parse_var};
@@ -167,7 +168,7 @@ pub fn app_setup(
         let anrok_client_ref = anrok_client.clone();
         actix_rt::spawn(async move {
             loop {
-                routes::internal::billing::index_billing(
+                index_billing(
                     stripe_client_ref.clone(),
                     anrok_client_ref.clone(),
                     pool_ref.clone(),
@@ -182,11 +183,7 @@ pub fn app_setup(
         let redis_ref = redis_pool.clone();
         actix_rt::spawn(async move {
             loop {
-                routes::internal::billing::index_subscriptions(
-                    pool_ref.clone(),
-                    redis_ref.clone(),
-                )
-                .await;
+                index_subscriptions(pool_ref.clone(), redis_ref.clone()).await;
                 tokio::time::sleep(Duration::from_secs(60 * 5)).await;
             }
         });

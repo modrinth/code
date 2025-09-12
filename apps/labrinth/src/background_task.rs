@@ -1,5 +1,6 @@
 use crate::database::redis::RedisPool;
 use crate::queue::email::EmailQueue;
+use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
     insert_bank_balances_and_webhook, process_payout,
@@ -43,7 +44,7 @@ impl BackgroundTask {
             UpdateVersions => update_versions(pool, redis_pool).await,
             Payouts => payouts(pool, clickhouse, redis_pool).await,
             IndexBilling => {
-                crate::routes::internal::billing::index_billing(
+                index_billing(
                     stripe_client,
                     anrok_client,
                     pool.clone(),
@@ -62,6 +63,7 @@ impl BackgroundTask {
             Mail => {
                 run_email(email_queue).await;
             }
+            IndexSubscriptions => index_subscriptions(pool, redis_pool).await,
         }
     }
 }

@@ -8,7 +8,6 @@ pub mod medal;
 pub mod moderation;
 pub mod pats;
 pub mod session;
-
 pub mod statuses;
 
 pub use super::ApiError;
