@@ -18,42 +18,53 @@
 					>{{ formatMoney(grandTotal) }}</span
 				>
 			</div>
+
 			<div class="flex h-3 w-full gap-2 overflow-hidden rounded-full bg-bg-raised">
-				<div v-for="seg in segments" :key="seg.key" class="h-full" :style="{ width: seg.widthPct }">
-					<Tooltip
-						theme="dismissable-prompt"
-						:triggers="['hover', 'focus']"
-						noAutoFocus
-						placement="top"
-						class="block h-full w-full"
-					>
-						<span
-							class="block h-full w-full transition duration-150 hover:brightness-150"
-							:class="seg.class"
-						></span>
-						<template #popper>
-							<div class="font-semibold text-contrast">{{ formatMoney(seg.amount) }}</div>
-						</template>
-					</Tooltip>
+				<div
+					v-for="seg in segments"
+					:key="seg.key"
+					class="h-full"
+					:style="{ width: seg.widthPct }"
+					@mouseenter="hoveredSeg = seg.key"
+					@mouseleave="hoveredSeg = null"
+				>
+					<span
+						class="block h-full w-full transition duration-150 hover:brightness-150"
+						:class="seg.class"
+					></span>
 				</div>
 			</div>
+
 			<div class="flex flex-col">
 				<div
 					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
 				>
-					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
+					<span
+						class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
+						:class="{ 'animate-flash-green text-green': hoveredSeg === 'available' }"
 						><span class="my-auto block size-4 rounded-full bg-brand-green"></span> Available
 						now</span
 					>
-					<span class="text-2xl font-bold text-contrast">{{ formatMoney(totalAvailable) }}</span>
+					<span
+						class="text-2xl font-bold text-contrast"
+						:class="{ 'animate-flash-green text-green': hoveredSeg === 'available' }"
+						>{{ formatMoney(totalAvailable) }}</span
+					>
 				</div>
+
 				<div
-					v-for="date in dateSegments"
+					v-for="(date, i) in dateSegments"
 					:key="date.date"
 					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
 				>
-					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
-						><span
+					<span
+						class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
+						:class="{
+							[date.textClass]: hoveredSeg === `upcoming-${date.date}-${i}`,
+							'animate-flash-color': hoveredSeg === `upcoming-${date.date}-${i}`,
+						}"
+					>
+						<span
 							class="zone--striped-small my-auto block size-4 rounded-full"
 							:class="[date.stripeClass, date.highlightClass]"
 						></span>
@@ -73,11 +84,22 @@
 							</template>
 						</Tooltip>
 					</span>
-					<span class="text-2xl font-bold text-contrast">{{ formatMoney(date?.amount ?? 0) }}</span>
+					<span
+						class="text-2xl font-bold text-contrast"
+						:class="{
+							[date.textClass]: hoveredSeg === `upcoming-${date.date}-${i}`,
+							'animate-flash-color': hoveredSeg === `upcoming-${date.date}-${i}`,
+						}"
+						>{{ formatMoney(date?.amount ?? 0) }}</span
+					>
 				</div>
+
 				<div class="flex flex-row justify-between p-2">
-					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
-						><span
+					<span
+						class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
+						:class="{ 'animate-flash-gray text-gray-500': hoveredSeg === 'processing' }"
+					>
+						<span
 							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg opacity-90"
 						></span>
 						Processing
@@ -91,12 +113,15 @@
 							</template>
 						</Tooltip>
 					</span>
-					<span class="text-2xl font-bold text-contrast">{{
-						formatMoney(processingDate?.amount ?? 0)
-					}}</span>
+					<span
+						class="text-2xl font-bold text-contrast"
+						:class="{ 'animate-flash-gray text-gray-500': hoveredSeg === 'processing' }"
+						>{{ formatMoney(processingDate?.amount ?? 0) }}</span
+					>
 				</div>
 			</div>
 		</div>
+
 		<div class="flex flex-col gap-4">
 			<span class="text-2xl font-semibold text-contrast">Withdraw</span>
 			<div class="grid grid-cols-3 gap-x-4 gap-y-2">
@@ -150,6 +175,7 @@
 				<nuxt-link class="text-link" to="/legal/cmp-info">Reward Program</nuxt-link>.</span
 			>
 		</div>
+
 		<div class="flex flex-col gap-4">
 			<div class="flex flex-row justify-between">
 				<span class="text-3xl font-semibold text-contrast">Transactions</span>
@@ -188,6 +214,7 @@
 		</div>
 	</div>
 </template>
+
 <script setup lang="ts">
 import { ArrowUpIcon, ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
 import { injectNotificationManager } from '@modrinth/ui'
@@ -223,6 +250,7 @@ interface UserBalanceResponse {
 	form_completion_status: FormCompletionStatus | null
 }
 
+// Types for payout methods and related shapes
 type PayoutInterval = { fixed: { values: number[] } } | { standard: { min: number; max: number } }
 interface PayoutMethodFee {
 	percentage: number
@@ -258,6 +286,8 @@ type RevenueBarSegment = {
 	widthPct: string
 	amount: number
 }
+
+const hoveredSeg = ref<string | null>(null)
 
 const withdrawModal = ref<InstanceType<typeof CreatorWithdrawModal>>()
 async function openWithdrawModal() {
@@ -395,6 +425,8 @@ const dateHighlightClasses = [
 	'bg-highlight-red',
 ] as const
 
+const dateTextClasses = ['text-blue', 'text-purple', 'text-orange', 'text-red'] as const
+
 const dateSegments = computed(() => {
 	const dates = nextDate.value
 	if (!dates?.length)
@@ -403,12 +435,14 @@ const dateSegments = computed(() => {
 			amount: number
 			stripeClass: string
 			highlightClass: string
+			textClass: string
 		}>
 
 	return dates.slice(0, -1).map((d, i) => ({
 		...d,
 		stripeClass: dateStripeClasses[i % dateStripeClasses.length],
 		highlightClass: dateHighlightClasses[i % dateHighlightClasses.length],
+		textClass: dateTextClasses[i % dateTextClasses.length],
 	}))
 })
 
@@ -457,9 +491,8 @@ const segments = computed<RevenueBarSegment[]>(() => {
 	}
 
 	let acc = 0
-	// normalize widths to sum to 100%, then drop any that are 0% and re-adjust the last
 	const normalized = segs.map((s, idx) => {
-		let pct = Math.round(s.width * 10000) / 100 // keep 2 decimals
+		let pct = Math.round(s.width * 10000) / 100
 		if (idx === segs.length - 1) {
 			pct = Math.max(0, 100 - acc)
 		}
@@ -528,6 +561,41 @@ $striped-colors: 'green', 'blue', 'purple', 'orange', 'red';
 	background-size: 6.19px 6.19px !important;
 	background-position: unset !important;
 	background-attachment: unset !important;
+}
+
+$flash-colors: 'green', 'blue', 'purple', 'orange', 'red';
+@each $color in $flash-colors {
+	@keyframes flash-#{$color} {
+		0%,
+		100% {
+			color: inherit;
+		}
+		50% {
+			color: var(--color-#{$color});
+		}
+	}
+
+	.animate-flash-#{$color} {
+		animation: flash-#{$color} 1.5s ease-in-out infinite;
+	}
+
+	.text-#{$color}.animate-flash-color {
+		animation: flash-#{$color} 1.5s ease-in-out infinite;
+	}
+}
+
+@keyframes flash-gray {
+	0%,
+	100% {
+		color: inherit;
+	}
+	50% {
+		color: var(--color-divider-dark);
+	}
+}
+
+.animate-flash-gray {
+	animation: flash-gray 1s ease-in-out infinite;
 }
 </style>
 
