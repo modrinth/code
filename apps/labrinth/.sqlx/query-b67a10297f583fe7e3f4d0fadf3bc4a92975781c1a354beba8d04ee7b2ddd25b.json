@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n          products_tax_identifiers.*,\n          products.metadata product_metadata\n        FROM products_prices\n        LEFT JOIN products ON products.id = products_prices.product_id\n        LEFT JOIN products_tax_identifiers ON products_tax_identifiers.product_id = products.id\n        WHERE products_prices.id = $1\n        ",
+  "query": "\n        SELECT\n          products_tax_identifiers.*,\n          products.metadata product_metadata\n        FROM products_prices\n        INNER JOIN products ON products.id = products_prices.product_id\n        INNER JOIN products_tax_identifiers ON products_tax_identifiers.product_id = products.id\n        WHERE products_prices.id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -36,5 +36,5 @@
       false
     ]
   },
-  "hash": "bc333453a3a0b6f54721a348b5a38a6f308458f435c780979f937f93fba215e6"
+  "hash": "b67a10297f583fe7e3f4d0fadf3bc4a92975781c1a354beba8d04ee7b2ddd25b"
 }
