@@ -67,7 +67,7 @@
 				<ButtonStyled color="brand">
 					<button :disabled="!canContinue || loading" @click="continueForm">
 						<template v-if="!loading">Continue <RightArrowIcon /></template>
-						<template v-else><SpinnerIcon /> Loading…</template>
+						<template v-else><SpinnerIcon class="animate-spin" /> Loading…</template>
 					</button>
 				</ButtonStyled>
 			</div>
