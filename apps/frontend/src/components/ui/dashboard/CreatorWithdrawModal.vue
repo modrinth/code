@@ -196,7 +196,6 @@
 </template>
 
 <script lang="ts" setup>
-import { normalizeChildren } from '@/utils/vue-children.ts'
 import { ChevronRightIcon, FileTextIcon, TransferIcon, UnknownIcon, XIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled, Combobox, NewModal } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
@@ -204,6 +203,8 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 import { all } from 'iso-3166-1'
 import { nextTick } from 'vue'
+
+import { normalizeChildren } from '@/utils/vue-children.ts'
 
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
 

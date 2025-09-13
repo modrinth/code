@@ -1,4 +1,16 @@
 {
+  "action.cancel": {
+    "message": "Cancel"
+  },
+  "action.continue": {
+    "message": "Continue"
+  },
+  "action.max": {
+    "message": "Max"
+  },
+  "action.withdraw": {
+    "message": "Withdraw"
+  },
   "admin.billing.error.not-found": {
     "message": "User not found"
   },
@@ -413,6 +425,15 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
+  "common.no": {
+    "message": "No"
+  },
+  "common.yes": {
+    "message": "Yes"
+  },
+  "creator.withdraw.debug.openTaxForm": {
+    "message": "Open tax form (debug)"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Create new"
   },
@@ -424,6 +445,99 @@
   },
   "dashboard.collections.long-title": {
     "message": "Your collections"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "A foreign entity means a business entity organized outside the United States (such as a non-US corporation, partnership, or LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Foreign entity"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Private individual"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Are you a private individual or part of a foreign entity?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Tax form"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth uses third-party provider Track1099 to securely collect and store your tax forms. <security-link>Learn more here.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Security practices"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Are you a US citizen?"
+  },
+  "dashboard.creator-withdraw-modal.amount": {
+    "message": "Amount"
+  },
+  "dashboard.creator-withdraw-modal.available-balance": {
+    "message": "Available balance"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Complete tax form"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Continue with limit"
+  },
+  "dashboard.creator-withdraw-modal.error.invalid-amount": {
+    "message": "{input} is not a valid amount"
+  },
+  "dashboard.creator-withdraw-modal.error.link-paypal": {
+    "message": "Please link your PayPal account to proceed."
+  },
+  "dashboard.creator-withdraw-modal.error.link-venmo": {
+    "message": "Please set your Venmo handle to proceed."
+  },
+  "dashboard.creator-withdraw-modal.error.max-amount": {
+    "message": "The amount must be no more than {max}"
+  },
+  "dashboard.creator-withdraw-modal.error.min-amount": {
+    "message": "The amount must be at least {min}"
+  },
+  "dashboard.creator-withdraw-modal.minimum-transfer-amount": {
+    "message": "The minimum transfer amount is {min}."
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "You're nearing the {amount600} withdrawal threshold. You can withdraw up to <b>{amountRemaining}</b> now, but you'll need to complete a tax form to withdraw more."
+  },
+  "dashboard.creator-withdraw-modal.placeholder.enter-amount": {
+    "message": "Enter amount..."
+  },
+  "dashboard.creator-withdraw-modal.placeholder.select-country": {
+    "message": "Select country..."
+  },
+  "dashboard.creator-withdraw-modal.placeholder.select-method": {
+    "message": "Select method..."
+  },
+  "dashboard.creator-withdraw-modal.region": {
+    "message": "Region"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "To withdraw your full <b>{available}</b> available balance please complete the form below. It is required for tax reporting and only needs to be done once."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Tax form required"
+  },
+  "dashboard.creator-withdraw-modal.tooltip.select-country-region": {
+    "message": "Select your country or region"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-from": {
+    "message": "Withdraw from"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "You've used up your <b>{amount600}</b> withdrawal limit. You must complete a tax form to withdraw more."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-remaining": {
+    "message": "Withdraw remaining"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-to": {
+    "message": "Withdraw to"
+  },
+  "dashboard.creator-withdraw-modal.withdraw.header": {
+    "message": "Withdraw"
   },
   "dashboard.revenue.available-now": {
     "message": "Available now"

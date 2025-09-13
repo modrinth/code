@@ -74,7 +74,7 @@
 				<ButtonStyled>
 					<button :disabled="!canContinue || loading" @click="continueForm">
 						{{ formatMessage(messages.continue) }}
-						<RightArrowIcon v-if="!loading" /> <SpinnerIcon class="animate-spin" v-else />
+						<RightArrowIcon v-if="!loading" /> <SpinnerIcon v-else class="animate-spin" />
 					</button>
 				</ButtonStyled>
 			</div>
