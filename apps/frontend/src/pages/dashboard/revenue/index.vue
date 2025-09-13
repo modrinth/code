@@ -12,7 +12,9 @@
 	<div class="mb-6 flex flex-col gap-8 p-12 py-0">
 		<div class="flex flex-col gap-5">
 			<div class="flex flex-col">
-				<span class="text-2xl font-semibold text-contrast">Balance</span>
+				<span class="text-2xl font-semibold text-contrast">{{
+					formatMessage(messages.balanceLabel)
+				}}</span>
 				<span
 					class="bg-gradient-to-r from-brand-purple via-brand-orange via-20% to-brand-orange bg-clip-text text-4xl font-extrabold text-transparent"
 					>{{ formatMoney(grandTotal) }}</span
@@ -45,7 +47,7 @@
 				>
 					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
 						><span class="gradient-border my-auto block size-4 rounded-full bg-brand-green"></span>
-						Available now</span
+						{{ formatMessage(messages.availableNow) }}</span
 					>
 					<span
 						class="text-2xl font-bold text-contrast"
@@ -64,7 +66,11 @@
 							class="zone--striped-small gradient-border my-auto block size-4 rounded-full"
 							:class="[date.stripeClass, date.highlightClass]"
 						></span>
-						Estimated {{ date.date ? dayjs(date.date).format('MMM D, YYYY') : '' }}
+						{{
+							formatMessage(messages.estimatedWithDate, {
+								date: date.date ? dayjs(date.date).format('MMM D, YYYY') : '',
+							})
+						}}
 						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
 							<nuxt-link
 								class="inline-flex items-center justify-center text-link"
@@ -74,8 +80,9 @@
 							</nuxt-link>
 							<template #popper>
 								<div class="w-[250px] font-semibold text-contrast">
-									Estimated revenue may be subject to change until it is made available.<br /><br />Click
-									to read about how Modrinth handles your revenue.
+									{{ formatMessage(messages.estimatedTooltip1) }}
+									<br /><br />
+									{{ formatMessage(messages.estimatedTooltip2) }}
 								</div>
 							</template>
 						</Tooltip>
@@ -95,13 +102,12 @@
 						<span
 							class="zone--striped-small zone--striped--gray gradient-border my-auto block size-4 rounded-full bg-button-bg opacity-90"
 						></span>
-						Processing
+						{{ formatMessage(messages.processing) }}
 						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
 							<InProgressIcon class="inline-block size-5 align-middle" />
 							<template #popper>
 								<div class="w-[250px] font-semibold text-contrast">
-									Revenue stays in processing until the end of the month, then becomes available 60
-									days later.
+									{{ formatMessage(messages.processingTooltip) }}
 								</div>
 							</template>
 						</Tooltip>
@@ -116,18 +122,22 @@
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<span class="text-2xl font-semibold text-contrast">Withdraw</span>
+			<span class="text-2xl font-semibold text-contrast">{{
+				formatMessage(messages.withdrawHeader)
+			}}</span>
 			<div class="grid grid-cols-3 gap-x-4 gap-y-2">
 				<button
 					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-700 p-5 text-inverted shadow-md transition-all duration-200 hover:brightness-110"
 					@click="openWithdrawModal"
 				>
 					<div class="relative z-10 flex flex-row justify-between">
-						<span class="text-md font-semibold">Withdraw</span>
+						<span class="text-md font-semibold">{{
+							formatMessage(messages.withdrawCardTitle)
+						}}</span>
 						<ArrowUpRightIcon class="my-auto size-6" />
 					</div>
 					<div class="relative z-10 text-left text-sm font-medium">
-						Withdraw from your available balance to any payout method.
+						{{ formatMessage(messages.withdrawCardDescription) }}
 					</div>
 					<svg
 						aria-hidden="true"
@@ -161,21 +171,31 @@
 					</svg>
 				</button>
 			</div>
-			<span class="text-sm text-secondary"
-				>By uploading projects to Modrinth and withdrawing money from your account, you agree to the
-				<nuxt-link class="text-link" to="/legal/cmp">Rewards Program Terms</nuxt-link>. Learn more
-				about the
-				<nuxt-link class="text-link" to="/legal/cmp-info">Reward Program</nuxt-link>.</span
-			>
+			<span class="text-sm text-secondary">
+				<IntlFormatted :message-id="messages.tosLabel">
+					<template #terms-link="{ children }">
+						<nuxt-link class="text-link" to="/legal/cmp">
+							<component :is="() => normalizeChildren(children)" />
+						</nuxt-link>
+					</template>
+					<template #info-link="{ children }">
+						<nuxt-link class="text-link" to="/legal/cmp-info">
+							<component :is="() => normalizeChildren(children)" />
+						</nuxt-link>
+					</template>
+				</IntlFormatted>
+			</span>
 		</div>
 
 		<div class="flex flex-col gap-4">
 			<div class="flex flex-row justify-between">
-				<span class="text-3xl font-semibold text-contrast">Transactions</span>
+				<span class="text-3xl font-semibold text-contrast">{{
+					formatMessage(messages.transactionsHeader)
+				}}</span>
 				<nuxt-link
 					class="my-auto font-semibold text-contrast underline underline-offset-2"
 					to="/dashboard/revenue/transfers"
-					>See all</nuxt-link
+					>{{ formatMessage(messages.seeAll) }}</nuxt-link
 				>
 			</div>
 			<div v-if="sortedPayouts.length > 0">
@@ -206,7 +226,7 @@
 				</div>
 			</div>
 			<div v-else class="rounded-xl border border-button-bg p-4 text-secondary">
-				No transactions found
+				{{ formatMessage(messages.noTransactions) }}
 			</div>
 		</div>
 	</div>
@@ -223,11 +243,15 @@ import {
 	type PayoutMethodType,
 	type PayoutStatus,
 } from '@modrinth/utils'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { IntlFormatted } from '@vintl/vintl/components'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 import { all } from 'iso-3166-1'
 
+import { normalizeChildren } from '@/utils/vue-children.ts'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
+const { formatMessage } = useVIntl()
 
 // TODO: Deduplicate in @modrinth/api-client PR.
 type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'
@@ -247,7 +271,6 @@ interface UserBalanceResponse {
 	form_completion_status: FormCompletionStatus | null
 }
 
-// Types for payout methods and related shapes
 type PayoutInterval = { fixed: { values: number[] } } | { standard: { min: number; max: number } }
 interface PayoutMethodFee {
 	percentage: number
@@ -290,6 +313,49 @@ const withdrawModal = ref<InstanceType<typeof CreatorWithdrawModal>>()
 async function openWithdrawModal() {
 	withdrawModal.value?.show?.()
 }
+
+const messages = defineMessages({
+	balanceLabel: { id: 'dashboard.revenue.balance', defaultMessage: 'Balance' },
+	availableNow: { id: 'dashboard.revenue.available-now', defaultMessage: 'Available now' },
+	estimatedWithDate: {
+		id: 'dashboard.revenue.estimated-with-date',
+		defaultMessage: 'Estimated {date}',
+	},
+	estimatedTooltip1: {
+		id: 'dashboard.revenue.estimated-tooltip.msg1',
+		defaultMessage: 'Estimated revenue may be subject to change until it is made available.',
+	},
+	estimatedTooltip2: {
+		id: 'dashboard.revenue.estimated-tooltip.msg2',
+		defaultMessage: 'Click to read about how Modrinth handles your revenue.',
+	},
+	processing: { id: 'dashboard.revenue.processing', defaultMessage: 'Processing' },
+	processingTooltip: {
+		id: 'dashboard.revenue.processing.tooltip',
+		defaultMessage:
+			'Revenue stays in processing until the end of the month, then becomes available 60 days later.',
+	},
+	withdrawHeader: { id: 'dashboard.revenue.withdraw.header', defaultMessage: 'Withdraw' },
+	withdrawCardTitle: { id: 'dashboard.revenue.withdraw.card.title', defaultMessage: 'Withdraw' },
+	withdrawCardDescription: {
+		id: 'dashboard.revenue.withdraw.card.description',
+		defaultMessage: 'Withdraw from your available balance to any payout method.',
+	},
+	tosLabel: {
+		id: 'dashboard.revenue.tos',
+		defaultMessage:
+			'By uploading projects to Modrinth and withdrawing money from your account, you agree to our <terms-link>Rewards Program Terms</terms-link>. Learn more about the <info-link>Reward Program</info-link>.',
+	},
+	transactionsHeader: {
+		id: 'dashboard.revenue.transactions.header',
+		defaultMessage: 'Transactions',
+	},
+	seeAll: { id: 'dashboard.revenue.transactions.see-all', defaultMessage: 'See all' },
+	noTransactions: {
+		id: 'dashboard.revenue.transactions.none',
+		defaultMessage: 'No transactions found',
+	},
+})
 
 function formatTransactionStatus(status: PayoutStatus) {
 	switch (status) {

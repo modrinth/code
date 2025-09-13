@@ -425,6 +425,48 @@
   "dashboard.collections.long-title": {
     "message": "Your collections"
   },
+  "dashboard.revenue.available-now": {
+    "message": "Available now"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Balance"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Estimated revenue may be subject to change until it is made available."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Click to read about how Modrinth handles your revenue."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Estimated {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Processing"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Revenue stays in processing until the end of the month, then becomes available 60 days later."
+  },
+  "dashboard.revenue.tos": {
+    "message": "By uploading projects to Modrinth and withdrawing money from your account, you agree to our <terms-link>Rewards Program Terms</terms-link>. Learn more about the <info-link>Reward Program</info-link>."
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transactions"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "No transactions found"
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "See all"
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Withdraw from your available balance to any payout method."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Withdraw"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Withdraw"
+  },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
   },
