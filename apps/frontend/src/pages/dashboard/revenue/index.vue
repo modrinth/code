@@ -19,9 +19,9 @@
 				>
 			</div>
 
-			<div class="flex h-3 w-full gap-2 overflow-hidden rounded-full bg-bg-raised">
+			<div class="flex h-4 w-full gap-2 overflow-hidden rounded-full bg-bg-raised">
 				<div
-					v-for="seg in segments"
+					v-for="(seg, index) in segments"
 					:key="seg.key"
 					class="h-full"
 					:style="{ width: seg.widthPct }"
@@ -29,8 +29,12 @@
 					@mouseleave="hoveredSeg = null"
 				>
 					<span
-						class="block h-full w-full transition duration-150 hover:brightness-150"
-						:class="seg.class"
+						class="gradient-border block h-full w-full transition duration-150 hover:brightness-150"
+						:class="[
+							seg.class,
+							index === 0 ? 'rounded-l-full' : '',
+							index === segments.length - 1 ? 'rounded-r-full' : '',
+						]"
 					></span>
 				</div>
 			</div>
@@ -42,8 +46,8 @@
 					<span
 						class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
 						:class="{ 'animate-flash-green text-green': hoveredSeg === 'available' }"
-						><span class="my-auto block size-4 rounded-full bg-brand-green"></span> Available
-						now</span
+						><span class="gradient-border my-auto block size-4 rounded-full bg-brand-green"></span>
+						Available now</span
 					>
 					<span
 						class="text-2xl font-bold text-contrast"
@@ -65,7 +69,7 @@
 						}"
 					>
 						<span
-							class="zone--striped-small my-auto block size-4 rounded-full"
+							class="zone--striped-small gradient-border my-auto block size-4 rounded-full"
 							:class="[date.stripeClass, date.highlightClass]"
 						></span>
 						Estimated {{ date.date ? dayjs(date.date).format('MMM D, YYYY') : '' }}
@@ -100,7 +104,7 @@
 						:class="{ 'animate-flash-gray text-gray-500': hoveredSeg === 'processing' }"
 					>
 						<span
-							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg opacity-90"
+							class="zone--striped-small zone--striped--gray gradient-border my-auto block size-4 rounded-full bg-button-bg opacity-90"
 						></span>
 						Processing
 						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
@@ -466,7 +470,7 @@ const segments = computed<RevenueBarSegment[]>(() => {
 	if (available > 0) {
 		segs.push({
 			key: 'available',
-			class: 'bg-gradient-to-r from-green to-green-700',
+			class: 'bg-gradient-to-r from-green-500 to-green-800',
 			width: available / total,
 			amount: available,
 		})
@@ -600,6 +604,24 @@ $flash-colors: 'green', 'blue', 'purple', 'orange', 'red';
 
 .animate-flash-gray {
 	animation: flash-gray 1s ease-in-out infinite;
+}
+
+.gradient-border {
+	position: relative;
+
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+		border-radius: inherit;
+		mask:
+			linear-gradient(#fff 0 0) content-box,
+			linear-gradient(#fff 0 0);
+		mask-composite: xor;
+		padding: 2px;
+		pointer-events: none;
+	}
 }
 </style>
 
