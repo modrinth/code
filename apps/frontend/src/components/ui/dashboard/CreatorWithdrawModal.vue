@@ -10,7 +10,9 @@
 		<div class="flex w-full flex-col gap-4 sm:w-[540px]">
 			<template v-if="currentStage === 'withdraw-limit'">
 				<div class="flex w-full flex-row justify-between">
-					<span class="font-semibold text-contrast">Withdraw Remaining</span>
+					<span class="font-semibold text-contrast">{{
+						formatMessage(messages.withdrawRemaining)
+					}}</span>
 					<div>
 						<span class="text-orange">{{ formatMoney(remainingLimit) }}</span> /
 						{{ formatMoney(600) }}
@@ -20,57 +22,89 @@
 					<div class="bg-orange" :style="{ width: `${(usedLimit / 600) * 100}%` }"></div>
 				</div>
 				<template v-if="remainingLimit > 0">
-					<span
-						>You're nearing the {{ formatMoney(600) }} withdrawal threshold. You can withdraw up to
-						<b>{{ formatMoney(remainingLimit) }}</b> now, but you'll need to complete a tax form to
-						withdraw more.</span
+					<span>
+						<IntlFormatted
+							:message-id="messages.nearingThreshold"
+							:values="{
+								amount600: formatMoney(600),
+								amountRemaining: formatMoney(remainingLimit),
+							}"
+						>
+							<template #b="{ children }">
+								<b><component :is="() => normalizeChildren(children)" /></b>
+							</template>
+						</IntlFormatted>
+					</span>
+					<Admonition
+						type="warning"
+						show-actions-underneath
+						:header="formatMessage(messages.taxFormRequiredHeader)"
 					>
-					<Admonition type="warning" show-actions-underneath header="Tax form required">
-						To withdraw your full <b>{{ formatMoney(balance?.available) }}</b> available balance
-						please complete the form below. It is required for tax reporting and only needs to be
-						done once.
+						<span>
+							<IntlFormatted
+								:message-id="messages.taxFormRequiredBody"
+								:values="{ available: formatMoney(balance?.available) }"
+							>
+								<template #b="{ children }">
+									<b><component :is="() => normalizeChildren(children)" /></b>
+								</template>
+							</IntlFormatted>
+						</span>
 						<template #icon="{ iconClass }">
 							<FileTextIcon :class="iconClass" />
 						</template>
 						<template #actions>
 							<ButtonStyled color="orange">
-								<button @click="showTaxFormModal">Complete tax form</button>
+								<button @click="showTaxFormModal">
+									{{ formatMessage(messages.completeTaxForm) }}
+								</button>
 							</ButtonStyled>
 						</template>
 					</Admonition>
 				</template>
 				<template v-else>
 					<span>
-						You've used up your <b>{{ formatMoney(600) }}</b> withdrawal limit. You must complete a
-						tax form to withdraw more.
+						<IntlFormatted
+							:message-id="messages.withdrawLimitUsed"
+							:values="{ amount600: formatMoney(600) }"
+						>
+							<template #b="{ children }">
+								<b><component :is="() => normalizeChildren(children)" /></b>
+							</template>
+						</IntlFormatted>
 					</span>
 				</template>
 				<div class="ml-auto flex gap-3">
 					<ButtonStyled color="standard">
-						<button @click="withdrawModal?.hide()"><XIcon />Cancel</button>
+						<button @click="withdrawModal?.hide()">
+							<XIcon />{{ formatMessage(messages.cancel) }}
+						</button>
 					</ButtonStyled>
 					<ButtonStyled v-if="remainingLimit > 0" color="standard">
 						<button @click="currentStage = 'withdraw-details'">
-							Continue with limit <ChevronRightIcon />
+							{{ formatMessage(messages.continueWithLimit) }} <ChevronRightIcon />
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-else color="orange">
-						<button @click="showTaxFormModal">Complete tax form <ChevronRightIcon /></button>
+						<button @click="showTaxFormModal">
+							{{ formatMessage(messages.completeTaxForm) }} <ChevronRightIcon />
+						</button>
 					</ButtonStyled>
 				</div>
 			</template>
 
 			<template v-if="currentStage === 'withdraw-details'">
-				<span class="font-semibold text-contrast">Withdraw from</span>
+				<span class="font-semibold text-contrast">{{ formatMessage(messages.withdrawFrom) }}</span>
 				<div class="flex flex-col rounded-xl bg-bg p-4">
-					<span class="text-sm text-primary">Available balance</span>
+					<span class="text-sm text-primary">{{ formatMessage(messages.availableBalance) }}</span>
 					<span class="font-semibold text-contrast">{{ formatMoney(balance?.available) }}</span>
 				</div>
 
 				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
-					<span>Region</span><span class="text-brand-red">*</span>
+					<span>{{ formatMessage(messages.region) }}</span
+					><span class="text-brand-red">*</span>
 					<UnknownIcon
-						v-tooltip="`Select your country or region`"
+						v-tooltip="formatMessage(messages.selectYourCountryOrRegion)"
 						class="my-auto size-4 text-secondary"
 					/>
 				</div>
@@ -79,12 +113,13 @@
 					:listbox="true"
 					:searchable="true"
 					:options="countryOptions"
-					placeholder="Select country..."
-					:display-value="countryProxy?.name ?? 'Select country...'"
+					:placeholder="formatMessage(messages.selectCountryPlaceholder)"
+					:display-value="countryProxy?.name ?? formatMessage(messages.selectCountryPlaceholder)"
 				/>
 
 				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
-					<span>Withdraw to</span><span class="text-brand-red">*</span>
+					<span>{{ formatMessage(messages.withdrawTo) }}</span
+					><span class="text-brand-red">*</span>
 				</div>
 				<div class="relative">
 					<Combobox
@@ -92,29 +127,36 @@
 						:listbox="true"
 						class="payment-method-select w-full"
 						:options="paymentMethodOptions"
-						placeholder="Select method..."
+						:placeholder="formatMessage(messages.selectMethodPlaceholder)"
 						:display-value="
-							paymentMethod ? formatPaymentMethodName(paymentMethod) : 'Select method...'
+							paymentMethod
+								? formatPaymentMethodName(paymentMethod)
+								: formatMessage(messages.selectMethodPlaceholder)
 						"
 					/>
 				</div>
 
 				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
-					<span>Amount</span><span class="text-brand-red">*</span>
+					<span>{{ formatMessage(messages.amount) }}</span
+					><span class="text-brand-red">*</span>
 				</div>
-				<span class="text-secondary"
-					>The minimum transfer amount is {{ formatMoney(minWithdrawAmount) }}.</span
-				>
+				<span class="text-secondary">
+					{{
+						formatMessage(messages.minimumTransferAmount, { min: formatMoney(minWithdrawAmount) })
+					}}
+				</span>
 				<div class="flex items-center gap-0">
 					<input
 						v-model="withdrawAmount"
 						type="text"
 						pattern="^\d*(\.\d{0,2})?$"
-						placeholder="Enter amount..."
+						:placeholder="formatMessage(messages.enterAmountPlaceholder)"
 						class="flex-1 rounded-l-xl border-y border-l border-divider bg-button-bg px-4 py-2.5 placeholder-secondary focus:outline-none"
 					/>
 					<ButtonStyled color="standard" class="rounded-l-none">
-						<button @click="withdrawAmount = maxWithdrawAmount.toFixed(2)">Max</button>
+						<button @click="withdrawAmount = maxWithdrawAmount.toFixed(2)">
+							{{ formatMessage(messages.max) }}
+						</button>
 					</ButtonStyled>
 				</div>
 
@@ -124,12 +166,21 @@
 					</span>
 				</div>
 
-				<div class="mt-2 flex gap-3">
+				<div class="ml-auto mt-2 flex gap-3">
+					<ButtonStyled v-if="isDev" color="standard">
+						<button @click="showTaxFormModal($event)">
+							{{ formatMessage(messages.openTaxDebug) }}
+						</button>
+					</ButtonStyled>
 					<ButtonStyled color="standard">
-						<button @click="withdrawModal?.hide()"><XIcon />Cancel</button>
+						<button @click="withdrawModal?.hide()">
+							<XIcon />{{ formatMessage(messages.cancel) }}
+						</button>
 					</ButtonStyled>
 					<ButtonStyled color="green" :disabled="!canProceedToWithdraw">
-						<button @click="initiateWithdraw"><TransferIcon />Withdraw</button>
+						<button @click="initiateWithdraw">
+							<TransferIcon />{{ formatMessage(messages.actionWithdraw) }}
+						</button>
 					</ButtonStyled>
 				</div>
 			</template>
@@ -145,9 +196,12 @@
 </template>
 
 <script lang="ts" setup>
+import { normalizeChildren } from '@/utils/vue-children.ts'
 import { ChevronRightIcon, FileTextIcon, TransferIcon, UnknownIcon, XIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled, Combobox, NewModal } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { IntlFormatted } from '@vintl/vintl/components'
 import { all } from 'iso-3166-1'
 import { nextTick } from 'vue'
 
@@ -284,22 +338,30 @@ const withdrawErrors = computed(() => {
 	const errors: string[] = []
 
 	if (!parsedWithdrawAmount.value && withdrawAmount.value.length > 0) {
-		errors.push(`${withdrawAmount.value} is not a valid amount`)
+		errors.push(formatMessage(messages.errorInvalidAmount, { input: withdrawAmount.value }))
 	} else if (parsedWithdrawAmount.value > maxWithdrawAmount.value) {
-		errors.push(`The amount must be no more than ${formatMoney(maxWithdrawAmount.value)}`)
+		errors.push(
+			formatMessage(messages.errorMaxAmount, {
+				max: formatMoney(maxWithdrawAmount.value),
+			}),
+		)
 	} else if (
 		parsedWithdrawAmount.value < minWithdrawAmount.value &&
 		parsedWithdrawAmount.value > 0
 	) {
-		errors.push(`The amount must be at least ${formatMoney(minWithdrawAmount.value)}`)
+		errors.push(
+			formatMessage(messages.errorMinAmount, {
+				min: formatMoney(minWithdrawAmount.value),
+			}),
+		)
 	}
 
 	if (paymentMethod.value?.type === 'paypal' && !props.userPayoutData?.paypal_address) {
-		errors.push('Please link your PayPal account to proceed.')
+		errors.push(formatMessage(messages.errorLinkPaypal))
 	}
 
 	if (paymentMethod.value?.type === 'venmo' && !props.userPayoutData?.venmo_handle) {
-		errors.push('Please set your Venmo handle to proceed.')
+		errors.push(formatMessage(messages.errorLinkVenmo))
 	}
 
 	return errors
@@ -344,15 +406,15 @@ function onTaxFormCancelled() {
 	show('withdraw-limit')
 }
 
-const stageLabels = readonly<Record<Stage, string | undefined>>({
-	'withdraw-limit': 'Withdraw Limit',
-	'withdraw-details': 'Withdraw Details',
+const stageLabels = computed<Record<Stage, string | undefined>>(() => ({
+	'withdraw-limit': formatMessage(messages.withdrawHeader),
+	'withdraw-details': formatMessage(messages.withdrawHeader),
 	confirmation: undefined,
-})
+}))
 
 const currentStageLabel = computed<string | undefined>(() => {
 	if (!currentStage.value) return undefined
-	return stageLabels[currentStage.value]
+	return stageLabels.value[currentStage.value]
 })
 
 const withdrawModal = ref<InstanceType<typeof NewModal> | null>(null)
@@ -401,5 +463,108 @@ watch(
 
 defineExpose({
 	show,
+})
+
+const isDev = import.meta.dev
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	withdrawHeader: {
+		id: 'dashboard.creator-withdraw-modal.withdraw.header',
+		defaultMessage: 'Withdraw',
+	},
+	withdrawRemaining: {
+		id: 'dashboard.creator-withdraw-modal.withdraw-remaining',
+		defaultMessage: 'Withdraw remaining',
+	},
+	withdrawFrom: {
+		id: 'dashboard.creator-withdraw-modal.withdraw-from',
+		defaultMessage: 'Withdraw from',
+	},
+	availableBalance: {
+		id: 'dashboard.creator-withdraw-modal.available-balance',
+		defaultMessage: 'Available balance',
+	},
+	region: { id: 'dashboard.creator-withdraw-modal.region', defaultMessage: 'Region' },
+	withdrawTo: { id: 'dashboard.creator-withdraw-modal.withdraw-to', defaultMessage: 'Withdraw to' },
+	amount: { id: 'dashboard.creator-withdraw-modal.amount', defaultMessage: 'Amount' },
+	selectYourCountryOrRegion: {
+		id: 'dashboard.creator-withdraw-modal.tooltip.select-country-region',
+		defaultMessage: 'Select your country or region',
+	},
+	selectCountryPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.placeholder.select-country',
+		defaultMessage: 'Select country...',
+	},
+	selectMethodPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.placeholder.select-method',
+		defaultMessage: 'Select method...',
+	},
+	enterAmountPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.placeholder.enter-amount',
+		defaultMessage: 'Enter amount...',
+	},
+	max: { id: 'action.max', defaultMessage: 'Max' },
+	nearingThreshold: {
+		id: 'dashboard.creator-withdraw-modal.nearing-threshold',
+		defaultMessage:
+			"You're nearing the {amount600} withdrawal threshold. You can withdraw up to <b>{amountRemaining}</b> now, but you'll need to complete a tax form to withdraw more.",
+	},
+	taxFormRequiredHeader: {
+		id: 'dashboard.creator-withdraw-modal.tax-form-required.header',
+		defaultMessage: 'Tax form required',
+	},
+	taxFormRequiredBody: {
+		id: 'dashboard.creator-withdraw-modal.tax-form-required.body',
+		defaultMessage:
+			'To withdraw your full <b>{available}</b> available balance please complete the form below. It is required for tax reporting and only needs to be done once.',
+	},
+	completeTaxForm: {
+		id: 'dashboard.creator-withdraw-modal.complete-tax-form',
+		defaultMessage: 'Complete tax form',
+	},
+	withdrawLimitUsed: {
+		id: 'dashboard.creator-withdraw-modal.withdraw-limit-used',
+		defaultMessage:
+			"You've used up your <b>{amount600}</b> withdrawal limit. You must complete a tax form to withdraw more.",
+	},
+	continueWithLimit: {
+		id: 'dashboard.creator-withdraw-modal.continue-with-limit',
+		defaultMessage: 'Continue with limit',
+	},
+
+	minimumTransferAmount: {
+		id: 'dashboard.creator-withdraw-modal.minimum-transfer-amount',
+		defaultMessage: 'The minimum transfer amount is {min}.',
+	},
+
+	cancel: { id: 'action.cancel', defaultMessage: 'Cancel' },
+	actionWithdraw: { id: 'action.withdraw', defaultMessage: 'Withdraw' },
+
+	errorInvalidAmount: {
+		id: 'dashboard.creator-withdraw-modal.error.invalid-amount',
+		defaultMessage: '{input} is not a valid amount',
+	},
+	errorMaxAmount: {
+		id: 'dashboard.creator-withdraw-modal.error.max-amount',
+		defaultMessage: 'The amount must be no more than {max}',
+	},
+	errorMinAmount: {
+		id: 'dashboard.creator-withdraw-modal.error.min-amount',
+		defaultMessage: 'The amount must be at least {min}',
+	},
+	errorLinkPaypal: {
+		id: 'dashboard.creator-withdraw-modal.error.link-paypal',
+		defaultMessage: 'Please link your PayPal account to proceed.',
+	},
+	errorLinkVenmo: {
+		id: 'dashboard.creator-withdraw-modal.error.link-venmo',
+		defaultMessage: 'Please set your Venmo handle to proceed.',
+	},
+	openTaxDebug: {
+		id: 'creator.withdraw.debug.openTaxForm',
+		defaultMessage: 'Open tax form (debug)',
+	},
 })
 </script>

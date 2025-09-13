@@ -1,29 +1,34 @@
 <template>
-	<NewModal ref="taxFormModal" header="Submitting tax form" :closable="false">
-		<div class="max-w-[40rem]">
-			<Admonition
-				type="info"
-				header="Modrinth uses third-party provider Track1099 to securely collect and store your tax forms."
-			>
-				<a
-					href="https://www.track1099.com/info/security"
-					class="flex w-fit flex-row gap-1 align-middle text-link"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Learn more about their security practices here. <ExternalIcon class="my-auto" />
-				</a>
+	<NewModal ref="taxFormModal" :header="formatMessage(messages.taxFormHeader)">
+		<div class="w-full sm:w-[540px]">
+			<Admonition type="info" :header="formatMessage(messages.securityHeader)">
+				<IntlFormatted :message-id="messages.securityDescription">
+					<template #security-link="{ children }">
+						<a
+							href="https://www.track1099.com/info/security"
+							class="flex w-fit flex-row gap-1 align-middle text-link"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<component :is="() => normalizeChildren(children)" />
+							<ExternalIcon class="my-auto" />
+						</a>
+					</template>
+				</IntlFormatted>
 			</Admonition>
 			<div class="mt-4 flex flex-col gap-2">
 				<label>
 					<span class="text-lg font-semibold text-contrast">
-						Are you a US citizen?
+						{{ formatMessage(messages.usCitizenQuestion) }}
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
 				<Chips
 					v-model="isUSCitizen"
 					:items="['yes', 'no']"
+					:format-label="
+						(item) => (item === 'yes' ? formatMessage(messages.yes) : formatMessage(messages.no))
+					"
 					:never-empty="false"
 					:capitalize="true"
 				/>
@@ -40,19 +45,21 @@
 				<div v-if="isUSCitizen === 'no'" class="flex flex-col gap-1">
 					<label class="mt-4">
 						<span class="text-lg font-semibold text-contrast">
-							Are you a private individual or part of a foreign entity?
+							{{ formatMessage(messages.entityQuestion) }}
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
 					<span class="text-md leading-tight">
-						A foreign entity means a business entity organized outside the United States (such as a
-						non-US corporation, partnership, or LLC).
+						{{ formatMessage(messages.entityDescription) }}
 					</span>
 					<Chips
 						v-model="entityType"
 						:items="['private-individual', 'foreign-entity']"
 						:format-label="
-							(item) => (item === 'private-individual' ? 'Private individual' : 'Foreign entity')
+							(item) =>
+								item === 'private-individual'
+									? formatMessage(messages.privateIndividual)
+									: formatMessage(messages.foreignEntity)
 						"
 						:never-empty="false"
 						:capitalize="false"
@@ -60,14 +67,14 @@
 					/>
 				</div>
 			</Transition>
-			<div class="mt-4 flex w-full flex-row justify-between gap-2">
+			<div class="mt-4 flex justify-end gap-3">
 				<ButtonStyled @click="handleCancel">
-					<button><XIcon /> Cancel</button>
+					<button><XIcon /> {{ formatMessage(messages.cancel) }}</button>
 				</ButtonStyled>
-				<ButtonStyled color="brand">
+				<ButtonStyled>
 					<button :disabled="!canContinue || loading" @click="continueForm">
-						<template v-if="!loading">Continue <RightArrowIcon /></template>
-						<template v-else><SpinnerIcon class="animate-spin" /> Loading…</template>
+						{{ formatMessage(messages.continue) }}
+						<RightArrowIcon v-if="!loading" /> <SpinnerIcon class="animate-spin" v-else />
 					</button>
 				</ButtonStyled>
 			</div>
@@ -78,7 +85,10 @@
 <script setup lang="ts">
 import { ExternalIcon, RightArrowIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { IntlFormatted } from '@vintl/vintl/components'
 
+import { normalizeChildren } from '@/utils/vue-children.ts'
 import { type FormRequestResponse, useAvalara1099 } from '~/composables/avalara1099'
 
 const { addNotification } = injectNotificationManager()
@@ -94,6 +104,49 @@ defineExpose({
 })
 
 const auth = await useAuth()
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	taxFormHeader: {
+		id: 'dashboard.creator-tax-form-modal.header',
+		defaultMessage: 'Tax form',
+	},
+	securityHeader: {
+		id: 'dashboard.creator-tax-form-modal.security.header',
+		defaultMessage: 'Security practices',
+	},
+	securityDescription: {
+		id: 'dashboard.creator-tax-form-modal.security.description',
+		defaultMessage:
+			'Modrinth uses third-party provider Track1099 to securely collect and store your tax forms. <security-link>Learn more here.</security-link>',
+	},
+	usCitizenQuestion: {
+		id: 'dashboard.creator-tax-form-modal.us-citizen.question',
+		defaultMessage: 'Are you a US citizen?',
+	},
+	yes: { id: 'common.yes', defaultMessage: 'Yes' },
+	no: { id: 'common.no', defaultMessage: 'No' },
+	entityQuestion: {
+		id: 'dashboard.creator-tax-form-modal.entity.question',
+		defaultMessage: 'Are you a private individual or part of a foreign entity?',
+	},
+	entityDescription: {
+		id: 'dashboard.creator-tax-form-modal.entity.description',
+		defaultMessage:
+			'A foreign entity means a business entity organized outside the United States (such as a non-US corporation, partnership, or LLC).',
+	},
+	privateIndividual: {
+		id: 'dashboard.creator-tax-form-modal.entity.private-individual',
+		defaultMessage: 'Private individual',
+	},
+	foreignEntity: {
+		id: 'dashboard.creator-tax-form-modal.entity.foreign-entity',
+		defaultMessage: 'Foreign entity',
+	},
+	cancel: { id: 'action.cancel', defaultMessage: 'Cancel' },
+	continue: { id: 'action.continue', defaultMessage: 'Continue' },
+})
 
 const isUSCitizen = ref<'yes' | 'no' | null>(null)
 const entityType = ref<'private-individual' | 'foreign-entity' | null>(null)
@@ -185,13 +238,7 @@ async function continueForm() {
 		}
 	} catch (error) {
 		console.error('Error occurred while continuing tax form:', error)
-		addNotification({
-			title: 'Error occurred while continuing tax form',
-			text: error instanceof Error ? error.message : String(error),
-			type: 'error',
-		})
 	} finally {
-		// Clear manual spinner when control returns to the app
 		manualLoading.value = false
 	}
 }
