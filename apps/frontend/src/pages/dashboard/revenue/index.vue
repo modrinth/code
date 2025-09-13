@@ -43,15 +43,13 @@
 				<div
 					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
 				>
-					<span
-						class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
-						:class="{ 'animate-flash-green text-green': hoveredSeg === 'available' }"
+					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
 						><span class="gradient-border my-auto block size-4 rounded-full bg-brand-green"></span>
 						Available now</span
 					>
 					<span
 						class="text-2xl font-bold text-contrast"
-						:class="{ 'animate-flash-green text-green': hoveredSeg === 'available' }"
+						:class="{ 'animate-flash-green': hoveredSeg === 'available' }"
 						>{{ formatMoney(totalAvailable) }}</span
 					>
 				</div>
@@ -61,13 +59,7 @@
 					:key="date.date"
 					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
 				>
-					<span
-						class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
-						:class="{
-							[date.textClass]: hoveredSeg === `upcoming-${date.date}-${i}`,
-							'animate-flash-color': hoveredSeg === `upcoming-${date.date}-${i}`,
-						}"
-					>
+					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none">
 						<span
 							class="zone--striped-small gradient-border my-auto block size-4 rounded-full"
 							:class="[date.stripeClass, date.highlightClass]"
@@ -99,10 +91,7 @@
 				</div>
 
 				<div class="flex flex-row justify-between p-2">
-					<span
-						class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
-						:class="{ 'animate-flash-gray text-gray-500': hoveredSeg === 'processing' }"
-					>
+					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none">
 						<span
 							class="zone--striped-small zone--striped--gray gradient-border my-auto block size-4 rounded-full bg-button-bg opacity-90"
 						></span>
@@ -119,7 +108,7 @@
 					</span>
 					<span
 						class="text-2xl font-bold text-contrast"
-						:class="{ 'animate-flash-gray text-gray-500': hoveredSeg === 'processing' }"
+						:class="{ 'animate-flash-gray': hoveredSeg === 'processing' }"
 						>{{ formatMoney(processingDate?.amount ?? 0) }}</span
 					>
 				</div>
@@ -571,12 +560,12 @@ $striped-colors: 'green', 'blue', 'purple', 'orange', 'red';
 	background-attachment: unset !important;
 }
 
-$flash-colors: 'green', 'blue', 'purple', 'orange', 'red';
+$flash-colors: 'green', 'blue', 'purple', 'orange', 'red', 'gray';
 @each $color in $flash-colors {
 	@keyframes flash-#{$color} {
 		0%,
 		100% {
-			color: inherit;
+			color: var(--color-contrast);
 		}
 		50% {
 			color: var(--color-#{$color});
@@ -590,20 +579,6 @@ $flash-colors: 'green', 'blue', 'purple', 'orange', 'red';
 	.text-#{$color}.animate-flash-color {
 		animation: flash-#{$color} 1.5s ease-in-out infinite;
 	}
-}
-
-@keyframes flash-gray {
-	0%,
-	100% {
-		color: inherit;
-	}
-	50% {
-		color: var(--color-divider-dark);
-	}
-}
-
-.animate-flash-gray {
-	animation: flash-gray 1s ease-in-out infinite;
 }
 
 .gradient-border {
