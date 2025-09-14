@@ -15,6 +15,7 @@ use clickhouse_crate::Client;
 use util::cors::default_cors;
 
 use crate::background_task::update_versions;
+use crate::database::ReadOnlyPgPool;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
@@ -42,6 +43,7 @@ pub struct Pepper {
 #[derive(Clone)]
 pub struct LabrinthConfig {
     pub pool: sqlx::Pool<Postgres>,
+    pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
@@ -61,6 +63,7 @@ pub struct LabrinthConfig {
 #[allow(clippy::too_many_arguments)]
 pub fn app_setup(
     pool: sqlx::Pool<Postgres>,
+    ro_pool: ReadOnlyPgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
     clickhouse: &mut Client,
@@ -265,6 +268,7 @@ pub fn app_setup(
 
     LabrinthConfig {
         pool,
+        ro_pool,
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
@@ -300,6 +304,7 @@ pub fn app_config(
     }))
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
+    .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
     .app_data(web::Data::new(labrinth_config.search_config.clone()))
     .app_data(labrinth_config.session_queue.clone())
