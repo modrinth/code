@@ -80,6 +80,11 @@ impl NotificationBuilder {
             .map(|_| self.body.notification_type().as_str())
             .collect::<Vec<_>>();
 
+        let notification_channels = NotificationChannel::list()
+            .iter()
+            .map(|x| x.as_str())
+            .collect::<Vec<&str>>();
+
         // Insert required rows into `notifications_deliveries` by channel
         // and notification type, based on the user's preferences.
         let query = sqlx::query!(
@@ -143,7 +148,7 @@ impl NotificationBuilder {
             FROM
               delivery_candidates dc
             "#,
-            &[NotificationChannel::Email.as_str().to_string()],
+            &notification_channels[..] as &[&str],
             &notification_ids[..],
             &users_raw_ids[..],
             &notification_types[..] as &[&str],

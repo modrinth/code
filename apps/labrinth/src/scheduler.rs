@@ -29,13 +29,6 @@ impl Scheduler {
 
         self.arbiter.spawn(future);
     }
-
-    pub fn run_raw<F>(&self, fut: F)
-    where
-        F: std::future::Future<Output = ()> + Send + 'static,
-    {
-        self.arbiter.spawn(fut);
-    }
 }
 
 impl Drop for Scheduler {

@@ -2,8 +2,7 @@ use actix_web::guard::GuardContext;
 
 pub const ADMIN_KEY_HEADER: &str = "Modrinth-Admin";
 pub const MEDAL_KEY_HEADER: &str = "X-Medal-Access-Key";
-pub const EXTERNAL_NOTIFICATION_KEY_HEADER: &str =
-    "X-External-Notification-Key";
+pub const EXTERNAL_NOTIFICATION_KEY_HEADER: &str = "External-Notification-Key";
 
 pub fn admin_key_guard(ctx: &GuardContext) -> bool {
     let admin_key = std::env::var("LABRINTH_ADMIN_KEY").expect(

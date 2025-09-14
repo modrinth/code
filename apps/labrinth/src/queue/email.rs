@@ -51,16 +51,11 @@ impl EmailQueue {
     /// # Panic
     ///
     /// Panics if a TLS backend cannot be initialized by [`reqwest::ClientBuilder`].
-    pub fn init(pg: PgPool, redis: RedisPool) -> Self {
-        const DEFAULT_SENDER_NAME: &str = "Modrinth";
-        const DEFAULT_SENDER_ADDRESS: &str = "no-reply@mail.modrinth.com";
+    pub fn init(pg: PgPool, redis: RedisPool) -> Result<Self, MailError> {
+        let from_name = dotenvy::var("SMTP_FROM_NAME")?;
+        let from_address = dotenvy::var("SMTP_FROM_ADDRESS")?;
 
-        let from_name = dotenvy::var("SMTP_FROM_NAME")
-            .unwrap_or_else(|_| DEFAULT_SENDER_NAME.to_string());
-        let from_address = dotenvy::var("SMTP_FROM_ADDRESS")
-            .unwrap_or_else(|_| DEFAULT_SENDER_ADDRESS.to_string());
-
-        Self {
+        Ok(Self {
             pg,
             redis,
             mailer: None,
@@ -70,7 +65,7 @@ impl EmailQueue {
                 .user_agent("Modrinth")
                 .build()
                 .expect("Failed to build HTTP client"),
-        }
+        })
     }
 
     /// Tries to initialize the mailer. Returns an error for missing environment variables,

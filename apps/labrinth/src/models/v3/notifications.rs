@@ -443,6 +443,10 @@ pub enum NotificationChannel {
 }
 
 impl NotificationChannel {
+    pub fn list() -> &'static [Self] {
+        &[NotificationChannel::Email]
+    }
+
     pub fn as_str(self) -> &'static str {
         match self {
             NotificationChannel::Email => "email",

@@ -250,7 +250,8 @@ pub fn app_setup(
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
 
-        let email_queue = EmailQueue::init(pool_ref, redis_ref);
+        let email_queue = EmailQueue::init(pool_ref, redis_ref)
+            .expect("Failed to initialize email queue");
         scheduler
             .run(Duration::from_secs(5), move || email_queue.clone().index());
     }
@@ -454,6 +455,8 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("SMTP_HOST");
     failed |= check_var::<u16>("SMTP_PORT");
     failed |= check_var::<String>("SMTP_TLS");
+    failed |= check_var::<String>("SMTP_FROM_NAME");
+    failed |= check_var::<String>("SMTP_FROM_ADDRESS");
 
     failed |= check_var::<String>("SITE_VERIFY_EMAIL_PATH");
     failed |= check_var::<String>("SITE_RESET_PASSWORD_PATH");
