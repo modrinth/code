@@ -26,6 +26,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     }
 
     let pool = db.pool.clone();
+    let ro_pool = db.ro_pool.clone();
     let redis_pool = db.redis_pool.clone();
     let search_config = db.search_config.clone();
     let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
@@ -40,6 +41,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
 
     labrinth::app_setup(
         pool.clone(),
+        ro_pool.clone(),
         redis_pool.clone(),
         search_config,
         &mut clickhouse,
