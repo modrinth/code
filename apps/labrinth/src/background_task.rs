@@ -1,6 +1,6 @@
 use crate::database::redis::RedisPool;
 use crate::queue::payouts::{
-    PayoutsQueue, insert_bank_balances, process_payout,
+    PayoutsQueue, insert_bank_balances_and_webhook, process_payout,
 };
 use crate::search::indexing::index_projects;
 use crate::{database, search};
@@ -59,7 +59,7 @@ impl BackgroundTask {
 pub async fn update_bank_balances(pool: sqlx::Pool<Postgres>) {
     let payouts_queue = PayoutsQueue::new();
 
-    match insert_bank_balances(&payouts_queue, &pool).await {
+    match insert_bank_balances_and_webhook(&payouts_queue, &pool).await {
         Ok(_) => info!("Bank balances updated successfully"),
         Err(error) => error!(%error, "Bank balances update failed"),
     }
