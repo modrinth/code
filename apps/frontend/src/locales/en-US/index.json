@@ -567,7 +567,10 @@
     "message": "Transactions"
   },
   "dashboard.revenue.transactions.none": {
-    "message": "No transactions found"
+    "message": "No transactions"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Your payouts and withdrawals will appear here."
   },
   "dashboard.revenue.transactions.see-all": {
     "message": "See all"

@@ -399,12 +399,11 @@ const { data: payouts, refresh: refreshPayouts } = await useAsyncData<PayoutList
 )
 
 const sortedPayouts = computed<PayoutList>(() => {
-	return []
-	// if (!payouts.value) return []
+	if (!payouts.value) return []
 
-	// return [...payouts.value].sort((a, b) => {
-	// 	return new Date(b.created).getTime() - new Date(a.created).getTime()
-	// })
+	return [...payouts.value].sort((a, b) => {
+		return new Date(b.created).getTime() - new Date(a.created).getTime()
+	})
 })
 
 // Fetch payout methods based on selected country
