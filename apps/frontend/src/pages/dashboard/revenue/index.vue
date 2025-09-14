@@ -11,7 +11,7 @@
 	/>
 	<div class="mb-6 flex flex-col gap-8 p-12 py-0">
 		<div class="flex flex-col gap-5">
-			<div class="flex flex-col">
+			<div class="flex flex-col gap-1">
 				<span class="text-2xl font-semibold text-contrast">{{
 					formatMessage(messages.balanceLabel)
 				}}</span>
@@ -25,15 +25,16 @@
 				<div
 					v-for="(seg, index) in segments"
 					:key="seg.key"
-					class="h-full"
+					class="h-full hover:brightness-150"
 					:style="{ width: seg.widthPct }"
 					@mouseenter="hoveredSeg = seg.key"
 					@mouseleave="hoveredSeg = null"
 				>
 					<span
-						class="gradient-border block h-full w-full transition duration-150 hover:brightness-150"
+						class="block h-full w-full transition duration-150"
 						:class="[
 							seg.class,
+							seg.key === 'available' ? 'gradient-border' : '',
 							index === 0 ? 'rounded-l-full' : '',
 							index === segments.length - 1 ? 'rounded-r-full' : '',
 						]"
@@ -45,13 +46,13 @@
 				<div
 					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
 				>
-					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none"
+					<span class="text-md my-auto flex flex-row items-center gap-2 leading-none"
 						><span class="gradient-border my-auto block size-4 rounded-full bg-brand-green"></span>
 						{{ formatMessage(messages.availableNow) }}</span
 					>
 					<span
-						class="text-2xl font-bold text-contrast"
-						:class="{ 'animate-flash-green': hoveredSeg === 'available' }"
+						class="text-lg font-semibold text-contrast"
+						:class="{ 'text-green': hoveredSeg === 'available' }"
 						>{{ formatMoney(totalAvailable) }}</span
 					>
 				</div>
@@ -61,9 +62,9 @@
 					:key="date.date"
 					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
 				>
-					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none">
+					<span class="text-md my-auto flex flex-row items-center gap-2 leading-none">
 						<span
-							class="zone--striped-small gradient-border my-auto block size-4 rounded-full"
+							class="zone--striped-small my-auto block size-4 rounded-full"
 							:class="[date.stripeClass, date.highlightClass]"
 						></span>
 						{{
@@ -88,19 +89,16 @@
 						</Tooltip>
 					</span>
 					<span
-						class="text-2xl font-bold text-contrast"
-						:class="{
-							[date.textClass]: hoveredSeg === `upcoming-${date.date}-${i}`,
-							'animate-flash-color': hoveredSeg === `upcoming-${date.date}-${i}`,
-						}"
+						class="text-lg font-semibold text-contrast"
+						:class="{ [date.textClass]: hoveredSeg === `upcoming-${date.date}-${i}` }"
 						>{{ formatMoney(date?.amount ?? 0) }}</span
 					>
 				</div>
 
 				<div class="flex flex-row justify-between p-2">
-					<span class="my-auto flex flex-row items-center gap-2 text-lg leading-none">
+					<span class="text-md my-auto flex flex-row items-center gap-2 leading-none">
 						<span
-							class="zone--striped-small zone--striped--gray gradient-border my-auto block size-4 rounded-full bg-button-bg opacity-90"
+							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg opacity-90"
 						></span>
 						{{ formatMessage(messages.processing) }}
 						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
@@ -113,8 +111,8 @@
 						</Tooltip>
 					</span>
 					<span
-						class="text-2xl font-bold text-contrast"
-						:class="{ 'animate-flash-gray': hoveredSeg === 'processing' }"
+						class="text-lg font-semibold text-contrast"
+						:class="{ 'text-gray': hoveredSeg === 'processing' }"
 						>{{ formatMoney(processingDate?.amount ?? 0) }}</span
 					>
 				</div>
@@ -219,14 +217,17 @@
 								{{ dayjs(transaction.created).format('MMM DD YYYY') }}</span
 							>
 						</div>
-						<span class="my-auto text-2xl font-bold text-contrast">{{
+						<span class="my-auto text-lg font-semibold text-contrast">{{
 							formatMoney(transaction.amount)
 						}}</span>
 					</div>
 				</div>
 			</div>
-			<div v-else class="rounded-xl border border-button-bg p-4 text-secondary">
-				{{ formatMessage(messages.noTransactions) }}
+			<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
+				<span class="text-xl text-contrast">{{ formatMessage(messages.noTransactions) }}</span>
+				<span class="max-w-[256px] text-lg text-secondary">{{
+					formatMessage(messages.noTransactionsDesc)
+				}}</span>
 			</div>
 		</div>
 	</div>
@@ -353,7 +354,11 @@ const messages = defineMessages({
 	seeAll: { id: 'dashboard.revenue.transactions.see-all', defaultMessage: 'See all' },
 	noTransactions: {
 		id: 'dashboard.revenue.transactions.none',
-		defaultMessage: 'No transactions found',
+		defaultMessage: 'No transactions',
+	},
+	noTransactionsDesc: {
+		id: 'dashboard.revenue.transactions.none.desc',
+		defaultMessage: 'Your payouts and withdrawals will appear here.',
 	},
 })
 
@@ -394,11 +399,12 @@ const { data: payouts, refresh: refreshPayouts } = await useAsyncData<PayoutList
 )
 
 const sortedPayouts = computed<PayoutList>(() => {
-	if (!payouts.value) return []
+	return []
+	// if (!payouts.value) return []
 
-	return [...payouts.value].sort((a, b) => {
-		return new Date(b.created).getTime() - new Date(a.created).getTime()
-	})
+	// return [...payouts.value].sort((a, b) => {
+	// 	return new Date(b.created).getTime() - new Date(a.created).getTime()
+	// })
 })
 
 // Fetch payout methods based on selected country
@@ -488,7 +494,7 @@ const dateHighlightClasses = [
 	'bg-highlight-red',
 ] as const
 
-const dateTextClasses = ['text-blue', 'text-purple', 'text-orange', 'text-red'] as const
+const dateTextClasses = ['text-blue-400', 'text-purple', 'text-orange', 'text-red'] as const
 
 const dateSegments = computed(() => {
 	const dates = nextDate.value
@@ -580,7 +586,8 @@ const segments = computed<RevenueBarSegment[]>(() => {
 
 <style scoped lang="scss">
 %zone--striped-common {
-	background-attachment: fixed;
+	/* Use scroll so stripes remain static relative to element when page scrolls */
+	background-attachment: scroll;
 	background-position: 0 0;
 	background-size: 9.38px 9.38px;
 }

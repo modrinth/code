@@ -384,7 +384,8 @@
 					<DropdownIcon class="h-5 w-5 text-secondary" />
 					<template #profile> <UserIcon aria-hidden="true" /> Profile </template>
 					<template #notifications> <BellIcon aria-hidden="true" /> Notifications </template>
-					<template #saved> <BookmarkIcon aria-hidden="true" /> Saved projects </template>
+					<template #reports> <ReportIcon aria-hidden="true" /> Active reports </template>
+					<template #saved> <LibraryIcon aria-hidden="true" /> Collections </template>
 					<template #servers> <ServerIcon aria-hidden="true" /> My servers </template>
 					<template #plus>
 						<ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
@@ -677,7 +678,6 @@ import {
 	ArrowBigUpDashIcon,
 	BellIcon,
 	BlueskyIcon,
-	BookmarkIcon,
 	BoxIcon,
 	BracesIcon,
 	ChartIcon,
@@ -964,14 +964,6 @@ const userMenuOptions = computed(() => {
 			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(auth.value.user.badges, 1 << 0),
 		},
 		{
-			id: 'notifications',
-			link: '/dashboard/notifications',
-		},
-		{
-			id: 'saved',
-			link: '/dashboard/collections',
-		},
-		{
 			id: 'servers',
 			link: '/servers/manage',
 		},
@@ -989,6 +981,21 @@ const userMenuOptions = computed(() => {
 	// TODO: Only show if user has projects
 	options = [
 		...options,
+		{
+			divider: true,
+		},
+		{
+			id: 'notifications',
+			link: '/dashboard/notifications',
+		},
+		{
+			id: 'reports',
+			link: '/dashboard/reports',
+		},
+		{
+			id: 'saved',
+			link: '/dashboard/collections',
+		},
 		{
 			divider: true,
 		},
