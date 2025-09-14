@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "Change theme"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Get Modrinth App"
+  "layout.action.close": {
+    "message": "Close"
+  },
+  "layout.action.create-new": {
+    "message": "Create new..."
+  },
+  "layout.action.file-lookup": {
+    "message": "File lookup"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Lookup by email"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Manage server notices"
+  },
+  "layout.action.new-collection": {
+    "message": "New collection"
+  },
+  "layout.action.new-organization": {
+    "message": "New organization"
+  },
+  "layout.action.new-project": {
+    "message": "New project"
+  },
+  "layout.action.reports": {
+    "message": "Reports"
+  },
+  "layout.action.review-projects": {
+    "message": "Review projects"
   },
   "layout.avatar.alt": {
     "message": "Your avatar"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Terms of Use"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinth information"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth is <github-link>open source</github-link>."
   },
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "Discover and publish Minecraft content!"
   },
+  "layout.nav.analytics": {
+    "message": "Analytics"
+  },
+  "layout.nav.discover": {
+    "message": "Discover"
+  },
+  "layout.nav.discover-content": {
+    "message": "Discover content"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Feature flags"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Get Modrinth App"
+  },
   "layout.nav.home": {
     "message": "Home"
   },
+  "layout.nav.host-a-server": {
+    "message": "Host a server"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth home page"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizations"
+  },
+  "layout.nav.profile": {
+    "message": "Profile"
+  },
+  "layout.nav.projects": {
+    "message": "Projects"
+  },
+  "layout.nav.revenue": {
+    "message": "Revenue"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Saved projects"
+  },
   "layout.nav.search": {
     "message": "Search"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Upgrade to Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filter by"
