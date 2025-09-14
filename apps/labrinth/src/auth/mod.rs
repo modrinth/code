@@ -7,9 +7,7 @@ pub use checks::{
     filter_visible_collections, filter_visible_project_ids,
     filter_visible_projects,
 };
-pub use email::send_email;
 use serde::{Deserialize, Serialize};
-// pub use pat::{generate_pat, PersonalAccessToken};
 pub use validate::{check_is_moderator_from_headers, get_user_from_headers};
 
 use crate::file_hosting::FileHostingError;
