@@ -22,4 +22,3 @@ SELECT
   id product_id
 FROM products
 WHERE metadata ->> 'type' = 'midas';
-
