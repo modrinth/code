@@ -665,7 +665,7 @@
   "layout.action.change-theme": {
     "message": "Change theme"
   },
-  "layout.action.close": {
+  "layout.action.close-banner": {
     "message": "Close"
   },
   "layout.action.create-new": {
