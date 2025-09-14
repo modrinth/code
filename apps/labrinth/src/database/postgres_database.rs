@@ -51,7 +51,7 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
         .connect(&database_url)
         .await?;
 
-    if let Some(url) = dotenvy::var("READONLY_DATABASE_URL").ok() {
+    if let Ok(url) = dotenvy::var("READONLY_DATABASE_URL") {
         let ro_pool = PgPoolOptions::new()
             .min_connections(
                 dotenvy::var("READONLY_DATABASE_MIN_CONNECTIONS")

@@ -189,7 +189,7 @@ pub async fn get_update_from_hash(
         .sorted();
 
         if let Some(first) = versions.next_back() {
-            if !is_visible_version(&first.inner, &user_option, &*pool, &redis)
+            if !is_visible_version(&first.inner, &user_option, &pool, &redis)
                 .await?
             {
                 return Err(ApiError::NotFound);
@@ -246,7 +246,7 @@ pub async fn get_versions_from_hashes(
         database::models::DBVersion::get_many(&version_ids, &***pool, &redis)
             .await?,
         &user_option,
-        &*pool,
+        &pool,
         &redis,
     )
     .await?;
