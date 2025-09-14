@@ -1,0 +1,21 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Egy leírás ami leírja a projekt célját és funkcióját szükséges."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Adjon hozzá egy leírást"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Egy egyedi, releváns, és vonzó ikon segít jobban azonosíthatóvá tenni a projekted és segít kitűnni."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Adjon hozzá egy ikont"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Adjon hozzá bármilyen releváns linket ami modrinth-en kívülre mutat, mint például a forráskód, egy hibakövető oldalra, vagy egy Discord meghívót."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Agy hozzá külső linkeket"
+  }
+}
+

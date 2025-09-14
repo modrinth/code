@@ -489,6 +489,8 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("COMPLIANCE_PAYOUT_THRESHOLD");
 
+    failed |= check_var::<String>("PAYOUT_ALERT_SLACK_WEBHOOK");
+
     failed |= check_var::<String>("ARCHON_URL");
 
     failed

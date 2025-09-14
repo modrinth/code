@@ -1,0 +1,23 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Arendusrežiim lubatud."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Välimus"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Vaikimisi instantsi valikud"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Funktsioonimärgid"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java installatsioonid"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privaatsus"
+  },
+  "instance.settings.title": {
+    "message": "Sätted"
+  }
+}

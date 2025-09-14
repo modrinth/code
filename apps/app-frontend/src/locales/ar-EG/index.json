@@ -1,0 +1,140 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "وضع المطور قيد التفعيل."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "المظهر"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "خيارات النسخة التلقائية"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "إعدادات المميزات"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "تثبيتات جافا"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "الخصوصية"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "إدارة الموارد"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "إضافة واللعب"
+  },
+  "instance.add-server.add-server": {
+    "message": "إضافة الخادم"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "إلغاء التفعيل"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "تفعيل"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "موجه"
+  },
+  "instance.add-server.title": {
+    "message": "إضافة خادم"
+  },
+  "instance.edit-server.title": {
+    "message": "تعديل خادم"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "إخفاء من الصفحة الرئيسية"
+  },
+  "instance.edit-world.name": {
+    "message": "اسم"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "عالم ماينكرافت"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": ""
+  },
+  "instance.edit-world.title": {
+    "message": "تعديل العالم"
+  },
+  "instance.filter.disabled": {
+    "message": "مشاريع ملغية التفعيل"
+  },
+  "instance.filter.updates-available": {
+    "message": "التحديثات المتاحة"
+  },
+  "instance.server-modal.address": {
+    "message": "عنوان"
+  },
+  "instance.server-modal.name": {
+    "message": "اسم"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "خادم ماين كرافت"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "حزمة الموارد"
+  },
+  "instance.settings.tabs.general": {
+    "message": "عام"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "حذف النسخة"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "حذف النسخة"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "يحذف النسخة نهائيًا من جهازك، بما في ذلك عوالمك، إعداداتك، وجميع المحتويات المثبّتة. كن حذرًا، فبمجرد حذف النسخة لن تكون هناك أي طريقة لاستعادتها."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "حذف..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "نسخ"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "لا يمكن النسخ أثناء التثبيت"
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "نسخة النسخة"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "إنشاء."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "تعديل الأيقونة"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "أزل الأيقونة"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "استبدل الأيقونة"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "اختر الأيقونة"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "مجموعات المكتبة"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "إنشاء مجموعة جديدة"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "مجموعات المكتبة تساعدك على ترتيب حالاتك على أقسام مختلفة في مكتبتك."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "إدخال اسم المجموعة"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "الاسم"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "إجراءات تشغيل إضافية"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "إجراءات تشغيل إضافية مخصصة"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "إجراءات التشغيل المضافة تسمح للمستخدمين المتقدمين بإنشاء أوامر نظامية محددة قبل و عند تشغيل اللعبة."
+  }
+}

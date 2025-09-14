@@ -1,0 +1,104 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Bruger ikke fundet"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Godkend"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Afvis"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> af <creator-link>{creator}</creator-link> vil kunne:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Godkend {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Ingen omdirigeringslokation fundet i svaret"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Du bliver omdirigeret til <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Send gendannelses e-mail"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Indtast din e-mail nedenfor, så sender vi et gendannelseslink, så du kan gendanne din konto."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "E-mail eller brugernavn"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "E-mail"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "En e-mail med instruktioner er blevet sendt til dig, hvis e-mailen tidligere er blevet gemt på din konto."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "E-mail sendt"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Du kan nu logge ind på din konto med din nye adgangskode."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Adgangskoden blev nulstillet"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Nulstil adgangskoden"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Bekræft adgangskoden"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Indtast din nye adgangskode nedenfor for at få adgang til din konto."
+  },
+  "auth.reset-password.title": {
+    "message": "Nulstil adgangskoden"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Nulstil din adgangskode"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Indtast en to-faktor-kode for at fortsætte."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Indtast to-faktor-kode"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Indtast kode..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Glemt adgangskode?</forgot-password-link> • <create-account-link>Opret en konto</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "E-mail eller brugernavn"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Adgangskode"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Log ind med"
+  },
+  "auth.sign-in.title": {
+    "message": "Log ind"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Eller brug en adgangskode"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Opret konto"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Bekræft adgangskoden"
+  },
+  "auth.sign-up.email.label": {
+    "message": "E-mail"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Brugernavn"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Navn"
+  }
+}

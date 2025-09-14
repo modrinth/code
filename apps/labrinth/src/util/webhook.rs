@@ -178,7 +178,76 @@ async fn get_webhook_metadata(
     }
 }
 
-pub async fn send_slack_webhook(
+pub enum PayoutSourceAlertType {
+    UnderThreshold {
+        source: String,
+        threshold: u64,
+        current_balance: u64,
+    },
+    CheckFailure {
+        source: String,
+        display_error: String,
+    },
+}
+
+impl PayoutSourceAlertType {
+    pub fn message(&self) -> String {
+        match self {
+            PayoutSourceAlertType::UnderThreshold {
+                source,
+                threshold,
+                current_balance,
+            } => format!(
+                "\u{1f6a8} *Payout Source Alert*\n\nPayout source '{source}' has an available balance under the ${threshold} threshold.\nBalance: ${current_balance}."
+            ),
+            PayoutSourceAlertType::CheckFailure {
+                source,
+                display_error,
+            } => format!(
+                "\u{1f6a8} *Payout Source Alert*\n\nFAILED TO CHECK payout source '{source}' balance.\nError: {display_error}"
+            ),
+        }
+    }
+}
+
+pub async fn send_slack_payout_source_alert_webhook(
+    alert: PayoutSourceAlertType,
+    webhook_url: &str,
+) -> Result<(), ApiError> {
+    let client = reqwest::Client::new();
+
+    client
+        .post(webhook_url)
+        .json(&serde_json::json!({
+            "blocks": [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": alert.message()
+                    }
+                },
+                {
+                    "type": "context",
+                    "elements": [
+                        {
+                            "type": "mrkdwn",
+                            "text": format!("via labrinth • <!date^{}^{{date_short_pretty}} at {{time}}|Unknown date>", Utc::now().timestamp())
+                        }
+                    ]
+                }
+            ],
+        }))
+        .send()
+        .await
+        .map_err(|_| {
+            ApiError::Slack("Error while sending projects webhook".to_string())
+        })?;
+
+    Ok(())
+}
+
+pub async fn send_slack_project_webhook(
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
@@ -288,7 +357,7 @@ pub async fn send_slack_webhook(
             .send()
             .await
             .map_err(|_| {
-                ApiError::Discord(
+                ApiError::Slack(
                     "Error while sending projects webhook".to_string(),
                 )
             })?;

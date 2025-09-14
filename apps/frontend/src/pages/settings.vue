@@ -16,6 +16,7 @@
 						</NavStackItem>
 						<NavStackItem
 							v-if="isStaging"
+							:badge="`${formatMessage(commonMessages.beta)}`"
 							link="/settings/language"
 							:label="formatMessage(commonSettingsMessages.language)"
 						>
