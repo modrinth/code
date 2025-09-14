@@ -85,9 +85,9 @@ pub fn dimensions(png_data: &[u8]) -> crate::Result<(u32, u32)> {
 }
 
 /// Normalizes the texture of a Minecraft skin to the modern 64x64 format, handling
-/// legacy 64x32 skins as the vanilla game client does. This function prioritizes
-/// PNG encoding speed over compression density, so the resulting textures are better
-/// suited for display purposes, not persistent storage or transmission.
+/// legacy 64x32 skins and stripping alpha from inner parts as the vanilla game client does.
+/// This function prioritizes PNG encoding speed over compression density, so the resulting
+/// textures are better suited for display purposes, not persistent storage or transmission.
 ///
 /// The normalized, processed is returned texture as a byte array in PNG format.
 pub async fn normalize_skin_texture(
@@ -151,6 +151,11 @@ pub async fn normalize_skin_texture(
                 png_reader.info(),
             )?;
         }
+        strip_alpha_from_inner_parts(
+            &mut texture_buf,
+            texture_buf_color_type,
+            png_reader.info(),
+        );
 
         let mut encoded_png = vec![];
 
@@ -251,6 +256,32 @@ fn convert_legacy_skin_texture(
     Ok(())
 }
 
+/// Strips alpha from inner parts of a skin texture.
+///
+/// See also 25w16a's `SkinTextureDownloader#processLegacySkin` method.
+#[inline]
+fn strip_alpha_from_inner_parts(
+    texture_buf: &mut [u8],
+    texture_color_type: png::ColorType,
+    texture_info: &png::Info,
+) {
+    /// The skin parts the game client strips alpha from.
+    const STRIP_ALPHA_PARAMETERS: &[(usize, usize, usize, usize)] =
+        &[(0, 0, 32, 16), (0, 16, 64, 32), (16, 48, 48, 64)];
+
+    for (x1, y1, x2, y2) in STRIP_ALPHA_PARAMETERS {
+        strip_alpha(
+            texture_buf,
+            texture_info,
+            texture_color_type,
+            *x1,
+            *y1,
+            *x2,
+            *y2,
+        );
+    }
+}
+
 /// Copies a `width` pixels wide, `height` pixels tall rectangle of pixels within `texture_buf`
 /// whose top-left corner is at coordinates `(x, y)` to a destination rectangle whose top-left
 /// corner is at coordinates `(x + off_x, y + off_y)`, while mirroring (i.e., flipping) the
@@ -279,6 +310,28 @@ fn copy_rect_mirror_horizontally<PixelType: NoUninit + AnyBitPattern>(
 
             texture_buf[dst_x + dst_y * texture_info.width as usize] =
                 texture_buf[src_x + src_y * texture_info.width as usize];
+        }
+    }
+}
+
+/// Strips alpha from a rectangle of pixels within `texture_buf`
+/// whose top-left corner is at `(x1, y1)` and bottom-right corner is at `(x2 - 1, y2 - 1)`.
+fn strip_alpha(
+    texture_buf: &mut [u8],
+    texture_info: &png::Info,
+    texture_color_type: png::ColorType,
+    x1: usize,
+    y1: usize,
+    x2: usize,
+    y2: usize,
+) {
+    if texture_color_type.samples() != 4 {
+        return;
+    }
+
+    for y in y1..y2 {
+        for x in x1..x2 {
+            texture_buf[(x + y * texture_info.width as usize) * 4 + 3] = 255;
         }
     }
 }
