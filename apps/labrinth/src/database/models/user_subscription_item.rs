@@ -161,3 +161,94 @@ impl DBUserSubscription {
         Ok(())
     }
 }
+
+pub struct SubscriptionWithCharge {
+    pub subscription_id: DBUserSubscriptionId,
+    pub user_id: DBUserId,
+    pub subscription_metadata: SubscriptionMetadata,
+    pub amount: i64,
+    pub tax_amount: i64,
+    pub due: DateTime<Utc>,
+}
+
+pub async fn fetch_update_lock_pending_taxation_notification(
+    exec: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    limit: i64,
+) -> Result<Vec<SubscriptionWithCharge>, DatabaseError> {
+    struct QueryResult {
+        subscription_id: i64,
+        user_id: i64,
+        subscription_metadata: serde_json::Value,
+        amount: i64,
+        tax_amount: i64,
+        due: DateTime<Utc>,
+    }
+
+    impl TryFrom<QueryResult> for SubscriptionWithCharge {
+        type Error = DatabaseError;
+
+        fn try_from(r: QueryResult) -> Result<Self, Self::Error> {
+            Ok(SubscriptionWithCharge {
+                subscription_id: DBUserSubscriptionId(r.subscription_id),
+                user_id: DBUserId(r.user_id),
+                subscription_metadata: serde_json::from_value(
+                    r.subscription_metadata,
+                )?,
+                amount: r.amount,
+                tax_amount: r.tax_amount,
+                due: r.due,
+            })
+        }
+    }
+
+    sqlx::query_as!(
+        QueryResult,
+        r#"
+        WITH
+          target_rows AS (
+            SELECT
+              us.id subscription_id,
+              us.user_id,
+              us.metadata subscription_metadata,
+              c.amount,
+              c.tax_amount,
+              c.due
+            FROM users_subscriptions us
+            INNER JOIN (
+              SELECT DISTINCT ON (subscription_id)
+                subscription_id,
+                due,
+                amount,
+                tax_amount
+              FROM charges
+              WHERE status = 'open'
+              ORDER BY subscription_id, due DESC
+            ) c(subscription_id, due, amount, tax_amount) ON us.id = c.subscription_id
+            WHERE
+              NOW() + INTERVAL '8 days' > c.due
+              AND c.tax_amount > 0
+              AND us.status = 'provisioned'
+              AND us.user_aware_of_tax_changes = FALSE
+            ),
+          taken AS (
+            SELECT target_rows.*
+            FROM users_subscriptions us
+            INNER JOIN target_rows ON us.id = target_rows.subscription_id
+            ORDER BY target_rows.due ASC
+            FOR NO KEY UPDATE SKIP LOCKED
+            LIMIT $1
+          )
+        UPDATE users_subscriptions us
+        SET user_aware_of_tax_changes = TRUE
+        FROM taken t
+        WHERE us.id = t.subscription_id
+        RETURNING t.*
+        "#,
+        limit,
+    )
+    .fetch_all(&mut **exec)
+    .await?
+    .into_iter()
+    .map(|r| r.try_into())
+    .collect::<Result<Vec<_>, DatabaseError>>()
+}

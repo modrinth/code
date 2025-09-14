@@ -1,7 +1,10 @@
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::*;
 use crate::database::models::user_item::DBUser;
-use crate::database::models::user_subscription_item::DBUserSubscription;
+use crate::database::models::user_subscription_item::{
+    DBUserSubscription, SubscriptionWithCharge,
+    fetch_update_lock_pending_taxation_notification,
+};
 use crate::database::models::users_redeemals::UserRedeemal;
 use crate::database::models::{
     product_item, user_subscription_item, users_redeemals,
@@ -211,6 +214,21 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
 
     info!("Done indexing subscriptions");
 }
+
+/*
+async fn index_tax_notifications(pool: PgPool, redis: RedisPool) {
+    info!("Indexing tax notifications");
+
+    let mut txn = pool.begin().await?;
+
+    let subscriptions =
+        fetch_update_lock_pending_taxation_notification(&mut txn, 150).await?;
+
+    for subs in subscriptions {
+        let user = DBUser::get_id(subs.user_id, pool, redis).await?;
+    }
+}
+*/
 
 /// Attempts to process a user redeemal.
 ///
