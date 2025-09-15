@@ -56,6 +56,7 @@ pub struct LabrinthConfig {
     pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
     pub rate_limiter: web::Data<AsyncRateLimiter>,
     pub stripe_client: stripe::Client,
+    pub email_queue: web::Data<EmailQueue>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -67,6 +68,7 @@ pub fn app_setup(
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     maxmind: Arc<queue::maxmind::MaxMindIndexer>,
     stripe_client: stripe::Client,
+    email_queue: EmailQueue,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!(
@@ -246,16 +248,6 @@ pub fn app_setup(
         });
     }
 
-    {
-        let pool_ref = pool.clone();
-        let redis_ref = redis_pool.clone();
-
-        let email_queue = EmailQueue::init(pool_ref, redis_ref)
-            .expect("Failed to initialize email queue");
-        scheduler
-            .run(Duration::from_secs(5), move || email_queue.clone().index());
-    }
-
     let ip_salt = Pepper {
         pepper: ariadne::ids::Base62Id(ariadne::ids::random_base62(11))
             .to_string(),
@@ -289,6 +281,7 @@ pub fn app_setup(
         automated_moderation_queue,
         rate_limiter: limiter,
         stripe_client,
+        email_queue: web::Data::new(email_queue),
     }
 }
 

@@ -1,4 +1,5 @@
 use crate::database::redis::RedisPool;
+use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
     PayoutsQueue, insert_bank_balances_and_webhook, process_payout,
 };
@@ -18,6 +19,7 @@ pub enum BackgroundTask {
     IndexBilling,
     IndexSubscriptions,
     Migrations,
+    Mail,
 }
 
 impl BackgroundTask {
@@ -28,6 +30,7 @@ impl BackgroundTask {
         search_config: search::SearchConfig,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
+        email_queue: EmailQueue,
     ) {
         use BackgroundTask::*;
         match self {
@@ -52,7 +55,16 @@ impl BackgroundTask {
                 )
                 .await
             }
+            Mail => {
+                run_email(email_queue).await;
+            }
         }
+    }
+}
+
+pub async fn run_email(email_queue: EmailQueue) {
+    if let Err(error) = email_queue.index().await {
+        error!(%error, "Failed to index email queue");
     }
 }
 

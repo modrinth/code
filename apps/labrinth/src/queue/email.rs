@@ -1,15 +1,17 @@
-use crate::database::models::DatabaseError;
 use crate::database::models::ids::*;
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
 use crate::database::models::notifications_template_item::NotificationTemplate;
+use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
+use crate::models::notifications::NotificationBody;
 use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
 };
 use crate::routes::ApiError;
 use chrono::Utc;
 use futures::stream::{FuturesUnordered, StreamExt};
+use lettre::message::Mailbox;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::transport::smtp::client::{Tls, TlsParameters};
 use lettre::{AsyncSmtpTransport, AsyncTransport, Tokio1Executor};
@@ -17,9 +19,84 @@ use reqwest::Client;
 use sqlx::PgPool;
 use std::sync::Arc;
 use thiserror::Error;
-use tracing::{error, info, instrument, trace, warn};
+use tokio::sync::Mutex as TokioMutex;
+use tracing::{error, info, instrument, warn};
 
 const EMAIL_RETRY_DELAY_SECONDS: i64 = 10;
+
+pub enum Mailer {
+    Uninitialized,
+    Initialized(Arc<AsyncSmtpTransport<Tokio1Executor>>),
+}
+
+impl Mailer {
+    pub async fn to_transport(
+        &mut self,
+    ) -> Result<Arc<AsyncSmtpTransport<Tokio1Executor>>, MailError> {
+        let maybe_transport = match self {
+            Mailer::Uninitialized => {
+                let username = dotenvy::var("SMTP_USERNAME")?;
+                let password = dotenvy::var("SMTP_PASSWORD")?;
+                let host = dotenvy::var("SMTP_HOST")?;
+                let port =
+                    dotenvy::var("SMTP_PORT")?.parse::<u16>().unwrap_or(465);
+
+                let creds = (!username.is_empty())
+                    .then(|| Credentials::new(username, password));
+
+                let tls_setting = match dotenvy::var("SMTP_TLS")?.as_str() {
+                    "none" => Tls::None,
+                    "opportunistic_start_tls" => Tls::Opportunistic(
+                        TlsParameters::new(host.to_string())?,
+                    ),
+                    "requires_start_tls" => {
+                        Tls::Required(TlsParameters::new(host.to_string())?)
+                    }
+                    "tls" => {
+                        Tls::Wrapper(TlsParameters::new(host.to_string())?)
+                    }
+                    _ => {
+                        warn!(
+                            "Unrecognized SMTP TLS setting. Defaulting to TLS."
+                        );
+                        Tls::Wrapper(TlsParameters::new(host.to_string())?)
+                    }
+                };
+
+                let mut mailer =
+                    AsyncSmtpTransport::<Tokio1Executor>::relay(&host)?
+                        .port(port)
+                        .tls(tls_setting);
+
+                if let Some(creds) = creds {
+                    mailer = mailer.credentials(creds);
+                }
+
+                let mailer = mailer.build();
+
+                let result = mailer.test_connection().await;
+
+                match &result {
+                    Ok(true) => Some(Arc::new(mailer)),
+                    Ok(false) => {
+                        error!("SMTP NOOP failed, disabling mailer");
+                        None
+                    }
+                    Err(error) => {
+                        error!(%error, "Failed to test SMTP connection, disabling mailer");
+                        None
+                    }
+                }
+            }
+            Mailer::Initialized(transport) => Some(Arc::clone(&transport)),
+        };
+
+        let transport =
+            maybe_transport.ok_or_else(|| MailError::Uninitialized)?;
+        *self = Mailer::Initialized(Arc::clone(&transport));
+        Ok(transport)
+    }
+}
 
 #[derive(Error, Debug)]
 pub enum MailError {
@@ -31,6 +108,8 @@ pub enum MailError {
     Address(#[from] lettre::address::AddressError),
     #[error("SMTP Error: {0}")]
     Smtp(#[from] lettre::transport::smtp::Error),
+    #[error("Couldn't initialize SMTP transport")]
+    Uninitialized,
     #[error("HTTP error fetching template: {0}")]
     HttpTemplate(#[from] reqwest::Error),
 }
@@ -40,7 +119,7 @@ pub struct EmailQueue {
     pg: PgPool,
     client: reqwest::Client,
     redis: RedisPool,
-    mailer: Option<Arc<AsyncSmtpTransport<Tokio1Executor>>>,
+    mailer: Arc<TokioMutex<Mailer>>,
     identity: templates::MailingIdentity,
 }
 
@@ -54,7 +133,7 @@ impl EmailQueue {
         Ok(Self {
             pg,
             redis,
-            mailer: None,
+            mailer: Arc::new(TokioMutex::new(Mailer::Uninitialized)),
             identity: templates::MailingIdentity::from_env()?,
             client: Client::builder()
                 .user_agent("Modrinth")
@@ -63,254 +142,186 @@ impl EmailQueue {
         })
     }
 
-    /// Tries to initialize the mailer. Returns an error for missing environment variables,
-    /// but does nothing if the connection fails (besides emitting logs.)
-    async fn try_init_mailer(&mut self) -> Result<(), MailError> {
-        let username = dotenvy::var("SMTP_USERNAME")?;
-        let password = dotenvy::var("SMTP_PASSWORD")?;
-        let host = dotenvy::var("SMTP_HOST")?;
-        let port = dotenvy::var("SMTP_PORT")?.parse::<u16>().unwrap_or(465);
-        let creds = (!username.is_empty())
-            .then(|| Credentials::new(username, password));
+    #[instrument(name = "EmailQueue::index", skip_all)]
+    pub async fn index(&self) -> Result<(), ApiError> {
+        let transport = self.mailer.lock().await.to_transport().await?;
 
-        let tls_setting = match dotenvy::var("SMTP_TLS")?.as_str() {
-            "none" => Tls::None,
-            "opportunistic_start_tls" => {
-                Tls::Opportunistic(TlsParameters::new(host.to_string())?)
-            }
-            "requires_start_tls" => {
-                Tls::Required(TlsParameters::new(host.to_string())?)
-            }
-            "tls" => Tls::Wrapper(TlsParameters::new(host.to_string())?),
-            _ => {
-                warn!("Unrecognized SMTP TLS setting. Defaulting to TLS.");
-                Tls::Wrapper(TlsParameters::new(host.to_string())?)
-            }
-        };
+        let begin = std::time::Instant::now();
+        let mut txn = self.pg.begin().await?;
 
-        let mut mailer = AsyncSmtpTransport::<Tokio1Executor>::relay(&host)?
-            .port(port)
-            .tls(tls_setting);
-        if let Some(creds) = creds {
-            mailer = mailer.credentials(creds);
+        let mut deliveries = DBNotificationDelivery::lock_channel_processable(
+            NotificationChannel::Email,
+            5,
+            &mut *txn,
+        )
+        .await?;
+
+        if deliveries.is_empty() {
+            return Ok(());
         }
 
-        let mailer = mailer.build();
+        let n_to_process = deliveries.len();
 
-        let result = mailer.test_connection().await;
+        // Auto-fail deliveries which have been attempted over 3 times to avoid
+        // ballooning the error rate.
+        for d in deliveries.iter_mut().filter(|d| d.attempt_count >= 3) {
+            d.status = NotificationDeliveryStatus::PermanentlyFailed;
+            d.update(&mut *txn).await?;
+        }
 
-        match &result {
-            Ok(true) => self.mailer = Some(Arc::new(mailer)),
-            Ok(false) => error!("SMTP NOOP failed, disabling mailer"),
-            Err(error) => {
-                error!(%error, "Failed to test SMTP connection, disabling mailer")
+        // We hold a FOR UPDATE lock on the rows here, so no other workers are accessing them
+        // at the same time.
+
+        let notification_ids = deliveries
+            .iter()
+            .filter(|d| d.attempt_count < 3)
+            .map(|d| d.notification_id)
+            .collect::<Vec<_>>();
+        let notifications =
+            DBNotification::get_many(&notification_ids, &mut *txn).await?;
+
+        // For all notifications we collected, fill out the template
+        // and send it via SMTP in parallel.
+
+        let mut futures = FuturesUnordered::new();
+
+        for notification in notifications {
+            let this = self.clone();
+            let transport = Arc::clone(&transport);
+
+            futures.push(async move {
+                let maybe_user =
+                    DBUser::get_id(notification.user_id, &this.pg, &this.redis)
+                        .await?;
+
+                let mailbox = match maybe_user
+                    .and_then(|user| user.email)
+                    .and_then(|email| email.parse().ok())
+                {
+                    Some(m) => m,
+                    None => {
+                        return Ok((
+                            notification.id,
+                            NotificationDeliveryStatus::SkippedPreferences,
+                        ));
+                    }
+                };
+
+                this.send_one_with_transport(
+                    transport,
+                    notification.body,
+                    notification.user_id,
+                    mailbox,
+                )
+                .await
+                .map(|status| (notification.id, status))
+            });
+        }
+
+        while let Some(result) = futures.next().await {
+            match result {
+                Ok((notification_id, status)) => {
+                    if let Some(idx) = deliveries
+                        .iter()
+                        .position(|d| d.notification_id == notification_id)
+                    {
+                        let update_next_attempt =
+                            status == NotificationDeliveryStatus::Pending;
+
+                        let mut delivery = deliveries.remove(idx);
+                        delivery.status = status;
+                        delivery.next_attempt += update_next_attempt
+                            .then_some(chrono::Duration::seconds(
+                                EMAIL_RETRY_DELAY_SECONDS,
+                            ))
+                            .unwrap_or_default();
+
+                        delivery.attempt_count += 1;
+                        delivery.update(&mut *txn).await?;
+                    }
+                }
+
+                Err(error) => error!(%error, "Error building email"),
             }
         }
+
+        for mut delivery in deliveries {
+            // For these, there was an error building the email, like a
+            // database error. Retry them after 30 seconds.
+
+            delivery.next_attempt = Utc::now()
+                + chrono::Duration::seconds(EMAIL_RETRY_DELAY_SECONDS);
+
+            delivery.update(&mut *txn).await?;
+        }
+
+        txn.commit().await?;
+
+        info!(
+            "Processed {} email deliveries in {}ms",
+            n_to_process,
+            begin.elapsed().as_millis()
+        );
 
         Ok(())
     }
 
-    #[instrument(name = "EmailQueue::index", skip_all)]
-    pub async fn index(mut self) {
-        let (mailer, pg, redis, client, identity) = {
-            if self.mailer.is_none() {
-                let _ = self.try_init_mailer().await;
-            }
+    pub async fn send_one(
+        &self,
+        notification: NotificationBody,
+        user_id: DBUserId,
+        address: Mailbox,
+    ) -> Result<NotificationDeliveryStatus, ApiError> {
+        let transport = self.mailer.lock().await.to_transport().await?;
+        self.send_one_with_transport(transport, notification, user_id, address)
+            .await
+    }
 
-            if let Self {
-                mailer: Some(mailer),
-                pg,
-                redis,
-                client,
-                identity,
-            } = self
-            {
-                (mailer, pg, redis, client, identity)
-            } else {
-                return;
-            }
+    async fn send_one_with_transport(
+        &self,
+        transport: Arc<AsyncSmtpTransport<Tokio1Executor>>,
+        notification: NotificationBody,
+        user_id: DBUserId,
+        address: Mailbox,
+    ) -> Result<NotificationDeliveryStatus, ApiError> {
+        // If there isn't any template present in the database for the
+        // notification type, skip it.
+
+        let Some(template) = NotificationTemplate::list_channel(
+            NotificationChannel::Email,
+            &self.pg,
+            &self.redis,
+        )
+        .await?
+        .into_iter()
+        .find(|t| t.notification_type == notification.notification_type()) else {
+            return Ok(NotificationDeliveryStatus::SkippedDefault);
         };
 
-        let result =
-            poll_queue(Arc::clone(&mailer), &pg, &redis, &client, identity)
-                .await;
+        let message = templates::build_email(
+            &self.pg,
+            &self.redis,
+            &self.client,
+            user_id,
+            &notification,
+            &template,
+            self.identity.clone(),
+            address,
+        )
+        .await?;
 
-        if let Err(error) = result {
-            error!(%error, "Database error in email queue");
-        }
-    }
-}
+        let send_result = transport.send(message).await;
 
-async fn poll_queue(
-    mailer: Arc<AsyncSmtpTransport<Tokio1Executor>>,
-    pg: &PgPool,
-    redis: &RedisPool,
-    client: &Client,
-    identity: templates::MailingIdentity,
-) -> Result<(), DatabaseError> {
-    let mut txn = pg.begin().await?;
+        Ok(send_result.map(|_| NotificationDeliveryStatus::Delivered).unwrap_or_else(|error| {
+            error!(%error, smtp.code = ?extract_smtp_code(&error), "Error sending email");
 
-    let begin = std::time::Instant::now();
-
-    let mut deliveries = DBNotificationDelivery::lock_channel_processable(
-        NotificationChannel::Email,
-        5,
-        &mut *txn,
-    )
-    .await?;
-
-    if deliveries.is_empty() {
-        return Ok(());
-    }
-
-    let n_to_process = deliveries.len();
-
-    // We hold a FOR UPDATE lock on the rows here, so no other workers are accessing them
-    // at the same time.
-
-    let templates = NotificationTemplate::list_channel(
-        NotificationChannel::Email,
-        &mut *txn,
-        redis,
-    )
-    .await?;
-
-    let notification_ids = deliveries
-        .iter()
-        .map(|d| d.notification_id)
-        .collect::<Vec<_>>();
-    let notifications =
-        DBNotification::get_many(&notification_ids, &mut *txn).await?;
-
-    struct DeliveryResult {
-        notification_id: DBNotificationId,
-        update_status: NotificationDeliveryStatus,
-        advance_next_attempt_time: bool,
-    }
-
-    // For all notifications we collected, fill out the template
-    // and send it via SMTP in parallel.
-
-    let mut futures = FuturesUnordered::new();
-
-    for notification in notifications {
-        let redis = redis.clone();
-        let pg = pg.clone();
-        let client = client.clone();
-        let identity = identity.clone();
-        let mailer = Arc::clone(&mailer);
-
-        let maybe_template = templates
-            .iter()
-            .find(|t| {
-                t.notification_type == notification.body.notification_type()
-            })
-            .cloned();
-
-        futures.push(async move {
-            let mut result = DeliveryResult {
-                notification_id: notification.id,
-                update_status: NotificationDeliveryStatus::Pending,
-                advance_next_attempt_time: false,
-            };
-
-            // If there isn't any template present in the database for the
-            // notification type, skip it.
-
-            let Some(template) = maybe_template else {
-                trace!("No template was found for notification type.");
-
-                result.update_status = NotificationDeliveryStatus::SkippedDefault;
-                return Ok(result);
-            };
-
-            let maybe_message = templates::build_email(
-                &pg,
-                &redis,
-                &client,
-                &notification,
-                &template,
-                identity,
-            )
-            .await?;
-
-            let Some(message) = maybe_message else {
-                // User has no email--skip it.
-                trace!("Attempted to send email to user without email");
-                result.update_status = NotificationDeliveryStatus::SkippedDefault;
-                return Ok(result);
-            };
-
-            let send_result = mailer.send(message).await;
-
-            match send_result {
-                Ok(_) => {
-                    result.update_status = NotificationDeliveryStatus::Delivered;
-                }
-
-                Err(error) => {
-                    error!(%error, smtp.code = ?extract_smtp_code(&error), "Error sending email");
-
-                    if error.is_permanent() {
-                        result.update_status =
-                            NotificationDeliveryStatus::PermanentlyFailed;
-                    }
-                }
-            };
-
-            Result::<DeliveryResult, ApiError>::Ok(result)
-        });
-    }
-
-    while let Some(result) = futures.next().await {
-        match result {
-            Ok(result) => {
-                // Find the matching delivery row
-
-                if let Some(idx) = deliveries
-                    .iter()
-                    .position(|d| d.notification_id == result.notification_id)
-                {
-                    let mut delivery = deliveries.remove(idx);
-                    delivery.status = result.update_status;
-                    delivery.next_attempt = if result.advance_next_attempt_time
-                    {
-                        Utc::now()
-                            + chrono::Duration::seconds(
-                                EMAIL_RETRY_DELAY_SECONDS,
-                            )
-                    } else {
-                        delivery.next_attempt
-                    };
-
-                    delivery.attempt_count += 1;
-                    delivery.update(&mut *txn).await?;
-                }
+            if error.is_permanent() {
+                NotificationDeliveryStatus::PermanentlyFailed
+            } else {
+                NotificationDeliveryStatus::Pending
             }
-
-            Err(error) => error!(%error, "Error building email"),
-        }
+        }))
     }
-
-    for mut delivery in deliveries {
-        // For these, there was an error building the email, like a
-        // database error. Retry them after 30 seconds.
-
-        delivery.next_attempt =
-            Utc::now() + chrono::Duration::seconds(EMAIL_RETRY_DELAY_SECONDS);
-
-        delivery.update(&mut *txn).await?;
-    }
-
-    txn.commit().await?;
-
-    info!(
-        "Processed {} email deliveries in {}ms",
-        n_to_process,
-        begin.elapsed().as_millis()
-    );
-
-    Ok(())
 }
 
 fn extract_smtp_code(e: &lettre::transport::smtp::Error) -> Option<u16> {

@@ -2,7 +2,6 @@ use super::MailError;
 use crate::database::models::DBUser;
 use crate::database::models::DatabaseError;
 use crate::database::models::ids::*;
-use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notifications_template_item::NotificationTemplate;
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationBody;
@@ -62,12 +61,14 @@ pub async fn build_email(
     exec: impl sqlx::PgExecutor<'_>,
     redis: &RedisPool,
     client: &reqwest::Client,
-    notification: &DBNotification,
+    user_id: DBUserId,
+    body: &NotificationBody,
     template: &NotificationTemplate,
-    identity: MailingIdentity,
-) -> Result<Option<Message>, ApiError> {
+    from: MailingIdentity,
+    to: Mailbox,
+) -> Result<Message, ApiError> {
     let get_html_body = async {
-        let result: Result<Result<String, reqwest::Error>, DatabaseError> =
+        let result: Result<Result<String, reqwest::Error>, ApiError> =
             match template.get_cached_html_data(redis).await? {
                 Some(html_body) => Ok(Ok(html_body)),
                 None => {
@@ -97,26 +98,18 @@ pub async fn build_email(
         from_address,
         reply_name,
         reply_address,
-    } = identity;
+    } = from;
 
-    let (html_body_result, template_variables_result) = futures::join!(
+    let (html_body_result, variables) = futures::try_join!(
         get_html_body,
-        collect_template_variables(exec, redis, notification)
-    );
-
-    let TemplateVariables {
-        user_email,
-        variables,
-    } = template_variables_result?;
+        collect_template_variables(exec, redis, user_id, body)
+    )?;
 
     let variables = variables
         .into_iter()
+        .chain(std::iter::once((USER_EMAIL, to.email.to_string())))
         .map(|(k, v)| (k.to_string(), v))
         .collect();
-
-    let Some(target_email) = user_email else {
-        return Ok(None);
-    };
 
     let mut message_builder = Message::builder().from(Mailbox::new(
         Some(from_name),
@@ -130,9 +123,7 @@ pub async fn build_email(
         ));
     }
 
-    message_builder = message_builder
-        .to(target_email.parse().map_err(MailError::from)?)
-        .subject(&template.subject_line);
+    message_builder = message_builder.to(to).subject(&template.subject_line);
 
     let plaintext_filled_body = strfmt::strfmt(
         &template.plaintext_fallback,
@@ -142,7 +133,7 @@ pub async fn build_email(
         ApiError::InvalidInput(format!("Failed to fill template: {fmt}"))
     })?;
 
-    let email_message = match html_body_result? {
+    let email_message = match html_body_result {
         Ok(html_body) => {
             let html_filled_body = strfmt::strfmt(&html_body, &variables)
                 .map_err(|fmt| {
@@ -166,40 +157,20 @@ pub async fn build_email(
         }
     };
 
-    Ok(Some(email_message))
-}
-
-struct TemplateVariables {
-    user_email: Option<String>,
-    variables: HashMap<&'static str, String>,
-}
-
-impl TemplateVariables {
-    fn with_email(
-        mut variables: HashMap<&'static str, String>,
-        maybe_user_email: Option<String>,
-    ) -> Self {
-        if let Some(user_email) = &maybe_user_email {
-            variables.insert(USER_EMAIL, user_email.clone());
-        }
-
-        Self {
-            user_email: maybe_user_email,
-            variables,
-        }
-    }
+    Ok(email_message)
 }
 
 async fn collect_template_variables(
     exec: impl sqlx::PgExecutor<'_>,
     redis: &RedisPool,
-    n: &DBNotification,
-) -> Result<TemplateVariables, ApiError> {
+    user_id: DBUserId,
+    n: &NotificationBody,
+) -> Result<HashMap<&'static str, String>, ApiError> {
     async fn only_select_default_variables(
         exec: impl sqlx::PgExecutor<'_>,
         redis: &RedisPool,
         user_id: DBUserId,
-    ) -> Result<TemplateVariables, ApiError> {
+    ) -> Result<HashMap<&'static str, String>, ApiError> {
         let mut map = HashMap::new();
 
         let user = DBUser::get_id(user_id, exec, redis)
@@ -207,10 +178,10 @@ async fn collect_template_variables(
             .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
 
         map.insert(USER_NAME, user.username);
-        Ok(TemplateVariables::with_email(map, user.email))
+        Ok(map)
     }
 
-    match &n.body {
+    match &n {
         NotificationBody::TeamInvite {
             team_id: _,
             project_id,
@@ -231,7 +202,7 @@ async fn collect_template_variables(
                 "#,
                 invited_by.0 as i64,
                 project_id.0 as i64,
-                n.user_id.0 as i64
+                user_id.0 as i64
             )
             .fetch_one(exec)
             .await?;
@@ -242,7 +213,7 @@ async fn collect_template_variables(
             map.insert(TEAMINVITE_PROJECT_NAME, result.project_name);
             map.insert(TEAMINVITE_ROLE_NAME, role.clone());
 
-            Ok(TemplateVariables::with_email(map, result.user_email))
+            Ok(map)
         }
 
         NotificationBody::OrganizationInvite {
@@ -265,7 +236,7 @@ async fn collect_template_variables(
                 "#,
                 invited_by.0 as i64,
                 organization_id.0 as i64,
-                n.user_id.0 as i64
+                user_id.0 as i64
             )
             .fetch_one(exec)
             .await?;
@@ -276,7 +247,7 @@ async fn collect_template_variables(
             map.insert(ORGINVITE_ORG_NAME, result.organization_name);
             map.insert(ORGINVITE_ROLE_NAME, role.clone());
 
-            Ok(TemplateVariables::with_email(map, result.user_email))
+            Ok(map)
         }
 
         NotificationBody::StatusChange {
@@ -295,7 +266,7 @@ async fn collect_template_variables(
                 WHERE users.id = $2
                 "#,
                 project_id.0 as i64,
-                n.user_id.0 as i64,
+                user_id.0 as i64,
             )
             .fetch_one(exec)
             .await?;
@@ -306,7 +277,7 @@ async fn collect_template_variables(
             map.insert(STATUSCHANGE_OLD_STATUS, old_status.as_str().to_owned());
             map.insert(STATUSCHANGE_NEW_STATUS, new_status.as_str().to_owned());
 
-            Ok(TemplateVariables::with_email(map, result.user_email))
+            Ok(map)
         }
 
         NotificationBody::ResetPassword { flow } => {
@@ -317,16 +288,15 @@ async fn collect_template_variables(
                 flow
             );
 
-            let user =
-                DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
-                    || DatabaseError::Database(sqlx::Error::RowNotFound),
-                )?;
+            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
+                || DatabaseError::Database(sqlx::Error::RowNotFound),
+            )?;
 
             let mut map = HashMap::new();
             map.insert(RESETPASSWORD_URL, url);
             map.insert(USER_NAME, user.username);
 
-            Ok(TemplateVariables::with_email(map, user.email))
+            Ok(map)
         }
 
         NotificationBody::VerifyEmail { flow } => {
@@ -337,60 +307,56 @@ async fn collect_template_variables(
                 flow
             );
 
-            let user =
-                DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
-                    || DatabaseError::Database(sqlx::Error::RowNotFound),
-                )?;
+            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
+                || DatabaseError::Database(sqlx::Error::RowNotFound),
+            )?;
 
             let mut map = HashMap::new();
             map.insert(VERIFYEMAIL_URL, url);
             map.insert(USER_NAME, user.username);
 
-            Ok(TemplateVariables::with_email(map, user.email))
+            Ok(map)
         }
 
         NotificationBody::AuthProviderAdded { provider }
         | NotificationBody::AuthProviderRemoved { provider } => {
-            let user =
-                DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
-                    || DatabaseError::Database(sqlx::Error::RowNotFound),
-                )?;
+            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
+                || DatabaseError::Database(sqlx::Error::RowNotFound),
+            )?;
 
             let mut map = HashMap::new();
             map.insert(USER_NAME, user.username);
             map.insert(AUTHPROVIDER_NAME, provider.clone());
 
-            Ok(TemplateVariables::with_email(map, user.email))
+            Ok(map)
         }
 
         NotificationBody::TwoFactorEnabled
         | NotificationBody::TwoFactorRemoved
         | NotificationBody::PasswordChanged
         | NotificationBody::PasswordRemoved => {
-            only_select_default_variables(exec, redis, n.user_id).await
+            only_select_default_variables(exec, redis, user_id).await
         }
 
         NotificationBody::EmailChanged {
             new_email,
-            to_email,
+            to_email: _,
         } => {
-            let user =
-                DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
-                    || DatabaseError::Database(sqlx::Error::RowNotFound),
-                )?;
+            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
+                || DatabaseError::Database(sqlx::Error::RowNotFound),
+            )?;
 
             let mut map = HashMap::new();
             map.insert(USER_NAME, user.username);
             map.insert(EMAILCHANGED_NEW_EMAIL, new_email.clone());
 
-            Ok(TemplateVariables::with_email(map, Some(to_email.clone())))
+            Ok(map)
         }
 
         NotificationBody::PaymentFailed { amount, service } => {
-            let user =
-                DBUser::get_id(n.user_id, exec, redis).await?.ok_or_else(
-                    || DatabaseError::Database(sqlx::Error::RowNotFound),
-                )?;
+            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
+                || DatabaseError::Database(sqlx::Error::RowNotFound),
+            )?;
 
             let url = format!(
                 "{}/{}",
@@ -404,14 +370,14 @@ async fn collect_template_variables(
             map.insert(PAYMENTFAILED_SERVICE, service.clone());
             map.insert(BILLING_URL, url);
 
-            Ok(TemplateVariables::with_email(map, user.email))
+            Ok(map)
         }
 
         NotificationBody::ProjectUpdate { .. }
         | NotificationBody::LegacyMarkdown { .. }
         | NotificationBody::ModeratorMessage { .. }
         | NotificationBody::Unknown => {
-            only_select_default_variables(exec, redis, n.user_id).await
+            only_select_default_variables(exec, redis, user_id).await
         }
     }
 }
