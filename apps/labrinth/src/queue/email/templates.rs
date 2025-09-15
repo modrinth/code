@@ -12,7 +12,7 @@ use lettre::message::{Mailbox, MultiPart, SinglePart};
 use sqlx::query;
 use std::collections::HashMap;
 use std::time::Duration;
-use tracing::error;
+use tracing::{error, warn};
 
 const USER_NAME: &str = "user.name";
 const USER_EMAIL: &str = "user.email";
@@ -125,22 +125,12 @@ pub async fn build_email(
 
     message_builder = message_builder.to(to).subject(&template.subject_line);
 
-    let plaintext_filled_body = strfmt::strfmt(
-        &template.plaintext_fallback,
-        &variables,
-    )
-    .map_err(|fmt| {
-        ApiError::InvalidInput(format!("Failed to fill template: {fmt}"))
-    })?;
+    let plaintext_filled_body =
+        fill_template(&template.plaintext_fallback, &variables);
 
     let email_message = match html_body_result {
         Ok(html_body) => {
-            let html_filled_body = strfmt::strfmt(&html_body, &variables)
-                .map_err(|fmt| {
-                    ApiError::InvalidInput(format!(
-                        "Failed to fill template: {fmt}"
-                    ))
-                })?;
+            let html_filled_body = fill_template(&html_body, &variables);
             message_builder
                 .multipart(MultiPart::alternative_plain_html(
                     plaintext_filled_body,

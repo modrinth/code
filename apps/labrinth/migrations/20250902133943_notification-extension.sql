@@ -119,7 +119,7 @@ VALUES (NULL, 'email', 'payment_failed', TRUE);
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'reset_password', 'Reset your Modrinth password', 'https://modrinth.com/email/resetpassword',
+    'email', 'reset_password', 'Reset your Modrinth password', 'https://modrinth.com/email/reset-password',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -132,7 +132,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'verify_email', 'Verify your Modrinth email', 'https://modrinth.com/email/verifyemail',
+    'email', 'verify_email', 'Verify your Modrinth email', 'https://modrinth.com/email/verify-email',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -145,7 +145,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'auth_provider_added', 'Authentication method added', 'https://modrinth.com/email/authprovideradded',
+    'email', 'auth_provider_added', 'Authentication method added', 'https://modrinth.com/email/auth-provider-added',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -159,7 +159,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'auth_provider_removed', 'Authentication method removed', 'https://modrinth.com/email/authproviderremoved',
+    'email', 'auth_provider_removed', 'Authentication method removed', 'https://modrinth.com/email/auth-provider-removed',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -173,7 +173,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'two_factor_enabled', 'Two-factor authentication enabled', 'https://modrinth.com/email/twofactorenabled',
+    'email', 'two_factor_enabled', 'Two-factor authentication enabled', 'https://modrinth.com/email/two-factor-enabled',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -187,7 +187,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'two_factor_removed', 'Two-factor authentication removed', 'https://modrinth.com/email/twofactorremoved',
+    'email', 'two_factor_removed', 'Two-factor authentication removed', 'https://modrinth.com/email/two-factor-removed',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -201,7 +201,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'password_changed', 'Your Modrinth password was changed', 'https://modrinth.com/email/passwordchanged',
+    'email', 'password_changed', 'Your Modrinth password was changed', 'https://modrinth.com/email/password-changed',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -215,7 +215,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'password_removed', 'Your Modrinth password was removed', 'https://modrinth.com/email/passwordremoved',
+    'email', 'password_removed', 'Your Modrinth password was removed', 'https://modrinth.com/email/password-removed',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -229,7 +229,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'email_changed', 'Your Modrinth email was changed', 'https://modrinth.com/email/emailchanged',
+    'email', 'email_changed', 'Your Modrinth email was changed', 'https://modrinth.com/email/email-changed',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
@@ -243,7 +243,7 @@ VALUES (
 
 INSERT INTO notifications_templates (channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES (
-    'email', 'payment_failed', 'Payment Failed for Modrinth', 'https://modrinth.com/email/paymentfailed',
+    'email', 'payment_failed', 'Payment Failed for Modrinth', 'https://modrinth.com/email/payment-failed',
     CONCAT(
         'Hi {user.name},',
         CHR(10),
