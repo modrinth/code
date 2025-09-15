@@ -164,7 +164,8 @@ jobs:
             target/release/bundle/appimage/Modrinth App_*.AppImage*
             target/release/bundle/deb/Modrinth App_*.deb*
             target/release/bundle/rpm/Modrinth App-*.rpm*
-            target/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz*
-            target/universal-apple-darwin/release/bundle/dmg/Modrinth App_*.dmg*
+            "target/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz*"
+            "target/universal-apple-darwin/release/bundle/macos/Modrinth App (dev build *).app.tar.gz"
+            "target/universal-apple-darwin/release/bundle/dmg/Modrinth App (dev build *).dmg"
             target/release/bundle/nsis/Modrinth App_*-setup.exe*
             target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*
