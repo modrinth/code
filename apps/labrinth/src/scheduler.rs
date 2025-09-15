@@ -1,5 +1,6 @@
 use actix_rt::Arbiter;
 use futures::StreamExt;
+use tokio_stream::wrappers::IntervalStream;
 
 pub struct Scheduler {
     arbiter: Arbiter,
@@ -18,7 +19,7 @@ impl Scheduler {
         }
     }
 
-    pub fn run<F, R>(&mut self, interval: std::time::Duration, mut task: F)
+    pub fn run<F, R>(&self, interval: std::time::Duration, mut task: F)
     where
         F: FnMut() -> R + Send + 'static,
         R: std::future::Future<Output = ()> + Send + 'static,
@@ -35,5 +36,3 @@ impl Drop for Scheduler {
         self.arbiter.stop();
     }
 }
-
-use tokio_stream::wrappers::IntervalStream;
