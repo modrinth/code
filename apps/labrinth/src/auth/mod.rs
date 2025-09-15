@@ -1,5 +1,4 @@
 pub mod checks;
-pub mod email;
 pub mod oauth;
 pub mod templates;
 pub mod validate;
@@ -8,9 +7,7 @@ pub use checks::{
     filter_visible_collections, filter_visible_project_ids,
     filter_visible_projects,
 };
-pub use email::send_email;
 use serde::{Deserialize, Serialize};
-// pub use pat::{generate_pat, PersonalAccessToken};
 pub use validate::{check_is_moderator_from_headers, get_user_from_headers};
 
 use crate::file_hosting::FileHostingError;
@@ -37,7 +34,7 @@ pub enum AuthenticationError {
     #[error("Error while decoding PAT: {0}")]
     Decoding(#[from] ariadne::ids::DecodingError),
     #[error("{0}")]
-    Mail(#[from] email::MailError),
+    Mail(#[from] crate::queue::email::MailError),
     #[error("Invalid Authentication Credentials")]
     InvalidCredentials,
     #[error("Authentication method was not valid")]

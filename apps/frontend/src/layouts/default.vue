@@ -93,7 +93,12 @@
 				{{ formatMessage(stagingBannerMessages.description) }}
 			</template>
 			<template #actions_right>
-				<Button transparent icon-only aria-label="Close" @click="hideStagingBanner">
+				<Button
+					transparent
+					icon-only
+					:aria-label="formatMessage(messages.close)"
+					@click="hideStagingBanner"
+				>
 					<XIcon aria-hidden="true" />
 				</Button>
 			</template>
@@ -115,7 +120,7 @@
 			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
 			<div>
-				<NuxtLink to="/" aria-label="Modrinth home page">
+				<NuxtLink to="/" :aria-label="formatMessage(messages.modrinthHomePage)">
 					<TextLogo aria-hidden="true" class="h-7 w-auto text-contrast" />
 				</NuxtLink>
 			</div>
@@ -130,7 +135,10 @@
 							route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/mods"> <BoxIcon aria-hidden="true" /> Mods </nuxt-link>
+						<nuxt-link to="/mods">
+							<BoxIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
+						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
@@ -142,7 +150,8 @@
 						"
 					>
 						<nuxt-link to="/resourcepacks">
-							<PaintbrushIcon aria-hidden="true" /> Resource Packs
+							<PaintbrushIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
@@ -152,7 +161,10 @@
 							route.name === 'search-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/datapacks"> <BracesIcon aria-hidden="true" /> Data Packs </nuxt-link>
+						<nuxt-link to="/datapacks">
+							<BracesIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
+						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
@@ -161,7 +173,10 @@
 							route.name === 'search-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/modpacks"> <PackageOpenIcon aria-hidden="true" /> Modpacks </nuxt-link>
+						<nuxt-link to="/modpacks">
+							<PackageOpenIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
+						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
@@ -170,7 +185,10 @@
 							route.name === 'search-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/shaders"> <GlassesIcon aria-hidden="true" /> Shaders </nuxt-link>
+						<nuxt-link to="/shaders">
+							<GlassesIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
+						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
@@ -179,7 +197,10 @@
 							route.name === 'search-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/plugins"> <PlugIcon aria-hidden="true" /> Plugins </nuxt-link>
+						<nuxt-link to="/plugins">
+							<PlugIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
+						</nuxt-link>
 					</ButtonStyled>
 				</template>
 				<template v-else>
@@ -244,18 +265,36 @@
 								aria-hidden="true"
 							/>
 							<CompassIcon v-else aria-hidden="true" />
-							<span class="hidden md:contents">Discover content</span>
-							<span class="contents md:hidden">Discover</span>
+							<span class="hidden md:contents">{{
+								formatMessage(navMenuMessages.discoverContent)
+							}}</span>
+							<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
 							<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
 
-							<template #mods> <BoxIcon aria-hidden="true" /> Mods </template>
-							<template #resourcepacks>
-								<PaintbrushIcon aria-hidden="true" /> Resource Packs
+							<template #mods>
+								<BoxIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
 							</template>
-							<template #datapacks> <BracesIcon aria-hidden="true" /> Data Packs </template>
-							<template #plugins> <PlugIcon aria-hidden="true" /> Plugins </template>
-							<template #shaders> <GlassesIcon aria-hidden="true" /> Shaders </template>
-							<template #modpacks> <PackageOpenIcon aria-hidden="true" /> Modpacks </template>
+							<template #resourcepacks>
+								<PaintbrushIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
+							</template>
+							<template #datapacks>
+								<BracesIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
+							</template>
+							<template #plugins>
+								<PlugIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
+							</template>
+							<template #shaders>
+								<GlassesIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
+							</template>
+							<template #modpacks>
+								<PackageOpenIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
+							</template>
 						</TeleportOverflowMenu>
 					</ButtonStyled>
 					<ButtonStyled
@@ -270,14 +309,18 @@
 					>
 						<nuxt-link to="/servers">
 							<ServerIcon aria-hidden="true" />
-							Host a server
+							{{ formatMessage(navMenuMessages.hostAServer) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled type="transparent" :highlighted="route.name === 'app'">
 						<nuxt-link to="/app">
 							<DownloadIcon aria-hidden="true" />
-							<span class="hidden md:contents">Get Modrinth App</span>
-							<span class="contents md:hidden">Modrinth App</span>
+							<span class="hidden md:contents">{{
+								formatMessage(navMenuMessages.getModrinthApp)
+							}}</span>
+							<span class="contents md:hidden">{{
+								formatMessage(navMenuMessages.modrinthApp)
+							}}</span>
 						</nuxt-link>
 					</ButtonStyled>
 				</template>
@@ -290,7 +333,7 @@
 						position="bottom"
 						direction="left"
 						:dropdown-id="`${basePopoutId}-staff`"
-						aria-label="Create new..."
+						:aria-label="formatMessage(messages.createNew)"
 						:options="[
 							{
 								id: 'review-projects',
@@ -329,12 +372,20 @@
 					>
 						<ModrinthIcon aria-hidden="true" />
 						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-						<template #review-projects> <ScaleIcon aria-hidden="true" /> Review projects </template>
-						<template #review-reports> <ReportIcon aria-hidden="true" /> Reports </template>
-						<template #user-lookup> <UserIcon aria-hidden="true" /> Lookup by email </template>
-						<template #file-lookup> <FileIcon aria-hidden="true" /> File lookup </template>
+						<template #review-projects>
+							<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProjects) }}
+						</template>
+						<template #review-reports>
+							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
+						</template>
+						<template #user-lookup>
+							<UserIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
+						</template>
+						<template #file-lookup>
+							<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
+						</template>
 						<template #servers-notices>
-							<IssuesIcon aria-hidden="true" /> Manage server notices
+							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -345,7 +396,7 @@
 						position="bottom"
 						direction="left"
 						:dropdown-id="`${basePopoutId}-create`"
-						aria-label="Create new..."
+						:aria-label="formatMessage(messages.createNew)"
 						:options="[
 							{
 								id: 'new-project',
@@ -364,13 +415,15 @@
 					>
 						<PlusIcon aria-hidden="true" />
 						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-						<template #new-project> <BoxIcon aria-hidden="true" /> New project </template>
+						<template #new-project>
+							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
+						</template>
 						<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
 						<template #new-collection>
-							<CollectionIcon aria-hidden="true" /> New collection
+							<CollectionIcon aria-hidden="true" /> {{ formatMessage(messages.newCollection) }}
 						</template>
 						<template #new-organization>
-							<OrganizationIcon aria-hidden="true" /> New organization
+							<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.newOrganization) }}
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -382,34 +435,57 @@
 				>
 					<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
 					<DropdownIcon class="h-5 w-5 text-secondary" />
-					<template #profile> <UserIcon aria-hidden="true" /> Profile </template>
-					<template #notifications> <BellIcon aria-hidden="true" /> Notifications </template>
-					<template #saved> <BookmarkIcon aria-hidden="true" /> Saved projects </template>
-					<template #servers> <ServerIcon aria-hidden="true" /> My servers </template>
+					<template #profile>
+						<UserIcon aria-hidden="true" /> {{ formatMessage(messages.profile) }}
+					</template>
+					<template #notifications>
+						<BellIcon aria-hidden="true" /> {{ formatMessage(commonMessages.notificationsLabel) }}
+					</template>
+					<template #saved>
+						<BookmarkIcon aria-hidden="true" /> {{ formatMessage(messages.savedProjects) }}
+					</template>
+					<template #servers>
+						<ServerIcon aria-hidden="true" /> {{ formatMessage(commonMessages.serversLabel) }}
+					</template>
 					<template #plus>
-						<ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
+						<ArrowBigUpDashIcon aria-hidden="true" />
+						{{ formatMessage(messages.upgradeToModrinthPlus) }}
 					</template>
-					<template #settings> <SettingsIcon aria-hidden="true" /> Settings </template>
-					<template #flags> <ReportIcon aria-hidden="true" /> Feature flags </template>
-					<template #projects> <BoxIcon aria-hidden="true" /> Projects </template>
+					<template #settings>
+						<SettingsIcon aria-hidden="true" /> {{ formatMessage(commonMessages.settingsLabel) }}
+					</template>
+					<template #flags>
+						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.featureFlags) }}
+					</template>
+					<template #projects>
+						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.projects) }}
+					</template>
 					<template #organizations>
-						<OrganizationIcon aria-hidden="true" /> Organizations
+						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.organizations) }}
 					</template>
-					<template #revenue> <CurrencyIcon aria-hidden="true" /> Revenue </template>
-					<template #analytics> <ChartIcon aria-hidden="true" /> Analytics </template>
-					<template #moderation> <ScaleIcon aria-hidden="true" /> Moderation </template>
-					<template #sign-out> <LogOutIcon aria-hidden="true" /> Sign out </template>
+					<template #revenue>
+						<CurrencyIcon aria-hidden="true" /> {{ formatMessage(messages.revenue) }}
+					</template>
+					<template #analytics>
+						<ChartIcon aria-hidden="true" /> {{ formatMessage(messages.analytics) }}
+					</template>
+					<template #moderation>
+						<ScaleIcon aria-hidden="true" /> {{ formatMessage(commonMessages.moderationLabel) }}
+					</template>
+					<template #sign-out>
+						<LogOutIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signOutButton) }}
+					</template>
 				</OverflowMenu>
 				<template v-else>
 					<ButtonStyled color="brand">
 						<nuxt-link to="/auth/sign-in">
 							<LogInIcon aria-hidden="true" />
-							Sign in
+							{{ formatMessage(commonMessages.signInButton) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled circular>
-						<nuxt-link v-tooltip="'Settings'" to="/settings">
-							<SettingsIcon aria-label="Settings" />
+						<nuxt-link :v-tooltip="formatMessage(commonMessages.settingsLabel)" to="/settings">
+							<SettingsIcon :aria-label="formatMessage(commonMessages.settingsLabel)" />
 						</nuxt-link>
 					</ButtonStyled>
 				</template>
@@ -489,7 +565,7 @@
 						</NuxtLink>
 						<NuxtLink v-if="flags.developerMode" class="iconified-button" to="/flags">
 							<ReportIcon aria-hidden="true" />
-							Feature flags
+							{{ formatMessage(messages.featureFlags) }}
 						</NuxtLink>
 					</template>
 					<NuxtLink class="iconified-button" to="/settings">
@@ -510,7 +586,7 @@
 					to="/"
 					class="tab button-animation"
 					:title="formatMessage(navMenuMessages.home)"
-					aria-label="Home"
+					:aria-label="formatMessage(navMenuMessages.home)"
 				>
 					<HomeIcon aria-hidden="true" />
 				</NuxtLink>
@@ -518,7 +594,7 @@
 					class="tab button-animation"
 					:class="{ 'router-link-exact-active': isBrowseMenuOpen }"
 					:title="formatMessage(navMenuMessages.search)"
-					aria-label="Search"
+					:aria-label="formatMessage(navMenuMessages.search)"
 					@click="toggleBrowseMenu()"
 				>
 					<template v-if="auth.user">
@@ -533,7 +609,7 @@
 					<NuxtLink
 						to="/dashboard/notifications"
 						class="tab button-animation"
-						aria-label="Notifications"
+						:aria-label="formatMessage(commonMessages.notificationsLabel)"
 						:class="{
 							'no-active': isMobileMenuOpen || isBrowseMenuOpen,
 						}"
@@ -550,7 +626,7 @@
 					<NuxtLink
 						to="/dashboard"
 						class="tab button-animation"
-						aria-label="Dashboard"
+						:aria-label="formatMessage(commonMessages.dashboardLabel)"
 						:title="formatMessage(commonMessages.dashboardLabel)"
 					>
 						<ChartIcon aria-hidden="true" />
@@ -595,7 +671,7 @@
 					<div
 						class="flex flex-col items-center gap-3 md:items-start"
 						role="region"
-						aria-label="Modrinth information"
+						:aria-label="formatMessage(messages.modrinthInformation)"
 					>
 						<TextLogo
 							aria-hidden="true"
@@ -719,6 +795,7 @@ import {
 	Button,
 	ButtonStyled,
 	commonMessages,
+	commonProjectTypeCategoryMessages,
 	injectNotificationManager,
 	OverflowMenu,
 	PagewideBanner,
@@ -848,6 +925,26 @@ const navMenuMessages = defineMessages({
 		id: 'layout.nav.search',
 		defaultMessage: 'Search',
 	},
+	discoverContent: {
+		id: 'layout.nav.discover-content',
+		defaultMessage: 'Discover content',
+	},
+	discover: {
+		id: 'layout.nav.discover',
+		defaultMessage: 'Discover',
+	},
+	hostAServer: {
+		id: 'layout.nav.host-a-server',
+		defaultMessage: 'Host a server',
+	},
+	getModrinthApp: {
+		id: 'layout.nav.get-modrinth-app',
+		defaultMessage: 'Get Modrinth App',
+	},
+	modrinthApp: {
+		id: 'layout.nav.modrinth-app',
+		defaultMessage: 'Modrinth App',
+	},
 })
 
 const messages = defineMessages({
@@ -859,13 +956,89 @@ const messages = defineMessages({
 		id: 'layout.avatar.alt',
 		defaultMessage: 'Your avatar',
 	},
-	getModrinthApp: {
-		id: 'layout.action.get-modrinth-app',
-		defaultMessage: 'Get Modrinth App',
-	},
 	changeTheme: {
 		id: 'layout.action.change-theme',
 		defaultMessage: 'Change theme',
+	},
+	close: {
+		id: 'layout.action.close-banner',
+		defaultMessage: 'Close',
+	},
+	modrinthHomePage: {
+		id: 'layout.nav.modrinth-home-page',
+		defaultMessage: 'Modrinth home page',
+	},
+	modrinthInformation: {
+		id: 'layout.footer.modrinth-information',
+		defaultMessage: 'Modrinth information',
+	},
+	createNew: {
+		id: 'layout.action.create-new',
+		defaultMessage: 'Create new...',
+	},
+	reviewProjects: {
+		id: 'layout.action.review-projects',
+		defaultMessage: 'Review projects',
+	},
+	reports: {
+		id: 'layout.action.reports',
+		defaultMessage: 'Reports',
+	},
+	lookupByEmail: {
+		id: 'layout.action.lookup-by-email',
+		defaultMessage: 'Lookup by email',
+	},
+	fileLookup: {
+		id: 'layout.action.file-lookup',
+		defaultMessage: 'File lookup',
+	},
+	manageServerNotices: {
+		id: 'layout.action.manage-server-notices',
+		defaultMessage: 'Manage server notices',
+	},
+	newProject: {
+		id: 'layout.action.new-project',
+		defaultMessage: 'New project',
+	},
+	newCollection: {
+		id: 'layout.action.new-collection',
+		defaultMessage: 'New collection',
+	},
+	newOrganization: {
+		id: 'layout.action.new-organization',
+		defaultMessage: 'New organization',
+	},
+	profile: {
+		id: 'layout.nav.profile',
+		defaultMessage: 'Profile',
+	},
+	savedProjects: {
+		id: 'layout.nav.saved-projects',
+		defaultMessage: 'Saved projects',
+	},
+	upgradeToModrinthPlus: {
+		id: 'layout.nav.upgrade-to-modrinth-plus',
+		defaultMessage: 'Upgrade to Modrinth+',
+	},
+	featureFlags: {
+		id: 'layout.nav.feature-flags',
+		defaultMessage: 'Feature flags',
+	},
+	projects: {
+		id: 'layout.nav.projects',
+		defaultMessage: 'Projects',
+	},
+	organizations: {
+		id: 'layout.nav.organizations',
+		defaultMessage: 'Organizations',
+	},
+	revenue: {
+		id: 'layout.nav.revenue',
+		defaultMessage: 'Revenue',
+	},
+	analytics: {
+		id: 'layout.nav.analytics',
+		defaultMessage: 'Analytics',
 	},
 })
 

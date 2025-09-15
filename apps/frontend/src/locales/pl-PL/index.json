@@ -123,7 +123,7 @@
     "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "Aplikacja Modrinth"
+    "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 miliard %"
@@ -225,7 +225,7 @@
     "message": "Wiadomość e-mail z instrukcjami została wysłana, jeśli e-mail był wcześniej zapisany na Twoim koncie."
   },
   "auth.reset-password.notification.email-sent.title": {
-    "message": "Wiadomość e-mail wysłana"
+    "message": "E-mail wysłany"
   },
   "auth.reset-password.notification.password-reset.text": {
     "message": "Możesz teraz zalogować się na swoje konto, używając nowego hasła."
@@ -369,7 +369,7 @@
     "message": "Usuń projekt"
   },
   "collection.button.unfollow-project": {
-    "message": "Od obserwuj projekt"
+    "message": "Przestań obserwować projekt"
   },
   "collection.delete-modal.description": {
     "message": "To usunie tą kolecje na zawsze. Nie może być to cofnięte."
@@ -542,26 +542,44 @@
   "landing.creator.feature.monetization.title": {
     "message": "Monetyzacja"
   },
+  "landing.creator.feature.team-management.title": {
+    "message": "Zarządzanie zespołami"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Nie udało się załadować losowych projektów :("
+  },
+  "landing.feature.follow.description": {
+    "message": "Otrzymuj powiadomienia o aktualizacjach twoich ulubionych projektów, by być na bieżąco"
+  },
+  "landing.feature.follow.heading": {
+    "message": "Obserwuj projekty, które kochasz"
+  },
   "landing.feature.launcher.heading": {
     "message": "Graj używając swojego ulubionego launchera"
   },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Miejsce dla {content} Minecraft"
+  },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "paczki danych"
+    "message": "paczek danych"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
-    "message": "paczki modów"
+    "message": "paczek modów"
   },
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "mody"
   },
   "landing.heading.the-place-for-minecraft.plugins": {
-    "message": "pluginy"
+    "message": "pluginów"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "paczek zasobów"
   },
   "landing.heading.the-place-for-minecraft.servers": {
-    "message": "serwery"
+    "message": "serwerów"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "shadery"
+    "message": "shaderów"
   },
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
@@ -588,13 +606,13 @@
     "message": "Dla twórców"
   },
   "landing.section.for-players.label": {
-    "message": "Dla Graczy"
+    "message": "Dla graczy"
   },
   "layout.action.change-theme": {
     "message": "Zmień motyw"
   },
   "layout.action.get-modrinth-app": {
-    "message": "Pobierz aplikację Modrinth"
+    "message": "Pobierz Modrinth App"
   },
   "layout.avatar.alt": {
     "message": "Twój awatar"
@@ -1028,6 +1046,9 @@
   "project.download.title": {
     "message": "Pobierz {title}"
   },
+  "project.environment.migration-no-permission.message": {
+    "message": "Właśnie wyremontowaliśmy system środowisk na Modrinth i nowe opcje są teraz dostępne. Nie masz uprawnień, aby modyfikować te ustawienia, ale daj znać innemu członkowi projektu, że metadane środowisk muszą zostać zweryfikowane."
+  },
   "project.environment.migration-no-permission.title": {
     "message": "Metadane środowiska muszą być sprawdzone"
   },
@@ -1155,7 +1176,7 @@
     "message": "Slogan"
   },
   "project.settings.general.url.title": {
-    "message": "Adres URL"
+    "message": "URL"
   },
   "project.settings.title": {
     "message": "Ustawienia"

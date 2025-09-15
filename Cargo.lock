@@ -4482,11 +4482,13 @@ version = "0.11.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5cb54db6ff7a89efac87dba5baeac57bb9ccd726b49a9b6f21fb92b3966aaf56"
 dependencies = [
+ "async-trait",
  "base64 0.22.1",
  "chumsky",
  "email-encoding",
  "email_address",
  "fastrand 2.3.0",
+ "futures-io",
  "futures-util",
  "hostname",
  "httpdate",
@@ -4499,6 +4501,7 @@ dependencies = [
  "rustls-native-certs 0.8.1",
  "socket2 0.6.0",
  "tokio",
+ "tokio-rustls 0.26.2",
  "url",
 ]
 

@@ -1094,25 +1094,6 @@ pub async fn insert_bank_balances_and_webhook(
     let brex_result = PayoutsQueue::get_brex_balance().await;
     let tremendous_result = payouts.get_tremendous_balance().await;
 
-    let paypal = check_balance_with_webhook(
-        "paypal",
-        "PAYPAL_BALANCE_ALERT_THRESHOLD",
-        paypal_result,
-    )
-    .await?;
-    let brex = check_balance_with_webhook(
-        "brex",
-        "BREX_BALANCE_ALERT_THRESHOLD",
-        brex_result,
-    )
-    .await?;
-    let tremendous = check_balance_with_webhook(
-        "tremendous",
-        "TREMENDOUS_BALANCE_ALERT_THRESHOLD",
-        tremendous_result,
-    )
-    .await?;
-
     let mut insert_account_types = Vec::new();
     let mut insert_amounts = Vec::new();
     let mut insert_pending = Vec::new();
@@ -1133,30 +1114,52 @@ pub async fn insert_bank_balances_and_webhook(
         insert_recorded.push(today);
     };
 
-    if let Some(paypal) = paypal {
-        add_balance("paypal", &paypal);
+    if let Ok(Some(ref paypal)) = paypal_result {
+        add_balance("paypal", paypal);
     }
-    if let Some(brex) = brex {
-        add_balance("brex", &brex);
+    if let Ok(Some(ref brex)) = brex_result {
+        add_balance("brex", brex);
     }
-    if let Some(tremendous) = tremendous {
-        add_balance("tremendous", &tremendous);
+    if let Ok(Some(ref tremendous)) = tremendous_result {
+        add_balance("tremendous", tremendous);
     }
 
-    sqlx::query!(
-        "
+    let inserted = sqlx::query_scalar!(
+        r#"
         INSERT INTO payout_sources_balance (account_type, amount, pending, recorded)
         SELECT * FROM UNNEST ($1::text[], $2::numeric[], $3::boolean[], $4::timestamptz[])
         ON CONFLICT (recorded, account_type, pending)
         DO UPDATE SET amount = EXCLUDED.amount
-        ",
+        RETURNING xmax = 0 "xmax!"
+        "#,
         &insert_account_types[..],
         &insert_amounts[..],
         &insert_pending[..],
         &insert_recorded[..],
     )
-        .execute(&mut *transaction)
+        .fetch_one(&mut *transaction)
         .await?;
+
+    if inserted {
+        check_balance_with_webhook(
+            "paypal",
+            "PAYPAL_BALANCE_ALERT_THRESHOLD",
+            paypal_result,
+        )
+        .await?;
+        check_balance_with_webhook(
+            "brex",
+            "BREX_BALANCE_ALERT_THRESHOLD",
+            brex_result,
+        )
+        .await?;
+        check_balance_with_webhook(
+            "tremendous",
+            "TREMENDOUS_BALANCE_ALERT_THRESHOLD",
+            tremendous_result,
+        )
+        .await?;
+    }
 
     transaction.commit().await?;
 

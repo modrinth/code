@@ -1,4 +1,7 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
   "badge.beta-release": {
     "defaultMessage": "Versão Beta"
   },
@@ -93,7 +96,7 @@
     "defaultMessage": "Carregar imagem"
   },
   "changelog.justNow": {
-    "defaultMessage": "Agora"
+    "defaultMessage": "Agora mesmo"
   },
   "changelog.product.api": {
     "defaultMessage": "API"
@@ -156,13 +159,13 @@
     "defaultMessage": "Coleções"
   },
   "label.created-ago": {
-    "defaultMessage": "Criada há {ago}"
+    "defaultMessage": "Criada {ago}"
   },
   "label.dashboard": {
     "defaultMessage": "Painel de Controlo"
   },
   "label.delete": {
-    "defaultMessage": "Apagar"
+    "defaultMessage": "Eliminar"
   },
   "label.description": {
     "defaultMessage": "Descrição"
@@ -315,7 +318,7 @@
     "defaultMessage": "Incompatível"
   },
   "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} terminando em {last_four}"
+    "defaultMessage": "{card_brand} que termina em {last_four}"
   },
   "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
     "defaultMessage": "Amazon Pay"
@@ -363,13 +366,13 @@
     "defaultMessage": "Cliente e servidor"
   },
   "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "No cliente"
+    "defaultMessage": "Cliente"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
     "defaultMessage": "Apenas servidores dedicados"
   },
   "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "No servidor"
+    "defaultMessage": "Servidor"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Um jogador"
@@ -393,25 +396,25 @@
     "defaultMessage": "Criadores"
   },
   "project.about.details.created": {
-    "defaultMessage": "Criado há {date}"
+    "defaultMessage": "Criado {date}"
   },
   "project.about.details.licensed": {
     "defaultMessage": "Licenciado {license}"
   },
   "project.about.details.published": {
-    "defaultMessage": "Publicado há {date}"
+    "defaultMessage": "Publicado {date}"
   },
   "project.about.details.submitted": {
-    "defaultMessage": "Enviado há {date}"
+    "defaultMessage": "Enviado {date}"
   },
   "project.about.details.title": {
     "defaultMessage": "Detalhes"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Atualizado há {date}"
+    "defaultMessage": "Atualizado {date}"
   },
   "project.about.links.discord": {
-    "defaultMessage": "Entrar no Servidor de Discord"
+    "defaultMessage": "Entrar no servidor de Discord"
   },
   "project.about.links.donate.bmac": {
     "defaultMessage": "Buy Me a Coffee"
@@ -453,7 +456,7 @@
     "defaultMessage": "Tem alguma funcionalidade tanto no cliente como no servidor, mesmo que apenas parcialmente."
   },
   "project.settings.environment.client_and_server.optional_both.title": {
-    "defaultMessage": "Opcional em ambos, tem a mesma funcionalidade se instalado em qualquer um"
+    "defaultMessage": "Opcional em ambos, funciona da mesma forma se instalado num deles"
   },
   "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
     "defaultMessage": "Opcional em ambos, funciona melhor quando instalado em ambos"
@@ -474,19 +477,19 @@
     "defaultMessage": "Toda a funcionalidade é feita no cliente e é compatível com servidores vanilla."
   },
   "project.settings.environment.client_only.title": {
-    "defaultMessage": "No cliente apenas"
+    "defaultMessage": "Apenas no cliente"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
-    "defaultMessage": "Servidor dedicado apenas"
+    "defaultMessage": "Apenas servidores dedicados"
   },
   "project.settings.environment.server_only.description": {
     "defaultMessage": "Toda a funcionalidade é feita no servidor e é compatível com clientes vanilla."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
-    "defaultMessage": "Também funciona em um jogador"
+    "defaultMessage": "Também funciona em mundos de um jogador"
   },
   "project.settings.environment.server_only.title": {
-    "defaultMessage": "No servidor apenas"
+    "defaultMessage": "Apenas no servidor"
   },
   "project.settings.environment.singleplayer.description": {
     "defaultMessage": "Apenas funciona em Um jogador ou quando não conectado a um servidor Multijogador."
@@ -675,7 +678,7 @@
     "defaultMessage": "Começar"
   },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "Ideal para 15 a 25 jogadores, modpacks, ou muitos mods."
+    "defaultMessage": "Ideal para 15 a 25 jogadores, modpacks ou muitos mods."
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "Ótimo para 6 a 15 jogadores e vários mods."
@@ -717,7 +720,7 @@
     "defaultMessage": "Onde queres que o teu servidor esteja localizado?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "A tua região não está na lista? <link>Diz-nos que região gostarias de ver para os servidores do Modrinth!</link>"
+    "defaultMessage": "Região não listada? <link>Deixa-nos saber onde gostavas de ver os Modrinth Servers a seguir!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste Asiático"

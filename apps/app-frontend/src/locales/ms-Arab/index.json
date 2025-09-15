@@ -21,7 +21,7 @@
     "message": "ڤڠوروسن سومبر"
   },
   "instance.add-server.add-and-play": {
-    "message": "تمبه دان ماٴين"
+    "message": "تمبه دان ماءين"
   },
   "instance.add-server.add-server": {
     "message": "تمبه ڤلاين"
@@ -48,7 +48,7 @@
     "message": "نام"
   },
   "instance.edit-world.placeholder-name": {
-    "message": "دنيا ماٴينکرف‌ت"
+    "message": "دنيا ماءينکرف‌ت"
   },
   "instance.edit-world.reset-icon": {
     "message": "تتڤ سمولا ايکون"
@@ -69,7 +69,7 @@
     "message": "نام"
   },
   "instance.server-modal.placeholder-name": {
-    "message": "ڤلاين ماٴينکرف‌ت"
+    "message": "ڤلاين ماءينکرف‌ت"
   },
   "instance.server-modal.resource-pack": {
     "message": "ڤيک سومبر"
@@ -84,7 +84,7 @@
     "message": "ڤادم ڤماسڠن"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "ممادمکن ڤماسڠن درڤد ڤرنتي اندا سچارا ککل⹁ ترماسوق دنيا⹁ کونفيݢوراسي دان سموا کاندوڠن يڠ دڤاسڠ. برهاتي-هاتي⹁ کران سباٴيق سهاج اندا ممادمکن ڤماسڠن اين⹁ تيدق اد چارا اونتوق مموليهکنڽ."
+    "message": "ممادمکن ڤماسڠن درڤد ڤرنتي اندا سچارا ککل⹁ ترماسوق دنيا⹁ کونفيݢوراسي دان سموا کاندوڠن يڠ دڤاسڠ. برهاتي-هاتي⹁ کران سباءيق سهاج اندا ممادمکن ڤماسڠن اين⹁ تيدق اد چارا اونتوق مموليهکنڽ."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "سدڠ ممادم..."
@@ -135,16 +135,16 @@
     "message": "چاڠکوق ڤلنچرن ترسواي"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "چاڠکوق ممبنرکن ڤڠݢونا لنجوتن منجالنکن ڤرينته سيستم ترتنتو سبلوم دان سلڤس ملنچرکن ڤرماٴينن."
+    "message": "چاڠکوق ممبنرکن ڤڠݢونا لنجوتن منجالنکن ڤرينته سيستم ترتنتو سبلوم دان سلڤس ملنچرکن ڤرماءينن."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "سلڤس کلوار"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "دجالنکن سلڤس ڤرماٴينن دتوتوڤ."
+    "message": "دجالنکن سلڤس ڤرماءينن دتوتوڤ."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "ماسوقکن ڤرينته يڠ اکن دجالنکن سلڤس ڤرماٴينن دتوتوڤ..."
+    "message": "ماسوقکن ڤرينته يڠ اکن دجالنکن سلڤس ڤرماءينن دتوتوڤ..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "سبلوم ڤلنچرن"
@@ -156,13 +156,13 @@
     "message": "ماسوقکن ڤرينته يڠ اکن دجالنکن سبلوم ڤماسڠن دلنچرکن..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "چاڠکوق ڤلنچرن ڤرماٴينن"
+    "message": "چاڠکوق ڤلنچرن ڤرماءينن"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "ڤمبالوت"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "ڤرينته ڤمبالوت اونتوق ملنچرکن ماٴينکرف‌ت."
+    "message": "ڤرينته ڤمبالوت اونتوق ملنچرکن ماءينکرف‌ت."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "ماسوقکن ڤرينته ڤمبالوت..."
@@ -171,7 +171,7 @@
     "message": "ڤماسڠن"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} اونتوق ماٴينکرف‌ت {game_version} سوده ڤون دڤاسڠ"
+    "message": "{platform} {version} اونتوق ماءينکرف‌ت {game_version} سوده ڤون دڤاسڠ"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "{game_version} ۏانيلا سوده ڤون دڤاسڠ"
@@ -201,7 +201,7 @@
     "message": "سدڠ مڠمبيل معلومت ڤيک مود"
   },
   "instance.settings.tabs.installation.game-version": {
-    "message": "ۏرسي ڤرماٴينن"
+    "message": "ۏرسي ڤرماءينن"
   },
   "instance.settings.tabs.installation.install": {
     "message": "ڤاسڠ"
@@ -213,16 +213,16 @@
     "message": "ۏرسي {loader}"
   },
   "instance.settings.tabs.installation.minecraft-version": {
-    "message": "ماٴينکرف‌ت {version}"
+    "message": "ماءينکرف‌ت {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "تيدق داڤت مڠمبيل بوتيرن ڤيک مود يڠ ترڤاٴوت. سيلا سمق سامبوڠن اينترنيت اندا."
+    "message": "تيدق داڤت مڠمبيل بوتيرن ڤيک مود يڠ ترڤاءوت. سيلا سمق سامبوڠن اينترنيت اندا."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} تيدق ترسديا اونتوق ماٴينکرف‌ت {version}. چوبا ڤموات مود يڠ لاٴين."
+    "message": "{loader} تيدق ترسديا اونتوق ماءينکرف‌ت {version}. چوبا ڤموات مود يڠ لاءين."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "ڤماسڠن اين دڤاٴوتکن کڤد سبواه ڤيک مود⹁ تتاڤي ڤيک مود ترسبوت تيدق داڤت دجومڤاٴي ڤد Modrinth."
+    "message": "ڤماسڠن اين دڤاءوتکن کڤد سبواه ڤيک مود⹁ تتاڤي ڤيک مود ترسبوت تيدق داڤت دجومڤاءي ڤد Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "ڤلتفوم"
@@ -240,25 +240,25 @@
     "message": "اداکه اندا ڤستي ماهو مماسڠ سمولا ڤماسڠن اين؟"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "منتڤکن سمولا کاندوڠن ڤماسڠن کڤد کأداٴن اصلڽ⹁ مڠاليه کلوار سبارڠ مود اتاو کاندوڠن يڠ تله اندا تمبهکن داتس ڤيک مود اصل."
+    "message": "منتڤکن سمولا کاندوڠن ڤماسڠن کڤد کأداءن اصلڽ⹁ مڠاليه کلوار سبارڠ مود اتاو کاندوڠن يڠ تله اندا تمبهکن داتس ڤيک مود اصل."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "ڤاسڠ سمولا ڤيک مود"
   },
   "instance.settings.tabs.installation.repair.button": {
-    "message": "ڤرباٴيقي"
+    "message": "ڤرباءيقي"
   },
   "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "سدڠ ممڤرباٴيقي"
+    "message": "سدڠ ممڤرباءيقي"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "ڤمباٴيقن اين اکن مماسڠ سمولا کبرݢنتوڠن ماٴينکرف‌ت دان ممريقسا کروسقن. اين موڠکين داڤت مڽلسايکن ايسو جک ڤرماٴينن اندا تيدق دلنچرکن کران رالت برکاٴيتن ڤلنچر⹁ تتاڤي تيدق اکن مڽلسايکن ايسو اتاو رانڤ يڠ برکاٴيتن دڠن مود يڠ دڤاسڠ."
+    "message": "ڤمباءيقن اين اکن مماسڠ سمولا کبرݢنتوڠن ماءينکرف‌ت دان ممريقسا کروسقن. اين موڠکين داڤت مڽلسايکن ايسو جک ڤرماءينن اندا تيدق دلنچرکن کران رالت برکاءيتن ڤلنچر⹁ تتاڤي تيدق اکن مڽلسايکن ايسو اتاو رانڤ يڠ برکاءيتن دڠن مود يڠ دڤاسڠ."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "ڤرباٴيقي ڤماسڠن؟"
+    "message": "ڤرباءيقي ڤماسڠن؟"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "ڤمباٴيقن سدڠ دجالنکن"
+    "message": "ڤمباءيقن سدڠ دجالنکن"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "تتڤ سمولا کڤد سماس"
@@ -276,7 +276,7 @@
     "message": "مماسڠ سمولا"
   },
   "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "ممڤرباٴيقي"
+    "message": "ممڤرباءيقي"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
     "message": "تيدق بوليه {action} سماس مماسڠ"
@@ -285,25 +285,25 @@
     "message": "تيدق بوليه {action} سماس براد دلوار تالين"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "تيدق بوليه {action} سماس ممڤرباٴيقي"
+    "message": "تيدق بوليه {action} سماس ممڤرباءيقي"
   },
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(ۏرسي تيدق دکتاهوءي)"
   },
   "instance.settings.tabs.installation.unlink.button": {
-    "message": "ڽهڤاٴوتکن ڤماسڠن"
+    "message": "ڽهڤاءوتکن ڤماسڠن"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "جک اندا منروسکن⹁ اندا تيدق اکن داڤت مماٴوتکنڽ سمولا تنڤا ممبوات ڤماسڠن يڠ بهارو سڤنوهڽ. اندا تيدق اکن منريما کمس کيني ڤيک مود لاݢي دان اي اکن منجادي ڤماسڠن بياسا."
+    "message": "جک اندا منروسکن⹁ اندا تيدق اکن داڤت مماءوتکنڽ سمولا تنڤا ممبوات ڤماسڠن يڠ بهارو سڤنوهڽ. اندا تيدق اکن منريما کمس کيني ڤيک مود لاݢي دان اي اکن منجادي ڤماسڠن بياسا."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "اداکه اندا ڤستي ماهو مڽهڤاٴوتکن ڤماسڠن اين؟"
+    "message": "اداکه اندا ڤستي ماهو مڽهڤاءوتکن ڤماسڠن اين؟"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "ڤماسڠن اين دڤاٴوتکن کڤد ڤيک مود⹁ يڠ برمقصود مود تيدق بوليه دکمس کيني دان اندا تيدق بوليه منوکر ڤموات مود اتاو ۏرسي ماٴينکرف‌ت. مڽهڤاٴوت ڤماسڠن اين اکن مموتوسکن سامبوڠن ڤماسڠن اين سچارا ککل درڤد ڤيک مود."
+    "message": "ڤماسڠن اين دڤاءوتکن کڤد ڤيک مود⹁ يڠ برمقصود مود تيدق بوليه دکمس کيني دان اندا تيدق بوليه منوکر ڤموات مود اتاو ۏرسي ماءينکرف‌ت. مڽهڤاءوت ڤماسڠن اين اکن مموتوسکن سامبوڠن ڤماسڠن اين سچارا ککل درڤد ڤيک مود."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "ڽهڤاٴوت درڤد ڤيک مود"
+    "message": "ڽهڤاءوت درڤد ڤيک مود"
   },
   "instance.settings.tabs.java": {
     "message": "جاۏا دان ايڠتن"
@@ -333,13 +333,13 @@
     "message": "سکرين ڤنوه"
   },
   "instance.settings.tabs.window.fullscreen.description": {
-    "message": "ڤرماٴينن اکن دمولاکن دالم سکرين ڤنوه کتيک دلنچرکن (مڠݢوناکن options.txt)."
+    "message": "ڤرماءينن اکن دمولاکن دالم سکرين ڤنوه کتيک دلنچرکن (مڠݢوناکن options.txt)."
   },
   "instance.settings.tabs.window.height": {
     "message": "تيڠݢي"
   },
   "instance.settings.tabs.window.height.description": {
-    "message": "تيڠݢي تتيڠکڤ ڤرماٴينن اڤابيلا دلنچرکن."
+    "message": "تيڠݢي تتيڠکڤ ڤرماءينن اڤابيلا دلنچرکن."
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "ماسوقکن تيڠݢي..."
@@ -348,7 +348,7 @@
     "message": "ليبر"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "ليبر تتيڠکڤ ڤرماٴينن اڤابيلا دلنچرکن."
+    "message": "ليبر تتيڠکڤ ڤرماءينن اڤابيلا دلنچرکن."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "ماسوقکن ليبر..."
@@ -357,7 +357,7 @@
     "message": "تتڤن"
   },
   "instance.worlds.a_minecraft_server": {
-    "message": "ڤلاين ماٴينکرف‌ت"
+    "message": "ڤلاين ماءينکرف‌ت"
   },
   "instance.worlds.cant_connect": {
     "message": "تيدق داڤت مڽامبوڠ کڤلاين"
@@ -384,19 +384,19 @@
     "message": "ڤلاين تيدق داڤت دهوبوڠي"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "اندا هاڽ بوليه ماسوق تروس کدالم ڤلاين ڤد ماٴينکرف‌ت ۏرسي الفا 1.0.5 دان کاتس"
+    "message": "اندا هاڽ بوليه ماسوق تروس کدالم ڤلاين ڤد ماءينکرف‌ت ۏرسي الفا 1.0.5 دان کاتس"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "اندا هاڽ بوليه ماسوق تروس کدالم دنيا ايکاڤماءين ڤد ماٴينکرف‌ت ۏرسي 1.20 دان کاتس"
+    "message": "اندا هاڽ بوليه ماسوق تروس کدالم دنيا ايکاڤماءين ڤد ماءينکرف‌ت ۏرسي 1.20 دان کاتس"
   },
   "instance.worlds.play_instance": {
-    "message": "ماٴينکن ڤماسڠن"
+    "message": "ماءينکن ڤماسڠن"
   },
   "instance.worlds.type.server": {
     "message": "ڤلاين"
   },
   "instance.worlds.type.singleplayer": {
-    "message": "ايکاڤماٴين"
+    "message": "ايکاڤماءين"
   },
   "instance.worlds.view_instance": {
     "message": "ليهت ڤماسڠن"
@@ -408,7 +408,7 @@
     "message": "دسدياکن اوليه ڤماسڠن اين"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "ۏرسي ڤرماٴينن اداله دسدياکن اوليه ڤماسڠن اين"
+    "message": "ۏرسي ڤرماءينن اداله دسدياکن اوليه ڤماسڠن اين"
   },
   "search.filter.locked.instance-loader.title": {
     "message": "ڤموات اداله دسدياکن اوليه ڤماسڠن اين"

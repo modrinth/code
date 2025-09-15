@@ -122,6 +122,9 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Pilih resolusi yang benar"
   },
+  "nags.select-environments.description": {
+    "defaultMessage": "Pilih lingkungan di mana {projectType} Anda berfungsi."
+  },
   "nags.select-environments.title": {
     "defaultMessage": "Pilih lingkungan"
   },

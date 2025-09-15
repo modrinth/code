@@ -1,4 +1,10 @@
 {
+  "badge.beta": {
+    "defaultMessage": "베타"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "베타 출시"
+  },
   "badge.new": {
     "defaultMessage": "소식"
   },
@@ -77,6 +83,9 @@
   "button.sign-out": {
     "defaultMessage": "로그아웃"
   },
+  "button.sign-up": {
+    "defaultMessage": "회원 가입"
+  },
   "button.stop": {
     "defaultMessage": "정지"
   },
@@ -115,6 +124,9 @@
   },
   "icon-select.select": {
     "defaultMessage": "아이콘 선택"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "검색..."
   },
   "input.view.gallery": {
     "defaultMessage": "갤러리 보기"
@@ -173,6 +185,9 @@
   "label.notifications": {
     "defaultMessage": "알림"
   },
+  "label.or": {
+    "defaultMessage": "또는"
+  },
   "label.password": {
     "defaultMessage": "비밀번호"
   },
@@ -184,6 +199,9 @@
   },
   "label.rejected": {
     "defaultMessage": "거부됨"
+  },
+  "label.saved": {
+    "defaultMessage": "저장됨"
   },
   "label.scopes": {
     "defaultMessage": "범위"
@@ -344,6 +362,24 @@
   "project.about.compatibility.environments": {
     "defaultMessage": "지원되는 실행 환경"
   },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "클라이언트 및 서버"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "클라이언트 측"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "지원되는 서버 전용"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "서버 측"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "싱글 플레이"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "싱글 플레이 전용"
+  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
   },
@@ -412,6 +448,84 @@
   },
   "project.settings.analytics.title": {
     "defaultMessage": "분석"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "설명"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "일부 기능은 부분적으로만이라도 클라이언트와 서버 양쪽에서 작동합니다."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "양쪽 모두에서 선택사항이며, 어느 한쪽에 설치해도 동일하게 작동합니다"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "양쪽 모두에서 선택사항이며, 양쪽에 모두 설치했을 때 가장 잘 작동합니다"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "클라이언트에서 선택사항"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "서버에서 선택사항"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "양쪽 모두 필요"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "클라이언트 및 서버"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "모든 기능은 클라이언트 측에서만 처리되며 바닐라 서버와 호환됩니다."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "클라이언트 측 전용"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "지원되는 서버 전용"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "모든 기능은 서버 측에서만 처리되며 바닐라 클라이언트와 호환됩니다."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "싱글 플레이에서도 작동"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "서버 측 전용"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "싱글 플레이거나 멀티 플레이 서버에 접속하지 않았을 때만 작동합니다."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "싱글 플레이 전용"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "갤러리"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "일반"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "라이센스"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "링크"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "멤버"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "태그"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "업로드"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "버전"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "보기"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -596,6 +710,9 @@
   "servers.region.region-unsupported": {
     "defaultMessage": "원하는 지역이 목록에 없나요? <link>Modrinth 서버를 어디에서 만나고 싶은지 알려주세요!</link>"
   },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "동남아시아"
+  },
   "servers.region.western-europe": {
     "defaultMessage": "서유럽"
   },
@@ -655,6 +772,9 @@
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "저장하지 않은 번경사항이 있습니다."
   }
 }
 

@@ -84,7 +84,7 @@
     "defaultMessage": "Verwenden Sie keine Linkverkürzer"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# Überschrift} other {# Überschriften}} in deiner Beschreibung {count, plural, one {ist} other {sind}} zu lang. Überschriften sollten kurz und prägnant sein und als Abschnittstitel dienen, nicht als vollständige Sätze.\n"
+    "defaultMessage": "{count, plural, one {# Überschrift} other {# Überschriften}} in deiner Beschreibung {count, plural, one {ist} other {sind}} zu lang. Überschriften sollten kurz und prägnant sein und als Abschnittstitel dienen, nicht als vollständige Sätze."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Überschrift kürzen"

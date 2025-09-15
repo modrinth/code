@@ -1910,6 +1910,9 @@
   "settings.language.languages.search.no-results": {
     "message": "No speakz match ur paw-searchez."
   },
+  "settings.language.warning": {
+    "message": "Hoomin speakz different make thingz in English if translations not herez. Site all translated not yet zo thingz still in English fur zum of dem. We kittehz tryin' to make teh localization system better, zo sumtime thingz ar weird."
+  },
   "settings.pats.action.create": {
     "message": "Maek a PAWT"
   },

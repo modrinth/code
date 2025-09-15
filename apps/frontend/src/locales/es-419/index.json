@@ -1910,6 +1910,9 @@
   "settings.language.languages.search.no-results": {
     "message": "Ningún idioma coincide con tu busqueda."
   },
+  "settings.language.warning": {
+    "message": "Cambiar el idioma del sitio puede hacer que parte del contenido aparezca en inglés si no hay una traducción disponible. El sitio aún no está totalmente traducido, por lo que en algunos idiomas cierto contenido puede seguir mostrándose en inglés. Todavía estamos trabajando en mejorar nuestro sistema de localización, así que en ocasiones el contenido puede mostrarse con errores."
+  },
   "settings.pats.action.create": {
     "message": "Crear un PAT"
   },

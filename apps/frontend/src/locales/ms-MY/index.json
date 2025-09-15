@@ -2,6 +2,195 @@
   "admin.billing.error.not-found": {
     "message": "Pengguna tidak dijumpai"
   },
+  "app-marketing.download.description": {
+    "message": "Aplikasi desktop kami tersedia pada semua platform, pilih versi yang anda inginkan."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Muat turun AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Muat turun beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Muat turun DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Muat turun RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Versi Linux Modrinth App <issues-link>diketahui mempunyai isu</issues-link> pada sistem dan konfigurasi tertentu. Jika Modrinth App tidak stabil pada sistem anda, kami menggalakkan anda mencuba aplikasi lain seperti <prism-link>Prism Launcher</prism-link> untuk memasang kandungan Modrinth dengan mudah."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Pilihan muat turun"
+  },
+  "app-marketing.download.terms": {
+    "message": "Dengan memuat turun Modrinth App, anda bersetuju dengan <terms-link>Terma</terms-link> dan <privacy-link>Dasar Privasi</privacy-link> kami."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Pakej pihak ketiga"
+  },
+  "app-marketing.download.title": {
+    "message": "Muat Turun Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Simpan kandungan yang anda suka dan terima kemas kini dengan sekali klik."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Ikuti projek"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Import semua profil kegemaran anda daripada pelancar yang anda gunakan sebelum ini, dan mula gunakan Modrinth App dalam beberapa saat!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Pengimportan profil"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Tindakan"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "oleh {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth menjadikan pengurusan semua mod anda pada satu tempat mudah. Anda boleh memasang, menyahpasang dan mengemas kini mod dengan sekali klik."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Mod yang dipasang"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Nama"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Cari mod"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Pengurusan mod"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Versi"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Mainkan mod anda, sama ada anda disambungkan ke internet atau tidak."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Mod luar talian"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Pelancar Modrinth adalah sumber terbuka sepenuhnya. Anda boleh melihat kod sumber pada laman <github-link>GitHub</github-link> kami!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Sumber terbuka"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Pemantau aktiviti"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App berprestasi lebih baik daripada kebanyakan pengurus mod terkemuka, menggunakan hanya 150mb RAM!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Prestasi yang baik"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 bilion %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Nama proses"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Kecil"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Cekap"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Gunakan Modrinth App untuk memuat turun dan memainkan mod dan pek mod kegemaran anda."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Mainkan mod kegemaran anda"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Bina, kongsi dan mainkan pek mod dengan mana-mana pilihan daripada beribu-ribu mod dan pek mod yang dihoskan di sini di Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Pek Mod"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Kongsi"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Kongsi pek mod"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Tidak seperti pelancar yang"
+  },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App disepadukan sepenuhnya dengan laman sesawang, jadi anda boleh mengakses semua projek kegemaran anda dari dalam aplikasi!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Penyepaduan laman sesawang"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "anda gunakan sebelum ini"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Petikan skrin Modrinth App dengan pemasangan Cobblemon dibuka ke halaman 'Kandungan'."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App ialah sebuah pelancar sumber terbuka unik yang membolehkan anda memainkan mod kegemaran anda dan memastikannya dikemas kini, semuanya dalam satu pakej kecil yang kemas."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Muat Turun Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Muat Turun Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Muat Turun Modrinth App untuk {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Petikan skrin menu utama pemasangan Cobblemon."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Lebih Banyak Pilihan Muat Turun"
+  },
   "auth.authorize.action.authorize": {
     "message": "Sahkan"
   },
@@ -157,6 +346,9 @@
   },
   "auth.welcome.checkbox.subscribe": {
     "message": "Langgan kepada kemas kini tentang Modrinth"
+  },
+  "auth.welcome.description": {
+    "message": "Anda kini sebahagian daripada komuniti hebat pencipta & peneroka yang sudah membina, memuat turun dan sentiasa mengikuti perkembangan terkini mengenai mod yang menakjubkan."
   },
   "auth.welcome.label.tos": {
     "message": "Dengan mencipta akaun, anda telah bersetuju dengan <terms-link>Terma</terms-link> dan <privacy-policy-link>Dasar Privasi</privacy-policy-link> Modrinth."
@@ -329,6 +521,147 @@
   "frog.title": {
     "message": "Katak"
   },
+  "landing.button.discover-mods": {
+    "message": "Temui mod"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Pergi ke papan pemuka"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Dapatkan pengalaman pengubahsuaian terbaik yang mungkin dengan kemas kini berterusan daripada pasukan Modrinth"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "Sentiasa Berkembang"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Dapatkan laporan terperinci tentang paparan halaman, kiraan muat turun dan hasil pendapatan"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Data dan Statistik"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "Serlahkan projek anda kepada beribu-ribu pengguna melalui carian, halaman utama kami, pelayan Discord dan lebih banyak cara yang akan datang pada masa hadapan!"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Penemuan"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Sepadukan dengan alatan binaan anda melalui Minotaur untuk muat naik automatik sebaik sahaja anda menerbitkan versi baharu"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Ekosistem yang Pelbagai"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Dapatkan hasil iklan berbayar daripada halaman projek anda dan keluarkan dana anda pada bila-bila masa"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Pengewangan"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Jemput rakan sepasukan anda dan uruskan peranan serta kebenaran dengan mudah"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Pengurusan Pasukan"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Gagal memuatkan projek-projek rawak :("
+  },
+  "landing.feature.follow.description": {
+    "message": "Dapatkan makluman setiap kali projek kegemaran anda dikemas kini dan elakkan daripada ketinggalan"
+  },
+  "landing.feature.follow.heading": {
+    "message": "Ikuti projek yang anda sukai"
+  },
+  "landing.feature.launcher.description": {
+    "message": "API sumber terbuka Modrinth membolehkan pelancar menambah penyepaduan yang mendalam dengan Modrinth. Anda boleh menggunakan Modrinth melalui <link>aplikasi kami sendiri</link> dan beberapa pelancar paling popular seperti ATLauncher, MultiMC dan Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Mainkan dengan pelancar kegemaran anda"
+  },
+  "landing.feature.search.description": {
+    "message": "Carian sepantas kilat dan penapis berkuasa oleh Modrinth membolehkan anda mencari perkara yang anda inginkan semasa anda menaip."
+  },
+  "landing.feature.search.heading": {
+    "message": "Cari apa yang anda mahu, dengan cepat dan mudah"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Tempat untuk {content} Minecraft"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "pek data"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "pek mod"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "mod"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "pemalam"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "pek sumber"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "pelayan"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "pembayang"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "Perwakilan ringkas tetingkap Minecraft, dengan logo Mojang Studios dalam warna hijau Modrinth."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} telah dikemas kini!"
+  },
+  "landing.notifications.heading": {
+    "message": "Pemberitahuan"
+  },
+  "landing.notifications.received-time": {
+    "message": "Diterima {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "Versi {version} telah diterbitkan untuk {gameVersion}"
+  },
+  "landing.search.label": {
+    "message": "Cari"
+  },
+  "landing.search.placeholder": {
+    "message": "Cari..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Isih mengikut"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Berikan tempat tinggal dalam talian untuk ciptaan anda dan jangkau khalayak ramai penuh dengan pemain yang berdedikasi"
+  },
+  "landing.section.for-creators.label": {
+    "message": "Untuk Pencipta"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Kongsi kandungan anda dengan dunia"
+  },
+  "landing.section.for-players.description": {
+    "message": "Daripada biom ajaib hingga penjara bawah tanah yang terkutuk, anda pasti akan menemukan kandungan untuk membawa permainan anda ke tahap yang seterusnya."
+  },
+  "landing.section.for-players.label": {
+    "message": "Untuk Pemain"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Temui lebih daripada {count} ciptaan"
+  },
+  "landing.subheading": {
+    "message": "Temui, main dan kongsi kandungan Minecraft melalui platform sumber terbuka kami yang dibina untuk komuniti."
+  },
   "layout.action.change-theme": {
     "message": "Tukar tema"
   },
@@ -426,7 +759,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Pelayan Modrinth"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Sumber"
@@ -693,7 +1026,7 @@
     "message": "Semak projek"
   },
   "project.actions.servers-promo.description": {
-    "message": "Pelayan Modrinth ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
+    "message": "Modrinth Servers ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
   },
   "project.actions.servers-promo.monthly": {
     "message": " / bulan"
@@ -1446,10 +1779,10 @@
     "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Urus langganan Pelayan Modrinth anda."
+    "message": "Urus langganan Modrinth Servers anda."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Langganan Pelayan Modrinth"
+    "message": "Langganan Modrinth Servers"
   },
   "settings.billing.subscription.description": {
     "message": "Urus langganan Modrinth anda."
@@ -1577,6 +1910,9 @@
   "settings.language.languages.search.no-results": {
     "message": "Tiada bahasa yang sepadan dengan carian anda."
   },
+  "settings.language.warning": {
+    "message": "Menukar bahasa laman mungkin menyebabkan beberapa kandungan muncul dalam bahasa Inggeris kerana terjemahan belum tersedia, atau teks belum lagi boleh diterjemahkan. Kami masih berusaha untuk menambah baik sistem penyetempatan kami, jadi kadangkala kandungan mungkin kelihatan rosak."
+  },
   "settings.pats.action.create": {
     "message": "Cipta PAT"
   },
@@ -1672,5 +2008,11 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Platform tidak diketahui"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Berita terkini dari Modrinth"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Lihat semua berita"
   }
 }

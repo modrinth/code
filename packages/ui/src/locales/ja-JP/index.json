@@ -1,4 +1,10 @@
 {
+  "badge.beta": {
+    "defaultMessage": "ベータ"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "ベータ版リリース"
+  },
   "badge.new": {
     "defaultMessage": "新しい"
   },
@@ -76,6 +82,9 @@
   },
   "button.sign-out": {
     "defaultMessage": "ログアウト"
+  },
+  "button.sign-up": {
+    "defaultMessage": "サインアップ"
   },
   "button.stop": {
     "defaultMessage": "停止"
@@ -410,6 +419,9 @@
   "project.about.links.title": {
     "defaultMessage": "リンク"
   },
+  "project.about.links.wiki": {
+    "defaultMessage": "ウィキを訪問する"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "統計"
   },
@@ -457,6 +469,9 @@
   },
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "シングルプレイのみ"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}：{description}"
   },
   "project.settings.environment.title": {
     "defaultMessage": "動作環境"
@@ -566,11 +581,17 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "ローダー"
   },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "警告"
+  },
   "servers.purchase.step.payment.prompt": {
     "defaultMessage": "支払い方法を選択"
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "支払い方法"
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "始めましょう"
   },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "15~25人、modpackや重いmodを導入するなら最適"
@@ -616,6 +637,9 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "リストにない地域ですか？<link>Modrinthサーバーを次のどこに設置したいかお知らせください。</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "東南アジア"
   },
   "servers.region.western-europe": {
     "defaultMessage": "西ヨーロッパ"
