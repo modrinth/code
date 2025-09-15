@@ -1,4 +1,7 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
   "badge.beta-release": {
     "defaultMessage": "Versión Beta"
   },
@@ -199,6 +202,9 @@
   },
   "label.saved": {
     "defaultMessage": "Guardado"
+  },
+  "label.scopes": {
+    "defaultMessage": "Ámbitos"
   },
   "label.server": {
     "defaultMessage": "Servidor"
@@ -447,7 +453,7 @@
     "defaultMessage": "Descripción"
   },
   "project.settings.environment.client_and_server.description": {
-    "defaultMessage": "Tiene alguna funcionabilidad tanto en el cliente como en el servidor, incluso si solo es parcialmente."
+    "defaultMessage": "Tiene alguna funcionalidad tanto en el cliente como en el servidor, incluso si solo es parcialmente."
   },
   "project.settings.environment.client_and_server.optional_both.title": {
     "defaultMessage": "Opcional en ambos, funciona igual si se instala en cualquier lado"
@@ -495,7 +501,7 @@
     "defaultMessage": "{title}: {description}"
   },
   "project.settings.environment.suboption.accessibility-suboption-group-label": {
-    "defaultMessage": "Subopciones de {option}"
+    "defaultMessage": "Sub opciones de {option}"
   },
   "project.settings.environment.title": {
     "defaultMessage": "Entorno"
@@ -715,6 +721,9 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "¿Tu región no aparece en la lista? <link>¡Dinos dónde te gustaría ver los servidores Modrinth la próxima vez!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Sudeste Asiático"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Europa Occidental"

@@ -26,6 +26,9 @@
   "instance.add-server.resource-pack.enabled": {
     "message": "Activat"
   },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Preguntar"
+  },
   "instance.add-server.title": {
     "message": "Afegir un servidor"
   },

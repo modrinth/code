@@ -2,6 +2,87 @@
   "admin.billing.error.not-found": {
     "message": "Bruger ikke fundet"
   },
+  "app-marketing.download.description": {
+    "message": "Vores skrivebords-app er tilgængelig til alle platforme, vælg din ønsket version."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Download AppImage'en"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Download beta'en"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Download DEB'en"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Download RPM'en"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Linux versionerne af Modrinth er <issues-link>kendt for at have fejl</issues-link> på bestemte systemer og konfigurationer. Hvis Modrinth er ustabil på dit system, vi opfordre dig til at prøve andre apps så som <prism-link>Prism Launcher</prism-link> for at nemt installere Modrinth indhold."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Download muligheder"
+  },
+  "app-marketing.download.terms": {
+    "message": "Ved at download Modrinth du acceptere vores <terms-link>servicevilkår</terms-link> og <privacy-link>privatlivspolitik</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Tredjepartspakker"
+  },
+  "app-marketing.download.title": {
+    "message": "Download Modrinth (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Gem indhold du elsker, og få opdateringer med et klik."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Følg projekter"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Importer alle dine favorit profiler fra launcher du brugte før, og kom i gang med Modrinth inde for få sekunder!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MiltiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Profil importering"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Handlinger"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "af {author}"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 billion %"
+  },
   "auth.authorize.action.authorize": {
     "message": "Godkend"
   },

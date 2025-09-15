@@ -1,4 +1,7 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Half baked"
+  },
   "badge.beta-release": {
     "defaultMessage": "Half baked edishun"
   },

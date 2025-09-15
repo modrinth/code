@@ -1,4 +1,6 @@
-use labrinth::{database::redis::RedisPool, search};
+use labrinth::database::ReadOnlyPgPool;
+use labrinth::database::redis::RedisPool;
+use labrinth::search;
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::time::Duration;
 use url::Url;
@@ -36,6 +38,7 @@ const TEMPLATE_DATABASE_NAME: &str = "labrinth_tests_template";
 #[derive(Clone)]
 pub struct TemporaryDatabase {
     pub pool: PgPool,
+    pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub search_config: labrinth::search::SearchConfig,
     pub database_name: String,
@@ -74,6 +77,8 @@ impl TemporaryDatabase {
             .await
             .expect("Connection to temporary database failed");
 
+        let ro_pool = ReadOnlyPgPool::from(pool.clone());
+
         println!("Running migrations on temporary database");
 
         // Performs migrations
@@ -90,6 +95,7 @@ impl TemporaryDatabase {
             search::SearchConfig::new(Some(temp_database_name.clone()));
         Self {
             pool,
+            ro_pool,
             database_name: temp_database_name,
             redis_pool,
             search_config,
@@ -184,6 +190,7 @@ impl TemporaryDatabase {
                     let name = generate_random_name("test_template_");
                     let db = TemporaryDatabase {
                         pool: pool.clone(),
+                        ro_pool: ReadOnlyPgPool::from(pool.clone()),
                         database_name: TEMPLATE_DATABASE_NAME.to_string(),
                         redis_pool: RedisPool::new(Some(name.clone())),
                         search_config: search::SearchConfig::new(Some(name)),

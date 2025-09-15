@@ -585,7 +585,7 @@
     "message": "Trova cosa ti serve: è semplice e veloce"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Il posto giusto per {content} Minecraft"
+    "message": "Il posto giusto per {content} di Minecraft"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "data pack"
@@ -1909,6 +1909,9 @@
   },
   "settings.language.languages.search.no-results": {
     "message": "Nessuna lingua trovata."
+  },
+  "settings.language.warning": {
+    "message": "È possibile che, anche cambiando la lingua del sito, ci sia comunque del contenuto in inglese, se una traduzione non fosse disponibile. Il sito non è ancora tradotto completamente, per cui del contenuto rimarrà in inglese per alcune lingue. Stiamo ancora lavorando per migliorare il nostro sistema di localizzazione, per cui a volte del contenuto potrebbe sembrare inaccurato."
   },
   "settings.pats.action.create": {
     "message": "Crea un PAT"

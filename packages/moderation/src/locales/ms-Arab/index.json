@@ -12,13 +12,13 @@
     "defaultMessage": "تمبه ايکون"
   },
   "nags.add-links.description": {
-    "defaultMessage": "تمبهکن سبارڠ ڤاٴوتن برکاٴيتن يڠ دساسرکن د لوار Modrinth⹁ سڤرتي کود سومبر⹁ ڤنججق ايسو اتاو جمڤوتن ديسکورد."
+    "defaultMessage": "تمبهکن سبارڠ ڤاءوتن برکاءيتن يڠ دساسرکن د لوار Modrinth⹁ سڤرتي کود سومبر⹁ ڤنججق ايسو اتاو جمڤوتن ديسکورد."
   },
   "nags.add-links.title": {
-    "defaultMessage": "تمبه ڤاٴوتن لوارن"
+    "defaultMessage": "تمبه ڤاءوتن لوارن"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "اندا تله مميليه کسموا {totalAvailableTags} تݢ يڠ ترسديا. اين مڠالهکن توجوان تݢ⹁ يڠ برتوجوان اونتوق ممبنتو ڤڠݢونا منچاري ڤروجيک يڠ برکاٴيتن. سيلا ڤيليه هاڽ تݢ يڠ برکاٴيتن دڠن ڤروجيک اندا."
+    "defaultMessage": "اندا تله مميليه کسموا {totalAvailableTags} تݢ يڠ ترسديا. اين مڠالهکن توجوان تݢ⹁ يڠ برتوجوان اونتوق ممبنتو ڤڠݢونا منچاري ڤروجيک يڠ برکاءيتن. سيلا ڤيليه هاڽ تݢ يڠ برکاءيتن دڠن ڤروجيک اندا."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "ڤيليه تݢ يڠ تڤت"
@@ -54,7 +54,7 @@
     "defaultMessage": "لاوت لامن ݢالري"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "{projectType} اندا مڠݢوناکن ليسين يڠ ممرلوکن کود سومبر ترسديا. سيلا برايکن ڤاٴوتن کود سومبر اتاو فاٴيل سومبر اونتوق ستياڤ ۏرسي تمبهن اتاو ڤرتيمبڠکن اونتوق مڠݢوناکن ليسين يڠ بربيذا."
+    "defaultMessage": "{projectType} اندا مڠݢوناکن ليسين يڠ ممرلوکن کود سومبر ترسديا. سيلا برايکن ڤاءوتن کود سومبر اتاو فاءيل سومبر اونتوق ستياڤ ۏرسي تمبهن اتاو ڤرتيمبڠکن اونتوق مڠݢوناکن ليسين يڠ بربيذا."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "سدياکن کود سومبر"
@@ -69,19 +69,19 @@
     "defaultMessage": "URL ليسين تيدق صح."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "URL ليسين اندا مڠهالا ک{domain}⹁ يڠ تيدق سسواي اونتوق معلومت ليسين. URL ليسين هاروس دڤاٴوتکن تروس کفاٴيل ليسين اندا⹁ بوکن ميديا سوسيال⹁ ڤلتفوم ڤرماٴينن⹁ دان سباݢايڽ."
+    "defaultMessage": "URL ليسين اندا مڠهالا ک{domain}⹁ يڠ تيدق سسواي اونتوق معلومت ليسين. URL ليسين هاروس دڤاءوتکن تروس کفاءيل ليسين اندا⹁ بوکن ميديا سوسيال⹁ ڤلتفوم ڤرماءينن⹁ دان سباݢايڽ."
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "URL ليسين اندا نمڤقڽ ساله بنتوق. سيلا برايکن URL يڠ صح کڤد تيک‌س ليسين اندا."
   },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "تمبهکن ڤاٴوتن ليسين يڠ صح"
+    "defaultMessage": "تمبهکن ڤاءوتن ليسين يڠ صح"
   },
   "nags.link-shortener-usage.description": {
-    "defaultMessage": "ڤڠݢوناٴن ڤمينديق ڤاٴوتن اتاو قاعده لاٴين اونتوق مڠابورکن هالا توجو ڤاٴوتن ددالم ڤاٴوتن لوارن اتاو ليسين اندا اداله دلارڠ⹁ سيلا ݢوناکن ڤاٴوتن ڤنجڠ ڤنوه يڠ سسواي سهاج."
+    "defaultMessage": "ڤڠݢوناءن ڤمينديق ڤاءوتن اتاو قاعده لاءين اونتوق مڠابورکن هالا توجو ڤاءوتن ددالم ڤاءوتن لوارن اتاو ليسين اندا اداله دلارڠ⹁ سيلا ݢوناکن ڤاءوتن ڤنجڠ ڤنوه يڠ سسواي سهاج."
   },
   "nags.link-shortener-usage.title": {
-    "defaultMessage": "جاڠن ݢوناکن ڤمينديق ڤاٴوتن"
+    "defaultMessage": "جاڠن ݢوناکن ڤمينديق ڤاءوتن"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, other {# تاجوق}} ددالم کترڠن اندا {count, plural, other {اداله}} ترلالو ڤنجڠ. تاجوق هندقله ريڠکس دان برتيندق سباݢاي تاجوق بهاݢين⹁ بوکن ايات ڤنوه."
@@ -90,7 +90,7 @@
     "defaultMessage": "ڤينديقکن تاجوق"
   },
   "nags.minecraft-title-clause.description": {
-    "defaultMessage": "ڤروجيک تيدق بوليه مڠݢوناکن ڤنجناماٴن ماٴينکرف‌ت اتاو مڽرتاکن \"Minecraft\" سباݢاي بهاݢين ڤنتيڠ دالم نام ترسبوت."
+    "defaultMessage": "ڤروجيک تيدق بوليه مڠݢوناکن ڤنجناماءن ماءينکرف‌ت اتاو مڽرتاکن \"Minecraft\" سباݢاي بهاݢين ڤنتيڠ دالم نام ترسبوت."
   },
   "nags.minecraft-title-clause.title": {
     "defaultMessage": "ايلقکن ڤلڠݢرن جنام"
@@ -102,13 +102,13 @@
     "defaultMessage": "تمبهکن تيک‌س الترناتيف ݢمبر"
   },
   "nags.misused-discord-link-description": {
-    "defaultMessage": "جمڤوتن ديسکورد تيدق بوليه دݢوناکن اونتوق جنيس ڤاٴوتن لاٴين. سيلا ليتقکن ڤاٴوتن ديسکورد اندا دالم ميدن ڤاٴوتن جمڤوتن ديسکورد سهاج."
+    "defaultMessage": "جمڤوتن ديسکورد تيدق بوليه دݢوناکن اونتوق جنيس ڤاءوتن لاءين. سيلا ليتقکن ڤاءوتن ديسکورد اندا دالم ميدن ڤاءوتن جمڤوتن ديسکورد سهاج."
   },
   "nags.misused-discord-link.title": {
-    "defaultMessage": "ڤيندهکن ڤاٴوتن جمڤوتن ديسکورد"
+    "defaultMessage": "ڤيندهکن ڤاءوتن جمڤوتن ديسکورد"
   },
   "nags.moderation.title": {
-    "defaultMessage": "لاوت ببنڠ ڤڽدرهاناٴن"
+    "defaultMessage": "لاوت ببنڠ ڤڽدرهاناءن"
   },
   "nags.moderator-feedback.description": {
     "defaultMessage": "سيمق دان تاڠني سموا کبيمبڠن درڤد ڤاسوقن ڤڽدرهان سبلوم مڽرهکن سمولا."
@@ -117,7 +117,7 @@
     "defaultMessage": "سيمق معلوم بالس ڤڽدرهان"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "اندا تله مميليه {count} تݢ ريسولوسي ({tags}). ڤيک سومبر بياساڽ هاڽ ممڤوڽاٴي ساتو تݢ ريسولوسي يڠ سڤادن دڠن ريسولوسي اوتامڽ."
+    "defaultMessage": "اندا تله مميليه {count} تݢ ريسولوسي ({tags}). ڤيک سومبر بياساڽ هاڽ ممڤوڽاءي ساتو تݢ ريسولوسي يڠ سڤادن دڠن ريسولوسي اوتامڽ."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "ڤيليه ريسولوسي يڠ بتول"
@@ -150,7 +150,7 @@
     "defaultMessage": "لاوت تتڤن ليسين"
   },
   "nags.settings.links.title": {
-    "defaultMessage": "لاوت تتڤن ڤاٴوتن"
+    "defaultMessage": "لاوت تتڤن ڤاءوتن"
   },
   "nags.settings.tags.title": {
     "defaultMessage": "لاوت تتڤن تݢ"
@@ -165,7 +165,7 @@
     "defaultMessage": "جاديکن ريڠکسن ايت اونيک"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "ريڠکسن اندا تيدق بوليه مڠاندوڠي ڤمفورمتن⹁ ڤميسه باريس⹁ اکسارا خاس اتاو ڤاٴوتن⹁ کران ريڠکسن هاڽ اکن مماڤرکن تيک‌س بياسا."
+    "defaultMessage": "ريڠکسن اندا تيدق بوليه مڠاندوڠي ڤمفورمتن⹁ ڤميسه باريس⹁ اکسارا خاس اتاو ڤاءوتن⹁ کران ريڠکسن هاڽ اکن مماڤرکن تيک‌س بياسا."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "برسيهکن ريڠکسن"
@@ -177,13 +177,13 @@
     "defaultMessage": "کمبڠکن ريڠکسن"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "نام ڤروجيک اندا يڠ کمس دان دايڠتي اکن منجاديکنڽ موده اونتوق دچاري. معلومت ۏرسي دان ڤموات دڤاڤرکن سچارا اٴوتوماتيک برسام ڤروجيک اندا."
+    "defaultMessage": "نام ڤروجيک اندا يڠ کمس دان دايڠتي اکن منجاديکنڽ موده اونتوق دچاري. معلومت ۏرسي دان ڤموات دڤاڤرکن سچارا اءوتوماتيک برسام ڤروجيک اندا."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "برسيهکن نام"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "اندا تله مميليه سباڽق {tagCount} تݢ. ڤرتيمبڠکن اونتوق مڠورڠکنڽ کڤد {maxTagCount} اتاو کورڠ اونتوق ممستيکن ڤروجيک اندا دڤاڤرکن دالم حاصيل چارين يڠ برکاٴيتن."
+    "defaultMessage": "اندا تله مميليه سباڽق {tagCount} تݢ. ڤرتيمبڠکن اونتوق مڠورڠکنڽ کڤد {maxTagCount} اتاو کورڠ اونتوق ممستيکن ڤروجيک اندا دڤاڤرکن دالم حاصيل چارين يڠ برکاءيتن."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "ڤيليه تݢ يڠ تڤت"
@@ -192,25 +192,25 @@
     "defaultMessage": "سکورڠ٢ڽ ساتو ݢمبر ݢالري دڤرلوکن اونتوق ممڤاميرکن کاندوڠن {type}{resourcepackMessage} اندا."
   },
   "nags.upload-gallery-image.title": {
-    "defaultMessage": "موات ناٴيق ݢمبر ݢالري"
+    "defaultMessage": "موات ناءيق ݢمبر ݢالري"
   },
   "nags.upload-version.description": {
     "defaultMessage": "سکورڠ٢ڽ ساتو ۏرسي دڤرلوکن اونتوق ڤروجيک دسرهکن اونتوق سيمقن."
   },
   "nags.upload-version.title": {
-    "defaultMessage": "موات ناٴيق ساتو ۏرسي"
+    "defaultMessage": "موات ناءيق ساتو ۏرسي"
   },
   "nags.verify-external-links.description": {
-    "defaultMessage": "سستڠه ڤاٴوتن لوارن اندا موڠکين مڠݢوناکن دوماٴين يڠ تيدق سسواي اونتوق جنيس ڤاٴوتن ترسبوت."
+    "defaultMessage": "سستڠه ڤاءوتن لوارن اندا موڠکين مڠݢوناکن دوماءين يڠ تيدق سسواي اونتوق جنيس ڤاءوتن ترسبوت."
   },
   "nags.verify-external-links.title": {
-    "defaultMessage": "صحکن ڤاٴوتن لوارن"
+    "defaultMessage": "صحکن ڤاءوتن لوارن"
   },
   "nags.versions.title": {
     "defaultMessage": "لاوت لامن ۏرسي"
   },
   "nags.visit-links-settings.title": {
-    "defaultMessage": "لاوت تتڤن ڤاٴوتن"
+    "defaultMessage": "لاوت تتڤن ڤاءوتن"
   }
 }
 

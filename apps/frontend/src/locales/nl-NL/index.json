@@ -161,6 +161,9 @@
   "app-marketing.features.unlike-any-launcher": {
     "message": "Onvergelijkbaar met de concurrentie "
   },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App is volledig geïntegreerd met de website, zodat u vanuit de app toegang heeft tot al uw favoriete projecten!"
+  },
   "app-marketing.features.website.title": {
     "message": "Website integratie "
   },
@@ -535,6 +538,15 @@
   },
   "landing.creator.feature.monetization.title": {
     "message": "Maak jouw projecten te gelden"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Team Beheer"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "plugins"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "bronpakketten"
   },
   "layout.action.change-theme": {
     "message": "Thema aanpassen"

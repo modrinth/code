@@ -1,6 +1,6 @@
 {
   "app.settings.developer-mode-enabled": {
-    "message": "开发者模式已启用。"
+    "message": "已启用开发者模式。"
   },
   "app.settings.tabs.appearance": {
     "message": "外观"

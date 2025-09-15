@@ -48,7 +48,7 @@
     "message": "Proje takibi"
   },
   "app-marketing.features.importing.description": {
-    "message": "Sevdiğin profilleri önceden kullandığın başlatıcıdan buraya aktar, saniyeler içinde Modrinth App'i kullanmaya başla!"
+    "message": "Sevdiğin profilleri önceki başlatıcından buraya aktar ve saniyeler içinde Modrinth Uygulamasını kullanmaya başla!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -90,7 +90,7 @@
     "message": "Çevrim-dışı mod"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth'in başlatıcısı tamamı ile açık kaynak kodludur. <github-link>GitHub</github-link> sayfamızda kaynak kodunu inceleyebilirsin!"
+    "message": "Modrinth'in başlatıcısı tamamen açık kaynak kodludur. <github-link>GitHub</github-link> sayfamızda kaynak kodunu inceleyebilirsin!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Açık kaynak"
@@ -170,6 +170,9 @@
   "app-marketing.features.youve-used-before": {
     "message": "başlatıcı"
   },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Cobblemon kurulumunun ‘İçerik’ sayfasında olduğu Modrinth Uygulaması’nın ekran görüntüsü."
+  },
   "app-marketing.hero.description": {
     "message": "Modrinth Uygulaması, favori modlarınızı güncel şekilde oynayabileceğiniz özgün ve açık kaynaklı bir başlatıcı."
   },
@@ -181,6 +184,9 @@
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
     "message": "{os} için Modrinth Uygulamasını İndir"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Cobblemon kurulumunun ana menü ekranının ekran görüntüsü."
   },
   "app-marketing.hero.more-download-options": {
     "message": "Diğer İndirme Seçenekleri"
@@ -1220,6 +1226,9 @@
   "project.settings.general.tagline.placeholder.5": {
     "message": "ör. Adds powerful boss versions of the normal mobs to encounter in the night."
   },
+  "project.settings.general.tagline.title": {
+    "message": "Kısa tanıtım cümlesi"
+  },
   "project.settings.general.url.title": {
     "message": "URL"
   },
@@ -1900,6 +1909,9 @@
   },
   "settings.language.languages.search.no-results": {
     "message": "Aramanızla eşleşen dil yok."
+  },
+  "settings.language.warning": {
+    "message": "Site dilini değiştirmek, çevirisi olmayan bazı içeriklerin İngilizce görünmesine neden olabilir. Site henüz tamamen çevrilmediği için bazı içerikler belirli dillerde İngilizce kalabilir. Yerelleştirme sistemimizi geliştirmeye devam ediyoruz, bu nedenle zaman zaman bazı içerikler hatalı olabilir."
   },
   "settings.pats.action.create": {
     "message": "Bir PAT yarat"

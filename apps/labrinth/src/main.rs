@@ -83,7 +83,7 @@ async fn main() -> std::io::Result<()> {
     }
 
     // Database Connector
-    let pool = database::connect()
+    let (pool, ro_pool) = database::connect_all()
         .await
         .expect("Database connection failed");
 
@@ -167,6 +167,7 @@ async fn main() -> std::io::Result<()> {
 
     let labrinth_config = labrinth::app_setup(
         pool.clone(),
+        ro_pool.clone(),
         redis_pool.clone(),
         search_config.clone(),
         &mut clickhouse,

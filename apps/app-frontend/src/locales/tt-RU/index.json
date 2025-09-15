@@ -17,6 +17,9 @@
   "instance.add-server.resource-pack.prompt": {
     "message": "Сорау"
   },
+  "instance.add-server.title": {
+    "message": "Серверны өстәү"
+  },
   "instance.edit-server.title": {
     "message": "Серверны үзгәртү"
   },
@@ -44,8 +47,17 @@
   "instance.server-modal.resource-pack": {
     "message": "Ресурс җыелмасы"
   },
+  "instance.settings.tabs.general.delete": {
+    "message": "Утыртуны бетерү"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Утыртуны бетерү"
+  },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Бетерү..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Күчермәләү"
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Тамгачыкны үзгәртү"
@@ -62,22 +74,49 @@
   "instance.settings.tabs.general.name": {
     "message": "Исем"
   },
+  "instance.settings.tabs.installation": {
+    "message": "Утырту"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Версияне үзгәртү"
+  },
   "instance.settings.tabs.installation.change-version.button.install": {
     "message": "Утырту"
   },
   "instance.settings.tabs.installation.change-version.button.installing": {
     "message": "Утырту"
   },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Уен версиясе"
+  },
   "instance.settings.tabs.installation.install": {
     "message": "Утырту"
   },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} версиясе"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
   "instance.settings.tabs.installation.platform": {
     "message": "Платформа"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(билгесез версия)"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Тәрәзә"
   },
   "instance.settings.title": {
     "message": "Көйләүләр"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft серверы"
+  },
+  "instance.worlds.type.server": {
+    "message": "Сервер"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Берлек уен"
   }
 }
