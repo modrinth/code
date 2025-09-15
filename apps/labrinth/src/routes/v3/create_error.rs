@@ -1,5 +1,6 @@
 use crate::auth::AuthenticationError;
 use crate::database::models;
+use crate::database::models::loader_fields::VersionFieldParseError;
 use crate::file_hosting::FileHostingError;
 use crate::models::error::AsApiError;
 use crate::models::ids::ImageId;
@@ -39,6 +40,8 @@ pub enum CreateError {
     InvalidIconFormat(ApiError),
     #[error("Error with multipart data: {0}")]
     InvalidInput(CreationInvalidInput),
+    #[error("Error with multipart data: {0}")]
+    InvalidLoaderField(#[from] VersionFieldParseError),
     #[error("Invalid loader: {0}")]
     InvalidLoader(String),
     #[error("Invalid category: {0}")]
@@ -70,6 +73,7 @@ i18n_enum!(
     MissingValueError(transparent cause) => "invalid_input.missing_value",
     InvalidIconFormat(cause) => "invalid_input.icon",
     InvalidInput(cause) => "invalid_input",
+    InvalidLoaderField(cause) => "invalid_input",
     InvalidLoader(loader) => "invalid_input.loader",
     InvalidCategory(category) => "invalid_input.category",
     InvalidFileType(extension) => "invalid_input.file_type",
@@ -216,6 +220,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::MissingValueError(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidIconFormat(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidInput(..) => StatusCode::BAD_REQUEST,
+            CreateError::InvalidLoaderField(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidLoader(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,

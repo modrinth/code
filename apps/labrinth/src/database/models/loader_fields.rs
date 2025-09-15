@@ -4,6 +4,7 @@ use std::hash::Hasher;
 use super::ids::*;
 use super::{DatabaseError, SchemaError};
 use crate::database::redis::RedisPool;
+use ariadne::i18n_enum;
 use chrono::DateTime;
 use chrono::Utc;
 use dashmap::DashMap;
@@ -809,7 +810,7 @@ impl VersionField {
         loader_field: LoaderField,
         value: serde_json::Value,
         enum_variants: Vec<LoaderFieldEnumValue>,
-    ) -> Result<VersionField, String> {
+    ) -> Result<VersionField, VersionFieldParseError> {
         let value =
             VersionFieldValue::parse(&loader_field, value, enum_variants)?;
 
@@ -829,20 +830,20 @@ impl VersionField {
             if let Some(min) = loader_field.min_val
                 && count < min
             {
-                return Err(format!(
-                    "Provided value '{v}' for {field_name} is less than the minimum of {min}",
-                    v = serde_json::to_string(&value).unwrap_or_default(),
-                    field_name = loader_field.field,
+                return Err(VersionFieldParseError::ValueLessThanMinimum(
+                    serde_json::to_value(value).unwrap_or_default(),
+                    loader_field.field,
+                    min,
                 ));
             }
 
             if let Some(max) = loader_field.max_val
                 && count > max
             {
-                return Err(format!(
-                    "Provided value '{v}' for {field_name} is greater than the maximum of {max}",
-                    v = serde_json::to_string(&value).unwrap_or_default(),
-                    field_name = loader_field.field,
+                return Err(VersionFieldParseError::ValueGreaterThanMaximum(
+                    serde_json::to_value(value).unwrap_or_default(),
+                    loader_field.field,
+                    max,
                 ));
             }
         }
@@ -966,15 +967,16 @@ impl VersionFieldValue {
         loader_field: &LoaderField,
         value: serde_json::Value,
         enum_array: Vec<LoaderFieldEnumValue>,
-    ) -> Result<VersionFieldValue, String> {
+    ) -> Result<VersionFieldValue, VersionFieldParseError> {
         let field_name = &loader_field.field;
         let field_type = &loader_field.field_type;
 
         let error_value = value.clone();
-        let incorrect_type_error = |field_type: &str| {
-            format!(
-                "Provided value '{v}' for {field_name} could not be parsed to {field_type} ",
-                v = serde_json::to_string(&error_value).unwrap_or_default()
+        let incorrect_type_error = |field_type| {
+            VersionFieldParseError::ParseFailure(
+                error_value,
+                field_name.to_string(),
+                field_type,
             )
         };
 
@@ -1020,8 +1022,9 @@ impl VersionFieldValue {
                 {
                     ev
                 } else {
-                    return Err(format!(
-                        "Provided value '{enum_value}' is not a valid variant for {field_name}"
+                    return Err(VersionFieldParseError::InvalidEnumVariant(
+                        serde_json::Value::String(enum_value.to_string()),
+                        field_name.to_string(),
                     ));
                 }
             }),
@@ -1038,9 +1041,12 @@ impl VersionFieldValue {
                         {
                             enum_values.push(ev.clone());
                         } else {
-                            return Err(format!(
-                                "Provided value '{av}' is not a valid variant for {field_name}"
-                            ));
+                            return Err(
+                                VersionFieldParseError::InvalidEnumVariant(
+                                    serde_json::Value::String(av),
+                                    field_name.to_string(),
+                                ),
+                            );
                         }
                     }
                     enum_values
@@ -1381,3 +1387,24 @@ impl VersionFieldValue {
         }
     }
 }
+
+#[derive(Debug, thiserror::Error)]
+pub enum VersionFieldParseError {
+    #[error("Provided value {0} for {1} is less than the minimum of {2}")]
+    ValueLessThanMinimum(serde_json::Value, String, i32),
+    #[error("Provided value {0} for {1} is greater than the maximum of {2}")]
+    ValueGreaterThanMaximum(serde_json::Value, String, i32),
+    #[error("Provided value {0} for {1} could not be parsed to {2}")]
+    ParseFailure(serde_json::Value, String, &'static str),
+    #[error("Provided value {0} is not a valid variant for {1}")]
+    InvalidEnumVariant(serde_json::Value, String),
+}
+
+i18n_enum!(
+    VersionFieldParseError,
+    root_key: "labrinth.error.version_field_parse",
+    ValueLessThanMinimum(value, field_name, minimum) => "value_less_than_minimum",
+    ValueGreaterThanMaximum(value, field_name, maximum) => "value_greater_than_maximum",
+    ParseFailure(value, field_name, field_type) => "parse_failure",
+    InvalidEnumVariant(value, field_name) => "invalid_enum_variant",
+);

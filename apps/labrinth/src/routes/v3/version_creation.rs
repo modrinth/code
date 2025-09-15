@@ -1120,13 +1120,12 @@ pub fn try_create_version_fields(
             .remove(&loader_field.id)
             .unwrap_or_default();
 
-        let vf: VersionField = VersionField::check_parse(
+        let vf = VersionField::check_parse(
             version_id.into(),
             loader_field.clone(),
             value.clone(),
             enum_variants,
-        )
-        .map_err(CreateError::InvalidInput)?;
+        )?;
         version_fields.push(vf);
     }
 

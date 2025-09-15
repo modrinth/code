@@ -434,6 +434,18 @@
   "labrinth.error.unauthorized.url_error": {
     "message": "Invalid callback URL specified"
   },
+  "labrinth.error.version_field_parse.invalid_enum_variant": {
+    "message": "Provided value {value} is not a valid variant for {field_name}"
+  },
+  "labrinth.error.version_field_parse.parse_failure": {
+    "message": "Provided value {value} for {field_name} could not be parsed to {field_type}"
+  },
+  "labrinth.error.version_field_parse.value_greater_than_maximum": {
+    "message": "Provided value {value} for {field_name} is greater than the maximum of {maximum}"
+  },
+  "labrinth.error.version_field_parse.value_less_than_minimum": {
+    "message": "Provided value {value} for {field_name} is less than the minimum of {minimum}"
+  },
   "labrinth.error.xml_error": {
     "message": "Internal server error: {cause}"
   },
