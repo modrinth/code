@@ -7,6 +7,7 @@ use crate::models::ids::{
     VersionId,
 };
 use crate::models::projects::ProjectStatus;
+use crate::routes::ApiError;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -472,6 +473,16 @@ pub enum NotificationDeliveryStatus {
 }
 
 impl NotificationDeliveryStatus {
+    pub fn as_user_error(self) -> Result<(), ApiError> {
+        match self {
+            NotificationDeliveryStatus::Delivered => Ok(()),
+            NotificationDeliveryStatus::SkippedPreferences |
+            NotificationDeliveryStatus::SkippedDefault |
+            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occured while sending an email to your email address. Please try again later.".to_owned())),
+            NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::InvalidInput("This email address doesn't exist! Please try another one.".to_owned())),
+        }
+    }
+
     pub fn as_str(self) -> &'static str {
         match self {
             NotificationDeliveryStatus::Pending => "pending",

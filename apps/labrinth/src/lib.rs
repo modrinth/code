@@ -307,6 +307,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.search_config.clone()))
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
+    .app_data(labrinth_config.email_queue.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
     .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))

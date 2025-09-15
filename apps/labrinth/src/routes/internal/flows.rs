@@ -10,6 +10,7 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
+use crate::queue::email::EmailQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::session::issue_session;
@@ -26,6 +27,7 @@ use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use ariadne::ids::random_base62_rng;
 use base64::Engine;
 use chrono::{Duration, Utc};
+use lettre::message::Mailbox;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use reqwest::header::AUTHORIZATION;
@@ -1334,6 +1336,7 @@ pub async fn create_account_with_password(
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     new_account: web::Json<NewAccount>,
+    email: web::Data<EmailQueue>,
 ) -> Result<HttpResponse, ApiError> {
     new_account.0.validate().map_err(|err| {
         ApiError::InvalidInput(validation_errors_to_string(err, None))
@@ -1429,6 +1432,10 @@ pub async fn create_account_with_password(
     let session = issue_session(req, user_id, &mut transaction, &redis).await?;
     let res = crate::models::sessions::Session::from(session, true, None);
 
+    let mailbox: Mailbox = new_account.email.parse().map_err(|_| {
+        ApiError::InvalidInput("Invalid email address!".to_string())
+    })?;
+
     let flow = DBFlow::ConfirmEmail {
         user_id,
         confirm_email: new_account.email.clone(),
@@ -1436,11 +1443,10 @@ pub async fn create_account_with_password(
     .insert(Duration::hours(24), &redis)
     .await?;
 
-    NotificationBuilder {
-        body: NotificationBody::VerifyEmail { flow },
-    }
-    .insert(user_id, &mut transaction, &redis)
-    .await?;
+    email
+        .send_one(NotificationBody::VerifyEmail { flow }, user_id, mailbox)
+        .await?
+        .as_user_error()?;
 
     transaction.commit().await?;
 
@@ -2143,12 +2149,17 @@ pub async fn set_email(
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
-    email: web::Json<SetEmail>,
+    email_address: web::Json<SetEmail>,
+    email: web::Data<EmailQueue>,
     session_queue: Data<AuthQueue>,
     stripe_client: Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    email.0.validate().map_err(|err| {
+    email_address.0.validate().map_err(|err| {
         ApiError::InvalidInput(validation_errors_to_string(err, None))
+    })?;
+
+    let mailbox: Mailbox = email_address.email.parse().map_err(|_| {
+        ApiError::InvalidInput("Invalid email address!".to_string())
     })?;
 
     let user = get_user_from_headers(
@@ -2162,7 +2173,7 @@ pub async fn set_email(
     .1;
 
     if !crate::database::models::DBUser::get_by_case_insensitive_email(
-        &email.email,
+        &email_address.email,
         &**pool,
     )
     .await?
@@ -2181,7 +2192,7 @@ pub async fn set_email(
         SET email = $1, email_verified = FALSE
         WHERE (id = $2)
         ",
-        email.email,
+        email_address.email,
         user.id.0 as i64,
     )
     .execute(&mut *transaction)
@@ -2190,7 +2201,7 @@ pub async fn set_email(
     if let Some(user_email) = user.email.clone() {
         NotificationBuilder {
             body: NotificationBody::EmailChanged {
-                new_email: email.email.clone(),
+                new_email: email_address.email.clone(),
                 to_email: user_email,
             },
         }
@@ -2207,7 +2218,7 @@ pub async fn set_email(
             &stripe_client,
             &customer_id,
             stripe::UpdateCustomer {
-                email: Some(&email.email),
+                email: Some(&email_address.email),
                 ..Default::default()
             },
         )
@@ -2216,18 +2227,22 @@ pub async fn set_email(
 
     let flow = DBFlow::ConfirmEmail {
         user_id: user.id.into(),
-        confirm_email: email.email.clone(),
+        confirm_email: email_address.email.clone(),
     }
     .insert(Duration::hours(24), &redis)
     .await?;
 
-    NotificationBuilder {
-        body: NotificationBody::VerifyEmail { flow },
-    }
-    .insert(user.id.into(), &mut transaction, &redis)
-    .await?;
+    email
+        .send_one(
+            NotificationBody::VerifyEmail { flow },
+            user.id.into(),
+            mailbox,
+        )
+        .await?
+        .as_user_error()?;
 
     transaction.commit().await?;
+
     crate::database::models::DBUser::clear_caches(
         &[(user.id.into(), None)],
         &redis,
@@ -2243,6 +2258,7 @@ pub async fn resend_verify_email(
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
+    email: web::Data<EmailQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -2254,7 +2270,7 @@ pub async fn resend_verify_email(
     .await?
     .1;
 
-    if let Some(email) = user.email {
+    if let Some(email_address) = user.email {
         if user.email_verified.unwrap_or(false) {
             return Err(ApiError::InvalidInput(
                 "User email is already verified!".to_string(),
@@ -2263,18 +2279,23 @@ pub async fn resend_verify_email(
 
         let flow = DBFlow::ConfirmEmail {
             user_id: user.id.into(),
-            confirm_email: email.clone(),
+            confirm_email: email_address.clone(),
         }
         .insert(Duration::hours(24), &redis)
         .await?;
 
-        let mut transaction = pool.begin().await?;
-        NotificationBuilder {
-            body: NotificationBody::VerifyEmail { flow },
-        }
-        .insert(user.id.into(), &mut transaction, &redis)
-        .await?;
-        transaction.commit().await?;
+        let mailbox: Mailbox = email_address.parse().map_err(|_| {
+            ApiError::InvalidInput("Invalid email address!".to_string())
+        })?;
+
+        email
+            .send_one(
+                NotificationBody::VerifyEmail { flow },
+                user.id.into(),
+                mailbox,
+            )
+            .await?
+            .as_user_error()?;
 
         Ok(HttpResponse::NoContent().finish())
     } else {
