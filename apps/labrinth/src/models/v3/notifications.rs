@@ -46,6 +46,7 @@ pub enum NotificationType {
     PasswordRemoved,
     EmailChanged,
     PaymentFailed,
+    TaxNotification,
     Unknown,
 }
 
@@ -68,6 +69,7 @@ impl NotificationType {
             NotificationType::PasswordRemoved => "password_removed",
             NotificationType::EmailChanged => "email_changed",
             NotificationType::PaymentFailed => "payment_failed",
+            NotificationType::TaxNotification => "tax_notification",
             NotificationType::Unknown => "unknown",
         }
     }
@@ -90,6 +92,7 @@ impl NotificationType {
             "password_removed" => NotificationType::PasswordRemoved,
             "email_changed" => NotificationType::EmailChanged,
             "payment_failed" => NotificationType::PaymentFailed,
+            "tax_notification" => NotificationType::TaxNotification,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -158,6 +161,12 @@ pub enum NotificationBody {
         amount: String,
         service: String,
     },
+    TaxNotification {
+        amount: i64,
+        tax_amount: i64,
+        due: DateTime<Utc>,
+        service: String,
+    },
     Unknown,
 }
 
@@ -209,6 +218,9 @@ impl NotificationBody {
             }
             NotificationBody::PaymentFailed { .. } => {
                 NotificationType::PaymentFailed
+            }
+            NotificationBody::TaxNotification { .. } => {
+                NotificationType::TaxNotification
             }
             NotificationBody::Unknown => NotificationType::Unknown,
         }
@@ -323,13 +335,6 @@ impl From<DBNotification> for Notification {
                     },
                     vec![],
                 ),
-                // Don't expose the `flow` field
-                NotificationBody::ResetPassword { .. } => (
-                    "Password reset requested".to_string(),
-                    "You've requested to reset your password. Please check your email for a reset link.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
                 NotificationBody::LegacyMarkdown {
                     name,
                     text,
@@ -397,6 +402,19 @@ impl From<DBNotification> for Notification {
                 NotificationBody::EmailChanged { .. } => (
                     "Email changed".to_string(),
                     "Your account email was changed.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                // Don't expose the `flow` field
+                NotificationBody::ResetPassword { .. } => (
+                    "Password reset requested".to_string(),
+                    "You've requested to reset your password. Please check your email for a reset link.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::TaxNotification { .. } => (
+                    "Tax notification".to_string(),
+                    "You've received a tax notification.".to_string(),
                     "#".to_string(),
                     vec![],
                 ),

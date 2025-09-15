@@ -1,9 +1,9 @@
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::*;
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::user_item::DBUser;
 use crate::database::models::user_subscription_item::{
-    DBUserSubscription, SubscriptionWithCharge,
-    fetch_update_lock_pending_taxation_notification,
+    DBUserSubscription, fetch_update_lock_pending_taxation_notification,
 };
 use crate::database::models::users_redeemals::UserRedeemal;
 use crate::database::models::{
@@ -14,6 +14,7 @@ use crate::models::billing::{
     ChargeStatus, ChargeType, PaymentPlatform, Price, PriceDuration,
     ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
 };
+use crate::models::notifications::NotificationBody;
 use crate::models::users::Badges;
 use crate::models::users::User;
 use crate::routes::ApiError;
@@ -214,21 +215,6 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
 
     info!("Done indexing subscriptions");
 }
-
-/*
-async fn index_tax_notifications(pool: PgPool, redis: RedisPool) {
-    info!("Indexing tax notifications");
-
-    let mut txn = pool.begin().await?;
-
-    let subscriptions =
-        fetch_update_lock_pending_taxation_notification(&mut txn, 150).await?;
-
-    for subs in subscriptions {
-        let user = DBUser::get_id(subs.user_id, pool, redis).await?;
-    }
-}
-*/
 
 /// Attempts to process a user redeemal.
 ///
@@ -515,6 +501,8 @@ pub async fn index_billing(
             transaction.commit().await?;
         }
 
+        index_tax_notifications(pool, redis).await?;
+
         Ok::<(), ApiError>(())
     }
     .await;
@@ -524,4 +512,51 @@ pub async fn index_billing(
     }
 
     info!("Done indexing billing queue");
+}
+
+async fn index_tax_notifications(
+    pool: PgPool,
+    redis: RedisPool,
+) -> Result<(), ApiError> {
+    info!("Indexing tax notifications");
+
+    let mut txn = pool.begin().await?;
+
+    let subscriptions =
+        fetch_update_lock_pending_taxation_notification(&mut txn, 300).await?;
+
+    let users = DBUser::get_many_ids(
+        &subscriptions.iter().map(|x| x.user_id).collect::<Vec<_>>(),
+        &pool,
+        &redis,
+    )
+    .await?;
+
+    for subs in subscriptions {
+        let Some(user) = users.iter().find(|x| x.id == subs.user_id) else {
+            continue;
+        };
+
+        // Some users don't have an email and so can't send them a notification. Just
+        // skip these people for now as they count very few users on the site with
+        // subscriptions.
+        if user.email.is_none() {
+            continue;
+        }
+
+        NotificationBuilder {
+            body: NotificationBody::TaxNotification {
+                amount: subs.amount,
+                tax_amount: subs.tax_amount,
+                due: subs.due,
+                service: subs.product_metadata.as_product_denomination(),
+            },
+        }
+        .insert(user.id, &mut txn, &redis)
+        .await?;
+    }
+
+    txn.commit().await?;
+
+    Ok(())
 }

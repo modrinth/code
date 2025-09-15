@@ -1,15 +1,10 @@
 use self::payments::*;
-use crate::auth::{get_user_from_headers, send_email};
-use crate::database::models::charge_item::DBCharge;
-use crate::database::models::products_tax_identifier_item::{
-    DBProductsTaxIdentifier, product_info_by_product_price_id,
-};
 use crate::auth::get_user_from_headers;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::notification_item::NotificationBuilder;
-use crate::database::models::user_item::DBUser;
-use crate::database::models::user_subscription_item::DBUserSubscription;
-use crate::database::models::users_redeemals::{self, UserRedeemal};
+use crate::database::models::products_tax_identifier_item::{
+    DBProductsTaxIdentifier, product_info_by_product_price_id,
+};
 use crate::database::models::{
     charge_item, generate_charge_id, product_item, user_subscription_item,
 };

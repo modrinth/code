@@ -53,12 +53,7 @@ impl BackgroundTask {
 
                 update_bank_balances(pool).await;
             }
-            IndexSubscriptions => {
-                crate::routes::internal::billing::index_subscriptions(
-                    pool, redis_pool,
-                )
-                .await
-            }
+            IndexSubscriptions => index_subscriptions(pool, redis_pool).await,
             Mail => {
                 run_email(email_queue).await;
             }
