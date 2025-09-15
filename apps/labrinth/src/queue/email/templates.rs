@@ -100,16 +100,12 @@ pub async fn build_email(
         reply_address,
     } = from;
 
-    let (html_body_result, variables) = futures::try_join!(
+    let (html_body_result, mut variables) = futures::try_join!(
         get_html_body,
         collect_template_variables(exec, redis, user_id, body)
     )?;
 
-    let variables = variables
-        .into_iter()
-        .chain(std::iter::once((USER_EMAIL, to.email.to_string())))
-        .map(|(k, v)| (k.to_string(), v))
-        .collect();
+    variables.insert(USER_EMAIL, to.email.to_string());
 
     let mut message_builder = Message::builder().from(Mailbox::new(
         Some(from_name),
@@ -148,6 +144,39 @@ pub async fn build_email(
     };
 
     Ok(email_message)
+}
+
+fn fill_template(
+    mut text: &str,
+    variables: &HashMap<&'static str, String>,
+) -> String {
+    let mut buffer = String::with_capacity(text.len());
+
+    loop {
+        if let Some((previous, start_variable)) = text.split_once('{') {
+            buffer.push_str(previous);
+
+            if let Some((variable_name, rest)) = start_variable.split_once('}')
+            {
+                // Replace variable with an empty string if it isn't matched
+                buffer.push_str(
+                    variables
+                        .get(variable_name)
+                        .map(|s| s.as_str())
+                        .unwrap_or_default(),
+                );
+                text = rest;
+            } else {
+                warn!("Unmatched open brace in template");
+                text = start_variable;
+            }
+        } else {
+            buffer.push_str(text);
+            break;
+        }
+    }
+
+    buffer
 }
 
 async fn collect_template_variables(
