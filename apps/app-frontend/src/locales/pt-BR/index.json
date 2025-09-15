@@ -36,7 +36,7 @@
     "message": "Perguntar"
   },
   "instance.add-server.title": {
-    "message": "Adicionar servidor"
+    "message": "Adicionar um servidor"
   },
   "instance.edit-server.title": {
     "message": "Editar servidor"
@@ -129,16 +129,16 @@
     "message": "Nome"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Ganchos de inicialização"
+    "message": "Gatilhos de inicialização"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Gancho de inicialização personalizado"
+    "message": "Gatilho de inicialização personalizado"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Os ganchos permitem que usuários avançados executem comandos do sistema antes e depois de executar o jogo."
+    "message": "Os Gatilhos permitem que usuários mais experientes executem comandos do sistema antes e depois de inicializar o jogo."
   },
   "instance.settings.tabs.hooks.post-exit": {
-    "message": "Pós-saída"
+    "message": "Ao sair"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
     "message": "Executado após o jogo fechar."
@@ -147,25 +147,25 @@
     "message": "Insira o comando de pós-saída..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Pré-lançamento"
+    "message": "Antes de inicializar"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Executado antes da instância iniciar."
+    "message": "Executado antes que a instância seja inicializada."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Insira o comando de pré-lançamento..."
+    "message": "Insira o comando a ser executado antes da inicialização..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Ganchos de inicialização do jogo"
+    "message": "Gatilhos de inicialização do jogo"
   },
   "instance.settings.tabs.hooks.wrapper": {
-    "message": "Wrapper"
+    "message": "Comando auxiliar"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Comando wrapper para iniciar o Minecraft."
+    "message": "Comando auxiliar para iniciar o Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Insira um comando wrapper..."
+    "message": "Digite um comando auxiliar..."
   },
   "instance.settings.tabs.installation": {
     "message": "Instalação"
@@ -210,7 +210,7 @@
     "message": "Instalação em progresso"
   },
   "instance.settings.tabs.installation.loader-version": {
-    "message": "versão {loader}"
+    "message": "Versão do {loader}"
   },
   "instance.settings.tabs.installation.minecraft-version": {
     "message": "Minecraft {version}"
@@ -261,7 +261,7 @@
     "message": "Reparação em progresso"
   },
   "instance.settings.tabs.installation.reset-selections": {
-    "message": "Redefinir para o padrão"
+    "message": "Retornar ao padrão"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Mostrar todas as versões"
@@ -312,7 +312,7 @@
     "message": "Variáveis de ambiente"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Ganchos"
+    "message": "Gatilhos"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Argumentos do Java"

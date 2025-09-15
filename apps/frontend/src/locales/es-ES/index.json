@@ -126,7 +126,7 @@
     "message": "Aplicación Modrinth"
   },
   "app-marketing.features.performance.one-billion-percent": {
-    "message": "1000 millones %"
+    "message": "1 millones %"
   },
   "app-marketing.features.performance.process-name": {
     "message": "Nombre del proceso"
@@ -830,8 +830,56 @@
   "project-member-header.success": {
     "message": "Éxito"
   },
+  "project-moderation-nags.publishing-checklist": {
+    "message": "Lista de verificación para la publicación"
+  },
   "project-moderation-nags.required": {
     "message": "Obligatorio"
+  },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "Reenviar para revisión"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Tu proyecto ha sido {status} por el personal de Modrinth. En la mayoría de los casos, puedes volver a enviarlo para su revisión después de responder al mensaje del personal."
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "¡Debes completar los pasos requeridos en la lista de verificación de publicación!"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "Enviar para revisión"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Tu proyecto solo puede ser visto por los miembros del proyecto. Debe ser revisado por los moderadores para poder ser publicado."
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Sugerencias"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "Visite la página de moderación."
+  },
+  "project-moderation-nags.warning": {
+    "message": "Advertencia"
+  },
+  "project-type.collection.plural": {
+    "message": "Colecciones"
+  },
+  "project-type.collection.singular": {
+    "message": "Colección"
+  },
+  "project-type.mod.plural": {
+    "message": "Mods"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.plugin.plural": {
+    "message": "Plugins"
+  },
+  "project-type.plugin.singular": {
+    "message": "Plugin"
+  },
+  "project-type.project.plural": {
+    "message": "Proyectos"
   },
   "project-type.project.singular": {
     "message": "Proyecto"
@@ -881,6 +929,9 @@
   "project.actions.servers-promo.description": {
     "message": "¡Modrinth Servers es la forma más fácil de jugar con tus amigos sin complicaciones!"
   },
+  "project.actions.servers-promo.monthly": {
+    "message": "/ mes"
+  },
   "project.actions.servers-promo.pricing": {
     "message": "A partir de $5{monthly}"
   },
@@ -908,8 +959,29 @@
   "project.download.game-version-tooltip": {
     "message": "{title} solo está disponible para {version}"
   },
+  "project.download.install-with-app": {
+    "message": "Instalar con la aplicación Modrinth"
+  },
+  "project.download.no-app": {
+    "message": "¿No tienes la aplicación Modrinth?"
+  },
+  "project.download.no-versions-available": {
+    "message": "No hay versiones disponibles para {gameVersion} y {platform}."
+  },
+  "project.download.platform": {
+    "message": "Plataforma: {platform}"
+  },
+  "project.download.platform-error": {
+    "message": "Error: plataforma no encontrada"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title} olo está disponible para {platform}"
+  },
   "project.download.select-platform": {
     "message": "Seleccionar plataforma"
+  },
+  "project.download.title": {
+    "message": "Descargar {title}"
   },
   "project.gallery.title": {
     "message": "Galería"
@@ -929,7 +1001,163 @@
   "project.settings.title": {
     "message": "Ajustes"
   },
+  "project.version.all-versions": {
+    "message": "Todas las versiones"
+  },
+  "project.version.back-to-versions": {
+    "message": "Volver a las versiones"
+  },
   "project.versions.title": {
     "message": "Versiones"
+  },
+  "settings.display.theme.description": {
+    "message": "Seleccione su tema de color preferido para Modrinth en este dispositivo."
+  },
+  "settings.display.theme.title": {
+    "message": "Tema de color"
+  },
+  "settings.language.categories.auto": {
+    "message": "Automático"
+  },
+  "settings.language.categories.default": {
+    "message": "Idiomas estándar"
+  },
+  "settings.language.categories.experimental": {
+    "message": "Lenguajes experimentales"
+  },
+  "settings.language.categories.fun": {
+    "message": "Idiomas divertidos"
+  },
+  "settings.language.categories.search-result": {
+    "message": "Resultados de la búsqueda"
+  },
+  "settings.language.description": {
+    "message": "Elige tu idioma preferido para el sitio. Las traducciones son aportadas por voluntarios <crowdin-link>en Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.automatic": {
+    "message": "Sincronizar con el idioma del sistema"
+  },
+  "settings.language.languages.language-label-applying": {
+    "message": "{label}. Aplicando..."
+  },
+  "settings.language.languages.language-label-error": {
+    "message": "{label}. Error"
+  },
+  "settings.language.languages.load-failed": {
+    "message": "No se puede cargar este idioma. Inténtalo de nuevo dentro de un rato."
+  },
+  "settings.language.languages.search-field.description": {
+    "message": "Enviar para centrar el primer resultado de búsqueda"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "message": "Buscar un idioma..."
+  },
+  "settings.language.languages.search.no-results": {
+    "message": "No hay idiomas que coincidan con tu búsqueda."
+  },
+  "settings.language.warning": {
+    "message": "Cambiar el idioma del sitio puede hacer que parte del contenido aparezca en inglés si no hay una traducción disponible. El sitio aún no está completamente traducido, por lo que parte del contenido puede permanecer en inglés para determinados idiomas. Seguimos trabajando para mejorar nuestro sistema de localización, por lo que en ocasiones el contenido puede aparecer incompleto."
+  },
+  "settings.pats.action.create": {
+    "message": "Crear un PAT"
+  },
+  "settings.pats.description": {
+    "message": "Los PAT se pueden utilizar para acceder a la API de Modrinth. Para obtener más información, consulte <doc-link>la documentación de la API de Modrinth</doc-link>. Se pueden crear y revocar en cualquier momento."
+  },
+  "settings.pats.modal.create.action": {
+    "message": "Crear Pat"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Caduca"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Nombre"
+  },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "Introduzca el nombre del PAT..."
+  },
+  "settings.pats.modal.create.title": {
+    "message": "Crear token de acceso personal"
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "Eliminar este token"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "Esto eliminará este token para siempre (de verdad, para siempre)."
+  },
+  "settings.pats.modal.delete.title": {
+    "message": "Estás seguro de que deseas eliminar este token?"
+  },
+  "settings.pats.modal.edit.title": {
+    "message": "Editar token de acceso personal"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Editar token"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "Revocar token"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Caducado {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Expira {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Último uso usada"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Nunca utilizado"
+  },
+  "settings.profile.bio.description": {
+    "message": "Una breve descripción para que todos sepan un poco sobre ti."
+  },
+  "settings.profile.bio.title": {
+    "message": "Biografía"
+  },
+  "settings.profile.description": {
+    "message": "La información de tu perfil es visible públicamente en Modrinth y a través de la <docs-link>API de Modrinth</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Información perfil"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Restablecer"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Foto de perfil"
+  },
+  "settings.profile.username.description": {
+    "message": "Un nombre único que no distingue entre mayúsculas y minúsculas para identificar tu perfil."
+  },
+  "settings.profile.username.title": {
+    "message": "Nombre de usuario"
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "Revocar sesión"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Creado {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Sesión actual"
+  },
+  "settings.sessions.description": {
+    "message": "Aquí están todos los dispositivos que están actualmente conectados con tu cuenta Modrinth. Puedes cerrar sesión en cada uno de ellos individualmente.\n\nSi ves una entrada que no reconoces, cierra sesión en ese dispositivo y cambia la contraseña de tu cuenta Modrinth inmediatamente."
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Último Acceso"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Sistema operativo desconocido"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Plataforma desconocida"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Últimas noticias de Modrinth"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Ver todas las noticias"
   }
 }

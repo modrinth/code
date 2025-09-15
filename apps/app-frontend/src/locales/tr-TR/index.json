@@ -93,13 +93,13 @@
     "message": "Klonla"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "İndirirken klonlanamaz"
+    "message": "Kurulurken kopyalanamaz."
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "Kurulumu klonla"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Bu kurulum birebir kopyasını (dünyalar, ayarlar, modlar vb. dahil) oluşturur."
+    "message": "Mevcut kurulumun kopyasını oluşturur, dünyalar, ayarlar, modlar vb. dahîl."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Simgeyi düzenle"
@@ -162,7 +162,7 @@
     "message": "Örtü"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Minecraft başlatmak için örtü komutu"
+    "message": "Minecraft başlatmak için örtü komutu."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "Örtü komutunu girin..."
@@ -198,7 +198,7 @@
     "message": "Ayıklama bilgisi:"
   },
   "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Modpack detayları alınıyor"
+    "message": "Mod paketi detayları alınıyor"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "Oyun sürümü"
@@ -231,7 +231,7 @@
     "message": "Mod paketini tekrar indir"
   },
   "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": " Modpack tekrar indiriliyor"
+    "message": "Mod paketi tekrar kuruluyor"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
     "message": "Tekrar indirmek modpack'teki indirilmiş veya değişmiş her şeyi sıfırlar ve senin modpack'in üstüne eklediğin herhangi bir modu veya içeriği siler. Eğer kurulumu değiştirdi isen bu bazı şeyleri düzeltebilir, fakat ekstra indirdiğin modları kullanan dünyalar varsa bozulabilirler."
@@ -306,7 +306,7 @@
     "message": "Modpack bağını kopar"
   },
   "instance.settings.tabs.java": {
-    "message": "Java ve RAM"
+    "message": "Java ve bellek"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Ortam değişkenleri"
@@ -321,7 +321,7 @@
     "message": "Java kurulumu"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "İzin verilen RAM"
+    "message": "Ayrılan bellek"
   },
   "instance.settings.tabs.window": {
     "message": "Pencere"
@@ -333,7 +333,7 @@
     "message": "Tam Ekran"
   },
   "instance.settings.tabs.window.fullscreen.description": {
-    "message": "Oyunu tam ekran olarak başlatır."
+    "message": "Oyunu tam ekran olarak başlat (options.txt kullanır)."
   },
   "instance.settings.tabs.window.height": {
     "message": "Yükseklik"
@@ -384,10 +384,10 @@
     "message": "Sunucuya erişilemedi"
   },
   "instance.worlds.no_server_quick_play": {
-    "message": "Minecraft Alpha 1.0.5'in altındaki sunuculara hızlıca giremezsin."
+    "message": "Yalnızca Minecraft Alpha 1.0.5 veya daha yüksek sunuculara hızlıca girebilirsin"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Yalnızca Minecraft 1.20 ve sonrası sürümlerde tek oyunculu dünyalara doğrudan girebilirsiniz"
+    "message": "Yalnızca Minecraft 1.20 veya daha yüksek sürümlerde tek oyunculu dünyalara doğrudan girebilirsin"
   },
   "instance.worlds.play_instance": {
     "message": "Kurulumu oyna"

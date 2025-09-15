@@ -9,7 +9,7 @@
     "message": "Скачать AppImage"
   },
   "app-marketing.download.download-beta": {
-    "message": "Скачать бету"
+    "message": "Скачать бета-версию"
   },
   "app-marketing.download.download-deb": {
     "message": "Скачать DEB"
@@ -21,7 +21,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Версии Modrinth App для Linux, <issues-link>как известно, имеют проблемы</issues-link> на некоторых системах и конфигурациях. Если приложение Modrinth работает нестабильно на вашей системе, мы рекомендуем попробовать другие приложения, такие как <prism-link>Prism Launcher</prism-link>, для простой установки контента с Modrinth."
+    "message": "Версии Modrinth App для Linux могут работать <issues-link>неправильно</issues-link> на некоторых системах и конфигурациях. Если приложение Modrinth работает нестабильно на вашей системе, мы рекомендуем попробовать другие приложения, такие как <prism-link>Prism Launcher</prism-link>, для простой установки контента с Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -30,7 +30,7 @@
     "message": "Варианты установки"
   },
   "app-marketing.download.terms": {
-    "message": "Скачивая Modrinth App вы соглашаетесь с нашими <terms-link>Условиями</terms-link> и <privacy-link>Политикой конфиденциальности</privacy-link>."
+    "message": "Скачивая Modrinth App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденциальности</privacy-link>."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Сторонние пакеты"
@@ -42,13 +42,13 @@
     "message": "Windows"
   },
   "app-marketing.features.follow.description": {
-    "message": "Сохраняй контент который вам нравится, и получайте обновления по одному клику."
+    "message": "Сохраняйте понравившийся контент и узнавайте об обновлениях в один клик."
   },
   "app-marketing.features.follow.title": {
     "message": "Отслеживайте проекты"
   },
   "app-marketing.features.importing.description": {
-    "message": "Импортируйте все ваши любимые профили из лаунчера, которыми вы пользовались раньше, и начните работать с Modrinth App за считанные секунды!"
+    "message": "Импортируйте любимые профили из прошлого лаунчера и начните пользоваться Modrinth App за считанные секунды!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -57,7 +57,7 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Импортирование профиля"
+    "message": "Импортирование профилей"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Действия"
@@ -66,13 +66,13 @@
     "message": "от {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "С Modrinth просто управлять всеми вашими модами. Вы можете скачивать, удалять, и обновлять моды всего в один клик."
+    "message": "Modrinth хранит все ваши моды в одном месте. Скачивайте, удаляйте и обновляйте моды в один клик."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Установленные моды"
   },
   "app-marketing.features.mod-management.name": {
-    "message": "Имя"
+    "message": "Название"
   },
   "app-marketing.features.mod-management.search-mods": {
     "message": "Поиск модов"
@@ -84,31 +84,31 @@
     "message": "Версия"
   },
   "app-marketing.features.offline.description": {
-    "message": "Играйте с модами, даже без подключения к интернету."
+    "message": "Играйте с модами даже без подключения к интернету."
   },
   "app-marketing.features.offline.title": {
     "message": "Офлайн-режим"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Лаунчер Modrinth имеет полностью открытый исходный код. Вы можете его просмотреть на нашей странице <github-link>GitHub</github-link>!"
+    "message": "Modrinth App имеет полностью открытый исходный код, доступный на <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
-    "message": "Открытый исходный код"
+    "message": "Открытый код"
   },
   "app-marketing.features.performance.activity-monitor": {
     "message": "Активности"
   },
   "app-marketing.features.performance.cpu-percent": {
-    "message": "% CPU"
+    "message": "% ЦП"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App работает лучше, чем многие ведущие мод менеджеры, используя лишь 150МБ ОЗУ!"
+    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Хорошая производительность"
+    "message": "Производительный"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -126,7 +126,7 @@
     "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
-    "message": "1 Миллиард %"
+    "message": "1 млрд %"
   },
   "app-marketing.features.performance.process-name": {
     "message": "Имя процесса"
@@ -138,43 +138,43 @@
     "message": "Мало"
   },
   "app-marketing.features.performance.title": {
-    "message": "Производительный"
+    "message": "Хорошая производительность"
   },
   "app-marketing.features.play.description": {
-    "message": "Используйте Modrinth App, чтобы скачивать и играть с вашими любимыми модами и сборками."
+    "message": "Скачивайте и играйте в любимые сборки и моды, используя Modrinth App."
   },
   "app-marketing.features.play.title": {
     "message": "Играйте с вашими любимыми модами"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Создавайте, делитесь, и играйте в сборки с более чем тысячами модами и сборками, размещенных на Modrinth."
+    "message": "Создавайте, делитесь и играйте в сборки, используя любую из тысяч модов и сборок на Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Сборка"
   },
   "app-marketing.features.sharing.share-button": {
-    "message": "Делитесь"
+    "message": "Поделиться"
   },
   "app-marketing.features.sharing.title": {
     "message": "Делитесь сборками"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Непохоже ни на один лаунчер,"
+    "message": "Не похож на лаунчеры,"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App объединён с сайтом, так что вы можете получить доступ ко всем вашим любимым проектам из приложения!"
+    "message": "Modrinth App полностью интегрирован с сайтом — открывайте любимые проекты прямо в приложении!"
   },
   "app-marketing.features.website.title": {
     "message": "Интеграция с сайтом"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "что вы использовали раньше"
+    "message": "которые вы пробовали"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Скриншот Modrinth App с открытой сборкой Cobblemon на странице \"Контент\"."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App - это уникальный, с открытым исходным кодом лаунчер, позволяющей вам играть в ваши любимые моды и быстро обновлять их, все в одном аккуратном маленьком пакете."
+    "message": "Modrinth App — уникальный лаунчер с открытым исходным кодом, возможностью играть в любимые моды и быстро обновлять их — всё в одной аккуратной упаковке."
   },
   "app-marketing.hero.download-button": {
     "message": "Скачать Modrinth App"
@@ -204,25 +204,25 @@
     "message": "Авторизация {appName}"
   },
   "auth.authorize.error.no-redirect-url": {
-    "message": "В ответе не обнаружено ни одного места перенаправления"
+    "message": "В ответе не найдена информация для перенаправления"
   },
   "auth.authorize.redirect-url": {
     "message": "Вы будете перенаправлены на <redirect-url>{url}</redirect-url>"
   },
   "auth.reset-password.method-choice.action": {
-    "message": "Отправить письмо для восстановления"
+    "message": "Отправить письмо с инструкциями"
   },
   "auth.reset-password.method-choice.description": {
     "message": "Введите адрес своей электронной почты, чтобы получить ссылку для восстановления доступа к учётной записи."
   },
   "auth.reset-password.method-choice.email-username.label": {
-    "message": "Электронная почта или имя пользователя"
+    "message": "Почта или имя пользователя"
   },
   "auth.reset-password.method-choice.email-username.placeholder": {
     "message": "Электронная почта"
   },
   "auth.reset-password.notification.email-sent.text": {
-    "message": "Электронное письмо с инструкциями было отправлено на вашу электронную почту, если она ранее была привязана к вашему аккаунту."
+    "message": "Письмо с инструкциями отправлено на вашу электронную почту, если вы привязали её к своей учётной записи ранее."
   },
   "auth.reset-password.notification.email-sent.title": {
     "message": "Письмо отправлено"
@@ -237,49 +237,49 @@
     "message": "Сбросить пароль"
   },
   "auth.reset-password.post-challenge.confirm-password.label": {
-    "message": "Подтвердите пароль"
+    "message": "Подтверждение пароля"
   },
   "auth.reset-password.post-challenge.description": {
     "message": "Введите новый пароль ниже, чтобы получить доступ к учётной записи."
   },
   "auth.reset-password.title": {
-    "message": "Сбросить пароль"
+    "message": "Сброс пароля"
   },
   "auth.reset-password.title.long": {
-    "message": "Сбросить пароль"
+    "message": "Сброс пароля"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Для продолжения введите код двухфакторной аутентификации."
+    "message": "Введите код двухфакторной аутентификации."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Введите код двухфакторной аутентификации"
+    "message": "Двухфакторная аутентификация"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Введите код..."
   },
   "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Забыли пароль?</forgot-password-link> • <create-account-link>Создать учетную запись</create-account-link>"
+    "message": "<forgot-password-link>Забыли пароль?</forgot-password-link> • <create-account-link>Создать учётную запись</create-account-link>"
   },
   "auth.sign-in.email-username.label": {
-    "message": "Электронная почта или имя пользователя"
+    "message": "Почта или имя пользователя"
   },
   "auth.sign-in.password.label": {
     "message": "Пароль"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Авторизуйтесь через"
+    "message": "Войдите через"
   },
   "auth.sign-in.title": {
     "message": "Войти"
   },
   "auth.sign-in.use-password": {
-    "message": "Или использовать пароль"
+    "message": "Или используйте пароль"
   },
   "auth.sign-up.action.create-account": {
     "message": "Создать учётную запись"
   },
   "auth.sign-up.confirm-password.label": {
-    "message": "Подтвердите пароль"
+    "message": "Подтверждение пароля"
   },
   "auth.sign-up.email.label": {
     "message": "Электронная почта"
@@ -288,7 +288,7 @@
     "message": "Имя пользователя"
   },
   "auth.sign-up.legal-dislaimer": {
-    "message": "Создавая учётную запись, вы соглашаетесь с нашими <terms-link>условиями</terms-link> и <privacy-policy-link>политикой конфиденциальности</privacy-policy-link>."
+    "message": "Регистрируясь, вы принимаете наши <terms-link>условия</terms-link> и <privacy-policy-link>политику конфиденциальности</privacy-policy-link>."
   },
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Пароли не совпадают!"
@@ -300,13 +300,13 @@
     "message": "Уже зарегистрированы?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Подписаться на рассылку новостей Modrinth"
+    "message": "Получать рассылку новостей о Modrinth"
   },
   "auth.sign-up.title": {
     "message": "Регистрация"
   },
   "auth.sign-up.title.create-account": {
-    "message": "Или создайте учётную запись самостоятельно"
+    "message": "Или создайте учётную запись сами"
   },
   "auth.sign-up.title.sign-up-with": {
     "message": "Зарегистрируйтесь через"
@@ -318,40 +318,40 @@
     "message": "Войти"
   },
   "auth.verify-email.already-verified.description": {
-    "message": "Адрес вашей электронной почты уже подтверждён!"
+    "message": "Ваша электронная почта уже подтверждена!"
   },
   "auth.verify-email.already-verified.title": {
-    "message": "Адрес вашей электронной почты уже подтверждён"
+    "message": "Почта уже подтверждена"
   },
   "auth.verify-email.failed-verification.action": {
     "message": "Отправить письмо ещё раз"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "Мы не смогли проверить вашу электронную почту. Попробуйте повторно отправить письмо для проверки через панель управления, войдя в систему."
+    "message": "Не удалось подтвердить электронную почту. Выполните вход и попробуйте запросить письмо с подтверждением ещё раз через панель управления."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
-    "message": "Не удалось подтвердить электронную почту. Отправить письмо с подтверждением ещё раз нажав кнопку ниже."
+    "message": "Не удалось подтвердить электронную почту. Попробуйте запросить письмо с подтверждением ещё раз при помощи кнопки ниже."
   },
   "auth.verify-email.failed-verification.title": {
-    "message": "Не удалось подтвердить электронную почту"
+    "message": "Подтверждение не удалось"
   },
   "auth.verify-email.post-verification.description": {
-    "message": "Адрес электронной почты успешно подтверждён!"
+    "message": "Электронная почта успешно подтверждена!"
   },
   "auth.verify-email.post-verification.title": {
-    "message": "Подтверждение электронной почты"
+    "message": "Почта подтверждена"
   },
   "auth.verify-email.title": {
-    "message": "Подтвердите электронную почту"
+    "message": "Подтверждение почты"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Подписаться на рассылку новостей Modrinth"
+    "message": "Получать рассылку новостей о Modrinth"
   },
   "auth.welcome.description": {
-    "message": "Теперь вы часть потрясающего сообщества создателей и посетителей, которые уже создают, скачивают, и остаются на слуху с потрясающими модами."
+    "message": "Теперь вы часть потрясающего сообщества авторов и искателей, которые уже создают, скачивают и следят за любимыми модами."
   },
   "auth.welcome.label.tos": {
-    "message": "Создавая учётную запись, вы соглашаетесь с нашими <terms-link>условиями</terms-link> и <privacy-policy-link>политикой конфиденциальности</privacy-policy-link>."
+    "message": "Зарегистрировавшись, вы приняли наши <terms-link>условия</terms-link> и <privacy-policy-link>политику конфиденциальности</privacy-policy-link>."
   },
   "auth.welcome.long-title": {
     "message": "Добро пожаловать на Modrinth!"
@@ -360,10 +360,10 @@
     "message": "Добро пожаловать"
   },
   "collection.button.delete-icon": {
-    "message": "Удалить иконку"
+    "message": "Удалить значок"
   },
   "collection.button.edit-icon": {
-    "message": "Изменить иконку"
+    "message": "Изменить"
   },
   "collection.button.remove-project": {
     "message": "Удалить проект"
@@ -372,16 +372,16 @@
     "message": "Отписаться от проекта"
   },
   "collection.delete-modal.description": {
-    "message": "Коллекция будет удалена навсегда. Это действие невозможно отменить."
+    "message": "Коллекция будет удалена навсегда. Это действие необратимо."
   },
   "collection.delete-modal.title": {
-    "message": "Вы уверены, что хотите удалить эту коллекцию?"
+    "message": "Вы действительно хотите удалить эту коллекцию?"
   },
   "collection.description": {
-    "message": "{description} - Посмотреть коллекцию {name} от {username} на Modrinth"
+    "message": "{description} — Смотрите коллекцию {name} от {username} на Modrinth"
   },
   "collection.description.following": {
-    "message": "Автоматически созданная коллекция всех проектов, за которыми вы следите."
+    "message": "Создана автоматически на основе всех отслеживаемых проектов."
   },
   "collection.error.not-found": {
     "message": "Коллекция не найдена"
@@ -390,49 +390,49 @@
     "message": "Коллекция"
   },
   "collection.label.created-at": {
-    "message": "Создан {ago}"
+    "message": "Создана {ago}"
   },
   "collection.label.curated-by": {
-    "message": "Курирует"
+    "message": "Кураторы"
   },
   "collection.label.no-projects": {
-    "message": "Данная коллекция не содержит никаких проектов!"
+    "message": "В этой коллекции нет проектов!"
   },
   "collection.label.no-projects-auth": {
-    "message": "У вас нет проектов в коллекции.\nХотели бы вы <create-link>добавить их</create-link>?"
+    "message": "У вас нет проектов.\nХотите <create-link>добавить их</create-link>?"
   },
   "collection.label.owner": {
     "message": "Владелец"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> проект} other {<stat>{count}</stat> проекта(-ов)}}"
+    "message": "{count, plural, one {<stat>{count}</stat> проект} few {<stat>{count}</stat> проекта} many {<stat>{count}</stat> проектов} other {<stat>{count}</stat> проекта}}"
   },
   "collection.label.updated-at": {
-    "message": "Обновлён {ago}"
+    "message": "Обновлена {ago}"
   },
   "collection.title": {
     "message": "{name} - Коллекция"
   },
   "dashboard.collections.button.create-new": {
-    "message": "Создать новую"
+    "message": "Создать"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} проект} other {{count} проекта (-ов)}}"
+    "message": "{count, plural, one {{count} проект} few {{count} проекта} many {{count} проектов} other {{count} проекта}}"
   },
   "dashboard.collections.label.search-input": {
-    "message": "Поиск по коллекциям"
+    "message": "Поиск коллекций"
   },
   "dashboard.collections.long-title": {
     "message": "Ваши коллекции"
   },
   "error.collection.404.list_item.1": {
-    "message": "Возможно, вы неправильно указали ссылку на коллекцию."
+    "message": "URL-адрес коллекции мог быть введён неправильно."
   },
   "error.collection.404.list_item.2": {
-    "message": "Коллекция возможно является приватной."
+    "message": "Коллекция может быть приватной."
   },
   "error.collection.404.list_item.3": {
-    "message": "Данная коллекция могла быть удалена модерации команды Modrinth за нарушение наших <tou-link>Правил Использования</tou-link>."
+    "message": "Коллекция могла быть удалена командой модерации Modrinth за нарушение <tou-link>условий использования</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "Почему?"
@@ -447,13 +447,13 @@
     "message": "Страница не найдена"
   },
   "error.generic.default.list_item.1": {
-    "message": "Проверьте, работает ли Modrinth на нашей <status-link>Странице статуса</status-link>."
+    "message": "Проверьте, работает ли Modrinth, на нашей <status-link>странице статуса</status-link>."
   },
   "error.generic.default.list_item.2": {
-    "message": "Если это повторяется, вам стоит уведомить об этом Modrinth Team присоединившись на наш <discord-link>Discord сервер</discord-link>."
+    "message": "Если ошибка не исчезнет, вы можете уведомить о ней Modrinth Team в нашем <discord-link>сервере Discord</discord-link>."
   },
   "error.generic.default.list_title": {
-    "message": "Пожалуйста, попробуйте снова через несколько минут."
+    "message": "Повторите попытку через несколько минут."
   },
   "error.generic.default.subtitle": {
     "message": "Что-то пошло не так."
@@ -465,10 +465,10 @@
     "message": "Возможно, вы неправильно указали URL ссылку на организацию."
   },
   "error.organization.404.list_item.2": {
-    "message": "Владелец организации возможно изменил ссылку, либо вовсе удалил её."
+    "message": "Владелец организации мог изменить URL-адрес или удалить её."
   },
   "error.organization.404.list_item.3": {
-    "message": "Данная организация могла быть удалена командой модераторов Modrinth за нарушение наших <tou-link>Правил Использования</tou-link>."
+    "message": "Организация могла быть удалена командой модерации Modrinth за нарушение <tou-link>условий использования</tou-link>."
   },
   "error.organization.404.list_title": {
     "message": "Почему?"
@@ -477,28 +477,28 @@
     "message": "Организация не найдена"
   },
   "error.project.404.list_item.1": {
-    "message": "Возможно, вы неправильно ввели URL-адрес проекта."
+    "message": "URL-адрес проекта мог быть введён неправильно."
   },
   "error.project.404.list_item.2": {
     "message": "Владелец проекта мог изменить URL-адрес, сделать проект приватным или удалить его."
   },
   "error.project.404.list_item.3": {
-    "message": "Возможно, проект был удалён командой модераторов Modrinth за нарушение наших <tou-link>Условий использования</tou-link>."
+    "message": "Проект мог быть удалён командой модерации Modrinth за нарушение <tou-link>условий использования</tou-link>."
   },
   "error.project.404.list_title": {
     "message": "Почему?"
   },
   "error.project.404.title": {
-    "message": "Проект не был найден"
+    "message": "Проект не найден"
   },
   "error.user.404.list_item.1": {
-    "message": "Возможно, вы неправильно ввели имя пользователя."
+    "message": "Имя пользователя могло быть введено неправильно."
   },
   "error.user.404.list_item.2": {
-    "message": "Возможно, пользователь сменил имя пользователя или удалил свою учётную запись."
+    "message": "Пользователь мог сменить имя или удалить учётную запись."
   },
   "error.user.404.list_item.3": {
-    "message": "Учётная запись пользователя могла быть заблокирована за нарушение <tou-link>Условий использования Modrinth</tou-link>."
+    "message": "Учётная запись пользователя могла быть заблокирована за нарушение <tou-link>условий использования</tou-link>."
   },
   "error.user.404.list_title": {
     "message": "Почему?"
@@ -516,73 +516,73 @@
     "message": "Кроме вас жабнули ещё {count, plural, one {{count} человека} other {{count} человек}}!"
   },
   "frog.sinceOpened": {
-    "message": "Данная страница была открыта {ago}"
+    "message": "Станица открыта {ago}"
   },
   "frog.title": {
     "message": "Жаба"
   },
   "landing.button.discover-mods": {
-    "message": "Изучить моды"
+    "message": "Найти моды"
   },
   "landing.button.go-to-dashboard": {
     "message": "Перейти в панель управления"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Получить лучший моддинг который возможен с постоянными обновлениями от команды Modrinth"
+    "message": "Получайте лучший опыт моддинга с постоянными обновлениями от команды Modrinth"
   },
   "landing.creator.feature.constantly-evolving.title": {
-    "message": "Постоянно развивается"
+    "message": "Постоянное развитие"
   },
   "landing.creator.feature.data-statistics.description": {
-    "message": "Получить подробные отчеты о просмотрах, загрузок и доходе"
+    "message": "Получайте детальные отчёты о просмотрах, скачиваниях и доходах"
   },
   "landing.creator.feature.data-statistics.title": {
     "message": "Данные и статистика"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Представьте свой проект тысячам пользователей через поиск, нашу главную страницу, Discord-сервер и другие возможности, которые появятся в будущем!"
+    "message": "Получайте внимание тысяч пользователей через поиск, главную страницу, сервер Discord и другие способы, которые появятся в будущем!"
   },
   "landing.creator.feature.discovery.title": {
-    "message": "Продвижение"
+    "message": "Заметность"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Настройте автоматическую загрузку новых версий в ваши инструменты сборки через Minotaur"
+    "message": "Подключайте инструменты сборки через Minotaur и публикуйте новые версии автоматически"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Разнообразная экосистема"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Получайте деньги за доходы с рекламы на странице вашего проекта, и выводите их в любое время"
+    "message": "Получайте доход от рекламы на страницах проектов и выводите средства в любое время"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Монетизация"
   },
   "landing.creator.feature.team-management.description": {
-    "message": "Приглашайте других участников и управляйте ролями и разрешениями с легкостью"
+    "message": "Приглашайте участников и управляйте ролями и разрешениями с лёгкостью"
   },
   "landing.creator.feature.team-management.title": {
     "message": "Управление командой"
   },
   "landing.error.failedToLoadRandomProjects": {
-    "message": "Не удалось загрузить случайный проект :("
+    "message": "Не удалось загрузить случайные проекты :("
   },
   "landing.feature.follow.description": {
-    "message": "Узнавайте когда ваши отслеживаемые проекты получают обновление"
+    "message": "Узнавайте о каждом обновлении и оставайтесь на связи с любимыми проектами"
   },
   "landing.feature.follow.heading": {
-    "message": "Отслеживайте проекты"
+    "message": "Следите за тем, что нравится"
   },
   "landing.feature.launcher.description": {
-    "message": "Открытое API Modrinth позволяет лаунчерам реализовать глубокую интеграцию с платформой. Вы можете пользоваться Modrinth через <link>наше собственное приложение</link> и через некоторых из самых популярных лаунчеров такие, как ATLauncher, MultiMC и Prism Launcher."
+    "message": "Наш открытый API позволяет глубже интегрироваться с Modrinth — используйте <link>наше приложение</link> или сторонние лаунчеры наподобие ATLauncher, MultiMC и Prism Launcher."
   },
   "landing.feature.launcher.heading": {
-    "message": "Играйте с вашим любимым лаунчером"
+    "message": "Играйте через свой лаунчер"
   },
   "landing.feature.search.description": {
-    "message": "Мгновенный поиск и мощные фильтры Modrinth позволяют находить нужное прямо во время ввода."
+    "message": "Мгновенный поиск и мощные фильтры Modrinth позволяют находить контент уже во время ввода."
   },
   "landing.feature.search.heading": {
-    "message": "Найдите то что нужно, быстро и легко"
+    "message": "Ищите нужное быстро и легко"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "Место для Minecraft {content}"
@@ -600,7 +600,7 @@
     "message": "плагинов"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "набор ресурсов"
+    "message": "наборов ресурсов"
   },
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "серверов"
@@ -612,7 +612,7 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "Упрощенное изображение окна Minecraft, с логотипом Mojang Studios в зелёном цвете Modrinth."
+    "message": "Упрощённое изображение окна Minecraft с логотипом Mojang Studios в зелёном цвете Modrinth."
   },
   "landing.launcher.modrinth-app-label": {
     "message": "Modrinth App"
@@ -621,7 +621,7 @@
     "message": "Prism Launcher"
   },
   "landing.notifications.has-been-updated": {
-    "message": "{title} получил обновление!"
+    "message": "{title} обновлён!"
   },
   "landing.notifications.heading": {
     "message": "Уведомления"
@@ -630,37 +630,37 @@
     "message": "Получено {time}"
   },
   "landing.notifications.version-released": {
-    "message": "Версия {version} была выпущена для {gameVersion}"
+    "message": "Выпущена версия {version} для {gameVersion}"
   },
   "landing.search.label": {
     "message": "Поиск"
   },
   "landing.search.placeholder": {
-    "message": "Искать..."
+    "message": "Поиск..."
   },
   "landing.search.sort-by.label": {
     "message": "Сортировать по"
   },
   "landing.section.for-creators.description": {
-    "message": "Найдите дом своим творениям и охватывайте аудиторию преданных игроков"
+    "message": "Разместите свои творения и найдите новых поклонников среди огромного сообщества игроков"
   },
   "landing.section.for-creators.label": {
-    "message": "Для создателей"
+    "message": "Для авторов"
   },
   "landing.section.for-creators.tagline": {
-    "message": "Делитесь своим творением с миром"
+    "message": "Делитесь творениями с миром"
   },
   "landing.section.for-players.description": {
-    "message": "От магических биомов до проклятых данжей, вы точно найдёте контент, который выведет ваш геймплей на новый уровень."
+    "message": "От магических биомов до проклятых подземелий — найдите контент, который выведет игру на новый уровень."
   },
   "landing.section.for-players.label": {
     "message": "Для игроков"
   },
   "landing.section.for-players.tagline": {
-    "message": "Исследуйте около {count} созданий"
+    "message": "Более {count} творений"
   },
   "landing.subheading": {
-    "message": "Исследуйте, играйте, и делитесь контентом через нашу платформу с открытым исходным кодом, сделанной для сообщества."
+    "message": "Находите, играйте и делитесь творениями для Minecraft на платформе с открытым кодом, созданной для сообщества."
   },
   "layout.action.change-theme": {
     "message": "Изменить тему"
@@ -675,37 +675,37 @@
     "message": "Требуются действия с учётной записью"
   },
   "layout.banner.add-email.button": {
-    "message": "Посетите настройки аккаунта"
+    "message": "Открыть настройки безопасности"
   },
   "layout.banner.add-email.description": {
-    "message": "В целях безопасности Modrinth просит вас зарегистрировать адрес электронной почты для вашей учётной записи."
+    "message": "В целях безопасности Modrinth просит вас привязать электронный адрес к учётной записи."
   },
   "layout.banner.build-fail.description": {
-    "message": "При развертывании frontend'а Modrinth не удалось создать данные о состоянии из API. Это может быть связано с перебоями в работе или ошибкой в конфигурации. Пересоздайте систему, когда API будет доступен. Коды ошибок: {errors}; Текущий URL API: {url}"
+    "message": "При развёртывании фронтенда Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Повторите сборку, когда API будет доступен. Коды ошибок: {errors}; Текущий URL-адрес API: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "Ошибка генерации состояния от API во время сборки."
   },
   "layout.banner.staging.description": {
-    "message": "Планировочная среда - это отдельная от основной база данных Modrinth. Она используется для тестирования и поиска ошибок и может быть использована для запуска тестовых версий backend и frontend Modrinth, более новых чем в основном профиле."
+    "message": "Тестовая среда полностью отделена от основной базы данных Modrinth и нужна для тестирования и отладки. Фронтенд и бэкенд здесь могут быть новее, чем на основном сайте."
   },
   "layout.banner.staging.title": {
-    "message": "Вы находитесь в среде планирования Modrinth"
+    "message": "Вы находитесь в тестовой среде Modrinth"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "Обновить платёжные данные"
   },
   "layout.banner.subscription-payment-failed.description": {
-    "message": "Одна или более подписок не были продлены. Обновите платежные данные, чтобы не потерять доступ!"
+    "message": "Не удалось продлить одну или несколько подписок. Обновите способ оплаты, чтобы не потерять доступ!"
   },
   "layout.banner.subscription-payment-failed.title": {
-    "message": "Требуются действия с платёжной информацией."
+    "message": "Требуются действия с платёжными данными."
   },
   "layout.banner.verify-email.action": {
-    "message": "Повторно отправить подтверждающее письмо"
+    "message": "Повторно отправить письмо"
   },
   "layout.banner.verify-email.description": {
-    "message": "В целях безопасности, Modrinth требует подтвердить адрес электронной почты, привязанный к вашему аккаунту."
+    "message": "В целях безопасности Modrinth просит вас подтвердить электронный адрес, привязанный к учётной записи."
   },
   "layout.footer.about": {
     "message": "О проекте"
@@ -729,10 +729,10 @@
     "message": "Правовой материал"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "НЕ ЯВЛЯЕТСЯ ОФИЦИАЛЬНЫМ СЕРВИСОМ MINECRAFT. НЕ ОДОБРЕН И НЕ СВЯЗАН С КОМПАНИЯМИ MOJANG ИЛИ MICROSOFT."
+    "message": "НЕ ЯВЛЯЕТСЯ ОФИЦИАЛЬНЫМ СЕРВИСОМ MINECRAFT. НЕ ОДОБРЕНО И НЕ СВЯЗАНО С КОМПАНИЕЙ MOJANG ИЛИ MICROSOFT."
   },
   "layout.footer.legal.copyright-policy": {
-    "message": "Политика авторских прав и DMCA"
+    "message": "Защита авторских прав и DMCA"
   },
   "layout.footer.legal.privacy-policy": {
     "message": "Политика конфиденциальности"
@@ -741,13 +741,13 @@
     "message": "Правила контента"
   },
   "layout.footer.legal.security-notice": {
-    "message": "Уведомление о безопасности"
+    "message": "Уведомление об уязвимости"
   },
   "layout.footer.legal.terms-of-use": {
     "message": "Условия использования"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth — это проект с <github-link> открытым исходным кодом </github-link>."
+    "message": "Modrinth с <github-link>открытым кодом</github-link>."
   },
   "layout.footer.products": {
     "message": "Продукты"
@@ -792,13 +792,13 @@
     "message": "X"
   },
   "layout.menu-toggle.action": {
-    "message": "Переключить меню"
+    "message": "Меню"
   },
   "layout.meta.description": {
-    "message": "Загружайте моды, плагины, наборы данных, шейдеры, наборы ресурсов и сборки модов для Minecraft на Modrinth. Открывайте для себя и публикуйте проекты на Modrinth с помощью современного, удобного интерфейса и API."
+    "message": "Скачивайте моды, плагины, наборы данных, шейдеры, наборы ресурсов и сборки для Minecraft на Modrinth. Ищите и публикуйте проекты на Modrinth, используя удобный современный интерфейс и API."
   },
   "layout.meta.og-description": {
-    "message": "Открывайте для себя и публикуйте контент Minecraft!"
+    "message": "Ищите и публикуйте проекты для Minecraft!"
   },
   "layout.nav.home": {
     "message": "Главная"
@@ -816,10 +816,10 @@
     "message": "Проекты"
   },
   "moderation.page.reports": {
-    "message": "Репорты"
+    "message": "Жалобы"
   },
   "moderation.page.technicalReview": {
-    "message": "Технический обзор"
+    "message": "Техническая проверка"
   },
   "moderation.search.placeholder": {
     "message": "Поиск..."
@@ -828,58 +828,58 @@
     "message": "Сортировать по"
   },
   "moderation.technical.search.placeholder": {
-    "message": "Искать технические обзоры..."
+    "message": "Поиск техпроверок..."
   },
   "profile.button.billing": {
-    "message": "Изменить платёжную информацию пользователя"
+    "message": "Управление платежами"
   },
   "profile.button.info": {
-    "message": "Посмотреть данные пользователя"
+    "message": "Посмотреть подробности"
   },
   "profile.button.manage-projects": {
-    "message": "Управлять проектами"
+    "message": "Управление проектами"
   },
   "profile.error.not-found": {
     "message": "Пользователь не найден"
   },
   "profile.joined-at": {
-    "message": "Присоединился <date>{ago}</date>"
+    "message": "Регистрация: <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Значки"
   },
   "profile.label.details": {
-    "message": "Детали"
+    "message": "Подробности"
   },
   "profile.label.no-collections": {
-    "message": "Данный пользователь не имеет коллекций!"
+    "message": "У этого пользователя нет коллекций!"
   },
   "profile.label.no-collections-auth": {
     "message": "У вас ещё нет коллекций.\nХотите <create-link>создать новую</create-link>?"
   },
   "profile.label.no-projects": {
-    "message": "Данный пользователь не имеет проектов!"
+    "message": "У этого пользователя нет проектов!"
   },
   "profile.label.no-projects-auth": {
-    "message": "У вас нет никаких проектов.\nХотели бы вы <create-link>создать новый</create-link>?"
+    "message": "У вас ещё нет проектов.\nХотите <create-link>создать новый</create-link>?"
   },
   "profile.label.organizations": {
     "message": "Организации"
   },
   "profile.meta.description": {
-    "message": "Скачать проект от {username} на Modrinth"
+    "message": "Скачивайте проекты {username} на Modrinth"
   },
   "profile.meta.description-with-bio": {
-    "message": "{bio} — Скачать проекты от {username} на Modrinth"
+    "message": "{bio} — Скачивайте проекты {username} на Modrinth"
   },
   "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> скачивание} other {<stat>{count}</stat> скачиваний(-ия)}}"
+    "message": "{count, plural, one {<stat>{count}</stat> скачивание} few {<stat>{count}</stat> скачивания} many {<stat>{count}</stat> скачиваний} other {<stat>{count}</stat> скачивания}} у проектов"
   },
   "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> проект} other {<stat>{count}</stat> проекта(-ов)}}"
+    "message": "{count, plural, one {<stat>{count}</stat> проект} few {<stat>{count}</stat> проекта} many {<stat>{count}</stat> проектов} other {<stat>{count}</stat> проекта}}"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> подписчик} other {<stat>{count}</stat> подписчика(-ов)}}"
+    "message": "{count, plural, one {<stat>{count}</stat> подписчик} few {<stat>{count}</stat> подписчика} many {<stat>{count}</stat> подписчиков} other {<stat>{count}</stat> подписчика}} у проектов"
   },
   "profile.user-id": {
     "message": "ID пользователя: {id}"
@@ -906,7 +906,7 @@
     "message": "Приглашение присоединиться к проекту"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Вас пригласили стать участником этого проекта как '{role}'."
+    "message": "Вас пригласили стать участником этого проекта как \"{role}\"."
   },
   "project-member-header.success": {
     "message": "Успех"
@@ -993,7 +993,7 @@
     "message": "Шейдеры"
   },
   "project-type.shader.singular": {
-    "message": "Шейдеры"
+    "message": "Шейдер"
   },
   "project.about.details.created": {
     "message": "Создан {date}"
@@ -1053,7 +1053,7 @@
     "message": "Версия игры: {version}"
   },
   "project.download.game-version-error": {
-    "message": "Ошибка: никаких версий не найдено"
+    "message": "Ошибка: версии игры не найдены"
   },
   "project.download.game-version-tooltip": {
     "message": "{title} доступен только для {version}"
@@ -1062,19 +1062,19 @@
     "message": "{title} не поддерживает {gameVersion} для {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Скачать с Modrinth App"
+    "message": "Скачать через Modrinth App"
   },
   "project.download.no-app": {
     "message": "У вас нет Modrinth App?"
   },
   "project.download.no-versions-available": {
-    "message": "Нет версий доступных для {gameVersion} и {platform}."
+    "message": "Нет версий, доступных для {gameVersion} и {platform}."
   },
   "project.download.platform": {
     "message": "Платформа: {platform}"
   },
   "project.download.platform-error": {
-    "message": "Ошибка: никаких платформ не найдено"
+    "message": "Ошибка: платформы не найдены"
   },
   "project.download.platform-tooltip": {
     "message": "{title} доступен только для {platform}"
@@ -1083,22 +1083,22 @@
     "message": "{title} не поддерживает {platform} для {gameVersion}"
   },
   "project.download.search-game-versions": {
-    "message": "Найдите версию..."
+    "message": "Поиск версий игры..."
   },
   "project.download.search-game-versions-label": {
     "message": "Поиск версий игры..."
   },
   "project.download.select-game-version": {
-    "message": "Выберите версию игры"
+    "message": "Выбрать версию игры"
   },
   "project.download.select-platform": {
-    "message": "Выберите платформу"
+    "message": "Выбрать платформу"
   },
   "project.download.show-all-versions": {
-    "message": "Показать все версии"
+    "message": "Показывать все версии"
   },
   "project.download.title": {
-    "message": "Скачать {title}"
+    "message": "Скачивание {title}"
   },
   "project.environment.migration-no-permission.message": {
     "message": "Мы обновили систему Сред на Modrinth, и теперь доступны новые варианты настроек. У вас нет прав на изменение этих настроек, но, пожалуйста, сообщите другому участнику проекта, что необходимо проверить метаданные сред."
@@ -1239,7 +1239,7 @@
     "message": "Посетите панель управления проектами"
   },
   "project.stats.downloads-label": {
-    "message": "скачиван{count, plural, one {ие} other {ий}}"
+    "message": "скачиван{count, plural, one {ие} few {ия} many {ий} other {ия}}"
   },
   "project.stats.followers-label": {
     "message": "подписчик{count, plural, one {} other {а(-ов)}}"
@@ -1278,7 +1278,7 @@
     "message": "Не удалось найти {item}"
   },
   "report.for.violation": {
-    "message": "Нарушение <rules-link>Правил</rules-link> или <terms-link>Условий использования</terms-link> Modrinth"
+    "message": "Нарушение наших <rules-link>правил</rules-link> или <terms-link>условий использования</terms-link>"
   },
   "report.for.violation.description": {
     "message": "Примеры включают в себя опасные, спам, оскорбительный, обманчивый, заблуждающий и нелегальный контент."
@@ -1683,13 +1683,13 @@
     "message": "Нет оповещений"
   },
   "servers.plan.large.description": {
-    "message": "Идеально для 15–25 игроков, сборок, либо требовательных модов."
+    "message": "Подходит для 15–25 игроков, сборок, либо требовательных модов."
   },
   "servers.plan.large.name": {
     "message": "Максимальный"
   },
   "servers.plan.medium.description": {
-    "message": "Отлично для 6–15 игроков и нескольких модов."
+    "message": "Подходит для 6–15 игроков и нескольких модов."
   },
   "servers.plan.medium.name": {
     "message": "Стандартный"
@@ -1909,6 +1909,9 @@
   },
   "settings.language.languages.search.no-results": {
     "message": "Ни один язык не соответствует вашему запросу."
+  },
+  "settings.language.warning": {
+    "message": "Часть контента может отображаться на английском языке, если перевод для данного фрагмента ещё не доступен. Мы всё ещё работаем над улучшением системы локализаций, поэтому иногда контент может казаться \"поломанным\"."
   },
   "settings.pats.action.create": {
     "message": "Создать PAT"

@@ -1910,6 +1910,9 @@
   "settings.language.languages.search.no-results": {
     "message": "Keine Sprache entspricht deiner Suche."
   },
+  "settings.language.warning": {
+    "message": "Das ändern der Sprache kann dafür sorgen, dass einige Inhalte in Englisch sind, sollte keine Übersetzung verfügbar sein. Die Seite ist noch nicht vollständig übersetzt. Darum können einige Inhalte für bestimmte Sprachen in Englisch erscheinen. Wir arbeiten stetig daran, unser Übersetzungssystem zu verbessern, darum können einige Inhalte unvollständig erscheinen."
+  },
   "settings.pats.action.create": {
     "message": "Erstelle einen PAT"
   },

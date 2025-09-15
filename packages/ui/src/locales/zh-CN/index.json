@@ -1,4 +1,7 @@
 {
+  "badge.beta": {
+    "defaultMessage": "测试版"
+  },
   "badge.beta-release": {
     "defaultMessage": "Beta 版本"
   },
@@ -420,7 +423,7 @@
     "defaultMessage": "赞助"
   },
   "project.about.links.donate.github": {
-    "defaultMessage": "Github 赞助"
+    "defaultMessage": "GitHub Sponsors 捐款"
   },
   "project.about.links.donate.kofi": {
     "defaultMessage": "Ko-fi 捐款"
@@ -522,7 +525,7 @@
     "defaultMessage": "你没有权限编辑这个。"
   },
   "project.settings.notice.no-permission.title": {
-    "defaultMessage": "没有取消"
+    "defaultMessage": "没有权限"
   },
   "project.settings.tags.title": {
     "defaultMessage": "标签"

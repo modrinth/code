@@ -1,4 +1,10 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Terbitan Beta"
+  },
   "badge.new": {
     "defaultMessage": "Baharu"
   },
@@ -76,6 +82,9 @@
   },
   "button.sign-out": {
     "defaultMessage": "Daftar keluar"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Daftar"
   },
   "button.stop": {
     "defaultMessage": "Berhenti"
@@ -711,7 +720,10 @@
     "defaultMessage": "Di manakah anda mahu pelayan anda ditempatkan?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Rantau tidak disenaraikan? <link>Beritahu kami di mana anda ingin melihat Pelayan Modrinth seterusnya!</link>"
+    "defaultMessage": "Rantau tidak disenaraikan? <link>Beritahu kami di mana anda ingin melihat Modrinth Servers seterusnya!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Asia Tenggara"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Eropah Barat"
