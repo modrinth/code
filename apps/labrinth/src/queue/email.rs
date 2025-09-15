@@ -150,7 +150,7 @@ impl EmailQueue {
 
         let mut deliveries = DBNotificationDelivery::lock_channel_processable(
             NotificationChannel::Email,
-            5,
+            50,
             &self.pg,
         )
         .await?;
