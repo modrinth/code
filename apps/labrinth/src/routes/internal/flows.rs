@@ -1444,7 +1444,12 @@ pub async fn create_account_with_password(
     .await?;
 
     email
-        .send_one(NotificationBody::VerifyEmail { flow }, user_id, mailbox)
+        .send_one(
+            &mut transaction,
+            NotificationBody::VerifyEmail { flow },
+            user_id,
+            mailbox,
+        )
         .await?
         .as_user_error()?;
 
@@ -2234,6 +2239,7 @@ pub async fn set_email(
 
     email
         .send_one(
+            &mut transaction,
             NotificationBody::VerifyEmail { flow },
             user.id.into(),
             mailbox,
@@ -2288,14 +2294,19 @@ pub async fn resend_verify_email(
             ApiError::InvalidInput("Invalid email address!".to_string())
         })?;
 
+        let mut transaction = pool.begin().await?;
+
         email
             .send_one(
+                &mut transaction,
                 NotificationBody::VerifyEmail { flow },
                 user.id.into(),
                 mailbox,
             )
             .await?
             .as_user_error()?;
+
+        transaction.commit().await?;
 
         Ok(HttpResponse::NoContent().finish())
     } else {

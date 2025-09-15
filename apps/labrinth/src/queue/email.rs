@@ -147,12 +147,11 @@ impl EmailQueue {
         let transport = self.mailer.lock().await.to_transport().await?;
 
         let begin = std::time::Instant::now();
-        let mut txn = self.pg.begin().await?;
 
         let mut deliveries = DBNotificationDelivery::lock_channel_processable(
             NotificationChannel::Email,
             5,
-            &mut *txn,
+            &self.pg,
         )
         .await?;
 
@@ -166,7 +165,7 @@ impl EmailQueue {
         // ballooning the error rate.
         for d in deliveries.iter_mut().filter(|d| d.attempt_count >= 3) {
             d.status = NotificationDeliveryStatus::PermanentlyFailed;
-            d.update(&mut *txn).await?;
+            d.update(&self.pg).await?;
         }
 
         // We hold a FOR UPDATE lock on the rows here, so no other workers are accessing them
@@ -178,7 +177,7 @@ impl EmailQueue {
             .map(|d| d.notification_id)
             .collect::<Vec<_>>();
         let notifications =
-            DBNotification::get_many(&notification_ids, &mut *txn).await?;
+            DBNotification::get_many(&notification_ids, &self.pg).await?;
 
         // For all notifications we collected, fill out the template
         // and send it via SMTP in parallel.
@@ -190,9 +189,14 @@ impl EmailQueue {
             let transport = Arc::clone(&transport);
 
             futures.push(async move {
-                let maybe_user =
-                    DBUser::get_id(notification.user_id, &this.pg, &this.redis)
-                        .await?;
+                let mut txn = this.pg.begin().await?;
+
+                let maybe_user = DBUser::get_id(
+                    notification.user_id,
+                    &mut *txn,
+                    &this.redis,
+                )
+                .await?;
 
                 let mailbox = match maybe_user
                     .and_then(|user| user.email)
@@ -208,6 +212,7 @@ impl EmailQueue {
                 };
 
                 this.send_one_with_transport(
+                    &mut txn,
                     transport,
                     notification.body,
                     notification.user_id,
@@ -237,7 +242,7 @@ impl EmailQueue {
                             .unwrap_or_default();
 
                         delivery.attempt_count += 1;
-                        delivery.update(&mut *txn).await?;
+                        delivery.update(&self.pg).await?;
                     }
                 }
 
@@ -247,15 +252,13 @@ impl EmailQueue {
 
         for mut delivery in deliveries {
             // For these, there was an error building the email, like a
-            // database error. Retry them after 30 seconds.
+            // database error. Retry them after a delay.
 
             delivery.next_attempt = Utc::now()
                 + chrono::Duration::seconds(EMAIL_RETRY_DELAY_SECONDS);
 
-            delivery.update(&mut *txn).await?;
+            delivery.update(&self.pg).await?;
         }
-
-        txn.commit().await?;
 
         info!(
             "Processed {} email deliveries in {}ms",
@@ -268,17 +271,25 @@ impl EmailQueue {
 
     pub async fn send_one(
         &self,
+        txn: &mut sqlx::PgTransaction<'_>,
         notification: NotificationBody,
         user_id: DBUserId,
         address: Mailbox,
     ) -> Result<NotificationDeliveryStatus, ApiError> {
         let transport = self.mailer.lock().await.to_transport().await?;
-        self.send_one_with_transport(transport, notification, user_id, address)
-            .await
+        self.send_one_with_transport(
+            txn,
+            transport,
+            notification,
+            user_id,
+            address,
+        )
+        .await
     }
 
     async fn send_one_with_transport(
         &self,
+        txn: &mut sqlx::PgTransaction<'_>,
         transport: Arc<AsyncSmtpTransport<Tokio1Executor>>,
         notification: NotificationBody,
         user_id: DBUserId,
@@ -289,7 +300,7 @@ impl EmailQueue {
 
         let Some(template) = NotificationTemplate::list_channel(
             NotificationChannel::Email,
-            &self.pg,
+            &mut **txn,
             &self.redis,
         )
         .await?
@@ -299,7 +310,7 @@ impl EmailQueue {
         };
 
         let message = templates::build_email(
-            &self.pg,
+            &mut **txn,
             &self.redis,
             &self.client,
             user_id,
