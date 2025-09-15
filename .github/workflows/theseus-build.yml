@@ -1,8 +1,6 @@
 name: Modrinth App build
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
     paths:
@@ -60,6 +58,22 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
+      - name: Generate tauri-dev.conf.json
+        run: |
+          GIT_HASH=$(git rev-parse --short HEAD)
+          cat > tauri-dev.conf.json <<EOF
+          {
+            "productName": "Modrinth App (dev)",
+            "mainBinaryName": "Modrinth App (dev build "
+            "bundle": {
+              "fileAssociations": []
+            }
+          }
+          EOF
+          jq --arg hash "$GIT_HASH" \
+            '.mainBinaryName = (.mainBinaryName + $hash + ")")' \
+          tauri-dev.conf.json > tauri.tmp && mv tauri.tmp tauri-dev.conf.json
+
       - name: 🧰 Install Linux build dependencies
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
@@ -103,7 +117,7 @@ jobs:
           fi
 
       - name: 🔨 Build macOS app
-        run: pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json
+        run: ${{ github.ref == 'refs/heads/main' && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json' }}
         if: startsWith(matrix.platform, 'macos')
         env:
           ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
