@@ -41,8 +41,7 @@ pub struct EmailQueue {
     client: reqwest::Client,
     redis: RedisPool,
     mailer: Option<Arc<AsyncSmtpTransport<Tokio1Executor>>>,
-    from_name: String,
-    from_address: String,
+    identity: templates::MailingIdentity,
 }
 
 impl EmailQueue {
@@ -52,15 +51,11 @@ impl EmailQueue {
     ///
     /// Panics if a TLS backend cannot be initialized by [`reqwest::ClientBuilder`].
     pub fn init(pg: PgPool, redis: RedisPool) -> Result<Self, MailError> {
-        let from_name = dotenvy::var("SMTP_FROM_NAME")?;
-        let from_address = dotenvy::var("SMTP_FROM_ADDRESS")?;
-
         Ok(Self {
             pg,
             redis,
             mailer: None,
-            from_name,
-            from_address,
+            identity: templates::MailingIdentity::from_env()?,
             client: Client::builder()
                 .user_agent("Modrinth")
                 .build()
@@ -117,7 +112,7 @@ impl EmailQueue {
 
     #[instrument(name = "EmailQueue::index", skip_all)]
     pub async fn index(mut self) {
-        let (mailer, pg, redis, client, from_name, from_address) = {
+        let (mailer, pg, redis, client, identity) = {
             if self.mailer.is_none() {
                 let _ = self.try_init_mailer().await;
             }
@@ -127,25 +122,18 @@ impl EmailQueue {
                 pg,
                 redis,
                 client,
-                from_name,
-                from_address,
+                identity,
             } = self
             {
-                (mailer, pg, redis, client, from_name, from_address)
+                (mailer, pg, redis, client, identity)
             } else {
                 return;
             }
         };
 
-        let result = poll_queue(
-            Arc::clone(&mailer),
-            &pg,
-            &redis,
-            &client,
-            from_name.clone(),
-            from_address.clone(),
-        )
-        .await;
+        let result =
+            poll_queue(Arc::clone(&mailer), &pg, &redis, &client, identity)
+                .await;
 
         if let Err(error) = result {
             error!(%error, "Database error in email queue");
@@ -158,8 +146,7 @@ async fn poll_queue(
     pg: &PgPool,
     redis: &RedisPool,
     client: &Client,
-    from_name: String,
-    from_address: String,
+    identity: templates::MailingIdentity,
 ) -> Result<(), DatabaseError> {
     let mut txn = pg.begin().await?;
 
@@ -210,8 +197,7 @@ async fn poll_queue(
         let redis = redis.clone();
         let pg = pg.clone();
         let client = client.clone();
-        let from_name = from_name.clone();
-        let from_address = from_address.clone();
+        let identity = identity.clone();
         let mailer = Arc::clone(&mailer);
 
         let maybe_template = templates
@@ -244,8 +230,7 @@ async fn poll_queue(
                 &client,
                 &notification,
                 &template,
-                from_name,
-                from_address,
+                identity,
             )
             .await?;
 
