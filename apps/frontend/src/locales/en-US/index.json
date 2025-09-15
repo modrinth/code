@@ -911,6 +911,9 @@
   "layout.footer.about.status": {
     "message": "Status"
   },
+  "layout.footer.copyright": {
+    "message": "© {year} Rinth, Inc."
+  },
   "layout.footer.legal": {
     "message": "Legal"
   },
@@ -989,6 +992,15 @@
   "layout.meta.og-description": {
     "message": "Discover and publish Minecraft content!"
   },
+  "layout.mobile.close-menu": {
+    "message": "Close menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Open menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Active reports"
+  },
   "layout.nav.analytics": {
     "message": "Analytics"
   },
@@ -1015,6 +1027,9 @@
   },
   "layout.nav.modrinth-home-page": {
     "message": "Modrinth home page"
+  },
+  "layout.nav.my-servers": {
+    "message": "My servers"
   },
   "layout.nav.organizations": {
     "message": "Organizations"
