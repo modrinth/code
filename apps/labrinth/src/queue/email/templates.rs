@@ -13,7 +13,7 @@ use lettre::message::{Mailbox, MultiPart, SinglePart};
 use sqlx::query;
 use std::collections::HashMap;
 use std::time::Duration;
-use tracing::{error, warn};
+use tracing::error;
 
 const USER_NAME: &str = "user.name";
 const USER_EMAIL: &str = "user.email";
@@ -84,6 +84,11 @@ pub async fn build_email(
         variables,
     } = template_variables_result?;
 
+    let variables = variables
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v))
+        .collect();
+
     let Some(target_email) = user_email else {
         return Ok(None);
     };
@@ -100,12 +105,22 @@ pub async fn build_email(
         .to(target_email.parse().map_err(MailError::from)?)
         .subject(&template.subject_line);
 
-    let plaintext_filled_body =
-        fill_template(&template.plaintext_fallback, &variables);
+    let plaintext_filled_body = strfmt::strfmt(
+        &template.plaintext_fallback,
+        &variables,
+    )
+    .map_err(|fmt| {
+        ApiError::InvalidInput(format!("Failed to fill template: {fmt}"))
+    })?;
 
     let email_message = match html_body_result? {
         Ok(html_body) => {
-            let html_filled_body = fill_template(&html_body, &variables);
+            let html_filled_body = strfmt::strfmt(&html_body, &variables)
+                .map_err(|fmt| {
+                    ApiError::InvalidInput(format!(
+                        "Failed to fill template: {fmt}"
+                    ))
+                })?;
             message_builder
                 .multipart(MultiPart::alternative_plain_html(
                     plaintext_filled_body,
@@ -123,39 +138,6 @@ pub async fn build_email(
     };
 
     Ok(Some(email_message))
-}
-
-fn fill_template(
-    mut text: &str,
-    variables: &HashMap<&'static str, String>,
-) -> String {
-    let mut buffer = String::with_capacity(text.len());
-
-    loop {
-        if let Some((previous, start_variable)) = text.split_once('{') {
-            buffer.push_str(previous);
-
-            if let Some((variable_name, rest)) = start_variable.split_once('}')
-            {
-                // Replace variable with an empty string if it isn't matched
-                buffer.push_str(
-                    variables
-                        .get(variable_name)
-                        .map(|s| s.as_str())
-                        .unwrap_or_default(),
-                );
-                text = rest;
-            } else {
-                warn!("Unmatched open brace in template");
-                text = start_variable;
-            }
-        } else {
-            buffer.push_str(text);
-            break;
-        }
-    }
-
-    buffer
 }
 
 struct TemplateVariables {

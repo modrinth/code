@@ -4395,6 +4395,7 @@ dependencies = [
  "sha2",
  "spdx",
  "sqlx",
+ "strfmt",
  "tar",
  "thiserror 2.0.12",
  "tikv-jemalloc-ctl",

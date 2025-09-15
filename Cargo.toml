@@ -139,6 +139,7 @@ sha1_smol = { version = "1.0.1", features = ["std"] }
 sha2 = "0.10.9"
 spdx = "0.10.9"
 sqlx = { version = "0.8.6", default-features = false }
+strfmt = "0.2.5"
 sysinfo = { version = "0.36.1", default-features = false }
 tar = "0.4.44"
 tauri = "2.7.0"
