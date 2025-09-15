@@ -677,6 +677,9 @@
   "layout.action.lookup-by-email": {
     "message": "Lookup by email"
   },
+  "layout.action.manage-affiliates": {
+    "message": "Manage affiliates"
+  },
   "layout.action.manage-server-notices": {
     "message": "Manage server notices"
   },

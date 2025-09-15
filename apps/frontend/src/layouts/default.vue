@@ -363,6 +363,12 @@
 								shown: isAdmin(auth.user),
 							},
 							{
+								id: 'affiliates',
+								color: 'primary',
+								link: '/admin/affiliates',
+								shown: isAdmin(auth.user),
+							},
+							{
 								id: 'servers-notices',
 								color: 'primary',
 								link: '/admin/servers/notices',
@@ -379,13 +385,16 @@
 							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
 						</template>
 						<template #user-lookup>
-							<UserIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
+							<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
 						</template>
 						<template #file-lookup>
 							<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
 						</template>
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
+						</template>
+						<template #affiliates>
+							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -750,6 +759,7 @@
 </template>
 <script setup>
 import {
+	AffiliateIcon,
 	ArrowBigUpDashIcon,
 	BellIcon,
 	BlueskyIcon,
@@ -788,6 +798,7 @@ import {
 	SunIcon,
 	TwitterIcon,
 	UserIcon,
+	UserSearchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -995,6 +1006,10 @@ const messages = defineMessages({
 	manageServerNotices: {
 		id: 'layout.action.manage-server-notices',
 		defaultMessage: 'Manage server notices',
+	},
+	manageAffiliates: {
+		id: 'layout.action.manage-affiliates',
+		defaultMessage: 'Manage affiliates',
 	},
 	newProject: {
 		id: 'layout.action.new-project',
