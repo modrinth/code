@@ -2,12 +2,14 @@ use crate::auth::AuthenticationError;
 use crate::database::models;
 use crate::file_hosting::FileHostingError;
 use crate::models::error::AsApiError;
+use crate::models::ids::ImageId;
+use crate::models::projects::VersionStatus;
 use crate::routes::error::ApiError;
 use crate::search::indexing::IndexingError;
 use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
 use ariadne::i18n_enum;
-use derive_more::Display;
+use derive_more::{Display, From};
 use image::ImageError;
 use thiserror::Error;
 
@@ -36,7 +38,7 @@ pub enum CreateError {
     #[error("Invalid format for image: {0}")]
     InvalidIconFormat(ApiError),
     #[error("Error with multipart data: {0}")]
-    InvalidInput(String), // TODO: Use an I18nEnum instead of a String
+    InvalidInput(CreationInvalidInput),
     #[error("Invalid loader: {0}")]
     InvalidLoader(String),
     #[error("Invalid category: {0}")]
@@ -99,6 +101,102 @@ i18n_enum!(
     ContentFileName! => "content_file_name",
     ContentFileExtension! => "content_file_extension",
     ProjectId! => "project_id",
+);
+
+#[derive(Debug, Display, From)]
+pub enum CreationInvalidInput {
+    #[display("Failed to get created team.")]
+    FailedGettingNewTeam,
+    #[display("`data` field must come before file fields")]
+    DataFieldOutOfOrder,
+    #[display("Duplicate multipart field name")]
+    DuplicateMultipartField,
+    #[display("Projects can only have one icon")]
+    MultipleIcons,
+    #[display("Only one gallery image can be featured.")]
+    MultipleFeaturedGallery,
+    #[display("Gallery image exceeds the maximum of {_0}.")]
+    GalleryImageTooLarge(&'static str),
+    #[display("File `{_0}` (field {_1}) isn't specified in the versions data")]
+    FileNotSpecified(String, String),
+    #[display("Some files were specified in initial_versions but not uploaded")]
+    InitialVersionsFilesMissing,
+    #[display("Invalid organization ID specified!")]
+    InvalidOrganizationId,
+    #[display("Project submitted for review with no initial versions")]
+    NoInitialVersions,
+    #[from]
+    #[display("Invalid SPDX license identifier: {_0}")]
+    InvalidLicenseId(spdx::ParseError),
+    #[display("Link platform {_0} does not exist.")]
+    NonexistentLinkPlatform(String),
+    #[display("Image {_0} is not unused or in the '{_1}' context")]
+    ImproperContextImage(ImageId, &'static str),
+    #[display("Image {_0} does not exist")]
+    NonexistentImage(ImageId),
+    #[display("Found project id in initial version for new project")]
+    ProjectIdInInitialVersion,
+    #[display("Icons must be smaller than {_0}")]
+    IconTooLarge(&'static str),
+    #[display("Status '{_0}' cannot be requested")]
+    CannotRequestStatus(VersionStatus),
+    #[display("An invalid project id was supplied")]
+    InvalidProjectId,
+    #[display("An invalid version id was supplied")]
+    InvalidVersionId,
+    #[display("`data` field is required")]
+    MissingDataField,
+    #[display("Versions must have at least one file uploaded to them")]
+    MissingAnyFiles,
+    #[display("At least one file must be specified")]
+    NoFilesSpecified,
+    #[display("Duplicate files are not allowed to be uploaded to Modrinth!")]
+    DuplicateFiles,
+    #[display("File names must not contain slashes!")]
+    FileNameHasSlashes,
+    #[display(
+        "Project file exceeds the maximum of {_0}. Contact a moderator or admin to request permission to upload larger files."
+    )]
+    ProjectFileTooLarge(&'static str),
+    #[display("Loader field '{_0}' does not exist for any loaders supplied")]
+    NonexistentLoaderField(String),
+    #[display("Missing mandatory loader fields: {_0}")]
+    MissingLoaderFields(String),
+    #[display("No json segment found in multipart.")]
+    NoJsonInMultipart,
+}
+
+i18n_enum!(
+    CreationInvalidInput,
+    root_key: "labrinth.error.creation.invalid_input",
+    FailedGettingNewTeam! => "failed_getting_new_team",
+    DataFieldOutOfOrder! => "data_field_out_of_order",
+    DuplicateMultipartField! => "duplicate_multipart_field",
+    MultipleIcons! => "multiple_icons",
+    MultipleFeaturedGallery! => "multiple_featured_gallery",
+    GalleryImageTooLarge(limit) => "gallery_image_too_large",
+    FileNotSpecified(file_name, in_field) => "file_not_specified",
+    InitialVersionsFilesMissing! => "initial_versions_files_missing",
+    InvalidOrganizationId! => "invalid_organization_id",
+    NoInitialVersions! => "no_initial_versions",
+    InvalidLicenseId(cause) => "invalid_license_id",
+    NonexistentLinkPlatform(platform) => "nonexistent_link_platform",
+    ImproperContextImage(image_id, proper_context) => "improper_context_image",
+    NonexistentImage(image_id) => "nonexistent_image",
+    ProjectIdInInitialVersion! => "project_id_in_initial_version",
+    IconTooLarge(limit) => "icon_too_large",
+    CannotRequestStatus(status) => "cannot_request_status",
+    InvalidProjectId! => "invalid_project_id",
+    InvalidVersionId! => "invalid_version_id",
+    MissingDataField! => "missing_data_field",
+    MissingAnyFiles! => "missing_any_files",
+    NoFilesSpecified! => "no_files_specified",
+    DuplicateFiles! => "duplicate_files",
+    FileNameHasSlashes! => "file_name_has_slashes",
+    ProjectFileTooLarge(limit) => "project_file_too_large",
+    NonexistentLoaderField(field) => "nonexistent_loader_field",
+    MissingLoaderFields(fields) => "missing_loader_fields",
+    NoJsonInMultipart! => "no_json_in_multipart",
 );
 
 impl actix_web::ResponseError for CreateError {

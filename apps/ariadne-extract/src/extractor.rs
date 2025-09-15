@@ -1,9 +1,10 @@
 use crate::error::Result;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize};
 use std::collections::{BTreeMap, HashMap, HashSet};
-use std::fmt::Display;
+use std::collections::btree_map::Entry;
 use std::fs;
 use std::path::Path;
+use proc_macro2::Span;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
@@ -14,14 +15,16 @@ use syn::{
 };
 use walkdir::{DirEntry, WalkDir};
 
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 pub struct TranslationEntry {
     pub message: String,
+    #[serde(skip)]
+    key_span: Span,
 }
 
 impl TranslationEntry {
-    pub fn new(message: String) -> Self {
-        Self { message }
+    pub fn new(message: String, key_span: Span) -> Self {
+        Self { message, key_span, }
     }
 }
 
@@ -151,9 +154,23 @@ struct FileInfo<'a> {
 }
 
 #[derive(Clone)]
-struct EnumMessage {
-    message: LitStr,
-    display_attribute_type: DisplayAttributeType,
+enum EnumMessage {
+    Absent {
+        variant_span: Span,
+    },
+    Present {
+        message: LitStr,
+        display_attribute_type: DisplayAttributeType,
+    },
+}
+
+impl EnumMessage {
+    fn as_option(&self) -> Option<(&LitStr, DisplayAttributeType)> {
+        match self {
+            Self::Absent { .. } => None,
+            Self::Present { message, display_attribute_type } => Some((message, *display_attribute_type)),
+        }
+    }
 }
 
 #[derive(PartialEq, Eq, Copy, Clone)]
@@ -177,10 +194,14 @@ impl Visit<'_> for FileExtractor<'_> {
 
     fn visit_item_enum(&mut self, i: &ItemEnum) {
         let mut variants = HashMap::new();
+        let mut has_missing_variants = false;
+        let mut ignored_variants = HashSet::new();
+
         for variant in &i.variants {
             let Some(error_attr) = variant.attrs.iter().find(|x| {
                 x.path().is_ident("error") || x.path().is_ident("display")
             }) else {
+                has_missing_variants = true;
                 continue;
             };
             let display_attribute_type = if error_attr.path().is_ident("error")
@@ -206,14 +227,14 @@ impl Visit<'_> for FileExtractor<'_> {
                 Some(Ok(message)) => {
                     variants.insert(
                         variant.ident.clone(),
-                        EnumMessage {
+                        EnumMessage::Present {
                             message,
                             display_attribute_type,
                         },
                     );
                 }
-                Some(Err(err)) => {
-                    let mut true_error = syn::Error::new(
+                Some(Err(_)) => {
+                    self.add_error(syn::Error::new(
                         error_attr.meta.span(),
                         match display_attribute_type {
                             DisplayAttributeType::ThiserrorError => {
@@ -223,14 +244,26 @@ impl Visit<'_> for FileExtractor<'_> {
                                 "only #[display(\"lone format string\")] syntax is supported"
                             }
                         },
-                    );
-                    true_error.combine(err);
-                    self.add_error(true_error);
+                    ));
+                    ignored_variants.insert(variant.ident.clone());
                 }
-                None => {}
+                None => {
+                    ignored_variants.insert(variant.ident.clone());
+                }
             }
         }
         if !variants.is_empty() {
+            if has_missing_variants {
+                for variant in &i.variants {
+                    if ignored_variants.contains(&variant.ident) {
+                        continue;
+                    }
+                    variants.entry(variant.ident.clone())
+                        .or_insert_with(|| EnumMessage::Absent {
+                            variant_span: variant.span(),
+                        });
+                }
+            }
             self.enum_messages.insert(i.ident.clone(), variants);
         }
     }
@@ -267,25 +300,46 @@ impl Visit<'_> for FileExtractor<'_> {
                     if variant.transparent.is_some() {
                         continue;
                     }
-                    let message_literal = messages.get(&variant.variant_name);
+                    let Some(message_literal) = messages.get(&variant.variant_name) else {
+                        continue;
+                    };
                     let (message, errors) = message_literal
-                        .map(|x| {
+                        .as_option()
+                        .map(|(message, display_attribute_type)| {
                             variant.transform_format_string(
-                                x.message.value(),
-                                x.display_attribute_type,
+                                message.value(),
+                                display_attribute_type,
                             )
                         })
-                        .map(|(x, errors)| (TranslationEntry::new(x), errors))
-                        .unwrap_or_default();
-                    self.extractor.output.insert(
-                        format!("{}.{}", root_key, variant.key.value()),
-                        message,
-                    );
+                        .unwrap_or_else(|| ("".into(), vec![format!("no default message specified for variant {}", variant.variant_name)]));
+                    let duplicate_key = match self.extractor.output.entry(format!("{}.{}", root_key, variant.key.value())) {
+                        Entry::Vacant(entry) => {
+                            entry.insert(TranslationEntry::new(message, variant.key.span()));
+                            None
+                        },
+                        Entry::Occupied(entry) => {
+                            (*entry.get().message != message).then(|| (entry.key().clone(), entry.get().key_span))
+                        }
+                    };
+                    if let Some((duplicate_key, original_span)) = duplicate_key {
+                        let mut error = syn::Error::new(
+                            variant.key.span(),
+                            format!("duplicate variant key {}", duplicate_key)
+                        );
+                        error.combine(syn::Error::new(
+                            original_span,
+                            "originally used here"
+                        ));
+                        self.extractor.add_error(&self.file, error);
+                    }
                     for error in errors {
                         self.extractor.add_error(
                             &self.file,
                             syn::Error::new(
-                                message_literal.unwrap().message.span(),
+                                match message_literal {
+                                    EnumMessage::Absent { variant_span } => *variant_span,
+                                    EnumMessage::Present { message, .. } => message.span(),
+                                },
                                 error,
                             ),
                         );
@@ -402,7 +456,7 @@ impl I18nEnumVariant {
         &self,
         format_string: String,
         display_attribute_type: DisplayAttributeType,
-    ) -> (String, Vec<impl Display>) {
+    ) -> (String, Vec<String>) {
         let mut errors = vec![];
         if !format_string.contains(['\'', '{', '}']) {
             return (format_string, errors);

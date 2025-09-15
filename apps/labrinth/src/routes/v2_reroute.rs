@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::models::v2::projects::LegacySideType;
 use crate::routes::error::ApiError;
-use crate::routes::v3::create_error::CreateError;
+use crate::routes::v3::create_error::{CreateError, CreationInvalidInput};
 use crate::util::actix::{
     MultipartSegment, MultipartSegmentData, generate_multipart,
 };
@@ -124,12 +124,11 @@ where
     // Finishes the json segment, with aggregated content dispositions
     {
         let json_value = json.ok_or(CreateError::InvalidInput(
-            "No json segment found in multipart.".to_string(),
+            CreationInvalidInput::NoJsonInMultipart,
         ))?;
-        let mut json_segment =
-            json_segment.ok_or(CreateError::InvalidInput(
-                "No json segment found in multipart.".to_string(),
-            ))?;
+        let mut json_segment = json_segment.ok_or(
+            CreateError::InvalidInput(CreationInvalidInput::NoJsonInMultipart),
+        )?;
 
         // Call closure, with the json value and names of the other segments
         let json_value: U = closure(json_value, content_dispositions).await?;
@@ -142,20 +141,13 @@ where
 
     let (boundary, payload) = generate_multipart(segments);
 
-    match (
+    if let Ok((key, value)) = (
         "Content-Type",
         format!("multipart/form-data; boundary={boundary}").as_str(),
     )
         .try_into_pair()
     {
-        Ok((key, value)) => {
-            headers.insert(key, value);
-        }
-        Err(err) => {
-            CreateError::InvalidInput(format!(
-                "Error inserting test header: {err:?}."
-            ));
-        }
+        headers.insert(key, value);
     };
 
     let new_multipart =

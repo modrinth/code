@@ -493,6 +493,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "miette",
+ "proc-macro2",
  "serde",
  "serde_json",
  "syn 2.0.106",

@@ -23,7 +23,9 @@ use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::create_error::{CreateError, MissingValuePart};
+use crate::routes::v3::create_error::{
+    CreateError, CreationInvalidInput, MissingValuePart,
+};
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{ValidationResult, validate_file};
@@ -215,7 +217,9 @@ async fn version_create_inner(
 
                 if !version_create_data.status.can_be_requested() {
                     return Err(CreateError::InvalidInput(
-                        "Status specified cannot be requested".to_string(),
+                        CreationInvalidInput::CannotRequestStatus(
+                            version_create_data.status,
+                        ),
                     ));
                 }
 
@@ -232,7 +236,7 @@ async fn version_create_inner(
                 .is_none()
                 {
                     return Err(CreateError::InvalidInput(
-                        "An invalid project id was supplied".to_string(),
+                        CreationInvalidInput::InvalidProjectId,
                     ));
                 }
 
@@ -364,14 +368,14 @@ async fn version_create_inner(
             }
 
             let version = version_builder.as_mut().ok_or_else(|| {
-                CreateError::InvalidInput(String::from(
-                    "`data` field must come before file fields",
-                ))
+                CreateError::InvalidInput(
+                    CreationInvalidInput::DataFieldOutOfOrder,
+                )
             })?;
             let loaders = selected_loaders.as_ref().ok_or_else(|| {
-                CreateError::InvalidInput(String::from(
-                    "`data` field must come before file fields",
-                ))
+                CreateError::InvalidInput(
+                    CreationInvalidInput::DataFieldOutOfOrder,
+                )
             })?;
             let loaders = loaders
                 .iter()
@@ -381,7 +385,7 @@ async fn version_create_inner(
             let version_data =
                 initial_version_data.clone().ok_or_else(|| {
                     CreateError::InvalidInput(
-                        "`data` field is required".to_string(),
+                        CreationInvalidInput::MissingDataField,
                     )
                 })?;
 
@@ -424,15 +428,15 @@ async fn version_create_inner(
     }
 
     let version_data = initial_version_data.ok_or_else(|| {
-        CreateError::InvalidInput("`data` field is required".to_string())
+        CreateError::InvalidInput(CreationInvalidInput::MissingDataField)
     })?;
     let builder = version_builder.ok_or_else(|| {
-        CreateError::InvalidInput("`data` field is required".to_string())
+        CreateError::InvalidInput(CreationInvalidInput::MissingDataField)
     })?;
 
     if builder.files.is_empty() {
         return Err(CreateError::InvalidInput(
-            "Versions must have at least one file uploaded to them".to_string(),
+            CreationInvalidInput::MissingAnyFiles,
         ));
     }
 
@@ -528,9 +532,11 @@ async fn version_create_inner(
             if !matches!(image.context, ImageContext::Report { .. })
                 || image.context.inner_id().is_some()
             {
-                return Err(CreateError::InvalidInput(format!(
-                    "Image {image_id} is not unused and in the 'version' context"
-                )));
+                return Err(CreateError::InvalidInput(
+                    CreationInvalidInput::ImproperContextImage(
+                        image_id, "report",
+                    ),
+                ));
             }
 
             sqlx::query!(
@@ -547,9 +553,9 @@ async fn version_create_inner(
 
             image_item::DBImage::clear_cache(image.id.into(), redis).await?;
         } else {
-            return Err(CreateError::InvalidInput(format!(
-                "Image {image_id} does not exist"
-            )));
+            return Err(CreateError::InvalidInput(
+                CreationInvalidInput::NonexistentImage(image_id),
+            ));
         }
     }
 
@@ -648,7 +654,7 @@ async fn upload_file_to_version_inner(
 
     let Some(version) = result else {
         return Err(CreateError::InvalidInput(
-            "An invalid version id was supplied".to_string(),
+            CreationInvalidInput::InvalidVersionId,
         ));
     };
 
@@ -675,7 +681,7 @@ async fn upload_file_to_version_inner(
     .is_none()
     {
         return Err(CreateError::InvalidInput(
-            "An invalid project id was supplied".to_string(),
+            CreationInvalidInput::InvalidProjectId,
         ));
     }
 
@@ -750,9 +756,9 @@ async fn upload_file_to_version_inner(
             }
 
             let file_data = initial_file_data.as_ref().ok_or_else(|| {
-                CreateError::InvalidInput(String::from(
-                    "`data` field must come before file fields",
-                ))
+                CreateError::InvalidInput(
+                    CreationInvalidInput::DataFieldOutOfOrder,
+                )
             })?;
 
             let loaders = selected_loaders
@@ -808,7 +814,7 @@ async fn upload_file_to_version_inner(
 
     if file_builders.is_empty() {
         return Err(CreateError::InvalidInput(
-            "At least one file must be specified".to_string(),
+            CreationInvalidInput::NoFilesSpecified,
         ));
     } else {
         for file in file_builders {
@@ -849,14 +855,13 @@ pub async fn upload_file(
 
     if other_file_names.contains(&format!("{file_name}.{file_extension}")) {
         return Err(CreateError::InvalidInput(
-            "Duplicate files are not allowed to be uploaded to Modrinth!"
-                .to_string(),
+            CreationInvalidInput::DuplicateFiles,
         ));
     }
 
     if file_name.contains('/') {
         return Err(CreateError::InvalidInput(
-            "File names must not contain slashes!".to_string(),
+            CreationInvalidInput::FileNameHasSlashes,
         ));
     }
 
@@ -866,9 +871,11 @@ pub async fn upload_file(
         })?;
 
     let data = read_from_field(
-        field, 500 * (1 << 20),
-        "Project file exceeds the maximum of 500MiB. Contact a moderator or admin to request permission to upload larger files."
-    ).await?;
+        field,
+        500 * (1 << 20),
+        CreationInvalidInput::ProjectFileTooLarge("500 MiB"),
+    )
+    .await?;
 
     let hash = sha1::Sha1::digest(&data).encode_hex::<String>();
     let exists = sqlx::query!(
@@ -889,8 +896,7 @@ pub async fn upload_file(
 
     if exists {
         return Err(CreateError::InvalidInput(
-            "Duplicate files are not allowed to be uploaded to Modrinth!"
-                .to_string(),
+            CreationInvalidInput::DuplicateFiles,
         ));
     }
 
@@ -1006,8 +1012,7 @@ pub async fn upload_file(
             .any(|y| y.hash == sha1_bytes || y.hash == sha512_bytes)
     }) {
         return Err(CreateError::InvalidInput(
-            "Duplicate files are not allowed to be uploaded to Modrinth!"
-                .to_string(),
+            CreationInvalidInput::DuplicateFiles,
         ));
     }
 
@@ -1104,9 +1109,11 @@ pub fn try_create_version_fields(
             .iter()
             .find(|lf| &lf.field == key)
             .ok_or_else(|| {
-                CreateError::InvalidInput(format!(
-                    "Loader field '{key}' does not exist for any loaders supplied,"
-                ))
+                CreateError::InvalidInput(
+                    CreationInvalidInput::NonexistentLoaderField(
+                        key.to_string(),
+                    ),
+                )
             })?;
         remaining_mandatory_loader_fields.remove(&loader_field.field);
         let enum_variants = loader_field_enum_values
@@ -1124,10 +1131,11 @@ pub fn try_create_version_fields(
     }
 
     if !remaining_mandatory_loader_fields.is_empty() {
-        return Err(CreateError::InvalidInput(format!(
-            "Missing mandatory loader fields: {}",
-            remaining_mandatory_loader_fields.iter().join(", ")
-        )));
+        return Err(CreateError::InvalidInput(
+            CreationInvalidInput::MissingLoaderFields(
+                remaining_mandatory_loader_fields.iter().join(", "),
+            ),
+        ));
     }
     Ok(version_fields)
 }

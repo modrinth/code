@@ -101,6 +101,7 @@ p256 = "0.13.2"
 paste = "1.0.15"
 phf = { version = "0.12.1", features = ["macros"] }
 png = "0.17.16"
+proc-macro2 = "1.0.101"
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
 quick-xml = "0.38.1"

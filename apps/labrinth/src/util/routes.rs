@@ -1,5 +1,5 @@
 use crate::routes::error::ApiError;
-use crate::routes::v3::create_error::CreateError;
+use crate::routes::v3::create_error::{CreateError, CreationInvalidInput};
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::Field;
 use actix_web::web::Payload;
@@ -53,14 +53,14 @@ where
 pub async fn read_from_field(
     field: &mut Field,
     cap: usize,
-    err_msg: &'static str,
+    error: CreationInvalidInput,
 ) -> Result<BytesMut, CreateError> {
     let mut bytes = BytesMut::new();
     while let Some(chunk) = field.next().await {
         let chunk = chunk?;
 
         if bytes.len().saturating_add(chunk.len()) > cap {
-            return Err(CreateError::InvalidInput(String::from(err_msg)));
+            return Err(CreateError::InvalidInput(error));
         }
 
         bytes.extend_from_slice(&chunk);

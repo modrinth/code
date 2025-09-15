@@ -17,7 +17,9 @@ use crate::models::projects::{
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::create_error::{CreateError, MissingValuePart};
+use crate::routes::v3::create_error::{
+    CreateError, CreationInvalidInput, MissingValuePart,
+};
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
@@ -259,9 +261,9 @@ async fn project_create_inner(
         })?;
 
         if name != "data" {
-            return Err(CreateError::InvalidInput(String::from(
-                "`data` field must come before file fields",
-            )));
+            return Err(CreateError::InvalidInput(
+                CreationInvalidInput::DataFieldOutOfOrder,
+            ));
         }
 
         let mut data = Vec::new();
@@ -320,9 +322,9 @@ async fn project_create_inner(
             for name in &data.file_parts {
                 if versions_map.insert(name.to_owned(), i).is_some() {
                     // If the name is already used
-                    return Err(CreateError::InvalidInput(String::from(
-                        "Duplicate multipart field name",
-                    )));
+                    return Err(CreateError::InvalidInput(
+                        CreationInvalidInput::DuplicateMultipartField,
+                    ));
                 }
             }
             versions.push(
@@ -352,7 +354,8 @@ async fn project_create_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().unwrap().clone();
+            let content_disposition =
+                field.content_disposition().unwrap().clone();
 
             let name = content_disposition.get_name().ok_or_else(|| {
                 CreateError::MissingValueError(MissingValuePart::ContentName)
@@ -363,9 +366,9 @@ async fn project_create_inner(
 
             if name == "icon" {
                 if icon_data.is_some() {
-                    return Err(CreateError::InvalidInput(String::from(
-                        "Projects can only have one icon",
-                    )));
+                    return Err(CreateError::InvalidInput(
+                        CreationInvalidInput::MultipleIcons,
+                    ));
                 }
                 // Upload the icon to the cdn
                 icon_data = Some(
@@ -382,20 +385,24 @@ async fn project_create_inner(
             }
             if let Some(gallery_items) = &project_create_data.gallery_items {
                 if gallery_items.iter().filter(|a| a.featured).count() > 1 {
-                    return Err(CreateError::InvalidInput(String::from(
-                        "Only one gallery image can be featured.",
-                    )));
+                    return Err(CreateError::InvalidInput(
+                        CreationInvalidInput::MultipleFeaturedGallery,
+                    ));
                 }
-                if let Some(item) = gallery_items.iter().find(|x| x.item == name) {
+                if let Some(item) =
+                    gallery_items.iter().find(|x| x.item == name)
+                {
                     let data = read_from_field(
                         &mut field,
                         5 * (1 << 20),
-                        "Gallery image exceeds the maximum of 5MiB.",
+                        CreationInvalidInput::GalleryImageTooLarge("5 MiB"),
                     )
                     .await?;
 
                     let (_, file_extension) =
-                        super::version_creation::get_name_ext(&content_disposition)?;
+                        super::version_creation::get_name_ext(
+                            &content_disposition,
+                        )?;
 
                     let url = format!("data/{project_id}/images");
                     let upload_result = upload_image_optimized(
@@ -430,9 +437,15 @@ async fn project_create_inner(
             let index = if let Some(i) = versions_map.get(name) {
                 *i
             } else {
-                return Err(CreateError::InvalidInput(format!(
-                    "File `{file_name}` (field {name}) isn't specified in the versions data"
-                )));
+                // return Err(CreateError::InvalidInput(format!(
+                //     "File `{file_name}` (field {name}) isn't specified in the versions data"
+                // )));
+                return Err(CreateError::InvalidInput(
+                    CreationInvalidInput::FileNotSpecified(
+                        file_name.to_string(),
+                        name.to_string(),
+                    ),
+                ));
             };
             // `index` is always valid for these lists
             let created_version = &mut versions[index];
@@ -488,9 +501,9 @@ async fn project_create_inner(
             .zip(versions.iter())
         {
             if version_data.file_parts.len() != builder.files.len() {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Some files were specified in initial_versions but not uploaded",
-                )));
+                return Err(CreateError::InvalidInput(
+                    CreationInvalidInput::InitialVersionsFilesMissing,
+                ));
             }
         }
 
@@ -539,7 +552,7 @@ async fn project_create_inner(
             .await?
             .ok_or_else(|| {
                 CreateError::InvalidInput(
-                    "Invalid organization ID specified!".to_string(),
+                    CreationInvalidInput::InvalidOrganizationId,
                 )
             })?;
 
@@ -585,20 +598,15 @@ async fn project_create_inner(
         } else {
             status = ProjectStatus::Processing;
             if project_create_data.initial_versions.is_empty() {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Project submitted for review with no initial versions",
-                )));
+                return Err(CreateError::InvalidInput(
+                    CreationInvalidInput::NoInitialVersions,
+                ));
             }
         }
 
-        let license_id = spdx::Expression::parse(
-            &project_create_data.license_id,
-        )
-        .map_err(|err| {
-            CreateError::InvalidInput(format!(
-                "Invalid SPDX license identifier: {err}"
-            ))
-        })?;
+        let license_id =
+            spdx::Expression::parse(&project_create_data.license_id)
+                .map_err(|err| CreateError::InvalidInput(err.into()))?;
 
         let mut link_urls = vec![];
 
@@ -612,19 +620,21 @@ async fn project_create_inner(
             )
             .await?
             .ok_or_else(|| {
-                CreateError::InvalidInput(format!(
-                    "Link platform {} does not exist.",
-                    platform.clone()
-                ))
+                CreateError::InvalidInput(
+                    CreationInvalidInput::NonexistentLinkPlatform(
+                        platform.clone(),
+                    ),
+                )
             })?;
             let link_platform = link_platforms
                 .iter()
                 .find(|x| x.id == platform_id)
                 .ok_or_else(|| {
-                    CreateError::InvalidInput(format!(
-                        "Link platform {} does not exist.",
-                        platform.clone()
-                    ))
+                    CreateError::InvalidInput(
+                        CreationInvalidInput::NonexistentLinkPlatform(
+                            platform.clone(),
+                        ),
+                    )
                 })?;
             link_urls.push(models::project_item::LinkUrl {
                 platform_id,
@@ -689,9 +699,11 @@ async fn project_create_inner(
                 if !matches!(image.context, ImageContext::Project { .. })
                     || image.context.inner_id().is_some()
                 {
-                    return Err(CreateError::InvalidInput(format!(
-                        "Image {image_id} is not unused and in the 'project' context"
-                    )));
+                    return Err(CreateError::InvalidInput(
+                        CreationInvalidInput::ImproperContextImage(
+                            image_id, "project",
+                        ),
+                    ));
                 }
 
                 sqlx::query!(
@@ -709,9 +721,9 @@ async fn project_create_inner(
                 image_item::DBImage::clear_cache(image.id.into(), redis)
                     .await?;
             } else {
-                return Err(CreateError::InvalidInput(format!(
-                    "Image {image_id} does not exist"
-                )));
+                return Err(CreateError::InvalidInput(
+                    CreationInvalidInput::NonexistentImage(image_id),
+                ));
             }
         }
 
@@ -806,9 +818,9 @@ async fn create_initial_version(
     redis: &RedisPool,
 ) -> Result<models::version_item::VersionBuilder, CreateError> {
     if version_data.project_id.is_some() {
-        return Err(CreateError::InvalidInput(String::from(
-            "Found project id in initial version for new project",
-        )));
+        return Err(CreateError::InvalidInput(
+            CreationInvalidInput::ProjectIdInInitialVersion,
+        ));
     }
 
     version_data.validate().map_err(|err| {
@@ -890,7 +902,7 @@ async fn process_icon_upload(
     let data = read_from_field(
         &mut field,
         262144,
-        "Icons must be smaller than 256KiB",
+        CreationInvalidInput::IconTooLarge("256 KiB"),
     )
     .await?;
     let upload_result = upload_image_optimized(

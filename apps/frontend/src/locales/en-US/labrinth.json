@@ -26,26 +26,110 @@
   "labrinth.error.creation.invalid_input": {
     "message": "Error with multipart data: {cause}"
   },
+  "labrinth.error.creation.invalid_input.cannot_request_status": {
+    "message": "Status ''{status}'' cannot be requested"
+  },
   "labrinth.error.creation.invalid_input.category": {
     "message": "Invalid category: {category}"
+  },
+  "labrinth.error.creation.invalid_input.data_field_out_of_order": {
+    "message": "`data` field must come before file fields"
+  },
+  "labrinth.error.creation.invalid_input.duplicate_files": {
+    "message": "Duplicate files are not allowed to be uploaded to Modrinth!"
+  },
+  "labrinth.error.creation.invalid_input.duplicate_multipart_field": {
+    "message": "Duplicate multipart field name"
+  },
+  "labrinth.error.creation.invalid_input.failed_getting_new_team": {
+    "message": "Failed to get created team."
   },
   "labrinth.error.creation.invalid_input.file": {
     "message": "Error while validating uploaded file: {cause}"
   },
+  "labrinth.error.creation.invalid_input.file_name_has_slashes": {
+    "message": "File names must not contain slashes!"
+  },
+  "labrinth.error.creation.invalid_input.file_not_specified": {
+    "message": "File `{file_name}` (field {in_field}) isn''t specified in the versions data"
+  },
   "labrinth.error.creation.invalid_input.file_type": {
     "message": "Invalid file type for version file: {extension}"
+  },
+  "labrinth.error.creation.invalid_input.gallery_image_too_large": {
+    "message": "Gallery image exceeds the maximum of {limit}."
   },
   "labrinth.error.creation.invalid_input.icon": {
     "message": "Invalid format for image: {cause}"
   },
+  "labrinth.error.creation.invalid_input.icon_too_large": {
+    "message": "Icons must be smaller than {limit}"
+  },
+  "labrinth.error.creation.invalid_input.improper_context_image": {
+    "message": "Image {image_id} is not unused or in the ''{proper_context}'' context"
+  },
+  "labrinth.error.creation.invalid_input.initial_versions_files_missing": {
+    "message": "Some files were specified in initial_versions but not uploaded"
+  },
+  "labrinth.error.creation.invalid_input.invalid_license_id": {
+    "message": "Invalid SPDX license identifier: {cause}"
+  },
+  "labrinth.error.creation.invalid_input.invalid_organization_id": {
+    "message": "Invalid organization ID specified!"
+  },
+  "labrinth.error.creation.invalid_input.invalid_project_id": {
+    "message": "An invalid project id was supplied"
+  },
+  "labrinth.error.creation.invalid_input.invalid_version_id": {
+    "message": "An invalid version id was supplied"
+  },
   "labrinth.error.creation.invalid_input.loader": {
     "message": "Invalid loader: {loader}"
+  },
+  "labrinth.error.creation.invalid_input.missing_any_files": {
+    "message": "Versions must have at least one file uploaded to them"
+  },
+  "labrinth.error.creation.invalid_input.missing_data_field": {
+    "message": "`data` field is required"
+  },
+  "labrinth.error.creation.invalid_input.missing_loader_fields": {
+    "message": "Missing mandatory loader fields: {fields}"
   },
   "labrinth.error.creation.invalid_input.multipart": {
     "message": "Error while parsing multipart payload: {cause}"
   },
+  "labrinth.error.creation.invalid_input.multiple_featured_gallery": {
+    "message": "Only one gallery image can be featured."
+  },
+  "labrinth.error.creation.invalid_input.multiple_icons": {
+    "message": "Projects can only have one icon"
+  },
+  "labrinth.error.creation.invalid_input.no_files_specified": {
+    "message": "At least one file must be specified"
+  },
+  "labrinth.error.creation.invalid_input.no_initial_versions": {
+    "message": "Project submitted for review with no initial versions"
+  },
+  "labrinth.error.creation.invalid_input.no_json_in_multipart": {
+    "message": "No json segment found in multipart."
+  },
+  "labrinth.error.creation.invalid_input.nonexistent_image": {
+    "message": "Image {image_id} does not exist"
+  },
+  "labrinth.error.creation.invalid_input.nonexistent_link_platform": {
+    "message": "Link platform {platform} does not exist."
+  },
+  "labrinth.error.creation.invalid_input.nonexistent_loader_field": {
+    "message": "Loader field ''{field}'' does not exist for any loaders supplied"
+  },
   "labrinth.error.creation.invalid_input.parsing": {
     "message": "Error while parsing JSON: {cause}"
+  },
+  "labrinth.error.creation.invalid_input.project_file_too_large": {
+    "message": "Project file exceeds the maximum of {limit}. Contact a moderator or admin to request permission to upload larger files."
+  },
+  "labrinth.error.creation.invalid_input.project_id_in_initial_version": {
+    "message": "Found project id in initial version for new project"
   },
   "labrinth.error.creation.invalid_input.slug_collision": {
     "message": "Slug is already taken!"

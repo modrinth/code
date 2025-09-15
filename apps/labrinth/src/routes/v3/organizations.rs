@@ -13,7 +13,7 @@ use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
 use crate::routes::error::ApiError;
-use crate::routes::v3::create_error::CreateError;
+use crate::routes::v3::create_error::{CreateError, CreationInvalidInput};
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
@@ -84,7 +84,7 @@ pub async fn organization_projects_get(
         .try_collect::<Vec<_>>()
         .await?;
 
-        let projects_data = crate::database::models::DBProject::get_many_ids(
+        let projects_data = database::models::DBProject::get_many_ids(
             &project_ids,
             &**pool,
             &redis,
@@ -162,7 +162,7 @@ pub async fn organization_create(
     let team = team_item::TeamBuilder {
         members: vec![team_item::TeamMemberBuilder {
             user_id: current_user.id.into(),
-            role: crate::models::teams::DEFAULT_ROLE.to_owned(),
+            role: models::teams::DEFAULT_ROLE.to_owned(),
             is_owner: true,
             permissions: ProjectPermissions::all(),
             organization_permissions: Some(OrganizationPermissions::all()),
@@ -194,14 +194,14 @@ pub async fn organization_create(
             .into_iter()
             .next();
     let members_data = if let Some(member_data) = member_data {
-        vec![crate::models::teams::TeamMember::from_model(
+        vec![models::teams::TeamMember::from_model(
             member_data,
             current_user.clone(),
             false,
         )]
     } else {
         return Err(CreateError::InvalidInput(
-            "Failed to get created team.".to_owned(), // should never happen
+            CreationInvalidInput::FailedGettingNewTeam, // should never happen
         ));
     };
 
@@ -237,7 +237,7 @@ pub async fn organization_get(
             DBTeamMember::get_from_team_full(data.team_id, &**pool, &redis)
                 .await?;
 
-        let users = crate::database::models::DBUser::get_many_ids(
+        let users = database::models::DBUser::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
             &redis,
@@ -256,13 +256,13 @@ pub async fn organization_get(
             .filter(|x| {
                 logged_in
                     || x.accepted
-                    || user_id.is_some_and(
-                        |y: crate::database::models::DBUserId| y == x.user_id,
-                    )
+                    || user_id.is_some_and(|y: database::models::DBUserId| {
+                        y == x.user_id
+                    })
             })
             .filter_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
-                    crate::models::teams::TeamMember::from(
+                    models::teams::TeamMember::from(
                         data,
                         user.clone(),
                         !logged_in,
@@ -301,7 +301,7 @@ pub async fn organizations_get(
     let teams_data =
         DBTeamMember::get_from_team_full_many(&team_ids, &**pool, &redis)
             .await?;
-    let users = crate::database::models::DBUser::get_many_ids(
+    let users = database::models::DBUser::get_many_ids(
         &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
         &**pool,
         &redis,
@@ -343,13 +343,13 @@ pub async fn organizations_get(
             .filter(|x| {
                 logged_in
                     || x.accepted
-                    || user_id.is_some_and(
-                        |y: crate::database::models::DBUserId| y == x.user_id,
-                    )
+                    || user_id.is_some_and(|y: database::models::DBUserId| {
+                        y == x.user_id
+                    })
             })
             .filter_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
-                    crate::models::teams::TeamMember::from(
+                    models::teams::TeamMember::from(
                         data,
                         user.clone(),
                         !logged_in,
@@ -402,12 +402,11 @@ pub async fn organizations_edit(
     })?;
 
     let string = info.into_inner().0;
-    let result =
-        database::models::DBOrganization::get(&string, &**pool, &redis).await?;
+    let result = DBOrganization::get(&string, &**pool, &redis).await?;
     if let Some(organization_item) = result {
         let id = organization_item.id;
 
-        let team_member = database::models::DBTeamMember::get_from_user_id(
+        let team_member = DBTeamMember::get_from_user_id(
             organization_item.team_id,
             user.id.into(),
             &**pool,
@@ -524,7 +523,7 @@ pub async fn organizations_edit(
             }
 
             transaction.commit().await?;
-            database::models::DBOrganization::clear_cache(
+            DBOrganization::clear_cache(
                 organization_item.id,
                 Some(organization_item.slug),
                 &redis,
@@ -561,30 +560,28 @@ pub async fn organization_delete(
     .1;
     let string = info.into_inner().0;
 
-    let organization =
-        database::models::DBOrganization::get(&string, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
-            })?;
+    let organization = DBOrganization::get(&string, &**pool, &redis)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The specified organization does not exist!".to_string(),
+            )
+        })?;
 
     if !user.role.is_admin() {
-        let team_member =
-            database::models::DBTeamMember::get_from_user_id_organization(
-                organization.id,
-                user.id.into(),
-                false,
-                &**pool,
+        let team_member = DBTeamMember::get_from_user_id_organization(
+            organization.id,
+            user.id.into(),
+            false,
+            &**pool,
+        )
+        .await
+        .map_err(ApiError::Database)?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The specified organization does not exist!".to_string(),
             )
-            .await
-            .map_err(ApiError::Database)?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
-            })?;
+        })?;
 
         let permissions = OrganizationPermissions::get_permissions_by_role(
             &user.role,
@@ -632,10 +629,9 @@ pub async fn organization_delete(
     .await?;
 
     for organization_project_team in &organization_project_teams {
-        let new_id = crate::database::models::ids::generate_team_member_id(
-            &mut transaction,
-        )
-        .await?;
+        let new_id =
+            database::models::ids::generate_team_member_id(&mut transaction)
+                .await?;
         let member = DBTeamMember {
             id: new_id,
             team_id: *organization_project_team,
@@ -651,16 +647,13 @@ pub async fn organization_delete(
         member.insert(&mut transaction).await?;
     }
     // Safely remove the organization
-    let result = database::models::DBOrganization::remove(
-        organization.id,
-        &mut transaction,
-        &redis,
-    )
-    .await?;
+    let result =
+        DBOrganization::remove(organization.id, &mut transaction, &redis)
+            .await?;
 
     transaction.commit().await?;
 
-    database::models::DBOrganization::clear_cache(
+    DBOrganization::clear_cache(
         organization.id,
         Some(organization.slug),
         &redis,
@@ -668,7 +661,7 @@ pub async fn organization_delete(
     .await?;
 
     for team_id in &organization_project_teams {
-        database::models::DBTeamMember::clear_cache(*team_id, &redis).await?;
+        DBTeamMember::clear_cache(*team_id, &redis).await?;
     }
 
     if !organization_project_teams.is_empty() {
@@ -706,14 +699,13 @@ pub async fn organization_projects_add(
     .await?
     .1;
 
-    let organization =
-        database::models::DBOrganization::get(&info, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
-            })?;
+    let organization = DBOrganization::get(&info, &**pool, &redis)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The specified organization does not exist!".to_string(),
+            )
+        })?;
 
     let project_item = database::models::DBProject::get(
         &project_info.project_id,
@@ -733,32 +725,30 @@ pub async fn organization_projects_add(
         ));
     }
 
-    let project_team_member =
-        database::models::DBTeamMember::get_from_user_id_project(
-            project_item.inner.id,
-            current_user.id.into(),
-            false,
-            &**pool,
+    let project_team_member = DBTeamMember::get_from_user_id_project(
+        project_item.inner.id,
+        current_user.id.into(),
+        false,
+        &**pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(
+            "You are not a member of this project!".to_string(),
         )
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "You are not a member of this project!".to_string(),
-            )
-        })?;
-    let organization_team_member =
-        database::models::DBTeamMember::get_from_user_id_organization(
-            organization.id,
-            current_user.id.into(),
-            false,
-            &**pool,
+    })?;
+    let organization_team_member = DBTeamMember::get_from_user_id_organization(
+        organization.id,
+        current_user.id.into(),
+        false,
+        &**pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(
+            "You are not a member of this organization!".to_string(),
         )
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "You are not a member of this organization!".to_string(),
-            )
-        })?;
+    })?;
 
     // Require ownership of a project to add it to an organization
     if !current_user.role.is_admin() && !project_team_member.is_owner {
@@ -822,11 +812,7 @@ pub async fn organization_projects_add(
             &redis,
         )
         .await?;
-        database::models::DBTeamMember::clear_cache(
-            project_item.inner.team_id,
-            &redis,
-        )
-        .await?;
+        DBTeamMember::clear_cache(project_item.inner.team_id, &redis).await?;
         database::models::DBProject::clear_cache(
             project_item.inner.id,
             project_item.inner.slug,
@@ -869,17 +855,13 @@ pub async fn organization_projects_remove(
     .await?
     .1;
 
-    let organization = database::models::DBOrganization::get(
-        &organization_id,
-        &**pool,
-        &redis,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(
-            "The specified organization does not exist!".to_string(),
-        )
-    })?;
+    let organization = DBOrganization::get(&organization_id, &**pool, &redis)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The specified organization does not exist!".to_string(),
+            )
+        })?;
 
     let project_item =
         database::models::DBProject::get(&project_id, &**pool, &redis)
@@ -901,19 +883,18 @@ pub async fn organization_projects_remove(
         ));
     }
 
-    let organization_team_member =
-        database::models::DBTeamMember::get_from_user_id_organization(
-            organization.id,
-            current_user.id.into(),
-            false,
-            &**pool,
+    let organization_team_member = DBTeamMember::get_from_user_id_organization(
+        organization.id,
+        current_user.id.into(),
+        false,
+        &**pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(
+            "You are not a member of this organization!".to_string(),
         )
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "You are not a member of this organization!".to_string(),
-            )
-        })?;
+    })?;
 
     let permissions = OrganizationPermissions::get_permissions_by_role(
         &current_user.role,
@@ -922,7 +903,7 @@ pub async fn organization_projects_remove(
     .unwrap_or_default();
     if permissions.contains(OrganizationPermissions::REMOVE_PROJECT) {
         // Now that permissions are confirmed, we confirm the veracity of the new user as an org member
-        database::models::DBTeamMember::get_from_user_id_organization(
+        DBTeamMember::get_from_user_id_organization(
             organization.id,
             data.new_owner.into(),
             false,
@@ -938,14 +919,13 @@ pub async fn organization_projects_remove(
 
         // Then, we get the team member of the project and that user (if it exists)
         // We use the team member get directly
-        let new_owner =
-            database::models::DBTeamMember::get_from_user_id_project(
-                project_item.inner.id,
-                data.new_owner.into(),
-                true,
-                &**pool,
-            )
-            .await?;
+        let new_owner = DBTeamMember::get_from_user_id_project(
+            project_item.inner.id,
+            data.new_owner.into(),
+            true,
+            &**pool,
+        )
+        .await?;
 
         let mut transaction = pool.begin().await?;
 
@@ -953,11 +933,10 @@ pub async fn organization_projects_remove(
         let new_owner = match new_owner {
             Some(new_owner) => new_owner,
             None => {
-                let new_id =
-                    crate::database::models::ids::generate_team_member_id(
-                        &mut transaction,
-                    )
-                    .await?;
+                let new_id = database::models::ids::generate_team_member_id(
+                    &mut transaction,
+                )
+                .await?;
                 let member = DBTeamMember {
                     id: new_id,
                     team_id: project_item.inner.team_id,
@@ -1010,11 +989,7 @@ pub async fn organization_projects_remove(
             &redis,
         )
         .await?;
-        database::models::DBTeamMember::clear_cache(
-            project_item.inner.team_id,
-            &redis,
-        )
-        .await?;
+        DBTeamMember::clear_cache(project_item.inner.team_id, &redis).await?;
         database::models::DBProject::clear_cache(
             project_item.inner.id,
             project_item.inner.slug,
@@ -1058,17 +1033,16 @@ pub async fn organization_icon_edit(
     .1;
     let string = info.into_inner().0;
 
-    let organization_item =
-        database::models::DBOrganization::get(&string, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
-            })?;
+    let organization_item = DBOrganization::get(&string, &**pool, &redis)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The specified organization does not exist!".to_string(),
+            )
+        })?;
 
     if !user.role.is_mod() {
-        let team_member = database::models::DBTeamMember::get_from_user_id(
+        let team_member = DBTeamMember::get_from_user_id(
             organization_item.team_id,
             user.id.into(),
             &**pool,
@@ -1134,7 +1108,7 @@ pub async fn organization_icon_edit(
     .await?;
 
     transaction.commit().await?;
-    database::models::DBOrganization::clear_cache(
+    DBOrganization::clear_cache(
         organization_item.id,
         Some(organization_item.slug),
         &redis,
@@ -1163,17 +1137,16 @@ pub async fn delete_organization_icon(
     .1;
     let string = info.into_inner().0;
 
-    let organization_item =
-        database::models::DBOrganization::get(&string, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified organization does not exist!".to_string(),
-                )
-            })?;
+    let organization_item = DBOrganization::get(&string, &**pool, &redis)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "The specified organization does not exist!".to_string(),
+            )
+        })?;
 
     if !user.role.is_mod() {
-        let team_member = database::models::DBTeamMember::get_from_user_id(
+        let team_member = DBTeamMember::get_from_user_id(
             organization_item.team_id,
             user.id.into(),
             &**pool,
@@ -1218,7 +1191,7 @@ pub async fn delete_organization_icon(
 
     transaction.commit().await?;
 
-    database::models::DBOrganization::clear_cache(
+    DBOrganization::clear_cache(
         organization_item.id,
         Some(organization_item.slug),
         &redis,
