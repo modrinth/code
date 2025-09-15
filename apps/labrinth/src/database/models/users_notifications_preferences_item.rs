@@ -55,7 +55,7 @@ impl UserNotificationPreference {
               unp.user_id,
               dnp.channel "channel!",
               dnp.notification_type "notification_type!",
-              COALESCE(unp.enabled, COALESCE(dnp.enabled, false)) "enabled!"
+              COALESCE(unp.enabled, dnp.enabled, false) "enabled!"
             FROM users_notifications_preferences dnp
             LEFT JOIN users_notifications_preferences unp
               ON unp.channel = dnp.channel
