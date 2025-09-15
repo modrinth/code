@@ -68,7 +68,7 @@ jobs:
           cat > tauri-dev.conf.json <<EOF
           {
             "productName": "Modrinth App (dev)",
-            "mainBinaryName": "Modrinth App (dev build "
+            "mainBinaryName": "Modrinth App (dev build ",
             "bundle": {
               "fileAssociations": []
             }
