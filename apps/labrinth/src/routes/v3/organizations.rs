@@ -13,7 +13,7 @@ use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
 use crate::routes::error::ApiError;
-use crate::routes::v3::project_creation::CreateError;
+use crate::routes::v3::create_error::CreateError;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;

@@ -8,8 +8,8 @@ use crate::models::v2::projects::{
     DonationLink, LegacyProject, LegacySideType,
 };
 use crate::queue::session::AuthQueue;
+use crate::routes::v3::project_creation::NewGalleryItem;
 use crate::routes::v3::project_creation::default_project_type;
-use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
 use crate::routes::{v2_reroute, v3};
 use actix_multipart::Multipart;
 use actix_web::web::Data;
@@ -18,11 +18,11 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::postgres::PgPool;
 
+use super::version_creation::InitialVersionData;
+use crate::routes::v3::create_error::CreateError;
 use std::collections::HashMap;
 use std::sync::Arc;
 use validator::Validate;
-
-use super::version_creation::InitialVersionData;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_create);

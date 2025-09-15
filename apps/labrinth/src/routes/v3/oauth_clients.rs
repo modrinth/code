@@ -3,6 +3,7 @@ use std::{collections::HashSet, fmt::Display, sync::Arc};
 use crate::file_hosting::FileHostPublicity;
 use crate::models::ids::OAuthClientId;
 use crate::routes::error::ApiError;
+use crate::routes::v3::create_error::CreateError;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
@@ -21,7 +22,6 @@ use crate::{
         pats::Scopes,
     },
     queue::session::AuthQueue,
-    routes::v3::project_creation::CreateError,
     util::validate::validation_errors_to_string,
 };
 use crate::{

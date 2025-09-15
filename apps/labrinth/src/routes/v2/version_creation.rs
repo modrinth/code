@@ -9,7 +9,7 @@ use crate::models::projects::{
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::project_creation::CreateError;
+use crate::routes::v3::create_error::CreateError;
 use crate::routes::v3::version_creation;
 use crate::routes::{v2_reroute, v3};
 use actix_multipart::Multipart;

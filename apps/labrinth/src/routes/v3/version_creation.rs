@@ -1,4 +1,4 @@
-use super::project_creation::{CreateError, MissingValuePart, UploadedFile};
+use super::project_creation::UploadedFile;
 use crate::auth::get_user_from_headers;
 use crate::database::models::loader_fields::{
     LoaderField, LoaderFieldEnumValue, VersionField,
@@ -23,6 +23,7 @@ use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
+use crate::routes::v3::create_error::{CreateError, MissingValuePart};
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{ValidationResult, validate_file};

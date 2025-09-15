@@ -5,6 +5,7 @@ use serde_json::json;
 
 pub mod analytics_get;
 pub mod collections;
+pub mod create_error;
 pub mod friends;
 pub mod images;
 pub mod notifications;
