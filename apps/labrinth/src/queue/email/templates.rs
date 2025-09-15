@@ -39,14 +39,32 @@ const STATUSCHANGE_PROJECT_NAME: &str = "statuschange.project.name";
 const STATUSCHANGE_OLD_STATUS: &str = "statuschange.old.status";
 const STATUSCHANGE_NEW_STATUS: &str = "statuschange.new.status";
 
+#[derive(Clone)]
+pub struct MailingIdentity {
+    from_name: String,
+    from_address: String,
+    reply_name: Option<String>,
+    reply_address: Option<String>,
+}
+
+impl MailingIdentity {
+    pub fn from_env() -> dotenvy::Result<Self> {
+        Ok(Self {
+            from_name: dotenvy::var("SMTP_FROM_NAME")?,
+            from_address: dotenvy::var("SMTP_FROM_ADDRESS")?,
+            reply_name: dotenvy::var("SMTP_REPLY_TO_NAME").ok(),
+            reply_address: dotenvy::var("SMTP_REPLY_TO_ADDRESS").ok(),
+        })
+    }
+}
+
 pub async fn build_email(
     exec: impl sqlx::PgExecutor<'_>,
     redis: &RedisPool,
     client: &reqwest::Client,
     notification: &DBNotification,
     template: &NotificationTemplate,
-    from_name: String,
-    from_address: String,
+    identity: MailingIdentity,
 ) -> Result<Option<Message>, ApiError> {
     let get_html_body = async {
         let result: Result<Result<String, reqwest::Error>, DatabaseError> =
@@ -74,6 +92,13 @@ pub async fn build_email(
         result
     };
 
+    let MailingIdentity {
+        from_name,
+        from_address,
+        reply_name,
+        reply_address,
+    } = identity;
+
     let (html_body_result, template_variables_result) = futures::join!(
         get_html_body,
         collect_template_variables(exec, redis, notification)
@@ -93,15 +118,19 @@ pub async fn build_email(
         return Ok(None);
     };
 
-    let message_builder = Message::builder()
-        .from(Mailbox::new(
-            Some(from_name),
-            from_address.parse().map_err(MailError::from)?,
-        ))
-        .reply_to(Mailbox::new(
-            Some("Modrinth Support".to_owned()),
-            "support@modrinth.com".parse().map_err(MailError::from)?,
-        ))
+    let mut message_builder = Message::builder().from(Mailbox::new(
+        Some(from_name),
+        from_address.parse().map_err(MailError::from)?,
+    ));
+
+    if let Some((name, address)) = reply_name.zip(reply_address) {
+        message_builder = message_builder.reply_to(Mailbox::new(
+            Some(name),
+            address.parse().map_err(MailError::from)?,
+        ));
+    }
+
+    message_builder = message_builder
         .to(target_email.parse().map_err(MailError::from)?)
         .subject(&template.subject_line);
 
