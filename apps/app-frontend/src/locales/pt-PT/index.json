@@ -129,10 +129,10 @@
     "message": "Nome"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Ganchos de lançamento"
+    "message": "Ganchos de inicio"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Ganchos de lançamento personalizados"
+    "message": "Ganchos de inicio personalizados"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Ganchos permitem a utilizadores avançados executarem certos comandos de sistema antes e depois de abrir o jogo."
@@ -147,16 +147,16 @@
     "message": "Insere o comando pós-saída..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Pré-lançamento"
+    "message": "Pré-inicio"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
     "message": "Executa antes da instância ser aberta."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Insere o comando pré-lançamento..."
+    "message": "Insere o comando pré-inicio..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Ganchos de lançamento do jogo"
+    "message": "Ganchos de inicio do jogo"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
@@ -222,7 +222,7 @@
     "message": "{loader} não está disponivel para Minecraft {version}. Tenta outro carregador de mods."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Esta instância está associada a um modpack, mas o modpack não conseguiu ser encontrado no Modrinth."
+    "message": "Esta instância está associada a um modpack, mas não foi possível encontrar o modpack no Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Plataforma"
@@ -252,7 +252,7 @@
     "message": "Reparando"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Reparar reinstala as dependências do Minecraft e verifica por corrupção. Isto pode resolver problemas se o teu jogo não estiver a abrir devido a erros relacionados ao lançador (launcher), mas não vai resolver problemas ou crashes relacionados a mods instalados."
+    "message": "Reparar reinstala as dependências do Minecraft e verifica por corrupção. Isto pode resolver problemas se o teu jogo não estiver a abrir devido a erros relacionados ao launcher, mas não vai resolver problemas ou crashes relacionados a mods instalados."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Reparar instância?"

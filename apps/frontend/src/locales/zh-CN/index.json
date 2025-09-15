@@ -399,7 +399,7 @@
     "message": "该收藏夹没有项目！"
   },
   "collection.label.no-projects-auth": {
-    "message": "你还没有收藏夹。\n想要<create-link>创建一个</create-link>吗？"
+    "message": "你还没有收藏项目。\n想要<create-link>添加一个</create-link>吗？"
   },
   "collection.label.owner": {
     "message": "所有者"
@@ -579,13 +579,13 @@
     "message": "与你喜欢的启动器协同并行"
   },
   "landing.feature.search.description": {
-    "message": "Modrinth的闪电般快速搜索和强大过滤器让你在输入时就能找到所需内容。"
+    "message": "Modrinth闪电般的快速搜索和强大的过滤器可以帮助你输入时就找到所需的内容。"
   },
   "landing.feature.search.heading": {
     "message": "快速轻松地找到你想找的内容"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Minecraft{content}大本营"
+    "message": "汇聚 Minecraft 各类 {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "数据包"
@@ -642,22 +642,22 @@
     "message": "排序方式："
   },
   "landing.section.for-creators.description": {
-    "message": "为你的创作打造一个线上家园，触达大量忠实玩家"
+    "message": "为你的作品打造一个在线家园并向大量忠实玩家推广"
   },
   "landing.section.for-creators.label": {
     "message": "面向创作者"
   },
   "landing.section.for-creators.tagline": {
-    "message": "让你的创作走向世界"
+    "message": "让你的作品走向世界"
   },
   "landing.section.for-players.description": {
-    "message": "从奇幻生物群系到诅咒地牢，海量内容定能让你的游戏体验提升到全新高度。"
+    "message": "从奇幻生物群系到诅咒地牢，海量内容定能将你的游戏体验提升到全新高度。"
   },
   "landing.section.for-players.label": {
     "message": "面向玩家"
   },
   "landing.section.for-players.tagline": {
-    "message": "探索超过 {count} 件创作"
+    "message": "探索超过 {count} 件作品"
   },
   "landing.subheading": {
     "message": "在我们为社区打造的开源平台上，探索、畅玩并分享 Minecraft 的无限可能。"
@@ -759,7 +759,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth 服务器"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "资源"
@@ -1910,6 +1910,9 @@
   "settings.language.languages.search.no-results": {
     "message": "没有符合搜索条件的语言。"
   },
+  "settings.language.warning": {
+    "message": "切换语言后，若译文暂缺，部分内容将仍以英文显示。本站本地化工作尚在进行中，特定语言的内容可能暂未完全翻译。我们正在持续优化本地化系统，偶有内容显示异常问题，如有不便敬请谅解。"
+  },
   "settings.pats.action.create": {
     "message": "创建个人访问令牌"
   },
@@ -1986,7 +1989,7 @@
     "message": "用户名"
   },
   "settings.sessions.action.revoke-session": {
-    "message": "强制该会话退出"
+    "message": "登出设备"
   },
   "settings.sessions.created-ago": {
     "message": "{ago}创建"

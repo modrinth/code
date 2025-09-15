@@ -1,4 +1,5 @@
 use super::ApiError;
+use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
 use crate::models::projects::{Project, Version, VersionType};
 use crate::models::v2::projects::{LegacyProject, LegacyVersion};
@@ -116,7 +117,7 @@ pub struct UpdateData {
 pub async fn get_update_from_hash(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     update_data: web::Json<UpdateData>,
@@ -170,7 +171,7 @@ pub struct FileHashes {
 #[post("")]
 pub async fn get_versions_from_hashes(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     file_data: web::Json<FileHashes>,
     session_queue: web::Data<AuthQueue>,
@@ -277,7 +278,7 @@ pub struct ManyUpdateData {
 
 #[post("update")]
 pub async fn update_files(
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
 ) -> Result<HttpResponse, ApiError> {

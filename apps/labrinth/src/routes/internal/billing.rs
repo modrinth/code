@@ -4,6 +4,12 @@ use crate::database::models::charge_item::DBCharge;
 use crate::database::models::products_tax_identifier_item::{
     DBProductsTaxIdentifier, product_info_by_product_price_id,
 };
+use crate::auth::get_user_from_headers;
+use crate::database::models::charge_item::DBCharge;
+use crate::database::models::notification_item::NotificationBuilder;
+use crate::database::models::user_item::DBUser;
+use crate::database::models::user_subscription_item::DBUserSubscription;
+use crate::database::models::users_redeemals::{self, UserRedeemal};
 use crate::database::models::{
     charge_item, generate_charge_id, product_item, user_subscription_item,
 };
@@ -13,6 +19,7 @@ use crate::models::billing::{
     Product, ProductMetadata, ProductPrice, SubscriptionMetadata,
     SubscriptionStatus, UserSubscription,
 };
+use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::users::Badges;
 use crate::queue::session::AuthQueue;
@@ -2238,7 +2245,7 @@ pub async fn stripe_webhook(
                     )
                     .await?;
 
-                    if let Some(email) = metadata.user_item.email {
+                    if metadata.user_item.email.is_some() {
                         let money = rusty_money::Money::from_minor(
                             metadata.charge_item.amount as i64,
                             rusty_money::iso::find(
@@ -2247,22 +2254,29 @@ pub async fn stripe_webhook(
                             .unwrap_or(rusty_money::iso::USD),
                         );
 
-                        let _ = send_email(
-                            email,
-                            "Payment Failed for Modrinth",
-                            &format!(
-                                "Our attempt to collect payment for {money} from the payment card on file was unsuccessful."
-                            ),
-                            "Please visit the following link below to update your payment method or contact your card provider. If the button does not work, you can copy the link and paste it into your browser.",
-                            Some((
-                                "Update billing settings",
-                                &format!(
-                                    "{}/{}",
-                                    dotenvy::var("SITE_URL")?,
-                                    dotenvy::var("SITE_BILLING_PATH")?
-                                ),
-                            )),
-                        );
+                        NotificationBuilder {
+                            body: NotificationBody::PaymentFailed {
+                                amount: money.to_string(),
+                                service: if metadata
+                                    .product_item
+                                    .metadata
+                                    .is_midas()
+                                {
+                                    "Modrinth+"
+                                } else if metadata
+                                    .product_item
+                                    .metadata
+                                    .is_pyro()
+                                {
+                                    "Modrinth Servers"
+                                } else {
+                                    "a Modrinth product"
+                                }
+                                .to_owned(),
+                            },
+                        }
+                        .insert(metadata.user_item.id, &mut transaction, &redis)
+                        .await?;
                     }
 
                     transaction.commit().await?;

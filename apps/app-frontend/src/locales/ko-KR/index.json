@@ -119,11 +119,23 @@
   "instance.settings.tabs.general.library-groups.create": {
     "message": "새 그룹 만들기"
   },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "라이브러리 그룹을 사용하면 라이브러리 내에서 인스턴스를 서로 다른 섹션으로 구성할 수 있습니다."
+  },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "그룹 이름 입력"
   },
   "instance.settings.tabs.general.name": {
     "message": "이름"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "실행 후크"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "사용자 지정 실행 후크"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "후크 기능을 사용하면 고급 사용자가 게임을 실행하기 전후에 특정 시스템 명령을 실행할 수 있습니다."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "종료 후"
@@ -142,6 +154,9 @@
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "실행 전 명령어 입력..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "게임 실행 후크"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "래퍼"
@@ -296,6 +311,9 @@
   "instance.settings.tabs.java.environment-variables": {
     "message": "환경 변수"
   },
+  "instance.settings.tabs.java.hooks": {
+    "message": "후크"
+  },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Java 매개변수"
   },
@@ -382,6 +400,9 @@
   },
   "instance.worlds.view_instance": {
     "message": "인스턴스 보기"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "사용중인 월드"
   },
   "search.filter.locked.instance": {
     "message": "인스턴스에서 관리"

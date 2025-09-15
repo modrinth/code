@@ -1,4 +1,10 @@
 {
+  "badge.beta": {
+    "defaultMessage": "ɐʇǝᗺ"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "ǝsɐǝlǝᴚ ɐʇǝᗺ"
+  },
   "badge.new": {
     "defaultMessage": "ʍǝN"
   },
@@ -76,6 +82,9 @@
   },
   "button.sign-out": {
     "defaultMessage": "ʇno uᵷᴉS"
+  },
+  "button.sign-up": {
+    "defaultMessage": "dn uɓᴉS"
   },
   "button.stop": {
     "defaultMessage": "doʇS"
@@ -464,6 +473,72 @@
   "project.settings.environment.client_and_server.title": {
     "defaultMessage": "ɹǝʌɹǝs puɐ ʇuǝᴉlƆ"
   },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "˙sɹǝʌɹǝs ɐllᴉuɐʌ ɥʇᴉʍ ǝlqᴉʇɐdɯoɔ sᴉ puɐ ǝpᴉs-ʇuǝᴉlɔ ǝuop sᴉ ʎʇᴉlɐuoᴉʇɔunɟ llⱯ"
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "ʎluo ǝpᴉs-ʇuǝᴉlƆ"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "ʎluo ɹǝʌɹǝs pǝʇɐɔᴉpǝᗡ"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "˙sʇuǝᴉlɔ ɐllᴉuɐʌ ɥʇᴉʍ ǝlqᴉʇɐdɯoɔ sᴉ puɐ ǝpᴉs-ɹǝʌɹǝs ǝuop sᴉ ʎʇᴉlɐuoᴉʇɔunɟ llⱯ"
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "ooʇ ɹǝʎɐldǝlɓuᴉs uᴉ sʞɹoM"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "ʎluo ǝpᴉs-ɹǝʌɹǝS"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "˙ɹǝʌɹǝs ɹǝʎɐldᴉʇlnW ɐ oʇ pǝʇɔǝuuoɔ ʇou uǝɥʍ ɹo ɹǝʎɐldǝlɓuᴉS uᴉ suoᴉʇɔunɟ ʎluO"
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "ʎluo ɹǝʎɐldǝlɓuᴉS"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "{option} ɟo suoᴉʇdoqnS"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "ʇuəɯuoɹıʌuƎ"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "ʎɹǝllɐ⅁"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "lɐɹǝuǝ⅁"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "ǝsuǝɔᴉ˥"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "sʞuᴉꞀ"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "sɹəqɯəW\n"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "˙sᴉɥʇ ʇᴉpǝ oʇ uoᴉssᴉɯɹǝd ǝʌɐɥ ʇ,uop no⅄"
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "uoᴉssᴉɯɹǝd oN"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "sɓɐ⟘"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "pɐold∩"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "suoᴉsɹǝΛ"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "ʍǝᴉΛ"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "Ɐ"
   },
@@ -647,6 +722,9 @@
   "servers.region.region-unsupported": {
     "defaultMessage": "<link>¡ʇxǝu sɹǝʌɹǝS ɥʇuᴉɹpoW ǝǝs oʇ ǝʞᴉl p,noʎ ǝɹǝɥʍ ʍouʞ sn ʇǝꞀ</link> ¿pǝʇsᴉl ʇou uoᴉɓǝᴚ"
   },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "ɐᴉsⱯ ʇsɐǝɥʇnoS"
+  },
   "servers.region.western-europe": {
     "defaultMessage": "ǝdoɹnƎ uɹǝʇsǝM"
   },
@@ -706,6 +784,9 @@
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{time, time, short} ʇɐ {date, date, long}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "˙sǝɓuɐɥɔ pǝʌɐsun ǝʌɐɥ no⅄"
   }
 }
 

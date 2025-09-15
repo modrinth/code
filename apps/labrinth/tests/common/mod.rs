@@ -1,4 +1,5 @@
 use labrinth::util::anrok;
+use labrinth::queue::email::EmailQueue;
 use labrinth::{LabrinthConfig, file_hosting, queue};
 use labrinth::{check_env_vars, clickhouse};
 use std::sync::Arc;
@@ -27,6 +28,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     }
 
     let pool = db.pool.clone();
+    let ro_pool = db.ro_pool.clone();
     let redis_pool = db.redis_pool.clone();
     let search_config = db.search_config.clone();
     let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
@@ -40,9 +42,12 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
 
     let anrok_client = anrok::Client::from_env().unwrap();
+    let email_queue =
+        EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
 
     labrinth::app_setup(
         pool.clone(),
+        ro_pool.clone(),
         redis_pool.clone(),
         search_config,
         &mut clickhouse,
@@ -50,6 +55,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         maxmind_reader,
         stripe_client,
         anrok_client,
+        email_queue,
         false,
     )
 }

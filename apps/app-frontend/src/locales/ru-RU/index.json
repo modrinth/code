@@ -6,10 +6,10 @@
     "message": "Внешний вид"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Настройки версии по умолчанию"
+    "message": "Предустановки"
   },
   "app.settings.tabs.feature-flags": {
-    "message": "Флаги функций"
+    "message": "Экспериментальные функции"
   },
   "app.settings.tabs.java-installations": {
     "message": "Установки Java"
@@ -24,22 +24,22 @@
     "message": "Добавить и играть"
   },
   "instance.add-server.add-server": {
-    "message": "Добавить сервер"
+    "message": "Добавить"
   },
   "instance.add-server.resource-pack.disabled": {
-    "message": "Отключены"
+    "message": "Отключён"
   },
   "instance.add-server.resource-pack.enabled": {
-    "message": "Включены"
+    "message": "Включён"
   },
   "instance.add-server.resource-pack.prompt": {
     "message": "Запрашивать"
   },
   "instance.add-server.title": {
-    "message": "Добавить сервер"
+    "message": "Добавление сервера"
   },
   "instance.edit-server.title": {
-    "message": "Настроить сервер"
+    "message": "Изменение сервера"
   },
   "instance.edit-world.hide-from-home": {
     "message": "Не показывать на главной"
@@ -51,22 +51,22 @@
     "message": "Мир Minecraft"
   },
   "instance.edit-world.reset-icon": {
-    "message": "Сбросить значок"
+    "message": "Сбросить иконку"
   },
   "instance.edit-world.title": {
-    "message": "Настроить мир"
+    "message": "Изменение информации о мире"
   },
   "instance.filter.disabled": {
-    "message": "Отключенные проекты"
+    "message": "Отключённые"
   },
   "instance.filter.updates-available": {
     "message": "Доступны обновления"
   },
   "instance.server-modal.address": {
-    "message": "Адрес сервера"
+    "message": "Адрес"
   },
   "instance.server-modal.name": {
-    "message": "Название сервера"
+    "message": "Название"
   },
   "instance.server-modal.placeholder-name": {
     "message": "Сервер Minecraft"
@@ -84,7 +84,7 @@
     "message": "Удалить сборку"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Удаляет сборку с устройства, включая миры, конфигурации и весь установленный контент. Будьте осторожны, поскольку после удаления сборки восстановить её невозможно."
+    "message": "Навсегда удаляет сборку с устройства, включая миры, настройки и весь установленный контент. Учтите, что после удаления сборки восстановить её невозможно."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Удаление..."
@@ -123,19 +123,19 @@
     "message": "Разделение по группам позволяет организовать сборки по разным разделам в библиотеке."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Укажите название группы"
+    "message": "Введите название группы"
   },
   "instance.settings.tabs.general.name": {
     "message": "Название"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Пользовательские команды"
+    "message": "Настройки запуска"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Пользовательские команды"
+    "message": "Пользовательские настройки запуска"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Команды позволяют продвинутым пользователям выполнять определённые системные команды при запуске игры."
+    "message": "Позволяют опытным пользователям задать системные команды, выполняемые перед запуском и после закрытия игры."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "После выхода"
@@ -144,7 +144,7 @@
     "message": "Выполняется после выхода из игры."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Команда завершения..."
+    "message": "Команда после закрытия..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Перед запуском"
@@ -156,7 +156,7 @@
     "message": "Введите команду перед запуском..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Пользовательские команды запуска"
+    "message": "Настройки запуска игры"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Обёртка"
@@ -165,19 +165,19 @@
     "message": "Команда обёртки для запуска Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Введите команду обёртки..."
+    "message": "Команда обёртки..."
   },
   "instance.settings.tabs.installation": {
     "message": "Установка"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} для Minecraft {game_version} уже установлен"
+    "message": "Платформа {platform} {version} для Minecraft {game_version} уже установлена"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "Vanilla {game_version} уже установлена"
+    "message": "Ванильный Minecraft {game_version} уже установлен"
   },
   "instance.settings.tabs.installation.change-version.button": {
-    "message": "Заменить версию"
+    "message": "Сменить версию"
   },
   "instance.settings.tabs.installation.change-version.button.install": {
     "message": "Установить"
@@ -186,7 +186,7 @@
     "message": "Установка"
   },
   "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Получение версий модпака"
+    "message": "Получение версий сборки"
   },
   "instance.settings.tabs.installation.change-version.in-progress": {
     "message": "Установка новой версии"
@@ -198,7 +198,7 @@
     "message": "Отладочная информация:"
   },
   "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Получение сведений модпака"
+    "message": "Получение данных о сборке"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "Версия игры"
@@ -207,22 +207,22 @@
     "message": "Установить"
   },
   "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Установка в процессе"
+    "message": "Выполняется установка..."
   },
   "instance.settings.tabs.installation.loader-version": {
-    "message": "Версия загрузчика {loader}"
+    "message": "Версия {loader}"
   },
   "instance.settings.tabs.installation.minecraft-version": {
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "Не удалось получить сведения о сборке. Проверьте соединение с интернетом."
+    "message": "Не удалось получить данные о сборке. Проверьте соединение с интернетом."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} недоступен для версии {version}. Попробуйте другой загрузчик."
+    "message": "{loader} недоступен для Minecraft {version}. Выберите другой загрузчик."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Не удаётся найти сборку на Modrinth, с которой связано установленное содержимое."
+    "message": "Не удалось найти сборку на Modrinth, с которой связано установленное содержимое."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Платформа"
@@ -240,7 +240,7 @@
     "message": "Вы действительно хотите переустановить сборку?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Удаляет все моды и контент, добавленные поверх оригинальной сборки, и восстанавливает её исходное состояние."
+    "message": "Возвращает содержимое сборки к исходному состоянию и удаляет все моды или контент, добавленные поверх оригинальной сборки."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Переустановка сборки"
@@ -252,22 +252,22 @@
     "message": "Исправление"
   },
   "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "В ходе исправления будут заново проверены контрольные суммы и переустановлены зависимости Minecraft. Это может помочь с проблемами запуска игры на стороне лаунчера, но не исправит проблемы и вылеты из-за ошибок в имеющихся модах."
+    "message": "Будут переустановлены зависимости Minecraft, а также определены и восстановлены повреждённые файлы. Это может помочь с проблемами запуска игры на стороне лаунчера, но не исправит проблемы и вылеты из-за ошибок в имеющихся модах."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Восстановить сборку?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Восстановление в прогрессе"
+    "message": "Выполняется исправление..."
   },
   "instance.settings.tabs.installation.reset-selections": {
-    "message": "Сбросить до текущего"
+    "message": "Сбросить выбор"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Показать все версии"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "изменить версию"
+    "message": "сменить версию"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "установить"
@@ -300,10 +300,10 @@
     "message": "Вы уверены, что хотите отвязать сборку?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Установленное содержимое связано со сборкой на Modrinth, что блокирует возможность менять версии игры, модов или их загрузчик. Нажатие на кнопку ниже необратимо разрушит эту связь."
+    "message": "Установленное содержимое связано со сборкой на Modrinth, что блокирует возможность менять версии игры, модов или загрузчик. Нажатие на кнопку ниже необратимо разрушит эту связь."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "Отвязать сборку"
+    "message": "Отвязка сборки"
   },
   "instance.settings.tabs.java": {
     "message": "Java и память"
@@ -312,7 +312,7 @@
     "message": "Переменные среды"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Действия запуска"
+    "message": "Настройки запуска"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Аргументы Java"
@@ -321,13 +321,13 @@
     "message": "Расположение Java"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Выделение ОЗУ"
+    "message": "Выделение памяти"
   },
   "instance.settings.tabs.window": {
     "message": "Окно"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Изменить настройки окна"
+    "message": "Изменение настроек окна"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Полноэкранный режим"
@@ -342,7 +342,7 @@
     "message": "Высота окна игры при запуске."
   },
   "instance.settings.tabs.window.height.enter": {
-    "message": "Укажите высоту..."
+    "message": "Введите высоту..."
   },
   "instance.settings.tabs.window.width": {
     "message": "Ширина"
@@ -351,7 +351,7 @@
     "message": "Ширина окна игры при запуске."
   },
   "instance.settings.tabs.window.width.enter": {
-    "message": "Укажите ширину..."
+    "message": "Введите ширину..."
   },
   "instance.settings.title": {
     "message": "Настройки"
@@ -369,7 +369,7 @@
     "message": "Не показывать на главной"
   },
   "instance.worlds.filter.available": {
-    "message": "Доступно"
+    "message": "Доступны"
   },
   "instance.worlds.game_already_open": {
     "message": "Сборка уже запущена"
@@ -381,7 +381,7 @@
     "message": "Сервер несовместим"
   },
   "instance.worlds.no_contact": {
-    "message": "Невозможно связаться с сервером"
+    "message": "Не удалось связаться с сервером"
   },
   "instance.worlds.no_server_quick_play": {
     "message": "Подключиться напрямую можно только к серверам Minecraft Alpha 1.0.5 и выше"
@@ -399,10 +399,10 @@
     "message": "Одиночная игра"
   },
   "instance.worlds.view_instance": {
-    "message": "Содержимое сборки"
+    "message": "Показать сборку"
   },
   "instance.worlds.world_in_use": {
-    "message": "Мир занят игрой"
+    "message": "Мир используется"
   },
   "search.filter.locked.instance": {
     "message": "Управляется сборкой"
@@ -414,6 +414,6 @@
     "message": "Загрузчик управляется сборкой"
   },
   "search.filter.locked.instance.sync": {
-    "message": "Синхронизировать"
+    "message": "Использовать из сборки"
   }
 }

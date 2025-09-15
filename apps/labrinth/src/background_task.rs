@@ -1,7 +1,8 @@
 use crate::database::redis::RedisPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
+use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
-    PayoutsQueue, insert_bank_balances, process_payout,
+    PayoutsQueue, insert_bank_balances_and_webhook, process_payout,
 };
 use crate::search::indexing::index_projects;
 use crate::util::anrok;
@@ -20,6 +21,7 @@ pub enum BackgroundTask {
     IndexBilling,
     IndexSubscriptions,
     Migrations,
+    Mail,
 }
 
 impl BackgroundTask {
@@ -31,6 +33,7 @@ impl BackgroundTask {
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
+        email_queue: EmailQueue,
     ) {
         use BackgroundTask::*;
         match self {
@@ -50,15 +53,29 @@ impl BackgroundTask {
 
                 update_bank_balances(pool).await;
             }
-            IndexSubscriptions => index_subscriptions(pool, redis_pool).await,
+            IndexSubscriptions => {
+                crate::routes::internal::billing::index_subscriptions(
+                    pool, redis_pool,
+                )
+                .await
+            }
+            Mail => {
+                run_email(email_queue).await;
+            }
         }
+    }
+}
+
+pub async fn run_email(email_queue: EmailQueue) {
+    if let Err(error) = email_queue.index().await {
+        error!(%error, "Failed to index email queue");
     }
 }
 
 pub async fn update_bank_balances(pool: sqlx::Pool<Postgres>) {
     let payouts_queue = PayoutsQueue::new();
 
-    match insert_bank_balances(&payouts_queue, &pool).await {
+    match insert_bank_balances_and_webhook(&payouts_queue, &pool).await {
         Ok(_) => info!("Bank balances updated successfully"),
         Err(error) => error!(%error, "Bank balances update failed"),
     }

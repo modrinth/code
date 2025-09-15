@@ -120,7 +120,7 @@
     "message": "Utwórz nową grupę"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Grupy bibliotek pozwalają ci organizować twoje instancje w różne sekcje w twojej bibliotece."
+    "message": "Grupowanie bibliotek pozwala ci na rozdzielenie instalacji na kilka różnych sekcji w twojej bibliotece."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "Wpisz nazwę grupy"
@@ -135,7 +135,7 @@
     "message": "Własne haczyki przy uruchomieniu"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Haczyki pozwalają zaawansowanym użytkownikom uruchamiać określone polecenia systemowe przed i po uruchomieniu gry."
+    "message": "Hooki pozwalają zaawansowanym użytkownikom uruchamiać określone systemowe komendy przed i po uruchomieniu gry."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Po wyjściu"
@@ -144,7 +144,7 @@
     "message": "Aktywowane po zamknięciu gry."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Wpisz komendę po wyjściu..."
+    "message": "Wpisz komendę po zamknięciu..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Przed uruchomieniem"
@@ -156,16 +156,16 @@
     "message": "Wpisz komendę przed uruchomieniem..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Haczyki do uruchamiania gry"
+    "message": "Hooki uruchamiania gry"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Polecenie wrappera do uruchamiania gry Minecraft."
+    "message": "Polecenie wrappera do uruchamiania Minecrafta."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Wprowadź polecenie wrappera..."
+    "message": "Wprowadź komendę wrappera..."
   },
   "instance.settings.tabs.installation": {
     "message": "Instalacja"
@@ -282,7 +282,7 @@
     "message": "Podczas instalowania nie można wykonać: {action}"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Podczas bycia offline nie można wykonać: {action}"
+    "message": "Nie możesz {action}, gdy jesteś offline"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
     "message": "Podczas naprawiania nie można wykonać: {action}"
@@ -312,7 +312,7 @@
     "message": "Zmienne środowiskowe"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Haczyki"
+    "message": "Hooki"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Argumenty Javy"

@@ -21,7 +21,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Versiunea de Linux a Aplicației Modrinth <issues-link>este cunoscută să aiba probleme</issues-link> pe anumite sisteme și configurări. Dacă aplicația Modrinth este instabilă pe sistemul tău, te încurajăm să încerci și alte aplicații precum <prism-link>Prism Launcher</prism-link> pentru a instala ușor conținut de pe Modrinth."
+    "message": "Versiunea de Linux a Modrinth App <issues-link>este cunoscută să aiba probleme</issues-link> pe anumite sisteme și configurări. Dacă Modrinth App este instabilă pe sistemul tău, te încurajăm să încerci și alte aplicații precum <prism-link>Prism Launcher</prism-link> pentru a instala ușor conținut de pe Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -30,13 +30,13 @@
     "message": "Opțiuni descărcare"
   },
   "app-marketing.download.terms": {
-    "message": "Prin descărcarea aplicației Modrinth ești de acord cu ai noștri <terms-link>Termeni</terms-link> și <privacy-link>Politica de confidențialitate</privacy-link>."
+    "message": "Prin descărcarea Modrinth App ești de acord cu ai noștri <terms-link>Termeni</terms-link> și <privacy-link>Politica de confidențialitate</privacy-link>."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Pachete terță"
   },
   "app-marketing.download.title": {
-    "message": "Descarcă aplicația Modrinth (Beta)"
+    "message": "Descarcă Modrinth App (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -48,7 +48,7 @@
     "message": "Urmărește proiecte"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importă toate profilurile tale favorite de pe aplicația pe care o foloseai înainte, și începe cu aplicația Modrinth în secunde!"
+    "message": "Importă toate profilurile tale favorite de pe aplicația pe care o foloseai înainte, și începe cu Modrinth App în secunde!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -102,7 +102,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Aplicația Modrinth funcționează mai bine decât multe dintre cele mai populare aplicații de gestionare a modurilor, utilizând doar 150 MB de memorie RAM!"
+    "message": "Modrinth App funcționează mai bine decât multe dintre cele mai populare aplicații de gestionare a modurilor, utilizând doar 150 MB de memorie RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -123,7 +123,7 @@
     "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "Aplicația Modrinth"
+    "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 miliard %"
@@ -141,7 +141,7 @@
     "message": "Performant"
   },
   "app-marketing.features.play.description": {
-    "message": "Folosește Aplicația Modrinth pentru a descărca și a te juca împreună cu modurile și pachetele de moduri preferate."
+    "message": "Folosește Modrinth App pentru a descărca și a te juca împreună cu modurile și pachetele de moduri preferate."
   },
   "app-marketing.features.play.title": {
     "message": "Joacă-te cu modurile tale favorite"
@@ -162,7 +162,7 @@
     "message": "Diferit de orice alt lansator pe care l-ai folosit vreodată"
   },
   "app-marketing.features.website.description": {
-    "message": "Aplicația Modrinth este complet integrată cu site-ul, astfel că poți accesa toate proiectele tale preferate direct din aplicație!"
+    "message": "Modrinth App este complet integrat cu site-ul, astfel că poți accesa toate proiectele tale preferate direct din aplicație!"
   },
   "app-marketing.features.website.title": {
     "message": "Integrare cu site-ul web"
@@ -171,19 +171,19 @@
     "message": "pe care le-ai folosit anterior"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Captură de ecran a aplicației Modrinth cu o instanță Cobblemon deschisă la pagina 'Conținut'."
+    "message": "Captură de ecran a Modrinth App cu o instanță Cobblemon deschisă la pagina 'Conținut'."
   },
   "app-marketing.hero.description": {
-    "message": "Aplicația Modrinth este un lansator unic, cu sursă deschisă, care îți permite să joci modurile tale preferate și să le menții mereu actualizate, totul într-un pachet mic și ordonat."
+    "message": "Modrinth App este un lansator unic, cu sursă deschisă, care îți permite să joci modurile tale preferate și să le menții mereu actualizate, totul într-un pachet mic și ordonat."
   },
   "app-marketing.hero.download-button": {
-    "message": "Descarcă aplicația Modrinth"
+    "message": "Descarcă Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Descarcă aplicația Modrinth"
+    "message": "Descarcă Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Descarcă aplicația Modrinth pentru {os}"
+    "message": "Descarcă Modrinth App pentru {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Captură de ecran a ecranului principal al meniului instanței Cobblemon."
@@ -522,7 +522,7 @@
     "message": "Broască"
   },
   "landing.button.discover-mods": {
-    "message": "Descoperă moduri"
+    "message": "Descoperă modurile"
   },
   "landing.button.go-to-dashboard": {
     "message": "Du-te la panoul principal"
@@ -543,7 +543,7 @@
     "message": "Fă-ți proiectul descoperit de mii de utilizatori prin căutări, pagina noastră de acasă, serverul de Discord, și mai multe modalități care vor veni în viitor!"
   },
   "landing.creator.feature.discovery.title": {
-    "message": "Descoperire"
+    "message": "Descoperă"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
     "message": "Integrează-te cu uneltele tale de construire prin Minotaur pentru încărcări automate imediat ce lansezi o versiune nouă"
@@ -561,31 +561,31 @@
     "message": "Invită-ți colegii și gestionează rolurile și permisiunile cu ușurință"
   },
   "landing.creator.feature.team-management.title": {
-    "message": "Administrarea Echipei"
+    "message": "Administrează Echipa"
   },
   "landing.error.failedToLoadRandomProjects": {
     "message": "Încărcarea proiectelor aleatoare a eșuat :("
   },
   "landing.feature.follow.description": {
-    "message": "Primește notificări de fiecare dată când proiectele tale preferate se actualizează și rămâi la curent"
+    "message": "Primește notificări de fiecare dată când proiectele tale preferate se actualizează și rămâi la curent cu ele."
   },
   "landing.feature.follow.heading": {
     "message": "Urmărește proiectele pe care le iubești"
   },
   "landing.feature.launcher.description": {
-    "message": "API-ul cu sursa deschisă Modrinth permite lansatoarelor să adauge o integrare avansată cu Modrinth. Poți folosi Modrinth prin <link>aplicația noastră</link> și prin unele dintre cele mai populare lansatoare, precum ATLauncher, MultiMC și Prism Launcher."
+    "message": "API-ul nostru permite lansatoarelor să adauge o integrare avansată cu Modrinth. Poți folosi <link>aplicația noastră</link> sau unul dintre cele mai populare lansatoare, precum ATLauncher, MultiMC și Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "Joacă-te cu lansatorul tău preferat"
   },
   "landing.feature.search.description": {
-    "message": "Căutarea ultra-rapidă a Modrinth și filtrele puternice îți permit să găsești ceea ce vrei pe măsură ce tastezi."
+    "message": "Căutarea ultra-rapidă și filtrele puternice îți permit să găsești ceea ce vrei pe măsură ce tastezi."
   },
   "landing.feature.search.heading": {
     "message": "Găsește ce vrei, rapid și ușor"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Locul pentru {content} de Minecraft"
+    "message": "Locul ideal pentru {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "pachete de date"
@@ -615,7 +615,7 @@
     "message": "O reprezentare simplificată a unei ferestre Minecraft, cu logo-ul Mojang Studios în verdele Modrinth."
   },
   "landing.launcher.modrinth-app-label": {
-    "message": "Aplicația Modrinth"
+    "message": "Modrinth App"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -651,7 +651,7 @@
     "message": "Distribuie conținutul tău cu toată lumea"
   },
   "landing.section.for-players.description": {
-    "message": "De la biomi magici la temnițe blestemate, poți să fi sigur că găsești conținut să-ți aducă satisfacția jocului la următorul nivel."
+    "message": "De la monștrii nemiloși la temnițe blestemate, poți să fi sigur că găsești conținut să-ți aducă satisfacția jocului la următorul nivel."
   },
   "landing.section.for-players.label": {
     "message": "Pentru Jucători"
@@ -666,7 +666,7 @@
     "message": "Schimbă tema"
   },
   "layout.action.get-modrinth-app": {
-    "message": "Ia-ți aplicația Modrinth"
+    "message": "Ia-ți Modrinth App"
   },
   "layout.avatar.alt": {
     "message": "Avatarul tău"
@@ -717,7 +717,7 @@
     "message": "Istoric modificări"
   },
   "layout.footer.about.news": {
-    "message": "Știri"
+    "message": "Noutăți"
   },
   "layout.footer.about.rewards-program": {
     "message": "Program de recompense"
@@ -747,13 +747,13 @@
     "message": "Termeni de Utilizare"
   },
   "layout.footer.open-source": {
-    "message": "Modrinth are <github-link>sursă deschisă</github-link>."
+    "message": "Modrinth are <github-link>sursa deschisă</github-link>."
   },
   "layout.footer.products": {
     "message": "Produse"
   },
   "layout.footer.products.app": {
-    "message": "Aplicația Modrinth"
+    "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
@@ -1062,10 +1062,10 @@
     "message": "{title} nu este compatibil cu {gameVersion} pentru {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Instalează cu aplicația Modrinth"
+    "message": "Instalează cu Modrinth App"
   },
   "project.download.no-app": {
-    "message": "Nu ai aplicația Modrinth?"
+    "message": "Nu ai Modrinth App?"
   },
   "project.download.no-versions-available": {
     "message": "Nu există versiuni disponibile pentru {gameVersion} și {platform}."
@@ -1845,10 +1845,10 @@
     "message": "Deschide linkurile externe într-un tab nou"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Ascunde butoanele \"Descarcă aplicația Modrinth\" din navigarea principală. Pagina aplicației Modrinth poate fi găsită în continuare pe pagina de destinație sau în subsol."
+    "message": "Ascunde butoanele \"Descarcă Modrinth App\" din navigarea principală. Pagina aplicației Modrinth poate fi găsită în continuare pe pagina de destinație sau în subsol."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Ascunde promoțiile aplicației Modrinth"
+    "message": "Ascunde promoțiile Modrinth App"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Bară laterală aliniată la stânga pe paginile de conținut"
@@ -1909,6 +1909,9 @@
   },
   "settings.language.languages.search.no-results": {
     "message": "Nicio limbă nu corespunde căutării tale."
+  },
+  "settings.language.warning": {
+    "message": "Schimbarea limbii site-ului poate face ca o parte din conținut să apară în engleză dacă nu există o traducere disponibilă. Site-ul nu este încă complet tradus, așa că unele conținuturi pot rămâne în engleză pentru anumite limbi. Încă lucrăm la îmbunătățirea sistemului nostru de localizare, așa că, ocazional, conținutul poate apărea incomplet."
   },
   "settings.pats.action.create": {
     "message": "Creează un token PAT"
@@ -2007,9 +2010,9 @@
     "message": "Platformă necunoscută"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Cele mai recente știri de pe Modrinth"
+    "message": "Cele mai recente noutăți de pe Modrinth"
   },
   "ui.latest-news-row.view-all": {
-    "message": "Vedeți toate știrile"
+    "message": "Vedeți toate noutățile"
   }
 }

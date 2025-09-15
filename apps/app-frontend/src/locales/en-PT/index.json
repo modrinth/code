@@ -46,5 +46,11 @@
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Change yer picture"
+  },
+  "instance.worlds.type.server": {
+    "message": "Island"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Lonely Voyage"
   }
 }

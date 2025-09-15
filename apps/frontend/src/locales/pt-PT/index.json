@@ -21,7 +21,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "As versões para Linux da app do Modrinth <issues-link>apresentam problemas</issues-link> em determinados sistemas e configurações. Se a app do Modrinth for instável no teu sistema, recomendamos que uses outras aplicações como o <prism-link>Prism Launcher</prism-link> para instalar conteúdo do Modrinth facilmente."
+    "message": "As versões para Linux da Modrinth App<issues-link>apresentam problemas</issues-link> em determinados sistemas e configurações. Se a Modrinth App for instável no teu sistema, recomendamos que uses outras aplicações como o <prism-link>Prism Launcher</prism-link> para instalar conteúdo do Modrinth facilmente."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -30,25 +30,25 @@
     "message": "Opções de transferência"
   },
   "app-marketing.download.terms": {
-    "message": "Ao transferires a app do Modrinth, concordas com os nossos <terms-link>termos</terms-link> e <privacy-link>política de privacidade</privacy-link>."
+    "message": "Ao transferires a App Modrinth concordas com os nossos <terms-link>Termos</terms-link> e <privacy-link>Política de Privacidade</privacy-link>."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Pacotes de terceiros"
   },
   "app-marketing.download.title": {
-    "message": "Transfere a app do Modrinth (Beta)"
+    "message": "Transfere a Modrinth App (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
   },
   "app-marketing.features.follow.description": {
-    "message": "Guarda o conteúdo que mais gostas e recebe atualizações com um clique."
+    "message": "Guarda o conteúdo de que mais gostas e recebe atualizações com apenas um clique."
   },
   "app-marketing.features.follow.title": {
     "message": "Segue projetos"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importa os teus perfis favoritos do launcher que utilizavas antes e começa a usar a app do Modrinth em segundos!"
+    "message": "Importa os teus perfis favoritos do launcher que utilizavas antes e começa a usar a Modrinth App em segundos!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -75,7 +75,7 @@
     "message": "Nome"
   },
   "app-marketing.features.mod-management.search-mods": {
-    "message": "Procurar mods"
+    "message": "Pesquisar mods"
   },
   "app-marketing.features.mod-management.title": {
     "message": "Gestão de mods"
@@ -84,13 +84,13 @@
     "message": "Versão"
   },
   "app-marketing.features.offline.description": {
-    "message": "Joga os teus mods, quer tenhas ligação à internet ou não."
+    "message": "Joga com os teus mods, quer tenhas ligação à internet ou não."
   },
   "app-marketing.features.offline.title": {
     "message": "Modo offline"
   },
   "app-marketing.features.open-source.description": {
-    "message": "O lançador do Modrinth é totalmente código-aberto. Podes ver o código-fonte no nosso <github-link>GitHub</github-link>!"
+    "message": "O launcher do Modrinth é totalmente código-aberto. Podes ver o código-fonte no nosso <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Código aberto"
@@ -102,13 +102,13 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "A app do Modrinth tem um desempenho melhor do que muitos dos principais gestores de mods, usando apenas 150MB de RAM!"
+    "message": "A Modrinth App tem um desempenho melhor do que muitos dos principais gestores de mods, usando apenas 150MB de RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Boa performance"
+    "message": "Bom desempenho"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -123,7 +123,7 @@
     "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "App Modrinth"
+    "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 bilião %"
@@ -141,13 +141,13 @@
     "message": "Bom desempenho"
   },
   "app-marketing.features.play.description": {
-    "message": "Usa a app do Modrinth para transferires e jogares os teus mods e modpacks favoritos."
+    "message": "Usa a Modrinth App para transferires e jogares os teus mods e modpacks favoritos."
   },
   "app-marketing.features.play.title": {
     "message": "Joga com os teus mods favoritos"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Constrói, partilha, e joga modpacks com quaisquer dos milhares de mods e modpacks disponíveis aqui no Modrinth."
+    "message": "Constrói, partilha e joga modpacks com quaisquer dos milhares de mods e modpacks disponíveis aqui no Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modpack"
@@ -159,10 +159,10 @@
     "message": "Partilha modpacks"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Diferente de qualquer lançador"
+    "message": "Diferente de qualquer launcher"
   },
   "app-marketing.features.website.description": {
-    "message": "A App Modrinth é integrada totalmente com o website, para que possas aceder a todos os teus projetos favoritos através da app!"
+    "message": "A Modrinth App está totalmente integrada com o website, para que possas aceder a todos os teus projetos favoritos através da app!"
   },
   "app-marketing.features.website.title": {
     "message": "Integração com o website"
@@ -171,19 +171,19 @@
     "message": "que tenhas usado antes"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Captura de ecrã da App Modrinth com uma instância de Cobblemon aberta na página \"Conteúdo\"."
+    "message": "Captura de ecrã da Modrinth App com uma instância de Cobblemon aberta na página \"Conteúdo\"."
   },
   "app-marketing.hero.description": {
-    "message": "A App Modrinth é um lançador único, de código aberto que te permite jogar os teus mods favoritos, e mantê-los atualizados, tudo no mesmo sítio."
+    "message": "A Modrinth App é um launcher único, de código aberto que te permite jogar os teus mods favoritos, e mantê-los atualizados, tudo no mesmo sítio."
   },
   "app-marketing.hero.download-button": {
-    "message": "Transferir a App Modrinth"
+    "message": "Transferir a Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Transferir a App Modrinth"
+    "message": "Transferir a Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Transfere a App Modrinth para {os}"
+    "message": "Transfere a Modrinth App para {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Captura de ecrã do menu principal da instância de Cobblemon."
@@ -348,7 +348,7 @@
     "message": "Receber novidades sobre o Modrinth por e-mail"
   },
   "auth.welcome.description": {
-    "message": "Agora fazes parte da incrível comunidade de criadores & exploradores que já estão a construir, a transferir, e a manterem-se atualizados com mods incríveis."
+    "message": "Agora fazes parte da incrível comunidade de criadores e exploradores que criam, transferem e se mantêm atualizados com mods fantásticos."
   },
   "auth.welcome.label.tos": {
     "message": "Ao criares uma conta, concordas com os <terms-link>Termos</terms-link> e com a <privacy-policy-link>Política de Privacidade </privacy-policy-link> do Modrinth."
@@ -357,7 +357,7 @@
     "message": "Bem-vindo(a) ao Modrinth!"
   },
   "auth.welcome.title": {
-    "message": "Bem-vindo(a)"
+    "message": "Boas-vindas"
   },
   "collection.button.delete-icon": {
     "message": "Apagar ícone"
@@ -390,7 +390,7 @@
     "message": "Coleção"
   },
   "collection.label.created-at": {
-    "message": "Criada há {ago}"
+    "message": "Criada {ago}"
   },
   "collection.label.curated-by": {
     "message": "Curada por"
@@ -408,7 +408,7 @@
     "message": "{count, plural, one {<stat>{count}</stat> projeto} other {<stat>{count}</stat> projetos}}"
   },
   "collection.label.updated-at": {
-    "message": "Atualizado há {ago}"
+    "message": "Atualizado {ago}"
   },
   "collection.title": {
     "message": "{name} - Coleção"
@@ -480,7 +480,7 @@
     "message": "Podes ter inserido incorretamente o URL do projeto."
   },
   "error.project.404.list_item.2": {
-    "message": "O dono do projeto pode ter alterado o URL, tornado o projeto privado, ou tê-lo apagado."
+    "message": "O dono do projeto pode ter alterado o URL, ter tornado o projeto privado, ou tê-lo apagado."
   },
   "error.project.404.list_item.3": {
     "message": "O projeto pode ter sido mandado abaixo pela equipa de moderação do Modrinth por violar os nossos <tou-link>Termos de Uso</tou-link>."
@@ -516,7 +516,7 @@
     "message": "{count, plural,one {{count} outra pessoa também foi sapada} other {{count} outras pessoas foram sapadas}}!"
   },
   "frog.sinceOpened": {
-    "message": "Esta página foi aberta há {ago}"
+    "message": "Esta página foi aberta {ago}"
   },
   "frog.title": {
     "message": "Sapo"
@@ -525,7 +525,7 @@
     "message": "Descobrir mods"
   },
   "landing.button.go-to-dashboard": {
-    "message": "Ir para o painel de controlo"
+    "message": "Ir para o painel"
   },
   "landing.creator.feature.constantly-evolving.description": {
     "message": "Obtém a melhor experiência de modding possível com atualizações constantes da equipa do Modrinth"
@@ -537,7 +537,7 @@
     "message": "Obtém relatórios detalhados sobre visualizações de páginas, número de transferências e receita"
   },
   "landing.creator.feature.data-statistics.title": {
-    "message": "Dados e estatísticas"
+    "message": "Dados e Estatísticas"
   },
   "landing.creator.feature.discovery.description": {
     "message": "Coloca o teu projeto à vista de milhares de utilizadores através de pesquisas, da página inicial, do servidor de Discord e futuramente de outras formas!"
@@ -546,7 +546,7 @@
     "message": "Visibilidade"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Integra o Minotaur nas tuas ferramentas de compilação para carregares uma nova versão do teu projeto automaticamente"
+    "message": "Integra o Minotaur nas tuas ferramentas de build para que os carregamentos sejam automáticos logo ao lançares uma nova versão"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Ecossistema diverso"
@@ -570,25 +570,25 @@
     "message": "Sê notificado sempre que os teus projetos favoritos recebem atualizações e fica a par das novidades"
   },
   "landing.feature.follow.heading": {
-    "message": "Segue os projetos que amas"
+    "message": "Segue os teus projetos favoritos"
   },
   "landing.feature.launcher.description": {
-    "message": "A API de código-aberto do Modrinth permite que lançadores adicionem integrações profundas com o Modrinth. Podes usar o Modrinth através da <link>nossa app</link> e de alguns dos lançadores mais populares como ATLauncher, MultiMC, e Prism Launcher."
+    "message": "A API de código-aberto do Modrinth permite que launchers adicionem integrações profundas com o Modrinth. Podes usar o Modrinth através da <link>nossa app</link> e de alguns dos launchers mais populares como ATLauncher, MultiMC, e Prism Launcher."
   },
   "landing.feature.launcher.heading": {
-    "message": "Joga com o teu lançador favorito"
+    "message": "Joga com o teu launcher favorito"
   },
   "landing.feature.search.description": {
     "message": "A pesquisa ultrarrápida e os filtros poderosos do Modrinth permitem-te encontrar o que queres enquanto escreves."
   },
   "landing.feature.search.heading": {
-    "message": "Encontra o que queres, rápido e facilmente"
+    "message": "Encontra o que queres, de forma rápida e fácil"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "O lugar para {content} de Minecraft"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "data packs"
+    "message": "pacotes de dados"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
     "message": "modpacks"
@@ -615,7 +615,7 @@
     "message": "Uma representação simplificada de uma janela de Minecraft, com o logótipo da Mojang Studios em verde Modrinth."
   },
   "landing.launcher.modrinth-app-label": {
-    "message": "App Modrinth"
+    "message": "Modrinth App"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -627,7 +627,7 @@
     "message": "Notificações"
   },
   "landing.notifications.received-time": {
-    "message": "Recebida há {time}"
+    "message": "Recebida {time}"
   },
   "landing.notifications.version-released": {
     "message": "Versão {version} foi lançada para {gameVersion}"
@@ -666,7 +666,7 @@
     "message": "Alterar tema"
   },
   "layout.action.get-modrinth-app": {
-    "message": "Obter a App Modrinth"
+    "message": "Obter a Modrinth App"
   },
   "layout.avatar.alt": {
     "message": "O teu avatar"
@@ -723,13 +723,13 @@
     "message": "Programa de Recompensas"
   },
   "layout.footer.about.status": {
-    "message": "Status"
+    "message": "Estado"
   },
   "layout.footer.legal": {
     "message": "Informação legal"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "NÃO É UM SERVIÇO OFICIAL MINECRAFT. NÃO APROVADO POR, NEM ASSOCIADO COM MOJANG E/OU MICROSOFT."
+    "message": "NÃO É UM SERVIÇO OFICIAL MINECRAFT. NÃO APROVADO NEM ASSOCIADO À MOJANG E/OU À MICROSOFT."
   },
   "layout.footer.legal.copyright-policy": {
     "message": "Política de Direitos de Autor e DMCA"
@@ -753,13 +753,13 @@
     "message": "Produtos"
   },
   "layout.footer.products.app": {
-    "message": "App Modrinth"
+    "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Servidores Modrinth"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Recursos"
@@ -795,7 +795,7 @@
     "message": "Abrir/Fechar menu"
   },
   "layout.meta.description": {
-    "message": "Transfere mods, plugins, datapacks, shaders, pacotes de recursos e modpacks no Modrinth. Descobre e publica projetos no Modrinth com uma interface e API modernas e fáceis de usar."
+    "message": "Transfere mods, plugins, pacotes de dados, shaders, pacotes de recursos e modpacks no Modrinth. Descobre e publica projetos no Modrinth com uma interface e API modernas e fáceis de usar."
   },
   "layout.meta.og-description": {
     "message": "Descobre e publica conteúdo de Minecraft!"
@@ -843,7 +843,7 @@
     "message": "Utilizador não encontrado"
   },
   "profile.joined-at": {
-    "message": "Juntou-se há <date>{ago}</date>"
+    "message": "Juntou-se <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Emblemas"
@@ -954,10 +954,10 @@
     "message": "Coleção"
   },
   "project-type.datapack.plural": {
-    "message": "Data Packs"
+    "message": "Pacotes de Dados"
   },
   "project-type.datapack.singular": {
-    "message": "Data Pack"
+    "message": "Pacote de Dados"
   },
   "project-type.mod.plural": {
     "message": "Mods"
@@ -996,22 +996,22 @@
     "message": "Shader"
   },
   "project.about.details.created": {
-    "message": "Criado há {date}"
+    "message": "Criado {date}"
   },
   "project.about.details.licensed": {
     "message": "Licenciado {license}"
   },
   "project.about.details.published": {
-    "message": "Publicado há {date}"
+    "message": "Publicado {date}"
   },
   "project.about.details.submitted": {
-    "message": "Enviado há {date}"
+    "message": "Enviado {date}"
   },
   "project.about.details.title": {
     "message": "Detalhes"
   },
   "project.about.details.updated": {
-    "message": "Atualizado há {date}"
+    "message": "Atualizado {date}"
   },
   "project.actions.create-server": {
     "message": "Criar um servidor"
@@ -1062,10 +1062,10 @@
     "message": "{title} não suporta {gameVersion} para {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Instala com a App Modrinth"
+    "message": "Instala com a Modrinth App"
   },
   "project.download.no-app": {
-    "message": "Não tens a App Modrinth?"
+    "message": "Não tens a Modrinth App?"
   },
   "project.download.no-versions-available": {
     "message": "Nenhuma versão disponível para {gameVersion} e {platform}."
@@ -1143,7 +1143,7 @@
     "message": "Moderação"
   },
   "project.navigation.changelog": {
-    "message": "Lista de alterações"
+    "message": "Alterações"
   },
   "project.notification.icon-updated.message": {
     "message": "O ícone do teu projeto foi atualizado."
@@ -1236,7 +1236,7 @@
     "message": "Definições"
   },
   "project.settings.visit-dashboard": {
-    "message": "Visitar painel de controlo de projetos"
+    "message": "Visitar o painel de projetos"
   },
   "project.stats.downloads-label": {
     "message": "transferência{count, plural,one { } other {s}}"
@@ -1281,7 +1281,7 @@
     "message": "Violação das <rules-link>Regras</rules-link> ou <terms-link>Termos de Uso</terms-link> do Modrinth"
   },
   "report.for.violation.description": {
-    "message": "Exemplos incluem conteúdo malicioso, spam, ofensivo, enganoso, ilusório e ilegal."
+    "message": "Exemplos incluem conteúdo malicioso, de spam, ofensivo, enganoso, ilusório e ilegal."
   },
   "report.form-not-for": {
     "message": "Este formulário não é para:"
@@ -1359,10 +1359,10 @@
     "message": "Criar coleções"
   },
   "scopes.collectionDelete.description": {
-    "message": "Apagar coleções"
+    "message": "Eliminar coleções"
   },
   "scopes.collectionDelete.label": {
-    "message": "Apagar coleções"
+    "message": "Eliminar coleções"
   },
   "scopes.collectionRead.description": {
     "message": "Ler coleções"
@@ -1683,7 +1683,7 @@
     "message": "Sem avisos"
   },
   "servers.plan.large.description": {
-    "message": "Ideal para 15–25 jogadores, modpacks, ou muitos mods."
+    "message": "Ideal para 15 a 25 jogadores, modpacks ou muitos mods."
   },
   "servers.plan.large.name": {
     "message": "Grande"
@@ -1800,10 +1800,10 @@
     "message": "Ativa ou desativa certas funcionalidades neste dispositivo."
   },
   "settings.display.flags.title": {
-    "message": "Alternar recursos"
+    "message": "Funcionalidades"
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Página de Data Packs"
+    "message": "Página de Pacotes de Dados"
   },
   "settings.display.project-list-layouts.description": {
     "message": "Seleciona o teu layout preferido para cada página que exibe listas de projetos neste dispositivo."
@@ -1833,22 +1833,22 @@
     "message": "Coleção"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Ativa renderização avançada, como efeitos de desfoque, que podem causar problemas de desempenho sem o uso de renderização acelerada por hardware."
+    "message": "Ativa a renderização avançada, como efeitos de desfoque, que podem causar problemas de desempenho sem o uso de renderização acelerada por hardware."
   },
   "settings.display.sidebar.advanced-rendering.title": {
     "message": "Renderização Avançada"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Faz com que links direcionados para fora do Modrinth abram numa nova aba. Esta definição não afeta links no mesmo domínio e em descrições Markdown, que vão abrir na mesma aba, e links em anúncios e páginas de edição, que vão abrir numa nova aba."
+    "message": "Os links que redirecionam para fora do Modrinth serão abertos num novo separador. Esta definição não afeta links no mesmo domínio e em descrições Markdown, que serão abertos no mesmo separador, nem links em anúncios e páginas de edição, que serão abertos num novo separador."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Abrir links externos numa nova aba"
+    "message": "Abrir links externos num novo separador"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Oculta os botões \"Obter a App Modrinth\" da navegação primária. A página da App Modrinth ainda pode ser encontrada na página inicial ou no rodapé."
+    "message": "Oculta os botões \"Obter a Modrinth App\" da navegação primária. A página da Modrinth App ainda pode ser encontrada na página inicial ou no rodapé."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Ocultar promoções da App Modrinth"
+    "message": "Ocultar promoções da Modrinth App"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Barra lateral alinhada à esquerda em páginas de conteúdo"
@@ -1910,6 +1910,9 @@
   "settings.language.languages.search.no-results": {
     "message": "Nenhum idioma corresponde à tua pesquisa."
   },
+  "settings.language.warning": {
+    "message": "Como o site ainda não está totalmente traduzido, alguns conteúdos poderão permanecer em inglês, caso não haja uma tradução disponível. Estamos a trabalhar para melhorar o nosso sistema de localização, por isso, alguns conteúdos podem não ser apresentados corretamente."
+  },
   "settings.pats.action.create": {
     "message": "Criar um TAP"
   },
@@ -1950,22 +1953,22 @@
     "message": "Revogar token"
   },
   "settings.pats.token.expired-ago": {
-    "message": "Expirou a {ago}"
+    "message": "Expirou {ago}"
   },
   "settings.pats.token.expires-in": {
     "message": "Expira em {inTime}"
   },
   "settings.pats.token.last-used": {
-    "message": "Último uso há {ago}"
+    "message": "Último uso {ago}"
   },
   "settings.pats.token.never-used": {
     "message": "Nunca usado"
   },
   "settings.profile.bio.description": {
-    "message": "Uma breve descrição para falar um pouco sobre ti para todos."
+    "message": "Uma breve descrição para que todos possam saber mais sobre ti."
   },
   "settings.profile.bio.title": {
-    "message": "Bio"
+    "message": "Biografia"
   },
   "settings.profile.description": {
     "message": "As informações do teu perfil são visíveis publicamente no Modrinth e por meio da <docs-link>Modrinth API</docs-link>."
@@ -1989,7 +1992,7 @@
     "message": "Revogar sessão"
   },
   "settings.sessions.created-ago": {
-    "message": "Criada há {ago}"
+    "message": "Criada {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Sessão atual"

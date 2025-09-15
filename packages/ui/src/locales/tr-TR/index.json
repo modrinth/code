@@ -1,4 +1,7 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
   "badge.beta-release": {
     "defaultMessage": "Beta Sürümü"
   },
@@ -81,7 +84,7 @@
     "defaultMessage": "Çıkış yap"
   },
   "button.sign-up": {
-    "defaultMessage": "Giriş yap"
+    "defaultMessage": "Kaydol"
   },
   "button.stop": {
     "defaultMessage": "Durdur"
@@ -144,7 +147,7 @@
     "defaultMessage": "İzleyici modu"
   },
   "instance.worlds.game_mode.survival": {
-    "defaultMessage": "Hayatta Kalma modu"
+    "defaultMessage": "Hayatta kalma modu"
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Bilinmeyen oyun modu"
@@ -483,7 +486,7 @@
     "defaultMessage": "Tüm işlevler sunucu tarafında gerçekleştirilir ve vanilla istemcilerle uyumludur."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
-    "defaultMessage": "Tek Oyunculuda da çalışır"
+    "defaultMessage": "Tek oyunculuda da çalışır"
   },
   "project.settings.environment.server_only.title": {
     "defaultMessage": "Sadece Sunucu-Tarafı"
@@ -718,6 +721,9 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Bölge listede yok mu? <link>Modrinth Sunucularını ileride nerede görmek istediğini bize bildir!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Güneydoğu Asya"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Batı Avrupa"

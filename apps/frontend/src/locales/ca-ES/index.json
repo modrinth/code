@@ -82,5 +82,8 @@
   },
   "layout.action.change-theme": {
     "message": "Canviar tema"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Afegir mètode de pagament"
   }
 }

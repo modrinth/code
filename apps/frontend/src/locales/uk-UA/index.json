@@ -522,43 +522,43 @@
     "message": "Жаба"
   },
   "landing.button.discover-mods": {
-    "message": "Відкрити для себе моди"
+    "message": "Дослідити модифікації"
   },
   "landing.button.go-to-dashboard": {
     "message": "До панелі керування"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Отримуйте найкращий досвід моддингу, який можливий з постійними оновленнями від команди Modrinth"
+    "message": "Отримуйте найкращий можливий досвід створення модифікацій завдяки постійним оновленням від команди Modrinth"
   },
   "landing.creator.feature.constantly-evolving.title": {
-    "message": "Постійно розвивається"
+    "message": "Постійний розвиток"
   },
   "landing.creator.feature.data-statistics.description": {
-    "message": "Отримуйте детальні звіти про перегляди, завантаження і доходи"
+    "message": "Отримуйте детальні звіти про перегляди, завантаження та доходи"
   },
   "landing.creator.feature.data-statistics.title": {
-    "message": "Дані і статистика"
+    "message": "Дані та статистика"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Відкрийте свій проєкт для тисяч користувачів через пошук, нашу головну сторінку, сервер Discord, та ще багато інших можливостей які з'являться в майбутньому!"
+    "message": "Дозвольте тисячам користувачів відкрити для себе ваш проєкт через пошук, нашу головну сторінку, сервер у Discord та інших способів, які з'являться в майбутньому!"
   },
   "landing.creator.feature.discovery.title": {
-    "message": "Досліджуйте"
+    "message": "Охоплення"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Інтегруйте інструменти збірки з Minotaur щоб одразу завантажувати нові версії, як тільки ви їх випускаєте"
+    "message": "Інтегруйте ваші інструменти збірки з Minotaur, щоб автоматично завантажувати нові версії, щойно ви їх випускаєте"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
-    "message": "Різноманітна Екосистема"
+    "message": "Різноманітна екосистема"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Отримуйте дохід від реклами зі сторінок ваших проєктів і знімайте кошти в будь-який час"
+    "message": "Отримуйте дохід від реклами на сторінках ваших проєктів і виводьте кошти в будь-який час"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Монетизація"
   },
   "landing.creator.feature.team-management.description": {
-    "message": "Запрошуйте ваших учасників команди та керуйте ролями та дозволами з легкістю"
+    "message": "Запрошуйте учасників вашої команди й керуйте їх ролями та дозволами з легкістю"
   },
   "landing.creator.feature.team-management.title": {
     "message": "Керування командою"
@@ -567,46 +567,46 @@
     "message": "Не вдалося завантажити випадкові проєкти :("
   },
   "landing.feature.follow.description": {
-    "message": "Отримуйте сповіщення кожен раз, як тільки ваші улюблені проєкти оновлются, і будьте в курсі подій"
+    "message": "Отримуйте сповіщення щоразу, коли ваші улюблені проєкти оновлюються й будьте в курсі подій"
   },
   "landing.feature.follow.heading": {
-    "message": "Відстежуйте проєкти які ви любите"
+    "message": "Відстежуйте проєкти, які любите"
   },
   "landing.feature.launcher.description": {
-    "message": "Відкрите API Modrinth дозволяє лаунчерам реалізувати глибоку інтеграцію з Modrinth. Ви можете користуватися Modrinth через <link>нашу власну програму</link> або деякими з найбільш популярний лаунчерів, таких як ATLauncher, MultiMC, або Prism Launcher."
+    "message": "Відкрите API Modrinth дозволяє запускачам реалізувати глибоку інтеграцію з Modrinth. Ви можете користуватися Modrinth у <link>нашому застосунку</link>, або через деякі найпопулярніші запускачі, наприклад, ATLauncher, MultiMC, або Prism Launcher."
   },
   "landing.feature.launcher.heading": {
-    "message": "Грайте з вашим улюбленим лаунчером"
+    "message": "Грайте з вашим улюбленим запускачем"
   },
   "landing.feature.search.description": {
-    "message": "Швидкісний пошук та потужні фільтри Modrinth дозволяють знаходити те що вам потрібно одразу під час введення."
+    "message": "Зі швидкісним пошуком і потужними фільтри Modrinth ви зможете знаходити те, що вам потрібно, вже під час набору."
   },
   "landing.feature.search.heading": {
-    "message": "Знаходьте те що ви хочете, швидко та легко"
+    "message": "Знаходите те, що бажаєте, швидко та легко"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "Місце для {content} Minecraft"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "пакети даних"
+    "message": "пакетів даних"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
-    "message": "збірки модів"
+    "message": "збірок"
   },
   "landing.heading.the-place-for-minecraft.mods": {
-    "message": "модифікації"
+    "message": "модифікацій"
   },
   "landing.heading.the-place-for-minecraft.plugins": {
-    "message": "плаґіни"
+    "message": "плаґінів"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "пакети ресурсів"
+    "message": "пакетів ресурсів"
   },
   "landing.heading.the-place-for-minecraft.servers": {
-    "message": "сервери"
+    "message": "серверів"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "шейдери"
+    "message": "шейдерів"
   },
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
@@ -621,7 +621,7 @@
     "message": "Prism Launcher"
   },
   "landing.notifications.has-been-updated": {
-    "message": "{title} отримав оновлення!"
+    "message": "Вийшло оновлення для «{title}»!"
   },
   "landing.notifications.heading": {
     "message": "Сповіщення"
@@ -642,25 +642,25 @@
     "message": "Сортувати за"
   },
   "landing.section.for-creators.description": {
-    "message": "Зробіть дім в мережі для своїх творінь і охоплюйте масивну аудиторію вірних гравців"
+    "message": "Зробіть дім для своїх творінь й охоплюйте величезну авдиторію відданих гравців"
   },
   "landing.section.for-creators.label": {
     "message": "Для творців"
   },
   "landing.section.for-creators.tagline": {
-    "message": "Діліться вашим контентом зі світом"
+    "message": "Діліться вашим вмістом зі світом"
   },
   "landing.section.for-players.description": {
-    "message": "Від магічних біомів до проклятих підземель, то ж ви точно знайдете контент, який виведе ваш ігровий процес до наступного рівня."
+    "message": "Від чарівних біомів до проклятих підземель — ви обов'язково знайдете вміст, який виведе вашу гру на новий рівень."
   },
   "landing.section.for-players.label": {
     "message": "Для гравців"
   },
   "landing.section.for-players.tagline": {
-    "message": "Дослідите близько {count} творінь"
+    "message": "Відкрийте для себе понад {count} творінь"
   },
   "landing.subheading": {
-    "message": "Досліджуйте, грайте, та діліться контентом Minecraft через нашу платформу з відкритим вихідним кодом, зробленої для спільноти."
+    "message": "Досліджуйте, грайте, та діліться вмістом Minecraft через нашу платформу з відкритим кодом, розроблену для спільноти."
   },
   "layout.action.change-theme": {
     "message": "Змінити тему"
@@ -708,7 +708,7 @@
     "message": "З міркувань безпеки, Modrinth вимагає підтвердження адреси електронної пошти, пов'язаної з вашим обліковим записом."
   },
   "layout.footer.about": {
-    "message": "Про"
+    "message": "Про нас"
   },
   "layout.footer.about.careers": {
     "message": "Кар'єра"
@@ -747,7 +747,7 @@
     "message": "Умови використання"
   },
   "layout.footer.open-source": {
-    "message": "Програма Modrinth є на <github-link>відкритому коді</github-link>."
+    "message": "Modrinth має <github-link>відкритий код</github-link>."
   },
   "layout.footer.products": {
     "message": "Продукти"
@@ -759,7 +759,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Сервери Modrinth"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Ресурси"
@@ -1909,6 +1909,9 @@
   },
   "settings.language.languages.search.no-results": {
     "message": "Жодна мова не пасує до твого пошуку."
+  },
+  "settings.language.warning": {
+    "message": "Зміна мови сайту може призвести до відображення деякого контенту англійською, якщо переклад недоступний. Сайт ще не перекладений повністю, тож якийсь контент може залишатися англійською для певних мов. Ми все ще працюємо над покращенням нашої локалізації, тому іноді контент може виглядати пошкодженним."
   },
   "settings.pats.action.create": {
     "message": "Створити PAT"

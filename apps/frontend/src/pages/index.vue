@@ -204,8 +204,10 @@
 						<h3>{{ formatMessage(messages.playWithLauncherHeading) }}</h3>
 						<p>
 							<IntlFormatted :message-id="messages.playWithLauncherDescription">
-								<template #link>
-									<nuxt-link class="title-link" to="/app">our own app</nuxt-link>
+								<template #link="{ children }">
+									<nuxt-link class="title-link" to="/app">
+										<component :is="() => children" />
+									</nuxt-link>
 								</template>
 							</IntlFormatted>
 						</p>
@@ -531,7 +533,7 @@ const messages = defineMessages({
 	creatorsDescription: {
 		id: 'landing.section.for-creators.description',
 		defaultMessage:
-			'Give an online home to your creations and reach a massive audience of dedicated players',
+			'Give an online home to your creations and reach a massive audience of dedicated players.',
 	},
 	findWhatYouWantHeading: {
 		id: 'landing.feature.search.heading',
@@ -548,7 +550,7 @@ const messages = defineMessages({
 	},
 	followProjectsDescription: {
 		id: 'landing.feature.follow.description',
-		defaultMessage: 'Get notified every time your favorite projects update and stay in the loop',
+		defaultMessage: 'Get notified every time your favorite projects update and stay in the loop.',
 	},
 	playWithLauncherHeading: {
 		id: 'landing.feature.launcher.heading',
@@ -982,10 +984,14 @@ const creatorFeatureMessages = defineMessages({
 							display: flex;
 							gap: 0.75rem;
 							align-items: center;
-							min-width: 12.25rem;
+
+							.label {
+								white-space: nowrap;
+							}
 
 							.selector {
-								max-width: 8rem;
+								min-width: 8rem;
+								white-space: nowrap;
 							}
 
 							@media screen and (max-width: 500px) {
@@ -1283,6 +1289,7 @@ const creatorFeatureMessages = defineMessages({
 	font-weight: 600;
 	line-height: 100%;
 	margin: 0 0 0.25rem;
+	width: 100%;
 }
 
 .main-header-strong {
@@ -1294,6 +1301,7 @@ const creatorFeatureMessages = defineMessages({
 	-webkit-text-fill-color: transparent;
 	-moz-text-fill-color: transparent;
 	color: transparent;
+	white-space: nowrap;
 }
 
 .animate-strong {

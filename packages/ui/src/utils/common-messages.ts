@@ -271,6 +271,87 @@ export const commonMessages = defineMessages({
 	},
 })
 
+export const commonProjectTypeCategoryMessages = defineMessages({
+	datapack: {
+		id: 'project-type.datapack.category',
+		defaultMessage: 'Data Packs',
+	},
+	mod: {
+		id: 'project-type.mod.category',
+		defaultMessage: 'Mods',
+	},
+	modpack: {
+		id: 'project-type.modpack.category',
+		defaultMessage: 'Modpacks',
+	},
+	plugin: {
+		id: 'project-type.plugin.category',
+		defaultMessage: 'Plugins',
+	},
+	resourcepack: {
+		id: 'project-type.resourcepack.category',
+		defaultMessage: 'Resource Packs',
+	},
+	shader: {
+		id: 'project-type.shader.category',
+		defaultMessage: 'Shaders',
+	},
+})
+
+export const commonProjectTypeTitleMessages = defineMessages({
+	datapack: {
+		id: 'project-type.datapack.capital',
+		defaultMessage: '{count, plural, one {Data Pack} other {Data Packs}}',
+	},
+	mod: {
+		id: 'project-type.mod.capital',
+		defaultMessage: '{count, plural, one {Mod} other {Mods}}',
+	},
+	modpack: {
+		id: 'project-type.modpack.capital',
+		defaultMessage: '{count, plural, one {Modpack} other {Modpacks}}',
+	},
+	plugin: {
+		id: 'project-type.plugin.capital',
+		defaultMessage: '{count, plural, one {Plugin} other {Plugins}}',
+	},
+	resourcepack: {
+		id: 'project-type.resourcepack.capital',
+		defaultMessage: '{count, plural, one {Resource Pack} other {Resource Packs}}',
+	},
+	shader: {
+		id: 'project-type.shader.capital',
+		defaultMessage: '{count, plural, one {Shader} other {Shaders}}',
+	},
+})
+
+export const commonProjectTypeSentenceMessages = defineMessages({
+	datapack: {
+		id: 'project-type.datapack.lowercase',
+		defaultMessage: '{count, plural, one {data pack} other {data packs}}',
+	},
+	mod: {
+		id: 'project-type.mod.lowercase',
+		defaultMessage: '{count, plural, one {mod} other {mods}}',
+	},
+	modpack: {
+		id: 'project-type.modpack.lowercase',
+		defaultMessage: '{count, plural, one {modpack} other {modpacks}}',
+	},
+	plugin: {
+		id: 'project-type.plugin.lowercase',
+		defaultMessage: '{count, plural, one {plugin} other {plugins}}',
+	},
+	resourcepack: {
+		id: 'project-type.resourcepack.lowercase',
+		defaultMessage: '{count, plural, one {resource pack} other {resource packs}}',
+	},
+	shader: {
+		id: 'project-type.shader.lowercase',
+		defaultMessage: '{count, plural, one {shader} other {shaders}}',
+	},
+})
+
 export const commonSettingsMessages = defineMessages({
 	account: {
 		id: 'settings.account.title',
