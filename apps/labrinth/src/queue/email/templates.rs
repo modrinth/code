@@ -57,6 +57,7 @@ impl MailingIdentity {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub async fn build_email(
     exec: impl sqlx::PgExecutor<'_>,
     redis: &RedisPool,

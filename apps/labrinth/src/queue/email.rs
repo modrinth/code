@@ -88,7 +88,7 @@ impl Mailer {
                     }
                 }
             }
-            Mailer::Initialized(transport) => Some(Arc::clone(&transport)),
+            Mailer::Initialized(transport) => Some(Arc::clone(transport)),
         };
 
         let transport =
@@ -198,17 +198,14 @@ impl EmailQueue {
                 )
                 .await?;
 
-                let mailbox = match maybe_user
+                let Some(mailbox) = maybe_user
                     .and_then(|user| user.email)
                     .and_then(|email| email.parse().ok())
-                {
-                    Some(m) => m,
-                    None => {
-                        return Ok((
-                            notification.id,
-                            NotificationDeliveryStatus::SkippedPreferences,
-                        ));
-                    }
+                else {
+                    return Ok((
+                        notification.id,
+                        NotificationDeliveryStatus::SkippedPreferences,
+                    ));
                 };
 
                 this.send_one_with_transport(
@@ -235,11 +232,11 @@ impl EmailQueue {
 
                         let mut delivery = deliveries.remove(idx);
                         delivery.status = status;
-                        delivery.next_attempt += update_next_attempt
-                            .then_some(chrono::Duration::seconds(
-                                EMAIL_RETRY_DELAY_SECONDS,
-                            ))
-                            .unwrap_or_default();
+                        delivery.next_attempt += if update_next_attempt {
+                            chrono::Duration::seconds(EMAIL_RETRY_DELAY_SECONDS)
+                        } else {
+                            chrono::Duration::seconds(0)
+                        };
 
                         delivery.attempt_count += 1;
                         delivery.update(&self.pg).await?;
@@ -323,7 +320,7 @@ impl EmailQueue {
 
         let send_result = transport.send(message).await;
 
-        Ok(send_result.map(|_| NotificationDeliveryStatus::Delivered).unwrap_or_else(|error| {
+        Ok(send_result.map_or_else(|error| {
             error!(%error, smtp.code = ?extract_smtp_code(&error), "Error sending email");
 
             if error.is_permanent() {
@@ -331,7 +328,7 @@ impl EmailQueue {
             } else {
                 NotificationDeliveryStatus::Pending
             }
-        }))
+        }, |_| NotificationDeliveryStatus::Delivered))
     }
 }
 
