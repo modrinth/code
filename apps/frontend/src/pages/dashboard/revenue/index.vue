@@ -52,7 +52,7 @@
 					>
 					<span
 						class="text-lg font-semibold text-contrast"
-						:class="{ 'text-green': hoveredSeg === 'available' }"
+						:class="{ '!text-green': hoveredSeg === 'available' }"
 						>{{ formatMoney(totalAvailable) }}</span
 					>
 				</div>
@@ -112,7 +112,7 @@
 					</span>
 					<span
 						class="text-lg font-semibold text-contrast"
-						:class="{ 'text-gray': hoveredSeg === 'processing' }"
+						:class="{ '!text-gray': hoveredSeg === 'processing' }"
 						>{{ formatMoney(processingDate?.amount ?? 0) }}</span
 					>
 				</div>
@@ -493,7 +493,7 @@ const dateHighlightClasses = [
 	'bg-highlight-red',
 ] as const
 
-const dateTextClasses = ['text-blue-400', 'text-purple', 'text-orange', 'text-red'] as const
+const dateTextClasses = ['!text-brand-blue', '!text-purple', '!text-orange', '!text-red'] as const
 
 const dateSegments = computed(() => {
 	const dates = nextDate.value
