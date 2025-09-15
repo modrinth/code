@@ -1016,10 +1016,12 @@ pub async fn upload_file(
         ));
     }
 
-    if let ValidationResult::Warning(msg) = validation_result
+    if let ValidationResult::Warning(warning) = validation_result
         && primary
     {
-        return Err(CreateError::InvalidInput(msg.to_string()));
+        return Err(CreateError::InvalidInput(
+            CreationInvalidInput::FileValidation(warning),
+        ));
     }
 
     let url = format!("{cdn_url}/{file_path_encode}");

@@ -1,5 +1,6 @@
 use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult, filter_out_packs,
+    SupportedGameVersions, ValidationError, ValidationResult,
+    ValidationWarning, filter_out_packs,
 };
 use std::io::Cursor;
 use zip::ZipArchive;
@@ -25,7 +26,7 @@ impl super::Validator for RiftValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if archive.by_name("riftmod.json").is_err() {
             return Ok(ValidationResult::Warning(
-                "No riftmod.json present for Rift file.",
+                ValidationWarning::MissingRiftmodJson,
             ));
         }
 

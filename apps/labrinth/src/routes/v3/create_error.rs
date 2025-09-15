@@ -7,6 +7,7 @@ use crate::models::ids::ImageId;
 use crate::models::projects::VersionStatus;
 use crate::routes::error::ApiError;
 use crate::search::indexing::IndexingError;
+use crate::validate::ValidationWarning;
 use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
 use ariadne::i18n_enum;
@@ -168,6 +169,7 @@ pub enum CreationInvalidInput {
     MissingLoaderFields(String),
     #[display("No json segment found in multipart.")]
     NoJsonInMultipart,
+    FileValidation(ValidationWarning),
     Validation(String),
 }
 
@@ -202,6 +204,7 @@ i18n_enum!(
     NonexistentLoaderField(field) => "nonexistent_loader_field",
     MissingLoaderFields(fields) => "missing_loader_fields",
     NoJsonInMultipart! => "no_json_in_multipart",
+    FileValidation(transparent cause) => "file_validation",
     Validation(transparent reason) => "validation",
 );
 

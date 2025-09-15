@@ -1,6 +1,6 @@
 use crate::validate::{
     MaybeProtectedZipFile, PLAUSIBLE_PACK_REGEX, SupportedGameVersions,
-    ValidationError, ValidationResult,
+    ValidationError, ValidationResult, ValidationWarning,
 };
 use chrono::DateTime;
 use std::io::Cursor;
@@ -39,7 +39,7 @@ impl super::Validator for PackValidator {
             Ok(ValidationResult::Pass)
         } else {
             Ok(ValidationResult::Warning(
-                "No pack.mcmeta present for resourcepack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!",
+                ValidationWarning::MissingResourcePackPackMcmeta,
             ))
         }
     }
@@ -70,7 +70,7 @@ impl super::Validator for TexturePackValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if archive.by_name("pack.txt").is_err() {
             return Ok(ValidationResult::Warning(
-                "No pack.txt present for pack file.",
+                ValidationWarning::MissingPackTxt,
             ));
         }
 

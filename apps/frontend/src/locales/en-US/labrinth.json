@@ -451,5 +451,68 @@
   },
   "labrinth.error.zip_error": {
     "message": "Unable to read Zip Archive: {cause}"
+  },
+  "labrinth.warning.file_validation.invalid_mrpack": {
+    "message": "Invalid modpack file. You must upload a valid .mrpack file."
+  },
+  "labrinth.warning.file_validation.missing_bukkit_plugin_yml": {
+    "message": "No plugin.yml or paper-plugin.yml present for plugin file."
+  },
+  "labrinth.warning.file_validation.missing_bungeecord_plugin_yml": {
+    "message": "No plugin.yml or bungee.yml present for plugin file."
+  },
+  "labrinth.warning.file_validation.missing_canvas_pack_mcmeta": {
+    "message": "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!"
+  },
+  "labrinth.warning.file_validation.missing_datapack_pack_mcmeta": {
+    "message": "No pack.mcmeta present for datapack file. Tip: Make sure pack.mcmeta is in the root directory of your datapack!"
+  },
+  "labrinth.warning.file_validation.missing_fabric_mod_json": {
+    "message": "No fabric.mod.json present for Fabric file."
+  },
+  "labrinth.warning.file_validation.missing_litemod_json": {
+    "message": "No litemod.json present for LiteLoader file."
+  },
+  "labrinth.warning.file_validation.missing_mcmod_info": {
+    "message": "Forge mod file does not contain mcmod.info or valid class files!"
+  },
+  "labrinth.warning.file_validation.missing_mods_toml": {
+    "message": "No mods.toml or valid class files present for Forge file."
+  },
+  "labrinth.warning.file_validation.missing_neoforge_mods_toml": {
+    "message": "No neoforge.mods.toml, mods.toml, or valid class files present for NeoForge file."
+  },
+  "labrinth.warning.file_validation.missing_pack_manifest": {
+    "message": "Pack manifest is missing."
+  },
+  "labrinth.warning.file_validation.missing_pack_txt": {
+    "message": "No pack.txt present for pack file."
+  },
+  "labrinth.warning.file_validation.missing_pipelines_folder": {
+    "message": "No pipeline shaders folder present for canvas shaders."
+  },
+  "labrinth.warning.file_validation.missing_quilt_mod_json": {
+    "message": "No quilt.mod.json present for Quilt file."
+  },
+  "labrinth.warning.file_validation.missing_resource_pack_pack_mcmeta": {
+    "message": "No pack.mcmeta present for resource pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!"
+  },
+  "labrinth.warning.file_validation.missing_riftmod_json": {
+    "message": "No riftmod.json present for Rift file."
+  },
+  "labrinth.warning.file_validation.missing_shaders_folder": {
+    "message": "No shaders folder present for OptiFine/Iris shader."
+  },
+  "labrinth.warning.file_validation.missing_sponge_plugins_json": {
+    "message": "No sponge_plugins.json or mcmod.info present for Sponge plugin."
+  },
+  "labrinth.warning.file_validation.missing_vanilla_shaders_folder": {
+    "message": "No pack.mcmeta or vanilla shaders folder present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!"
+  },
+  "labrinth.warning.file_validation.missing_velocity_plugin_json": {
+    "message": "No velocity-plugin.json present for plugin file."
+  },
+  "labrinth.warning.file_validation.wrong_file_extension": {
+    "message": "File extension is invalid for input file"
   }
 }

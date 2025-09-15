@@ -1,5 +1,5 @@
 use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult,
+    SupportedGameVersions, ValidationError, ValidationResult, ValidationWarning,
 };
 use std::io::Cursor;
 use zip::ZipArchive;
@@ -28,7 +28,7 @@ impl super::Validator for PluginYmlValidator {
             .any(|name| name == "plugin.yml" || name == "paper-plugin.yml")
         {
             return Ok(ValidationResult::Warning(
-                "No plugin.yml or paper-plugin.yml present for plugin file.",
+                ValidationWarning::WrongFileExtension,
             ));
         };
 
@@ -60,7 +60,7 @@ impl super::Validator for BungeeCordValidator {
             .any(|name| name == "plugin.yml" || name == "bungee.yml")
         {
             return Ok(ValidationResult::Warning(
-                "No plugin.yml or bungee.yml present for plugin file.",
+                ValidationWarning::MissingBungeecordPluginYml,
             ));
         };
 
@@ -89,7 +89,7 @@ impl super::Validator for VelocityValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if archive.by_name("velocity-plugin.json").is_err() {
             return Ok(ValidationResult::Warning(
-                "No velocity-plugin.json present for plugin file.",
+                ValidationWarning::MissingVelocityPluginJson,
             ));
         }
 
@@ -122,7 +122,7 @@ impl super::Validator for SpongeValidator {
                 || name == "META-INF/sponge_plugins.json"
         }) {
             return Ok(ValidationResult::Warning(
-                "No sponge_plugins.json or mcmod.info present for Sponge plugin.",
+                ValidationWarning::MissingSpongePluginsJson,
             ));
         };
 

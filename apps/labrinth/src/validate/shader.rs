@@ -1,6 +1,6 @@
 use crate::validate::{
     MaybeProtectedZipFile, PLAUSIBLE_PACK_REGEX, SupportedGameVersions,
-    ValidationError, ValidationResult,
+    ValidationError, ValidationResult, ValidationWarning,
 };
 use std::{io::Cursor, sync::LazyLock};
 use zip::ZipArchive;
@@ -26,7 +26,7 @@ impl super::Validator for ShaderValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if !archive.file_names().any(|x| x.starts_with("shaders/")) {
             return Ok(ValidationResult::Warning(
-                "No shaders folder present for OptiFine/Iris shader.",
+                ValidationWarning::MissingShadersFolder,
             ));
         }
 
@@ -55,13 +55,13 @@ impl super::Validator for CanvasShaderValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if archive.by_name("pack.mcmeta").is_err() {
             return Ok(ValidationResult::Warning(
-                "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!",
+                ValidationWarning::MissingCanvasPackMcmeta,
             ));
         };
 
         if !archive.file_names().any(|x| x.contains("/pipelines/")) {
             return Ok(ValidationResult::Warning(
-                "No pipeline shaders folder present for canvas shaders.",
+                ValidationWarning::MissingPipelinesFolder,
             ));
         }
 
@@ -118,7 +118,7 @@ impl super::Validator for CoreShaderValidator {
             Ok(ValidationResult::Pass)
         } else {
             Ok(ValidationResult::Warning(
-                "No pack.mcmeta or vanilla shaders folder present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!",
+                ValidationWarning::MissingVanillaShadersFolder,
             ))
         }
     }
