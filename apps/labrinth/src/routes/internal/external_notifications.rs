@@ -3,13 +3,13 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationBody;
+use crate::routes::error::ApiError;
 use crate::util::guards::external_notification_key_guard;
 use actix_web::web;
 use actix_web::{HttpResponse, post};
 use ariadne::ids::UserId;
 use serde::Deserialize;
 use sqlx::PgPool;
-use crate::routes::error::ApiError;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(create);

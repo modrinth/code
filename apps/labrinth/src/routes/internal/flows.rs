@@ -1167,11 +1167,13 @@ pub async fn auth_callback(
                         .execute(&mut *transaction)
                         .await?;
                 } else if let Some(user) = user {
-                    NotificationBuilder { body: NotificationBody::AuthProviderAdded { provider:
-                            provider.as_str()
-                        .to_string() } }
-                        .insert(user.id, &mut transaction, &redis)
-                        .await?;
+                    NotificationBuilder {
+                        body: NotificationBody::AuthProviderAdded {
+                            provider: provider.as_str().to_string(),
+                        },
+                    }
+                    .insert(user.id, &mut transaction, &redis)
+                    .await?;
                 }
 
                 transaction.commit().await?;

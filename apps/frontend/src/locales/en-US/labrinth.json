@@ -299,8 +299,14 @@
   "labrinth.error.mail.environment": {
     "message": "Environment Error"
   },
+  "labrinth.error.mail.http_template": {
+    "message": "HTTP error fetching template: {cause}"
+  },
   "labrinth.error.mail.smtp": {
     "message": "SMTP Error: {cause}"
+  },
+  "labrinth.error.mail.uninitialized": {
+    "message": "Couldn''t initialize SMTP transport"
   },
   "labrinth.error.not_found": {
     "message": "Resource not found"

@@ -1,5 +1,5 @@
-use crate::database::redis::RedisPool;
 use crate::database::ReadOnlyPgPool;
+use crate::database::redis::RedisPool;
 use crate::models::projects::{Project, Version, VersionType};
 use crate::models::v2::projects::{LegacyProject, LegacyVersion};
 use crate::queue::session::AuthQueue;

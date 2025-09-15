@@ -7,10 +7,10 @@ use crate::models::ids::{
     VersionId,
 };
 use crate::models::projects::ProjectStatus;
+use crate::routes::error::ApiError;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use crate::routes::error::ApiError;
 
 #[derive(Serialize, Deserialize)]
 pub struct Notification {

@@ -8,6 +8,8 @@ use crate::models::notifications::NotificationBody;
 use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
 };
+use crate::routes::error::ApiError;
+use ariadne::i18n_enum;
 use chrono::Utc;
 use futures::stream::{FuturesUnordered, StreamExt};
 use lettre::message::Mailbox;
@@ -20,8 +22,6 @@ use std::sync::Arc;
 use thiserror::Error;
 use tokio::sync::Mutex as TokioMutex;
 use tracing::{error, info, instrument, warn};
-use ariadne::i18n_enum;
-use crate::routes::error::ApiError;
 
 const EMAIL_RETRY_DELAY_SECONDS: i64 = 10;
 

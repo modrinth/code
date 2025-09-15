@@ -5,6 +5,7 @@ use crate::database::models::ids::*;
 use crate::database::models::notifications_template_item::NotificationTemplate;
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationBody;
+use crate::routes::error::ApiError;
 use futures::TryFutureExt;
 use lettre::Message;
 use lettre::message::{Mailbox, MultiPart, SinglePart};
@@ -12,7 +13,6 @@ use sqlx::query;
 use std::collections::HashMap;
 use std::time::Duration;
 use tracing::{error, warn};
-use crate::routes::error::ApiError;
 
 const USER_NAME: &str = "user.name";
 const USER_EMAIL: &str = "user.email";
