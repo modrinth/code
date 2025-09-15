@@ -1,2 +1,240 @@
-{}
+{
+  "badge.beta": {
+    "defaultMessage": "בטא"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "גרסת בטא"
+  },
+  "badge.new": {
+    "defaultMessage": "חדש"
+  },
+  "button.back": {
+    "defaultMessage": "אחורה"
+  },
+  "button.cancel": {
+    "defaultMessage": "ביטול"
+  },
+  "button.continue": {
+    "defaultMessage": "המשך"
+  },
+  "button.copy-id": {
+    "defaultMessage": "העתק ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "העתק קישור קבוע"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "צור פרוייקט חדש"
+  },
+  "button.download": {
+    "defaultMessage": "הורדה"
+  },
+  "button.downloading": {
+    "defaultMessage": "מוריד"
+  },
+  "button.edit": {
+    "defaultMessage": "ערוך"
+  },
+  "button.follow": {
+    "defaultMessage": "עקוב"
+  },
+  "button.more-options": {
+    "defaultMessage": "אפשרויות נוספות"
+  },
+  "button.next": {
+    "defaultMessage": "הבא"
+  },
+  "button.open-folder": {
+    "defaultMessage": "פתח תיקיה"
+  },
+  "button.play": {
+    "defaultMessage": "שחק"
+  },
+  "button.refresh": {
+    "defaultMessage": "רענן"
+  },
+  "button.remove": {
+    "defaultMessage": "מחק"
+  },
+  "button.remove-image": {
+    "defaultMessage": "מחק תמונה"
+  },
+  "button.report": {
+    "defaultMessage": "דווח"
+  },
+  "button.reset": {
+    "defaultMessage": "איפוס"
+  },
+  "button.save": {
+    "defaultMessage": "שמור"
+  },
+  "button.save-changes": {
+    "defaultMessage": "שמור שינויים"
+  },
+  "button.saving": {
+    "defaultMessage": "שומר"
+  },
+  "button.sign-in": {
+    "defaultMessage": "התחבר"
+  },
+  "button.sign-out": {
+    "defaultMessage": "התנתק"
+  },
+  "button.sign-up": {
+    "defaultMessage": "הירשם"
+  },
+  "button.stop": {
+    "defaultMessage": "עצור"
+  },
+  "button.unfollow": {
+    "defaultMessage": "הפסק מעקב"
+  },
+  "button.upload-image": {
+    "defaultMessage": "הוסף תמונה"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "עכשיו"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "שרתים"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "אתר אינטרנט"
+  },
+  "collection.label.private": {
+    "defaultMessage": "פרטי"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "ערוך סמל"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "מחק סמל"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "החלף אייקון"
+  },
+  "icon-select.select": {
+    "defaultMessage": "בחר אייקון"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "חפש..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "תצוגת גלריה"
+  },
+  "input.view.grid": {
+    "defaultMessage": "תצוגת טבלה"
+  },
+  "input.view.list": {
+    "defaultMessage": "תצוגת שורות"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "מצב הרפתקה"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "מצב יצירתי"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "מצב צופה"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "מצב הישרדות"
+  },
+  "label.created-ago": {
+    "defaultMessage": "נוצר לפני {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "לוח בקרה"
+  },
+  "label.delete": {
+    "defaultMessage": "מחק"
+  },
+  "label.description": {
+    "defaultMessage": "תיאור"
+  },
+  "label.public": {
+    "defaultMessage": "ציבורי"
+  },
+  "label.settings": {
+    "defaultMessage": "הגדרות"
+  },
+  "label.title": {
+    "defaultMessage": "כותרת"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "בקר בפרופיל שלך"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "צוות מודרינט"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "בהמתנה"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "פרטי"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "נדחה"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "מתוזמן"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "בבדיקה"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "לא רשום"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "העתק קוד אל הלוח"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "לקוח"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "לקוח ושרת"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "לקוח או שרת"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "שרת"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "לא נתמך"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "סביבות נתמכות"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "לקוח ושרת"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "צד-לקוח"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "שרתים ייעודיים בלבד"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "צד-שרת"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "שחקן יחיד"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "שחקן יחיד בלבד"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "מיינקראפט: גרסת ג'אבה"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "בעלי הפרוייקט"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "יוצרים"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "פורסם {date}"
+  }
+}
 

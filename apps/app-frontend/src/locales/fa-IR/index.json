@@ -120,7 +120,7 @@
     "message": "ساخت گروه کتابخانه ی جدید"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "گروه‌های کتابخانه بهت اجازه می‌دن اینستنس‌ها (نسخه‌های جدا) رو تو بخش‌های مختلف کتابخونه‌ت مرتب کنی."
+    "message": "گروه‌های کتابخانه به شما امکان می‌دهند اینستنس‌های خود را در بخش‌های مختلف کتابخانه مرتب کنید."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "نام گروه رو بنویس"
@@ -138,16 +138,16 @@
     "message": "اجرای پیشرفته به کاربران حرفه‌ای اجازه می‌ده قبل و بعد از اجرای بازی، بعضی کامند های سیستمی رو اجرا کنن."
   },
   "instance.settings.tabs.hooks.post-exit": {
-    "message": "بعد خروج"
+    "message": "پس از خروج"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "بعد از اجرا شدن بازی ران میشه."
+    "message": "پس از بسته شدن بازی اجرا شد."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
     "message": "کامند بعد خروج رو بنویس..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
-    "message": "قبل اجرا"
+    "message": "قبل از اجرا"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
     "message": "قبل از اجرا شدن بازی ران میشه."

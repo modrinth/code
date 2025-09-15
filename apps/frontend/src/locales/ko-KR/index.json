@@ -2,6 +2,15 @@
   "admin.billing.error.not-found": {
     "message": "사용자를 찾을 수 없습니다"
   },
+  "app-marketing.features.sharing.modpack": {
+    "message": "모드팩"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "공유"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "모드팩 공유"
+  },
   "auth.authorize.action.authorize": {
     "message": "승인"
   },
@@ -328,6 +337,9 @@
   },
   "frog.title": {
     "message": "개구리"
+  },
+  "landing.button.discover-mods": {
+    "message": "모드 탐색"
   },
   "layout.action.change-theme": {
     "message": "테마 변경"
@@ -674,6 +686,9 @@
   "project.settings.title": {
     "message": "설정"
   },
+  "project.settings.visit-dashboard": {
+    "message": "프로젝트 대시보드 방문"
+  },
   "project.stats.downloads-label": {
     "message": "다운로드{count, plural, other {}}"
   },
@@ -736,6 +751,12 @@
   },
   "report.not-for.dmca.description": {
     "message": "우리의 <policy-link>저작권 정책</policy-link>을 참조하세요."
+  },
+  "report.note.copyright.1": {
+    "message": "이것은 DMCA 삭제 요청이 아닌 재업로드된 콘텐츠에 대한 신고임을 유의해주시기 바랍니다."
+  },
+  "report.note.copyright.2": {
+    "message": "DMCA 삭제 요청(법적 조치)을 하려는 경우, 대신 저희의 <copyright-policy-link>저작권 정책</copyright-policy-link>을 참조해주시기 바랍니다."
   },
   "report.note.malicious.1": {
     "message": "악성 또는 기만적인 콘텐츠에 대한 신고에는 코드 샘플과 같은 행위에 대한 실질적 증거가 포함되어야 합니다."
@@ -818,26 +839,50 @@
   "scopes.notificationWrite.label": {
     "message": "알림 쓰기"
   },
+  "scopes.organizationCreate.description": {
+    "message": "조직 생성하기"
+  },
   "scopes.organizationCreate.label": {
     "message": "조직 생성"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "조직 삭제"
   },
   "scopes.organizationDelete.label": {
     "message": "조직 삭제"
   },
+  "scopes.organizationRead.description": {
+    "message": "조직 읽기"
+  },
   "scopes.organizationRead.label": {
     "message": "조직 읽기"
+  },
+  "scopes.organizationWrite.description": {
+    "message": "조직에 쓰기"
   },
   "scopes.organizationWrite.label": {
     "message": "조직 쓰기"
   },
+  "scopes.patCreate.description": {
+    "message": "개인 API 토큰 생성하기"
+  },
   "scopes.patCreate.label": {
     "message": "PAT 생성"
+  },
+  "scopes.patDelete.description": {
+    "message": "개인 API 토큰 삭제하기"
   },
   "scopes.patDelete.label": {
     "message": "PAT 삭제"
   },
+  "scopes.patRead.description": {
+    "message": "생성된 API 토큰 확인하기"
+  },
   "scopes.patRead.label": {
     "message": "PAT 읽기"
+  },
+  "scopes.patWrite.description": {
+    "message": "개인 API 토큰 편집하기"
   },
   "scopes.patWrite.label": {
     "message": "PAT 쓰기"
@@ -851,8 +896,14 @@
   "scopes.performAnalytics.label": {
     "message": "분석 수행"
   },
+  "scopes.projectCreate.description": {
+    "message": "새 프로젝트 생성"
+  },
   "scopes.projectCreate.label": {
     "message": "프로젝트 생성"
+  },
+  "scopes.projectDelete.description": {
+    "message": "프로젝트 삭제하기"
   },
   "scopes.projectDelete.label": {
     "message": "프로젝트 삭제"
@@ -860,17 +911,32 @@
   "scopes.projectRead.label": {
     "message": "프로젝트 읽기"
   },
+  "scopes.projectWrite.description": {
+    "message": "프로젝트 데이터에 쓰기"
+  },
   "scopes.projectWrite.label": {
     "message": "프로젝트 쓰기"
+  },
+  "scopes.reportCreate.description": {
+    "message": "신고 생성"
   },
   "scopes.reportCreate.label": {
     "message": "신고 생성"
   },
+  "scopes.reportDelete.description": {
+    "message": "신고 삭제"
+  },
   "scopes.reportDelete.label": {
     "message": "신고 삭제"
   },
+  "scopes.reportRead.description": {
+    "message": "신고 읽기"
+  },
   "scopes.reportRead.label": {
     "message": "신고 읽기"
+  },
+  "scopes.reportWrite.description": {
+    "message": "신고 편집"
   },
   "scopes.reportWrite.label": {
     "message": "신고 쓰기"
@@ -878,11 +944,17 @@
   "scopes.sessionAccess.label": {
     "message": "세션 접근"
   },
+  "scopes.sessionDelete.description": {
+    "message": "세션 삭제"
+  },
   "scopes.sessionDelete.label": {
     "message": "세션 삭제"
   },
   "scopes.sessionRead.label": {
     "message": "세션 읽기"
+  },
+  "scopes.threadRead.description": {
+    "message": "스레드 읽기"
   },
   "scopes.threadRead.label": {
     "message": "스레드 읽기"
@@ -923,8 +995,14 @@
   "scopes.userWrite.label": {
     "message": "사용자 데이터 쓰기"
   },
+  "scopes.versionCreate.description": {
+    "message": "새 버전 만들기"
+  },
   "scopes.versionCreate.label": {
     "message": "버전 생성"
+  },
+  "scopes.versionDelete.description": {
+    "message": "버전 삭제하기"
   },
   "scopes.versionDelete.label": {
     "message": "버전 삭제"
@@ -950,11 +1028,26 @@
   "servers.backups.item.creating-backup": {
     "message": "백업 생성 중..."
   },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "백업 생성에 실패했습니다"
+  },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "다운로드 준비를 실패했습니다"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "백업을 복구하는데 실패했습니다"
+  },
   "servers.backups.item.lock": {
     "message": "잠금"
   },
   "servers.backups.item.locked": {
     "message": "잠김"
+  },
+  "servers.backups.item.prepare-download": {
+    "message": "다운로드 준비중"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "다시 시도하기"
   },
   "servers.backups.item.preparing-download": {
     "message": "다운로드를 준비하는 중..."
@@ -1223,6 +1316,9 @@
   "settings.language.languages.search.no-results": {
     "message": "검색어와 일치하는 언어가 없습니다."
   },
+  "settings.language.warning": {
+    "message": "사이트 언어를 변경할 시 번역이 제공되지 않는 경우 일부 콘텐츠가 영어로 표시될 수 있습니다. 사이트가 아직 완전히 번역되지 않았기 때문에 특정 언어에서는 일부 콘텐츠가 아직 영어로 남아 있을 수 있습니다. 저희는 현지화 시스템을 개선하기 위해 계속 작업 중이므로, 가끔 콘텐츠가 깨져 보일 수 있습니다."
+  },
   "settings.pats.action.create": {
     "message": "PAT 생성"
   },
@@ -1318,5 +1414,11 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "알 수 없는 플랫폼"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Modrinth의 최신 뉴스"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "모든 뉴스 보기"
   }
 }

@@ -93,10 +93,7 @@
     "defaultMessage": "Projeler Minecraft'ın logolarını kullanmamalı ve isimlerinde \"Minecraft\" içermemeli."
   },
   "nags.minecraft-title-clause.title": {
-    "defaultMessage": "Marka ihlalinden haçın"
-  },
-  "nags.missing-alt-text.description": {
-    "defaultMessage": "Bazı resimlerinin açıklaması yok."
+    "defaultMessage": "Marka ihlalinden kaçın"
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Resim açıklaması ekle"
@@ -162,7 +159,7 @@
     "defaultMessage": "Özetin proje adın ile aynı olamaz. Bilgilendirici ve ilgi çekici bir özet yazmak çok önemlidir."
   },
   "nags.summary-same-as-title.title": {
-    "defaultMessage": "Özetin özel olsun"
+    "defaultMessage": "Özetin özgün olsun"
   },
   "nags.summary-special-formatting.description": {
     "defaultMessage": "Özetin düz yazı olarak gösterildiği için formatlama, yeni satırlar, özel karakterler veya bağlantılar içermemelidir."
@@ -171,7 +168,7 @@
     "defaultMessage": "Özetini düzenle"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Özetin {length} karakter. Bilgilendirici bir özet için en az {minChars} karakter önerilir."
+    "defaultMessage": "Özetin {length} karakter. Bilgilendirici ve ilgi çekici bir özet için en az {minChars} karakter önerilir."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Özeti uzat"

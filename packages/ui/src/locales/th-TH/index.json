@@ -20,6 +20,9 @@
   "button.edit": {
     "defaultMessage": "แก้ไข"
   },
+  "button.follow": {
+    "defaultMessage": "ติดตาม"
+  },
   "button.next": {
     "defaultMessage": "ถัดไป"
   },

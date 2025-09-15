@@ -158,6 +158,12 @@
   "instance.settings.tabs.hooks.title": {
     "message": "Játék indítási parancsok"
   },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Wrapper kommand a Minecraft elindításához."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Írd ide a wrapper kommandot..."
+  },
   "instance.settings.tabs.installation": {
     "message": "Telepítés"
   },
@@ -212,6 +218,9 @@
   "instance.settings.tabs.installation.no-loader-versions": {
     "message": "{loader} nem elérhető a Minecraft {version} verziójához. Próbálj meg egy másik loader-t."
   },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "A \"Példányod\" linkelve van egy Modrinth modpack-hoz, de a modpack nem található online."
+  },
   "instance.settings.tabs.installation.platform": {
     "message": "Platform"
   },
@@ -221,6 +230,15 @@
   "instance.settings.tabs.installation.reinstall.button.reinstalling": {
     "message": "Modpack újratelepítése"
   },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Az újratelepítés visszaállítja az összes telepített vagy módosított tartalmat a modpack által biztosított állapotra, eltávolítva az eredeti telepítéshez hozzáadott modokat vagy tartalmakat. Ez megoldhatja a váratlan hibákat, de fontos tudni hogyha használsz világokat amelyekben utólagosan hozzáadott tartalom van, azok a világok korruptálódhatnak."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Biztosan szeretnéd újratelepíteni ezt a példányt?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Visszaállítja a Példányod tartalmát az eredeti állapotába, eltávolítva az eredeti modpackhoz hozzáadott összes modot és tartalmat."
+  },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Modpack újratelepítése"
   },
@@ -229,6 +247,9 @@
   },
   "instance.settings.tabs.installation.repair.button.repairing": {
     "message": "Javítás"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "A javítás újratelepíti a Minecraft alapját és ellenőrzi, hogy nincs-e sérülés. Ez megoldhatja a problémákat, ha a játék nem launcherrel kapcsolatos hibák miatt nem indul el, de nem oldja meg a telepített modokkal kapcsolatos problémákat vagy összeomlásokat."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Példány javítása?"
@@ -248,14 +269,29 @@
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "telepítés"
   },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "újratelepítés"
+  },
   "instance.settings.tabs.installation.tooltip.action.repair": {
     "message": "javítás"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(ismeretlen verzió)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Példány leválasztása"
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Modpack-ről való leválasztás"
   },
   "instance.settings.tabs.java": {
     "message": "Java és memória"
   },
   "instance.settings.tabs.java.environment-variables": {
     "message": "Környezeti változók"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java argumentumok"
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Hozzárendelt memória"
@@ -289,6 +325,15 @@
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Egy Minecraft szerver"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Cím másolása"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Elérhető"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Példány már megnyitva"
   },
   "instance.worlds.type.server": {
     "message": "Szerver"

@@ -1,9 +1,12 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Бета"
+  },
   "badge.beta-release": {
     "defaultMessage": "Бета-реліз"
   },
   "badge.new": {
-    "defaultMessage": "Нове"
+    "defaultMessage": "Новинка"
   },
   "button.analytics": {
     "defaultMessage": "Аналітика"
@@ -718,6 +721,9 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Регіону немає в списку? <link>Повідомте нам, де ви хотіли б побачити наступні сервери Modrinth!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Південно-східна Азія"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Західна Європа"

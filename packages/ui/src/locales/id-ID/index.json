@@ -1,4 +1,16 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Rilisan Beta"
+  },
+  "badge.new": {
+    "defaultMessage": "Baru"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analitik"
+  },
   "button.back": {
     "defaultMessage": "Kembali"
   },
@@ -26,11 +38,149 @@
   "button.edit": {
     "defaultMessage": "Sunting"
   },
+  "button.follow": {
+    "defaultMessage": "Ikuti"
+  },
+  "button.more-options": {
+    "defaultMessage": "Pilihan lainnya"
+  },
   "button.next": {
     "defaultMessage": "Berikutnya"
   },
   "button.open-folder": {
     "defaultMessage": "Buka map"
+  },
+  "button.play": {
+    "defaultMessage": "Mainkan"
+  },
+  "button.refresh": {
+    "defaultMessage": "Segarkan"
+  },
+  "button.remove": {
+    "defaultMessage": "Hapus"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Hapus gambar"
+  },
+  "button.report": {
+    "defaultMessage": "Laporkan"
+  },
+  "button.reset": {
+    "defaultMessage": "Atur Ulang"
+  },
+  "button.save": {
+    "defaultMessage": "Simpan"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Simpan perubahan"
+  },
+  "button.saving": {
+    "defaultMessage": "Menyimpan"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Masuk"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Keluar"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Daftar"
+  },
+  "button.stop": {
+    "defaultMessage": "Hentikan"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Batal ikuti"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Unggah gambar"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Baru saja"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Aplikasi"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Peladen"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Situs web"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Pribadi"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Sunting ikon"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Hapus ikon"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Ganti ikon"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Pilih ikon"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Cari..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Tampilan galeri"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Tampilan grid"
+  },
+  "input.view.list": {
+    "defaultMessage": "Tampilan baris"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Mode petualangan"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Mode kreatif"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Mode penonton"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Mode sintas"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Mode permainan tak dikenal"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Perubahan disimpan"
+  },
+  "label.collections": {
+    "defaultMessage": "Koleksi"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Dibuat {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Panel tampilan"
+  },
+  "label.delete": {
+    "defaultMessage": "Hapus"
+  },
+  "label.description": {
+    "defaultMessage": "Keterangan"
+  },
+  "label.error": {
+    "defaultMessage": "Kesalahan"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Proyek yang diikuti"
+  },
+  "label.loading": {
+    "defaultMessage": "Memuat..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderasi"
   }
 }
 

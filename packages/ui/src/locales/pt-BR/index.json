@@ -1,4 +1,7 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
   "badge.beta-release": {
     "defaultMessage": "Em beta"
   },
@@ -717,7 +720,7 @@
     "defaultMessage": "Onde deseja que seu servidor esteja localizado?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Região não listada? <link>Compartilhe conosco qual região você gostaria de ver nos servidores do Modrinth!</link>"
+    "defaultMessage": "Região não listada? <link>Compartilhe conosco qual região você gostaria de ver no Modrinth Servers!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste Asiático"

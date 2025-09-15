@@ -1,6 +1,6 @@
 {
   "admin.billing.error.not-found": {
-    "message": "Utilisateur non trouvé"
+    "message": "Utilisateur introuvable"
   },
   "app-marketing.download.description": {
     "message": "Notre application de bureau est disponible sur toutes les plateformes, choisissez la version qui vous convient."
@@ -32,14 +32,164 @@
   "app-marketing.download.terms": {
     "message": "En téléchargeant l'application Modrinth, vous acceptez nos <terms-link>Conditions générales</terms-link> et notre <privacy-link>Politique de confidentialité</privacy-link>."
   },
+  "app-marketing.download.third-party-packages": {
+    "message": "Paquets tiers"
+  },
+  "app-marketing.download.title": {
+    "message": "Télécharger l’application Modrinth (bêta)"
+  },
   "app-marketing.download.windows": {
     "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Enregistrez le contenu que vous aimez et recevez des mises à jour en un seul clic."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Projets suivis"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Importez tous vos favoris depuis votre ancien launcher, et importez-les dans l’application Modrinth en quelques secondes !"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Importez un profil"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Actions"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "de {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth rend plus facile la gestion des mods en un seul endroit. Vous pouvez installer, désinstaller et mettre à jour vos mods en un seul clic."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Mods installée "
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Nom"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Rechercher des mods"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Gestion des mods"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Versions"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Jouez avec des mods, que vous soyez en ligne ou hors ligne."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Mode hors-ligne"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Le launcher officiel Modrinth est open source. Vous pouvez consulter le code source sur le dépôt GitHub <github-link>GitHub</github-link> !"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Open source"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Moniteur d'activité"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "L’application Modrinth est plus performante que la plupart des autres gestionnaires de mods, tout en n’utilisant que 150 Mo de RAM !"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Bonnes performances"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ Mb"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ Mb"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 Mb"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "launcher Modrinth"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 milliard %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Nom du processus"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Petit"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Performant"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Utilisez l'application Modrinth pour télécharger et jouer avec vos mods et modpacks préférés."
   },
   "app-marketing.features.play.title": {
     "message": "Jouez avec vos mods favoris"
   },
   "app-marketing.features.sharing.description": {
-    "message": "."
+    "message": "Construisez, partagez et jouez avec l’un des milliers de mods ou de modpacks hébergés ici sur Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpack"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Partager"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Partager des modpacks"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Différent de tous les autres launcher"
+  },
+  "app-marketing.features.website.description": {
+    "message": "L'application Modrinth est entièrement intégrée au site Web, vous pouvez donc accéder à tous vos projets préférés depuis l'application !"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Intégration au site Web"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "vous avez utilisé avant"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Capture d'écran de l'application Modrinth avec une instance Cobblemon ouverte sur la page \"Contenu\"."
+  },
+  "app-marketing.hero.description": {
+    "message": "L'application Modrinth est un launcher unique et open source qui vous permet de jouer à vos mods préférés et de les maintenir à jour, le tout dans un petit package pratique."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Télécharger l'application Modrinth"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Télécharger l'application Modrinth"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Télécharger l'application Modrinth pour {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Capture d’écran du menu principal de votre instance de Cobblemon."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Plus d'options de téléchargement"
   },
   "auth.authorize.action.authorize": {
     "message": "Autoriser"
@@ -60,13 +210,13 @@
     "message": "Vous serez redirigé vers <redirect-url>{url}</redirect-url>"
   },
   "auth.reset-password.method-choice.action": {
-    "message": "Envoyer email de récupération"
+    "message": "Envoyez un email de récupération"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Entrez votre email ci-dessous et nous enverrons un lien de récupération pour vous permettre de récupérer votre compte."
+    "message": "Entrez votre email ci-dessous, et nous vous enverrons un lien pour récupérer votre compte."
   },
   "auth.reset-password.method-choice.email-username.label": {
-    "message": "Email ou pseudonyme"
+    "message": "Adresse email ou nom d'utilisateur"
   },
   "auth.reset-password.method-choice.email-username.placeholder": {
     "message": "Email"
@@ -90,7 +240,7 @@
     "message": "Confirmer mot de passe"
   },
   "auth.reset-password.post-challenge.description": {
-    "message": "Entrez ci-dessous votre nouveau mot de passe pour récupérer l'accès à votre compte."
+    "message": "Entrez ci-dessous votre nouveau mot de passe pour accéder à votre compte."
   },
   "auth.reset-password.title": {
     "message": "Réinitialiser le mot de passe"
@@ -99,10 +249,10 @@
     "message": "Réinitialiser votre mot de passe"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Veuillez entrer un code à doubles facteurs pour continuer."
+    "message": "Veuillez entrer un code à double facteur pour continuer."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Saisir le code à doubles facteurs"
+    "message": "Saisir le code à double facteur"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Saisir le code..."
@@ -177,7 +327,7 @@
     "message": "Renvoyer un e-mail de vérification"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "Nous n'avons pas pu vérifier votre courriel. Essayez d'envoyer à nouveau l'e-mail de vérification via votre tableau de bord en vous connectant."
+    "message": "Nous n’avons pas pu vérifier votre adresse e-mail. Essayez de renvoyer l’e-mail de vérification depuis votre tableau de bord en vous connectant."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
     "message": "Nous n'avons pas pu vérifier votre e-mail. Essayez de renvoyer l'e-mail de vérification via le bouton ci-dessous."
@@ -196,6 +346,9 @@
   },
   "auth.welcome.checkbox.subscribe": {
     "message": "S'abonner aux mises à jour de Modrinth"
+  },
+  "auth.welcome.description": {
+    "message": "Vous faites maintenant partie de la formidable communauté de créateurs et d'explorateurs qui construisent, téléchargent et se tiennent au courant des incroyables mods."
   },
   "auth.welcome.label.tos": {
     "message": "En créant un compte, vous acceptez les <terms-link>Conditions d'utilisation</terms-link> et la <privacy-policy-link>Politique de confidentialité</privacy-policy-link> de Modrinth."
@@ -367,6 +520,147 @@
   },
   "frog.title": {
     "message": "Grenouille"
+  },
+  "landing.button.discover-mods": {
+    "message": "Découvrez des mods"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Accéder au tableau de bord"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Profitez de la meilleure expérience de modding possible grâce aux mises à jour régulières de l’équipe Modrinth"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "En constante évolution"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Obtenez des rapports détaillés sur les pages vues, le nombre de téléchargements et les revenus"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Données et statistiques"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "Faites découvrir votre projet à des milliers d'utilisateurs grâce à la recherche, notre page d'accueil, notre serveur Discord et d'autres moyens qui seront disponibles à l'avenir !"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Découvrir"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Intégrée à vos outils de build depuis Minautor pour des uploads automatiques dès que vous publiez une nouvelle version"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Écosystème divers"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Obtenez des revenus publicitaires depuis vos pages de projet et retirez vos fonds à tout moment"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Monétisation"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Invitez vos coéquipiers et gérez facilement les rôles et les permissions"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Gérez votre équipe"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Échec du chargement des projets aléatoires :("
+  },
+  "landing.feature.follow.description": {
+    "message": "Recevez une notification à chaque mise à jour de vos projets favoris et restez à l’affût"
+  },
+  "landing.feature.follow.heading": {
+    "message": "Suivez les projets que vous aimez"
+  },
+  "landing.feature.launcher.description": {
+    "message": "L’API open-source de Modrinth permet aux launchers d’ajouter des intégrations à Modrinth. Vous pouvez utiliser Modrinth depuis notre <link>application officielle</link> ou depuis les launchers les plus populaires, par exemple ATLauncher, MultiMC et Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Jouez avec vos launchers favoris"
+  },
+  "landing.feature.search.description": {
+    "message": "La recherche ultra-rapide de Modrinth et ses filtres puissants vous permettent de trouver ce que vous cherchez au fur et à mesure que vous tapez."
+  },
+  "landing.feature.search.heading": {
+    "message": "Trouvez ce que vous souhaitez, rapidement et facilement"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "L’endroit idéal pour les {content} Minecraft"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "data packs"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "modpacks"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "mods"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "plugins"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "packs de ressources"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "serveurs"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "shaders"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "Une représentation simplifiée d'une fenêtre Minecraft, avec le logo de Mojang Studios en vert."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Application Modrinth"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} a été mis à jour !"
+  },
+  "landing.notifications.heading": {
+    "message": "Notifications"
+  },
+  "landing.notifications.received-time": {
+    "message": "Reçu le {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "La version {version} a été publiée pour la {gameVersion}"
+  },
+  "landing.search.label": {
+    "message": "Rechercher"
+  },
+  "landing.search.placeholder": {
+    "message": "Rechercher..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Trier par"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Offrez un foyer en ligne à vos créations et atteignez un large public de joueurs passionnés"
+  },
+  "landing.section.for-creators.label": {
+    "message": "Pour les créateurs"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Partagez vos créations avec le monde"
+  },
+  "landing.section.for-players.description": {
+    "message": "Des biomes magiques aux donjons maudits, vous pouvez être sûr de trouver ce que vous cherchez pour amener votre gameplay au niveau supérieur."
+  },
+  "landing.section.for-players.label": {
+    "message": "Pour les joueurs"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Découvrez jusqu’à {count} créations"
+  },
+  "landing.subheading": {
+    "message": "Découvrez, jouez et partagez du contenu Minecraft grâce à notre plateforme open-source conçue pour la communauté."
   },
   "layout.action.change-theme": {
     "message": "Changer le thème"
@@ -1616,6 +1910,9 @@
   "settings.language.languages.search.no-results": {
     "message": "Aucun langage correspond à votre recherche."
   },
+  "settings.language.warning": {
+    "message": "Changer la langue du site peut provoquer des problèmes, certaines parties peuvent apparaître en anglais si la traduction n’est pas disponible. Le site n’est pas encore entièrement traduit, et certaines sections peuvent rester en anglais selon la langue choisie. Nous travaillons constamment à améliorer le système de traduction, donc il est possible que certaines parties du site semblent parfois incomplètes ou non fonctionnelles."
+  },
   "settings.pats.action.create": {
     "message": "Créer un PAT"
   },
@@ -1711,6 +2008,9 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Plateforme inconnue"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Dernières nouveautés de Modrinth"
   },
   "ui.latest-news-row.view-all": {
     "message": "Voir toutes les actualités"

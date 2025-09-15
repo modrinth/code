@@ -122,6 +122,9 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
   },
+  "nags.select-environments.description": {
+    "defaultMessage": "{projectType} が機能する環境を選択ください。"
+  },
   "nags.select-environments.title": {
     "defaultMessage": "環境を選択"
   },

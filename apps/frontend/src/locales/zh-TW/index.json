@@ -141,13 +141,13 @@
     "message": "高效能"
   },
   "app-marketing.features.play.description": {
-    "message": "使用 Modrinth App 下載並遊玩您最喜愛的模組與模組包。"
+    "message": "使用 Modrinth App 下載並遊玩您喜愛的模組和模組包。"
   },
   "app-marketing.features.play.title": {
-    "message": "用您最喜歡的模組包遊玩"
+    "message": "遊玩您喜愛的模組"
   },
   "app-marketing.features.sharing.description": {
-    "message": "使用Modrinth平台上數千個模組與模組包，隨心打造、分享與遊玩模組包。"
+    "message": "透過 Modrinth 上託管的數千種模組與模組包，建立、分享並遊玩您的模組包。"
   },
   "app-marketing.features.sharing.modpack": {
     "message": "模組包"
@@ -159,7 +159,7 @@
     "message": "分享模組包"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "與您以往使用過的"
+    "message": "前所未有的"
   },
   "app-marketing.features.website.description": {
     "message": "Modrinth App 已與網站完全整合，因此您可透過應用程式存取所有喜愛的專案！"
@@ -168,7 +168,7 @@
     "message": "網站整合"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "任何啟動器都截然不同"
+    "message": "啟動器體驗"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Modrinth App 的螢幕擷取畫面，顯示已開啟 Cobblemon 實例的「內容」頁面。"
@@ -183,7 +183,7 @@
     "message": "下載 Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "下載 Modrinth App"
+    "message": "下載適用於 {os} 的 Modrinth App"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Cobblemon 實例主選單的螢幕擷取畫面。"
@@ -237,7 +237,7 @@
     "message": "重設密碼"
   },
   "auth.reset-password.post-challenge.confirm-password.label": {
-    "message": "確認新密碼"
+    "message": "確認密碼"
   },
   "auth.reset-password.post-challenge.description": {
     "message": "請設定新密碼以登入你的帳號。"
@@ -447,7 +447,7 @@
     "message": "找不到頁面"
   },
   "error.generic.default.list_item.1": {
-    "message": "前往我們的 <status-link>狀態頁面</status-link>，查看 Modrinth 是否停機。"
+    "message": "前往我們的<status-link>狀態頁面</status-link>，查看 Modrinth 是否停機。"
   },
   "error.generic.default.list_item.2": {
     "message": "如果這個問題持續發生，你或許會想加入我們的 <discord-link>Discord 伺服器</discord-link>，通知 Modrinth 團隊。"
@@ -565,6 +565,102 @@
   },
   "landing.error.failedToLoadRandomProjects": {
     "message": "載入隨機專案失敗 :("
+  },
+  "landing.feature.follow.description": {
+    "message": "隨時接收您喜愛專案的更新通知，掌握最新動態"
+  },
+  "landing.feature.follow.heading": {
+    "message": "追蹤您喜愛的專案"
+  },
+  "landing.feature.launcher.description": {
+    "message": "Modrinth 的開源 API 讓啟動器能夠深度整合 Modrinth。您可以透過<link>我們的應用程式</link>，以及 ATLauncher、MultiMC 和 Prism Launcher 等熱門啟動器使用 Modrinth。"
+  },
+  "landing.feature.launcher.heading": {
+    "message": "使用您偏好的啟動器遊玩"
+  },
+  "landing.feature.search.description": {
+    "message": "Modrinth 閃電般快速搜尋與強大的篩選功能，讓您在輸入時就能輕鬆找到所需內容。"
+  },
+  "landing.feature.search.heading": {
+    "message": "快速輕鬆地找到您想要的內容"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "匯聚 Minecraft 各類{content}"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "資料包"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "模組包"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "模組"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "插件"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "資源包"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "伺服器"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "光影包"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "一個簡化的 Minecraft 視窗圖片，其中 Mojang Studios 標誌採用 Modrinth 綠色。"
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} 已更新！"
+  },
+  "landing.notifications.heading": {
+    "message": "通知"
+  },
+  "landing.notifications.received-time": {
+    "message": "{time} 接收"
+  },
+  "landing.notifications.version-released": {
+    "message": "已為 {gameVersion} 發布了版本 {version}"
+  },
+  "landing.search.label": {
+    "message": "搜尋"
+  },
+  "landing.search.placeholder": {
+    "message": "搜尋..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "排序方式："
+  },
+  "landing.section.for-creators.description": {
+    "message": "為你的創作打造一個線上家園，觸達大量忠實玩家"
+  },
+  "landing.section.for-creators.label": {
+    "message": "面向创作者"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "讓你的創作走向世界"
+  },
+  "landing.section.for-players.description": {
+    "message": "從奇幻生態域到受詛咒的地下城，您一定能找到將您的遊戲體驗提升至全新層次的內容。"
+  },
+  "landing.section.for-players.label": {
+    "message": "面向玩家"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "探索超過 {count} 個創作"
+  },
+  "landing.subheading": {
+    "message": "透過我們為社群打造的開源平台，探索、遊玩並分享 Minecraft 內容。"
   },
   "layout.action.change-theme": {
     "message": "更換主題"
@@ -921,7 +1017,10 @@
     "message": "審核專案"
   },
   "project.actions.servers-promo.monthly": {
-    "message": " / 每月"
+    "message": " / 月"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "$5{monthly} 起"
   },
   "project.actions.servers-promo.title": {
     "message": "建立伺服器"
@@ -941,14 +1040,35 @@
   "project.download.game-version": {
     "message": "遊戲版本：{version}"
   },
+  "project.download.game-version-error": {
+    "message": "錯誤：沒有合適的遊戲版本"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{title} 僅適用於 {version}"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{title} 不支援 {platform} {gameVersion}"
+  },
   "project.download.install-with-app": {
     "message": "使用 Modrinth App 安裝"
   },
   "project.download.no-app": {
     "message": "還沒有 Modrinth App 嗎？"
   },
+  "project.download.no-versions-available": {
+    "message": "{platform} {gameVersion} 沒有可用的版本。"
+  },
   "project.download.platform": {
     "message": "平台：{platform}"
+  },
+  "project.download.platform-error": {
+    "message": "錯誤：找不到平台"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title} 僅適用於 {platform}"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{title} 不支援 {platform} {gameVersion}"
   },
   "project.download.search-game-versions": {
     "message": "搜尋遊戲版本..."
@@ -968,11 +1088,23 @@
   "project.download.title": {
     "message": "下載 {title}"
   },
+  "project.environment.migration.learn-more": {
+    "message": "深入了解這項變更"
+  },
+  "project.error.page-not-found": {
+    "message": "頁面不存在"
+  },
   "project.error.project-not-found": {
     "message": "找不到專案"
   },
   "project.gallery.title": {
     "message": "圖庫"
+  },
+  "project.license.error": {
+    "message": "取得授權條款文字內容時發生錯誤。"
+  },
+  "project.license.loading": {
+    "message": "正在載入授權條款文字…"
   },
   "project.license.title": {
     "message": "授權條款"
@@ -983,8 +1115,35 @@
   "project.navigation.changelog": {
     "message": "變更記錄"
   },
+  "project.notification.icon-updated.message": {
+    "message": "你的專案的圖示已更新。"
+  },
+  "project.notification.icon-updated.title": {
+    "message": "專案圖示已更新"
+  },
+  "project.notification.updated.message": {
+    "message": "你的專案已更新。"
+  },
+  "project.notification.updated.title": {
+    "message": "專案已更新"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "message": "驗證"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "message": "驗證這個專案的執行環境設定是否正確。"
+  },
   "project.settings.general.name.title": {
     "message": "名稱"
+  },
+  "project.settings.general.tagline.title": {
+    "message": "標語"
+  },
+  "project.settings.general.url.title": {
+    "message": "網址"
+  },
+  "project.settings.title": {
+    "message": "設定"
   },
   "project.stats.downloads-label": {
     "message": "次下載{count, plural, other {}}"
@@ -1321,5 +1480,29 @@
   },
   "settings.billing.payment_method_type.unknown": {
     "message": "未知的付款方式"
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "模組頁面"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "模組包頁面"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "插件頁面"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "資源包頁面"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "光影包頁面"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "專案清單版面配置"
+  },
+  "settings.display.project-list-layouts.user": {
+    "message": "使用者個人檔案頁面"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "收藏"
   }
 }

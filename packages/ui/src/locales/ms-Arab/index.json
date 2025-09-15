@@ -1,4 +1,10 @@
 {
+  "badge.beta": {
+    "defaultMessage": "بيتا"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "تربيتن بيتا"
+  },
   "badge.new": {
     "defaultMessage": "بهارو"
   },
@@ -18,7 +24,7 @@
     "defaultMessage": "سالين ID"
   },
   "button.copy-permalink": {
-    "defaultMessage": "سالين ڤاٴوتن ککل"
+    "defaultMessage": "سالين ڤاءوتن ککل"
   },
   "button.create-a-project": {
     "defaultMessage": "چيڤتا ڤروجيک"
@@ -45,7 +51,7 @@
     "defaultMessage": "بوک فولدر"
   },
   "button.play": {
-    "defaultMessage": "ماٴين"
+    "defaultMessage": "ماءين"
   },
   "button.refresh": {
     "defaultMessage": "سݢر سمولا"
@@ -77,6 +83,9 @@
   "button.sign-out": {
     "defaultMessage": "دفتر کلوار"
   },
+  "button.sign-up": {
+    "defaultMessage": "دفتر"
+  },
   "button.stop": {
     "defaultMessage": "برهنتي"
   },
@@ -84,7 +93,7 @@
     "defaultMessage": "ڽهأيکوت"
   },
   "button.upload-image": {
-    "defaultMessage": "موات ناٴيق ݢمبر"
+    "defaultMessage": "موات ناءيق ݢمبر"
   },
   "changelog.justNow": {
     "defaultMessage": "تادي"
@@ -129,7 +138,7 @@
     "defaultMessage": "بنتوق باريسن"
   },
   "instance.worlds.game_mode.adventure": {
-    "defaultMessage": "مود ڤڠمباراٴن"
+    "defaultMessage": "مود ڤڠمباراءن"
   },
   "instance.worlds.game_mode.creative": {
     "defaultMessage": "مود کرياتيف"
@@ -141,7 +150,7 @@
     "defaultMessage": "مود کمنديرين"
   },
   "instance.worlds.game_mode.unknown": {
-    "defaultMessage": "مود ڤرماٴينن يڠ تيدق دکتاهوءي"
+    "defaultMessage": "مود ڤرماءينن يڠ تيدق دکتاهوءي"
   },
   "label.changes-saved": {
     "defaultMessage": "ڤروبهن دسيمڤن"
@@ -171,7 +180,7 @@
     "defaultMessage": "سدڠ مموات..."
   },
   "label.moderation": {
-    "defaultMessage": "ڤڽدرهاناٴن"
+    "defaultMessage": "ڤڽدرهاناءن"
   },
   "label.notifications": {
     "defaultMessage": "ڤمبريتاهوان"
@@ -183,7 +192,7 @@
     "defaultMessage": "کات لالوان"
   },
   "label.played": {
-    "defaultMessage": "دماٴينکن سلاما {time}"
+    "defaultMessage": "دماءينکن سلاما {time}"
   },
   "label.public": {
     "defaultMessage": "عوام"
@@ -207,7 +216,7 @@
     "defaultMessage": "تتڤن"
   },
   "label.singleplayer": {
-    "defaultMessage": "ايکاڤماٴين"
+    "defaultMessage": "ايکاڤماءين"
   },
   "label.title": {
     "defaultMessage": "تاجوق"
@@ -366,13 +375,13 @@
     "defaultMessage": "بهاݢين ڤلاين"
   },
   "project.about.compatibility.environments.singleplayer": {
-    "defaultMessage": "ايکاڤماٴين"
+    "defaultMessage": "ايکاڤماءين"
   },
   "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "ايکاڤماٴين سهاج"
+    "defaultMessage": "ايکاڤماءين سهاج"
   },
   "project.about.compatibility.game.minecraftJava": {
-    "defaultMessage": "ماٴينکرف‌ت: ايديسي جاۏا"
+    "defaultMessage": "ماءينکرف‌ت: ايديسي جاۏا"
   },
   "project.about.compatibility.platforms": {
     "defaultMessage": "ڤلتفوم"
@@ -432,7 +441,7 @@
     "defaultMessage": "ليهت سومبر"
   },
   "project.about.links.title": {
-    "defaultMessage": "ڤاٴوتن"
+    "defaultMessage": "ڤاءوتن"
   },
   "project.about.links.wiki": {
     "defaultMessage": "لاوت ويکي"
@@ -444,13 +453,13 @@
     "defaultMessage": "کترڠن"
   },
   "project.settings.environment.client_and_server.description": {
-    "defaultMessage": "ممڤوڽاٴي ببراڤ فوڠسي ڤد کدوا-دوا ڤلڠݢن دان ڤلاين⹁ والاوڤون هاڽ سبهاݢينڽ."
+    "defaultMessage": "ممڤوڽاءي ببراڤ فوڠسي ڤد کدوا-دوا ڤلڠݢن دان ڤلاين⹁ والاوڤون هاڽ سبهاݢينڽ."
   },
   "project.settings.environment.client_and_server.optional_both.title": {
     "defaultMessage": "تيدق واجب ڤد کدوا-دواڽ⹁ برفوڠسي سام جک دڤاسڠ ڤد کدوا-دوا بهاݢين"
   },
   "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
-    "defaultMessage": "تيدق واجب ڤد کدوا-دواڽ⹁ برفوڠسي ڤاليڠ باٴيق اڤابيلا دڤاسڠ ڤد کدوا-دوا بهاݢين"
+    "defaultMessage": "تيدق واجب ڤد کدوا-دواڽ⹁ برفوڠسي ڤاليڠ باءيق اڤابيلا دڤاسڠ ڤد کدوا-دوا بهاݢين"
   },
   "project.settings.environment.client_and_server.optional_client.title": {
     "defaultMessage": "تيدق واجب ڤد ڤلڠݢن"
@@ -477,16 +486,16 @@
     "defaultMessage": "سموا فوڠسي دلاکوکن ڤد بهاݢين ڤلاين دان سراسي دڠن ڤلڠݢن ۏانيلا."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
-    "defaultMessage": "برفوڠسي دالم ايکاڤماٴين جوݢ"
+    "defaultMessage": "برفوڠسي دالم ايکاڤماءين جوݢ"
   },
   "project.settings.environment.server_only.title": {
     "defaultMessage": "بهاݢين ڤلاين سهاج"
   },
   "project.settings.environment.singleplayer.description": {
-    "defaultMessage": "هاڽ برفوڠسي دالم ايکاڤماٴين اتاو اڤابيلا تيدق برسامبوڠ کڤلاين مولتيڤماٴين."
+    "defaultMessage": "هاڽ برفوڠسي دالم ايکاڤماءين اتاو اڤابيلا تيدق برسامبوڠ کڤلاين مولتيڤماءين."
   },
   "project.settings.environment.singleplayer.title": {
-    "defaultMessage": "ايکاڤماٴين سهاج"
+    "defaultMessage": "ايکاڤماءين سهاج"
   },
   "project.settings.environment.suboption.accessibility-option-label": {
     "defaultMessage": "{title}: {description}"
@@ -507,13 +516,13 @@
     "defaultMessage": "ليسين"
   },
   "project.settings.links.title": {
-    "defaultMessage": "ڤاٴوتن"
+    "defaultMessage": "ڤاءوتن"
   },
   "project.settings.members.title": {
     "defaultMessage": "اهلي"
   },
   "project.settings.notice.no-permission.description": {
-    "defaultMessage": "اندا تيدق ممڤوڽاٴي کبنرن اونتوق مڽونتيڠ اين."
+    "defaultMessage": "اندا تيدق ممڤوڽاءي کبنرن اونتوق مڽونتيڠ اين."
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "تياد کبنرن"
@@ -522,7 +531,7 @@
     "defaultMessage": "تݢ"
   },
   "project.settings.upload.title": {
-    "defaultMessage": "موات ناٴيق"
+    "defaultMessage": "موات ناءيق"
   },
   "project.settings.versions.title": {
     "defaultMessage": "ۏرسي"
@@ -594,7 +603,7 @@
     "defaultMessage": "ڤلاين"
   },
   "search.filter_type.game_version": {
-    "defaultMessage": "ۏرسي ڤرماٴينن"
+    "defaultMessage": "ۏرسي ڤرماءينن"
   },
   "search.filter_type.game_version.all_versions": {
     "defaultMessage": "تونجوقکن سموا ۏرسي"
@@ -669,10 +678,10 @@
     "defaultMessage": "ماري مولاکن"
   },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "سسواي اونتوق 15–25 ڤماٴين⹁ ڤيک مود اتاو ڤڠوبهسواين يڠ برت."
+    "defaultMessage": "سسواي اونتوق 15–25 ڤماءين⹁ ڤيک مود اتاو ڤڠوبهسواين يڠ برت."
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "باݢوس اونتوق 6–15 ڤماٴين دان بربيلڠ مود."
+    "defaultMessage": "باݢوس اونتوق 6–15 ڤماءين دان بربيلڠ مود."
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "ڤاليڠ ڤوڤولر"
@@ -711,13 +720,16 @@
     "defaultMessage": "دمانکه اندا ماهو ڤلاين اندا دتمڤتکن؟"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "رنتاو تيدق دسنارايکن؟ <link>بريتاهو کامي دمان اندا ايڠين مليهت ڤلاين Modrinth ستروسڽ!</link>"
+    "defaultMessage": "رنتاو تيدق دسنارايکن؟ <link>بريتاهو کامي دمان اندا ايڠين مليهت Modrinth Servers ستروسڽ!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "اسيا تڠݢارا"
   },
   "servers.region.western-europe": {
     "defaultMessage": "ايروڤه بارت"
   },
   "settings.account.title": {
-    "defaultMessage": "اکاٴون دان کسلامتن"
+    "defaultMessage": "اکاءون دان کسلامتن"
   },
   "settings.appearance.title": {
     "defaultMessage": "تمڤيلن"
@@ -774,7 +786,7 @@
     "defaultMessage": "{date, date, long} ڤد جم {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
-    "defaultMessage": "اندا ممڤوڽاٴي ڤروبهن يڠ بلوم دسيمڤن."
+    "defaultMessage": "اندا ممڤوڽاءي ڤروبهن يڠ بلوم دسيمڤن."
   }
 }
 

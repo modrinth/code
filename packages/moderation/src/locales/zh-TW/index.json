@@ -123,7 +123,7 @@
     "defaultMessage": "選擇正確的解析度"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "選擇您的 {projectType} 運行環境。"
+    "defaultMessage": "選擇您的{projectType}執行環境。"
   },
   "nags.select-environments.title": {
     "defaultMessage": "選擇環境"
