@@ -206,7 +206,7 @@
 							<IntlFormatted :message-id="messages.playWithLauncherDescription">
 								<template #link="{ children }">
 									<nuxt-link class="title-link" to="/app">
-										<component :is="() => children"/>
+										<component :is="() => children" />
 									</nuxt-link>
 								</template>
 							</IntlFormatted>
