@@ -203,9 +203,9 @@
 					class="flex flex-row gap-3"
 				>
 					<div
-						class="flex size-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised shadow-md"
+						class="flex h-12 min-h-12 w-12 min-w-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md"
 					>
-						<ArrowUpIcon class="my-auto size-8 text-contrast" />
+						<ArrowUpIcon class="my-auto size-8 text-secondary" />
 					</div>
 					<div class="flex w-full flex-row justify-between">
 						<div class="flex flex-col">
