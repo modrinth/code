@@ -162,6 +162,9 @@ pub struct PaymentBootstrapOptions<'a> {
     /// Some products have additional provisioning metadata that should be attached to the payment
     /// intent.
     pub attach_payment_metadata: Option<PaymentRequestMetadata>,
+    /// Should we skip tax collection? This can happen if the user wasn't able to be notified in
+    /// due time.
+    pub skip_tax_collection: bool,
 }
 
 pub struct PaymentBootstrapResults {
@@ -194,6 +197,7 @@ pub async fn create_or_update_payment_intent(
         attached_charge,
         currency: currency_mode,
         attach_payment_metadata,
+        skip_tax_collection,
     }: PaymentBootstrapOptions<'_>,
 ) -> Result<PaymentBootstrapResults, ApiError> {
     let customer_id = get_or_create_customer(
@@ -386,20 +390,24 @@ pub async fn create_or_update_payment_intent(
                 )
             })?;
 
-    let ephemeral_invoice = anrok_client
-        .create_ephemeral_txn(&anrok::TransactionFields {
-            customer_address: anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&address),
-            currency_code: charge_data.currency_code.clone(),
-            accounting_time: chrono::Utc::now(),
-            accounting_time_zone: anrok::AccountingTimeZone::Utc,
-            line_items: vec![anrok::LineItem::new(
-                product_info.tax_identifier.tax_processor_id,
-                charge_data.amount,
-            )],
-        })
-        .await?;
+    let tax_amount = if skip_tax_collection {
+        0
+    } else {
+        let ephemeral_invoice = anrok_client
+            .create_ephemeral_txn(&anrok::TransactionFields {
+                customer_address: anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&address),
+                currency_code: charge_data.currency_code.clone(),
+                accounting_time: chrono::Utc::now(),
+                accounting_time_zone: anrok::AccountingTimeZone::Utc,
+                line_items: vec![anrok::LineItem::new(
+                    product_info.tax_identifier.tax_processor_id,
+                    charge_data.amount,
+                )],
+            })
+            .await?;
 
-    let tax_amount = ephemeral_invoice.tax_amount_to_collect;
+        ephemeral_invoice.tax_amount_to_collect
+    };
 
     let mut metadata = HashMap::new();
 

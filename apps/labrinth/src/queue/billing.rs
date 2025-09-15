@@ -1,11 +1,11 @@
 use crate::database::models::charge_item::DBCharge;
-use crate::database::models::ids::*;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::user_item::DBUser;
 use crate::database::models::user_subscription_item::{
     DBUserSubscription, fetch_update_lock_pending_taxation_notification,
 };
 use crate::database::models::users_redeemals::UserRedeemal;
+use crate::database::models::{DatabaseError, ids::*};
 use crate::database::models::{
     product_item, user_subscription_item, users_redeemals,
 };
@@ -336,6 +336,7 @@ pub async fn try_process_user_redeemal(
         metadata: Some(SubscriptionMetadata::Medal {
             id: server_id.to_string(),
         }),
+        user_aware_of_tax_changes: true,
     };
 
     subscription.upsert(&mut txn).await?;
@@ -440,6 +441,14 @@ pub async fn index_billing(
                 continue;
             };
 
+            let skip_tax_collection = if let Some(subscription_id) = charge.subscription_id {
+                let subs = DBUserSubscription::get(subscription_id, &pool).await?.ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
+
+                !subs.user_aware_of_tax_changes
+            } else {
+                false
+            };
+
             let user = User::from_full(user.clone());
 
             let result = create_or_update_payment_intent(
@@ -458,6 +467,7 @@ pub async fn index_billing(
                         currency,
                     ),
                     attach_payment_metadata: None,
+                    skip_tax_collection,
                 },
             )
             .await;
@@ -540,6 +550,8 @@ async fn index_tax_notifications(
         // Some users don't have an email and so can't send them a notification. Just
         // skip these people for now as they count very few users on the site with
         // subscriptions.
+        //
+        // We skip them to be sure here but they're already skipped in `fetch_update_lock_pending_taxation_notification`.
         if user.email.is_none() {
             continue;
         }
