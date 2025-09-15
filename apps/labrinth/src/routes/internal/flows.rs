@@ -1920,6 +1920,7 @@ pub async fn reset_password_begin(
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     reset_password: web::Json<ResetPassword>,
+    email: web::Data<EmailQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if !check_hcaptcha(&req, &reset_password.challenge).await? {
         return Err(ApiError::Turnstile);
@@ -1973,16 +1974,27 @@ pub async fn reset_password_begin(
             }
         };
 
-    if let Some(DBUser { id: user_id, .. }) = user {
+    if let Some(DBUser {
+        id: user_id,
+        email: user_email,
+        ..
+    }) = user
+    {
         let flow = DBFlow::ForgotPassword { user_id }
             .insert(Duration::hours(24), &redis)
             .await?;
 
-        NotificationBuilder {
-            body: NotificationBody::ResetPassword { flow },
+        if let Ok(mailbox) = user_email.unwrap_or_default().parse() {
+            email
+                .send_one(
+                    &mut txn,
+                    NotificationBody::ResetPassword { flow },
+                    user_id,
+                    mailbox,
+                )
+                .await?
+                .as_user_error()?;
         }
-        .insert(user_id, &mut txn, &redis)
-        .await?;
     }
 
     txn.commit().await?;
