@@ -477,13 +477,12 @@ pub async fn version_edit_helper(
                     let enum_variants = loader_field_enum_values
                         .remove(&loader_field.id)
                         .unwrap_or_default();
-                    let vf: VersionField = VersionField::check_parse(
+                    let vf = VersionField::check_parse(
                         version_id,
                         loader_field.clone(),
                         vf_value.clone(),
                         enum_variants,
-                    )
-                    .map_err(ApiError::InvalidInput)?;
+                    )?;
                     version_fields.push(vf);
                 }
                 VersionField::insert_many(version_fields, &mut transaction)

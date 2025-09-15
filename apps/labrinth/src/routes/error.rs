@@ -1,3 +1,4 @@
+use crate::database::models::loader_fields::VersionFieldParseError;
 use crate::file_hosting::FileHostingError;
 use crate::models::error::AsApiError;
 use actix_web::http::StatusCode;
@@ -41,6 +42,9 @@ pub enum ApiError {
     // TODO: Use an I18nEnum instead of a String
     #[error("Invalid Input: {0}")]
     InvalidInput(String),
+
+    #[error("Invalid Input: {0}")]
+    InvalidLoaderField(#[from] VersionFieldParseError),
 
     // TODO: Perhaps remove this in favor of InvalidInput?
     #[error("Error while validating input: {0}")]
@@ -123,6 +127,7 @@ i18n_enum!(
     Authentication(cause) => "unauthorized",
     CustomAuthentication(cause) => "unauthorized",
     InvalidInput(cause) => "invalid_input",
+    InvalidLoaderField(cause) => "invalid_input",
     Validation(cause) => "invalid_input.validation",
     Search(cause) => "search_error",
     Indexing(cause) => "indexing_error",
@@ -161,6 +166,7 @@ impl ResponseError for ApiError {
             ApiError::Indexing(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::FileHosting(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InvalidInput(..) => StatusCode::BAD_REQUEST,
+            ApiError::InvalidLoaderField(..) => StatusCode::BAD_REQUEST,
             ApiError::Validation(..) => StatusCode::BAD_REQUEST,
             ApiError::Payments(..) => StatusCode::FAILED_DEPENDENCY,
             ApiError::Discord(..) => StatusCode::FAILED_DEPENDENCY,
