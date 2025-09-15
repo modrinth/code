@@ -2,7 +2,7 @@ use crate::database::models::{
     DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
 use crate::models::billing::{
-    PriceDuration, SubscriptionMetadata, SubscriptionStatus,
+    PriceDuration, ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
 };
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
@@ -165,7 +165,7 @@ impl DBUserSubscription {
 pub struct SubscriptionWithCharge {
     pub subscription_id: DBUserSubscriptionId,
     pub user_id: DBUserId,
-    pub subscription_metadata: SubscriptionMetadata,
+    pub product_metadata: ProductMetadata,
     pub amount: i64,
     pub tax_amount: i64,
     pub due: DateTime<Utc>,
@@ -178,7 +178,7 @@ pub async fn fetch_update_lock_pending_taxation_notification(
     struct QueryResult {
         subscription_id: i64,
         user_id: i64,
-        subscription_metadata: serde_json::Value,
+        product_metadata: serde_json::Value,
         amount: i64,
         tax_amount: i64,
         due: DateTime<Utc>,
@@ -191,9 +191,7 @@ pub async fn fetch_update_lock_pending_taxation_notification(
             Ok(SubscriptionWithCharge {
                 subscription_id: DBUserSubscriptionId(r.subscription_id),
                 user_id: DBUserId(r.user_id),
-                subscription_metadata: serde_json::from_value(
-                    r.subscription_metadata,
-                )?,
+                product_metadata: serde_json::from_value(r.product_metadata)?,
                 amount: r.amount,
                 tax_amount: r.tax_amount,
                 due: r.due,
@@ -209,7 +207,7 @@ pub async fn fetch_update_lock_pending_taxation_notification(
             SELECT
               us.id subscription_id,
               us.user_id,
-              us.metadata subscription_metadata,
+              p.metadata product_metadata,
               c.amount,
               c.tax_amount,
               c.due
@@ -224,11 +222,16 @@ pub async fn fetch_update_lock_pending_taxation_notification(
               WHERE status = 'open'
               ORDER BY subscription_id, due DESC
             ) c(subscription_id, due, amount, tax_amount) ON us.id = c.subscription_id
+            INNER JOIN products_prices pp ON pp.id = us.price_id
+            INNER JOIN products p ON p.id = pp.product_id
+            INNER JOIN users u ON u.id = us.user_id
             WHERE
-              NOW() + INTERVAL '8 days' > c.due
+              NOW() + INTERVAL '9 days' > c.due
+              AND NOW() + INTERVAL '7 days' < c.due -- Between 7 and 9 days before the due date
               AND c.tax_amount > 0
               AND us.status = 'provisioned'
               AND us.user_aware_of_tax_changes = FALSE
+              AND u.email IS NOT NULL
             ),
           taken AS (
             SELECT target_rows.*

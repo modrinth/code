@@ -37,6 +37,12 @@ pub struct LegacyNotificationAction {
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum LegacyNotificationBody {
+    TaxNotification {
+        amount: i64,
+        tax_amount: i64,
+        due: DateTime<Utc>,
+        service: String,
+    },
     ProjectUpdate {
         project_id: ProjectId,
         version_id: VersionId,
@@ -201,6 +207,9 @@ impl LegacyNotification {
             NotificationBody::PayoutAvailable { .. } => {
                 Some("payout_available".to_string())
             }
+            NotificationBody::TaxNotification { .. } => {
+                Some("tax_notification".to_string())
+            }
             NotificationBody::LegacyMarkdown {
                 notification_type, ..
             } => notification_type.clone(),
@@ -340,6 +349,17 @@ impl LegacyNotification {
             } => LegacyNotificationBody::EmailChanged {
                 new_email,
                 to_email,
+            },
+            NotificationBody::TaxNotification {
+                amount,
+                tax_amount,
+                due,
+                service,
+            } => LegacyNotificationBody::TaxNotification {
+                amount,
+                tax_amount,
+                due,
+                service,
             },
             NotificationBody::PaymentFailed { amount, service } => {
                 LegacyNotificationBody::PaymentFailed { amount, service }

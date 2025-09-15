@@ -25,6 +25,12 @@ const AUTHPROVIDER_NAME: &str = "authprovider.name";
 const EMAILCHANGED_NEW_EMAIL: &str = "emailchanged.new_email";
 const BILLING_URL: &str = "billing.url";
 
+const TAXNOTIFICATION_AMOUNT: &str = "taxnotification.amount";
+const TAXNOTIFICATION_TAX_AMOUNT: &str = "taxnotification.tax_amount";
+const TAXNOTIFICATION_TOTAL_AMOUNT: &str = "taxnotification.total_amount";
+const TAXNOTIFICATION_DUE: &str = "taxnotification.due";
+const TAXNOTIFICATION_SERVICE: &str = "taxnotification.service";
+
 const PAYMENTFAILED_AMOUNT: &str = "paymentfailed.amount";
 const PAYMENTFAILED_SERVICE: &str = "paymentfailed.service";
 
@@ -554,6 +560,33 @@ async fn collect_template_variables(
         | NotificationBody::ModeratorMessage { .. }
         | NotificationBody::LegacyMarkdown { .. }
         | NotificationBody::Unknown => Ok(map),
+        NotificationBody::TaxNotification {
+            amount,
+            tax_amount,
+            due,
+            service,
+        } => {
+            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
+                || DatabaseError::Database(sqlx::Error::RowNotFound),
+            )?;
+
+            let mut map = HashMap::new();
+
+            map.insert(USER_NAME, user.username);
+            map.insert(TAXNOTIFICATION_AMOUNT, amount.to_string());
+            map.insert(TAXNOTIFICATION_TAX_AMOUNT, tax_amount.to_string());
+            map.insert(
+                TAXNOTIFICATION_TOTAL_AMOUNT,
+                (amount + tax_amount).to_string(),
+            );
+            map.insert(
+                TAXNOTIFICATION_DUE,
+                due.format("%B %d, %Y").to_string(),
+            );
+            map.insert(TAXNOTIFICATION_SERVICE, service.to_string());
+
+            Ok(map)
+        }
     }
 }
 
