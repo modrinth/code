@@ -10,7 +10,7 @@ use crate::models::ids::{CollectionId, ProjectId};
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::error::ApiError;
-use crate::routes::v3::create_error::CreateError;
+use crate::routes::v3::create_error::{CreateError, CreationInvalidInput};
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
@@ -77,7 +77,9 @@ pub async fn collection_create(
     .1;
 
     collection_create_data.validate().map_err(|err| {
-        CreateError::InvalidInput(validation_errors_to_string(err, None))
+        CreateError::InvalidInput(CreationInvalidInput::Validation(
+            validation_errors_to_string(err, None),
+        ))
     })?;
 
     let mut transaction = client.begin().await?;

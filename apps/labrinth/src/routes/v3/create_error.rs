@@ -168,6 +168,7 @@ pub enum CreationInvalidInput {
     MissingLoaderFields(String),
     #[display("No json segment found in multipart.")]
     NoJsonInMultipart,
+    Validation(String),
 }
 
 i18n_enum!(
@@ -201,6 +202,7 @@ i18n_enum!(
     NonexistentLoaderField(field) => "nonexistent_loader_field",
     MissingLoaderFields(fields) => "missing_loader_fields",
     NoJsonInMultipart! => "no_json_in_multipart",
+    Validation(transparent reason) => "validation",
 );
 
 impl actix_web::ResponseError for CreateError {

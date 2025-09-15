@@ -275,7 +275,9 @@ async fn project_create_inner(
         let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
 
         create_data.validate().map_err(|err| {
-            CreateError::InvalidInput(validation_errors_to_string(err, None))
+            CreateError::InvalidInput(CreationInvalidInput::Validation(
+                validation_errors_to_string(err, None),
+            ))
         })?;
 
         let slug_project_id_option: Option<ProjectId> =
