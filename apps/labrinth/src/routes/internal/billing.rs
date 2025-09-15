@@ -714,6 +714,7 @@ pub async fn edit_subscription(
                             },
                             currency: CurrencyMode::Set(currency),
                             attach_payment_metadata: None,
+                            skip_tax_collection: false,
                         },
                     )
                     .await?;
@@ -803,6 +804,7 @@ pub async fn edit_subscription(
                                 },
                                 currency: CurrencyMode::Set(currency),
                                 attach_payment_metadata: None,
+                                skip_tax_collection: false,
                             },
                         )
                         .await?;
@@ -1344,6 +1346,7 @@ pub async fn initiate_payment(
             .await?,
             currency: CurrencyMode::Infer,
             attach_payment_metadata: payment_request.metadata,
+            skip_tax_collection: false,
         },
     )
     .await?;
@@ -1735,6 +1738,7 @@ pub async fn stripe_webhook(
                                         created: Utc::now(),
                                         status: SubscriptionStatus::Unprovisioned,
                                         metadata: None,
+                                        user_aware_of_tax_changes: true,
                                     }
                                 };
 

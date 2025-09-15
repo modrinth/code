@@ -16,6 +16,7 @@ pub struct DBUserSubscription {
     pub created: DateTime<Utc>,
     pub status: SubscriptionStatus,
     pub metadata: Option<SubscriptionMetadata>,
+    pub user_aware_of_tax_changes: bool,
 }
 
 struct UserSubscriptionQueryResult {
@@ -26,6 +27,7 @@ struct UserSubscriptionQueryResult {
     pub created: DateTime<Utc>,
     pub status: String,
     pub metadata: serde_json::Value,
+    pub user_aware_of_tax_changes: bool,
 }
 
 macro_rules! select_user_subscriptions_with_predicate {
@@ -34,7 +36,7 @@ macro_rules! select_user_subscriptions_with_predicate {
             UserSubscriptionQueryResult,
             r#"
             SELECT
-                us.id, us.user_id, us.price_id, us.interval, us.created, us.status, us.metadata
+                us.id, us.user_id, us.price_id, us.interval, us.created, us.status, us.metadata, us.user_aware_of_tax_changes
             FROM users_subscriptions us
             "#
                 + $predicate,
@@ -55,6 +57,7 @@ impl TryFrom<UserSubscriptionQueryResult> for DBUserSubscription {
             created: r.created,
             status: SubscriptionStatus::from_string(&r.status),
             metadata: serde_json::from_value(r.metadata)?,
+            user_aware_of_tax_changes: r.user_aware_of_tax_changes,
         })
     }
 }
