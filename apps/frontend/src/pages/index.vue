@@ -982,10 +982,14 @@ const creatorFeatureMessages = defineMessages({
 							display: flex;
 							gap: 0.75rem;
 							align-items: center;
-							min-width: 12.25rem;
+
+							.label {
+								white-space: nowrap;
+							}
 
 							.selector {
-								max-width: 8rem;
+								min-width: 8rem;
+								white-space: nowrap;
 							}
 
 							@media screen and (max-width: 500px) {
