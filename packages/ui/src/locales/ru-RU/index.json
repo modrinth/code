@@ -1,4 +1,7 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Бета"
+  },
   "badge.beta-release": {
     "defaultMessage": "Бета Релиз"
   },
@@ -30,7 +33,7 @@
     "defaultMessage": "Скачать"
   },
   "button.downloading": {
-    "defaultMessage": "Загрузка"
+    "defaultMessage": "Скачивание"
   },
   "button.edit": {
     "defaultMessage": "Изменить"
@@ -675,10 +678,10 @@
     "defaultMessage": "Начать"
   },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "Идеально для 15–25 игроков, сборок, либо требовательных модов."
+    "defaultMessage": "Подходит для 15–25 игроков, сборок, либо требовательных модов."
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "Отлично для 6–15 игроков и нескольких модов."
+    "defaultMessage": "Подходит для 6–15 игроков и нескольких модов."
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Самый популярный"

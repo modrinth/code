@@ -1,4 +1,160 @@
 {
+  "admin.billing.error.not-found": {
+    "message": "Felhasználó nem található"
+  },
+  "app-marketing.download.description": {
+    "message": "Asztali alkalmazásunk minden platformon elérhető, válassza ki a kívánt verziót."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Appimage letöltése"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Béta letöltése"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "DEB letöltése"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "RPM letöltése"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Letöltési opciók"
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Harmadik féltül származó csomagok"
+  },
+  "app-marketing.download.title": {
+    "message": "Modrinth App (Béta) letöltése"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Mentse el kedvenc tartalmait, és egy kattintással kapjon frissítéseket."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Projektek követése"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Importálja az összes kedvenc profilját a korábban használt launcherből, és néhány másodperc alatt elindíthatja a Modrinth alkalmazást!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Profil importálás"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "A Modrinth könnyűvé teszi az összes telepített modjaidnak a kezelését egy helyen. Telepíthetsz, eltávolíthatsz és frissíthetsz modokat egyetlen kattintással."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Telepített modok"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Név"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Modok keresése"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Modok kezelése"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Verzió"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Játsz a modjaiddal, attól függetlenül, hogy felvagy-e kapcsolódva az internetre, vagy sem."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Offline mód"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "A Modrinth inditóprogramja teljesen nyílt forráskódú. Ellenőrízheted a forráskódot a <github-link>GitHub</github-link> oldalunkon!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Nyílt forráskódú"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Aktivitásfigyelő"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Jó teljesítmény"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 milliárd %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Folyamat neve"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Alacsony"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Teljesítményes"
+  },
+  "app-marketing.features.play.title": {
+    "message": "Játssz a kedvenc modjaiddal"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Készíts, ossz meg és játssz a Modrinthen fentartott több ezer modok és modpackek közül bármelyikkel."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpack"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Megosztás"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Modpackek megosztása"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Olyan Minecraft inditóprogram"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "ami eltérő"
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Modrinth App letöltése"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Modrinth App letöltése"
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Több letöltési lehetőség"
+  },
   "auth.sign-up.label.username": {
     "message": "Felhasználónév"
   },

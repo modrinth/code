@@ -179,6 +179,9 @@
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Bạn có chắc là bạn muốn tải lại phiên bản này không?"
   },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Cài lại gói mod"
+  },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Sửa chửa"
   },

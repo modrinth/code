@@ -2,6 +2,96 @@
   "admin.billing.error.not-found": {
     "message": "ユーザーが見つかりませんでした"
   },
+  "app-marketing.download.download-appimage": {
+    "message": "AppImageをダウンロードする"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "ベータ版をダウンロードする"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "DEBをダウンロードする"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "RPMをダウンロードする"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "ダウンロードオプション"
+  },
+  "app-marketing.download.title": {
+    "message": "Modrinth アプリ (ベータ版) をダウンロードする"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.title": {
+    "message": "プロジェクトをフォローする"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "アクション"
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "インストールされたMod"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "名前"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Modを検索する"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "バージョン"
+  },
+  "app-marketing.features.offline.title": {
+    "message": "オフラインモード"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "オープンソース"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "アクティビティモニター"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "％ CPU"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinthアプリ"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "10億％"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modパック"
+  },
   "auth.authorize.action.authorize": {
     "message": "認証"
   },
@@ -256,6 +346,9 @@
   },
   "error.organization.404.list_title": {
     "message": "なぜ？"
+  },
+  "error.organization.404.title": {
+    "message": "組織が見つかりません"
   },
   "error.project.404.list_item.1": {
     "message": "プロジェクトのURLを誤って入力した可能性があります。"

@@ -2,6 +2,99 @@
   "admin.billing.error.not-found": {
     "message": "punoɟ ʇou ɹǝs∩"
   },
+  "app-marketing.download.description": {
+    "message": "˙uoᴉsɹǝʌ pǝɹᴉsǝp ɹnoʎ ǝsooɥɔ 'sɯɹoɟʇɐld llɐ ssoɹɔɐ ǝlqɐlᴉɐʌɐ sᴉ ddɐ doʇʞsǝp ɹnO"
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "ǝƃɐɯIdd∀ ǝɥʇ pɐoluʍop"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "ɐʇǝq ǝɥʇ pɐoluʍop"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "qƎp ǝɥʇ pɐoluʍop"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "WԀɹ ǝɥʇ pɐoluʍop"
+  },
+  "app-marketing.download.linux": {
+    "message": "xnuᴉ˥"
+  },
+  "app-marketing.download.mac": {
+    "message": "ɔɐW"
+  },
+  "app-marketing.download.options-title": {
+    "message": "suoᴉʇdo pɐoluʍop"
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "sǝƃɐʞɔɐd ʎʇɹɐd-pɹᴉɥ┴"
+  },
+  "app-marketing.download.windows": {
+    "message": "sʍopuᴉM"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "˙ʞɔᴉlɔ ǝuo ɥʇᴉʍ sǝʇɐpdn ǝʌᴉǝɔǝɹ puɐ ǝʌol noʎ ʇuǝʇuoɔ ǝʌɐS"
+  },
+  "app-marketing.features.follow.title": {
+    "message": "sʇɔǝɾoɹd ʍolloℲ"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "ɹǝɥɔunɐ˥pפ"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "ƆWᴉʇlnW"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "ƃuᴉʇɹodɯᴉ ǝlᴉɟoɹԀ"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "suoᴉʇɔ∀"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "ʎq"
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "spoɯ pǝllɐʇsuI"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "ǝɯɐN"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "spoɯ ɥɔɹɐǝS"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "ʇuǝɯǝƃɐuɐɯ poW"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "uoᴉsɹǝΛ"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "˙ʇou ɹo 'ʇǝuɹǝʇuᴉ ǝɥʇ oʇ pǝʇɔǝuuoɔ ǝɹɐ noʎ ɹǝɥʇǝɥʍ 'spoɯ ɹnoʎ ʎɐlԀ"
+  },
+  "app-marketing.features.offline.title": {
+    "message": "ǝpoɯ ǝuᴉlɟɟO"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "ǝɔɹnos uǝdO"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "ɹoʇᴉuoɯ ʎʇᴉʌᴉʇɔ∀"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "∩ԀƆ %"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "pɹoɔsᴉp"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "ǝɔuɐɯɹoɟɹǝd pooפ"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "ǝɯoɹɥƆ ǝlƃooפ"
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "ʞɔɐdpoW"
+  },
   "auth.authorize.action.authorize": {
     "message": "ǝsᴉɹoɥʇnⱯ"
   },

@@ -1,4 +1,88 @@
 {
+  "admin.billing.error.not-found": {
+    "message": "Không tìm thấy người dùng"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Tải bản beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Tải bản DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Tải bản RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Tuỳ chọn tải về"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Theo dõi các dự án"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Nhập hồ sơ"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Hành động"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "bởi {author}"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "App Modrinth"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 tỉ %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Tên tiến trình"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Nhỏ"
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Gói mod"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Chia sẻ"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Chia sẻ gói mod"
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Tải App Modrinth"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Tải App Modrinth"
+  },
   "auth.authorize.action.authorize": {
     "message": "Ủy quyền"
   },
@@ -230,6 +314,60 @@
   "error.generic.404.title": {
     "message": "Không tìm thấy trang"
   },
+  "error.project.404.title": {
+    "message": "Không tìm thấy dự án"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Dữ liệu và thống kê"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Khám phá"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Hệ sinh thái đa dạng"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Kiếm tiền"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Quản lý đội"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "gói dữ liệu"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "gói mod"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "mod"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "trình cắm"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "gói tài nguyên"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "máy chủ"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "trình tô bóng"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.search.label": {
+    "message": "Tìm kiếm"
+  },
+  "landing.search.placeholder": {
+    "message": "Tìm kiếm..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Sắp xếp theo"
+  },
+  "layout.avatar.alt": {
+    "message": "Hình đại diện của bạn"
+  },
   "layout.footer.about": {
     "message": "Giới thiệu"
   },
@@ -353,6 +491,9 @@
   "profile.label.no-collections": {
     "message": "Người dùng này không có bộ sưu tập nào cả!"
   },
+  "profile.label.no-projects-auth": {
+    "message": "Bạn không có dự án nào cả.\nBạn có muốn <create-link>tạo một dự án</create-link> không?"
+  },
   "profile.label.organizations": {
     "message": "Tổ chức"
   },
@@ -386,6 +527,33 @@
   "project-member-header.success": {
     "message": "Thành công"
   },
+  "project-moderation-nags.required": {
+    "message": "Bắt buộc"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Cảnh báo"
+  },
+  "project-type.collection.plural": {
+    "message": "Bộ sưu tập"
+  },
+  "project-type.collection.singular": {
+    "message": "Bộ sưu tập"
+  },
+  "project-type.datapack.plural": {
+    "message": "Gói dữ liệu"
+  },
+  "project-type.datapack.singular": {
+    "message": "Gói dữ liệu"
+  },
+  "project-type.mod.plural": {
+    "message": "Mod"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Gói mod"
+  },
   "project-type.modpack.singular": {
     "message": "Gói mod"
   },
@@ -416,14 +584,35 @@
   "project.about.details.created": {
     "message": "Đã tạo {date}"
   },
+  "project.about.details.licensed": {
+    "message": "Được cấp phép theo {license}"
+  },
   "project.about.details.published": {
     "message": "Được đăng vào {date}"
+  },
+  "project.about.details.submitted": {
+    "message": "Gửi lên vào {date}"
   },
   "project.about.details.title": {
     "message": "Chi tiết"
   },
   "project.about.details.updated": {
     "message": "Cập nhật vào {date}"
+  },
+  "project.actions.create-server": {
+    "message": "Tạo một máy chủ"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "Tạo một máy chủ"
+  },
+  "project.actions.dont-show-again": {
+    "message": "Đừng hiện lại nữa"
+  },
+  "project.actions.review-project": {
+    "message": "Xem lại dự án"
+  },
+  "project.actions.servers-promo.monthly": {
+    "message": " / tháng"
   },
   "project.description.title": {
     "message": "Mô tả"
@@ -433,6 +622,21 @@
   },
   "project.moderation.title": {
     "message": "Điều phối"
+  },
+  "project.navigation.changelog": {
+    "message": "Nhật ký thay đổi"
+  },
+  "project.settings.general.name.title": {
+    "message": "Tên"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "Tóm tắt dự án của bạn trong không quá một câu."
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.title": {
+    "message": "Thiết đặt"
   },
   "project.stats.downloads-label": {
     "message": "lượt tải về{count, plural, other {s}}"

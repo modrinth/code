@@ -582,7 +582,7 @@
     "message": "A busca na velocidade da luz e os filtros poderosos do Modrinth permitem que você encontre o que deseja ao digitar."
   },
   "landing.feature.search.heading": {
-    "message": "Encontre o que quiser, de forma rápida e simples"
+    "message": "Encontre o que quiser, rápido e fácil"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "O lugar para {content} de Minecraft"
@@ -720,7 +720,7 @@
     "message": "Notícias"
   },
   "layout.footer.about.rewards-program": {
-    "message": "Programa de Recompensas"
+    "message": "Programa de recompensas"
   },
   "layout.footer.about.status": {
     "message": "Status"
@@ -768,7 +768,7 @@
     "message": "Documentação da API"
   },
   "layout.footer.resources.help-center": {
-    "message": "Central de Ajuda"
+    "message": "Central de ajuda"
   },
   "layout.footer.resources.report-issues": {
     "message": "Relatar problemas"
@@ -1026,7 +1026,7 @@
     "message": "Revisar projeto"
   },
   "project.actions.servers-promo.description": {
-    "message": "Os servidores do Modrinth são a maneira mais fácil de jogar com seus amigos sem complicações!"
+    "message": "O Modrinth Servers é a maneira mais fácil de jogar com seus amigos sem complicações!"
   },
   "project.actions.servers-promo.monthly": {
     "message": " / mês"
@@ -1779,10 +1779,10 @@
     "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Gerencie suas assinaturas de servidores do Modrinth."
+    "message": "Gerencie suas assinaturas do Modrinth Servers."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Assinaturas de servidores do Modrinth"
+    "message": "Assinaturas do Modrinth Servers"
   },
   "settings.billing.subscription.description": {
     "message": "Gerencie suas assinaturas do Modrinth."
@@ -1909,6 +1909,9 @@
   },
   "settings.language.languages.search.no-results": {
     "message": "Nenhum idioma corresponde com sua busca."
+  },
+  "settings.language.warning": {
+    "message": "Nosso site ainda não está totalmente traduzido e parte dele ainda pode aparecer em inglês para determinados idiomas. Estamos melhorando nosso sistema de localização e alguns conteúdos também podem estar quebrados."
   },
   "settings.pats.action.create": {
     "message": "Criar um TAP"
