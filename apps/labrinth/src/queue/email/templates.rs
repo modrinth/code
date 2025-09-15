@@ -572,12 +572,16 @@ async fn collect_template_variables(
 
             let mut map = HashMap::new();
 
+            fn fmt_money(amount: i64) -> String {
+                format!("{:.2}", amount as f64 / 100.0)
+            }
+
             map.insert(USER_NAME, user.username);
-            map.insert(TAXNOTIFICATION_AMOUNT, amount.to_string());
-            map.insert(TAXNOTIFICATION_TAX_AMOUNT, tax_amount.to_string());
+            map.insert(TAXNOTIFICATION_AMOUNT, fmt_money(*amount));
+            map.insert(TAXNOTIFICATION_TAX_AMOUNT, fmt_money(*tax_amount));
             map.insert(
                 TAXNOTIFICATION_TOTAL_AMOUNT,
-                (amount + tax_amount).to_string(),
+                fmt_money(*amount + *tax_amount),
             );
             map.insert(
                 TAXNOTIFICATION_DUE,
