@@ -55,7 +55,7 @@ pub enum CreateError {
 
 i18n_enum!(
     CreateError,
-    root_key: "labrinth.error.project_creation",
+    root_key: "labrinth.error.creation",
     EnvError(..) => "environment_error",
     SqlxDatabaseError(..) => "database_error.unknown",
     DatabaseError(cause) => "database_error",
@@ -93,7 +93,7 @@ pub enum MissingValuePart {
 
 i18n_enum!(
     MissingValuePart,
-    root_key: "labrinth.error.project_creation.missing_value",
+    root_key: "labrinth.error.creation.missing_value",
     DataField! => "data_field",
     ContentName! => "content_name",
     ContentFileName! => "content_file_name",
