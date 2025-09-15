@@ -1,6 +1,10 @@
 name: Modrinth App build
 on:
   push:
+    branches:
+      - main
+      - prod
+      - '**/**'
     tags:
       - 'v*'
     paths:
