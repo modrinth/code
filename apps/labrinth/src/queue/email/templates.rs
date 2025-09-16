@@ -1,9 +1,9 @@
 use super::MailError;
-use crate::database::DBProject;
-use crate::database::models::DBUser;
-use crate::database::models::DatabaseError;
 use crate::database::models::ids::*;
 use crate::database::models::notifications_template_item::NotificationTemplate;
+use crate::database::models::{
+    DBOrganization, DBProject, DBUser, DatabaseError,
+};
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationBody;
 use crate::routes::ApiError;
@@ -346,30 +346,38 @@ async fn collect_template_variables(
             map.insert(PROJECT_ICON_URL, project.icon_url.unwrap_or_default());
 
             if let Some(new_owner_user_id) = new_owner_user_id {
-                let user = query!(
-                    r#"SELECT username FROM users WHERE id = $1"#,
-                    new_owner_user_id.0 as i64
+                let user = DBUser::get_id(
+                    DBUserId(new_owner_user_id.0 as i64),
+                    &mut **exec,
+                    redis,
                 )
-                .fetch_one(&mut **exec)
-                .await?;
+                .await?
+                .ok_or_else(|| {
+                    DatabaseError::Database(sqlx::Error::RowNotFound)
+                })?;
+
                 map.insert(NEWOWNER_TYPE, "user".to_string());
                 map.insert(NEWOWNER_TYPE_CAPITALIZED, "User".to_string());
                 map.insert(NEWOWNER_NAME, user.username);
             } else if let Some(new_owner_organization_id) =
                 new_owner_organization_id
             {
-                let org = query!(
-                    r#"SELECT slug FROM organizations WHERE id = $1"#,
-                    new_owner_organization_id.0 as i64
+                let org = DBOrganization::get_id(
+                    DBOrganizationId(new_owner_organization_id.0 as i64),
+                    &mut **exec,
+                    redis,
                 )
-                .fetch_one(&mut **exec)
-                .await?;
+                .await?
+                .ok_or_else(|| {
+                    DatabaseError::Database(sqlx::Error::RowNotFound)
+                })?;
+
                 map.insert(NEWOWNER_TYPE, "organization".to_string());
                 map.insert(
                     NEWOWNER_TYPE_CAPITALIZED,
                     "Organization".to_string(),
                 );
-                map.insert(NEWOWNER_NAME, org.slug);
+                map.insert(NEWOWNER_NAME, org.name);
             }
 
             Ok(map)
