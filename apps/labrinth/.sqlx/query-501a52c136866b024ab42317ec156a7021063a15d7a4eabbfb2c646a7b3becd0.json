@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT\n\t\t\t  id,\n\t\t\t  user_id,\n\t\t\t  date_available\n\t\t\tFROM payouts_values_notifications\n\t\t\tWHERE\n\t\t\t  notified = FALSE\n\t\t\t  AND date_available <= NOW()\n\t\t\tFOR UPDATE SKIP LOCKED\n\t\t\tLIMIT $1\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "date_available",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "501a52c136866b024ab42317ec156a7021063a15d7a4eabbfb2c646a7b3becd0"
+}

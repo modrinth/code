@@ -60,12 +60,15 @@ macro_rules! generate_bulk_ids {
             count: usize,
             con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         ) -> Result<Vec<$return_type>, DatabaseError> {
-            let mut rng = rand::thread_rng();
             let mut retry_count = 0;
 
             // Check if ID is unique
             loop {
-                let base = random_base62_rng_range(&mut rng, 1, 10) as i64;
+                // We re-acquire a thread-local RNG handle for each uniqueness loop for
+                // the bulk generator future to be `Send + Sync`.
+                let base =
+                    random_base62_rng_range(&mut rand::thread_rng(), 1, 10)
+                        as i64;
                 let ids =
                     (0..count).map(|x| base + x as i64).collect::<Vec<_>>();
 

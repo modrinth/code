@@ -485,7 +485,7 @@ pub async fn project_edit(
                         project_id: project_item.inner.id.into(),
                     }
                 } else {
-                    NotificationBody::ProjectStatusUpdatedNeutral {
+                    NotificationBody::ProjectStatusNeutral {
                         project_id: project_item.inner.id.into(),
                         old_status: project_item.inner.status,
                         new_status: *status,

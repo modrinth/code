@@ -58,8 +58,8 @@ const NEWOWNER_TYPE: &str = "new_owner.type";
 const NEWOWNER_TYPE_CAPITALIZED: &str = "new_owner.type_capitalized";
 const NEWOWNER_NAME: &str = "new_owner.name";
 
-const PAYOUTAVAILABLE_AMOUNT: &str = "payoutavailable.amount";
-const PAYOUTAVAILABLE_PERIOD: &str = "payoutavailable.period";
+const PAYOUTAVAILABLE_AMOUNT: &str = "payout.amount";
+const PAYOUTAVAILABLE_PERIOD: &str = "payout.period";
 
 #[derive(Clone)]
 pub struct MailingIdentity {
@@ -221,10 +221,7 @@ async fn collect_template_variables(
             Ok(map)
         }
 
-        NotificationBody::ModerationThreadMessageReceived {
-            project_id,
-            ..
-        } => {
+        NotificationBody::ModerationMessageReceived { project_id, .. } => {
             let result = DBProject::get_id(
                 DBProjectId(project_id.0 as i64),
                 exec,
@@ -300,7 +297,7 @@ async fn collect_template_variables(
             Ok(map)
         }
 
-        NotificationBody::ProjectStatusUpdatedNeutral {
+        NotificationBody::ProjectStatusNeutral {
             project_id,
             old_status,
             new_status,
@@ -544,12 +541,10 @@ async fn collect_template_variables(
                 );
             }
 
-            let money = rusty_money::Money::from_minor(
-                (amount * 100.0) as i64,
-                rusty_money::iso::USD,
+            map.insert(
+                PAYOUTAVAILABLE_AMOUNT,
+                format!("{:.2}", (amount * 100.0) as i64),
             );
-
-            map.insert(PAYOUTAVAILABLE_AMOUNT, money.to_string());
 
             Ok(map)
         }

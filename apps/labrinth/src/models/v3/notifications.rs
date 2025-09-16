@@ -47,11 +47,11 @@ pub enum NotificationType {
     EmailChanged,
     PaymentFailed,
     PatCreated,
-    ModerationThreadMessageReceived,
+    ModerationMessageReceived,
     ReportStatusUpdated,
     ReportSubmitted,
     ProjectStatusApproved,
-    ProjectStatusUpdatedNeutral,
+    ProjectStatusNeutral,
     ProjectTransferred,
     PayoutAvailable,
     Unknown,
@@ -77,17 +77,15 @@ impl NotificationType {
             NotificationType::EmailChanged => "email_changed",
             NotificationType::PaymentFailed => "payment_failed",
             NotificationType::PatCreated => "pat_created",
-            NotificationType::ModerationThreadMessageReceived => {
-                "moderation_thread_message_received"
+            NotificationType::ModerationMessageReceived => {
+                "moderation_message_received"
             }
             NotificationType::ReportStatusUpdated => "report_status_updated",
             NotificationType::ReportSubmitted => "report_submitted",
             NotificationType::ProjectStatusApproved => {
                 "project_status_approved"
             }
-            NotificationType::ProjectStatusUpdatedNeutral => {
-                "project_status_updated_neutral"
-            }
+            NotificationType::ProjectStatusNeutral => "project_status_neutral",
             NotificationType::ProjectTransferred => "project_transferred",
             NotificationType::PayoutAvailable => "payout_available",
             NotificationType::Unknown => "unknown",
@@ -113,17 +111,15 @@ impl NotificationType {
             "email_changed" => NotificationType::EmailChanged,
             "payment_failed" => NotificationType::PaymentFailed,
             "pat_created" => NotificationType::PatCreated,
-            "moderation_thread_message_received" => {
-                NotificationType::ModerationThreadMessageReceived
+            "moderation_message_received" => {
+                NotificationType::ModerationMessageReceived
             }
             "report_status_updated" => NotificationType::ReportStatusUpdated,
             "report_submitted" => NotificationType::ReportSubmitted,
             "project_status_approved" => {
                 NotificationType::ProjectStatusApproved
             }
-            "project_status_updated_neutral" => {
-                NotificationType::ProjectStatusUpdatedNeutral
-            }
+            "project_status_neutral" => NotificationType::ProjectStatusNeutral,
             "project_transferred" => NotificationType::ProjectTransferred,
             "payout_available" => NotificationType::PayoutAvailable,
             "unknown" => NotificationType::Unknown,
@@ -156,6 +152,7 @@ pub enum NotificationBody {
         old_status: ProjectStatus,
         new_status: ProjectStatus,
     },
+    /// This is for website notifications only. Email notifications have `ModerationMessageReceived`.
     ModeratorMessage {
         thread_id: ThreadId,
         message_id: ThreadMessageId,
@@ -168,7 +165,7 @@ pub enum NotificationBody {
     },
     /// This differs from ModeratorMessage as this notification is only for project threads and
     /// email notifications, not for site notifications.
-    ModerationThreadMessageReceived {
+    ModerationMessageReceived {
         project_id: ProjectId,
     },
     ReportStatusUpdated {
@@ -180,7 +177,7 @@ pub enum NotificationBody {
     ProjectStatusApproved {
         project_id: ProjectId,
     },
-    ProjectStatusUpdatedNeutral {
+    ProjectStatusNeutral {
         project_id: ProjectId,
         old_status: ProjectStatus,
         new_status: ProjectStatus,
@@ -245,8 +242,8 @@ impl NotificationBody {
                 NotificationType::ModeratorMessage
             }
             NotificationBody::PatCreated { .. } => NotificationType::PatCreated,
-            NotificationBody::ModerationThreadMessageReceived { .. } => {
-                NotificationType::ModerationThreadMessageReceived
+            NotificationBody::ModerationMessageReceived { .. } => {
+                NotificationType::ModerationMessageReceived
             }
             NotificationBody::ReportStatusUpdated { .. } => {
                 NotificationType::ReportStatusUpdated
@@ -257,8 +254,8 @@ impl NotificationBody {
             NotificationBody::ProjectStatusApproved { .. } => {
                 NotificationType::ProjectStatusApproved
             }
-            NotificationBody::ProjectStatusUpdatedNeutral { .. } => {
-                NotificationType::ProjectStatusUpdatedNeutral
+            NotificationBody::ProjectStatusNeutral { .. } => {
+                NotificationType::ProjectStatusNeutral
             }
             NotificationBody::ProjectTransferred { .. } => {
                 NotificationType::ProjectTransferred
@@ -440,7 +437,7 @@ impl From<DBNotification> for Notification {
                     "#".to_string(),
                     vec![],
                 ),
-                NotificationBody::ProjectStatusUpdatedNeutral { .. } => (
+                NotificationBody::ProjectStatusNeutral { .. } => (
                     "Project status updated".to_string(),
                     "Your project status has been updated.".to_string(),
                     "#".to_string(),
@@ -531,7 +528,7 @@ impl From<DBNotification> for Notification {
                     "#".to_string(),
                     vec![],
                 ),
-				NotificationBody::ModerationThreadMessageReceived { .. } => (
+				NotificationBody::ModerationMessageReceived { .. } => (
                     "New message in moderation thread".to_string(),
                     "You have a new message in a moderation thread.".to_string(),
                     "#".to_string(),

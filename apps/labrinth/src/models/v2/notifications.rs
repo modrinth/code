@@ -99,7 +99,7 @@ pub enum LegacyNotificationBody {
     PatCreated {
         token_name: String,
     },
-    ModerationThreadMessageReceived {
+    ModerationMessageReceived {
         project_id: ProjectId,
     },
     ReportStatusUpdated {
@@ -111,7 +111,7 @@ pub enum LegacyNotificationBody {
     ProjectStatusApproved {
         project_id: ProjectId,
     },
-    ProjectStatusUpdatedNeutral {
+    ProjectStatusNeutral {
         project_id: ProjectId,
         old_status: ProjectStatus,
         new_status: ProjectStatus,
@@ -150,8 +150,8 @@ impl LegacyNotification {
             NotificationBody::PatCreated { .. } => {
                 Some("pat_created".to_string())
             }
-            NotificationBody::ModerationThreadMessageReceived { .. } => {
-                Some("moderation_thread_message_received".to_string())
+            NotificationBody::ModerationMessageReceived { .. } => {
+                Some("moderation_message_received".to_string())
             }
             NotificationBody::ReportStatusUpdated { .. } => {
                 Some("report_status_updated".to_string())
@@ -162,8 +162,8 @@ impl LegacyNotification {
             NotificationBody::ProjectStatusApproved { .. } => {
                 Some("project_status_approved".to_string())
             }
-            NotificationBody::ProjectStatusUpdatedNeutral { .. } => {
-                Some("project_status_updated_neutral".to_string())
+            NotificationBody::ProjectStatusNeutral { .. } => {
+                Some("project_status_neutral".to_string())
             }
             NotificationBody::ProjectTransferred { .. } => {
                 Some("project_transferred".to_string())
@@ -260,11 +260,9 @@ impl LegacyNotification {
             NotificationBody::PatCreated { token_name } => {
                 LegacyNotificationBody::PatCreated { token_name }
             }
-            NotificationBody::ModerationThreadMessageReceived {
-                project_id,
-            } => LegacyNotificationBody::ModerationThreadMessageReceived {
-                project_id,
-            },
+            NotificationBody::ModerationMessageReceived { project_id } => {
+                LegacyNotificationBody::ModerationMessageReceived { project_id }
+            }
             NotificationBody::ReportStatusUpdated { report_id } => {
                 LegacyNotificationBody::ReportStatusUpdated { report_id }
             }
@@ -274,11 +272,11 @@ impl LegacyNotification {
             NotificationBody::ProjectStatusApproved { project_id } => {
                 LegacyNotificationBody::ProjectStatusApproved { project_id }
             }
-            NotificationBody::ProjectStatusUpdatedNeutral {
+            NotificationBody::ProjectStatusNeutral {
                 project_id,
                 old_status,
                 new_status,
-            } => LegacyNotificationBody::ProjectStatusUpdatedNeutral {
+            } => LegacyNotificationBody::ProjectStatusNeutral {
                 project_id,
                 old_status,
                 new_status,

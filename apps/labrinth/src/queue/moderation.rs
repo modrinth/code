@@ -718,7 +718,7 @@ impl AutomatedModerationQueue {
                                         .await?;
 
                                     NotificationBuilder {
-                                        body: NotificationBody::ModerationThreadMessageReceived {
+                                        body: NotificationBody::ModerationMessageReceived {
                                             project_id: project.inner.id.into(),
                                         },
                                     }

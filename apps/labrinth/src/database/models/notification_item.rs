@@ -59,27 +59,27 @@ impl NotificationBuilder {
         sqlx::query!(
             "
             WITH
-            period_payouts AS (
+              period_payouts AS (
                 SELECT
-                ids.notification_id,
-                ids.user_id,
-                ids.date_available,
-                SUM(pv.amount)
-                FROM UNNEST($1::bigint[], $2::bigint[], $3::timestamptz[]) AS ids(notification_id, user_id, date_available)
+                  ids.notification_id,
+                  ids.user_id,
+                  ids.date_available,
+                  COALESCE(SUM(pv.amount), 0.0) sum
+                  FROM UNNEST($1::bigint[], $2::bigint[], $3::timestamptz[]) AS ids(notification_id, user_id, date_available)
                 LEFT JOIN payouts_values pv ON pv.user_id = ids.user_id AND pv.date_available = ids.date_available
                 GROUP BY ids.user_id, ids.notification_id, ids.date_available
-            )
+              )
             INSERT INTO notifications (
                 id, user_id, body
             )
             SELECT
-            notification_id id,
-            user_id,
-            JSONB_BUILD_OBJECT(
+              notification_id id,
+              user_id,
+              JSONB_BUILD_OBJECT(
                 'type', 'payout_available',
                 'date_available', to_jsonb(date_available),
                 'amount', to_jsonb(sum)
-            ) body
+              ) body
             FROM period_payouts
             ",
             &notification_ids[..],
