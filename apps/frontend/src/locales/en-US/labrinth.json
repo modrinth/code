@@ -458,6 +458,105 @@
   "labrinth.error.zip_error": {
     "message": "Unable to read Zip Archive: {cause}"
   },
+  "labrinth.notification.body.auth_provider_added": {
+    "message": "You''ve added a new authentication provider to your account."
+  },
+  "labrinth.notification.body.auth_provider_removed": {
+    "message": "You''ve removed a authentication provider from your account."
+  },
+  "labrinth.notification.body.email_changed": {
+    "message": "Your account email was changed."
+  },
+  "labrinth.notification.body.moderator_message": {
+    "message": "Click on the link to read more."
+  },
+  "labrinth.notification.body.organization_invite": {
+    "message": "An invite has been sent for you to be {role} of an organization"
+  },
+  "labrinth.notification.body.password_changed": {
+    "message": "You''ve changed your account password."
+  },
+  "labrinth.notification.body.password_removed": {
+    "message": "You''ve removed your account password."
+  },
+  "labrinth.notification.body.payment_failed": {
+    "message": "A payment on your account failed. Please update your billing information."
+  },
+  "labrinth.notification.body.project_update": {
+    "message": "The project {project_id} has released a new version: {version_id}"
+  },
+  "labrinth.notification.body.reset_password": {
+    "message": "You''ve requested to reset your password. Please check your email for a reset link."
+  },
+  "labrinth.notification.body.status_change": {
+    "message": "Status has changed from {old_status} to {new_status}"
+  },
+  "labrinth.notification.body.team_invite": {
+    "message": "An invite has been sent for you to be {role} of a team"
+  },
+  "labrinth.notification.body.two_factor_enabled": {
+    "message": "You''ve enabled two-factor authentication on your account."
+  },
+  "labrinth.notification.body.two_factor_removed": {
+    "message": "You''ve removed two-factor authentication from your account."
+  },
+  "labrinth.notification.body.unknown": {
+    "message": ""
+  },
+  "labrinth.notification.body.verify_email": {
+    "message": "You''ve requested to verify your email. Please check your email for a verification link."
+  },
+  "labrinth.notification.type.auth_provider_added": {
+    "message": "Auth provider added"
+  },
+  "labrinth.notification.type.auth_provider_removed": {
+    "message": "Auth provider removed"
+  },
+  "labrinth.notification.type.email_changed": {
+    "message": "Email changed"
+  },
+  "labrinth.notification.type.legacy_markdown": {
+    "message": "LEGACY MARKDOWN NOTIFICATION"
+  },
+  "labrinth.notification.type.moderator_message": {
+    "message": "A moderator has sent you a message!"
+  },
+  "labrinth.notification.type.organization_invite": {
+    "message": "You have been invited to join an organization!"
+  },
+  "labrinth.notification.type.password_changed": {
+    "message": "Password changed"
+  },
+  "labrinth.notification.type.password_removed": {
+    "message": "Password removed"
+  },
+  "labrinth.notification.type.payment_failed": {
+    "message": "Payment failed"
+  },
+  "labrinth.notification.type.project_update": {
+    "message": "A project you follow has been updated!"
+  },
+  "labrinth.notification.type.reset_password": {
+    "message": "Password reset requested"
+  },
+  "labrinth.notification.type.status_change": {
+    "message": "Project status has changed"
+  },
+  "labrinth.notification.type.team_invite": {
+    "message": "You have been invited to join a team!"
+  },
+  "labrinth.notification.type.two_factor_enabled": {
+    "message": "Two-factor authentication enabled"
+  },
+  "labrinth.notification.type.two_factor_removed": {
+    "message": "Two-factor authentication removed"
+  },
+  "labrinth.notification.type.unknown": {
+    "message": ""
+  },
+  "labrinth.notification.type.verify_email": {
+    "message": "Verify your email"
+  },
   "labrinth.warning.file_validation.invalid_mrpack": {
     "message": "Invalid modpack file. You must upload a valid .mrpack file."
   },

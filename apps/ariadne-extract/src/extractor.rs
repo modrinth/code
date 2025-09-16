@@ -404,36 +404,38 @@ impl Parse for I18nEnumVariant {
         let variant_name = input.parse()?;
 
         let mut transparent = None;
+        let mut fields = Punctuated::new();
         let fields_type;
-        let fields = if input.peek(Token![!]) || input.peek(Token![=>]) {
+        if input.peek(Token![!]) || input.peek(Token![=>]) {
             // Immediate => also flows into this case for a better error message
             fields_type = FieldsType::Unit;
             input.parse::<Token![!]>()?;
-            Punctuated::new()
         } else {
             let content;
             if input.peek(token::Brace) {
                 fields_type = FieldsType::Named;
                 braced!(content in input);
-                if content.peek(Token![..]) {
-                    content.parse::<Token![..]>()?;
-                    Punctuated::new()
-                } else {
-                    content.parse_terminated(Ident::parse, Token![,])?
-                }
             } else {
                 fields_type = FieldsType::Tuple;
                 parenthesized!(content in input);
-                if content.peek(Token![..]) {
-                    content.parse::<Token![..]>()?;
-                    Punctuated::new()
-                } else if content.peek(kw::transparent) {
-                    transparent = Some(content.parse()?);
-                    content.parse::<Ident>()?;
-                    Punctuated::new()
-                } else {
-                    content.parse_terminated(Ident::parse, Token![,])?
+            }
+            if content.peek(Token![..]) {
+                content.parse::<Token![..]>()?;
+            } else if content.peek(kw::transparent) {
+                transparent = Some(content.parse()?);
+                content.parse::<Ident>()?;
+            } else if content.peek(Ident) {
+                loop {
+                    fields.push_value(content.parse()?);
+                    if !content.peek(Token![,]) || !content.peek2(Ident) {
+                        break;
+                    }
+                    fields.push_punct(content.parse()?);
                 }
+            };
+            if fields_type == FieldsType::Named && content.peek(Token![,]) {
+                content.parse::<Token![,]>()?;
+                content.parse::<Token![..]>()?;
             }
         };
 
@@ -462,7 +464,7 @@ impl I18nEnumVariant {
             return (format_string, errors);
         }
 
-        let known_names = if matches!(self.fields_type, FieldsType::Named) {
+        let known_names = if self.fields_type == FieldsType::Named {
             self.fields.iter().map(Ident::to_string).collect()
         } else {
             HashSet::new()
@@ -578,6 +580,7 @@ impl I18nEnumVariant {
     }
 }
 
+#[derive(Eq, PartialEq)]
 enum FieldsType {
     Unit,
     Tuple,

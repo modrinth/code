@@ -207,7 +207,7 @@ pub enum NotificationBody {
 
 i18n_enum!(
     NotificationBody,
-    root_key: "labrinth.notification.type",
+    root_key: "labrinth.notification.body",
     ProjectUpdate { project_id, version_id } => "project_update",
     TeamInvite { role, .. } => "team_invite",
     OrganizationInvite { role, .. } => "organization_invite",
