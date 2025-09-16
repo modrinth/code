@@ -234,7 +234,6 @@ async fn collect_template_variables(
             .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
             .inner;
 
-            let mut map = HashMap::new();
             map.insert(PROJECT_ID, to_base62(project_id.0 as u64));
             map.insert(PROJECT_NAME, result.name);
             map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
@@ -258,7 +257,6 @@ async fn collect_template_variables(
             .fetch_one(&mut **exec)
             .await?;
 
-            let mut map = HashMap::new();
             map.insert(REPORT_ID, to_base62(report_id.0 as u64));
             map.insert(REPORT_TITLE, result.title);
             map.insert(REPORT_DATE, result.created.to_rfc2822());
@@ -296,7 +294,6 @@ async fn collect_template_variables(
             .fetch_one(&mut **exec)
             .await?;
 
-            let mut map = HashMap::new();
             map.insert(PROJECT_ID, to_base62(project_id.0 as u64));
             map.insert(PROJECT_NAME, result.name);
             map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
@@ -317,7 +314,6 @@ async fn collect_template_variables(
             .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
             .inner;
 
-            let mut map = HashMap::new();
             map.insert(PROJECT_ID, to_base62(project_id.0 as u64));
             map.insert(PROJECT_NAME, result.name);
             map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
@@ -340,7 +336,6 @@ async fn collect_template_variables(
             .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
             .inner;
 
-            let mut map = HashMap::new();
             map.insert(PROJECT_ID, to_base62(project_id.0 as u64));
             map.insert(PROJECT_NAME, project.name);
             map.insert(PROJECT_ICON_URL, project.icon_url.unwrap_or_default());
@@ -407,8 +402,6 @@ async fn collect_template_variables(
             .fetch_one(&mut **exec)
             .await?;
 
-            let mut map = HashMap::new();
-            map.insert(USER_NAME, result.user_name);
             map.insert(TEAMINVITE_INVITER_NAME, result.inviter_name);
             map.insert(TEAMINVITE_PROJECT_NAME, result.project_name);
             map.insert(TEAMINVITE_ROLE_NAME, role.clone());
@@ -441,8 +434,6 @@ async fn collect_template_variables(
             .fetch_one(&mut **exec)
             .await?;
 
-            let mut map = HashMap::new();
-            map.insert(USER_NAME, result.user_name);
             map.insert(ORGINVITE_INVITER_NAME, result.inviter_name);
             map.insert(ORGINVITE_ORG_NAME, result.organization_name);
             map.insert(ORGINVITE_ROLE_NAME, role.clone());
@@ -471,8 +462,6 @@ async fn collect_template_variables(
             .fetch_one(&mut **exec)
             .await?;
 
-            let mut map = HashMap::new();
-            map.insert(USER_NAME, result.user_name);
             map.insert(STATUSCHANGE_PROJECT_NAME, result.project_name);
             map.insert(STATUSCHANGE_OLD_STATUS, old_status.as_str().to_owned());
             map.insert(STATUSCHANGE_NEW_STATUS, new_status.as_str().to_owned());
@@ -488,15 +477,7 @@ async fn collect_template_variables(
                 flow
             );
 
-            let user = DBUser::get_id(user_id, &mut **exec, redis)
-                .await?
-                .ok_or_else(|| {
-                    DatabaseError::Database(sqlx::Error::RowNotFound)
-                })?;
-
-            let mut map = HashMap::new();
             map.insert(RESETPASSWORD_URL, url);
-            map.insert(USER_NAME, user.username);
 
             Ok(map)
         }
@@ -509,29 +490,13 @@ async fn collect_template_variables(
                 flow
             );
 
-            let user = DBUser::get_id(user_id, &mut **exec, redis)
-                .await?
-                .ok_or_else(|| {
-                    DatabaseError::Database(sqlx::Error::RowNotFound)
-                })?;
-
-            let mut map = HashMap::new();
             map.insert(VERIFYEMAIL_URL, url);
-            map.insert(USER_NAME, user.username);
 
             Ok(map)
         }
 
         NotificationBody::AuthProviderAdded { provider }
         | NotificationBody::AuthProviderRemoved { provider } => {
-            let user = DBUser::get_id(user_id, &mut **exec, redis)
-                .await?
-                .ok_or_else(|| {
-                    DatabaseError::Database(sqlx::Error::RowNotFound)
-                })?;
-
-            let mut map = HashMap::new();
-            map.insert(USER_NAME, user.username);
             map.insert(AUTHPROVIDER_NAME, provider.clone());
 
             Ok(map)
@@ -546,26 +511,12 @@ async fn collect_template_variables(
             new_email,
             to_email: _,
         } => {
-            let user = DBUser::get_id(user_id, &mut **exec, redis)
-                .await?
-                .ok_or_else(|| {
-                    DatabaseError::Database(sqlx::Error::RowNotFound)
-                })?;
-
-            let mut map = HashMap::new();
-            map.insert(USER_NAME, user.username);
             map.insert(EMAILCHANGED_NEW_EMAIL, new_email.clone());
 
             Ok(map)
         }
 
         NotificationBody::PaymentFailed { amount, service } => {
-            let user = DBUser::get_id(user_id, &mut **exec, redis)
-                .await?
-                .ok_or_else(|| {
-                    DatabaseError::Database(sqlx::Error::RowNotFound)
-                })?;
-
             let url = format!(
                 "{}/{}",
                 dotenvy::var("SITE_URL")?,
@@ -573,7 +524,6 @@ async fn collect_template_variables(
             );
 
             let mut map = HashMap::new();
-            map.insert(USER_NAME, user.username);
             map.insert(PAYMENTFAILED_AMOUNT, amount.clone());
             map.insert(PAYMENTFAILED_SERVICE, service.clone());
             map.insert(BILLING_URL, url);
@@ -585,14 +535,6 @@ async fn collect_template_variables(
             amount,
             date_available,
         } => {
-            let user = DBUser::get_id(user_id, &mut **exec, redis)
-                .await?
-                .ok_or_else(|| {
-                    DatabaseError::Database(sqlx::Error::RowNotFound)
-                })?;
-
-            let mut map = HashMap::new();
-
             if let Some(period_month) =
                 date_available.checked_sub_months(chrono::Months::new(2))
             {
@@ -607,15 +549,14 @@ async fn collect_template_variables(
                 rusty_money::iso::USD,
             );
 
-            map.insert(USER_NAME, user.username);
             map.insert(PAYOUTAVAILABLE_AMOUNT, money.to_string());
 
             Ok(map)
         }
 
         NotificationBody::ProjectUpdate { .. }
-        | NotificationBody::LegacyMarkdown { .. }
         | NotificationBody::ModeratorMessage { .. }
+        | NotificationBody::LegacyMarkdown { .. }
         | NotificationBody::Unknown => Ok(map),
     }
 }
