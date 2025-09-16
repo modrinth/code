@@ -15,8 +15,8 @@ use clickhouse_crate::Client;
 use util::cors::default_cors;
 
 use crate::background_task::update_versions;
-use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::database::ReadOnlyPgPool;
+use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::anrok;
 use crate::util::env::{parse_strings_from_var, parse_var};
