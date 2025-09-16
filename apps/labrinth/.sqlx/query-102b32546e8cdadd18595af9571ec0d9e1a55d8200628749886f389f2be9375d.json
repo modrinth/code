@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id, tax_amount, tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\"\n            FROM charges\n            WHERE parent_charge_id = $1",
+  "query": "\n\t\tSELECT\n\t\t  c.id, c.user_id, c.price_id, c.amount, c.currency_code, c.status, c.due, c.last_attempt,\n\t\t  c.charge_type, c.subscription_id, c.tax_amount, c.tax_platform_id,\n\t\t  -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n\t\t  c.subscription_interval AS \"subscription_interval?\",\n\t\t  c.payment_platform,\n\t\t  c.payment_platform_id AS \"payment_platform_id?\",\n\t\t  c.parent_charge_id AS \"parent_charge_id?\",\n\t\t  c.net AS \"net?\",\n\t\t  c.tax_last_updated AS \"tax_last_updated?\",\n\t\t  u.stripe_customer_id AS \"stripe_customer_id!\",\n\t\t  pti.tax_processor_id AS \"product_tax_id!\"\n\t\tFROM charges c\n\t\tINNER JOIN users u ON u.id = c.user_id\n\t\tINNER JOIN products_prices pp ON pp.id = c.price_id\n\t\tINNER JOIN products p ON p.id = pp.product_id\n\t\tINNER JOIN products_tax_identifiers pti ON pti.product_id = p.id\n\t\tWHERE\n\t\t  c.status = 'open'\n\t\t  AND c.tax_amount = 0\n\t\t  AND u.stripe_customer_id IS NOT NULL\n\t\t  AND COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) + INTERVAL '10 minutes' < NOW()\n\t\tORDER BY COALESCE(c.tax_last_updated, '-infinity' :: TIMESTAMPTZ) DESC\n\t\tLIMIT $1\n\t\t",
   "describe": {
     "columns": [
       {
@@ -87,6 +87,21 @@
         "ordinal": 16,
         "name": "net?",
         "type_info": "Int8"
+      },
+      {
+        "ordinal": 17,
+        "name": "tax_last_updated?",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 18,
+        "name": "stripe_customer_id!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 19,
+        "name": "product_tax_id!",
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -111,8 +126,11 @@
       false,
       true,
       true,
-      true
+      true,
+      true,
+      true,
+      false
     ]
   },
-  "hash": "17a8f281653d8562d612d332a84a76219114805cb235412b9af898daa70fa98d"
+  "hash": "102b32546e8cdadd18595af9571ec0d9e1a55d8200628749886f389f2be9375d"
 }

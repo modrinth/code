@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id, tax_amount, tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\"\n            FROM charges\n            WHERE subscription_id = $1 AND (status = 'open' OR status = 'expiring' OR status = 'cancelled' OR status = 'failed')",
+  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id, tax_amount, tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\",\n\t\t\t\ttax_last_updated AS \"tax_last_updated?\"\n            FROM charges\n            WHERE user_id = $1 ORDER BY due DESC",
   "describe": {
     "columns": [
       {
@@ -87,6 +87,11 @@
         "ordinal": 16,
         "name": "net?",
         "type_info": "Int8"
+      },
+      {
+        "ordinal": 17,
+        "name": "tax_last_updated?",
+        "type_info": "Timestamptz"
       }
     ],
     "parameters": {
@@ -111,8 +116,9 @@
       false,
       true,
       true,
+      true,
       true
     ]
   },
-  "hash": "d2d921aedccfee1032672486ff430b850836a96dc074483d1502bc5320a59922"
+  "hash": "74affb4cb12ff47ffa0fcca8ac14a4dffcec2c20962390f9078dad0a78aee3ac"
 }
