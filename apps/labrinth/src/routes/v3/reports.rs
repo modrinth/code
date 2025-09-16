@@ -473,7 +473,7 @@ pub async fn report_edit(
                     report_id: id.into(),
                 },
             }
-            .insert(report.reporter.into(), &mut transaction, &redis)
+            .insert(report.reporter, &mut transaction, &redis)
             .await?;
 
             sqlx::query!(

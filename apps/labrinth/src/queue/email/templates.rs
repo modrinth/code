@@ -234,7 +234,7 @@ async fn collect_template_variables(
             .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
             .inner;
 
-            map.insert(PROJECT_ID, to_base62(project_id.0 as u64));
+            map.insert(PROJECT_ID, to_base62(project_id.0));
             map.insert(PROJECT_NAME, result.name);
             map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
             Ok(map)
@@ -257,7 +257,7 @@ async fn collect_template_variables(
             .fetch_one(&mut **exec)
             .await?;
 
-            map.insert(REPORT_ID, to_base62(report_id.0 as u64));
+            map.insert(REPORT_ID, to_base62(report_id.0));
             map.insert(REPORT_TITLE, result.title);
             map.insert(REPORT_DATE, date_human_readable(result.created));
             Ok(map)
@@ -280,7 +280,7 @@ async fn collect_template_variables(
             .await?;
 
             map.insert(REPORT_TITLE, result.title);
-            map.insert(NEWREPORT_ID, to_base62(report_id.0 as u64));
+            map.insert(NEWREPORT_ID, to_base62(report_id.0));
             Ok(map)
         }
 
@@ -294,7 +294,7 @@ async fn collect_template_variables(
             .fetch_one(&mut **exec)
             .await?;
 
-            map.insert(PROJECT_ID, to_base62(project_id.0 as u64));
+            map.insert(PROJECT_ID, to_base62(project_id.0));
             map.insert(PROJECT_NAME, result.name);
             map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
             Ok(map)
@@ -314,7 +314,7 @@ async fn collect_template_variables(
             .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
             .inner;
 
-            map.insert(PROJECT_ID, to_base62(project_id.0 as u64));
+            map.insert(PROJECT_ID, to_base62(project_id.0));
             map.insert(PROJECT_NAME, result.name);
             map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
             map.insert(PROJECT_OLD_STATUS, old_status.as_str().to_string());
@@ -336,7 +336,7 @@ async fn collect_template_variables(
             .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
             .inner;
 
-            map.insert(PROJECT_ID, to_base62(project_id.0 as u64));
+            map.insert(PROJECT_ID, to_base62(project_id.0));
             map.insert(PROJECT_NAME, project.name);
             map.insert(PROJECT_ICON_URL, project.icon_url.unwrap_or_default());
 
