@@ -18,7 +18,7 @@ pub enum TranslationData {
     Literal(String),
     Translatable {
         key: Cow<'static, str>,
-        #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+        #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
         values: BTreeMap<Cow<'static, str>, TranslationData>,
     },
 }

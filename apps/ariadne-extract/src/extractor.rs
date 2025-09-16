@@ -432,7 +432,7 @@ impl Parse for I18nEnumVariant {
                     }
                     fields.push_punct(content.parse()?);
                 }
-            };
+            }
             if fields_type == FieldsType::Named && content.peek(Token![,]) {
                 content.parse::<Token![,]>()?;
                 content.parse::<Token![..]>()?;
