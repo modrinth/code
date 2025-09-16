@@ -29,6 +29,7 @@ pub struct DBCharge {
 
     pub tax_amount: i64,
     pub tax_platform_id: Option<String>,
+    pub tax_last_updated: Option<DateTime<Utc>>,
 
     // Net is always in USD
     pub net: Option<i64>,
@@ -51,6 +52,7 @@ struct ChargeQueryResult {
     parent_charge_id: Option<i64>,
     tax_amount: i64,
     tax_platform_id: Option<String>,
+    tax_last_updated: Option<DateTime<Utc>>,
     net: Option<i64>,
 }
 
@@ -78,6 +80,7 @@ impl TryFrom<ChargeQueryResult> for DBCharge {
             tax_amount: r.tax_amount,
             tax_platform_id: r.tax_platform_id,
             net: r.net,
+            tax_last_updated: r.tax_last_updated,
         })
     }
 }
@@ -95,7 +98,8 @@ macro_rules! select_charges_with_predicate {
                 payment_platform,
                 payment_platform_id AS "payment_platform_id?",
                 parent_charge_id AS "parent_charge_id?",
-                net AS "net?"
+                net AS "net?",
+				tax_last_updated AS "tax_last_updated?"
             FROM charges
             "#
                 + $predicate,
@@ -111,8 +115,8 @@ impl DBCharge {
     ) -> Result<DBChargeId, DatabaseError> {
         sqlx::query!(
             r#"
-            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net, tax_amount, tax_platform_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net, tax_amount, tax_platform_id, tax_last_updated)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
             ON CONFLICT (id)
             DO UPDATE
                 SET status = EXCLUDED.status,
@@ -126,6 +130,7 @@ impl DBCharge {
                     net = EXCLUDED.net,
                     tax_amount = EXCLUDED.tax_amount,
                     tax_platform_id = EXCLUDED.tax_platform_id,
+                    tax_last_updated = EXCLUDED.tax_last_updated,
                     price_id = EXCLUDED.price_id,
                     amount = EXCLUDED.amount,
                     currency_code = EXCLUDED.currency_code,
@@ -148,6 +153,7 @@ impl DBCharge {
             self.net,
             self.tax_amount,
             self.tax_platform_id.as_deref(),
+            self.tax_last_updated,
         )
             .execute(&mut **transaction)
         .await?;
@@ -304,4 +310,115 @@ impl DBCharge {
 
         Ok(())
     }
+}
+
+pub struct CustomerCharge {
+    pub stripe_customer_id: String,
+    pub charge: DBCharge,
+    pub product_tax_id: String,
+}
+
+/// Returns open charges, alongside customer information, which are missing tax amount, ordered
+/// by when they were last updated.
+pub async fn get_missing_tax_with_limit(
+    exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    limit: i64,
+) -> Result<Vec<CustomerCharge>, DatabaseError> {
+    struct QueryResult {
+        id: i64,
+        user_id: i64,
+        price_id: i64,
+        amount: i64,
+        currency_code: String,
+        status: String,
+        due: DateTime<Utc>,
+        last_attempt: Option<DateTime<Utc>>,
+        charge_type: String,
+        subscription_id: Option<i64>,
+        subscription_interval: Option<String>,
+        payment_platform: String,
+        payment_platform_id: Option<String>,
+        parent_charge_id: Option<i64>,
+        tax_amount: i64,
+        tax_platform_id: Option<String>,
+        tax_last_updated: Option<DateTime<Utc>>,
+        net: Option<i64>,
+        stripe_customer_id: String,
+        product_tax_id: String,
+    }
+
+    impl QueryResult {
+        /// Destructures the query result into the charge, Stripe CustomerID and Anrok product ID.
+        pub fn into_all(self) -> (ChargeQueryResult, String, String) {
+            (
+                ChargeQueryResult {
+                    id: self.id,
+                    user_id: self.user_id,
+                    price_id: self.price_id,
+                    amount: self.amount,
+                    currency_code: self.currency_code,
+                    status: self.status,
+                    due: self.due,
+                    last_attempt: self.last_attempt,
+                    charge_type: self.charge_type,
+                    subscription_id: self.subscription_id,
+                    subscription_interval: self.subscription_interval,
+                    payment_platform: self.payment_platform,
+                    payment_platform_id: self.payment_platform_id,
+                    parent_charge_id: self.parent_charge_id,
+                    tax_amount: self.tax_amount,
+                    tax_platform_id: self.tax_platform_id,
+                    tax_last_updated: self.tax_last_updated,
+                    net: self.net,
+                },
+                self.stripe_customer_id,
+                self.product_tax_id,
+            )
+        }
+    }
+
+    sqlx::query_as!(
+		QueryResult,
+		r#"
+		SELECT
+		  c.id, c.user_id, c.price_id, c.amount, c.currency_code, c.status, c.due, c.last_attempt,
+		  c.charge_type, c.subscription_id, c.tax_amount, c.tax_platform_id,
+		  -- Workaround for https://github.com/launchbadge/sqlx/issues/3336
+		  c.subscription_interval AS "subscription_interval?",
+		  c.payment_platform,
+		  c.payment_platform_id AS "payment_platform_id?",
+		  c.parent_charge_id AS "parent_charge_id?",
+		  c.net AS "net?",
+		  c.tax_last_updated AS "tax_last_updated?",
+		  u.stripe_customer_id AS "stripe_customer_id!",
+		  pti.tax_processor_id AS "product_tax_id!"
+		FROM charges c
+		INNER JOIN users u ON u.id = c.user_id
+		INNER JOIN products_prices pp ON pp.id = c.price_id
+		INNER JOIN products p ON p.id = pp.product_id
+		INNER JOIN products_tax_identifiers pti ON pti.product_id = p.id
+		WHERE
+		  c.status = 'open'
+		  AND c.tax_amount = 0
+		  AND u.stripe_customer_id IS NOT NULL
+		ORDER BY COALESCE(c.tax_last_updated, '-infinity' :: TIMESTAMPTZ) DESC
+		LIMIT $1
+		"#,
+		limit
+	)
+	.fetch_all(exec)
+	.await?
+	.into_iter()
+	.map(|r| {
+		let (charge_query_result, stripe_customer_id, product_tax_id) = r.into_all();
+
+		charge_query_result.try_into().map_err(|e: serde_json::Error| {
+			DatabaseError::SchemaError(e.to_string())
+		}).map(move |charge| CustomerCharge {
+			charge,
+			stripe_customer_id,
+			product_tax_id,
+		})
+	})
+	.collect::<Result<Vec<_>, DatabaseError>>()
 }
