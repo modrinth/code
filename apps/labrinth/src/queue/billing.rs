@@ -569,6 +569,11 @@ async fn roll_index_tax_amount_on_charges(
         let charges =
             charge_item::get_missing_tax_with_limit(&mut *txn, 5).await?;
 
+        if charges.is_empty() {
+            info!("No more charges to process");
+            break Ok(());
+        }
+
         let anrok_client = anrok_client.clone();
         let stripe_client = stripe_client.clone();
 
