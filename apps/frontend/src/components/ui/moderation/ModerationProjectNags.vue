@@ -69,7 +69,7 @@
 						:disabled="!canSubmitForReview"
 					>
 						<SendIcon />
-						{{ getFormattedMessage(messages.submitForReview) }}
+						{{ getFormattedMessage(messages.submitForReviewButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -127,6 +127,10 @@ const messages = defineMessages({
 		id: 'project-moderation-nags.submit-for-review-desc',
 		defaultMessage:
 			'Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published.',
+	},
+	submitForReviewButton: {
+		id: 'project-moderation-nags.submit-for-review-button',
+		defaultMessage: 'Submit for review',
 	},
 	resubmitForReview: {
 		id: 'project-moderation-nags.resubmit-for-review',
