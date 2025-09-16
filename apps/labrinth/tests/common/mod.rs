@@ -1,5 +1,5 @@
-use labrinth::util::anrok;
 use labrinth::queue::email::EmailQueue;
+use labrinth::util::anrok;
 use labrinth::{LabrinthConfig, file_hosting, queue};
 use labrinth::{check_env_vars, clickhouse};
 use std::sync::Arc;
