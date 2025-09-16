@@ -27,13 +27,13 @@
 					</p>
 				</div>
 
-				<TeleportDropdownMenu
+				<Combobox
 					:id="'interval-field'"
 					v-model="backupIntervalsLabel"
 					:disabled="!autoBackupEnabled || isSaving"
 					name="interval"
-					:options="Object.keys(backupIntervals)"
-					placeholder="Backup interval"
+					:options="Object.keys(backupIntervals).map((k) => ({ value: k, label: k }))"
+					:display-value="backupIntervalsLabel"
 				/>
 
 				<div class="mt-4 flex justify-start gap-4">
@@ -57,12 +57,7 @@
 
 <script setup lang="ts">
 import { SaveIcon, XIcon } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	injectNotificationManager,
-	NewModal,
-	TeleportDropdownMenu,
-} from '@modrinth/ui'
+import { ButtonStyled, Combobox, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'

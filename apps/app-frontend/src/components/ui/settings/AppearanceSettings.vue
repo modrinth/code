@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TeleportDropdownMenu, ThemeSelector, Toggle } from '@modrinth/ui'
+import { Combobox, ThemeSelector, Toggle } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import { get, set } from '@/helpers/settings.ts'
@@ -50,7 +50,7 @@ watch(
 			:model-value="themeStore.advancedRendering"
 			@update:model-value="
 				(e) => {
-					themeStore.advancedRendering = e
+					themeStore.advancedRendering = !!e
 					settings.advanced_rendering = themeStore.advancedRendering
 				}
 			"
@@ -86,12 +86,13 @@ watch(
 			<h2 class="m-0 text-lg font-extrabold text-contrast">Default landing page</h2>
 			<p class="m-0 mt-1">Change the page to which the launcher opens on.</p>
 		</div>
-		<TeleportDropdownMenu
+		<Combobox
 			id="opening-page"
 			v-model="settings.default_page"
 			name="Opening page dropdown"
 			class="w-40"
-			:options="['Home', 'Library']"
+			:options="['Home', 'Library'].map((v) => ({ value: v, label: v }))"
+			:display-value="settings.default_page ?? 'Select an option'"
 		/>
 	</div>
 
@@ -122,7 +123,7 @@ watch(
 			:model-value="settings.toggle_sidebar"
 			@update:model-value="
 				(e) => {
-					settings.toggle_sidebar = e
+					settings.toggle_sidebar = !!e
 					themeStore.toggleSidebar = settings.toggle_sidebar
 				}
 			"
