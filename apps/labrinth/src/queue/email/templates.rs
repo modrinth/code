@@ -259,7 +259,7 @@ async fn collect_template_variables(
 
             map.insert(REPORT_ID, to_base62(report_id.0 as u64));
             map.insert(REPORT_TITLE, result.title);
-            map.insert(REPORT_DATE, result.created.to_rfc2822());
+            map.insert(REPORT_DATE, date_human_readable(result.created));
             Ok(map)
         }
 
@@ -559,4 +559,8 @@ async fn collect_template_variables(
         | NotificationBody::LegacyMarkdown { .. }
         | NotificationBody::Unknown => Ok(map),
     }
+}
+
+fn date_human_readable(date: chrono::DateTime<chrono::Utc>) -> String {
+    date.format("%B %d, %Y").to_string()
 }

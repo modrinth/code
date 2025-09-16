@@ -476,6 +476,22 @@ pub async fn project_edit(
                     new_status: *status,
                 },
             }
+            .insert_many(notified_members.clone(), &mut transaction, &redis)
+            .await?;
+
+            NotificationBuilder {
+                body: if status.is_approved() {
+                    NotificationBody::ProjectStatusApproved {
+                        project_id: project_item.inner.id.into(),
+                    }
+                } else {
+                    NotificationBody::ProjectStatusUpdatedNeutral {
+                        project_id: project_item.inner.id.into(),
+                        old_status: project_item.inner.status,
+                        new_status: *status,
+                    }
+                },
+            }
             .insert_many(notified_members, &mut transaction, &redis)
             .await?;
         }

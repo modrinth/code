@@ -468,6 +468,14 @@ pub async fn report_edit(
             .insert(&mut transaction)
             .await?;
 
+            NotificationBuilder {
+                body: NotificationBody::ReportStatusUpdated {
+                    report_id: id.into(),
+                },
+            }
+            .insert(report.reporter.into(), &mut transaction, &redis)
+            .await?;
+
             sqlx::query!(
                 "
                 UPDATE reports
