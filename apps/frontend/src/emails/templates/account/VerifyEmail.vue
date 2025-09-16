@@ -13,8 +13,8 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 		<Text class="text-muted text-base">Hi {user.name},</Text>
 		<Text class="text-muted text-base">
-			Please visit the following link below to verify your email. If the button does not work, you
-			can copy the link and paste it into your browser. This link expires in 24 hours.
+			Please visit the link below to verify your email. If the button does not work, you can copy
+			the link and paste it into your browser. This link expires in 24 hours.
 		</Text>
 
 		<Button
@@ -22,7 +22,7 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 			target="_blank"
 			class="text-accentContrast inline-block rounded-[12px] bg-brand pb-3 pl-4 pr-4 pt-3 text-[14px] font-bold"
 		>
-			Verify Email
+			Verify email
 		</Button>
 
 		<VLink href="{verifyemail.url}">

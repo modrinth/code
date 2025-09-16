@@ -6,7 +6,7 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="Project status updated"
+		title="Your project, {project.name}, status has been updated"
 		:manual-links="[
 			{ link: 'https://modrinth.com/legal/rules', label: 'Community Guidelines' },
 			{
@@ -25,25 +25,22 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 				class="block h-auto rounded-lg"
 			/>
 		</Section>
-		<Heading as="h1" class="mb-2 text-2xl font-bold">Project status updated</Heading>
+		<Heading as="h1" class="mb-2 text-2xl font-bold"
+			>Your project, {project.name}, status has been updated</Heading
+		>
 
 		<Text class="text-base">Hi {user.name},</Text>
 
 		<Text class="text-base">
-			Your project <b>{project.name}</b> has been <b>{project.newstatus}</b> by the moderation team.
+			Your project's status has been changed from <b>{project.oldstatus}</b> to
+			<b>{project.newstatus}</b> by the moderation team. Please review any messages left in the
+			<VLink
+				href="https://modrinth.com/project/{project.id}/moderation"
+				class="text-green underline"
+				>moderation thread</VLink
+			>
+			which might be relevant to why the status was changed.
 		</Text>
-
-		<Section class="bg-bg-super mb-4 mt-4 rounded-lg border border-divider pb-4 pl-4 pr-4 pt-4">
-			<Text class="m-0 text-base">
-				If it is <b>withheld</b> or <b>rejected</b>, please
-				<VLink
-					href="https://modrinth.com/project/{project.id}/moderation"
-					class="text-green underline"
-					>check the moderation thread</VLink
-				>
-				for any requested changes or information on why it was rejected or withheld.
-			</Text>
-		</Section>
 
 		<Button
 			href="https://modrinth.com/project/{project.id}"

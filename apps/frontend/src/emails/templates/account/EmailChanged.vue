@@ -6,14 +6,15 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="Your Modrinth email was changed"
+		title="Your email has been changed"
 		:manual-links="[{ link: 'https://support.modrinth.com', label: 'Support Portal' }]"
 	>
-		<Heading as="h1" class="mb-2 text-2xl font-bold"> Your Modrinth email was changed </Heading>
+		<Heading as="h1" class="mb-2 text-2xl font-bold"> Your email has been changed </Heading>
 
 		<Text class="text-muted text-base">Hi {user.name},</Text>
 		<Text class="text-muted text-base">
-			Your Modrinth account email has been updated to {emailchanged.new_email}.
+			At your request, we've successfully updated your Modrinth account's email to
+			{emailchanged.new_email}.
 		</Text>
 		<Text class="text-muted text-base">
 			If you did not make this change, please contact us immediately by replying to this email or

@@ -6,15 +6,16 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="Your Modrinth password was removed"
+		title="Your password has been removed"
 		:manual-links="[{ link: 'https://support.modrinth.com', label: 'Support Portal' }]"
 	>
-		<Heading as="h1" class="mb-2 text-2xl font-bold"> Your Modrinth password was removed </Heading>
+		<Heading as="h1" class="mb-2 text-2xl font-bold"> Your password has been removed </Heading>
 
 		<Text class="text-muted text-base">Hi {user.name},</Text>
 		<Text class="text-muted text-base">
-			Your password has been removed from your account. You must now use an authentication provider
-			to log into your Modrinth account.</Text
+			At your request, your password has been removed from your account. You must now use a linked
+			authentication provider (such as your {passremoved.provider} account) to log into your
+			Modrinth account.</Text
 		>
 		<Text class="text-muted text-base">
 			If you did not make this change, please contact us immediately by replying to this email or

@@ -6,15 +6,15 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="A new device is using your account"
+		title="Sign in from new device"
 		:manual-links="[{ link: 'https://support.modrinth.com', label: 'Support Portal' }]"
 	>
-		<Heading as="h1" class="mb-2 text-2xl font-bold"> A new device is using your account </Heading>
+		<Heading as="h1" class="mb-2 text-2xl font-bold"> Sign in from new device </Heading>
 
 		<Text class="text-muted text-base">Hi {user.name},</Text>
 		<Text class="text-muted text-base">
-			We noticed a login to your account from a new device or location. If this was you, you can
-			safely ignore this email.
+			We noticed that your account was just signed into from a new device or location. If this was
+			you, you can safely ignore this email.
 		</Text>
 
 		<Section class="bg-bg-super rounded-lg border border-divider pb-4 pl-4 pr-4 pt-4">
@@ -69,8 +69,8 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 		</Section>
 
 		<Text class="text-muted text-base">
-			If you did not log in, please update your password and review your account security settings.
-			If you cannot do this, contact us immediately by replying to this email or
+			If this wasn't you, please update your password and review your account security settings. If
+			you cannot do this, contact us immediately by replying to this email or
 			<VLink href="https://support.modrinth.com" class="text-green underline"
 				>through our Support Portal</VLink
 			>.

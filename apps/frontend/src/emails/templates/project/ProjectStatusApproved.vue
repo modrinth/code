@@ -6,7 +6,7 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="Your project has been approved"
+		title="Your project, {project.name}, has been approved 🎉"
 		:manual-links="[
 			{ link: 'https://modrinth.com/project/{project.id}', label: 'Project page' },
 			{ link: 'https://modrinth.com/legal/rules', label: 'Community Guidelines' },
@@ -22,7 +22,9 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 				class="block h-auto rounded-lg"
 			/>
 		</Section>
-		<Heading as="h1" class="mb-2 text-2xl font-bold">Your project has been approved 🎉</Heading>
+		<Heading as="h1" class="mb-2 text-2xl font-bold"
+			>Your project, {project.name}, has been approved 🎉</Heading
+		>
 
 		<Text class="text-base">Congratulations {user.name},</Text>
 

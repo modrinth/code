@@ -27,13 +27,18 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 		<Text class="text-base">Hi {user.name},</Text>
 
 		<Text class="text-base">
-			<VLink href="https://modrinth.com/user/{inviter.name}" class="text-green underline"
-				>{inviter.name}</VLink
+			Modrinth user
+			<b
+				><VLink href="https://modrinth.com/user/{inviter.name}" class="text-green underline">
+					{inviter.name}
+				</VLink></b
 			>
 			has invited you to join the project
-			<VLink href="https://modrinth.com/project/{project.id}" class="text-green underline"
-				>{project.name}</VLink
-			>
+			<b>
+				<VLink href="https://modrinth.com/project/{project.id}" class="text-green underline">
+					{project.name}
+				</VLink>
+			</b>
 			on Modrinth.
 		</Text>
 
@@ -50,12 +55,12 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 			target="_blank"
 			class="text-accentContrast inline-block rounded-[12px] bg-brand pb-3 pl-4 pr-4 pt-3 text-[14px] font-bold"
 		>
-			Reply to invitation
+			Review invitation
 		</Button>
 
 		<Text class="text-base">
-			If you were not expecting this invitation you can safely ignore this email; it will expire
-			automatically. If you believe this was sent in error or is abusive, please contact support
+			If you were not expecting this invitation you should reject the invitation. If you believe
+			this was sent in error or is abusive, please contact support
 			<VLink href="https://support.modrinth.com" class="text-green underline">
 				through the Support Portal</VLink
 			>

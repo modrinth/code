@@ -6,7 +6,7 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="Report submitted successfully"
+		title="Report of {report.title} has been submitted"
 		:manual-links="[
 			{ link: 'https://modrinth.com/legal/rules', label: 'Community Guidelines' },
 			{
@@ -16,20 +16,23 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 			{ link: 'https://support.modrinth.com', label: 'Support Portal' },
 		]"
 	>
-		<Heading as="h1" class="mb-2 text-2xl font-bold">Report submitted successfully</Heading>
+		<Heading as="h1" class="mb-2 text-2xl font-bold"
+			>Report of {report.title} has been submitted</Heading
+		>
 
 		<Text class="text-base">Hi {user.name},</Text>
 
 		<Text class="text-base">
-			Thank you for reporting content on Modrinth. We've received your report, {newreport.id}, and
-			our moderation team will review it shortly.
+			We've received your report of {report.title} and our moderation team will review it shortly.
 		</Text>
 
 		<Text class="text-base">
 			Our team takes all reports seriously and will investigate according to our
 			<VLink href="https://modrinth.com/legal/rules" class="text-green underline"
 				>Content Rules</VLink
-			>. You'll receive an update once we've completed our review.
+			>, <VLink href="https://modrinth.com/legal/terms">Terms of Service</VLink> and
+			<VLink href="https://modrinth.com/legal/copyright">Copyright Policy</VLink>. You'll receive an
+			email update once we've completed our review.
 		</Text>
 
 		<Text class="text-base">
@@ -37,11 +40,8 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 			<VLink
 				href="https://modrinth.com/dashboard/report/{newreport.id}"
 				class="text-green underline"
-				>view it in your dashboard</VLink
-			>
-			or contact our support team through the
-			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink>
-			or by replying to this email.
+				>view it here</VLink
+			>.
 		</Text>
 
 		<Text class="text-base">

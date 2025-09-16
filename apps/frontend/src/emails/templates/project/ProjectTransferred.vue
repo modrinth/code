@@ -28,14 +28,18 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 		<Text class="text-base">
 			The ownership of
-			<VLink href="https://modrinth.com/project/{project.id}" class="text-green underline"
-				>{project.name}</VLink
-			>
-			has been successfully transferred to
-			<VLink
-				href="https://modrinth.com/{new_owner.type}/{new_owner.name}"
-				class="text-green underline"
-				>{new_owner.name}</VLink
+			<b>
+				<VLink href="https://modrinth.com/project/{project.id}" class="text-green underline">
+					{project.name}
+				</VLink>
+			</b>
+			has been successfully transferred to the Modrinth {new_owner.type_capitalized}
+			<b
+				><VLink
+					href="https://modrinth.com/{new_owner.type}/{new_owner.name}"
+					class="text-green underline"
+					>{new_owner.name}</VLink
+				></b
 			>.
 		</Text>
 

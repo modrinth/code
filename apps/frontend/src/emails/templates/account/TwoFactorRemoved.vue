@@ -6,14 +6,16 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="Two-factor authentication disabled"
+		title="You've disabled two-factor authentication security on your account."
 		:manual-links="[{ link: 'https://support.modrinth.com', label: 'Support Portal' }]"
 	>
-		<Heading as="h1" class="mb-2 text-2xl font-bold"> Two-factor authentication disabled </Heading>
+		<Heading as="h1" class="mb-2 text-2xl font-bold">
+			You've disabled two-factor authentication security on your account.
+		</Heading>
 
 		<Text class="text-muted text-base">Hi {user.name},</Text>
 		<Text class="text-muted text-base">
-			When logging into Modrinth, you no longer need two-factor authentication to gain access.
+			At your request, we've removed two-factor authentication from your Modrinth account.
 		</Text>
 		<Text class="text-muted text-base">
 			If you did not make this change, please contact us immediately by replying to this email or

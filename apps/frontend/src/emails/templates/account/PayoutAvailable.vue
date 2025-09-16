@@ -6,19 +6,19 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="Payout available"
+		title="Revenue available to withdraw!"
 		:manual-links="[
 			{ link: 'https://modrinth.com/dashboard/revenue', label: 'Revenue dashboard' },
 			{ link: 'https://support.modrinth.com', label: 'Support Portal' },
 		]"
 	>
-		<Heading as="h1" class="mb-2 text-2xl font-bold">Payout available</Heading>
+		<Heading as="h1" class="mb-2 text-2xl font-bold">Revenue available to withdraw!</Heading>
 
 		<Text class="text-base">Hi {user.name},</Text>
 
 		<Text class="text-base">
-			The ${payout.amount} payout for {payout.period} is now available to withdraw from your
-			account.
+			The ${payout.amount} earned during {payout.period} has been processed and is now available to
+			withdraw from your account.
 		</Text>
 
 		<Section class="mb-4 mt-4">
@@ -27,7 +27,7 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 				target="_blank"
 				class="text-accentContrast inline-block rounded-[12px] bg-brand pb-3 pl-4 pr-4 pt-3 text-[14px] font-bold"
 			>
-				View revenue
+				View revenue dashboard
 			</Button>
 		</Section>
 

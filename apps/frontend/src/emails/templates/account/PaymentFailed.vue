@@ -16,7 +16,7 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 		<Text class="text-muted text-base">Hi {user.name},</Text>
 		<Text class="text-muted text-base">
 			Our attempt to collect payment for {paymentfailed.amount} from the payment card on file was
-			unsuccessful. Please update your billing settings to avoid service termination.
+			unsuccessful. Please update your billing settings to avoid suspension of your service.
 		</Text>
 		<Button
 			href="{billing.url}"

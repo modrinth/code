@@ -6,16 +6,16 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="A new PAT has been added to your account"
+		title="A new personal access token has been created"
 		:manual-links="[{ link: 'https://support.modrinth.com', label: 'Support Portal' }]"
 	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold">
-			A new PAT has been added to your account
+			A new personal access token has been created
 		</Heading>
 
 		<Text class="text-muted text-base">Hi {user.name},</Text>
 		<Text class="text-muted text-base">
-			A new personal access token, <b>{newpat.token_name}</b>, has been created for your account.
+			A new personal access token, <b>{newpat.token_name}</b>, has been added to your account.
 		</Text>
 		<Text class="text-muted text-base">
 			If you did not create this token, please contact us immediately by replying to this email or

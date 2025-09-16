@@ -6,15 +6,15 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 
 <template>
 	<StyledEmail
-		title="Authentication method removed"
+		title="Sign-in method removed"
 		:manual-links="[{ link: 'https://support.modrinth.com', label: 'Support Portal' }]"
 	>
-		<Heading as="h1" class="mb-2 text-2xl font-bold"> Authentication method removed </Heading>
+		<Heading as="h1" class="mb-2 text-2xl font-bold"> Sign-in method removed</Heading>
 
 		<Text class="text-muted text-base">Hi {user.name},</Text>
 		<Text class="text-muted text-base">
-			When logging into Modrinth, you can no longer log in using the {authprovider.name}
-			authentication provider.
+			Your <b>{authprovider.name}</b> account has been disconnected and you can no longer use it to
+			sign in to your Modrinth account.
 		</Text>
 		<Text class="text-muted text-base">
 			If you did not make this change, please contact us immediately by replying to this email or
