@@ -26,6 +26,7 @@ pub enum BackgroundTask {
 }
 
 impl BackgroundTask {
+    #[allow(clippy::too_many_arguments)]
     pub async fn run(
         self,
         pool: sqlx::Pool<Postgres>,

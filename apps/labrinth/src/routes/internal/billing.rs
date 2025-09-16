@@ -158,6 +158,7 @@ pub struct ChargeRefund {
 }
 
 #[post("charge/{id}/refund")]
+#[allow(clippy::too_many_arguments)]
 pub async fn refund_charge(
     req: HttpRequest,
     pool: web::Data<PgPool>,
