@@ -181,9 +181,18 @@ pub fn app_setup(
 
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
+        let stripe_client_ref = stripe_client.clone();
+        let anrok_client_ref = anrok_client.clone();
+
         actix_rt::spawn(async move {
             loop {
-                index_subscriptions(pool_ref.clone(), redis_ref.clone()).await;
+                index_subscriptions(
+                    pool_ref.clone(),
+                    redis_ref.clone(),
+                    stripe_client_ref.clone(),
+                    anrok_client_ref.clone(),
+                )
+                .await;
                 tokio::time::sleep(Duration::from_secs(60 * 5)).await;
             }
         });

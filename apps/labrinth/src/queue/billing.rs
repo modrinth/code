@@ -1,4 +1,4 @@
-use crate::database::models::charge_item::DBCharge;
+use crate::database::models::charge_item::{self, CustomerCharge, DBCharge};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::user_item::DBUser;
 use crate::database::models::user_subscription_item::{
@@ -24,14 +24,28 @@ use crate::util::archon::ArchonClient;
 use crate::util::archon::{CreateServerRequest, Specs};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
+use futures::stream::{FuturesUnordered, StreamExt};
 use sqlx::PgPool;
 use std::collections::HashSet;
 use std::str::FromStr;
 use stripe::{self, Currency};
 use tracing::{error, info, warn};
 
-pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
+pub async fn index_subscriptions(
+    pool: PgPool,
+    redis: RedisPool,
+    stripe_client: stripe::Client,
+    anrok_client: anrok::Client,
+) {
     info!("Indexing subscriptions");
+
+    let tax_charges_index_handle =
+        tokio::spawn(roll_index_tax_amount_on_charges(
+            pool.clone(),
+            anrok_client,
+            stripe_client,
+            150,
+        ));
 
     let res = async {
         let mut transaction = pool.begin().await?;
@@ -213,6 +227,12 @@ pub async fn index_subscriptions(pool: PgPool, redis: RedisPool) {
         warn!("Error indexing subscriptions: {:?}", e);
     }
 
+    if let Err(error) = tax_charges_index_handle.await {
+        if error.is_panic() {
+            std::panic::resume_unwind(error.into_panic());
+        }
+    }
+
     info!("Done indexing subscriptions");
 }
 
@@ -361,6 +381,7 @@ pub async fn try_process_user_redeemal(
         payment_platform_id: None,
         parent_charge_id: None,
         net: None,
+        tax_last_updated: Some(Utc::now()),
     }
     .upsert(&mut txn)
     .await?;
@@ -522,6 +543,121 @@ pub async fn index_billing(
     }
 
     info!("Done indexing billing queue");
+}
+
+/// Updates charges which are missing an amount of tax. This is done within a timer to avoid reaching
+/// Anrok API limits.
+///
+/// The global rate limit for Anrok API operations is 10 RPS, so we run ~5 requests every second up
+/// to the specified limit of processed charges.
+async fn roll_index_tax_amount_on_charges(
+    pg: PgPool,
+    anrok_client: anrok::Client,
+    stripe_client: stripe::Client,
+    limit: i64,
+) -> Result<(), ApiError> {
+    let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
+    interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+
+    let mut processed_charges = 0;
+
+    loop {
+        interval.tick().await;
+
+        let mut txn = pg.begin().await?;
+
+        let charges =
+            charge_item::get_missing_tax_with_limit(&mut *txn, 5).await?;
+
+        let anrok_client = anrok_client.clone();
+        let stripe_client = stripe_client.clone();
+
+        let mut futures = charges
+            .into_iter()
+            .map(move |customer_charge| {
+                let CustomerCharge {
+                    mut charge,
+                    stripe_customer_id,
+                    product_tax_id,
+                } = customer_charge;
+
+                let stripe_client = stripe_client.clone();
+                let anrok_client = anrok_client.clone();
+
+                async move {
+                    let Ok(customer_id): Result<stripe::CustomerId, _> =
+                        stripe_customer_id.parse()
+                    else {
+                        return Err(ApiError::InvalidInput(
+                            "Charge's Stripe customer ID was invalid"
+                                .to_owned(),
+                        ));
+                    };
+
+                    let customer = stripe::Customer::retrieve(
+                        &stripe_client,
+                        &customer_id,
+                        &[],
+                    )
+                    .await?;
+
+                    let Some(stripe_address) = customer.address else {
+                        return Err(ApiError::InvalidInput(
+                            "Stripe customer had no address".to_owned(),
+                        ));
+                    };
+
+                    let customer_address =
+                        anrok::Address::from_stripe_address(&stripe_address);
+
+                    let tax_amount = anrok_client
+                        .create_ephemeral_txn(&anrok::TransactionFields {
+                            customer_address,
+                            currency_code: charge.currency_code.clone(),
+                            accounting_time: charge.due,
+                            accounting_time_zone:
+                                anrok::AccountingTimeZone::Utc,
+                            line_items: vec![anrok::LineItem::new(
+                                product_tax_id,
+                                charge.amount,
+                            )],
+                        })
+                        .await?
+                        .tax_amount_to_collect;
+
+                    charge.tax_amount = tax_amount;
+                    charge.tax_last_updated = Some(Utc::now());
+
+                    Result::<DBCharge, ApiError>::Ok(charge)
+                }
+            })
+            .collect::<FuturesUnordered<_>>();
+
+        let mut upsert_results = vec![];
+
+        while let Some(result) = futures.next().await {
+            match result {
+                Ok(charge) => {
+                    upsert_results.push(charge.upsert(&mut txn).await);
+                }
+                Err(error) => {
+                    error!(%error, "Error indexing tax amount on charge");
+                }
+            }
+        }
+
+        let _ = upsert_results
+            .into_iter()
+            .collect::<Result<Vec<_>, DatabaseError>>()?;
+
+        txn.commit().await?;
+
+        processed_charges += 5;
+
+        if processed_charges >= limit {
+            break Ok(());
+        }
+    }
 }
 
 async fn index_tax_notifications(

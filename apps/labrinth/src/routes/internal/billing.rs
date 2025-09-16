@@ -351,6 +351,7 @@ pub async fn refund_charge(
             },
             net,
             currency_code: charge.currency_code,
+            tax_last_updated: Some(Utc::now()),
         }
         .upsert(&mut transaction)
         .await?;
@@ -1806,6 +1807,7 @@ pub async fn stripe_webhook(
                         tax_platform_id: Some(anrok_id),
                         parent_charge_id: None,
                         net: None,
+                        tax_last_updated: Some(Utc::now()),
                     };
 
                     if charge_status != ChargeStatus::Failed {
@@ -2136,6 +2138,7 @@ pub async fn stripe_webhook(
                                 charge.amount = new_price as i64;
                                 charge.price_id =
                                     metadata.product_price_item.id;
+                                charge.tax_last_updated = None;
                             } else {
                                 // Note: do not update the due date
                                 charge.subscription_interval =
@@ -2180,6 +2183,7 @@ pub async fn stripe_webhook(
                                 parent_charge_id: None,
                                 net: None,
                                 tax_platform_id: None,
+                                tax_last_updated: Some(Utc::now()),
                             }
                             .upsert(&mut transaction)
                             .await?;

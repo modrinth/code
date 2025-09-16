@@ -1,6 +1,7 @@
 use crate::database::models::{
     DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
+use crate::models::billing::{ChargeStatus, ChargeType};
 use crate::models::billing::{
     PriceDuration, ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
 };
@@ -222,7 +223,7 @@ pub async fn fetch_update_lock_pending_taxation_notification(
                 amount,
                 tax_amount
               FROM charges
-              WHERE status = 'open'
+              WHERE status = $2 AND charge_type = $3
               ORDER BY subscription_id, due DESC
             ) c(subscription_id, due, amount, tax_amount) ON us.id = c.subscription_id
             INNER JOIN products_prices pp ON pp.id = us.price_id
@@ -232,7 +233,7 @@ pub async fn fetch_update_lock_pending_taxation_notification(
               NOW() + INTERVAL '9 days' > c.due
               AND NOW() + INTERVAL '7 days' < c.due -- Between 7 and 9 days before the due date
               AND c.tax_amount > 0
-              AND us.status = 'provisioned'
+              AND us.status = $4
               AND us.user_aware_of_tax_changes = FALSE
               AND u.email IS NOT NULL
             ),
@@ -251,6 +252,9 @@ pub async fn fetch_update_lock_pending_taxation_notification(
         RETURNING t.*
         "#,
         limit,
+		ChargeStatus::Open.as_str(),
+		ChargeType::Subscription.as_str(),
+		SubscriptionStatus::Provisioned.as_str(),
     )
     .fetch_all(&mut **exec)
     .await?
