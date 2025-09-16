@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id, tax_amount, tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\"\n            FROM charges\n            \n            WHERE\n                charge_type = $1 AND\n                (\n                    (status = 'open' AND due < NOW()) OR\n                    (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')\n                )\n            ",
+  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id, tax_amount, tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\",\n\t\t\t\ttax_last_updated AS \"tax_last_updated?\"\n            FROM charges\n            WHERE id = $1",
   "describe": {
     "columns": [
       {
@@ -87,11 +87,16 @@
         "ordinal": 16,
         "name": "net?",
         "type_info": "Int8"
+      },
+      {
+        "ordinal": 17,
+        "name": "tax_last_updated?",
+        "type_info": "Timestamptz"
       }
     ],
     "parameters": {
       "Left": [
-        "Text"
+        "Int8"
       ]
     },
     "nullable": [
@@ -111,8 +116,9 @@
       false,
       true,
       true,
+      true,
       true
     ]
   },
-  "hash": "ba18b94525f23651c84fed66ebe9bf6d3e266d7753cbe523797ac290af27557f"
+  "hash": "75cff25957c7b5c5874883a8473f6dee2e27b545ee0bddc32bb3fcd46c47c81e"
 }

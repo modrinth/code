@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id, tax_amount, tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\"\n            FROM charges\n            WHERE user_id = $1 ORDER BY due DESC",
+  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id, tax_amount, tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\",\n\t\t\t\ttax_last_updated AS \"tax_last_updated?\"\n            FROM charges\n            \n            WHERE\n                charge_type = $1 AND\n                (\n                    (status = 'cancelled' AND due < NOW()) OR\n                    (status = 'expiring' AND due < NOW()) OR\n                    (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')\n                )\n            ",
   "describe": {
     "columns": [
       {
@@ -87,11 +87,16 @@
         "ordinal": 16,
         "name": "net?",
         "type_info": "Int8"
+      },
+      {
+        "ordinal": 17,
+        "name": "tax_last_updated?",
+        "type_info": "Timestamptz"
       }
     ],
     "parameters": {
       "Left": [
-        "Int8"
+        "Text"
       ]
     },
     "nullable": [
@@ -111,8 +116,9 @@
       false,
       true,
       true,
+      true,
       true
     ]
   },
-  "hash": "9e2d8d65e04025f089f294537d4c9f1bc97d9af9015d5fa26ffbd75d7bc21810"
+  "hash": "4dfd80bfee5d81fec2529048c9ea001169443e4e7267ac95b70969aa29457efc"
 }

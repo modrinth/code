@@ -227,10 +227,10 @@ pub async fn index_subscriptions(
         warn!("Error indexing subscriptions: {:?}", e);
     }
 
-    if let Err(error) = tax_charges_index_handle.await {
-        if error.is_panic() {
-            std::panic::resume_unwind(error.into_panic());
-        }
+    if let Err(error) = tax_charges_index_handle.await
+        && error.is_panic()
+    {
+        std::panic::resume_unwind(error.into_panic());
     }
 
     info!("Done indexing subscriptions");
