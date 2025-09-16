@@ -1,5 +1,6 @@
-use serde::Serialize;
-use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
+use std::collections::BTreeMap;
 
 pub trait I18nEnum {
     const ROOT_TRANSLATION_ID: &'static str;
@@ -11,14 +12,14 @@ pub trait I18nEnum {
     fn translation_data(&self) -> TranslationData;
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum TranslationData {
     Literal(String),
     Translatable {
-        key: &'static str,
-        #[serde(skip_serializing_if = "HashMap::is_empty")]
-        values: HashMap<&'static str, TranslationData>,
+        key: Cow<'static, str>,
+        #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+        values: BTreeMap<Cow<'static, str>, TranslationData>,
     },
 }
 
@@ -103,6 +104,9 @@ macro_rules! __i18n_enum_variant_parameters_no_store {
     ($variant_name:ident, (transparent $_:ident)) => {
         $variant_name(_)
     };
+    ($variant_name:ident, { transparent $_:ident }) => {
+        $variant_name { .. }
+    };
     ($variant_name:ident, ($($_:tt)+)) => {
         $variant_name(..)
     };
@@ -120,6 +124,9 @@ macro_rules! __i18n_enum_variant_parameters {
     ($variant_name:ident, (transparent $field:ident)) => {
         $variant_name($field)
     };
+    ($variant_name:ident, { transparent $field:ident }) => {
+        $variant_name { $field, .. }
+    };
     ($variant_name:ident, ($($field:tt)+)) => {
         $variant_name($($field)+)
     };
@@ -133,8 +140,8 @@ macro_rules! __i18n_enum_variant_parameters {
 macro_rules! __i18n_enum_variant_values {
     ($root_key:literal, $key:literal, !) => {
         $crate::i18n::TranslationData::Translatable {
-            key: ::core::concat!($root_key, ".", $key),
-            values: ::std::collections::HashMap::new(),
+            key: ::std::borrow::Cow::Borrowed(::core::concat!($root_key, ".", $key)),
+            values: ::std::collections::BTreeMap::new(),
         }
     };
     ($root_key:literal, $key:literal, (..)) => {
@@ -146,15 +153,18 @@ macro_rules! __i18n_enum_variant_values {
     ($root_key:literal, $key:literal, (transparent $field:ident)) => {
         $field.__maybe_translate()
     };
+    ($root_key:literal, $key:literal, { transparent $field:ident }) => {
+        $field.__maybe_translate()
+    };
     ($root_key:literal, $key:literal, ($($field:ident),*)) => {
         $crate::i18n::TranslationData::Translatable {
-            key: ::core::concat!($root_key, ".", $key),
-            values: ::std::collections::HashMap::from([
-                $((::core::stringify!($field), $field.__maybe_translate()),)*
+            key: ::std::borrow::Cow::Borrowed(::core::concat!($root_key, ".", $key)),
+            values: ::std::collections::BTreeMap::from([
+                $((::std::borrow::Cow::Borrowed(::core::stringify!($field)), $field.__maybe_translate()),)*
             ]),
         }
     };
-    ($root_key:literal, $key:literal, {$($field:ident),*}) => {
+    ($root_key:literal, $key:literal, {$($field:ident),* $(, ..)?}) => {
         $crate::__i18n_enum_variant_values!($root_key, $key, ($($field),*))
     };
 }
@@ -183,8 +193,8 @@ pub mod test {
 
         fn translation_data(&self) -> TranslationData {
             TranslationData::Translatable {
-                key: self.full_translation_id(),
-                values: HashMap::new(),
+                key: Cow::Borrowed(self.full_translation_id()),
+                values: BTreeMap::new(),
             }
         }
     }

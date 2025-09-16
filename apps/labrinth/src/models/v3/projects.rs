@@ -427,6 +427,7 @@ impl From<LinkUrl> for Link {
 /// Private - Project is approved, but is not viewable to the public
 #[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
 #[serde(rename_all = "lowercase")]
+// TODO: Make translatable and remove as_friendly_str
 pub enum ProjectStatus {
     Approved,
     Archived,

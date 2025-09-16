@@ -8,8 +8,11 @@ use crate::models::ids::{
 };
 use crate::models::projects::ProjectStatus;
 use crate::routes::error::ApiError;
+use ariadne::i18n::{I18nEnum, TranslationData};
+use ariadne::i18n_enum;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
+use derive_more::Display;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -21,55 +24,82 @@ pub struct Notification {
     pub body: NotificationBody,
 
     pub name: String,
+    pub translatable_name: TranslationData,
     pub text: String,
+    pub translatable_text: TranslationData,
     pub link: String,
     pub actions: Vec<NotificationAction>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Display)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationType {
     // If adding a notification type, add a variant in `NotificationBody` of the same name!
+    #[display("A project you follow has been updated!")]
     ProjectUpdate,
+    #[display("You have been invited to join a team!")]
     TeamInvite,
+    #[display("You have been invited to join an organization!")]
     OrganizationInvite,
+    #[display("Project status has changed")]
     StatusChange,
+    #[display("A moderator has sent you a message!")]
     ModeratorMessage,
+    #[display("LEGACY MARKDOWN NOTIFICATION")]
     LegacyMarkdown,
+    #[display("Password reset requested")]
     ResetPassword,
+    // The notifications from here to down below are listed with messages for completeness' sake,
+    // though they should never be sent via site notifications. This should be disabled via database
+    // options. Messages should be reviewed and worded better if we want to distribute these notifications
+    // via the site.
+    #[display("Verify your email")]
     VerifyEmail,
+    #[display("Auth provider added")]
     AuthProviderAdded,
+    #[display("Auth provider removed")]
     AuthProviderRemoved,
+    #[display("Two-factor authentication enabled")]
     TwoFactorEnabled,
+    #[display("Two-factor authentication removed")]
     TwoFactorRemoved,
+    #[display("Password changed")]
     PasswordChanged,
+    #[display("Password removed")]
     PasswordRemoved,
+    #[display("Email changed")]
     EmailChanged,
+    #[display("Payment failed")]
     PaymentFailed,
+    #[display("")]
     Unknown,
 }
 
+i18n_enum!(
+    NotificationType,
+    root_key: "labrinth.notification.type",
+    ProjectUpdate! => "project_update",
+    TeamInvite! => "team_invite",
+    OrganizationInvite! => "organization_invite",
+    StatusChange! => "status_change",
+    ModeratorMessage! => "moderator_message",
+    LegacyMarkdown! => "legacy_markdown",
+    ResetPassword! => "reset_password",
+    VerifyEmail! => "verify_email",
+    AuthProviderAdded! => "auth_provider_added",
+    AuthProviderRemoved! => "auth_provider_removed",
+    TwoFactorEnabled! => "two_factor_enabled",
+    TwoFactorRemoved! => "two_factor_removed",
+    PasswordChanged! => "password_changed",
+    PasswordRemoved! => "password_removed",
+    EmailChanged! => "email_changed",
+    PaymentFailed! => "payment_failed",
+    Unknown! => "unknown",
+);
+
 impl NotificationType {
     pub fn as_str(self) -> &'static str {
-        match self {
-            NotificationType::ProjectUpdate => "project_update",
-            NotificationType::TeamInvite => "team_invite",
-            NotificationType::OrganizationInvite => "organization_invite",
-            NotificationType::StatusChange => "status_change",
-            NotificationType::ModeratorMessage => "moderator_message",
-            NotificationType::LegacyMarkdown => "legacy_markdown",
-            NotificationType::ResetPassword => "reset_password",
-            NotificationType::VerifyEmail => "verify_email",
-            NotificationType::AuthProviderAdded => "auth_provider_added",
-            NotificationType::AuthProviderRemoved => "auth_provider_removed",
-            NotificationType::TwoFactorEnabled => "two_factor_enabled",
-            NotificationType::TwoFactorRemoved => "two_factor_removed",
-            NotificationType::PasswordChanged => "password_changed",
-            NotificationType::PasswordRemoved => "password_removed",
-            NotificationType::EmailChanged => "email_changed",
-            NotificationType::PaymentFailed => "payment_failed",
-            NotificationType::Unknown => "unknown",
-        }
+        self.translation_id()
     }
 
     pub fn from_str_or_default(s: &str) -> Self {
@@ -96,30 +126,39 @@ impl NotificationType {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Display)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum NotificationBody {
+    #[display(
+        "The project {project_id} has released a new version: {version_id}"
+    )]
     ProjectUpdate {
         project_id: ProjectId,
         version_id: VersionId,
     },
+    #[display("An invite has been sent for you to be {role} of a team")]
     TeamInvite {
         project_id: ProjectId,
         team_id: TeamId,
         invited_by: UserId,
         role: String,
     },
+    #[display(
+        "An invite has been sent for you to be {role} of an organization"
+    )]
     OrganizationInvite {
         organization_id: OrganizationId,
         invited_by: UserId,
         team_id: TeamId,
         role: String,
     },
+    #[display("Status has changed from {old_status} to {new_status}")]
     StatusChange {
         project_id: ProjectId,
         old_status: ProjectStatus,
         new_status: ProjectStatus,
     },
+    #[display("Click on the link to read more.")]
     ModeratorMessage {
         thread_id: ThreadId,
         message_id: ThreadMessageId,
@@ -127,6 +166,7 @@ pub enum NotificationBody {
         project_id: Option<ProjectId>,
         report_id: Option<ReportId>,
     },
+    #[display("{text}")]
     LegacyMarkdown {
         notification_type: Option<String>,
         name: String,
@@ -134,32 +174,58 @@ pub enum NotificationBody {
         link: String,
         actions: Vec<NotificationAction>,
     },
-    ResetPassword {
-        flow: String,
-    },
-    VerifyEmail {
-        flow: String,
-    },
-    AuthProviderAdded {
-        provider: String,
-    },
-    AuthProviderRemoved {
-        provider: String,
-    },
+    #[display(
+        "You've requested to reset your password. Please check your email for a reset link."
+    )]
+    ResetPassword { flow: String },
+    // See comment above VerifyEmail in NotificationType
+    #[display(
+        "You've requested to verify your email. Please check your email for a verification link."
+    )]
+    VerifyEmail { flow: String },
+    #[display("You've added a new authentication provider to your account.")]
+    AuthProviderAdded { provider: String },
+    #[display("You've removed a authentication provider from your account.")]
+    AuthProviderRemoved { provider: String },
+    #[display("You've enabled two-factor authentication on your account.")]
     TwoFactorEnabled,
+    #[display("You've removed two-factor authentication from your account.")]
     TwoFactorRemoved,
+    #[display("You've changed your account password.")]
     PasswordChanged,
+    #[display("You've removed your account password.")]
     PasswordRemoved,
-    EmailChanged {
-        new_email: String,
-        to_email: String,
-    },
-    PaymentFailed {
-        amount: String,
-        service: String,
-    },
+    #[display("Your account email was changed.")]
+    EmailChanged { new_email: String, to_email: String },
+    #[display(
+        "A payment on your account failed. Please update your billing information."
+    )]
+    PaymentFailed { amount: String, service: String },
+    #[display("")]
     Unknown,
 }
+
+i18n_enum!(
+    NotificationBody,
+    root_key: "labrinth.notification.type",
+    ProjectUpdate { project_id, version_id } => "project_update",
+    TeamInvite { role, .. } => "team_invite",
+    OrganizationInvite { role, .. } => "organization_invite",
+    StatusChange { old_status, new_status, .. } => "status_change",
+    ModeratorMessage { .. } => "moderator_message",
+    LegacyMarkdown { transparent text } => "legacy_markdown",
+    ResetPassword { .. } => "reset_password",
+    VerifyEmail { .. } => "verify_email",
+    AuthProviderAdded { .. } => "auth_provider_added",
+    AuthProviderRemoved { .. } => "auth_provider_removed",
+    TwoFactorEnabled! => "two_factor_enabled",
+    TwoFactorRemoved! => "two_factor_removed",
+    PasswordChanged! => "password_changed",
+    PasswordRemoved! => "password_removed",
+    EmailChanged { .. } => "email_changed",
+    PaymentFailed { .. } => "payment_failed",
+    Unknown! => "unknown",
+);
 
 impl NotificationBody {
     pub fn notification_type(&self) -> NotificationType {
@@ -216,31 +282,21 @@ impl NotificationBody {
 }
 
 impl From<DBNotification> for Notification {
-    // TODO: Should be translatable
     fn from(notif: DBNotification) -> Self {
-        let (name, text, link, actions) = {
+        let (link, actions) = {
             match &notif.body {
                 NotificationBody::ProjectUpdate {
                     project_id,
                     version_id,
                 } => (
-                    "A project you follow has been updated!".to_string(),
-                    format!(
-                        "The project {project_id} has released a new version: {version_id}"
-                    ),
                     format!("/project/{project_id}/version/{version_id}"),
                     vec![],
                 ),
                 NotificationBody::TeamInvite {
                     project_id,
-                    role,
                     team_id,
                     ..
                 } => (
-                    "You have been invited to join a team!".to_string(),
-                    format!(
-                        "An invite has been sent for you to be {role} of a team"
-                    ),
                     format!("/project/{project_id}"),
                     vec![
                         NotificationAction {
@@ -264,15 +320,9 @@ impl From<DBNotification> for Notification {
                 ),
                 NotificationBody::OrganizationInvite {
                     organization_id,
-                    role,
                     team_id,
                     ..
                 } => (
-                    "You have been invited to join an organization!"
-                        .to_string(),
-                    format!(
-                        "An invite has been sent for you to be {role} of an organization"
-                    ),
                     format!("/organization/{organization_id}"),
                     vec![
                         NotificationAction {
@@ -294,27 +344,14 @@ impl From<DBNotification> for Notification {
                         },
                     ],
                 ),
-                NotificationBody::StatusChange {
-                    old_status,
-                    new_status,
-                    project_id,
-                } => (
-                    "Project status has changed".to_string(),
-                    format!(
-                        "Status has changed from {} to {}",
-                        old_status.as_friendly_str(),
-                        new_status.as_friendly_str()
-                    ),
-                    format!("/project/{project_id}"),
-                    vec![],
-                ),
+                NotificationBody::StatusChange { project_id, .. } => {
+                    (format!("/project/{project_id}"), vec![])
+                }
                 NotificationBody::ModeratorMessage {
                     project_id,
                     report_id,
                     ..
                 } => (
-                    "A moderator has sent you a message!".to_string(),
-                    "Click on the link to read more.".to_string(),
                     if let Some(project_id) = project_id {
                         format!("/project/{project_id}")
                     } else if let Some(report_id) = report_id {
@@ -325,87 +362,45 @@ impl From<DBNotification> for Notification {
                     vec![],
                 ),
                 // Don't expose the `flow` field
-                NotificationBody::ResetPassword { .. } => (
-                    "Password reset requested".to_string(),
-                    "You've requested to reset your password. Please check your email for a reset link.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::LegacyMarkdown {
-                    name,
-                    text,
-                    link,
-                    actions,
-                    ..
-                } => (
-                    name.clone(),
-                    text.clone(),
-                    link.clone(),
-                    actions.clone().into_iter().collect(),
-                ),
-                // The notifications from here to down below are listed with messages for completeness' sake,
-                // though they should never be sent via site notifications. This should be disabled via database
-                // options. Messages should be reviewed and worded better if we want to distribute these notifications
-                // via the site.
-                NotificationBody::PaymentFailed { .. } => (
-                    "Payment failed".to_string(),
-                    "A payment on your account failed. Please update your billing information.".to_string(),
-                    "/settings/billing".to_string(),
-                    vec![],
-                ),
-                NotificationBody::VerifyEmail { .. } => (
-                    "Verify your email".to_string(),
-                    "You've requested to verify your email. Please check your email for a verification link.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::AuthProviderAdded { .. } => (
-                    "Auth provider added".to_string(),
-                    "You've added a new authentication provider to your account.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::AuthProviderRemoved { .. } => (
-                    "Auth provider removed".to_string(),
-                    "You've removed a authentication provider from your account.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::TwoFactorEnabled => (
-                    "Two-factor authentication enabled".to_string(),
-                    "You've enabled two-factor authentication on your account.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::TwoFactorRemoved => (
-                    "Two-factor authentication removed".to_string(),
-                    "You've removed two-factor authentication from your account.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::PasswordChanged => (
-                    "Password changed".to_string(),
-                    "You've changed your account password.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::PasswordRemoved => (
-                    "Password removed".to_string(),
-                    "You've removed your account password.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::EmailChanged { .. } => (
-                    "Email changed".to_string(),
-                    "Your account email was changed.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::Unknown => {
-                    ("".to_string(), "".to_string(), "#".to_string(), vec![])
+                NotificationBody::ResetPassword { .. } => {
+                    ("#".to_string(), vec![])
                 }
+                NotificationBody::LegacyMarkdown { link, actions, .. } => {
+                    (link.clone(), actions.clone().into_iter().collect())
+                }
+                NotificationBody::PaymentFailed { .. } => {
+                    ("/settings/billing".to_string(), vec![])
+                }
+                NotificationBody::VerifyEmail { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::AuthProviderAdded { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::AuthProviderRemoved { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::TwoFactorEnabled => ("#".to_string(), vec![]),
+                NotificationBody::TwoFactorRemoved => ("#".to_string(), vec![]),
+                NotificationBody::PasswordChanged => ("#".to_string(), vec![]),
+                NotificationBody::PasswordRemoved => ("#".to_string(), vec![]),
+                NotificationBody::EmailChanged { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::Unknown => ("#".to_string(), vec![]),
             }
         };
+        let (name, translatable_name) = match &notif.body {
+            NotificationBody::LegacyMarkdown { name, .. } => {
+                (name.clone(), TranslationData::Literal(name.clone()))
+            }
+            _ => (
+                notif.body.notification_type().to_string(),
+                notif.body.notification_type().translation_data(),
+            ),
+        };
+        let text = notif.body.to_string();
+        let translatable_text = notif.body.translation_data();
 
         Self {
             id: notif.id.into(),
@@ -415,7 +410,9 @@ impl From<DBNotification> for Notification {
             created: notif.created,
 
             name,
+            translatable_name,
             text,
+            translatable_text,
             link,
             actions,
         }
