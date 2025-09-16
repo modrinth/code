@@ -2,6 +2,7 @@ use super::ids::*;
 use crate::database::{models::DatabaseError, redis::RedisPool};
 use crate::models::notifications::{
     NotificationBody, NotificationChannel, NotificationDeliveryStatus,
+    NotificationType,
 };
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
@@ -39,6 +40,71 @@ impl NotificationBuilder {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         self.insert_many(vec![user], transaction, redis).await
+    }
+
+    pub async fn insert_many_payout_notifications(
+        users: Vec<DBUserId>,
+        dates_available: Vec<DateTime<Utc>>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        redis: &RedisPool,
+    ) -> Result<(), DatabaseError> {
+        let notification_ids =
+            generate_many_notification_ids(users.len(), &mut *transaction)
+                .await?;
+
+        let users_raw_ids = users.iter().map(|x| x.0).collect::<Vec<_>>();
+        let notification_ids =
+            notification_ids.iter().map(|x| x.0).collect::<Vec<_>>();
+
+        sqlx::query!(
+            "
+            WITH
+            period_payouts AS (
+                SELECT
+                ids.notification_id,
+                ids.user_id,
+                ids.date_available,
+                SUM(pv.amount)
+                FROM UNNEST($1::bigint[], $2::bigint[], $3::timestamptz[]) AS ids(notification_id, user_id, date_available)
+                LEFT JOIN payouts_values pv ON pv.user_id = ids.user_id AND pv.date_available = ids.date_available
+                GROUP BY ids.user_id, ids.notification_id, ids.date_available
+            )
+            INSERT INTO notifications (
+                id, user_id, body
+            )
+            SELECT
+            notification_id id,
+            user_id,
+            JSONB_BUILD_OBJECT(
+                'type', 'payout_available',
+                'date_available', to_jsonb(date_available),
+                'amount', to_jsonb(sum)
+            ) body
+            FROM period_payouts
+            ",
+            &notification_ids[..],
+            &users_raw_ids[..],
+            &dates_available[..],
+        )
+        .execute(&mut **transaction)
+        .await?;
+
+        let notification_types = notification_ids
+            .iter()
+            .map(|_| NotificationType::PayoutAvailable.as_str())
+            .collect::<Vec<_>>();
+
+        NotificationBuilder::insert_many_deliveries(
+            transaction,
+            redis,
+            &notification_ids,
+            &users_raw_ids,
+            &notification_types,
+            &users,
+        )
+        .await?;
+
+        Ok(())
     }
 
     pub async fn insert_many(
@@ -80,6 +146,27 @@ impl NotificationBuilder {
             .map(|_| self.body.notification_type().as_str())
             .collect::<Vec<_>>();
 
+        NotificationBuilder::insert_many_deliveries(
+            transaction,
+            redis,
+            &notification_ids,
+            &users_raw_ids,
+            &notification_types,
+            &users,
+        )
+        .await?;
+
+        Ok(())
+    }
+
+    async fn insert_many_deliveries(
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        redis: &RedisPool,
+        notification_ids: &[i64],
+        users_raw_ids: &[i64],
+        notification_types: &[&str],
+        users: &[DBUserId],
+    ) -> Result<(), DatabaseError> {
         let notification_channels = NotificationChannel::list()
             .iter()
             .map(|x| x.as_str())
@@ -159,7 +246,7 @@ impl NotificationBuilder {
 
         query.execute(&mut **transaction).await?;
 
-        DBNotification::clear_user_notifications_cache(&users, redis).await?;
+        DBNotification::clear_user_notifications_cache(users, redis).await?;
 
         Ok(())
     }

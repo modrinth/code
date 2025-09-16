@@ -1,6 +1,7 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database;
 use crate::database::models::image_item;
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::{
     ThreadBuilder, ThreadMessageBuilder,
 };
@@ -8,6 +9,7 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
+use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::reports::{ItemType, Report};
 use crate::models::threads::{MessageBody, ThreadType};
@@ -205,6 +207,17 @@ pub async fn report_create(
     .await?;
 
     transaction.commit().await?;
+
+    // Notify the reporter that the report has been submitted
+    let mut notif_tx = pool.begin().await?;
+    NotificationBuilder {
+        body: NotificationBody::ReportSubmitted {
+            report_id: id.into(),
+        },
+    }
+    .insert(current_user.id.into(), &mut notif_tx, &redis)
+    .await?;
+    notif_tx.commit().await?;
 
     Ok(HttpResponse::Ok().json(Report {
         id: id.into(),

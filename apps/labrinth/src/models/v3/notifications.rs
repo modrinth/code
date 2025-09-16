@@ -46,6 +46,14 @@ pub enum NotificationType {
     PasswordRemoved,
     EmailChanged,
     PaymentFailed,
+    PatCreated,
+    ModerationThreadMessageReceived,
+    ReportStatusUpdated,
+    ReportSubmitted,
+    ProjectStatusApproved,
+    ProjectStatusUpdatedNeutral,
+    ProjectTransferred,
+    PayoutAvailable,
     Unknown,
 }
 
@@ -68,6 +76,20 @@ impl NotificationType {
             NotificationType::PasswordRemoved => "password_removed",
             NotificationType::EmailChanged => "email_changed",
             NotificationType::PaymentFailed => "payment_failed",
+            NotificationType::PatCreated => "pat_created",
+            NotificationType::ModerationThreadMessageReceived => {
+                "moderation_thread_message_received"
+            }
+            NotificationType::ReportStatusUpdated => "report_status_updated",
+            NotificationType::ReportSubmitted => "report_submitted",
+            NotificationType::ProjectStatusApproved => {
+                "project_status_approved"
+            }
+            NotificationType::ProjectStatusUpdatedNeutral => {
+                "project_status_updated_neutral"
+            }
+            NotificationType::ProjectTransferred => "project_transferred",
+            NotificationType::PayoutAvailable => "payout_available",
             NotificationType::Unknown => "unknown",
         }
     }
@@ -90,6 +112,20 @@ impl NotificationType {
             "password_removed" => NotificationType::PasswordRemoved,
             "email_changed" => NotificationType::EmailChanged,
             "payment_failed" => NotificationType::PaymentFailed,
+            "pat_created" => NotificationType::PatCreated,
+            "moderation_thread_message_received" => {
+                NotificationType::ModerationThreadMessageReceived
+            }
+            "report_status_updated" => NotificationType::ReportStatusUpdated,
+            "report_submitted" => NotificationType::ReportSubmitted,
+            "project_status_approved" => {
+                NotificationType::ProjectStatusApproved
+            }
+            "project_status_updated_neutral" => {
+                NotificationType::ProjectStatusUpdatedNeutral
+            }
+            "project_transferred" => NotificationType::ProjectTransferred,
+            "payout_available" => NotificationType::PayoutAvailable,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -127,6 +163,32 @@ pub enum NotificationBody {
         project_id: Option<ProjectId>,
         report_id: Option<ReportId>,
     },
+    PatCreated {
+        token_name: String,
+    },
+    ModerationThreadMessageReceived {
+        thread_id: ThreadId,
+        project_id: ProjectId,
+    },
+    ReportStatusUpdated {
+        report_id: ReportId,
+    },
+    ReportSubmitted {
+        report_id: ReportId,
+    },
+    ProjectStatusApproved {
+        project_id: ProjectId,
+    },
+    ProjectStatusUpdatedNeutral {
+        project_id: ProjectId,
+        old_status: ProjectStatus,
+        new_status: ProjectStatus,
+    },
+    ProjectTransferred {
+        project_id: ProjectId,
+        new_owner_user_id: Option<UserId>,
+        new_owner_organization_id: Option<OrganizationId>,
+    },
     LegacyMarkdown {
         notification_type: Option<String>,
         name: String,
@@ -158,6 +220,10 @@ pub enum NotificationBody {
         amount: String,
         service: String,
     },
+    PayoutAvailable {
+        date_available: DateTime<Utc>,
+        amount: f64,
+    },
     Unknown,
 }
 
@@ -176,6 +242,25 @@ impl NotificationBody {
             }
             NotificationBody::ModeratorMessage { .. } => {
                 NotificationType::ModeratorMessage
+            }
+            NotificationBody::PatCreated { .. } => NotificationType::PatCreated,
+            NotificationBody::ModerationThreadMessageReceived { .. } => {
+                NotificationType::ModerationThreadMessageReceived
+            }
+            NotificationBody::ReportStatusUpdated { .. } => {
+                NotificationType::ReportStatusUpdated
+            }
+            NotificationBody::ReportSubmitted { .. } => {
+                NotificationType::ReportSubmitted
+            }
+            NotificationBody::ProjectStatusApproved { .. } => {
+                NotificationType::ProjectStatusApproved
+            }
+            NotificationBody::ProjectStatusUpdatedNeutral { .. } => {
+                NotificationType::ProjectStatusUpdatedNeutral
+            }
+            NotificationBody::ProjectTransferred { .. } => {
+                NotificationType::ProjectTransferred
             }
             NotificationBody::LegacyMarkdown { .. } => {
                 NotificationType::LegacyMarkdown
@@ -209,6 +294,9 @@ impl NotificationBody {
             }
             NotificationBody::PaymentFailed { .. } => {
                 NotificationType::PaymentFailed
+            }
+            NotificationBody::PayoutAvailable { .. } => {
+                NotificationType::PayoutAvailable
             }
             NotificationBody::Unknown => NotificationType::Unknown,
         }
@@ -323,6 +411,48 @@ impl From<DBNotification> for Notification {
                     },
                     vec![],
                 ),
+                NotificationBody::PatCreated { token_name } => (
+                    "New personal access token created".to_string(),
+                    format!("Your personal access token '{token_name}' was created."),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ModerationThreadMessageReceived { .. } => (
+                    "New message in moderation thread".to_string(),
+                    "You have a new message in a moderation thread.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ReportStatusUpdated { .. } => (
+                    "Report status updated".to_string(),
+                    "A report you are involved in has been updated.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ReportSubmitted { .. } => (
+                    "Report submitted".to_string(),
+                    "Your report was submitted successfully.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ProjectStatusApproved { .. } => (
+                    "Project approved".to_string(),
+                    "Your project has been approved.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ProjectStatusUpdatedNeutral { .. } => (
+                    "Project status updated".to_string(),
+                    "Your project status has been updated.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ProjectTransferred { .. } => (
+                    "Project ownership transferred".to_string(),
+                    "A project's ownership has been transferred.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
                 // Don't expose the `flow` field
                 NotificationBody::ResetPassword { .. } => (
                     "Password reset requested".to_string(),
@@ -397,6 +527,12 @@ impl From<DBNotification> for Notification {
                 NotificationBody::EmailChanged { .. } => (
                     "Email changed".to_string(),
                     "Your account email was changed.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::PayoutAvailable { .. } => (
+                    "Payout available".to_string(),
+                    "A payout is available!".to_string(),
                     "#".to_string(),
                     vec![],
                 ),

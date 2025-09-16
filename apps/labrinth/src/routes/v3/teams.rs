@@ -878,7 +878,7 @@ pub async fn transfer_ownership(
 
     // Forbid transferring ownership of a project team that is owned by an organization
     // These are owned by the organization owner, and must be removed from the organization first
-    // There shouldnt be an ownr on these projects in these cases, but just in case.
+    // There shouldnt be an owner on these projects in these cases, but just in case.
     let team_association_id =
         DBTeam::get_association(id.into(), &**pool).await?;
     if let Some(TeamAssociationId::Project(pid)) = team_association_id {
@@ -1019,6 +1019,20 @@ pub async fn transfer_ownership(
         };
 
     transaction.commit().await?;
+    // If this team is associated with a project, notify the new owner
+    if let Some(TeamAssociationId::Project(pid)) = team_association_id {
+        let mut notif_tx = pool.begin().await?;
+        NotificationBuilder {
+            body: NotificationBody::ProjectTransferred {
+                project_id: pid.into(),
+                new_owner_user_id: Some(new_owner.user_id),
+                new_owner_organization_id: None,
+            },
+        }
+        .insert(new_owner.user_id.into(), &mut notif_tx, &redis)
+        .await?;
+        notif_tx.commit().await?;
+    }
     DBTeamMember::clear_cache(id.into(), &redis).await?;
     for team_id in project_teams_edited {
         DBTeamMember::clear_cache(team_id, &redis).await?;
