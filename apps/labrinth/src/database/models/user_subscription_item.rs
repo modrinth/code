@@ -139,17 +139,18 @@ impl DBUserSubscription {
         sqlx::query!(
             "
             INSERT INTO users_subscriptions (
-                id, user_id, price_id, interval, created, status, metadata
+                id, user_id, price_id, interval, created, status, metadata, user_aware_of_tax_changes
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6, $7
+                $1, $2, $3, $4, $5, $6, $7, $8
             )
             ON CONFLICT (id)
             DO UPDATE
                 SET interval = EXCLUDED.interval,
                     status = EXCLUDED.status,
                     price_id = EXCLUDED.price_id,
-                    metadata = EXCLUDED.metadata
+                    metadata = EXCLUDED.metadata,
+					user_aware_of_tax_changes = EXCLUDED.user_aware_of_tax_changes
             ",
             self.id.0,
             self.user_id.0,
@@ -158,6 +159,7 @@ impl DBUserSubscription {
             self.created,
             self.status.as_str(),
             serde_json::to_value(&self.metadata)?,
+            self.user_aware_of_tax_changes,
         )
         .execute(&mut **transaction)
         .await?;

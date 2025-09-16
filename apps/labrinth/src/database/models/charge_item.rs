@@ -401,6 +401,7 @@ pub async fn get_missing_tax_with_limit(
 		  c.status = 'open'
 		  AND c.tax_amount = 0
 		  AND u.stripe_customer_id IS NOT NULL
+		  AND COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) + INTERVAL '10 minutes' < NOW()
 		ORDER BY COALESCE(c.tax_last_updated, '-infinity' :: TIMESTAMPTZ) DESC
 		LIMIT $1
 		"#,
