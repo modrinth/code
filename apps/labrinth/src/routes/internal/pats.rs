@@ -131,17 +131,15 @@ pub async fn create_pat(
     .insert(&mut transaction)
     .await?;
 
-    transaction.commit().await?;
-    // Send a notification to the user about the new PAT creation
-    let mut notification_tx = pool.begin().await?;
     NotificationBuilder {
         body: NotificationBody::PatCreated {
             token_name: name.clone(),
         },
     }
-    .insert(user.id.into(), &mut notification_tx, &redis)
+    .insert(user.id.into(), &mut transaction, &redis)
     .await?;
-    notification_tx.commit().await?;
+    transaction.commit().await?;
+
     database::models::pat_item::DBPersonalAccessToken::clear_cache(
         vec![(None, None, Some(user.id.into()))],
         &redis,

@@ -206,18 +206,16 @@ pub async fn report_create(
     .insert(&mut transaction)
     .await?;
 
-    transaction.commit().await?;
-
     // Notify the reporter that the report has been submitted
-    let mut notif_tx = pool.begin().await?;
     NotificationBuilder {
         body: NotificationBody::ReportSubmitted {
             report_id: id.into(),
         },
     }
-    .insert(current_user.id.into(), &mut notif_tx, &redis)
+    .insert(current_user.id.into(), &mut transaction, &redis)
     .await?;
-    notif_tx.commit().await?;
+
+    transaction.commit().await?;
 
     Ok(HttpResponse::Ok().json(Report {
         id: id.into(),
