@@ -166,8 +166,9 @@ pub enum NotificationBody {
     PatCreated {
         token_name: String,
     },
+    /// This differs from ModeratorMessage as this notification is only for project threads and
+    /// email notifications, not for site notifications.
     ModerationThreadMessageReceived {
-        thread_id: ThreadId,
         project_id: ProjectId,
     },
     ReportStatusUpdated {
@@ -411,15 +412,13 @@ impl From<DBNotification> for Notification {
                     },
                     vec![],
                 ),
+                // The notifications from here to down below are listed with messages for completeness' sake,
+                // though they should never be sent via site notifications. This should be disabled via database
+                // options. Messages should be reviewed and worded better if we want to distribute these notifications
+                // via the site.
                 NotificationBody::PatCreated { token_name } => (
                     "New personal access token created".to_string(),
                     format!("Your personal access token '{token_name}' was created."),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::ModerationThreadMessageReceived { .. } => (
-                    "New message in moderation thread".to_string(),
-                    "You have a new message in a moderation thread.".to_string(),
                     "#".to_string(),
                     vec![],
                 ),
@@ -472,10 +471,6 @@ impl From<DBNotification> for Notification {
                     link.clone(),
                     actions.clone().into_iter().collect(),
                 ),
-                // The notifications from here to down below are listed with messages for completeness' sake,
-                // though they should never be sent via site notifications. This should be disabled via database
-                // options. Messages should be reviewed and worded better if we want to distribute these notifications
-                // via the site.
                 NotificationBody::PaymentFailed { .. } => (
                     "Payment failed".to_string(),
                     "A payment on your account failed. Please update your billing information.".to_string(),
@@ -533,6 +528,12 @@ impl From<DBNotification> for Notification {
                 NotificationBody::PayoutAvailable { .. } => (
                     "Payout available".to_string(),
                     "A payout is available!".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+				NotificationBody::ModerationThreadMessageReceived { .. } => (
+                    "New message in moderation thread".to_string(),
+                    "You have a new message in a moderation thread.".to_string(),
                     "#".to_string(),
                     vec![],
                 ),

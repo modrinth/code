@@ -100,7 +100,6 @@ pub enum LegacyNotificationBody {
         token_name: String,
     },
     ModerationThreadMessageReceived {
-        thread_id: ThreadId,
         project_id: ProjectId,
     },
     ReportStatusUpdated {
@@ -262,10 +261,8 @@ impl LegacyNotification {
                 LegacyNotificationBody::PatCreated { token_name }
             }
             NotificationBody::ModerationThreadMessageReceived {
-                thread_id,
                 project_id,
             } => LegacyNotificationBody::ModerationThreadMessageReceived {
-                thread_id,
                 project_id,
             },
             NotificationBody::ReportStatusUpdated { report_id } => {
