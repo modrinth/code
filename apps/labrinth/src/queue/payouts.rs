@@ -879,8 +879,8 @@ pub async fn process_payout(
         MonetizationStatus::Monetized.as_str(),
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| !x.is_hidden())
-            .map(|x| x.to_string())
-            .collect::<Vec<String>>(),
+            .map(|x| x.as_str().to_string())
+            .collect::<Vec<_>>(),
     )
     .fetch(&mut *transaction)
     .try_fold(DashMap::new(), |acc: DashMap<i64, HashMap<i64, Decimal>>, r| {
@@ -902,7 +902,7 @@ pub async fn process_payout(
         MonetizationStatus::Monetized.as_str(),
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| !x.is_hidden())
-            .map(|x| x.to_string())
+            .map(|x| x.as_str().to_string())
             .collect::<Vec<String>>(),
     )
     .fetch(&mut *transaction)

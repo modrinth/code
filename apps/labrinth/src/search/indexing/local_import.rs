@@ -50,7 +50,7 @@ pub async fn index_local(
         ",
         &*crate::models::projects::ProjectStatus::iterator()
         .filter(|x| x.is_searchable())
-        .map(|x| x.to_string())
+        .map(|x| x.as_str().to_string())
         .collect::<Vec<String>>(),
     )
         .fetch(pool)

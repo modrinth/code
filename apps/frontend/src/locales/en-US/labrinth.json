@@ -557,6 +557,36 @@
   "labrinth.notification.type.verify_email": {
     "message": "Verify your email"
   },
+  "labrinth.project_status.approved": {
+    "message": "Listed"
+  },
+  "labrinth.project_status.archived": {
+    "message": "Archived"
+  },
+  "labrinth.project_status.draft": {
+    "message": "Draft"
+  },
+  "labrinth.project_status.private": {
+    "message": "Private"
+  },
+  "labrinth.project_status.processing": {
+    "message": "Under review"
+  },
+  "labrinth.project_status.rejected": {
+    "message": "Rejected"
+  },
+  "labrinth.project_status.scheduled": {
+    "message": "Scheduled"
+  },
+  "labrinth.project_status.unknown": {
+    "message": "Unknown"
+  },
+  "labrinth.project_status.unlisted": {
+    "message": "Unlisted"
+  },
+  "labrinth.project_status.withheld": {
+    "message": "Withheld"
+  },
   "labrinth.warning.file_validation.invalid_mrpack": {
     "message": "Invalid modpack file. You must upload a valid .mrpack file."
   },

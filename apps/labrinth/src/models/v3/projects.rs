@@ -7,8 +7,11 @@ use crate::database::models::version_item::VersionQueryResult;
 use crate::models::ids::{
     OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
 };
+use ariadne::i18n::I18nEnum;
+use ariadne::i18n_enum;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
+use derive_more::Display;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -417,23 +420,26 @@ impl From<LinkUrl> for Link {
 }
 
 /// A status decides the visibility of a project in search, URLs, and the whole site itself.
-/// Approved - Project is displayed on search, and accessible by URL
-/// Rejected - Project is not displayed on search, and not accessible by URL (Temporary state, project can reapply)
-/// Draft - Project is not displayed on search, and not accessible by URL
-/// Unlisted - Project is not displayed on search, but accessible by URL
-/// Withheld - Same as unlisted, but set by a moderator. Cannot be switched to another type without moderator approval
-/// Processing - Project is not displayed on search, and not accessible by URL (Temporary state, project under review)
-/// Scheduled - Project is scheduled to be released in the future
-/// Private - Project is approved, but is not viewable to the public
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+/// - Approved - Project is displayed on search, and accessible by URL
+/// - Rejected - Project is not displayed on search, and not accessible by URL (Temporary state, project can reapply)
+/// - Draft - Project is not displayed on search, and not accessible by URL
+/// - Unlisted - Project is not displayed on search, but accessible by URL
+/// - Withheld - Same as unlisted, but set by a moderator. Cannot be switched to another type without moderator approval
+/// - Processing - Project is not displayed on search, and not accessible by URL (Temporary state, project under review)
+/// - Scheduled - Project is scheduled to be released in the future
+/// - Private - Project is approved, but is not viewable to the public
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug, Display,
+)]
 #[serde(rename_all = "lowercase")]
-// TODO: Make translatable and remove as_friendly_str
 pub enum ProjectStatus {
+    #[display("Listed")]
     Approved,
     Archived,
     Rejected,
     Draft,
     Unlisted,
+    #[display("Under review")]
     Processing,
     Withheld,
     Scheduled,
@@ -441,11 +447,20 @@ pub enum ProjectStatus {
     Unknown,
 }
 
-impl std::fmt::Display for ProjectStatus {
-    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(fmt, "{}", self.as_str())
-    }
-}
+i18n_enum!(
+    ProjectStatus,
+    root_key: "labrinth.project_status",
+    Approved! => "approved",
+    Archived! => "archived",
+    Rejected! => "rejected",
+    Draft! => "draft",
+    Unlisted! => "unlisted",
+    Processing! => "processing",
+    Withheld! => "withheld",
+    Scheduled! => "scheduled",
+    Private! => "private",
+    Unknown! => "unknown",
+);
 
 impl ProjectStatus {
     pub fn from_string(string: &str) -> ProjectStatus {
@@ -461,33 +476,9 @@ impl ProjectStatus {
             _ => ProjectStatus::Unknown,
         }
     }
+
     pub fn as_str(&self) -> &'static str {
-        match self {
-            ProjectStatus::Approved => "approved",
-            ProjectStatus::Rejected => "rejected",
-            ProjectStatus::Draft => "draft",
-            ProjectStatus::Unlisted => "unlisted",
-            ProjectStatus::Processing => "processing",
-            ProjectStatus::Unknown => "unknown",
-            ProjectStatus::Archived => "archived",
-            ProjectStatus::Withheld => "withheld",
-            ProjectStatus::Scheduled => "scheduled",
-            ProjectStatus::Private => "private",
-        }
-    }
-    pub fn as_friendly_str(&self) -> &'static str {
-        match self {
-            ProjectStatus::Approved => "Listed",
-            ProjectStatus::Rejected => "Rejected",
-            ProjectStatus::Draft => "Draft",
-            ProjectStatus::Unlisted => "Unlisted",
-            ProjectStatus::Processing => "Under review",
-            ProjectStatus::Unknown => "Unknown",
-            ProjectStatus::Archived => "Archived",
-            ProjectStatus::Withheld => "Withheld",
-            ProjectStatus::Scheduled => "Scheduled",
-            ProjectStatus::Private => "Private",
-        }
+        self.translation_id()
     }
 
     pub fn iterator() -> impl Iterator<Item = ProjectStatus> {

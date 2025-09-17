@@ -492,6 +492,7 @@ name = "ariadne-extract"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "derive_more 2.0.1",
  "miette",
  "proc-macro2",
  "serde",

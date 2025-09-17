@@ -1,10 +1,11 @@
 use crate::error::Result;
-use serde::{Serialize};
-use std::collections::{BTreeMap, HashMap, HashSet};
+use derive_more::Display;
+use proc_macro2::Span;
+use serde::Serialize;
 use std::collections::btree_map::Entry;
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs;
 use std::path::Path;
-use proc_macro2::Span;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
@@ -24,7 +25,7 @@ pub struct TranslationEntry {
 
 impl TranslationEntry {
     pub fn new(message: String, key_span: Span) -> Self {
-        Self { message, key_span, }
+        Self { message, key_span }
     }
 }
 
@@ -168,14 +169,19 @@ impl EnumMessage {
     fn as_option(&self) -> Option<(&LitStr, DisplayAttributeType)> {
         match self {
             Self::Absent { .. } => None,
-            Self::Present { message, display_attribute_type } => Some((message, *display_attribute_type)),
+            Self::Present {
+                message,
+                display_attribute_type,
+            } => Some((message, *display_attribute_type)),
         }
     }
 }
 
-#[derive(PartialEq, Eq, Copy, Clone)]
+#[derive(PartialEq, Eq, Copy, Clone, Display)]
 enum DisplayAttributeType {
+    #[display("#[error]")]
     ThiserrorError,
+    #[display("#[display]")]
     DeriveMoreDisplay,
 }
 
@@ -196,6 +202,7 @@ impl Visit<'_> for FileExtractor<'_> {
         let mut variants = HashMap::new();
         let mut has_missing_variants = false;
         let mut ignored_variants = HashSet::new();
+        let mut main_display_attribute_type = None;
 
         for variant in &i.variants {
             let Some(error_attr) = variant.attrs.iter().find(|x| {
@@ -210,6 +217,26 @@ impl Visit<'_> for FileExtractor<'_> {
             } else {
                 DisplayAttributeType::DeriveMoreDisplay
             };
+            if display_attribute_type
+                != main_display_attribute_type
+                    .get_or_insert_with(|| {
+                        (error_attr.path().span(), display_attribute_type)
+                    })
+                    .1
+            {
+                let (old_span, old_type) = main_display_attribute_type.unwrap();
+                let mut error = syn::Error::new(
+                    error_attr.path().span(),
+                    format!(
+                        "expected {old_type} but found {display_attribute_type} (for consistency)"
+                    ),
+                );
+                error.combine(syn::Error::new(
+                    old_span,
+                    format!("{old_type} initially used here"),
+                ));
+                self.add_error(error);
+            }
             let error_message = error_attr
                 .parse_args_with(|input: ParseStream| {
                     if display_attribute_type
@@ -258,10 +285,25 @@ impl Visit<'_> for FileExtractor<'_> {
                     if ignored_variants.contains(&variant.ident) {
                         continue;
                     }
-                    variants.entry(variant.ident.clone())
-                        .or_insert_with(|| EnumMessage::Absent {
-                            variant_span: variant.span(),
-                        });
+                    variants.entry(variant.ident.clone()).or_insert_with(
+                        || match main_display_attribute_type.unwrap().1 {
+                            DisplayAttributeType::ThiserrorError => {
+                                EnumMessage::Absent {
+                                    variant_span: variant.span(),
+                                }
+                            }
+                            DisplayAttributeType::DeriveMoreDisplay => {
+                                EnumMessage::Present {
+                                    message: LitStr::new(
+                                        &variant.ident.to_string(),
+                                        variant.ident.span(),
+                                    ),
+                                    display_attribute_type:
+                                        DisplayAttributeType::DeriveMoreDisplay,
+                                }
+                            }
+                        },
+                    );
                 }
             }
             self.enum_messages.insert(i.ident.clone(), variants);
@@ -300,35 +342,49 @@ impl Visit<'_> for FileExtractor<'_> {
                     if variant.transparent.is_some() {
                         continue;
                     }
-                    let Some(message_literal) = messages.get(&variant.variant_name) else {
+                    let Some(message_literal) =
+                        messages.get(&variant.variant_name)
+                    else {
                         continue;
                     };
                     let (message, errors) = message_literal
                         .as_option()
-                        .map(|(message, display_attribute_type)| {
-                            variant.transform_format_string(
-                                message.value(),
-                                display_attribute_type,
-                            )
-                        })
-                        .unwrap_or_else(|| ("".into(), vec![format!("no default message specified for variant {}", variant.variant_name)]));
-                    let duplicate_key = match self.extractor.output.entry(format!("{}.{}", root_key, variant.key.value())) {
+                        .map_or_else(
+                            || ("".into(), vec![format!("no default message specified for variant {}", variant.variant_name)]),
+                            |(message, display_attribute_type)| {
+                                variant.transform_format_string(
+                                    message.value(),
+                                    display_attribute_type,
+                                )
+                            },
+                        );
+                    let duplicate_key = match self
+                        .extractor
+                        .output
+                        .entry(format!("{}.{}", root_key, variant.key.value()))
+                    {
                         Entry::Vacant(entry) => {
-                            entry.insert(TranslationEntry::new(message, variant.key.span()));
+                            entry.insert(TranslationEntry::new(
+                                message,
+                                variant.key.span(),
+                            ));
                             None
-                        },
+                        }
                         Entry::Occupied(entry) => {
-                            (*entry.get().message != message).then(|| (entry.key().clone(), entry.get().key_span))
+                            (*entry.get().message != message).then(|| {
+                                (entry.key().clone(), entry.get().key_span)
+                            })
                         }
                     };
-                    if let Some((duplicate_key, original_span)) = duplicate_key {
+                    if let Some((duplicate_key, original_span)) = duplicate_key
+                    {
                         let mut error = syn::Error::new(
                             variant.key.span(),
-                            format!("duplicate variant key {}", duplicate_key)
+                            format!("duplicate variant key {}", duplicate_key),
                         );
                         error.combine(syn::Error::new(
                             original_span,
-                            "originally used here"
+                            "originally used here",
                         ));
                         self.extractor.add_error(&self.file, error);
                     }
@@ -337,8 +393,12 @@ impl Visit<'_> for FileExtractor<'_> {
                             &self.file,
                             syn::Error::new(
                                 match message_literal {
-                                    EnumMessage::Absent { variant_span } => *variant_span,
-                                    EnumMessage::Present { message, .. } => message.span(),
+                                    EnumMessage::Absent { variant_span } => {
+                                        *variant_span
+                                    }
+                                    EnumMessage::Present {
+                                        message, ..
+                                    } => message.span(),
                                 },
                                 error,
                             ),

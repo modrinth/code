@@ -25,7 +25,7 @@ pub async fn get_stats(
         ",
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_searchable())
-            .map(|x| x.to_string())
+            .map(|x| x.as_str().to_string())
             .collect::<Vec<String>>(),
     )
     .fetch_one(&**pool)
@@ -40,7 +40,7 @@ pub async fn get_stats(
         ",
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_searchable())
-            .map(|x| x.to_string())
+            .map(|x| x.as_str().to_string())
             .collect::<Vec<String>>(),
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_listed())
@@ -59,7 +59,7 @@ pub async fn get_stats(
         ",
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_searchable())
-            .map(|x| x.to_string())
+            .map(|x| x.as_str().to_string())
             .collect::<Vec<String>>(),
     )
     .fetch_one(&**pool)
@@ -73,7 +73,7 @@ pub async fn get_stats(
         ",
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_searchable())
-            .map(|x| x.to_string())
+            .map(|x| x.as_str().to_string())
             .collect::<Vec<String>>(),
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_listed())

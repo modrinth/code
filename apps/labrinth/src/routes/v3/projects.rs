@@ -107,7 +107,7 @@ pub async fn random_projects_get(
         LIMIT $2",
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_searchable())
-            .map(|x| x.to_string())
+            .map(|x| x.as_str().to_string())
             .collect::<Vec<String>>(),
         count.count as i32,
     )
@@ -445,10 +445,9 @@ pub async fn project_edit(
                             dotenvy::var("SITE_URL")?,
                             user.username,
                             user.username,
-                            &project_item.inner.status.as_friendly_str(),
-                            status.as_friendly_str(),
-                        )
-                        .to_string(),
+                            &project_item.inner.status,
+                            status,
+                        ),
                     ),
                 )
                 .await

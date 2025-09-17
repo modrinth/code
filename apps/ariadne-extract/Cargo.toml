@@ -6,6 +6,7 @@ edition.workspace = true
 [dependencies]
 clap.workspace = true
 thiserror.workspace = true
+derive_more = { workspace = true, features = ["display"] }
 
 serde_json.workspace = true
 serde.workspace = true

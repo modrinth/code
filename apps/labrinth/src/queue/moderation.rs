@@ -675,9 +675,8 @@ impl AutomatedModerationQueue {
                                                 format!(
                                                     "*<{}/user/AutoMod|AutoMod>* changed project status from *{}* to *Rejected*",
                                                     dotenvy::var("SITE_URL")?,
-                                                    &project.inner.status.as_friendly_str(),
-                                                )
-                                                    .to_string(),
+                                                    &project.inner.status,
+                                                ),
                                             ),
                                         )
                                             .await
