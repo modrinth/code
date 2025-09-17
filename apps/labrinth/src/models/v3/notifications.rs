@@ -2,6 +2,7 @@ use super::ids::*;
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notification_item::DBNotificationAction;
 use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
+use crate::models::billing::PriceDuration;
 use crate::models::ids::{
     NotificationId, ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId,
     VersionId,
@@ -162,8 +163,11 @@ pub enum NotificationBody {
         service: String,
     },
     TaxNotification {
-        amount: i64,
-        tax_amount: i64,
+        new_amount: i64,
+        new_tax_amount: i64,
+        old_amount: i64,
+        old_tax_amount: i64,
+        billing_interval: PriceDuration,
         due: DateTime<Utc>,
         service: String,
     },

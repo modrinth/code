@@ -1,9 +1,9 @@
-use crate::database::models::charge_item::{self, CustomerCharge, DBCharge};
+use crate::database::models::charge_item::DBCharge;
 use crate::database::models::notification_item::NotificationBuilder;
+use crate::database::models::product_item::DBProduct;
+use crate::database::models::products_tax_identifier_item::DBProductsTaxIdentifier;
 use crate::database::models::user_item::DBUser;
-use crate::database::models::user_subscription_item::{
-    DBUserSubscription, fetch_update_lock_pending_taxation_notification,
-};
+use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::users_redeemals::UserRedeemal;
 use crate::database::models::{DatabaseError, ids::*};
 use crate::database::models::{
@@ -39,13 +39,373 @@ pub async fn index_subscriptions(
 ) {
     info!("Indexing subscriptions");
 
-    let tax_charges_index_handle =
-        tokio::spawn(roll_index_tax_amount_on_charges(
+    async fn anrok_api_operations(
+        pool: PgPool,
+        redis: RedisPool,
+        stripe_client: stripe::Client,
+        anrok_client: anrok::Client,
+    ) {
+        let then = std::time::Instant::now();
+        let result = update_tax_amounts(
             pool.clone(),
+            redis.clone(),
+            anrok_client.clone(),
+            stripe_client.clone(),
+            100,
+        )
+        .await;
+
+        if let Err(e) = result {
+            warn!("Error updating tax amount on charges: {:?}", e);
+        }
+
+        let result = update_tax_transactions(
+            pool,
+            redis,
             anrok_client,
             stripe_client,
-            150,
-        ));
+            100,
+        )
+        .await;
+
+        if let Err(e) = result {
+            warn!("Error updating tax transactions: {:?}", e);
+        }
+
+        info!(
+            "Updating tax amounts and Anrok transactions took {:?}",
+            then.elapsed()
+        );
+    }
+
+    /// Updates charges which need to have their tax amount updated. This is done within a timer to avoid reaching
+    /// Anrok API limits.
+    ///
+    /// The global rate limit for Anrok API operations is 10 RPS, so we run ~6 requests every second up
+    /// to the specified limit of processed charges.
+    async fn update_tax_amounts(
+        pg: PgPool,
+        redis: RedisPool,
+        anrok_client: anrok::Client,
+        stripe_client: stripe::Client,
+        limit: i64,
+    ) -> Result<(), ApiError> {
+        let mut interval =
+            tokio::time::interval(std::time::Duration::from_secs(1));
+        interval
+            .set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+
+        let mut processed_charges = 0;
+
+        loop {
+            interval.tick().await;
+
+            let mut txn = pg.begin().await?;
+
+            let charges = DBCharge::get_updateable_lock(&mut *txn, 6).await?;
+
+            if charges.is_empty() {
+                info!("No more charges to process");
+                break Ok(());
+            }
+
+            let anrok_client_ref = anrok_client.clone();
+            let stripe_client_ref = stripe_client.clone();
+            let pg_ref = pg.clone();
+            let redis_ref = redis.clone();
+
+            struct ProcessedCharge {
+                charge: DBCharge,
+                new_tax_amount: i64,
+                product_name: String,
+            }
+
+            let mut futures = charges
+                .into_iter()
+                .map(|charge| {
+                    let stripe_client = stripe_client_ref.clone();
+                    let anrok_client = anrok_client_ref.clone();
+                    let pg = pg_ref.clone();
+                    let redis = redis_ref.clone();
+
+                    async move {
+                        let stripe_customer_id =
+                            DBUser::get_id(charge.user_id, &pg, &redis)
+                                .await?
+                                .ok_or_else(|| {
+                                    ApiError::from(DatabaseError::Database(
+                                        sqlx::Error::RowNotFound,
+                                    ))
+                                })
+                                .and_then(|user| {
+                                    user.stripe_customer_id.ok_or_else(|| {
+                                        ApiError::InvalidInput(
+                                            "User has no Stripe customer ID"
+                                                .to_owned(),
+                                        )
+                                    })
+                                })?;
+
+                        let tax_id = DBProductsTaxIdentifier::get_price(
+                            charge.price_id,
+                            &pg,
+                        )
+                        .await?
+                        .ok_or_else(|| {
+                            DatabaseError::Database(sqlx::Error::RowNotFound)
+                        })?;
+
+                        let product =
+                            DBProduct::get_price(charge.price_id, &pg)
+                                .await?
+                                .ok_or_else(|| {
+                                DatabaseError::Database(
+                                    sqlx::Error::RowNotFound,
+                                )
+                            })?;
+
+                        let Ok(customer_id): Result<stripe::CustomerId, _> =
+                            stripe_customer_id.parse()
+                        else {
+                            return Err(ApiError::InvalidInput(
+                                "Charge's Stripe customer ID was invalid"
+                                    .to_owned(),
+                            ));
+                        };
+
+                        let customer = stripe::Customer::retrieve(
+                            &stripe_client,
+                            &customer_id,
+                            &[],
+                        )
+                        .await?;
+
+                        /*
+                        let Some(stripe_address) = customer.address else {
+                            return Err(ApiError::InvalidInput(
+                                "Stripe customer had no address".to_owned(),
+                            ));
+                        };
+                        */
+
+                        let customer_address =
+                            anrok::Address::from_stripe_address(
+                                &Default::default(),
+                            );
+
+                        let tax_amount = anrok_client
+                            .create_ephemeral_txn(&anrok::TransactionFields {
+                                customer_address,
+                                currency_code: charge.currency_code.clone(),
+                                accounting_time: charge.due,
+                                accounting_time_zone:
+                                    anrok::AccountingTimeZone::Utc,
+                                line_items: vec![anrok::LineItem::new(
+                                    tax_id.tax_processor_id,
+                                    charge.amount,
+                                )],
+                            })
+                            .await?
+                            .tax_amount_to_collect;
+
+                        Result::<ProcessedCharge, ApiError>::Ok(
+                            ProcessedCharge {
+                                charge,
+                                new_tax_amount: tax_amount,
+                                product_name: product
+                                    .name
+                                    .unwrap_or_else(|| "Modrinth".to_owned()),
+                            },
+                        )
+                    }
+                })
+                .collect::<FuturesUnordered<_>>();
+
+            while let Some(result) = futures.next().await {
+                processed_charges += 1;
+
+                match result {
+                    Ok(ProcessedCharge {
+                        mut charge,
+                        new_tax_amount,
+                        product_name,
+                    }) => {
+                        charge.tax_last_updated = Some(Utc::now());
+
+                        if new_tax_amount != charge.tax_amount {
+                            // The price of the subscription has changed, we need to insert a notification
+                            // for this.
+
+                            NotificationBuilder {
+                                body: NotificationBody::TaxNotification {
+                                    new_amount: charge.amount,
+                                    new_tax_amount: new_tax_amount,
+                                    old_amount: charge.amount,
+                                    old_tax_amount: charge.tax_amount,
+                                    billing_interval: charge
+                                        .subscription_interval
+                                        .unwrap_or(PriceDuration::Monthly),
+                                    due: charge.due,
+                                    service: product_name,
+                                },
+                            }
+                            .insert(charge.user_id, &mut txn, &redis)
+                            .await?;
+
+                            charge.tax_amount = new_tax_amount;
+                        }
+
+                        charge.upsert(&mut txn).await?;
+                    }
+                    Err(error) => {
+                        error!(%error, "Error indexing tax amount on charge");
+                    }
+                }
+            }
+
+            txn.commit().await?;
+
+            if processed_charges >= limit {
+                break Ok(());
+            }
+        }
+    }
+
+    /// Registers Anrok transactions for charges which are missing a tax identifier.
+    ///
+    /// Same as update_tax_amounts, this is done within a timer to avoid reaching Anrok API limits.
+    ///
+    /// The global rate limit for Anrok API operations is 10 RPS, so we run ~6 requests every second up
+    /// to the specified limit of processed charges.
+    async fn update_tax_transactions(
+        pg: PgPool,
+        redis: RedisPool,
+        anrok_client: anrok::Client,
+        stripe_client: stripe::Client,
+        limit: i64,
+    ) -> Result<(), ApiError> {
+        let mut interval =
+            tokio::time::interval(std::time::Duration::from_secs(1));
+        interval
+            .set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+
+        let mut processed_charges = 0;
+
+        loop {
+            interval.tick().await;
+
+            let mut txn = pg.begin().await?;
+
+            let charges =
+                DBCharge::get_missing_tax_identifier_lock(&mut *txn, 6).await?;
+
+            if charges.is_empty() {
+                info!("No more charges to process");
+                break Ok(());
+            }
+
+            for mut c in charges {
+                let payment_intent_id = c
+                    .payment_platform_id
+                    .as_deref()
+                    .and_then(|x| x.parse().ok())
+                    .ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "Charge has no or an invalid payment platform ID"
+                                .to_owned(),
+                        )
+                    })?;
+
+                let stripe_customer_id = DBUser::get_id(c.user_id, &pg, &redis)
+                    .await?
+                    .ok_or_else(|| {
+                        ApiError::from(DatabaseError::Database(
+                            sqlx::Error::RowNotFound,
+                        ))
+                    })
+                    .and_then(|user| {
+                        user.stripe_customer_id.ok_or_else(|| {
+                            ApiError::InvalidInput(
+                                "User has no Stripe customer ID".to_owned(),
+                            )
+                        })
+                    })?;
+
+                let tax_id =
+                    DBProductsTaxIdentifier::get_price(c.price_id, &pg)
+                        .await?
+                        .ok_or_else(|| {
+                            DatabaseError::Database(sqlx::Error::RowNotFound)
+                        })?;
+
+                let Ok(customer_id): Result<stripe::CustomerId, _> =
+                    stripe_customer_id.parse()
+                else {
+                    return Err(ApiError::InvalidInput(
+                        "Charge's Stripe customer ID was invalid".to_owned(),
+                    ));
+                };
+
+                let customer = stripe::Customer::retrieve(
+                    &stripe_client,
+                    &customer_id,
+                    &[],
+                )
+                .await?;
+
+                /*
+                let Some(stripe_address) = customer.address else {
+                    return Err(ApiError::InvalidInput(
+                        "Stripe customer had no address".to_owned(),
+                    ));
+                };
+                */
+
+                let customer_address =
+                    anrok::Address::from_stripe_address(&Default::default());
+
+                let tax_platform_id =
+                    anrok::transaction_id_stripe_pi(&payment_intent_id);
+
+                anrok_client
+                    .create_or_update_txn(&anrok::Transaction {
+                        id: tax_platform_id.clone(),
+                        fields: anrok::TransactionFields {
+                            customer_address,
+                            currency_code: c.currency_code.clone(),
+                            accounting_time: c.due,
+                            accounting_time_zone:
+                                anrok::AccountingTimeZone::Utc,
+                            line_items: vec![
+                                anrok::LineItem::new_including_tax_amount(
+                                    tax_id.tax_processor_id,
+                                    c.tax_amount + c.amount,
+                                ),
+                            ],
+                        },
+                    })
+                    .await?;
+
+                c.tax_platform_id = Some(tax_platform_id);
+                c.upsert(&mut txn).await?;
+
+                processed_charges += 1;
+            }
+
+            txn.commit().await?;
+
+            if processed_charges >= limit {
+                break Ok(());
+            }
+        }
+    }
+
+    let tax_charges_index_handle = tokio::spawn(anrok_api_operations(
+        pool.clone(),
+        redis.clone(),
+        stripe_client.clone(),
+        anrok_client.clone(),
+    ));
 
     let res = async {
         let mut transaction = pool.begin().await?;
@@ -269,6 +629,7 @@ pub async fn try_process_user_redeemal(
         metadata,
         mut prices,
         unitary: _,
+        name: _,
     }) = medal_products.pop()
     else {
         return Err(ApiError::Conflict(
@@ -356,7 +717,6 @@ pub async fn try_process_user_redeemal(
         metadata: Some(SubscriptionMetadata::Medal {
             id: server_id.to_string(),
         }),
-        user_aware_of_tax_changes: true,
     };
 
     subscription.upsert(&mut txn).await?;
@@ -462,14 +822,6 @@ pub async fn index_billing(
                 continue;
             };
 
-            let skip_tax_collection = if let Some(subscription_id) = charge.subscription_id {
-                let subs = DBUserSubscription::get(subscription_id, &pool).await?.ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
-
-                !subs.user_aware_of_tax_changes
-            } else {
-                false
-            };
-
             let user = User::from_full(user.clone());
 
             let result = create_or_update_payment_intent(
@@ -488,7 +840,6 @@ pub async fn index_billing(
                         currency,
                     ),
                     attach_payment_metadata: None,
-                    skip_tax_collection,
                 },
             )
             .await;
@@ -532,8 +883,6 @@ pub async fn index_billing(
             transaction.commit().await?;
         }
 
-        index_tax_notifications(pool, redis).await?;
-
         Ok::<(), ApiError>(())
     }
     .await;
@@ -543,173 +892,4 @@ pub async fn index_billing(
     }
 
     info!("Done indexing billing queue");
-}
-
-/// Updates charges which are missing an amount of tax. This is done within a timer to avoid reaching
-/// Anrok API limits.
-///
-/// The global rate limit for Anrok API operations is 10 RPS, so we run ~5 requests every second up
-/// to the specified limit of processed charges.
-async fn roll_index_tax_amount_on_charges(
-    pg: PgPool,
-    anrok_client: anrok::Client,
-    stripe_client: stripe::Client,
-    limit: i64,
-) -> Result<(), ApiError> {
-    let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
-    interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
-
-    let mut processed_charges = 0;
-
-    loop {
-        interval.tick().await;
-
-        let mut txn = pg.begin().await?;
-
-        let charges =
-            charge_item::get_missing_tax_with_limit(&mut *txn, 5).await?;
-
-        if charges.is_empty() {
-            info!("No more charges to process");
-            break Ok(());
-        }
-
-        let anrok_client = anrok_client.clone();
-        let stripe_client = stripe_client.clone();
-
-        let mut futures = charges
-            .into_iter()
-            .map(move |customer_charge| {
-                let CustomerCharge {
-                    mut charge,
-                    stripe_customer_id,
-                    product_tax_id,
-                } = customer_charge;
-
-                let stripe_client = stripe_client.clone();
-                let anrok_client = anrok_client.clone();
-
-                async move {
-                    let Ok(customer_id): Result<stripe::CustomerId, _> =
-                        stripe_customer_id.parse()
-                    else {
-                        return Err(ApiError::InvalidInput(
-                            "Charge's Stripe customer ID was invalid"
-                                .to_owned(),
-                        ));
-                    };
-
-                    let customer = stripe::Customer::retrieve(
-                        &stripe_client,
-                        &customer_id,
-                        &[],
-                    )
-                    .await?;
-
-                    let Some(stripe_address) = customer.address else {
-                        return Err(ApiError::InvalidInput(
-                            "Stripe customer had no address".to_owned(),
-                        ));
-                    };
-
-                    let customer_address =
-                        anrok::Address::from_stripe_address(&stripe_address);
-
-                    let tax_amount = anrok_client
-                        .create_ephemeral_txn(&anrok::TransactionFields {
-                            customer_address,
-                            currency_code: charge.currency_code.clone(),
-                            accounting_time: charge.due,
-                            accounting_time_zone:
-                                anrok::AccountingTimeZone::Utc,
-                            line_items: vec![anrok::LineItem::new(
-                                product_tax_id,
-                                charge.amount,
-                            )],
-                        })
-                        .await?
-                        .tax_amount_to_collect;
-
-                    charge.tax_amount = tax_amount;
-                    charge.tax_last_updated = Some(Utc::now());
-
-                    Result::<DBCharge, ApiError>::Ok(charge)
-                }
-            })
-            .collect::<FuturesUnordered<_>>();
-
-        let mut upsert_results = vec![];
-
-        while let Some(result) = futures.next().await {
-            match result {
-                Ok(charge) => {
-                    upsert_results.push(charge.upsert(&mut txn).await);
-                }
-                Err(error) => {
-                    error!(%error, "Error indexing tax amount on charge");
-                }
-            }
-        }
-
-        let _ = upsert_results
-            .into_iter()
-            .collect::<Result<Vec<_>, DatabaseError>>()?;
-
-        txn.commit().await?;
-
-        processed_charges += 5;
-
-        if processed_charges >= limit {
-            break Ok(());
-        }
-    }
-}
-
-async fn index_tax_notifications(
-    pool: PgPool,
-    redis: RedisPool,
-) -> Result<(), ApiError> {
-    info!("Indexing tax notifications");
-
-    let mut txn = pool.begin().await?;
-
-    let subscriptions =
-        fetch_update_lock_pending_taxation_notification(&mut txn, 300).await?;
-
-    let users = DBUser::get_many_ids(
-        &subscriptions.iter().map(|x| x.user_id).collect::<Vec<_>>(),
-        &pool,
-        &redis,
-    )
-    .await?;
-
-    for subs in subscriptions {
-        let Some(user) = users.iter().find(|x| x.id == subs.user_id) else {
-            continue;
-        };
-
-        // Some users don't have an email and so can't send them a notification. Just
-        // skip these people for now as they count very few users on the site with
-        // subscriptions.
-        //
-        // We skip them to be sure here but they're already skipped in `fetch_update_lock_pending_taxation_notification`.
-        if user.email.is_none() {
-            continue;
-        }
-
-        NotificationBuilder {
-            body: NotificationBody::TaxNotification {
-                amount: subs.amount,
-                tax_amount: subs.tax_amount,
-                due: subs.due,
-                service: subs.product_metadata.as_product_denomination(),
-            },
-        }
-        .insert(user.id, &mut txn, &redis)
-        .await?;
-    }
-
-    txn.commit().await?;
-
-    Ok(())
 }

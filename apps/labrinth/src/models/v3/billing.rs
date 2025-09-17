@@ -45,30 +45,6 @@ impl ProductMetadata {
     pub fn is_midas(&self) -> bool {
         matches!(self, ProductMetadata::Midas)
     }
-
-    /// TODO: Have this in DB
-    ///
-    /// Returns a text representation of the product's marketing name.
-    pub fn as_product_denomination(&self) -> String {
-        match self {
-            ProductMetadata::Pyro { ram: 4096, .. } => {
-                "Modrinth Server (Small plan)".to_owned()
-            }
-            ProductMetadata::Pyro { ram: 6144, .. } => {
-                "Modrinth Server (Medium plan)".to_owned()
-            }
-            ProductMetadata::Pyro { ram: 8192, .. } => {
-                "Modrinth Server (Large plan)".to_owned()
-            }
-            ProductMetadata::Pyro { .. } => {
-                "Modrinth Server (Custom plan)".to_owned()
-            }
-            ProductMetadata::Medal { .. } => {
-                "Modrinth Server (Medal quest)".to_owned()
-            }
-            ProductMetadata::Midas => "Modrinth+".to_owned(),
-        }
-    }
 }
 
 #[derive(Serialize, Deserialize)]
