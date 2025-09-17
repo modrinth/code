@@ -63,6 +63,7 @@ jobs:
           cache: pnpm
 
       - name: Generate tauri-dev.conf.json
+        shell: bash
         run: |
           GIT_HASH=$(git rev-parse --short HEAD)
           cat > apps/app/tauri-dev.conf.json <<EOF
