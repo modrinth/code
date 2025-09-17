@@ -12,9 +12,9 @@ use crate::queue::session::AuthQueue;
 use crate::routes::error::ApiError;
 use crate::{auth::get_user_from_headers, database};
 use actix_web::{HttpRequest, HttpResponse, get, route, web};
+use serde::Serialize;
 use sqlx::PgPool;
 use std::collections::HashSet;
-use yaserde::YaSerialize;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(maven_metadata);
@@ -23,45 +23,37 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(version_file);
 }
 
-#[derive(Default, Debug, Clone, YaSerialize)]
-#[yaserde(rename = "metadata")]
+#[derive(Default, Debug, Clone, Serialize)]
+#[serde(rename = "metadata", rename_all = "camelCase")]
 pub struct Metadata {
-    #[yaserde(rename = "groupId")]
     group_id: String,
-    #[yaserde(rename = "artifactId")]
     artifact_id: String,
     versioning: Versioning,
 }
 
-#[derive(Default, Debug, Clone, YaSerialize)]
-#[yaserde(rename = "versioning")]
+#[derive(Default, Debug, Clone, Serialize)]
+#[serde(rename = "versioning", rename_all = "camelCase")]
 pub struct Versioning {
     latest: String,
     release: String,
     versions: Versions,
-    #[yaserde(rename = "lastUpdated")]
     last_updated: String,
 }
 
-#[derive(Default, Debug, Clone, YaSerialize)]
-#[yaserde(rename = "versions")]
+#[derive(Default, Debug, Clone, Serialize)]
+#[serde(rename = "versions")]
 pub struct Versions {
-    #[yaserde(rename = "version")]
+    #[serde(rename = "version")]
     versions: Vec<String>,
 }
 
-#[derive(Default, Debug, Clone, YaSerialize)]
-#[yaserde(rename = "project", namespaces = { "" = "http://maven.apache.org/POM/4.0.0" })]
+#[derive(Default, Debug, Clone, Serialize)]
+#[serde(rename = "project", rename_all = "camelCase")]
 pub struct MavenPom {
-    #[yaserde(rename = "xsi:schemaLocation", attribute = true)]
+    #[serde(rename = "@xsi:schemaLocation")]
     schema_location: String,
-    #[yaserde(rename = "xmlns:xsi", attribute = true)]
-    xsi: String,
-    #[yaserde(rename = "modelVersion")]
     model_version: String,
-    #[yaserde(rename = "groupId")]
     group_id: String,
-    #[yaserde(rename = "artifactId")]
     artifact_id: String,
     version: String,
     name: String,
@@ -157,7 +149,7 @@ pub async fn maven_metadata(
 
     Ok(HttpResponse::Ok()
         .content_type("text/xml")
-        .body(yaserde::ser::to_string(&respdata).map_err(ApiError::Xml)?))
+        .body(serde_xml_rs::to_string(&respdata).map_err(ApiError::Xml)?))
 }
 
 async fn find_version(
@@ -318,7 +310,6 @@ pub async fn version_file(
             schema_location:
                 "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
                     .to_string(),
-            xsi: "http://www.w3.org/2001/XMLSchema-instance".to_string(),
             model_version: "4.0.0".to_string(),
             group_id: "maven.modrinth".to_string(),
             artifact_id: project_id,
@@ -326,9 +317,13 @@ pub async fn version_file(
             name: project.inner.name,
             description: project.inner.description,
         };
-        return Ok(HttpResponse::Ok()
-            .content_type("text/xml")
-            .body(yaserde::ser::to_string(&respdata).map_err(ApiError::Xml)?));
+        return Ok(HttpResponse::Ok().content_type("text/xml").body(
+            serde_xml_rs::SerdeXml::new()
+                .default_namespace("http://maven.apache.org/POM/4.0.0")
+                .namespace("xsi", "http://www.w3.org/2001/XMLSchema-instance")
+                .to_string(&respdata)
+                .map_err(ApiError::Xml)?,
+        ));
     } else if let Some(selected_file) =
         find_file(&project_id, &vnum, &version, &file)
     {

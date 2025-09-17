@@ -25,9 +25,8 @@ pub enum ApiError {
     #[error("Clickhouse Error: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
 
-    // TODO: Use an I18nEnum instead of a String
     #[error("Internal server error: {0}")]
-    Xml(String),
+    Xml(serde_xml_rs::Error),
 
     #[error("Deserialization error: {0}")]
     Json(#[from] serde_json::Error),
