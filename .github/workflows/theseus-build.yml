@@ -67,16 +67,14 @@ jobs:
           GIT_HASH=$(git rev-parse --short HEAD)
           cat > apps/app/tauri-dev.conf.json <<EOF
           {
-            "productName": "Modrinth App (dev)",
-            "mainBinaryName": "Modrinth App (dev build ",
+            "productName": "Modrinth App (dev-${GIT_HASH})",
+            "mainBinaryName": "Modrinth App (dev-${GIT_HASH})",
+            "identifier": "com.modrinth.app.dev.${GIT_HASH}",
             "bundle": {
               "fileAssociations": []
             }
           }
           EOF
-          jq --arg hash "$GIT_HASH" \
-            '.mainBinaryName = (.mainBinaryName + $hash + ")")' \
-          apps/app/tauri-dev.conf.json > apps/app/tauri.tmp && mv apps/app/tauri.tmp apps/app/tauri-dev.conf.json
 
       - name: 🧰 Install Linux build dependencies
         if: startsWith(matrix.platform, 'ubuntu')
@@ -164,8 +162,8 @@ jobs:
             target/release/bundle/appimage/Modrinth App_*.AppImage*
             target/release/bundle/deb/Modrinth App_*.deb*
             target/release/bundle/rpm/Modrinth App-*.rpm*
-            "target/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz*"
-            "target/universal-apple-darwin/release/bundle/macos/Modrinth App (dev build *).app.tar.gz"
-            "target/universal-apple-darwin/release/bundle/dmg/Modrinth App (dev build *).dmg"
+            target/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz*
+            target/universal-apple-darwin/release/bundle/macos/Modrinth App (dev-*)*.app.tar.gz
+            target/universal-apple-darwin/release/bundle/dmg/Modrinth App (dev-*)*.dmg
             target/release/bundle/nsis/Modrinth App_*-setup.exe*
             target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*
