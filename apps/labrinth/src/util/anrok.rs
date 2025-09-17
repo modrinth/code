@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use rand::Rng;
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -40,7 +41,20 @@ pub struct Address {
 }
 
 impl Address {
-    pub fn from_stripe_address(address: &stripe::Address) -> Self {
+    pub fn from_stripe_address(_address: &stripe::Address) -> Self {
+        fn default_remitting() -> Address {
+            Address {
+                country: Some("US".to_owned()),
+                line1: Some("1100 Congress Ave.".to_owned()),
+                city: Some("Austin".to_owned()),
+                region: Some("TX".to_owned()),
+                postal_code: Some("78701".to_owned()),
+            }
+        }
+
+        default_remitting()
+
+        /*
         Self {
             country: address.country.clone(),
             line1: address.line1.clone(),
@@ -48,30 +62,7 @@ impl Address {
             region: address.state.clone(),
             postal_code: address.postal_code.clone(),
         }
-    }
-
-    #[allow(unused)]
-    #[cfg(debug_assertions)]
-    pub fn default_remitting() -> Self {
-        Self {
-            country: Some("US".to_owned()),
-            line1: Some("1100 Congress Ave.".to_owned()),
-            city: Some("Austin".to_owned()),
-            region: Some("TX".to_owned()),
-            postal_code: Some("78701".to_owned()),
-        }
-    }
-
-    #[allow(unused)]
-    #[cfg(debug_assertions)]
-    pub fn default_exempt() -> Self {
-        Self {
-            country: Some("US".to_owned()),
-            line1: Some("1315 10th St".to_owned()),
-            city: Some("Sacramento".to_owned()),
-            region: Some("CA".to_owned()),
-            postal_code: Some("95814".to_owned()),
-        }
+        */
     }
 }
 
@@ -224,6 +215,36 @@ impl Client {
     }
 
     async fn make_request<T: Serialize, R: DeserializeOwned>(
+        &self,
+        method: Method,
+        path: &str,
+        body: Option<&T>,
+    ) -> Result<R, AnrokError> {
+        let mut n = 0u64;
+
+        loop {
+            if n >= 3 {
+                return Err(AnrokError::RateLimit);
+            }
+
+            match self.make_request_inner(method.clone(), path, body).await {
+                Err(AnrokError::RateLimit) => {
+                    n += 1;
+                    // 1000 + ~500, 2000 + ~1000, 5000 + ~2500
+                    let base = (n - 1).pow(2) * 1000 + 1000;
+                    let random = rand::thread_rng().gen_range(0..(base / 2));
+                    tokio::time::sleep(std::time::Duration::from_millis(
+                        base + random,
+                    ))
+                    .await;
+                }
+
+                other => return other,
+            }
+        }
+    }
+
+    async fn make_request_inner<T: Serialize, R: DeserializeOwned>(
         &self,
         method: Method,
         path: &str,

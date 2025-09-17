@@ -91,15 +91,15 @@ macro_rules! select_charges_with_predicate {
             ChargeQueryResult,
             r#"
             SELECT
-                id, user_id, price_id, amount, currency_code, status, due, last_attempt,
-                charge_type, subscription_id, tax_amount, tax_platform_id,
+                charges.id, charges.user_id, charges.price_id, charges.amount, charges.currency_code, charges.status, charges.due, charges.last_attempt,
+                charges.charge_type, charges.subscription_id, charges.tax_amount, charges.tax_platform_id,
                 -- Workaround for https://github.com/launchbadge/sqlx/issues/3336
-                subscription_interval AS "subscription_interval?",
-                payment_platform,
-                payment_platform_id AS "payment_platform_id?",
-                parent_charge_id AS "parent_charge_id?",
-                net AS "net?",
-				tax_last_updated AS "tax_last_updated?"
+                charges.subscription_interval AS "subscription_interval?",
+                charges.payment_platform,
+                charges.payment_platform_id AS "payment_platform_id?",
+                charges.parent_charge_id AS "parent_charge_id?",
+                charges.net AS "net?",
+				charges.tax_last_updated AS "tax_last_updated?"
             FROM charges
             "#
                 + $predicate,
@@ -284,6 +284,71 @@ impl DBCharge {
                 status = 'failed' AND due < NOW() - INTERVAL '30 days'
             "#,
             charge_type
+        )
+        .fetch_all(exec)
+        .await?;
+
+        Ok(res
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+    }
+
+    /// Returns all charges that need to have their tax amount updated.
+    ///
+    /// This only selects charges which are:
+    /// - Open;
+    /// - Haven't been updated in the last day;
+    /// - Are due in more than 7 days;
+    /// - Where the user has an email, because we can't notify users without an email about a price change.
+    ///
+    /// This also locks the charges.
+    pub async fn get_updateable_lock(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        limit: i64,
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
+        let res = select_charges_with_predicate!(
+			"
+			INNER JOIN users u ON u.id = charges.user_id
+			WHERE
+			  status = 'open'
+			  AND COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) < NOW() - INTERVAL '1 day'
+			  AND u.email IS NOT NULL
+			  AND due - INTERVAL '7 days' > NOW()
+			ORDER BY COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) ASC
+			FOR NO KEY UPDATE SKIP LOCKED
+			LIMIT $1
+			",
+			limit
+		)
+		.fetch_all(exec)
+		.await?;
+
+        Ok(res
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+    }
+
+    /// Returns all charges which are missing a tax identifier, that is, are 1. succeeded, 2. have a tax amount and
+    /// 3. haven't been assigned a tax identifier yet.
+    ///
+    /// Charges are locked.
+    pub async fn get_missing_tax_identifier_lock(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        limit: i64,
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
+        let res = select_charges_with_predicate!(
+            "
+			WHERE
+			  status = 'succeeded'
+			  AND tax_platform_id IS NULL
+			  AND tax_amount <> 0
+			ORDER BY due ASC
+			FOR NO KEY UPDATE SKIP LOCKED
+			LIMIT $1
+			",
+            limit
         )
         .fetch_all(exec)
         .await?;

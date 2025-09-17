@@ -162,9 +162,6 @@ pub struct PaymentBootstrapOptions<'a> {
     /// Some products have additional provisioning metadata that should be attached to the payment
     /// intent.
     pub attach_payment_metadata: Option<PaymentRequestMetadata>,
-    /// Should we skip tax collection? This can happen if the user wasn't able to be notified in
-    /// due time.
-    pub skip_tax_collection: bool,
 }
 
 pub struct PaymentBootstrapResults {
@@ -197,7 +194,6 @@ pub async fn create_or_update_payment_intent(
         attached_charge,
         currency: currency_mode,
         attach_payment_metadata,
-        skip_tax_collection,
     }: PaymentBootstrapOptions<'_>,
 ) -> Result<PaymentBootstrapResults, ApiError> {
     let customer_id = get_or_create_customer(
@@ -378,7 +374,7 @@ pub async fn create_or_update_payment_intent(
             )
         })?;
 
-    let _address =
+    let address =
         payment_method
             .billing_details
             .address
@@ -390,12 +386,10 @@ pub async fn create_or_update_payment_intent(
                 )
             })?;
 
-    let tax_amount = if skip_tax_collection {
-        0
-    } else {
+    let tax_amount = 'tax: {
         let ephemeral_invoice = anrok_client
             .create_ephemeral_txn(&anrok::TransactionFields {
-                customer_address: anrok::Address::default_remitting(), // anrok::Address::from_stripe_address(&address),
+                customer_address: anrok::Address::from_stripe_address(&address),
                 currency_code: charge_data.currency_code.clone(),
                 accounting_time: chrono::Utc::now(),
                 accounting_time_zone: anrok::AccountingTimeZone::Utc,
@@ -405,6 +399,13 @@ pub async fn create_or_update_payment_intent(
                 )],
             })
             .await?;
+
+        if let Some(c) = attached_charge.as_charge() {
+            if c.tax_amount == 0 && ephemeral_invoice.tax_amount_to_collect > 0
+            {
+                break 'tax 0;
+            }
+        }
 
         ephemeral_invoice.tax_amount_to_collect
     };

@@ -8,11 +8,6 @@ pub struct DBProductsTaxIdentifier {
     pub product_id: DBProductId,
 }
 
-pub struct ProductInfo {
-    pub tax_identifier: DBProductsTaxIdentifier,
-    pub product_metadata: ProductMetadata,
-}
-
 impl DBProductsTaxIdentifier {
     pub async fn get_product(
         product_id: DBProductId,
@@ -31,6 +26,34 @@ impl DBProductsTaxIdentifier {
             product_id: DBProductId(row.product_id),
         }))
     }
+
+    pub async fn get_price(
+        price_id: DBProductPriceId,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Option<Self>, ApiError> {
+        let maybe_row = sqlx::query!(
+            "
+			SELECT pti.*
+			FROM products_prices pp
+			INNER JOIN products_tax_identifiers pti ON pti.product_id = pp.product_id
+			WHERE pp.id = $1
+			",
+            price_id.0,
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(maybe_row.map(|row| DBProductsTaxIdentifier {
+            id: row.id,
+            tax_processor_id: row.tax_processor_id,
+            product_id: DBProductId(row.product_id),
+        }))
+    }
+}
+
+pub struct ProductInfo {
+    pub tax_identifier: DBProductsTaxIdentifier,
+    pub product_metadata: ProductMetadata,
 }
 
 pub async fn product_info_by_product_price_id(

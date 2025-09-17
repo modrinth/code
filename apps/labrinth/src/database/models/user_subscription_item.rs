@@ -1,7 +1,6 @@
 use crate::database::models::{
     DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
-use crate::models::billing::{ChargeStatus, ChargeType};
 use crate::models::billing::{
     PriceDuration, ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
 };
@@ -17,7 +16,6 @@ pub struct DBUserSubscription {
     pub created: DateTime<Utc>,
     pub status: SubscriptionStatus,
     pub metadata: Option<SubscriptionMetadata>,
-    pub user_aware_of_tax_changes: bool,
 }
 
 struct UserSubscriptionQueryResult {
@@ -28,7 +26,6 @@ struct UserSubscriptionQueryResult {
     pub created: DateTime<Utc>,
     pub status: String,
     pub metadata: serde_json::Value,
-    pub user_aware_of_tax_changes: bool,
 }
 
 macro_rules! select_user_subscriptions_with_predicate {
@@ -37,7 +34,7 @@ macro_rules! select_user_subscriptions_with_predicate {
             UserSubscriptionQueryResult,
             r#"
             SELECT
-                us.id, us.user_id, us.price_id, us.interval, us.created, us.status, us.metadata, us.user_aware_of_tax_changes
+                us.id, us.user_id, us.price_id, us.interval, us.created, us.status, us.metadata
             FROM users_subscriptions us
             "#
                 + $predicate,
@@ -58,7 +55,6 @@ impl TryFrom<UserSubscriptionQueryResult> for DBUserSubscription {
             created: r.created,
             status: SubscriptionStatus::from_string(&r.status),
             metadata: serde_json::from_value(r.metadata)?,
-            user_aware_of_tax_changes: r.user_aware_of_tax_changes,
         })
     }
 }
@@ -139,18 +135,17 @@ impl DBUserSubscription {
         sqlx::query!(
             "
             INSERT INTO users_subscriptions (
-                id, user_id, price_id, interval, created, status, metadata, user_aware_of_tax_changes
+                id, user_id, price_id, interval, created, status, metadata
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8
+                $1, $2, $3, $4, $5, $6, $7
             )
             ON CONFLICT (id)
             DO UPDATE
                 SET interval = EXCLUDED.interval,
                     status = EXCLUDED.status,
                     price_id = EXCLUDED.price_id,
-                    metadata = EXCLUDED.metadata,
-					user_aware_of_tax_changes = EXCLUDED.user_aware_of_tax_changes
+                    metadata = EXCLUDED.metadata
             ",
             self.id.0,
             self.user_id.0,
@@ -159,7 +154,6 @@ impl DBUserSubscription {
             self.created,
             self.status.as_str(),
             serde_json::to_value(&self.metadata)?,
-            self.user_aware_of_tax_changes,
         )
         .execute(&mut **transaction)
         .await?;
@@ -175,92 +169,4 @@ pub struct SubscriptionWithCharge {
     pub amount: i64,
     pub tax_amount: i64,
     pub due: DateTime<Utc>,
-}
-
-pub async fn fetch_update_lock_pending_taxation_notification(
-    exec: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    limit: i64,
-) -> Result<Vec<SubscriptionWithCharge>, DatabaseError> {
-    struct QueryResult {
-        subscription_id: i64,
-        user_id: i64,
-        product_metadata: serde_json::Value,
-        amount: i64,
-        tax_amount: i64,
-        due: DateTime<Utc>,
-    }
-
-    impl TryFrom<QueryResult> for SubscriptionWithCharge {
-        type Error = DatabaseError;
-
-        fn try_from(r: QueryResult) -> Result<Self, Self::Error> {
-            Ok(SubscriptionWithCharge {
-                subscription_id: DBUserSubscriptionId(r.subscription_id),
-                user_id: DBUserId(r.user_id),
-                product_metadata: serde_json::from_value(r.product_metadata)?,
-                amount: r.amount,
-                tax_amount: r.tax_amount,
-                due: r.due,
-            })
-        }
-    }
-
-    sqlx::query_as!(
-        QueryResult,
-        r#"
-        WITH
-          target_rows AS (
-            SELECT
-              us.id subscription_id,
-              us.user_id,
-              p.metadata product_metadata,
-              c.amount,
-              c.tax_amount,
-              c.due
-            FROM users_subscriptions us
-            INNER JOIN (
-              SELECT DISTINCT ON (subscription_id)
-                subscription_id,
-                due,
-                amount,
-                tax_amount
-              FROM charges
-              WHERE status = $2 AND charge_type = $3
-              ORDER BY subscription_id, due DESC
-            ) c(subscription_id, due, amount, tax_amount) ON us.id = c.subscription_id
-            INNER JOIN products_prices pp ON pp.id = us.price_id
-            INNER JOIN products p ON p.id = pp.product_id
-            INNER JOIN users u ON u.id = us.user_id
-            WHERE
-              NOW() + INTERVAL '9 days' > c.due
-              AND NOW() + INTERVAL '7 days' < c.due -- Between 7 and 9 days before the due date
-              AND c.tax_amount > 0
-              AND us.status = $4
-              AND us.user_aware_of_tax_changes = FALSE
-              AND u.email IS NOT NULL
-            ),
-          taken AS (
-            SELECT target_rows.*
-            FROM users_subscriptions us
-            INNER JOIN target_rows ON us.id = target_rows.subscription_id
-            ORDER BY target_rows.due ASC
-            FOR NO KEY UPDATE SKIP LOCKED
-            LIMIT $1
-          )
-        UPDATE users_subscriptions us
-        SET user_aware_of_tax_changes = TRUE
-        FROM taken t
-        WHERE us.id = t.subscription_id
-        RETURNING t.*
-        "#,
-        limit,
-		ChargeStatus::Open.as_str(),
-		ChargeType::Subscription.as_str(),
-		SubscriptionStatus::Provisioned.as_str(),
-    )
-    .fetch_all(&mut **exec)
-    .await?
-    .into_iter()
-    .map(|r| r.try_into())
-    .collect::<Result<Vec<_>, DatabaseError>>()
 }
