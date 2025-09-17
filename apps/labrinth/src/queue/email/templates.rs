@@ -124,9 +124,10 @@ pub async fn build_email(
         reply_address,
     } = from;
 
-    let html_body_result = get_html_body.await?;
-    let mut variables =
-        collect_template_variables(exec, redis, user_id, body).await?;
+    let (html_body_result, mut variables) = futures::try_join!(
+        get_html_body,
+        collect_template_variables(exec, redis, user_id, body)
+    )?;
 
     variables.insert(USER_EMAIL, to.email.to_string());
 
