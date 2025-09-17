@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id, tax_amount, tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\",\n\t\t\t\ttax_last_updated AS \"tax_last_updated?\"\n            FROM charges\n            \n            WHERE\n                charge_type = $1 AND\n                status = 'failed' AND due < NOW() - INTERVAL '30 days'\n            ",
+  "query": "\n            SELECT\n                charges.id, charges.user_id, charges.price_id, charges.amount, charges.currency_code, charges.status, charges.due, charges.last_attempt,\n                charges.charge_type, charges.subscription_id, charges.tax_amount, charges.tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                charges.subscription_interval AS \"subscription_interval?\",\n                charges.payment_platform,\n                charges.payment_platform_id AS \"payment_platform_id?\",\n                charges.parent_charge_id AS \"parent_charge_id?\",\n                charges.net AS \"net?\",\n\t\t\t\tcharges.tax_last_updated AS \"tax_last_updated?\"\n            FROM charges\n            WHERE parent_charge_id = $1",
   "describe": {
     "columns": [
       {
@@ -96,7 +96,7 @@
     ],
     "parameters": {
       "Left": [
-        "Text"
+        "Int8"
       ]
     },
     "nullable": [
@@ -120,5 +120,5 @@
       true
     ]
   },
-  "hash": "e92e33faeffbfc79c2b4557a2f21d210df509880d0acf88ea8172b5c3d977c3c"
+  "hash": "ddaefaa189b9533483f671d670634dfce9a3d7bb4e4d5b6c2b191dbc7bd8a065"
 }

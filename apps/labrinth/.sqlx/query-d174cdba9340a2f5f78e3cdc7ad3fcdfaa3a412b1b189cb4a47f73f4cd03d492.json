@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, user_id, price_id, amount, currency_code, status, due, last_attempt,\n                charge_type, subscription_id, tax_amount, tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                subscription_interval AS \"subscription_interval?\",\n                payment_platform,\n                payment_platform_id AS \"payment_platform_id?\",\n                parent_charge_id AS \"parent_charge_id?\",\n                net AS \"net?\",\n\t\t\t\ttax_last_updated AS \"tax_last_updated?\"\n            FROM charges\n            WHERE parent_charge_id = $1",
+  "query": "\n            SELECT\n                charges.id, charges.user_id, charges.price_id, charges.amount, charges.currency_code, charges.status, charges.due, charges.last_attempt,\n                charges.charge_type, charges.subscription_id, charges.tax_amount, charges.tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                charges.subscription_interval AS \"subscription_interval?\",\n                charges.payment_platform,\n                charges.payment_platform_id AS \"payment_platform_id?\",\n                charges.parent_charge_id AS \"parent_charge_id?\",\n                charges.net AS \"net?\",\n\t\t\t\tcharges.tax_last_updated AS \"tax_last_updated?\"\n            FROM charges\n            \n\t\t\tWHERE\n\t\t\t  status = 'succeeded'\n\t\t\t  AND tax_platform_id IS NULL\n\t\t\t  AND tax_amount <> 0\n\t\t\tORDER BY due ASC\n\t\t\tFOR NO KEY UPDATE SKIP LOCKED\n\t\t\tLIMIT $1\n\t\t\t",
   "describe": {
     "columns": [
       {
@@ -120,5 +120,5 @@
       true
     ]
   },
-  "hash": "83bf51e91cf0a609fdc4f79ae4d5d591ad5526d77b4e839458c2c0035ab2238b"
+  "hash": "d174cdba9340a2f5f78e3cdc7ad3fcdfaa3a412b1b189cb4a47f73f4cd03d492"
 }
