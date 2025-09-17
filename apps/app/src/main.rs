@@ -26,7 +26,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     #[cfg(feature = "updater")]
     'updater: {
         if env::var("MODRINTH_EXTERNAL_UPDATE_PROVIDER").is_ok() {
-            State::init().await?;
+            State::init(app_identifier).await?;
             break 'updater;
         }
 
