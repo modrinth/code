@@ -4,13 +4,17 @@ use crate::{
         models::{DBAffiliateCode, DBAffiliateCodeId, DBUser, DBUserId},
         redis::RedisPool,
     },
-    models::{pats::Scopes, v3::affiliate_code::AffiliateCode},
+    models::{
+        ids::AffiliateCodeId,
+        pats::Scopes,
+        v3::affiliate_code::{AdminAffiliateCode, AffiliateCode},
+    },
     queue::session::AuthQueue,
 };
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::{UserId, base62_impl::parse_base62};
 use chrono::Utc;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::routes::ApiError;
@@ -26,10 +30,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
-#[derive(Deserialize)]
-pub struct CreateCode {
-    pub affiliate: UserId,
-}
+#[derive(Serialize, Deserialize)]
+struct CodeGetAllResponse(Vec<AdminAffiliateCode>);
 
 pub async fn code_get_all(
     req: HttpRequest,
@@ -56,18 +58,26 @@ pub async fn code_get_all(
     let codes = DBAffiliateCode::get_all(&**pool).await?;
     let codes = codes
         .into_iter()
-        .map(|code| AffiliateCode::from(code, true))
+        .map(|code| AdminAffiliateCode::from(code))
         .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(codes))
+    Ok(HttpResponse::Ok().json(CodeGetAllResponse(codes)))
 }
+
+#[derive(Serialize, Deserialize)]
+struct CodeCreateRequest {
+    affiliate: UserId,
+}
+
+#[derive(Serialize, Deserialize)]
+struct CodeCreateResponse(AdminAffiliateCode);
 
 pub async fn code_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    body: web::Json<CreateCode>,
+    body: web::Json<CodeCreateRequest>,
 ) -> Result<HttpResponse, ApiError> {
     let (_, creator) = get_user_from_headers(
         &req,
@@ -111,8 +121,12 @@ pub async fn code_create(
 
     transaction.commit().await?;
 
-    Ok(HttpResponse::Ok().json(AffiliateCode::from(code, true)))
+    Ok(HttpResponse::Ok()
+        .json(CodeCreateResponse(AdminAffiliateCode::from(code))))
 }
+
+#[derive(Serialize, Deserialize)]
+struct CodeGetResponse(AdminAffiliateCode);
 
 pub async fn code_get(
     req: HttpRequest,
@@ -143,8 +157,8 @@ pub async fn code_get(
     if let Some(model) =
         DBAffiliateCode::get_by_id(affiliate_code_id, &**pool).await?
     {
-        let model = AffiliateCode::from(model, true);
-        Ok(HttpResponse::Ok().json(model))
+        let model = AdminAffiliateCode::from(model);
+        Ok(HttpResponse::Ok().json(CodeGetResponse(model)))
     } else {
         Err(ApiError::NotFound)
     }
@@ -191,14 +205,15 @@ pub async fn code_delete(
     }
 }
 
+#[derive(Serialize, Deserialize)]
+struct SelfGetResponse(Vec<AffiliateCode>);
+
 async fn self_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    tracing::info!("fetching user");
-
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -208,18 +223,14 @@ async fn self_get(
     )
     .await?;
 
-    tracing::info!("uid = {:?}", user.id);
-
     let codes =
         DBAffiliateCode::get_by_affiliate(DBUserId::from(user.id), &**pool)
             .await?;
 
-    tracing::info!("codes = {:?}", codes);
-
     let codes = codes
         .into_iter()
-        .map(|data| AffiliateCode::from(data, false))
+        .map(|data| AffiliateCode::from(data))
         .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(codes))
+    Ok(HttpResponse::Ok().json(SelfGetResponse(codes)))
 }
