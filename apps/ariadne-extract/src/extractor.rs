@@ -228,7 +228,7 @@ impl Visit<'_> for FileExtractor<'_> {
                 let mut error = syn::Error::new(
                     error_attr.path().span(),
                     format!(
-                        "expected {old_type} but found {display_attribute_type} (for consistency)"
+                        "inconsistent usage of {old_type} and {display_attribute_type}"
                     ),
                 );
                 error.combine(syn::Error::new(
@@ -380,7 +380,10 @@ impl Visit<'_> for FileExtractor<'_> {
                     {
                         let mut error = syn::Error::new(
                             variant.key.span(),
-                            format!("duplicate variant key {}", duplicate_key),
+                            format!(
+                                "duplicate variant key {} with differing messages",
+                                duplicate_key
+                            ),
                         );
                         error.combine(syn::Error::new(
                             original_span,

@@ -24,7 +24,8 @@ use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::create_error::{
-    CreateError, CreationInvalidInput, MissingValuePart,
+    CreateError, CreationAuthenticationError, CreationInvalidInput,
+    MissingValuePart,
 };
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
@@ -279,9 +280,8 @@ async fn version_create_inner(
                 .unwrap_or_default();
 
                 if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
-                    return Err(CreateError::CustomAuthenticationError(
-                        "You don't have permission to upload this version!"
-                            .to_string(),
+                    return Err(CreateError::CreationAuthenticationError(
+                        CreationAuthenticationError::UploadVersion,
                     ));
                 }
 
@@ -721,9 +721,8 @@ async fn upload_file_to_version_inner(
         .unwrap_or_default();
 
         if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
-            return Err(CreateError::CustomAuthenticationError(
-                "You don't have permission to upload files to this version!"
-                    .to_string(),
+            return Err(CreateError::CreationAuthenticationError(
+                CreationAuthenticationError::UploadFilesToVersion,
             ));
         }
     }

@@ -18,7 +18,8 @@ use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::create_error::{
-    CreateError, CreationInvalidInput, MissingValuePart,
+    CreateError, CreationAuthenticationError, CreationInvalidInput,
+    MissingValuePart,
 };
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_field;
@@ -573,9 +574,8 @@ async fn project_create_inner(
             if !perms.is_some_and(|x| {
                 x.contains(OrganizationPermissions::ADD_PROJECT)
             }) {
-                return Err(CreateError::CustomAuthenticationError(
-                    "You do not have the permissions to create projects in this organization!"
-                        .to_string(),
+                return Err(CreateError::CreationAuthenticationError(
+                    CreationAuthenticationError::CreateProjectsInOrganization,
                 ));
             }
         } else {

@@ -153,10 +153,16 @@
     "message": "Missing project id"
   },
   "labrinth.error.creation.unauthorized": {
-    "message": "Authentication Error: {cause}"
+    "message": "Authentication Error: {cause_or_reason}"
   },
-  "labrinth.error.creation.unauthorized.custom": {
-    "message": "Authentication Error: {reason}"
+  "labrinth.error.creation.unauthorized.create_projects_in_organization": {
+    "message": "You do not have the permissions to create projects in this organization!"
+  },
+  "labrinth.error.creation.unauthorized.upload_files_to_version": {
+    "message": "You don''t have permission to upload files to this version!"
+  },
+  "labrinth.error.creation.unauthorized.upload_version": {
+    "message": "You don''t have permission to upload this version!"
   },
   "labrinth.error.database.cache": {
     "message": "Error while interacting with the cache: {cause}"

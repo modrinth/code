@@ -54,7 +54,7 @@ pub enum CreateError {
     #[error("Authentication Error: {0}")]
     Unauthorized(#[from] AuthenticationError),
     #[error("Authentication Error: {0}")]
-    CustomAuthenticationError(String), // TODO: Use an I18nEnum instead of a String
+    CreationAuthenticationError(CreationAuthenticationError),
     #[error("Image Parsing Error: {0}")]
     ImageError(#[from] ImageError),
 }
@@ -79,8 +79,8 @@ i18n_enum!(
     InvalidCategory(category) => "invalid_input.category",
     InvalidFileType(extension) => "invalid_input.file_type",
     SlugCollision! => "invalid_input.slug_collision",
-    Unauthorized(cause) => "unauthorized",
-    CustomAuthenticationError(reason) => "unauthorized.custom",
+    Unauthorized(cause_or_reason) => "unauthorized",
+    CreationAuthenticationError(cause_or_reason) => "unauthorized",
     ImageError(cause) => "invalid_image",
 );
 
@@ -208,6 +208,26 @@ i18n_enum!(
     Validation(transparent reason) => "validation",
 );
 
+#[derive(Copy, Clone, Debug, Display)]
+pub enum CreationAuthenticationError {
+    #[display(
+        "You do not have the permissions to create projects in this organization!"
+    )]
+    CreateProjectsInOrganization,
+    #[display("You don't have permission to upload this version!")]
+    UploadVersion,
+    #[display("You don't have permission to upload files to this version!")]
+    UploadFilesToVersion,
+}
+
+i18n_enum!(
+    CreationAuthenticationError,
+    root_key: "labrinth.error.creation.unauthorized",
+    CreateProjectsInOrganization! => "create_projects_in_organization",
+    UploadVersion! => "upload_version",
+    UploadFilesToVersion! => "upload_files_to_version",
+);
+
 impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
@@ -230,7 +250,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
             CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
-            CreateError::CustomAuthenticationError(..) => {
+            CreateError::CreationAuthenticationError(..) => {
                 StatusCode::UNAUTHORIZED
             }
             CreateError::SlugCollision => StatusCode::BAD_REQUEST,
