@@ -172,6 +172,12 @@ impl DirectoryInfo {
             .map(|d| d.join(LAUNCHER_LOGS_FOLDER_NAME))
     }
 
+    #[inline]
+    pub fn launcher_logs_dir_path(app_identifier: &str) -> Option<PathBuf> {
+        Self::initial_settings_dir_path(app_identifier)
+            .map(|d| d.join(LAUNCHER_LOGS_FOLDER_NAME))
+    }
+
     /// Get the cache directory for Theseus
     #[inline]
     pub fn caches_dir(&self) -> PathBuf {
