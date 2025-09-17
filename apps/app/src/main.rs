@@ -160,7 +160,10 @@ fn main() {
             RUST_LOG="theseus=trace" {run command}
 
     */
-    let _log_guard = theseus::start_logger();
+
+    let tauri_context = tauri::generate_context!();
+
+    let _log_guard = theseus::start_logger(&tauri_context.config().identifier);
 
     tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
@@ -277,7 +280,7 @@ fn main() {
         ]);
 
     tracing::info!("Initializing app...");
-    let app = builder.build(tauri::generate_context!());
+    let app = builder.build(tauri_context);
 
     match app {
         Ok(app) => {

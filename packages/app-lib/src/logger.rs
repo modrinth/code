@@ -18,7 +18,7 @@
 // Handling for the live development logging
 // This will log to the console, and will not log to a file
 #[cfg(debug_assertions)]
-pub fn start_logger() -> Option<()> {
+pub fn start_logger(_app_identifier: &str) -> Option<()> {
     use tracing_subscriber::prelude::*;
 
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
@@ -37,7 +37,7 @@ pub fn start_logger() -> Option<()> {
 // Handling for the live production logging
 // This will log to a file in the logs directory, and will not show any logs in the console
 #[cfg(not(debug_assertions))]
-pub fn start_logger() -> Option<()> {
+pub fn start_logger(app_identifier: &str) -> Option<()> {
     use crate::prelude::DirectoryInfo;
     use chrono::Local;
     use std::fs::OpenOptions;
@@ -45,7 +45,9 @@ pub fn start_logger() -> Option<()> {
     use tracing_subscriber::prelude::*;
 
     // Initialize and get logs directory path
-    let logs_dir = if let Some(d) = DirectoryInfo::launcher_logs_dir() {
+    let logs_dir = if let Some(d) =
+        DirectoryInfo::launcher_logs_dir_path(app_identifier)
+    {
         d
     } else {
         eprintln!("Could not start logger");

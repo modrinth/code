@@ -38,7 +38,7 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
 async fn main() -> theseus::Result<()> {
     println!("Starting.");
 
-    let _log_guard = theseus::start_logger();
+    let _log_guard = theseus::start_logger("ModrinthApp");
 
     // Initialize state
     State::init("ModrinthApp".to_owned()).await?;
