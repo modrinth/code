@@ -237,7 +237,7 @@ pub async fn index_subscriptions(
                             NotificationBuilder {
                                 body: NotificationBody::TaxNotification {
                                     new_amount: charge.amount,
-                                    new_tax_amount: new_tax_amount,
+                                    new_tax_amount,
                                     old_amount: charge.amount,
                                     old_tax_amount: charge.tax_amount,
                                     billing_interval: charge

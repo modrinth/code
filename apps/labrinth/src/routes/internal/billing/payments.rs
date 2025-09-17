@@ -400,11 +400,11 @@ pub async fn create_or_update_payment_intent(
             })
             .await?;
 
-        if let Some(c) = attached_charge.as_charge() {
-            if c.tax_amount == 0 && ephemeral_invoice.tax_amount_to_collect > 0
-            {
-                break 'tax 0;
-            }
+        if let Some(c) = attached_charge.as_charge()
+            && c.tax_amount == 0
+            && ephemeral_invoice.tax_amount_to_collect > 0
+        {
+            break 'tax 0;
         }
 
         ephemeral_invoice.tax_amount_to_collect
