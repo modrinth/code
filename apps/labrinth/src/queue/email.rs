@@ -307,7 +307,7 @@ impl EmailQueue {
         };
 
         let message = templates::build_email(
-            &mut **txn,
+            txn,
             &self.redis,
             &self.client,
             user_id,

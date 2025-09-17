@@ -1,3 +1,6 @@
+use crate::database::models::notification_item::NotificationBuilder;
+use crate::database::models::payouts_values_notifications;
+use crate::database::redis::RedisPool;
 use crate::models::payouts::{
     PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodFee,
     PayoutMethodType,
@@ -1082,6 +1085,41 @@ pub async fn insert_payouts(
     )
     .execute(&mut **transaction)
     .await
+}
+
+pub async fn index_payouts_notifications(
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    let mut transaction = pool.begin().await?;
+
+    payouts_values_notifications::synchronize_future_payout_values(
+        &mut *transaction,
+    )
+    .await?;
+    let items = payouts_values_notifications::PayoutsValuesNotification::unnotified_users_with_available_payouts_with_limit(&mut *transaction, 200).await?;
+
+    let payout_ref_ids = items.iter().map(|x| x.id).collect::<Vec<_>>();
+    let dates_available =
+        items.iter().map(|x| x.date_available).collect::<Vec<_>>();
+    let user_ids = items.iter().map(|x| x.user_id).collect::<Vec<_>>();
+
+    NotificationBuilder::insert_many_payout_notifications(
+        user_ids,
+        dates_available,
+        &mut transaction,
+        redis,
+    )
+    .await?;
+    payouts_values_notifications::PayoutsValuesNotification::set_notified_many(
+        &payout_ref_ids,
+        &mut *transaction,
+    )
+    .await?;
+
+    transaction.commit().await?;
+
+    Ok(())
 }
 
 pub async fn insert_bank_balances_and_webhook(
