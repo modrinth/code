@@ -180,17 +180,15 @@ pub async fn index_subscriptions(
                         )
                         .await?;
 
-                        /*
                         let Some(stripe_address) = customer.address else {
                             return Err(ApiError::InvalidInput(
                                 "Stripe customer had no address".to_owned(),
                             ));
                         };
-                        */
 
                         let customer_address =
                             anrok::Address::from_stripe_address(
-                                &Default::default(),
+                                &stripe_address,
                             );
 
                         let tax_amount = anrok_client
@@ -353,16 +351,14 @@ pub async fn index_subscriptions(
                 )
                 .await?;
 
-                /*
                 let Some(stripe_address) = customer.address else {
                     return Err(ApiError::InvalidInput(
                         "Stripe customer had no address".to_owned(),
                     ));
                 };
-                */
 
                 let customer_address =
-                    anrok::Address::from_stripe_address(&Default::default());
+                    anrok::Address::from_stripe_address(&stripe_address);
 
                 let tax_platform_id =
                     anrok::transaction_id_stripe_pi(&payment_intent_id);

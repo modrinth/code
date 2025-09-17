@@ -41,20 +41,7 @@ pub struct Address {
 }
 
 impl Address {
-    pub fn from_stripe_address(_address: &stripe::Address) -> Self {
-        fn default_remitting() -> Address {
-            Address {
-                country: Some("US".to_owned()),
-                line1: Some("1100 Congress Ave.".to_owned()),
-                city: Some("Austin".to_owned()),
-                region: Some("TX".to_owned()),
-                postal_code: Some("78701".to_owned()),
-            }
-        }
-
-        default_remitting()
-
-        /*
+    pub fn from_stripe_address(address: &stripe::Address) -> Self {
         Self {
             country: address.country.clone(),
             line1: address.line1.clone(),
@@ -62,7 +49,6 @@ impl Address {
             region: address.state.clone(),
             postal_code: address.postal_code.clone(),
         }
-        */
     }
 }
 
