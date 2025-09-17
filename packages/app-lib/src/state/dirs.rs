@@ -1,6 +1,7 @@
 //! Theseus directory information
 use crate::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
+use crate::state::LAUNCHER_STATE;
 use crate::state::{JavaVersion, Profile, Settings};
 use crate::util::fetch::IoSemaphore;
 use dashmap::DashSet;
@@ -17,24 +18,35 @@ pub const METADATA_FOLDER_NAME: &str = "meta";
 pub struct DirectoryInfo {
     pub settings_dir: PathBuf, // Base settings directory- app database
     pub config_dir: PathBuf, // Base config directory- instances, minecraft downloads, etc. Changeable as a setting.
+    pub app_identifier: String,
 }
 
 impl DirectoryInfo {
+    pub fn global_handle_if_ready() -> Option<&'static Self> {
+        LAUNCHER_STATE.get().map(|x| &x.directories)
+    }
+
+    pub fn get_initial_settings_dir(&self) -> Option<PathBuf> {
+        Self::initial_settings_dir_path(&self.app_identifier)
+    }
+
     // Get the settings directory
     // init() is not needed for this function
-    pub fn get_initial_settings_dir() -> Option<PathBuf> {
+    pub fn initial_settings_dir_path(app_identifier: &str) -> Option<PathBuf> {
         Self::env_path("THESEUS_CONFIG_DIR")
-            .or_else(|| Some(dirs::data_dir()?.join("ModrinthApp")))
+            .or_else(|| Some(dirs::data_dir()?.join(app_identifier)))
     }
 
     /// Get all paths needed for Theseus to operate properly
     #[tracing::instrument]
-    pub async fn init(config_dir: Option<String>) -> crate::Result<Self> {
-        let settings_dir = Self::get_initial_settings_dir().ok_or(
-            crate::ErrorKind::FSError(
+    pub async fn init(
+        config_dir: Option<String>,
+        app_identifier: &str,
+    ) -> crate::Result<Self> {
+        let settings_dir = Self::initial_settings_dir_path(app_identifier)
+            .ok_or(crate::ErrorKind::FSError(
                 "Could not find valid settings dir".to_string(),
-            ),
-        )?;
+            ))?;
 
         fs::create_dir_all(&settings_dir).await.map_err(|err| {
             crate::ErrorKind::FSError(format!(
@@ -48,6 +60,7 @@ impl DirectoryInfo {
         Ok(Self {
             settings_dir,
             config_dir,
+            app_identifier: app_identifier.to_owned(),
         })
     }
 
@@ -154,8 +167,8 @@ impl DirectoryInfo {
     }
 
     #[inline]
-    pub fn launcher_logs_dir() -> Option<PathBuf> {
-        Self::get_initial_settings_dir()
+    pub fn launcher_logs_dir(&self) -> Option<PathBuf> {
+        self.get_initial_settings_dir()
             .map(|d| d.join(LAUNCHER_LOGS_FOLDER_NAME))
     }
 
@@ -176,15 +189,15 @@ impl DirectoryInfo {
         settings: &mut Settings,
         exec: E,
         io_semaphore: &IoSemaphore,
+        app_identifier: &str,
     ) -> crate::Result<()>
     where
         E: sqlx::Executor<'a, Database = sqlx::Sqlite> + Copy,
     {
-        let app_dir = DirectoryInfo::get_initial_settings_dir().ok_or(
-            crate::ErrorKind::FSError(
+        let app_dir = DirectoryInfo::initial_settings_dir_path(app_identifier)
+            .ok_or(crate::ErrorKind::FSError(
                 "Could not find valid config dir".to_string(),
-            ),
-        )?;
+            ))?;
 
         if let Some(ref prev_custom_dir) = settings.prev_custom_dir {
             let prev_dir = PathBuf::from(prev_custom_dir);
