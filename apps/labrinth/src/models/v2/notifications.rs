@@ -44,6 +44,7 @@ pub enum LegacyNotificationBody {
         new_amount: i64,
         new_tax_amount: i64,
         billing_interval: PriceDuration,
+        currency: String,
         due: DateTime<Utc>,
         service: String,
     },
@@ -360,6 +361,7 @@ impl LegacyNotification {
                 new_amount,
                 new_tax_amount,
                 billing_interval,
+                currency,
                 due,
                 service,
             } => LegacyNotificationBody::TaxNotification {
@@ -370,6 +372,7 @@ impl LegacyNotification {
                 billing_interval,
                 due,
                 service,
+                currency,
             },
             NotificationBody::PaymentFailed { amount, service } => {
                 LegacyNotificationBody::PaymentFailed { amount, service }

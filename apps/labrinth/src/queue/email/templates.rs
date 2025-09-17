@@ -573,6 +573,7 @@ async fn collect_template_variables(
             new_amount,
             new_tax_amount,
             billing_interval,
+            currency,
             due,
             service,
         } => {
@@ -582,28 +583,30 @@ async fn collect_template_variables(
 
             let mut map = HashMap::new();
 
-            fn fmt_money(amount: i64) -> String {
-                format!("{:.2}", amount as f64 / 100.0)
-            }
-
             map.insert(USER_NAME, user.username);
-            map.insert(TAXNOTIFICATION_OLD_AMOUNT, fmt_money(*old_amount));
+            map.insert(
+                TAXNOTIFICATION_OLD_AMOUNT,
+                fmt_money(*old_amount, currency),
+            );
             map.insert(
                 TAXNOTIFICATION_OLD_TAX_AMOUNT,
-                fmt_money(*old_tax_amount),
+                fmt_money(*old_tax_amount, currency),
             );
-            map.insert(TAXNOTIFICATION_NEW_AMOUNT, fmt_money(*new_amount));
+            map.insert(
+                TAXNOTIFICATION_NEW_AMOUNT,
+                fmt_money(*new_amount, currency),
+            );
             map.insert(
                 TAXNOTIFICATION_NEW_TAX_AMOUNT,
-                fmt_money(*new_tax_amount),
+                fmt_money(*new_tax_amount, currency),
             );
             map.insert(
                 TAXNOTIFICATION_OLD_TOTAL_AMOUNT,
-                fmt_money(*old_amount + *old_tax_amount),
+                fmt_money(*old_amount + *old_tax_amount, currency),
             );
             map.insert(
                 TAXNOTIFICATION_NEW_TOTAL_AMOUNT,
-                fmt_money(*new_amount + *new_tax_amount),
+                fmt_money(*new_amount + *new_tax_amount, currency),
             );
             map.insert(
                 TAXNOTIFICATION_BILLING_INTERVAL,
@@ -622,4 +625,10 @@ async fn collect_template_variables(
 
 fn date_human_readable(date: chrono::DateTime<chrono::Utc>) -> String {
     date.format("%B %d, %Y").to_string()
+}
+
+fn fmt_money(amount: i64, currency: &str) -> String {
+    let currency: &rusty_money::iso::Currency =
+        rusty_money::iso::find(currency).unwrap_or(rusty_money::iso::USD);
+    rusty_money::Money::from_minor(amount, currency).to_string()
 }

@@ -232,6 +232,7 @@ pub enum NotificationBody {
         old_amount: i64,
         old_tax_amount: i64,
         billing_interval: PriceDuration,
+        currency: String,
         due: DateTime<Utc>,
         service: String,
     },

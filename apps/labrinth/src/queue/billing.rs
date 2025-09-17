@@ -245,6 +245,7 @@ pub async fn index_subscriptions(
                                         .unwrap_or(PriceDuration::Monthly),
                                     due: charge.due,
                                     service: product_name,
+                                    currency: charge.currency_code.clone(),
                                 },
                             }
                             .insert(charge.user_id, &mut txn, &redis)
