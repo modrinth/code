@@ -473,6 +473,9 @@
   "labrinth.notification.body.email_changed": {
     "message": "Your account email was changed."
   },
+  "labrinth.notification.body.moderation_message_received": {
+    "message": "You have a new message in a moderation thread."
+  },
   "labrinth.notification.body.moderator_message": {
     "message": "Click on the link to read more."
   },
@@ -485,11 +488,32 @@
   "labrinth.notification.body.password_removed": {
     "message": "You''ve removed your account password."
   },
+  "labrinth.notification.body.pat_created": {
+    "message": "Your personal access token ''{token_name}'' was created."
+  },
   "labrinth.notification.body.payment_failed": {
     "message": "A payment on your account failed. Please update your billing information."
   },
+  "labrinth.notification.body.payout_available": {
+    "message": "A payout is available!"
+  },
+  "labrinth.notification.body.project_status_approved": {
+    "message": "Your project has been approved."
+  },
+  "labrinth.notification.body.project_status_neutral": {
+    "message": "Your project status has been updated."
+  },
+  "labrinth.notification.body.project_transferred": {
+    "message": "A project''s ownership has been transferred."
+  },
   "labrinth.notification.body.project_update": {
     "message": "The project {project_id} has released a new version: {version_id}"
+  },
+  "labrinth.notification.body.report_status_updated": {
+    "message": "A report you are involved in has been updated."
+  },
+  "labrinth.notification.body.report_submitted": {
+    "message": "Your report was submitted successfully."
   },
   "labrinth.notification.body.reset_password": {
     "message": "You''ve requested to reset your password. Please check your email for a reset link."
@@ -524,6 +548,9 @@
   "labrinth.notification.type.legacy_markdown": {
     "message": "LEGACY MARKDOWN NOTIFICATION"
   },
+  "labrinth.notification.type.moderation_message_received": {
+    "message": "New message in moderation thread"
+  },
   "labrinth.notification.type.moderator_message": {
     "message": "A moderator has sent you a message!"
   },
@@ -536,11 +563,32 @@
   "labrinth.notification.type.password_removed": {
     "message": "Password removed"
   },
+  "labrinth.notification.type.pat_created": {
+    "message": "New personal access token created"
+  },
   "labrinth.notification.type.payment_failed": {
     "message": "Payment failed"
   },
+  "labrinth.notification.type.payout_available": {
+    "message": "Payout available"
+  },
+  "labrinth.notification.type.project_status_approved": {
+    "message": "Project approved"
+  },
+  "labrinth.notification.type.project_status_neutral": {
+    "message": "Project status updated"
+  },
+  "labrinth.notification.type.project_transferred": {
+    "message": "Project ownership transferred"
+  },
   "labrinth.notification.type.project_update": {
     "message": "A project you follow has been updated!"
+  },
+  "labrinth.notification.type.report_status_updated": {
+    "message": "Report status updated"
+  },
+  "labrinth.notification.type.report_submitted": {
+    "message": "Report submitted"
   },
   "labrinth.notification.type.reset_password": {
     "message": "Password reset requested"
