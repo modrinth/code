@@ -20,6 +20,7 @@ pub mod oauth_token_item;
 pub mod organization_item;
 pub mod pat_item;
 pub mod payout_item;
+pub mod payouts_values_notifications;
 pub mod product_item;
 pub mod project_item;
 pub mod report_item;

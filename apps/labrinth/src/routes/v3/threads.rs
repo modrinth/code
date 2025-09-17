@@ -477,7 +477,19 @@ pub async fn thread_send_message(
                     },
                 }
                 .insert_many(
-                    members.into_iter().map(|x| x.user_id).collect(),
+                    members.iter().map(|x| x.user_id).collect(),
+                    &mut transaction,
+                    &redis,
+                )
+                .await?;
+
+                NotificationBuilder {
+                    body: NotificationBody::ModerationMessageReceived {
+                        project_id: project.inner.id.into(),
+                    },
+                }
+                .insert_many(
+                    members.iter().map(|x| x.user_id).collect(),
                     &mut transaction,
                     &redis,
                 )

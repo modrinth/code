@@ -45,14 +45,14 @@ pub enum NotificationType {
     StatusChange,
     #[display("A moderator has sent you a message!")]
     ModeratorMessage,
-    #[display("LEGACY MARKDOWN NOTIFICATION")]
-    LegacyMarkdown,
-    #[display("Password reset requested")]
-    ResetPassword,
     // The notifications from here to down below are listed with messages for completeness' sake,
     // though they should never be sent via site notifications. This should be disabled via database
     // options. Messages should be reviewed and worded better if we want to distribute these notifications
     // via the site.
+    #[display("LEGACY MARKDOWN NOTIFICATION")]
+    LegacyMarkdown,
+    #[display("Password reset requested")]
+    ResetPassword,
     #[display("Verify your email")]
     VerifyEmail,
     #[display("Auth provider added")]
@@ -71,6 +71,22 @@ pub enum NotificationType {
     EmailChanged,
     #[display("Payment failed")]
     PaymentFailed,
+    #[display("New personal access token created")]
+    PatCreated,
+    #[display("New message in moderation thread")]
+    ModerationMessageReceived,
+    #[display("Report status updated")]
+    ReportStatusUpdated,
+    #[display("Report submitted")]
+    ReportSubmitted,
+    #[display("Project approved")]
+    ProjectStatusApproved,
+    #[display("Project status updated")]
+    ProjectStatusNeutral,
+    #[display("Project ownership transferred")]
+    ProjectTransferred,
+    #[display("Payout available")]
+    PayoutAvailable,
     #[display("")]
     Unknown,
 }
@@ -94,6 +110,14 @@ i18n_enum!(
     PasswordRemoved! => "password_removed",
     EmailChanged! => "email_changed",
     PaymentFailed! => "payment_failed",
+    PatCreated! => "pat_created",
+    ModerationMessageReceived! => "moderation_message_received",
+    ReportStatusUpdated! => "report_status_updated",
+    ReportSubmitted! => "report_submitted",
+    ProjectStatusApproved! => "project_status_approved",
+    ProjectStatusNeutral! => "project_status_neutral",
+    ProjectTransferred! => "project_transferred",
+    PayoutAvailable! => "payout_available",
     Unknown! => "unknown",
 );
 
@@ -120,6 +144,18 @@ impl NotificationType {
             "password_removed" => NotificationType::PasswordRemoved,
             "email_changed" => NotificationType::EmailChanged,
             "payment_failed" => NotificationType::PaymentFailed,
+            "pat_created" => NotificationType::PatCreated,
+            "moderation_message_received" => {
+                NotificationType::ModerationMessageReceived
+            }
+            "report_status_updated" => NotificationType::ReportStatusUpdated,
+            "report_submitted" => NotificationType::ReportSubmitted,
+            "project_status_approved" => {
+                NotificationType::ProjectStatusApproved
+            }
+            "project_status_neutral" => NotificationType::ProjectStatusNeutral,
+            "project_transferred" => NotificationType::ProjectTransferred,
+            "payout_available" => NotificationType::PayoutAvailable,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -158,6 +194,7 @@ pub enum NotificationBody {
         old_status: ProjectStatus,
         new_status: ProjectStatus,
     },
+    /// This is for website notifications only. Email notifications have `ModerationMessageReceived`.
     #[display("Click on the link to read more.")]
     ModeratorMessage {
         thread_id: ThreadId,
@@ -165,6 +202,30 @@ pub enum NotificationBody {
 
         project_id: Option<ProjectId>,
         report_id: Option<ReportId>,
+    },
+    #[display("Your personal access token '{token_name}' was created.")]
+    PatCreated { token_name: String },
+    /// This differs from ModeratorMessage as this notification is only for project threads and
+    /// email notifications, not for site notifications.
+    #[display("You have a new message in a moderation thread.")]
+    ModerationMessageReceived { project_id: ProjectId },
+    #[display("A report you are involved in has been updated.")]
+    ReportStatusUpdated { report_id: ReportId },
+    #[display("Your report was submitted successfully.")]
+    ReportSubmitted { report_id: ReportId },
+    #[display("Your project has been approved.")]
+    ProjectStatusApproved { project_id: ProjectId },
+    #[display("Your project status has been updated.")]
+    ProjectStatusNeutral {
+        project_id: ProjectId,
+        old_status: ProjectStatus,
+        new_status: ProjectStatus,
+    },
+    #[display("A project's ownership has been transferred.")]
+    ProjectTransferred {
+        project_id: ProjectId,
+        new_owner_user_id: Option<UserId>,
+        new_owner_organization_id: Option<OrganizationId>,
     },
     #[display("{text}")]
     LegacyMarkdown {
@@ -201,6 +262,11 @@ pub enum NotificationBody {
         "A payment on your account failed. Please update your billing information."
     )]
     PaymentFailed { amount: String, service: String },
+    #[display("A payout is available!")]
+    PayoutAvailable {
+        date_available: DateTime<Utc>,
+        amount: f64,
+    },
     #[display("")]
     Unknown,
 }
@@ -213,6 +279,13 @@ i18n_enum!(
     OrganizationInvite { role, .. } => "organization_invite",
     StatusChange { old_status, new_status, .. } => "status_change",
     ModeratorMessage { .. } => "moderator_message",
+    PatCreated { token_name } => "pat_created",
+    ModerationMessageReceived { .. } => "moderation_message_received",
+    ReportStatusUpdated { .. } => "report_status_updated",
+    ReportSubmitted { .. } => "report_submitted",
+    ProjectStatusApproved { .. } => "project_status_approved",
+    ProjectStatusNeutral { .. } => "project_status_neutral",
+    ProjectTransferred { .. } => "project_transferred",
     LegacyMarkdown { transparent text } => "legacy_markdown",
     ResetPassword { .. } => "reset_password",
     VerifyEmail { .. } => "verify_email",
@@ -224,6 +297,7 @@ i18n_enum!(
     PasswordRemoved! => "password_removed",
     EmailChanged { .. } => "email_changed",
     PaymentFailed { .. } => "payment_failed",
+    PayoutAvailable { .. } => "payout_available",
     Unknown! => "unknown",
 );
 
@@ -242,6 +316,25 @@ impl NotificationBody {
             }
             NotificationBody::ModeratorMessage { .. } => {
                 NotificationType::ModeratorMessage
+            }
+            NotificationBody::PatCreated { .. } => NotificationType::PatCreated,
+            NotificationBody::ModerationMessageReceived { .. } => {
+                NotificationType::ModerationMessageReceived
+            }
+            NotificationBody::ReportStatusUpdated { .. } => {
+                NotificationType::ReportStatusUpdated
+            }
+            NotificationBody::ReportSubmitted { .. } => {
+                NotificationType::ReportSubmitted
+            }
+            NotificationBody::ProjectStatusApproved { .. } => {
+                NotificationType::ProjectStatusApproved
+            }
+            NotificationBody::ProjectStatusNeutral { .. } => {
+                NotificationType::ProjectStatusNeutral
+            }
+            NotificationBody::ProjectTransferred { .. } => {
+                NotificationType::ProjectTransferred
             }
             NotificationBody::LegacyMarkdown { .. } => {
                 NotificationType::LegacyMarkdown
@@ -275,6 +368,9 @@ impl NotificationBody {
             }
             NotificationBody::PaymentFailed { .. } => {
                 NotificationType::PaymentFailed
+            }
+            NotificationBody::PayoutAvailable { .. } => {
+                NotificationType::PayoutAvailable
             }
             NotificationBody::Unknown => NotificationType::Unknown,
         }
@@ -361,6 +457,24 @@ impl From<DBNotification> for Notification {
                     },
                     vec![],
                 ),
+                NotificationBody::PatCreated { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::ReportStatusUpdated { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::ReportSubmitted { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::ProjectStatusApproved { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::ProjectStatusNeutral { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::ProjectTransferred { .. } => {
+                    ("#".to_string(), vec![])
+                }
                 // Don't expose the `flow` field
                 NotificationBody::ResetPassword { .. } => {
                     ("#".to_string(), vec![])
@@ -385,6 +499,12 @@ impl From<DBNotification> for Notification {
                 NotificationBody::PasswordChanged => ("#".to_string(), vec![]),
                 NotificationBody::PasswordRemoved => ("#".to_string(), vec![]),
                 NotificationBody::EmailChanged { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::PayoutAvailable { .. } => {
+                    ("#".to_string(), vec![])
+                }
+                NotificationBody::ModerationMessageReceived { .. } => {
                     ("#".to_string(), vec![])
                 }
                 NotificationBody::Unknown => ("#".to_string(), vec![]),
