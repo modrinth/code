@@ -55,7 +55,7 @@ async fn code_get_all(
     let codes = DBAffiliateCode::get_all(&**pool).await?;
     let codes = codes
         .into_iter()
-        .map(|code| AdminAffiliateCode::from(code))
+        .map(AdminAffiliateCode::from)
         .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(codes))
@@ -209,7 +209,7 @@ async fn self_get(
 
     let codes = codes
         .into_iter()
-        .map(|data| AffiliateCode::from(data))
+        .map(AffiliateCode::from)
         .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(codes))
