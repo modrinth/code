@@ -221,19 +221,12 @@ fn get_skin_texture_buffer<R: Read>(
                 a: 255,
             })
             .collect_vec(),
-        png::ColorType::Rgba => png_buf
-            .chunks_exact(4)
-            .map(|chunk| Rgba {
-                r: chunk[0],
-                g: chunk[1],
-                b: chunk[2],
-                a: chunk[3],
-            })
-            .collect_vec(),
+        png::ColorType::Rgba => bytemuck::try_cast_vec(png_buf)
+            .map_err(|_| ErrorKind::InvalidPng)?,
         _ => Err(ErrorKind::InvalidPng)?, // Cannot happen by PNG spec after transformations
     };
 
-    // Make a bottom legacy skin half transparent
+    // Make the added bottom half of the expanded legacy skin buffer transparent
     if is_legacy_skin {
         set_alpha(&mut texture_buf, png_reader.info(), 0, 32, 64, 64, 0);
     }
