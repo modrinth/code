@@ -557,9 +557,52 @@ async fn collect_template_variables(
 
             map.insert(
                 PAYOUTAVAILABLE_AMOUNT,
-                format!("{:.2}", (amount * 100.0) as i64),
+                format!("USD${:.2}", (amount * 100.0) as i64),
             );
 
+            Ok(map)
+        }
+
+        NotificationBody::TaxNotification {
+            old_amount,
+            old_tax_amount,
+            new_amount,
+            new_tax_amount,
+            billing_interval,
+            currency,
+            due,
+            service,
+        } => {
+            map.insert(
+                TAXNOTIFICATION_OLD_AMOUNT,
+                fmt_money(*old_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_OLD_TAX_AMOUNT,
+                fmt_money(*old_tax_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_OLD_TOTAL_AMOUNT,
+                fmt_money(*old_amount + *old_tax_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_NEW_AMOUNT,
+                fmt_money(*new_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_NEW_TAX_AMOUNT,
+                fmt_money(*new_tax_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_NEW_TOTAL_AMOUNT,
+                fmt_money(*new_amount + *new_tax_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_BILLING_INTERVAL,
+                billing_interval.as_str().to_owned(),
+            );
+            map.insert(TAXNOTIFICATION_DUE, date_human_readable(*due));
+            map.insert(TAXNOTIFICATION_SERVICE, service.clone());
             Ok(map)
         }
 
@@ -572,4 +615,12 @@ async fn collect_template_variables(
 
 fn date_human_readable(date: chrono::DateTime<chrono::Utc>) -> String {
     date.format("%B %d, %Y").to_string()
+}
+
+fn fmt_money(amount: i64, currency: &str) -> String {
+    rusty_money::Money::from_minor(
+        amount,
+        rusty_money::iso::find(currency).unwrap_or(rusty_money::iso::USD),
+    )
+    .to_string()
 }

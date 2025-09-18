@@ -211,6 +211,7 @@ impl LegacyNotification {
             }
             NotificationBody::TaxNotification { .. } => {
                 Some("tax_notification".to_string())
+            }
             NotificationBody::PayoutAvailable { .. } => {
                 Some("payout_available".to_string())
             }
