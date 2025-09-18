@@ -1,4 +1,5 @@
 use crate::models::ids::{ThreadMessageId, VersionId};
+use crate::models::v3::billing::PriceDuration;
 use crate::models::{
     ids::{
         NotificationId, OrganizationId, ProjectId, ReportId, TeamId, ThreadId,
@@ -37,6 +38,16 @@ pub struct LegacyNotificationAction {
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum LegacyNotificationBody {
+    TaxNotification {
+        old_amount: i64,
+        old_tax_amount: i64,
+        new_amount: i64,
+        new_tax_amount: i64,
+        billing_interval: PriceDuration,
+        currency: String,
+        due: DateTime<Utc>,
+        service: String,
+    },
     ProjectUpdate {
         project_id: ProjectId,
         version_id: VersionId,
@@ -198,6 +209,9 @@ impl LegacyNotification {
             NotificationBody::PaymentFailed { .. } => {
                 Some("payment_failed".to_string())
             }
+            NotificationBody::TaxNotification { .. } => {
+                Some("tax_notification".to_string())
+            }
             NotificationBody::PayoutAvailable { .. } => {
                 Some("payout_available".to_string())
             }
@@ -340,6 +354,25 @@ impl LegacyNotification {
             } => LegacyNotificationBody::EmailChanged {
                 new_email,
                 to_email,
+            },
+            NotificationBody::TaxNotification {
+                old_amount,
+                old_tax_amount,
+                new_amount,
+                new_tax_amount,
+                billing_interval,
+                currency,
+                due,
+                service,
+            } => LegacyNotificationBody::TaxNotification {
+                old_amount,
+                old_tax_amount,
+                new_amount,
+                new_tax_amount,
+                billing_interval,
+                due,
+                service,
+                currency,
             },
             NotificationBody::PaymentFailed { amount, service } => {
                 LegacyNotificationBody::PaymentFailed { amount, service }

@@ -2,7 +2,7 @@ use crate::database::models::{
     DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
 };
 use crate::models::billing::{
-    PriceDuration, SubscriptionMetadata, SubscriptionStatus,
+    PriceDuration, ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
 };
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
@@ -160,4 +160,13 @@ impl DBUserSubscription {
 
         Ok(())
     }
+}
+
+pub struct SubscriptionWithCharge {
+    pub subscription_id: DBUserSubscriptionId,
+    pub user_id: DBUserId,
+    pub product_metadata: ProductMetadata,
+    pub amount: i64,
+    pub tax_amount: i64,
+    pub due: DateTime<Utc>,
 }
