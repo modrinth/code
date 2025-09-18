@@ -519,11 +519,14 @@ impl CacheValue {
     }
 }
 
-#[derive(Deserialize, Serialize, PartialEq, Eq, Debug, Copy, Clone)]
+#[derive(
+    Deserialize, Serialize, PartialEq, Eq, Debug, Copy, Clone, Default,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum CacheBehaviour {
     /// Serve expired data. If fetch fails / launcher is offline, errors are ignored
     /// and expired data is served
+    #[default]
     StaleWhileRevalidateSkipOffline,
     // Serve expired data, revalidate in background
     StaleWhileRevalidate,
@@ -531,12 +534,6 @@ pub enum CacheBehaviour {
     MustRevalidate,
     // Ignore cache- always fetch updated data from origin
     Bypass,
-}
-
-impl Default for CacheBehaviour {
-    fn default() -> Self {
-        Self::StaleWhileRevalidateSkipOffline
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
