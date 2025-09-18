@@ -364,7 +364,10 @@ pub async fn index_subscriptions(
                 let tax_platform_id =
                     anrok::transaction_id_stripe_pi(&payment_intent_id);
 
-                anrok_client
+                // Note: if the tax amount that was charged to the customer is *different* than
+                // what it *should* be NOW, we will take on a loss here.
+
+                let should_have_collected = anrok_client
                     .create_or_update_txn(&anrok::Transaction {
                         id: tax_platform_id.clone(),
                         fields: anrok::TransactionFields {
@@ -381,8 +384,12 @@ pub async fn index_subscriptions(
                             ],
                         },
                     })
-                    .await?;
+                    .await?
+                    .tax_amount_to_collect;
 
+                let drift = should_have_collected - c.tax_amount;
+
+                c.tax_drift_loss = Some(drift);
                 c.tax_platform_id = Some(tax_platform_id);
                 c.upsert(&mut txn).await?;
 
@@ -739,6 +746,7 @@ pub async fn try_process_user_redeemal(
         parent_charge_id: None,
         net: None,
         tax_last_updated: Some(Utc::now()),
+        tax_drift_loss: Some(0),
     }
     .upsert(&mut txn)
     .await?;
