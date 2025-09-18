@@ -209,6 +209,9 @@ impl LegacyNotification {
             NotificationBody::PaymentFailed { .. } => {
                 Some("payment_failed".to_string())
             }
+            NotificationBody::TaxNotification { .. } => {
+                Some("tax_notification".to_string())
+            }
             NotificationBody::PayoutAvailable { .. } => {
                 Some("payout_available".to_string())
             }
