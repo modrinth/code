@@ -1010,7 +1010,7 @@ mod tests {
 
     #[test]
     fn test_version_sorting() {
-        let versions = vec![
+        let versions = [
             get_version(4, None, months_ago(6)),
             get_version(3, None, months_ago(7)),
             get_version(2, Some(1), months_ago(6)),
