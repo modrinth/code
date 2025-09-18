@@ -1,2 +1,8 @@
 [toolchain]
-channel = "1.89.0"
+channel = "nightly"
+
+components = [
+	# use cranelift in debug builds to improve compile times
+	# also see `.cargo/config.toml`
+	"rustc-codegen-cranelift-preview"
+]

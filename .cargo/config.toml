@@ -1,9 +1,26 @@
+# Enable Cranelift for debug builds, improving iterative compile times
+[unstable]
+codegen-backend = true
+
+[profile.dev]
+codegen-backend = "cranelift"
+
+[build]
+rustflags = ["--cfg", "tokio_unstable"]
+
 # Windows has stack overflows when calling from Tauri, so we increase the default stack size used by the compiler
 [target.'cfg(windows)']
-rustflags = ["-C", "link-args=/STACK:16777220", "--cfg", "tokio_unstable"]
+rustflags = ["--cfg", "tokio_unstable", "-C", "link-args=/STACK:16777220"]
 
 [target.x86_64-pc-windows-msvc]
 linker = "rust-lld"
 
-[build]
-rustflags = ["--cfg", "tokio_unstable"]
+[target.x86_64-unknown-linux-gnu]
+linker = "/usr/bin/clang"
+rustflags = [
+	"--cfg",
+	"tokio_unstable",
+	# Use mold linker to improve linking times
+	"-C",
+	"link-arg=--ld-path=/usr/bin/mold"
+]
