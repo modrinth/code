@@ -1,6 +1,6 @@
 use super::DatabaseError;
 use crate::models::ids::{
-    ChargeId, CollectionId, FileId, ImageId, NotificationId,
+    AffiliateCodeId, ChargeId, CollectionId, FileId, ImageId, NotificationId,
     OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
     OAuthRedirectUriId, OrganizationId, PatId, PayoutId, ProductId,
     ProductPriceId, ProjectId, ReportId, SessionId, SharedInstanceId,
@@ -64,6 +64,8 @@ macro_rules! generate_bulk_ids {
 
             // Check if ID is unique
             loop {
+                // We re-acquire a thread-local RNG handle for each uniqueness loop for
+                // the bulk generator future to be `Send + Sync`.
                 let base =
                     random_base62_rng_range(&mut rand::thread_rng(), 1, 10)
                         as i64;
@@ -260,6 +262,10 @@ db_id_interface!(
 db_id_interface!(
     VersionId,
     generator: generate_version_id @ "versions",
+);
+db_id_interface!(
+    AffiliateCodeId,
+    generator: generate_affiliate_code_id @ "affiliate_codes",
 );
 
 short_id_type!(CategoryId);

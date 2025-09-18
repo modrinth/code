@@ -1,3 +1,4 @@
+pub mod affiliate_code;
 pub mod analytics;
 pub mod billing;
 pub mod collections;

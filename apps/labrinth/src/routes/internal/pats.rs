@@ -13,6 +13,8 @@ use rand::distributions::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 
+use crate::database::models::notification_item::NotificationBuilder;
+use crate::models::notifications::NotificationBody;
 use crate::models::pats::{PersonalAccessToken, Scopes};
 use crate::queue::session::AuthQueue;
 use crate::util::validate::validation_errors_to_string;
@@ -129,7 +131,15 @@ pub async fn create_pat(
     .insert(&mut transaction)
     .await?;
 
+    NotificationBuilder {
+        body: NotificationBody::PatCreated {
+            token_name: name.clone(),
+        },
+    }
+    .insert(user.id.into(), &mut transaction, &redis)
+    .await?;
     transaction.commit().await?;
+
     database::models::pat_item::DBPersonalAccessToken::clear_cache(
         vec![(None, None, Some(user.id.into()))],
         &redis,

@@ -48,6 +48,14 @@ pub enum NotificationType {
     EmailChanged,
     PaymentFailed,
     TaxNotification,
+    PatCreated,
+    ModerationMessageReceived,
+    ReportStatusUpdated,
+    ReportSubmitted,
+    ProjectStatusApproved,
+    ProjectStatusNeutral,
+    ProjectTransferred,
+    PayoutAvailable,
     Unknown,
 }
 
@@ -124,12 +132,40 @@ pub enum NotificationBody {
         old_status: ProjectStatus,
         new_status: ProjectStatus,
     },
+    /// This is for website notifications only. Email notifications have `ModerationMessageReceived`.
     ModeratorMessage {
         thread_id: ThreadId,
         message_id: ThreadMessageId,
 
         project_id: Option<ProjectId>,
         report_id: Option<ReportId>,
+    },
+    PatCreated {
+        token_name: String,
+    },
+    /// This differs from ModeratorMessage as this notification is only for project threads and
+    /// email notifications, not for site notifications.
+    ModerationMessageReceived {
+        project_id: ProjectId,
+    },
+    ReportStatusUpdated {
+        report_id: ReportId,
+    },
+    ReportSubmitted {
+        report_id: ReportId,
+    },
+    ProjectStatusApproved {
+        project_id: ProjectId,
+    },
+    ProjectStatusNeutral {
+        project_id: ProjectId,
+        old_status: ProjectStatus,
+        new_status: ProjectStatus,
+    },
+    ProjectTransferred {
+        project_id: ProjectId,
+        new_owner_user_id: Option<UserId>,
+        new_owner_organization_id: Option<OrganizationId>,
     },
     LegacyMarkdown {
         notification_type: Option<String>,
@@ -171,6 +207,9 @@ pub enum NotificationBody {
         currency: String,
         due: DateTime<Utc>,
         service: String,
+    PayoutAvailable {
+        date_available: DateTime<Utc>,
+        amount: f64,
     },
     Unknown,
 }
@@ -190,6 +229,25 @@ impl NotificationBody {
             }
             NotificationBody::ModeratorMessage { .. } => {
                 NotificationType::ModeratorMessage
+            }
+            NotificationBody::PatCreated { .. } => NotificationType::PatCreated,
+            NotificationBody::ModerationMessageReceived { .. } => {
+                NotificationType::ModerationMessageReceived
+            }
+            NotificationBody::ReportStatusUpdated { .. } => {
+                NotificationType::ReportStatusUpdated
+            }
+            NotificationBody::ReportSubmitted { .. } => {
+                NotificationType::ReportSubmitted
+            }
+            NotificationBody::ProjectStatusApproved { .. } => {
+                NotificationType::ProjectStatusApproved
+            }
+            NotificationBody::ProjectStatusNeutral { .. } => {
+                NotificationType::ProjectStatusNeutral
+            }
+            NotificationBody::ProjectTransferred { .. } => {
+                NotificationType::ProjectTransferred
             }
             NotificationBody::LegacyMarkdown { .. } => {
                 NotificationType::LegacyMarkdown
@@ -226,6 +284,8 @@ impl NotificationBody {
             }
             NotificationBody::TaxNotification { .. } => {
                 NotificationType::TaxNotification
+            NotificationBody::PayoutAvailable { .. } => {
+                NotificationType::PayoutAvailable
             }
             NotificationBody::Unknown => NotificationType::Unknown,
         }
@@ -340,6 +400,53 @@ impl From<DBNotification> for Notification {
                     },
                     vec![],
                 ),
+                // The notifications from here to down below are listed with messages for completeness' sake,
+                // though they should never be sent via site notifications. This should be disabled via database
+                // options. Messages should be reviewed and worded better if we want to distribute these notifications
+                // via the site.
+                NotificationBody::PatCreated { token_name } => (
+                    "New personal access token created".to_string(),
+                    format!("Your personal access token '{token_name}' was created."),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ReportStatusUpdated { .. } => (
+                    "Report status updated".to_string(),
+                    "A report you are involved in has been updated.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ReportSubmitted { .. } => (
+                    "Report submitted".to_string(),
+                    "Your report was submitted successfully.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ProjectStatusApproved { .. } => (
+                    "Project approved".to_string(),
+                    "Your project has been approved.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ProjectStatusNeutral { .. } => (
+                    "Project status updated".to_string(),
+                    "Your project status has been updated.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::ProjectTransferred { .. } => (
+                    "Project ownership transferred".to_string(),
+                    "A project's ownership has been transferred.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                // Don't expose the `flow` field
+                NotificationBody::ResetPassword { .. } => (
+                    "Password reset requested".to_string(),
+                    "You've requested to reset your password. Please check your email for a reset link.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
                 NotificationBody::LegacyMarkdown {
                     name,
                     text,
@@ -352,10 +459,6 @@ impl From<DBNotification> for Notification {
                     link.clone(),
                     actions.clone().into_iter().collect(),
                 ),
-                // The notifications from here to down below are listed with messages for completeness' sake,
-                // though they should never be sent via site notifications. This should be disabled via database
-                // options. Messages should be reviewed and worded better if we want to distribute these notifications
-                // via the site.
                 NotificationBody::PaymentFailed { .. } => (
                     "Payment failed".to_string(),
                     "A payment on your account failed. Please update your billing information.".to_string(),
@@ -420,6 +523,15 @@ impl From<DBNotification> for Notification {
                 NotificationBody::TaxNotification { .. } => (
                     "Tax notification".to_string(),
                     "You've received a tax notification.".to_string(),
+                NotificationBody::PayoutAvailable { .. } => (
+                    "Payout available".to_string(),
+                    "A payout is available!".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+				NotificationBody::ModerationMessageReceived { .. } => (
+                    "New message in moderation thread".to_string(),
+                    "You have a new message in a moderation thread.".to_string(),
                     "#".to_string(),
                     vec![],
                 ),

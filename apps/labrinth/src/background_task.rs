@@ -2,7 +2,8 @@ use crate::database::redis::RedisPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
-    PayoutsQueue, insert_bank_balances_and_webhook, process_payout,
+    PayoutsQueue, index_payouts_notifications,
+    insert_bank_balances_and_webhook, process_payout,
 };
 use crate::search::indexing::index_projects;
 use crate::util::anrok;
@@ -42,7 +43,7 @@ impl BackgroundTask {
             IndexSearch => index_search(pool, redis_pool, search_config).await,
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
-            Payouts => payouts(pool, clickhouse).await,
+            Payouts => payouts(pool, clickhouse, redis_pool).await,
             IndexBilling => {
                 index_billing(
                     stripe_client,
@@ -155,12 +156,19 @@ pub async fn update_versions(
 pub async fn payouts(
     pool: sqlx::Pool<Postgres>,
     clickhouse: clickhouse::Client,
+    redis_pool: RedisPool,
 ) {
     info!("Started running payouts");
     let result = process_payout(&pool, &clickhouse).await;
     if let Err(e) = result {
         warn!("Payouts run failed: {:?}", e);
     }
+
+    let result = index_payouts_notifications(&pool, &redis_pool).await;
+    if let Err(e) = result {
+        warn!("Payouts notifications indexing failed: {:?}", e);
+    }
+
     info!("Done running payouts");
 }
 
