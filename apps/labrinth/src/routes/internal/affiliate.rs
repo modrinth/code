@@ -29,9 +29,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
-#[derive(Serialize, Deserialize)]
-struct CodeGetAllResponse(Vec<AdminAffiliateCode>);
-
 async fn code_get_all(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -60,16 +57,13 @@ async fn code_get_all(
         .map(|code| AdminAffiliateCode::from(code))
         .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(CodeGetAllResponse(codes)))
+    Ok(HttpResponse::Ok().json(codes))
 }
 
 #[derive(Serialize, Deserialize)]
 struct CodeCreateRequest {
     affiliate: UserId,
 }
-
-#[derive(Serialize, Deserialize)]
-struct CodeCreateResponse(AdminAffiliateCode);
 
 async fn code_create(
     req: HttpRequest,
@@ -120,12 +114,8 @@ async fn code_create(
 
     transaction.commit().await?;
 
-    Ok(HttpResponse::Ok()
-        .json(CodeCreateResponse(AdminAffiliateCode::from(code))))
+    Ok(HttpResponse::Ok().json(AdminAffiliateCode::from(code)))
 }
-
-#[derive(Serialize, Deserialize)]
-struct CodeGetResponse(AdminAffiliateCode);
 
 async fn code_get(
     req: HttpRequest,
@@ -157,7 +147,7 @@ async fn code_get(
         DBAffiliateCode::get_by_id(affiliate_code_id, &**pool).await?
     {
         let model = AdminAffiliateCode::from(model);
-        Ok(HttpResponse::Ok().json(CodeGetResponse(model)))
+        Ok(HttpResponse::Ok().json(model))
     } else {
         Err(ApiError::NotFound)
     }
@@ -190,22 +180,14 @@ async fn code_delete(
     let affiliate_code_id =
         DBAffiliateCodeId(parse_base62(&affiliate_code_id)? as i64);
 
-    let mut transaction = pool.begin().await?;
-
-    let result =
-        DBAffiliateCode::remove(affiliate_code_id, &mut *transaction).await?;
-
-    transaction.commit().await?;
+    let result = DBAffiliateCode::remove(affiliate_code_id, &**pool).await?;
 
     if result.is_some() {
-        Ok(HttpResponse::NoContent().body(""))
+        Ok(HttpResponse::NoContent().finish())
     } else {
         Err(ApiError::NotFound)
     }
 }
-
-#[derive(Serialize, Deserialize)]
-struct SelfGetResponse(Vec<AffiliateCode>);
 
 async fn self_get(
     req: HttpRequest,
@@ -218,7 +200,7 @@ async fn self_get(
         &**pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS, // TODO: what token scope?
+        Scopes::SESSION_ACCESS,
     )
     .await?;
 
@@ -231,5 +213,5 @@ async fn self_get(
         .map(|data| AffiliateCode::from(data))
         .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(SelfGetResponse(codes)))
+    Ok(HttpResponse::Ok().json(codes))
 }

@@ -38,8 +38,10 @@ pub struct AffiliateCode {
     pub affiliate: UserId,
 }
 
-impl AdminAffiliateCode {
-    pub fn from(
+impl From<crate::database::models::affiliate_code_item::DBAffiliateCode>
+    for AdminAffiliateCode
+{
+    fn from(
         data: crate::database::models::affiliate_code_item::DBAffiliateCode,
     ) -> Self {
         Self {
@@ -51,8 +53,10 @@ impl AdminAffiliateCode {
     }
 }
 
-impl AffiliateCode {
-    pub fn from(
+impl From<crate::database::models::affiliate_code_item::DBAffiliateCode>
+    for AffiliateCode
+{
+    fn from(
         data: crate::database::models::affiliate_code_item::DBAffiliateCode,
     ) -> Self {
         Self {
