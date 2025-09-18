@@ -1,4 +1,5 @@
 ALTER TABLE charges ADD COLUMN tax_last_updated TIMESTAMPTZ;
+ALTER TABLE charges ADD COLUMN tax_drift_loss BIGINT;
 
 INSERT INTO notifications_types
 	(name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications)

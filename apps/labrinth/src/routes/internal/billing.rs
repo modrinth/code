@@ -350,6 +350,7 @@ pub async fn refund_charge(
             net,
             currency_code: charge.currency_code,
             tax_last_updated: Some(Utc::now()),
+            tax_drift_loss: Some(0),
         }
         .upsert(&mut transaction)
         .await?;
@@ -1643,6 +1644,7 @@ pub async fn stripe_webhook(
                             parent_charge_id: None,
                             net: None,
                             tax_last_updated: Some(Utc::now()),
+                            tax_drift_loss: Some(0),
                         };
 
                         if charge_status != ChargeStatus::Failed {
@@ -2005,6 +2007,7 @@ pub async fn stripe_webhook(
                                 net: None,
                                 tax_platform_id: None,
                                 tax_last_updated: Some(Utc::now()),
+                                tax_drift_loss: Some(0),
                             }
                             .upsert(&mut transaction)
                             .await?;
