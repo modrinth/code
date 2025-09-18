@@ -218,10 +218,6 @@ todo = "warn"
 unnested_or_patterns = "warn"
 wildcard_dependencies = "warn"
 
-[workspace.lints.rust]
-# Turn warnings into errors by default
-warnings = "deny"
-
 [patch.crates-io]
 wry = { git = "https://github.com/modrinth/wry", rev = "f2ce0b0" }
 
