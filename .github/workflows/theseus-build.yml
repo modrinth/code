@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - main
-      - prod
-      - '**/**'
     tags:
       - 'v*'
     paths:
@@ -62,7 +60,7 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
-      - name: Generate tauri-dev.conf.json
+      - name: 📄 Generate tauri-dev.conf.json
         shell: bash
         run: |
           GIT_HASH=$(git rev-parse --short HEAD)
@@ -145,7 +143,7 @@ jobs:
           [System.Convert]::FromBase64String("$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_BASE64") | Set-Content -Path signer-client-cert.p12 -AsByteStream
           $env:DIGICERT_ONE_SIGNER_CREDENTIALS = "$env:DIGICERT_ONE_SIGNER_API_KEY|$PWD\signer-client-cert.p12|$env:DIGICERT_ONE_SIGNER_CLIENT_CERTIFICATE_PASSWORD"
           $env:JAVA_HOME = "$env:JAVA_HOME_11_X64"
-          pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles 'nsis,updater'
+          ${{ github.ref == 'refs/heads/main' && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json --verbose --bundles "nsis,updater"' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json --verbose --bundles "nsis,updater"' }}
           Remove-Item -Path signer-client-cert.p12 -ErrorAction SilentlyContinue
         if: startsWith(matrix.platform, 'windows')
         env:
