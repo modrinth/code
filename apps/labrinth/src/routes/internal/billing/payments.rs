@@ -42,6 +42,8 @@ pub const MODRINTH_PAYMENT_METADATA: &str = "modrinth_payment_metadata";
 
 pub enum AttachedCharge {
     /// Create a proration charge.
+    ///
+    /// This should be accompanied by an interactive payment session.
     Proration {
         next_product_id: ProductId,
         next_interval: PriceDuration,
@@ -49,6 +51,8 @@ pub enum AttachedCharge {
         amount: i64,
     },
     /// Create a promotion charge.
+    ///
+    /// This should be accompanied by an interactive payment session.
     Promotion {
         product_id: ProductId,
         interval: PriceDuration,
@@ -60,6 +64,8 @@ pub enum AttachedCharge {
     ///
     /// The amount will be based on the product's price at this interval,
     /// and tax calculated based on the payment method.
+    ///
+    /// This should be accompanied by an interactive payment session.
     BaseUpon {
         product_id: ProductId,
         interval: Option<PriceDuration>,
@@ -71,6 +77,8 @@ pub enum AttachedCharge {
     ///
     /// The charge's status will NOT be updated - it is the caller's responsability to
     /// update the charge's status on failure or success.
+    ///
+    /// This may be accompanied by an automated payment session.
     UseExisting { charge: DBCharge },
 }
 
@@ -359,34 +367,41 @@ pub async fn create_or_update_payment_intent(
         }
     };
 
-    // Create an ephemeral transaction to precalculate taxation amount statelessly
+    // Create an ephemeral transaction to calculate the tax amount if needed
 
-    let product_info =
-        products_tax_identifier_item::product_info_by_product_price_id(
-            charge_data.price_id.into(),
-            pg,
-        )
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "Missing product tax identifier for charge to continue"
-                    .to_owned(),
+    let tax_amount = 'tax: {
+        // If a charge is attached, we must use the tax amount noted on the charge
+        // as the tax amount.
+        //
+        // Note: if we supported interactive payments of existing charges, we may
+        // want to update the charge's tax amount immediately here.
+        if let Some(c) = attached_charge.as_charge() {
+            break 'tax c.tax_amount;
+        }
+
+        let product_info =
+            products_tax_identifier_item::product_info_by_product_price_id(
+                charge_data.price_id.into(),
+                pg,
             )
-        })?;
-
-    let address =
-        payment_method
-            .billing_details
-            .address
-            .clone()
+            .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(
-                    "Missing billing details from payment method to continue"
+                    "Missing product tax identifier for charge to continue"
                         .to_owned(),
                 )
             })?;
 
-    let tax_amount = 'tax: {
+        let address =
+            payment_method.billing_details.address.clone().ok_or_else(
+                || {
+                    ApiError::InvalidInput(
+						"Missing billing details from payment method to continue"
+							.to_owned(),
+					)
+                },
+            )?;
+
         let ephemeral_invoice = anrok_client
             .create_ephemeral_txn(&anrok::TransactionFields {
                 customer_address: anrok::Address::from_stripe_address(&address),
@@ -399,13 +414,6 @@ pub async fn create_or_update_payment_intent(
                 )],
             })
             .await?;
-
-        if let Some(c) = attached_charge.as_charge()
-            && c.tax_amount == 0
-            && ephemeral_invoice.tax_amount_to_collect > 0
-        {
-            break 'tax 0;
-        }
 
         ephemeral_invoice.tax_amount_to_collect
     };
