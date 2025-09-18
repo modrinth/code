@@ -5,13 +5,14 @@ use crate::{
         redis::RedisPool,
     },
     models::{
+        ids::AffiliateCodeId,
         pats::Scopes,
         v3::affiliate_code::{AdminAffiliateCode, AffiliateCode},
     },
     queue::session::AuthQueue,
 };
 use actix_web::{HttpRequest, HttpResponse, web};
-use ariadne::ids::{UserId, base62_impl::parse_base62};
+use ariadne::ids::UserId;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -119,7 +120,7 @@ async fn code_create(
 
 async fn code_get(
     req: HttpRequest,
-    path: web::Path<(String,)>,
+    path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -140,8 +141,7 @@ async fn code_get(
     }
 
     let (affiliate_code_id,) = path.into_inner();
-    let affiliate_code_id =
-        DBAffiliateCodeId(parse_base62(&affiliate_code_id)? as i64);
+    let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
     if let Some(model) =
         DBAffiliateCode::get_by_id(affiliate_code_id, &**pool).await?
@@ -155,7 +155,7 @@ async fn code_get(
 
 async fn code_delete(
     req: HttpRequest,
-    path: web::Path<(String,)>,
+    path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -177,8 +177,7 @@ async fn code_delete(
     }
 
     let (affiliate_code_id,) = path.into_inner();
-    let affiliate_code_id =
-        DBAffiliateCodeId(parse_base62(&affiliate_code_id)? as i64);
+    let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
     let result = DBAffiliateCode::remove(affiliate_code_id, &**pool).await?;
 
