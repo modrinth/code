@@ -5,7 +5,6 @@ use crate::{
         redis::RedisPool,
     },
     models::{
-        ids::AffiliateCodeId,
         pats::Scopes,
         v3::affiliate_code::{AdminAffiliateCode, AffiliateCode},
     },
@@ -33,7 +32,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[derive(Serialize, Deserialize)]
 struct CodeGetAllResponse(Vec<AdminAffiliateCode>);
 
-pub async fn code_get_all(
+async fn code_get_all(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -72,7 +71,7 @@ struct CodeCreateRequest {
 #[derive(Serialize, Deserialize)]
 struct CodeCreateResponse(AdminAffiliateCode);
 
-pub async fn code_create(
+async fn code_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -128,7 +127,7 @@ pub async fn code_create(
 #[derive(Serialize, Deserialize)]
 struct CodeGetResponse(AdminAffiliateCode);
 
-pub async fn code_get(
+async fn code_get(
     req: HttpRequest,
     path: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -164,7 +163,7 @@ pub async fn code_get(
     }
 }
 
-pub async fn code_delete(
+async fn code_delete(
     req: HttpRequest,
     path: web::Path<(String,)>,
     pool: web::Data<PgPool>,
