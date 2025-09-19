@@ -9,7 +9,7 @@ use crate::models::collections::{Collection, CollectionStatus};
 use crate::models::ids::{CollectionId, ProjectId};
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::routes::v3::create_error::{CreateError, CreationInvalidInput};
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
@@ -114,7 +114,7 @@ pub async fn collection_create(
     let now = Utc::now();
     collection_builder_actual.insert(&mut transaction).await?;
 
-    let response = crate::models::collections::Collection {
+    let response = Collection {
         id: collection_id,
         user: collection_builder.user_id.into(),
         name: collection_builder.name.clone(),
@@ -138,9 +138,9 @@ pub struct CollectionIds {
 pub async fn collections_get(
     req: HttpRequest,
     web::Query(ids): web::Query<CollectionIds>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
     let ids = ids
@@ -174,9 +174,9 @@ pub async fn collections_get(
 pub async fn collection_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
@@ -224,10 +224,10 @@ pub struct EditCollection {
 pub async fn collection_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    pool: Data<PgPool>,
     new_collection: web::Json<EditCollection>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -290,8 +290,8 @@ pub async fn collection_edit(
                 || collection_item.status.is_approved()
                     && status.can_be_requested())
             {
-                return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to set this status!".to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::SetStatus,
                 ));
             }
 
@@ -382,11 +382,11 @@ pub async fn collection_icon_edit(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
-    session_queue: web::Data<AuthQueue>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -466,10 +466,10 @@ pub async fn collection_icon_edit(
 pub async fn delete_collection_icon(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<AuthQueue>,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -525,9 +525,9 @@ pub async fn delete_collection_icon(
 pub async fn collection_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,

@@ -7,7 +7,7 @@ use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, web};
 use dashmap::DashMap;
@@ -610,9 +610,8 @@ pub async fn delete_file(
             .unwrap_or_default();
 
             if !permissions.contains(ProjectPermissions::DELETE_VERSION) {
-                return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to delete this file!"
-                        .to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::DeleteFile,
                 ));
             }
         }

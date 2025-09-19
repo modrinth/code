@@ -443,6 +443,228 @@
   "labrinth.error.unauthorized.socket": {
     "message": "Invalid state sent, you probably need to get a new websocket"
   },
+  "labrinth.error.unauthorized.specific.add_to_organization": {
+    "message": "You do not have permission to add projects to this organization!"
+  },
+  "labrinth.error.unauthorized.specific.bulk_edit_project": {
+    "message": "You do not have the permissions to bulk edit project {project_name}!"
+  },
+  "labrinth.error.unauthorized.specific.cancel_organization_invite": {
+    "message": "You do not have permission to cancel an organization invite"
+  },
+  "labrinth.error.unauthorized.specific.cancel_team_invite": {
+    "message": "You do not have permission to cancel a team invite"
+  },
+  "labrinth.error.unauthorized.specific.delete_file": {
+    "message": "You don''t have permission to delete this file!"
+  },
+  "labrinth.error.unauthorized.specific.delete_message": {
+    "message": "You cannot delete this message!"
+  },
+  "labrinth.error.unauthorized.specific.delete_organization": {
+    "message": "You don''t have permission to delete this organization!"
+  },
+  "labrinth.error.unauthorized.specific.delete_project": {
+    "message": "You don''t have permission to delete this project!"
+  },
+  "labrinth.error.unauthorized.specific.delete_shared_instance": {
+    "message": "You do not have permission to delete this shared instance."
+  },
+  "labrinth.error.unauthorized.specific.delete_shared_instance_version": {
+    "message": "You do not have permission to delete this shared instance version."
+  },
+  "labrinth.error.unauthorized.specific.delete_user": {
+    "message": "You do not have permission to delete this user!"
+  },
+  "labrinth.error.unauthorized.specific.delete_versions_in_team": {
+    "message": "You do not have permission to delete versions in this team"
+  },
+  "labrinth.error.unauthorized.specific.edit_organization": {
+    "message": "You do not have permission to edit this organization!"
+  },
+  "labrinth.error.unauthorized.specific.edit_organization_description": {
+    "message": "You do not have the permissions to edit the description of this organization!"
+  },
+  "labrinth.error.unauthorized.specific.edit_organization_icon": {
+    "message": "You don''t have permission to edit this organization''s icon."
+  },
+  "labrinth.error.unauthorized.specific.edit_organization_name": {
+    "message": "You do not have the permissions to edit the name of this organization!"
+  },
+  "labrinth.error.unauthorized.specific.edit_organization_slug": {
+    "message": "You do not have the permissions to edit the slug of this organization!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project": {
+    "message": "You do not have permission to edit this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_additional_categories": {
+    "message": "You do not have the permissions to edit the additional categories of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_categories": {
+    "message": "You do not have the permissions to edit the categories of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_description": {
+    "message": "You do not have the permissions to edit the description (body) of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_gallery": {
+    "message": "You don''t have permission to edit this project''s gallery."
+  },
+  "labrinth.error.unauthorized.specific.edit_project_icon": {
+    "message": "You don''t have permission to edit this project''s icon."
+  },
+  "labrinth.error.unauthorized.specific.edit_project_license": {
+    "message": "You do not have the permissions to edit the license of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_license_url": {
+    "message": "You do not have the permissions to edit the license URL of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_links": {
+    "message": "You do not have the permissions to edit the links of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_moderation_message": {
+    "message": "You do not have the permissions to edit the moderation message of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_moderation_message_body": {
+    "message": "You do not have the permissions to edit the moderation message body of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_monetization_status": {
+    "message": "You do not have the permissions to edit the monetization status of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_name": {
+    "message": "You do not have the permissions to edit the name of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_requested_status": {
+    "message": "You do not have the permissions to edit the requested status of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_side_types_migration_review_status": {
+    "message": "You do not have the permissions to edit the side types migration review status of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_slug": {
+    "message": "You do not have the permissions to edit the slug of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_status": {
+    "message": "You do not have the permissions to edit the status of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_summary": {
+    "message": "You do not have the permissions to edit the summary of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_shared_instance": {
+    "message": "You do not have permission to edit this shared instance."
+  },
+  "labrinth.error.unauthorized.specific.edit_team_members": {
+    "message": "You don''t have permission to edit members of this team"
+  },
+  "labrinth.error.unauthorized.specific.edit_team_ownership": {
+    "message": "You don''t have permission to edit the ownership of this team"
+  },
+  "labrinth.error.unauthorized.specific.edit_user": {
+    "message": "You do not have permission to edit this user!"
+  },
+  "labrinth.error.unauthorized.specific.edit_user_badges": {
+    "message": "You do not have the permissions to edit the badges of this user!"
+  },
+  "labrinth.error.unauthorized.specific.edit_user_icon": {
+    "message": "You don''t have permission to edit this user''s icon."
+  },
+  "labrinth.error.unauthorized.specific.edit_user_role": {
+    "message": "You do not have the permissions to edit the role of this user!"
+  },
+  "labrinth.error.unauthorized.specific.edit_user_venmo_handle": {
+    "message": "You do not have the permissions to edit the venmo handle of this user!"
+  },
+  "labrinth.error.unauthorized.specific.edit_version": {
+    "message": "You do not have the permissions to edit this version!"
+  },
+  "labrinth.error.unauthorized.specific.get_user_from_email": {
+    "message": "You do not have permission to get a user from their email!"
+  },
+  "labrinth.error.unauthorized.specific.give_user_default_project_permissions": {
+    "message": "You do not have permission to give this user default project permissions."
+  },
+  "labrinth.error.unauthorized.specific.insufficient_oauth_permissions": {
+    "message": "You don''t have sufficient permissions to interact with this OAuth application"
+  },
+  "labrinth.error.unauthorized.specific.invalid_flow_code": {
+    "message": "The password change flow code is invalid or has expired. Did you copy it promptly and correctly?"
+  },
+  "labrinth.error.unauthorized.specific.invalid_master_key": {
+    "message": "Invalid master key"
+  },
+  "labrinth.error.unauthorized.specific.invite_users_to_organization": {
+    "message": "You don''t have permission to invite users to this organization"
+  },
+  "labrinth.error.unauthorized.specific.invite_users_to_team": {
+    "message": "You don''t have permission to invite users to this team"
+  },
+  "labrinth.error.unauthorized.specific.maximum_gallery_images": {
+    "message": "You have reached the maximum of gallery images to upload."
+  },
+  "labrinth.error.unauthorized.specific.not_member_of_project": {
+    "message": "You are not a member of project {project_name}!"
+  },
+  "labrinth.error.unauthorized.specific.not_project_owner_for_add_to_org": {
+    "message": "You need to be an owner of a project to add it to an organization!"
+  },
+  "labrinth.error.unauthorized.specific.notification_delete": {
+    "message": "You are not authorized to delete this notification!"
+  },
+  "labrinth.error.unauthorized.specific.notification_read": {
+    "message": "You are not authorized to read this notification!"
+  },
+  "labrinth.error.unauthorized.specific.old_password_not_specified": {
+    "message": "You must specify the old password to change your password!"
+  },
+  "labrinth.error.unauthorized.specific.override_organization_owner_default_project_permissions": {
+    "message": "You cannot override the project permissions of the organization owner!"
+  },
+  "labrinth.error.unauthorized.specific.refund": {
+    "message": "You do not have permission to refund a subscription!"
+  },
+  "labrinth.error.unauthorized.specific.remove_organization_member": {
+    "message": "You do not have permission to remove a member from this organization"
+  },
+  "labrinth.error.unauthorized.specific.remove_owner_from_team": {
+    "message": "The owner can''t be removed from a team"
+  },
+  "labrinth.error.unauthorized.specific.remove_team_member": {
+    "message": "You do not have permission to remove a member from this team"
+  },
+  "labrinth.error.unauthorized.specific.restricted_project_status": {
+    "message": "You don''t have permission to set this status!"
+  },
+  "labrinth.error.unauthorized.specific.see_oauth_clients": {
+    "message": "You do not have permission to see the OAuth clients of this user!"
+  },
+  "labrinth.error.unauthorized.specific.see_user_follows": {
+    "message": "You do not have permission to see the projects this user follows!"
+  },
+  "labrinth.error.unauthorized.specific.see_user_notifications": {
+    "message": "You do not have permission to see the notifications of this user!"
+  },
+  "labrinth.error.unauthorized.specific.set_mod_downloads": {
+    "message": "You don''t have permission to set the downloads of this mod"
+  },
+  "labrinth.error.unauthorized.specific.set_status": {
+    "message": "You don''t have permission to set this status!"
+  },
+  "labrinth.error.unauthorized.specific.shared_instance_upload_version": {
+    "message": "You do not have permission to upload a version for this shared instance."
+  },
+  "labrinth.error.unauthorized.specific.unknown_user_ip": {
+    "message": "Unable to obtain user IP address!"
+  },
+  "labrinth.error.unauthorized.specific.upload_project_images": {
+    "message": "You are not authorized to upload images for this project"
+  },
+  "labrinth.error.unauthorized.specific.upload_report_images": {
+    "message": "You are not authorized to upload images for this report"
+  },
+  "labrinth.error.unauthorized.specific.upload_thread_message_images": {
+    "message": "You are not authorized to upload images for this thread message"
+  },
+  "labrinth.error.unauthorized.specific.upload_version_images": {
+    "message": "You are not authorized to upload images for this version"
+  },
   "labrinth.error.unauthorized.url_error": {
     "message": "Invalid callback URL specified"
   },

@@ -26,24 +26,6 @@ pub enum TranslationData {
 // The extractor in ariadne_extract::extractor needs to be kept up-to-date with this macro definition
 #[macro_export]
 macro_rules! i18n_enum {
-    (transparent $for_enum:ident[$field:ident: $field_type:ty]) => {
-        impl $crate::i18n::I18nEnum for $for_enum {
-            const ROOT_TRANSLATION_ID: &'static str = <$field_type as $crate::i18n::I18nEnum>::ROOT_TRANSLATION_ID;
-
-            fn translation_id(&self) -> &'static str {
-                $crate::i18n::I18nEnum::translation_id(&*self.$field)
-            }
-
-            fn full_translation_id(&self) -> &'static str {
-                $crate::i18n::I18nEnum::full_translation_id(&*self.$field)
-            }
-
-            fn translation_data(&self) -> $crate::i18n::TranslationData {
-                $crate::i18n::I18nEnum::translation_data(&*self.$field)
-            }
-        }
-    };
-
     (
         $for_enum:ident,
         root_key: $root_key:literal,
@@ -90,6 +72,24 @@ macro_rules! i18n_enum {
                             $crate::__i18n_enum_variant_values!($root_key, $key, $variant_pat),
                     )*
                 }
+            }
+        }
+    };
+
+    (transparent $for_enum:ident[$field:ident: $field_type:ty]) => {
+        impl $crate::i18n::I18nEnum for $for_enum {
+            const ROOT_TRANSLATION_ID: &'static str = <$field_type as $crate::i18n::I18nEnum>::ROOT_TRANSLATION_ID;
+
+            fn translation_id(&self) -> &'static str {
+                $crate::i18n::I18nEnum::translation_id(&*self.$field)
+            }
+
+            fn full_translation_id(&self) -> &'static str {
+                $crate::i18n::I18nEnum::full_translation_id(&*self.$field)
+            }
+
+            fn translation_data(&self) -> $crate::i18n::TranslationData {
+                $crate::i18n::I18nEnum::translation_data(&*self.$field)
             }
         }
     };

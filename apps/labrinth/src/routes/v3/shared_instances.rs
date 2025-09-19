@@ -15,7 +15,7 @@ use crate::models::shared_instances::{
 };
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::util::routes::read_typed_from_payload;
 use actix_web::web::{Data, Redirect};
 use actix_web::{HttpRequest, HttpResponse, web};
@@ -257,9 +257,8 @@ pub async fn shared_instance_edit(
         .await?;
         if let Some(permissions) = permissions {
             if !permissions.contains(SharedInstanceUserPermissions::EDIT) {
-                return Err(ApiError::CustomAuthentication(
-                    "You do not have permission to edit this shared instance."
-                        .to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::EditSharedInstance,
                 ));
             }
         } else {
@@ -332,8 +331,8 @@ pub async fn shared_instance_delete(
         .await?;
         if let Some(permissions) = permissions {
             if !permissions.contains(SharedInstanceUserPermissions::DELETE) {
-                return Err(ApiError::CustomAuthentication(
-                    "You do not have permission to delete this shared instance.".to_string()
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::DeleteSharedInstance,
                 ));
             }
         } else {
@@ -503,8 +502,8 @@ pub async fn shared_instance_version_delete(
                     if !permissions
                         .contains(SharedInstanceUserPermissions::DELETE)
                     {
-                        return Err(ApiError::CustomAuthentication(
-                            "You do not have permission to delete this shared instance version.".to_string()
+                        return Err(ApiError::SpecificAuthentication(
+                            SpecificAuthenticationError::DeleteSharedInstanceVersion
                         ));
                     }
                 } else {

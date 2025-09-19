@@ -23,7 +23,7 @@ use crate::models::projects::{
 use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::search::SearchConfig;
 use crate::search::indexing::remove_documents;
 use crate::util::img;
@@ -130,11 +130,10 @@ pub async fn versions_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let version_ids =
-        serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
-            .into_iter()
-            .map(|x| x.into())
-            .collect::<Vec<database::models::DBVersionId>>();
+    let version_ids = serde_json::from_str::<Vec<VersionId>>(&ids.ids)?
+        .into_iter()
+        .map(|x| x.into())
+        .collect::<Vec<database::models::DBVersionId>>();
     let versions_data =
         database::models::DBVersion::get_many(&version_ids, &**pool, &redis)
             .await?;
@@ -159,7 +158,7 @@ pub async fn versions_get(
 
 pub async fn version_get(
     req: HttpRequest,
-    info: web::Path<(models::ids::VersionId,)>,
+    info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -170,7 +169,7 @@ pub async fn version_get(
 
 pub async fn version_get_helper(
     req: HttpRequest,
-    id: models::ids::VersionId,
+    id: VersionId,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -214,7 +213,7 @@ pub struct EditVersion {
     pub version_number: Option<String>,
     #[validate(length(max = 65536))]
     pub changelog: Option<String>,
-    pub version_type: Option<models::projects::VersionType>,
+    pub version_type: Option<VersionType>,
     #[validate(
         length(min = 0, max = 4096),
         custom(function = "crate::util::validate::validate_deps")
@@ -331,9 +330,8 @@ pub async fn version_edit_helper(
 
         if let Some(perms) = permissions {
             if !perms.contains(ProjectPermissions::UPLOAD_VERSION) {
-                return Err(ApiError::CustomAuthentication(
-                    "You do not have the permissions to edit this version!"
-                        .to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::EditVersion,
                 ));
             }
 
@@ -393,13 +391,13 @@ pub async fn version_edit_helper(
 
                 let builders = dependencies
                     .iter()
-                    .map(|x| database::models::version_item::DependencyBuilder {
+                    .map(|x| DependencyBuilder {
                         project_id: x.project_id.map(|x| x.into()),
                         version_id: x.version_id.map(|x| x.into()),
                         file_name: x.file_name.clone(),
                         dependency_type: x.dependency_type.to_string(),
                     })
-                    .collect::<Vec<database::models::version_item::DependencyBuilder>>();
+                    .collect::<Vec<DependencyBuilder>>();
 
                 DependencyBuilder::insert_many(
                     builders,
@@ -501,19 +499,18 @@ pub async fn version_edit_helper(
 
                 let mut loader_versions = Vec::new();
                 for loader in loaders {
-                    let loader_id =
-                        database::models::loader_fields::Loader::get_id(
-                            &loader.0,
-                            &mut *transaction,
-                            &redis,
+                    let loader_id = loader_fields::Loader::get_id(
+                        &loader.0,
+                        &mut *transaction,
+                        &redis,
+                    )
+                    .await?
+                    .ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "No database entry for loader provided."
+                                .to_string(),
                         )
-                        .await?
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(
-                                "No database entry for loader provided."
-                                    .to_string(),
-                            )
-                        })?;
+                    })?;
                     loader_versions.push(DBLoaderVersion {
                         loader_id,
                         version_id,
@@ -522,7 +519,7 @@ pub async fn version_edit_helper(
                 DBLoaderVersion::insert_many(loader_versions, &mut transaction)
                     .await?;
 
-                crate::database::models::DBProject::clear_cache(
+                database::models::DBProject::clear_cache(
                     version_item.inner.project_id,
                     None,
                     None,
@@ -561,8 +558,8 @@ pub async fn version_edit_helper(
 
             if let Some(downloads) = &new_version.downloads {
                 if !user.role.is_mod() {
-                    return Err(ApiError::CustomAuthentication(
-                        "You don't have permission to set the downloads of this mod".to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::SetModDownloads,
                     ));
                 }
 
@@ -691,8 +688,8 @@ pub async fn version_edit_helper(
             .await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthentication(
-                "You do not have permission to edit this version!".to_string(),
+            Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditVersion,
             ))
         }
     } else {
@@ -809,7 +806,7 @@ pub async fn version_list(
             // TODO: This is a bandaid fix for detecting auto-featured versions.
             // In the future, not all versions will have 'game_versions' fields, so this will need to be changed.
             let (loaders, game_versions) = futures::future::try_join(
-                database::models::loader_fields::Loader::list(&**pool, &redis),
+                loader_fields::Loader::list(&**pool, &redis),
                 database::models::legacy_loader_fields::MinecraftGameVersion::list(
                     None,
                     Some(true),
@@ -929,9 +926,8 @@ pub async fn version_delete(
         .unwrap_or_default();
 
         if !permissions.contains(ProjectPermissions::DELETE_VERSION) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to delete versions in this team"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::DeleteVersionsInTeam,
             ));
         }
     }

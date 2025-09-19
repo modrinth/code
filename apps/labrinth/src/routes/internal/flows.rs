@@ -13,7 +13,7 @@ use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
 use crate::queue::email::EmailQueue;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::routes::internal::session::issue_session;
 use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;
@@ -84,9 +84,7 @@ impl TempUser {
         redis: &RedisPool,
     ) -> Result<crate::database::models::DBUserId, AuthenticationError> {
         if let Some(email) = &self.email
-            && crate::database::models::DBUser::get_by_email(email, client)
-                .await?
-                .is_some()
+            && DBUser::get_by_email(email, client).await?.is_some()
         {
             return Err(AuthenticationError::DuplicateUser);
         }
@@ -108,12 +106,7 @@ impl TempUser {
                 }
             );
 
-            let new_id = crate::database::models::DBUser::get(
-                &test_username,
-                client,
-                redis,
-            )
-            .await?;
+            let new_id = DBUser::get(&test_username, client, redis).await?;
 
             if new_id.is_none() {
                 username = Some(test_username);
@@ -164,7 +157,7 @@ impl TempUser {
         };
 
         if let Some(username) = username {
-            crate::database::models::DBUser {
+            DBUser {
                 id: user_id,
                 github_id: if provider == AuthProvider::GitHub {
                     Some(
@@ -1610,9 +1603,7 @@ async fn validate_2fa_code(
 
         Ok(true)
     } else if allow_backup {
-        let backup_codes =
-            crate::database::models::DBUser::get_backup_codes(user_id, pool)
-                .await?;
+        let backup_codes = DBUser::get_backup_codes(user_id, pool).await?;
 
         if !backup_codes.contains(&input) {
             Ok(false)
@@ -1630,11 +1621,7 @@ async fn validate_2fa_code(
             .execute(&mut **transaction)
             .await?;
 
-            crate::database::models::DBUser::clear_caches(
-                &[(user_id, None)],
-                redis,
-            )
-            .await?;
+            DBUser::clear_caches(&[(user_id, None)], redis).await?;
 
             Ok(true)
         }
@@ -2056,8 +2043,8 @@ pub async fn change_password(
 
             Some(user)
         } else {
-            return Err(ApiError::CustomAuthentication(
-                "The password change flow code is invalid or has expired. Did you copy it promptly and correctly?".to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::InvalidFlowCode,
             ));
         }
     } else {
@@ -2084,11 +2071,12 @@ pub async fn change_password(
         }
 
         if let Some(pass) = user.password.as_ref() {
-            let old_password = change_password.old_password.as_ref().ok_or_else(|| {
-                ApiError::CustomAuthentication(
-                    "You must specify the old password to change your password!".to_string(),
-                )
-            })?;
+            let old_password =
+                change_password.old_password.as_ref().ok_or_else(|| {
+                    ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::OldPasswordNotSpecified,
+                    )
+                })?;
 
             let hasher = Argon2::default();
             hasher.verify_password(

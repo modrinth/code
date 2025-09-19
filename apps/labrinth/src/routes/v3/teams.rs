@@ -10,7 +10,7 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use rust_decimal::Decimal;
@@ -47,9 +47,7 @@ pub async fn team_members_get_project(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
-    let project_data =
-        crate::database::models::DBProject::get(&string, &**pool, &redis)
-            .await?;
+    let project_data = DBProject::get(&string, &**pool, &redis).await?;
 
     if let Some(project) = project_data {
         let current_user = get_user_from_headers(
@@ -131,8 +129,7 @@ pub async fn team_members_get_organization(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
     let organization_data =
-        crate::database::models::DBOrganization::get(&string, &**pool, &redis)
-            .await?;
+        DBOrganization::get(&string, &**pool, &redis).await?;
 
     if let Some(organization) = organization_data {
         let current_user = get_user_from_headers(
@@ -152,7 +149,7 @@ pub async fn team_members_get_organization(
             &redis,
         )
         .await?;
-        let users = crate::database::models::DBUser::get_many_ids(
+        let users = DBUser::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
             &redis,
@@ -206,7 +203,7 @@ pub async fn team_members_get(
     let id = info.into_inner().0;
     let members_data =
         DBTeamMember::get_from_team_full(id.into(), &**pool, &redis).await?;
-    let users = crate::database::models::DBUser::get_many_ids(
+    let users = DBUser::get_many_ids(
         &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
         &**pool,
         &redis,
@@ -278,7 +275,7 @@ pub async fn teams_get(
     let teams_data =
         DBTeamMember::get_from_team_full_many(&team_ids, &**pool, &redis)
             .await?;
-    let users = crate::database::models::DBUser::get_many_ids(
+    let users = DBUser::get_many_ids(
         &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
         &**pool,
         &redis,
@@ -477,9 +474,8 @@ pub async fn add_team_member(
             .unwrap_or_default();
 
             if !permissions.contains(ProjectPermissions::MANAGE_INVITES) {
-                return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to invite users to this team"
-                        .to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::InviteUsersToTeam,
                 ));
             }
             if !permissions.contains(new_member.permissions) {
@@ -507,8 +503,8 @@ pub async fn add_team_member(
             if !organization_permissions
                 .contains(OrganizationPermissions::MANAGE_INVITES)
             {
-                return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to invite users to this organization".to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::InviteUsersToOrganization,
                 ));
             }
             if !organization_permissions.contains(
@@ -522,9 +518,8 @@ pub async fn add_team_member(
                 OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS,
             ) && !new_member.permissions.is_empty()
             {
-                return Err(ApiError::CustomAuthentication(
-                    "You do not have permission to give this user default project permissions. Ensure 'permissions' is set if it is not, and empty (0)."
-                        .to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::GiveUserDefaultProjectPermissions,
                 ));
             }
         }
@@ -557,15 +552,11 @@ pub async fn add_team_member(
             ));
         }
     }
-    let new_user = crate::database::models::DBUser::get_id(
-        new_member.user_id.into(),
-        &**pool,
-        &redis,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput("An invalid User ID specified".to_string())
-    })?;
+    let new_user = DBUser::get_id(new_member.user_id.into(), &**pool, &redis)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput("An invalid User ID specified".to_string())
+        })?;
 
     let mut force_accepted = false;
     if let TeamAssociationId::Project(pid) = team_association {
@@ -705,9 +696,8 @@ pub async fn edit_team_member(
         DBTeamMember::get_from_user_id_pending(id, user_id, &**pool)
             .await?
             .ok_or_else(|| {
-                ApiError::CustomAuthentication(
-                    "You don't have permission to edit members of this team"
-                        .to_string(),
+                ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::EditTeamMembers,
                 )
             })?;
 
@@ -748,9 +738,8 @@ pub async fn edit_team_member(
                     .permissions
                     .is_some_and(|x| x != ProjectPermissions::all())
             {
-                return Err(ApiError::CustomAuthentication(
-                    "You cannot override the project permissions of the organization owner!"
-                        .to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::OverrideOrganizationOwnerDefaultProjectPermissions,
                 ));
             }
 
@@ -761,9 +750,8 @@ pub async fn edit_team_member(
             )
             .unwrap_or_default();
             if !permissions.contains(ProjectPermissions::EDIT_MEMBER) {
-                return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to edit members of this team"
-                        .to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::EditTeamMembers,
                 ));
             }
 
@@ -794,9 +782,8 @@ pub async fn edit_team_member(
             if !organization_permissions
                 .contains(OrganizationPermissions::EDIT_MEMBER)
             {
-                return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to edit members of this team"
-                        .to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::EditTeamMembers,
                 ));
             }
 
@@ -814,9 +801,8 @@ pub async fn edit_team_member(
                     OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS,
                 )
             {
-                return Err(ApiError::CustomAuthentication(
-                    "You do not have permission to give this user default project permissions."
-                        .to_string(),
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::GiveUserDefaultProjectPermissions,
                 ));
             }
         }
@@ -901,16 +887,14 @@ pub async fn transfer_ownership(
         )
         .await?
         .ok_or_else(|| {
-            ApiError::CustomAuthentication(
-                "You don't have permission to edit members of this team"
-                    .to_string(),
+            ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditTeamMembers,
             )
         })?;
 
         if !member.is_owner {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit the ownership of this team"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditTeamOwnership,
             ));
         }
     }
@@ -1078,8 +1062,8 @@ pub async fn remove_team_member(
     if let Some(delete_member) = delete_member {
         if delete_member.is_owner {
             // The owner cannot be removed from a team
-            return Err(ApiError::CustomAuthentication(
-                "The owner can't be removed from a team".to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::RemoveOwnerFromTeam,
             ));
         }
 
@@ -1123,9 +1107,8 @@ pub async fn remove_team_member(
                         DBTeamMember::delete(id, user_id, &mut transaction)
                             .await?;
                     } else {
-                        return Err(ApiError::CustomAuthentication(
-                            "You do not have permission to remove a member from this team"
-                                .to_string(),
+                        return Err(ApiError::SpecificAuthentication(
+                            SpecificAuthenticationError::RemoveTeamMember,
                         ));
                     }
                 } else if Some(delete_member.user_id)
@@ -1138,9 +1121,8 @@ pub async fn remove_team_member(
                     // permission can remove it.
                     DBTeamMember::delete(id, user_id, &mut transaction).await?;
                 } else {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have permission to cancel a team invite"
-                            .to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::CancelTeamInvite,
                     ));
                 }
             }
@@ -1162,9 +1144,8 @@ pub async fn remove_team_member(
                         DBTeamMember::delete(id, user_id, &mut transaction)
                             .await?;
                     } else {
-                        return Err(ApiError::CustomAuthentication(
-                            "You do not have permission to remove a member from this organization"
-                                .to_string(),
+                        return Err(ApiError::SpecificAuthentication(
+                            SpecificAuthenticationError::RemoveOrganizationMember,
                         ));
                     }
                 } else if Some(delete_member.user_id)
@@ -1177,8 +1158,8 @@ pub async fn remove_team_member(
                     // permission can remove it.
                     DBTeamMember::delete(id, user_id, &mut transaction).await?;
                 } else {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have permission to cancel an organization invite".to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::CancelOrganizationInvite,
                     ));
                 }
             }

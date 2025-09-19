@@ -23,7 +23,7 @@ use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::search::indexing::remove_documents;
 use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::img;
@@ -289,7 +289,7 @@ pub async fn project_edit(
     let id = project_item.inner.id;
 
     let (team_member, organization_team_member) =
-        db_models::DBTeamMember::get_for_project_permissions(
+        DBTeamMember::get_for_project_permissions(
             &project_item.inner,
             user.id.into(),
             &**pool,
@@ -301,8 +301,8 @@ pub async fn project_edit(
         &team_member,
         &organization_team_member,
     ) else {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to edit this project!".to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::EditProject,
         ));
     };
 
@@ -310,9 +310,8 @@ pub async fn project_edit(
 
     if let Some(name) = &new_project.name {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the name of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectName,
             ));
         }
 
@@ -331,9 +330,8 @@ pub async fn project_edit(
 
     if let Some(summary) = &new_project.summary {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the summary of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectSummary,
             ));
         }
 
@@ -352,9 +350,8 @@ pub async fn project_edit(
 
     if let Some(status) = &new_project.status {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the status of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectStatus,
             ));
         }
 
@@ -364,8 +361,8 @@ pub async fn project_edit(
             || project_item.inner.status.is_approved()
                 && status.can_be_requested())
         {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to set this status!".to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::RestrictedProjectStatus,
             ));
         }
 
@@ -522,9 +519,8 @@ pub async fn project_edit(
 
     if let Some(requested_status) = &new_project.requested_status {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the requested status of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectRequestedStatus,
             ));
         }
 
@@ -580,7 +576,7 @@ pub async fn project_edit(
         edit_project_categories(
             categories,
             &perms,
-            id as db_ids::DBProjectId,
+            id,
             false,
             &mut transaction,
         )
@@ -588,21 +584,14 @@ pub async fn project_edit(
     }
 
     if let Some(categories) = &new_project.additional_categories {
-        edit_project_categories(
-            categories,
-            &perms,
-            id as db_ids::DBProjectId,
-            true,
-            &mut transaction,
-        )
-        .await?;
+        edit_project_categories(categories, &perms, id, true, &mut transaction)
+            .await?;
     }
 
     if let Some(license_url) = &new_project.license_url {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the license URL of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectLicenseUrl,
             ));
         }
 
@@ -621,9 +610,8 @@ pub async fn project_edit(
 
     if let Some(slug) = &new_project.slug {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the slug of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectSlug,
             ));
         }
 
@@ -679,9 +667,8 @@ pub async fn project_edit(
 
     if let Some(license) = &new_project.license_id {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the license of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectLicense,
             ));
         }
 
@@ -714,10 +701,9 @@ pub async fn project_edit(
         && !links.is_empty()
     {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                    "You do not have the permissions to edit the links of this project!"
-                        .to_string(),
-                ));
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectLinks,
+            ));
         }
 
         let ids_to_delete = links.keys().cloned().collect::<Vec<String>>();
@@ -767,9 +753,8 @@ pub async fn project_edit(
             && (!project_item.inner.status.is_approved()
                 || moderation_message.is_some())
         {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the moderation message of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectModerationMessage,
             ));
         }
 
@@ -792,9 +777,8 @@ pub async fn project_edit(
             && (!project_item.inner.status.is_approved()
                 || moderation_message_body.is_some())
         {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the moderation message body of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectModerationMessageBody,
             ));
         }
 
@@ -813,9 +797,8 @@ pub async fn project_edit(
 
     if let Some(description) = &new_project.description {
         if !perms.contains(ProjectPermissions::EDIT_BODY) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the description (body) of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectDescription,
             ));
         }
 
@@ -834,9 +817,8 @@ pub async fn project_edit(
 
     if let Some(monetization_status) = &new_project.monetization_status {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the monetization status of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectMonetizationStatus,
             ));
         }
 
@@ -845,9 +827,8 @@ pub async fn project_edit(
                 == MonetizationStatus::ForceDemonetized)
             && !user.role.is_mod()
         {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the monetization status of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectMonetizationStatus,
             ));
         }
 
@@ -868,9 +849,8 @@ pub async fn project_edit(
         &new_project.side_types_migration_review_status
     {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have the permissions to edit the side types migration review status of this project!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectSideTypesMigrationReviewStatus,
             ));
         }
 
@@ -976,10 +956,11 @@ pub async fn edit_project_categories(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<(), ApiError> {
     if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-        let additional_str = if is_additional { "additional " } else { "" };
-        return Err(ApiError::CustomAuthentication(format!(
-            "You do not have the permissions to edit the {additional_str}categories of this project!"
-        )));
+        return Err(ApiError::SpecificAuthentication(if is_additional {
+            SpecificAuthenticationError::EditProjectAdditionalCategories
+        } else {
+            SpecificAuthenticationError::EditProjectCategories
+        }));
     }
 
     let mut mod_categories = Vec::new();
@@ -1224,10 +1205,9 @@ pub async fn projects_edit(
         .iter()
         .map(|x| x.inner.team_id)
         .collect::<Vec<db_models::DBTeamId>>();
-    let team_members = db_models::DBTeamMember::get_from_team_full_many(
-        &team_ids, &**pool, &redis,
-    )
-    .await?;
+    let team_members =
+        DBTeamMember::get_from_team_full_many(&team_ids, &**pool, &redis)
+            .await?;
 
     let organization_ids = projects_data
         .iter()
@@ -1244,13 +1224,12 @@ pub async fn projects_edit(
         .iter()
         .map(|x| x.team_id)
         .collect::<Vec<db_models::DBTeamId>>();
-    let organization_team_members =
-        db_models::DBTeamMember::get_from_team_full_many(
-            &organization_team_ids,
-            &**pool,
-            &redis,
-        )
-        .await?;
+    let organization_team_members = DBTeamMember::get_from_team_full_many(
+        &organization_team_ids,
+        &**pool,
+        &redis,
+    )
+    .await?;
 
     let categories =
         db_models::categories::Category::list(&**pool, &redis).await?;
@@ -1290,10 +1269,11 @@ pub async fn projects_edit(
 
             if team_member.is_some() {
                 if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(format!(
-                        "You do not have the permissions to bulk edit project {}!",
-                        project.inner.name
-                    )));
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::BulkEditProject(
+                            project.inner.name,
+                        ),
+                    ));
                 }
             } else if project.inner.status.is_hidden() {
                 return Err(ApiError::InvalidInput(format!(
@@ -1301,17 +1281,18 @@ pub async fn projects_edit(
                     ProjectId(project.inner.id.0 as u64)
                 )));
             } else {
-                return Err(ApiError::CustomAuthentication(format!(
-                    "You are not a member of project {}!",
-                    project.inner.name
-                )));
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::NotMemberOfProject(
+                        project.inner.name,
+                    ),
+                ));
             };
         }
 
         bulk_edit_project_categories(
             &categories,
             &project.categories,
-            project.inner.id as db_ids::DBProjectId,
+            project.inner.id,
             CategoryChanges {
                 categories: &bulk_edit_project.categories,
                 add_categories: &bulk_edit_project.add_categories,
@@ -1326,7 +1307,7 @@ pub async fn projects_edit(
         bulk_edit_project_categories(
             &categories,
             &project.additional_categories,
-            project.inner.id as db_ids::DBProjectId,
+            project.inner.id,
             CategoryChanges {
                 categories: &bulk_edit_project.additional_categories,
                 add_categories: &bulk_edit_project.add_additional_categories,
@@ -1497,6 +1478,8 @@ pub async fn project_icon_edit(
     let project_item = db_models::DBProject::get(&string, &**pool, &redis)
         .await?
         .ok_or_else(|| {
+            // FIXME: Change this to a 404 but also make sure it doesn't break existing clients
+            // (also applies to several other routes)
             ApiError::InvalidInput(
                 "The specified project does not exist!".to_string(),
             )
@@ -1504,7 +1487,7 @@ pub async fn project_icon_edit(
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
-            db_models::DBTeamMember::get_for_project_permissions(
+            DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -1513,7 +1496,7 @@ pub async fn project_icon_edit(
 
         // Hide the project
         if team_member.is_none() && organization_team_member.is_none() {
-            return Err(ApiError::CustomAuthentication(
+            return Err(ApiError::InvalidInput(
                 "The specified project does not exist!".to_string(),
             ));
         }
@@ -1526,9 +1509,8 @@ pub async fn project_icon_edit(
         .unwrap_or_default();
 
         if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this project's icon."
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectIcon,
             ));
         }
     }
@@ -1617,7 +1599,7 @@ pub async fn delete_project_icon(
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
-            db_models::DBTeamMember::get_for_project_permissions(
+            DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -1626,7 +1608,7 @@ pub async fn delete_project_icon(
 
         // Hide the project
         if team_member.is_none() && organization_team_member.is_none() {
-            return Err(ApiError::CustomAuthentication(
+            return Err(ApiError::InvalidInput(
                 "The specified project does not exist!".to_string(),
             ));
         }
@@ -1638,9 +1620,8 @@ pub async fn delete_project_icon(
         .unwrap_or_default();
 
         if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this project's icon."
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectIcon,
             ));
         }
     }
@@ -1723,16 +1704,9 @@ pub async fn add_gallery_item(
             )
         })?;
 
-    if project_item.gallery_items.len() > 64 {
-        return Err(ApiError::CustomAuthentication(
-            "You have reached the maximum of gallery images to upload."
-                .to_string(),
-        ));
-    }
-
     if !user.role.is_admin() {
         let (team_member, organization_team_member) =
-            db_models::DBTeamMember::get_for_project_permissions(
+            DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -1741,8 +1715,14 @@ pub async fn add_gallery_item(
 
         // Hide the project
         if team_member.is_none() && organization_team_member.is_none() {
-            return Err(ApiError::CustomAuthentication(
+            return Err(ApiError::InvalidInput(
                 "The specified project does not exist!".to_string(),
+            ));
+        }
+
+        if project_item.gallery_items.len() > 64 {
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::MaximumGalleryImages,
             ));
         }
 
@@ -1754,9 +1734,8 @@ pub async fn add_gallery_item(
         .unwrap_or_default();
 
         if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this project's gallery."
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectGallery,
             ));
         }
     }
@@ -1806,7 +1785,7 @@ pub async fn add_gallery_item(
         .await?;
     }
 
-    let gallery_item = vec![db_models::project_item::DBGalleryItem {
+    let gallery_item = vec![DBGalleryItem {
         image_url: upload_result.url,
         raw_image_url: upload_result.raw_url,
         featured: item.featured,
@@ -1907,7 +1886,7 @@ pub async fn edit_gallery_item(
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
-            db_models::DBTeamMember::get_for_project_permissions(
+            DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -1916,7 +1895,7 @@ pub async fn edit_gallery_item(
 
         // Hide the project
         if team_member.is_none() && organization_team_member.is_none() {
-            return Err(ApiError::CustomAuthentication(
+            return Err(ApiError::InvalidInput(
                 "The specified project does not exist!".to_string(),
             ));
         }
@@ -1928,9 +1907,8 @@ pub async fn edit_gallery_item(
         .unwrap_or_default();
 
         if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this project's gallery."
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectGallery,
             ));
         }
     }
@@ -2070,7 +2048,7 @@ pub async fn delete_gallery_item(
 
     if !user.role.is_mod() {
         let (team_member, organization_team_member) =
-            db_models::DBTeamMember::get_for_project_permissions(
+            DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
                 user.id.into(),
                 &**pool,
@@ -2079,7 +2057,7 @@ pub async fn delete_gallery_item(
 
         // Hide the project
         if team_member.is_none() && organization_team_member.is_none() {
-            return Err(ApiError::CustomAuthentication(
+            return Err(ApiError::InvalidInput(
                 "The specified project does not exist!".to_string(),
             ));
         }
@@ -2092,9 +2070,8 @@ pub async fn delete_gallery_item(
         .unwrap_or_default();
 
         if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this project's gallery."
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditProjectGallery,
             ));
         }
     }
@@ -2161,7 +2138,7 @@ pub async fn project_delete(
 
     if !user.role.is_admin() {
         let (team_member, organization_team_member) =
-            db_models::DBTeamMember::get_for_project_permissions(
+            DBTeamMember::get_for_project_permissions(
                 &project.inner,
                 user.id.into(),
                 &**pool,
@@ -2170,7 +2147,7 @@ pub async fn project_delete(
 
         // Hide the project
         if team_member.is_none() && organization_team_member.is_none() {
-            return Err(ApiError::CustomAuthentication(
+            return Err(ApiError::InvalidInput(
                 "The specified project does not exist!".to_string(),
             ));
         }
@@ -2183,8 +2160,8 @@ pub async fn project_delete(
         .unwrap_or_default();
 
         if !permissions.contains(ProjectPermissions::DELETE_PROJECT) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to delete this project!".to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::DeleteProject,
             ));
         }
     }
@@ -2441,7 +2418,7 @@ pub async fn project_get_organization(
         )
         .await?;
 
-        let users = crate::database::models::DBUser::get_many_ids(
+        let users = database::models::DBUser::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
             &redis,
@@ -2460,13 +2437,13 @@ pub async fn project_get_organization(
             .filter(|x| {
                 logged_in
                     || x.accepted
-                    || user_id.is_some_and(
-                        |y: crate::database::models::DBUserId| y == x.user_id,
-                    )
+                    || user_id.is_some_and(|y: database::models::DBUserId| {
+                        y == x.user_id
+                    })
             })
             .filter_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
-                    crate::models::teams::TeamMember::from(
+                    models::teams::TeamMember::from(
                         data,
                         user.clone(),
                         !logged_in,

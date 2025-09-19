@@ -5,7 +5,7 @@ use crate::models::ids::NotificationId;
 use crate::models::notifications::Notification;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use actix_web::{HttpRequest, HttpResponse, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -55,11 +55,7 @@ pub async fn notifications_get(
             .collect();
 
     let notifications_data: Vec<DBNotification> =
-        database::models::notification_item::DBNotification::get_many(
-            &notification_ids,
-            &**pool,
-        )
-        .await?;
+        DBNotification::get_many(&notification_ids, &**pool).await?;
 
     let notifications: Vec<Notification> = notifications_data
         .into_iter()
@@ -148,8 +144,8 @@ pub async fn notification_read(
 
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthentication(
-                "You are not authorized to read this notification!".to_string(),
+            Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::NotificationRead,
             ))
         }
     } else {
@@ -198,9 +194,8 @@ pub async fn notification_delete(
 
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthentication(
-                "You are not authorized to delete this notification!"
-                    .to_string(),
+            Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::NotificationDelete,
             ))
         }
     } else {

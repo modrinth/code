@@ -14,7 +14,7 @@ use crate::models::shared_instances::{
     SharedInstanceUserPermissions, SharedInstanceVersion,
 };
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::routes::v3::project_creation::UploadedFile;
 use crate::util::ext::MRPACK_MIME_TYPE;
 use actix_web::http::header::ContentLength;
@@ -127,8 +127,8 @@ async fn shared_instance_version_create_inner(
             if !permissions
                 .contains(SharedInstanceUserPermissions::UPLOAD_VERSION)
             {
-                return Err(ApiError::CustomAuthentication(
-                    "You do not have permission to upload a version for this shared instance.".to_string()
+                return Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::SharedInstanceUploadVersion,
                 ));
             }
         } else {

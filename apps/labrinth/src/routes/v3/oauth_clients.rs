@@ -2,7 +2,7 @@ use std::{collections::HashSet, fmt::Display, sync::Arc};
 
 use crate::file_hosting::FileHostPublicity;
 use crate::models::ids::OAuthClientId;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::routes::v3::create_error::CreateError;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::{
@@ -80,8 +80,8 @@ pub async fn get_user_clients(
         if target_user.id != current_user.id.into()
             && !current_user.role.is_admin()
         {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to see the OAuth clients of this user!".to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::SeeOAuthClients,
             ));
         }
 

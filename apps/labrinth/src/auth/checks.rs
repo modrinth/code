@@ -5,7 +5,7 @@ use crate::database::models::version_item::VersionQueryResult;
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
 use crate::models::users::User;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use itertools::Itertools;
 use sqlx::PgPool;
 
@@ -90,7 +90,7 @@ pub async fn filter_visible_project_ids(
     user_option: &Option<User>,
     pool: &PgPool,
     hide_unlisted: bool,
-) -> Result<Vec<crate::database::models::DBProjectId>, ApiError> {
+) -> Result<Vec<models::DBProjectId>, ApiError> {
     let mut return_projects = Vec::new();
     let mut check_projects = Vec::new();
 
@@ -126,7 +126,7 @@ pub async fn filter_enlisted_projects_ids(
     projects: Vec<&DBProject>,
     user_option: &Option<User>,
     pool: &PgPool,
-) -> Result<Vec<crate::database::models::DBProjectId>, ApiError> {
+) -> Result<Vec<models::DBProjectId>, ApiError> {
     let mut return_projects = vec![];
 
     if let Some(user) = user_option {
@@ -217,9 +217,8 @@ impl ValidateAuthorized for models::DBOAuthClient {
             return if user.role.is_mod() || user.id == self.created_by.into() {
                 Ok(())
             } else {
-                Err(ApiError::CustomAuthentication(
-                    "You don't have sufficient permissions to interact with this OAuth application"
-                        .to_string(),
+                Err(ApiError::SpecificAuthentication(
+                    SpecificAuthenticationError::InsufficientOAuthPermissions,
                 ))
             };
         }
@@ -233,7 +232,7 @@ pub async fn filter_visible_version_ids(
     user_option: &Option<User>,
     pool: &PgPool,
     redis: &RedisPool,
-) -> Result<Vec<crate::database::models::DBVersionId>, ApiError> {
+) -> Result<Vec<models::DBVersionId>, ApiError> {
     let mut return_versions = Vec::new();
 
     // First, filter out versions belonging to projects we can't see
@@ -282,7 +281,7 @@ pub async fn filter_enlisted_version_ids(
     user_option: &Option<User>,
     pool: &PgPool,
     redis: &RedisPool,
-) -> Result<Vec<crate::database::models::DBVersionId>, ApiError> {
+) -> Result<Vec<models::DBVersionId>, ApiError> {
     let mut return_versions = Vec::new();
 
     // Get project ids of versions

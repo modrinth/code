@@ -1,5 +1,5 @@
 use crate::database::redis::RedisPool;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::util::env::parse_var;
 use actix_web::{
     Error, ResponseError,
@@ -225,8 +225,8 @@ pub async fn rate_limit_middleware(
             Ok(req.into_response(response.map_into_right_body()))
         }
     } else {
-        let response = ApiError::CustomAuthentication(
-            "Unable to obtain user IP address!".to_string(),
+        let response = ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::UnknownUserIp,
         )
         .error_response();
 

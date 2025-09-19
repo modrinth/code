@@ -15,7 +15,7 @@ use crate::models::projects::ProjectStatus;
 use crate::models::threads::{MessageBody, Thread, ThreadType};
 use crate::models::users::User;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use actix_web::{HttpRequest, HttpResponse, web};
 use futures::TryStreamExt;
 use serde::Deserialize;
@@ -602,8 +602,8 @@ pub async fn message_delete(
 
     if let Some(thread) = result {
         if !user.role.is_mod() && thread.author_id != Some(user.id.into()) {
-            return Err(ApiError::CustomAuthentication(
-                "You cannot delete this message!".to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::DeleteMessage,
             ));
         }
 

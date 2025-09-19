@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use super::oauth_clients::get_user_clients;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::{
     auth::{
         filter_visible_collections, filter_visible_projects,
@@ -71,9 +71,8 @@ pub async fn admin_user_email(
     .map(|x| x.1)?;
 
     if !user.role.is_admin() {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to get a user from their email!"
-                .to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::GetUserFromEmail,
         ));
     }
 
@@ -444,9 +443,8 @@ pub async fn user_edit(
 
             if let Some(role) = &new_user.role {
                 if !user.role.is_admin() {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the role of this user!"
-                            .to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::EditUserRole,
                     ));
                 }
 
@@ -467,9 +465,8 @@ pub async fn user_edit(
 
             if let Some(badges) = &new_user.badges {
                 if !user.role.is_admin() {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the badges of this user!"
-                            .to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::EditUserBadges,
                     ));
                 }
 
@@ -488,9 +485,8 @@ pub async fn user_edit(
 
             if let Some(venmo_handle) = &new_user.venmo_handle {
                 if !scopes.contains(Scopes::PAYOUTS_WRITE) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the venmo handle of this user!"
-                            .to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::EditUserVenmoHandle,
                     ));
                 }
 
@@ -526,8 +522,8 @@ pub async fn user_edit(
                 .await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthentication(
-                "You do not have permission to edit this user!".to_string(),
+            Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditUser,
             ))
         }
     } else {
@@ -564,9 +560,8 @@ pub async fn user_icon_edit(
 
     if let Some(actual_user) = id_option {
         if user.id != actual_user.id.into() && !user.role.is_mod() {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this user's icon."
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditUserIcon,
             ));
         }
 
@@ -638,9 +633,8 @@ pub async fn user_icon_delete(
 
     if let Some(actual_user) = id_option {
         if user.id != actual_user.id.into() && !user.role.is_mod() {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this user's icon."
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditUserIcon,
             ));
         }
 
@@ -691,8 +685,8 @@ pub async fn user_delete(
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to delete this user!".to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::DeleteUser,
             ));
         }
 
@@ -732,8 +726,8 @@ pub async fn user_follows(
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to see the projects this user follows!".to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::SeeUserFollows,
             ));
         }
 
@@ -774,8 +768,8 @@ pub async fn user_notifications(
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to see the notifications of this user!".to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::SeeUserNotifications,
             ));
         }
 

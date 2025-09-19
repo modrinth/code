@@ -12,7 +12,7 @@ use crate::models::ids::OrganizationId;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::routes::v3::create_error::{CreateError, CreationInvalidInput};
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
@@ -422,9 +422,8 @@ pub async fn organizations_edit(
             let mut transaction = pool.begin().await?;
             if let Some(description) = &new_organization.description {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the description of this organization!"
-                            .to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::EditOrganizationDescription,
                     ));
                 }
                 sqlx::query!(
@@ -442,9 +441,8 @@ pub async fn organizations_edit(
 
             if let Some(name) = &new_organization.name {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the name of this organization!"
-                            .to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::EditOrganizationName,
                     ));
                 }
                 sqlx::query!(
@@ -462,9 +460,8 @@ pub async fn organizations_edit(
 
             if let Some(slug) = &new_organization.slug {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the slug of this organization!"
-                            .to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::EditOrganizationSlug,
                     ));
                 }
 
@@ -532,9 +529,8 @@ pub async fn organizations_edit(
 
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthentication(
-                "You do not have permission to edit this organization!"
-                    .to_string(),
+            Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditOrganization,
             ))
         }
     } else {
@@ -590,9 +586,8 @@ pub async fn organization_delete(
         .unwrap_or_default();
 
         if !permissions.contains(OrganizationPermissions::DELETE_ORGANIZATION) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to delete this organization!"
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::DeleteOrganization,
             ));
         }
     }
@@ -752,8 +747,8 @@ pub async fn organization_projects_add(
 
     // Require ownership of a project to add it to an organization
     if !current_user.role.is_admin() && !project_team_member.is_owner {
-        return Err(ApiError::CustomAuthentication(
-            "You need to be an owner of a project to add it to an organization!".to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::NotProjectOwnerForAddToOrg,
         ));
     }
 
@@ -821,9 +816,8 @@ pub async fn organization_projects_add(
         )
         .await?;
     } else {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to add projects to this organization!"
-                .to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::AddToOrganization,
         ));
     }
     Ok(HttpResponse::Ok().finish())
@@ -998,9 +992,8 @@ pub async fn organization_projects_remove(
         )
         .await?;
     } else {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to add projects to this organization!"
-                .to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::AddToOrganization,
         ));
     }
     Ok(HttpResponse::Ok().finish())
@@ -1057,9 +1050,8 @@ pub async fn organization_icon_edit(
         .unwrap_or_default();
 
         if !permissions.contains(OrganizationPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this organization's icon."
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditOrganizationIcon,
             ));
         }
     }
@@ -1161,9 +1153,8 @@ pub async fn delete_organization_icon(
         .unwrap_or_default();
 
         if !permissions.contains(OrganizationPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this organization's icon."
-                    .to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::EditOrganizationIcon,
             ));
         }
     }

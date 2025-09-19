@@ -12,7 +12,7 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ReportId, ThreadMessageId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_limited_from_payload;
 use actix_web::{HttpRequest, HttpResponse, web};
@@ -76,8 +76,8 @@ pub async fn images_add(
                     {
                         *project_id = Some(project.inner.id.into());
                     } else {
-                        return Err(ApiError::CustomAuthentication(
-                            "You are not authorized to upload images for this project".to_string(),
+                        return Err(ApiError::SpecificAuthentication(
+                            SpecificAuthenticationError::UploadProjectImages,
                         ));
                     }
                 } else {
@@ -103,8 +103,8 @@ pub async fn images_add(
                     {
                         *version_id = Some(version.inner.id.into());
                     } else {
-                        return Err(ApiError::CustomAuthentication(
-                            "You are not authorized to upload images for this version".to_string(),
+                        return Err(ApiError::SpecificAuthentication(
+                            SpecificAuthenticationError::UploadVersionImages,
                         ));
                     }
                 } else {
@@ -136,9 +136,8 @@ pub async fn images_add(
                 if is_authorized_thread(&thread, &user, &pool).await? {
                     *thread_message_id = Some(thread_message.id.into());
                 } else {
-                    return Err(ApiError::CustomAuthentication(
-                        "You are not authorized to upload images for this thread message"
-                            .to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::UploadThreadMessageImages,
                     ));
                 }
             }
@@ -162,8 +161,8 @@ pub async fn images_add(
                 if is_authorized_thread(&thread, &user, &pool).await? {
                     *report_id = Some(report.id.into());
                 } else {
-                    return Err(ApiError::CustomAuthentication(
-                        "You are not authorized to upload images for this report".to_string(),
+                    return Err(ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::UploadReportImages,
                     ));
                 }
             }
