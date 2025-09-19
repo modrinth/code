@@ -2,6 +2,7 @@ use super::ids::*;
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notification_item::DBNotificationAction;
 use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
+use crate::models::billing::PriceDuration;
 use crate::models::ids::{
     NotificationId, ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId,
     VersionId,
@@ -54,6 +55,7 @@ pub enum NotificationType {
     ProjectStatusNeutral,
     ProjectTransferred,
     PayoutAvailable,
+    TaxNotification,
     Unknown,
 }
 
@@ -88,6 +90,7 @@ impl NotificationType {
             NotificationType::ProjectStatusNeutral => "project_status_neutral",
             NotificationType::ProjectTransferred => "project_transferred",
             NotificationType::PayoutAvailable => "payout_available",
+            NotificationType::TaxNotification => "tax_notification",
             NotificationType::Unknown => "unknown",
         }
     }
@@ -122,6 +125,7 @@ impl NotificationType {
             "project_status_neutral" => NotificationType::ProjectStatusNeutral,
             "project_transferred" => NotificationType::ProjectTransferred,
             "payout_available" => NotificationType::PayoutAvailable,
+            "tax_notification" => NotificationType::TaxNotification,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -222,6 +226,16 @@ pub enum NotificationBody {
         date_available: DateTime<Utc>,
         amount: f64,
     },
+    TaxNotification {
+        new_amount: i64,
+        new_tax_amount: i64,
+        old_amount: i64,
+        old_tax_amount: i64,
+        billing_interval: PriceDuration,
+        currency: String,
+        due: DateTime<Utc>,
+        service: String,
+    },
     Unknown,
 }
 
@@ -292,6 +306,9 @@ impl NotificationBody {
             }
             NotificationBody::PaymentFailed { .. } => {
                 NotificationType::PaymentFailed
+            }
+            NotificationBody::TaxNotification { .. } => {
+                NotificationType::TaxNotification
             }
             NotificationBody::PayoutAvailable { .. } => {
                 NotificationType::PayoutAvailable
@@ -531,6 +548,12 @@ impl From<DBNotification> for Notification {
 				NotificationBody::ModerationMessageReceived { .. } => (
                     "New message in moderation thread".to_string(),
                     "You have a new message in a moderation thread.".to_string(),
+                    "#".to_string(),
+                    vec![],
+				),
+                NotificationBody::TaxNotification { .. } => (
+                    "Tax notification".to_string(),
+                    "You've received a tax notification.".to_string(),
                     "#".to_string(),
                     vec![],
                 ),

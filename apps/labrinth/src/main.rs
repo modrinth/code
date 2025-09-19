@@ -8,6 +8,7 @@ use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::{S3BucketConfig, S3Host};
 use labrinth::queue::email::EmailQueue;
 use labrinth::search;
+use labrinth::util::anrok;
 use labrinth::util::env::parse_var;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
@@ -138,6 +139,7 @@ async fn main() -> std::io::Result<()> {
 
     let email_queue =
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
+    let anrok_client = anrok::Client::from_env().unwrap();
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
@@ -148,6 +150,7 @@ async fn main() -> std::io::Result<()> {
             clickhouse,
             stripe_client,
             email_queue,
+            anrok_client.clone(),
         )
         .await;
         return Ok(());
@@ -187,6 +190,7 @@ async fn main() -> std::io::Result<()> {
         maxmind_reader.clone(),
         stripe_client,
         email_queue,
+        anrok_client.clone(),
         !args.no_background_tasks,
     );
 
