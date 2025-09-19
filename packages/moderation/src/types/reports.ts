@@ -1,4 +1,4 @@
-import type { DelphiReport, Project, Report, Thread, User, Version } from '@modrinth/utils'
+import type { Project, Report, Thread, User, Version } from '@modrinth/utils'
 
 export interface OwnershipTarget {
 	name: string
@@ -13,10 +13,6 @@ export interface ExtendedReport extends Report {
 	project?: Project
 	user?: User
 	version?: Version
-	target?: OwnershipTarget
-}
-
-export interface ExtendedDelphiReport extends DelphiReport {
 	target?: OwnershipTarget
 }
 
