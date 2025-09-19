@@ -1,6 +1,7 @@
 use ariadne::i18n_enum;
 use thiserror::Error;
 
+pub mod affiliate_code_item;
 pub mod categories;
 pub mod charge_item;
 pub mod collection_item;
@@ -35,6 +36,7 @@ pub mod users_notifications_preferences_item;
 pub mod users_redeemals;
 pub mod version_item;
 
+pub use affiliate_code_item::DBAffiliateCode;
 pub use collection_item::DBCollection;
 pub use ids::*;
 pub use image_item::DBImage;

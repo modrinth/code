@@ -455,6 +455,12 @@
   "labrinth.error.unauthorized.specific.cancel_team_invite": {
     "message": "You do not have permission to cancel a team invite"
   },
+  "labrinth.error.unauthorized.specific.create_affiliate_code": {
+    "message": "You do not have permission to create an affiliate code!"
+  },
+  "labrinth.error.unauthorized.specific.delete_affiliate_code": {
+    "message": "You do not have permission to delete an affiliate code!"
+  },
   "labrinth.error.unauthorized.specific.delete_file": {
     "message": "You don''t have permission to delete this file!"
   },
@@ -617,6 +623,12 @@
   "labrinth.error.unauthorized.specific.override_org_owner_default_project_permissions": {
     "message": "You cannot override the project permissions of the organization owner!"
   },
+  "labrinth.error.unauthorized.specific.read_affiliate_code": {
+    "message": "You do not have permission to read an affiliate code!"
+  },
+  "labrinth.error.unauthorized.specific.read_all_affiliate_codes": {
+    "message": "You do not have permission to read all affiliate codes!"
+  },
   "labrinth.error.unauthorized.specific.refund": {
     "message": "You do not have permission to refund a subscription!"
   },
@@ -649,6 +661,9 @@
   },
   "labrinth.error.unauthorized.specific.shared_instance_upload_version": {
     "message": "You do not have permission to upload a version for this shared instance."
+  },
+  "labrinth.error.unauthorized.specific.unknown_affiliate_user": {
+    "message": "Affiliate user not found!"
   },
   "labrinth.error.unauthorized.specific.unknown_user_ip": {
     "message": "Unable to obtain user IP address!"

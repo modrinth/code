@@ -120,6 +120,16 @@ i18n_enum!(
 
 #[derive(Clone, Debug, Error)]
 pub enum SpecificAuthenticationError {
+    #[error("You do not have permission to read all affiliate codes!")]
+    ReadAllAffiliateCodes,
+    #[error("You do not have permission to create an affiliate code!")]
+    CreateAffiliateCode,
+    #[error("Affiliate user not found!")]
+    UnknownAffiliateUser,
+    #[error("You do not have permission to read an affiliate code!")]
+    ReadAffiliateCode,
+    #[error("You do not have permission to delete an affiliate code!")]
+    DeleteAffiliateCode,
     #[error("You do not have permission to refund a subscription!")]
     Refund,
     #[error("Invalid master key")]
@@ -333,6 +343,11 @@ pub enum SpecificAuthenticationError {
 i18n_enum!(
     SpecificAuthenticationError,
     root_key: "labrinth.error.unauthorized.specific",
+    ReadAllAffiliateCodes! => "read_all_affiliate_codes",
+    CreateAffiliateCode! => "create_affiliate_code",
+    UnknownAffiliateUser! => "unknown_affiliate_user",
+    ReadAffiliateCode! => "read_affiliate_code",
+    DeleteAffiliateCode! => "delete_affiliate_code",
     Refund! => "refund",
     InvalidMasterKey! => "invalid_master_key",
     InsufficientOAuthPermissions! => "insufficient_oauth_permissions",
