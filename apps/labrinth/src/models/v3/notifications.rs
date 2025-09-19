@@ -91,18 +91,6 @@ impl NotificationType {
             NotificationType::ProjectTransferred => "project_transferred",
             NotificationType::PayoutAvailable => "payout_available",
             NotificationType::TaxNotification => "tax_notification",
-            NotificationType::PatCreated => "pat_created",
-            NotificationType::PayoutAvailable => "payout_available",
-            NotificationType::ModerationMessageReceived => {
-                "moderation_message_received"
-            }
-            NotificationType::ReportStatusUpdated => "report_status_updated",
-            NotificationType::ReportSubmitted => "report_submitted",
-            NotificationType::ProjectStatusApproved => {
-                "project_status_approved"
-            }
-            NotificationType::ProjectStatusNeutral => "project_status_neutral",
-            NotificationType::ProjectTransferred => "project_transferred",
             NotificationType::Unknown => "unknown",
         }
     }
@@ -248,10 +236,6 @@ pub enum NotificationBody {
         due: DateTime<Utc>,
         service: String,
     },
-    PayoutAvailable {
-        date_available: DateTime<Utc>,
-        amount: f64,
-    },
     Unknown,
 }
 
@@ -328,9 +312,6 @@ impl NotificationBody {
             }
             NotificationBody::PayoutAvailable { .. } => {
                 NotificationType::PayoutAvailable
-            }
-            NotificationBody::TaxNotification { .. } => {
-                NotificationType::TaxNotification
             }
             NotificationBody::Unknown => NotificationType::Unknown,
         }
@@ -570,34 +551,9 @@ impl From<DBNotification> for Notification {
                     "#".to_string(),
                     vec![],
 				),
-                // Don't expose the `flow` field
-                NotificationBody::ResetPassword { .. } => (
-                    "Password reset requested".to_string(),
-                    "You've requested to reset your password. Please check your email for a reset link.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
                 NotificationBody::TaxNotification { .. } => (
                     "Tax notification".to_string(),
                     "You've received a tax notification.".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-                NotificationBody::TaxNotification { .. } => (
-                    "Tax notification".to_string(),
-                    "You've received a tax notification.".to_string(),
-					"#".to_string(),
-                    vec![],
-				),
-                NotificationBody::PayoutAvailable { .. } => (
-                    "Payout available".to_string(),
-                    "A payout is available!".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
-				NotificationBody::ModerationMessageReceived { .. } => (
-                    "New message in moderation thread".to_string(),
-                    "You have a new message in a moderation thread.".to_string(),
                     "#".to_string(),
                     vec![],
                 ),

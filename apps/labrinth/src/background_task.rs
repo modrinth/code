@@ -1,6 +1,6 @@
 use crate::database::redis::RedisPool;
-use crate::queue::email::EmailQueue;
 use crate::queue::billing::{index_billing, index_subscriptions};
+use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
     insert_bank_balances_and_webhook, process_payout,
@@ -67,7 +67,6 @@ impl BackgroundTask {
             Mail => {
                 run_email(email_queue).await;
             }
-            IndexSubscriptions => index_subscriptions(pool, redis_pool).await,
         }
     }
 }

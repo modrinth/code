@@ -610,59 +610,6 @@ async fn collect_template_variables(
         | NotificationBody::ModeratorMessage { .. }
         | NotificationBody::LegacyMarkdown { .. }
         | NotificationBody::Unknown => Ok(map),
-        NotificationBody::TaxNotification {
-            old_amount,
-            old_tax_amount,
-            new_amount,
-            new_tax_amount,
-            billing_interval,
-            currency,
-            due,
-            service,
-        } => {
-            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
-                || DatabaseError::Database(sqlx::Error::RowNotFound),
-            )?;
-
-            let mut map = HashMap::new();
-
-            map.insert(USER_NAME, user.username);
-            map.insert(
-                TAXNOTIFICATION_OLD_AMOUNT,
-                fmt_money(*old_amount, currency),
-            );
-            map.insert(
-                TAXNOTIFICATION_OLD_TAX_AMOUNT,
-                fmt_money(*old_tax_amount, currency),
-            );
-            map.insert(
-                TAXNOTIFICATION_NEW_AMOUNT,
-                fmt_money(*new_amount, currency),
-            );
-            map.insert(
-                TAXNOTIFICATION_NEW_TAX_AMOUNT,
-                fmt_money(*new_tax_amount, currency),
-            );
-            map.insert(
-                TAXNOTIFICATION_OLD_TOTAL_AMOUNT,
-                fmt_money(*old_amount + *old_tax_amount, currency),
-            );
-            map.insert(
-                TAXNOTIFICATION_NEW_TOTAL_AMOUNT,
-                fmt_money(*new_amount + *new_tax_amount, currency),
-            );
-            map.insert(
-                TAXNOTIFICATION_BILLING_INTERVAL,
-                billing_interval.as_str().to_owned(),
-            );
-            map.insert(
-                TAXNOTIFICATION_DUE,
-                due.format("%B %d, %Y").to_string(),
-            );
-            map.insert(TAXNOTIFICATION_SERVICE, service.to_string());
-
-            Ok(map)
-        }
     }
 }
 

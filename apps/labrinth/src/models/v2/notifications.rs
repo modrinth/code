@@ -215,9 +215,6 @@ impl LegacyNotification {
             NotificationBody::PayoutAvailable { .. } => {
                 Some("payout_available".to_string())
             }
-            NotificationBody::TaxNotification { .. } => {
-                Some("tax_notification".to_string())
-            }
             NotificationBody::LegacyMarkdown {
                 notification_type, ..
             } => notification_type.clone(),

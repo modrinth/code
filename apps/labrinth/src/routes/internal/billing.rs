@@ -1,9 +1,4 @@
-use crate::auth::get_user_from_headers;
 use self::payments::*;
-use crate::auth::{get_user_from_headers, send_email};
-use crate::database::models::charge_item::DBCharge;
-use crate::database::models::notification_item::NotificationBuilder;
-use crate::database::models::products_tax_identifier_item::DBProductsTaxIdentifier;
 use crate::auth::get_user_from_headers;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::notification_item::NotificationBuilder;
