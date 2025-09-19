@@ -38,10 +38,10 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
 async fn main() -> theseus::Result<()> {
     println!("Starting.");
 
-    let _log_guard = theseus::start_logger();
+    let _log_guard = theseus::start_logger("ModrinthApp");
 
     // Initialize state
-    State::init().await?;
+    State::init("ModrinthApp".to_owned()).await?;
 
     let worlds = get_recent_worlds(4, EnumSet::all()).await?;
     for world in worlds {

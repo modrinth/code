@@ -80,9 +80,9 @@ pub struct State {
 }
 
 impl State {
-    pub async fn init() -> crate::Result<()> {
+    pub async fn init(app_identifier: String) -> crate::Result<()> {
         let state = LAUNCHER_STATE
-            .get_or_try_init(Self::initialize_state)
+            .get_or_try_init(move || Self::initialize_state(app_identifier))
             .await?;
 
         tokio::task::spawn(async move {
@@ -131,9 +131,11 @@ impl State {
     }
 
     #[tracing::instrument]
-    async fn initialize_state() -> crate::Result<Arc<Self>> {
+    async fn initialize_state(
+        app_identifier: String,
+    ) -> crate::Result<Arc<Self>> {
         tracing::info!("Connecting to app database");
-        let pool = db::connect().await?;
+        let pool = db::connect(&app_identifier).await?;
 
         legacy_converter::migrate_legacy_data(&pool).await?;
 
@@ -152,9 +154,12 @@ impl State {
             &mut settings,
             &pool,
             &io_semaphore,
+            &app_identifier,
         )
         .await?;
-        let directories = DirectoryInfo::init(settings.custom_dir).await?;
+
+        let directories =
+            DirectoryInfo::init(settings.custom_dir, &app_identifier).await?;
 
         let discord_rpc = DiscordGuard::init()?;
 
