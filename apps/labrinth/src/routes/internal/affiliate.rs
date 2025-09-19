@@ -7,6 +7,7 @@ use crate::{
     models::{
         ids::AffiliateCodeId,
         pats::Scopes,
+        users::Badges,
         v3::affiliate_code::{AdminAffiliateCode, AffiliateCode},
     },
     queue::session::AuthQueue,
@@ -222,6 +223,13 @@ async fn self_get_all(
     )
     .await?;
 
+    if !user.badges.contains(Badges::AFFILIATE) {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to view your affiliate codes!"
+                .to_string(),
+        ));
+    }
+
     let codes =
         DBAffiliateCode::get_by_affiliate(DBUserId::from(user.id), &**pool)
             .await?;
@@ -256,9 +264,15 @@ async fn self_patch(
     )
     .await?;
 
+    if !user.badges.contains(Badges::AFFILIATE) {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to update your affiliate codes!"
+                .to_string(),
+        ));
+    }
+
     let affiliate_code_id = DBAffiliateCodeId::from(body.id);
 
-    // TODO: permissions - check if user owns this code
     let existing_code = DBAffiliateCode::get_by_id(affiliate_code_id, &**pool)
         .await?
         .ok_or(ApiError::NotFound)?;
@@ -293,10 +307,16 @@ async fn self_delete(
     )
     .await?;
 
+    if !user.badges.contains(Badges::AFFILIATE) {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to delete your affiliate codes!"
+                .to_string(),
+        ));
+    }
+
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
-    // TODO: permissions - check if user owns this code
     let code = DBAffiliateCode::get_by_id(affiliate_code_id, &**pool)
         .await?
         .ok_or(ApiError::NotFound)?;
