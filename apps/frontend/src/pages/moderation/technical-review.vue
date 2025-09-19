@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import BatchScanProgressAlert, {
-	type BatchScanProgress,
-} from '@/components/ui/moderation/delphi/BatchScanProgressAlert.vue'
 import { FilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
 import { Button, DropdownSelect, Pagination } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
+import BatchScanProgressAlert, {
+	type BatchScanProgress,
+} from '~/components/ui/moderation/BatchScanProgressAlert.vue'
+import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 import { fetchDelphiIssues, fetchIssueTypeSchema, type OrderBy } from '~/helpers/tech-review'
 
 // Data from backend helper (with dummy fallback)
@@ -275,11 +276,10 @@ const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() 
 			<div
 				v-else
 				v-for="(item, idx) in paginatedItems"
-				:key="(item as any)?.id ?? idx"
-				class="universal-card p-4"
+				:key="item.issue.id ?? idx"
+				class=""
 			>
-				<!-- TODO: Replace with <TechReviewCard :item="item" /> -->
-				<pre class="max-h-48 overflow-auto text-xs">{{ item }}</pre>
+				<ModerationTechRevCard :item="item" />
 			</div>
 		</div>
 
