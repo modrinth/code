@@ -978,7 +978,7 @@
     "message": "Invitation to join project"
   },
   "project-member-header.invitation-with-role": {
-    "message": "You've been invited be a member of this project with the role of '{role}'."
+    "message": "You've been invited to be a member of this project with the role of ''{role}''."
   },
   "project-member-header.success": {
     "message": "Success"
@@ -1009,6 +1009,9 @@
   },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published."
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Submit for review"
   },
   "project-moderation-nags.suggestion": {
     "message": "Suggestion"
