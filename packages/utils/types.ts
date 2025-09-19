@@ -562,38 +562,3 @@ export interface Charge {
 export type SubscriptionMetadata =
 	| { type: 'pyro'; id: string; region?: string }
 	| { type: 'medal'; id: string }
-
-// Delphi
-export interface DelphiReport {
-	id: string
-	project: Project
-	version: Version
-	priority_score: number
-	detected_at: string
-	trace_type:
-		| 'reflection_indirection'
-		| 'xor_obfuscation'
-		| 'included_libraries'
-		| 'suspicious_binaries'
-		| 'corrupt_classes'
-		| 'suspicious_classes'
-		| 'url_usage'
-		| 'classloader_usage'
-		| 'processbuilder_usage'
-		| 'runtime_exec_usage'
-		| 'jni_usage'
-		| 'main_method'
-		| 'native_loading'
-		| 'malformed_jar'
-		| 'nested_jar_too_deep'
-		| 'failed_decompilation'
-		| 'analysis_failure'
-		| 'malware_easyforme'
-		| 'malware_simplyloader'
-	file_path: string
-	// pending = not reviewed yet.
-	// approved = approved as malicious, removed from modrinth
-	// rejected = not approved as malicious, remains on modrinth?
-	status: 'pending' | 'approved' | 'rejected'
-	content?: string
-}

@@ -14,6 +14,13 @@ const config: Config = {
 	theme: {
 		extend: {
 			colors: {
+				surface: {
+					l1: 'var(--surface-l1)',
+					l2: 'var(--surface-l2)',
+					l3: 'var(--surface-l3)',
+					l4: 'var(--surface-l4)',
+					l5: 'var(--surface-l5)',
+				},
 				icon: 'var(--color-base)',
 				// Text
 				primary: 'var(--color-base)',
@@ -29,13 +36,13 @@ const config: Config = {
 				blue: 'var(--color-blue)',
 				purple: 'var(--color-purple)',
 				bg: {
-					DEFAULT: 'var(--color-bg)',
+					DEFAULT: 'var(--surface-l1)', // var(--color-bg)
 					red: 'var(--color-red-bg)',
 					orange: 'var(--color-orange-bg)',
 					green: 'var(--color-green-bg)',
 					blue: 'var(--color-blue-bg)',
 					purple: 'var(--color-purple-bg)',
-					raised: 'var(--color-raised-bg)',
+					raised: 'var(--surface-l3)', // var(--color-raised-bg)
 				},
 				banners: {
 					error: {

@@ -1,14 +1,11 @@
 <template>
 	<div>
-		<div v-if="flags.developerMode" class="mb-4 font-bold text-heading">
+		<div v-if="flags.developerMode" class="mt-4 font-bold text-heading">
 			Thread ID:
 			<CopyCode :text="thread.id" />
 		</div>
 
-		<div
-			v-if="sortedMessages.length > 0"
-			class="bg-raised flex flex-col space-y-4 rounded-xl p-3 sm:p-4"
-		>
+		<div v-if="sortedMessages.length > 0" class="flex flex-col space-y-4 rounded-xl p-3 sm:p-4">
 			<ThreadMessage
 				v-for="message in sortedMessages"
 				:key="'message-' + message.id"
@@ -74,10 +71,14 @@
 							class="flex w-full items-center justify-center gap-2 sm:w-auto"
 							@click="sendReply(true)"
 						>
-							<ScaleIcon class="size-4" />
-							<span class="hidden sm:inline">Add private note</span>
-							<span class="sm:hidden">Private note</span>
+							Add note
 						</button>
+					</ButtonStyled>
+					<ButtonStyled v-if="visibleQuickReplies.length > 0">
+						<OverflowMenu :options="visibleQuickReplies">
+							Quick Reply
+							<ChevronDownIcon />
+						</OverflowMenu>
 					</ButtonStyled>
 				</div>
 
@@ -89,8 +90,7 @@
 								@click="closeReport(true)"
 							>
 								<CheckCircleIcon class="size-4" />
-								<span class="hidden sm:inline">Close with reply</span>
-								<span class="sm:hidden">Close & reply</span>
+								Reply and close
 							</button>
 						</ButtonStyled>
 						<ButtonStyled v-else color="red" class="w-full sm:w-auto">
@@ -110,23 +110,62 @@
 </template>
 
 <script setup lang="ts">
-import { CheckCircleIcon, ReplyIcon, ScaleIcon, SendIcon } from '@modrinth/assets'
-import { ButtonStyled, CopyCode, injectNotificationManager, MarkdownEditor } from '@modrinth/ui'
-import type { Report, Thread, ThreadMessage as TypeThreadMessage, User } from '@modrinth/utils'
+import { CheckCircleIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
+import {
+	reportQuickReplies,
+	type ExtendedReport,
+	type ReportQuickReply,
+} from '@modrinth/moderation'
+import {
+	ButtonStyled,
+	CopyCode,
+	injectNotificationManager,
+	MarkdownEditor,
+	OverflowMenu,
+	type OverflowMenuOption,
+} from '@modrinth/ui'
+import type { Thread, ThreadMessage as TypeThreadMessage, User } from '@modrinth/utils'
 import dayjs from 'dayjs'
-
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { isStaff } from '~/helpers/users.js'
-
 import ThreadMessage from './ThreadMessage.vue'
 
+import ChevronDownIcon from '../servers/icons/ChevronDownIcon.vue'
+
 const { addNotification } = injectNotificationManager()
+
+const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
+	return reportQuickReplies
+		.filter((reply) => {
+			if (reply.shouldShow === undefined) return true
+			if (typeof reply.shouldShow === 'function') {
+				return reply.shouldShow(props.report)
+			}
+
+			return reply.shouldShow
+		})
+		.map(
+			(reply) =>
+				({
+					id: reply.label,
+					action: () => handleQuickReply(reply),
+				}) as OverflowMenuOption,
+		)
+})
 
 const props = defineProps<{
 	thread: Thread
 	reporter: User
-	report: Report
+	report: ExtendedReport
 }>()
+
+async function handleQuickReply(reply: ReportQuickReply) {
+	const message =
+		typeof reply.message === 'function' ? await reply.message(props.report) : reply.message
+
+	await nextTick()
+	setReplyContent(message)
+}
 
 defineExpose({
 	setReplyContent,
