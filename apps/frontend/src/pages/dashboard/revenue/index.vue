@@ -68,12 +68,16 @@
 				</div>
 			</div>
 			<div class="input-group mt-4">
-				<span :class="{ 'disabled-cursor-wrapper': userBalance.available < minWithdraw }">
+				<span
+					:class="{
+						'disabled-cursor-wrapper': userBalance.available < minWithdraw || blockedByTax,
+					}"
+				>
 					<nuxt-link
-						:aria-disabled="userBalance.available < minWithdraw ? 'true' : 'false'"
-						:class="{ 'disabled-link': userBalance.available < minWithdraw }"
-						:disabled="userBalance.available < minWithdraw ? 'true' : 'false'"
-						:tabindex="userBalance.available < minWithdraw ? -1 : undefined"
+						:aria-disabled="userBalance.available < minWithdraw || blockedByTax ? 'true' : 'false'"
+						:class="{ 'disabled-link': userBalance.available < minWithdraw || blockedByTax }"
+						:disabled="userBalance.available < minWithdraw || blockedByTax ? 'true' : 'false'"
+						:tabindex="userBalance.available < minWithdraw || blockedByTax ? -1 : undefined"
 						class="iconified-button brand-button"
 						to="/dashboard/revenue/withdraw"
 					>
@@ -85,6 +89,11 @@
 					View transfer history
 				</NuxtLink>
 			</div>
+			<p class="text-sm font-bold text-orange" v-if="blockedByTax">
+				You have withdrawn over $600 this year. To continue withdrawing, you must complete a tax
+				form.
+			</p>
+
 			<p class="text-sm text-secondary">
 				By uploading projects to Modrinth and withdrawing money from your account, you agree to the
 				<nuxt-link class="text-link" to="/legal/cmp">Rewards Program Terms</nuxt-link>. For more
@@ -162,6 +171,12 @@ const minWithdraw = ref(0.01)
 const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
 	useBaseFetch(`payout/balance`, { apiVersion: 3 }),
 )
+
+const blockedByTax = computed(() => {
+	const status = userBalance.value?.form_completion_status ?? 'unknown'
+	const thresholdMet = (userBalance.value?.withdrawn_ytd ?? 0) >= 600
+	return thresholdMet && status !== 'complete'
+})
 
 const deadlineEnding = computed(() => {
 	let deadline = dayjs().subtract(2, 'month').endOf('month').add(60, 'days')
