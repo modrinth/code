@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Cancel"
+  },
+  "action.continue": {
+    "message": "Continue"
+  },
   "admin.billing.error.not-found": {
     "message": "User not found"
   },
@@ -413,6 +419,15 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
+  "common.close": {
+    "message": "Close"
+  },
+  "common.no": {
+    "message": "No"
+  },
+  "common.yes": {
+    "message": "Yes"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Create new"
   },
@@ -424,6 +439,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Your collections"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "A foreign entity means a business entity organized outside the United States (such as a non-US corporation, partnership, or LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Foreign entity"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Private individual"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Are you a private individual or part of a foreign entity?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Tax form"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth uses third-party provider Track1099 to securely collect and store your tax forms. <security-link>Learn more here.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Security practices"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Are you a US citizen?"
   },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
@@ -727,6 +766,15 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Billing action required."
+  },
+  "layout.banner.tax.action": {
+    "message": "Complete tax form"
+  },
+  "layout.banner.tax.description": {
+    "message": "You've withdrawn over $600 this year in revenue from Modrinth. For tax purposes, we need you to complete a tax form as soon as possible."
+  },
+  "layout.banner.tax.title": {
+    "message": "Tax form required"
   },
   "layout.banner.verify-email.action": {
     "message": "Re-send verification email"

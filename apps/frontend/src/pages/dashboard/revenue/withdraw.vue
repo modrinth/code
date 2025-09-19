@@ -135,7 +135,7 @@
 			</template>
 		</div>
 
-		<p class="font-bold text-orange" v-if="blockedByTax">
+		<p v-if="blockedByTax" class="font-bold text-orange">
 			You have withdrawn over $600 this year. To continue withdrawing, you must complete a tax form.
 		</p>
 
