@@ -118,7 +118,6 @@ i18n_enum!(
     Stripe(cause) => "stripe_error",
 );
 
-// TODO: Rename "Organization" to "Org"
 #[derive(Clone, Debug, Error)]
 pub enum SpecificAuthenticationError {
     #[error("You do not have permission to refund a subscription!")]
@@ -156,27 +155,27 @@ pub enum SpecificAuthenticationError {
     #[error(
         "You do not have the permissions to edit the slug of this organization!"
     )]
-    EditOrganizationSlug,
+    EditOrgSlug,
     #[error(
         "You do not have the permissions to edit the description of this organization!"
     )]
-    EditOrganizationDescription,
+    EditOrgDescription,
     #[error(
         "You do not have the permissions to edit the name of this organization!"
     )]
-    EditOrganizationName,
+    EditOrgName,
     #[error("You do not have permission to edit this organization!")]
-    EditOrganization,
+    EditOrg,
     #[error("You don't have permission to delete this organization!")]
-    DeleteOrganization,
+    DeleteOrg,
     #[error(
         "You need to be an owner of a project to add it to an organization!"
     )]
     NotProjectOwnerForAddToOrg,
     #[error("You do not have permission to add projects to this organization!")]
-    AddToOrganization,
+    AddToOrg,
     #[error("You don't have permission to edit this organization's icon.")]
-    EditOrganizationIcon,
+    EditOrgIcon,
     #[error("You do not have permission to edit this project!")]
     EditProject,
     #[error(
@@ -270,7 +269,7 @@ pub enum SpecificAuthenticationError {
     #[error("You don't have permission to invite users to this team")]
     InviteUsersToTeam,
     #[error("You don't have permission to invite users to this organization")]
-    InviteUsersToOrganization,
+    InviteUsersToOrg,
     #[error(
         "You do not have permission to give this user default project permissions."
     )]
@@ -280,7 +279,7 @@ pub enum SpecificAuthenticationError {
     #[error(
         "You cannot override the project permissions of the organization owner!"
     )]
-    OverrideOrganizationOwnerDefaultProjectPermissions,
+    OverrideOrgOwnerDefaultProjectPermissions,
     #[error("You don't have permission to edit the ownership of this team")]
     EditTeamOwnership,
     #[error("The owner can't be removed from a team")]
@@ -292,9 +291,9 @@ pub enum SpecificAuthenticationError {
     #[error(
         "You do not have permission to remove a member from this organization"
     )]
-    RemoveOrganizationMember,
+    RemoveOrgMember,
     #[error("You do not have permission to cancel an organization invite")]
-    CancelOrganizationInvite,
+    CancelOrgInvite,
     #[error("You cannot delete this message!")]
     DeleteMessage,
     #[error("You do not have permission to get a user from their email!")]
@@ -347,14 +346,14 @@ i18n_enum!(
     NotificationRead! => "notification_read",
     NotificationDelete! => "notification_delete",
     SeeOAuthClients! => "see_oauth_clients",
-    EditOrganizationSlug! => "edit_organization_slug",
-    EditOrganizationDescription! => "edit_organization_description",
-    EditOrganizationName! => "edit_organization_name",
-    EditOrganization! => "edit_organization",
-    DeleteOrganization! => "delete_organization",
+    EditOrgSlug! => "edit_org_slug",
+    EditOrgDescription! => "edit_org_description",
+    EditOrgName! => "edit_org_name",
+    EditOrg! => "edit_org",
+    DeleteOrg! => "delete_org",
     NotProjectOwnerForAddToOrg! => "not_project_owner_for_add_to_org",
-    AddToOrganization! => "add_to_organization",
-    EditOrganizationIcon! => "edit_organization_icon",
+    AddToOrg! => "add_to_org",
+    EditOrgIcon! => "edit_org_icon",
     EditProject! => "edit_project",
     EditProjectName! => "edit_project_name",
     EditProjectSummary! => "edit_project_summary",
@@ -384,16 +383,16 @@ i18n_enum!(
     DeleteSharedInstance! => "delete_shared_instance",
     DeleteSharedInstanceVersion! => "delete_shared_instance_version",
     InviteUsersToTeam! => "invite_users_to_team",
-    InviteUsersToOrganization! => "invite_users_to_organization",
+    InviteUsersToOrg! => "invite_users_to_org",
     GiveUserDefaultProjectPermissions! => "give_user_default_project_permissions",
     EditTeamMembers! => "edit_team_members",
-    OverrideOrganizationOwnerDefaultProjectPermissions! => "override_organization_owner_default_project_permissions",
+    OverrideOrgOwnerDefaultProjectPermissions! => "override_org_owner_default_project_permissions",
     EditTeamOwnership! => "edit_team_ownership",
     RemoveOwnerFromTeam! => "remove_owner_from_team",
     RemoveTeamMember! => "remove_team_member",
     CancelTeamInvite! => "cancel_team_invite",
-    RemoveOrganizationMember! => "remove_organization_member",
-    CancelOrganizationInvite! => "cancel_organization_invite",
+    RemoveOrgMember! => "remove_org_member",
+    CancelOrgInvite! => "cancel_org_invite",
     DeleteMessage! => "delete_message",
     GetUserFromEmail! => "get_user_from_email",
     EditUserRole! => "edit_user_role",

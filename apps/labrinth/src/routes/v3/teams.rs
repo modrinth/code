@@ -504,7 +504,7 @@ pub async fn add_team_member(
                 .contains(OrganizationPermissions::MANAGE_INVITES)
             {
                 return Err(ApiError::SpecificAuthentication(
-                    SpecificAuthenticationError::InviteUsersToOrganization,
+                    SpecificAuthenticationError::InviteUsersToOrg,
                 ));
             }
             if !organization_permissions.contains(
@@ -739,7 +739,7 @@ pub async fn edit_team_member(
                     .is_some_and(|x| x != ProjectPermissions::all())
             {
                 return Err(ApiError::SpecificAuthentication(
-                    SpecificAuthenticationError::OverrideOrganizationOwnerDefaultProjectPermissions,
+                    SpecificAuthenticationError::OverrideOrgOwnerDefaultProjectPermissions,
                 ));
             }
 
@@ -1145,7 +1145,7 @@ pub async fn remove_team_member(
                             .await?;
                     } else {
                         return Err(ApiError::SpecificAuthentication(
-                            SpecificAuthenticationError::RemoveOrganizationMember,
+                            SpecificAuthenticationError::RemoveOrgMember,
                         ));
                     }
                 } else if Some(delete_member.user_id)
@@ -1159,7 +1159,7 @@ pub async fn remove_team_member(
                     DBTeamMember::delete(id, user_id, &mut transaction).await?;
                 } else {
                     return Err(ApiError::SpecificAuthentication(
-                        SpecificAuthenticationError::CancelOrganizationInvite,
+                        SpecificAuthenticationError::CancelOrgInvite,
                     ));
                 }
             }

@@ -443,13 +443,13 @@
   "labrinth.error.unauthorized.socket": {
     "message": "Invalid state sent, you probably need to get a new websocket"
   },
-  "labrinth.error.unauthorized.specific.add_to_organization": {
+  "labrinth.error.unauthorized.specific.add_to_org": {
     "message": "You do not have permission to add projects to this organization!"
   },
   "labrinth.error.unauthorized.specific.bulk_edit_project": {
     "message": "You do not have the permissions to bulk edit project {project_name}!"
   },
-  "labrinth.error.unauthorized.specific.cancel_organization_invite": {
+  "labrinth.error.unauthorized.specific.cancel_org_invite": {
     "message": "You do not have permission to cancel an organization invite"
   },
   "labrinth.error.unauthorized.specific.cancel_team_invite": {
@@ -461,7 +461,7 @@
   "labrinth.error.unauthorized.specific.delete_message": {
     "message": "You cannot delete this message!"
   },
-  "labrinth.error.unauthorized.specific.delete_organization": {
+  "labrinth.error.unauthorized.specific.delete_org": {
     "message": "You don''t have permission to delete this organization!"
   },
   "labrinth.error.unauthorized.specific.delete_project": {
@@ -479,19 +479,19 @@
   "labrinth.error.unauthorized.specific.delete_versions_in_team": {
     "message": "You do not have permission to delete versions in this team"
   },
-  "labrinth.error.unauthorized.specific.edit_organization": {
+  "labrinth.error.unauthorized.specific.edit_org": {
     "message": "You do not have permission to edit this organization!"
   },
-  "labrinth.error.unauthorized.specific.edit_organization_description": {
+  "labrinth.error.unauthorized.specific.edit_org_description": {
     "message": "You do not have the permissions to edit the description of this organization!"
   },
-  "labrinth.error.unauthorized.specific.edit_organization_icon": {
+  "labrinth.error.unauthorized.specific.edit_org_icon": {
     "message": "You don''t have permission to edit this organization''s icon."
   },
-  "labrinth.error.unauthorized.specific.edit_organization_name": {
+  "labrinth.error.unauthorized.specific.edit_org_name": {
     "message": "You do not have the permissions to edit the name of this organization!"
   },
-  "labrinth.error.unauthorized.specific.edit_organization_slug": {
+  "labrinth.error.unauthorized.specific.edit_org_slug": {
     "message": "You do not have the permissions to edit the slug of this organization!"
   },
   "labrinth.error.unauthorized.specific.edit_project": {
@@ -590,7 +590,7 @@
   "labrinth.error.unauthorized.specific.invalid_master_key": {
     "message": "Invalid master key"
   },
-  "labrinth.error.unauthorized.specific.invite_users_to_organization": {
+  "labrinth.error.unauthorized.specific.invite_users_to_org": {
     "message": "You don''t have permission to invite users to this organization"
   },
   "labrinth.error.unauthorized.specific.invite_users_to_team": {
@@ -614,13 +614,13 @@
   "labrinth.error.unauthorized.specific.old_password_not_specified": {
     "message": "You must specify the old password to change your password!"
   },
-  "labrinth.error.unauthorized.specific.override_organization_owner_default_project_permissions": {
+  "labrinth.error.unauthorized.specific.override_org_owner_default_project_permissions": {
     "message": "You cannot override the project permissions of the organization owner!"
   },
   "labrinth.error.unauthorized.specific.refund": {
     "message": "You do not have permission to refund a subscription!"
   },
-  "labrinth.error.unauthorized.specific.remove_organization_member": {
+  "labrinth.error.unauthorized.specific.remove_org_member": {
     "message": "You do not have permission to remove a member from this organization"
   },
   "labrinth.error.unauthorized.specific.remove_owner_from_team": {

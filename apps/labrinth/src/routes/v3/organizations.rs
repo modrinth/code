@@ -423,7 +423,7 @@ pub async fn organizations_edit(
             if let Some(description) = &new_organization.description {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
                     return Err(ApiError::SpecificAuthentication(
-                        SpecificAuthenticationError::EditOrganizationDescription,
+                        SpecificAuthenticationError::EditOrgDescription,
                     ));
                 }
                 sqlx::query!(
@@ -442,7 +442,7 @@ pub async fn organizations_edit(
             if let Some(name) = &new_organization.name {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
                     return Err(ApiError::SpecificAuthentication(
-                        SpecificAuthenticationError::EditOrganizationName,
+                        SpecificAuthenticationError::EditOrgName,
                     ));
                 }
                 sqlx::query!(
@@ -461,7 +461,7 @@ pub async fn organizations_edit(
             if let Some(slug) = &new_organization.slug {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
                     return Err(ApiError::SpecificAuthentication(
-                        SpecificAuthenticationError::EditOrganizationSlug,
+                        SpecificAuthenticationError::EditOrgSlug,
                     ));
                 }
 
@@ -530,7 +530,7 @@ pub async fn organizations_edit(
             Ok(HttpResponse::NoContent().body(""))
         } else {
             Err(ApiError::SpecificAuthentication(
-                SpecificAuthenticationError::EditOrganization,
+                SpecificAuthenticationError::EditOrg,
             ))
         }
     } else {
@@ -587,7 +587,7 @@ pub async fn organization_delete(
 
         if !permissions.contains(OrganizationPermissions::DELETE_ORGANIZATION) {
             return Err(ApiError::SpecificAuthentication(
-                SpecificAuthenticationError::DeleteOrganization,
+                SpecificAuthenticationError::DeleteOrg,
             ));
         }
     }
@@ -817,7 +817,7 @@ pub async fn organization_projects_add(
         .await?;
     } else {
         return Err(ApiError::SpecificAuthentication(
-            SpecificAuthenticationError::AddToOrganization,
+            SpecificAuthenticationError::AddToOrg,
         ));
     }
     Ok(HttpResponse::Ok().finish())
@@ -993,7 +993,7 @@ pub async fn organization_projects_remove(
         .await?;
     } else {
         return Err(ApiError::SpecificAuthentication(
-            SpecificAuthenticationError::AddToOrganization,
+            SpecificAuthenticationError::AddToOrg,
         ));
     }
     Ok(HttpResponse::Ok().finish())
@@ -1051,7 +1051,7 @@ pub async fn organization_icon_edit(
 
         if !permissions.contains(OrganizationPermissions::EDIT_DETAILS) {
             return Err(ApiError::SpecificAuthentication(
-                SpecificAuthenticationError::EditOrganizationIcon,
+                SpecificAuthenticationError::EditOrgIcon,
             ));
         }
     }
@@ -1154,7 +1154,7 @@ pub async fn delete_organization_icon(
 
         if !permissions.contains(OrganizationPermissions::EDIT_DETAILS) {
             return Err(ApiError::SpecificAuthentication(
-                SpecificAuthenticationError::EditOrganizationIcon,
+                SpecificAuthenticationError::EditOrgIcon,
             ));
         }
     }
