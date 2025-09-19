@@ -1,6 +1,6 @@
 use crate::validate::{
     MaybeProtectedZipFile, PLAUSIBLE_PACK_REGEX, SupportedGameVersions,
-    ValidationError, ValidationResult,
+    ValidationError, ValidationResult, ValidationWarning,
 };
 use chrono::DateTime;
 
@@ -37,7 +37,7 @@ impl super::Validator for DataPackValidator {
             Ok(ValidationResult::Pass)
         } else {
             Ok(ValidationResult::Warning(
-                "No pack.mcmeta present for datapack file. Tip: Make sure pack.mcmeta is in the root directory of your datapack!",
+                ValidationWarning::MissingDatapackPackMcmeta,
             ))
         }
     }

@@ -1,7 +1,7 @@
 use crate::models::pack::{PackFileHash, PackFormat};
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult,
+    SupportedGameVersions, ValidationError, ValidationResult, ValidationWarning,
 };
 use std::io::{Cursor, Read};
 use std::path::Component;
@@ -30,7 +30,7 @@ impl super::Validator for ModpackValidator {
         let pack: PackFormat = {
             let Ok(mut file) = archive.by_name("modrinth.index.json") else {
                 return Ok(ValidationResult::Warning(
-                    "Pack manifest is missing.",
+                    ValidationWarning::MissingPackManifest,
                 ));
             };
 

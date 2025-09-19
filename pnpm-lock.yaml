@@ -177,6 +177,8 @@ importers:
 
   apps/app-playground: {}
 
+  apps/ariadne-extract: {}
+
   apps/daedalus_client:
     dependencies:
       '@modrinth/daedalus':
@@ -385,6 +387,8 @@ importers:
   apps/labrinth: {}
 
   packages/app-lib: {}
+
+  packages/ariadne: {}
 
   packages/assets:
     devDependencies:

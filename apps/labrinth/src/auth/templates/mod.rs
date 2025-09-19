@@ -46,7 +46,7 @@ impl ErrorPage {
     }
 }
 
-impl actix_web::ResponseError for ErrorPage {
+impl ResponseError for ErrorPage {
     fn status_code(&self) -> StatusCode {
         self.code
     }

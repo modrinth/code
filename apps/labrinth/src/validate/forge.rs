@@ -1,5 +1,6 @@
 use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult, filter_out_packs,
+    SupportedGameVersions, ValidationError, ValidationResult,
+    ValidationWarning, filter_out_packs,
 };
 use chrono::DateTime;
 use std::io::Cursor;
@@ -32,7 +33,7 @@ impl super::Validator for ForgeValidator {
             && !archive.file_names().any(|x| x.ends_with(".class"))
         {
             return Ok(ValidationResult::Warning(
-                "No mods.toml or valid class files present for Forge file.",
+                ValidationWarning::MissingModsToml,
             ));
         }
 
@@ -70,7 +71,7 @@ impl super::Validator for LegacyForgeValidator {
             && !archive.file_names().any(|x| x.ends_with(".class"))
         {
             return Ok(ValidationResult::Warning(
-                "Forge mod file does not contain mcmod.info or valid class files!",
+                ValidationWarning::MissingMcmodInfo,
             ));
         };
 

@@ -1,3 +1,4 @@
+use crate::auth::templates::ErrorPage;
 use crate::auth::validate::{
     get_full_user_from_headers, get_user_record_from_bearer_token,
 };
@@ -12,7 +13,7 @@ use crate::models::pats::Scopes;
 use crate::models::users::{Badges, Role};
 use crate::queue::email::EmailQueue;
 use crate::queue::session::AuthQueue;
-use crate::routes::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 use crate::routes::internal::session::issue_session;
 use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;
@@ -83,9 +84,7 @@ impl TempUser {
         redis: &RedisPool,
     ) -> Result<crate::database::models::DBUserId, AuthenticationError> {
         if let Some(email) = &self.email
-            && crate::database::models::DBUser::get_by_email(email, client)
-                .await?
-                .is_some()
+            && DBUser::get_by_email(email, client).await?.is_some()
         {
             return Err(AuthenticationError::DuplicateUser);
         }
@@ -107,12 +106,7 @@ impl TempUser {
                 }
             );
 
-            let new_id = crate::database::models::DBUser::get(
-                &test_username,
-                client,
-                redis,
-            )
-            .await?;
+            let new_id = DBUser::get(&test_username, client, redis).await?;
 
             if new_id.is_none() {
                 username = Some(test_username);
@@ -163,7 +157,7 @@ impl TempUser {
         };
 
         if let Some(username) = username {
-            crate::database::models::DBUser {
+            DBUser {
                 id: user_id,
                 github_id: if provider == AuthProvider::GitHub {
                     Some(
@@ -1112,29 +1106,29 @@ pub async fn auth_callback(
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     redis: Data<RedisPool>,
-) -> Result<HttpResponse, crate::auth::templates::ErrorPage> {
-    let state_string = query
-        .get("state")
-        .ok_or_else(|| AuthenticationError::InvalidCredentials)?
-        .clone();
+) -> Result<HttpResponse, ErrorPage> {
+    let res = async || {
+        let state = query
+            .get("state")
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)?
+            .clone();
 
-    let state = state_string.clone();
-    let res: Result<HttpResponse, AuthenticationError> = async move {
         let flow = DBFlow::get(&state, &redis).await?;
 
         // Extract cookie header from request
         if let Some(DBFlow::OAuth {
-                        user_id,
-                        provider,
-                        url,
-                    }) = flow
+            user_id,
+            provider,
+            url,
+        }) = flow
         {
             DBFlow::remove(&state, &redis).await?;
 
             let token = provider.get_token(query).await?;
             let oauth_user = provider.get_user(&token).await?;
 
-            let user_id_opt = provider.get_user_id(&oauth_user.id, &**client).await?;
+            let user_id_opt =
+                provider.get_user_id(&oauth_user.id, &**client).await?;
 
             let mut transaction = client.begin().await?;
             if let Some(id) = user_id {
@@ -1146,9 +1140,12 @@ pub async fn auth_callback(
                     .update_user_id(id, Some(&oauth_user.id), &mut transaction)
                     .await?;
 
-                let user = crate::database::models::DBUser::get_id(id, &**client, &redis).await?;
+                let user = crate::database::models::DBUser::get_id(
+                    id, &**client, &redis,
+                )
+                .await?;
 
-                if provider == AuthProvider::PayPal  {
+                if provider == AuthProvider::PayPal {
                     sqlx::query!(
                         "
                         UPDATE users
@@ -1163,22 +1160,32 @@ pub async fn auth_callback(
                         .execute(&mut *transaction)
                         .await?;
                 } else if let Some(user) = user {
-                    NotificationBuilder { body: NotificationBody::AuthProviderAdded { provider: provider.as_str().to_string() } }
-                        .insert(user.id, &mut transaction, &redis)
-                        .await?;
+                    NotificationBuilder {
+                        body: NotificationBody::AuthProviderAdded {
+                            provider: provider.as_str().to_string(),
+                        },
+                    }
+                    .insert(user.id, &mut transaction, &redis)
+                    .await?;
                 }
 
                 transaction.commit().await?;
-                crate::database::models::DBUser::clear_caches(&[(id, None)], &redis).await?;
+                crate::database::models::DBUser::clear_caches(
+                    &[(id, None)],
+                    &redis,
+                )
+                .await?;
 
                 Ok(HttpResponse::TemporaryRedirect()
                     .append_header(("Location", &*url))
                     .json(serde_json::json!({ "url": url })))
             } else {
                 let user_id = if let Some(user_id) = user_id_opt {
-                    let user = crate::database::models::DBUser::get_id(user_id, &**client, &redis)
-                        .await?
-                        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+                    let user = crate::database::models::DBUser::get_id(
+                        user_id, &**client, &redis,
+                    )
+                    .await?
+                    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
                     if user.totp_secret.is_some() {
                         let flow = DBFlow::Login2FA { user_id: user.id }
@@ -1199,10 +1206,20 @@ pub async fn auth_callback(
 
                     user_id
                 } else {
-                    oauth_user.create_account(provider, &mut transaction, &client, &file_host, &redis).await?
+                    oauth_user
+                        .create_account(
+                            provider,
+                            &mut transaction,
+                            &client,
+                            &file_host,
+                            &redis,
+                        )
+                        .await?
                 };
 
-                let session = issue_session(req, user_id, &mut transaction, &redis).await?;
+                let session =
+                    issue_session(&req, user_id, &mut transaction, &redis)
+                        .await?;
                 transaction.commit().await?;
 
                 let redirect_url = format!(
@@ -1222,11 +1239,13 @@ pub async fn auth_callback(
                     .json(serde_json::json!({ "url": redirect_url })))
             }
         } else {
-            Err::<HttpResponse, AuthenticationError>(AuthenticationError::InvalidCredentials)
+            Err::<HttpResponse, AuthenticationError>(
+                AuthenticationError::InvalidCredentials,
+            )
         }
-    }.await;
+    };
 
-    Ok(res?)
+    Ok(res().await?)
 }
 
 #[derive(Deserialize)]
@@ -1429,7 +1448,8 @@ pub async fn create_account_with_password(
     .insert(&mut transaction)
     .await?;
 
-    let session = issue_session(req, user_id, &mut transaction, &redis).await?;
+    let session =
+        issue_session(&req, user_id, &mut transaction, &redis).await?;
     let res = crate::models::sessions::Session::from(session, true, None);
 
     let mailbox: Mailbox = new_account.email.parse().map_err(|_| {
@@ -1523,7 +1543,7 @@ pub async fn login_password(
     } else {
         let mut transaction = pool.begin().await?;
         let session =
-            issue_session(req, user.id, &mut transaction, &redis).await?;
+            issue_session(&req, user.id, &mut transaction, &redis).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 
@@ -1583,9 +1603,7 @@ async fn validate_2fa_code(
 
         Ok(true)
     } else if allow_backup {
-        let backup_codes =
-            crate::database::models::DBUser::get_backup_codes(user_id, pool)
-                .await?;
+        let backup_codes = DBUser::get_backup_codes(user_id, pool).await?;
 
         if !backup_codes.contains(&input) {
             Ok(false)
@@ -1603,11 +1621,7 @@ async fn validate_2fa_code(
             .execute(&mut **transaction)
             .await?;
 
-            crate::database::models::DBUser::clear_caches(
-                &[(user_id, None)],
-                redis,
-            )
-            .await?;
+            DBUser::clear_caches(&[(user_id, None)], redis).await?;
 
             Ok(true)
         }
@@ -1653,7 +1667,7 @@ pub async fn login_2fa(
         DBFlow::remove(&login.flow, &redis).await?;
 
         let session =
-            issue_session(req, user_id, &mut transaction, &redis).await?;
+            issue_session(&req, user_id, &mut transaction, &redis).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 
@@ -2029,8 +2043,8 @@ pub async fn change_password(
 
             Some(user)
         } else {
-            return Err(ApiError::CustomAuthentication(
-                "The password change flow code is invalid or has expired. Did you copy it promptly and correctly?".to_string(),
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::InvalidFlowCode,
             ));
         }
     } else {
@@ -2057,11 +2071,12 @@ pub async fn change_password(
         }
 
         if let Some(pass) = user.password.as_ref() {
-            let old_password = change_password.old_password.as_ref().ok_or_else(|| {
-                ApiError::CustomAuthentication(
-                    "You must specify the old password to change your password!".to_string(),
-                )
-            })?;
+            let old_password =
+                change_password.old_password.as_ref().ok_or_else(|| {
+                    ApiError::SpecificAuthentication(
+                        SpecificAuthenticationError::OldPasswordNotSpecified,
+                    )
+                })?;
 
             let hasher = Argon2::default();
             hasher.verify_password(

@@ -2,7 +2,7 @@ use crate::database;
 use crate::database::models::generate_pat_id;
 
 use crate::auth::get_user_from_headers;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 
 use crate::database::redis::RedisPool;
 use actix_web::web::{self, Data};

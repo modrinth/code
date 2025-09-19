@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use super::ApiError;
 use crate::database::models::categories::{
     Category, LinkPlatform, ProjectType, ReportType,
 };
@@ -8,6 +7,7 @@ use crate::database::models::loader_fields::{
     Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
 };
 use crate::database::redis::RedisPool;
+use crate::routes::error::ApiError;
 use actix_web::{HttpResponse, web};
 
 use itertools::Itertools;
