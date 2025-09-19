@@ -1,11 +1,13 @@
 use super::MailError;
-use crate::database::models::DBUser;
-use crate::database::models::DatabaseError;
 use crate::database::models::ids::*;
 use crate::database::models::notifications_template_item::NotificationTemplate;
+use crate::database::models::{
+    DBOrganization, DBProject, DBUser, DatabaseError,
+};
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationBody;
 use crate::routes::ApiError;
+use ariadne::ids::base62_impl::to_base62;
 use futures::TryFutureExt;
 use lettre::Message;
 use lettre::message::{Mailbox, MultiPart, SinglePart};
@@ -38,6 +40,27 @@ const STATUSCHANGE_PROJECT_NAME: &str = "statuschange.project.name";
 const STATUSCHANGE_OLD_STATUS: &str = "statuschange.old.status";
 const STATUSCHANGE_NEW_STATUS: &str = "statuschange.new.status";
 
+const NEWPAT_TOKEN_NAME: &str = "newpat.token_name";
+
+const PROJECT_ID: &str = "project.id";
+const PROJECT_NAME: &str = "project.name";
+const PROJECT_ICON_URL: &str = "project.icon_url";
+
+const REPORT_ID: &str = "report.id";
+const REPORT_TITLE: &str = "report.title";
+const REPORT_DATE: &str = "report.date";
+const NEWREPORT_ID: &str = "newreport.id";
+
+const PROJECT_OLD_STATUS: &str = "project.oldstatus";
+const PROJECT_NEW_STATUS: &str = "project.newstatus";
+
+const NEWOWNER_TYPE: &str = "new_owner.type";
+const NEWOWNER_TYPE_CAPITALIZED: &str = "new_owner.type_capitalized";
+const NEWOWNER_NAME: &str = "new_owner.name";
+
+const PAYOUTAVAILABLE_AMOUNT: &str = "payout.amount";
+const PAYOUTAVAILABLE_PERIOD: &str = "payout.period";
+
 #[derive(Clone)]
 pub struct MailingIdentity {
     from_name: String,
@@ -59,7 +82,7 @@ impl MailingIdentity {
 
 #[allow(clippy::too_many_arguments)]
 pub async fn build_email(
-    exec: impl sqlx::PgExecutor<'_>,
+    exec: &mut sqlx::PgTransaction<'_>,
     redis: &RedisPool,
     client: &reqwest::Client,
     user_id: DBUserId,
@@ -181,27 +204,177 @@ fn fill_template(
 }
 
 async fn collect_template_variables(
-    exec: impl sqlx::PgExecutor<'_>,
+    exec: &mut sqlx::PgTransaction<'_>,
     redis: &RedisPool,
     user_id: DBUserId,
     n: &NotificationBody,
 ) -> Result<HashMap<&'static str, String>, ApiError> {
-    async fn only_select_default_variables(
-        exec: impl sqlx::PgExecutor<'_>,
-        redis: &RedisPool,
-        user_id: DBUserId,
-    ) -> Result<HashMap<&'static str, String>, ApiError> {
-        let mut map = HashMap::new();
+    let db_user = DBUser::get_id(user_id, &mut **exec, redis)
+        .await?
+        .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
 
-        let user = DBUser::get_id(user_id, exec, redis)
-            .await?
-            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
-
-        map.insert(USER_NAME, user.username);
-        Ok(map)
-    }
+    let mut map = HashMap::new();
+    map.insert(USER_NAME, db_user.username);
 
     match &n {
+        NotificationBody::PatCreated { token_name } => {
+            map.insert(NEWPAT_TOKEN_NAME, token_name.clone());
+            Ok(map)
+        }
+
+        NotificationBody::ModerationMessageReceived { project_id, .. } => {
+            let result = DBProject::get_id(
+                DBProjectId(project_id.0 as i64),
+                exec,
+                redis,
+            )
+            .await?
+            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
+            .inner;
+
+            map.insert(PROJECT_ID, to_base62(project_id.0));
+            map.insert(PROJECT_NAME, result.name);
+            map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
+            Ok(map)
+        }
+
+        NotificationBody::ReportStatusUpdated { report_id } => {
+            let result = query!(
+                r#"
+                SELECT
+                  r.created,
+                  COALESCE(m.name, v.version_number, u.username, 'unknown') "title!"
+                FROM reports r
+                LEFT JOIN mods m ON r.mod_id = m.id
+                LEFT JOIN versions v ON r.version_id = v.id
+                LEFT JOIN users u ON r.user_id = u.id
+                WHERE r.id = $1
+                "#,
+                report_id.0 as i64
+            )
+            .fetch_one(&mut **exec)
+            .await?;
+
+            map.insert(REPORT_ID, to_base62(report_id.0));
+            map.insert(REPORT_TITLE, result.title);
+            map.insert(REPORT_DATE, date_human_readable(result.created));
+            Ok(map)
+        }
+
+        NotificationBody::ReportSubmitted { report_id } => {
+            let result = query!(
+                r#"
+                SELECT
+                  COALESCE(m.name, v.version_number, u.username, 'unknown') "title!"
+                FROM reports r
+                LEFT JOIN mods m ON r.mod_id = m.id
+                LEFT JOIN versions v ON r.version_id = v.id
+                LEFT JOIN users u ON r.user_id = u.id
+                WHERE r.id = $1
+                "#,
+                report_id.0 as i64
+            )
+            .fetch_one(&mut **exec)
+            .await?;
+
+            map.insert(REPORT_TITLE, result.title);
+            map.insert(NEWREPORT_ID, to_base62(report_id.0));
+            Ok(map)
+        }
+
+        NotificationBody::ProjectStatusApproved { project_id } => {
+            let result = query!(
+                r#"
+                SELECT name, icon_url FROM mods WHERE id = $1
+                "#,
+                project_id.0 as i64
+            )
+            .fetch_one(&mut **exec)
+            .await?;
+
+            map.insert(PROJECT_ID, to_base62(project_id.0));
+            map.insert(PROJECT_NAME, result.name);
+            map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
+            Ok(map)
+        }
+
+        NotificationBody::ProjectStatusNeutral {
+            project_id,
+            old_status,
+            new_status,
+        } => {
+            let result = DBProject::get_id(
+                DBProjectId(project_id.0 as i64),
+                exec,
+                redis,
+            )
+            .await?
+            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
+            .inner;
+
+            map.insert(PROJECT_ID, to_base62(project_id.0));
+            map.insert(PROJECT_NAME, result.name);
+            map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
+            map.insert(PROJECT_OLD_STATUS, old_status.as_str().to_string());
+            map.insert(PROJECT_NEW_STATUS, new_status.as_str().to_string());
+            Ok(map)
+        }
+
+        NotificationBody::ProjectTransferred {
+            project_id,
+            new_owner_user_id,
+            new_owner_organization_id,
+        } => {
+            let project = DBProject::get_id(
+                DBProjectId(project_id.0 as i64),
+                &mut **exec,
+                redis,
+            )
+            .await?
+            .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?
+            .inner;
+
+            map.insert(PROJECT_ID, to_base62(project_id.0));
+            map.insert(PROJECT_NAME, project.name);
+            map.insert(PROJECT_ICON_URL, project.icon_url.unwrap_or_default());
+
+            if let Some(new_owner_user_id) = new_owner_user_id {
+                let user = DBUser::get_id(
+                    DBUserId(new_owner_user_id.0 as i64),
+                    &mut **exec,
+                    redis,
+                )
+                .await?
+                .ok_or_else(|| {
+                    DatabaseError::Database(sqlx::Error::RowNotFound)
+                })?;
+
+                map.insert(NEWOWNER_TYPE, "user".to_string());
+                map.insert(NEWOWNER_TYPE_CAPITALIZED, "User".to_string());
+                map.insert(NEWOWNER_NAME, user.username);
+            } else if let Some(new_owner_organization_id) =
+                new_owner_organization_id
+            {
+                let org = DBOrganization::get_id(
+                    DBOrganizationId(new_owner_organization_id.0 as i64),
+                    &mut **exec,
+                    redis,
+                )
+                .await?
+                .ok_or_else(|| {
+                    DatabaseError::Database(sqlx::Error::RowNotFound)
+                })?;
+
+                map.insert(NEWOWNER_TYPE, "organization".to_string());
+                map.insert(
+                    NEWOWNER_TYPE_CAPITALIZED,
+                    "Organization".to_string(),
+                );
+                map.insert(NEWOWNER_NAME, org.name);
+            }
+
+            Ok(map)
+        }
         NotificationBody::TeamInvite {
             team_id: _,
             project_id,
@@ -224,11 +397,9 @@ async fn collect_template_variables(
                 project_id.0 as i64,
                 user_id.0 as i64
             )
-            .fetch_one(exec)
+            .fetch_one(&mut **exec)
             .await?;
 
-            let mut map = HashMap::new();
-            map.insert(USER_NAME, result.user_name);
             map.insert(TEAMINVITE_INVITER_NAME, result.inviter_name);
             map.insert(TEAMINVITE_PROJECT_NAME, result.project_name);
             map.insert(TEAMINVITE_ROLE_NAME, role.clone());
@@ -258,11 +429,9 @@ async fn collect_template_variables(
                 organization_id.0 as i64,
                 user_id.0 as i64
             )
-            .fetch_one(exec)
+            .fetch_one(&mut **exec)
             .await?;
 
-            let mut map = HashMap::new();
-            map.insert(USER_NAME, result.user_name);
             map.insert(ORGINVITE_INVITER_NAME, result.inviter_name);
             map.insert(ORGINVITE_ORG_NAME, result.organization_name);
             map.insert(ORGINVITE_ROLE_NAME, role.clone());
@@ -288,11 +457,9 @@ async fn collect_template_variables(
                 project_id.0 as i64,
                 user_id.0 as i64,
             )
-            .fetch_one(exec)
+            .fetch_one(&mut **exec)
             .await?;
 
-            let mut map = HashMap::new();
-            map.insert(USER_NAME, result.user_name);
             map.insert(STATUSCHANGE_PROJECT_NAME, result.project_name);
             map.insert(STATUSCHANGE_OLD_STATUS, old_status.as_str().to_owned());
             map.insert(STATUSCHANGE_NEW_STATUS, new_status.as_str().to_owned());
@@ -308,13 +475,7 @@ async fn collect_template_variables(
                 flow
             );
 
-            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
-                || DatabaseError::Database(sqlx::Error::RowNotFound),
-            )?;
-
-            let mut map = HashMap::new();
             map.insert(RESETPASSWORD_URL, url);
-            map.insert(USER_NAME, user.username);
 
             Ok(map)
         }
@@ -327,25 +488,13 @@ async fn collect_template_variables(
                 flow
             );
 
-            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
-                || DatabaseError::Database(sqlx::Error::RowNotFound),
-            )?;
-
-            let mut map = HashMap::new();
             map.insert(VERIFYEMAIL_URL, url);
-            map.insert(USER_NAME, user.username);
 
             Ok(map)
         }
 
         NotificationBody::AuthProviderAdded { provider }
         | NotificationBody::AuthProviderRemoved { provider } => {
-            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
-                || DatabaseError::Database(sqlx::Error::RowNotFound),
-            )?;
-
-            let mut map = HashMap::new();
-            map.insert(USER_NAME, user.username);
             map.insert(AUTHPROVIDER_NAME, provider.clone());
 
             Ok(map)
@@ -354,30 +503,18 @@ async fn collect_template_variables(
         NotificationBody::TwoFactorEnabled
         | NotificationBody::TwoFactorRemoved
         | NotificationBody::PasswordChanged
-        | NotificationBody::PasswordRemoved => {
-            only_select_default_variables(exec, redis, user_id).await
-        }
+        | NotificationBody::PasswordRemoved => Ok(map),
 
         NotificationBody::EmailChanged {
             new_email,
             to_email: _,
         } => {
-            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
-                || DatabaseError::Database(sqlx::Error::RowNotFound),
-            )?;
-
-            let mut map = HashMap::new();
-            map.insert(USER_NAME, user.username);
             map.insert(EMAILCHANGED_NEW_EMAIL, new_email.clone());
 
             Ok(map)
         }
 
         NotificationBody::PaymentFailed { amount, service } => {
-            let user = DBUser::get_id(user_id, exec, redis).await?.ok_or_else(
-                || DatabaseError::Database(sqlx::Error::RowNotFound),
-            )?;
-
             let url = format!(
                 "{}/{}",
                 dotenvy::var("SITE_URL")?,
@@ -385,7 +522,6 @@ async fn collect_template_variables(
             );
 
             let mut map = HashMap::new();
-            map.insert(USER_NAME, user.username);
             map.insert(PAYMENTFAILED_AMOUNT, amount.clone());
             map.insert(PAYMENTFAILED_SERVICE, service.clone());
             map.insert(BILLING_URL, url);
@@ -393,11 +529,34 @@ async fn collect_template_variables(
             Ok(map)
         }
 
-        NotificationBody::ProjectUpdate { .. }
-        | NotificationBody::LegacyMarkdown { .. }
-        | NotificationBody::ModeratorMessage { .. }
-        | NotificationBody::Unknown => {
-            only_select_default_variables(exec, redis, user_id).await
+        NotificationBody::PayoutAvailable {
+            amount,
+            date_available,
+        } => {
+            if let Some(period_month) =
+                date_available.checked_sub_months(chrono::Months::new(2))
+            {
+                map.insert(
+                    PAYOUTAVAILABLE_PERIOD,
+                    period_month.format("%B %Y").to_string(),
+                );
+            }
+
+            map.insert(
+                PAYOUTAVAILABLE_AMOUNT,
+                format!("{:.2}", (amount * 100.0) as i64),
+            );
+
+            Ok(map)
         }
+
+        NotificationBody::ProjectUpdate { .. }
+        | NotificationBody::ModeratorMessage { .. }
+        | NotificationBody::LegacyMarkdown { .. }
+        | NotificationBody::Unknown => Ok(map),
     }
+}
+
+fn date_human_readable(date: chrono::DateTime<chrono::Utc>) -> String {
+    date.format("%B %d, %Y").to_string()
 }

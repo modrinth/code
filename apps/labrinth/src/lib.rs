@@ -148,11 +148,13 @@ pub fn app_setup(
 
         let pool_ref = pool.clone();
         let client_ref = clickhouse.clone();
+        let redis_pool_ref = redis_pool.clone();
         scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
             let pool_ref = pool_ref.clone();
             let client_ref = client_ref.clone();
+            let redis_ref = redis_pool_ref.clone();
             async move {
-                background_task::payouts(pool_ref, client_ref).await;
+                background_task::payouts(pool_ref, client_ref, redis_ref).await;
             }
         });
 

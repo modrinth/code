@@ -73,12 +73,6 @@ pub struct InitialVersionData {
     pub ordering: Option<i32>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
-struct InitialFileData {
-    #[serde(default = "HashMap::new")]
-    pub file_types: HashMap<String, Option<FileType>>,
-}
-
 // under `/api/v1/version`
 #[post("version")]
 pub async fn version_create(
