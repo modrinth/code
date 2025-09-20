@@ -1664,6 +1664,12 @@ if (!route.name.startsWith('type-id-settings')) {
 const onUserCollectProject = useClientTry(userCollectProject)
 
 const { version, loader } = route.query
+if (
+	project.value.game_versions.length > 0 &&
+	project.value.game_versions.every((v) => v.includes('w') || v.includes('-'))
+) {
+	showAllVersions.value = true
+}
 if (version !== undefined && project.value.game_versions.includes(version)) {
 	userSelectedGameVersion.value = version
 }
