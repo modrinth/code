@@ -1065,18 +1065,26 @@ const currentPlatform = computed(() => {
 	)
 })
 
-const gameVersionMetaByVersion = computed(() => {
-	const map = new Map()
+const releaseVersions = computed(() => {
+	const set = new Set()
 	for (const gv of tags.value.gameVersions || []) {
-		if (gv && gv.version) map.set(gv.version, gv)
+		if (gv?.version && gv.version_type === 'release') set.add(gv.version)
 	}
-	return map
+	return set
+})
+
+const nonReleaseVersions = computed(() => {
+	const set = new Set()
+	for (const gv of tags.value.gameVersions || []) {
+		if (gv?.version && gv.version_type !== 'release') set.add(gv.version)
+	}
+	return set
 })
 
 function isReleaseGameVersion(ver) {
-	const meta = gameVersionMetaByVersion.value.get(ver)
-	if (meta && meta.version_type) return meta.version_type === 'release'
-	return !ver.includes('w') && !ver.includes('-')
+	if (releaseVersions.value.has(ver)) return true
+	if (nonReleaseVersions.value.has(ver)) return false
+	return true
 }
 
 const showVersionsCheckbox = computed(() => {
