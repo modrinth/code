@@ -73,21 +73,26 @@
 						'disabled-cursor-wrapper': userBalance.available < minWithdraw || blockedByTax,
 					}"
 				>
-					<nuxt-link
-						:aria-disabled="userBalance.available < minWithdraw || blockedByTax ? 'true' : 'false'"
-						:class="{ 'disabled-link': userBalance.available < minWithdraw || blockedByTax }"
-						:disabled="userBalance.available < minWithdraw || blockedByTax ? 'true' : 'false'"
-						:tabindex="userBalance.available < minWithdraw || blockedByTax ? -1 : undefined"
-						class="iconified-button brand-button"
-						to="/dashboard/revenue/withdraw"
-					>
-						<TransferIcon /> Withdraw
-					</nuxt-link>
+					<ButtonStyled color="brand">
+						<nuxt-link
+							:aria-disabled="
+								userBalance.available < minWithdraw || blockedByTax ? 'true' : 'false'
+							"
+							:class="{ 'disabled-link': userBalance.available < minWithdraw || blockedByTax }"
+							:disabled="userBalance.available < minWithdraw || blockedByTax ? 'true' : 'false'"
+							:tabindex="userBalance.available < minWithdraw || blockedByTax ? -1 : undefined"
+							to="/dashboard/revenue/withdraw"
+						>
+							<TransferIcon /> Withdraw
+						</nuxt-link>
+					</ButtonStyled>
 				</span>
-				<NuxtLink class="iconified-button" to="/dashboard/revenue/transfers">
-					<HistoryIcon />
-					View transfer history
-				</NuxtLink>
+				<ButtonStyled>
+					<NuxtLink to="/dashboard/revenue/transfers">
+						<HistoryIcon />
+						View transfer history
+					</NuxtLink>
+				</ButtonStyled>
 			</div>
 			<p v-if="blockedByTax" class="text-sm font-bold text-orange">
 				You have withdrawn over $600 this year. To continue withdrawing, you must complete a tax
@@ -110,10 +115,12 @@
 					email
 					{{ auth.user.payout_data.paypal_address }}
 				</p>
-				<button class="btn mt-4" @click="handleRemoveAuthProvider('paypal')">
-					<XIcon />
-					Disconnect account
-				</button>
+				<ButtonStyled>
+					<button class="mt-4" @click="handleRemoveAuthProvider('paypal')">
+						<XIcon />
+						Disconnect account
+					</button>
+				</ButtonStyled>
 			</template>
 			<template v-else>
 				<p>Connect your PayPal account to enable withdrawing to your PayPal balance.</p>
@@ -135,15 +142,16 @@
 				id="venmo"
 				v-model="auth.user.payout_data.venmo_handle"
 				autocomplete="off"
-				class="mt-4"
 				name="search"
 				placeholder="@example"
 				type="search"
 			/>
-			<button class="btn btn-secondary" @click="updateVenmo">
-				<SaveIcon />
-				Save information
-			</button>
+			<ButtonStyled color="brand">
+				<button class="mt-4" @click="updateVenmo">
+					<SaveIcon />
+					Save information
+				</button>
+			</ButtonStyled>
 		</section>
 	</div>
 </template>
@@ -157,7 +165,7 @@ import {
 	UnknownIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { injectNotificationManager } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { formatDate } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'

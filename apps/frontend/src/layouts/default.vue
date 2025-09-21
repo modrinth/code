@@ -132,7 +132,10 @@
 			</template>
 		</PagewideBanner>
 
-		<CreatorTaxFormModal ref="taxFormModalRef" @success="() => navigateTo('/dashboard/revenue')" />
+		<CreatorTaxFormModal
+			ref="taxFormModalRef"
+			@success="() => navigateTo('/dashboard/revenue', { external: true })"
+		/>
 		<header
 			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
@@ -866,7 +869,7 @@ const taxBannerMessages = defineMessages({
 	description: {
 		id: 'layout.banner.tax.description',
 		defaultMessage:
-			"You've withdrawn over $600 this year in revenue from Modrinth. For tax purposes, we need you to complete a tax form as soon as possible.",
+			'You’ve already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.',
 	},
 	action: {
 		id: 'layout.banner.tax.action',

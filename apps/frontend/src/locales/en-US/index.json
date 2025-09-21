@@ -771,7 +771,7 @@
     "message": "Complete tax form"
   },
   "layout.banner.tax.description": {
-    "message": "You've withdrawn over $600 this year in revenue from Modrinth. For tax purposes, we need you to complete a tax form as soon as possible."
+    "message": "You’ve already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted."
   },
   "layout.banner.tax.title": {
     "message": "Tax form required"
