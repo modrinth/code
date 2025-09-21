@@ -38,10 +38,12 @@ export async function fetchDelphiIssues(params: FetchIssuesParams): Promise<Delp
 	if (params.count != null) query.set('count', String(params.count))
 	if (params.offset != null) query.set('offset', String(params.offset))
 
-	try {
-		const res = await useBaseFetch(`internal/delphi/issues?${query.toString()}`, { internal: true })
-		return (res as any[]) || []
-	} catch {
-		return DUMMY_ISSUES
-	}
+	return DUMMY_ISSUES
+
+	// try {
+	// 	const res = await useBaseFetch(`internal/delphi/issues?${query.toString()}`, { internal: true })
+	// 	return (res as any[]) || []
+	// } catch {
+	// 	return DUMMY_ISSUES
+	// }
 }
