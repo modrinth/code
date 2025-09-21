@@ -135,6 +135,10 @@
 			</template>
 		</div>
 
+		<p v-if="blockedByTax" class="font-bold text-orange">
+			You have withdrawn over $600 this year. To continue withdrawing, you must complete a tax form.
+		</p>
+
 		<div class="confirm-text">
 			<template v-if="knownErrors.length === 0 && amount">
 				<Checkbox v-if="fees > 0" v-model="agreedFees" description="Consent to fee">
@@ -175,7 +179,8 @@
 					!amount ||
 					!agreedTransfer ||
 					!agreedTerms ||
-					(fees > 0 && !agreedFees)
+					(fees > 0 && !agreedFees) ||
+					blockedByTax
 				"
 				class="iconified-button brand-button"
 				@click="withdraw"
@@ -322,6 +327,12 @@ const knownErrors = computed(() => {
 const agreedTransfer = ref(false)
 const agreedFees = ref(false)
 const agreedTerms = ref(false)
+
+const blockedByTax = computed(() => {
+	const status = userBalance.value?.form_completion_status ?? 'unknown'
+	const thresholdMet = (userBalance.value?.withdrawn_ytd ?? 0) >= 600
+	return thresholdMet && status !== 'complete'
+})
 
 watch(country, async () => {
 	await refreshPayoutMethods()
