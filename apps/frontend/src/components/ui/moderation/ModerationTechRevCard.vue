@@ -8,9 +8,9 @@ const props = defineProps<{
 	item: DelphiIssueResult
 }>()
 
-type Tab = 'Summary' | 'Thread' | 'Files'
-const tabs: readonly Tab[] = ['Summary', 'Thread', 'Files']
-const currentTab = ref<Tab>('Summary')
+type Tab = 'Thread' | 'Files'
+const tabs: readonly Tab[] = ['Thread', 'Files']
+const currentTab = ref<Tab>('Thread')
 
 const severityColor = computed(() => {
 	switch (props.item.report.severity) {
@@ -26,17 +26,6 @@ const severityColor = computed(() => {
 	}
 })
 
-const statusColor = computed(() => {
-	switch (props.item.issue.status) {
-		case 'pending':
-			return 'text-orange bg-orange/10'
-		case 'approved':
-			return 'text-green bg-green/10'
-		case 'rejected':
-			return 'text-red bg-red/10'
-	}
-})
-
 const createdAt = computed(() => new Date(props.item.report.created).toLocaleDateString())
 </script>
 
@@ -44,7 +33,7 @@ const createdAt = computed(() => new Date(props.item.report.created).toLocaleDat
 	<div
 		class="overflow-hidden rounded-2xl border-[1px] border-solid border-surface-l4 bg-surface-l3"
 	>
-		<div class="flex flex-col gap-4 bg-surface-l3 p-4">
+		<div class="flex flex-col gap-4 bg-surface-l3 p-4 pb-0">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-4">
 					<Avatar
@@ -118,36 +107,26 @@ const createdAt = computed(() => new Date(props.item.report.created).toLocaleDat
 				</div>
 			</div>
 
-			<hr class="border-surface-l5" />
+			<div class="h-[1px] w-full bg-surface-l5" />
 
-			<!-- todo -->
-			<div class="flex items-center gap-3">
-				<button
+			<div class="flex items-center">
+				<div
 					v-for="tab in tabs"
 					:key="tab"
-					class="border-b-2 px-4 py-2 text-base font-semibold transition-colors"
+					class="cursor-pointer border-2 border-solid border-transparent px-4 pb-3 pt-2 text-base font-semibold transition-colors"
 					:class="{
-						'border-white text-white': currentTab === tab,
-						'border-transparent text-secondary': currentTab !== tab,
+						'border-b-contrast text-contrast': currentTab === tab,
+						'border-b-transparent text-secondary': currentTab !== tab,
 					}"
 					@click="currentTab = tab"
 				>
 					{{ tab }}
-				</button>
+				</div>
 			</div>
 		</div>
 
 		<div class="min-h-[200px] border-t border-surface-l3 bg-surface-l2 p-4">
-			<div v-if="currentTab === 'Summary'" class="flex min-h-[200px] items-center justify-center">
-				<div class="text-center text-secondary">
-					<p class="mt-1 text-sm">TBD</p>
-				</div>
-			</div>
-
-			<div
-				v-else-if="currentTab === 'Thread'"
-				class="flex min-h-[200px] items-center justify-center"
-			>
+			<div v-if="currentTab === 'Thread'" class="flex min-h-[200px] items-center justify-center">
 				<div class="text-center text-secondary">
 					<p class="mt-1 text-sm">TBD</p>
 				</div>
