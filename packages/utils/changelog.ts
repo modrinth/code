@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-09-21T15:45:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Added tax compliance for creators who have withdrawn over the tax reporting threshold.
+- Fixed project download interface displaying empty for projects that only support snapshots.`,
+	},
+	{
 		date: `2025-09-08T14:45:00-07:00`,
 		product: 'servers',
 		body: `### Improvements
