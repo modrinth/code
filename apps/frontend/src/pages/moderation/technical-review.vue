@@ -1,6 +1,13 @@
 <script setup lang="ts">
-import { FilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
-import { Button, DropdownSelect, Pagination } from '@modrinth/ui'
+import {
+	FilterIcon,
+	SearchIcon,
+	ShieldAlertIcon,
+	SortAscIcon,
+	SortDescIcon,
+	XIcon,
+} from '@modrinth/assets'
+import { Button, ButtonStyled, DropdownSelect, Pagination } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 import BatchScanProgressAlert, {
@@ -9,14 +16,11 @@ import BatchScanProgressAlert, {
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 import { fetchDelphiIssues, fetchIssueTypeSchema, type OrderBy } from '~/helpers/tech-review'
 
-// Data from backend helper (with dummy fallback)
 type TechReviewItem = Awaited<ReturnType<typeof fetchDelphiIssues>>[number]
 const reviewItems = ref<TechReviewItem[]>([])
 
-// Basic pagination state (mirrors moderation pages)
 const currentPage = ref(1)
 const itemsPerPage = 15
-// Search/filter/sort UI state
 const { formatMessage } = useVIntl()
 const route = useRoute()
 const router = useRouter()
@@ -158,7 +162,6 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-// Map sort label to backend order_by param
 function toOrderBy(label: string): OrderBy | null {
 	switch (label) {
 		case 'Oldest':
@@ -176,7 +179,6 @@ function toOrderBy(label: string): OrderBy | null {
 	}
 }
 
-// Initial fetch and reactive refetch on filter/sort changes
 onMounted(async () => {
 	rawIssueTypes.value = await fetchIssueTypeSchema()
 	const order_by = toOrderBy(currentSortType.value)
@@ -193,7 +195,6 @@ watch(currentFilterType, async (val) => {
 watch(currentSortType, async (val) => {
 	const type = currentFilterType.value === 'All issues' ? null : currentFilterType.value
 	const order_by = toOrderBy(val)
-	// If you prefer server-side sorting only, keep this; otherwise client-side above already reorders
 	reviewItems.value = await fetchDelphiIssues({ type, count: 350, offset: 0, order_by })
 	goToPage(1)
 })
@@ -264,6 +265,10 @@ const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() 
 						<span class="truncate">{{ selected }}</span>
 					</span>
 				</DropdownSelect>
+
+				<ButtonStyled color="orange">
+					<button><ShieldAlertIcon /> Batch scan</button>
+				</ButtonStyled>
 			</div>
 		</div>
 
@@ -271,19 +276,13 @@ const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() 
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 		</div>
 
-		<div class="flex flex-col gap-2">
+		<div class="flex flex-col gap-4">
 			<div v-if="paginatedItems.length === 0" class="universal-card h-24 animate-pulse"></div>
-			<div
-				v-else
-				v-for="(item, idx) in paginatedItems"
-				:key="item.issue.id ?? idx"
-				class=""
-			>
+			<div v-else v-for="(item, idx) in paginatedItems" :key="item.issue.id ?? idx" class="">
 				<ModerationTechRevCard :item="item" />
 			</div>
 		</div>
 
-		<!-- Bottom pagination -->
 		<div v-if="totalPages > 1" class="mt-4 flex justify-center">
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 		</div>
