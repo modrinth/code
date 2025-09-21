@@ -229,8 +229,7 @@
 										.filter(
 											(x) =>
 												(versionFilter && x.includes(versionFilter)) ||
-												(!versionFilter &&
-													(showAllVersions || (!x.includes('w') && !x.includes('-')))),
+												(!versionFilter && (showAllVersions || isReleaseGameVersion(x))),
 										)
 										.slice()
 										.reverse()"
@@ -279,6 +278,7 @@
 								</ButtonStyled>
 							</ScrollablePanel>
 							<Checkbox
+								v-if="showVersionsCheckbox"
 								v-model="showAllVersions"
 								class="mx-1"
 								:label="formatMessage(messages.showAllVersions)"
@@ -1065,6 +1065,32 @@ const currentPlatform = computed(() => {
 	)
 })
 
+const gameVersionMetaByVersion = computed(() => {
+	const map = new Map()
+	for (const gv of tags.value.gameVersions || []) {
+		if (gv && gv.version) map.set(gv.version, gv)
+	}
+	return map
+})
+
+function isReleaseGameVersion(ver) {
+	const meta = gameVersionMetaByVersion.value.get(ver)
+	if (meta && meta.version_type) return meta.version_type === 'release'
+	return !ver.includes('w') && !ver.includes('-')
+}
+
+const showVersionsCheckbox = computed(() => {
+	const list = project.value?.game_versions || []
+	let hasRelease = false
+	let hasNonRelease = false
+	for (const v of list) {
+		if (isReleaseGameVersion(v)) hasRelease = true
+		else hasNonRelease = true
+		if (hasRelease && hasNonRelease) return true
+	}
+	return false
+})
+
 function installWithApp() {
 	setTimeout(() => {
 		getModrinthAppAccordion.value.open()
@@ -1664,15 +1690,18 @@ if (!route.name.startsWith('type-id-settings')) {
 const onUserCollectProject = useClientTry(userCollectProject)
 
 const { version, loader } = route.query
+
 if (
 	project.value.game_versions.length > 0 &&
-	project.value.game_versions.every((v) => v.includes('w') || v.includes('-'))
+	project.value.game_versions.every((v) => !isReleaseGameVersion(v))
 ) {
 	showAllVersions.value = true
 }
+
 if (version !== undefined && project.value.game_versions.includes(version)) {
 	userSelectedGameVersion.value = version
 }
+
 if (loader !== undefined && project.value.loaders.includes(loader)) {
 	userSelectedPlatform.value = loader
 }
