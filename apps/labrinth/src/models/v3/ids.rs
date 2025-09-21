@@ -25,3 +25,4 @@ base62_id!(ThreadId);
 base62_id!(ThreadMessageId);
 base62_id!(UserSubscriptionId);
 base62_id!(VersionId);
+base62_id!(AffiliateCodeId);
