@@ -211,6 +211,7 @@ pub enum NotificationBody {
         service: String,
     },
     TaxNotification {
+        subscription_id: UserSubscriptionId,
         new_amount: i64,
         new_tax_amount: i64,
         old_amount: i64,

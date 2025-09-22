@@ -24,6 +24,7 @@ const VERIFYEMAIL_URL: &str = "verifyemail.url";
 const AUTHPROVIDER_NAME: &str = "authprovider.name";
 const EMAILCHANGED_NEW_EMAIL: &str = "emailchanged.new_email";
 const BILLING_URL: &str = "billing.url";
+const SUBSCRIPTION_ID: &str = "subscription.id";
 
 const TAXNOTIFICATION_OLD_AMOUNT: &str = "taxnotification.old_amount";
 const TAXNOTIFICATION_OLD_TAX_AMOUNT: &str = "taxnotification.old_tax_amount";
@@ -564,6 +565,7 @@ async fn collect_template_variables(
         }
 
         NotificationBody::TaxNotification {
+            subscription_id,
             old_amount,
             old_tax_amount,
             new_amount,
@@ -603,6 +605,7 @@ async fn collect_template_variables(
             );
             map.insert(TAXNOTIFICATION_DUE, date_human_readable(*due));
             map.insert(TAXNOTIFICATION_SERVICE, service.clone());
+            map.insert(SUBSCRIPTION_ID, to_base62(subscription_id.0));
             Ok(map)
         }
 

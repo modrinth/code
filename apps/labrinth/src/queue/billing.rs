@@ -234,8 +234,17 @@ pub async fn index_subscriptions(
                             // The price of the subscription has changed, we need to insert a notification
                             // for this.
 
+                            let Some(subscription_id) =
+                                charge.subscription_id.clone()
+                            else {
+                                return Err(ApiError::InvalidInput(
+                                    "Charge has no subscription ID".to_owned(),
+                                ));
+                            };
+
                             NotificationBuilder {
                                 body: NotificationBody::TaxNotification {
+                                    subscription_id: subscription_id.into(),
                                     new_amount: charge.amount,
                                     new_tax_amount,
                                     old_amount: charge.amount,

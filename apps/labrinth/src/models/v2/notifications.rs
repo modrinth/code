@@ -3,6 +3,7 @@ use crate::models::v3::billing::PriceDuration;
 use crate::models::{
     ids::{
         NotificationId, OrganizationId, ProjectId, ReportId, TeamId, ThreadId,
+        UserSubscriptionId,
     },
     notifications::{Notification, NotificationAction, NotificationBody},
     projects::ProjectStatus,
@@ -39,6 +40,7 @@ pub struct LegacyNotificationAction {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum LegacyNotificationBody {
     TaxNotification {
+        subscription_id: UserSubscriptionId,
         old_amount: i64,
         old_tax_amount: i64,
         new_amount: i64,
@@ -356,6 +358,7 @@ impl LegacyNotification {
                 to_email,
             },
             NotificationBody::TaxNotification {
+                subscription_id,
                 old_amount,
                 old_tax_amount,
                 new_amount,
@@ -365,6 +368,7 @@ impl LegacyNotification {
                 due,
                 service,
             } => LegacyNotificationBody::TaxNotification {
+                subscription_id,
                 old_amount,
                 old_tax_amount,
                 new_amount,
