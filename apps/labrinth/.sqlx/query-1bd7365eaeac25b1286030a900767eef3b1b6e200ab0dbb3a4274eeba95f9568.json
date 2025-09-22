@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, created_at, created_by, affiliate\n            FROM affiliate_codes WHERE affiliate = $1",
+  "query": "SELECT id, created_at, created_by, affiliate, source_name\n            FROM affiliate_codes WHERE id = $1",
   "describe": {
     "columns": [
       {
@@ -22,6 +22,11 @@
         "ordinal": 3,
         "name": "affiliate",
         "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "source_name",
+        "type_info": "Varchar"
       }
     ],
     "parameters": {
@@ -33,8 +38,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "6ef8402f0f0685acda118c024d82e31b1b235ab7c5ec00a86af4dfbe81342a58"
+  "hash": "1bd7365eaeac25b1286030a900767eef3b1b6e200ab0dbb3a4274eeba95f9568"
 }
