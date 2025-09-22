@@ -21,7 +21,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Las versiones de la App de Modrinth para Linux <issues-link>tienen problemas conocidos</issues-link> en ciertos sistemas y configuraciones. Si la App de Modrinth no es estable en tu equipo, te recomendamos probar otras aplicaciones como <prism-link>Prism Launcher</prism-link> para instalar contenido de Modrinth de forma sencilla."
+    "message": "Las versiones de la Modrinth App para Linux <issues-link>tienen problemas conocidos</issues-link> en ciertos sistemas y configuraciones. Si la App de Modrinth no es estable en tu equipo, te recomendamos probar otras aplicaciones como <prism-link>Prism Launcher</prism-link> para instalar contenido de Modrinth de forma sencilla."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -30,13 +30,13 @@
     "message": "Opciones de descarga"
   },
   "app-marketing.download.terms": {
-    "message": "Al descargar la App de Modrinth, aceptas nuestros <terms-link>Términos de uso</terms-link> y nuestra <privacy-link>Política de privacidad</privacy-link>."
+    "message": "Al descargar la Modrinth App, aceptas nuestros <terms-link>Términos de uso</terms-link> y nuestra <privacy-link>Política de privacidad</privacy-link>."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Paquetes de terceros"
   },
   "app-marketing.download.title": {
-    "message": "Descargar la App de Modrinth (Beta)"
+    "message": "Descargar la Modrinth App (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -45,10 +45,10 @@
     "message": "Guarda el contenido que te gusta y recibe actualizaciones con un solo clic."
   },
   "app-marketing.features.follow.title": {
-    "message": "Seguir proyectos"
+    "message": "Sigue proyectos"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importa todos tus perfiles favoritos desde el launcher que usabas antes y ¡comienza a usar la App de Modrinth en segundos!"
+    "message": "Importa todos tus perfiles favoritos desde el launcher que usabas antes y ¡comienza a usar la Modrinth App en segundos!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -66,7 +66,7 @@
     "message": "por {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "La App de Modrinth facilita gestionar todos tus mods en un solo lugar. Puedes instalar, desinstalar y actualizar mods con un solo clic."
+    "message": "La Modrinth App facilita gestionar todos tus mods en un solo lugar. Puedes instalar, desinstalar y actualizar mods con un solo clic."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Mods instalados"
@@ -102,7 +102,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "¡La App de Modrinth funciona mejor que muchos de los principales gestores de mods, usando solo 150mb de RAM!"
+    "message": "¡La Modrinth App funciona mejor que muchos de los principales gestores de mods, usando solo 150 MB de RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -123,7 +123,7 @@
     "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "App de Modrinth"
+    "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1000 millones %"
@@ -141,7 +141,7 @@
     "message": "Eficiente"
   },
   "app-marketing.features.play.description": {
-    "message": "Usa la App de Modrinth para descargar y jugar con tus mods y modpacks favoritos."
+    "message": "Usa la Modrinth App para descargar y jugar con tus mods y modpacks favoritos."
   },
   "app-marketing.features.play.title": {
     "message": "Juega con tus mods favoritos"
@@ -162,7 +162,7 @@
     "message": "Como ningún otro launcher"
   },
   "app-marketing.features.website.description": {
-    "message": "¡La App de Modrinth está completamente integrada con el sitio web, así que puedes acceder a todos tus proyectos favoritos desde la app!"
+    "message": "¡La Modrinth App está completamente integrada con el sitio web, así que puedes acceder a todos tus proyectos favoritos desde la app!"
   },
   "app-marketing.features.website.title": {
     "message": "Integración con el sitio web"
@@ -171,19 +171,19 @@
     "message": "que has usado antes"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Captura de pantalla de la App de Modrinth con una instancia de Cobblemon abierta en la página de \"Contenido\"."
+    "message": "Captura de pantalla de la Modrinth App con una instancia de Cobblemon abierta en la página de \"Contenido\"."
   },
   "app-marketing.hero.description": {
-    "message": "La App de Modrinth es un launcher único y de código abierto que te permite jugar con tus mods favoritos y mantenerlos actualizados, todo en un solo paquete compacto."
+    "message": "La Modrinth App es un launcher único y de código abierto que te permite jugar con tus mods favoritos y mantenerlos actualizados, todo en un solo paquete compacto."
   },
   "app-marketing.hero.download-button": {
-    "message": "Descargar la App de Modrinth"
+    "message": "Descargar la Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Descargar la App de Modrinth"
+    "message": "Descargar la Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Descargar la App de Modrinth para {os}"
+    "message": "Descargar la Modrinth App para {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Captura de pantalla del menú principal de la instancia Cobblemon."
@@ -567,7 +567,7 @@
     "message": "Error al cargar proyectos aleatorios :("
   },
   "landing.feature.follow.description": {
-    "message": "Recibe notificaciones cada vez que tus proyectos favoritos se actualicen y mantente al día"
+    "message": "Recibe notificaciones cada vez que tus proyectos favoritos se actualicen y mantente al día."
   },
   "landing.feature.follow.heading": {
     "message": "Sigue tus proyectos favoritos"
@@ -642,7 +642,7 @@
     "message": "Ordenar por"
   },
   "landing.section.for-creators.description": {
-    "message": "Dale un hogar en línea a tus creaciones y llega a una gran audiencia de jugadores dedicados"
+    "message": "Dale un hogar en línea a tus creaciones y llega a una gran audiencia de jugadores dedicados."
   },
   "landing.section.for-creators.label": {
     "message": "Para creadores"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "Cambiar tema"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Obtener la App de Modrinth"
+  "layout.action.close-banner": {
+    "message": "Cerrar"
+  },
+  "layout.action.create-new": {
+    "message": "Crear nuevo..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Buscar archivo"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Buscar por correo electrónico"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Administrar notificaciones del servidor"
+  },
+  "layout.action.new-collection": {
+    "message": "Nueva colección"
+  },
+  "layout.action.new-organization": {
+    "message": "Nueva organización"
+  },
+  "layout.action.new-project": {
+    "message": "Nuevo proyecto"
+  },
+  "layout.action.reports": {
+    "message": "Reportes"
+  },
+  "layout.action.review-projects": {
+    "message": "Revisar proyectos"
   },
   "layout.avatar.alt": {
     "message": "Tu avatar"
@@ -687,7 +714,7 @@
     "message": "Error al generar el estado desde la API durante la compilación."
   },
   "layout.banner.staging.description": {
-    "message": "ChatGPT Plus\n\nEl entorno de staging está completamente separado de la base de datos de producción de Modrinth. Se utiliza con fines de prueba y depuración, y puede estar ejecutando versiones en desarrollo del backend o frontend de Modrinth más recientes que la instancia de producción."
+    "message": "El entorno de staging está completamente separado de la base de datos de producción de Modrinth. Se utiliza con fines de prueba y depuración, y puede estar ejecutando versiones en desarrollo del backend o frontend de Modrinth más recientes que la instancia de producción."
   },
   "layout.banner.staging.title": {
     "message": "Estás viendo el entorno de staging de Modrinth"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Términos de Uso"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Información de Modrinth"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth es de <github-link>código abierto</github-link>."
   },
@@ -759,7 +789,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Servidores de Modrinth"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Recursos"
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "¡Descubre y publica contenido de Minecraft!"
   },
+  "layout.nav.analytics": {
+    "message": "Estadísticas"
+  },
+  "layout.nav.discover": {
+    "message": "Descubre"
+  },
+  "layout.nav.discover-content": {
+    "message": "Descubre contenido"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Funciones experimentales"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Obtener la Modrinth App"
+  },
   "layout.nav.home": {
     "message": "Inicio"
   },
+  "layout.nav.host-a-server": {
+    "message": "Alojar un servidor"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Página de inicio de Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizaciones"
+  },
+  "layout.nav.profile": {
+    "message": "Perfil"
+  },
+  "layout.nav.projects": {
+    "message": "Proyectos"
+  },
+  "layout.nav.revenue": {
+    "message": "Ingresos"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Proyectos guardados"
+  },
   "layout.nav.search": {
     "message": "Buscar"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Actualizar a Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filtrar por"
@@ -1062,10 +1134,10 @@
     "message": "{title} no soporta {gameVersion} para {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Instalar con la App de Modrinth"
+    "message": "Instalar con la Modrinth App"
   },
   "project.download.no-app": {
-    "message": "¿No tienes la App de Modrinth?"
+    "message": "¿No tienes la Modrinth App?"
   },
   "project.download.no-versions-available": {
     "message": "No hay versiones disponibles para {gameVersion} y {platform}."
@@ -1779,10 +1851,10 @@
     "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Gestiona tus suscripciones de servidores Modrinth."
+    "message": "Gestiona tus suscripciones de Modrinth Servers."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Suscripciones de servidores Modrinth"
+    "message": "Suscripciones de Modrinth Servers"
   },
   "settings.billing.subscription.description": {
     "message": "Gestiona tus suscripciones de servidores Modrinth."
@@ -1845,10 +1917,10 @@
     "message": "Abrir enlaces externos en una nueva pestaña"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Oculta los botones \"Obtener la App de Modrinth\" de la navegación principal. La página de la aplicación Modrinth sigue estando disponible en la página de inicio o en el pie de página."
+    "message": "Oculta los botones \"Obtener la Modrinth App\" de la navegación principal. La página de la aplicación Modrinth sigue estando disponible en la página de inicio o en el pie de página."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Ocultar promociones de la App de Modrinth"
+    "message": "Ocultar promociones de la Modrinth App"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Barra lateral alineada a la izquierda en las páginas de contenido"

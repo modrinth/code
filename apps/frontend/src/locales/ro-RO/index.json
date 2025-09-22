@@ -78,7 +78,7 @@
     "message": "Caută moduri"
   },
   "app-marketing.features.mod-management.title": {
-    "message": "Administrează modul"
+    "message": "Administrare mod"
   },
   "app-marketing.features.mod-management.version": {
     "message": "Versiune"
@@ -567,7 +567,7 @@
     "message": "Încărcarea proiectelor aleatoare a eșuat :("
   },
   "landing.feature.follow.description": {
-    "message": "Primește notificări de fiecare dată când proiectele tale preferate se actualizează și rămâi la curent cu ele."
+    "message": "Primește notificări de fiecare dată când proiectele tale preferate se actualizează și rămâi la curent."
   },
   "landing.feature.follow.heading": {
     "message": "Urmărește proiectele pe care le iubești"
@@ -642,7 +642,7 @@
     "message": "Ordonează după"
   },
   "landing.section.for-creators.description": {
-    "message": "Oferă o casă online creațiilor tale și ajungi la o audiență masivă de jucători dedicați"
+    "message": "Oferă o casă online creațiilor tale și ajungi la o audiență masivă de jucători dedicați."
   },
   "landing.section.for-creators.label": {
     "message": "Pentru Creatori"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "Schimbă tema"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Ia-ți Modrinth App"
+  "layout.action.close-banner": {
+    "message": "Închide"
+  },
+  "layout.action.create-new": {
+    "message": "Creează nou..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Căutare fișier"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Căutare după email"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Administrează notificările serverului"
+  },
+  "layout.action.new-collection": {
+    "message": "Colecție nouă"
+  },
+  "layout.action.new-organization": {
+    "message": "Organizație nouă"
+  },
+  "layout.action.new-project": {
+    "message": "Proiect nou"
+  },
+  "layout.action.reports": {
+    "message": "Rapoarte"
+  },
+  "layout.action.review-projects": {
+    "message": "Revizuiește proiectele"
   },
   "layout.avatar.alt": {
     "message": "Avatarul tău"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Termeni de Utilizare"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Informații Modrinth"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth are <github-link>sursa deschisă</github-link>."
   },
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "Descoperă și publică conținut pentru Minecraft!"
   },
+  "layout.nav.analytics": {
+    "message": "Analitice"
+  },
+  "layout.nav.discover": {
+    "message": "Descoperă"
+  },
+  "layout.nav.discover-content": {
+    "message": "Descoperă conținut"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Controale funcționalitate"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Ia-ți Modrinth App"
+  },
   "layout.nav.home": {
     "message": "Acasă"
   },
+  "layout.nav.host-a-server": {
+    "message": "Găzduiește un server"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Pagina de pornire Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizații"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Proiecte"
+  },
+  "layout.nav.revenue": {
+    "message": "Venituri"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Proiecte salvate"
+  },
   "layout.nav.search": {
     "message": "Caută"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Treci la Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filtrează după"

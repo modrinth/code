@@ -192,7 +192,7 @@
     "defaultMessage": "Senha"
   },
   "label.played": {
-    "defaultMessage": "Jogou por {time}"
+    "defaultMessage": "Jogado {time}"
   },
   "label.public": {
     "defaultMessage": "Público"
@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "Todos"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Pacote de dados} other {Pacotes de dados}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Pacotes de dados"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {pacote de dados} other {pacotes de dados}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mods"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} other {mods}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Pacote de mods} other {Pacotes de mods}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Pacotes de mods"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {pacote de mods} other {pacotes de mods}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Plugins"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Pacote de recursos} other {Pacotes de recursos}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Pacotes de recursos"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {pacote de recursos} other {pacotes de recursos}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Sombreador} other {Sombreadores}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Sombreadores"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {sombreador} other {sombreadores}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Ambientes suportados"
   },
@@ -396,22 +450,22 @@
     "defaultMessage": "Criadores"
   },
   "project.about.details.created": {
-    "defaultMessage": "Criado em {date}"
+    "defaultMessage": "Criado {date}"
   },
   "project.about.details.licensed": {
     "defaultMessage": "Licenciado sob {license}"
   },
   "project.about.details.published": {
-    "defaultMessage": "Publicado em {date}"
+    "defaultMessage": "Publicado {date}"
   },
   "project.about.details.submitted": {
-    "defaultMessage": "Enviado em {date}"
+    "defaultMessage": "Enviado {date}"
   },
   "project.about.details.title": {
     "defaultMessage": "Detalhes"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Atualizado em {date}"
+    "defaultMessage": "Atualizado {date}"
   },
   "project.about.links.discord": {
     "defaultMessage": "Entrar no servidor de Discord"

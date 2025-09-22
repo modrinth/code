@@ -158,6 +158,9 @@
   "instance.settings.tabs.hooks.title": {
     "message": "Játék indítási parancsok"
   },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Indítóparancs"
+  },
   "instance.settings.tabs.hooks.wrapper.description": {
     "message": "Wrapper kommand a Minecraft elindításához."
   },
@@ -275,6 +278,15 @@
   "instance.settings.tabs.installation.tooltip.action.repair": {
     "message": "javítás"
   },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Nem lehet {action} telepítés közben"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Offline állapotban nem lehet {action} végrehajtani"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Nem lehet {action} javítás közben"
+  },
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(ismeretlen verzió)"
   },
@@ -290,8 +302,14 @@
   "instance.settings.tabs.java.environment-variables": {
     "message": "Környezeti változók"
   },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Hookok"
+  },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Java argumentumok"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java telepítés"
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Hozzárendelt memória"
@@ -314,11 +332,17 @@
   "instance.settings.tabs.window.height.description": {
     "message": "A játék ablakának magassága indításkor."
   },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Magaság megadása..."
+  },
   "instance.settings.tabs.window.width": {
     "message": "Szélesség"
   },
   "instance.settings.tabs.window.width.description": {
     "message": "A játék ablakának szélessége indításkor."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Hosszúság megadása..."
   },
   "instance.settings.title": {
     "message": "Beállítások"
@@ -326,8 +350,14 @@
   "instance.worlds.a_minecraft_server": {
     "message": "Egy Minecraft szerver"
   },
+  "instance.worlds.cant_connect": {
+    "message": "A szerverhez nem lehet csatlakozni"
+  },
   "instance.worlds.copy_address": {
     "message": "Cím másolása"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Ne mutasd a kezdőlapon"
   },
   "instance.worlds.filter.available": {
     "message": "Elérhető"
@@ -335,10 +365,46 @@
   "instance.worlds.game_already_open": {
     "message": "Példány már megnyitva"
   },
+  "instance.worlds.hardcore": {
+    "message": "Hardcore mód"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "A Szerver nem kompatibilis"
+  },
+  "instance.worlds.no_contact": {
+    "message": "A szerverrel nem lehet kapcsolatott létesíteni"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Csak Minecraft Alpha 1.0.5+ tól tudsz egyből szerverhez csatlakozni"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Csak Minecraft 1.20+ tól tudsz egyből egyjátékos világba belépni"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Profil indítása"
+  },
   "instance.worlds.type.server": {
     "message": "Szerver"
   },
+  "instance.worlds.type.singleplayer": {
+    "message": "Egyjátékos"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Profil megtekintése"
+  },
   "instance.worlds.world_in_use": {
     "message": "A világ használatban van"
+  },
+  "search.filter.locked.instance": {
+    "message": "Profil által van megadva"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "A játék verzió a profil által van megadva"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "A betöltő a profil által van megadva"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Profil Szinkronizálása"
   }
 }

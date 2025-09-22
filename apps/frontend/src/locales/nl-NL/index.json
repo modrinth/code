@@ -170,6 +170,9 @@
   "app-marketing.features.youve-used-before": {
     "message": "je hebt het al gezien"
   },
+  "app-marketing.hero.description": {
+    "message": "De Modrinth App is een unieke, openbare launcher waarmee je je favoriete mods kunt spelen en up-to-date houden, allemaal in één handig app."
+  },
   "app-marketing.hero.download-button": {
     "message": "Download de Modrinth-app"
   },
@@ -340,6 +343,9 @@
   },
   "auth.welcome.checkbox.subscribe": {
     "message": "Abonneer op updates over Modrinth"
+  },
+  "auth.welcome.description": {
+    "message": "Je bent nu deel van de geweldige community van makers en ontdekkers die mods bouwen, downloaden en up-to-date blijven van geweldige mods."
   },
   "auth.welcome.label.tos": {
     "message": "Door een account te hebben gemaakt, ben je akkoord gegaan met de <terms-link>Voorwaarden</terms-link> en het </privacy-policy-link>Privacybeleid</privacy-policy-link> van Modrinth."
@@ -523,6 +529,9 @@
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Voortdurende Verbetering "
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Krijg gedetailleerde overzichten over paginaweergaven, aantal downloads en inkomsten"
   },
   "landing.creator.feature.data-statistics.title": {
     "message": "Cijfers en Statistieken "
