@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Button, Heading, Link as VLink, Section, Text } from '@vue-email/components'
+import { Button, Heading, Section, Text, Link as VLink } from '@vue-email/components'
 
-import StyledEmail from '@/emails/shared/StyledEmail.vue'
+import StyledEmail from '../shared/StyledEmail.vue'
 </script>
 
 <template>
