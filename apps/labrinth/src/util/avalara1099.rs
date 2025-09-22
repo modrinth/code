@@ -33,12 +33,12 @@ pub struct FormResponse {
     pub company_name: String,
     pub company_email: String,
     pub reference_id: String,
-    pub signed_at: Option<NaiveDateTime>,
+    pub signed_at: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct W9FormsResponse {
-    pub e_delivery_consented_at: Option<NaiveDateTime>,
+    pub e_delivery_consented_at: Option<String>,
     pub tin_match_status: Option<String>,
     pub entry_status: String,
 }
