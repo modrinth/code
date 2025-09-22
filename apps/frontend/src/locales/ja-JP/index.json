@@ -2,6 +2,9 @@
   "admin.billing.error.not-found": {
     "message": "ユーザーが見つかりませんでした"
   },
+  "app-marketing.download.description": {
+    "message": "我々のデスクトップ アプリはすべてのプラットフォームでご利用いただけますので、ご希望のバージョンをお選びください。"
+  },
   "app-marketing.download.download-appimage": {
     "message": "AppImageをダウンロードする"
   },
@@ -17,11 +20,20 @@
   "app-marketing.download.linux": {
     "message": "Linux"
   },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "ModrinthアプリのLinux版は、特定のシステムや構成において<issues-link>問題が発生することが確認されています</issues-link>。お使いのシステムでModrinthアプリが不安定な場合は、Modrinthコンテンツを簡単にインストールできる<prism-link>Prism Launcher</prism-link>などの他のランチャーをお試しください。"
+  },
   "app-marketing.download.mac": {
     "message": "Mac"
   },
   "app-marketing.download.options-title": {
     "message": "ダウンロードオプション"
+  },
+  "app-marketing.download.terms": {
+    "message": "Modrinth アプリをダウンロードすることにより、<terms-link>利用規約</terms-link>および <privacy-link>プライバシー ポリシー</privacy-link> に同意したと見なされます。"
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "サードパーティ パッケージ"
   },
   "app-marketing.download.title": {
     "message": "Modrinth アプリ (ベータ版) をダウンロードする"
@@ -29,8 +41,14 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.follow.description": {
+    "message": "お気に入りのコンテンツを保存し、ワンクリックで更新情報を受け取ります。"
+  },
   "app-marketing.features.follow.title": {
     "message": "プロジェクトをフォローする"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "以前使用していたランチャーからお気に入りのプロファイルをすべてインポートし、Modrinth アプリをすぐに使い始めましょう！"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -38,8 +56,17 @@
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
   },
+  "app-marketing.features.importing.title": {
+    "message": "プロファイルのインポート"
+  },
   "app-marketing.features.mod-management.actions": {
     "message": "アクション"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "{author} より"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinthを使えば、すべてのMODを一箇所で簡単に管理できます。ワンクリックでMODのインストール、アンインストール、アップデートが可能です。"
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "インストールされたMod"
@@ -50,11 +77,20 @@
   "app-marketing.features.mod-management.search-mods": {
     "message": "Modを検索する"
   },
+  "app-marketing.features.mod-management.title": {
+    "message": "Modを管理"
+  },
   "app-marketing.features.mod-management.version": {
     "message": "バージョン"
   },
+  "app-marketing.features.offline.description": {
+    "message": "インターネットに接続しているかどうかに関係なく、MOD をプレイできます。"
+  },
   "app-marketing.features.offline.title": {
     "message": "オフラインモード"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinthのランチャーは完全にオープンソースです。ソースコードは<github-link>GitHub</github-link>にてご覧いただけます。"
   },
   "app-marketing.features.open-source.title": {
     "message": "オープンソース"
@@ -65,8 +101,14 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "％ CPU"
   },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth アプリは、わずか 150 MB のみのRAMを使用します。多くの主要な MOD マネージャーよりも優れたパフォーマンスを発揮します。"
+  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "良いパフォーマンス"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -86,11 +128,38 @@
   "app-marketing.features.performance.one-billion-percent": {
     "message": "10億％"
   },
+  "app-marketing.features.performance.process-name": {
+    "message": "プロセス名"
+  },
   "app-marketing.features.performance.ram": {
     "message": "RAM"
   },
+  "app-marketing.features.performance.small": {
+    "message": "少"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "効率的"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Modrinth アプリを使用して、お気に入りの MOD と MOD パックをダウンロードしてプレイしましょう。"
+  },
+  "app-marketing.features.play.title": {
+    "message": "お気に入りのMODで遊ぶ"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Modrinth でホストされている何千もの MOD や MOD パックのいずれかを使用して、MOD パックを構築、共有、プレイできます。"
+  },
   "app-marketing.features.sharing.modpack": {
     "message": "Modパック"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "共有"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "MODパックを共有する"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "他のランチャーと異なる点"
   },
   "auth.authorize.action.authorize": {
     "message": "認証"
@@ -442,9 +511,6 @@
   },
   "layout.action.change-theme": {
     "message": "テーマを変える"
-  },
-  "layout.action.get-modrinth-app": {
-    "message": "Modrinth Appを入手する"
   },
   "layout.avatar.alt": {
     "message": "あなたのアバター"

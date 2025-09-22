@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "llⱯ"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {ʞɔɐԀ ɐʇɐᗡ} other {sʞɔɐԀ ɐʇɐᗡ}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "sʞɔɐԀ ɐʇɐᗡ"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {ʞɔɐd ɐʇɐp} other {sʞɔɐd ɐʇɐp}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {poW} other {spoW}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "spoW"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {poɯ} other {spoɯ}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {ʞɔɐdpoW} other {sʞɔɐdpoW}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "sʞɔɐdpoW"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {ʞɔɐdpoɯ} other {sʞɔɐdpoɯ}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {uᴉɓnlԀ} other {suᴉɓnlԀ}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "suᴉɓnlԀ"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {uᴉɓnld} other {suᴉɓnld}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {ʞɔɐԀ ǝɔɹnosǝᴚ} other {sʞɔɐԀ ǝɔɹnosǝᴚ}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "sʞɔɐԀ ǝɔɹnosǝᴚ"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {ʞɔɐd ǝɔɹnosǝɹ} other {sʞɔɐd ǝɔɹnosǝɹ}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {ɹǝpɐɥS} other {sɹǝpɐɥS}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "sɹǝpɐɥS"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {ɹǝpɐɥs} other {sɹǝpɐɥs}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "sʇuǝɯuoɹᴉʌuǝ pǝʇɹoddnS"
   },

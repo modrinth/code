@@ -1148,11 +1148,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers is the easiest way to play with your friends without hassle!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / month"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "Starting at $5{monthly}"
+    "message": "Starting at {price}<small> / month</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Create a server"

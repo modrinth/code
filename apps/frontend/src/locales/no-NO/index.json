@@ -1,4 +1,85 @@
 {
+  "admin.billing.error.not-found": {
+    "message": "Bruker ikke funnet"
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Last ned AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Last ned betaversjon"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Last ned DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Last ned RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Tredjepartspakker"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "av {author}"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Navn"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Søk mods"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Versjon"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "God ytelse"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 milliard %"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Lite"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Del"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Last ned Modrinth App for {os}"
+  },
   "auth.authorize.action.authorize": {
     "message": "Godkjenn"
   },
@@ -7,6 +88,9 @@
   },
   "auth.authorize.app-info": {
     "message": "<strong>{appName}</strong> av <creator-link>{creator}</creator-link> vil kunne:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Autoriser {appName}"
   },
   "auth.authorize.redirect-url": {
     "message": "Du vil bli videresendt til <redirect-url>{url}</redirect-url>"
@@ -107,8 +191,14 @@
   "auth.sign-up.title": {
     "message": "Registrer deg"
   },
+  "auth.sign-up.title.create-account": {
+    "message": "Eller lag en konko selv"
+  },
   "auth.sign-up.title.sign-up-with": {
     "message": "Registrer deg med"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Kontoinstillinger"
   },
   "auth.verify-email.action.sign-in": {
     "message": "Logg inn"
@@ -118,5 +208,68 @@
   },
   "auth.verify-email.already-verified.title": {
     "message": "E-posten er allerede bekreftet"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Send brekreftelsesepost på nytt"
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Emailverifisering mislykkes"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Email verifisering"
+  },
+  "auth.verify-email.title": {
+    "message": "Verifiser Email"
+  },
+  "collection.button.remove-project": {
+    "message": "Fjern prosjekt"
+  },
+  "collection.label.owner": {
+    "message": "Eier"
+  },
+  "collection.label.updated-at": {
+    "message": "Oppdatert {ago}"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Lag ny"
+  },
+  "error.collection.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "error.organization.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "error.user.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "frog.title": {
+    "message": "Frosk"
+  },
+  "landing.button.discover-mods": {
+    "message": "Oppdag mods"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Gå til dashbord"
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.search.label": {
+    "message": "Søk"
+  },
+  "landing.search.placeholder": {
+    "message": "Søk..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Sorter etter"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "API dokumentasjon"
   }
 }

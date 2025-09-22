@@ -72,8 +72,26 @@ impl BackgroundTask {
 }
 
 pub async fn run_email(email_queue: EmailQueue) {
-    if let Err(error) = email_queue.index().await {
-        error!(%error, "Failed to index email queue");
+    // Only index for 5 emails at a time, to reduce transaction length,
+    // for a total of 100 emails.
+    for _ in 0..20 {
+        let then = std::time::Instant::now();
+
+        match email_queue.index(5).await {
+            Ok(true) => {
+                info!(
+                    "Indexed email queue in {}ms",
+                    then.elapsed().as_millis()
+                );
+            }
+            Ok(false) => {
+                info!("No more emails to index");
+                break;
+            }
+            Err(error) => {
+                error!(%error, "Failed to index email queue");
+            }
+        }
     }
 }
 

@@ -1082,8 +1082,6 @@ async fn update_compliance_status(
             Ok(Some(avalara1099::DataWrapper {
                 data: avalara1099::Data { attributes, .. },
             })) => {
-                // It's unclear what timezone the DateTime is in (as it returns a naive RFC-3339 timestamp)
-                // so we can just say it was signed now
                 compliance.signed =
                     (&attributes.entry_status == "signed").then(Utc::now);
                 compliance.e_delivery_consented =
