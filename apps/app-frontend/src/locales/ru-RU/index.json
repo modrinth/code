@@ -18,7 +18,7 @@
     "message": "Конфиденциальность"
   },
   "app.settings.tabs.resource-management": {
-    "message": "Управление ресурсами"
+    "message": "Управление данными"
   },
   "instance.add-server.add-and-play": {
     "message": "Добавить и играть"
@@ -132,7 +132,7 @@
     "message": "Настройки запуска"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Пользовательские настройки запуска"
+    "message": "Изменение команд запуска"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Позволяют опытным пользователям задать системные команды, выполняемые перед запуском и после закрытия игры."
@@ -171,7 +171,7 @@
     "message": "Установка"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "Платформа {platform} {version} для Minecraft {game_version} уже установлена"
+    "message": "{platform} {version} для Minecraft {game_version} уже установлен"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "Ванильный Minecraft {game_version} уже установлен"
@@ -267,7 +267,7 @@
     "message": "Показать все версии"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "сменить версию"
+    "message": "изменить версию"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "установить"
@@ -399,7 +399,7 @@
     "message": "Одиночная игра"
   },
   "instance.worlds.view_instance": {
-    "message": "Показать сборку"
+    "message": "Посмотреть сборку"
   },
   "instance.worlds.world_in_use": {
     "message": "Мир используется"

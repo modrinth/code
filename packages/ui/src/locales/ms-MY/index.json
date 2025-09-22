@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "Semua"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {Pek Data}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Pek Data"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {pek data}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {Mod}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mod"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {mod}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {Pek Mod}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Pek Mod"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {pek mod}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {Pemalam}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pemalam"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {pemalam}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {Pek Sumber}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Pek Sumber"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {pek sumber}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {Pembayang}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Pembayang"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {pembayang}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Persekitaran yang disokong"
   },

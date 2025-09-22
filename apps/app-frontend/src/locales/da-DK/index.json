@@ -1,18 +1,18 @@
 {
   "app.settings.developer-mode-enabled": {
-    "message": "Udvikler tilstand aktiveret."
+    "message": "Udvikler-tilstand aktiveret."
   },
   "app.settings.tabs.appearance": {
     "message": "Udseende"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Standard instance indstillinger"
+    "message": "Standardindstillinger for instans"
   },
   "app.settings.tabs.feature-flags": {
-    "message": "Funktions flags"
+    "message": "Funktionsflags"
   },
   "app.settings.tabs.java-installations": {
-    "message": "Java installationer"
+    "message": "Javainstallationer"
   },
   "app.settings.tabs.privacy": {
     "message": "Privatliv"
@@ -75,31 +75,31 @@
     "message": "Ressourcepakke"
   },
   "instance.settings.tabs.general": {
-    "message": "General"
+    "message": "Generelt"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Slet instance"
+    "message": "Slet instans"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Slet instance"
+    "message": "Slet instans"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Permanent slet en instance fra din enhed, inkludere dine verdener, konfigurationer, og alt installeret indhold. Vær forsigtig, for så snart du sletter en instance der er ingen at gendanne det."
+    "message": "Permanent slet en instans fra din enhed, inkluderer dine verdener, konfigurationer, og alt installeret indhold. Vær forsigtig, for så snart du sletter en instans der er ingen at gendanne det."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Sletter..."
   },
   "instance.settings.tabs.general.duplicate-button": {
-    "message": "Kopi"
+    "message": "Kopiér"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
     "message": "Kan ikke kopiere under installation."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Kopi instance"
+    "message": "Kopiér instans"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Opret en kopi af denne instance, inkludere verdener, konfigurationer, mods, osv."
+    "message": "Opret en kopi af denne instans, inkluderer verdener, konfigurationer, mods, osv."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Rediger ikon"
@@ -120,22 +120,22 @@
     "message": "Opret ny gruppe"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Biblioteks grupper tillader dig at organisere dine instances i forskellige sektioner i dit bibliotek."
+    "message": "Biblioteksgrupper lader dig organisere dine instanser i forskellige sektioner i dit bibliotek."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Ændre gruppe navn"
+    "message": "Indtast gruppenavn"
   },
   "instance.settings.tabs.general.name": {
     "message": "Navn"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Kør hooks"
+    "message": "Startkommandoer"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Brugerfinansieret køre hooks"
+    "message": "Brugerfinansieret startkommandoer"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Hooks tillader avanceret brugere at køre bestemte kommandoer før og efter at køre spillet."
+    "message": "Startkommandoer giver avancerede brugere mulighed for at køre bestemte systemkommandoer før og efter spillet startes."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exit"
@@ -144,7 +144,7 @@
     "message": "Kørte efter spillet lukkes."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Indskriv post-ext kommando..."
+    "message": "Indskriv post-exit kommando..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Pre-launch"

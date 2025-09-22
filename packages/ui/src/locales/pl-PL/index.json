@@ -1,4 +1,7 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
   "badge.beta-release": {
     "defaultMessage": "Wersja Beta"
   },
@@ -355,6 +358,60 @@
   },
   "project-type.all": {
     "defaultMessage": "Wszystko"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Paczka danych} few {Paczki danych} other {Paczek danych}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Paczki danych"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {paczka danych} few {paczki danych} other {paczek danych}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} few {Mody} other {Modów}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mody"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} few {mody} other {modów}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Paczka modów} few {Paczki modów} other {Paczek modów}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Paczki modów"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {paczka modów} few {paczki modów} other {paczek modów}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} few {Pluginy} other {Pluginów}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pluginy"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} few {pluginy} other {pluginów}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Paczka zasobów} few {Paczki zasobów} other {Paczek zasobów}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Paczki zasobów"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {paczka zasobów} few {paczki zasobów} other {paczek zasobów}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} few {Shadery} other {Shaderów}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shadery"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} few {shadery} other {shaderów}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Wspierane środowiska"
@@ -718,6 +775,9 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Nie ma na liście lokalizacji, którą potrzebujesz? <link>Daj nam znać, gdzie chcesz zobaczyć Serwery Modrinth w następnej kolejności!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Azja Południowo-Wschodnia"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Europa Zachodnia"

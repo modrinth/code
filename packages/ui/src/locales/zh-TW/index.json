@@ -105,7 +105,7 @@
     "defaultMessage": "App"
   },
   "changelog.product.servers": {
-    "defaultMessage": "伺服器"
+    "defaultMessage": "Servers"
   },
   "changelog.product.web": {
     "defaultMessage": "網站"
@@ -318,19 +318,19 @@
     "defaultMessage": "不支援"
   },
   "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "以 {last_four} 結尾的 {card_brand}"
+    "defaultMessage": "「{card_brand}」卡，卡號末四碼為 {last_four}"
   },
   "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
     "defaultMessage": "Amazon Pay"
   },
   "omorphia.component.purchase_modal.payment_method_type.amex": {
-    "defaultMessage": "American Express"
+    "defaultMessage": "美國運通"
   },
   "omorphia.component.purchase_modal.payment_method_type.cashapp": {
     "defaultMessage": "Cash App"
   },
   "omorphia.component.purchase_modal.payment_method_type.diners": {
-    "defaultMessage": "Diners Club"
+    "defaultMessage": "大來國際"
   },
   "omorphia.component.purchase_modal.payment_method_type.discover": {
     "defaultMessage": "Discover"
@@ -358,6 +358,60 @@
   },
   "project-type.all": {
     "defaultMessage": "全部"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {資料包}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "資料包"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {資料包}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {模組}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "模組"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {模組}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {模組包}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "模組包"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {模組包}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {插件}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "插件"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {插件}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {資源包}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "資源包"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {資源包}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {光影包}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "光影包"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {光影包}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "支援環境"
@@ -504,7 +558,7 @@
     "defaultMessage": "{option} 的子選項"
   },
   "project.settings.environment.title": {
-    "defaultMessage": "執行環境"
+    "defaultMessage": "環境"
   },
   "project.settings.gallery.title": {
     "defaultMessage": "圖庫"
@@ -594,7 +648,7 @@
     "defaultMessage": "解鎖篩選器"
   },
   "search.filter_type.environment": {
-    "defaultMessage": "執行環境"
+    "defaultMessage": "環境"
   },
   "search.filter_type.environment.client": {
     "defaultMessage": "用戶端"
@@ -660,7 +714,7 @@
     "defaultMessage": "不可撤銷"
   },
   "servers.purchase.step.payment.description": {
-    "defaultMessage": "您暫時還不會被收取費用。"
+    "defaultMessage": "你暫時還不會被收取費用。"
   },
   "servers.purchase.step.payment.prompt": {
     "defaultMessage": "選擇一個付款方式"
@@ -672,7 +726,7 @@
     "defaultMessage": "按 {interval} 付款"
   },
   "servers.purchase.step.plan.custom.desc": {
-    "defaultMessage": "選擇一個符合您所需規格的自訂方案。"
+    "defaultMessage": "選擇一個符合你所需規格的自訂方案。"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "入門"
@@ -711,16 +765,16 @@
     "defaultMessage": "中歐"
   },
   "servers.region.custom.prompt": {
-    "defaultMessage": "你的伺服器想要多少記憶體？"
+    "defaultMessage": "你希望伺服器有多少記憶體？"
   },
   "servers.region.north-america": {
     "defaultMessage": "北美洲"
   },
   "servers.region.prompt": {
-    "defaultMessage": "你希望你的伺服器位在何處？"
+    "defaultMessage": "你希望伺服器部署在何處？"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "沒列出你想要的區域？<link>讓我們知道你想在哪架設 Modrinth 伺服器！</link>"
+    "defaultMessage": "沒有想要的地區？<link>請告訴我們，你希望 Modrinth Severs 接下來在哪裡提供服務！</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "東南亞"
@@ -762,7 +816,7 @@
     "defaultMessage": "偏好淺色主題"
   },
   "settings.display.theme.retro": {
-    "defaultMessage": "經典"
+    "defaultMessage": "復古"
   },
   "settings.display.theme.system": {
     "defaultMessage": "與系統同步"
@@ -786,7 +840,7 @@
     "defaultMessage": "{date, date, long} {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
-    "defaultMessage": "您的變更尚未儲存。"
+    "defaultMessage": "你的變更尚未儲存。"
   }
 }
 

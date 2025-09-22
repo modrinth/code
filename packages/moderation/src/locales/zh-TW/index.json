@@ -114,7 +114,7 @@
     "defaultMessage": "在重新提交之前，請審閱並處理審核團隊提出的所有疑慮。"
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "審閱審查員回饋"
+    "defaultMessage": "審閱審核員意見"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "你選擇了 {count} 個解析度標籤 ({tags})。資源包通常應該只會有一個解析度標籤，且須符合其主要解析度。"
@@ -123,7 +123,7 @@
     "defaultMessage": "選擇正確的解析度"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "選擇您的{projectType}執行環境。"
+    "defaultMessage": "選擇你的{projectType}環境。"
   },
   "nags.select-environments.title": {
     "defaultMessage": "選擇環境"

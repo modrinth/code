@@ -344,9 +344,6 @@
   "layout.action.change-theme": {
     "message": "테마 변경"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Modrinth 앱 받기"
-  },
   "layout.avatar.alt": {
     "message": "당신의 아바타"
   },

@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Abbrechen"
+  },
+  "action.continue": {
+    "message": "Weiter"
+  },
   "admin.billing.error.not-found": {
     "message": "Benutzer nicht gefunden"
   },
@@ -413,6 +419,15 @@
   "collection.title": {
     "message": "{name} - Kollektion"
   },
+  "common.close": {
+    "message": "Schliessen"
+  },
+  "common.no": {
+    "message": "Nein"
+  },
+  "common.yes": {
+    "message": "Ja"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Erstellen"
   },
@@ -424,6 +439,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Deine Kollektionen"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Eine ausländische Einheit bezeichnet eine ausserhalb der Vereinigten Staaten gegründete Geschäftseinheit (z.B. eine nicht US-amerikanische Kapitalgesellschaft, Personengesellschaft oder LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Ausländische Einheit"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Privatperson"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Bist du eine Privatperson oder Teil einer ausländischen Einheit?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Steuerformular"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth verwendet den Drittanbieter Track1099 zum sicheren sammeln und verwahren deine Steuerformulare. <security-link>Erfahre hier mehr.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Sicherheitshinweise"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Bist du ein US Bürger?"
   },
   "error.collection.404.list_item.1": {
     "message": "Du hast eventuell die Kollektions-URL falsch geschrieben."
@@ -567,7 +606,7 @@
     "message": "Laden von zufälligem Projekt fehlgeschlagen :("
   },
   "landing.feature.follow.description": {
-    "message": "Erhalte Benachrichtigungen, sobald sich deine Lieblingsprojekte aktualisieren, und bleibe immer auf dem laufenden"
+    "message": "Erhalte Benachrichtigungen, sobald deine Lieblingsprojekte aktualisier werden und bleibe immer auf dem Laufenden."
   },
   "landing.feature.follow.heading": {
     "message": "Folge Projekten, die du magst"
@@ -642,7 +681,7 @@
     "message": "Sortieren nach"
   },
   "landing.section.for-creators.description": {
-    "message": "Gib deinen Kreationen ein Online-Zuhause und erreiche ein riesiges Publikum engagierter Spieler"
+    "message": "Gib deinen Kreationen ein Online-Zuhause und erreiche ein riesiges Publikum engagierter Spieler."
   },
   "landing.section.for-creators.label": {
     "message": "Für Ersteller"
@@ -665,8 +704,35 @@
   "layout.action.change-theme": {
     "message": "Farbschema ändern"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Hol dir die Modrinth App"
+  "layout.action.close-banner": {
+    "message": "Schliessen"
+  },
+  "layout.action.create-new": {
+    "message": "Erstellen..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Datei ansehen"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Über E-Mail ansehen"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Servermitteilungen verwalten"
+  },
+  "layout.action.new-collection": {
+    "message": "Neue Kollektion"
+  },
+  "layout.action.new-organization": {
+    "message": "Neue Organisation"
+  },
+  "layout.action.new-project": {
+    "message": "Neues Projekt"
+  },
+  "layout.action.reports": {
+    "message": "Meldungen"
+  },
+  "layout.action.review-projects": {
+    "message": "Projekte überprüfen"
   },
   "layout.avatar.alt": {
     "message": "Dein Avatar"
@@ -700,6 +766,15 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Zahlungsaktion benötigt."
+  },
+  "layout.banner.tax.action": {
+    "message": "Steuerformular abschliessen"
+  },
+  "layout.banner.tax.description": {
+    "message": "Du hast dieses Jahr bereits mehr als $600 von Modrinth abgehoben. Um die Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Abhebungen werden ausgesetzt, bis dieses Formular eingereicht wurde."
+  },
+  "layout.banner.tax.title": {
+    "message": "Steuerformular benötigt"
   },
   "layout.banner.verify-email.action": {
     "message": "Verifizierungs-E-Mail erneut senden"
@@ -745,6 +820,9 @@
   },
   "layout.footer.legal.terms-of-use": {
     "message": "Nutzungsbedingungen"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinth Informationen"
   },
   "layout.footer.open-source": {
     "message": "Modrinth ist <github-link>quelloffen</github-link>."
@@ -800,11 +878,53 @@
   "layout.meta.og-description": {
     "message": "Entdecke und veröffentliche Minecraft-Inhalte!"
   },
+  "layout.nav.analytics": {
+    "message": "Analytik"
+  },
+  "layout.nav.discover": {
+    "message": "Entdecken"
+  },
+  "layout.nav.discover-content": {
+    "message": "Inhalte entdecken"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Funktionsflags"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Modrinth App herunterladen"
+  },
   "layout.nav.home": {
     "message": "Startseite"
   },
+  "layout.nav.host-a-server": {
+    "message": "Server hosten"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth Startseite"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisationen"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projekte"
+  },
+  "layout.nav.revenue": {
+    "message": "Einnahmen"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Gespeicherte Projekte"
+  },
   "layout.nav.search": {
     "message": "Suche"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Auf Modrinth+ upgraden"
   },
   "moderation.filter.by": {
     "message": "Filtern nach"
@@ -1911,7 +2031,7 @@
     "message": "Keine Sprache entspricht deiner Suche."
   },
   "settings.language.warning": {
-    "message": "Das ändern der Sprache kann dafür sorgen, dass einige Inhalte in Englisch sind, sollte keine Übersetzung verfügbar sein. Die Seite ist noch nicht vollständig übersetzt. Darum können einige Inhalte für bestimmte Sprachen in Englisch erscheinen. Wir arbeiten stetig daran, unser Übersetzungssystem zu verbessern, darum können einige Inhalte unvollständig erscheinen."
+    "message": "Das Ändern der Sprache kann dazu führen, dass in bestimmten Sprachen einige Inhalte auf Englisch angezeigt werden, da die Seite noch nicht vollständig übersetzt wurde. Wir arbeiten daran, unser Lokalisierungssystem zu verbessern, sodass Inhalte gelegentlich fehlerhaft dargestellt werden können."
   },
   "settings.pats.action.create": {
     "message": "Erstelle einen PAT"

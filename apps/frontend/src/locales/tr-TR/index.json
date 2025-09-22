@@ -567,7 +567,7 @@
     "message": "Rastgele proje yüklenemedi :("
   },
   "landing.feature.follow.description": {
-    "message": "Favori projeleriniz güncellendiğinde bildirilim alıp haberdar olun"
+    "message": "Favori projeleriniz güncellendiğinde bildirilin ve haberdar olun."
   },
   "landing.feature.follow.heading": {
     "message": "Sevdiğiniz projeleri takip edin"
@@ -642,7 +642,7 @@
     "message": "Sırala"
   },
   "landing.section.for-creators.description": {
-    "message": "İçeriklerinize çevrim içi bir yer verin ve büyük bir kitleye ulaşın"
+    "message": "İçeriklerinize çevrim içi bir yer verin ve büyük ilgili oyuncu kitleye ulaşın."
   },
   "landing.section.for-creators.label": {
     "message": "Yapımcılar İçin"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "Tema değiştir"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Modrinth Uygulaması Edin"
+  "layout.action.close-banner": {
+    "message": "Kapat"
+  },
+  "layout.action.create-new": {
+    "message": "Yeni oluştur..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Dosya bulma"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "E-posta ile arama"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Sunucu bildirimlerini yönet"
+  },
+  "layout.action.new-collection": {
+    "message": "Yeni koleksiyon"
+  },
+  "layout.action.new-organization": {
+    "message": "Yeni organizasyon"
+  },
+  "layout.action.new-project": {
+    "message": "Yeni proje"
+  },
+  "layout.action.reports": {
+    "message": "Bildiriler"
+  },
+  "layout.action.review-projects": {
+    "message": "Proje incele"
   },
   "layout.avatar.alt": {
     "message": "Avatarınız"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Kullanım Koşulları"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinth bilgileri"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth <github-link>açık kaynaklıdır</github-link>."
   },
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "Minecraft içeriği keşfet ve yayınla!"
   },
+  "layout.nav.analytics": {
+    "message": "Veriler"
+  },
+  "layout.nav.discover": {
+    "message": "Keşfet"
+  },
+  "layout.nav.discover-content": {
+    "message": "İçerik keşfet"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Özellik bayrakları"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Modrinth Uygulaması Edin"
+  },
   "layout.nav.home": {
     "message": "Anasayfa"
   },
+  "layout.nav.host-a-server": {
+    "message": "Sunucu kur"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth Uygulaması"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth ana sayfası"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizasyonlar"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projeler"
+  },
+  "layout.nav.revenue": {
+    "message": "Gelir"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Kayıtlı projeler"
+  },
   "layout.nav.search": {
     "message": "Arama"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Modrinth+ Kullan"
   },
   "moderation.filter.by": {
     "message": "Filtrele"

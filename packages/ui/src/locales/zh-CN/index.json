@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "全部"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {数据包}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "数据包"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {数据包}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {模组}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "模组"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {模组}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {整合包}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "整合包"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {整合包}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {插件}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "插件"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {插件}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {资源包}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "资源包"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {资源包}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {光影}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "光影包"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {光影}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "支持的环境"
   },

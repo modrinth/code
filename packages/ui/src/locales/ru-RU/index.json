@@ -3,7 +3,7 @@
     "defaultMessage": "Бета"
   },
   "badge.beta-release": {
-    "defaultMessage": "Бета Релиз"
+    "defaultMessage": "Бета-версия"
   },
   "badge.new": {
     "defaultMessage": "Новое"
@@ -358,6 +358,60 @@
   },
   "project-type.all": {
     "defaultMessage": "Всё"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Наборов данных} few {Набора данных} many {Наборов данных} other {Наборов данных}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Наборы данных"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {наборов данных} few {набора данных} many {наборов данных} other {наборов данных}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Мод} few {Мода} many {Модов} other {Модов}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Моды"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {мод} few {мода} many {модов} other {модов}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Сборка} few {Сборки} many {Сборок} other {Сборок}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Сборки"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {сборка} few {сборки} many {сборок} other {сборок}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Плагин} few {Плагина} many {Плагинов} other {Плагинов}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Плагины"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {плагин} few {плагина} many {плагинов} other {плагинов}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Набор Ресурсов} few {Набора Ресурсов} many {Наборов Ресурсов} other {Наборов Ресурсов}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Наборы ресурсов"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {набор ресурсов} few {набора ресурсов} many {наборов ресурсов} other {наборов ресурсов}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Шейдер} few {Шейдера} many {Шейдеров} other {Шейдеров}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Шейдеры"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {шейдер} few {шейдера} many {шейдеров} other {шейдеров}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Поддерживаемые среды"

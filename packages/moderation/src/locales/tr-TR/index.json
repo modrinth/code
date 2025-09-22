@@ -93,7 +93,10 @@
     "defaultMessage": "Projeler Minecraft'ın logolarını kullanmamalı ve isimlerinde \"Minecraft\" içermemeli."
   },
   "nags.minecraft-title-clause.title": {
-    "defaultMessage": "Marka ihlalinden kaçın"
+    "defaultMessage": "Marka ihlalinden kaçının"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "Bazı resimlerinin alt yazısı eksik, erişebilirlik açısından özellikle görme engelli kişiler için alt yazı önemli."
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Resim açıklaması ekle"
@@ -120,7 +123,7 @@
     "defaultMessage": "Doğru boyutu seç"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "Projenin çalıştığı çevreleri seçin."
+    "defaultMessage": "Projenin çalıştığı ortamları seçin."
   },
   "nags.select-environments.title": {
     "defaultMessage": "Ortamları seç"

@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Er is een beschrijving nodig die het doel en de functie van het project duidelijk weergeeft."
+    "defaultMessage": "Een beschrijving die het doel en de functie van het project duidelijk weergeeft is vereist."
   },
   "nags.add-description.title": {
     "defaultMessage": "Voeg een beschrijving toe"
