@@ -122,9 +122,6 @@
   "layout.action.change-theme": {
     "message": "Теманы үзгәртү"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Modrinth App алу"
-  },
   "layout.banner.add-email.button": {
     "message": "Аккаунт көйләүләрен ачу"
   },

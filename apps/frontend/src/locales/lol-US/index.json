@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "No plz"
+  },
+  "action.continue": {
+    "message": "Keepz goinz"
+  },
   "admin.billing.error.not-found": {
     "message": "No can haz hooman"
   },
@@ -413,6 +419,15 @@
   "collection.title": {
     "message": "{name} - Hoardz"
   },
+  "common.close": {
+    "message": "Close"
+  },
+  "common.no": {
+    "message": "Naw"
+  },
+  "common.yes": {
+    "message": "Yaas"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Maek new"
   },
@@ -424,6 +439,27 @@
   },
   "dashboard.collections.long-title": {
     "message": "Yer hoardz"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "An outlandish kittehr meanz a biznez crittur organizd owtzide da US (like non-US corpurrashun, pawtnership or LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Outlandish kittehr"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Loneleh pawson"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Iz u a sneaky kitteh hoomin or a pawt of outlandish kittehr?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Moneh papurrz"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Safez kitteh habitz"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "U belongz to da US pawty?"
   },
   "error.collection.404.list_item.1": {
     "message": "U haz teh wrongz URL fur teh cute kitteh hoardz, maybeh."
@@ -567,7 +603,7 @@
     "message": "Uh oh, no randum pawjectz loadz :("
   },
   "landing.feature.follow.description": {
-    "message": "Get pingz when ur fav pawjectz update, stay in da loop"
+    "message": "Get pingz when ur fav pawjectz update, stay in da loop."
   },
   "landing.feature.follow.heading": {
     "message": "Stalk pawjectz u luv"
@@ -642,7 +678,7 @@
     "message": "Sortn'"
   },
   "landing.section.for-creators.description": {
-    "message": "Give ur pawjects an online den n show floof to all da kittehs"
+    "message": "Give ur pawjects an online den n show floof to all da kittehs."
   },
   "landing.section.for-creators.label": {
     "message": "For peeps makin' stuff"
@@ -665,8 +701,35 @@
   "layout.action.change-theme": {
     "message": "Changez themez"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "I can haz da Modrinth Appz"
+  "layout.action.close-banner": {
+    "message": "Close"
+  },
+  "layout.action.create-new": {
+    "message": "Maek new..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Checkz teh filez"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Sniff by mailz"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Kontrol teh server shoutz"
+  },
+  "layout.action.new-collection": {
+    "message": "New hoardz"
+  },
+  "layout.action.new-organization": {
+    "message": "New kitteh clubz"
+  },
+  "layout.action.new-project": {
+    "message": "New pawject"
+  },
+  "layout.action.reports": {
+    "message": "Repurrtz"
+  },
+  "layout.action.review-projects": {
+    "message": "Kitteh check pawject"
   },
   "layout.avatar.alt": {
     "message": "Yur avatarz"
@@ -700,6 +763,12 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Oh hai! Billz needz sum luvin' nao."
+  },
+  "layout.banner.tax.action": {
+    "message": "Fillz out moneh papurrz"
+  },
+  "layout.banner.tax.title": {
+    "message": "Moneh papurrz needz"
   },
   "layout.banner.verify-email.action": {
     "message": "Sendz teh verify emailz againz, plz"
@@ -745,6 +814,9 @@
   },
   "layout.footer.legal.terms-of-use": {
     "message": "Rulez for Hoominz"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinth knoledgez"
   },
   "layout.footer.open-source": {
     "message": "Modrinth iz <github-link>kitteh sorce code</github-link>."
@@ -800,11 +872,53 @@
   "layout.meta.og-description": {
     "message": "Findz and sharez Minecwaft stuffz!"
   },
+  "layout.nav.analytics": {
+    "message": "Countz"
+  },
+  "layout.nav.discover": {
+    "message": "Findz it"
+  },
+  "layout.nav.discover-content": {
+    "message": "Findz stuffz"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Feeechurrr flaaagz"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "I can haz da Modrinth Appz"
+  },
   "layout.nav.home": {
     "message": "Lookin' for stuff"
   },
+  "layout.nav.host-a-server": {
+    "message": "Throwz a server pawrty"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth Appz"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth haus pawge"
+  },
+  "layout.nav.organizations": {
+    "message": "Kitteh clubz"
+  },
+  "layout.nav.profile": {
+    "message": "Pawfile"
+  },
+  "layout.nav.projects": {
+    "message": "Pawjects"
+  },
+  "layout.nav.revenue": {
+    "message": "Profitt"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Stashed pawjects"
+  },
   "layout.nav.search": {
     "message": "Searchez"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Levelz up to Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Picn'"

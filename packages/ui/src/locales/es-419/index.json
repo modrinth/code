@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "Todo"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Data Packs"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {data pack} other {data packs}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mods"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} other {mods}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpacks"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpack} other {modpacks}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Plugins"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packs}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resource Packs"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaders"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shaders}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Entornos soportados"
   },

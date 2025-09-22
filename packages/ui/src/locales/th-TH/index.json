@@ -1,4 +1,10 @@
 {
+  "badge.beta": {
+    "defaultMessage": "เบต้า"
+  },
+  "badge.new": {
+    "defaultMessage": "ใหม่"
+  },
   "button.back": {
     "defaultMessage": "กลับ"
   },
@@ -17,11 +23,17 @@
   "button.download": {
     "defaultMessage": "ดาวน์โหลด"
   },
+  "button.downloading": {
+    "defaultMessage": "กำลังดาวน์โหลด"
+  },
   "button.edit": {
     "defaultMessage": "แก้ไข"
   },
   "button.follow": {
     "defaultMessage": "ติดตาม"
+  },
+  "button.more-options": {
+    "defaultMessage": "ตัวเลือกเพิ่มเติม"
   },
   "button.next": {
     "defaultMessage": "ถัดไป"
@@ -38,8 +50,14 @@
   "button.remove": {
     "defaultMessage": "ลบ"
   },
+  "button.remove-image": {
+    "defaultMessage": "ลบรูป"
+  },
   "button.report": {
     "defaultMessage": "รายงาน"
+  },
+  "button.reset": {
+    "defaultMessage": "คืนค่า"
   },
   "button.save": {
     "defaultMessage": "บันทึก"
@@ -47,14 +65,23 @@
   "button.save-changes": {
     "defaultMessage": "บันทึกการเปลี่ยนแปลง"
   },
+  "button.saving": {
+    "defaultMessage": "บันทึก"
+  },
   "button.sign-in": {
     "defaultMessage": "เข้าสู่ระบบ"
   },
   "button.sign-out": {
     "defaultMessage": "ออกจากระบบ"
   },
+  "button.sign-up": {
+    "defaultMessage": "ลงทะเบียน"
+  },
   "button.stop": {
     "defaultMessage": "หยุด"
+  },
+  "button.unfollow": {
+    "defaultMessage": "เลิกติดตาม"
   },
   "button.upload-image": {
     "defaultMessage": "อัพโหลดภาพ"
@@ -73,6 +100,30 @@
   },
   "collection.label.private": {
     "defaultMessage": "ส่วนตัว"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "แก้ไขไอคอน"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "ลบไอคอน"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "เปลี่ยนไอคอน"
+  },
+  "icon-select.select": {
+    "defaultMessage": "เลือกรูปไอคอน"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "ค้นหา..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "มุมมองแกลเลอรี"
+  },
+  "input.view.grid": {
+    "defaultMessage": "มุมมองตาราง"
+  },
+  "input.view.list": {
+    "defaultMessage": "มุมมองแถว"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "โหมดผจญภัย"

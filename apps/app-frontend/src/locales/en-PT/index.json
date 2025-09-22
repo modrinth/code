@@ -1,6 +1,12 @@
 {
+  "app.settings.developer-mode-enabled": {
+    "message": "In ye captain's boots."
+  },
   "app.settings.tabs.appearance": {
     "message": "How ye be looking"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Keepin' ye gold under lock and key"
   },
   "instance.add-server.add-server": {
     "message": "Plundered"
@@ -22,6 +28,9 @@
   },
   "instance.edit-world.name": {
     "message": "What'n yer world be called"
+  },
+  "instance.server-modal.address": {
+    "message": "Whar ye' reside"
   },
   "instance.server-modal.resource-pack": {
     "message": "Picture pack"
@@ -46,6 +55,12 @@
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Change yer picture"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Scrub ye deck of old paint"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Ye model of sloop"
   },
   "instance.worlds.type.server": {
     "message": "Island"

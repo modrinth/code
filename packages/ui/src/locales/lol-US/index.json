@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "Allz da tingz"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Nerdy Pack} other {Nerdy Packz}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Nerdy Packz"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {nerdy pack} other {nerdy packz}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Tweakie} other {Tweakiez}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Tweakiez"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {tweakie} other {tweekiez}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Tweakie bundle} other {Tweakie bundlez}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Tweakie bundlez"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {tweakie bundle} other {tweakie bundlez}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Pluggie} other {Pluggiez}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pluggiez"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {pluggie} other {pluggiez}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packz}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resource Packz"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {resource pack} other {resource packz}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Fanceh Light} other {Fanceh Lights}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Fanceh Lights"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {fanceh light} other {fanceh lights}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Environments dat me supports"
   },

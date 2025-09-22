@@ -1,6 +1,6 @@
 {
   "admin.billing.error.not-found": {
-    "message": "Utilisateur introuvable"
+    "message": "Utilisateur non trouvé"
   },
   "app-marketing.download.description": {
     "message": "Notre application de bureau est disponible sur toutes les plateformes, choisissez la version qui vous convient."
@@ -9,7 +9,7 @@
     "message": "Télécharger l'AppImage"
   },
   "app-marketing.download.download-beta": {
-    "message": "Télécharger la beta"
+    "message": "Télécharger la bêta"
   },
   "app-marketing.download.download-deb": {
     "message": "Télécharger le DEB"
@@ -45,10 +45,10 @@
     "message": "Enregistrez le contenu que vous aimez et recevez des mises à jour en un seul clic."
   },
   "app-marketing.features.follow.title": {
-    "message": "Projets suivis"
+    "message": "Suivre des projets"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importez tous vos favoris depuis votre ancien launcher, et importez-les dans l’application Modrinth en quelques secondes !"
+    "message": "Importez tous vos profils depuis votre launcher précédent, et utilisez les dans l'application Modrinth en quelques secondes !"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -57,40 +57,40 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Importez un profil"
+    "message": "Importez des profils"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Actions"
   },
   "app-marketing.features.mod-management.byAuthor": {
-    "message": "de {author}"
+    "message": "par {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth rend plus facile la gestion des mods en un seul endroit. Vous pouvez installer, désinstaller et mettre à jour vos mods en un seul clic."
+    "message": "Modrinth rend facile la gestion des mods en un seul endroit. Vous pouvez installer, désinstaller et mettre à jour vos mods en un seul clic."
   },
   "app-marketing.features.mod-management.installed-mods": {
-    "message": "Mods installée "
+    "message": "Mods installés"
   },
   "app-marketing.features.mod-management.name": {
     "message": "Nom"
   },
   "app-marketing.features.mod-management.search-mods": {
-    "message": "Rechercher des mods"
+    "message": "Recherchez des mods"
   },
   "app-marketing.features.mod-management.title": {
-    "message": "Gestion des mods"
+    "message": "Gestion de mods"
   },
   "app-marketing.features.mod-management.version": {
     "message": "Versions"
   },
   "app-marketing.features.offline.description": {
-    "message": "Jouez avec des mods, que vous soyez en ligne ou hors ligne."
+    "message": "Jouez avec vos mods, que vous soyez en ligne ou non."
   },
   "app-marketing.features.offline.title": {
     "message": "Mode hors-ligne"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Le launcher officiel Modrinth est open source. Vous pouvez consulter le code source sur le dépôt GitHub <github-link>GitHub</github-link> !"
+    "message": "Le launcher Modrinth est entièrement open source. Vous pouvez consulter le code source sur notre <github-link>GitHub</github-link> !"
   },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
@@ -102,7 +102,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "L’application Modrinth est plus performante que la plupart des autres gestionnaires de mods, tout en n’utilisant que 150 Mo de RAM !"
+    "message": "L’application Modrinth est plus performante que la plupart des autres gestionnaires de mods, tout en n’utilisant que 150 Mo de RAM !"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -114,16 +114,16 @@
     "message": "Google Chrome"
   },
   "app-marketing.features.performance.infinite-mb": {
-    "message": "∞ Mb"
+    "message": "∞ Mo"
   },
   "app-marketing.features.performance.infinite-times-infinite-mb": {
-    "message": "∞ * ∞ Mb"
+    "message": "∞ * ∞ Mo"
   },
   "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 Mb"
+    "message": "< 150 Mo"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "launcher Modrinth"
+    "message": "Application Modrinth"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 milliard %"
@@ -141,13 +141,13 @@
     "message": "Performant"
   },
   "app-marketing.features.play.description": {
-    "message": "Utilisez l'application Modrinth pour télécharger et jouer avec vos mods et modpacks préférés."
+    "message": "Utilisez l'application Modrinth pour télécharger et jouer avec vos mods et modpacks favoris."
   },
   "app-marketing.features.play.title": {
     "message": "Jouez avec vos mods favoris"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Construisez, partagez et jouez avec l’un des milliers de mods ou de modpacks hébergés ici sur Modrinth."
+    "message": "Créez, partagez et jouez sur des modpacks avec les milliers de mods et modpack présents ici sur Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modpack"
@@ -159,7 +159,7 @@
     "message": "Partager des modpacks"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Différent de tous les autres launcher"
+    "message": "Différent de tous les autres launchers"
   },
   "app-marketing.features.website.description": {
     "message": "L'application Modrinth est entièrement intégrée au site Web, vous pouvez donc accéder à tous vos projets préférés depuis l'application !"
@@ -174,7 +174,7 @@
     "message": "Capture d'écran de l'application Modrinth avec une instance Cobblemon ouverte sur la page \"Contenu\"."
   },
   "app-marketing.hero.description": {
-    "message": "L'application Modrinth est un launcher unique et open source qui vous permet de jouer à vos mods préférés et de les maintenir à jour, le tout dans un petit package pratique."
+    "message": "L'application Modrinth est un launcher unique et open source qui vous permet de jouer à vos mods favoris et de les maintenir à jour, le tout dans une seule petite application."
   },
   "app-marketing.hero.download-button": {
     "message": "Télécharger l'application Modrinth"
@@ -186,7 +186,7 @@
     "message": "Télécharger l'application Modrinth pour {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
-    "message": "Capture d’écran du menu principal de votre instance de Cobblemon."
+    "message": "Capture d’écran du menu principal de l'instance de Cobblemon."
   },
   "app-marketing.hero.more-download-options": {
     "message": "Plus d'options de téléchargement"
@@ -234,7 +234,7 @@
     "message": "Mot de passe réinitialisé avec succès"
   },
   "auth.reset-password.post-challenge.action": {
-    "message": "Réinitialiser mot de passe"
+    "message": "Réinitialiser le mot de passe"
   },
   "auth.reset-password.post-challenge.confirm-password.label": {
     "message": "Confirmer mot de passe"
@@ -297,7 +297,7 @@
     "message": "Mot de passe"
   },
   "auth.sign-up.sign-in-option.title": {
-    "message": "Avez-vous déjà un compte ?"
+    "message": "Vous avez déjà un compte ?"
   },
   "auth.sign-up.subscribe.label": {
     "message": "S'abonner aux mises à jour de Modrinth"
@@ -567,7 +567,7 @@
     "message": "Échec du chargement des projets aléatoires :("
   },
   "landing.feature.follow.description": {
-    "message": "Recevez une notification à chaque mise à jour de vos projets favoris et restez à l’affût"
+    "message": "Recevez une notification à chaque mise à jour de votre projet favori pour rester au courant."
   },
   "landing.feature.follow.heading": {
     "message": "Suivez les projets que vous aimez"
@@ -642,7 +642,7 @@
     "message": "Trier par"
   },
   "landing.section.for-creators.description": {
-    "message": "Offrez un foyer en ligne à vos créations et atteignez un large public de joueurs passionnés"
+    "message": "Donnez un foyer en ligne à vos créations et touchez une audience massive de joueurs dévoués."
   },
   "landing.section.for-creators.label": {
     "message": "Pour les créateurs"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "Changer le thème"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Obtenir l’application Modrinth"
+  "layout.action.close-banner": {
+    "message": "Fermer"
+  },
+  "layout.action.create-new": {
+    "message": "Créer nouveau..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Recherche de fichier"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Recherche par email"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Gérer les notifications du serveur"
+  },
+  "layout.action.new-collection": {
+    "message": "Nouvelle collection"
+  },
+  "layout.action.new-organization": {
+    "message": "Nouvelle organisation"
+  },
+  "layout.action.new-project": {
+    "message": "Nouveau projet"
+  },
+  "layout.action.reports": {
+    "message": "Signalements"
+  },
+  "layout.action.review-projects": {
+    "message": "Revoir le projet"
   },
   "layout.avatar.alt": {
     "message": "Votre avatar"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Conditions d’utilisation"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Information Modrinth"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth est <github-link>open source</github-link>."
   },
@@ -753,7 +783,7 @@
     "message": "Produits"
   },
   "layout.footer.products.app": {
-    "message": "App Modrinth"
+    "message": "Application Modrinth"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "Découvrez et publiez du contenu Minecraft !"
   },
+  "layout.nav.analytics": {
+    "message": "Analytiques"
+  },
+  "layout.nav.discover": {
+    "message": "Découvrir"
+  },
+  "layout.nav.discover-content": {
+    "message": "Découvrir du contenu"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Fonctionnalités expérimentales"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Obtenir l’application Modrinth"
+  },
   "layout.nav.home": {
     "message": "Accueil"
   },
+  "layout.nav.host-a-server": {
+    "message": "Héberger un serveur"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Application Modrinth"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Page d'accueil de Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisations"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projets"
+  },
+  "layout.nav.revenue": {
+    "message": "Revenu"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Projets sauvegardés"
+  },
   "layout.nav.search": {
     "message": "Rechercher"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Passer à Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filtrer par"
@@ -1062,10 +1134,10 @@
     "message": "{title} ne supporte pas {gameVersion} pour {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Télécharger avec l'application Modrinth"
+    "message": "Installer avec l'application Modrinth"
   },
   "project.download.no-app": {
-    "message": "Vous n'avez pas l'appli Modrinth ?"
+    "message": "Vous n'avez pas l'application Modrinth ?"
   },
   "project.download.no-versions-available": {
     "message": "Aucune version disponible pour {gameVersion} et {platform}."
@@ -1845,10 +1917,10 @@
     "message": "Ouvre les liens externes dans un nouvel onglet"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Cache les boutons \"Obtenir l'Application Modrinth\" de la navigation principale. La page de l'Application Modrinth peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
+    "message": "Cache les boutons \"Obtenir l'Application Modrinth\" de la navigation principale. La page de l'application Modrinth peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Cache les publicités de l'Application Modrinth"
+    "message": "Cache les publicités de l'application Modrinth"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "Barre latérale alignée à gauche sur les pages de contenus"

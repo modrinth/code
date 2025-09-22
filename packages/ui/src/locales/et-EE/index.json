@@ -1,18 +1,78 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beeta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Beeta-versioon"
+  },
+  "badge.new": {
+    "defaultMessage": "Uus"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analüütika"
+  },
+  "button.back": {
+    "defaultMessage": "Tagasi"
+  },
   "button.cancel": {
     "defaultMessage": "Tühista"
+  },
+  "button.continue": {
+    "defaultMessage": "Jätka"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Kopeeri ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Kopeeri püsilink"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Loo projekt"
   },
   "button.download": {
     "defaultMessage": "Laadi alla"
   },
+  "button.downloading": {
+    "defaultMessage": "Allalaadimine"
+  },
   "button.edit": {
     "defaultMessage": "Muuda"
+  },
+  "button.follow": {
+    "defaultMessage": "Jälgi"
+  },
+  "button.more-options": {
+    "defaultMessage": "Rohkem valikuid"
+  },
+  "button.next": {
+    "defaultMessage": "Järgmine"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Ava kaust"
+  },
+  "button.play": {
+    "defaultMessage": "Mängi"
+  },
+  "button.refresh": {
+    "defaultMessage": "Värskenda"
+  },
+  "button.remove": {
+    "defaultMessage": "Eemalda"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Eemalda pilt"
   },
   "button.report": {
     "defaultMessage": "Teata"
   },
+  "button.reset": {
+    "defaultMessage": "Lähtesta"
+  },
   "button.save": {
     "defaultMessage": "Salvesta"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Salvesta muudatused"
   },
   "label.created-ago": {
     "defaultMessage": "Loodud {ago}"

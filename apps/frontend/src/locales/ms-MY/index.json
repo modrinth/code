@@ -552,7 +552,7 @@
     "message": "Ekosistem yang Pelbagai"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Dapatkan hasil iklan berbayar daripada halaman projek anda dan keluarkan dana anda pada bila-bila masa"
+    "message": "Dapatkan hasil pendapatan iklan berbayar daripada halaman projek anda dan keluarkan dana anda pada bila-bila masa"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Pengewangan"
@@ -567,7 +567,7 @@
     "message": "Gagal memuatkan projek-projek rawak :("
   },
   "landing.feature.follow.description": {
-    "message": "Dapatkan makluman setiap kali projek kegemaran anda dikemas kini dan elakkan daripada ketinggalan"
+    "message": "Dapatkan makluman setiap kali projek kegemaran anda dikemas kini dan elakkan daripada ketinggalan."
   },
   "landing.feature.follow.heading": {
     "message": "Ikuti projek yang anda sukai"
@@ -642,7 +642,7 @@
     "message": "Isih mengikut"
   },
   "landing.section.for-creators.description": {
-    "message": "Berikan tempat tinggal dalam talian untuk ciptaan anda dan jangkau khalayak ramai penuh dengan pemain yang berdedikasi"
+    "message": "Berikan tempat tinggal dalam talian untuk ciptaan anda dan jangkau khalayak ramai penuh dengan pemain yang berdedikasi."
   },
   "landing.section.for-creators.label": {
     "message": "Untuk Pencipta"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "Tukar tema"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Dapatkan Modrinth App"
+  "layout.action.close-banner": {
+    "message": "Tutup"
+  },
+  "layout.action.create-new": {
+    "message": "Cipta baharu..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Carian fail"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Cari melalui e-mel"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Urus notis pelayan"
+  },
+  "layout.action.new-collection": {
+    "message": "Koleksi baharu"
+  },
+  "layout.action.new-organization": {
+    "message": "Organisasi baharu"
+  },
+  "layout.action.new-project": {
+    "message": "Projek baharu"
+  },
+  "layout.action.reports": {
+    "message": "Laporan"
+  },
+  "layout.action.review-projects": {
+    "message": "Semak projek"
   },
   "layout.avatar.alt": {
     "message": "Avatar anda"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Terma Penggunaan"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Maklumat Modrinth"
+  },
   "layout.footer.open-source": {
     "message": "<github-link>Sumber Modrinth adalah terbuka</github-link>."
   },
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "Temui dan terbitkan kandungan Minecraft!"
   },
+  "layout.nav.analytics": {
+    "message": "Analitik"
+  },
+  "layout.nav.discover": {
+    "message": "Temui"
+  },
+  "layout.nav.discover-content": {
+    "message": "Temui kandungan"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Penetapan ciri"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Dapatkan Modrinth App"
+  },
   "layout.nav.home": {
     "message": "Laman Utama"
   },
+  "layout.nav.host-a-server": {
+    "message": "Hos sebuah pelayan"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Laman utama Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisasi"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projek"
+  },
+  "layout.nav.revenue": {
+    "message": "Pendapatan"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Projek yang disimpan"
+  },
   "layout.nav.search": {
     "message": "Cari"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Naik Taraf ke Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Tapis mengikut"

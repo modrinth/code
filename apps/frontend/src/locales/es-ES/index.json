@@ -563,9 +563,6 @@
   "landing.error.failedToLoadRandomProjects": {
     "message": "No se han podido cargar proyectos aleatorios :("
   },
-  "landing.feature.follow.description": {
-    "message": "Recibe notificaciones cada vez que se actualicen tus proyectos favoritos y mantente al día"
-  },
   "landing.feature.follow.heading": {
     "message": "Sigue los proyectos que te gustan"
   },
@@ -638,9 +635,6 @@
   "landing.search.sort-by.label": {
     "message": "Ordenar por"
   },
-  "landing.section.for-creators.description": {
-    "message": "Dale un hogar online a tus creaciones y llega a una gran audiencia de jugadores dedicados"
-  },
   "landing.section.for-creators.label": {
     "message": "Para Creadores"
   },
@@ -661,9 +655,6 @@
   },
   "layout.action.change-theme": {
     "message": "Cambiar tema"
-  },
-  "layout.action.get-modrinth-app": {
-    "message": "Conseguir aplicación de Modrinth"
   },
   "layout.avatar.alt": {
     "message": "Tu avatar"

@@ -20,14 +20,23 @@
   "app-marketing.download.linux": {
     "message": "xnuᴉ˥"
   },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "˙ʇuǝʇuoɔ ɥʇuᴉɹpoW llɐʇsuᴉ ʎlᴉsɐǝ oʇ <prism-link>ɹǝɥɔunɐꞀ ɯsᴉɹԀ</prism-link> ǝʞᴉl sddɐ ɹǝɥʇo ʎɹʇ oʇ noʎ ǝɓɐɹnoɔuǝ ǝʍ ˋɯǝʇsʎs ɹnoʎ uo ǝlqɐʇsun sᴉ ddⱯ ɥʇuᴉɹpoW ɟI ˙suoᴉʇɐɹnɓᴉɟuoɔ puɐ sɯǝʇsʎs uᴉɐʇɹǝɔ uo <issues-link>sǝnssᴉ ǝʌɐɥ oʇ uʍouʞ</issues-link> ǝɹɐ ddⱯ ɥʇuᴉɹpoW ɟo suoᴉsɹǝʌ xnuᴉꞀ ǝɥ⟘"
+  },
   "app-marketing.download.mac": {
     "message": "ɔɐW"
   },
   "app-marketing.download.options-title": {
     "message": "suoᴉʇdo pɐoluʍop"
   },
+  "app-marketing.download.terms": {
+    "message": "˙<privacy-link>ʎɔᴉloԀ ʎɔɐʌᴉɹԀ</privacy-link> puɐ <terms-link>sɯɹǝ⟘</terms-link> ɹno oʇ ǝǝɹɓɐ noʎ ddⱯ ɥʇuᴉɹpoW ɓuᴉpɐoluʍop ʎᗺ"
+  },
   "app-marketing.download.third-party-packages": {
     "message": "sǝƃɐʞɔɐd ʎʇɹɐd-pɹᴉɥ┴"
+  },
+  "app-marketing.download.title": {
+    "message": "(ɐʇǝᗺ) ddⱯ ɥʇuᴉɹpoW pɐoluʍoᗡ"
   },
   "app-marketing.download.windows": {
     "message": "sʍopuᴉM"
@@ -37,6 +46,9 @@
   },
   "app-marketing.features.follow.title": {
     "message": "sʇɔǝɾoɹd ʍolloℲ"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "¡spuoɔǝs uᴉ ddⱯ ɥʇuᴉɹpoW ɥʇᴉʍ pǝʇɹɐʇs ʇǝɓ puɐ ˋǝɹoɟǝq ɓuᴉsn ǝɹǝʍ noʎ ɹǝɥɔunɐl ǝɥʇ ɯoɹɟ sǝlᴉɟoɹd ǝʇᴉɹoʌɐɟ ɹnoʎ llɐ ʇɹodɯI"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "ɹǝɥɔunɐ˥pפ"
@@ -52,6 +64,9 @@
   },
   "app-marketing.features.mod-management.byAuthor": {
     "message": "ʎq"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "˙ʞɔᴉlɔ ǝlɓuᴉs ɐ ɥʇᴉʍ spoɯ ǝʇɐpdn puɐ ˋllɐʇsuᴉun ˋllɐʇsuᴉ uɐɔ no⅄ ˙ǝɔɐld ǝuo uᴉ spoɯ ɹnoʎ llɐ ǝɓɐuɐɯ oʇ ʎsɐǝ ʇᴉ sǝʞɐɯ ɥʇuᴉɹpoW"
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "spoɯ pǝllɐʇsuI"
@@ -74,6 +89,9 @@
   "app-marketing.features.offline.title": {
     "message": "ǝpoɯ ǝuᴉlɟɟO"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "¡<github-link>qnHʇᴉ⅁</github-link> ɹno uo ǝpoɔ ǝɔɹnos ǝɥʇ ʍǝᴉʌ uɐɔ no⅄ ˙ǝɔɹnos uǝdo ʎllnɟ sᴉ ɹǝɥɔunɐl s,ɥʇuᴉɹpoW"
+  },
   "app-marketing.features.open-source.title": {
     "message": "ǝɔɹnos uǝdO"
   },
@@ -82,6 +100,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "∩ԀƆ %"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "¡WⱯᴚ ɟo qɯ0૨⇂ ʇsnſ ɓuᴉsn ˋsɹǝɓɐuɐɯ poɯ ɓuᴉpɐǝl ǝɥʇ ɟo ʎuɐɯ uɐɥʇ ɹǝʇʇǝq sɯɹoɟɹǝd ddⱯ ɥʇuᴉɹpoW"
   },
   "app-marketing.features.performance.discord": {
     "message": "pɹoɔsᴉp"
@@ -92,8 +113,83 @@
   "app-marketing.features.performance.google-chrome": {
     "message": "ǝɯoɹɥƆ ǝlƃooפ"
   },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "ᗺW ∞"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "ᗺW ∞ * ∞"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "ᗺW 0૨⇂ <"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "% uoᴉllᴉq ⇂"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "ǝɯɐu ssǝɔoɹԀ"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "WⱯᴚ"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "llɐɯS"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "ʇuɐɯɹoɟɹǝԀ"
+  },
+  "app-marketing.features.play.description": {
+    "message": "˙sʞɔɐdpoɯ puɐ spoɯ ǝʇᴉɹoʌɐɟ ɹnoʎ ɥʇᴉʍ ʎɐld puɐ pɐoluʍop oʇ ddⱯ ɥʇuᴉɹpoW ǝs∩"
+  },
+  "app-marketing.features.play.title": {
+    "message": "Play with your favorite mods"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "˙ɥʇuᴉɹpoW uo ǝɹǝɥ pǝʇsoɥ sʞɔɐdpoɯ puɐ spoɯ ɟo spuɐsnoɥʇ ǝɥʇ ɟo ʎuɐ ɥʇᴉʍ sʞɔɐdpoɯ ʎɐld puɐ ˋǝɹɐɥs ˋplᴉnᗺ"
+  },
   "app-marketing.features.sharing.modpack": {
     "message": "ʞɔɐdpoW"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "ǝɹɐɥS"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "sʞɔɐdpoɯ ǝɹɐɥS"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "ɹǝɥɔunɐl ʎuɐ ǝʞᴉlu∩"
+  },
+  "app-marketing.features.website.description": {
+    "message": "¡ddɐ ǝɥʇ ɯoɹɟ sʇɔǝſoɹd ǝʇᴉɹoʌɐɟ ɹnoʎ llɐ ssǝɔɔɐ uɐɔ noʎ os ˋǝʇᴉsqǝʍ ǝɥʇ ɥʇᴉʍ pǝʇɐɹɓǝʇuᴉ ʎllnɟ sᴉ ddⱯ ɥʇuᴉɹpoW"
+  },
+  "app-marketing.features.website.title": {
+    "message": "uoᴉʇɐɹɓǝʇuᴉ ǝʇᴉsqǝM"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "ǝɹoɟǝq pǝsn ǝʌ,noʎ"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "˙ǝɓɐd ,ʇuǝʇuoƆ, ǝɥʇ oʇ pǝuǝdo ǝɔuɐʇsuᴉ uoɯǝlqqoƆ ɐ ɥʇᴉʍ ddⱯ ɥʇuᴉɹpoW ɟo ʇoɥsuǝǝɹɔS"
+  },
+  "app-marketing.hero.description": {
+    "message": "˙ǝɓɐʞɔɐd ǝlʇʇᴉl ʇɐǝu ǝuo uᴉ llɐ ˋǝʇɐp oʇ dn ɯǝɥʇ dǝǝʞ puɐ ˋspoɯ ǝʇᴉɹoʌɐɟ ɹnoʎ ʎɐld oʇ noʎ sʍollɐ ʇɐɥʇ ɹǝɥɔunɐl ǝɔɹnos uǝdo ˋǝnbᴉun ɐ sᴉ ddⱯ ɥʇuᴉɹpoW"
+  },
+  "app-marketing.hero.download-button": {
+    "message": "ddⱯ ɥʇuᴉɹpoW pɐoluʍoᗡ"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW pɐoluʍoᗡ"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "{os} ɹoɟ ddⱯ ɥʇuᴉɹpoW pɐoluʍoᗡ"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "˙uǝǝɹɔs nuǝɯ uᴉɐɯ s,ǝɔuɐʇsuᴉ uoɯǝlqqoƆ ǝɥʇ ɟo ʇoɥsuǝǝɹɔS"
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "suoᴉʇdO pɐoluʍoᗡ ǝɹoW"
   },
   "auth.authorize.action.authorize": {
     "message": "ǝsᴉɹoɥʇnⱯ"
@@ -250,6 +346,9 @@
   },
   "auth.welcome.checkbox.subscribe": {
     "message": "ɥʇuᴉɹpoW ʇnoqɐ sǝʇɐpdn oʇ ǝqᴉɹɔsqnS"
+  },
+  "auth.welcome.description": {
+    "message": "˙spoɯ ɓuᴉzɐɯɐ ɥʇᴉʍ ǝʇɐp-oʇ-dn ɓuᴉʎɐʇs puɐ ˋɓuᴉpɐoluʍop ˋɓuᴉplᴉnq ʎpɐǝɹlɐ sɹǝɹoldxǝ & sɹoʇɐǝɹɔ ɟo ʎʇᴉunɯɯoɔ ǝɯosǝʍɐ ǝɥʇ ɟo ʇɹɐd ʍou ǝɹ’no⅄"
   },
   "auth.welcome.label.tos": {
     "message": "˙</privacy-policy-link>ʎɔᴉꞁoԀ ʎɔɐʌᴉɹԀ<privacy-policy-link> puɐ </terms-link>sɯɹǝ⟘<terms-link> s,ɥʇuᴉɹpoW oʇ pǝǝɹᵷɐ ǝʌɐɥ noʎ 'ʇunoɔɔɐ uɐ ᵷuᴉʇɐǝɹɔ ʎᗺ"
@@ -422,11 +521,179 @@
   "frog.title": {
     "message": "ɓoɹℲ"
   },
+  "landing.button.discover-mods": {
+    "message": "spoɯ ɹǝʌoɔsᴉᗡ"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "pɹɐoqɥsɐp oʇ o⅁"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "ɯɐǝʇ ɥʇuᴉɹpoW ǝɥʇ ɯoɹɟ sǝʇɐpdn ʇuɐʇsuoɔ ɥʇᴉʍ ǝlqᴉssod ǝɔuǝᴉɹǝdxǝ ɓuᴉppoɯ ʇsǝq ǝɥʇ ʇǝ⅁"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "ɓuᴉʌloʌƎ ʎlʇuɐʇsuoƆ"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "ǝnuǝʌǝɹ puɐ ˋsʇunoɔ pɐoluʍop ˋsʍǝᴉʌ ǝɓɐd uo sʇɹodǝɹ pǝlᴉɐʇǝp ʇǝ⅁"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "sɔᴉʇsᴉʇɐʇS puɐ ɐʇɐᗡ"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "¡ǝɹnʇnɟ ǝɥʇ uᴉ ǝɯoɔ oʇ sʎɐʍ ǝɹoɯ puɐ ˋɹǝʌɹǝs pɹoɔsᴉᗡ ˋǝɓɐd ǝɯoɥ ɹno ˋɥɔɹɐǝs ɥɓnoɹɥʇ sɹǝsn ɟo spuɐsnoɥʇ ʎq pǝɹǝʌoɔsᴉp ʇɔǝſoɹd ɹnoʎ ʇǝ⅁"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "ʎɹǝʌoɔsᴉᗡ"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "uoᴉsɹǝʌ ʍǝu ɐ ǝsɐǝlǝɹ noʎ uǝɥʍ ʇɥɓᴉɹ spɐoldn ɔᴉʇɐɯoʇnɐ ɹoɟ ɹnɐʇouᴉW ɥɓnoɹɥʇ slooʇ plᴉnq ɹnoʎ ɥʇᴉʍ ǝʇɐɹɓǝʇuI"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "ɯǝʇsʎsoɔƎ ǝsɹǝʌᴉᗡ"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "ǝɯᴉʇ ʎuɐ ʇɐ spunɟ ɹnoʎ ʍɐɹpɥʇᴉʍ puɐ sǝɓɐd ʇɔǝſoɹd ɹnoʎ ɯoɹɟ ǝnuǝʌǝɹ pɐ pᴉɐd ʇǝ⅁"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "uoᴉʇɐzᴉʇǝuoW"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "ǝsɐǝ ɥʇᴉʍ suoᴉssᴉɯɹǝd puɐ sǝloɹ ǝɓɐuɐɯ puɐ sǝʇɐɯɯɐǝʇ ɹnoʎ ǝʇᴉʌuI"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "ʇuǝɯǝɓɐuɐW ɯɐǝ⟘"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "): sʇɔǝſoɹd ɯopuɐɹ pɐol oʇ pǝlᴉɐℲ"
+  },
+  "landing.feature.follow.description": {
+    "message": "˙dool ǝɥʇ uᴉ ʎɐʇs puɐ ǝʇɐpdn sʇɔǝſoɹd ǝʇᴉɹoʌɐɟ ɹnoʎ ǝɯᴉʇ ʎɹǝʌǝ pǝᴉɟᴉʇou ʇǝ⅁"
+  },
+  "landing.feature.follow.heading": {
+    "message": "ǝʌol noʎ sʇɔǝɾoɹd ʍolloℲ"
+  },
+  "landing.feature.launcher.description": {
+    "message": "˙ɹǝɥɔunɐꞀ ɯsᴉɹԀ puɐ ˋƆWᴉʇlnW ˋɹǝɥɔunɐꞀ⟘Ɐ ǝʞᴉl sɹǝɥɔunɐl ɹɐlndod ʇsoɯ ǝɥʇ ɟo ǝɯos puɐ <link>ddɐ uʍo ɹno</link> ɥɓnoɹɥʇ ɥʇuᴉɹpoW ǝsn uɐɔ no⅄ ˙ɥʇuᴉɹpoW ɥʇᴉʍ uoᴉʇɐɹɓǝʇuᴉ dǝǝp ppɐ sɹǝɥɔunɐl sʇǝl IԀⱯ ǝɔɹnos-uǝdo s,ɥʇuᴉɹpoW"
+  },
+  "landing.feature.launcher.heading": {
+    "message": "ɹǝɥɔunɐl ǝʇᴉɹoʌɐɟ ɹnoʎ ɥʇᴉʍ ʎɐlԀ"
+  },
+  "landing.feature.search.description": {
+    "message": "˙ǝdʎʇ noʎ sɐ ʇuɐʍ noʎ ʇɐɥʍ puᴉɟ noʎ ʇǝl sɹǝʇlᴉɟ lnɟɹǝʍod puɐ ɥɔɹɐǝs ʇsɐɟ-ɓuᴉuʇɥɓᴉl s,ɥʇuᴉɹpoW"
+  },
+  "landing.feature.search.heading": {
+    "message": "ʎlᴉsɐǝ puɐ ʎlʞɔᴉnb ˋʇuɐʍ noʎ ʇɐɥʍ puᴉℲ"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "{content} ʇɟɐɹɔǝuᴉW ɹoɟ ǝɔɐld ǝɥ⟘"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "sʞɔɐd ɐʇɐp"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "sʞɔɐdpoW"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "spoW"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "suᴉɓnlԀ"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "sʞɔɐd ǝɔɹnosǝɹ"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "sɹǝʌɹǝs"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "sɹǝpɐɥs"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ɹǝɥɔunɐꞀ⟘Ɐ"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "˙uǝǝɹɓ ɥʇuᴉɹpoW uᴉ oɓol soᴉpnʇS ɓuɐſoW ǝɥʇ ɥʇᴉʍ ˋʍopuᴉʍ ʇɟɐɹɔǝuᴉW ɐ ɟo uoᴉʇɐʇuǝsǝɹdǝɹ pǝᴉɟᴉldɯᴉs Ɐ"
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "ddⱯ ɥʇuᴉɹpoW"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "ɹǝɥɔunɐꞀ ɯsᴉɹԀ"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "¡pǝʇɐpdn uǝǝq sɐɥ {title}"
+  },
+  "landing.notifications.heading": {
+    "message": "suoᴉʇɐɔᴉɟᴉʇoN"
+  },
+  "landing.notifications.received-time": {
+    "message": "{time} pǝʌᴉǝɔǝᴚ"
+  },
+  "landing.notifications.version-released": {
+    "message": "{gameVersion} ɹoɟ pǝsɐǝlǝɹ uǝǝq sɐɥ {version} uoᴉsɹǝΛ"
+  },
+  "landing.search.label": {
+    "message": "ɥɔɹɐǝS"
+  },
+  "landing.search.placeholder": {
+    "message": "˙˙˙ɥɔɹɐǝS"
+  },
+  "landing.search.sort-by.label": {
+    "message": "ʎq ʇɹoS"
+  },
+  "landing.section.for-creators.description": {
+    "message": "˙sɹǝʎɐld pǝʇɐɔᴉpǝp ɟo ǝɔuǝᴉpnɐ ǝʌᴉssɐɯ ɐ ɥɔɐǝɹ puɐ suoᴉʇɐǝɹɔ ɹnoʎ oʇ ǝɯoɥ ǝuᴉluo uɐ ǝʌᴉ⅁"
+  },
+  "landing.section.for-creators.label": {
+    "message": "sɹoʇɐǝɹƆ ɹoℲ"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "plɹoʍ ǝɥʇ ɥʇᴉʍ ʇuǝʇuoɔ ɹnoʎ ǝɹɐɥS"
+  },
+  "landing.section.for-players.description": {
+    "message": "˙lǝʌǝl ʇxǝu ǝɥʇ oʇ ʎɐldǝɯɐɓ ɹnoʎ ɓuᴉɹq oʇ ʇuǝʇuoɔ puᴉɟ oʇ ǝɹns ǝq uɐɔ noʎ ˋsuoǝɓunp pǝsɹnɔ oʇ sǝɯoᴉq lɐɔᴉɓɐɯ ɯoɹℲ"
+  },
+  "landing.section.for-players.label": {
+    "message": "sɹǝʎɐlԀ ɹoℲ"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "suoᴉʇɐǝɹɔ {count} ɹǝʌo ɹǝʌoɔsᴉᗡ"
+  },
+  "landing.subheading": {
+    "message": "˙ʎʇᴉunɯɯoɔ ǝɥʇ ɹoɟ ʇlᴉnq ɯɹoɟʇɐld ǝɔɹnos-uǝdo ɹno ɥɓnoɹɥʇ ʇuǝʇuoɔ ʇɟɐɹɔǝuᴉW ǝɹɐɥs puɐ ˋʎɐld ˋɹǝʌoɔsᴉᗡ"
+  },
   "layout.action.change-theme": {
     "message": "ǝɯǝɥʇ ǝɓuɐɥƆ"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "ddⱯ ɥʇuᴉɹpoW ʇǝ⅁"
+  "layout.action.close-banner": {
+    "message": "ǝsolƆ"
+  },
+  "layout.action.create-new": {
+    "message": "...ʍǝu ǝʇɐǝɹƆ"
+  },
+  "layout.action.file-lookup": {
+    "message": "dnʞool ǝlᴉℲ"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "lᴉɐɯǝ ʎq dnʞooꞀ"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "sǝɔᴉʇou ɹǝʌɹǝs ǝɓɐuɐW"
+  },
+  "layout.action.new-collection": {
+    "message": "uoᴉʇɔǝlloɔ ʍǝN"
+  },
+  "layout.action.new-organization": {
+    "message": "uoᴉʇɐzᴉuɐɓɹo ʍǝN"
+  },
+  "layout.action.new-project": {
+    "message": "ʇɔǝſoɹd ʍǝN"
+  },
+  "layout.action.reports": {
+    "message": "sʇɹodǝᴚ"
+  },
+  "layout.action.review-projects": {
+    "message": "sʇɔǝſoɹd ʍǝᴉʌǝᴚ"
   },
   "layout.avatar.alt": {
     "message": "ɹɐʇɐʌɐ ɹno⅄"
@@ -506,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "ǝs∩ ɟo sɯɹǝ⟘"
   },
+  "layout.footer.modrinth-information": {
+    "message": "uoᴉʇɐɯɹoɟuᴉ ɥʇuᴉɹpoW"
+  },
   "layout.footer.open-source": {
     "message": "˙<github-link>ǝɔɹnos uǝdo</github-link> sᴉ ɥʇuᴉɹpoW"
   },
@@ -560,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "¡ʇuǝʇuoɔ ʇɟɐɹɔǝuᴉW ɥsᴉlqnd puɐ ɹǝʌoɔsᴉᗡ"
   },
+  "layout.nav.analytics": {
+    "message": "sɔᴉʇʎlɐuⱯ"
+  },
+  "layout.nav.discover": {
+    "message": "ɹǝʌoɔsᴉᗡ"
+  },
+  "layout.nav.discover-content": {
+    "message": "ʇuǝʇuoɔ ɹǝʌoɔsᴉᗡ"
+  },
+  "layout.nav.feature-flags": {
+    "message": "sɓɐlɟ ǝɹnʇɐǝℲ"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW ʇǝ⅁"
+  },
   "layout.nav.home": {
     "message": "ǝɯoH"
   },
+  "layout.nav.host-a-server": {
+    "message": "ɹǝʌɹǝs ɐ ʇsoH"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "ǝɓɐd ǝɯoɥ ɥʇuᴉɹpoW"
+  },
+  "layout.nav.organizations": {
+    "message": "suoᴉʇɐsᴉuɐɓɹO"
+  },
+  "layout.nav.profile": {
+    "message": "ǝlᴉɟoɹԀ"
+  },
+  "layout.nav.projects": {
+    "message": "sʇɔǝſoɹԀ"
+  },
+  "layout.nav.revenue": {
+    "message": "ǝnuǝʌǝᴚ"
+  },
+  "layout.nav.saved-projects": {
+    "message": "sʇɔǝſoɹd pǝʌɐS"
+  },
   "layout.nav.search": {
     "message": "ɥɔɹɐǝS"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "+ɥʇuᴉɹpoW oʇ ǝpɐɹɓd∩"
   },
   "moderation.filter.by": {
     "message": "ʎq ɹǝʇlᴉℲ"
@@ -782,6 +1094,9 @@
   "project.actions.dont-show-again": {
     "message": "uᴉɐƃɐ ʍoɥs ʇ,uop"
   },
+  "project.actions.review-project": {
+    "message": "ʇɔǝſoɹd ʍǝᴉʌǝᴚ"
+  },
   "project.actions.servers-promo.description": {
     "message": "¡ǝlssɐɥ ʇnoɥʇᴉʍ spuǝᴉɹɟ ɹnoʎ ɥʇᴉʍ ʎɐld oʇ ʎɐʍ ʇsǝᴉsɐǝ ǝɥʇ sᴉ sɹǝʌɹǝS ɥʇuᴉɹpoW"
   },
@@ -806,17 +1121,203 @@
   "project.details.licensed": {
     "message": "pǝsuǝɔᴉ˥"
   },
+  "project.download.game-version": {
+    "message": "{version} :uoᴉsɹǝʌ ǝɯɐ⅁"
+  },
+  "project.download.game-version-error": {
+    "message": "punoɟ suoᴉsɹǝʌ ǝɯɐɓ ou :ɹoɹɹƎ"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{version} ɹoɟ ǝlqɐlᴉɐʌɐ ʎluo sᴉ {title}"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{platform} ɹoɟ {gameVersion} ʇɹoddns ʇou sǝop {title}"
+  },
+  "project.download.install-with-app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW ɥʇᴉʍ llɐʇsuI"
+  },
+  "project.download.no-app": {
+    "message": "¿ddⱯ ɥʇuᴉɹpoW ǝʌɐɥ ʇ,uoᗡ"
+  },
+  "project.download.no-versions-available": {
+    "message": "˙{platform} puɐ {gameVersion} ɹoɟ ǝlqɐlᴉɐʌɐ suoᴉsɹǝʌ oN"
+  },
+  "project.download.platform": {
+    "message": "{platform} :ɯɹoɟʇɐlԀ"
+  },
+  "project.download.platform-error": {
+    "message": "punoɟ sɯɹoɟʇɐld ou :ɹoɹɹƎ"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{platform} ɹoɟ ǝlqɐlᴉɐʌɐ ʎluo sᴉ {title}"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{gameVersion} ɹoɟ {platform} ʇɹoddns ʇou sǝop {title}"
+  },
+  "project.download.search-game-versions": {
+    "message": "˙˙˙suoᴉsɹǝʌ ǝɯɐɓ ɥɔɹɐǝS"
+  },
+  "project.download.search-game-versions-label": {
+    "message": "˙˙˙suoᴉsɹǝʌ ǝɯɐɓ ɥɔɹɐǝS"
+  },
+  "project.download.select-game-version": {
+    "message": "uoᴉsɹǝʌ ǝɯɐɓ ʇɔǝlǝS"
+  },
+  "project.download.select-platform": {
+    "message": "ɯɹoɟʇɐld ʇɔǝlǝS"
+  },
+  "project.download.show-all-versions": {
+    "message": "suoᴉsɹǝʌ llɐ ʍoɥS"
+  },
+  "project.download.title": {
+    "message": "{title} pɐoluʍoᗡ"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "˙pǝᴉɟᴉɹǝʌ ǝq oʇ spǝǝu ɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuǝ ǝɥʇ ʇɐɥʇ ʍouʞ ʇɔǝſoɹd ǝɥʇ ɟo ɹǝqɯǝɯ ɹǝɥʇouɐ ʇǝl ǝsɐǝld ʇnq ˋsɓuᴉʇʇǝs ǝsǝɥʇ ʎɟᴉpoɯ oʇ uoᴉssᴉɯɹǝd ǝʌɐɥ ʇ,uop no⅄ ˙ǝlqɐlᴉɐʌɐ ʍou ǝɹɐ suoᴉʇdo ʍǝu puɐ ɥʇuᴉɹpoW uo ɯǝʇsʎs sʇuǝɯuoɹᴉʌuƎ ǝɥʇ pǝlnɐɥɹǝʌo ʇsnſ ǝʌ,ǝM"
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "pǝʍǝᴉʌǝɹ ǝq oʇ spǝǝu ɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuƎ"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "ǝɓuɐɥɔ sᴉɥʇ ʇnoqɐ ǝɹoɯ uɹɐǝꞀ"
+  },
+  "project.environment.migration.message": {
+    "message": "˙ʇɔǝɹɹoɔ sᴉ ɐʇɐpɐʇǝɯ ǝɥʇ ʇɐɥʇ ʎɟᴉɹǝʌ puɐ sɓuᴉʇʇǝs s,ʇɔǝſoɹd ɹnoʎ ʇᴉsᴉʌ ǝsɐǝlԀ ˙ǝlqɐlᴉɐʌɐ ʍou ǝɹɐ suoᴉʇdo ʍǝu puɐ ɥʇuᴉɹpoW uo ɯǝʇsʎs sʇuǝɯuoɹᴉʌuƎ ǝɥʇ pǝlnɐɥɹǝʌo ʇsnſ ǝʌ,ǝM"
+  },
+  "project.environment.migration.review-button": {
+    "message": "sɓuᴉʇʇǝs ʇuǝɯuoɹᴉʌuǝ ʍǝᴉʌǝᴚ"
+  },
+  "project.environment.migration.title": {
+    "message": "ɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuǝ ʍǝᴉʌǝɹ ǝsɐǝlԀ"
+  },
+  "project.error.loading": {
+    "message": "{message}ɐʇɐp ʇɔǝſoɹd ɓuᴉpɐol ɹoɹɹƎ"
+  },
+  "project.error.page-not-found": {
+    "message": "punoɟ ǝq ʇou plnoɔ ǝɓɐd ǝɥ⟘"
+  },
+  "project.error.project-not-found": {
+    "message": "punoɟ ʇou ʇɔǝſoɹԀ"
+  },
   "project.gallery.title": {
     "message": "ʎɹǝllɐ⅁"
   },
+  "project.license.error": {
+    "message": "˙pǝʌǝᴉɹʇǝɹ ǝq ʇou plnoɔ ʇxǝʇ ǝsuǝɔᴉꞀ"
+  },
+  "project.license.loading": {
+    "message": "˙˙˙ʇxǝʇ ǝsuǝɔᴉl ɓuᴉpɐoꞀ"
+  },
+  "project.license.title": {
+    "message": "ǝsuǝɔᴉ˥"
+  },
   "project.moderation.title": {
     "message": "uoᴉʇɐɹǝpoW"
+  },
+  "project.navigation.changelog": {
+    "message": "ɓolǝɓuɐɥƆ"
+  },
+  "project.notification.icon-updated.message": {
+    "message": "˙pǝʇɐpdn uǝǝq sɐɥ uoɔᴉ s,ʇɔǝſoɹd ɹno⅄"
+  },
+  "project.notification.icon-updated.title": {
+    "message": "pǝʇɐpdn uoɔᴉ ʇɔǝſoɹԀ"
+  },
+  "project.notification.updated.message": {
+    "message": "˙pǝʇɐpdn uǝǝq sɐɥ ʇɔǝſoɹd ɹno⅄"
+  },
+  "project.notification.updated.title": {
+    "message": "pǝʇɐpdn ʇɔǝſoɹԀ"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "˙ʍolǝq uoᴉʇdo ǝʇɐᴉɹdoɹddɐ ǝɥʇ ʇɔǝlǝs ǝsɐǝld ˋɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuǝ ɓuᴉssᴉɯ sᴉ ʇɔǝſoɹd ɹno⅄"
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "ʇɔǝſoɹd ɹnoʎ ɹoɟ ʇuǝɯuoɹᴉʌuǝ uɐ ʇɔǝlǝs ǝsɐǝlԀ"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "message": "˙ǝɯᴉʇ sᴉɥʇ ʇɐ ʎllɐqolɓ ɯǝɥʇ ʇᴉpǝ ʇ,uɐɔ noʎ os ˋpǝʇɔǝlǝs sʇuǝɯuoɹᴉʌuǝ ʇuǝɹǝɟɟᴉp ǝʌɐɥ ʇɔǝſoɹd ɹnoʎ ɟo suoᴉsɹǝʌ ʇuǝɹǝɟɟᴉᗡ"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "sʇuǝɯuoɹᴉʌuǝ ǝldᴉʇlnɯ sɐɥ ʇɔǝſoɹd ɹno⅄"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "¡ǝuop ǝɹ,noʎ uǝɥʍ ,ʎɟᴉɹǝΛ, ʞɔᴉlɔ uǝɥʇ puɐ ʍolǝq pǝʇɔǝlǝs sᴉ uoᴉʇdo ʇɔǝɹɹoɔ ǝɥʇ ǝɹnsuǝ ǝsɐǝlԀ ˙ǝlqɐlᴉɐʌɐ ʍou ǝɹɐ suoᴉʇdo ʍǝu puɐ ɥʇuᴉɹpoW uo ɯǝʇsʎs sʇuǝɯuoɹᴉʌuƎ ǝɥʇ pǝlnɐɥɹǝʌo ʇsnſ ǝʌ,ǝM"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "message": "ʍolǝq suoᴉʇdo ǝɥʇ ʍǝᴉʌǝɹ ǝsɐǝlԀ"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "message": "˙ɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuǝ ǝʌɐɥ uɐɔ sʇɔǝſoɹd ʞɔɐdpoɯ ɹo poɯ ʎluO"
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "message": "ɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuǝ ʇɹoddns ʇou sǝop ǝdʎʇ ʇɔǝſoɹd sᴉɥ⟘"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "message": "ʎɟᴉɹǝΛ"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "message": "˙ʎlʇɔǝɹɹoɔ ʇǝs sᴉ ʇuǝɯuoɹᴉʌuǝ s,ʇɔǝſoɹd sᴉɥʇ ʇɐɥʇ ʎɟᴉɹǝΛ"
+  },
+  "project.settings.general.name.description": {
+    "message": "˙ǝɯɐu lɐnʇɔɐ s,ʇɔǝſoɹd ǝɥʇ ʇsnſ—suoᴉʇdᴉɹɔsǝp pǝppɐ ɹo ˋslɐɔᴉʇǝɥʇuǝɹɐd ˋsǝxᴉɟɟns ˋsǝxᴉɟǝɹd pᴉoʌⱯ"
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "ᘕ lnɐɥɹǝʌO ɹǝɥʇǝN ˙ɓ˙ǝ"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "ʇuǝɯdᴉnbƎ uoᴉʇɔnɹʇsuoƆ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "ɓuᴉʌɐƆ uɐɥʇ ɹǝʇʇǝᗺ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "slɐʇɹoԀ pǝɔuɐɥuƎ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "sqoW snoɹǝɓuɐᗡ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.name.title": {
+    "message": "ǝɯɐN"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "˙ǝɔuǝʇuǝs ǝuo uɐɥʇ ǝɹoɯ ou uᴉ ʇɔǝſoɹd ɹnoʎ ǝzᴉɹɐɯɯnS"
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "˙ɹǝɥʇǝN ǝɥʇ punoɹɐ ǝʌloʌǝɹ oʇ uoᴉssǝɹɓoɹd ǝɯɐɓ slnɐɥɹǝʌO ˙ɓ˙ǝ"
+  },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "˙ɹɐǝɓ uoᴉʇɔnɹʇsuoɔ ǝlqɐɹɐǝʍ sppⱯ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "˙sɔᴉuɐɥɔǝɯ ɓuᴉplᴉnq-ʇɟɐɥsǝuᴉɯ ɔᴉʇsᴉlɐǝɹ sppⱯ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "˙ɹǝɥʇo ɥɔɐǝ oʇ ʞuᴉl slɐʇɹod ɹǝɥʇǝN ʍoɥ sǝʌoɹdɯI ˙ɓ˙ǝ"
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "˙ʇɥɓᴉu ǝɥʇ uᴉ ɹǝʇunoɔuǝ oʇ sqoɯ lɐɯɹou ǝɥʇ ɟo suoᴉsɹǝʌ ssoq lnɟɹǝʍod sppⱯ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.tagline.title": {
+    "message": "ǝuᴉlɓɐ⟘"
+  },
+  "project.settings.general.url.title": {
+    "message": "Ꞁᴚ∩"
+  },
+  "project.settings.title": {
+    "message": "sᵷuᴉʇʇǝS"
+  },
+  "project.settings.visit-dashboard": {
+    "message": "pɹɐoqɥsɐp sʇɔǝſoɹd ʇᴉsᴉΛ"
   },
   "project.stats.downloads-label": {
     "message": "{count, plural, one {} other {s}}pɐoluʍop"
   },
   "project.stats.followers-label": {
     "message": "{count, plural, one {} other {s}}ɹǝʍolloɟ"
+  },
+  "project.status.archived.message": {
+    "message": "˙ʇɔǝſoɹd ǝɥʇ ǝʌᴉɥɔɹɐun oʇ sǝpᴉɔǝp ɹoɥʇnɐ ǝɥʇ ssǝlun sǝʇɐpdn ɹǝɥʇɹnɟ ʎuɐ ǝʌᴉǝɔǝɹ ʇou llᴉʍ {title}˙pǝʌᴉɥɔɹɐ uǝǝq sɐɥ {title}"
   },
   "project.version.all-versions": {
     "message": "suoᴉsɹǝʌ llⱯ"
@@ -1481,6 +1982,9 @@
   "settings.language.languages.search.no-results": {
     "message": "˙ɥɔɹɐǝs ɹnoʎ ɥɔʇɐɯ sǝᵷɐnᵷuɐꞁ oN"
   },
+  "settings.language.warning": {
+    "message": "˙uǝʞoɹq ɹɐǝddɐ ʎɐɯ ʇuǝʇuoɔ ʎllɐuoᴉsɐɔɔo os ˋɯǝʇsʎs uoᴉʇɐzᴉlɐɔol ɹno ɓuᴉʌoɹdɯᴉ uo ɓuᴉʞɹoʍ llᴉʇs ǝɹɐ ǝM ˙sǝɓɐnɓuɐl uᴉɐʇɹǝɔ ɹoɟ ɥsᴉlɓuƎ uᴉ uᴉɐɯǝɹ ʎɐɯ ʇuǝʇuoɔ ǝɯos os ˋpǝʇɐlsuɐɹʇ ʎllnɟ ʇǝʎ ʇou sᴉ ǝʇᴉs ǝɥ⟘ ˙ǝlqɐlᴉɐʌɐ ʇou sᴉ uoᴉʇɐlsuɐɹʇ ɐ ɟᴉ ɥsᴉlɓuƎ uᴉ ɹɐǝddɐ oʇ ʇuǝʇuoɔ ǝɯos ǝsnɐɔ ʎɐɯ ǝɓɐnɓuɐl ǝʇᴉs ǝɥʇ ɓuᴉɓuɐɥƆ"
+  },
   "settings.pats.action.create": {
     "message": "⟘ⱯԀ ɐ ǝʇɐǝɹƆ"
   },
@@ -1576,5 +2080,11 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "ɯɹoɟʇɐꞁd uʍouʞu∩"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "ɥʇuᴉɹpoW ɯoɹɟ sʍǝu ʇsǝʇɐꞀ"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "sʍǝu llɐ ʍǝᴉΛ"
   }
 }

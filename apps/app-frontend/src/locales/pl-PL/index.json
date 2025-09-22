@@ -78,13 +78,13 @@
     "message": "Ogólne"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Usuń instancje"
+    "message": "Usuń instancję"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Usuń instancje"
+    "message": "Usuń instancję"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Permanentnie usuwa instancje z Twojego urządzenia, w tym Twoje światy, konfiguracje i całą zainstalowaną zawartość. Bądź ostrożny(-a), gdy usuniesz instancje, nie ma możliwości odzyskania jej."
+    "message": "Trwale usuwa instancję z Twojego urządzenia, w tym Twoje światy, konfiguracje i całą zainstalowaną zawartość. Bądź ostrożny(-a), gdy usuniesz instancję, nie ma możliwości jej odzyskania."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Usuwanie..."
@@ -96,7 +96,7 @@
     "message": "Nie można duplikować podczas instalowania."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Duplikuj instancje"
+    "message": "Duplikuj instancję"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
     "message": "Tworzy kopie tej instancji, w tym światy, konfiguracje, mody, itp."
@@ -216,13 +216,13 @@
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "Nie można pobrać załączonych szczegółów paczki modów. Sprawdź swoje połączenie internetowe."
+    "message": "Nie można pobrać powiązanych szczegółów paczki modów. Sprawdź swoje połączenie internetowe."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} nie jest dostępny dla Minecraft {version}. Wypróbuj inny."
+    "message": "{loader} nie jest dostępny dla Minecraft {version}. Spróbuj inny."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Ta instancja jest połączona z paczką modów, ale paczka modów nie mogła zostać odnaleziona na Modrinth."
+    "message": "Ta instancja jest połączona z paczką modów, ale nie udało się znaleźć tej paczki modów na Modrinth."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Platforma"
@@ -234,7 +234,7 @@
     "message": "Ponowne instalowanie paczki modów"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Ponowne instalowanie zresetuje całą zainstalowaną lub zmodyfikowaną zawartość do stanu podanego przez paczkę modów, usuwając jakiekolwiek mody lub zawartość którą dodałeś ponad oryginalną instalację. To może naprawić niespodziewane zachowanie, jeśli instancja została zmieniona, ale jeśli twoje istniejące światy polegają na dodatkowej zawartości którą zainstalowałeś, może to je zepsuć."
+    "message": "Ponowne instalowanie zresetuje całą zainstalowaną lub zmodyfikowaną zawartość do stanu podanego przez paczkę modów, usuwając jakiekolwiek mody lub zawartość, którą dodałeś(-aś) ponad oryginalną instalację. Może to naprawić nieoczekiwane zachowanie, jeśli instancja została zmieniona, ale jeśli Twoje istniejące światy polegają na dodatkowej zawartości, którą zainstalowałeś, może to je zepsuć."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Czy jesteś pewien, że chcesz ponownie zainstalować tę instancję?"
@@ -255,7 +255,7 @@
     "message": "Naprawa ponownej instalacji zależności Minecraft i kontroli korupcji. Może to rozwiązać problemy, jeśli gra nie uruchomi się z powodu błędów związanych z uruchamianiem, ale nie rozwiąże problemów ani awarii związanych z zainstalowanymi modami."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Naprawić instancje?"
+    "message": "Naprawić instancję?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "Trwa naprawianie"
@@ -282,7 +282,7 @@
     "message": "Podczas instalowania nie można wykonać: {action}"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Nie możesz {action}, gdy jesteś offline"
+    "message": "Nie możesz {action} podczas bycia offline"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
     "message": "Podczas naprawiania nie można wykonać: {action}"
@@ -312,7 +312,7 @@
     "message": "Zmienne środowiskowe"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Hooki"
+    "message": "Haczyki"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Argumenty Javy"
@@ -363,7 +363,7 @@
     "message": "Nie można połączyć się z serwerem"
   },
   "instance.worlds.copy_address": {
-    "message": "Skopiuj adres"
+    "message": "Kopiuj adres"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Nie pokazuj na stronie głównej"
@@ -405,13 +405,13 @@
     "message": "Świat jest w użytku"
   },
   "search.filter.locked.instance": {
-    "message": "Podane przez instancje"
+    "message": "Podane przez instancję"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "Wersja gry jest podana przez instancje"
+    "message": "Wersja gry jest dostarczana przez instancję"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Wersja silnika gry jest podana przez instancje"
+    "message": "Loader jest dostarczony przez instancję"
   },
   "search.filter.locked.instance.sync": {
     "message": "Synchronizuj z instancją"

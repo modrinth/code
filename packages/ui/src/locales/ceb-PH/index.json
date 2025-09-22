@@ -284,6 +284,9 @@
   "project.about.details.updated": {
     "defaultMessage": "Nagbag-o {date}"
   },
+  "project.settings.environment.title": {
+    "defaultMessage": "Kalikopan"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "ᜀ"
   },
@@ -316,6 +319,9 @@
   },
   "project.visibility.unknown": {
     "defaultMessage": "Wala mahibal-an"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Kalikopan"
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Bukas nga tinubdan"

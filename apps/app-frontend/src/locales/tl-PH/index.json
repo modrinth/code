@@ -73,5 +73,11 @@
   },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Tanggalin ang lambana"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Mga kagustuhan sa pasadyang durungawan"
+  },
+  "instance.settings.title": {
+    "message": "Mga Kagustuhan"
   }
 }

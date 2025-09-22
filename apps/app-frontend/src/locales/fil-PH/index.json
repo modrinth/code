@@ -73,5 +73,11 @@
   },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Tanggalin ang ikono"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Mga setting sa custom na window"
+  },
+  "instance.settings.title": {
+    "message": "Mga Setting"
   }
 }
