@@ -8,6 +8,7 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 	<StyledEmail
 		title="Payment failed for {paymentfailed.service}"
 		:manual-links="[{ link: '{billing.url}', label: 'Billing settings' }]"
+		:support-info="['{subscription.id}']"
 	>
 		<Heading as="h1" class="mb-2 text-2xl font-bold">
 			Payment failed for {paymentfailed.service}

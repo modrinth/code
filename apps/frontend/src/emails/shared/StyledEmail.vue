@@ -17,6 +17,7 @@ import {
 defineProps<{
 	title?: string
 	manualLinks?: { link: string; label?: string }[]
+	supportInfo?: string[]
 }>()
 
 interface SocialLink {
@@ -211,9 +212,19 @@ const socialLinks = Object.freeze<readonly SocialLink[]>([
 
 					<hr />
 
+					<Section v-if="supportInfo && supportInfo.length" class="mb-0 pb-0 pl-4 pr-4 pt-0">
+						<Text
+							v-for="(line, index) in supportInfo"
+							:key="index"
+							class="text-footerText text-2xs font-sans"
+						>
+							{{ line }}
+						</Text>
+					</Section>
+
 					<Section
 						v-if="manualLinks && manualLinks.length"
-						class="text-footerText text-2xs mb-4 mt-4 pb-0 pl-4 pr-4 pt-0 font-sans"
+						class="text-footerText text-2xs mb-4 pb-0 pl-4 pr-4 pt-0 font-sans"
 					>
 						<small class="text-muted text-2xs"
 							>If you're having trouble with the links above, copy and paste these URLs into your
