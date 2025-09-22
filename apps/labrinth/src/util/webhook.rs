@@ -1,7 +1,7 @@
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
 use crate::models::ids::ProjectId;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
 use serde::Serialize;
@@ -113,7 +113,7 @@ async fn get_webhook_metadata(
             .clone()
             .into_iter()
             .find_map(|vf| {
-                MinecraftGameVersion::try_from_version_field(&vf).ok()
+                MinecraftGameVersion::try_from_version_field(vf).ok()
             })
             .unwrap_or_default();
 
@@ -240,9 +240,7 @@ pub async fn send_slack_payout_source_alert_webhook(
         }))
         .send()
         .await
-        .map_err(|_| {
-            ApiError::Slack("Error while sending projects webhook".to_string())
-        })?;
+        .map_err(|_| ApiError::Slack)?;
 
     Ok(())
 }
@@ -356,11 +354,7 @@ pub async fn send_slack_project_webhook(
             }))
             .send()
             .await
-            .map_err(|_| {
-                ApiError::Slack(
-                    "Error while sending projects webhook".to_string(),
-                )
-            })?;
+            .map_err(|_| ApiError::Slack)?;
     }
 
     Ok(())

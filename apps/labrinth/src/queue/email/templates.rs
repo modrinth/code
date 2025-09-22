@@ -6,7 +6,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationBody;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use ariadne::ids::base62_impl::to_base62;
 use futures::TryFutureExt;
 use lettre::Message;

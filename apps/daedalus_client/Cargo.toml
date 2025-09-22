@@ -11,7 +11,7 @@ daedalus.workspace = true
 tokio = { workspace = true, features = ["sync", "macros", "rt-multi-thread"] }
 futures.workspace = true
 dotenvy.workspace = true
-serde = { workspace = true, features = ["derive"] }
+serde.workspace = true
 serde_json.workspace = true
 serde-xml-rs.workspace = true
 thiserror.workspace = true

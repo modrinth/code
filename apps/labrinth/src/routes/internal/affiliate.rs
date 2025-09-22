@@ -20,7 +20,7 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::routes::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -52,9 +52,8 @@ async fn code_get_all(
     .await?;
 
     if !user.role.is_admin() {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to read all affiliate codes!"
-                .to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::ReadAllAffiliateCodes,
         ));
     }
 
@@ -80,7 +79,7 @@ async fn code_create(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    body: web::Json<CodeCreateRequest>,
+    body: Json<CodeCreateRequest>,
 ) -> Result<Json<CodeCreateResponse>, ApiError> {
     let (_, creator) = get_user_from_headers(
         &req,
@@ -92,9 +91,8 @@ async fn code_create(
     .await?;
 
     if !creator.role.is_admin() {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to create an affiliate code!"
-                .to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::CreateAffiliateCode,
         ));
     }
 
@@ -103,8 +101,8 @@ async fn code_create(
     let Some(_affiliate_user) =
         DBUser::get_id(affiliate_id, &**pool, &redis).await?
     else {
-        return Err(ApiError::CustomAuthentication(
-            "Affiliate user not found!".to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::UnknownAffiliateUser,
         ));
     };
 
@@ -147,8 +145,8 @@ async fn code_get(
     .await?;
 
     if !user.role.is_admin() {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to read an affiliate code!".to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::ReadAffiliateCode,
         ));
     }
 
@@ -182,9 +180,8 @@ async fn code_delete(
     .await?;
 
     if !user.role.is_admin() {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to delete an affiliate code!"
-                .to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::DeleteAffiliateCode,
         ));
     }
 

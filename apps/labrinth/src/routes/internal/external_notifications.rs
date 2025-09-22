@@ -3,7 +3,7 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationBody;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::guards::external_notification_key_guard;
 use actix_web::web;
 use actix_web::{HttpResponse, post};

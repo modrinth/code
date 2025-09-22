@@ -7,11 +7,13 @@ on:
     paths:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'
+      - 'packages/ariadne/**'
   pull_request:
     types: [opened, synchronize]
     paths:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'
+      - 'packages/ariadne/**'
   merge_group:
     types: [checks_requested]
 

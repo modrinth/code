@@ -1,0 +1,944 @@
+{
+  "labrinth.error.clickhouse_error": {
+    "message": "Clickhouse Error: {cause}"
+  },
+  "labrinth.error.conflict": {
+    "message": "Conflict: {cause}"
+  },
+  "labrinth.error.creation.database_error": {
+    "message": "Database Error: {cause}"
+  },
+  "labrinth.error.creation.database_error.unknown": {
+    "message": "An unknown database error occurred"
+  },
+  "labrinth.error.creation.environment_error": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.creation.file_hosting_error": {
+    "message": "Error while uploading file: {cause}"
+  },
+  "labrinth.error.creation.indexing_error": {
+    "message": "Indexing Error: {cause}"
+  },
+  "labrinth.error.creation.invalid_image": {
+    "message": "Image Parsing Error: {cause}"
+  },
+  "labrinth.error.creation.invalid_input": {
+    "message": "Error with multipart data: {cause}"
+  },
+  "labrinth.error.creation.invalid_input.cannot_request_status": {
+    "message": "Status ''{status}'' cannot be requested"
+  },
+  "labrinth.error.creation.invalid_input.category": {
+    "message": "Invalid category: {category}"
+  },
+  "labrinth.error.creation.invalid_input.data_field_out_of_order": {
+    "message": "`data` field must come before file fields"
+  },
+  "labrinth.error.creation.invalid_input.duplicate_files": {
+    "message": "Duplicate files are not allowed to be uploaded to Modrinth!"
+  },
+  "labrinth.error.creation.invalid_input.duplicate_multipart_field": {
+    "message": "Duplicate multipart field name"
+  },
+  "labrinth.error.creation.invalid_input.failed_getting_new_team": {
+    "message": "Failed to get created team."
+  },
+  "labrinth.error.creation.invalid_input.file": {
+    "message": "Error while validating uploaded file: {cause}"
+  },
+  "labrinth.error.creation.invalid_input.file_name_has_slashes": {
+    "message": "File names must not contain slashes!"
+  },
+  "labrinth.error.creation.invalid_input.file_not_specified": {
+    "message": "File `{file_name}` (field {in_field}) isn''t specified in the versions data"
+  },
+  "labrinth.error.creation.invalid_input.file_type": {
+    "message": "Invalid file type for version file: {extension}"
+  },
+  "labrinth.error.creation.invalid_input.gallery_image_too_large": {
+    "message": "Gallery image exceeds the maximum of {limit}."
+  },
+  "labrinth.error.creation.invalid_input.icon": {
+    "message": "Invalid format for image: {cause}"
+  },
+  "labrinth.error.creation.invalid_input.icon_too_large": {
+    "message": "Icons must be smaller than {limit}"
+  },
+  "labrinth.error.creation.invalid_input.improper_context_image": {
+    "message": "Image {image_id} is not unused or in the ''{proper_context}'' context"
+  },
+  "labrinth.error.creation.invalid_input.initial_versions_files_missing": {
+    "message": "Some files were specified in initial_versions but not uploaded"
+  },
+  "labrinth.error.creation.invalid_input.invalid_license_id": {
+    "message": "Invalid SPDX license identifier: {cause}"
+  },
+  "labrinth.error.creation.invalid_input.invalid_organization_id": {
+    "message": "Invalid organization ID specified!"
+  },
+  "labrinth.error.creation.invalid_input.invalid_project_id": {
+    "message": "An invalid project id was supplied"
+  },
+  "labrinth.error.creation.invalid_input.invalid_version_id": {
+    "message": "An invalid version id was supplied"
+  },
+  "labrinth.error.creation.invalid_input.loader": {
+    "message": "Invalid loader: {loader}"
+  },
+  "labrinth.error.creation.invalid_input.missing_any_files": {
+    "message": "Versions must have at least one file uploaded to them"
+  },
+  "labrinth.error.creation.invalid_input.missing_data_field": {
+    "message": "`data` field is required"
+  },
+  "labrinth.error.creation.invalid_input.missing_loader_fields": {
+    "message": "Missing mandatory loader fields: {fields}"
+  },
+  "labrinth.error.creation.invalid_input.multipart": {
+    "message": "Error while parsing multipart payload: {cause}"
+  },
+  "labrinth.error.creation.invalid_input.multiple_featured_gallery": {
+    "message": "Only one gallery image can be featured."
+  },
+  "labrinth.error.creation.invalid_input.multiple_icons": {
+    "message": "Projects can only have one icon"
+  },
+  "labrinth.error.creation.invalid_input.no_files_specified": {
+    "message": "At least one file must be specified"
+  },
+  "labrinth.error.creation.invalid_input.no_initial_versions": {
+    "message": "Project submitted for review with no initial versions"
+  },
+  "labrinth.error.creation.invalid_input.no_json_in_multipart": {
+    "message": "No json segment found in multipart."
+  },
+  "labrinth.error.creation.invalid_input.nonexistent_image": {
+    "message": "Image {image_id} does not exist"
+  },
+  "labrinth.error.creation.invalid_input.nonexistent_link_platform": {
+    "message": "Link platform {platform} does not exist."
+  },
+  "labrinth.error.creation.invalid_input.nonexistent_loader_field": {
+    "message": "Loader field ''{field}'' does not exist for any loaders supplied"
+  },
+  "labrinth.error.creation.invalid_input.parsing": {
+    "message": "Error while parsing JSON: {cause}"
+  },
+  "labrinth.error.creation.invalid_input.project_file_too_large": {
+    "message": "Project file exceeds the maximum of {limit}. Contact a moderator or admin to request permission to upload larger files."
+  },
+  "labrinth.error.creation.invalid_input.project_id_in_initial_version": {
+    "message": "Found project id in initial version for new project"
+  },
+  "labrinth.error.creation.invalid_input.slug_collision": {
+    "message": "Slug is already taken!"
+  },
+  "labrinth.error.creation.invalid_input.validation": {
+    "message": "Error while validating input: {cause}"
+  },
+  "labrinth.error.creation.missing_value.content_file_extension": {
+    "message": "Missing content file extension"
+  },
+  "labrinth.error.creation.missing_value.content_file_name": {
+    "message": "Missing content file name"
+  },
+  "labrinth.error.creation.missing_value.content_name": {
+    "message": "Missing content name"
+  },
+  "labrinth.error.creation.missing_value.data_field": {
+    "message": "No `data` field in multipart upload"
+  },
+  "labrinth.error.creation.missing_value.project_id": {
+    "message": "Missing project id"
+  },
+  "labrinth.error.creation.unauthorized": {
+    "message": "Authentication Error: {cause_or_reason}"
+  },
+  "labrinth.error.creation.unauthorized.create_projects_in_organization": {
+    "message": "You do not have the permissions to create projects in this organization!"
+  },
+  "labrinth.error.creation.unauthorized.upload_files_to_version": {
+    "message": "You don''t have permission to upload files to this version!"
+  },
+  "labrinth.error.creation.unauthorized.upload_version": {
+    "message": "You don''t have permission to upload this version!"
+  },
+  "labrinth.error.database.cache": {
+    "message": "Error while interacting with the cache: {cause}"
+  },
+  "labrinth.error.database.cache_serialization": {
+    "message": "Error while serializing with the cache: {cause}"
+  },
+  "labrinth.error.database.cache_timeout": {
+    "message": "Timeout when waiting for cache subscriber"
+  },
+  "labrinth.error.database.random_id": {
+    "message": "Error while trying to generate random ID"
+  },
+  "labrinth.error.database.redis_pool": {
+    "message": "Redis Pool Error: {cause}"
+  },
+  "labrinth.error.database.schema": {
+    "message": "Schema error: {cause}"
+  },
+  "labrinth.error.database.schema.field_name_does_not_exist": {
+    "message": "Field name {field_name} for field {field} in does not exist"
+  },
+  "labrinth.error.database.schema.field_name_mismatch": {
+    "message": "Field name {expected} is not {actual}"
+  },
+  "labrinth.error.database.schema.game_version_field_not_enum": {
+    "message": "Game version requires field value to be an enum: {field}"
+  },
+  "labrinth.error.database.schema.missing_game_version_enum": {
+    "message": "Could not find game version enum."
+  },
+  "labrinth.error.database.schema.multiple_fields": {
+    "message": "Multiple fields for field {field}"
+  },
+  "labrinth.error.database.schema.multiple_ids_for_field": {
+    "message": "Multiple field ids for field {field}"
+  },
+  "labrinth.error.database.schema.no_version_fields": {
+    "message": "No version fields for field {field}"
+  },
+  "labrinth.error.database.sqlx": {
+    "message": "Error while interacting with the database: {cause}"
+  },
+  "labrinth.error.database_error": {
+    "message": "Database Error: {cause}"
+  },
+  "labrinth.error.decoding_error": {
+    "message": "Error while decoding Base62: {cause}"
+  },
+  "labrinth.error.discord_error": {
+    "message": "Discord Error: {cause}"
+  },
+  "labrinth.error.environment_error": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.file_hosting_error": {
+    "message": "Error while uploading file: {cause}"
+  },
+  "labrinth.error.file_hosting_error.file_system": {
+    "message": "File system error in file hosting: {cause}"
+  },
+  "labrinth.error.file_hosting_error.invalid_filename": {
+    "message": "Invalid Filename"
+  },
+  "labrinth.error.file_hosting_error.s3": {
+    "message": "{action}: {cause}"
+  },
+  "labrinth.error.file_hosting_error.s3.creating_bucket_instance": {
+    "message": "S3 error when creating bucket instance"
+  },
+  "labrinth.error.file_hosting_error.s3.deleting_file": {
+    "message": "S3 error when deleting file"
+  },
+  "labrinth.error.file_hosting_error.s3.generating_presigned_url": {
+    "message": "S3 error when generating presigned URL"
+  },
+  "labrinth.error.file_hosting_error.s3.uploading_file": {
+    "message": "S3 error when uploading file"
+  },
+  "labrinth.error.file_validation.blocking": {
+    "message": "Error while managing threads"
+  },
+  "labrinth.error.file_validation.database": {
+    "message": "Error while querying database"
+  },
+  "labrinth.error.file_validation.invalid_input": {
+    "message": "Invalid Input: {cause}"
+  },
+  "labrinth.error.file_validation.io": {
+    "message": "IO Error: {cause}"
+  },
+  "labrinth.error.file_validation.serialization": {
+    "message": "Error while validating JSON for uploaded file: {cause}"
+  },
+  "labrinth.error.file_validation.zip": {
+    "message": "Unable to read Zip Archive: {cause}"
+  },
+  "labrinth.error.indexing.database": {
+    "message": "Database Error: {cause}"
+  },
+  "labrinth.error.indexing.environment": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.indexing.meilisearch": {
+    "message": "Error while connecting to the MeiliSearch database"
+  },
+  "labrinth.error.indexing.serialization": {
+    "message": "Error while serializing or deserializing JSON: {cause}"
+  },
+  "labrinth.error.indexing.sqlx": {
+    "message": "Database Error: {cause}"
+  },
+  "labrinth.error.indexing.task": {
+    "message": "Error while awaiting index creation task"
+  },
+  "labrinth.error.indexing_error": {
+    "message": "Indexing Error: {cause}"
+  },
+  "labrinth.error.invalid_image": {
+    "message": "Image Parsing Error: {cause}"
+  },
+  "labrinth.error.invalid_input": {
+    "message": "Invalid Input: {cause}"
+  },
+  "labrinth.error.invalid_input.validation": {
+    "message": "Error while validating input: {cause}"
+  },
+  "labrinth.error.io_error": {
+    "message": "IO Error: {cause}"
+  },
+  "labrinth.error.json_error": {
+    "message": "Deserialization error: {cause}"
+  },
+  "labrinth.error.mail.address": {
+    "message": "Address Parse Error: {cause}"
+  },
+  "labrinth.error.mail.email": {
+    "message": "Mail Error: {cause}"
+  },
+  "labrinth.error.mail.environment": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.mail.http_template": {
+    "message": "HTTP error fetching template: {cause}"
+  },
+  "labrinth.error.mail.smtp": {
+    "message": "SMTP Error: {cause}"
+  },
+  "labrinth.error.mail.uninitialized": {
+    "message": "Couldn''t initialize SMTP transport"
+  },
+  "labrinth.error.not_found": {
+    "message": "Resource not found"
+  },
+  "labrinth.error.not_found.route": {
+    "message": "The requested route does not exist"
+  },
+  "labrinth.error.oauth.access_denied": {
+    "message": "The resource owner denied the request"
+  },
+  "labrinth.error.oauth.invalid_client.auth_failed": {
+    "message": "Failed to authenticate client"
+  },
+  "labrinth.error.oauth.invalid_client.invalid_id": {
+    "message": "The provided client id was invalid"
+  },
+  "labrinth.error.oauth.invalid_grant.invalid_auth_code": {
+    "message": "The provided authorization grant code was invalid"
+  },
+  "labrinth.error.oauth.invalid_grant.invalid_grant_type": {
+    "message": "The provided grant type ({grant_type}) must be \"authorization_code\""
+  },
+  "labrinth.error.oauth.invalid_request.malformed_id": {
+    "message": "The provided ID could not be decoded: {cause}"
+  },
+  "labrinth.error.oauth.invalid_request.redirect_uri_mismatch": {
+    "message": "The provided redirect URI did not exactly match the uri originally provided when this flow began"
+  },
+  "labrinth.error.oauth.invalid_scope.parse": {
+    "message": "The provided scope was malformed or did not correspond to known scopes ({cause})"
+  },
+  "labrinth.error.oauth.invalid_scope.too_broad": {
+    "message": "The provided scope requested scopes broader than the developer app is configured with"
+  },
+  "labrinth.error.oauth.invalid_uri.none_configured": {
+    "message": "The provided redirect URI did not match any configured in the client"
+  },
+  "labrinth.error.oauth.invalid_uri.none_specified": {
+    "message": "Client {client_id} has no redirect URIs specified"
+  },
+  "labrinth.error.oauth.server_error.invalid_flow_id": {
+    "message": "The provided flow id was invalid"
+  },
+  "labrinth.error.oauth.unauthorized_client": {
+    "message": "The provided client id did not match the id this authorization code was granted to"
+  },
+  "labrinth.error.password_hashing_error": {
+    "message": "Password Hashing Error: {cause}"
+  },
+  "labrinth.error.payments_error": {
+    "message": "Payments Error: {cause}"
+  },
+  "labrinth.error.ratelimit_error": {
+    "message": "You are being rate-limited. Please wait {wait_ms} milliseconds. 0/{total_allowed_requests} remaining."
+  },
+  "labrinth.error.reroute_error": {
+    "message": "Error while rerouting request: {cause}"
+  },
+  "labrinth.error.search.environment_error": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.search.invalid_input.formatting": {
+    "message": "Error while formatting strings: {cause}"
+  },
+  "labrinth.error.search.invalid_input.index": {
+    "message": "Invalid index to sort by: {index}"
+  },
+  "labrinth.error.search.invalid_input.int_parsing": {
+    "message": "Error while parsing an integer: {cause}"
+  },
+  "labrinth.error.search.invalid_input.serialization": {
+    "message": "Error while serializing or deserializing JSON: {cause}"
+  },
+  "labrinth.error.search.meilisearch_error": {
+    "message": "MeiliSearch Error: {cause}"
+  },
+  "labrinth.error.search_error": {
+    "message": "Search Error: {cause}"
+  },
+  "labrinth.error.slack_error": {
+    "message": "Slack Webhook Error: Error while sending projects webhook"
+  },
+  "labrinth.error.stripe_error": {
+    "message": "Error while interacting with payment processor: {cause}"
+  },
+  "labrinth.error.tax_compliance_api_error": {
+    "message": "External tax compliance API Error"
+  },
+  "labrinth.error.turnstile_error": {
+    "message": "Captcha Error. Try resubmitting the form."
+  },
+  "labrinth.error.unauthorized": {
+    "message": "Authentication Error: {cause}"
+  },
+  "labrinth.error.unauthorized.database_error": {
+    "message": "Database Error: {cause}"
+  },
+  "labrinth.error.unauthorized.database_error.unknown": {
+    "message": "An unknown database error occurred: {cause}"
+  },
+  "labrinth.error.unauthorized.decoding_error": {
+    "message": "Error while decoding PAT: {cause}"
+  },
+  "labrinth.error.unauthorized.duplicate_user": {
+    "message": "User email is already registered on Modrinth. Try ''Forgot password'' to access your account."
+  },
+  "labrinth.error.unauthorized.environment_error": {
+    "message": "Environment Error"
+  },
+  "labrinth.error.unauthorized.file_hosting": {
+    "message": "Error uploading user profile picture"
+  },
+  "labrinth.error.unauthorized.invalid_auth_method": {
+    "message": "Authentication method was not valid"
+  },
+  "labrinth.error.unauthorized.invalid_client_id": {
+    "message": "GitHub Token from incorrect Client ID"
+  },
+  "labrinth.error.unauthorized.invalid_credentials": {
+    "message": "Invalid Authentication Credentials"
+  },
+  "labrinth.error.unauthorized.invalid_input": {
+    "message": "Error while parsing JSON: {cause}"
+  },
+  "labrinth.error.unauthorized.network_error": {
+    "message": "Error while communicating to external provider"
+  },
+  "labrinth.error.unauthorized.socket": {
+    "message": "Invalid state sent, you probably need to get a new websocket"
+  },
+  "labrinth.error.unauthorized.specific.add_to_org": {
+    "message": "You do not have permission to add projects to this organization!"
+  },
+  "labrinth.error.unauthorized.specific.bulk_edit_project": {
+    "message": "You do not have the permissions to bulk edit project {project_name}!"
+  },
+  "labrinth.error.unauthorized.specific.cancel_org_invite": {
+    "message": "You do not have permission to cancel an organization invite"
+  },
+  "labrinth.error.unauthorized.specific.cancel_team_invite": {
+    "message": "You do not have permission to cancel a team invite"
+  },
+  "labrinth.error.unauthorized.specific.create_affiliate_code": {
+    "message": "You do not have permission to create an affiliate code!"
+  },
+  "labrinth.error.unauthorized.specific.delete_affiliate_code": {
+    "message": "You do not have permission to delete an affiliate code!"
+  },
+  "labrinth.error.unauthorized.specific.delete_file": {
+    "message": "You don''t have permission to delete this file!"
+  },
+  "labrinth.error.unauthorized.specific.delete_message": {
+    "message": "You cannot delete this message!"
+  },
+  "labrinth.error.unauthorized.specific.delete_org": {
+    "message": "You don''t have permission to delete this organization!"
+  },
+  "labrinth.error.unauthorized.specific.delete_project": {
+    "message": "You don''t have permission to delete this project!"
+  },
+  "labrinth.error.unauthorized.specific.delete_shared_instance": {
+    "message": "You do not have permission to delete this shared instance."
+  },
+  "labrinth.error.unauthorized.specific.delete_shared_instance_version": {
+    "message": "You do not have permission to delete this shared instance version."
+  },
+  "labrinth.error.unauthorized.specific.delete_user": {
+    "message": "You do not have permission to delete this user!"
+  },
+  "labrinth.error.unauthorized.specific.delete_versions_in_team": {
+    "message": "You do not have permission to delete versions in this team"
+  },
+  "labrinth.error.unauthorized.specific.edit_org": {
+    "message": "You do not have permission to edit this organization!"
+  },
+  "labrinth.error.unauthorized.specific.edit_org_description": {
+    "message": "You do not have the permissions to edit the description of this organization!"
+  },
+  "labrinth.error.unauthorized.specific.edit_org_icon": {
+    "message": "You don''t have permission to edit this organization''s icon."
+  },
+  "labrinth.error.unauthorized.specific.edit_org_name": {
+    "message": "You do not have the permissions to edit the name of this organization!"
+  },
+  "labrinth.error.unauthorized.specific.edit_org_slug": {
+    "message": "You do not have the permissions to edit the slug of this organization!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project": {
+    "message": "You do not have permission to edit this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_additional_categories": {
+    "message": "You do not have the permissions to edit the additional categories of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_categories": {
+    "message": "You do not have the permissions to edit the categories of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_description": {
+    "message": "You do not have the permissions to edit the description (body) of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_gallery": {
+    "message": "You don''t have permission to edit this project''s gallery."
+  },
+  "labrinth.error.unauthorized.specific.edit_project_icon": {
+    "message": "You don''t have permission to edit this project''s icon."
+  },
+  "labrinth.error.unauthorized.specific.edit_project_license": {
+    "message": "You do not have the permissions to edit the license of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_license_url": {
+    "message": "You do not have the permissions to edit the license URL of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_links": {
+    "message": "You do not have the permissions to edit the links of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_moderation_message": {
+    "message": "You do not have the permissions to edit the moderation message of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_moderation_message_body": {
+    "message": "You do not have the permissions to edit the moderation message body of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_monetization_status": {
+    "message": "You do not have the permissions to edit the monetization status of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_name": {
+    "message": "You do not have the permissions to edit the name of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_requested_status": {
+    "message": "You do not have the permissions to edit the requested status of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_side_types_migration_review_status": {
+    "message": "You do not have the permissions to edit the side types migration review status of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_slug": {
+    "message": "You do not have the permissions to edit the slug of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_status": {
+    "message": "You do not have the permissions to edit the status of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_project_summary": {
+    "message": "You do not have the permissions to edit the summary of this project!"
+  },
+  "labrinth.error.unauthorized.specific.edit_shared_instance": {
+    "message": "You do not have permission to edit this shared instance."
+  },
+  "labrinth.error.unauthorized.specific.edit_team_members": {
+    "message": "You don''t have permission to edit members of this team"
+  },
+  "labrinth.error.unauthorized.specific.edit_team_ownership": {
+    "message": "You don''t have permission to edit the ownership of this team"
+  },
+  "labrinth.error.unauthorized.specific.edit_user": {
+    "message": "You do not have permission to edit this user!"
+  },
+  "labrinth.error.unauthorized.specific.edit_user_badges": {
+    "message": "You do not have the permissions to edit the badges of this user!"
+  },
+  "labrinth.error.unauthorized.specific.edit_user_icon": {
+    "message": "You don''t have permission to edit this user''s icon."
+  },
+  "labrinth.error.unauthorized.specific.edit_user_role": {
+    "message": "You do not have the permissions to edit the role of this user!"
+  },
+  "labrinth.error.unauthorized.specific.edit_user_venmo_handle": {
+    "message": "You do not have the permissions to edit the venmo handle of this user!"
+  },
+  "labrinth.error.unauthorized.specific.edit_version": {
+    "message": "You do not have the permissions to edit this version!"
+  },
+  "labrinth.error.unauthorized.specific.get_user_from_email": {
+    "message": "You do not have permission to get a user from their email!"
+  },
+  "labrinth.error.unauthorized.specific.give_user_default_project_permissions": {
+    "message": "You do not have permission to give this user default project permissions."
+  },
+  "labrinth.error.unauthorized.specific.insufficient_oauth_permissions": {
+    "message": "You don''t have sufficient permissions to interact with this OAuth application"
+  },
+  "labrinth.error.unauthorized.specific.invalid_flow_code": {
+    "message": "The password change flow code is invalid or has expired. Did you copy it promptly and correctly?"
+  },
+  "labrinth.error.unauthorized.specific.invalid_master_key": {
+    "message": "Invalid master key"
+  },
+  "labrinth.error.unauthorized.specific.invite_users_to_org": {
+    "message": "You don''t have permission to invite users to this organization"
+  },
+  "labrinth.error.unauthorized.specific.invite_users_to_team": {
+    "message": "You don''t have permission to invite users to this team"
+  },
+  "labrinth.error.unauthorized.specific.maximum_gallery_images": {
+    "message": "You have reached the maximum of gallery images to upload."
+  },
+  "labrinth.error.unauthorized.specific.not_member_of_project": {
+    "message": "You are not a member of project {project_name}!"
+  },
+  "labrinth.error.unauthorized.specific.not_project_owner_for_add_to_org": {
+    "message": "You need to be an owner of a project to add it to an organization!"
+  },
+  "labrinth.error.unauthorized.specific.notification_delete": {
+    "message": "You are not authorized to delete this notification!"
+  },
+  "labrinth.error.unauthorized.specific.notification_read": {
+    "message": "You are not authorized to read this notification!"
+  },
+  "labrinth.error.unauthorized.specific.old_password_not_specified": {
+    "message": "You must specify the old password to change your password!"
+  },
+  "labrinth.error.unauthorized.specific.override_org_owner_default_project_permissions": {
+    "message": "You cannot override the project permissions of the organization owner!"
+  },
+  "labrinth.error.unauthorized.specific.read_affiliate_code": {
+    "message": "You do not have permission to read an affiliate code!"
+  },
+  "labrinth.error.unauthorized.specific.read_all_affiliate_codes": {
+    "message": "You do not have permission to read all affiliate codes!"
+  },
+  "labrinth.error.unauthorized.specific.refund": {
+    "message": "You do not have permission to refund a subscription!"
+  },
+  "labrinth.error.unauthorized.specific.remove_org_member": {
+    "message": "You do not have permission to remove a member from this organization"
+  },
+  "labrinth.error.unauthorized.specific.remove_owner_from_team": {
+    "message": "The owner can''t be removed from a team"
+  },
+  "labrinth.error.unauthorized.specific.remove_team_member": {
+    "message": "You do not have permission to remove a member from this team"
+  },
+  "labrinth.error.unauthorized.specific.restricted_project_status": {
+    "message": "You don''t have permission to set this status!"
+  },
+  "labrinth.error.unauthorized.specific.see_oauth_clients": {
+    "message": "You do not have permission to see the OAuth clients of this user!"
+  },
+  "labrinth.error.unauthorized.specific.see_user_follows": {
+    "message": "You do not have permission to see the projects this user follows!"
+  },
+  "labrinth.error.unauthorized.specific.see_user_notifications": {
+    "message": "You do not have permission to see the notifications of this user!"
+  },
+  "labrinth.error.unauthorized.specific.set_mod_downloads": {
+    "message": "You don''t have permission to set the downloads of this mod"
+  },
+  "labrinth.error.unauthorized.specific.set_status": {
+    "message": "You don''t have permission to set this status!"
+  },
+  "labrinth.error.unauthorized.specific.shared_instance_upload_version": {
+    "message": "You do not have permission to upload a version for this shared instance."
+  },
+  "labrinth.error.unauthorized.specific.unknown_affiliate_user": {
+    "message": "Affiliate user not found!"
+  },
+  "labrinth.error.unauthorized.specific.unknown_user_ip": {
+    "message": "Unable to obtain user IP address!"
+  },
+  "labrinth.error.unauthorized.specific.upload_project_images": {
+    "message": "You are not authorized to upload images for this project"
+  },
+  "labrinth.error.unauthorized.specific.upload_report_images": {
+    "message": "You are not authorized to upload images for this report"
+  },
+  "labrinth.error.unauthorized.specific.upload_thread_message_images": {
+    "message": "You are not authorized to upload images for this thread message"
+  },
+  "labrinth.error.unauthorized.specific.upload_version_images": {
+    "message": "You are not authorized to upload images for this version"
+  },
+  "labrinth.error.unauthorized.url_error": {
+    "message": "Invalid callback URL specified"
+  },
+  "labrinth.error.version_field_parse.invalid_enum_variant": {
+    "message": "Provided value {value} is not a valid variant for {field_name}"
+  },
+  "labrinth.error.version_field_parse.parse_failure": {
+    "message": "Provided value {value} for {field_name} could not be parsed to {field_type}"
+  },
+  "labrinth.error.version_field_parse.value_greater_than_maximum": {
+    "message": "Provided value {value} for {field_name} is greater than the maximum of {maximum}"
+  },
+  "labrinth.error.version_field_parse.value_less_than_minimum": {
+    "message": "Provided value {value} for {field_name} is less than the minimum of {minimum}"
+  },
+  "labrinth.error.xml_error": {
+    "message": "Internal server error: {cause}"
+  },
+  "labrinth.error.zip_error": {
+    "message": "Unable to read Zip Archive: {cause}"
+  },
+  "labrinth.notification.body.auth_provider_added": {
+    "message": "You''ve added a new authentication provider to your account."
+  },
+  "labrinth.notification.body.auth_provider_removed": {
+    "message": "You''ve removed a authentication provider from your account."
+  },
+  "labrinth.notification.body.email_changed": {
+    "message": "Your account email was changed."
+  },
+  "labrinth.notification.body.moderation_message_received": {
+    "message": "You have a new message in a moderation thread."
+  },
+  "labrinth.notification.body.moderator_message": {
+    "message": "Click on the link to read more."
+  },
+  "labrinth.notification.body.organization_invite": {
+    "message": "An invite has been sent for you to be {role} of an organization"
+  },
+  "labrinth.notification.body.password_changed": {
+    "message": "You''ve changed your account password."
+  },
+  "labrinth.notification.body.password_removed": {
+    "message": "You''ve removed your account password."
+  },
+  "labrinth.notification.body.pat_created": {
+    "message": "Your personal access token ''{token_name}'' was created."
+  },
+  "labrinth.notification.body.payment_failed": {
+    "message": "A payment on your account failed. Please update your billing information."
+  },
+  "labrinth.notification.body.payout_available": {
+    "message": "A payout is available!"
+  },
+  "labrinth.notification.body.project_status_approved": {
+    "message": "Your project has been approved."
+  },
+  "labrinth.notification.body.project_status_neutral": {
+    "message": "Your project status has been updated."
+  },
+  "labrinth.notification.body.project_transferred": {
+    "message": "A project''s ownership has been transferred."
+  },
+  "labrinth.notification.body.project_update": {
+    "message": "The project {project_id} has released a new version: {version_id}"
+  },
+  "labrinth.notification.body.report_status_updated": {
+    "message": "A report you are involved in has been updated."
+  },
+  "labrinth.notification.body.report_submitted": {
+    "message": "Your report was submitted successfully."
+  },
+  "labrinth.notification.body.reset_password": {
+    "message": "You''ve requested to reset your password. Please check your email for a reset link."
+  },
+  "labrinth.notification.body.status_change": {
+    "message": "Status has changed from {old_status} to {new_status}"
+  },
+  "labrinth.notification.body.team_invite": {
+    "message": "An invite has been sent for you to be {role} of a team"
+  },
+  "labrinth.notification.body.two_factor_enabled": {
+    "message": "You''ve enabled two-factor authentication on your account."
+  },
+  "labrinth.notification.body.two_factor_removed": {
+    "message": "You''ve removed two-factor authentication from your account."
+  },
+  "labrinth.notification.body.unknown": {
+    "message": ""
+  },
+  "labrinth.notification.body.verify_email": {
+    "message": "You''ve requested to verify your email. Please check your email for a verification link."
+  },
+  "labrinth.notification.type.auth_provider_added": {
+    "message": "Auth provider added"
+  },
+  "labrinth.notification.type.auth_provider_removed": {
+    "message": "Auth provider removed"
+  },
+  "labrinth.notification.type.email_changed": {
+    "message": "Email changed"
+  },
+  "labrinth.notification.type.legacy_markdown": {
+    "message": "LEGACY MARKDOWN NOTIFICATION"
+  },
+  "labrinth.notification.type.moderation_message_received": {
+    "message": "New message in moderation thread"
+  },
+  "labrinth.notification.type.moderator_message": {
+    "message": "A moderator has sent you a message!"
+  },
+  "labrinth.notification.type.organization_invite": {
+    "message": "You have been invited to join an organization!"
+  },
+  "labrinth.notification.type.password_changed": {
+    "message": "Password changed"
+  },
+  "labrinth.notification.type.password_removed": {
+    "message": "Password removed"
+  },
+  "labrinth.notification.type.pat_created": {
+    "message": "New personal access token created"
+  },
+  "labrinth.notification.type.payment_failed": {
+    "message": "Payment failed"
+  },
+  "labrinth.notification.type.payout_available": {
+    "message": "Payout available"
+  },
+  "labrinth.notification.type.project_status_approved": {
+    "message": "Project approved"
+  },
+  "labrinth.notification.type.project_status_neutral": {
+    "message": "Project status updated"
+  },
+  "labrinth.notification.type.project_transferred": {
+    "message": "Project ownership transferred"
+  },
+  "labrinth.notification.type.project_update": {
+    "message": "A project you follow has been updated!"
+  },
+  "labrinth.notification.type.report_status_updated": {
+    "message": "Report status updated"
+  },
+  "labrinth.notification.type.report_submitted": {
+    "message": "Report submitted"
+  },
+  "labrinth.notification.type.reset_password": {
+    "message": "Password reset requested"
+  },
+  "labrinth.notification.type.status_change": {
+    "message": "Project status has changed"
+  },
+  "labrinth.notification.type.team_invite": {
+    "message": "You have been invited to join a team!"
+  },
+  "labrinth.notification.type.two_factor_enabled": {
+    "message": "Two-factor authentication enabled"
+  },
+  "labrinth.notification.type.two_factor_removed": {
+    "message": "Two-factor authentication removed"
+  },
+  "labrinth.notification.type.unknown": {
+    "message": ""
+  },
+  "labrinth.notification.type.verify_email": {
+    "message": "Verify your email"
+  },
+  "labrinth.project_status.approved": {
+    "message": "Listed"
+  },
+  "labrinth.project_status.archived": {
+    "message": "Archived"
+  },
+  "labrinth.project_status.draft": {
+    "message": "Draft"
+  },
+  "labrinth.project_status.private": {
+    "message": "Private"
+  },
+  "labrinth.project_status.processing": {
+    "message": "Under review"
+  },
+  "labrinth.project_status.rejected": {
+    "message": "Rejected"
+  },
+  "labrinth.project_status.scheduled": {
+    "message": "Scheduled"
+  },
+  "labrinth.project_status.unknown": {
+    "message": "Unknown"
+  },
+  "labrinth.project_status.unlisted": {
+    "message": "Unlisted"
+  },
+  "labrinth.project_status.withheld": {
+    "message": "Withheld"
+  },
+  "labrinth.warning.file_validation.invalid_mrpack": {
+    "message": "Invalid modpack file. You must upload a valid .mrpack file."
+  },
+  "labrinth.warning.file_validation.missing_bukkit_plugin_yml": {
+    "message": "No plugin.yml or paper-plugin.yml present for plugin file."
+  },
+  "labrinth.warning.file_validation.missing_bungeecord_plugin_yml": {
+    "message": "No plugin.yml or bungee.yml present for plugin file."
+  },
+  "labrinth.warning.file_validation.missing_canvas_pack_mcmeta": {
+    "message": "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!"
+  },
+  "labrinth.warning.file_validation.missing_datapack_pack_mcmeta": {
+    "message": "No pack.mcmeta present for datapack file. Tip: Make sure pack.mcmeta is in the root directory of your datapack!"
+  },
+  "labrinth.warning.file_validation.missing_fabric_mod_json": {
+    "message": "No fabric.mod.json present for Fabric file."
+  },
+  "labrinth.warning.file_validation.missing_litemod_json": {
+    "message": "No litemod.json present for LiteLoader file."
+  },
+  "labrinth.warning.file_validation.missing_mcmod_info": {
+    "message": "Forge mod file does not contain mcmod.info or valid class files!"
+  },
+  "labrinth.warning.file_validation.missing_mods_toml": {
+    "message": "No mods.toml or valid class files present for Forge file."
+  },
+  "labrinth.warning.file_validation.missing_neoforge_mods_toml": {
+    "message": "No neoforge.mods.toml, mods.toml, or valid class files present for NeoForge file."
+  },
+  "labrinth.warning.file_validation.missing_pack_manifest": {
+    "message": "Pack manifest is missing."
+  },
+  "labrinth.warning.file_validation.missing_pack_txt": {
+    "message": "No pack.txt present for pack file."
+  },
+  "labrinth.warning.file_validation.missing_pipelines_folder": {
+    "message": "No pipeline shaders folder present for canvas shaders."
+  },
+  "labrinth.warning.file_validation.missing_quilt_mod_json": {
+    "message": "No quilt.mod.json present for Quilt file."
+  },
+  "labrinth.warning.file_validation.missing_resource_pack_pack_mcmeta": {
+    "message": "No pack.mcmeta present for resource pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!"
+  },
+  "labrinth.warning.file_validation.missing_riftmod_json": {
+    "message": "No riftmod.json present for Rift file."
+  },
+  "labrinth.warning.file_validation.missing_shaders_folder": {
+    "message": "No shaders folder present for OptiFine/Iris shader."
+  },
+  "labrinth.warning.file_validation.missing_sponge_plugins_json": {
+    "message": "No sponge_plugins.json or mcmod.info present for Sponge plugin."
+  },
+  "labrinth.warning.file_validation.missing_vanilla_shaders_folder": {
+    "message": "No pack.mcmeta or vanilla shaders folder present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!"
+  },
+  "labrinth.warning.file_validation.missing_velocity_plugin_json": {
+    "message": "No velocity-plugin.json present for plugin file."
+  },
+  "labrinth.warning.file_validation.wrong_file_extension": {
+    "message": "File extension is invalid for input file"
+  }
+}

@@ -13,7 +13,7 @@ use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::queue::session::AuthQueue;
 
-use super::ApiError;
+use crate::routes::error::ApiError;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(forge_updates);

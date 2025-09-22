@@ -1,5 +1,6 @@
 use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult, filter_out_packs,
+    SupportedGameVersions, ValidationError, ValidationResult,
+    ValidationWarning, filter_out_packs,
 };
 use chrono::DateTime;
 use std::io::Cursor;
@@ -30,7 +31,7 @@ impl super::Validator for QuiltValidator {
             && archive.by_name("fabric.mod.json").is_err()
         {
             return Ok(ValidationResult::Warning(
-                "No quilt.mod.json present for Quilt file.",
+                ValidationWarning::MissingQuiltModJson,
             ));
         }
 
