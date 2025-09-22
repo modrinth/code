@@ -9,7 +9,7 @@ use crate::{
     auth::get_user_from_headers,
     database::{
         self, DBProject,
-        models::{DBProjectId, DBUser},
+        models::{DBProjectId, DBUser, DBVersionId},
         redis::RedisPool,
     },
     models::{
@@ -85,13 +85,18 @@ struct ProjectAnalytics {
 #[serde(rename_all = "snake_case", tag = "metric_kind")]
 enum ProjectMetrics {
     Views {
+        #[serde(skip_serializing_if = "Option::is_none")]
         domain: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         site_path: Option<String>,
         views: u64,
     },
     Downloads {
+        #[serde(skip_serializing_if = "Option::is_none")]
         domain: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         site_path: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         version_id: Option<VersionId>,
         downloads: u64,
     },
@@ -103,165 +108,86 @@ impl From<ProjectAnalytics> for AnalyticsData {
     }
 }
 
-// #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-// struct AffiliateCodeAnalytics {
-//     #[serde(skip_serializing_if = "Option::is_none")]
-//     clicks: Option<u64>,
-//     #[serde(skip_serializing_if = "Option::is_none")]
-//     conversions: Option<u64>,
-//     #[serde(skip_serializing_if = "Option::is_none")]
-//     revenue: Option<u64>,
-// }
-
-// impl AffiliateCodeAnalytics {
-//     fn new(source_affiliate_code: AffiliateCodeId) -> Self {
-//         Self {
-//             source_affiliate_code,
-//             clicks: None,
-//             conversions: None,
-//             revenue: None,
-//         }
-//     }
-// }
-
-// impl From<AffiliateCodeAnalytics> for AnalyticsData {
-//     fn from(value: AffiliateCodeAnalytics) -> Self {
-//         Self::AffiliateCode(value)
-//     }
-// }
-
-// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-// #[serde(rename_all = "snake_case")]
-// enum RevenueSource {
-//     Adverts,
-//     ModrinthPlus,
-// }
-
 // logic
 
 mod query {
-    use super::MetricField;
+    use crate::database::models::{DBProjectId, DBVersionId};
     use const_format::formatcp;
 
     const TIME_RANGE_START: &str = "{time_range_start: UInt64}";
     const TIME_RANGE_END: &str = "{time_range_end: UInt64}";
     const TIME_SLICES: &str = "{time_slices: UInt64}";
-    const INCLUDE_FIELDS: &str = "{include_fields: UInt64}";
     const PROJECT_IDS: &str = "{project_ids: Array(UInt64)}";
-
-    bitflags::bitflags! {
-        pub struct ViewsField: u64 {
-            const PROJECT_ID = 1 << 1;
-            const DOMAIN = 1 << 2;
-            const SITE_PATH = 1 << 3;
-        }
-    }
-
-    impl ViewsField {
-        pub fn from_metric(field: MetricField) -> Option<Self> {
-            match field {
-                MetricField::ProjectId => Some(Self::PROJECT_ID),
-                MetricField::ViewDomain => Some(Self::DOMAIN),
-                MetricField::ViewSitePath => Some(Self::SITE_PATH),
-                _ => None,
-            }
-        }
-    }
 
     #[derive(Debug, clickhouse::Row, serde::Deserialize)]
     pub struct ViewRow {
         pub bucket: u64,
-        pub project_id: u64,
+        pub project_id: DBProjectId,
         pub domain: String,
         pub site_path: String,
         pub views: u64,
     }
 
-    pub const VIEWS: &str = {
-        const HAS_PROJECT_ID: &str = formatcp!("bitTest({INCLUDE_FIELDS}, 0)");
-        const HAS_DOMAIN: &str = formatcp!("bitTest({INCLUDE_FIELDS}, 1)");
-        const HAS_SITE_PATH: &str = formatcp!("bitTest({INCLUDE_FIELDS}, 2)");
-
-        formatcp!(
-            "
-            SELECT
-                widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
-                if({HAS_PROJECT_ID}, project_id, 0) AS project_id,
-                if({HAS_DOMAIN}, domain, '') AS domain,
-                if({HAS_SITE_PATH}, site_path, '') AS site_path,
-                COUNT(*) AS views
-            FROM views
-            WHERE
-                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
-                AND project_id IN {PROJECT_IDS}
-            GROUP BY
-                bucket, project_id, domain, site_path
-            HAVING
-                ({HAS_DOMAIN} AND domain != '') OR
-                ({HAS_SITE_PATH} AND site_path != '') OR
-                {HAS_PROJECT_ID}"
-        )
-    };
-
-    bitflags::bitflags! {
-        pub struct DownloadsField: u64 {
-            const PROJECT_ID = 1 << 1;
-            const DOMAIN = 1 << 2;
-            const SITE_PATH = 1 << 3;
-            const VERSION_ID = 1 << 4;
-        }
-    }
-
-    impl DownloadsField {
-        pub fn from_metric(field: MetricField) -> Option<Self> {
-            match field {
-                MetricField::ProjectId => Some(Self::PROJECT_ID),
-                MetricField::DownloadDomain => Some(Self::DOMAIN),
-                MetricField::DownloadSitePath => Some(Self::SITE_PATH),
-                MetricField::DownloadVersionId => Some(Self::VERSION_ID),
-                _ => None,
-            }
-        }
-    }
+    pub const VIEWS: &str = formatcp!(
+        "
+        WITH
+            {{has_project_id: Bool}} AS has_project_id,
+            {{has_domain: Bool}} AS has_domain,
+            {{has_site_path: Bool}} AS has_site_path
+        SELECT
+            widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
+            if(has_project_id, project_id, 0) AS project_id,
+            if(has_domain, domain, '') AS domain,
+            if(has_site_path, site_path, '') AS site_path,
+            COUNT(*) AS views
+        FROM views
+        WHERE
+            recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+            AND project_id IN {PROJECT_IDS}
+        GROUP BY
+            bucket, project_id, domain, site_path
+        HAVING
+            (has_domain AND domain != '') OR
+            (has_site_path AND site_path != '') OR
+            has_project_id"
+    );
 
     #[derive(Debug, clickhouse::Row, serde::Deserialize)]
     pub struct DownloadRow {
         pub bucket: u64,
-        pub project_id: u64,
+        pub project_id: DBProjectId,
         pub domain: String,
         pub site_path: String,
-        pub version_id: u64,
+        pub version_id: DBVersionId,
         pub downloads: u64,
     }
 
-    pub const DOWNLOADS: &str = {
-        const HAS_PROJECT_ID: &str = formatcp!("bitTest({INCLUDE_FIELDS}, 0)");
-        const HAS_DOMAIN: &str = formatcp!("bitTest({INCLUDE_FIELDS}, 1)");
-        const HAS_SITE_PATH: &str = formatcp!("bitTest({INCLUDE_FIELDS}, 2)");
-        const HAS_VERSION_ID: &str = formatcp!("bitTest({INCLUDE_FIELDS}, 3)");
-
-        formatcp!(
-            "
-            SELECT
-                widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
-                if({HAS_PROJECT_ID}, project_id, 0) AS project_id,
-                if({HAS_DOMAIN}, domain, '') AS domain,
-                if({HAS_SITE_PATH}, site_path, '') AS site_path,
-                if({HAS_VERSION_ID}, version_id, 0) AS version_id,
-                COUNT(*) AS downloads
-            FROM downloads
-            WHERE
-                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
-                AND project_id IN {PROJECT_IDS}
-            GROUP BY
-                bucket, project_id, domain, site_path, version_id
-            HAVING
-                ({HAS_DOMAIN} AND domain != '') OR
-                ({HAS_SITE_PATH} AND site_path != '') OR
-                ({HAS_VERSION_ID} AND version_id != 0) OR
-                {HAS_PROJECT_ID}"
-        )
-    };
+    pub const DOWNLOADS: &str = formatcp!(
+        "
+        WITH
+            {{has_project_id: Bool}} AS has_project_id,
+            {{has_domain: Bool}} AS has_domain,
+            {{has_site_path: Bool}} AS has_site_path,
+            {{has_version_id: Bool}} AS has_version_id
+        SELECT
+            widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
+            if(has_project_id, project_id, 0) AS project_id,
+            if(has_domain, domain, '') AS domain,
+            if(has_site_path, site_path, '') AS site_path,
+            if(has_version_id, version_id, 0) AS version_id,
+            COUNT(*) AS downloads
+        FROM downloads
+        WHERE
+            recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+            AND project_id IN {PROJECT_IDS}
+        GROUP BY
+            bucket, project_id, domain, site_path, version_id
+        HAVING
+            (has_domain AND domain != '') OR
+            (has_site_path AND site_path != '') OR
+            (has_version_id AND version_id != 0) OR
+            has_project_id"
+    );
 }
 
 async fn get(
@@ -281,128 +207,139 @@ async fn get(
     )
     .await?;
 
-    let time_range_start = req.time_range.start.timestamp();
-    let time_range_end = req.time_range.end.timestamp();
     let num_time_slices = req.time_range.num_slices.get() as usize;
     if num_time_slices > 256 {
         return Err(ApiError::InvalidInput("too many time slices".to_string()));
     }
     let mut time_slices = vec![TimeSlice::default(); num_time_slices];
 
+    // TODO fetch from req
     let project_ids =
         DBUser::get_projects(user.id.into(), &**pool, &redis).await?;
 
     let project_ids =
         filter_allowed_project_ids(&project_ids, &user, &pool, &redis).await?;
 
-    let mut cursor = clickhouse
-        .query(query::VIEWS)
-        .param("time_range_start", time_range_start)
-        .param("time_range_end", time_range_end)
-        .param("time_slices", num_time_slices)
-        .param(
-            "include_fields",
-            req.include
-                .iter()
-                .copied()
-                .filter_map(query::ViewsField::from_metric)
-                .collect::<query::ViewsField>()
-                .bits(),
-        )
-        .param("project_ids", &project_ids)
-        .fetch::<query::ViewRow>()?;
+    let mut query_clickhouse_cx = QueryClickhouseContext {
+        clickhouse: &clickhouse,
+        req: &req,
+        time_slices: &mut time_slices,
+        project_ids: &project_ids,
+    };
 
-    while let Some(row) = cursor.next().await? {
-        // row.recorded <  time_range_start => bucket = 0
-        // row.recorded >= time_range_end   => bucket = num_time_slices
-        //   (note: this is out of range of `time_slices`!)
-        let Some(bucket) = (row.bucket as usize).checked_sub(1) else {
-            continue;
-        };
-
-        let slice = time_slices.get_mut(bucket).ok_or_else(|| {
-            ApiError::InvalidInput(format!(
-                "bucket {} returned by query out of range for {num_time_slices} - query bug!",
-                row.bucket,
-            ))
-        })?;
-
-        slice.0.push(
+    query_clickhouse::<query::ViewRow>(
+        &mut query_clickhouse_cx,
+        query::VIEWS,
+        &[
+            ("has_project_id", MetricField::ProjectId),
+            ("has_domain", MetricField::ViewDomain),
+            ("has_site_path", MetricField::ViewSitePath),
+        ],
+        |row| row.bucket,
+        |row| {
             ProjectAnalytics {
-                source_project: ProjectId(row.project_id),
+                source_project: row.project_id.into(),
                 metrics: ProjectMetrics::Views {
-                    domain: Some(row.domain),
-                    site_path: Some(row.site_path),
+                    domain: none_if_empty(row.domain),
+                    site_path: none_if_empty(row.site_path),
                     views: row.views,
                 },
             }
-            .into(),
-        );
-    }
+            .into()
+        },
+    )
+    .await?;
+
+    query_clickhouse::<query::DownloadRow>(
+        &mut query_clickhouse_cx,
+        query::DOWNLOADS,
+        &[
+            ("has_project_id", MetricField::ProjectId),
+            ("has_domain", MetricField::DownloadDomain),
+            ("has_site_path", MetricField::DownloadSitePath),
+            ("has_version_id", MetricField::DownloadVersionId),
+        ],
+        |row| row.bucket,
+        |row| {
+            ProjectAnalytics {
+                source_project: row.project_id.into(),
+                metrics: ProjectMetrics::Downloads {
+                    domain: none_if_empty(row.domain),
+                    site_path: none_if_empty(row.site_path),
+                    version_id: none_if_zero_version_id(row.version_id),
+                    downloads: row.downloads,
+                },
+            }
+            .into()
+        },
+    )
+    .await?;
 
     Ok(web::Json(GetResponse(time_slices)))
+}
 
-    // "
-    // -- SELECT bucket, project_id, 1 AS metric_type, COUNT(*) AS total
-    // -- FROM (
-    // --     SELECT
-    // --         widthBucket(
-    // --             toUnixTimestamp(recorded),
-    // --             {time_range_start: UInt64},
-    // --             {time_range_end: UInt64},
-    // --             {time_slices: UInt64}
-    // --         ) AS bucket,
-    // --         project_id
-    // --     FROM views
-    // --     WHERE
-    // --         recorded BETWEEN toDateTime({time_range_start: UInt64}) AND toDateTime({time_range_end: UInt64})
-    // --         AND project_id IN {project_ids: Array(UInt64)}
-    // -- )
-    // -- GROUP BY bucket, project_id
+fn none_if_empty(s: String) -> Option<String> {
+    if s.is_empty() { None } else { Some(s) }
+}
 
-    // -- UNION ALL
+fn none_if_zero_version_id(v: DBVersionId) -> Option<VersionId> {
+    if v.0 == 0 { None } else { Some(v.into()) }
+}
 
-    // SELECT bucket, project_id, 2 AS metric_type, COUNT(*) AS total
-    // FROM (
-    //     SELECT
-    //         widthBucket(
-    //             toUnixTimestamp(recorded),
-    //             {time_range_start: UInt64},
-    //             {time_range_end: UInt64},
-    //             {time_slices: UInt64}
-    //         ) AS bucket,
-    //         if(bitTest({include_fields: UInt64}, 0)) project_id
-    //     FROM downloads
-    //     WHERE
-    //         recorded BETWEEN toDateTime({time_range_start: UInt64}) AND toDateTime({time_range_end: UInt64})
-    //         AND project_id IN {project_ids: Array(UInt64)}
-    // )
-    // GROUP BY
-    //     bucket, project_id, domain, site_path
-    // HAVING
-    //     (bitTest({include_fields: UInt64}, 0) AND domain != '') OR
-    //     (bitTest({include_fields: UInt64}, 1) AND site_path != '') OR
+struct QueryClickhouseContext<'a> {
+    clickhouse: &'a clickhouse::Client,
+    req: &'a GetRequest,
+    time_slices: &'a mut [TimeSlice],
+    project_ids: &'a [DBProjectId],
+}
 
-    // UNION ALL
+async fn query_clickhouse<Row>(
+    cx: &mut QueryClickhouseContext<'_>,
+    query: &str,
+    metric_field_params: &[(&str, MetricField)],
+    row_get_bucket: impl Fn(&Row) -> u64,
+    row_to_analytics: impl Fn(Row) -> AnalyticsData,
+) -> Result<(), ApiError>
+where
+    Row: clickhouse::Row + serde::de::DeserializeOwned + std::fmt::Debug,
+{
+    let mut query = cx
+        .clickhouse
+        .query(query)
+        .param("time_range_start", cx.req.time_range.start.timestamp())
+        .param("time_range_end", cx.req.time_range.end.timestamp())
+        .param("time_slices", cx.time_slices.len())
+        .param(
+            "project_ids",
+            cx.project_ids,
+            // cx.project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
+        );
+    for (param_name, field) in metric_field_params {
+        query = query.param(param_name, cx.req.include.contains(field))
+    }
+    let mut cursor = query.fetch::<Row>()?;
 
-    // SELECT bucket, project_id, 3 AS metric_type, SUM(seconds) AS total
-    // FROM (
-    //     SELECT
-    //         widthBucket(
-    //             toUnixTimestamp(recorded),
-    //             {time_range_start: UInt64},
-    //             {time_range_end: UInt64},
-    //             {time_slices: UInt64}
-    //         ) AS bucket,
-    //         project_id,
-    //         seconds
-    //     FROM playtime
-    //     WHERE
-    //         recorded BETWEEN toDateTime({time_range_start: UInt64}) AND toDateTime({time_range_end: UInt64})
-    //         AND project_id IN {project_ids: Array(UInt64)}
-    // )
-    // GROUP BY bucket, project_id
-    // ORDER BY bucket, metric_type, project_id"
+    while let Some(row) = cursor.next().await? {
+        let bucket = row_get_bucket(&row);
+
+        // row.recorded <  time_range_start => bucket = 0
+        // row.recorded >= time_range_end   => bucket = num_time_slices
+        //   (note: this is out of range of `time_slices`!)
+        let Some(bucket) = (bucket as usize).checked_sub(1) else {
+            continue;
+        };
+
+        let num_time_slices = cx.time_slices.len();
+        let slice = cx.time_slices.get_mut(bucket).ok_or_else(|| {
+            ApiError::InvalidInput(
+                format!("bucket {bucket} returned by query out of range for {num_time_slices} - query bug!")
+            )
+        })?;
+
+        slice.0.push(row_to_analytics(row));
+    }
+
+    Ok(())
 }
 
 async fn filter_allowed_project_ids(
