@@ -1,0 +1,3 @@
+{
+	"extends": "@modrinth/tooling-config/typescript/base.json"
+}

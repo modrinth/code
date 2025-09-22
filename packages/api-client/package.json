@@ -1,0 +1,13 @@
+{
+	"name": "@modrinth/api-client",
+	"version": "0.1.0",
+	"description": "An API client for Modrinth's API for use in nuxt, tauri and plain node/browser environments.",
+	"main": "./src/index.ts",
+	"scripts": {
+		"lint": "eslint . && prettier --check .",
+		"fix": "eslint . --fix && prettier --write ."
+	},
+	"devDependencies": {
+		"@modrinth/tooling-config": "workspace:*"
+	}
+}
