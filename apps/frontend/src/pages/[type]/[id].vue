@@ -497,9 +497,11 @@
 								</nuxt-link>
 							</ButtonStyled>
 							<template #popper>
-								<div class="experimental-styles-within flex max-w-60 flex-col gap-1">
-									<div class="flex items-center justify-between gap-4">
-										<h3 class="m-0 flex items-center gap-2 text-base font-bold text-contrast">
+								<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+									<div class="flex min-w-60 items-center justify-between gap-4">
+										<h3
+											class="m-0 flex items-center gap-2 whitespace-nowrap text-base font-bold text-contrast"
+										>
 											{{ formatMessage(messages.serversPromoTitle) }}
 											<TagItem
 												:style="{
@@ -529,9 +531,18 @@
 									</p>
 
 									<p class="m-0 text-wrap text-sm font-bold text-primary">
-										{{ formatMessage(messages.serversPromoPricing, { monthly: `<span class="text-xs"
-											>${formatMessage(projectPageMessages.monthly)}</span
-										>` }) }}
+										<IntlFormatted
+											:message-id="messages.serversPromoPricing"
+											:values="{
+												price: formatPrice(locale, 500, 'USD', true),
+											}"
+										>
+											<template #small="{ children }">
+												<span class="text-xs">
+													<component :is="() => children" />
+												</span>
+											</template>
+										</IntlFormatted>
 									</p>
 								</div>
 							</template>
@@ -991,7 +1002,8 @@ import {
 	useRelativeTime,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { formatCategory, formatProjectType, renderString } from '@modrinth/utils'
+import { formatCategory, formatPrice, formatProjectType, renderString } from '@modrinth/utils'
+import { IntlFormatted } from '@vintl/vintl/components'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
@@ -1024,7 +1036,7 @@ const tags = useTags()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
-const { formatMessage } = useVIntl()
+const { locale, formatMessage } = useVIntl()
 
 const settingsModal = ref()
 const downloadModal = ref()
@@ -1254,10 +1266,6 @@ const messages = defineMessages({
 		id: 'project.moderation.title',
 		defaultMessage: 'Moderation',
 	},
-	monthly: {
-		id: 'project.actions.servers-promo.monthly',
-		defaultMessage: ' / month',
-	},
 	noCollectionsFound: {
 		id: 'project.collections.none-found',
 		defaultMessage: 'No collections found.',
@@ -1336,7 +1344,7 @@ const messages = defineMessages({
 	},
 	serversPromoPricing: {
 		id: 'project.actions.servers-promo.pricing',
-		defaultMessage: 'Starting at $5{monthly}',
+		defaultMessage: 'Starting at {price}<small> / month</small>',
 	},
 	serversPromoTitle: {
 		id: 'project.actions.servers-promo.title',
