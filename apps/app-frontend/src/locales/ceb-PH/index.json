@@ -73,5 +73,11 @@
   },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Tangtangi ang amoy"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Mga gusto sa pinatuyo nga tamboanan"
+  },
+  "instance.settings.title": {
+    "message": "Mga Gusto"
   }
 }

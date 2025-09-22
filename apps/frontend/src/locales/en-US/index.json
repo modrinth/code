@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Cancel"
+  },
+  "action.continue": {
+    "message": "Continue"
+  },
   "admin.billing.error.not-found": {
     "message": "User not found"
   },
@@ -413,6 +419,15 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
+  "common.close": {
+    "message": "Close"
+  },
+  "common.no": {
+    "message": "No"
+  },
+  "common.yes": {
+    "message": "Yes"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Create new"
   },
@@ -424,6 +439,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Your collections"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "A foreign entity means a business entity organized outside the United States (such as a non-US corporation, partnership, or LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Foreign entity"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Private individual"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Are you a private individual or part of a foreign entity?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Tax form"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth uses third-party provider Track1099 to securely collect and store your tax forms. <security-link>Learn more here.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Security practices"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Are you a US citizen?"
   },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
@@ -567,7 +606,7 @@
     "message": "Failed to load random projects :("
   },
   "landing.feature.follow.description": {
-    "message": "Get notified every time your favorite projects update and stay in the loop"
+    "message": "Get notified every time your favorite projects update and stay in the loop."
   },
   "landing.feature.follow.heading": {
     "message": "Follow projects you love"
@@ -642,7 +681,7 @@
     "message": "Sort by"
   },
   "landing.section.for-creators.description": {
-    "message": "Give an online home to your creations and reach a massive audience of dedicated players"
+    "message": "Give an online home to your creations and reach a massive audience of dedicated players."
   },
   "landing.section.for-creators.label": {
     "message": "For Creators"
@@ -727,6 +766,15 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Billing action required."
+  },
+  "layout.banner.tax.action": {
+    "message": "Complete tax form"
+  },
+  "layout.banner.tax.description": {
+    "message": "You’ve already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted."
+  },
+  "layout.banner.tax.title": {
+    "message": "Tax form required"
   },
   "layout.banner.verify-email.action": {
     "message": "Re-send verification email"
@@ -1103,11 +1151,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers is the easiest way to play with your friends without hassle!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / month"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "Starting at $5{monthly}"
+    "message": "Starting at {price}<small> / month</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Create a server"

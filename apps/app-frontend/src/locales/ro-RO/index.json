@@ -339,7 +339,7 @@
     "message": "Înălțime"
   },
   "instance.settings.tabs.window.height.description": {
-    "message": "Înălțimea ferestrei de joc la lansare."
+    "message": "Înălțimea ferestrei de joc la pornire."
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Introdu înălțimea..."
@@ -348,7 +348,7 @@
     "message": "Lățime"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "Lățimea ferestrei jocului la lansare."
+    "message": "Lățimea ferestrei jocului la pornire."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Introdu lățimea..."
@@ -375,7 +375,7 @@
     "message": "Instanța este deja deschisă"
   },
   "instance.worlds.hardcore": {
-    "message": "Modul hardcore"
+    "message": "Modul extrem"
   },
   "instance.worlds.incompatible_server": {
     "message": "Serverul este incompatibil"
@@ -396,7 +396,7 @@
     "message": "Server"
   },
   "instance.worlds.type.singleplayer": {
-    "message": "Singleplayer"
+    "message": "Un singur jucător"
   },
   "instance.worlds.view_instance": {
     "message": "Afișează instanța"

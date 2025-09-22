@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "سموا"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {ڤيک داتا}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "ڤيک داتا"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {ڤيک داتا}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {مود}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "مود"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {مود}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {ڤيک مود}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "ڤيک مود"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {ڤيک مود}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {ڤمالم}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "ڤمالم"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {ڤمالم}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {ڤيک سومبر}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "ڤيک سومبر"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {ڤيک سومبر}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {ڤمبايڠ}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "ڤمبايڠ"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {ڤمبايڠ}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "ڤرسکيترن يڠ دسوکوڠ"
   },

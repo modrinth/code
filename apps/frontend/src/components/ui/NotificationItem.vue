@@ -173,7 +173,7 @@
 					<span class="version-info">
 						for
 						<Categories
-							:categories="loaderCategories"
+							:categories="getLoaderCategories(notif.extra_data.version)"
 							:type="notif.extra_data.project.project_type"
 							class="categories"
 						/>
@@ -391,12 +391,6 @@ const user = computed(() => props.notification.extra_data.user)
 const organization = computed(() => props.notification.extra_data.organization)
 const invitedBy = computed(() => props.notification.extra_data.invited_by)
 
-const loaderCategories = computed(() => {
-	return tags.value.loaders.filter((loader) => {
-		return version.value?.loaders?.includes(loader.name)
-	})
-})
-
 const threadLink = computed(() => {
 	if (report.value) {
 		return `/dashboard/report/${report.value.id}`
@@ -461,6 +455,12 @@ function getMessages() {
 		}
 	}
 	return messages
+}
+
+function getLoaderCategories(ver) {
+	return tags.value.loaders.filter((loader) => {
+		return ver?.loaders?.includes(loader.name)
+	})
 }
 </script>
 

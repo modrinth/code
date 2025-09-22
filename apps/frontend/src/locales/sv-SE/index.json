@@ -560,9 +560,6 @@
   "landing.error.failedToLoadRandomProjects": {
     "message": "Misslyckades att ladda slumpmässiga projekts :("
   },
-  "landing.feature.follow.description": {
-    "message": "Bli notifierad varje gång dina favoritprojekt uppdateras och håll dig informerad"
-  },
   "landing.feature.follow.heading": {
     "message": "Följ projekt du älskar"
   },
@@ -635,9 +632,6 @@
   "landing.search.sort-by.label": {
     "message": "Sortera efter"
   },
-  "landing.section.for-creators.description": {
-    "message": "Ge dina skapelser ett hem online och nå en massiv publik av dedikerade spelare"
-  },
   "landing.section.for-creators.label": {
     "message": "För skapare"
   },
@@ -659,8 +653,32 @@
   "layout.action.change-theme": {
     "message": "Ändra tema"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Skaffa Modrinth appen"
+  "layout.action.close-banner": {
+    "message": "Stäng"
+  },
+  "layout.action.create-new": {
+    "message": "Skapa ny..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Sök efter fil"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Sök efter e-post"
+  },
+  "layout.action.new-collection": {
+    "message": "Ny samling"
+  },
+  "layout.action.new-organization": {
+    "message": "Ny organisation"
+  },
+  "layout.action.new-project": {
+    "message": "Nytt projekt"
+  },
+  "layout.action.reports": {
+    "message": "Rapporter"
+  },
+  "layout.action.review-projects": {
+    "message": "Granska projekt"
   },
   "layout.avatar.alt": {
     "message": "Din avatar"
@@ -740,6 +758,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Användarvillkor"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinth information"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth har <github-link>öppen källkod</github-link>."
   },
@@ -794,11 +815,53 @@
   "layout.meta.og-description": {
     "message": "Utforska och lägg upp Minecraft innehåll!"
   },
+  "layout.nav.analytics": {
+    "message": "Statistik"
+  },
+  "layout.nav.discover": {
+    "message": "Utforska"
+  },
+  "layout.nav.discover-content": {
+    "message": "Utforska innehåll"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Funktionsflaggor"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Installera Modrinth appen"
+  },
   "layout.nav.home": {
     "message": "Hem"
   },
+  "layout.nav.host-a-server": {
+    "message": "Skaffa en server"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth hem sida"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisationer"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projekt"
+  },
+  "layout.nav.revenue": {
+    "message": "Intäkter"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Sparade projekt"
+  },
   "layout.nav.search": {
     "message": "Sök"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Uppgradera till Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filtrera via"
@@ -1112,6 +1175,9 @@
   "project.environment.migration.title": {
     "message": "Vänligen verifiera miljömetadata"
   },
+  "project.error.loading": {
+    "message": "Fel vid laddning av projekt data{message}"
+  },
   "project.error.page-not-found": {
     "message": "Sidan kunde inte hittas"
   },
@@ -1120,6 +1186,9 @@
   },
   "project.gallery.title": {
     "message": "Galleri"
+  },
+  "project.license.error": {
+    "message": "Licenstext kunde inte hämtas."
   },
   "project.license.loading": {
     "message": "Laddar licenstext..."
@@ -1133,6 +1202,9 @@
   "project.navigation.changelog": {
     "message": "Ändringslogg"
   },
+  "project.notification.icon-updated.message": {
+    "message": "Ditt projekts ikon har blivit uppdaterad."
+  },
   "project.notification.icon-updated.title": {
     "message": "Projektikon uppdaterad"
   },
@@ -1142,17 +1214,41 @@
   "project.notification.updated.title": {
     "message": "Projekt uppdaterat"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Ditt projekt saknar miljömetadata, vänligen välj den passande inställningen nedan."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Vänligen välj en miljö för ditt projekt"
+  },
   "project.settings.environment.verification.verify-button": {
     "message": "Verifiera"
   },
+  "project.settings.general.name.placeholder.2": {
+    "message": "ex. Bygg föremål"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "ex. Bättre än att gräva"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "ex. Förbättrade portaler"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "ex. Farliga varelser"
+  },
   "project.settings.general.name.title": {
     "message": "Namn"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "Sammanfatta ditt projekt i bara en mening."
   },
   "project.settings.general.url.title": {
     "message": "URL"
   },
   "project.settings.title": {
     "message": "Inställningar"
+  },
+  "project.stats.downloads-label": {
+    "message": "ladda ner{count, plural, one {} other {s}}"
   },
   "project.version.all-versions": {
     "message": "Alla versioner"
@@ -1169,8 +1265,17 @@
   "report.back-to-item": {
     "message": "Tillbaka till {item}"
   },
+  "report.body.title": {
+    "message": "Vänligen ge oss mer kontext om din rapport"
+  },
+  "report.checking": {
+    "message": "Checkar {item}..."
+  },
   "report.could-not-find": {
     "message": "Kunde inte hitta {item}"
+  },
+  "report.for.violation": {
+    "message": "Detta bryter mot Modrinths <rules-link>regler</rules-link> eller våra <terms-link>användarvillkor</terms-link>"
   },
   "report.go-to-report": {
     "message": "Gå till rapportering"

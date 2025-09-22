@@ -422,9 +422,6 @@
   "layout.action.change-theme": {
     "message": "Změnit motiv"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Získat Modrinth aplikaci"
-  },
   "layout.avatar.alt": {
     "message": "Váš avatar"
   },

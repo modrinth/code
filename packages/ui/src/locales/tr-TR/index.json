@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "Tümü"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "Veri Paketi"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Veri Paketleri"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "veri paketi"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "Mod"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Modlar"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "mod"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "Mod Paketi"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Mod Paketleri"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "mod paketi"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "Eklenti"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Eklentiler"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "eklenti"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "Kaynak Paketi"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Kaynak Paketleri"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "kaynak paketi"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "Gölgelendirme"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Gölgelendirmeler"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "gölgelendirme"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Desteklenen ortamlar"
   },

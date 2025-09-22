@@ -148,5 +148,11 @@
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Voorbekendstelling"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Het gehardloop voordat die instansie geloods is."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Voer pre-lanceringsopdrag in..."
   }
 }

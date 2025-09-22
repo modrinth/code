@@ -2,9 +2,11 @@ use actix_web::middleware::from_fn;
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
+use labrinth::app_config;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::{S3BucketConfig, S3Host};
+use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::env::parse_var;
 use labrinth::util::ratelimit::rate_limit_middleware;
@@ -134,10 +136,20 @@ async fn main() -> std::io::Result<()> {
     let stripe_client =
         stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
 
+    let email_queue =
+        EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
+
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
-        task.run(pool, redis_pool, search_config, clickhouse, stripe_client)
-            .await;
+        task.run(
+            pool,
+            redis_pool,
+            search_config,
+            clickhouse,
+            stripe_client,
+            email_queue,
+        )
+        .await;
         return Ok(());
     }
 
@@ -174,12 +186,12 @@ async fn main() -> std::io::Result<()> {
         file_host.clone(),
         maxmind_reader.clone(),
         stripe_client,
+        email_queue,
         !args.no_background_tasks,
     );
 
     info!("Starting Actix HTTP server!");
 
-    // Init App
     HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
@@ -187,7 +199,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(from_fn(rate_limit_middleware))
             .wrap(actix_web::middleware::Compress::default())
             .wrap(sentry_actix::Sentry::new())
-            .configure(|cfg| labrinth::app_config(cfg, labrinth_config.clone()))
+            .configure(|cfg| app_config(cfg, labrinth_config.clone()))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
     .run()

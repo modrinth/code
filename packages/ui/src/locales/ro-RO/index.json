@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "Toate"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Pachet} other {Pachete}} de Date"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Pachete de Date"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {pachet} other {pachete}} de date"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Moduri}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Moduri"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} other {moduri}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Pachet} other {Pachete}} de Moduri"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Pachete de Moduri"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {pachet} other {pachete}} de moduri"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Pluginuri}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pluginuri"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {pluginuri}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Pachet} other {Pachete}} de Resurse"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Pachete de Resurse"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {pachet} other {pachete}} de resurse"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shadere}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shadere"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shadere}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Medii suportate"
   },

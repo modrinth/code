@@ -287,6 +287,9 @@
   "project.about.details.updated": {
     "defaultMessage": "Nagbago {date}"
   },
+  "project.settings.environment.title": {
+    "defaultMessage": "Kapaligiran"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "ᜀ"
   },
@@ -319,6 +322,9 @@
   },
   "project.visibility.unknown": {
     "defaultMessage": "Hindi alam"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Kapaligiran"
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Bukas na batis"

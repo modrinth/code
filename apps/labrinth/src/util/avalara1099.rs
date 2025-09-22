@@ -105,10 +105,20 @@ pub async fn check_form(
     let response = request_builder.send().await?;
 
     Ok(if response.status().is_success() {
-        let mut list_wrapper =
-            response.json::<ListWrapper<W9FormsResponse>>().await?;
+        let body = response.text().await?;
+        let serde_result =
+            serde_json::from_str::<ListWrapper<W9FormsResponse>>(&body);
 
-        Ok(list_wrapper.data.pop().map(|data| DataWrapper { data }))
+        match serde_result {
+            Ok(mut list_wrapper) => {
+                Ok(list_wrapper.data.pop().map(|data| DataWrapper { data }))
+            }
+            Err(e) => {
+                return Err(ApiError::InvalidInput(format!(
+                    "Error parsing avalara1099 response: {e}. Actual response body: {body}"
+                )));
+            }
+        }
     } else {
         Err(response.json().await?)
     })
