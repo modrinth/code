@@ -1,7 +1,7 @@
 use crate::database::models::{DBUserId, users_compliance::FormType};
 use crate::routes::ApiError;
 use ariadne::ids::base62_impl::to_base62;
-use chrono::{Datelike, NaiveDateTime};
+use chrono::Datelike;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
@@ -33,12 +33,15 @@ pub struct FormResponse {
     pub company_name: String,
     pub company_email: String,
     pub reference_id: String,
-    pub signed_at: Option<NaiveDateTime>,
+    /// This is a DateTime, but it's not consistent wether it has a
+    /// timezone or not, so we just parse it as a string and use [`Utc::now()`](fn@chrono::Utc::now)
+    /// rather than using the provided DateTime.
+    pub signed_at: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct W9FormsResponse {
-    pub e_delivery_consented_at: Option<NaiveDateTime>,
+    pub e_delivery_consented_at: Option<String>,
     pub tin_match_status: Option<String>,
     pub entry_status: String,
 }
