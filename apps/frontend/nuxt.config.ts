@@ -114,7 +114,7 @@ export default defineNuxtConfig({
 	hooks: {
 		async 'nitro:config'(nitroConfig) {
 			const emailTemplates = Object.keys(
-				await import('./src/emails/index.ts').then((m) => m.default),
+				await import('./src/templates/emails/index.ts').then((m) => m.default),
 			)
 
 			nitroConfig.prerender = nitroConfig.prerender || {}

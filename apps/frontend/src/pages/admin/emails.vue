@@ -3,7 +3,7 @@ import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, Card } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
-import emails from '@/emails'
+import emails from '~/templates/emails'
 
 const allTemplates = Object.keys(emails).sort()
 const query = ref('')

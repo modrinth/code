@@ -1,7 +1,7 @@
 import { render } from '@vue-email/render'
 import type { Component } from 'vue'
 
-import emails from '~/emails'
+import emails from '~/templates/emails'
 
 export default defineEventHandler(async (event) => {
 	const template = event.context.params?.template as string
