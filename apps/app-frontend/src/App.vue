@@ -17,6 +17,7 @@ import {
 	RestoreIcon,
 	RightArrowIcon,
 	SettingsIcon,
+	UpdatedIcon,
 	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -24,9 +25,11 @@ import {
 	Avatar,
 	Button,
 	ButtonStyled,
+	commonMessages,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
+	ProgressSpinner,
 	provideNotificationManager,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
@@ -37,18 +40,8 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-import { createTooltip, destroyTooltip } from 'floating-vue'
 import { $fetch } from 'ofetch'
-import {
-	computed,
-	nextTick,
-	onMounted,
-	onUnmounted,
-	provide,
-	ref,
-	useTemplateRef,
-	watch,
-} from 'vue'
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
@@ -63,15 +56,15 @@ import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
-import MeteredNetworkModal from '@/components/ui/modal/MeteredNetworkModal.vue'
-import UpdateModal from '@/components/ui/modal/UpdateModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import UpdateToast from '@/components/ui/UpdateToast.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
+import { useDownloadProgress } from '@/composables/useDownloadProgress'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { get_user } from '@/helpers/cache.js'
@@ -81,7 +74,14 @@ import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.j
 import { list } from '@/helpers/profile.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
-import { areUpdatesEnabled, getOS, isDev, isNetworkMetered } from '@/helpers/utils.js'
+import {
+	areUpdatesEnabled,
+	enqueueUpdateForInstallation,
+	getOS,
+	getUpdateSize,
+	isDev,
+	isNetworkMetered,
+} from '@/helpers/utils.js'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
@@ -126,11 +126,15 @@ onMounted(async () => {
 
 	document.querySelector('body').addEventListener('click', handleClick)
 	document.querySelector('body').addEventListener('auxclick', handleAuxClick)
+
+	checkUpdates()
 })
 
-onUnmounted(() => {
+onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
+
+	await unlisten?.()
 })
 
 const { formatMessage } = useVIntl()
@@ -142,6 +146,14 @@ const messages = defineMessages({
 	updateInstalledToastText: {
 		id: 'app.update.complete-toast.text',
 		defaultMessage: 'Click here to view the changelog.',
+	},
+	reloadToUpdate: {
+		id: 'app.update.reload-to-update',
+		defaultMessage: 'Reload to update Modrinth App',
+	},
+	downloadUpdate: {
+		id: 'app.update.download-update',
+		defaultMessage: 'Download Modrinth App update',
 	},
 })
 
@@ -417,52 +429,47 @@ async function handleCommand(e) {
 	}
 }
 
+const downloadProgress = ref(0)
+const unlisten = null
+
+const metered = ref(true)
+const finishedDownloading = ref(false)
+const restarting = ref(false)
+const updateToastDismissed = ref(false)
 const availableUpdate = ref(null)
-const updateSkipped = ref(false)
-const enqueuedUpdate = ref(null)
-const updateModal = useTemplateRef('updateModal')
+const updateSize = ref(null)
 async function checkUpdates() {
+
+	downloadProgress.value = 0
+	finishedDownloading.value = false
+	updateToastDismissed.value = false
+
 	if (!(await areUpdatesEnabled())) {
 		console.log('Skipping update check as updates are disabled in this build')
 		return
 	}
 
 	async function performCheck() {
-		if (updateModal.value.isOpen) {
-			console.log('Skipping update check because the update modal is already open')
-			return
-		}
-
 		const update = await invoke('plugin:updater|check')
-		if (!update) {
+		const isExistingUpdate = update.version === availableUpdate.value?.version
+
+		if (!update || isExistingUpdate) {
 			return
 		}
 
 		console.log(`Update ${update.version} is available.`)
 
-		if (update.version === availableUpdate.value?.version) {
-			console.log(
-				'Skipping update modal because the new version is the same as the dismissed update',
-			)
-			return
+		metered.value = await isNetworkMetered()
+		if (!metered.value) {
+			console.log('Starting download of update')
+			downloadUpdate(update)
+		} else {
+			console.log(`Metered connection detected, not auto-downloading update.`)
 		}
+
+		getUpdateSize(update.rid).then((size) => (updateSize.value = size))
 
 		availableUpdate.value = update
-
-		const settings = await getSettings()
-		if (settings.skipped_update === update.version) {
-			updateSkipped.value = true
-			console.log('Skipping update modal because the user chose to skip this update')
-			return
-		}
-
-		updateSkipped.value = false
-
-		if (settings.auto_download_updates) {
-			updateModal.value.updateAtNextExit(update)
-		} else {
-			updateModal.value.show(update)
-		}
 	}
 
 	await performCheck()
@@ -470,58 +477,43 @@ async function checkUpdates() {
 		() => {
 			checkUpdates()
 		},
-		5 * 60 * 1000,
+		5 /* min */ * 60 /* sec */ * 1000 /* ms */,
 	)
 }
 
-async function skipUpdate(version) {
-	enqueuedUpdate.value = null
-
-	updateSkipped.value = true
-	const settings = await getSettings()
-	settings.skipped_update = version
-	await setSettings(settings)
+async function showUpdateToast() {
+	updateToastDismissed.value = false
 }
 
-async function updateEnqueuedForLater(version) {
-	enqueuedUpdate.value = version
-}
-
-async function forceOpenUpdateModal() {
-	if (updateSkipped.value) {
-		updateSkipped.value = false
-		const settings = await getSettings()
-		settings.skipped_update = null
-		await setSettings(settings)
+async function downloadUpdate(versionToDownload = availableUpdate.value) {
+	if (!versionToDownload) {
+		handleError(`Failed to download update: no version available`)
 	}
-	updateModal.value.show(availableUpdate.value)
-}
 
-const updateButton = useTemplateRef('updateButton')
-async function showUpdateButtonTooltip() {
-	await nextTick()
-	const tooltip = createTooltip(updateButton.value.$el, {
-		placement: 'right',
-		content: 'Click here to view the update again.',
-	})
-	tooltip.show()
-	setTimeout(() => {
-		tooltip.hide()
-		destroyTooltip(updateButton.value.$el)
-	}, 3500)
-}
-
-const meteredNetworkModal = useTemplateRef('meteredNetworkModal')
-async function checkMeteredNetwork() {
-	const settings = await getSettings()
-	if (settings.auto_download_updates === null) {
-		if (await isNetworkMetered()) {
-			meteredNetworkModal.value.show()
-		} else {
-			settings.auto_download_updates = true
-			await setSettings(settings)
-		}
+	try {
+		enqueueUpdateForInstallation(versionToDownload.rid).then(() => {
+				finishedDownloading.value = true
+				unlisten?.().then(() => {
+					unlisten = null
+				})
+				console.log('Finished downloading!')
+			})
+		useDownloadProgress(versionToDownload.version).then(({ downloadProgress: progress, unlisten }) => {
+			watch(progress, (newProgress) => {
+				downloadProgress.value = newProgress
+			})
+			unlisten.value = unlisten
+		})
+	} catch (e) {
+		handleError(e)
 	}
+}
+
+async function installUpdate() {
+	restarting.value = true
+	setTimeout(async () => {
+		await handleClose()
+	}, 250)
 }
 
 function handleClick(e) {
@@ -674,17 +666,39 @@ async function processPendingSurveys() {
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
 	<div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
-		<Suspense @resolve="checkUpdates">
-			<UpdateModal
-				ref="updateModal"
-				@update-skipped="skipUpdate"
-				@update-enqueued-for-later="updateEnqueuedForLater"
-				@modal-hidden="showUpdateButtonTooltip"
-			/>
+		<Suspense>
+			<Transition name="toast">
+				<UpdateToast
+					v-if="
+						!!availableUpdate &&
+						!updateToastDismissed &&
+						!restarting &&
+						(finishedDownloading || metered)
+					"
+					:version="availableUpdate.version"
+					:size="updateSize"
+					:metered="metered"
+					@close="updateToastDismissed = true"
+					@restart="installUpdate"
+					@download="downloadUpdate"
+				/>
+			</Transition>
 		</Suspense>
-		<Suspense @resolve="checkMeteredNetwork">
-			<MeteredNetworkModal ref="meteredNetworkModal" :update-modal="updateModal" />
-		</Suspense>
+		<Transition name="fade">
+			<div
+				v-if="restarting"
+				data-tauri-drag-region
+				class="inset-0 fixed bg-black/80 backdrop-blur z-[200] flex items-center justify-center"
+			>
+				<span
+					data-tauri-drag-region
+					class="flex items-center gap-4 text-contrast font-semibold text-xl select-none cursor-default"
+				>
+					<UpdatedIcon data-tauri-drag-region class="animate-spin reverse w-6 h-6" />
+					Restarting...
+				</span>
+			</div>
+		</Transition>
 		<Suspense>
 			<AppSettingsModal ref="settingsModal" />
 		</Suspense>
@@ -738,20 +752,29 @@ async function processPendingSurveys() {
 				<PlusIcon />
 			</NavButton>
 			<div class="flex flex-grow"></div>
+			<Transition name="nav-button-animated">
+				<div
+					v-if="
+						availableUpdate &&
+						updateToastDismissed &&
+						!restarting &&
+						(finishedDownloading || metered)
+					"
+				>
+					<NavButton
+						v-tooltip.right="formatMessage(finishedDownloading ? messages.reloadToUpdate : messages.downloadUpdate)"
+						:to="finishedDownloading ? installUpdate : (downloadProgress > 0 && downloadProgress < 1) ? showUpdateToast : downloadUpdate"
+					>
+					<ProgressSpinner v-if="downloadProgress > 0 && downloadProgress < 1" class="text-brand" :progress="downloadProgress" />
+					<UpdatedIcon v-else-if="finishedDownloading" class="text-brand" />
+					<DownloadIcon v-else class="text-brand" />
+				</NavButton>
+				</div>
+			</Transition>
 			<NavButton
-				v-if="!!availableUpdate"
-				ref="updateButton"
-				v-tooltip.right="
-					enqueuedUpdate === availableUpdate?.version
-						? 'Update installation queued for next restart'
-						: 'Update available'
-				"
-				:to="forceOpenUpdateModal"
+				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
+				:to="() => $refs.settingsModal.show()"
 			>
-				<DownloadIcon v-if="updateSkipped || enqueuedUpdate === availableUpdate?.version" />
-				<DownloadIcon v-else class="text-brand-green" />
-			</NavButton>
-			<NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
 				<SettingsIcon />
 			</NavButton>
 			<ButtonStyled v-if="credentials" type="transparent" circular>
@@ -1180,6 +1203,88 @@ async function processPendingSurveys() {
 .popup-survey-leave-to {
 	opacity: 0;
 	transform: translateY(10rem) scale(0.8) scaleY(1.6);
+}
+
+.toast-enter-active {
+	transition: opacity 0.25s linear;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+	opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.toast-enter-active,
+	.nav-button-animated-enter-active {
+		transition: all 0.5s cubic-bezier(0.15, 1.4, 0.64, 0.96);
+	}
+
+	.toast-leave-active,
+	.nav-button-animated-leave-active {
+		transition: all 0.25s ease;
+	}
+
+	.toast-enter-from {
+		scale: 0.5;
+		translate: 0 10rem;
+		opacity: 0;
+	}
+
+	.toast-leave-to {
+		scale: 0.96;
+		translate: 20rem 0;
+		opacity: 0;
+	}
+
+	.nav-button-animated-enter-active {
+		position: relative;
+	}
+
+	.nav-button-animated-enter-active::before {
+		content: '';
+		inset: 0;
+		border-radius: 100vw;
+		background-color: var(--color-brand-highlight);
+		position: absolute;
+		animation: pop 0.5s ease-in forwards;
+		opacity: 0;
+	}
+
+	@keyframes pop {
+		0% {
+			scale: 0.5;
+		}
+		50% {
+			opacity: 0.5;
+		}
+		100% {
+			scale: 1.5;
+		}
+	}
+
+	.nav-button-animated-enter-from {
+		scale: 0.5;
+		translate: -2rem 0;
+		opacity: 0;
+	}
+
+	.nav-button-animated-leave-to {
+		scale: 0.75;
+		opacity: 0;
+	}
+
+	.fade-enter-active {
+		transition: 0.25s ease-in-out;
+	}
+
+	.fade-enter-from {
+		opacity: 0;
+	}
+}
+
+.reverse {
+	animation-direction: reverse;
 }
 </style>
 <style>

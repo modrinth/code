@@ -191,7 +191,7 @@ const refreshInfo = async () => {
 
 			return x
 		},
-	)
+	).filter((bar) => bar?.bar_type?.type !== 'launcher_update')
 
 	currentLoadingBars.value.sort((a, b) => {
 		if (a.loading_bar_uuid < b.loading_bar_uuid) {

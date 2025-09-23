@@ -1,24 +1,15 @@
 {
-  "app.meteredNetwork.body": {
-    "message": "You appear to be on a metered network. Would you like to disable automatic file downloads?"
-  },
-  "app.meteredNetwork.disable": {
-    "message": "Disable"
-  },
-  "app.meteredNetwork.keepEnabled": {
-    "message": "Keep Enabled"
-  },
-  "app.meteredNetwork.title": {
-    "message": "Metered Network Detected"
-  },
-  "app.settings.automaticDownloads": {
-    "message": "Automatic downloads"
-  },
-  "app.settings.automaticDownloads.description": {
-    "message": "The Modrinth app download updates automatically in the background, enabling updates to be installed seamlessly. Disable this if you have a metered network and would like to save data."
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
+  },
+  "app.settings.downloaded": {
+    "message": "Downloaded v{version}"
+  },
+  "app.settings.downloading": {
+    "message": "Downloading v{version}"
+  },
+  "app.settings.reload-to-update": {
+    "message": "Reload to update"
   },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
@@ -38,8 +29,38 @@
   "app.settings.tabs.resource-management": {
     "message": "Resource management"
   },
-  "app.update.changelog": {
-    "message": "View changelog"
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} is available now! Reload to update now, or automatically when you close Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} is available now! Since you're on a metered network, we didn't automatically download it."
+  },
+  "app.update-toast.changelog": {
+    "message": "Changelog"
+  },
+  "app.update-toast.download": {
+    "message": "Download"
+  },
+  "app.update-toast.downloading": {
+    "message": "Downloading..."
+  },
+  "app.update-toast.loading-update-size": {
+    "message": "Loading update size..."
+  },
+  "app.update-toast.reload": {
+    "message": "Reload"
+  },
+  "app.update-toast.title": {
+    "message": "Update available"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Download complete"
+  },
+  "app.update-toast.update-size": {
+    "message": "The update is {size}"
   },
   "app.update.complete-toast.text": {
     "message": "Click here to view the changelog."
@@ -47,35 +68,11 @@
   "app.update.complete-toast.title": {
     "message": "Version {version} was successfully installed!"
   },
-  "app.update.copied-error": {
-    "message": "Copied to clipboard!"
+  "app.update.download-update": {
+    "message": "Download Modrinth App update"
   },
-  "app.update.copy-error": {
-    "message": "Copy error"
-  },
-  "app.update.download-error": {
-    "message": "An error occurred while downloading the update. Please try again later. Contact support if the issue persists."
-  },
-  "app.update.download-size": {
-    "message": "The update is {size}."
-  },
-  "app.update.hide": {
-    "message": "Hide update reminder"
-  },
-  "app.update.later": {
-    "message": "Update on exit"
-  },
-  "app.update.modal-body-version": {
-    "message": "We recommend updating as soon as possible so you can enjoy the latest features, fixes, and improvements."
-  },
-  "app.update.modal-header": {
-    "message": "Update available - "
-  },
-  "app.update.restart": {
-    "message": "Update now"
-  },
-  "app.update.try-again": {
-    "message": "Try again"
+  "app.update.reload-to-update": {
+    "message": "Reload to update Modrinth App"
   },
   "instance.add-server.add-and-play": {
     "message": "Add and play"

@@ -9,6 +9,10 @@ export const commonMessages = defineMessages({
 		id: 'button.cancel',
 		defaultMessage: 'Cancel',
 	},
+	closeButton: {
+		id: 'button.close',
+		defaultMessage: 'Close',
+	},
 	collectionsLabel: {
 		id: 'label.collections',
 		defaultMessage: 'Collections',
