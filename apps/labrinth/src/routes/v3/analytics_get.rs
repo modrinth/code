@@ -55,6 +55,7 @@ enum ProjectViewsField {
     ProjectId,
     Domain,
     SitePath,
+    Monetized,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -105,6 +106,8 @@ enum ProjectMetrics {
         domain: Option<String>,
         #[serde(skip_serializing_if = "Option::is_none")]
         site_path: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        monetized: Option<bool>,
         views: u64,
     },
     Downloads {
@@ -150,6 +153,7 @@ mod query {
         pub project_id: DBProjectId,
         pub domain: String,
         pub site_path: String,
+        pub monetized: i8,
         pub views: u64,
     }
 
@@ -157,6 +161,7 @@ mod query {
         const USE_PROJECT_ID: &str = "{use_project_id: Bool}";
         const USE_DOMAIN: &str = "{use_domain: Bool}";
         const USE_SITE_PATH: &str = "{use_site_path: Bool}";
+        const USE_MONETIZED: &str = "{use_monetized: Bool}";
 
         formatcp!(
             "SELECT
@@ -164,6 +169,7 @@ mod query {
                 if({USE_PROJECT_ID}, project_id, 0) AS project_id,
                 if({USE_DOMAIN}, domain, '') AS domain,
                 if({USE_SITE_PATH}, site_path, '') AS site_path,
+                if({USE_MONETIZED}, CAST(monetized AS Int8), -1) AS monetized,
                 COUNT(*) AS views
             FROM views
             WHERE
@@ -173,7 +179,7 @@ mod query {
                 -- by using `views.project_id` instead of `project_id`
                 AND views.project_id IN {PROJECT_IDS}
             GROUP BY
-                bucket, project_id, domain, site_path"
+                bucket, project_id, domain, site_path, monetized"
         )
     };
 
@@ -298,6 +304,7 @@ async fn get(
                 ("use_project_id", uses(F::ProjectId)),
                 ("use_domain", uses(F::Domain)),
                 ("use_site_path", uses(F::SitePath)),
+                ("use_monetized", uses(F::Monetized)),
             ],
             |row| row.bucket,
             |row| {
@@ -306,6 +313,11 @@ async fn get(
                     metrics: ProjectMetrics::Views {
                         domain: none_if_empty(row.domain),
                         site_path: none_if_empty(row.site_path),
+                        monetized: match row.monetized {
+                            0 => Some(false),
+                            1 => Some(true),
+                            _ => None,
+                        },
                         views: row.views,
                     },
                 }
