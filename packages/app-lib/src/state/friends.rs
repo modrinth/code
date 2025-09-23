@@ -1,5 +1,5 @@
-use crate::LAUNCHER_USER_AGENT;
 use crate::ErrorKind;
+use crate::LAUNCHER_USER_AGENT;
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::emit_friend;

@@ -1,7 +1,7 @@
 //! Functions for fetching information from the Internet
 use super::io::{self, IOError};
-use crate::LAUNCHER_USER_AGENT;
 use crate::ErrorKind;
+use crate::LAUNCHER_USER_AGENT;
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use bytes::Bytes;
