@@ -1055,11 +1055,11 @@
   "project-moderation-nags.submit-for-review": {
     "message": "Submit for review"
   },
-  "project-moderation-nags.submit-for-review-desc": {
-    "message": "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published."
-  },
   "project-moderation-nags.submit-for-review-button": {
     "message": "Submit for review"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Your project is only viewable by members of the project. It must be reviewed by moderators in order to be published."
   },
   "project-moderation-nags.suggestion": {
     "message": "Suggestion"
