@@ -30,19 +30,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[derive(Debug, Serialize, Deserialize)]
 struct GetRequest {
     time_range: TimeRange,
-    include: Vec<MetricField>,
+    bucket_by: BucketBy,
     // filters: Filters,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-enum MetricField {
-    ProjectId,
-    ViewDomain,
-    ViewSitePath,
-    DownloadDomain,
-    DownloadSitePath,
-    DownloadVersionId,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -54,10 +43,37 @@ struct TimeRange {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Filters {}
+struct BucketBy {
+    project_views: Option<Vec<ProjectViewsField>>,
+    project_downloads: Option<Vec<ProjectDownloadsField>>,
+    project_playtime: Option<Vec<ProjectPlaytimeField>>,
+}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-enum AnalyticsKind {}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum ProjectViewsField {
+    ProjectId,
+    Domain,
+    SitePath,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum ProjectDownloadsField {
+    ProjectId,
+    VersionId,
+    Domain,
+    SitePath,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum ProjectPlaytimeField {
+    ProjectId,
+    VersionId,
+    Loader,
+    GameVersion,
+}
 
 // response
 
@@ -100,6 +116,15 @@ enum ProjectMetrics {
         version_id: Option<VersionId>,
         downloads: u64,
     },
+    Playtime {
+        #[serde(skip_serializing_if = "Option::is_none")]
+        version_id: Option<VersionId>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        loader: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        game_version: Option<String>,
+        seconds: u64,
+    },
 }
 
 impl From<ProjectAnalytics> for AnalyticsData {
@@ -128,29 +153,29 @@ mod query {
         pub views: u64,
     }
 
-    pub const VIEWS: &str = formatcp!(
-        "
-        WITH
-            {{has_project_id: Bool}} AS has_project_id,
-            {{has_domain: Bool}} AS has_domain,
-            {{has_site_path: Bool}} AS has_site_path
-        SELECT
-            widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
-            if(has_project_id, project_id, 0) AS project_id,
-            if(has_domain, domain, '') AS domain,
-            if(has_site_path, site_path, '') AS site_path,
-            COUNT(*) AS views
-        FROM views
-        WHERE
-            recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
-            AND project_id IN {PROJECT_IDS}
-        GROUP BY
-            bucket, project_id, domain, site_path
-        HAVING
-            (has_domain AND domain != '') OR
-            (has_site_path AND site_path != '') OR
-            has_project_id"
-    );
+    pub const VIEWS: &str = {
+        const USE_PROJECT_ID: &str = "{use_project_id: Bool}";
+        const USE_DOMAIN: &str = "{use_domain: Bool}";
+        const USE_SITE_PATH: &str = "{use_site_path: Bool}";
+
+        formatcp!(
+            "SELECT
+                widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
+                if({USE_PROJECT_ID}, project_id, 0) AS project_id,
+                if({USE_DOMAIN}, domain, '') AS domain,
+                if({USE_SITE_PATH}, site_path, '') AS site_path,
+                COUNT(*) AS views
+            FROM views
+            WHERE
+                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                -- make sure that the REAL project id is included,
+                -- not the possibly-zero one,
+                -- by using `views.project_id` instead of `project_id`
+                AND views.project_id IN {PROJECT_IDS}
+            GROUP BY
+                bucket, project_id, domain, site_path"
+        )
+    };
 
     #[derive(Debug, clickhouse::Row, serde::Deserialize)]
     pub struct DownloadRow {
@@ -162,32 +187,67 @@ mod query {
         pub downloads: u64,
     }
 
-    pub const DOWNLOADS: &str = formatcp!(
-        "
-        WITH
-            {{has_project_id: Bool}} AS has_project_id,
-            {{has_domain: Bool}} AS has_domain,
-            {{has_site_path: Bool}} AS has_site_path,
-            {{has_version_id: Bool}} AS has_version_id
-        SELECT
-            widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
-            if(has_project_id, project_id, 0) AS project_id,
-            if(has_domain, domain, '') AS domain,
-            if(has_site_path, site_path, '') AS site_path,
-            if(has_version_id, version_id, 0) AS version_id,
-            COUNT(*) AS downloads
-        FROM downloads
-        WHERE
-            recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
-            AND project_id IN {PROJECT_IDS}
-        GROUP BY
-            bucket, project_id, domain, site_path, version_id
-        HAVING
-            (has_domain AND domain != '') OR
-            (has_site_path AND site_path != '') OR
-            (has_version_id AND version_id != 0) OR
-            has_project_id"
-    );
+    pub const DOWNLOADS: &str = {
+        const USE_PROJECT_ID: &str = "{use_project_id: Bool}";
+        const USE_DOMAIN: &str = "{use_domain: Bool}";
+        const USE_SITE_PATH: &str = "{use_site_path: Bool}";
+        const USE_VERSION_ID: &str = "{use_version_id: Bool}";
+
+        formatcp!(
+            "SELECT
+                widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
+                if({USE_PROJECT_ID}, project_id, 0) AS project_id,
+                if({USE_DOMAIN}, domain, '') AS domain,
+                if({USE_SITE_PATH}, site_path, '') AS site_path,
+                if({USE_VERSION_ID}, version_id, 0) AS version_id,
+                COUNT(*) AS downloads
+            FROM downloads
+            WHERE
+                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                -- make sure that the REAL project id is included,
+                -- not the possibly-zero one,
+                -- by using `downloads.project_id` instead of `project_id`
+                AND downloads.project_id IN {PROJECT_IDS}
+            GROUP BY
+                bucket, project_id, domain, site_path, version_id"
+        )
+    };
+
+    #[derive(Debug, clickhouse::Row, serde::Deserialize)]
+    pub struct PlaytimeRow {
+        pub bucket: u64,
+        pub project_id: DBProjectId,
+        pub version_id: DBVersionId,
+        pub loader: String,
+        pub game_version: String,
+        pub seconds: u64,
+    }
+
+    pub const PLAYTIME: &str = {
+        const USE_PROJECT_ID: &str = "{use_project_id: Bool}";
+        const USE_VERSION_ID: &str = "{use_version_id: Bool}";
+        const USE_LOADER: &str = "{use_loader: Bool}";
+        const USE_GAME_VERSION: &str = "{use_game_version: Bool}";
+
+        formatcp!(
+            "SELECT
+                widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
+                if({USE_PROJECT_ID}, project_id, 0) AS project_id,
+                if({USE_VERSION_ID}, version_id, 0) AS version_id,
+                if({USE_LOADER}, loader, '') AS loader,
+                if({USE_GAME_VERSION}, game_version, '') AS game_version,
+                SUM(seconds) AS seconds
+            FROM playtime
+            WHERE
+                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                -- make sure that the REAL project id is included,
+                -- not the possibly-zero one,
+                -- by using `playtime.project_id` instead of `project_id`
+                AND playtime.project_id IN {PROJECT_IDS}
+            GROUP BY
+                bucket, project_id, version_id, loader, game_version"
+        )
+    };
 }
 
 async fn get(
@@ -227,53 +287,93 @@ async fn get(
         project_ids: &project_ids,
     };
 
-    query_clickhouse::<query::ViewRow>(
-        &mut query_clickhouse_cx,
-        query::VIEWS,
-        &[
-            ("has_project_id", MetricField::ProjectId),
-            ("has_domain", MetricField::ViewDomain),
-            ("has_site_path", MetricField::ViewSitePath),
-        ],
-        |row| row.bucket,
-        |row| {
-            ProjectAnalytics {
-                source_project: row.project_id.into(),
-                metrics: ProjectMetrics::Views {
-                    domain: none_if_empty(row.domain),
-                    site_path: none_if_empty(row.site_path),
-                    views: row.views,
-                },
-            }
-            .into()
-        },
-    )
-    .await?;
+    if let Some(bucket_by) = &req.bucket_by.project_views {
+        use ProjectViewsField as F;
+        let uses = |field| bucket_by.contains(&field);
 
-    query_clickhouse::<query::DownloadRow>(
-        &mut query_clickhouse_cx,
-        query::DOWNLOADS,
-        &[
-            ("has_project_id", MetricField::ProjectId),
-            ("has_domain", MetricField::DownloadDomain),
-            ("has_site_path", MetricField::DownloadSitePath),
-            ("has_version_id", MetricField::DownloadVersionId),
-        ],
-        |row| row.bucket,
-        |row| {
-            ProjectAnalytics {
-                source_project: row.project_id.into(),
-                metrics: ProjectMetrics::Downloads {
-                    domain: none_if_empty(row.domain),
-                    site_path: none_if_empty(row.site_path),
-                    version_id: none_if_zero_version_id(row.version_id),
-                    downloads: row.downloads,
-                },
-            }
-            .into()
-        },
-    )
-    .await?;
+        query_clickhouse::<query::ViewRow>(
+            &mut query_clickhouse_cx,
+            query::VIEWS,
+            &[
+                ("use_project_id", uses(F::ProjectId)),
+                ("use_domain", uses(F::Domain)),
+                ("use_site_path", uses(F::SitePath)),
+            ],
+            |row| row.bucket,
+            |row| {
+                ProjectAnalytics {
+                    source_project: row.project_id.into(),
+                    metrics: ProjectMetrics::Views {
+                        domain: none_if_empty(row.domain),
+                        site_path: none_if_empty(row.site_path),
+                        views: row.views,
+                    },
+                }
+                .into()
+            },
+        )
+        .await?;
+    }
+
+    if let Some(bucket_by) = &req.bucket_by.project_downloads {
+        use ProjectDownloadsField as F;
+        let uses = |field| bucket_by.contains(&field);
+
+        query_clickhouse::<query::DownloadRow>(
+            &mut query_clickhouse_cx,
+            query::DOWNLOADS,
+            &[
+                ("use_project_id", uses(F::ProjectId)),
+                ("use_domain", uses(F::Domain)),
+                ("use_site_path", uses(F::SitePath)),
+                ("use_version_id", uses(F::VersionId)),
+            ],
+            |row| row.bucket,
+            |row| {
+                ProjectAnalytics {
+                    source_project: row.project_id.into(),
+                    metrics: ProjectMetrics::Downloads {
+                        domain: none_if_empty(row.domain),
+                        site_path: none_if_empty(row.site_path),
+                        version_id: none_if_zero_version_id(row.version_id),
+                        downloads: row.downloads,
+                    },
+                }
+                .into()
+            },
+        )
+        .await?;
+    }
+
+    if let Some(bucket_by) = &req.bucket_by.project_playtime {
+        use ProjectPlaytimeField as F;
+        let uses = |field| bucket_by.contains(&field);
+
+        query_clickhouse::<query::PlaytimeRow>(
+            &mut query_clickhouse_cx,
+            query::PLAYTIME,
+            &[
+                ("use_project_id", uses(F::ProjectId)),
+                ("use_version_id", uses(F::VersionId)),
+                ("use_loader", uses(F::Loader)),
+                ("use_game_version", uses(F::GameVersion)),
+            ],
+            |row| row.bucket,
+            |row| {
+                ProjectAnalytics {
+                    source_project: row.project_id.into(),
+                    metrics: ProjectMetrics::Playtime {
+                        version_id: none_if_zero_version_id(row.version_id),
+                        loader: none_if_empty(row.loader),
+                        game_version: none_if_empty(row.game_version),
+                        seconds: row.seconds,
+                    },
+                }
+                .into()
+            },
+        )
+        .await?;
+    }
 
     Ok(web::Json(GetResponse(time_slices)))
 }
@@ -296,7 +396,7 @@ struct QueryClickhouseContext<'a> {
 async fn query_clickhouse<Row>(
     cx: &mut QueryClickhouseContext<'_>,
     query: &str,
-    metric_field_params: &[(&str, MetricField)],
+    use_columns: &[(&str, bool)],
     row_get_bucket: impl Fn(&Row) -> u64,
     row_to_analytics: impl Fn(Row) -> AnalyticsData,
 ) -> Result<(), ApiError>
@@ -309,13 +409,9 @@ where
         .param("time_range_start", cx.req.time_range.start.timestamp())
         .param("time_range_end", cx.req.time_range.end.timestamp())
         .param("time_slices", cx.time_slices.len())
-        .param(
-            "project_ids",
-            cx.project_ids,
-            // cx.project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
-        );
-    for (param_name, field) in metric_field_params {
-        query = query.param(param_name, cx.req.include.contains(field))
+        .param("project_ids", cx.project_ids);
+    for (param_name, used) in use_columns {
+        query = query.param(param_name, used)
     }
     let mut cursor = query.fetch::<Row>()?;
 
