@@ -439,7 +439,6 @@ const updateToastDismissed = ref(false)
 const availableUpdate = ref(null)
 const updateSize = ref(null)
 async function checkUpdates() {
-
 	downloadProgress.value = 0
 	finishedDownloading.value = false
 	updateToastDismissed.value = false
@@ -492,18 +491,20 @@ async function downloadUpdate(versionToDownload = availableUpdate.value) {
 
 	try {
 		enqueueUpdateForInstallation(versionToDownload.rid).then(() => {
-				finishedDownloading.value = true
-				unlisten.value?.().then(() => {
-					unlisten.value = null
-				})
-				console.log('Finished downloading!')
+			finishedDownloading.value = true
+			unlisten.value?.().then(() => {
+				unlisten.value = null
 			})
-		useDownloadProgress(versionToDownload.version).then(({ downloadProgress: progress, unlisten }) => {
-			watch(progress, (newProgress) => {
-				downloadProgress.value = newProgress
-			})
-			unlisten.value = unlisten
+			console.log('Finished downloading!')
 		})
+		useDownloadProgress(versionToDownload.version).then(
+			({ downloadProgress: progress, unlisten }) => {
+				watch(progress, (newProgress) => {
+					downloadProgress.value = newProgress
+				})
+				unlisten.value = unlisten
+			},
+		)
 	} catch (e) {
 		handleError(e)
 	}
@@ -762,13 +763,25 @@ async function processPendingSurveys() {
 					"
 				>
 					<NavButton
-						v-tooltip.right="formatMessage(finishedDownloading ? messages.reloadToUpdate : messages.downloadUpdate)"
-						:to="finishedDownloading ? installUpdate : (downloadProgress > 0 && downloadProgress < 1) ? showUpdateToast : downloadUpdate"
+						v-tooltip.right="
+							formatMessage(finishedDownloading ? messages.reloadToUpdate : messages.downloadUpdate)
+						"
+						:to="
+							finishedDownloading
+								? installUpdate
+								: downloadProgress > 0 && downloadProgress < 1
+									? showUpdateToast
+									: downloadUpdate
+						"
 					>
-					<ProgressSpinner v-if="downloadProgress > 0 && downloadProgress < 1" class="text-brand" :progress="downloadProgress" />
-					<UpdatedIcon v-else-if="finishedDownloading" class="text-brand" />
-					<DownloadIcon v-else class="text-brand" />
-				</NavButton>
+						<ProgressSpinner
+							v-if="downloadProgress > 0 && downloadProgress < 1"
+							class="text-brand"
+							:progress="downloadProgress"
+						/>
+						<UpdatedIcon v-else-if="finishedDownloading" class="text-brand" />
+						<DownloadIcon v-else class="text-brand" />
+					</NavButton>
 				</div>
 			</Transition>
 			<NavButton

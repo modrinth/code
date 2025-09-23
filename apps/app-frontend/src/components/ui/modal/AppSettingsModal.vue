@@ -151,7 +151,9 @@ onUnmounted(async () => {
 				<div class="mt-auto text-secondary text-sm">
 					<div class="mb-3">
 						<template v-if="downloadProgress > 0 && downloadProgress < 1">
-							<p class="m-0 mb-2">{{ formatMessage(messages.downloading, { version: downloadVersion }) }}</p>
+							<p class="m-0 mb-2">
+								{{ formatMessage(messages.downloading, { version: downloadVersion }) }}
+							</p>
 							<ProgressBar :progress="downloadProgress" />
 						</template>
 					</div>

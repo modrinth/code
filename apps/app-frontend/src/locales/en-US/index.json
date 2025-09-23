@@ -24,7 +24,7 @@
     "message": "Resource management"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} is available now! Reload to update now, or automatically when you close Modrinth App."
+    "message": "Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App."
   },
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App."

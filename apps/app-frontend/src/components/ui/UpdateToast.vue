@@ -39,7 +39,7 @@ const messages = defineMessages({
 	body: {
 		id: 'app.update-toast.body',
 		defaultMessage:
-			'Modrinth App v{version} is available now! Reload to update now, or automatically when you close Modrinth App.',
+			'Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App.',
 	},
 	reload: {
 		id: 'app.update-toast.reload',
@@ -88,7 +88,11 @@ const messages = defineMessages({
 	>
 		<div class="flex">
 			<h2 class="text-base text-contrast font-semibold m-0 grow">
-				{{ formatMessage(metered && downloadProgress === 1 ? messages.downloadCompleteTitle : messages.title) }}
+				{{
+					formatMessage(
+						metered && downloadProgress === 1 ? messages.downloadCompleteTitle : messages.title,
+					)
+				}}
 			</h2>
 			<ButtonStyled size="small" circular>
 				<button v-tooltip="formatMessage(commonMessages.closeButton)" @click="emit('close')">
