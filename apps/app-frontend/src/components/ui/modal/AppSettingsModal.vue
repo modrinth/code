@@ -30,8 +30,6 @@ const themeStore = useTheming()
 
 const { formatMessage } = useVIntl()
 
-const { downloadProgress, downloadVersion, unlisten } = await useDownloadProgress()
-
 const devModeCounter = ref(0)
 
 const developerModeEnabled = defineMessage({
@@ -100,6 +98,8 @@ function show() {
 const isOpen = computed(() => modal.value?.isOpen)
 
 defineExpose({ show, isOpen })
+
+const { downloadProgress, downloadVersion, unlisten } = await useDownloadProgress()
 
 const version = await getVersion()
 const osPlatform = getOsPlatform()
