@@ -1,8 +1,95 @@
 .light-properties {
-	--color-bg: #ebebeb;
-	--color-raised-bg: #ffffff;
-	--color-super-raised-bg: #e9e9e9;
-	--color-button-bg: #f5f5f5;
+	--surface-l1: #ebebeb;
+	--surface-l2: #ffffff;
+	--surface-l3: #f5f5f5;
+	--surface-l4: #eeeeee;
+	--surface-l5: #e6e6e6;
+
+	--color-red-50: #fef2f2;
+	--color-red-100: #fee5e7;
+	--color-red-200: #fccfd3;
+	--color-red-300: #faa7b1;
+	--color-red-400: #f67687;
+	--color-red-500: #ed4661;
+	--color-red-600: #cb2245;
+	--color-red-700: #b7193d;
+	--color-red-800: #9a1739;
+	--color-red-900: #841738;
+	--color-red-950: #490819;
+	--color-red: var(--color-red-600);
+
+	--color-orange-50: #fdf8ed;
+	--color-orange-100: #f9eacc;
+	--color-orange-200: #f2d495;
+	--color-orange-300: #ecb85d;
+	--color-orange-400: #e7a038;
+	--color-orange-500: #e08325;
+	--color-orange-600: #c66019;
+	--color-orange-700: #a44419;
+	--color-orange-800: #86351a;
+	--color-orange-900: #6e2d19;
+	--color-orange-950: #3f1509;
+	--color-orange: var(--color-orange-500);
+
+	--color-green-50: #eefff6;
+	--color-green-100: #d7ffeb;
+	--color-green-200: #b2ffd9;
+	--color-green-300: #76ffbc;
+	--color-green-400: #33f598;
+	--color-green-500: #09de78;
+	--color-green-600: #00af5c;
+	--color-green-700: #04914f;
+	--color-green-800: #0a7141;
+	--color-green-900: #0a5d38;
+	--color-green-950: #00341d;
+	--color-green: var(--color-green-600);
+
+	--color-blue-50: #f2f7fd;
+	--color-blue-100: #e4ecfa;
+	--color-blue-200: #c3d9f4;
+	--color-blue-300: #8ebaeb;
+	--color-blue-400: #5196df;
+	--color-blue-500: #2b79cc;
+	--color-blue-600: #1f68c0;
+	--color-blue-700: #184b8c;
+	--color-blue-800: #184174;
+	--color-blue-900: #193861;
+	--color-blue-950: #112340;
+	--color-blue: var(--color-blue-600);
+
+	--color-purple-50: #faf5ff;
+	--color-purple-100: #f2e7ff;
+	--color-purple-200: #e7d3ff;
+	--color-purple-300: #d4b1ff;
+	--color-purple-400: #ba7eff;
+	--color-purple-500: #9f4dff;
+	--color-purple-600: #8e32f3;
+	--color-purple-700: #761ad6;
+	--color-purple-800: #651bae;
+	--color-purple-900: #53178c;
+	--color-purple-950: #370368;
+	--color-purple: var(--color-purple-600);
+
+	--color-gray-50: #f5f5f6;
+	--color-gray-100: #e5e5e8;
+	--color-gray-200: #cecfd3;
+	--color-gray-300: #adb0b3;
+	--color-gray-400: #83868d;
+	--color-gray-500: #686a72;
+	--color-gray-600: #595b61;
+	--color-gray-700: #4c4e52;
+	--color-gray-800: #434447;
+	--color-gray-900: #3b3b3e;
+	--color-gray-950: #252627;
+	--color-gray: var(--color-gray-600);
+
+	// ===
+
+	--color-bg: var(--surface-l1);
+	--color-raised-bg: var(--surface-l3);
+	--color-super-raised-bg: var(--surface-l4);
+
+	--color-button-bg: var(--surface-l4);
 	--color-button-border: rgba(161, 161, 161, 0.35);
 	--color-scrollbar: #96a2b0;
 
@@ -13,13 +100,6 @@
 	--color-secondary: #484d54;
 	--color-contrast: #1a202c;
 	--color-accent-contrast: #ffffff;
-
-	--color-red: #cb2245;
-	--color-orange: #e08325;
-	--color-green: #00af5c;
-	--color-blue: #1f68c0;
-	--color-purple: #8e32f3;
-	--color-gray: #595b61;
 
 	--color-red-highlight: rgba(203, 34, 69, 0.25);
 	--color-orange-highlight: rgba(224, 131, 37, 0.25);
@@ -133,10 +213,97 @@ html {
 .dark-mode,
 .dark,
 :root[data-theme='dark'] {
-	--color-bg: #16181c;
-	--color-raised-bg: #26292f;
-	--color-super-raised-bg: #40434a;
-	--color-button-bg: #33363d;
+	--surface-l1: #16181c;
+	--surface-l2: #1d1f23;
+	--surface-l3: #27292e;
+	--surface-l4: #34363c;
+	--surface-l5: #42444a;
+
+	--color-red-50: #fff0f1;
+	--color-red-100: #ffe2e6;
+	--color-red-200: #ffcad3;
+	--color-red-300: #ff9fae;
+	--color-red-400: #ff6984;
+	--color-red-500: #ff496e;
+	--color-red-600: #ed1148;
+	--color-red-700: #c8083d;
+	--color-red-800: #a8093a;
+	--color-red-900: #8f0c38;
+	--color-red-950: #50011a;
+	--color-red: var(--color-red-500);
+
+	--color-orange-50: #fff8ed;
+	--color-orange-100: #ffefd4;
+	--color-orange-200: #ffdba8;
+	--color-orange-300: #ffc171;
+	--color-orange-400: #ffa347;
+	--color-orange-500: #fe7e11;
+	--color-orange-600: #ef6307;
+	--color-orange-700: #c64808;
+	--color-orange-800: #9d3a0f;
+	--color-orange-900: #7e3110;
+	--color-orange-950: #441606;
+	--color-orange: var(--color-orange-400);
+
+	--color-green-50: #effef5;
+	--color-green-100: #dafee8;
+	--color-green-200: #b8fad2;
+	--color-green-300: #81f4af;
+	--color-green-400: #42e686;
+	--color-green-500: #1bd96a;
+	--color-green-600: #0faa4f;
+	--color-green-700: #0f8642;
+	--color-green-800: #126937;
+	--color-green-900: #11562f;
+	--color-green-950: #033018;
+	--color-green: var(--color-green-500);
+
+	--color-blue-50: #eef6ff;
+	--color-blue-100: #daeaff;
+	--color-blue-200: #bddaff;
+	--color-blue-300: #90c4ff;
+	--color-blue-400: #4f9cff;
+	--color-blue-500: #357ffc;
+	--color-blue-600: #1f5ff1;
+	--color-blue-700: #1749de;
+	--color-blue-800: #193cb4;
+	--color-blue-900: #1a378e;
+	--color-blue-950: #152356;
+	--color-blue: var(--color-blue-400);
+
+	--color-purple-50: #faf5ff;
+	--color-purple-100: #f4e7ff;
+	--color-purple-200: #ead4ff;
+	--color-purple-300: #dab2ff;
+	--color-purple-400: #c78aff;
+	--color-purple-500: #ac51fb;
+	--color-purple-600: #972eef;
+	--color-purple-700: #821ed2;
+	--color-purple-800: #6e1eab;
+	--color-purple-900: #5a198a;
+	--color-purple-950: #3d0566;
+	--color-purple: var(--color-purple-400);
+
+	--color-gray-50: #f5f7f8;
+	--color-gray-100: #edeff2;
+	--color-gray-200: #dfe2e6;
+	--color-gray-300: #cad0d7;
+	--color-gray-400: #b4bac5;
+	--color-gray-500: #9fa4b3;
+	--color-gray-600: #8a8da1;
+	--color-gray-700: #777b8b;
+	--color-gray-800: #616472;
+	--color-gray-900: #52555d;
+	--color-gray-950: #303136;
+	--color-gray: var(--color-gray-500);
+
+	// ===
+
+	--color-bg: var(--surface-l1);
+	--color-raised-bg: var(--surface-l3);
+	--color-super-raised-bg: var(--surface-l4);
+
+	--color-button-bg: var(--surface-l4);
 	--color-button-border: rgba(193, 190, 209, 0.12);
 	--color-scrollbar: var(--color-button-bg);
 
@@ -147,13 +314,6 @@ html {
 	--color-secondary: #96a2b0;
 	--color-contrast: var(--dark-color-contrast);
 	--color-accent-contrast: #000000;
-
-	--color-red: #ff496e;
-	--color-orange: #ffa347;
-	--color-green: #1bd96a;
-	--color-blue: #4f9cff;
-	--color-purple: #c78aff;
-	--color-gray: #9fa4b3;
 
 	--color-red-highlight: rgba(255, 73, 110, 0.25);
 	--color-orange-highlight: rgba(255, 163, 71, 0.25);
@@ -220,8 +380,12 @@ html {
 
 .oled-mode {
 	@extend .dark-mode;
-	--color-bg: #000000;
-	--color-raised-bg: #101013;
+	--surface-l1: #000000;
+	--surface-l2: #101013;
+	--surface-l3: #1b1b20;
+	--surface-l4: #25262b;
+	--surface-l5: #2e2f34;
+
 	--color-button-bg: #222329;
 
 	--color-ad: #0d1828;
