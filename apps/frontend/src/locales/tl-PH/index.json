@@ -1,0 +1,188 @@
+{
+  "app-marketing.download.download-appimage": {
+    "message": "Ibaba ang sipi ng AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Ibaba ang sipi ng beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Ibaba ang sipi ng DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Ibaba ang sipi ng RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Mga pagpipilian sa pagbaba ng sipi"
+  },
+  "app-marketing.download.title": {
+    "message": "Ibaba ang sipi ng Aplikasyon ng Modrinth (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Bukas na batis"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Aplikasyon ng Modrinth"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Gamitin ang Aplikasyon ng Modrinth sa pagbaba ng sipi at paglaro ng iyong mga paboritong pambago at balot ng pambago."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Ibaba ang sipi ng Aplikasyon ng Modrinth"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Mga kagustuhan sa akawnt"
+  },
+  "collection.button.edit-icon": {
+    "message": "Baguhin ang lambana"
+  },
+  "collection.button.remove-project": {
+    "message": "Tanggalin ang panukala"
+  },
+  "collection.delete-modal.description": {
+    "message": "Habambuhay na matatanggal ang pagtitipong ito. Hindi mababawi ang pagkilos na ito."
+  },
+  "landing.feature.launcher.description": {
+    "message": "Binibigyang-daan ng bukas na batis na API ng Modrinth ang mga tagapaglunsad na makadagdag ng malalimang pagsasama sa Modrinth. Maaari mong gamitin ang Modrinth sa <link>aming aplikasyon</link> at sa iilang pinakasikat na mga tagapaglunsad gaya ng ATLauncher, MultiMC, at Prism Launcher."
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "mga balot ng mapagkukunan"
+  },
+  "landing.subheading": {
+    "message": "Magtuklas, maglaro, at magbahagi ng mga kontentong Minecraft sa aming bukas na batis na platapormang ginawa para sa pamayanan."
+  },
+  "layout.banner.add-email.button": {
+    "message": "Mga kagustuhan sa akawnt"
+  },
+  "layout.footer.about": {
+    "message": "Tungkol"
+  },
+  "layout.footer.about.careers": {
+    "message": "Mga Karera"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Tala ng Pagbabago"
+  },
+  "layout.footer.about.news": {
+    "message": "Balita"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Programa ng Gantimpala"
+  },
+  "layout.footer.about.status": {
+    "message": "Katayuan"
+  },
+  "layout.footer.legal": {
+    "message": "Pambatas"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "HINDI OPISYAL NA SERBISYO NG MINECRAFT. HINDI APRUBADO O KAAKIBAT NG MOJANG O MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Patakaran sa Karapatang-Sipi at DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Patakaran sa Pribasiya"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Mga Tuntuning sa Content"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Paunawa sa Kaligtasan"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Mga Tuntunin sa Paggamit"
+  },
+  "layout.footer.open-source": {
+    "message": "<github-link>Bukas na batis</github-link> ang Modrinth."
+  },
+  "layout.footer.products": {
+    "message": "Mga Produkto"
+  },
+  "layout.footer.products.app": {
+    "message": "Aplikasyon ng Modrinth"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Mga Modrinth na Tagapagsilbi"
+  },
+  "layout.footer.resources": {
+    "message": "Mga Mapagkukunan"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "Mga kasalatan ng API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Sentro ng Pagtulong"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Mag-ulat ng mga isyu"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Isalin"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Mga Balot ng Mapagkukunan"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Balot ng Mapagkukunan"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "Kakaunlad lang ng aming sistema sa Mga Kapaligiran sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Wala kang pahintulot na magbago sa mga kagustuhang ito, mangyaring ipaalam sa isa pang kasapi ng panukala na kailangang mapatunayan ang maayos na malak ng kapaligiran."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Kailangang suriin ang maayos na malak ng kapaligiran"
+  },
+  "project.environment.migration.message": {
+    "message": "Kakaunlad lang ng aming kaayusan sa Mga Kapaligiran sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring bisitahin ang mga kagustuhan ng iyong panukala at patunaying tama ang maayos na malak."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Suriin ang mga kagustuhan sa kapaligiran"
+  },
+  "project.environment.migration.title": {
+    "message": "Pakisuri sa maayos na malak ng kapaligiran"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Wala pang maayos na malak sa kapaligiran ang iyong panukala, pakipili ng wasto sa ibaba."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Pakipili sa kapaligiran ng iyong panukala"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "Marami ang kapaligiran ng iyong panukala"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "Kakaunlad lang ng aming sistema sa Mga Kapaligiran sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring suriin na tama ang napili sa ibaba at pindutin ang 'Patunayan' kapag tapos ka na!"
+  },
+  "project.settings.title": {
+    "message": "Mga Kagustuhan"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Pahina ng mga Balot ng Mapagkukunan"
+  }
+}

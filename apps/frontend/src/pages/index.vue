@@ -3,40 +3,43 @@
 		<div class="landing-hero">
 			<ModrinthIcon class="modrinth-icon text-brand" />
 			<h1 class="main-header">
-				The place for Minecraft
-				<div class="animate-strong">
-					<span>
-						<strong
-							v-for="projectType in tags.projectTypes"
-							:key="projectType.id"
-							class="main-header-strong"
-						>
-							{{ projectType.display }}s <br />
-						</strong>
-						<strong class="main-header-strong">servers <br /></strong>
-						<strong class="main-header-strong">mods</strong>
-					</span>
-				</div>
+				<IntlFormatted :message-id="messages.thePlaceForMinecraft">
+					<template #~content>
+						<div class="animate-strong">
+							<span>
+								<strong
+									v-for="[key, message] in Object.entries(contentTypeMessages)"
+									:key="`landing-content-type-${key}`"
+									class="main-header-strong"
+								>
+									{{ formatMessage(message) }} <br />
+								</strong>
+								<strong class="main-header-strong">
+									{{ formatMessage(contentTypeMessages.mods) }}
+								</strong>
+							</span>
+						</div>
+					</template>
+				</IntlFormatted>
 			</h1>
 			<h2>
-				Discover, play, and share Minecraft content through our open-source platform built for the
-				community.
+				{{ formatMessage(messages.discoverHeading) }}
 			</h2>
 			<div class="button-group">
 				<ButtonStyled color="brand" size="large">
 					<nuxt-link to="/mods">
 						<CompassIcon aria-hidden="true" />
-						Discover mods
+						{{ formatMessage(messages.discoverMods) }}
 					</nuxt-link>
 				</ButtonStyled>
 				<ButtonStyled size="large" type="outlined">
 					<nuxt-link v-if="!auth.user" to="/auth/sign-up" rel="noopener nofollow">
 						<LogInIcon aria-hidden="true" />
-						Sign up
+						{{ formatMessage(commonMessages.signUpButton) }}
 					</nuxt-link>
 					<nuxt-link v-else to="/dashboard/projects">
 						<DashboardIcon aria-hidden="true" />
-						Go to dashboard
+						{{ formatMessage(messages.goToDashboard) }}
 					</nuxt-link>
 				</ButtonStyled>
 			</div>
@@ -65,44 +68,46 @@
 				</div>
 			</div>
 			<div v-else class="relative z-[10] w-full text-center text-xl font-bold text-contrast">
-				Failed to load random projects :(
+				{{ formatMessage(messages.failedToLoadRandomProjects) }}
 			</div>
 			<div class="projects-transition" />
 			<div class="users-section">
 				<div class="section-header">
-					<div class="section-label green">For Players</div>
-					<h2 class="section-tagline">Discover over 50,000 creations</h2>
+					<div class="section-label green">{{ formatMessage(messages.forPlayersLabel) }}</div>
+					<h2 class="section-tagline">
+						{{ formatMessage(messages.discoverCreationsTagline, { count: formattedProjectCount }) }}
+					</h2>
 					<p class="section-description">
-						From magical biomes to cursed dungeons, you can be sure to find content to bring your
-						gameplay to the next level.
+						{{ formatMessage(messages.playersDescription) }}
 					</p>
 				</div>
 				<div class="feature-blob">
 					<div class="blob-text">
-						<h3>Find what you want, quickly and easily</h3>
+						<h3>{{ formatMessage(messages.findWhatYouWantHeading) }}</h3>
 						<p>
-							Modrinth's lightning-fast search and powerful filters let you find what you want as
-							you type.
+							{{ formatMessage(messages.findWhatYouWantDescription) }}
 						</p>
 					</div>
 					<div class="blob-demonstration gradient-border bigger">
 						<div class="demo-search">
 							<div class="search-controls">
 								<div class="iconified-input">
-									<label class="hidden" for="search">Search</label>
+									<label class="hidden" for="search">{{
+										formatMessage(messages.searchLabel)
+									}}</label>
 									<SearchIcon aria-hidden="true" />
 									<input
 										id="search"
 										v-model="searchQuery"
 										type="search"
 										name="search"
-										:placeholder="`Search...`"
+										:placeholder="formatMessage(messages.searchPlaceholder)"
 										autocomplete="off"
 										@input="updateSearchProjects"
 									/>
 								</div>
 								<div class="sort-by">
-									<span class="label">Sort by</span>
+									<span class="label">{{ formatMessage(messages.sortByLabel) }}</span>
 									<Multiselect
 										v-model="sortType"
 										placeholder="Select one"
@@ -145,12 +150,12 @@
 				</div>
 				<div class="feature-blob reverse">
 					<div class="blob-text">
-						<h3>Follow projects you love</h3>
-						<p>Get notified every time your favorite projects update and stay in the loop</p>
+						<h3>{{ formatMessage(messages.followProjectsHeading) }}</h3>
+						<p>{{ formatMessage(messages.followProjectsDescription) }}</p>
 					</div>
 					<div class="blob-demonstration gradient-border">
 						<div class="notifs-demo">
-							<h3>Notifications</h3>
+							<h3>{{ formatMessage(messages.notificationsHeading) }}</h3>
 							<div class="notifications">
 								<div
 									v-for="(notification, index) in notifications"
@@ -168,24 +173,24 @@
 											:to="`${notification.project_type}/${notification.slug}`"
 											class="notif-header"
 										>
-											{{ notification.title }} has been updated!
+											{{ formatMessage(messages.hasBeenUpdated, { title: notification.title }) }}
 										</nuxt-link>
 										<p class="notif-desc">
-											Version {{ ['1.1.2', '1.0.3', '15.1'][index] }} has been released for
 											{{
-												$capitalizeString(
-													notification.display_categories[
-														notification.display_categories.length - 1
-													],
-												)
+												formatMessage(messages.versionReleased, {
+													version: ['1.1.2', '1.0.3', '15.1'][index],
+													gameVersion: notification.versions[notification.versions.length - 1],
+												})
 											}}
-											{{ notification.versions[notification.versions.length - 1] }}
 										</p>
 										<div class="date">
 											<CalendarIcon aria-hidden="true" />
 											<span>
-												Received
-												{{ formatRelativeTime(notification.date_modified) }}
+												{{
+													formatMessage(messages.receivedTime, {
+														time: formatRelativeTime(notification.date_modified),
+													})
+												}}
 											</span>
 										</div>
 									</div>
@@ -196,12 +201,15 @@
 				</div>
 				<div class="feature-blob">
 					<div class="blob-text">
-						<h3>Play with your favorite launcher</h3>
+						<h3>{{ formatMessage(messages.playWithLauncherHeading) }}</h3>
 						<p>
-							Modrinth's open-source API lets launchers add deep integration with Modrinth. You can
-							use Modrinth through
-							<nuxt-link class="title-link" to="/app">our own app</nuxt-link>
-							and some of the most popular launchers like ATLauncher, MultiMC, and Prism Launcher.
+							<IntlFormatted :message-id="messages.playWithLauncherDescription">
+								<template #link="{ children }">
+									<nuxt-link class="title-link" to="/app">
+										<component :is="() => children" />
+									</nuxt-link>
+								</template>
+							</IntlFormatted>
 						</p>
 					</div>
 					<div class="blob-demonstration gradient-border">
@@ -209,13 +217,13 @@
 							<img
 								v-if="$theme.active === 'light'"
 								src="https://cdn.modrinth.com/landing-new/launcher-light.webp"
-								alt="launcher graphic"
+								:alt="formatMessage(messages.launcherGraphicAlt)"
 								class="minecraft-screen"
 							/>
 							<img
 								v-else
 								src="https://cdn.modrinth.com/landing-new/launcher.webp"
-								alt="launcher graphic"
+								:alt="formatMessage(messages.launcherGraphicAlt)"
 								class="minecraft-screen"
 							/>
 							<div class="launcher-graphics">
@@ -223,15 +231,15 @@
 									rel="noopener"
 									href="https://prismlauncher.org/"
 									class="graphic gradient-border"
-									title="Prism Launcher"
-									aria-label="Prism Launcher"
+									:title="formatMessage(messages.prismLauncherLabel)"
+									:aria-label="formatMessage(messages.prismLauncherLabel)"
 								>
 									<PrismLauncherLogo aria-hidden="true" />
 								</a>
 								<nuxt-link
 									to="/app"
 									class="graphic gradient-border text-brand"
-									aria-label="Modrinth App"
+									:aria-label="formatMessage(messages.modrinthAppLabel)"
 								>
 									<ModrinthIcon aria-hidden="true" />
 								</nuxt-link>
@@ -239,8 +247,8 @@
 									rel="noopener"
 									href="https://atlauncher.com/"
 									class="graphic gradient-border"
-									title="ATLauncher"
-									aria-label="ATLauncher"
+									:title="formatMessage(messages.atlauncherLabel)"
+									:aria-label="formatMessage(messages.atlauncherLabel)"
 								>
 									<ATLauncherLogo aria-hidden="true" />
 								</a>
@@ -252,10 +260,10 @@
 		</div>
 		<div class="creator-section">
 			<div class="section-header">
-				<div class="section-label blue">For Creators</div>
-				<h2 class="section-tagline">Share your content with the world</h2>
+				<div class="section-label blue">{{ formatMessage(messages.forCreatorsLabel) }}</div>
+				<h2 class="section-tagline">{{ formatMessage(messages.shareContentTagline) }}</h2>
 				<p class="section-description">
-					Give an online home to your creations and reach a massive audience of dedicated players
+					{{ formatMessage(messages.creatorsDescription) }}
 				</p>
 			</div>
 			<div class="features">
@@ -281,10 +289,9 @@
 							</defs>
 						</svg>
 					</div>
-					<h3>Discovery</h3>
+					<h3>{{ formatMessage(creatorFeatureMessages.discoveryTitle) }}</h3>
 					<p>
-						Get your project discovered by thousands of users through search, our home page, Discord
-						server, and more ways to come in the future!
+						{{ formatMessage(creatorFeatureMessages.discoveryDescription) }}
 					</p>
 				</div>
 				<div class="feature gradient-border">
@@ -309,8 +316,8 @@
 							</defs>
 						</svg>
 					</div>
-					<h3>Team Management</h3>
-					<p>Invite your teammates and manage roles and permissions with ease</p>
+					<h3>{{ formatMessage(creatorFeatureMessages.teamManagementTitle) }}</h3>
+					<p>{{ formatMessage(creatorFeatureMessages.teamManagementDescription) }}</p>
 				</div>
 				<div class="feature gradient-border">
 					<div class="icon gradient-border">
@@ -334,8 +341,8 @@
 							</defs>
 						</svg>
 					</div>
-					<h3>Monetization</h3>
-					<p>Get paid ad revenue from your project pages and withdraw your funds at any time</p>
+					<h3>{{ formatMessage(creatorFeatureMessages.monetizationTitle) }}</h3>
+					<p>{{ formatMessage(creatorFeatureMessages.monetizationDescription) }}</p>
 				</div>
 				<div class="feature gradient-border">
 					<div class="icon gradient-border">
@@ -359,10 +366,9 @@
 							</defs>
 						</svg>
 					</div>
-					<h3>Diverse Ecosystem</h3>
+					<h3>{{ formatMessage(creatorFeatureMessages.diverseEcosystemTitle) }}</h3>
 					<p>
-						Integrate with your build tools through Minotaur for automatic uploads right when you
-						release a new version
+						{{ formatMessage(creatorFeatureMessages.diverseEcosystemDescription) }}
 					</p>
 				</div>
 				<div class="feature gradient-border">
@@ -387,8 +393,8 @@
 							</defs>
 						</svg>
 					</div>
-					<h3>Data and Statistics</h3>
-					<p>Get detailed reports on page views, download counts, and revenue</p>
+					<h3>{{ formatMessage(creatorFeatureMessages.dataStatisticsTitle) }}</h3>
+					<p>{{ formatMessage(creatorFeatureMessages.dataStatisticsDescription) }}</p>
 				</div>
 				<div class="feature gradient-border">
 					<div class="icon gradient-border">
@@ -412,9 +418,9 @@
 							</defs>
 						</svg>
 					</div>
-					<h3>Constantly Evolving</h3>
+					<h3>{{ formatMessage(creatorFeatureMessages.constantlyEvolvingTitle) }}</h3>
 					<p>
-						Get the best modding experience possible with constant updates from the Modrinth team
+						{{ formatMessage(creatorFeatureMessages.constantlyEvolvingDescription) }}
 					</p>
 				</div>
 			</div>
@@ -433,7 +439,9 @@ import {
 	ModrinthIcon,
 	SearchIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, useRelativeTime } from '@modrinth/ui'
+import { Avatar, ButtonStyled, commonMessages, useRelativeTime } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { IntlFormatted } from '@vintl/vintl/components'
 import { ref } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 
@@ -445,11 +453,16 @@ import { homePageNotifs, homePageProjects, homePageSearch } from '~/generated/st
 
 const formatRelativeTime = useRelativeTime()
 
+const { formatMessage } = useVIntl()
+
 const searchQuery = ref('leave')
 const sortType = ref('relevance')
 
+const PROJECT_COUNT = 75000
+const formatNumber = new Intl.NumberFormat().format
+const formattedProjectCount = computed(() => formatNumber(PROJECT_COUNT))
+
 const auth = await useAuth()
-const tags = useTags()
 
 const newProjects = homePageProjects?.slice(0, 40)
 const val = Math.ceil(newProjects?.length / 3)
@@ -473,6 +486,213 @@ async function updateSearchProjects() {
 
 	searchProjects.value = res?.hits ?? []
 }
+
+const messages = defineMessages({
+	thePlaceForMinecraft: {
+		id: 'landing.heading.the-place-for-minecraft',
+		defaultMessage: 'The place for Minecraft {content}',
+	},
+	discoverHeading: {
+		id: 'landing.subheading',
+		defaultMessage:
+			'Discover, play, and share Minecraft content through our open-source platform built for the community.',
+	},
+	discoverMods: {
+		id: 'landing.button.discover-mods',
+		defaultMessage: 'Discover mods',
+	},
+	goToDashboard: {
+		id: 'landing.button.go-to-dashboard',
+		defaultMessage: 'Go to dashboard',
+	},
+	failedToLoadRandomProjects: {
+		id: 'landing.error.failedToLoadRandomProjects',
+		defaultMessage: 'Failed to load random projects :(',
+	},
+	forPlayersLabel: {
+		id: 'landing.section.for-players.label',
+		defaultMessage: 'For Players',
+	},
+	forCreatorsLabel: {
+		id: 'landing.section.for-creators.label',
+		defaultMessage: 'For Creators',
+	},
+	discoverCreationsTagline: {
+		id: 'landing.section.for-players.tagline',
+		defaultMessage: 'Discover over {count} creations',
+	},
+	shareContentTagline: {
+		id: 'landing.section.for-creators.tagline',
+		defaultMessage: 'Share your content with the world',
+	},
+	playersDescription: {
+		id: 'landing.section.for-players.description',
+		defaultMessage:
+			'From magical biomes to cursed dungeons, you can be sure to find content to bring your gameplay to the next level.',
+	},
+	creatorsDescription: {
+		id: 'landing.section.for-creators.description',
+		defaultMessage:
+			'Give an online home to your creations and reach a massive audience of dedicated players.',
+	},
+	findWhatYouWantHeading: {
+		id: 'landing.feature.search.heading',
+		defaultMessage: 'Find what you want, quickly and easily',
+	},
+	findWhatYouWantDescription: {
+		id: 'landing.feature.search.description',
+		defaultMessage:
+			"Modrinth's lightning-fast search and powerful filters let you find what you want as you type.",
+	},
+	followProjectsHeading: {
+		id: 'landing.feature.follow.heading',
+		defaultMessage: 'Follow projects you love',
+	},
+	followProjectsDescription: {
+		id: 'landing.feature.follow.description',
+		defaultMessage: 'Get notified every time your favorite projects update and stay in the loop.',
+	},
+	playWithLauncherHeading: {
+		id: 'landing.feature.launcher.heading',
+		defaultMessage: 'Play with your favorite launcher',
+	},
+	playWithLauncherDescription: {
+		id: 'landing.feature.launcher.description',
+		defaultMessage:
+			"Modrinth's open-source API lets launchers add deep integration with Modrinth. You can use Modrinth through <link>our own app</link> and some of the most popular launchers like ATLauncher, MultiMC, and Prism Launcher.",
+	},
+	searchPlaceholder: {
+		id: 'landing.search.placeholder',
+		defaultMessage: 'Search...',
+	},
+	searchLabel: {
+		id: 'landing.search.label',
+		defaultMessage: 'Search',
+	},
+	sortByLabel: {
+		id: 'landing.search.sort-by.label',
+		defaultMessage: 'Sort by',
+	},
+	notificationsHeading: {
+		id: 'landing.notifications.heading',
+		defaultMessage: 'Notifications',
+	},
+	hasBeenUpdated: {
+		id: 'landing.notifications.has-been-updated',
+		defaultMessage: '{title} has been updated!',
+	},
+	versionReleased: {
+		id: 'landing.notifications.version-released',
+		defaultMessage: 'Version {version} has been released for {gameVersion}',
+	},
+	receivedTime: {
+		id: 'landing.notifications.received-time',
+		defaultMessage: 'Received {time}',
+	},
+	launcherGraphicAlt: {
+		id: 'landing.launcher.graphic-alt',
+		defaultMessage:
+			'A simplified representation of a Minecraft window, with the Mojang Studios logo in Modrinth green.',
+	},
+	prismLauncherLabel: {
+		id: 'landing.launcher.prism-launcher-label',
+		defaultMessage: 'Prism Launcher',
+	},
+	modrinthAppLabel: {
+		id: 'landing.launcher.modrinth-app-label',
+		defaultMessage: 'Modrinth App',
+	},
+	atlauncherLabel: {
+		id: 'landing.launcher.atlauncher-label',
+		defaultMessage: 'ATLauncher',
+	},
+})
+
+const contentTypeMessages = defineMessages({
+	mods: {
+		id: 'landing.heading.the-place-for-minecraft.mods',
+		defaultMessage: 'mods',
+	},
+	resourcePacks: {
+		id: 'landing.heading.the-place-for-minecraft.resource-packs',
+		defaultMessage: 'resource packs',
+	},
+	dataPacks: {
+		id: 'landing.heading.the-place-for-minecraft.data-packs',
+		defaultMessage: 'data packs',
+	},
+	shaders: {
+		id: 'landing.heading.the-place-for-minecraft.shaders',
+		defaultMessage: 'shaders',
+	},
+	modpacks: {
+		id: 'landing.heading.the-place-for-minecraft.modpacks',
+		defaultMessage: 'modpacks',
+	},
+	plugins: {
+		id: 'landing.heading.the-place-for-minecraft.plugins',
+		defaultMessage: 'plugins',
+	},
+	servers: {
+		id: 'landing.heading.the-place-for-minecraft.servers',
+		defaultMessage: 'servers',
+	},
+})
+
+const creatorFeatureMessages = defineMessages({
+	discoveryTitle: {
+		id: 'landing.creator.feature.discovery.title',
+		defaultMessage: 'Discovery',
+	},
+	discoveryDescription: {
+		id: 'landing.creator.feature.discovery.description',
+		defaultMessage:
+			'Get your project discovered by thousands of users through search, our home page, Discord server, and more ways to come in the future!',
+	},
+	teamManagementTitle: {
+		id: 'landing.creator.feature.team-management.title',
+		defaultMessage: 'Team Management',
+	},
+	teamManagementDescription: {
+		id: 'landing.creator.feature.team-management.description',
+		defaultMessage: 'Invite your teammates and manage roles and permissions with ease',
+	},
+	monetizationTitle: {
+		id: 'landing.creator.feature.monetization.title',
+		defaultMessage: 'Monetization',
+	},
+	monetizationDescription: {
+		id: 'landing.creator.feature.monetization.description',
+		defaultMessage:
+			'Get paid ad revenue from your project pages and withdraw your funds at any time',
+	},
+	diverseEcosystemTitle: {
+		id: 'landing.creator.feature.diverse-ecosystem.title',
+		defaultMessage: 'Diverse Ecosystem',
+	},
+	diverseEcosystemDescription: {
+		id: 'landing.creator.feature.diverse-ecosystem.description',
+		defaultMessage:
+			'Integrate with your build tools through Minotaur for automatic uploads right when you release a new version',
+	},
+	dataStatisticsTitle: {
+		id: 'landing.creator.feature.data-statistics.title',
+		defaultMessage: 'Data and Statistics',
+	},
+	dataStatisticsDescription: {
+		id: 'landing.creator.feature.data-statistics.description',
+		defaultMessage: 'Get detailed reports on page views, download counts, and revenue',
+	},
+	constantlyEvolvingTitle: {
+		id: 'landing.creator.feature.constantly-evolving.title',
+		defaultMessage: 'Constantly Evolving',
+	},
+	constantlyEvolvingDescription: {
+		id: 'landing.creator.feature.constantly-evolving.description',
+		defaultMessage:
+			'Get the best modding experience possible with constant updates from the Modrinth team',
+	},
+})
 </script>
 
 <style lang="scss" scoped>
@@ -764,10 +984,14 @@ async function updateSearchProjects() {
 							display: flex;
 							gap: 0.75rem;
 							align-items: center;
-							min-width: 12.25rem;
+
+							.label {
+								white-space: nowrap;
+							}
 
 							.selector {
-								max-width: 8rem;
+								min-width: 8rem;
+								white-space: nowrap;
 							}
 
 							@media screen and (max-width: 500px) {
@@ -1065,6 +1289,7 @@ async function updateSearchProjects() {
 	font-weight: 600;
 	line-height: 100%;
 	margin: 0 0 0.25rem;
+	width: 100%;
 }
 
 .main-header-strong {
@@ -1076,6 +1301,7 @@ async function updateSearchProjects() {
 	-webkit-text-fill-color: transparent;
 	-moz-text-fill-color: transparent;
 	color: transparent;
+	white-space: nowrap;
 }
 
 .animate-strong {
@@ -1089,7 +1315,7 @@ async function updateSearchProjects() {
 	> span {
 		position: absolute;
 		top: 0;
-		animation: slide 12s infinite;
+		animation: slide 14s infinite;
 
 		@media (prefers-reduced-motion) {
 			animation-play-state: paused !important;
@@ -1098,39 +1324,35 @@ async function updateSearchProjects() {
 
 	@keyframes slide {
 		0%,
-		10% {
+		12.5% {
 			top: 0;
 		}
-		13%,
-		23% {
+		14.3%,
+		26.8% {
 			top: -1.2em;
 		}
-		26%,
-		36% {
+		28.6%,
+		41.1% {
 			top: -2.4em;
 		}
-		39%,
-		49% {
+		42.9%,
+		55.4% {
 			top: -3.6em;
 		}
-		52%,
-		62% {
+		57.2%,
+		69.7% {
 			top: -4.8em;
 		}
-		65%,
-		75% {
+		71.5%,
+		84% {
 			top: -6em;
 		}
-		78%,
-		88% {
+		85.8%,
+		98.3% {
 			top: -7.2em;
 		}
-		99.99997%,
-		99.99998% {
+		100% {
 			top: -8.4em;
-		}
-		99.99999% {
-			top: 0;
 		}
 	}
 }

@@ -4,8 +4,8 @@ use std::time::Duration;
 use actix_web::web;
 use database::redis::RedisPool;
 use queue::{
-    analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
-    socket::ActiveSockets,
+    analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
+    session::AuthQueue, socket::ActiveSockets,
 };
 use sqlx::Postgres;
 use tracing::{info, warn};
@@ -15,8 +15,8 @@ use clickhouse_crate::Client;
 use util::cors::default_cors;
 
 use crate::background_task::update_versions;
+use crate::database::ReadOnlyPgPool;
 use crate::queue::moderation::AutomatedModerationQueue;
-use crate::queue::payouts::insert_bank_balances;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
@@ -43,6 +43,7 @@ pub struct Pepper {
 #[derive(Clone)]
 pub struct LabrinthConfig {
     pub pool: sqlx::Pool<Postgres>,
+    pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
@@ -57,17 +58,20 @@ pub struct LabrinthConfig {
     pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
     pub rate_limiter: web::Data<AsyncRateLimiter>,
     pub stripe_client: stripe::Client,
+    pub email_queue: web::Data<EmailQueue>,
 }
 
 #[allow(clippy::too_many_arguments)]
 pub fn app_setup(
     pool: sqlx::Pool<Postgres>,
+    ro_pool: ReadOnlyPgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     maxmind: Arc<queue::maxmind::MaxMindIndexer>,
     stripe_client: stripe::Client,
+    email_queue: EmailQueue,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!(
@@ -89,7 +93,7 @@ pub fn app_setup(
         });
     }
 
-    let mut scheduler = scheduler::Scheduler::new();
+    let scheduler = scheduler::Scheduler::new();
 
     let limiter = web::Data::new(AsyncRateLimiter::new(
         redis_pool.clone(),
@@ -144,11 +148,13 @@ pub fn app_setup(
 
         let pool_ref = pool.clone();
         let client_ref = clickhouse.clone();
+        let redis_pool_ref = redis_pool.clone();
         scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
             let pool_ref = pool_ref.clone();
             let client_ref = client_ref.clone();
+            let redis_ref = redis_pool_ref.clone();
             async move {
-                background_task::payouts(pool_ref, client_ref).await;
+                background_task::payouts(pool_ref, client_ref, redis_ref).await;
             }
         });
 
@@ -252,24 +258,6 @@ pub fn app_setup(
             .to_string(),
     };
 
-    let payouts_queue = web::Data::new(PayoutsQueue::new());
-
-    let payouts_queue_ref = payouts_queue.clone();
-    let pool_ref = pool.clone();
-    scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
-        let payouts_queue_ref = payouts_queue_ref.clone();
-        let pool_ref = pool_ref.clone();
-        async move {
-            info!("Started updating bank balances");
-            let result =
-                insert_bank_balances(&payouts_queue_ref, &pool_ref).await;
-            if let Err(e) = result {
-                warn!("Bank balance update failed: {:?}", e);
-            }
-            info!("Done updating bank balances");
-        }
-    });
-
     let active_sockets = web::Data::new(ActiveSockets::default());
 
     {
@@ -284,6 +272,7 @@ pub fn app_setup(
 
     LabrinthConfig {
         pool,
+        ro_pool,
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
@@ -292,12 +281,13 @@ pub fn app_setup(
         ip_salt,
         search_config,
         session_queue,
-        payouts_queue,
+        payouts_queue: web::Data::new(PayoutsQueue::new()),
         analytics_queue,
         active_sockets,
         automated_moderation_queue,
         rate_limiter: limiter,
         stripe_client,
+        email_queue: web::Data::new(email_queue),
     }
 }
 
@@ -319,10 +309,12 @@ pub fn app_config(
     }))
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
+    .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
     .app_data(web::Data::new(labrinth_config.search_config.clone()))
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
+    .app_data(labrinth_config.email_queue.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
     .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
@@ -367,6 +359,7 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("SITE_URL");
     failed |= check_var::<String>("CDN_URL");
     failed |= check_var::<String>("LABRINTH_ADMIN_KEY");
+    failed |= check_var::<String>("LABRINTH_EXTERNAL_NOTIFICATION_KEY");
     failed |= check_var::<String>("RATE_LIMIT_IGNORE_KEY");
     failed |= check_var::<String>("DATABASE_URL");
     failed |= check_var::<String>("MEILISEARCH_ADDR");
@@ -463,6 +456,8 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("SMTP_HOST");
     failed |= check_var::<u16>("SMTP_PORT");
     failed |= check_var::<String>("SMTP_TLS");
+    failed |= check_var::<String>("SMTP_FROM_NAME");
+    failed |= check_var::<String>("SMTP_FROM_ADDRESS");
 
     failed |= check_var::<String>("SITE_VERIFY_EMAIL_PATH");
     failed |= check_var::<String>("SITE_RESET_PASSWORD_PATH");
@@ -500,6 +495,15 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("BREX_API_KEY");
 
     failed |= check_var::<String>("DELPHI_URL");
+
+    failed |= check_var::<String>("AVALARA_1099_API_URL");
+    failed |= check_var::<String>("AVALARA_1099_API_KEY");
+    failed |= check_var::<String>("AVALARA_1099_API_TEAM_ID");
+    failed |= check_var::<String>("AVALARA_1099_COMPANY_ID");
+
+    failed |= check_var::<String>("COMPLIANCE_PAYOUT_THRESHOLD");
+
+    failed |= check_var::<String>("PAYOUT_ALERT_SLACK_WEBHOOK");
 
     failed |= check_var::<String>("ARCHON_URL");
 

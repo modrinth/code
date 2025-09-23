@@ -1,0 +1,419 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "وضع المطوّر مُفعَّل."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "المظهر"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "خيارات النسخة الافتراضية"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "إعدادات المميزات"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "تثبيتات جافا"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "الخصوصية"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "إدارة الموارد"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "إضافة واللعب"
+  },
+  "instance.add-server.add-server": {
+    "message": "إضافة الخادم"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "معطَّل"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "مفعَّل"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "موجه الأوامر"
+  },
+  "instance.add-server.title": {
+    "message": "إضافة خادم"
+  },
+  "instance.edit-server.title": {
+    "message": "تعديل خادم"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "إخفاء من الصفحة الرئيسية"
+  },
+  "instance.edit-world.name": {
+    "message": "الاسم"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "عالم ماينكرافت"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "إعادة تعيين الأيقونة"
+  },
+  "instance.edit-world.title": {
+    "message": "تعديل العالم"
+  },
+  "instance.filter.disabled": {
+    "message": "المشاريع المعطَّلة"
+  },
+  "instance.filter.updates-available": {
+    "message": "توجد تحديثات متاحة"
+  },
+  "instance.server-modal.address": {
+    "message": "العنوان"
+  },
+  "instance.server-modal.name": {
+    "message": "الاسم"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "خادم ماين كرافت"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "حزمة الموارد"
+  },
+  "instance.settings.tabs.general": {
+    "message": "عام"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "حذف النسخة"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "حذف النسخة"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "يحذف النسخة نهائيًا من جهازك، بما في ذلك عوالمك، إعداداتك، وجميع المحتويات المثبّتة. كن حذرًا، فبمجرد حذف النسخة لن تكون هناك أي طريقة لاستعادتها."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "جاري الحذف..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "نسخ"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "لا يمكن النسخ أثناء التثبيت."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "نسخة النسخة"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "إنشاء."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "تعديل الأيقونة"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "أزل الأيقونة"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "استبدل الأيقونة"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "اختر الأيقونة"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "مجموعات المكتبة"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "إنشاء مجموعة جديدة"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "مجموعات المكتبة تساعدك على ترتيب حالاتك على أقسام مختلفة في مكتبتك."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "إدخال اسم المجموعة"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "الاسم"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "إجراءات تشغيل إضافية"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "إجراءات تشغيل إضافية مخصصة"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "إجراءات التشغيل المضافة تسمح للمستخدمين المتقدمين بإنشاء أوامر نظامية محددة قبل و عند تشغيل اللعبة."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "ما بعد الخروج"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "يتم تشغيله بعد إغلاق اللعبة."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "أدخل أمر ما بعد الخروج..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "ما قبل الإطلاق"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "يتم تشغيله قبل بَدْء تشغيل النسخة."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "أدخل أمر ما قبل الإطلاق..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "خطافات تشغيل اللعبة"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "مُغلِّف"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "أمر غلاف لتشغيل ماين كرافت."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "أدخل أمر الغلاف..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "تثبيت"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} لماين كرافت {game_version} مثبت بالفعل"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "فانيلا {game_version} مُثبّتة بالفعل"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "تغيير الإصدار"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "تثبيت"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "جاري التثبيت"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "جاري جلب إصدارات حزمة المودات"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "جاري تثبيت الإصدار الجديد"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "المثبت حاليًا"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "معلومات التصحيح:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "جاري جلب تفاصيل حزمة المودات"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "إصدار اللعبة"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "تثبيت"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "التثبيت قيد التنفيذ"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "إصدار {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "ماين كرافت {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "تعذّر جلب تفاصيل حزمة المودات المرتبطة. يرجى التحقق من اتصالك بالإنترنت."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} غير متاح لماين كرافت {version}. جرّب محمّل مودات آخر."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "هذه النسخة مرتبطة بحزمة مودات، لكن لم يتم العثور على الحزمة على مودرنث."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "منصّة"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "إعادة تثبيت حزمة المودات"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "جاري إعادة تثبيت حزمة المودات"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "إعادة التثبيت ستُعيد جميع الملفات المثبتة أو المعدلة إلى ما توفره حُزْمة المودات، مع إزالة أي مودات أو محتوى أضفته بعد التثبيت الأصلي. قد يساعد ذلك في حل السلوك غير المتوقع إذا تم تعديل النسخة، لكن إذا كانت عوالمك تعتمد على محتويات إضافية، فقد يتسبب ذلك في تعطلها."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "هل أنت متأكد أنك تريد إعادة تثبيت هذه النسخة؟"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "يعيد محتوى النسخة إلى حالته الأصلية، مع إزالة جميع المودات أو المحتوى الذي أُضيف فوق حزمة المودات الأصلية."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "إعادة تثبيت حزمة المودات"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "إصلاح"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "جاري الإصلاح"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "الإصلاح يعيد تثبيت مكوّنات ماين كرافت ويتحقق من التلف. قد يساعد ذلك في حل المشكلات إذا كانت لعبتك لا تعمل بسبب أخطاء متعلقة ببرنامج التشغيل، لكنه لن يحل المشكلات أو الأعطال الناتجة عن المودات المثبّتة."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "إصلاح النسخة؟"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "الإصلاح قيد التنفيذ"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "إعادة التعيين إلى الحالة الحالية"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "عرض جميع الإصدارات"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "تغيير الإصدار"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "تثبيت"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "إعادة التثبيت"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "إصلاح"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "لا يمكن {action} أثناء التثبيت"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "لا يمكن {action} أثناء عدم الاتصال بالإنترنت"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "لا يمكن {action} أثناء الإصلاح"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(إصدار غير معروف)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "إلغاء ربط النسخة"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "إذا تابعت، فلن تتمكّن من إعادة ربطها إلا بإنشاء نسخة جديدة بالكامل. لن تتلقى بعد ذلك تحديثات حزمة المودات، وستصبح نسخة عادية."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "هل أنت متأكد أنك تريد إلغاء ربط هذه النسخة؟"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "هذه النسخة مرتبطة بحزمة مودات، مما يعني أنه لا يمكن تحديث المودات أو تغيير محمّل المودات أو إصدار ماين كرافت. سيؤدي إلغاء الربط إلى فصل هذه النسخة نهائيًا عن حزمة المودات."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "إلغاء الربط من حزمة المودات"
+  },
+  "instance.settings.tabs.java": {
+    "message": "جافا والذاكرة"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "المتغيرات البيئية"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "الخطافات"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "وسائط جافا"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "تثبيت جافا"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "الذاكرة المخصَّصة"
+  },
+  "instance.settings.tabs.window": {
+    "message": "النافذة"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "إعدادات نافذة مخصّصة"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "ملء الشاشة"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "جعل اللعبة تبدأ في وضع ملء الشاشة عند التشغيل (باستخدام ‎options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "الارتفاع"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "ارتفاع نافذة اللعبة عند التشغيل."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "أدخل الارتفاع..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "العرض"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "عرض نافذة اللعبة عند التشغيل."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "أدخل العرض..."
+  },
+  "instance.settings.title": {
+    "message": "الإعدادات"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "خادم ماين كرافت"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "لا يمكن الاتصال بالخادم"
+  },
+  "instance.worlds.copy_address": {
+    "message": "نسخ العنوان"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "عدم العرض في الصفحة الرئيسية"
+  },
+  "instance.worlds.filter.available": {
+    "message": "متاح"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "النسخة مفتوحة بالفعل"
+  },
+  "instance.worlds.hardcore": {
+    "message": "وضع الهاردكور"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "الخادم غير متوافق"
+  },
+  "instance.worlds.no_contact": {
+    "message": "تعذّر الاتصال بالخادم"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "يمكنك الدخول مباشرة إلى الخوادم فقط على ماين كرافت Alpha 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "يمكنك الدخول مباشرة إلى عوالم اللعب الفردي فقط على ماين كرافت ‎1.20+‎"
+  },
+  "instance.worlds.play_instance": {
+    "message": "تشغيل النسخة"
+  },
+  "instance.worlds.type.server": {
+    "message": "الخادم"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "لعب فردي"
+  },
+  "instance.worlds.view_instance": {
+    "message": "عرض النسخة"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "العالم قيد الاستخدام"
+  },
+  "search.filter.locked.instance": {
+    "message": "مقدَّم من النسخة"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "إصدار اللعبة مقدَّم من النسخة"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "المحمّل مقدَّم من النسخة"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "مزامنة مع النسخة"
+  }
+}

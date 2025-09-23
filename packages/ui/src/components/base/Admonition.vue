@@ -13,7 +13,7 @@
 			<div class="font-semibold flex justify-between gap-4">
 				<slot name="header">{{ header }}</slot>
 			</div>
-			<div class="font-normal">
+			<div class="font-normal text-sm sm:text-base">
 				<slot>{{ body }}</slot>
 			</div>
 		</div>

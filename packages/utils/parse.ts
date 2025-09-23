@@ -140,6 +140,11 @@ export const md = (options = {}) => {
 			return self.renderToken(tokens, idx, options)
 		}
 
+	md.linkify.set({
+		fuzzyLink: false,
+		fuzzyIP: false,
+	})
+
 	md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
 		const token = tokens[idx]
 		const index = token.attrIndex('href')

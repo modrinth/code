@@ -1,0 +1,138 @@
+{
+  "badge.new": {
+    "defaultMessage": "Жаңа"
+  },
+  "button.back": {
+    "defaultMessage": "Артқа"
+  },
+  "button.cancel": {
+    "defaultMessage": "Болдырмау"
+  },
+  "button.continue": {
+    "defaultMessage": "Жалғастыру"
+  },
+  "button.copy-id": {
+    "defaultMessage": "ID көшіру"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Тұрақты сілтемені көшіру"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Жобаны құру"
+  },
+  "button.download": {
+    "defaultMessage": "Жүктеу"
+  },
+  "button.downloading": {
+    "defaultMessage": "Жүктелім"
+  },
+  "button.edit": {
+    "defaultMessage": "Өзгерту"
+  },
+  "button.follow": {
+    "defaultMessage": "Жазылу"
+  },
+  "button.more-options": {
+    "defaultMessage": "Көбірек баптаулар"
+  },
+  "button.next": {
+    "defaultMessage": "Ілгері"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Буманы ашу"
+  },
+  "button.play": {
+    "defaultMessage": "Ойнау"
+  },
+  "button.refresh": {
+    "defaultMessage": "Жаңарту"
+  },
+  "button.remove": {
+    "defaultMessage": "Жою"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Кескінді жою"
+  },
+  "button.report": {
+    "defaultMessage": "Шағыну"
+  },
+  "button.reset": {
+    "defaultMessage": "Қалпына келтіру"
+  },
+  "button.save": {
+    "defaultMessage": "Сақтау"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Өзгерістерді сақтау"
+  },
+  "button.saving": {
+    "defaultMessage": "Сақтау жүргізілуде"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Кіру"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Шығу"
+  },
+  "button.stop": {
+    "defaultMessage": "Тоқтату"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Жазылудан бас тарту"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Суретті жүктеу"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Қазір ғана"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Қолданба"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Серверлер"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Веб-сайт"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Жеке"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Белгішені өңдеу"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Белгішені жою"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Белгішені таңдау"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Іздеу..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Галерея"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Кесте"
+  },
+  "input.view.list": {
+    "defaultMessage": "Тізім"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Белгісіз ойын режимі"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Өзгерістер сақталды"
+  },
+  "label.collections": {
+    "defaultMessage": "Жинақтар"
+  },
+  "project-type.all": {
+    "defaultMessage": "Барлығы"
+  }
+}
+

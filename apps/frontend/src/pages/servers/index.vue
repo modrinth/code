@@ -36,7 +36,7 @@
 					<div
 						class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 					>
-						Beta Release
+						{{ formatMessage(commonMessages.betaRelease) }}
 					</div>
 					<h1 class="relative m-0 max-w-3xl text-3xl font-bold !leading-[110%] md:text-6xl">
 						Host your next server with Modrinth Servers
@@ -441,9 +441,9 @@
 								Where are Modrinth Servers located? Can I choose a region?
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								We have servers available in North America and Europe at the moment that you can
-								choose upon purchase. More regions to come in the future! If you'd like to switch
-								your region, please contact support.
+								We have servers available in North America, Europe, and Southeast Asia at the moment
+								that you can choose upon purchase. More regions to come in the future! If you'd like
+								to switch your region, please contact support.
 							</p>
 						</details>
 
@@ -527,7 +527,7 @@
 					There's a server for everyone
 				</h1>
 				<p class="m-0 flex items-center gap-1">
-					Available in North America and Europe for wide coverage.
+					Available in North America, Europe, and Southeast Asia for wide coverage.
 				</p>
 
 				<div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
@@ -645,7 +645,12 @@ import {
 	TransferIcon,
 	VersionIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, ModrinthServersPurchaseModal } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	commonMessages,
+	injectNotificationManager,
+	ModrinthServersPurchaseModal,
+} from '@modrinth/ui'
 import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { formatPrice } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
@@ -660,7 +665,7 @@ import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 
 const { addNotification } = injectNotificationManager()
-const { locale } = useVIntl()
+const { locale, formatMessage } = useVIntl()
 const flags = useFeatureFlags()
 
 const billingPeriods = ref(['monthly', 'quarterly'])

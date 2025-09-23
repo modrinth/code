@@ -19,7 +19,19 @@ const statusAlerts: Stage = {
 			weight: -999999,
 			suggestedStatus: 'approved',
 			disablesActions: ['status_private_use', 'status_account_issues'],
+			shouldShow: (project) => project.status !== 'approved',
 			message: async () => (await import('../messages/status-alerts/fixed.md?raw')).default,
+		} as ButtonAction,
+		{
+			id: 'status_corrections_applied-approved',
+			type: 'button',
+			label: 'Corrections applied',
+			weight: -999999,
+			suggestedStatus: 'approved',
+			disablesActions: ['status_private_use', 'status_account_issues'],
+			shouldShow: (project) => project.status === 'approved',
+			message: async () =>
+				(await import('../messages/status-alerts/fixed-approved.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'status_private_use',

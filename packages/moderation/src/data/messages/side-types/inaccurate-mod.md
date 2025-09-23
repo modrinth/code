@@ -1,9 +1,5 @@
-## Environment Information
+## Environment Metadata
 
-Per section 5.1 of %RULES%, it is important that the metadata of your projects is accurate, including whether the project runs on the client or server side.
+Per section 5.1 of %RULES%, it is important that the metadata of your projects is accurate, including %PROJECT_ENVIRONMENT_FLINK%.
 
-For a brief rundown of how this works:
-
-- **Client side** refers to a mod that is only required by the client, like [Sodium](https://modrinth.com/mod/sodium).
-- **Server side** mods change the behavior of the server without the client needing the mod, like Datapacks, recipes, or server-side behaviors, like [Falling Tree](https://modrinth.com/mod/fallingtree).
-- A mod that adds features, entities, or new blocks and items, generally will be required on **both** the server and the client, for example [Cobblemon](https://modrinth.com/mod/cobblemon).
+We've recently overhauled how environment metadata works on Modrinth, please [Read this blogpost](%NEW_ENVIRONMENTS_LINK%) for full details and information on how to ensure your project is labeled correctly.

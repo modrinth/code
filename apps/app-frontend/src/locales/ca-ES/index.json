@@ -1,0 +1,179 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Mode de desenvolupament activat."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Aparença"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Opcions d'instància per defecte"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Instal·lacions de Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privacitat"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Afegir i jugar"
+  },
+  "instance.add-server.add-server": {
+    "message": "Afegir servidor"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Desactivat"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Activat"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Preguntar"
+  },
+  "instance.add-server.title": {
+    "message": "Afegir un servidor"
+  },
+  "instance.edit-server.title": {
+    "message": "Editar servidor"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Amagar de l'inici"
+  },
+  "instance.edit-world.name": {
+    "message": "Nom"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Món de Minecraft"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Reinicia l'icona"
+  },
+  "instance.edit-world.title": {
+    "message": "Edita el món"
+  },
+  "instance.filter.disabled": {
+    "message": "Projectes desactivats"
+  },
+  "instance.filter.updates-available": {
+    "message": "Actualitzacions disponibles"
+  },
+  "instance.server-modal.address": {
+    "message": "Adreça web"
+  },
+  "instance.server-modal.name": {
+    "message": "Nom"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Servidor de Minecraft"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Paquet de recursos"
+  },
+  "instance.settings.tabs.general": {
+    "message": "General"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Suprimeix la instància"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Suprimir instància"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Suprimeix permanentment una instància del dispositiu, inclosos els vostres mons, configuracions i tot el contingut instal·lat. Aneu amb compte, ja que un cop suprimiu una instància no hi ha manera de recuperar-la."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "S'està suprimint..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Duplicar"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "No es pot duplicar durant la instal·lació."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Duplica la instància"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Crea una còpia d'aquesta instància, incloent-hi mons, configuracions, mods, etc."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Edita la icona"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Treu icona"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Substitueix icona"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Selecciona icona"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Grup de llibreries"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Crear nou grup"
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Introdueix nom del grup"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Nom"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Instal·lació"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Canviar versió"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Instal·lar"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Instal·lant"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Versió del joc"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Plataforma"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Reparar"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "canviar versió"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "reparar"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(versió desconeguda)"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java i memòria"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Pantalla completa"
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Altura"
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Amplada"
+  },
+  "instance.settings.title": {
+    "message": "Configuració"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Disponible"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Jugar instància"
+  },
+  "instance.worlds.type.server": {
+    "message": "Servidor"
+  }
+}

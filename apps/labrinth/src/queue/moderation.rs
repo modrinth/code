@@ -665,7 +665,7 @@ impl AutomatedModerationQueue {
                                         .await?;
 
                                     if let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK") {
-                                        crate::util::webhook::send_slack_webhook(
+                                        crate::util::webhook::send_slack_project_webhook(
                                             project.inner.id.into(),
                                             &pool,
                                             &redis,
@@ -711,7 +711,19 @@ impl AutomatedModerationQueue {
                                         },
                                     }
                                         .insert_many(
-                                            members.into_iter().map(|x| x.user_id).collect(),
+                                            members.iter().map(|x| x.user_id).collect(),
+                                            &mut transaction,
+                                            &redis,
+                                        )
+                                        .await?;
+
+                                    NotificationBuilder {
+                                        body: NotificationBody::ModerationMessageReceived {
+                                            project_id: project.inner.id.into(),
+                                        },
+                                    }
+                                        .insert_many(
+                                            members.iter().map(|x| x.user_id).collect(),
                                             &mut transaction,
                                             &redis,
                                         )

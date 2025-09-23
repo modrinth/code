@@ -71,7 +71,7 @@ const messages = defineMessages({
 	welcomeDescription: {
 		id: 'auth.welcome.description',
 		defaultMessage:
-			'You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with awazing mods.',
+			'You’re now part of the awesome community of creators & explorers already building, downloading, and staying up-to-date with amazing mods.',
 	},
 	welcomeLongTitle: {
 		id: 'auth.welcome.long-title',

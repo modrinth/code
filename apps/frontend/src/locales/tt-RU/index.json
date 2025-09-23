@@ -1,0 +1,293 @@
+{
+  "app-marketing.download.linux": {
+    "message": "GNU/Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Гамәлләр"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "Автор: {author}"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Исем"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Версия"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ МБ"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ МБ"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 МБ"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 млрд %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Процесс исеме"
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Мод җыелмасы"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Электрон почта"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Серсүз"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Электрон почта"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Кулланучы исеме"
+  },
+  "auth.sign-up.title": {
+    "message": "Теркәлү"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Аккаунт көйләүләре"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Керү"
+  },
+  "auth.welcome.long-title": {
+    "message": "Modrinth сайтына рәхим итегез!"
+  },
+  "collection.button.edit-icon": {
+    "message": "Тамгачыкны үзгәртү"
+  },
+  "error.collection.404.title": {
+    "message": "Коллекция табылмады"
+  },
+  "error.project.404.title": {
+    "message": "Проект табылмады"
+  },
+  "error.user.404.title": {
+    "message": "Кулланучы табылмады"
+  },
+  "frog": {
+    "message": "Сезне бакалады! 🐸"
+  },
+  "frog.title": {
+    "message": "Бака"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} яңартылды!"
+  },
+  "landing.notifications.heading": {
+    "message": "Хәбәрләр"
+  },
+  "landing.search.label": {
+    "message": "Эзләү"
+  },
+  "landing.search.placeholder": {
+    "message": "Эзләү..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Тәртипләү:"
+  },
+  "landing.section.for-players.label": {
+    "message": "Уенчы өчен"
+  },
+  "layout.action.change-theme": {
+    "message": "Теманы үзгәртү"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Аккаунт көйләүләрен ачу"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
+  },
+  "layout.footer.resources": {
+    "message": "Ресурслар"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Проблема буенча хәбәр итү"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Тәрҗемә итү"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.nav.search": {
+    "message": "Эзләү"
+  },
+  "moderation.search.placeholder": {
+    "message": "Эзләү..."
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Тәкъдимнәр"
+  },
+  "project-type.datapack.plural": {
+    "message": "Мәгълүмат җыелмалары"
+  },
+  "project-type.datapack.singular": {
+    "message": "Мәгълүмат җыелмасы"
+  },
+  "project-type.mod.plural": {
+    "message": "Модлар"
+  },
+  "project-type.mod.singular": {
+    "message": "Мод"
+  },
+  "project-type.modpack.plural": {
+    "message": "Мод җыелмалары"
+  },
+  "project-type.modpack.singular": {
+    "message": "Мод җыелмасы"
+  },
+  "project-type.plugin.plural": {
+    "message": "Кушылмалар"
+  },
+  "project-type.plugin.singular": {
+    "message": "Кушылма"
+  },
+  "project-type.project.plural": {
+    "message": "Проектлар"
+  },
+  "project-type.project.singular": {
+    "message": "Проект"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Ресурс җыелмалары"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Ресурс җыелмасы"
+  },
+  "project-type.shader.plural": {
+    "message": "Шейдерлар"
+  },
+  "project-type.shader.singular": {
+    "message": "Шейдер"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "Серверны ясау"
+  },
+  "project.description.title": {
+    "message": "Тасвирлама"
+  },
+  "project.download.game-version": {
+    "message": "Уен версиясе: {version}"
+  },
+  "project.error.project-not-found": {
+    "message": "Проект табылмады"
+  },
+  "project.gallery.title": {
+    "message": "Галерея"
+  },
+  "project.navigation.changelog": {
+    "message": "Үзгәрешләр исемлеге"
+  },
+  "project.settings.general.name.title": {
+    "message": "Исем"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.title": {
+    "message": "Көйләүләр"
+  },
+  "project.version.all-versions": {
+    "message": "Барлык версияләр"
+  },
+  "project.versions.title": {
+    "message": "Версияләр"
+  },
+  "servers.backups.item.lock": {
+    "message": "Ябу"
+  },
+  "servers.backups.item.locked": {
+    "message": "Ябык"
+  },
+  "servers.backups.item.retry": {
+    "message": "Кабатлау"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Ачу"
+  },
+  "servers.notice.actions": {
+    "message": "Гамәлләр"
+  },
+  "servers.notice.level": {
+    "message": "Дәрәҗә"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.language.categories.default": {
+    "message": "Гади телләр"
+  },
+  "settings.language.categories.experimental": {
+    "message": "Эксперименталь телләр"
+  },
+  "settings.language.categories.fun": {
+    "message": "Көлке телләр"
+  },
+  "settings.language.languages.language-label-applying": {
+    "message": "{label}. Куллану..."
+  },
+  "settings.language.languages.language-label-error": {
+    "message": "{label}. Хата"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Исем"
+  },
+  "settings.profile.bio.title": {
+    "message": "Био"
+  }
+}

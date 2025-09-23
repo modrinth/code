@@ -2,7 +2,7 @@
 	<img
 		v-if="src"
 		ref="img"
-		class="`experimental-styles-within avatar"
+		class="`experimental-styles-within avatar shrink-0"
 		:style="`--_size: ${cssSize}`"
 		:class="{
 			circle: circle,
@@ -17,7 +17,7 @@
 	/>
 	<svg
 		v-else
-		class="`experimental-styles-within avatar"
+		class="`experimental-styles-within avatar shrink-0"
 		:style="`--_size: ${cssSize}${tint ? `;--_tint:oklch(50% 75% ${tint})` : ''}`"
 		:class="{
 			tint: tint,

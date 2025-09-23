@@ -195,12 +195,12 @@ import {
 import {
 	ButtonStyled,
 	ConfirmModal,
+	DropArea,
 	FileInput,
 	OverflowMenu,
 	ProjectPageVersions,
 } from '@modrinth/ui'
 
-import DropArea from '~/components/ui/DropArea.vue'
 import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
 import { isPermission } from '~/utils/permissions.ts'
 import { reportVersion } from '~/utils/report-helpers.ts'

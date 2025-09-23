@@ -1,0 +1,99 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Popis, který jasně vysvětluje účel a funkci projektu."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Přidat popis"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Přidání jedinečné, relevantní a poutavé ikony zvýší rozpoznatelnost vašeho projektu a pomůže mu vyniknout."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Přidat ikonu"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Přidejte všechny relevantní odkazy mimo Modrinth, jako například zdrojový kód, sledovač problémů nebo pozvánku na Discord."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Přidat externí odkazy"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Vybrali jste všechny {totalAvailableTags} dostupné tagy. To je v rozporu s účelem tagů, které mají uživatelům pomáhat najít relevantní projekty. Vyberte prosím pouze tagy, které jsou relevantní pro váš projekt."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Vyberte vhodné tagy"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Váš popis má {length} čitelných znaků. Pro vytvoření jasného a informativního popisu se doporučuje minimálně {minChars} znaků."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Rozšířit popisek"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Upravit popisek"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Upravit licenci"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Upravit souhrn"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Upravit tagy"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Upravit titul"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "Obrázek v galerii často určuje první dojem z vašeho projektu."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Přidejte platný odkaz na licenci"
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Vyberte správné rozlišení"
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Vybrat licenci"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "Vyberte štítky, které správně vystihují váš projekt, abyste pomohli uživatelům ho najít."
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Vybrat štítky"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Navštívit nastavení popisu"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "Navštívit nastavení prostředí"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Navštívit nastavení licence"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Navštívit nastavení odkazů"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Navštívit nastavení štítků"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Navštívit obecné nastavení"
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Nahrát verzi"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "Některé z vašich externích odkazů mohou používat domény, které nejsou pro daný typ odkazu vhodné."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Ověřit externí odkaz"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "Navštivte stránku verzí"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Navštívit nastavení odkazů"
+  }
+}
+

@@ -1,0 +1,846 @@
+{
+  "badge.beta": {
+    "defaultMessage": "בטא"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "גרסת בטא"
+  },
+  "badge.new": {
+    "defaultMessage": "חדש"
+  },
+  "button.analytics": {
+    "defaultMessage": "אנליטיקה"
+  },
+  "button.back": {
+    "defaultMessage": "אחורה"
+  },
+  "button.cancel": {
+    "defaultMessage": "ביטול"
+  },
+  "button.continue": {
+    "defaultMessage": "המשך"
+  },
+  "button.copy-id": {
+    "defaultMessage": "העתק מזהה"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "העתק קישור קבוע"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "צור פרויקט חדש"
+  },
+  "button.download": {
+    "defaultMessage": "הורדה"
+  },
+  "button.downloading": {
+    "defaultMessage": "מוריד"
+  },
+  "button.edit": {
+    "defaultMessage": "ערוך"
+  },
+  "button.follow": {
+    "defaultMessage": "עקוב"
+  },
+  "button.more-options": {
+    "defaultMessage": "אפשרויות נוספות"
+  },
+  "button.next": {
+    "defaultMessage": "הבא"
+  },
+  "button.open-folder": {
+    "defaultMessage": "פתח תיקיה"
+  },
+  "button.play": {
+    "defaultMessage": "שחק"
+  },
+  "button.refresh": {
+    "defaultMessage": "רענן"
+  },
+  "button.remove": {
+    "defaultMessage": "מחק"
+  },
+  "button.remove-image": {
+    "defaultMessage": "מחק תמונה"
+  },
+  "button.report": {
+    "defaultMessage": "דיווח"
+  },
+  "button.reset": {
+    "defaultMessage": "איפוס"
+  },
+  "button.save": {
+    "defaultMessage": "שמור"
+  },
+  "button.save-changes": {
+    "defaultMessage": "שמור שינויים"
+  },
+  "button.saving": {
+    "defaultMessage": "שומר"
+  },
+  "button.sign-in": {
+    "defaultMessage": "התחבר"
+  },
+  "button.sign-out": {
+    "defaultMessage": "התנתק"
+  },
+  "button.sign-up": {
+    "defaultMessage": "הירשם"
+  },
+  "button.stop": {
+    "defaultMessage": "עצור"
+  },
+  "button.unfollow": {
+    "defaultMessage": "הסר מעקב"
+  },
+  "button.upload-image": {
+    "defaultMessage": "העלה תמונה"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "רק לעכשיו"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "ממשק API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "אפליקציה"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "שרתים"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "אתר אינטרנט"
+  },
+  "collection.label.private": {
+    "defaultMessage": "פרטי"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "ערוך אייקון"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "מחק אייקון"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "החלף אייקון"
+  },
+  "icon-select.select": {
+    "defaultMessage": "בחר אייקון"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "חפש..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "תצוגת גלריה"
+  },
+  "input.view.grid": {
+    "defaultMessage": "תצוגת טבלה"
+  },
+  "input.view.list": {
+    "defaultMessage": "תצוגת שורות"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "מצב הרפתקה"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "מצב יצירתי"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "מצב צופה"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "מצב הישרדות"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "מצב משחק לא ידוע"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "שינויים נשמרו"
+  },
+  "label.collections": {
+    "defaultMessage": "אוספים"
+  },
+  "label.created-ago": {
+    "defaultMessage": "נוצר ב-{ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "לוח בקרה"
+  },
+  "label.delete": {
+    "defaultMessage": "מחק"
+  },
+  "label.description": {
+    "defaultMessage": "תיאור"
+  },
+  "label.error": {
+    "defaultMessage": "שגיאה"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "פרויקטים במעקב"
+  },
+  "label.loading": {
+    "defaultMessage": "טוען..."
+  },
+  "label.moderation": {
+    "defaultMessage": "פיקוח ובקרה"
+  },
+  "label.notifications": {
+    "defaultMessage": "התראות"
+  },
+  "label.or": {
+    "defaultMessage": "או"
+  },
+  "label.password": {
+    "defaultMessage": "סיסמה"
+  },
+  "label.played": {
+    "defaultMessage": "שוחק לאחרונה ב-{time}"
+  },
+  "label.public": {
+    "defaultMessage": "ציבורי"
+  },
+  "label.rejected": {
+    "defaultMessage": "נדחה"
+  },
+  "label.saved": {
+    "defaultMessage": "נשמר"
+  },
+  "label.scopes": {
+    "defaultMessage": "סמכויות"
+  },
+  "label.server": {
+    "defaultMessage": "שרת"
+  },
+  "label.servers": {
+    "defaultMessage": "שרתים"
+  },
+  "label.settings": {
+    "defaultMessage": "הגדרות"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "שחקן יחיד"
+  },
+  "label.title": {
+    "defaultMessage": "כותרת"
+  },
+  "label.unlisted": {
+    "defaultMessage": "לא נמצא ברשימה"
+  },
+  "label.visibility": {
+    "defaultMessage": "חשיפה"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "בקר בפרופיל שלך"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "הוסף שיטת תשלום"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "מוסיף שיטת תשלום"
+  },
+  "notification.error.title": {
+    "defaultMessage": "אירעה שגיאה"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "אושר"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "מאושר"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "נשמר בארכיון"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "נסגר"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "יוצר"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "טיוטה"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "נכשל"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "רשום"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "מפקח"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "צוות מודרינט"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "בהמתנה"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "פרטי"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "מעובד"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "נדחה"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "הוחזר"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "מתוזמן"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "בבדיקה"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "לא רשום"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "מוסתר"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "העתק קוד אל הלוח"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "לקוח"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "לקוח ושרת"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "לקוח או שרת"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "שרת"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "של {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "לא נתמך"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} מסתיים ב-{last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "תשלום דרך אמזון"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "אמריקן אקספרס"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "כרטיס חיוב מיידי"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "פייפאל"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "שיטת תשלום לא ידועה"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "הכל"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{כמות, plural, one {Data Pack} other {Data Packs}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "חבילות נתונים"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{כמות, plural, one {data pack} other {דטאפאקים}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{כמות, plural, one {Mod} other {מודים}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "מודים"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{כמות, plural, one {mod} other {מודים}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{כמות, plural, one {Modpack} other {מודפאקים}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "מודפאקים"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{כמות, plural, one {modpack} other {modpacks}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{כמות, plural, one {Plugin} other {פלאגינים}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "פלאגינים"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{כמות, plural, one {plugin} other {פלאגינים}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{כמות, plural, one {Resource Pack} other {Resource Packs}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resource Packs"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{כמות, plural, one {resource pack} other {חבילות משאבים}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{כמות, plural, one {Shader} other {Shaders}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaders"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{כמות, plural, one {shader} other {shaders}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "סביבות נתמכות"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "לקוח ושרת"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "צד-לקוח"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "שרתים ייעודיים בלבד"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "צד-שרת"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "שחקן יחיד"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "שחקן יחיד בלבד"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "מיינקראפט: גרסת ג'אבה"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "פלטפורמות"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "תאימות"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "בעלי הפרוייקט"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "יוצרים"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "נוצר ב-{date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "מורשה ב-{license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "פורסם {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "נשלח ב-{date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "פרטים"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "עודכן ב-{date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "הצטרף לשרת הדיסקורד"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "תרום"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "ספונסר ב-GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "תרום דרך Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "תרום דרך Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "תרום דרך פייפאל"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "דיווח בעיות"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "מקור צפיות"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "קישורים"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "בקרו בויקי"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "אנליטיקה"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "תיאור"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "כולל חלק מהפונקציונליות גם בצד הלקוח וגם בצד השרת, אפילו אם רק באופן חלקי."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "אופציונלי בשניהם, פועל אותו דבר אם מותקן בצד כלשהו"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "אופציונלי בשניהם, עובד הכי טוב כאשר מותקן על שני הצדדים"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "אופציונלי בצד הלקוח"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "אופציונלי בשרת"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "נדרש בשניהם"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "לקוח ושרת"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "כל הפונקציונליות מתבצעת בצד הלקוח ותואמת לשרתי ונילה."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "צד לקוח בלבד"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "שרת ייעודי בלבד"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "כל הפעולות מתבצעות בצד השרת, ותואמות לשחקנים עם לקוח ונילה."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "תומך גם במשחק יחיד"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "צד שרת בלבד"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "פועל רק במצב משחק יחיד או כאשר אין חיבור לשרת מרובה משתתפים."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "משחק יחיד בלבד"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "תתי-אפשרויות של {option}"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "סביבה"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "גלריה"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "כללי"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "רישיון"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "קישורים"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "חברים"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "אין לך הרשאה לערוך זאת."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "אין הרשאה"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "תגים"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "העלה"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "גרסאות"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "צפייה"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "א"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "ב"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "ש"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "בארכיון"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "טיוטה"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "פרטי"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "ציבורי"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "נדחה"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "מתוזמן"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "בבדיקה"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "לא ידוע"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "לא ברשימה"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "הוסתר על ידי הצוות"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "סינון נעול"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "שחרור סינון זה עלול לאפשר התקנת תוכן שאינו תואם."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "סנכרן סינון"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} נעול"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "שחרר סינון"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "סביבה"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "לקוח"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "שרת"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "גרסת משחק"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "הראה את כל הגרסאות"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "רישיון"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "קוד פתוח"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "מנהל מודים"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "מנהל חבילת מודים"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "מנהל פלאגינים"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "פלטפורמה"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "מזהה פרויקט"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "מנהל שיידרים"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "סגור"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "ניתן לסגירה"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "חשוב"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "מידע"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "קריטי"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "מידע"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "סקר"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "אזהרה"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "חיוני – לא ניתן להתעלם"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "לא תחויב עדיין."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "בחר שיטת תשלום"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "שיטת תשלום"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "מחויב כל {interval}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "בחר תוכנית מותאמת אישית עם המפרט שאתה צריך בלבד."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "התחל עכשיו"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "מתאים ל־15–25 שחקנים, חבילות מודים או מודינג כבד."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "מתאים ל‑6–15 שחקנים ולכמה מודים."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "הכי פופולרי"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "בחר תוכנית"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "בחר תוכנית"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "מושלם ל‑1–5 חברים עם מספר מועט של מודים קלים."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "בחר את כמות ה‑RAM והמאפיינים המתאימים לצרכיך."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "תוכנית"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "אזור"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "סקירה"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "מרכז אירופה"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "כמה זיכרון RAM תרצה שהשרת שלך יקבל?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "צפון אמריקה"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "באיזה מיקום תרצה שהשרת שלך יימצא?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "האזור שלך אינו ברשימה? <link>ספר לנו היכן תרצה לראות את שרתי Modrinth בעתיד!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "דרום־מזרח אסיה"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "מערב אירופה"
+  },
+  "settings.account.title": {
+    "defaultMessage": "חשבון ואבטחה"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "מראה"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "היישומים שלך"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "אפליקציות מורשות"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "חיובים ומנויים"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "כהה"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "בחר את ערכת הצבעים המועדפת עליך עבור Modrinth במכשיר זה."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "בהיר"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "ערכת צבעים כהה מועדפת"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "ערכת צבעים בהירה מועדפת"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "רטרו"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "סנכרן עם המערכת"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "צבעי ממשק"
+  },
+  "settings.language.title": {
+    "defaultMessage": "שפה"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "מפתחות גישה אישיים"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "פרופיל ציבורי"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "חיבורים פעילים"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} ב-{time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "יש לך שינויים שלא נשמרו."
+  }
+}
+

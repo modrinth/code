@@ -1,0 +1,216 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "需要一份能清晰说明该项目目的与功能的描述文案。"
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "编辑一份描述文案"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "添加一个独特、有相关性的且博人眼球的图标。来让你的项目易于识别，或者脱颖而出。"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "添加项目图标"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "添加一些非Modrinth的相关链接，例如源代码仓库、问题收集器亦或是Discord频道邀请。"
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "添加外部链接"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "你已选择全部 {totalAvailableTags} 个可用标签。这违背了标签的初衷——帮助用户发现相关项目。请仅选择与你项目相关的标签。"
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "选择准确的标签"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "你的描述包含{length}个可读字符。建议描述至少包含{minChars}个字符，以便撰写清晰且信息充实的描述文案。"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "扩展描述"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "编辑描述文案"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "编辑版权许可"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "编辑简介"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "编辑标签"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "编辑项目标题"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "精选的图库图片往往就是你的项目给人留下的第一印象。"
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "精选为图库图片"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "访问图库界面"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "你的{projectType}所使用的版权许可要求源代码必须公开。请为每个新增版本提供源代码地址或源文件，或考虑使用其他的版权许可。"
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "提供源代码"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "你的介绍描述应包含足够的纯文本或图片替代文本，确保使用屏幕阅读器的用户或网速较慢的用户也能正常访问。"
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "确保可读性"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "版权许可链接不合法。"
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "你提供的许可证 URL 指向 {domain}，该地址不适合用于提供许可证信息。许可证 URL 应直接链接至你的许可证文件，而非社交媒体、游戏平台等无关网站。"
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "你提供的许可证 URL 格式有误。请提供一个指向许可证文本的有效的 URL 地址。"
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "添加一个有效的许可证链接"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "禁止在外部链接或许可证链接中使用短链接或其他可能隐藏地址的技术。请务必使用完整长度的标准链接。"
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "不要使用短链接"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "描述中的第 {count, plural, other {# 个标题}}过长。标题应简洁明了，作为章节名称而非完整句子。"
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "缩短项目标题"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "项目不得使用Minecraft的品牌标识，也不得将“Minecraft”或“我的世界”作为名称的主要部分。"
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "避免品牌侵权"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "你的一些图片缺失替代文本，这对于无障碍访问至关重要，特别是对视障用户而言。"
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "添加图片替代文本"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Discord 邀请链接不可用作其他类型的链接。请将你的 Discord 链接仅放置在 “Discord 邀请链接” 输入框中。"
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "移动Discord邀请链接位置"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "访问审核页面"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "请在重新提交前，检查并处理审核团队提出的所有问题。"
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "查看审核员反馈"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "你已选择{count}个分辨率标签（{tags}）。资源包通常应仅保留一个与其主要分辨率相匹配的标签。"
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "选择正确的分辨率"
+  },
+  "nags.select-environments.description": {
+    "defaultMessage": "选择你的{projectType}运行的环境。"
+  },
+  "nags.select-environments.title": {
+    "defaultMessage": "选择环境"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "请选择你的{projectType}所遵循的许可证。"
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "选择一个许可证"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "请选择能准确描述你项目的标签，以便帮助其目标用户发现它。"
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "选择标签"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "访问介绍设置"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "查看环境设置"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "访问许可证设置"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "访问链接设置"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "访问标签设置"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "访问通用设置"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "你的简介不能与项目名称相同。撰写一个兼具信息量与吸引力的简介是十分重要的。"
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "让你的简介与众不同"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "你的简介不应包含任何格式、换行符、特殊字符或链接，因为简介仅会以纯文本形式展示。"
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "清除简介"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "你的简介包含 {length} 个字符。建议：简介要至少包含 {minChars} 个字符，以便撰写兼具信息量与吸引力的内容。"
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "扩充你的简介"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "保持项目名称简洁明了，这不仅能让其更易被记住，也能更方便他人查找。版本和加载器信息会显示在你的项目旁。"
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "清除名称"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "你已经选择了{tagCount}个标签了。建议将其数量减少到 {maxTagCount} 个或更少，以确保你的项目能准确地出现在相关搜索的结果中。"
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "选择准确的标签"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "至少需要上传一张图片来展示你的{type}{resourcepackMessage} 的内容。"
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "上传图片至项目图库"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "项目提交审核时，至少需要包含一个版本。"
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "上传一个版本"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "你的部分外部链接可能与其所属类型不适配。"
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "验证外部链接"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "访问版本页面"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "访问链接设置"
+  }
+}
+

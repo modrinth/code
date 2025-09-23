@@ -1,0 +1,71 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "In ye captain's boots."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "How ye be looking"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Keepin' ye gold under lock and key"
+  },
+  "instance.add-server.add-server": {
+    "message": "Plundered"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Unable"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Able"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Can"
+  },
+  "instance.add-server.title": {
+    "message": "Plundered"
+  },
+  "instance.edit-server.title": {
+    "message": "Change yer island"
+  },
+  "instance.edit-world.name": {
+    "message": "What'n yer world be called"
+  },
+  "instance.server-modal.address": {
+    "message": "Whar ye' reside"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Picture pack"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Mutiny instance"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Mutiny instance"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Forces yer intstance to be walk'n the plank an' to see Davy Jones' locker, never to be seen nor heard from ever again. Ya hear?"
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Shoving..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Ship o' Theseus your instance"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Replaces all o' the planks on yer instance wit' new ones - be it even the same anymore?"
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Change yer picture"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Scrub ye deck of old paint"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Ye model of sloop"
+  },
+  "instance.worlds.type.server": {
+    "message": "Island"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Lonely Voyage"
+  }
+}

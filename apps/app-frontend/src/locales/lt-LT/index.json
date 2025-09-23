@@ -1,0 +1,11 @@
+{
+  "instance.add-server.add-server": {
+    "message": "Prideti Serverį"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Serveris"
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Prieš paleidimą"
+  }
+}

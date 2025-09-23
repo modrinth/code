@@ -1,0 +1,191 @@
+{
+  "app-marketing.download.download-appimage": {
+    "message": "Karganugi ang AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Karganugi ang beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Karganugi ang DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Karganugi ang RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Mga kapilian sa pagkarganug"
+  },
+  "app-marketing.download.title": {
+    "message": "Karganugi ang Aplikasyon sa Modrinth (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Bukas nga tinubdan"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Aplikasyon sa Modrinth"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Bagita ang Aplikasyon sa Modrinth sa pagkarganug ug pagdula sa imong paborito nga mga pagbag-o ug putos sa pagbag-o."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Karganugi ang Aplikasyon sa Modrinth"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Mga gusto sa akawnt"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "\n"
+  },
+  "collection.button.edit-icon": {
+    "message": "Usba ang amoy"
+  },
+  "collection.button.remove-project": {
+    "message": "Tangtangi ang proyekto"
+  },
+  "collection.delete-modal.description": {
+    "message": "Hangtod sa kahangturan nga matangtang kining gitipon. Kini nga aksyon dili mabawi."
+  },
+  "landing.feature.launcher.description": {
+    "message": "Ang bukas nga tinubdan nga API sa Modrinth nagtugot sa mga tiglansad nga makadugang sa lawom nga panagsama sa Modrinth. Mahimo nimong magamit ang Modrinth pinaagi sa <link>among aplikasyon</link> ug sa pipila nga labing inila nga mga tiglansad sama sa ATLauncher, MultiMC, ug Prism Launcher."
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "mga putos sa kabtangan"
+  },
+  "landing.subheading": {
+    "message": "Pagkaplag, pagdula, ug pagbahin og mga Minecraft nga kontento sa among bukas nga tinubdan nga plataporma nga gihimo alang sa komunidad."
+  },
+  "layout.banner.add-email.button": {
+    "message": "Mga gusto sa akawnt"
+  },
+  "layout.footer.about": {
+    "message": "Mahitungod"
+  },
+  "layout.footer.about.careers": {
+    "message": "Mga Karera"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Talaan sa Kausaban"
+  },
+  "layout.footer.about.news": {
+    "message": "Balita"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Programa sa Pagganti"
+  },
+  "layout.footer.about.status": {
+    "message": "Kahimtang"
+  },
+  "layout.footer.legal": {
+    "message": "Legal"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "DILI OPISYAL NGA SERBISYO SA MINECRAFT. WALA MAAPRUBAHAN UG DILI KAAKIBAT SA MOJANG O MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Palisiya sa Katungod sa Pagkopya ug DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Palisiya sa Pribasiya"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Mga Lagda sa Content"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Pahibalo sa Kahilwasan"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Mga Kahimtang sa Paggamit"
+  },
+  "layout.footer.open-source": {
+    "message": "<github-link>Bukas nga tinubdan</github-link> ang Modrinth."
+  },
+  "layout.footer.products": {
+    "message": "Mga Produkto"
+  },
+  "layout.footer.products.app": {
+    "message": "Aplikasyon sa Modrinth"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth nga mga Tigtagad"
+  },
+  "layout.footer.resources": {
+    "message": "Mga Kabtangan"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "Dokumentasyon sa API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Sentro sa Pagtabang"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Pagtaho og mga isyu"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Paghubad"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Mga Putos sa Kabtangan"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Putos sa Kabtangan"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "Bag-o ra namo gipalambo ang sistema sa Mga Kalikopan sa Modrinth ug ang mga bag-ong kapilian magamit na karon. Wala kay permiso sa pag-usab sa niining mga gusto, apan palihug pahibaloa ang ubang sakop sa proyekto nga kinahanglan nga mapamatud-an ang metadata sa kalikopan."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Kinahanglang masusi ang metadata sa environment"
+  },
+  "project.environment.migration.message": {
+    "message": "Bag-o ra namo gipalambo ang sistema sa Mga Kalikopan sa Modrinth ug ang mga bag-ong kapilian magamit na karon. Mahimo nga bisitahon ang mga gusto sa imong proyekto ug pamatud-i nga husto ang metadata."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Susihon ang mga gusto sa kalikopan"
+  },
+  "project.environment.migration.title": {
+    "message": "Palihug sa pagsusi sa metadata sa kalikopan"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Wala pay metadata sa kalikopan ang imong proyekto, mahimo nga pilia ang husto sa ubos."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Palihug sa pagpili sa kalikopan sa imong proyekto"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "Daghang kalikopan ang imong proyekto"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "Bag-o ra namo gipalambo ang sistema sa Mga Kalikopan sa Modrinth ug ang mga bag-ong kapilian magamit na karon. Mahimo nga susiha nga husto ang  gipili sa ubos ug tuploka ang 'Pamatud-i' sa imong paghuman!"
+  },
+  "project.settings.title": {
+    "message": "Mga Gusto"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Panid sa mga Putos sa Kabtangan"
+  }
+}

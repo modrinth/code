@@ -17,9 +17,7 @@ bitflags::bitflags! {
         const ALPHA_TESTER = 1 << 4;
         const CONTRIBUTOR = 1 << 5;
         const TRANSLATOR = 1 << 6;
-
-        const ALL = 0b1111111;
-        const NONE = 0b0;
+        const AFFILIATE = 1 << 7;
     }
 }
 
@@ -27,7 +25,7 @@ bitflags_serde_impl!(Badges, u64);
 
 impl Default for Badges {
     fn default() -> Badges {
-        Badges::NONE
+        Badges::empty()
     }
 }
 
@@ -189,7 +187,7 @@ impl Role {
 pub struct UserFriend {
     // The user who accepted the friend request
     pub id: UserId,
-    /// THe user who sent the friend request
+    /// The user who sent the friend request
     pub friend_id: UserId,
     pub accepted: bool,
     pub created: DateTime<Utc>,

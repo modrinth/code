@@ -313,6 +313,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
 		`[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting)`
 	vars[`LICENSING_GUIDE`] =
 		`our guide to [Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
+	vars[`NEW_ENVIRONMENTS_LINK`] = `https://modrinth.com/news/article/new-environments`
 
 	// Navigation related variables
 	vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
@@ -322,7 +323,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
 	vars[`PROJECT_SLUG_FLINK`] = `[URL](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SUMMARY_FLINK`] = `[Summary](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_ENVIRONMENT_FLINK`] =
-		`[Environment Information](https://modrinth.com/project/${project.id}/settings)`
+		`[Environment Information](https://modrinth.com/project/${project.id}/settings/environment)`
 	vars[`PROJECT_TAGS_LINK`] = `https://modrinth.com/project/${project.id}/settings/tags`
 	vars[`PROJECT_TAGS_FLINK`] = `[Tags](https://modrinth.com/project/${project.id}/settings/tags)`
 	vars[`PROJECT_DESCRIPTION_LINK`] =

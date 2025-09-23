@@ -1,0 +1,185 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Bruger ikke fundet"
+  },
+  "app-marketing.download.description": {
+    "message": "Vores skrivebords-app er tilgængelig til alle platforme, vælg din ønsket version."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Download AppImage'en"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Download beta'en"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Download DEB'en"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Download RPM'en"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Linux versionerne af Modrinth er <issues-link>kendt for at have fejl</issues-link> på bestemte systemer og konfigurationer. Hvis Modrinth er ustabil på dit system, vi opfordre dig til at prøve andre apps så som <prism-link>Prism Launcher</prism-link> for at nemt installere Modrinth indhold."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Download muligheder"
+  },
+  "app-marketing.download.terms": {
+    "message": "Ved at download Modrinth du acceptere vores <terms-link>servicevilkår</terms-link> og <privacy-link>privatlivspolitik</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Tredjepartspakker"
+  },
+  "app-marketing.download.title": {
+    "message": "Download Modrinth (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Gem indhold du elsker, og få opdateringer med et klik."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Følg projekter"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Importer alle dine favorit profiler fra launcher du brugte før, og kom i gang med Modrinth inde for få sekunder!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Profil importering"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Handlinger"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "af {author}"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 billion %"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Godkend"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Afvis"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> af <creator-link>{creator}</creator-link> vil kunne:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Godkend {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Ingen omdirigeringslokation fundet i svaret"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Du bliver omdirigeret til <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Send gendannelses e-mail"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Indtast din e-mail nedenfor, så sender vi et gendannelseslink, så du kan gendanne din konto."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "E-mail eller brugernavn"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "E-mail"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "En e-mail med instruktioner er blevet sendt til dig, hvis e-mailen tidligere er blevet gemt på din konto."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "E-mail sendt"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Du kan nu logge ind på din konto med din nye adgangskode."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Adgangskoden blev nulstillet"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Nulstil adgangskoden"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Bekræft adgangskoden"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Indtast din nye adgangskode nedenfor for at få adgang til din konto."
+  },
+  "auth.reset-password.title": {
+    "message": "Nulstil adgangskoden"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Nulstil din adgangskode"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Indtast en to-faktor-kode for at fortsætte."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Indtast to-faktor-kode"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Indtast kode..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Glemt adgangskode?</forgot-password-link> • <create-account-link>Opret en konto</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "E-mail eller brugernavn"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Adgangskode"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Log ind med"
+  },
+  "auth.sign-in.title": {
+    "message": "Log ind"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Eller brug en adgangskode"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Opret konto"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Bekræft adgangskoden"
+  },
+  "auth.sign-up.email.label": {
+    "message": "E-mail"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Brugernavn"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Navn"
+  }
+}

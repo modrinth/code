@@ -8,6 +8,13 @@ export const regionOverrides = {
 		}),
 		flag: 'https://flagcdn.com/us.svg',
 	},
+	'eu-cov': {
+		name: defineMessage({
+			id: 'servers.region.western-europe',
+			defaultMessage: 'Western Europe',
+		}),
+		flag: 'https://flagcdn.com/gb.svg',
+	},
 	'eu-lim': {
 		name: defineMessage({
 			id: 'servers.region.central-europe',
@@ -15,11 +22,11 @@ export const regionOverrides = {
 		}),
 		flag: 'https://flagcdn.com/de.svg',
 	},
-	'eu-cov': {
+	'as-sin': {
 		name: defineMessage({
-			id: 'servers.region.western-europe',
-			defaultMessage: 'Western Europe',
+			id: 'servers.region.southeast-asia',
+			defaultMessage: 'Southeast Asia',
 		}),
-		flag: 'https://flagcdn.com/gb.svg',
+		flag: 'https://flagcdn.com/sg.svg',
 	},
 } satisfies Record<string, { name?: MessageDescriptor; flag?: string }>

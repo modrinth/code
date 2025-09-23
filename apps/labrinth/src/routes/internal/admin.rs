@@ -210,7 +210,7 @@ pub async fn delphi_result_ingest(
         }
     }
 
-    crate::util::webhook::send_slack_webhook(
+    crate::util::webhook::send_slack_project_webhook(
         body.project_id,
         &pool,
         &redis,

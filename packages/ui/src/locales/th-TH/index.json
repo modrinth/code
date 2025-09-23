@@ -1,0 +1,342 @@
+{
+  "badge.beta": {
+    "defaultMessage": "เบต้า"
+  },
+  "badge.new": {
+    "defaultMessage": "ใหม่"
+  },
+  "button.back": {
+    "defaultMessage": "กลับ"
+  },
+  "button.cancel": {
+    "defaultMessage": "ยกเลิก"
+  },
+  "button.continue": {
+    "defaultMessage": "ดำเนินการต่อ"
+  },
+  "button.copy-id": {
+    "defaultMessage": "คัดลอก ID"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "สร้างโปรเจกต์"
+  },
+  "button.download": {
+    "defaultMessage": "ดาวน์โหลด"
+  },
+  "button.downloading": {
+    "defaultMessage": "กำลังดาวน์โหลด"
+  },
+  "button.edit": {
+    "defaultMessage": "แก้ไข"
+  },
+  "button.follow": {
+    "defaultMessage": "ติดตาม"
+  },
+  "button.more-options": {
+    "defaultMessage": "ตัวเลือกเพิ่มเติม"
+  },
+  "button.next": {
+    "defaultMessage": "ถัดไป"
+  },
+  "button.open-folder": {
+    "defaultMessage": "เปิดโฟลเดอร์"
+  },
+  "button.play": {
+    "defaultMessage": "เล่น"
+  },
+  "button.refresh": {
+    "defaultMessage": "รีเฟรช"
+  },
+  "button.remove": {
+    "defaultMessage": "ลบ"
+  },
+  "button.remove-image": {
+    "defaultMessage": "ลบรูป"
+  },
+  "button.report": {
+    "defaultMessage": "รายงาน"
+  },
+  "button.reset": {
+    "defaultMessage": "คืนค่า"
+  },
+  "button.save": {
+    "defaultMessage": "บันทึก"
+  },
+  "button.save-changes": {
+    "defaultMessage": "บันทึกการเปลี่ยนแปลง"
+  },
+  "button.saving": {
+    "defaultMessage": "บันทึก"
+  },
+  "button.sign-in": {
+    "defaultMessage": "เข้าสู่ระบบ"
+  },
+  "button.sign-out": {
+    "defaultMessage": "ออกจากระบบ"
+  },
+  "button.sign-up": {
+    "defaultMessage": "ลงทะเบียน"
+  },
+  "button.stop": {
+    "defaultMessage": "หยุด"
+  },
+  "button.unfollow": {
+    "defaultMessage": "เลิกติดตาม"
+  },
+  "button.upload-image": {
+    "defaultMessage": "อัพโหลดภาพ"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "ตอนนี้"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "เซิร์ฟเวอร์"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "เว็ปไซต์"
+  },
+  "collection.label.private": {
+    "defaultMessage": "ส่วนตัว"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "แก้ไขไอคอน"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "ลบไอคอน"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "เปลี่ยนไอคอน"
+  },
+  "icon-select.select": {
+    "defaultMessage": "เลือกรูปไอคอน"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "ค้นหา..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "มุมมองแกลเลอรี"
+  },
+  "input.view.grid": {
+    "defaultMessage": "มุมมองตาราง"
+  },
+  "input.view.list": {
+    "defaultMessage": "มุมมองแถว"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "โหมดผจญภัย"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "โหมดสร้างสรรค์"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "โหมดผู้ชม"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "โหมดเอาชีวิตรอด"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "ไม่ทราบเกมโหมด"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "บันทึกการเปลี่ยนแปลงแล้ว"
+  },
+  "label.created-ago": {
+    "defaultMessage": "สร้างขึ้นเมื่อ {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "แดชบอร์ด"
+  },
+  "label.delete": {
+    "defaultMessage": "ลบ"
+  },
+  "label.description": {
+    "defaultMessage": "คำอธิบาย"
+  },
+  "label.error": {
+    "defaultMessage": "ข้อผิดพลาด"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "โปรเจกต์ที่ติดตาม"
+  },
+  "label.loading": {
+    "defaultMessage": "กำลังโหลด..."
+  },
+  "label.moderation": {
+    "defaultMessage": "การกลั่นกรอง"
+  },
+  "label.notifications": {
+    "defaultMessage": "แจ้งเตือน"
+  },
+  "label.password": {
+    "defaultMessage": "รหัสผ่าน"
+  },
+  "label.played": {
+    "defaultMessage": "เล่นไป {time}"
+  },
+  "label.public": {
+    "defaultMessage": "สาธารณะ"
+  },
+  "label.rejected": {
+    "defaultMessage": "ไม่อนุมัติ"
+  },
+  "label.server": {
+    "defaultMessage": "เซิร์ฟเวอร์"
+  },
+  "label.servers": {
+    "defaultMessage": "เซิร์ฟเวอร์"
+  },
+  "label.settings": {
+    "defaultMessage": "ตั้งค่า"
+  },
+  "label.unlisted": {
+    "defaultMessage": "ไม่เปิดเผย"
+  },
+  "label.visibility": {
+    "defaultMessage": "การเปิดเผย"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "เพิ่มช่องทางการชำระเงิน"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "กำลังเพิ่มช่องทางการชำระเงิน"
+  },
+  "notification.error.title": {
+    "defaultMessage": "เกิดข้อผิดพลาด"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "แบบร่าง"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "ไม่สำเร็จ"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "ทีม Modrinth"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "กําลังดำเนินการ"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "ส่วนตัว"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "ประมวลผลแล้ว"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "อยู่ภายใต้การพิจารณา"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "ไม่เผยแพร่"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "สร้างขึ้นเมื่อ {date}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "เผยแพร่เมื่อ {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "รายละเอียด"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "อัพเดทเมื่อ {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "เข้าร่วม Discord server"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "สนับสนุน"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "สปอนเซอร์บน GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "สนับสนุนบน Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "สนับสนุนบน Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "สนับสนุนบน PayPal"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "รายงานปัญหา"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "ลิงก์"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "แบบร่าง"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "ส่วนตัว"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "สาธารณะ"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "ไม่อนุมัติ"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "อยู่ภายใต้การพิจารณา"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "ไม่ทราบ"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "ไม่เปิดเผย"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "เซิร์ฟเวอร์"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "ดูทุกเวอร์ชั่น"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "คุณอยากตั้งเซิร์ฟเวอร์ไว้ที่ไหน"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "ยุโรปตะวันตก"
+  },
+  "settings.account.title": {
+    "defaultMessage": "บัญชีและความปลอดภัย"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "แอพที่ได้รับอนุญาต"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "มืด"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "เลือกธีมสีที่คุณต้องการสำหรับ Modrinth บนอุปกรณ์นี้"
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "สว่าง"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "ธีมสี"
+  },
+  "settings.language.title": {
+    "defaultMessage": "ภาษา"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "โปรไฟล์สาธารณะ"
+  }
+}
+

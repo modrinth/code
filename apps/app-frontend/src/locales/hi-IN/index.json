@@ -1,0 +1,95 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "विकासकर्ता विधि सक्रिय की गई।"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "स्वरूप"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "पूर्वनिर्धारित प्रतिरूप विकल्प"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "विशेषता ध्वज"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "जावा संस्थापना"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "गोपनीयता"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "संसाधन प्रबंधन"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "जोड़ें एवं चलाएँ"
+  },
+  "instance.add-server.add-server": {
+    "message": "सेवक जोड़ें"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "निष्क्रिय"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "सक्रिय"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "प्रेरणा"
+  },
+  "instance.add-server.title": {
+    "message": "एक सेवक जोड़ें"
+  },
+  "instance.edit-server.title": {
+    "message": "सेवक का सम्पादन करें"
+  },
+  "instance.edit-world.name": {
+    "message": "Nam"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft ki dunia"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "चिह्न हटाएँ"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "चिह्न संपादित करें"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "चिह्न चुनें"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "पुस्तकालय समूह"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "नया समूह बनाएं"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "लाइब्रेरी समूह आपको अपने इंस्टैंस को अपनी लाइब्रेरी में विभिन्न अनुभाग में व्यवस्थित करने की अनुमति देते हैं।"
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "समूह का नाम दर्ज करें"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "नाम"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "हुक लॉन्च करें"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "कस्टम लाँच हुक्स"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "हुक्स उन्नत उपयोगकर्ताओं को गेम लॉन्च करने से पहले और बाद में कुछ सिस्टम कमांड चलाने की अनुमति देते हैं।"
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "पोस्ट-एक्ज़िट"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "खेल समाप्त होने के बाद चला।"
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "पोस्ट-एग्जिट कमांड दर्ज करें..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "पूर्व-लाँच"
+  }
+}

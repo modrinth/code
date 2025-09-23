@@ -1,0 +1,369 @@
+{
+  "badge.new": {
+    "defaultMessage": "Yeni"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analitika"
+  },
+  "button.back": {
+    "defaultMessage": "Geri"
+  },
+  "button.cancel": {
+    "defaultMessage": "Ləğv et"
+  },
+  "button.continue": {
+    "defaultMessage": "Davam et"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Copy ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": ""
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Yeni Layihə Yarat"
+  },
+  "button.download": {
+    "defaultMessage": "Yüklə"
+  },
+  "button.downloading": {
+    "defaultMessage": "Yüklənir"
+  },
+  "button.edit": {
+    "defaultMessage": "Redakte Et"
+  },
+  "button.follow": {
+    "defaultMessage": "Təqib et"
+  },
+  "button.more-options": {
+    "defaultMessage": "Daha çox seçim"
+  },
+  "button.next": {
+    "defaultMessage": "Növbəti"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Qovluğu aç"
+  },
+  "button.play": {
+    "defaultMessage": "Oyna"
+  },
+  "button.refresh": {
+    "defaultMessage": "Yenilə"
+  },
+  "button.remove": {
+    "defaultMessage": "Sil"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Şəkli Sil"
+  },
+  "button.report": {
+    "defaultMessage": ""
+  },
+  "button.reset": {
+    "defaultMessage": "Sıfırla"
+  },
+  "button.save": {
+    "defaultMessage": "Yadda Saxla"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Dəyişiklikləri Yadda Saxla"
+  },
+  "button.saving": {
+    "defaultMessage": "Yadda Saxlanılır"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Daxil ol"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Çıxış et"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Qeydiyattan Keç"
+  },
+  "button.stop": {
+    "defaultMessage": "Dayandır"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Təqibi Bırax"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Şəkil Yüklə"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "İndi"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "APİ"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Tətbiq"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Serverlər"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Vebsayt"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Gizli"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "İkonu Düzəlt"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "İkonu Sil"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "İkonu Dəyişdir"
+  },
+  "icon-select.select": {
+    "defaultMessage": "İkonu Seç"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Axtar..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Qaleriya görünümü"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Şəbəkə görünüşü"
+  },
+  "input.view.list": {
+    "defaultMessage": "Sətirlər görünüşü"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Macəra modu"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Yaradıcılıq modu"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "İzləyici modu"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Həyatta Qalma modu"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Bilinməyən Oyun Modu"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Dəyişikliklər yadda saxlanıldı"
+  },
+  "label.collections": {
+    "defaultMessage": "Kalleksiyalar"
+  },
+  "label.created-ago": {
+    "defaultMessage": "{ago} öncə yaradıldı"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Panel"
+  },
+  "label.delete": {
+    "defaultMessage": "Sil"
+  },
+  "label.description": {
+    "defaultMessage": "Təsvir"
+  },
+  "label.error": {
+    "defaultMessage": "Səhv"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Təqip edilən layihələr"
+  },
+  "label.loading": {
+    "defaultMessage": "Yüklənir..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderasyon"
+  },
+  "label.notifications": {
+    "defaultMessage": "Bildirişlər"
+  },
+  "label.or": {
+    "defaultMessage": "və ya"
+  },
+  "label.password": {
+    "defaultMessage": "Şifrə"
+  },
+  "label.played": {
+    "defaultMessage": "{time} qədər oynandı"
+  },
+  "label.public": {
+    "defaultMessage": ""
+  },
+  "label.rejected": {
+    "defaultMessage": "Rədd Olunmuş"
+  },
+  "label.saved": {
+    "defaultMessage": "Yadda Saxlanılıb"
+  },
+  "label.server": {
+    "defaultMessage": "Server"
+  },
+  "label.servers": {
+    "defaultMessage": "Serverlər"
+  },
+  "label.settings": {
+    "defaultMessage": "Ayarlar"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Tək Oyuncu"
+  },
+  "label.title": {
+    "defaultMessage": "Başlıq"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Listədə Deyil"
+  },
+  "label.visibility": {
+    "defaultMessage": "Görünürlük"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Profilinə Bax"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Ödəmə yolu əlavə et"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Ödəmə yolu əlavə eləmə"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Bir Səhv oldu"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Qəbul Edildi"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Qəbul Edildi"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Arşivləndi"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Bağlatıldı"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Yaradıcı"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": ""
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Səhv"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Siyahıda"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderator"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth Komandası"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Gözlənilmedə"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Gizli"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "İşlənib"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Qəbul Edilmədi"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Geri Qaytarıldı"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Planlanmış"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Gözləmədə"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Siyahıda Yoxdur"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Tutulur"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kodu lövhəyə kopyala"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "İşləmci"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "İşləmci və server"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "İşləmci və ya server"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Server"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "Bir {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Dəstəklənmir"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": ""
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Bilinməyən ödəmə yolu"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Hamısı"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": ""
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "İşləmci və server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "İşləmci içi"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Yalnız Xüsusi serverlər"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": ""
+  }
+}
+

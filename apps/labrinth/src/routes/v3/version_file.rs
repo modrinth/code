@@ -1,6 +1,7 @@
 use super::ApiError;
 use crate::auth::checks::{filter_visible_versions, is_visible_version};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
 use crate::models::ids::VersionId;
 use crate::models::pats::Scopes;
@@ -121,7 +122,7 @@ pub struct UpdateData {
 pub async fn get_update_from_hash(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     update_data: web::Json<UpdateData>,
@@ -129,7 +130,7 @@ pub async fn get_update_from_hash(
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***pool,
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
@@ -144,20 +145,20 @@ pub async fn get_update_from_hash(
         }),
         hash,
         hash_query.version_id.map(|x| x.into()),
-        &**pool,
+        &***pool,
         &redis,
     )
     .await?
         && let Some(project) = database::models::DBProject::get_id(
             file.project_id,
-            &**pool,
+            &***pool,
             &redis,
         )
         .await?
     {
         let mut versions = database::models::DBVersion::get_many(
             &project.versions,
-            &**pool,
+            &***pool,
             &redis,
         )
         .await?
@@ -211,14 +212,14 @@ pub struct FileHashes {
 
 pub async fn get_versions_from_hashes(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     file_data: web::Json<FileHashes>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***pool,
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
@@ -235,14 +236,14 @@ pub async fn get_versions_from_hashes(
     let files = database::models::DBVersion::get_files_from_hash(
         algorithm.clone(),
         &file_data.hashes,
-        &**pool,
+        &***pool,
         &redis,
     )
     .await?;
 
     let version_ids = files.iter().map(|x| x.version_id).collect::<Vec<_>>();
     let versions_data = filter_visible_versions(
-        database::models::DBVersion::get_many(&version_ids, &**pool, &redis)
+        database::models::DBVersion::get_many(&version_ids, &***pool, &redis)
             .await?,
         &user_option,
         &pool,
@@ -329,8 +330,9 @@ pub struct ManyUpdateData {
     pub game_versions: Option<Vec<String>>,
     pub version_types: Option<Vec<VersionType>>,
 }
+
 pub async fn update_files(
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
 ) -> Result<HttpResponse, ApiError> {
@@ -341,7 +343,7 @@ pub async fn update_files(
     let files = database::models::DBVersion::get_files_from_hash(
         algorithm.clone(),
         &update_data.hashes,
-        &**pool,
+        &***pool,
         &redis,
     )
     .await?;
@@ -364,7 +366,7 @@ pub async fn update_files(
         &update_data.loaders.clone().unwrap_or_default(),
         &update_data.version_types.clone().unwrap_or_default().iter().map(|x| x.to_string()).collect::<Vec<_>>(),
     )
-        .fetch(&**pool)
+        .fetch(&***pool)
         .try_fold(DashMap::new(), |acc : DashMap<_,Vec<database::models::ids::DBVersionId>>, m| {
             acc.entry(database::models::DBProjectId(m.mod_id))
                 .or_default()
@@ -378,7 +380,7 @@ pub async fn update_files(
             .into_iter()
             .filter_map(|x| x.1.last().copied())
             .collect::<Vec<_>>(),
-        &**pool,
+        &***pool,
         &redis,
     )
     .await?;

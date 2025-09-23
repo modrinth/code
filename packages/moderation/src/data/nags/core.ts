@@ -224,7 +224,7 @@ export const coreNags: Nag[] = [
 		id: 'select-environments',
 		title: defineMessage({
 			id: 'nags.select-environments.title',
-			defaultMessage: 'Select supported environments',
+			defaultMessage: 'Select environments',
 		}),
 		description: (context: NagContext) => {
 			const { formatMessage } = useVIntl()
@@ -232,7 +232,7 @@ export const coreNags: Nag[] = [
 			return formatMessage(
 				defineMessage({
 					id: 'nags.select-environments.description',
-					defaultMessage: `Select if the {projectType} functions on the client-side and/or server-side.`,
+					defaultMessage: `Select the environments your {projectType} functions on.`,
 				}),
 				{
 					projectType: formatProjectType(context.project.project_type).toLowerCase(),
@@ -252,12 +252,12 @@ export const coreNags: Nag[] = [
 			)
 		},
 		link: {
-			path: 'settings',
+			path: 'settings/environment',
 			title: defineMessage({
 				id: 'nags.settings.environments.title',
-				defaultMessage: 'Visit general settings',
+				defaultMessage: 'Visit environment settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-environment',
 		},
 	},
 	{

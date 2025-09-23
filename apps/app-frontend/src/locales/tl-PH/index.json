@@ -1,0 +1,83 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Nakabukas ang paraan ng tagapagsulong."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Kiyas"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Mga pagpipilian sa batayang pangyayari"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Watawat ng mga tampok"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Mga pagkakabit ng Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Pribasiya"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Pamamahala ng mapagkukunan"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Idagdag at laruin"
+  },
+  "instance.add-server.add-server": {
+    "message": "Idagdag ang tagapagsilbi"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Hindi pinahihintulotan"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Pinahihintulotan"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Magpahintulot"
+  },
+  "instance.add-server.title": {
+    "message": "Magdagdag ng tagapagsilbi"
+  },
+  "instance.edit-server.title": {
+    "message": "Baguhin ang tagapagsilbi"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Huwag ipakita sa panig ng Bahay"
+  },
+  "instance.edit-world.name": {
+    "message": "Pangalan"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft na Daigdig"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Walain ang lambana"
+  },
+  "instance.edit-world.title": {
+    "message": "Baguhin ang daigdig"
+  },
+  "instance.filter.updates-available": {
+    "message": "May mga bagong pagbagao"
+  },
+  "instance.server-modal.name": {
+    "message": "Pangalan"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft na Tagapagsilbi"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Balot ng mapagkukunan"
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Baguhin ang lambana"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Tanggalin ang lambana"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Mga kagustuhan sa pasadyang durungawan"
+  },
+  "instance.settings.title": {
+    "message": "Mga Kagustuhan"
+  }
+}

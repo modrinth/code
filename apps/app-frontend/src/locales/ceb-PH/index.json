@@ -1,0 +1,83 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Gipaandar ang paagi sa tigpalambo."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Panagway"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Mga kapilian sa sukaranan nga pananglitan"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Bandera sa mga bahin"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Mga pagtaod sa Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Pribasiya"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Pagdumala sa kabtangan"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Idugang ug dulaa"
+  },
+  "instance.add-server.add-server": {
+    "message": "Idugang ang tigtagad"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Dili motugot"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Gitugotan"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Magpatugot"
+  },
+  "instance.add-server.title": {
+    "message": "Pagdugang og tigtagad"
+  },
+  "instance.edit-server.title": {
+    "message": "Usba ang tigtagad"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Ayaw ipakita sa panid sa Balay"
+  },
+  "instance.edit-world.name": {
+    "message": "Ngalan"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft nga Kalibutan"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Walaa ang amoy"
+  },
+  "instance.edit-world.title": {
+    "message": "Usba ang kalibutan"
+  },
+  "instance.filter.updates-available": {
+    "message": "Naay bag-ong mga kausaban"
+  },
+  "instance.server-modal.name": {
+    "message": "Ngalan"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft nga Tigtagad"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Putos sa kabtangan"
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Usba ang amoy"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Tangtangi ang amoy"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Mga gusto sa pinatuyo nga tamboanan"
+  },
+  "instance.settings.title": {
+    "message": "Mga Gusto"
+  }
+}

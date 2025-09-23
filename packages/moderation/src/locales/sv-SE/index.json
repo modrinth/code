@@ -1,0 +1,84 @@
+{
+  "nags.add-description.title": {
+    "defaultMessage": "Lägg till en beskrivning"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Lägg till en ikon"
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Lägg till externa länkar"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Expandera beskrivning"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Redigera beskrivning"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Redigera licens"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Redigera taggar"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Redigera titel"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "Besök gallerisida"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "Licens-URL är ogiltig."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Lägg till en giltig licenslänk"
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Flytta Discord-inbjudan"
+  },
+  "nags.select-environments.title": {
+    "defaultMessage": "Välj miljöer"
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Välj en licens"
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Välj taggar"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Besök beskrivningsinställningar"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "Besök miljöinställningar"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Besök licensinställningar"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Besök länkinställningar"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Besök tagginställningar"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Besök allmänna inställningar"
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "Rensa upp namnet"
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Ladda upp en galleribild"
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Ladda upp en version"
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Verifiera externa länkar"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "Besök versionssida"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Besök länkinställningar"
+  }
+}
+

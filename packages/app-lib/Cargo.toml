@@ -31,10 +31,11 @@ enumset.workspace = true
 chardetng.workspace = true
 encoding_rs.workspace = true
 png.workspace = true
-bytemuck.workspace = true
+bytemuck = { workspace = true, features = ["extern_crate_alloc"] }
 rgb.workspace = true
 phf.workspace = true
 itertools.workspace = true
+derive_more = { workspace = true, features = ["display"] }
 
 chrono = { workspace = true, features = ["serde"] }
 daedalus.workspace = true

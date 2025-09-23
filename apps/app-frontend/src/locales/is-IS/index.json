@@ -1,0 +1,170 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Kveikt er á forritaraham."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Útlit"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Virknirofar"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java uppsetningar"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Persónuvernd"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Bæta við og spila"
+  },
+  "instance.add-server.add-server": {
+    "message": "Bæta við þjóni"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Óvirkt"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Virkt"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Spyrja"
+  },
+  "instance.add-server.title": {
+    "message": "Bæta við þjóni"
+  },
+  "instance.edit-server.title": {
+    "message": "Breyta þjóni"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Fela frá Heimasíðu"
+  },
+  "instance.edit-world.name": {
+    "message": "Nafn"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Nýr Heimur"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Endursetja táknmynd"
+  },
+  "instance.edit-world.title": {
+    "message": "Breyta heim"
+  },
+  "instance.filter.updates-available": {
+    "message": "Uppfærslur mögulegar"
+  },
+  "instance.server-modal.address": {
+    "message": "Vistfang þjóns"
+  },
+  "instance.server-modal.name": {
+    "message": "Nafn þjóns"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Netþjónn"
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Eyðir..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Tvöfalda"
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Breyta táknmynd"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Fjarlægja táknmynd"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Skipta út táknmynd"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Velja táknmynd"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Búa til nýjan hóp"
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Sláðu inn hópnafn"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Nafn"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Ræsikrókar"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Sérsniðnir ræsikrókar"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Uppsetning"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Minecraft Vanilla {game_version} er nú þegar sett upp"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Leikjaútgafa"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Setja upp"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Gera við"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Gerir við"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Verið er að gera við"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Endursetja til núverandi"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Sýna allar útgáfur"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(Óþekkt útgáfa)"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java og vinnsluminni"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Krókar"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java uppsetning"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Vinnsluminni gefið"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Gluggi"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Sérsniðnar gluggastillingar"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Fullur skjár"
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Hæð"
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Sláðu inn hæð..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Breidd"
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Sláðu inn breidd..."
+  },
+  "instance.settings.title": {
+    "message": "Stillingar"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Minecraft Netþjónn"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Ekki sýna á heimasíðu"
+  }
+}

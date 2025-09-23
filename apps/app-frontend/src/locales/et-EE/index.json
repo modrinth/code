@@ -1,0 +1,107 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Arendajarežiim sisse lülitatud."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Välimus"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Vaikimisi instantsi valikud"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Funktsioonimärgid"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java installatsioonid"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privaatsus"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Ressursside haldus"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Lisa ja mängi"
+  },
+  "instance.add-server.add-server": {
+    "message": "Lisa server"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Väljas"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Sees"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Küsi"
+  },
+  "instance.add-server.title": {
+    "message": "Lisa server"
+  },
+  "instance.edit-server.title": {
+    "message": "Muuda server"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Peida koduleheküljelt"
+  },
+  "instance.edit-world.name": {
+    "message": "Nimi"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecrafti maailm"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Lähtesta ikoon"
+  },
+  "instance.edit-world.title": {
+    "message": "Muuda maailm"
+  },
+  "instance.filter.disabled": {
+    "message": "Suletud projektid"
+  },
+  "instance.filter.updates-available": {
+    "message": "Uuendused on saadaval"
+  },
+  "instance.server-modal.address": {
+    "message": "Aadress"
+  },
+  "instance.server-modal.name": {
+    "message": "Nimi"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecrafti server"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Ressursipakk"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Üldised"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Kustuta instants"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Kustuta instants"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Kustutab instantsi seadmest alatiselt, sealhulgas maailmad, konfiguratsioonid ja kogu paigaldatud sisu. Ole ettevaatlik, kuna instantsi kustutamisel ei ole seda enam võimalik taastada."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Kustutab..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Dubleeri"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Pole võimalik dubleerida paigaldamisel."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Dubleeri instants"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Nimi"
+  },
+  "instance.settings.title": {
+    "message": "Sätted"
+  }
+}

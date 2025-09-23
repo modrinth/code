@@ -1,0 +1,83 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Nakabukas ang moda ng nagdidibelop."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Itsura"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Mga pagpipilian sa default na instansiya"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Mga feature flag"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Mga instalasyon ng Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Pribasiya"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Pamamahala ng resource"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Idagdag at laruin"
+  },
+  "instance.add-server.add-server": {
+    "message": "Idagdag ang serber"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Hindi pinahihintulotan"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Pinahihintulotan"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Magpahintulot"
+  },
+  "instance.add-server.title": {
+    "message": "Magdagdag ng serber"
+  },
+  "instance.edit-server.title": {
+    "message": "Baguhin ang serber"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Huwag ipakita sa Home na pahina"
+  },
+  "instance.edit-world.name": {
+    "message": "Pangalan"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft na Mundo"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Walain ang ikono"
+  },
+  "instance.edit-world.title": {
+    "message": "Baguhin ang mundo"
+  },
+  "instance.filter.updates-available": {
+    "message": "May bagong mga update"
+  },
+  "instance.server-modal.name": {
+    "message": "Pangalan"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft na Serber"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resource pack"
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Baguhin ang ikono"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Tanggalin ang ikono"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Mga setting sa custom na window"
+  },
+  "instance.settings.title": {
+    "message": "Mga Setting"
+  }
+}

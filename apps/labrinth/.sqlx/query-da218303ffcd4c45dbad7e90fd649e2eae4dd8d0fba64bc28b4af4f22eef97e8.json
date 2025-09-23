@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT\n                  COALESCE(m.name, v.version_number, u.username, 'unknown') \"title!\"\n                FROM reports r\n                LEFT JOIN mods m ON r.mod_id = m.id\n                LEFT JOIN versions v ON r.version_id = v.id\n                LEFT JOIN users u ON r.user_id = u.id\n                WHERE r.id = $1\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "title!",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "da218303ffcd4c45dbad7e90fd649e2eae4dd8d0fba64bc28b4af4f22eef97e8"
+}

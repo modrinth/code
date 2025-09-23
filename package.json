@@ -22,6 +22,7 @@
 		"lint:ancillary": "prettier --check .github *.*",
 		"test": "turbo run test --continue",
 		"fix": "turbo run fix fix:ancillary --continue",
+		"fix:frontend": "turbo run fix --continue --parallel --filter='!@modrinth/labrinth' --filter='!@modrinth/app' --filter='!@modrinth/app-lib' --filter='!@modrinth/daedalus' --filter='!@modrinth/daedalus_client' --filter='!@modrinth/app-playground'",
 		"fix:ancillary": "prettier --write .github *.*",
 		"ci": "turbo run lint test --continue",
 		"intl:extract": "pnpm ui:intl:extract && pnpm web:intl:extract && pnpm app:intl:extract && pnpm moderation:intl:extract"

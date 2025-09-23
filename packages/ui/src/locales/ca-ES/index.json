@@ -1,0 +1,18 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Versió beta"
+  },
+  "button.back": {
+    "defaultMessage": "Enrere"
+  },
+  "button.continue": {
+    "defaultMessage": "Continua"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Afegir mètode de pagament"
+  }
+}
+

@@ -1,0 +1,209 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "کاربر یافت نشد"
+  },
+  "app-marketing.download.description": {
+    "message": "اپلیکیشن دسکتاپ ما در تمامی پلتفرم‌ها در دسترس است، نسخه‌ی دلخواه خود را انتخاب کنید."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "دانلود AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "دانلود بتا"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "دانلود DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "دانلود RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "لینوکس"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "نسخه‌های لینوکس اپلیکیشن Modrinth در برخی سیستم‌ها ممکن است <issues-link>مشکلاتی</issues-link> داشته باشند. اگر اپلیکیشن Modrinth روی سیستم شما ناپایدار است، پیشنهاد می‌کنیم از برنامه‌های دیگری مانند <prism-link>Prism Launcher</prism-link> استفاده کنید تا بتوانید به‌راحتی محتوای Modrinth را نصب کنید."
+  },
+  "app-marketing.download.mac": {
+    "message": "مکینتاش"
+  },
+  "app-marketing.download.options-title": {
+    "message": "گزینه‌های دانلود"
+  },
+  "app-marketing.download.terms": {
+    "message": "با دانلود اپلیکیشن Modrinth، شما با <terms-link>شرایط استفاده</terms-link> و <privacy-link>سیاست حریم خصوصی ما</privacy-link> موافقت می‌کنید."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "بسته‌های شخص ثالث"
+  },
+  "app-marketing.download.title": {
+    "message": "دانلود اپلیکیشن Modrinth (نسخه بتا)"
+  },
+  "app-marketing.download.windows": {
+    "message": "ویندوز"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "محتوایی که دوست دارید را ذخیره کنید و با یک کلیک به‌روزرسانی‌ها را دریافت کنید."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "دنبال کردن پروژه‌ها"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "تمام پروفایل‌های مورد علاقه خود را از لانچری که قبلاً استفاده می‌کردید وارد کنید و در چند ثانیه با اپلیکیشن Modrinth شروع به کار کنید!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "وارد کردن پروفایل‌ها"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "عمل‌ها"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "توسط {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "با Modrinth می‌توانید همه مودهای خود را راحت در یکجا مدیریت کنید. می‌توانید نصب، حذف و بروزرسانی مادها را تنها با یک کلیک انجام بدهید."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "ماده‌ای نصب شده"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "نام"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "جست‌وجوی مادها"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "مدیریت مادها"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "نسخه"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "مادهای خود را اجرا کنید، چه به اینترنت متصل باشید و چه نباشید."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "حالت آفلاین"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "لانچر Modrinth کاملاً متن‌باز است. می‌توانید کد منبع را در <github-link>گیت هاب</github-link> ما مشاهده کنید!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "متن باز"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "نمایشگر فعالیت‌ها"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "دیسکورد"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "عملکرد خوب"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "گوگل کروم"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "کمتر از ۱۵۰ مگابایت"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "اپلیکیشن Modrinth"
+  },
+  "app-marketing.features.play.title": {
+    "message": "با ماد های موردعلاقه خود بازی کنید"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "اجازه دادن"
+  },
+  "auth.authorize.action.decline": {
+    "message": "رد"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> از <creator-link>{creator}</creator-link> مجاز خواهد بود تا:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "اجازه دادن {appName}"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "ایمیل خود را در زیر وارد کنید و ما یک لینک بازیابی ارسال خواهیم کرد تا به شما امکان بازیابی حساب خود را بدهیم."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "ایمیل یا نام کاربری"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "ایمیل"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "اگر ایمیل قبلاً در حساب شما ذخیره شده بود ، ایمیلی با دستورالعمل برای شما ارسال شده است."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "ایمیل ارسال شد"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "اکنون میتوانید با رمز عبور جدید وارد حساب خود شوید."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "رمز عبور با موفقیت بازنشانی شد"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "بازنشانی رمز عبور"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "تایید رمز عبور"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "رمز عبور جدید را وارد کنید تا به حساب خود دسترسی پیدا کنید"
+  },
+  "auth.reset-password.title": {
+    "message": "بازنشانی رمز عبور"
+  },
+  "auth.reset-password.title.long": {
+    "message": "رمز عبور خود را بازنشانی کنید"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "لطفاً برای ادامه یک کد دو عاملی وارد کنید."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "کد دو عاملی را وارد کنید"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "کد را وارد کنید..."
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "ایمیل یا نام کاربری"
+  },
+  "auth.sign-in.password.label": {
+    "message": "رمز عبور"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "ورود با"
+  },
+  "auth.sign-in.title": {
+    "message": "ورود"
+  },
+  "auth.sign-in.use-password": {
+    "message": "یا از رمز عبور استفاده کنید"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "ایجاد حساب"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "تأیید رمز عبور"
+  },
+  "auth.sign-up.email.label": {
+    "message": "ایمیل"
+  },
+  "auth.sign-up.label.username": {
+    "message": "نام کاربری"
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "رمز های عبور مطابقت ندارند!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "رمز عبور"
+  }
+}

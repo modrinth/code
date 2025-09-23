@@ -1,0 +1,846 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Half baked"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Half baked edishun"
+  },
+  "badge.new": {
+    "defaultMessage": "New kitteh"
+  },
+  "button.analytics": {
+    "defaultMessage": "Countz"
+  },
+  "button.back": {
+    "defaultMessage": "Go bakk"
+  },
+  "button.cancel": {
+    "defaultMessage": "No plz"
+  },
+  "button.continue": {
+    "defaultMessage": "Keepz goinz"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Copy teh IDz"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Copy da forever linkz"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Makez a pawject"
+  },
+  "button.download": {
+    "defaultMessage": "Downloaf"
+  },
+  "button.downloading": {
+    "defaultMessage": "Downloafin'"
+  },
+  "button.edit": {
+    "defaultMessage": "Pawdit"
+  },
+  "button.follow": {
+    "defaultMessage": "Stalk"
+  },
+  "button.more-options": {
+    "defaultMessage": "Moar optshunz"
+  },
+  "button.next": {
+    "defaultMessage": "Nexxt"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Open teh folderz"
+  },
+  "button.play": {
+    "defaultMessage": "Playz"
+  },
+  "button.refresh": {
+    "defaultMessage": "Refresherate"
+  },
+  "button.remove": {
+    "defaultMessage": "Shoo away"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Shoo away teh pictar"
+  },
+  "button.report": {
+    "defaultMessage": "Repurrtd"
+  },
+  "button.reset": {
+    "defaultMessage": "Start over"
+  },
+  "button.save": {
+    "defaultMessage": "Stash"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Stash teh changez"
+  },
+  "button.saving": {
+    "defaultMessage": "Stashin’"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Signz in nao"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Git outta here"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Signz upz"
+  },
+  "button.stop": {
+    "defaultMessage": "Halt"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Stop stalkin'"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Uploadz teh pictarz"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Rite meow"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "APIz"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Appz"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Servahz"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Da webz"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Preeeivate"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Tweak iconz"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Shoo away iconz"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Swap iconz"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Choose da iconz"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Searchez..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Pictar viewz"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Grid viewz"
+  },
+  "input.view.list": {
+    "defaultMessage": "Rowz viewz"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Adventures timez"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Creaturz mode"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Iz peekin' tyme"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Survivlz mode"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Kitteh dunno gamez modez"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Changies stashed"
+  },
+  "label.collections": {
+    "defaultMessage": "Hoardz"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Madez on {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Dashyboard"
+  },
+  "label.delete": {
+    "defaultMessage": "Shoo away"
+  },
+  "label.description": {
+    "defaultMessage": "What dis is"
+  },
+  "label.error": {
+    "defaultMessage": "Oopsie"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Stuffz I iz followin'"
+  },
+  "label.loading": {
+    "defaultMessage": "Loadin'..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Mod kittehz"
+  },
+  "label.notifications": {
+    "defaultMessage": "Notifikashuns"
+  },
+  "label.or": {
+    "defaultMessage": "or"
+  },
+  "label.password": {
+    "defaultMessage": "Secwet"
+  },
+  "label.played": {
+    "defaultMessage": "Playz {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Piblic"
+  },
+  "label.rejected": {
+    "defaultMessage": "Nope"
+  },
+  "label.saved": {
+    "defaultMessage": "Stashed"
+  },
+  "label.scopes": {
+    "defaultMessage": "Scopez"
+  },
+  "label.server": {
+    "defaultMessage": "Servah"
+  },
+  "label.servers": {
+    "defaultMessage": "Servahz"
+  },
+  "label.settings": {
+    "defaultMessage": "Tweakz"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Lone kitteh mode"
+  },
+  "label.title": {
+    "defaultMessage": "Tittle"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Iz unlistedz"
+  },
+  "label.visibility": {
+    "defaultMessage": "Can haz see"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Visit ur pawfile"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Add sum wayz to payz"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Addin' a wayz to payz"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Sumthin' went wrongz"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Iz okai"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Iz approovd"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Archive'd"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Iz closed"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Creaturz"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Draftz"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Haz fail"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listeded"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Mod kittehz"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth Teem"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Hangin' in there"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Preeeivate"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Procezzzed"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Nope"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Iz bakk"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Schedoolz"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Under kitteh check"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Iz unlisteds"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Wifheld"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Copy teh codez to clipboard"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Cliehntz"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Cliehntz an' servah"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Cliehntz or servah"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Servah"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "Iz a {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Unsupurrted"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} endinz in {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Payz"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "Amurrican Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Catz Appz"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Clubz"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Findz it"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCardz"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPaw"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPayz"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Unknowz wayz to payz"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Veezah"
+  },
+  "project-type.all": {
+    "defaultMessage": "Allz da tingz"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Nerdy Pack} other {Nerdy Packz}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Nerdy Packz"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {nerdy pack} other {nerdy packz}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Tweakie} other {Tweakiez}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Tweakiez"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {tweakie} other {tweekiez}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Tweakie bundle} other {Tweakie bundlez}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Tweakie bundlez"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {tweakie bundle} other {tweakie bundlez}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Pluggie} other {Pluggiez}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pluggiez"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {pluggie} other {pluggiez}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packz}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resource Packz"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {resource pack} other {resource packz}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Fanceh Light} other {Fanceh Lights}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Fanceh Lights"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {fanceh light} other {fanceh lights}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Environments dat me supports"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Cliehntz an' servah"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Kitteh end"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Servah only"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Servah end"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Loneleh kitteh"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Loneleh kitteh only"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecwaft: Java Editionz"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platfurrms"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Iz teh compatiblez"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Pawject hoomin"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Creaturz"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Madez on {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "Kitteh rights {license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Putt'd out on {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "Gibz to da on {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "De lil' stuffs"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "I updaited dis on {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Join teh Kittehcord"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Gib meh a kitteh koffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Gib moniez"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponsorz on CatHubz"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Gib Catz moniez on Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Gib da Catz moniez on Pawtreonz"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Gib da Catz moniez on PayPaw"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Repurrt dem issuez"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Iz can haz source code"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Linkses"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Visit teh wiki"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Countz"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "What dis is"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Kitteh doez sum stuffz on both endz, even if halfie."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Kitteh can haz on both, workz da same no matter side"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Optional on both, works best when installed on both sides"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "If u want on kitteh end"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "If u want on servah"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Kitteh must haz on both"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Cliehntz an' servah"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "Kitteh stuffs all on ur side, compatible wif vanilla blockz."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Kitteh end only"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Servah only"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "Kitteh stuffs all on ur side, compatible wif vanilla blockz."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Wurks in loneleh kitteh worldz too"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Servah end only"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Kitteh only doez stuff in loneleh kitteh mode or wen not connected to a Multiplayer servah."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Loneleh kitteh only"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Lil optionz of {option}"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Enviromint"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Pictarzies"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Generulz"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "Kitteh rights"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Linkses"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Peoplez hoo helpd"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "You haz no pawmission to edit dis."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "No pawmission"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Markz"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Plop in"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Verzhunz"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Peekz"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "In da box"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Draftz"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Preeeivate"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Piblic"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Nope"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Schedoolz"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Under kitteh check"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Dunno"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Unlisted dis"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Unlisted dis cuz staff did it"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Filturr iz locked"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Unlockin' dis filturr maybz letz u install sumthin' dat iz no worky."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Sync filturr"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} iz locked"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Unlocks da filturr"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Enviromint"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Cliehntz"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Servah"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Game stuffs verzhun"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Show all da verzhunz"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Kitteh rights"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Iz freez codez"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Loadarz"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Loadarz"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Loadarz"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Platfurrm"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "Pawject ID"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Loadarz"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Bai Bai"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Can haz bye bye"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Oh hai"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Infurmazhun"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Iz kritical"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Infurmazhun"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Surveee"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Oh noez"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Cant' haz bye bye"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "U iz not gonna get teh billz YET."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Mebbe pickz a wayz to payz"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Wayz to payz"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "billz iz da {interval}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "Iz pickz a speshul plawn wif jus da stuffz u needz."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Get goin'"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Purrfect fur 15–25 playrz, tweakie bundlez, or heavy tweakiez."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "Greeeat fur 6–15 playas an' like, ALL da tweakiez."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Most Pawpularz"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Chosez a plawn"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Choose plawn"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "Purrfect fur 1–5 frendz wif sum lite tweakiez."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "Iz pick da RAMz and speshulz dat fitz ur needz."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Plawn"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Kitteh spot"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Reeview"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Middles of Europe"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "How much RAMz do you wantz for ur servah?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "North Amewica"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Ware iz u wanna put mah servah, kitteh?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Region not here? <link>Tellz us wherez u wanna seez Modrinth Servah next, plz!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Souzeasht Azia"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Westurrrope"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Accont n' sekurityz"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Lookz liek"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Yur appz"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Appz dat iz halpfulz"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "Billz an' subscripshuns"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Teh darkz"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Pick ur fave colorz fur Modrinth on dis thingy, plz."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Litez"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLEDz"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Prefurred darkz themez"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Prefurred litez themez"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Old skool stuffz"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Syncin' wit da systemz"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Da vibe palette"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Langwage"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "Hoomin access pawtken"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Piblic pawfile"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Sessionz"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} atz {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "U haz unstashd tweakz."
+  }
+}
+

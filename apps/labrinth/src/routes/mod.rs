@@ -119,6 +119,8 @@ pub enum ApiError {
     Payments(String),
     #[error("Discord Error: {0}")]
     Discord(String),
+    #[error("Slack Webhook Error: {0}")]
+    Slack(String),
     #[error("Captcha Error. Try resubmitting the form.")]
     Turnstile,
     #[error("Error while decoding Base62: {0}")]
@@ -128,8 +130,8 @@ pub enum ApiError {
     #[error("Password Hashing Error: {0}")]
     PasswordHashing(#[from] argon2::password_hash::Error),
     #[error("{0}")]
-    Mail(#[from] crate::auth::email::MailError),
-    #[error("Error while rerouting request: {0}")]
+    Mail(#[from] crate::queue::email::MailError),
+    #[error("Error while rerouting request: {0:?}")]
     Reroute(#[from] reqwest::Error),
     #[error("Unable to read Zip Archive: {0}")]
     Zip(#[from] zip::result::ZipError),
@@ -139,6 +141,8 @@ pub enum ApiError {
     NotFound,
     #[error("Conflict: {0}")]
     Conflict(String),
+    #[error("External tax compliance API Error")]
+    TaxComplianceApi,
     #[error(
         "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
     )]
@@ -175,10 +179,12 @@ impl ApiError {
                 ApiError::Reroute(..) => "reroute_error",
                 ApiError::NotFound => "not_found",
                 ApiError::Conflict(..) => "conflict",
+                ApiError::TaxComplianceApi => "tax_compliance_api_error",
                 ApiError::Zip(..) => "zip_error",
                 ApiError::Io(..) => "io_error",
                 ApiError::RateLimitError(..) => "ratelimit_error",
                 ApiError::Stripe(..) => "stripe_error",
+                ApiError::Slack(..) => "slack_error",
             },
             description: self.to_string(),
         }
@@ -212,10 +218,12 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotFound => StatusCode::NOT_FOUND,
             ApiError::Conflict(..) => StatusCode::CONFLICT,
+            ApiError::TaxComplianceApi => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Zip(..) => StatusCode::BAD_REQUEST,
             ApiError::Io(..) => StatusCode::BAD_REQUEST,
             ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
             ApiError::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
+            ApiError::Slack(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

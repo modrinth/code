@@ -328,6 +328,7 @@ import {
 	Button,
 	ButtonStyled,
 	Checkbox,
+	commonProjectTypeCategoryMessages,
 	DropdownSelect,
 	NewProjectCard,
 	Pagination,
@@ -635,12 +636,15 @@ function setClosestMaxResults() {
 
 const selectableProjectTypes = computed(() => {
 	return [
-		{ label: 'Mods', href: `/mods` },
-		{ label: 'Resource Packs', href: `/resourcepacks` },
-		{ label: 'Data Packs', href: `/datapacks` },
-		{ label: 'Shaders', href: `/shaders` },
-		{ label: 'Modpacks', href: `/modpacks` },
-		{ label: 'Plugins', href: `/plugins` },
+		{ label: formatMessage(commonProjectTypeCategoryMessages.mod), href: `/mods` },
+		{
+			label: formatMessage(commonProjectTypeCategoryMessages.resourcepack),
+			href: `/resourcepacks`,
+		},
+		{ label: formatMessage(commonProjectTypeCategoryMessages.datapack), href: `/datapacks` },
+		{ label: formatMessage(commonProjectTypeCategoryMessages.shader), href: `/shaders` },
+		{ label: formatMessage(commonProjectTypeCategoryMessages.modpack), href: `/modpacks` },
+		{ label: formatMessage(commonProjectTypeCategoryMessages.plugin), href: `/plugins` },
 	]
 })
 

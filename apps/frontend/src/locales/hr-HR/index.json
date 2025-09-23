@@ -1,0 +1,200 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Korisnik nije pronađen"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Ovlasti"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Odbij"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> od <creator-link>{creator}</creator-link> moći će:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Ovlasti {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "U odgovoru nije pronađena lokacija za preusmjeravanje"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Bit ćeš preusmjeren/na do <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Pošaljite e -poštu za oporavak"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Upišite svoju e -poštu ispod i poslat ćemo ti link za oporavak tvog računa."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "E -pošta ili korisničko ime"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "E -pošta"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "E-pošta sa instrukcijama je poslana je vama ako je adresa predhodno spremljena na vaš račun."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "E -pošta poslana"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Sada se možeš prijaviti u svoj račun sa novom lozinkom."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Lozinka uspješno resetirana"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Resetiraj lozinku"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Potvrdi Lozinku"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Upiši svoju novu lozinku kako bi pristupio svom računu."
+  },
+  "auth.reset-password.title": {
+    "message": "Resetiraj lozinku"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Resetiraj svoju lozinku"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Molim upiši svoj dvo-faktorni kod za nastavak."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Upiši dvo-faktorni kod"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Upiši kod..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Zaboravili lozinku?</forgot-password-link> • <create-account-link>Napravi račun</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "E -pošta ili korisničko ime"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Lozinka"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Prijavi se sa"
+  },
+  "auth.sign-in.title": {
+    "message": "Prijavi se"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Ili koristi lozinku"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Napravi račun"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Potvrdi lozinku"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Korisničko ime"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Izradom računa pristajete na Modrinthove <terms-link>Uvjete</terms-link> i <privacy-policy-link>Pravila o pivatnosti</privacy-policy-link>."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Lozinke se ne podudaraju!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Lozinka"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Već imate račun?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Pretplatite se na obavjesti o Modrinthu"
+  },
+  "auth.sign-up.title": {
+    "message": "Prijavite se"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Ili sami stvorite račun"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Prijavite se sa"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Postavke računa"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Prijavite se"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Vaša je e -pošta već potvrđena!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "E -pošta već potvrđena"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Ponovno pošaljite e-poštu za potvrdu"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Nismo bili u mogućnosti potvrditi vašu e -poštu. Pokušajte ponovno poslati e-poštu za potvrdu putem nadzorne ploče tako da se prijavite."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Nismo bili u mogućnosti potvrditi vašu e -poštu. Pokušajte ponovno poslati e-poštu za potvrdu putem gumba u ispod."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Potvrda e -pošte nije uspjela"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Vaša je adresa e -pošte uspješno potvrđena!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Potvrda e -pošte"
+  },
+  "auth.verify-email.title": {
+    "message": "Potvrdite e -poštu"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Pretplatite se na obavjesti o Modrinthu"
+  },
+  "auth.welcome.label.tos": {
+    "message": "Izradom računa pristali ste na Modrinthove <terms-link>Uvjete</terms-link> i <privacy-policy-link>Pravila o privatnosti</privacy-policy-link>."
+  },
+  "auth.welcome.long-title": {
+    "message": "Dobro došli u Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "Dobro došli"
+  },
+  "collection.button.delete-icon": {
+    "message": "Izbriši ikonu"
+  },
+  "collection.button.edit-icon": {
+    "message": "Uredi ikonu"
+  },
+  "collection.button.remove-project": {
+    "message": "Uklonite projekt"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Odpratite projekt"
+  },
+  "collection.delete-modal.description": {
+    "message": "Ovo će zauvijek ukloniti ovu kolekciju. Ova se radnja ne može poništiti."
+  },
+  "collection.delete-modal.title": {
+    "message": "Jeste li sigurni da želite izbrisati ovu kolekciju?"
+  },
+  "collection.description": {
+    "message": "{description} - Pogledajte kolekciju {name} od {username} na Modrinthu"
+  },
+  "layout.avatar.alt": {
+    "message": "Vaš avatar"
+  },
+  "layout.banner.account-action": {
+    "message": "Akcija za account je potrebna"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Posjetite postavke računa"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Za sigurnosne razloge, Modrinth treba da registrirate e -poštu na ovaj račun."
+  }
+}

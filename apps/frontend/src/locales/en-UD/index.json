@@ -1,0 +1,2090 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "punoɟ ʇou ɹǝs∩"
+  },
+  "app-marketing.download.description": {
+    "message": "˙uoᴉsɹǝʌ pǝɹᴉsǝp ɹnoʎ ǝsooɥɔ 'sɯɹoɟʇɐld llɐ ssoɹɔɐ ǝlqɐlᴉɐʌɐ sᴉ ddɐ doʇʞsǝp ɹnO"
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "ǝƃɐɯIdd∀ ǝɥʇ pɐoluʍop"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "ɐʇǝq ǝɥʇ pɐoluʍop"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "qƎp ǝɥʇ pɐoluʍop"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "WԀɹ ǝɥʇ pɐoluʍop"
+  },
+  "app-marketing.download.linux": {
+    "message": "xnuᴉ˥"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "˙ʇuǝʇuoɔ ɥʇuᴉɹpoW llɐʇsuᴉ ʎlᴉsɐǝ oʇ <prism-link>ɹǝɥɔunɐꞀ ɯsᴉɹԀ</prism-link> ǝʞᴉl sddɐ ɹǝɥʇo ʎɹʇ oʇ noʎ ǝɓɐɹnoɔuǝ ǝʍ ˋɯǝʇsʎs ɹnoʎ uo ǝlqɐʇsun sᴉ ddⱯ ɥʇuᴉɹpoW ɟI ˙suoᴉʇɐɹnɓᴉɟuoɔ puɐ sɯǝʇsʎs uᴉɐʇɹǝɔ uo <issues-link>sǝnssᴉ ǝʌɐɥ oʇ uʍouʞ</issues-link> ǝɹɐ ddⱯ ɥʇuᴉɹpoW ɟo suoᴉsɹǝʌ xnuᴉꞀ ǝɥ⟘"
+  },
+  "app-marketing.download.mac": {
+    "message": "ɔɐW"
+  },
+  "app-marketing.download.options-title": {
+    "message": "suoᴉʇdo pɐoluʍop"
+  },
+  "app-marketing.download.terms": {
+    "message": "˙<privacy-link>ʎɔᴉloԀ ʎɔɐʌᴉɹԀ</privacy-link> puɐ <terms-link>sɯɹǝ⟘</terms-link> ɹno oʇ ǝǝɹɓɐ noʎ ddⱯ ɥʇuᴉɹpoW ɓuᴉpɐoluʍop ʎᗺ"
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "sǝƃɐʞɔɐd ʎʇɹɐd-pɹᴉɥ┴"
+  },
+  "app-marketing.download.title": {
+    "message": "(ɐʇǝᗺ) ddⱯ ɥʇuᴉɹpoW pɐoluʍoᗡ"
+  },
+  "app-marketing.download.windows": {
+    "message": "sʍopuᴉM"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "˙ʞɔᴉlɔ ǝuo ɥʇᴉʍ sǝʇɐpdn ǝʌᴉǝɔǝɹ puɐ ǝʌol noʎ ʇuǝʇuoɔ ǝʌɐS"
+  },
+  "app-marketing.features.follow.title": {
+    "message": "sʇɔǝɾoɹd ʍolloℲ"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "¡spuoɔǝs uᴉ ddⱯ ɥʇuᴉɹpoW ɥʇᴉʍ pǝʇɹɐʇs ʇǝɓ puɐ ˋǝɹoɟǝq ɓuᴉsn ǝɹǝʍ noʎ ɹǝɥɔunɐl ǝɥʇ ɯoɹɟ sǝlᴉɟoɹd ǝʇᴉɹoʌɐɟ ɹnoʎ llɐ ʇɹodɯI"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "ɹǝɥɔunɐ˥pפ"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "ƆWᴉʇlnW"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "ƃuᴉʇɹodɯᴉ ǝlᴉɟoɹԀ"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "suoᴉʇɔ∀"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "ʎq"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "˙ʞɔᴉlɔ ǝlɓuᴉs ɐ ɥʇᴉʍ spoɯ ǝʇɐpdn puɐ ˋllɐʇsuᴉun ˋllɐʇsuᴉ uɐɔ no⅄ ˙ǝɔɐld ǝuo uᴉ spoɯ ɹnoʎ llɐ ǝɓɐuɐɯ oʇ ʎsɐǝ ʇᴉ sǝʞɐɯ ɥʇuᴉɹpoW"
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "spoɯ pǝllɐʇsuI"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "ǝɯɐN"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "spoɯ ɥɔɹɐǝS"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "ʇuǝɯǝƃɐuɐɯ poW"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "uoᴉsɹǝΛ"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "˙ʇou ɹo 'ʇǝuɹǝʇuᴉ ǝɥʇ oʇ pǝʇɔǝuuoɔ ǝɹɐ noʎ ɹǝɥʇǝɥʍ 'spoɯ ɹnoʎ ʎɐlԀ"
+  },
+  "app-marketing.features.offline.title": {
+    "message": "ǝpoɯ ǝuᴉlɟɟO"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "¡<github-link>qnHʇᴉ⅁</github-link> ɹno uo ǝpoɔ ǝɔɹnos ǝɥʇ ʍǝᴉʌ uɐɔ no⅄ ˙ǝɔɹnos uǝdo ʎllnɟ sᴉ ɹǝɥɔunɐl s,ɥʇuᴉɹpoW"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "ǝɔɹnos uǝdO"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "ɹoʇᴉuoɯ ʎʇᴉʌᴉʇɔ∀"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "∩ԀƆ %"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "¡WⱯᴚ ɟo qɯ0૨⇂ ʇsnſ ɓuᴉsn ˋsɹǝɓɐuɐɯ poɯ ɓuᴉpɐǝl ǝɥʇ ɟo ʎuɐɯ uɐɥʇ ɹǝʇʇǝq sɯɹoɟɹǝd ddⱯ ɥʇuᴉɹpoW"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "pɹoɔsᴉp"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "ǝɔuɐɯɹoɟɹǝd pooפ"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "ǝɯoɹɥƆ ǝlƃooפ"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "ᗺW ∞"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "ᗺW ∞ * ∞"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "ᗺW 0૨⇂ <"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "% uoᴉllᴉq ⇂"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "ǝɯɐu ssǝɔoɹԀ"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "WⱯᴚ"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "llɐɯS"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "ʇuɐɯɹoɟɹǝԀ"
+  },
+  "app-marketing.features.play.description": {
+    "message": "˙sʞɔɐdpoɯ puɐ spoɯ ǝʇᴉɹoʌɐɟ ɹnoʎ ɥʇᴉʍ ʎɐld puɐ pɐoluʍop oʇ ddⱯ ɥʇuᴉɹpoW ǝs∩"
+  },
+  "app-marketing.features.play.title": {
+    "message": "Play with your favorite mods"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "˙ɥʇuᴉɹpoW uo ǝɹǝɥ pǝʇsoɥ sʞɔɐdpoɯ puɐ spoɯ ɟo spuɐsnoɥʇ ǝɥʇ ɟo ʎuɐ ɥʇᴉʍ sʞɔɐdpoɯ ʎɐld puɐ ˋǝɹɐɥs ˋplᴉnᗺ"
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "ʞɔɐdpoW"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "ǝɹɐɥS"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "sʞɔɐdpoɯ ǝɹɐɥS"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "ɹǝɥɔunɐl ʎuɐ ǝʞᴉlu∩"
+  },
+  "app-marketing.features.website.description": {
+    "message": "¡ddɐ ǝɥʇ ɯoɹɟ sʇɔǝſoɹd ǝʇᴉɹoʌɐɟ ɹnoʎ llɐ ssǝɔɔɐ uɐɔ noʎ os ˋǝʇᴉsqǝʍ ǝɥʇ ɥʇᴉʍ pǝʇɐɹɓǝʇuᴉ ʎllnɟ sᴉ ddⱯ ɥʇuᴉɹpoW"
+  },
+  "app-marketing.features.website.title": {
+    "message": "uoᴉʇɐɹɓǝʇuᴉ ǝʇᴉsqǝM"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "ǝɹoɟǝq pǝsn ǝʌ,noʎ"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "˙ǝɓɐd ,ʇuǝʇuoƆ, ǝɥʇ oʇ pǝuǝdo ǝɔuɐʇsuᴉ uoɯǝlqqoƆ ɐ ɥʇᴉʍ ddⱯ ɥʇuᴉɹpoW ɟo ʇoɥsuǝǝɹɔS"
+  },
+  "app-marketing.hero.description": {
+    "message": "˙ǝɓɐʞɔɐd ǝlʇʇᴉl ʇɐǝu ǝuo uᴉ llɐ ˋǝʇɐp oʇ dn ɯǝɥʇ dǝǝʞ puɐ ˋspoɯ ǝʇᴉɹoʌɐɟ ɹnoʎ ʎɐld oʇ noʎ sʍollɐ ʇɐɥʇ ɹǝɥɔunɐl ǝɔɹnos uǝdo ˋǝnbᴉun ɐ sᴉ ddⱯ ɥʇuᴉɹpoW"
+  },
+  "app-marketing.hero.download-button": {
+    "message": "ddⱯ ɥʇuᴉɹpoW pɐoluʍoᗡ"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW pɐoluʍoᗡ"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "{os} ɹoɟ ddⱯ ɥʇuᴉɹpoW pɐoluʍoᗡ"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "˙uǝǝɹɔs nuǝɯ uᴉɐɯ s,ǝɔuɐʇsuᴉ uoɯǝlqqoƆ ǝɥʇ ɟo ʇoɥsuǝǝɹɔS"
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "suoᴉʇdO pɐoluʍoᗡ ǝɹoW"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "ǝsᴉɹoɥʇnⱯ"
+  },
+  "auth.authorize.action.decline": {
+    "message": "ǝuᴉlɔǝᗡ"
+  },
+  "auth.authorize.app-info": {
+    "message": ":oʇ ǝlqɐ ǝq llᴉʍ <creator-link>{creator}</creator-link> ʎq <strong>{appName}</strong> "
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "{appName} ǝzᴉɹoɥʇnⱯ"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "ǝsuodsǝɹ uᴉ punoɟ uoᴉʇɐɔol ʇɔǝɹᴉpǝɹ oN"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "<redirect-url>{url}</redirect-url> oʇ pǝʇɔǝɹᴉpǝɹ ǝq llᴉʍ no⅄"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "lᴉɐɯǝ ʎɹǝʌoɔǝɹ puǝS"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "˙ʇunoɔɔɐ ɹnoʎ ɹǝʌoɔǝɹ oʇ noʎ ʍollɐ oʇ ʞuᴉl ʎɹǝʌoɔǝɹ ɐ puǝs ll,ǝʍ puɐ ʍolǝq lᴉɐɯǝ ɹnoʎ ɹǝʇuƎ"
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "ǝɯɐuɹǝsn ɹo lᴉɐɯƎ"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "lᴉɐɯƎ"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "˙ʇunoɔɔɐ ɹnoʎ uo pǝʌɐs ʎꞁsnoᴉʌǝɹd sɐʍ ꞁᴉɐɯǝ ǝɥʇ ɟᴉ noʎ oʇ ʇuǝs uǝǝq sɐɥ suoᴉʇɔnɹʇsuᴉ ɥʇᴉʍ ꞁᴉɐɯǝ uⱯ"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "ʇuǝs ꞁᴉɐɯƎ"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "˙pɹoʍssɐd ʍǝu ɹnoʎ ɥʇᴉʍ ʇunoɔɔɐ ɹnoʎ oʇuᴉ uᴉ-ᵷoꞁ ʍou uɐɔ no⅄"
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "ʇǝsǝɹ ʎꞁꞁnɟssǝɔɔns pɹoʍssɐԀ"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "pɹoʍssɐd ʇǝsǝᴚ"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "pɹoʍssɐd ɯɹᴉɟuoƆ"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "˙ʇunoɔɔɐ ɹnoʎ oʇ ssǝɔɔɐ uᴉɐᵷ oʇ ʍoꞁǝq pɹoʍssɐd ʍǝu ɹnoʎ ɹǝʇuƎ"
+  },
+  "auth.reset-password.title": {
+    "message": "pɹoʍssɐԀ ʇǝsǝᴚ"
+  },
+  "auth.reset-password.title.long": {
+    "message": "pɹoʍssɐd ɹnoʎ ʇǝsǝᴚ"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "˙pǝǝɔoɹd oʇ ǝpoɔ ɹoʇɔɐɟ-oʍʇ ɐ ɹǝʇuǝ ǝsɐǝꞁԀ"
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "ǝpoɔ ɹoʇɔɐɟ-oʍʇ ɹǝʇuƎ"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "˙˙˙ǝpoɔ ɹǝʇuƎ"
+  },
+  "auth.sign-in.additional-options": {
+    "message": "</create-account-link>ʇunoɔɔɐ uɐ ǝʇɐǝɹƆ<create-account-link> • </forgot-password-link>¿pɹoʍssɐd ʇoᵷɹoℲ<forgot-password-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "ǝɯɐuɹǝsn ɹo ꞁᴉɐɯƎ"
+  },
+  "auth.sign-in.password.label": {
+    "message": "pɹoʍssɐԀ"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "ɥʇᴉʍ uᴉ uᵷᴉS"
+  },
+  "auth.sign-in.title": {
+    "message": "uI uᵷᴉS"
+  },
+  "auth.sign-in.use-password": {
+    "message": "pɹoʍssɐd ɐ ǝsn ɹO"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "ʇunoɔɔɐ ǝʇɐǝɹƆ"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "pɹoʍssɐd ɯɹᴉɟuoƆ"
+  },
+  "auth.sign-up.email.label": {
+    "message": "ꞁᴉɐɯƎ"
+  },
+  "auth.sign-up.label.username": {
+    "message": "ǝɯɐuɹǝs∩"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "˙</privacy-policy-link>ʎɔᴉꞁoԀ ʎɔɐʌᴉɹԀ<privacy-policy-link> puɐ </terms-link>sɯɹǝ⟘<terms-link> s,ɥʇuᴉɹpoW oʇ ǝǝɹᵷɐ noʎ 'ʇunoɔɔɐ uɐ ᵷuᴉʇɐǝɹɔ ʎᗺ"
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "¡ɥɔʇɐɯ ʇou op spɹoʍssɐԀ"
+  },
+  "auth.sign-up.password.label": {
+    "message": "pɹoʍssɐԀ"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "¿ʇunoɔɔɐ uɐ ǝʌɐɥ ʎpɐǝɹꞁⱯ"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "ɥʇuᴉɹpoW ʇnoqɐ sǝʇɐpdn oʇ ǝqᴉɹɔsqnS"
+  },
+  "auth.sign-up.title": {
+    "message": "d∩ uᵷᴉS"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "ɟꞁǝsɹnoʎ ʇunoɔɔɐ uɐ ǝʇɐǝɹɔ ɹO"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "ɥʇᴉʍ dn uᵷᴉS"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "sᵷuᴉʇʇǝs ʇunoɔɔⱯ"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "uᴉ uᵷᴉS"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "¡pǝᴉɟᴉɹǝʌ ʎpɐǝɹꞁɐ sᴉ ꞁᴉɐɯǝ ɹno⅄"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "pǝᴉɟᴉɹǝʌ ʎpɐǝɹꞁɐ ꞁᴉɐɯƎ"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "ꞁᴉɐɯǝ uoᴉʇɐɔᴉɟᴉɹǝʌ puǝsǝᴚ"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "˙uᴉ ᵷuᴉuᵷᴉs ʎq pɹɐoqɥsɐp ɹnoʎ ɥᵷnoɹɥʇ ꞁᴉɐɯǝ uoᴉʇɐɔᴉɟᴉɹǝʌ ǝɥʇ ᵷuᴉpuǝs-ǝɹ ʎɹ⟘ ˙ꞁᴉɐɯǝ ɹnoʎ ʎɟᴉɹǝʌ oʇ ǝꞁqɐun ǝɹǝʍ ǝM"
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "˙ʍoꞁǝq uoʇʇnq ǝɥʇ ɥᵷnoɹɥʇ ꞁᴉɐɯǝ uoᴉʇɐɔᴉɟᴉɹǝʌ ǝɥʇ ᵷuᴉpuǝs-ǝɹ ʎɹ⟘ ˙ꞁᴉɐɯǝ ɹnoʎ ʎɟᴉɹǝʌ oʇ ǝꞁqɐun ǝɹǝʍ ǝM"
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "pǝꞁᴉɐɟ uoᴉʇɐɔᴉɟᴉɹǝʌ ꞁᴉɐɯƎ"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "¡pǝᴉɟᴉɹǝʌ ʎꞁꞁnɟssǝɔɔns uǝǝq sɐɥ ssǝɹppɐ ꞁᴉɐɯǝ ɹno⅄"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "uoᴉʇɐɔᴉɟᴉɹǝʌ ꞁᴉɐɯƎ"
+  },
+  "auth.verify-email.title": {
+    "message": "ꞁᴉɐɯƎ ʎɟᴉɹǝɅ"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "ɥʇuᴉɹpoW ʇnoqɐ sǝʇɐpdn oʇ ǝqᴉɹɔsqnS"
+  },
+  "auth.welcome.description": {
+    "message": "˙spoɯ ɓuᴉzɐɯɐ ɥʇᴉʍ ǝʇɐp-oʇ-dn ɓuᴉʎɐʇs puɐ ˋɓuᴉpɐoluʍop ˋɓuᴉplᴉnq ʎpɐǝɹlɐ sɹǝɹoldxǝ & sɹoʇɐǝɹɔ ɟo ʎʇᴉunɯɯoɔ ǝɯosǝʍɐ ǝɥʇ ɟo ʇɹɐd ʍou ǝɹ’no⅄"
+  },
+  "auth.welcome.label.tos": {
+    "message": "˙</privacy-policy-link>ʎɔᴉꞁoԀ ʎɔɐʌᴉɹԀ<privacy-policy-link> puɐ </terms-link>sɯɹǝ⟘<terms-link> s,ɥʇuᴉɹpoW oʇ pǝǝɹᵷɐ ǝʌɐɥ noʎ 'ʇunoɔɔɐ uɐ ᵷuᴉʇɐǝɹɔ ʎᗺ"
+  },
+  "auth.welcome.long-title": {
+    "message": "¡ɥʇuᴉɹpoW oʇ ǝɯoɔꞁǝM"
+  },
+  "auth.welcome.title": {
+    "message": "ǝɯoɔꞁǝM"
+  },
+  "collection.button.delete-icon": {
+    "message": "uoɔᴉ ǝʇǝlǝᗡ"
+  },
+  "collection.button.edit-icon": {
+    "message": "uoɔᴉ ʇᴉpƎ"
+  },
+  "collection.button.remove-project": {
+    "message": "ʇɔǝɾoɹd ǝʌoɯǝᴚ"
+  },
+  "collection.button.unfollow-project": {
+    "message": "ʇɔǝɾoɹd ʍoꞁꞁoɟu∩"
+  },
+  "collection.delete-modal.description": {
+    "message": "˙ǝuopun ǝq ʇouuɐɔ uoᴉʇɔɐ sᴉɥ⟘ ˙ɹǝʌǝɹoɟ uoᴉʇɔǝlloɔ sᴉɥʇ ǝʌoɯǝɹ llᴉʍ sᴉɥ⟘"
+  },
+  "collection.delete-modal.title": {
+    "message": "¿uoᴉʇɔǝlloɔ sᴉɥʇ ǝʇǝlǝp oʇ ʇuɐʍ noʎ ǝɹns noʎ ǝɹⱯ"
+  },
+  "collection.description": {
+    "message": "ɥʇuᴉɹpoW uo {username} ʎq {name} uoᴉʇɔǝlloɔ ǝɥʇ ʍǝᴉΛ - {description}"
+  },
+  "collection.description.following": {
+    "message": "˙ɓuᴉʍolloɟ ǝɹ,noʎ sʇɔǝſoɹd ǝɥʇ llɐ ɟo uoᴉʇɔǝlloɔ pǝʇɐɹǝuǝɓ-oʇnⱯ"
+  },
+  "collection.error.not-found": {
+    "message": "punoɟ ʇou uoᴉʇɔǝlloƆ"
+  },
+  "collection.label.collection": {
+    "message": "uoᴉʇɔǝlloƆ"
+  },
+  "collection.label.created-at": {
+    "message": "{ago} pǝʇɐǝɹƆ"
+  },
+  "collection.label.curated-by": {
+    "message": "ʎq pǝʇɐɹnƆ"
+  },
+  "collection.label.no-projects": {
+    "message": "¡sʇɔǝſoɹd ou sɐɥ uoᴉʇɔǝlloɔ sᴉɥ⟘"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "¿<create-link>ǝuo ppɐ</create-link> oʇ ǝʞᴉl noʎ plnoM\n˙sʇɔǝſoɹd ʎuɐ ǝʌɐɥ ʇ,uop no⅄"
+  },
+  "collection.label.owner": {
+    "message": "ɹǝuʍO"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, one {ʇɔǝſoɹd <stat>{count}</stat>} other {sʇɔǝſoɹd <stat>{count}</stat>}}"
+  },
+  "collection.label.updated-at": {
+    "message": "{ago} pǝʇɐpd∩"
+  },
+  "collection.title": {
+    "message": "uoᴉʇɔǝlloƆ - {name}"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "ʍǝu ǝʇɐǝɹƆ"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural, one {ʇɔǝſoɹd {count}} other {sʇɔǝſoɹd {count}}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "suoᴉʇɔǝlloɔ ɹnoʎ ɥɔɹɐǝS"
+  },
+  "dashboard.collections.long-title": {
+    "message": "suoᴉʇɔǝlloɔ ɹno⅄"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "˙Ꞁᴚ∩ s,uoᴉʇɔǝlloɔ ǝɥʇ pǝdʎʇsᴉɯ ǝʌɐɥ ʎɐɯ no⅄"
+  },
+  "error.collection.404.list_item.2": {
+    "message": "˙ǝʇɐʌᴉɹd ǝq ʎɐɯ uoᴉʇɔǝlloɔ ǝɥ⟘"
+  },
+  "error.collection.404.list_item.3": {
+    "message": "˙<tou-link>ǝs∩ ɟo sɯɹǝ⟘</tou-link> ɹno ɓuᴉʇɐloᴉʌ ɹoɟ ɯɐǝʇ uoᴉʇɐɹǝpoɯ s,ɥʇuᴉɹpoW ʎq uʍop uǝʞɐʇ uǝǝq ǝʌɐɥ ʎɐɯ uoᴉʇɔǝlloɔ ǝɥ⟘"
+  },
+  "error.collection.404.list_title": {
+    "message": "¿ʎɥM"
+  },
+  "error.collection.404.title": {
+    "message": "punoɟ ʇou uoᴉʇɔǝlloƆ"
+  },
+  "error.generic.404.subtitle": {
+    "message": "˙ʇsᴉxǝ oʇ ɯǝǝs ʇ,usǝop ɹoɟ ɓuᴉʞool ǝɹǝʍ noʎ ǝɓɐd ǝɥ⟘"
+  },
+  "error.generic.404.title": {
+    "message": "punoɟ ʇou ǝɓɐԀ"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "˙<status-link>ǝɓɐd snʇɐʇS</status-link> ɹno uo uʍop sᴉ ɥʇuᴉɹpoW ɟᴉ ʞɔǝɥƆ"
+  },
+  "error.generic.default.list_item.2": {
+    "message": "˙<discord-link>ɹǝʌɹǝs pɹoɔsᴉᗡ</discord-link> ɹno ɓuᴉuᴉoſ ʎq ʍouʞ ɯɐǝ⟘ ɥʇuᴉɹpoW ǝɥʇ ʇǝl oʇ ʇuɐʍ ʎɐɯ noʎ ˋɓuᴉuǝddɐɥ sdǝǝʞ sᴉɥʇ ɟI"
+  },
+  "error.generic.default.list_title": {
+    "message": "˙sǝʇnuᴉɯ ʍǝɟ ɐ uᴉ uᴉɐɓɐ ʎɹʇ ǝsɐǝlԀ"
+  },
+  "error.generic.default.subtitle": {
+    "message": "˙ɓuoɹʍ ʇuǝʍ ɓuᴉɥʇǝɯoS"
+  },
+  "error.generic.default.title": {
+    "message": "¡ɥo ɥ∩"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "˙Ꞁᴚ∩ s,uoᴉʇɐzᴉuɐɓɹo ǝɥʇ pǝdʎʇsᴉɯ ǝʌɐɥ ʎɐɯ no⅄"
+  },
+  "error.organization.404.list_item.2": {
+    "message": "˙ʇᴉ pǝʇǝlǝp ɹo Ꞁᴚ∩ ǝɥʇ pǝɓuɐɥɔ ǝʌɐɥ ʎɐɯ ɹǝuʍo s,uoᴉʇɐzᴉuɐɓɹo ǝɥ⟘"
+  },
+  "error.organization.404.list_item.3": {
+    "message": "˙<tou-link>ǝs∩ ɟo sɯɹǝ⟘</tou-link> ɹno ɓuᴉʇɐloᴉʌ ɹoɟ ɯɐǝʇ uoᴉʇɐɹǝpoɯ s,ɥʇuᴉɹpoW ʎq pǝʌoɯǝɹ uǝǝq ǝʌɐɥ ʎɐɯ uoᴉʇɐzᴉuɐɓɹo ǝɥ⟘"
+  },
+  "error.organization.404.list_title": {
+    "message": "¿ʎɥM"
+  },
+  "error.organization.404.title": {
+    "message": "punoɟ ʇou uoᴉʇɐzᴉuɐɓɹO"
+  },
+  "error.project.404.list_item.1": {
+    "message": "˙Ꞁᴚ∩ s,ʇɔǝſoɹd ǝɥʇ pǝdʎʇsᴉɯ ǝʌɐɥ ʎɐɯ no⅄"
+  },
+  "error.project.404.list_item.2": {
+    "message": "˙ʇᴉ pǝʇǝlǝp ɹo ˋǝʇɐʌᴉɹd ʇɔǝſoɹd ǝɥʇ ǝpɐɯ ˋꞀᴚ∩ ǝɥʇ pǝɓuɐɥɔ ǝʌɐɥ ʎɐɯ ɹǝuʍo s,ʇɔǝſoɹd ǝɥ⟘"
+  },
+  "error.project.404.list_item.3": {
+    "message": "˙<tou-link>ǝs∩ ɟo sɯɹǝ⟘</tou-link> ɹno ɓuᴉʇɐloᴉʌ ɹoɟ ɯɐǝʇ uoᴉʇɐɹǝpoɯ s,ɥʇuᴉɹpoW ʎq uʍop uǝʞɐʇ uǝǝq ǝʌɐɥ ʎɐɯ ʇɔǝſoɹd ǝɥ⟘"
+  },
+  "error.project.404.list_title": {
+    "message": "¿ʎɥM"
+  },
+  "error.project.404.title": {
+    "message": "punoɟ ʇou ʇɔǝſoɹԀ"
+  },
+  "error.user.404.list_item.1": {
+    "message": "˙ǝɯɐuɹǝsn s,ɹǝsn ǝɥʇ pǝdʎʇsᴉɯ ǝʌɐɥ ʎɐɯ no⅄"
+  },
+  "error.user.404.list_item.2": {
+    "message": "˙ʇunoɔɔɐ ɹᴉǝɥʇ pǝʇǝlǝp ɹo ǝɯɐuɹǝsn ɹᴉǝɥʇ pǝɓuɐɥɔ ǝʌɐɥ ʎɐɯ ɹǝsn ǝɥ⟘"
+  },
+  "error.user.404.list_item.3": {
+    "message": "˙<tou-link>ǝs∩ ɟo sɯɹǝ⟘</tou-link> s,ɥʇuᴉɹpoW ɓuᴉʇɐloᴉʌ ɹoɟ pǝʇɐuᴉɯɹǝʇ uǝǝq ǝʌɐɥ ʎɐɯ ʇunoɔɔɐ s,ɹǝsn ǝɥ⟘"
+  },
+  "error.user.404.list_title": {
+    "message": "¿ʎɥM"
+  },
+  "error.user.404.title": {
+    "message": "punoɟ ʇou ɹǝs∩"
+  },
+  "frog": {
+    "message": "🐸 ¡pǝɓɓoɹɟ uǝǝq ǝʌ,no⅄"
+  },
+  "frog.altText": {
+    "message": "ɥʇuᴉɹʎqɐl ɓoɹɟ ɐ ɟo ɓuᴉʇuᴉɐd ɔᴉʇsᴉlɐǝɹoʇoɥd Ɐ"
+  },
+  "frog.froggedPeople": {
+    "message": "¡pǝɓɓoɹɟ oslɐ ǝɹǝʍ {count, plural, one {uosɹǝd ǝɹoɯ {count}} other {ǝldoǝd ǝɹoɯ {count}}}"
+  },
+  "frog.sinceOpened": {
+    "message": "{ago} pǝuǝdo sɐʍ ǝɓɐd sᴉɥ⟘"
+  },
+  "frog.title": {
+    "message": "ɓoɹℲ"
+  },
+  "landing.button.discover-mods": {
+    "message": "spoɯ ɹǝʌoɔsᴉᗡ"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "pɹɐoqɥsɐp oʇ o⅁"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "ɯɐǝʇ ɥʇuᴉɹpoW ǝɥʇ ɯoɹɟ sǝʇɐpdn ʇuɐʇsuoɔ ɥʇᴉʍ ǝlqᴉssod ǝɔuǝᴉɹǝdxǝ ɓuᴉppoɯ ʇsǝq ǝɥʇ ʇǝ⅁"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "ɓuᴉʌloʌƎ ʎlʇuɐʇsuoƆ"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "ǝnuǝʌǝɹ puɐ ˋsʇunoɔ pɐoluʍop ˋsʍǝᴉʌ ǝɓɐd uo sʇɹodǝɹ pǝlᴉɐʇǝp ʇǝ⅁"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "sɔᴉʇsᴉʇɐʇS puɐ ɐʇɐᗡ"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "¡ǝɹnʇnɟ ǝɥʇ uᴉ ǝɯoɔ oʇ sʎɐʍ ǝɹoɯ puɐ ˋɹǝʌɹǝs pɹoɔsᴉᗡ ˋǝɓɐd ǝɯoɥ ɹno ˋɥɔɹɐǝs ɥɓnoɹɥʇ sɹǝsn ɟo spuɐsnoɥʇ ʎq pǝɹǝʌoɔsᴉp ʇɔǝſoɹd ɹnoʎ ʇǝ⅁"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "ʎɹǝʌoɔsᴉᗡ"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "uoᴉsɹǝʌ ʍǝu ɐ ǝsɐǝlǝɹ noʎ uǝɥʍ ʇɥɓᴉɹ spɐoldn ɔᴉʇɐɯoʇnɐ ɹoɟ ɹnɐʇouᴉW ɥɓnoɹɥʇ slooʇ plᴉnq ɹnoʎ ɥʇᴉʍ ǝʇɐɹɓǝʇuI"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "ɯǝʇsʎsoɔƎ ǝsɹǝʌᴉᗡ"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "ǝɯᴉʇ ʎuɐ ʇɐ spunɟ ɹnoʎ ʍɐɹpɥʇᴉʍ puɐ sǝɓɐd ʇɔǝſoɹd ɹnoʎ ɯoɹɟ ǝnuǝʌǝɹ pɐ pᴉɐd ʇǝ⅁"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "uoᴉʇɐzᴉʇǝuoW"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "ǝsɐǝ ɥʇᴉʍ suoᴉssᴉɯɹǝd puɐ sǝloɹ ǝɓɐuɐɯ puɐ sǝʇɐɯɯɐǝʇ ɹnoʎ ǝʇᴉʌuI"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "ʇuǝɯǝɓɐuɐW ɯɐǝ⟘"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "): sʇɔǝſoɹd ɯopuɐɹ pɐol oʇ pǝlᴉɐℲ"
+  },
+  "landing.feature.follow.description": {
+    "message": "˙dool ǝɥʇ uᴉ ʎɐʇs puɐ ǝʇɐpdn sʇɔǝſoɹd ǝʇᴉɹoʌɐɟ ɹnoʎ ǝɯᴉʇ ʎɹǝʌǝ pǝᴉɟᴉʇou ʇǝ⅁"
+  },
+  "landing.feature.follow.heading": {
+    "message": "ǝʌol noʎ sʇɔǝɾoɹd ʍolloℲ"
+  },
+  "landing.feature.launcher.description": {
+    "message": "˙ɹǝɥɔunɐꞀ ɯsᴉɹԀ puɐ ˋƆWᴉʇlnW ˋɹǝɥɔunɐꞀ⟘Ɐ ǝʞᴉl sɹǝɥɔunɐl ɹɐlndod ʇsoɯ ǝɥʇ ɟo ǝɯos puɐ <link>ddɐ uʍo ɹno</link> ɥɓnoɹɥʇ ɥʇuᴉɹpoW ǝsn uɐɔ no⅄ ˙ɥʇuᴉɹpoW ɥʇᴉʍ uoᴉʇɐɹɓǝʇuᴉ dǝǝp ppɐ sɹǝɥɔunɐl sʇǝl IԀⱯ ǝɔɹnos-uǝdo s,ɥʇuᴉɹpoW"
+  },
+  "landing.feature.launcher.heading": {
+    "message": "ɹǝɥɔunɐl ǝʇᴉɹoʌɐɟ ɹnoʎ ɥʇᴉʍ ʎɐlԀ"
+  },
+  "landing.feature.search.description": {
+    "message": "˙ǝdʎʇ noʎ sɐ ʇuɐʍ noʎ ʇɐɥʍ puᴉɟ noʎ ʇǝl sɹǝʇlᴉɟ lnɟɹǝʍod puɐ ɥɔɹɐǝs ʇsɐɟ-ɓuᴉuʇɥɓᴉl s,ɥʇuᴉɹpoW"
+  },
+  "landing.feature.search.heading": {
+    "message": "ʎlᴉsɐǝ puɐ ʎlʞɔᴉnb ˋʇuɐʍ noʎ ʇɐɥʍ puᴉℲ"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "{content} ʇɟɐɹɔǝuᴉW ɹoɟ ǝɔɐld ǝɥ⟘"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "sʞɔɐd ɐʇɐp"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "sʞɔɐdpoW"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "spoW"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "suᴉɓnlԀ"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "sʞɔɐd ǝɔɹnosǝɹ"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "sɹǝʌɹǝs"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "sɹǝpɐɥs"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ɹǝɥɔunɐꞀ⟘Ɐ"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "˙uǝǝɹɓ ɥʇuᴉɹpoW uᴉ oɓol soᴉpnʇS ɓuɐſoW ǝɥʇ ɥʇᴉʍ ˋʍopuᴉʍ ʇɟɐɹɔǝuᴉW ɐ ɟo uoᴉʇɐʇuǝsǝɹdǝɹ pǝᴉɟᴉldɯᴉs Ɐ"
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "ddⱯ ɥʇuᴉɹpoW"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "ɹǝɥɔunɐꞀ ɯsᴉɹԀ"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "¡pǝʇɐpdn uǝǝq sɐɥ {title}"
+  },
+  "landing.notifications.heading": {
+    "message": "suoᴉʇɐɔᴉɟᴉʇoN"
+  },
+  "landing.notifications.received-time": {
+    "message": "{time} pǝʌᴉǝɔǝᴚ"
+  },
+  "landing.notifications.version-released": {
+    "message": "{gameVersion} ɹoɟ pǝsɐǝlǝɹ uǝǝq sɐɥ {version} uoᴉsɹǝΛ"
+  },
+  "landing.search.label": {
+    "message": "ɥɔɹɐǝS"
+  },
+  "landing.search.placeholder": {
+    "message": "˙˙˙ɥɔɹɐǝS"
+  },
+  "landing.search.sort-by.label": {
+    "message": "ʎq ʇɹoS"
+  },
+  "landing.section.for-creators.description": {
+    "message": "˙sɹǝʎɐld pǝʇɐɔᴉpǝp ɟo ǝɔuǝᴉpnɐ ǝʌᴉssɐɯ ɐ ɥɔɐǝɹ puɐ suoᴉʇɐǝɹɔ ɹnoʎ oʇ ǝɯoɥ ǝuᴉluo uɐ ǝʌᴉ⅁"
+  },
+  "landing.section.for-creators.label": {
+    "message": "sɹoʇɐǝɹƆ ɹoℲ"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "plɹoʍ ǝɥʇ ɥʇᴉʍ ʇuǝʇuoɔ ɹnoʎ ǝɹɐɥS"
+  },
+  "landing.section.for-players.description": {
+    "message": "˙lǝʌǝl ʇxǝu ǝɥʇ oʇ ʎɐldǝɯɐɓ ɹnoʎ ɓuᴉɹq oʇ ʇuǝʇuoɔ puᴉɟ oʇ ǝɹns ǝq uɐɔ noʎ ˋsuoǝɓunp pǝsɹnɔ oʇ sǝɯoᴉq lɐɔᴉɓɐɯ ɯoɹℲ"
+  },
+  "landing.section.for-players.label": {
+    "message": "sɹǝʎɐlԀ ɹoℲ"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "suoᴉʇɐǝɹɔ {count} ɹǝʌo ɹǝʌoɔsᴉᗡ"
+  },
+  "landing.subheading": {
+    "message": "˙ʎʇᴉunɯɯoɔ ǝɥʇ ɹoɟ ʇlᴉnq ɯɹoɟʇɐld ǝɔɹnos-uǝdo ɹno ɥɓnoɹɥʇ ʇuǝʇuoɔ ʇɟɐɹɔǝuᴉW ǝɹɐɥs puɐ ˋʎɐld ˋɹǝʌoɔsᴉᗡ"
+  },
+  "layout.action.change-theme": {
+    "message": "ǝɯǝɥʇ ǝɓuɐɥƆ"
+  },
+  "layout.action.close-banner": {
+    "message": "ǝsolƆ"
+  },
+  "layout.action.create-new": {
+    "message": "...ʍǝu ǝʇɐǝɹƆ"
+  },
+  "layout.action.file-lookup": {
+    "message": "dnʞool ǝlᴉℲ"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "lᴉɐɯǝ ʎq dnʞooꞀ"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "sǝɔᴉʇou ɹǝʌɹǝs ǝɓɐuɐW"
+  },
+  "layout.action.new-collection": {
+    "message": "uoᴉʇɔǝlloɔ ʍǝN"
+  },
+  "layout.action.new-organization": {
+    "message": "uoᴉʇɐzᴉuɐɓɹo ʍǝN"
+  },
+  "layout.action.new-project": {
+    "message": "ʇɔǝſoɹd ʍǝN"
+  },
+  "layout.action.reports": {
+    "message": "sʇɹodǝᴚ"
+  },
+  "layout.action.review-projects": {
+    "message": "sʇɔǝſoɹd ʍǝᴉʌǝᴚ"
+  },
+  "layout.avatar.alt": {
+    "message": "ɹɐʇɐʌɐ ɹno⅄"
+  },
+  "layout.banner.account-action": {
+    "message": "pǝɹᴉnbǝɹ uoᴉʇɔɐ ʇunoɔɔⱯ"
+  },
+  "layout.banner.add-email.button": {
+    "message": "sɓuᴉʇʇǝs ʇunoɔɔɐ ʇᴉsᴉΛ"
+  },
+  "layout.banner.add-email.description": {
+    "message": "˙ʇunoɔɔɐ ɹnoʎ oʇ ssǝɹppɐ lᴉɐɯǝ uɐ ɹǝʇsᴉɓǝɹ oʇ noʎ spǝǝu ɥʇuᴉɹpoW ˋsuosɐǝɹ ʎʇᴉɹnɔǝs ɹoℲ"
+  },
+  "layout.banner.build-fail.description": {
+    "message": "{url} :sᴉ Ꞁᴚ∩ IԀⱯ ʇuǝɹɹnƆ ;{errors} :sǝpoɔ ɹoɹɹƎ ˙ǝlqɐlᴉɐʌɐ sᴉ IԀⱯ ǝɥʇ uǝɥʍ plᴉnqǝᴚ ˙uoᴉʇɐɹnɓᴉɟuoɔ uᴉ ɹoɹɹǝ uɐ ɹo ǝɓɐʇno uɐ oʇ ǝnp ǝq ʎɐɯ sᴉɥ⟘ ˙IԀⱯ ǝɥʇ ɯoɹɟ ǝʇɐʇs ǝʇɐɹǝuǝɓ oʇ pǝlᴉɐɟ puǝʇuoɹɟ s,ɥʇuᴉɹpoW ɟo ʎoldǝp sᴉɥ⟘"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "˙ɓuᴉplᴉnq uǝɥʍ IԀⱯ ɯoɹɟ ǝʇɐʇs ɓuᴉʇɐɹǝuǝɓ ɹoɹɹƎ"
+  },
+  "layout.banner.staging.description": {
+    "message": "˙ǝɔuɐʇsuᴉ uoᴉʇɔnpoɹd ǝɥʇ uɐɥʇ ɹǝʍǝu puǝʇuoɹɟ ɹo puǝʞɔɐq ɥʇuᴉɹpoW ǝɥʇ ɟo suoᴉsɹǝʌ ʇuǝɯdolǝʌǝp-uᴉ ɓuᴉuunɹ ǝq ʎɐɯ puɐ ˋsǝsodɹnd ɓuᴉɓɓnqǝp puɐ ɓuᴉʇsǝʇ ɹoɟ pǝsn sᴉ sᴉɥ⟘ ˙ǝsɐqɐʇɐp ɥʇuᴉɹpoW uoᴉʇɔnpoɹd ǝɥʇ ɯoɹɟ ǝʇɐɹɐdǝs ʎlǝʇǝldɯoɔ sᴉ ʇuǝɯuoɹᴉʌuǝ ɓuᴉɓɐʇs ǝɥ⟘"
+  },
+  "layout.banner.staging.title": {
+    "message": "ʇuǝɯuoɹᴉʌuǝ ɓuᴉɓɐʇs s’ɥʇuᴉɹpoW ɓuᴉʍǝᴉʌ ǝɹ’no⅄"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "oɟuᴉ ɓuᴉllᴉq ǝʇɐpd∩"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "¡ssǝɔɔɐ ɓuᴉsol ʇuǝʌǝɹd oʇ poɥʇǝɯ ʇuǝɯʎɐd ɹnoʎ ǝʇɐpdn ǝsɐǝlԀ ˙ʍǝuǝɹ oʇ pǝlᴉɐɟ suoᴉʇdᴉɹɔsqns ǝɹoɯ ɹo ǝuO"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "˙pǝɹᴉnbǝɹ uoᴉʇɔɐ ɓuᴉllᴉᗺ"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "lᴉɐɯǝ uoᴉʇɐɔᴉɟᴉɹǝʌ puǝs-ǝᴚ"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "˙ʇunoɔɔɐ ɹnoʎ ɥʇᴉʍ pǝʇɐᴉɔossɐ ssǝɹppɐ lᴉɐɯǝ ǝɥʇ ʎɟᴉɹǝʌ oʇ noʎ spǝǝu ɥʇuᴉɹpoW ˋsuosɐǝɹ ʎʇᴉɹnɔǝs ɹoℲ"
+  },
+  "layout.footer.about": {
+    "message": "ʇnoqⱯ"
+  },
+  "layout.footer.about.careers": {
+    "message": "sɹǝǝɹɐƆ"
+  },
+  "layout.footer.about.changelog": {
+    "message": "ɓolǝɓuɐɥƆ"
+  },
+  "layout.footer.about.news": {
+    "message": "sʍǝN"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "ɯɐɹɓoɹԀ spɹɐʍǝᴚ"
+  },
+  "layout.footer.about.status": {
+    "message": "snʇɐʇS"
+  },
+  "layout.footer.legal": {
+    "message": "lɐɓǝꞀ"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "˙⟘ℲOSOᴚƆIW ᴚO ⅁NⱯſOW H⟘IM ᗡƎ⟘ⱯIƆOSSⱯ ᴚO ⅄ᗺ ᗡƎΛOᴚԀԀⱯ ⟘ON ˙ƎƆIΛᴚƎS ⟘ℲⱯᴚƆƎNIW ꞀⱯIƆIℲℲO NⱯ ⟘ON"
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "ⱯƆWᗡ puɐ ʎɔᴉloԀ ʇɥɓᴉɹʎdoƆ"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "ʎɔᴉloԀ ʎɔɐʌᴉɹԀ"
+  },
+  "layout.footer.legal.rules": {
+    "message": "sǝlnᴚ ʇuǝʇuoƆ"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "ǝɔᴉʇoN ʎʇᴉɹnɔǝS"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "ǝs∩ ɟo sɯɹǝ⟘"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "uoᴉʇɐɯɹoɟuᴉ ɥʇuᴉɹpoW"
+  },
+  "layout.footer.open-source": {
+    "message": "˙<github-link>ǝɔɹnos uǝdo</github-link> sᴉ ɥʇuᴉɹpoW"
+  },
+  "layout.footer.products": {
+    "message": "sʇɔnpoɹԀ"
+  },
+  "layout.footer.products.app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW"
+  },
+  "layout.footer.products.plus": {
+    "message": "+ɥʇuᴉɹpoW"
+  },
+  "layout.footer.products.servers": {
+    "message": "sɹǝʌɹǝS ɥʇuᴉɹpoW"
+  },
+  "layout.footer.resources": {
+    "message": "sǝɔɹnosǝᴚ"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "uoᴉʇɐʇuǝɯnɔop IԀⱯ"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "ɹǝʇuǝƆ dlǝH"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "sǝnssᴉ ʇɹodǝᴚ"
+  },
+  "layout.footer.resources.translate": {
+    "message": "ǝʇɐlsuɐɹ⟘"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "ʎʞsǝnlᗺ"
+  },
+  "layout.footer.social.discord": {
+    "message": "pɹoɔsᴉᗡ"
+  },
+  "layout.footer.social.github": {
+    "message": "qnHʇᴉפ"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "uopoʇsɐW"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "nuǝɯ ǝlɓɓo⟘"
+  },
+  "layout.meta.description": {
+    "message": "˙IԀⱯ puɐ ǝɔɐɟɹǝʇuᴉ ǝsn oʇ ʎsɐǝ ˋuɹǝpoɯ ɐ ɥʇᴉʍ ɥʇuᴉɹpoW uo sʇɔǝſoɹd ɥsᴉlqnd puɐ ɹǝʌoɔsᴉᗡ ˙ɥʇuᴉɹpoW uo sʞɔɐdpoɯ puɐ ˋsʞɔɐdǝɔɹnosǝɹ ˋsɹǝpɐɥs ˋsʞɔɐdɐʇɐp ˋsuᴉɓnld ˋspoɯ ʇɟɐɹɔǝuᴉW pɐoluʍoᗡ"
+  },
+  "layout.meta.og-description": {
+    "message": "¡ʇuǝʇuoɔ ʇɟɐɹɔǝuᴉW ɥsᴉlqnd puɐ ɹǝʌoɔsᴉᗡ"
+  },
+  "layout.nav.analytics": {
+    "message": "sɔᴉʇʎlɐuⱯ"
+  },
+  "layout.nav.discover": {
+    "message": "ɹǝʌoɔsᴉᗡ"
+  },
+  "layout.nav.discover-content": {
+    "message": "ʇuǝʇuoɔ ɹǝʌoɔsᴉᗡ"
+  },
+  "layout.nav.feature-flags": {
+    "message": "sɓɐlɟ ǝɹnʇɐǝℲ"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW ʇǝ⅁"
+  },
+  "layout.nav.home": {
+    "message": "ǝɯoH"
+  },
+  "layout.nav.host-a-server": {
+    "message": "ɹǝʌɹǝs ɐ ʇsoH"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "ǝɓɐd ǝɯoɥ ɥʇuᴉɹpoW"
+  },
+  "layout.nav.organizations": {
+    "message": "suoᴉʇɐsᴉuɐɓɹO"
+  },
+  "layout.nav.profile": {
+    "message": "ǝlᴉɟoɹԀ"
+  },
+  "layout.nav.projects": {
+    "message": "sʇɔǝſoɹԀ"
+  },
+  "layout.nav.revenue": {
+    "message": "ǝnuǝʌǝᴚ"
+  },
+  "layout.nav.saved-projects": {
+    "message": "sʇɔǝſoɹd pǝʌɐS"
+  },
+  "layout.nav.search": {
+    "message": "ɥɔɹɐǝS"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "+ɥʇuᴉɹpoW oʇ ǝpɐɹɓd∩"
+  },
+  "moderation.filter.by": {
+    "message": "ʎq ɹǝʇlᴉℲ"
+  },
+  "moderation.moderate": {
+    "message": "ǝʇɐɹǝpoW"
+  },
+  "moderation.page.projects": {
+    "message": "sʇɔǝſoɹԀ"
+  },
+  "moderation.page.reports": {
+    "message": "ʇɹodǝᴚ"
+  },
+  "moderation.page.technicalReview": {
+    "message": "ʍǝᴉʌǝᴚ lɐɔᴉuɥɔǝ⟘"
+  },
+  "moderation.search.placeholder": {
+    "message": "˙˙˙ɥɔɹɐǝS"
+  },
+  "moderation.sort.by": {
+    "message": "ʎq ʇɹoS"
+  },
+  "moderation.technical.search.placeholder": {
+    "message": "˙˙˙sʍǝᴉʌǝɹ ɥɔǝʇ ɥɔɹɐǝS"
+  },
+  "profile.button.billing": {
+    "message": "ɓuᴉllᴉq ɹǝsn ǝɓɐuɐW"
+  },
+  "profile.button.info": {
+    "message": "slᴉɐʇǝp ɹǝsn ʍǝᴉΛ"
+  },
+  "profile.button.manage-projects": {
+    "message": "sʇɔǝſoɹd ǝɓɐuɐW"
+  },
+  "profile.error.not-found": {
+    "message": "punoɟ ʇou ɹǝs∩"
+  },
+  "profile.joined-at": {
+    "message": "<date>{ago}</date> pǝuᴉoſ"
+  },
+  "profile.label.badges": {
+    "message": "sǝɓpɐᗺ"
+  },
+  "profile.label.details": {
+    "message": "slᴉɐʇǝᗡ"
+  },
+  "profile.label.no-collections": {
+    "message": "¡suoᴉʇɔǝlloɔ ou sɐɥ ɹǝsn sᴉɥ⟘"
+  },
+  "profile.label.no-collections-auth": {
+    "message": "¿<create-link>ǝuo ǝʇɐǝɹɔ</create-link> oʇ ǝʞᴉl noʎ plnoM\n˙suoᴉʇɔǝlloɔ ʎuɐ ǝʌɐɥ ʇ,uop no⅄"
+  },
+  "profile.label.no-projects": {
+    "message": "¡sʇɔǝɾoɹd ou sɐɥ ɹǝsn sᴉɥ⟘"
+  },
+  "profile.label.no-projects-auth": {
+    "message": "¿ǝuo <create-link>ǝʇɐǝɹɔ</create-link> oʇ ǝʞᴉl noʎ plnoM\n˙sʇɔǝſoɹd ʎuɐ ǝʌɐɥ ʇ'uop no⅄"
+  },
+  "profile.label.organizations": {
+    "message": "suoᴉʇɐsᴉuɐɓɹO"
+  },
+  "profile.meta.description": {
+    "message": "ɥʇuᴉɹpoW uo sʇɔǝſoɹd s,{username} pɐoluʍoᗡ"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "ɥʇuᴉɹpoꟽ uo sʇɔǝſoɹd {username}'s pɐoluʍoᗡ - {bio}"
+  },
+  "profile.stats.downloads": {
+    "message": "{count, plural, one {pɐoluʍop ʇɔǝſoɹd <stat>{count}</stat>} other {spɐoluʍop ʇɔǝſoɹd <stat>{count}</stat>}}"
+  },
+  "profile.stats.projects": {
+    "message": "{count, plural, one {ʇɔǝſoɹd <stat>{count}</stat>} other {sʇɔǝſoɹd <stat>{count}</stat>}}"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {ɹǝʍolloɟ ʇɔǝſoɹd <stat>{count}</stat>} other {sɹǝʍolloɟ ʇɔǝſoɹd <stat>{count}</stat>}}"
+  },
+  "profile.user-id": {
+    "message": "{id} :ᗡI ɹǝs∩"
+  },
+  "project-member-header.accept": {
+    "message": "ʇdǝɔɔⱯ"
+  },
+  "project-member-header.decline": {
+    "message": "ǝuᴉlɔǝᗡ"
+  },
+  "project-member-header.error": {
+    "message": "ɹoɹɹƎ"
+  },
+  "project-member-header.error-decline": {
+    "message": "uoᴉʇɐʇᴉʌuᴉ ɯɐǝʇ ǝuᴉlɔǝp oʇ pǝlᴉɐℲ"
+  },
+  "project-member-header.error-join": {
+    "message": "uoᴉʇɐʇᴉʌuᴉ ɯɐǝʇ ʇdǝɔɔɐ oʇ pǝlᴉɐℲ"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "˙uoᴉʇɐʇᴉʌuᴉ ǝɥʇ ǝuᴉlɔǝp ɹo ʇdǝɔɔɐ ǝsɐǝlԀ ˙ʇɔǝſoɹd sᴉɥʇ uᴉoſ oʇ pǝʇᴉʌuᴉ uǝǝq ǝʌ,no⅄"
+  },
+  "project-member-header.invitation-title": {
+    "message": "ʇɔǝſoɹd uᴉoſ oʇ uoᴉʇɐʇᴉʌuI"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "˙,{role}, ɟo ǝloɹ ǝɥʇ ɥʇᴉʍ ʇɔǝſoɹd sᴉɥʇ ɟo ɹǝqɯǝɯ ɐ ǝq pǝʇᴉʌuᴉ uǝǝq ǝʌ,no⅄"
+  },
+  "project-member-header.success": {
+    "message": "ssǝɔɔnS"
+  },
+  "project-member-header.success-decline": {
+    "message": "uoᴉʇɐʇᴉʌuᴉ ɯɐǝʇ ǝɥʇ pǝuᴉlɔǝp ǝʌɐɥ no⅄"
+  },
+  "project-member-header.success-join": {
+    "message": "ɯɐǝʇ ʇɔǝſoɹd ǝɥʇ pǝuᴉoſ ǝʌɐɥ no⅄"
+  },
+  "project-moderation-nags.publishing-checklist": {
+    "message": "ʇsᴉlʞɔǝɥɔ ɓuᴉɥsᴉlqnԀ"
+  },
+  "project-moderation-nags.required": {
+    "message": "pǝɹᴉnbǝᴚ"
+  },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "ʍǝᴉʌǝɹ ɹoɟ ʇᴉɯqnsǝᴚ"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "˙ǝɓɐssǝɯ s,ɟɟɐʇs ǝɥʇ ɓuᴉssǝɹppɐ ɹǝʇɟɐ ʍǝᴉʌǝɹ ɹoɟ ʇᴉɯqnsǝɹ uɐɔ noʎ ˋsǝsɐɔ ʇsoɯ uI ˙ɟɟɐʇs s,ɥʇuᴉɹpoW ʎq {status} uǝǝq sɐɥ ʇɔǝſoɹd ɹno⅄"
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "¡ʇsᴉlʞɔǝɥɔ ɓuᴉɥsᴉlqnd ǝɥʇ uᴉ sdǝʇs pǝɹᴉnbǝɹ ǝɥʇ ǝʇǝldɯoɔ ʇsnɯ no⅄"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "ʍǝᴉʌǝɹ ɹoɟ ʇᴉɯqnS"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "˙pǝɥsᴉlqnd ǝq oʇ ɹǝpɹo uᴉ sɹoʇɐɹǝpoɯ ʎq pǝʍǝᴉʌǝɹ ǝq ʇsnɯ ʇI ˙ʇɔǝſoɹd ǝɥʇ ɟo sɹǝqɯǝɯ ʎq ǝlqɐʍǝᴉʌ ʎluo sᴉ ʇɔǝſoɹd ɹno⅄"
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "uoᴉʇsǝɓɓnS"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "ǝɓɐd uoᴉʇɐɹǝpoɯ ʇᴉsᴉΛ"
+  },
+  "project-moderation-nags.warning": {
+    "message": "ɓuᴉuɹɐM"
+  },
+  "project-type.collection.plural": {
+    "message": "suoᴉʇɔǝlloƆ"
+  },
+  "project-type.collection.singular": {
+    "message": "uoᴉʇɔǝlloƆ"
+  },
+  "project-type.datapack.plural": {
+    "message": "sʞɔɐԀ ɐʇɐᗡ"
+  },
+  "project-type.datapack.singular": {
+    "message": "ʞɔɐԀ ɐʇɐᗡ"
+  },
+  "project-type.mod.plural": {
+    "message": "spoW"
+  },
+  "project-type.mod.singular": {
+    "message": "poW"
+  },
+  "project-type.modpack.plural": {
+    "message": "sʞɔɐdpoW"
+  },
+  "project-type.modpack.singular": {
+    "message": "ʞɔɐdpoW"
+  },
+  "project-type.plugin.plural": {
+    "message": "suᴉɓnlԀ"
+  },
+  "project-type.plugin.singular": {
+    "message": "uᴉɓnlԀ"
+  },
+  "project-type.project.plural": {
+    "message": "sʇɔǝſoɹԀ"
+  },
+  "project-type.project.singular": {
+    "message": "ʇɔǝſoɹԀ"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "sʞɔɐԀ ǝɔɹnosǝᴚ"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "ʞɔɐԀ ǝɔɹnosǝᴚ"
+  },
+  "project-type.shader.plural": {
+    "message": "sɹǝpɐɥS"
+  },
+  "project-type.shader.singular": {
+    "message": "ɹǝpɐɥS"
+  },
+  "project.about.details.created": {
+    "message": "{date} pǝʇɐǝɹƆ"
+  },
+  "project.about.details.licensed": {
+    "message": "{license} pǝsuǝɔᴉꞀ"
+  },
+  "project.about.details.published": {
+    "message": "{date} pǝɥsᴉlqnԀ"
+  },
+  "project.about.details.submitted": {
+    "message": "{date} pǝʇʇᴉɯqnS"
+  },
+  "project.about.details.title": {
+    "message": "slᴉɐʇǝᗡ"
+  },
+  "project.about.details.updated": {
+    "message": "{date} pǝʇɐpd∩"
+  },
+  "project.actions.create-server": {
+    "message": "ɹǝʌɹǝs ɐ ǝʇɐǝɹƆ"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "ɹǝʌɹǝs ɐ ǝʇɐǝɹƆ"
+  },
+  "project.actions.dont-show-again": {
+    "message": "uᴉɐƃɐ ʍoɥs ʇ,uop"
+  },
+  "project.actions.review-project": {
+    "message": "ʇɔǝſoɹd ʍǝᴉʌǝᴚ"
+  },
+  "project.actions.servers-promo.description": {
+    "message": "¡ǝlssɐɥ ʇnoɥʇᴉʍ spuǝᴉɹɟ ɹnoʎ ɥʇᴉʍ ʎɐld oʇ ʎɐʍ ʇsǝᴉsɐǝ ǝɥʇ sᴉ sɹǝʌɹǝS ɥʇuᴉɹpoW"
+  },
+  "project.actions.servers-promo.monthly": {
+    "message": " / month"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "{monthly}ϛ$ ʇɐ ƃuᴉʇɹɐʇS"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "ɹǝʌɹǝs ɐ ǝʇɐǝɹƆ"
+  },
+  "project.collections.create-new": {
+    "message": "uoᴉʇɔǝlloɔ ʍǝu ǝʇɐǝɹƆ"
+  },
+  "project.collections.none-found": {
+    "message": "˙punoɟ suoᴉʇɔǝlloɔ oN"
+  },
+  "project.description.title": {
+    "message": "uoᴉʇdᴉɹɔsǝᗡ"
+  },
+  "project.details.licensed": {
+    "message": "pǝsuǝɔᴉ˥"
+  },
+  "project.download.game-version": {
+    "message": "{version} :uoᴉsɹǝʌ ǝɯɐ⅁"
+  },
+  "project.download.game-version-error": {
+    "message": "punoɟ suoᴉsɹǝʌ ǝɯɐɓ ou :ɹoɹɹƎ"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{version} ɹoɟ ǝlqɐlᴉɐʌɐ ʎluo sᴉ {title}"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{platform} ɹoɟ {gameVersion} ʇɹoddns ʇou sǝop {title}"
+  },
+  "project.download.install-with-app": {
+    "message": "ddⱯ ɥʇuᴉɹpoW ɥʇᴉʍ llɐʇsuI"
+  },
+  "project.download.no-app": {
+    "message": "¿ddⱯ ɥʇuᴉɹpoW ǝʌɐɥ ʇ,uoᗡ"
+  },
+  "project.download.no-versions-available": {
+    "message": "˙{platform} puɐ {gameVersion} ɹoɟ ǝlqɐlᴉɐʌɐ suoᴉsɹǝʌ oN"
+  },
+  "project.download.platform": {
+    "message": "{platform} :ɯɹoɟʇɐlԀ"
+  },
+  "project.download.platform-error": {
+    "message": "punoɟ sɯɹoɟʇɐld ou :ɹoɹɹƎ"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{platform} ɹoɟ ǝlqɐlᴉɐʌɐ ʎluo sᴉ {title}"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{gameVersion} ɹoɟ {platform} ʇɹoddns ʇou sǝop {title}"
+  },
+  "project.download.search-game-versions": {
+    "message": "˙˙˙suoᴉsɹǝʌ ǝɯɐɓ ɥɔɹɐǝS"
+  },
+  "project.download.search-game-versions-label": {
+    "message": "˙˙˙suoᴉsɹǝʌ ǝɯɐɓ ɥɔɹɐǝS"
+  },
+  "project.download.select-game-version": {
+    "message": "uoᴉsɹǝʌ ǝɯɐɓ ʇɔǝlǝS"
+  },
+  "project.download.select-platform": {
+    "message": "ɯɹoɟʇɐld ʇɔǝlǝS"
+  },
+  "project.download.show-all-versions": {
+    "message": "suoᴉsɹǝʌ llɐ ʍoɥS"
+  },
+  "project.download.title": {
+    "message": "{title} pɐoluʍoᗡ"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "˙pǝᴉɟᴉɹǝʌ ǝq oʇ spǝǝu ɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuǝ ǝɥʇ ʇɐɥʇ ʍouʞ ʇɔǝſoɹd ǝɥʇ ɟo ɹǝqɯǝɯ ɹǝɥʇouɐ ʇǝl ǝsɐǝld ʇnq ˋsɓuᴉʇʇǝs ǝsǝɥʇ ʎɟᴉpoɯ oʇ uoᴉssᴉɯɹǝd ǝʌɐɥ ʇ,uop no⅄ ˙ǝlqɐlᴉɐʌɐ ʍou ǝɹɐ suoᴉʇdo ʍǝu puɐ ɥʇuᴉɹpoW uo ɯǝʇsʎs sʇuǝɯuoɹᴉʌuƎ ǝɥʇ pǝlnɐɥɹǝʌo ʇsnſ ǝʌ,ǝM"
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "pǝʍǝᴉʌǝɹ ǝq oʇ spǝǝu ɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuƎ"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "ǝɓuɐɥɔ sᴉɥʇ ʇnoqɐ ǝɹoɯ uɹɐǝꞀ"
+  },
+  "project.environment.migration.message": {
+    "message": "˙ʇɔǝɹɹoɔ sᴉ ɐʇɐpɐʇǝɯ ǝɥʇ ʇɐɥʇ ʎɟᴉɹǝʌ puɐ sɓuᴉʇʇǝs s,ʇɔǝſoɹd ɹnoʎ ʇᴉsᴉʌ ǝsɐǝlԀ ˙ǝlqɐlᴉɐʌɐ ʍou ǝɹɐ suoᴉʇdo ʍǝu puɐ ɥʇuᴉɹpoW uo ɯǝʇsʎs sʇuǝɯuoɹᴉʌuƎ ǝɥʇ pǝlnɐɥɹǝʌo ʇsnſ ǝʌ,ǝM"
+  },
+  "project.environment.migration.review-button": {
+    "message": "sɓuᴉʇʇǝs ʇuǝɯuoɹᴉʌuǝ ʍǝᴉʌǝᴚ"
+  },
+  "project.environment.migration.title": {
+    "message": "ɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuǝ ʍǝᴉʌǝɹ ǝsɐǝlԀ"
+  },
+  "project.error.loading": {
+    "message": "{message}ɐʇɐp ʇɔǝſoɹd ɓuᴉpɐol ɹoɹɹƎ"
+  },
+  "project.error.page-not-found": {
+    "message": "punoɟ ǝq ʇou plnoɔ ǝɓɐd ǝɥ⟘"
+  },
+  "project.error.project-not-found": {
+    "message": "punoɟ ʇou ʇɔǝſoɹԀ"
+  },
+  "project.gallery.title": {
+    "message": "ʎɹǝllɐ⅁"
+  },
+  "project.license.error": {
+    "message": "˙pǝʌǝᴉɹʇǝɹ ǝq ʇou plnoɔ ʇxǝʇ ǝsuǝɔᴉꞀ"
+  },
+  "project.license.loading": {
+    "message": "˙˙˙ʇxǝʇ ǝsuǝɔᴉl ɓuᴉpɐoꞀ"
+  },
+  "project.license.title": {
+    "message": "ǝsuǝɔᴉ˥"
+  },
+  "project.moderation.title": {
+    "message": "uoᴉʇɐɹǝpoW"
+  },
+  "project.navigation.changelog": {
+    "message": "ɓolǝɓuɐɥƆ"
+  },
+  "project.notification.icon-updated.message": {
+    "message": "˙pǝʇɐpdn uǝǝq sɐɥ uoɔᴉ s,ʇɔǝſoɹd ɹno⅄"
+  },
+  "project.notification.icon-updated.title": {
+    "message": "pǝʇɐpdn uoɔᴉ ʇɔǝſoɹԀ"
+  },
+  "project.notification.updated.message": {
+    "message": "˙pǝʇɐpdn uǝǝq sɐɥ ʇɔǝſoɹd ɹno⅄"
+  },
+  "project.notification.updated.title": {
+    "message": "pǝʇɐpdn ʇɔǝſoɹԀ"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "˙ʍolǝq uoᴉʇdo ǝʇɐᴉɹdoɹddɐ ǝɥʇ ʇɔǝlǝs ǝsɐǝld ˋɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuǝ ɓuᴉssᴉɯ sᴉ ʇɔǝſoɹd ɹno⅄"
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "ʇɔǝſoɹd ɹnoʎ ɹoɟ ʇuǝɯuoɹᴉʌuǝ uɐ ʇɔǝlǝs ǝsɐǝlԀ"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "message": "˙ǝɯᴉʇ sᴉɥʇ ʇɐ ʎllɐqolɓ ɯǝɥʇ ʇᴉpǝ ʇ,uɐɔ noʎ os ˋpǝʇɔǝlǝs sʇuǝɯuoɹᴉʌuǝ ʇuǝɹǝɟɟᴉp ǝʌɐɥ ʇɔǝſoɹd ɹnoʎ ɟo suoᴉsɹǝʌ ʇuǝɹǝɟɟᴉᗡ"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "sʇuǝɯuoɹᴉʌuǝ ǝldᴉʇlnɯ sɐɥ ʇɔǝſoɹd ɹno⅄"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "¡ǝuop ǝɹ,noʎ uǝɥʍ ,ʎɟᴉɹǝΛ, ʞɔᴉlɔ uǝɥʇ puɐ ʍolǝq pǝʇɔǝlǝs sᴉ uoᴉʇdo ʇɔǝɹɹoɔ ǝɥʇ ǝɹnsuǝ ǝsɐǝlԀ ˙ǝlqɐlᴉɐʌɐ ʍou ǝɹɐ suoᴉʇdo ʍǝu puɐ ɥʇuᴉɹpoW uo ɯǝʇsʎs sʇuǝɯuoɹᴉʌuƎ ǝɥʇ pǝlnɐɥɹǝʌo ʇsnſ ǝʌ,ǝM"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "message": "ʍolǝq suoᴉʇdo ǝɥʇ ʍǝᴉʌǝɹ ǝsɐǝlԀ"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "message": "˙ɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuǝ ǝʌɐɥ uɐɔ sʇɔǝſoɹd ʞɔɐdpoɯ ɹo poɯ ʎluO"
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "message": "ɐʇɐpɐʇǝɯ ʇuǝɯuoɹᴉʌuǝ ʇɹoddns ʇou sǝop ǝdʎʇ ʇɔǝſoɹd sᴉɥ⟘"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "message": "ʎɟᴉɹǝΛ"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "message": "˙ʎlʇɔǝɹɹoɔ ʇǝs sᴉ ʇuǝɯuoɹᴉʌuǝ s,ʇɔǝſoɹd sᴉɥʇ ʇɐɥʇ ʎɟᴉɹǝΛ"
+  },
+  "project.settings.general.name.description": {
+    "message": "˙ǝɯɐu lɐnʇɔɐ s,ʇɔǝſoɹd ǝɥʇ ʇsnſ—suoᴉʇdᴉɹɔsǝp pǝppɐ ɹo ˋslɐɔᴉʇǝɥʇuǝɹɐd ˋsǝxᴉɟɟns ˋsǝxᴉɟǝɹd pᴉoʌⱯ"
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "ᘕ lnɐɥɹǝʌO ɹǝɥʇǝN ˙ɓ˙ǝ"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "ʇuǝɯdᴉnbƎ uoᴉʇɔnɹʇsuoƆ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "ɓuᴉʌɐƆ uɐɥʇ ɹǝʇʇǝᗺ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "slɐʇɹoԀ pǝɔuɐɥuƎ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "sqoW snoɹǝɓuɐᗡ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.name.title": {
+    "message": "ǝɯɐN"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "˙ǝɔuǝʇuǝs ǝuo uɐɥʇ ǝɹoɯ ou uᴉ ʇɔǝſoɹd ɹnoʎ ǝzᴉɹɐɯɯnS"
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "˙ɹǝɥʇǝN ǝɥʇ punoɹɐ ǝʌloʌǝɹ oʇ uoᴉssǝɹɓoɹd ǝɯɐɓ slnɐɥɹǝʌO ˙ɓ˙ǝ"
+  },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "˙ɹɐǝɓ uoᴉʇɔnɹʇsuoɔ ǝlqɐɹɐǝʍ sppⱯ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "˙sɔᴉuɐɥɔǝɯ ɓuᴉplᴉnq-ʇɟɐɥsǝuᴉɯ ɔᴉʇsᴉlɐǝɹ sppⱯ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "˙ɹǝɥʇo ɥɔɐǝ oʇ ʞuᴉl slɐʇɹod ɹǝɥʇǝN ʍoɥ sǝʌoɹdɯI ˙ɓ˙ǝ"
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "˙ʇɥɓᴉu ǝɥʇ uᴉ ɹǝʇunoɔuǝ oʇ sqoɯ lɐɯɹou ǝɥʇ ɟo suoᴉsɹǝʌ ssoq lnɟɹǝʍod sppⱯ ˙ɓ˙ǝ"
+  },
+  "project.settings.general.tagline.title": {
+    "message": "ǝuᴉlɓɐ⟘"
+  },
+  "project.settings.general.url.title": {
+    "message": "Ꞁᴚ∩"
+  },
+  "project.settings.title": {
+    "message": "sᵷuᴉʇʇǝS"
+  },
+  "project.settings.visit-dashboard": {
+    "message": "pɹɐoqɥsɐp sʇɔǝſoɹd ʇᴉsᴉΛ"
+  },
+  "project.stats.downloads-label": {
+    "message": "{count, plural, one {} other {s}}pɐoluʍop"
+  },
+  "project.stats.followers-label": {
+    "message": "{count, plural, one {} other {s}}ɹǝʍolloɟ"
+  },
+  "project.status.archived.message": {
+    "message": "˙ʇɔǝſoɹd ǝɥʇ ǝʌᴉɥɔɹɐun oʇ sǝpᴉɔǝp ɹoɥʇnɐ ǝɥʇ ssǝlun sǝʇɐpdn ɹǝɥʇɹnɟ ʎuɐ ǝʌᴉǝɔǝɹ ʇou llᴉʍ {title}˙pǝʌᴉɥɔɹɐ uǝǝq sɐɥ {title}"
+  },
+  "project.version.all-versions": {
+    "message": "suoᴉsɹǝʌ llⱯ"
+  },
+  "project.version.back-to-versions": {
+    "message": "suoᴉsɹǝʌ oʇ ʞɔɐᗺ"
+  },
+  "project.versions.title": {
+    "message": "suoᴉsɹǝΛ"
+  },
+  "report.already-reported": {
+    "message": "{title} pǝʇɹodǝɹ ʎpɐǝɹlɐ ǝʌ,no⅄"
+  },
+  "report.already-reported-description": {
+    "message": "˙ppɐ oʇ uoᴉʇɐɯɹoɟuᴉ ǝɹoɯ ǝʌɐɥ noʎ ɟᴉ ʇɹodǝɹ ɹnoʎ oʇ slᴉɐʇǝp ǝɹoɯ ppɐ uɐɔ no⅄ ˙ʎpɐǝɹlɐ {item} sᴉɥʇ ɹoɟ ʇɹodǝɹ uǝdo uɐ ǝʌɐɥ no⅄"
+  },
+  "report.back-to-item": {
+    "message": "{item} oʇ ʞɔɐᗺ"
+  },
+  "report.body.description": {
+    "message": "˙pǝɹouɓᴉ puɐ pǝsolɔ ǝq llᴉʍ sʇɹodǝɹ ʇuǝᴉɔᴉɟɟnsuᴉ ɹo ʎʇdɯƎ ˙ʇuɐʌǝlǝɹ puɐ ǝlqᴉssod ɟᴉ sǝɓɐɯᴉ puɐ sʞuᴉl ǝpnlɔuI"
+  },
+  "report.body.title": {
+    "message": "ʇɹodǝɹ ɹnoʎ ʇnoqɐ ʇxǝʇuoɔ lɐuoᴉʇᴉppɐ ǝpᴉʌoɹd ǝsɐǝlԀ"
+  },
+  "report.checking": {
+    "message": "˙˙˙{item} ɓuᴉʞɔǝɥƆ"
+  },
+  "report.could-not-find": {
+    "message": "{item} puᴉɟ ʇou plnoƆ"
+  },
+  "report.for.violation": {
+    "message": "<terms-link>ǝs∩ ɟo sɯɹǝ⟘</terms-link> ɹo <rules-link>sǝlnᴚ</rules-link> ɥʇuᴉɹpoW ɟo uoᴉʇɐloᴉΛ"
+  },
+  "report.for.violation.description": {
+    "message": "˙ʇuǝʇuoɔ lɐɓǝllᴉ puɐ ˋɓuᴉpɐǝlsᴉɯ ˋǝʌᴉʇdǝɔǝp ˋǝʌᴉsuǝɟɟo ˋɯɐds ˋsnoᴉɔᴉlɐɯ ǝpnlɔuᴉ sǝldɯɐxƎ"
+  },
+  "report.form-not-for": {
+    "message": ":ɹoɟ ʇou sᴉ ɯɹoɟ sᴉɥ⟘"
+  },
+  "report.go-to-report": {
+    "message": "ʇɹodǝɹ oʇ o⅁"
+  },
+  "report.not-for.bug-reports": {
+    "message": "sʇɹodǝɹ ɓnᗺ"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "˙<issues-link>ɹǝʞɔɐɹʇ ǝnssᴉ</issues-link> ɹᴉǝɥʇ oʇ sɓnq ʇɹodǝɹ uɐɔ no⅄"
+  },
+  "report.not-for.dmca": {
+    "message": "suʍopǝʞɐʇ ⱯƆWᗡ"
+  },
+  "report.not-for.dmca.description": {
+    "message": "˙<policy-link>ʎɔᴉloԀ ʇɥɓᴉɹʎdoƆ</policy-link> ɹno ǝǝS"
+  },
+  "report.note.copyright.1": {
+    "message": "˙ʇuǝʇuoɔ pǝpɐoldnǝɹ ɟo ʇɹodǝɹ ɐ ɹǝɥʇɐɹ ʇnq ˋʇsǝnbǝɹ uʍopǝʞɐʇ ⱯƆWᗡ ɐ ɓuᴉʇʇᴉɯqns *ʇou* ǝɹɐ noʎ ʇɐɥʇ ǝʇou ǝsɐǝlԀ"
+  },
+  "report.note.copyright.2": {
+    "message": "˙<copyright-policy-link>ʎɔᴉloԀ ʇɥɓᴉɹʎdoƆ</copyright-policy-link> ɹno ǝǝs ǝsɐǝld ˋpɐǝʇsuᴉ (uoᴉʇɔɐ lɐɓǝl ɐ sᴉ ɥɔᴉɥʍ) ʇsǝnbǝɹ uʍopǝʞɐʇ ⱯƆWᗡ ɐ ǝlᴉɟ oʇ ʇuɐǝɯ noʎ ɟI"
+  },
+  "report.note.malicious.1": {
+    "message": "˙sǝldɯɐs ǝpoɔ sɐ ɥɔns ˋɹoᴉʌɐɥǝq ǝɥʇ ɟo ǝɔuǝpᴉʌǝ lɐᴉʇuɐʇsqns ǝpnlɔuᴉ ʇsnɯ ʇuǝʇuoɔ ǝʌᴉʇdǝɔǝp ɹo snoᴉɔᴉlɐɯ ɹoɟ sʇɹodǝᴚ"
+  },
+  "report.note.malicious.2": {
+    "message": "˙pǝʇdǝɔɔɐ ǝq ʇou llᴉʍ puɐ ǝɔuǝpᴉʌǝ ɟo sɯɹoɟ ʇuǝᴉɔᴉɟɟns ʇou ǝɹɐ uoᴉʇɔǝʇǝp ǝɹɐʍlɐɯ IⱯ ɹo ˋlɐʇo⟘snɹᴉΛ ˋɹǝpuǝɟǝᗡ ʇɟosoɹɔᴉW ɯoɹɟ sǝᴉɹɐɯɯnS"
+  },
+  "report.please-report": {
+    "message": ":ʇɹodǝɹ ǝsɐǝlԀ"
+  },
+  "report.question.content-id": {
+    "message": "¿{item} ǝɥʇ ɟo ᗡI ǝɥʇ sᴉ ʇɐɥM"
+  },
+  "report.question.content-type": {
+    "message": "¿ɓuᴉʇɹodǝɹ noʎ ǝɹɐ ʇuǝʇuoɔ ɟo ǝdʎʇ ʇɐɥM"
+  },
+  "report.question.report-reason": {
+    "message": "¿ɓuᴉʇɐloᴉʌ {item} sᴉɥʇ sᴉ sǝlnɹ s,ɥʇuᴉɹpoW ɟo ɥɔᴉɥM"
+  },
+  "report.report-content": {
+    "message": "sɹoʇɐɹǝpoɯ oʇ ʇuǝʇuoɔ ʇɹodǝᴚ"
+  },
+  "report.report-item": {
+    "message": "sɹoʇɐɹǝpoɯ oʇ {title} ʇɹodǝᴚ"
+  },
+  "report.submit": {
+    "message": "ʇɹodǝɹ ʇᴉɯqnS"
+  },
+  "revenue.transfers.total": {
+    "message": "˙lɐʇoʇ uᴉ {amount} uʍɐɹpɥʇᴉʍ ǝʌɐɥ no⅄"
+  },
+  "revenue.transfers.total.method": {
+    "message": "˙{method} ɥɓnoɹɥʇ {amount} uʍɐɹpɥʇᴉʍ ǝʌɐɥ no⅄"
+  },
+  "revenue.transfers.total.year": {
+    "message": "˙{year} uᴉ {amount} uʍɐɹpɥʇᴉʍ ǝʌɐɥ no⅄"
+  },
+  "revenue.transfers.total.year_method": {
+    "message": "˙{method} ɥᵷnoɹɥʇ {year} uᴉ {amount} uʍɐɹpɥʇᴉʍ ǝʌɐɥ no⅄"
+  },
+  "scopes.analytics.description": {
+    "message": "ɐʇɐp sɔᴉʇʎꞁɐuɐ ɹnoʎ ssǝɔɔⱯ"
+  },
+  "scopes.analytics.label": {
+    "message": "sɔᴉʇʎꞁɐuɐ pɐǝᴚ"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "suoᴉʇɔǝꞁꞁoɔ ǝʇɐǝɹƆ"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "suoᴉʇɔǝꞁꞁoɔ ǝʇɐǝɹƆ"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "suoᴉʇɔǝꞁꞁoɔ ǝʇǝꞁǝᗡ"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "suoᴉʇɔǝꞁꞁoɔ ǝʇǝꞁǝᗡ"
+  },
+  "scopes.collectionRead.description": {
+    "message": "suoᴉʇɔǝꞁꞁoɔ pɐǝᴚ"
+  },
+  "scopes.collectionRead.label": {
+    "message": "suoᴉʇɔǝꞁꞁoɔ pɐǝᴚ"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "suoᴉʇɔǝꞁꞁoɔ oʇ ǝʇᴉɹM"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "suoᴉʇɔǝꞁꞁoɔ ǝʇᴉɹM"
+  },
+  "scopes.notificationRead.description": {
+    "message": "suoᴉʇɐɔᴉɟᴉʇou ɹnoʎ pɐǝᴚ"
+  },
+  "scopes.notificationRead.label": {
+    "message": "suoᴉʇɐɔᴉɟᴉʇou pɐǝᴚ"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "suoᴉʇɐɔᴉɟᴉʇou ɹnoʎ ʍǝᴉɅ/ǝʇǝꞁǝᗡ"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "suoᴉʇɐɔᴉɟᴉʇou ǝʇᴉɹM"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "suoᴉʇɐzᴉuɐᵷɹo ǝʇɐǝɹƆ"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "suoᴉʇɐzᴉuɐᵷɹo ǝʇɐǝɹƆ"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "suoᴉʇɐzᴉuɐᵷɹo ǝʇǝꞁǝᗡ"
+  },
+  "scopes.organizationDelete.label": {
+    "message": "suoᴉʇɐzᴉuɐᵷɹo ǝʇǝꞁǝᗡ"
+  },
+  "scopes.organizationRead.description": {
+    "message": "suoᴉʇɐzᴉuɐᵷɹo pɐǝᴚ"
+  },
+  "scopes.organizationRead.label": {
+    "message": "suoᴉʇɐzᴉuɐᵷɹo pɐǝᴚ"
+  },
+  "scopes.organizationWrite.description": {
+    "message": "suoᴉʇɐzᴉuɐᵷɹo oʇ ǝʇᴉɹM"
+  },
+  "scopes.organizationWrite.label": {
+    "message": "suoᴉʇɐzᴉuɐᵷɹo ǝʇᴉɹM"
+  },
+  "scopes.patCreate.description": {
+    "message": "suǝʞoʇ IԀⱯ ꞁɐuosɹǝd ǝʇɐǝɹƆ"
+  },
+  "scopes.patCreate.label": {
+    "message": "s⟘ⱯԀ ǝʇɐǝɹƆ"
+  },
+  "scopes.patDelete.description": {
+    "message": "suǝʞoʇ IԀⱯ ꞁɐuosɹǝd ɹnoʎ ǝʇǝꞁǝᗡ"
+  },
+  "scopes.patDelete.label": {
+    "message": "s⟘ⱯԀ ǝʇǝꞁǝᗡ"
+  },
+  "scopes.patRead.description": {
+    "message": "suǝʞoʇ IԀⱯ pǝʇɐǝɹɔ ʍǝᴉɅ"
+  },
+  "scopes.patRead.label": {
+    "message": "s⟘ⱯԀ pɐǝᴚ"
+  },
+  "scopes.patWrite.description": {
+    "message": "suǝʞoʇ IԀⱯ ꞁɐuosɹǝd ʇᴉpƎ"
+  },
+  "scopes.patWrite.label": {
+    "message": "s⟘ⱯԀ ǝʇᴉɹM"
+  },
+  "scopes.payoutsRead.description": {
+    "message": "ɐʇɐp sʇnoʎɐd ɹnoʎ pɐǝᴚ"
+  },
+  "scopes.payoutsRead.label": {
+    "message": "sʇnoʎɐd pɐǝᴚ"
+  },
+  "scopes.payoutsWrite.description": {
+    "message": "ʎǝuoɯ ʍɐɹpɥʇᴉM"
+  },
+  "scopes.payoutsWrite.label": {
+    "message": "sʇnoʎɐd ǝʇᴉɹM"
+  },
+  "scopes.performAnalytics.description": {
+    "message": "suoᴉʇɔɐ sɔᴉʇʎꞁɐuɐ ɯɹoɟɹǝԀ"
+  },
+  "scopes.performAnalytics.label": {
+    "message": "sɔᴉʇʎꞁɐuɐ ɯɹoɟɹǝԀ"
+  },
+  "scopes.projectCreate.description": {
+    "message": "sʇɔǝɾoɹd ʍǝu ǝʇɐǝɹƆ"
+  },
+  "scopes.projectCreate.label": {
+    "message": "sʇɔǝɾoɹd ǝʇɐǝɹƆ"
+  },
+  "scopes.projectDelete.description": {
+    "message": "sʇɔǝſoɹd ɹnoʎ ǝʇǝlǝᗡ"
+  },
+  "scopes.projectDelete.label": {
+    "message": "sʇɔǝſoɹd ǝʇǝlǝᗡ"
+  },
+  "scopes.projectRead.description": {
+    "message": "sʇɔǝſoɹd ɹnoʎ llɐ pɐǝᴚ"
+  },
+  "scopes.projectRead.label": {
+    "message": "sʇɔǝſoɹd pɐǝᴚ"
+  },
+  "scopes.projectWrite.description": {
+    "message": "ɐʇɐp ʇɔǝſoɹd oʇ ǝʇᴉɹM"
+  },
+  "scopes.projectWrite.label": {
+    "message": "sʇɔǝſoɹd ǝʇᴉɹM"
+  },
+  "scopes.reportCreate.description": {
+    "message": "sʇɹodǝɹ ǝʇɐǝɹƆ"
+  },
+  "scopes.reportCreate.label": {
+    "message": "sʇɹodǝɹ ǝʇɐǝɹƆ"
+  },
+  "scopes.reportDelete.description": {
+    "message": "sʇɹodǝɹ ǝʇǝlǝᗡ"
+  },
+  "scopes.reportDelete.label": {
+    "message": "sʇɹodǝɹ ǝʇǝlǝᗡ"
+  },
+  "scopes.reportRead.description": {
+    "message": "sʇɹodǝɹ pɐǝᴚ"
+  },
+  "scopes.reportRead.label": {
+    "message": "sʇɹodǝɹ pɐǝᴚ"
+  },
+  "scopes.reportWrite.description": {
+    "message": "sʇɹodǝɹ ʇᴉpƎ"
+  },
+  "scopes.reportWrite.label": {
+    "message": "sʇɹodǝɹ ǝʇᴉɹM"
+  },
+  "scopes.sessionAccess.description": {
+    "message": "suoᴉssǝs pǝnssᴉ-ɥʇuᴉɹpoɯ ssǝɔɔⱯ"
+  },
+  "scopes.sessionAccess.label": {
+    "message": "suoᴉssǝs ssǝɔɔⱯ"
+  },
+  "scopes.sessionDelete.description": {
+    "message": "suoᴉssǝs ǝʇǝlǝᗡ"
+  },
+  "scopes.sessionDelete.label": {
+    "message": "suoᴉssǝs ǝʇǝlǝᗡ"
+  },
+  "scopes.sessionRead.description": {
+    "message": "suoᴉssǝs ǝʌᴉʇɔɐ pɐǝᴚ"
+  },
+  "scopes.sessionRead.label": {
+    "message": "suoᴉssǝs pɐǝᴚ"
+  },
+  "scopes.threadRead.description": {
+    "message": "spɐǝɹɥʇ pɐǝᴚ"
+  },
+  "scopes.threadRead.label": {
+    "message": "spɐǝɹɥʇ pɐǝᴚ"
+  },
+  "scopes.threadWrite.description": {
+    "message": "spɐǝɹɥʇ oʇ ǝʇᴉɹM"
+  },
+  "scopes.threadWrite.label": {
+    "message": "spɐǝɹɥʇ ǝʇᴉɹM"
+  },
+  "scopes.userAuthWrite.description": {
+    "message": "ɐʇɐp uoᴉʇɐɔᴉʇuǝɥʇnɐ ɹnoʎ ʎɟᴉpoW"
+  },
+  "scopes.userAuthWrite.label": {
+    "message": "ɐʇɐp ɥʇnɐ ǝʇᴉɹM"
+  },
+  "scopes.userDelete.description": {
+    "message": "ʇunoɔɔɐ ɹnoʎ ǝʇǝlǝᗡ"
+  },
+  "scopes.userDelete.label": {
+    "message": "ʇunoɔɔɐ ɹnoʎ ǝʇǝlǝᗡ"
+  },
+  "scopes.userRead.description": {
+    "message": "uoᴉʇɐɯɹoɟuᴉ ǝlᴉɟoɹd ɔᴉlqnd ɹnoʎ ssǝɔɔⱯ"
+  },
+  "scopes.userRead.label": {
+    "message": "ɐʇɐp ɹǝsn pɐǝᴚ"
+  },
+  "scopes.userReadEmail.description": {
+    "message": "lᴉɐɯǝ ɹnoʎ pɐǝᴚ"
+  },
+  "scopes.userReadEmail.label": {
+    "message": "lᴉɐɯǝ ɹǝsn pɐǝᴚ"
+  },
+  "scopes.userWrite.description": {
+    "message": "ǝlᴉɟoɹd ɹnoʎ oʇ ǝʇᴉɹM"
+  },
+  "scopes.userWrite.label": {
+    "message": "ɐʇɐp ɹǝsn ǝʇᴉɹM"
+  },
+  "scopes.versionCreate.description": {
+    "message": "suoᴉsɹǝʌ ʍǝu ǝʇɐǝɹƆ"
+  },
+  "scopes.versionCreate.label": {
+    "message": "suoᴉsɹǝʌ ǝʇɐǝɹƆ"
+  },
+  "scopes.versionDelete.description": {
+    "message": "uoᴉsɹǝʌ ɐ ǝʇǝlǝᗡ"
+  },
+  "scopes.versionDelete.label": {
+    "message": "suoᴉsɹǝʌ ǝʇǝlǝᗡ"
+  },
+  "scopes.versionRead.description": {
+    "message": "Read all versions"
+  },
+  "scopes.versionRead.label": {
+    "message": "suoᴉsɹǝʌ pɐǝᴚ"
+  },
+  "scopes.versionWrite.description": {
+    "message": "ɐʇɐp uoᴉsɹǝʌ oʇ ǝʇᴉɹM"
+  },
+  "scopes.versionWrite.label": {
+    "message": "suoᴉsɹǝʌ ǝʇᴉɹM"
+  },
+  "search.filter.locked.server": {
+    "message": "ɹǝʌɹǝs ǝɥʇ ʎq pǝpᴉʌoɹԀ"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "ɹǝʌɹǝs ǝɥʇ ʎq pǝpᴉʌoɹd sᴉ uoᴉsɹǝʌ ǝɯɐ⅁"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "ɹǝʌɹǝs ǝɥʇ ʎq pǝpᴉʌoɹd sᴉ ɹǝpɐoꞀ"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "ɹǝʌɹǝs ɥʇᴉʍ ɔuʎS"
+  },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "ssǝɹɓoɹd uᴉ uoᴉʇɐǝɹɔ dnʞɔɐᗺ"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "ssǝɹɓoɹd uᴉ ǝɹoʇsǝɹ dnʞɔɐᗺ"
+  },
+  "servers.backups.item.already-preparing": {
+    "message": "pɐoluʍop ɹoɟ dnʞɔɐq ɓuᴉɹɐdǝɹd ʎpɐǝɹlⱯ"
+  },
+  "servers.backups.item.automated": {
+    "message": "pǝʇɐɯoʇnⱯ"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "˙˙˙dnʞɔɐq ɓuᴉʇɐǝɹƆ"
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "dnʞɔɐq ǝʇɐǝɹɔ oʇ pǝlᴉɐℲ"
+  },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "pɐoluʍop ǝɹɐdǝɹd oʇ pǝlᴉɐℲ"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "dnʞɔɐq ɯoɹɟ ǝɹoʇsǝɹ oʇ pǝlᴉɐℲ"
+  },
+  "servers.backups.item.lock": {
+    "message": "ʞɔoꞀ"
+  },
+  "servers.backups.item.locked": {
+    "message": "pǝʞɔoꞀ"
+  },
+  "servers.backups.item.prepare-download": {
+    "message": "pɐoluʍop ǝɹɐdǝɹԀ"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "uᴉɐɓɐ ɓuᴉɹɐdǝɹd ʎɹ⟘"
+  },
+  "servers.backups.item.preparing-download": {
+    "message": "˙˙˙pɐoluʍop ɓuᴉɹɐdǝɹԀ"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "dnʞɔɐq ɹoɟ pǝnǝnꝹ"
+  },
+  "servers.backups.item.rename": {
+    "message": "ǝɯɐuǝᴚ"
+  },
+  "servers.backups.item.restore": {
+    "message": "ǝɹoʇsǝᴚ"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "˙˙˙dnʞɔɐq ɯoɹɟ ɓuᴉɹoʇsǝᴚ"
+  },
+  "servers.backups.item.retry": {
+    "message": "ʎɹʇǝᴚ"
+  },
+  "servers.backups.item.unlock": {
+    "message": "ʞɔolu∩"
+  },
+  "servers.notice.actions": {
+    "message": "suoᴉʇɔⱯ"
+  },
+  "servers.notice.begins": {
+    "message": "suᴉɓǝᗺ"
+  },
+  "servers.notice.dismissable": {
+    "message": "ǝlqɐssᴉɯsᴉᗡ"
+  },
+  "servers.notice.expires": {
+    "message": "sǝɹᴉdxƎ"
+  },
+  "servers.notice.id": {
+    "message": "ᗡI"
+  },
+  "servers.notice.level": {
+    "message": "lǝʌǝꞀ"
+  },
+  "servers.notice.undismissable": {
+    "message": "ǝlqɐssᴉɯsᴉpu∩"
+  },
+  "servers.notices.create-notice": {
+    "message": "ǝɔᴉʇou ǝʇɐǝɹƆ"
+  },
+  "servers.notices.no-notices": {
+    "message": "sǝɔᴉʇou oN"
+  },
+  "servers.plan.large.description": {
+    "message": "˙ɓuᴉppoɯ ʎʌɐǝɥ ɹo ˋsʞɔɐdpoɯ ˋsɹǝʎɐld ૨ᘕ–૨⇂ ɹoɟ lɐǝpI"
+  },
+  "servers.plan.large.name": {
+    "message": "ǝɓɹɐꞀ"
+  },
+  "servers.plan.medium.description": {
+    "message": "˙spoɯ ǝldᴉʇlnɯ puɐ sɹǝʎɐld ૨⇂–୧ ɹoɟ ʇɐǝɹ⅁"
+  },
+  "servers.plan.medium.name": {
+    "message": "ɯnᴉpǝW"
+  },
+  "servers.plan.small.description": {
+    "message": "˙spoɯ ʇɥɓᴉl ʍǝɟ ɐ ɥʇᴉʍ spuǝᴉɹɟ ૨–⇂ ɹoɟ ʇɔǝɟɹǝԀ"
+  },
+  "servers.plan.small.name": {
+    "message": "llɐɯS"
+  },
+  "settings.billing.modal.cancel.action": {
+    "message": "uoᴉʇdᴉɹɔsqns lǝɔuɐƆ"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "˙ǝlɔʎɔ ɓuᴉllᴉq ʇuǝɹɹnɔ ǝɥʇ ɟo puǝ ǝɥʇ lᴉʇun sʞɹǝd ɹnoʎ uᴉɐʇǝɹ llᴉʍ no⅄ ˙uoᴉʇdᴉɹɔsqns ɹnoʎ lǝɔuɐɔ llᴉʍ sᴉɥ⟘"
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "¿uoᴉʇdᴉɹɔsqns ɹnoʎ lǝɔuɐɔ oʇ ʇuɐʍ noʎ ǝɹns noʎ ǝɹⱯ"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "poɥʇǝɯ ʇuǝɯʎɐd sᴉɥʇ ǝʌoɯǝᴚ"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "˙(ɹǝʌǝɹoɟ ʎllɐǝɹ ǝʞᴉl) ɹǝʌǝɹoɟ poɥʇǝɯ ʇuǝɯʎɐd sᴉɥʇ ǝʌoɯǝɹ llᴉʍ sᴉɥ⟘"
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "¿poɥʇǝɯ ʇuǝɯʎɐd sᴉɥʇ ǝʌoɯǝɹ oʇ ʇuɐʍ noʎ ǝɹns noʎ ǝɹⱯ"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "poɥʇǝɯ ʇuǝɯʎɐd ppⱯ"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "sǝɓɹɐɥɔ ʇsɐd ʍǝᴉΛ"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "ʎɹɐɯᴉɹd ǝʞɐW"
+  },
+  "settings.billing.payment_method.card_display": {
+    "message": "{last_four} uᴉ ɓuᴉpuǝ {card_brand}"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "{year}/{month} sǝɹᴉdxƎ"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "˙spoɥʇǝɯ ʇuǝɯʎɐd ʎuɐ pǝppɐ ʇou ǝʌɐɥ no⅄"
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "ʎɹɐɯᴉɹԀ"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "spoɥʇǝɯ ʇuǝɯʎɐԀ"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "ʎɐԀ uozɐɯⱯ"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "ssǝɹdxƎ uɐɔᴉɹǝɯⱯ"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "ddⱯ ɥsɐƆ"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "qnlƆ sɹǝuᴉᗡ"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "ɹǝʌoɔsᴉᗡ"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "SOԀ⟘ℲƎ"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "ᗺƆſ"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "pɹɐƆɹǝʇsɐW"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "lɐԀʎɐԀ"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "ʎɐԀuoᴉu∩"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "poɥʇǝɯ ʇuǝɯʎɐd uʍouʞu∩"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "ɐsᴉΛ"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "˙suoᴉʇdᴉɹɔsqns ɹǝʌɹǝS ɥʇuᴉɹpoW ɹnoʎ ǝɓɐuɐW"
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "suoᴉʇdᴉɹɔsqnS ɹǝʌɹǝS ɥʇuᴉɹpoW"
+  },
+  "settings.billing.subscription.description": {
+    "message": "˙suoᴉʇdᴉɹɔsqns ɥʇuᴉɹpoW ɹnoʎ ǝɓɐuɐW"
+  },
+  "settings.billing.subscription.title": {
+    "message": "suoᴉʇdᴉɹɔsqnS"
+  },
+  "settings.display.banner.developer-mode.button": {
+    "message": "ǝpoɯ ɹǝdolǝʌǝp ǝʇɐʌᴉʇɔɐǝᗡ"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "˙ǝpoɯ ɹǝdolǝʌǝp ǝlɓɓoʇ oʇ sǝɯᴉʇ ૨ ǝɓɐd ǝɥʇ ɟo ɯoʇʇoq ǝɥʇ ʇɐ oɓol ɥʇuᴉɹpoW ǝɥʇ uo ʞɔᴉlƆ ˙IԀⱯ ɥʇuᴉɹpoW ǝɥʇ ɓuᴉsn ɹǝdolǝʌǝp ɐ ǝɹ,noʎ ɟᴉ lnɟdlǝɥ ǝq ʎɐɯ ʇɐɥʇ ɥʇuᴉɹpoW ʇnoɥɓnoɹɥʇ sɓuᴉɥʇ snoᴉɹɐʌ ɟo sᗡI lɐuɹǝʇuᴉ ǝɥʇ ʍǝᴉʌ oʇ noʎ ʍollɐ llᴉʍ sᴉɥ⟘ ˙ǝʌᴉʇɔɐ sᴉ <strong>ǝpoɯ ɹǝdolǝʌǝᗡ</strong>"
+  },
+  "settings.display.flags.description": {
+    "message": "˙ǝɔᴉʌǝp sᴉɥʇ uo sǝɹnʇɐǝɟ uᴉɐʇɹǝɔ ǝlqɐsᴉp ɹo ǝlqɐuƎ"
+  },
+  "settings.display.flags.title": {
+    "message": "sǝɹnʇɐǝɟ ǝlɓɓo⟘"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "ǝɓɐd sʞɔɐԀ ɐʇɐᗡ"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "˙ǝɔᴉʌǝp sᴉɥʇ uo sʇsᴉl ʇɔǝſoɹd sʎɐldsᴉp ʇɐɥʇ ǝɓɐd ɥɔɐǝ ɹoɟ ʇnoʎɐl pǝɹɹǝɟǝɹd ɹnoʎ ʇɔǝlǝS"
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "ǝɓɐd spoW"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "ǝɓɐd sʞɔɐdpoW"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "ǝɓɐd suᴉɓnlԀ"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "ǝɓɐd sʞɔɐԀ ǝɔɹnosǝᴚ"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "ǝɓɐd sɹǝpɐɥS"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "sʇnoʎɐl ʇsᴉl ʇɔǝſoɹԀ"
+  },
+  "settings.display.project-list-layouts.user": {
+    "message": "sǝƃɐd ǝlᴉɟoɹd ɹǝs∩"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "uoᴉʇɔǝlloƆ"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "message": "˙ƃuᴉɹǝpuǝɹ pǝʇɐɹǝlǝɔɔɐ-ǝɹɐʍpɹɐɥ ʇnoɥʇᴉʍ sǝnssᴉ ǝɔuɐɯɹoɟɹǝd ǝsnɐɔ ʎɐɯ ʇɐɥʇ sʇɔǝɟɟǝ ɹnlq sɐ ɥɔns ƃuᴉɹǝpuǝɹ pǝɔuɐʌpɐ sǝlqɐuƎ"
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "ƃuᴉɹǝpuǝɹ pǝɔuɐʌp∀"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "˙qɐʇ ʍǝu ɐ uᴉ uǝdo llᴉʍ sǝƃɐd ʇᴉpǝ puɐ spɐ uo sʞuᴉl puɐ 'qɐʇ ǝɯɐs ǝɥʇ uᴉ uǝdo llᴉʍ suoᴉʇdᴉɹɔsǝp uʍopʞɹɐW uᴉ puɐ uᴉɐɯop ǝɯɐs ǝɥʇ uo sʞuᴉl 'ƃuᴉʇʇǝs sᴉɥʇ ɹǝʇʇɐɯ oN ˙qɐʇ ʍǝu ɐ uᴉ uǝdo ɥʇuᴉɹpoW ɟo ǝpᴉsʇno oƃ ɥɔᴉɥʍ sʞuᴉl ǝʞɐW"
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "message": "qɐʇ ʍǝu uᴉ sʞuᴉl lɐuɹǝʇxǝ uǝdO"
+  },
+  "settings.display.sidebar.hide-app-promos.description": {
+    "message": "˙ɹǝʇooɟ ǝɥʇ uᴉ ɹo ǝƃɐd ƃuᴉpuɐl ǝɥʇ uo punoɟ ǝq llᴉʇs uɐɔ ǝƃɐd dd∀ ɥʇuᴉɹpoW ǝɥ┴ ˙uoᴉʇɐƃᴉʌɐu ʎɹɐɯᴉɹd ɯoɹɟ suoʇʇnq ,,dd∀ ɥʇuᴉɹpoW ʇǝפ,, ǝɥʇ sǝpᴉH"
+  },
+  "settings.display.sidebar.hide-app-promos.title": {
+    "message": "suoᴉʇoɯoɹd dd∀ ɥʇuᴉɹpoW ǝpᴉH"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "sǝɓɐd ʇuǝʇuoɔ uo ɹɐqǝpᴉs pǝuɓᴉlɐ-ʇɟǝꞀ"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "˙ʇuǝʇuoɔ s,ǝɓɐd ǝɥʇ ɟo ʇɟǝl ǝɥʇ oʇ ɹɐqǝpᴉs ǝɥʇ suɓᴉlⱯ"
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "˙sʇlnsǝɹ ɥɔɹɐǝs ǝɥʇ ɟo ʇɥɓᴉɹ ǝɥʇ oʇ ɹɐqǝpᴉs sɹǝʇlᴉɟ ǝɥʇ suɓᴉlⱯ"
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "sǝɓɐd ɥɔɹɐǝs uo ɹɐqǝpᴉs sɹǝʇlᴉɟ pǝuɓᴉlɐ-ʇɥɓᴉᴚ"
+  },
+  "settings.display.theme.description": {
+    "message": "˙ǝɔᴉʌǝp sᴉɥʇ uo ɥʇuᴉɹpoW ɹoɟ ǝɯǝɥʇ ɹoloɔ pǝɹɹǝɟǝɹd ɹnoʎ ʇɔǝlǝS"
+  },
+  "settings.display.theme.title": {
+    "message": "ǝɯǝɥʇ ɹoloƆ"
+  },
+  "settings.language.categories.auto": {
+    "message": "ɔᴉʇɐɯoʇnⱯ"
+  },
+  "settings.language.categories.default": {
+    "message": "sǝɓɐnɓuɐl pɹɐpuɐʇS"
+  },
+  "settings.language.categories.experimental": {
+    "message": "sǝɓɐnɓuɐl lɐʇuǝɯᴉɹǝdxƎ"
+  },
+  "settings.language.categories.fun": {
+    "message": "sǝɓɐnɓuɐl unℲ"
+  },
+  "settings.language.categories.search-result": {
+    "message": "sʇlnsǝɹ ɥɔɹɐǝS"
+  },
+  "settings.language.description": {
+    "message": "˙<crowdin-link>uᴉpʍoɹƆ uo</crowdin-link> sɹǝǝʇunloʌ ʎq pǝʇnqᴉɹʇuoɔ ǝɹɐ suoᴉʇɐlsuɐɹꞱ ˙ǝʇᴉs ǝɥʇ ɹoɟ ǝɓɐnɓuɐl pǝɹɹǝɟǝɹd ɹnoʎ ǝsooɥƆ"
+  },
+  "settings.language.languages.automatic": {
+    "message": "ǝɓɐnɓuɐl ɯǝʇsʎs ǝɥʇ ɥʇᴉʍ ɔuʎS"
+  },
+  "settings.language.languages.language-label-applying": {
+    "message": "˙˙˙ᵷuᴉʎꞁddⱯ ˙{label}"
+  },
+  "settings.language.languages.language-label-error": {
+    "message": "ɹoɹɹƎ ˙{label}"
+  },
+  "settings.language.languages.load-failed": {
+    "message": "˙ʇᴉq ɐ uᴉ uᴉɐɓɐ ʎɹꞱ ˙ǝɓɐnɓuɐl sᴉɥʇ pɐol ʇouuɐƆ"
+  },
+  "settings.language.languages.search-field.description": {
+    "message": "ʇlnsǝɹ ɥɔɹɐǝs ʇsɹᴉɟ ǝɥʇ snɔoɟ oʇ ʇᴉɯqnS"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "message": "˙˙˙ǝɓɐnɓuɐl ɐ ɹoɟ ɥɔɹɐǝS"
+  },
+  "settings.language.languages.search-results-announcement": {
+    "message": "˙ɥɔɹɐǝs ɹnoʎ {matches, plural, =0 {ɥɔʇɐɯ sǝɓɐnɓuɐl oN} one {sǝɥɔʇɐɯ ǝɓɐnɓuɐl #} other {ɥɔʇɐɯ sǝɓɐnɓuɐl #}}"
+  },
+  "settings.language.languages.search.no-results": {
+    "message": "˙ɥɔɹɐǝs ɹnoʎ ɥɔʇɐɯ sǝᵷɐnᵷuɐꞁ oN"
+  },
+  "settings.language.warning": {
+    "message": "˙uǝʞoɹq ɹɐǝddɐ ʎɐɯ ʇuǝʇuoɔ ʎllɐuoᴉsɐɔɔo os ˋɯǝʇsʎs uoᴉʇɐzᴉlɐɔol ɹno ɓuᴉʌoɹdɯᴉ uo ɓuᴉʞɹoʍ llᴉʇs ǝɹɐ ǝM ˙sǝɓɐnɓuɐl uᴉɐʇɹǝɔ ɹoɟ ɥsᴉlɓuƎ uᴉ uᴉɐɯǝɹ ʎɐɯ ʇuǝʇuoɔ ǝɯos os ˋpǝʇɐlsuɐɹʇ ʎllnɟ ʇǝʎ ʇou sᴉ ǝʇᴉs ǝɥ⟘ ˙ǝlqɐlᴉɐʌɐ ʇou sᴉ uoᴉʇɐlsuɐɹʇ ɐ ɟᴉ ɥsᴉlɓuƎ uᴉ ɹɐǝddɐ oʇ ʇuǝʇuoɔ ǝɯos ǝsnɐɔ ʎɐɯ ǝɓɐnɓuɐl ǝʇᴉs ǝɥʇ ɓuᴉɓuɐɥƆ"
+  },
+  "settings.pats.action.create": {
+    "message": "⟘ⱯԀ ɐ ǝʇɐǝɹƆ"
+  },
+  "settings.pats.description": {
+    "message": "˙ǝɯᴉʇ ʎuɐ ʇɐ pǝʞoʌǝɹ puɐ pǝʇɐǝɹɔ ǝq uɐɔ ʎǝɥ⟘ ˙</doc-link>uoᴉʇɐʇuǝɯnɔop IԀⱯ s,ɥʇuᴉɹpoW<<doc-link> ǝǝs 'uoᴉʇɐɯɹoɟuᴉ ǝɹoɯ ɹoℲ ˙IԀⱯ s,ɥʇuᴉɹpoW ssǝɔɔɐ oʇ pǝsn ǝq uɐɔ s⟘ⱯԀ"
+  },
+  "settings.pats.modal.create.action": {
+    "message": "⟘ⱯԀ ǝʇɐǝɹƆ"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "sǝɹᴉdxƎ"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "ǝɯɐN"
+  },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "˙˙˙ǝɯɐu s,⟘ⱯԀ ǝɥʇ ɹǝʇuƎ"
+  },
+  "settings.pats.modal.create.title": {
+    "message": "uǝʞoʇ ssǝɔɔɐ ꞁɐuosɹǝd ǝʇɐǝɹƆ"
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "uǝʞoʇ sᴉɥʇ ǝʇǝꞁǝᗡ"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "˙(ɹǝʌǝɹoɟ ʎꞁꞁɐǝɹ ǝʞᴉꞁ) ɹǝʌǝɹoɟ uǝʞoʇ sᴉɥʇ ǝʌoɯǝɹ ꞁꞁᴉʍ sᴉɥ⟘"
+  },
+  "settings.pats.modal.delete.title": {
+    "message": "¿uǝʞoʇ sᴉɥʇ ǝʇǝꞁǝp oʇ ʇuɐʍ noʎ ǝɹns noʎ ǝɹⱯ"
+  },
+  "settings.pats.modal.edit.title": {
+    "message": "uǝʞoʇ ssǝɔɔɐ ꞁɐuosɹǝd ʇᴉpƎ"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "uǝʞoʇ ʇᴉpƎ"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "uǝʞoʇ ǝʞoʌǝᴚ"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "{ago} pǝɹᴉdxƎ"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "{inTime} sǝɹᴉdxƎ"
+  },
+  "settings.pats.token.last-used": {
+    "message": "{ago} pǝsn ʇsɐꞀ"
+  },
+  "settings.pats.token.never-used": {
+    "message": "pǝsn ɹǝʌǝN"
+  },
+  "settings.profile.bio.description": {
+    "message": "˙noʎ ʇnoqɐ ʇᴉq ǝlʇʇᴉl ɐ ǝuoʎɹǝʌǝ llǝʇ oʇ uoᴉʇdᴉɹɔsǝp ʇɹoɥs ∀"
+  },
+  "settings.profile.bio.title": {
+    "message": "oᴉᗺ"
+  },
+  "settings.profile.description": {
+    "message": "<docs-link>IԀ∀ ɥʇuᴉɹpoW</docs-link> ǝɥʇ ɥƃnoɹɥʇ puɐ ɥʇuᴉɹpoW uo ǝlqɐʍǝᴉʌ ʎlɔᴉlqnd sᴉ uoᴉʇɐɯɹoɟuᴉ ǝlᴉɟoɹd ɹno⅄"
+  },
+  "settings.profile.profile-info": {
+    "message": "uoᴉʇɐɯɹoɟuᴉ ǝlᴉɟoɹԀ"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "ʇǝsǝɹ"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "ǝɹnʇɔᴉd ǝlᴉɟoɹԀ"
+  },
+  "settings.profile.username.description": {
+    "message": "˙ǝlᴉɟoɹd ɹnoʎ ʎɟᴉʇuǝpᴉ oʇ ǝɯɐu ǝʌᴉʇᴉsuǝsuᴉ-ǝsɐɔ ǝnbᴉun ∀"
+  },
+  "settings.profile.username.title": {
+    "message": "ǝɯɐuɹǝs∩"
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "uoᴉssǝs ǝʞoʌǝᴚ"
+  },
+  "settings.sessions.created-ago": {
+    "message": "{ago} pǝʇɐǝɹƆ"
+  },
+  "settings.sessions.current-session": {
+    "message": "uoᴉssǝs ʇuǝɹɹnƆ"
+  },
+  "settings.sessions.description": {
+    "message": "˙ʎꞁǝʇɐᴉpǝɯɯᴉ pɹoʍssɐd ʇunoɔɔɐ ɥʇuᴉɹpoW ɹnoʎ ǝᵷuɐɥɔ puɐ ǝɔᴉʌǝp ʇɐɥʇ ɟo ʇno ᵷoꞁ 'ǝzᴉuᵷoɔǝɹ ʇ,uop noʎ ʎɹʇuǝ uɐ ǝǝs noʎ ɟI\n\n˙ʎꞁꞁɐnpᴉʌᴉpuᴉ ǝuo ɥɔɐǝ ɟo ʇno ᵷoꞁ uɐɔ no⅄ ˙ʇunoɔɔɐ ɥʇuᴉɹpoW ɹnoʎ ɥʇᴉʍ uᴉ pǝᵷᵷoꞁ ʎꞁʇuǝɹɹnɔ ǝɹɐ ʇɐɥʇ sǝɔᴉʌǝp ǝɥʇ ꞁꞁɐ ǝɹɐ ǝɹǝH"
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "{ago} pǝssǝɔɔɐ ʇsɐꞀ"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "SO uʍouʞu∩"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "ɯɹoɟʇɐꞁd uʍouʞu∩"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "ɥʇuᴉɹpoW ɯoɹɟ sʍǝu ʇsǝʇɐꞀ"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "sʍǝu llɐ ʍǝᴉΛ"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Režim pre vývojárov zapnutý."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Vzhľad"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Inštalácie Javy"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Súkromie"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Manažment zdrojov"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Pridať a hrať"
+  },
+  "instance.add-server.add-server": {
+    "message": "Pridať server"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Vypnuté"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Zapnuté"
+  },
+  "instance.add-server.title": {
+    "message": "Pridať server"
+  },
+  "instance.edit-server.title": {
+    "message": "Upraviť server"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Skryť z domovskej stránky"
+  },
+  "instance.edit-world.name": {
+    "message": "Meno"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraftový svet"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Resetovať ikonu"
+  },
+  "instance.edit-world.title": {
+    "message": "Upraviť svet"
+  },
+  "instance.filter.disabled": {
+    "message": "Deaktivované projekty"
+  },
+  "instance.filter.updates-available": {
+    "message": "Dostupné aktualizácie"
+  },
+  "instance.server-modal.address": {
+    "message": "Adresa"
+  },
+  "instance.server-modal.name": {
+    "message": "Meno"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraftový server"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Balík zdrojov"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Generálne"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Zmazať inštaláciu"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Zmazať inštaláciu"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Permanentne vymazať inštaláciu z vášho zariadenia, inkluzívne vašich svetov, nastavení, a všetkého stiahnutého obsahu. Opatrne, lebo keď raz vymažete inštaláciu nebude možne ju získať späť."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Vymazávam..."
+  }
+}

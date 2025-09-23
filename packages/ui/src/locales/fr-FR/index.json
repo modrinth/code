@@ -1,0 +1,846 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Bêta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Version bêta"
+  },
+  "badge.new": {
+    "defaultMessage": "Nouveau"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analyses"
+  },
+  "button.back": {
+    "defaultMessage": "Retour"
+  },
+  "button.cancel": {
+    "defaultMessage": "Annuler"
+  },
+  "button.continue": {
+    "defaultMessage": "Continuer"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Copier l'ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Copier le lien permanent"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Créer un projet"
+  },
+  "button.download": {
+    "defaultMessage": "Télécharger"
+  },
+  "button.downloading": {
+    "defaultMessage": "Téléchargement"
+  },
+  "button.edit": {
+    "defaultMessage": "Éditer"
+  },
+  "button.follow": {
+    "defaultMessage": "S'abonner"
+  },
+  "button.more-options": {
+    "defaultMessage": "Plus d'options"
+  },
+  "button.next": {
+    "defaultMessage": "Suivant"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Ouvrir le dossier"
+  },
+  "button.play": {
+    "defaultMessage": "Jouer"
+  },
+  "button.refresh": {
+    "defaultMessage": "Actualiser"
+  },
+  "button.remove": {
+    "defaultMessage": "Supprimer"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Supprimer l'image"
+  },
+  "button.report": {
+    "defaultMessage": "Signaler"
+  },
+  "button.reset": {
+    "defaultMessage": "Réinitialiser"
+  },
+  "button.save": {
+    "defaultMessage": "Sauvegarder"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Enregistrer les modifications"
+  },
+  "button.saving": {
+    "defaultMessage": "Sauvegarder"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Se connecter"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Se déconnecter"
+  },
+  "button.sign-up": {
+    "defaultMessage": "S'inscrire"
+  },
+  "button.stop": {
+    "defaultMessage": "Stop"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Se désabonner"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Importer une image"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "À l'instant"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "App"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Serveurs"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Site web"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Privé"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Modifier l'icône"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Supprimer l'icône"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Remplacer l'icône"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Sélectionner l'icône"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Rechercher..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Vue galerie"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Vue en grille"
+  },
+  "input.view.list": {
+    "defaultMessage": "Vue en lignes"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Mode aventure"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Mode créatif"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Mode spectateur"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Mode survie"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Mode de jeu inconnu"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Changements enregistrés"
+  },
+  "label.collections": {
+    "defaultMessage": "Collections"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Créé {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Tableau de bord"
+  },
+  "label.delete": {
+    "defaultMessage": "Supprimer"
+  },
+  "label.description": {
+    "defaultMessage": "Description"
+  },
+  "label.error": {
+    "defaultMessage": "Erreur"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Projets suivis"
+  },
+  "label.loading": {
+    "defaultMessage": "Chargement..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Modération"
+  },
+  "label.notifications": {
+    "defaultMessage": "Notifications"
+  },
+  "label.or": {
+    "defaultMessage": "ou"
+  },
+  "label.password": {
+    "defaultMessage": "Mot de passe"
+  },
+  "label.played": {
+    "defaultMessage": "Joué {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Publique"
+  },
+  "label.rejected": {
+    "defaultMessage": "Rejeté"
+  },
+  "label.saved": {
+    "defaultMessage": "Sauvegardé"
+  },
+  "label.scopes": {
+    "defaultMessage": "Portées"
+  },
+  "label.server": {
+    "defaultMessage": "Serveur"
+  },
+  "label.servers": {
+    "defaultMessage": "Serveurs"
+  },
+  "label.settings": {
+    "defaultMessage": "Paramètres"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Solo"
+  },
+  "label.title": {
+    "defaultMessage": "Titre"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Non-listé"
+  },
+  "label.visibility": {
+    "defaultMessage": "Visibilité"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Visiter votre profil"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Ajouter un mode de paiement"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Ajout d'une méthode de paiement"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Une erreur est survenue"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Accepté"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Approuvé"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Archivé"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Fermé"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Créateur"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Brouillon"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Échoué"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listé"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Modérateur"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Équipe Modrinth"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "En attente"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Privé"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Traité"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Rejeté"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Retourné"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Programmé"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "En examen"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Non-listé"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Bloqué"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Copier le code dans le presse-papiers"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Client"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Client et serveur"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Client ou serveur"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Serveur"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "Un {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Non-supporté"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} se terminant par {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Méthode de paiement inconnue"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Tout"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "{count, plural, one {Pack de données} other {Packs de données}}"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {Pack de données} other {Packs de données}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mods"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpacks"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modPack} other {modPacks}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Plugins"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Ressource Pack} other {Ressource Packs}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Packs de ressources"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {ressource pack} other {ressource packs}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaders"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shaders}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Environnements pris en charge"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Client et serveur"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Côté client"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Serveur dédié uniquement"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Côté serveur"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Solo"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Solo uniquement"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Plateforme"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Compatibilité"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Propriétaire du projet"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Créateurs"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Créé le {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "Sous licence {license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Publié le {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "Soumis le {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Détails"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Mise à jour le {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Rejoindre le serveur Discord"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Offrez-moi un café"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Donner"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Parrainer sur GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Faire un don sur Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Faire un don sur Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Faire un don sur PayPal"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Signaler un problème"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Voir la source"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Liens"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Visiter le wiki"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Analyses"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Description"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Dispose de certaines fonctionnalités à la fois côté client et côté serveur, même si ce n'est que partiellement."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Optionnel sur les deux, fonctionne pareil si installé d'un côté ou de l'autre"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Optionnel sur les deux, fonctionne mieux lorsqu'il est installé des deux côtés"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Optionnel côté client"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Optionnel côté serveur"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Requis partout"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Client et serveur"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "Tout est fait côté client et est compatible avec un serveur Vanilla."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Côté client uniquement"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Serveur dédié uniquement"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "Tout est fait côté serveur et est compatible avec un client Vanilla."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Fonctionne en solo aussi"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Côté serveur uniquement"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Fonctionne seulement en solo ou quand non connecté à un serveur multi-joueur."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Solo uniquement"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Sous-options de {option}"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Environnement"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Galerie"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Général"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "License"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Liens"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Membres"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "Tu n'as pas l'autorisation de modifier ça."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "Pas de permissions"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Tags"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Envoyer"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Versions"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Voir"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Archivé"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Brouillon"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Privé"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Public"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Rejeté"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Programmé"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "En examen"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Inconnu"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Non-listé"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Désactivé par les modérateurs"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Filtre bloqué"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Le déverrouillage de ce filtre peut permettre l'ajout de contenus non compatibles."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Synchroniser le filtre"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} est bloqué"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Débloquer le filtre"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Environnement"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Client"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Serveur"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Version du jeu"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Afficher toutes les versions"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Licence"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Source libre"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Chargeur"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Chargeur"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Chargeur"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Plateforme"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "ID de projet"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Chargeur"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Rejeter"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Rejetable"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Attention"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Information"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Critique"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Information"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Sondage"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Avertissement"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Obligatoire"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "Aucun prélèvement ne sera effectué pour l’instant."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Sélectionnez une méthode de paiement"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Méthode de paiement"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "prélevé {interval}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "Choisissez un plan personnalisé avec uniquement les spécifications dont vous avez besoin."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Commencer"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Idéal pour 15–25 joueurs, des modpacks, ou le modding intensif."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "Parfait pour 6–15 joueurs et plusieurs mods."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Le plus populaire"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Choisissez un plan"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Sélectionnez un plan"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "Parfait pour 1–5 amis et quelques mods légers."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "Choisissez la quantité de RAM et les spécifications qui correspondent à vos besoins."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Plan"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Région"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Évaluer"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Europe centrale"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "Quelle quantité de RAM souhaitez-vous que votre serveur ait ?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Amérique du Nord"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Où souhaitez-vous que votre serveur soit situé ?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Région non répertoriée ? <link>Faites-nous savoir où vous aimeriez voir les prochains serveurs Modrinth !</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Asie du sud est"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Europe de l'Ouest"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Compte et sécurité"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Apparence"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Vos applications"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Applications autorisées"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "Facturation et abonnements"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Sombre"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Sélectionnez votre thème de couleur préféré pour Modrinth sur cet appareil."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Clair"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Thème sombre préféré"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Thème clair préféré"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Rétro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Synchroniser avec le système"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Couleur du thème"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Langue"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "Jetons d'accès personnel"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Profil public"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Sessions"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} à {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Vous avez des modifications non enregistrées."
+  }
+}
+

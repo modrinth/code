@@ -1,0 +1,30 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO users_compliance\n              (\n                user_id,\n                requested,\n                signed,\n                e_delivery_consented,\n                tin_matched,\n                last_checked,\n                external_request_id,\n                reference_id,\n                form_type\n              )\n              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)\n            ON CONFLICT (user_id)\n            DO UPDATE SET\n              requested = EXCLUDED.requested,\n              signed = EXCLUDED.signed,\n              e_delivery_consented = EXCLUDED.e_delivery_consented,\n              tin_matched = EXCLUDED.tin_matched,\n              last_checked = EXCLUDED.last_checked,\n              external_request_id = EXCLUDED.external_request_id,\n              reference_id = EXCLUDED.reference_id,\n              form_type = EXCLUDED.form_type\n            RETURNING id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Timestamptz",
+        "Timestamptz",
+        "Bool",
+        "Bool",
+        "Timestamptz",
+        "Varchar",
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "8ad3460f73020decc59106f28cdc3313ca0dc8aaf8c7b4e0f2e3a6f87ba4104b"
+}

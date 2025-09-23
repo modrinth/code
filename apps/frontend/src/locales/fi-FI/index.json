@@ -1,0 +1,290 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Käyttäjää ei löydetty"
+  },
+  "app-marketing.download.description": {
+    "message": "Työpöytä sovelluksemme on saatavilla kaikilla alustoilla, valitse haluamasi versio."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Lataa AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Lataa beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Lataa DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Lataa RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Modrinth Appin Linux versioilla <issues-link>tunnetaan olevan ongelmia</issues-link> tietyillä järjestelmillä ja asetuksilla. Jos Modrinth App on epävakaa järjestelmälläsi, kannustamme sinua kokeilemaan toisia sovelluksia kuten <prism-link>Prism Launcher</prism-link> asentaaksesi helposti Modrinth sisältöä."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Lataus vaihtoehdot"
+  },
+  "app-marketing.download.terms": {
+    "message": "Lataamalla Modrinth Appin hyväksyt meidän <terms-link>Ehdot</terms-link> ja <privacy-link>Tietosuojaselosteen</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Kolmannen osapuolen paketit"
+  },
+  "app-marketing.download.title": {
+    "message": "Lattaa Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Tallenna sisältöä jota rakastat ja vastaanota päivityksiä yhdellä klikkauksella."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Seuraa projekteja"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Tuo kaikki lempi profiilisi launcherista jota käytit ennen, ja aloita Modrinth Appin käyttö sekunneissa!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Profiilien tuonti"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Toiminnot"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "käyttäjältä {author}"
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Asennetut modit"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Nimi"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Hae modeja"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Modien hallinta"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Versio"
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Offline tila"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth launcherin lähdekoodi on täysin avointa. Voit lukea lähdekoodia meidän <github-link>Githubissa</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Avoin lähdekoodi"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Aktiviteetti monitori"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App on tehokkaampi kuin moni johtavista modin hallitsijoista, käyttäen vain 150mt muistia!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Hyvä suorituskyky"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MT"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MT"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MT"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 miljardi %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Prosessin nimi"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "Muisti"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Pieni"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Suorituskykyinen"
+  },
+  "app-marketing.features.play.title": {
+    "message": "Pelaa lempi modeillasi"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Kieltäydy"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Lähetä palautus sähköposti"
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Sähköposti tai käyttäjänimi"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Sähköposti"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Sähköposti lähetetty"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Anna koodi..."
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Sähköposti tai käyttäjänimi"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Salasana"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Kirjaudu sisään käyttäen"
+  },
+  "auth.sign-in.title": {
+    "message": "Kirjaudu sisään"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Tai käytä salasanaa"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Luo tili"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Vahvista salasana"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Sähköposti"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Käyttäjänimi"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Salasana"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Tilaa päivityksiä Modrinthista"
+  },
+  "auth.sign-up.title": {
+    "message": "Rekisteröidy"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Reskiteröidy käyttäen"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Kirjaudu sisään"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Sähköpostisi on jo vahvistettu!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Sähköposti on jo vahvistettu"
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Sähköpostin vahvistus epäonnistui"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Sähköpostiosoitteesi on vahvistettu onnistuneesti!"
+  },
+  "collection.button.delete-icon": {
+    "message": "Poista kuvake"
+  },
+  "collection.button.edit-icon": {
+    "message": "Muokkaa kuvaketta"
+  },
+  "collection.button.remove-project": {
+    "message": "Poista projekti"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Lopeta projektin seuraaminen"
+  },
+  "collection.delete-modal.description": {
+    "message": "Tämä poistaa tämän kokoelman ikuisesti. Tätä toimintoa ei voida peruuttaa."
+  },
+  "collection.delete-modal.title": {
+    "message": "Oletko varma että haluat poistaa tämän kokoelman?"
+  },
+  "collection.error.not-found": {
+    "message": "Kokoelmaa ei löydy"
+  },
+  "collection.label.collection": {
+    "message": "Kokoelma"
+  },
+  "collection.label.created-at": {
+    "message": "Luotu {ago}"
+  },
+  "collection.label.no-projects": {
+    "message": "Tässä kokelmassa ei ole projekteja!"
+  },
+  "collection.label.owner": {
+    "message": "Omistaja"
+  },
+  "collection.label.updated-at": {
+    "message": "Päivitetty {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - kokoelma"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Luo uusi"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Hae kokoelmistasi"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Kokoelmasi"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "Saatoit kirjoittaa kokoelman URL osoitteen väärin."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "Tämä kokelma saattaa olla yksityinen."
+  },
+  "error.collection.404.list_title": {
+    "message": "Miksi?"
+  },
+  "error.collection.404.title": {
+    "message": "Kokoelmaa ei löytynyt"
+  },
+  "error.generic.404.subtitle": {
+    "message": "Sivu jota etsit ei näytä olevan olemassa."
+  },
+  "error.generic.404.title": {
+    "message": "Sivua ei löytynyt"
+  },
+  "error.generic.default.subtitle": {
+    "message": "Jokin meni pieleen."
+  },
+  "error.generic.default.title": {
+    "message": "Voi ei!"
+  },
+  "error.organization.404.list_title": {
+    "message": "Miksi?"
+  },
+  "error.project.404.list_title": {
+    "message": "Miksi?"
+  }
+}

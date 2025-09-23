@@ -1,0 +1,354 @@
+{
+  "button.back": {
+    "defaultMessage": "Quay lại"
+  },
+  "button.cancel": {
+    "defaultMessage": "Huỷ"
+  },
+  "button.continue": {
+    "defaultMessage": "Tiếp"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Sao chép ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Sao chép liên kết vĩnh viễn"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Tạo một dự án"
+  },
+  "button.download": {
+    "defaultMessage": "Tải về"
+  },
+  "button.downloading": {
+    "defaultMessage": "Đang tải xuống"
+  },
+  "button.edit": {
+    "defaultMessage": "Sửa"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Mở folder"
+  },
+  "button.play": {
+    "defaultMessage": "Chơi"
+  },
+  "button.refresh": {
+    "defaultMessage": "Tải lại"
+  },
+  "button.remove": {
+    "defaultMessage": "Gỡ bỏ"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Xóa hình ảnh"
+  },
+  "button.report": {
+    "defaultMessage": "Báo cáo"
+  },
+  "button.save": {
+    "defaultMessage": "Lưu"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Lưu các thay đổi"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Đăng nhập"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Đăng xuất"
+  },
+  "button.stop": {
+    "defaultMessage": "Dừng"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Tải lên hình ảnh"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Máy chủ"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Website"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Riêng tư"
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Chế độ xem ảnh"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Chế độ phiêu lưu"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Chế độ sáng tạo"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Chế độ sinh tồn"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Chế độ chơi không xác định"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Đã lưu các thay đổi"
+  },
+  "label.collections": {
+    "defaultMessage": "Bộ sưu tập"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Đã tạo {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Bảng điều khiển"
+  },
+  "label.delete": {
+    "defaultMessage": "Xóa"
+  },
+  "label.description": {
+    "defaultMessage": "Mô tả"
+  },
+  "label.error": {
+    "defaultMessage": "Lỗi"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Các dự án đang theo dõi"
+  },
+  "label.loading": {
+    "defaultMessage": "Đang tải..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Kiểm duyệt"
+  },
+  "label.notifications": {
+    "defaultMessage": "Thông báo"
+  },
+  "label.password": {
+    "defaultMessage": "Mật khẩu"
+  },
+  "label.played": {
+    "defaultMessage": "Thời gian chơi {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Công khai"
+  },
+  "label.rejected": {
+    "defaultMessage": "Bị từ chối"
+  },
+  "label.server": {
+    "defaultMessage": "Máy chủ"
+  },
+  "label.servers": {
+    "defaultMessage": "Các máy chủ"
+  },
+  "label.settings": {
+    "defaultMessage": "Cài đặt"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Chế độ một người chơi"
+  },
+  "label.title": {
+    "defaultMessage": "Tiêu đề"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Không công khai"
+  },
+  "label.visibility": {
+    "defaultMessage": "Hiển thị"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Xem hồ sơ của bạn"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Thêm phương thức thanh toán"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Đang thêm phương thức thanh toán"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Đã có lỗi xảy ra"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Được chấp nhận"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Đã phê duyệt"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Đã lưu trữ"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Đã đóng"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Tác giả"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Nháp"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Thất bại"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Quản trị viên"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Riêng tư"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Máy chủ"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Ủng hộ"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Tài trợ trên GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Ủng hộ qua Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Ủng hộ qua Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Ủng hộ qua PayPal"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Báo cáo lỗi"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Xem nguồn"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Các liên kết"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Xem trang wiki"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Nháp"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Riêng tư"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Công khai"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Bị từ chối"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Đã lên lịch"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Đang phê duyệt"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Không rõ"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Không công khai"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} đã bị khóa"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Mở khoá bộ lọc"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Môi trường"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Máy khách"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Máy chủ"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Phiên bản trò chơi"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Hiện tất cả phiên bản"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Giấy phép"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Mã nguồn mở"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Trình nạp"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Trình nạp"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Trình nạp"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Nền tảng"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "ID dự án"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Trình nạp"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Bỏ qua"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Có thể bỏ qua"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Lưu ý"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Thông tin"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Thông tin"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Khảo sát"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Cảnh báo"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Không thể bỏ qua"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "Bạn sẽ không bị tính phí."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Chọn phương thức thanh toán"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Phương thức thanh toán"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Ý tưởng cho 15–25 người chơi, modpacks hoặc nặng về modding."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "Tốt cho 6–15 người chơi và nhiều mods khác nhau."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Phổ biến nhất"
+  }
+}
+

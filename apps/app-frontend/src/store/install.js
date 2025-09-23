@@ -41,6 +41,31 @@ export const useInstall = defineStore('installStore', {
 	},
 })
 
+export const findPreferredVersion = (versions, project, instance) => {
+	// If we can find a version using strictly the instance loader then prefer that
+	let version = versions.find(
+		(v) =>
+			v.game_versions.includes(instance.game_version) &&
+			(project.project_type === 'mod' ? v.loaders.includes(instance.loader) : true),
+	)
+
+	if (!version) {
+		// Otherwise use first compatible version (in addition to versions with the instance loader this includes datapacks)
+		version = versions.find((v) => isVersionCompatible(v, project, instance))
+	}
+
+	return version
+}
+
+export const isVersionCompatible = (version, project, instance) => {
+	return (
+		version.game_versions.includes(instance.game_version) &&
+		(project.project_type === 'mod'
+			? version.loaders.includes(instance.loader) || version.loaders.includes('datapack')
+			: true)
+	)
+}
+
 export const install = async (
 	projectId,
 	versionId,
@@ -90,27 +115,16 @@ export const install = async (
 
 			let version
 			if (versionId) {
-				version = projectVersions.find((x) => x.id === versionId)
+				version = projectVersions.find((v) => v.id === versionId)
 			} else {
-				version = projectVersions.find(
-					(v) =>
-						v.game_versions.includes(instance.game_version) &&
-						(project.project_type === 'mod'
-							? v.loaders.includes(instance.loader) || v.loaders.includes('minecraft')
-							: true),
-				)
+				version = findPreferredVersion(projectVersions, project, instance)
 			}
 
 			if (!version) {
 				version = projectVersions[0]
 			}
 
-			if (
-				version.game_versions.includes(instance.game_version) &&
-				(project.project_type === 'mod'
-					? version.loaders.includes(instance.loader) || version.loaders.includes('minecraft')
-					: true)
-			) {
+			if (isVersionCompatible(version, project, instance, true)) {
 				for (const [path, file] of Object.entries(instanceProjects)) {
 					if (file.metadata && file.metadata.project_id === project.id) {
 						await remove_project(instance.path, path)
@@ -142,9 +156,13 @@ export const install = async (
 				)
 			}
 		} else {
-			const versions = (await get_version_many(project.versions)).sort(
+			let versions = (await get_version_many(project.versions)).sort(
 				(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
 			)
+
+			if (versionId) {
+				versions = versions.filter((v) => v.id === versionId)
+			}
 
 			const install = useInstall()
 			install.showModInstallModal(project, versions, callback)
@@ -162,7 +180,7 @@ export const install = async (
 	//        - If no version is selected, we look check the instance for versions to select based on the versions
 	//            - If there are no versions, we show the incompat modal
 	//        - If a version is selected, and the version is incompatible, we show the incompat modal
-	//   - Version is inarlled, as well as version dependencies
+	//   - Version is installed, as well as version dependencies
 }
 
 export const installVersionDependencies = async (profile, version) => {
@@ -182,9 +200,7 @@ export const installVersionDependencies = async (profile, version) => {
 				(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
 			)
 
-			const latest = depVersions.find(
-				(v) => v.game_versions.includes(profile.game_version) && v.loaders.includes(profile.loader),
-			)
+			const latest = findPreferredVersion(depVersions, dep, profile)
 			if (latest) {
 				await add_project_from_version(profile.path, latest.id)
 			}

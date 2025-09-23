@@ -1,0 +1,179 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Карыстальнік не знойдзен"
+  },
+  "app-marketing.download.description": {
+    "message": "Наша настольнае прыкладанне даступна для ўсіх платформ, выберыце патрэбную вам версію."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Спампаваць AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Спампаваць бэта-версію"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Спампаваць DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Спампаваць RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Вядома, што версіі Modrinth App для Linux <issues-link>маюць праблемы</issues-link> на пэўных сістэмах і ў пэўных канфігурацыях. Калі Modrinth App працуе нестабільна на вашай сістэме, мы рэкамендуем вам паспрабаваць іншыя праграмы, такія як <prism-link>Prism Launcher</prism-link>, каб лёгка ўсталяваць кантэнт Modrinth."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Опцыі спампоўкі"
+  },
+  "app-marketing.download.terms": {
+    "message": "Спампоўваючы Modrinth App, вы згаджаецеся з нашымі <terms-link>Умовамі</terms-link> і <privacy-link>Палітыкай прыватнасці</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Пакеты іншых вытворцаў"
+  },
+  "app-marketing.download.title": {
+    "message": "Спампаваць Modrinth App (бэта-версія)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Захоўвайце любімы кантэнт і атрымлівайце абнаўленні адным пстрычкай мышы."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Сачыце за праектамі"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Імпартуйце ўсе свае любімыя профілі з лаўнчара, якім вы карысталіся раней, і пачніце працаваць з Modrinth App за лічаныя секунды!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Імпартаванне профілю"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Дзеянні"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "ад {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth дазваляе лёгка кіраваць усімі вашымі модамі ў адным месцы. Вы можаце ўсталёўваць, выдаляць і абнаўляць моды адным пстрычкай мышы."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Усталяваныя моды"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Назва"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Шукаць моды"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Кіраванне модамі"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Версія"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Гуляйце ў свае моды, незалежна ад таго, падключаны вы да Інтэрнэту ці не."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Афлайн-рэжым"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Лаўнчар Modrinth мае цалкам адкрыты зыходны код. Вы можаце паглядзець зыходны код на нашым <github-link>GitHub</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Адкрыты зыходны код"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Маніторынг актыўнасці"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App працуе лепш, чым многія з вядучых мэнэджараў модаў, выкарыстоўваючы ўсяго 150 МБ аператыўнай памяці!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Добрая прадукцыйнасць"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 billion %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Назва працэсу"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Мала"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Прадукцыйны"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Выкарыстоўвайце Modrinth App, каб спампоўваць і гуляць у свае любімыя моды і модпакі."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Гуляйце з вашымі любімымі модамі"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Стварайце, дзяліцеся і гуляйце ў модпакі з любым з тысяч модаў і модпакаў, размешчаных тут, на Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Модпак"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Падзяліцца"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Дзяліцеся модпакамі"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "У адрозненне ад любога лаунчера"
+  },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App цалкам інтэграваная з вэб-сайтам, таму вы можаце атрымаць доступ да ўсіх сваіх любімых праектаў праз праграму!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Інтэграцыя з вэб-сайтам"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "які вы выкарыстоўвалі раней"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Здымак экрана Modrinth App з адкрытым экзэмплярам Cobblemon на старонцы «Змест»."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App — гэта ўнікальны лаунчер з адкрытым зыходным кодам, які дазваляе вам гуляць у вашы любімыя моды і падтрымліваць іх у актуальным стане — усё ў адным акуратным невялікім пакеце."
+  }
+}

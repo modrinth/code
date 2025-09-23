@@ -1,0 +1,216 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Oh hai! Needz a gud descripshun 'bout what dis project doez, ya know? Like, what iz it fur and howz it workz? Hoomans needz teh knowz."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Gimme a descripshun"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Gettin' a speshul, amazin', an' funneh icon iz makin' ur projecshun stand out an' be rekernizable, yaaaay."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Gimme an iconz"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Gimme all teh gud linkz! Like, codez, bug reportz, or even a Kittehcord invite."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Gimme teh extra linkz"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "U picked all {totalAvailableTags} tagz! Dat no good – tagz shud help kittehz find da right projects. Plz only pick tagz dat fit ur project."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Pick teh rite tagz"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Oh hai! Ur description is {length} charakters long. Mini-mewm of {minChars} charakters iz recommended, to make itz super clear n' tell evrything."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Makez teh words biggerz"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Pawdit da descripshun"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Pawdit teh kitteh rights"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Pawdit summry"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Pawdit teh tagz"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Pawdit teh titlez"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "Oh hai! Da feechurd gallerry pictar iz liek, how ur projec gives da furrst impreshun, ya knowz."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Maek an pictar shiny n’ frontpage"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "Peek at teh gallery page"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Oh hai! Ur {projectType} uses a kitteh rights dat sez peeps gots ta see teh codez. Gibz us teh codez linkz or files fur evry new vershun, or maybe use diffrent kitteh rights."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Gimme da magic codez"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "Ur Descripshun shud haz enuff plain text or alt-text for pictarz, so hoomanz usin’ screen readerz or slow webz can still get da fun."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "Keep it easy for all kittehz"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "Kitteh rights webz iz borked."
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "Ur license webz points to {domain}, but dat no good fur license info. License URLz shud go straight to da license file, no social media, game platformz, or other shiny stuffs."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "Ur license webz lookz all messy. Plz gimme a proper URL to ur license text."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Gimme a proper URL"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "No can haz link-shortenerz or sneaky ways to hide where link goez. Only use full-length shiny linkz for external stuff or licensez, kthx."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "No can haz shorty linkz"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, one {# header} other {# headers}} in ur descripshun {count, plural, one {is} other {are}} too long. Headerz shud be short n’ snappy, actin’ like section titlez, not full sentences."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "Make headerz tiny"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "Projectz shud not use Minecwaft brandy-stuff or put ‘Minecwaft’ big in da name."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "No copy hooman brandz"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "Sum of ur pictarz missin’ alt-text, and dat iz impawtant fur hoomanz usin’ screen readerz or wit slow webz."
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "Gimme da describey text"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "No can haz Discord invitez for other link typez. Gib me ur Kittehcord link only in da Discord Invite link box, kthx."
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Move da Kittehcord link"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "Peek at teh mod thread"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "Peek at all da mod kittehz concerns n’ fix dem before sendin’ it bakk, kthx."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Peek at mod kittehz notes"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "U picked {count} resolution tagz ({tags}). Resource packz shud usually only haz one tag dat matchz their main resolution."
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Choose da right resolution tag"
+  },
+  "nags.select-environments.description": {
+    "defaultMessage": "Pickz da enviroz ur {projectType} wurks on."
+  },
+  "nags.select-environments.title": {
+    "defaultMessage": "Select where da pawject workz"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Pick da license dat ur {projectType} sharin’ undr."
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Choose da right license"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "Pick da tagz dat fit ur project so da rite kittehz can find it."
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Choose da tagz"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Peek at descripshun tweakz"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "Visit teh where da pawject workz tweakz"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Peek at license tweakz"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Peek at linkz tweakz"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Peek at tagz tweakz"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Peek at general tweakz"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Ur summary no can be da same as ur project Name. Make a fun n’ info-y Summary dat kittehz wanna read."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "Give ur summary its own shiny style"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Ur summary shud no haz fancy format, line breaks, special charz, or linkz, cuz it only shows plain text."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Make summary neat n’ tidy"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Ur summary iz {length} characturz. At least {minChars} characturz recommended to make a fun n’ info-y summary."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "Gimme moar fun n’ info"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Keep ur project Name clean n’ snappy so kittehz can find it easy! Verzhun n’ loader info shows up automatically next to ur project."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "Tidy up da naem"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "U picked {tagCount} tagz. Try usin’ {maxTagCount} or fewer so kittehz can find ur project in search."
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "Choose da right tagz"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "U need at least one gallery pictar to show off da content of ur {type}{resourcepackMessage}."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Plop n’ a pictar to gallery"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "U need at least one verzhun before ur project can go for kitteh check."
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Plop in a verzhun"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "Sum of ur external linkz might be usin’ domains dat no fit dat type of link, oops."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Check da shiny webz links"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "Peek at verzhunz page"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Peek at linkz tweakz"
+  }
+}
+

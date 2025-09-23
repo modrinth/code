@@ -1,0 +1,158 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Ontwikkelaarmodus geaktiveer."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Voorkoms"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Verstek instansie opsies"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Kenmerk vlae"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java installasies"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privaatheid"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Hulpbronbestuur"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "voeg by en speel"
+  },
+  "instance.add-server.add-server": {
+    "message": "bediener byvoeg"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Gestrem"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "aangeskakel"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "spoed"
+  },
+  "instance.add-server.title": {
+    "message": "voeg 'n bediener by"
+  },
+  "instance.edit-server.title": {
+    "message": "wysig bediener"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "versteek van die tuisblad"
+  },
+  "instance.edit-world.name": {
+    "message": "Naam"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft Wêreld"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "herstel ikoon"
+  },
+  "instance.edit-world.title": {
+    "message": "wêreld wysig"
+  },
+  "instance.filter.disabled": {
+    "message": "gestremde projekte"
+  },
+  "instance.filter.updates-available": {
+    "message": "opdaterings beskikbaar"
+  },
+  "instance.server-modal.address": {
+    "message": "adres"
+  },
+  "instance.server-modal.name": {
+    "message": "Naam"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft-bediener"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Hulpbronpakket"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Algemeen"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "verwyder instansie"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "verwyder instansie"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Vee 'n instansie permanent van jou toestel uit, insluitend jou wêrelde, konfigurasies en alle geïnstalleerde inhoud. Wees versigtig, want sodra jy 'n instansie verwyder het, is daar geen manier om dit te herstel nie."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Vee tans uit …"
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "duplikaat"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Kan nie dupliseer tydens installasie nie."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Duplikaat instansie"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Skep 'n kopie van hierdie instansie, insluitend wêrelde, konfigurasies, mods, ens."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "wysig ikoon"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "verwyder ikoon"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "vervang ikoon"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "kies ikoon"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "biblioteekgroepe"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "skep nuwe groep"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Biblioteekgroepe laat jou toe om jou instansies in verskillende afdelings in jou biblioteek te organiseer."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Voer groepnaam in"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Naam"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Lanseerhake"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Pasgemaakte lanseerhake"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Hooks laat gevorderde gebruikers toe om sekere stelselopdragte uit te voer voor en na die bekendstelling van die spel."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Na-uitgang"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Het gehardloop nadat die wedstryd geëindig het"
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Voer die na-uitgang-opdrag in..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Voorbekendstelling"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Het gehardloop voordat die instansie geloods is."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Voer pre-lanceringsopdrag in..."
+  }
+}

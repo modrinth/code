@@ -72,18 +72,18 @@ function asString(theme: T): string {
 				</div>
 			</div>
 			<div class="label">
-				<RadioButtonCheckedIcon v-if="currentTheme === option" class="radio" />
-				<RadioButtonIcon v-else class="radio" />
+				<RadioButtonCheckedIcon v-if="currentTheme === option" class="radio shrink-0" />
+				<RadioButtonIcon v-else class="radio shrink-0" />
 				{{ colorTheme[asString(option)] ? formatMessage(colorTheme[asString(option)]) : option }}
 				<SunIcon
 					v-if="'light' === option"
 					v-tooltip="formatMessage(colorTheme.preferredLight)"
-					class="theme-icon"
+					class="theme-icon shrink-0"
 				/>
 				<MoonIcon
 					v-else-if="'dark' === option"
 					v-tooltip="formatMessage(colorTheme.preferredDark)"
-					class="theme-icon"
+					class="theme-icon shrink-0"
 				/>
 			</div>
 		</button>

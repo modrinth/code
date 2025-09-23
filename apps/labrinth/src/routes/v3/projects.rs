@@ -434,7 +434,7 @@ pub async fn project_edit(
         if user.role.is_mod()
             && let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK")
         {
-            crate::util::webhook::send_slack_webhook(
+            crate::util::webhook::send_slack_project_webhook(
                     project_item.inner.id.into(),
                     &pool,
                     &redis,
@@ -474,6 +474,22 @@ pub async fn project_edit(
                     project_id: project_item.inner.id.into(),
                     old_status: project_item.inner.status,
                     new_status: *status,
+                },
+            }
+            .insert_many(notified_members.clone(), &mut transaction, &redis)
+            .await?;
+
+            NotificationBuilder {
+                body: if status.is_approved() {
+                    NotificationBody::ProjectStatusApproved {
+                        project_id: project_item.inner.id.into(),
+                    }
+                } else {
+                    NotificationBody::ProjectStatusNeutral {
+                        project_id: project_item.inner.id.into(),
+                        old_status: project_item.inner.status,
+                        new_status: *status,
+                    }
                 },
             }
             .insert_many(notified_members, &mut transaction, &redis)
@@ -880,7 +896,7 @@ pub async fn project_edit(
         )
         .await?
         {
-            super::versions::version_edit_helper(
+            match super::versions::version_edit_helper(
                 req.clone(),
                 (VersionId::from(version.inner.id),),
                 pool.clone(),
@@ -891,7 +907,16 @@ pub async fn project_edit(
                 },
                 session_queue.clone(),
             )
-            .await?;
+            .await
+            {
+                // An `InvalidInput` error being returned from this route when only
+                // editing the loader fields means that such fields are not valid for
+                // the loaders defined for this version, which is a common case for
+                // projects with heterogeneous loaders across versions and is best
+                // handled with opportunistic update semantics
+                Ok(_) | Err(ApiError::InvalidInput(_)) => continue,
+                err => return err,
+            }
         }
     }
 
@@ -1739,8 +1764,8 @@ pub async fn add_gallery_item(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        2 * (1 << 20),
-        "Gallery image exceeds the maximum of 2MiB.",
+        5 * (1 << 20),
+        "Gallery image exceeds the maximum of 5MiB.",
     )
     .await?;
 

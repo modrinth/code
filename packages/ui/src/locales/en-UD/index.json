@@ -1,0 +1,846 @@
+{
+  "badge.beta": {
+    "defaultMessage": "ɐʇǝᗺ"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "ǝsɐǝlǝᴚ ɐʇǝᗺ"
+  },
+  "badge.new": {
+    "defaultMessage": "ʍǝN"
+  },
+  "button.analytics": {
+    "defaultMessage": "sɔᴉʇʎlɐu∀"
+  },
+  "button.back": {
+    "defaultMessage": "ʞɔɐᗺ"
+  },
+  "button.cancel": {
+    "defaultMessage": "ꞁǝɔuɐƆ"
+  },
+  "button.continue": {
+    "defaultMessage": "ǝnuᴉʇuoƆ"
+  },
+  "button.copy-id": {
+    "defaultMessage": "ᗡI ʎdoƆ"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "ʞuᴉl ʇuǝuɐɯɹǝd ʎdoƆ"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "ʇɔǝɾoɹd ɐ ǝʇɐǝɹƆ"
+  },
+  "button.download": {
+    "defaultMessage": "pɐoluʍoᗡ"
+  },
+  "button.downloading": {
+    "defaultMessage": "ɓuᴉpɐoluʍoᗡ"
+  },
+  "button.edit": {
+    "defaultMessage": "ʇᴉpƎ"
+  },
+  "button.follow": {
+    "defaultMessage": "Follow"
+  },
+  "button.more-options": {
+    "defaultMessage": "suoᴉʇdo ǝɹoW"
+  },
+  "button.next": {
+    "defaultMessage": "ʇxǝN"
+  },
+  "button.open-folder": {
+    "defaultMessage": "ɹǝploɟ uǝdO"
+  },
+  "button.play": {
+    "defaultMessage": "ʎɐlԀ"
+  },
+  "button.refresh": {
+    "defaultMessage": "ɥsǝɹɟǝᴚ"
+  },
+  "button.remove": {
+    "defaultMessage": "ǝʌoɯǝᴚ"
+  },
+  "button.remove-image": {
+    "defaultMessage": "ǝɓɐɯᴉ ǝʌoɯǝᴚ"
+  },
+  "button.report": {
+    "defaultMessage": "ʇɹodǝᴚ"
+  },
+  "button.reset": {
+    "defaultMessage": "ʇǝsǝᴚ"
+  },
+  "button.save": {
+    "defaultMessage": "ǝʌɐS"
+  },
+  "button.save-changes": {
+    "defaultMessage": "sǝɓuɐɥɔ ǝʌɐS"
+  },
+  "button.saving": {
+    "defaultMessage": "ƃuᴉʌɐS"
+  },
+  "button.sign-in": {
+    "defaultMessage": "uᴉ uᵷᴉS"
+  },
+  "button.sign-out": {
+    "defaultMessage": "ʇno uᵷᴉS"
+  },
+  "button.sign-up": {
+    "defaultMessage": "dn uɓᴉS"
+  },
+  "button.stop": {
+    "defaultMessage": "doʇS"
+  },
+  "button.unfollow": {
+    "defaultMessage": "ʍolloɟu∩"
+  },
+  "button.upload-image": {
+    "defaultMessage": "ǝƃɐɯᴉ pɐold∩"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "ʍou ʇsnſ"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "IԀⱯ"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "ddⱯ"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "sɹǝʌɹǝS"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "ǝʇᴉsqǝM"
+  },
+  "collection.label.private": {
+    "defaultMessage": "ǝʇɐʌᴉɹԀ"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "uoɔᴉ ʇᴉpƎ"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "uoɔᴉ ǝʌoɯǝᴚ"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "uoɔᴉ ǝɔɐldǝᴚ"
+  },
+  "icon-select.select": {
+    "defaultMessage": "uoɔᴉ ʇɔǝlǝS"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "˙˙˙ɥɔɹɐǝS"
+  },
+  "input.view.gallery": {
+    "defaultMessage": "ʍǝᴉʌ ʎɹǝꞁꞁɐ⅁"
+  },
+  "input.view.grid": {
+    "defaultMessage": "ʍǝᴉʌ pᴉɹ⅁"
+  },
+  "input.view.list": {
+    "defaultMessage": "ʍǝᴉʌ sʍoᴚ"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "ǝpoɯ ǝɹnʇuǝʌpⱯ"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "ǝpoɯ ǝʌᴉʇɐǝɹƆ"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "ǝpoɯ ɹoʇɐʇɔǝdS"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "ǝpoɯ lɐʌᴉʌɹnS"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "ǝpoɯ ǝɯɐɓ uʍouʞu∩"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "pǝʌɐs sǝɓuɐɥƆ"
+  },
+  "label.collections": {
+    "defaultMessage": "suoᴉʇɔǝꞁꞁoƆ"
+  },
+  "label.created-ago": {
+    "defaultMessage": "{ago} pǝʇɐǝɹƆ"
+  },
+  "label.dashboard": {
+    "defaultMessage": "pɹɐoqɥsɐᗡ"
+  },
+  "label.delete": {
+    "defaultMessage": "ǝʇǝꞁǝᗡ"
+  },
+  "label.description": {
+    "defaultMessage": "uoᴉʇdᴉɹɔsǝᗡ"
+  },
+  "label.error": {
+    "defaultMessage": "ɹoɹɹƎ"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "sʇɔǝɾoɹd pǝʍoꞁꞁoℲ"
+  },
+  "label.loading": {
+    "defaultMessage": "˙˙˙ɓuᴉpɐoꞀ"
+  },
+  "label.moderation": {
+    "defaultMessage": "uoᴉʇɐɹǝpoW"
+  },
+  "label.notifications": {
+    "defaultMessage": "suoᴉʇɐɔᴉɟᴉʇoN"
+  },
+  "label.or": {
+    "defaultMessage": "or"
+  },
+  "label.password": {
+    "defaultMessage": "pɹoʍssɐԀ"
+  },
+  "label.played": {
+    "defaultMessage": "{time} pǝʎɐlԀ"
+  },
+  "label.public": {
+    "defaultMessage": "ɔᴉlqnԀ"
+  },
+  "label.rejected": {
+    "defaultMessage": "pǝʇɔǝɾǝᴚ"
+  },
+  "label.saved": {
+    "defaultMessage": "Saved"
+  },
+  "label.scopes": {
+    "defaultMessage": "sǝdoɔS"
+  },
+  "label.server": {
+    "defaultMessage": "ɹǝʌɹǝS"
+  },
+  "label.servers": {
+    "defaultMessage": "sɹǝʌɹǝS"
+  },
+  "label.settings": {
+    "defaultMessage": "sᵷuᴉʇʇǝS"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "ɹǝʎɐldǝlɓuᴉS"
+  },
+  "label.title": {
+    "defaultMessage": "ǝꞁʇᴉ⟘"
+  },
+  "label.unlisted": {
+    "defaultMessage": "pǝʇsᴉꞁu∩"
+  },
+  "label.visibility": {
+    "defaultMessage": "ʎʇᴉꞁᴉqᴉsᴉɅ"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "ǝꞁᴉɟoɹd ɹnoʎ ʇᴉsᴉɅ"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "poɥʇǝɯ ʇuǝɯʎɐd ppⱯ"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "poɥʇǝɯ ʇuǝɯʎɐd ɐ ɓuᴉppⱯ"
+  },
+  "notification.error.title": {
+    "defaultMessage": "pǝɹɹnɔɔo ɹoɹɹǝ uⱯ"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "pǝʇdǝɔɔⱯ"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "pǝʌoɹddⱯ"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "pǝʌᴉɥɔɹⱯ"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "pǝsoꞁƆ"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "ɹoʇɐǝɹƆ"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "ʇɟɐɹᗡ"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "pǝꞁᴉɐℲ"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "pǝʇsᴉꞀ"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "ɹoʇɐɹǝpoW"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "ɯɐǝ⟘ ɥʇuᴉɹpoW"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "ᵷuᴉpuǝԀ"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "ǝʇɐʌᴉɹԀ"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "pǝssǝɔoɹԀ"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "pǝʇɔǝɾǝᴚ"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "pǝuɹnʇǝᴚ"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "pǝꞁnpǝɥɔS"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "ʍǝᴉʌǝɹ ɹǝpu∩"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "pǝʇsᴉlu∩"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "pꞁǝɥɥʇᴉM"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "pɹɐoqdᴉlɔ oʇ ǝpoɔ ʎdoƆ"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "ʇuǝᴉꞁƆ"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "ɹǝʌɹǝs puɐ ʇuǝᴉlƆ"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "ɹǝʌɹǝs ɹo ʇuǝᴉꞁƆ"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "ɹǝʌɹǝS"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type} Ɐ"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "pǝʇɹoddnsu∩"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{last_four} uᴉ ɓuᴉpuǝ {card_brand}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "ʎɐԀ uozɐɯⱯ"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "ssǝɹdxƎ uɐɔᴉɹǝɯⱯ"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "ddⱯ ɥsɐƆ"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "qnlƆ sɹǝuᴉᗡ"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "ɹǝʌoɔsᴉᗡ"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "SOԀ⟘ℲƎ"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "ᗺƆſ"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "pɹɐƆɹǝʇsɐW"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "lɐԀʎɐԀ"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "ʎɐԀuoᴉu∩"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "poɥʇǝɯ ʇuǝɯʎɐd uʍouʞu∩"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "ɐsᴉΛ"
+  },
+  "project-type.all": {
+    "defaultMessage": "llⱯ"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {ʞɔɐԀ ɐʇɐᗡ} other {sʞɔɐԀ ɐʇɐᗡ}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "sʞɔɐԀ ɐʇɐᗡ"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {ʞɔɐd ɐʇɐp} other {sʞɔɐd ɐʇɐp}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {poW} other {spoW}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "spoW"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {poɯ} other {spoɯ}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {ʞɔɐdpoW} other {sʞɔɐdpoW}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "sʞɔɐdpoW"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {ʞɔɐdpoɯ} other {sʞɔɐdpoɯ}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {uᴉɓnlԀ} other {suᴉɓnlԀ}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "suᴉɓnlԀ"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {uᴉɓnld} other {suᴉɓnld}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {ʞɔɐԀ ǝɔɹnosǝᴚ} other {sʞɔɐԀ ǝɔɹnosǝᴚ}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "sʞɔɐԀ ǝɔɹnosǝᴚ"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {ʞɔɐd ǝɔɹnosǝɹ} other {sʞɔɐd ǝɔɹnosǝɹ}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {ɹǝpɐɥS} other {sɹǝpɐɥS}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "sɹǝpɐɥS"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {ɹǝpɐɥs} other {sɹǝpɐɥs}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "sʇuǝɯuoɹᴉʌuǝ pǝʇɹoddnS"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Client and server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Client-side"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "ʎluo sɹǝʌɹǝs pǝʇɐɔᴉpǝp"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "ǝpᴉs-ɹǝʌɹǝS"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "ɹǝʎɐldǝlƃuᴉS"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "ʎluo ɹǝʎɐldǝlƃuᴉS"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "uoᴉʇᴉpƎ ɐʌɐſ :ʇɟɐɹɔǝuᴉW"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "sɯɹoɟʇɐlԀ"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "ʎʇᴉlᴉqᴉʇɐdɯoƆ"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "ɹǝuʍo ʇɔǝſoɹԀ"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "sɹoʇɐǝɹƆ"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "{date} pǝʇɐǝɹƆ"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "{license} pǝsuǝɔᴉꞀ"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "{date} pǝɥsᴉlqnԀ"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "{date} pǝʇʇᴉɯqnS"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "slᴉɐʇǝᗡ"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "{date} pǝʇɐpd∩"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "ɹǝʌɹǝs pɹoɔsᴉᗡ uᴉoſ"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "əəɟɟoƆ ɐ əW ʎnઘ"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "ǝʇɐuoᗡ"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "qnHʇᴉ⅁ uo ɹosuodS"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "ᴉɟ-oꓘ uo ǝʇɐuoᗡ"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "uoǝɹʇɐԀ uo ǝʇɐuoᗡ"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "lɐԀʎɐԀ uo ǝʇɐuoᗡ"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "sǝnssᴉ ʇɹodǝᴚ"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "ǝɔɹnos ʍǝᴉΛ"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "sʞuᴉꞀ"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "ᴉʞᴉʍ ʇᴉsᴉΛ"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "sɔᴉʇʎlɐu∀"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "uoᴉʇdᴉɹɔsǝᗡ"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "˙ʎllɐᴉʇɹɐd ʎluo ɟᴉ uǝʌǝ 'ɹǝʌɹǝs puɐ ʇuǝᴉlɔ ǝɥʇ ɥʇoq uo ʎʇᴉlɐuoᴉʇɔunɟ ǝɯos sɐH"
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "ǝpᴉs ɹǝɥʇᴉǝ uo pǝllɐʇsuᴉ ɟᴉ ǝɯɐs ǝɥʇ sʞɹoʍ 'ɥʇoq uo lɐuoᴉʇdO"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "sǝpᴉs ɥʇoq uo pǝllɐʇsuᴉ uǝɥʍ ʇsǝq sʞɹoʍ 'ɥʇoq uo lɐuoᴉʇdO"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "ʇuǝᴉlɔ uo lɐuoᴉʇdO"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "ɹǝʌɹǝs uo lɐuoᴉʇdO"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "ɥʇoq uo pǝɹᴉnbǝɹ"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "ɹǝʌɹǝs puɐ ʇuǝᴉlƆ"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "˙sɹǝʌɹǝs ɐllᴉuɐʌ ɥʇᴉʍ ǝlqᴉʇɐdɯoɔ sᴉ puɐ ǝpᴉs-ʇuǝᴉlɔ ǝuop sᴉ ʎʇᴉlɐuoᴉʇɔunɟ llⱯ"
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "ʎluo ǝpᴉs-ʇuǝᴉlƆ"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "ʎluo ɹǝʌɹǝs pǝʇɐɔᴉpǝᗡ"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "˙sʇuǝᴉlɔ ɐllᴉuɐʌ ɥʇᴉʍ ǝlqᴉʇɐdɯoɔ sᴉ puɐ ǝpᴉs-ɹǝʌɹǝs ǝuop sᴉ ʎʇᴉlɐuoᴉʇɔunɟ llⱯ"
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "ooʇ ɹǝʎɐldǝlɓuᴉs uᴉ sʞɹoM"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "ʎluo ǝpᴉs-ɹǝʌɹǝS"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "˙ɹǝʌɹǝs ɹǝʎɐldᴉʇlnW ɐ oʇ pǝʇɔǝuuoɔ ʇou uǝɥʍ ɹo ɹǝʎɐldǝlɓuᴉS uᴉ suoᴉʇɔunɟ ʎluO"
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "ʎluo ɹǝʎɐldǝlɓuᴉS"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "{option} ɟo suoᴉʇdoqnS"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "ʇuəɯuoɹıʌuƎ"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "ʎɹǝllɐ⅁"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "lɐɹǝuǝ⅁"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "ǝsuǝɔᴉ˥"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "sʞuᴉꞀ"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "sɹəqɯəW\n"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "˙sᴉɥʇ ʇᴉpǝ oʇ uoᴉssᴉɯɹǝd ǝʌɐɥ ʇ,uop no⅄"
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "uoᴉssᴉɯɹǝd oN"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "sɓɐ⟘"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "pɐold∩"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "suoᴉsɹǝΛ"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "ʍǝᴉΛ"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "Ɐ"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "ᗺ"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "ᴚ"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "pǝʌᴉɥɔɹⱯ"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "ʇɟɐɹᗡ"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "ǝʇɐʌᴉɹԀ"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "ɔᴉlqnԀ"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "pǝʇɔǝɾǝᴚ"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "pǝꞁnpǝɥɔS"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "ʍǝᴉʌǝɹ ɹǝpu∩"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "uʍouʞu∩"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "pǝʇsᴉꞁu∩"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "ɟɟɐʇs ʎq pǝʇsᴉlu∩"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "pǝʞɔol ɹǝʇlᴉℲ"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "˙ʇuǝʇuoɔ ǝlqᴉʇɐdɯoɔuᴉ llɐʇsuᴉ oʇ noʎ ʍollɐ ʎɐɯ ɹǝʇlᴉɟ sᴉɥʇ ɓuᴉʞɔolu∩"
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "ɹǝʇlᴉɟ ɔuʎS"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "pǝʞɔol sᴉ {type}"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "ɹǝʇlᴉɟ ʞɔolu∩"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "ʇuəɯuoɹıʌuƎ"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "ʇuǝᴉꞁƆ"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "ɹǝʌɹǝS"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "uoᴉsɹǝʌ ǝɯɐ⅁"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "suoᴉsɹǝʌ llɐ ʍoɥS"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "ǝsuǝɔᴉ˥"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "ǝɔɹnos uǝdO"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "ɹǝpɐoꞀ"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "ɹǝpɐoꞀ"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "ɹǝpɐoꞀ"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "ɯɹoɟʇɐlԀ"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "ᗡI ʇɔǝſoɹԀ"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "ɹǝpɐoꞀ"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "ssᴉɯsᴉᗡ"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "ǝlqɐssᴉɯsᴉᗡ"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "uoᴉʇuǝʇʇⱯ"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "oɟuI"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "lɐɔᴉʇᴉɹƆ"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "oɟuI"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "ʎǝʌɹnS"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "ɓuᴉuɹɐM"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "ǝlqɐssᴉɯsᴉpu∩"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "˙ʇǝʎ pǝɓɹɐɥɔ ǝq ʇ,uoʍ no⅄"
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "poɥʇǝɯ ʇuǝɯʎɐd ɐ ʇɔǝlǝS"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "poɥʇǝɯ ʇuǝɯʎɐԀ"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "{interval} pǝllᴉq"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "˙pǝǝu noʎ sɔǝds ǝɥʇ ʇsnſ ɥʇᴉʍ uɐld pǝzᴉɯoʇsnɔ ɐ ʞɔᴉԀ"
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "pǝʇɹɐʇs ʇǝ⅁"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "˙ɓuᴉppoɯ ʎʌɐǝɥ ɹo ˋsʞɔɐdpoɯ ˋsɹǝʎɐld ૨ᘕ–૨⇂ ɹoɟ lɐǝpI"
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "˙spoɯ ǝldᴉʇlnɯ puɐ sɹǝʎɐld ૨⇂–୧ ɹoɟ ʇɐǝɹ⅁"
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "ɹɐlndoԀ ʇsoW"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "uɐld ɐ ǝsooɥƆ"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "uɐlԀ ʇɔǝlǝS"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "˙spoɯ ʇɥɓᴉl ʍǝɟ ɐ ɥʇᴉʍ spuǝᴉɹɟ ૨–⇂ ɹoɟ ʇɔǝɟɹǝԀ"
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "˙spǝǝu ɹnoʎ ʇᴉɟ ʇɐɥʇ sɔǝds puɐ WⱯᴚ ɟo ʇunoɯɐ ǝɥʇ ʞɔᴉԀ"
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "uɐlԀ"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "uoᴉɓǝᴚ"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "ʍǝᴉʌǝᴚ"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "ǝdoɹnƎ lɐɹʇuǝƆ"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "¿ǝʌɐɥ oʇ ɹǝʌɹǝs ɹnoʎ ʇuɐʍ noʎ op WⱯᴚ ɥɔnɯ ʍoH"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "ɐɔᴉɹǝɯⱯ ɥʇɹoN"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "¿pǝʇɐɔol ǝq oʇ ɹǝʌɹǝs ɹnoʎ ǝʞᴉl noʎ plnoʍ ǝɹǝɥM"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "<link>¡ʇxǝu sɹǝʌɹǝS ɥʇuᴉɹpoW ǝǝs oʇ ǝʞᴉl p,noʎ ǝɹǝɥʍ ʍouʞ sn ʇǝꞀ</link> ¿pǝʇsᴉl ʇou uoᴉɓǝᴚ"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "ɐᴉsⱯ ʇsɐǝɥʇnoS"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "ǝdoɹnƎ uɹǝʇsǝM"
+  },
+  "settings.account.title": {
+    "defaultMessage": "ʎʇᴉɹnɔǝs puɐ ʇunoɔɔ∀"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "ǝɔuɐɹɐǝdd∀"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "suoᴉʇɐɔᴉlddɐ ɹno⅄"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "sddɐ pǝsᴉɹoɥʇnⱯ"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "suoᴉʇdᴉɹɔsqns puɐ ɓuᴉllᴉᗺ"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "ʞɹɐᗡ"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "˙ǝɔᴉʌǝp sᴉɥʇ uo ɥʇuᴉɹpoW ɹoɟ ǝɯǝɥʇ ɹoloɔ pǝɹɹǝɟǝɹd ɹnoʎ ʇɔǝlǝS"
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "ʇɥƃᴉ˥"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "ᗡƎꞀO"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "ǝɯǝɥʇ ʞɹɐp pǝɹɹǝɟǝɹԀ"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "ǝɯǝɥʇ ʇɥƃᴉl pǝɹɹǝɟǝɹԀ"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "oɹʇǝᴚ"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "ɯǝʇsʎs ɥʇᴉʍ ɔuʎS"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "ǝɯǝɥʇ ɹoloƆ"
+  },
+  "settings.language.title": {
+    "defaultMessage": "ǝᵷɐnᵷuɐꞀ"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "suǝʞoʇ ssǝɔɔɐ lɐuosɹǝԀ"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "ǝlᴉɟoɹd ɔᴉlqnԀ"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "suoᴉssǝS"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{time, time, short} ʇɐ {date, date, long}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "˙sǝɓuɐɥɔ pǝʌɐsun ǝʌɐɥ no⅄"
+  }
+}
+

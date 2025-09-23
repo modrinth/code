@@ -85,11 +85,19 @@ export default defineComponent({
 label {
 	flex-direction: unset;
 	max-height: unset;
+	&:focus-within {
+		outline: 0.25rem solid #ea80ff;
+	}
+
 	svg {
 		height: 1rem;
 	}
 	input {
-		display: none;
+		position: absolute;
+		height: 1px;
+		width: 1px;
+		overflow: hidden;
+		clip: rect(1px, 1px, 1px, 1px);
 	}
 	&.long-style {
 		display: flex;

@@ -175,7 +175,7 @@ const quickActions: OverflowMenuOption[] = [
 ]
 
 const versionUrl = computed(() => {
-	return `/${props.report.project.project_type}/${props.report.project.slug}/versions/${props.report.version.id}`
+	return `/${props.report.project.project_type}/${props.report.project.slug}/version/${props.report.version.id}`
 })
 </script>
 

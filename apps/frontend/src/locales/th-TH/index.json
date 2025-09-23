@@ -1,0 +1,32 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "ไม่พบผู้ใช้นี้"
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "โหลดไฟล์ AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "โหลดตัวเบต้า"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "โหลดไฟล์ DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "โหลดไฟล์ RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  }
+}
