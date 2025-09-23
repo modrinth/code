@@ -134,7 +134,7 @@ onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 
-	await unlisten?.()
+	await unlisten.value?.()
 })
 
 const { formatMessage } = useVIntl()
@@ -430,7 +430,7 @@ async function handleCommand(e) {
 }
 
 const downloadProgress = ref(0)
-const unlisten = null
+const unlisten = ref(null)
 
 const metered = ref(true)
 const finishedDownloading = ref(false)
@@ -493,8 +493,8 @@ async function downloadUpdate(versionToDownload = availableUpdate.value) {
 	try {
 		enqueueUpdateForInstallation(versionToDownload.rid).then(() => {
 				finishedDownloading.value = true
-				unlisten?.().then(() => {
-					unlisten = null
+				unlisten.value?.().then(() => {
+					unlisten.value = null
 				})
 				console.log('Finished downloading!')
 			})
