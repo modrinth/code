@@ -128,17 +128,9 @@ function devModeCount() {
 }
 
 const messages = defineMessages({
-	reloadToUpdate: {
-		id: 'app.settings.reload-to-update',
-		defaultMessage: 'Reload to update',
-	},
 	downloading: {
 		id: 'app.settings.downloading',
 		defaultMessage: 'Downloading v{version}',
-	},
-	downloaded: {
-		id: 'app.settings.downloaded',
-		defaultMessage: 'Downloaded v{version}',
 	},
 })
 

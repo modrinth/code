@@ -2,14 +2,8 @@
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },
-  "app.settings.downloaded": {
-    "message": "Downloaded v{version}"
-  },
   "app.settings.downloading": {
     "message": "Downloading v{version}"
-  },
-  "app.settings.reload-to-update": {
-    "message": "Reload to update"
   },
   "app.settings.tabs.appearance": {
     "message": "Appearance"
