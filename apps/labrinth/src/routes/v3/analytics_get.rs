@@ -1,15 +1,26 @@
-use std::num::NonZeroU32;
+//! # Design rationale
+//!
+//! - different metrics require different scopes
+//!   - views, downloads, playtime requires `Scopes::ANALYTICS`
+//!   - revenue requires `Scopes::PAYOUTS_READ`
+//! - each request returns an array of N elements; if you have to make multiple
+//!   requests, you have to zip together M arrays of N elements
+//!   - this makes it inconvenient to have separate endpoints
+
+use std::num::NonZeroU64;
 
 use actix_web::{HttpRequest, web};
 use chrono::{DateTime, Utc};
+use futures::StreamExt;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::{
-    auth::get_user_from_headers,
+    auth::{AuthenticationError, get_user_from_headers},
     database::{
         self, DBProject,
-        models::{DBProjectId, DBUser, DBVersionId},
+        models::{DBProjectId, DBUser, DBUserId, DBVersionId},
         redis::RedisPool,
     },
     models::{
@@ -38,20 +49,21 @@ struct GetRequest {
 struct TimeRange {
     start: DateTime<Utc>,
     end: DateTime<Utc>,
-    num_slices: NonZeroU32,
-    // resolution_minutes: NonZeroU32,
+    resolution_minutes: NonZeroU64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct ReturnMetrics {
-    project_views: Option<ProjectViewsMetrics>,
-    project_downloads: Option<ProjectDownloadsMetrics>,
-    project_playtime: Option<ProjectPlaytimeMetrics>,
+    project_views: Option<Metrics<ProjectViewsField>>,
+    project_downloads: Option<Metrics<ProjectDownloadsField>>,
+    project_playtime: Option<Metrics<ProjectPlaytimeField>>,
+    project_revenue: Option<Metrics<()>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct ProjectViewsMetrics {
-    bucket_by: Vec<ProjectViewsField>,
+struct Metrics<F> {
+    #[serde(default = "Vec::default")]
+    bucket_by: Vec<F>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -63,11 +75,6 @@ enum ProjectViewsField {
     Monetized,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct ProjectDownloadsMetrics {
-    bucket_by: Vec<ProjectDownloadsField>,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 enum ProjectDownloadsField {
@@ -75,11 +82,6 @@ enum ProjectDownloadsField {
     VersionId,
     Domain,
     SitePath,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct ProjectPlaytimeMetrics {
-    bucket_by: Vec<ProjectPlaytimeField>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -142,6 +144,9 @@ enum ProjectMetrics {
         #[serde(skip_serializing_if = "Option::is_none")]
         game_version: Option<String>,
         seconds: u64,
+    },
+    Revenue {
+        revenue: Decimal,
     },
 }
 
@@ -279,7 +284,10 @@ async fn get(
     session_queue: web::Data<AuthQueue>,
     clickhouse: web::Data<clickhouse::Client>,
 ) -> Result<web::Json<GetResponse>, ApiError> {
-    let (_, user) = get_user_from_headers(
+    const MIN_RESOLUTION_MINUTES: u64 = 60;
+    const MAX_TIME_SLICES: usize = 0x10000;
+
+    let (scopes, user) = get_user_from_headers(
         &http_req,
         &**pool,
         &redis,
@@ -288,9 +296,27 @@ async fn get(
     )
     .await?;
 
-    let num_time_slices = req.time_range.num_slices.get() as usize;
-    if num_time_slices > 256 {
-        return Err(ApiError::InvalidInput("too many time slices".to_string()));
+    let resolution_minutes = req.time_range.resolution_minutes.get();
+    if resolution_minutes < MIN_RESOLUTION_MINUTES {
+        return Err(ApiError::InvalidInput(format!(
+            "resolution must be at least {} minutes",
+            MIN_RESOLUTION_MINUTES
+        )));
+    }
+
+    let range_minutes = u64::try_from(
+        (req.time_range.end - req.time_range.start).num_minutes(),
+    )
+    .map_err(|_| {
+        ApiError::InvalidInput("time range end must be after start".into())
+    })?;
+
+    let num_time_slices = usize::try_from(range_minutes / resolution_minutes)
+        .expect("u64 should fit within a usize");
+    if num_time_slices > MAX_TIME_SLICES {
+        return Err(ApiError::InvalidInput(format!(
+            "resolution is too fine or range is too large - maximum of {MAX_TIME_SLICES} time slices"
+        )));
     }
     let mut time_slices = vec![TimeSlice::default(); num_time_slices];
 
@@ -402,6 +428,63 @@ async fn get(
         .await?;
     }
 
+    if req.return_metrics.project_revenue.is_some() {
+        if !scopes.contains(Scopes::PAYOUTS_READ) {
+            return Err(AuthenticationError::InvalidCredentials.into());
+        }
+
+        let mut rows = sqlx::query!(
+            "SELECT
+                WIDTH_BUCKET(
+                    EXTRACT(EPOCH FROM created)::bigint,
+                    EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
+                    EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
+                    $3::integer
+                ) AS bucket,
+                COALESCE(mod_id, 0) AS mod_id,
+                SUM(amount) amount_sum
+            FROM payouts_values
+            WHERE
+                user_id = $4
+                AND created BETWEEN $1 AND $2
+            GROUP BY bucket, mod_id",
+            req.time_range.start,
+            req.time_range.end,
+            num_time_slices as i64,
+            DBUserId::from(user.id) as DBUserId,
+        )
+        .fetch(&**pool);
+        while let Some(row) = rows.next().await.transpose()? {
+            let bucket = row.bucket.ok_or_else(|| {
+                ApiError::InvalidInput(
+                    "bucket should be non-null - query bug!".into(),
+                )
+            })?;
+            let bucket = usize::try_from(bucket).map_err(|_| {
+                ApiError::InvalidInput(
+                    "bucket value {bucket} does not fit into `usize` - query bug!".into(),
+                )
+            })?;
+
+            tracing::info!("bkt = {bucket}");
+
+            if let Some(source_project) =
+                row.mod_id.map(DBProjectId).map(ProjectId::from)
+                && let Some(revenue) = row.amount_sum
+            {
+                add_to_time_slice(
+                    &mut time_slices,
+                    bucket,
+                    ProjectAnalytics {
+                        source_project,
+                        metrics: ProjectMetrics::Revenue { revenue },
+                    }
+                    .into(),
+                )?;
+            }
+        }
+    }
+
     Ok(web::Json(GetResponse(time_slices)))
 }
 
@@ -443,25 +526,33 @@ where
     let mut cursor = query.fetch::<Row>()?;
 
     while let Some(row) = cursor.next().await? {
-        let bucket = row_get_bucket(&row);
-
-        // row.recorded <  time_range_start => bucket = 0
-        // row.recorded >= time_range_end   => bucket = num_time_slices
-        //   (note: this is out of range of `time_slices`!)
-        let Some(bucket) = (bucket as usize).checked_sub(1) else {
-            continue;
-        };
-
-        let num_time_slices = cx.time_slices.len();
-        let slice = cx.time_slices.get_mut(bucket).ok_or_else(|| {
-            ApiError::InvalidInput(
-                format!("bucket {bucket} returned by query out of range for {num_time_slices} - query bug!")
-            )
-        })?;
-
-        slice.0.push(row_to_analytics(row));
+        let bucket = row_get_bucket(&row) as usize;
+        add_to_time_slice(cx.time_slices, bucket, row_to_analytics(row))?;
     }
 
+    Ok(())
+}
+
+fn add_to_time_slice(
+    time_slices: &mut [TimeSlice],
+    bucket: usize,
+    data: AnalyticsData,
+) -> Result<(), ApiError> {
+    // row.recorded <  time_range_start => bucket = 0
+    // row.recorded >= time_range_end   => bucket = num_time_slices
+    //   (note: this is out of range of `time_slices`!)
+    let Some(bucket) = bucket.checked_sub(1) else {
+        return Ok(());
+    };
+
+    let num_time_slices = time_slices.len();
+    let slice = time_slices.get_mut(bucket).ok_or_else(|| {
+        ApiError::InvalidInput(
+            format!("bucket {bucket} returned by query out of range for {num_time_slices} - query bug!")
+        )
+    })?;
+
+    slice.0.push(data);
     Ok(())
 }
 
