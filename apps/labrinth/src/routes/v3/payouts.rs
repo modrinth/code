@@ -543,8 +543,7 @@ pub async fn create_payout(
     } else {
         users_compliance::UserCompliance::get_by_user_id(&**pool, user.id)
             .await?
-            .map(|x| x.requires_manual_review)
-            .unwrap_or_default()
+            .is_some_and(|x| x.requires_manual_review)
     };
 
     if requires_manual_review {
@@ -980,7 +979,7 @@ pub async fn get_balance(
                 .await?
                 .filter(|x| x.model.form_type.is_some())
                 .map_or(FormCompletionStatus::Unrequested, |compliance| {
-                    requested_form_type = compliance.model.form_type.clone();
+                    requested_form_type = compliance.model.form_type;
 
                     if compliance.compliance_api_check_failed {
                         FormCompletionStatus::Unknown
