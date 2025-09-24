@@ -233,7 +233,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Option<DBUserId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let user = sqlx::query!(
             "
@@ -254,7 +254,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBUserId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let users = sqlx::query!(
             "
@@ -270,13 +270,32 @@ impl DBUser {
         Ok(users)
     }
 
+    /// Returns `false` if any of the specified user IDs do not exist.
+    pub async fn exists_many<'a, E>(
+        user_ids: &[DBUserId],
+        exec: E,
+    ) -> Result<bool, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let ids = user_ids.iter().map(|x| x.0).collect::<Vec<_>>();
+        let count = sqlx::query_scalar!(
+            r#"SELECT COUNT(*) "count!" FROM users WHERE id = ANY($1)"#,
+            &ids
+        )
+        .fetch_one(exec)
+        .await?;
+
+        Ok(count as usize == user_ids.len())
+    }
+
     pub async fn get_projects<'a, E>(
         user_id: DBUserId,
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<DBProjectId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -324,7 +343,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBOrganizationId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -349,7 +368,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBCollectionId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -373,7 +392,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBProjectId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -397,7 +416,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBReportId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -421,7 +440,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<String>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 

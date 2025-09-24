@@ -84,7 +84,7 @@
     "message": "版本"
   },
   "app-marketing.features.offline.description": {
-    "message": "无论联网与否，皆可畅玩你的模组。"
+    "message": "无论联网与否，在这里皆可畅玩你所下载的模组。"
   },
   "app-marketing.features.offline.title": {
     "message": "离线模式"
@@ -222,7 +222,7 @@
     "message": "电子邮箱"
   },
   "auth.reset-password.notification.email-sent.text": {
-    "message": "如果该电子邮箱之前已保存在你的账户中，一封包含操作说明的电子邮件已发送至该电子邮箱。"
+    "message": "若该电子邮箱地址已存于你的账户，则我们已向该地址发送了一封包含操作说明的邮件。"
   },
   "auth.reset-password.notification.email-sent.title": {
     "message": "电子邮件已发送"
@@ -348,7 +348,7 @@
     "message": "订阅有关 Modrinth 的更新邮件"
   },
   "auth.welcome.description": {
-    "message": "你已加入我们超棒的社区！在这里尽情探索、创造、使用、更新这些超酷的模组。"
+    "message": "你现在已经是这个超棒的社区的一份子了！在这里尽情探索、创造、使用、更新这些超酷的模组吧。"
   },
   "auth.welcome.label.tos": {
     "message": "创建账户即表示你已同意 Modrinth 的<terms-link>使用条款</terms-link>和<privacy-policy-link>隐私政策</privacy-policy-link>。"
@@ -567,7 +567,7 @@
     "message": "加载随机项目失败 :("
   },
   "landing.feature.follow.description": {
-    "message": "每次你喜欢的项目更新时都会收到通知，并保持最新动态"
+    "message": "每次你喜欢的项目更新时都会收到通知，并保持最新动态。"
   },
   "landing.feature.follow.heading": {
     "message": "关注你喜欢的项目"
@@ -579,7 +579,7 @@
     "message": "与你喜欢的启动器协同并行"
   },
   "landing.feature.search.description": {
-    "message": "Modrinth闪电般的快速搜索和强大的过滤器可以帮助你输入时就找到所需的内容。"
+    "message": "Modrinth 的搜索快如闪电，配合强大的筛选功能，心仪内容就在弹指一挥间。"
   },
   "landing.feature.search.heading": {
     "message": "快速轻松地找到你想找的内容"
@@ -642,7 +642,7 @@
     "message": "排序方式："
   },
   "landing.section.for-creators.description": {
-    "message": "为你的作品打造一个在线家园并向大量忠实玩家推广"
+    "message": "为你的作品打造一个在线家园并向大量忠实玩家推广。"
   },
   "landing.section.for-creators.label": {
     "message": "面向创作者"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "更改界面主题"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "获取 Modrinth App"
+  "layout.action.close-banner": {
+    "message": "关闭"
+  },
+  "layout.action.create-new": {
+    "message": "新建……"
+  },
+  "layout.action.file-lookup": {
+    "message": "文件查询"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "通过电子邮箱查找"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "管理服务器通知"
+  },
+  "layout.action.new-collection": {
+    "message": "新建收藏夹"
+  },
+  "layout.action.new-organization": {
+    "message": "新建组织"
+  },
+  "layout.action.new-project": {
+    "message": "新建项目"
+  },
+  "layout.action.reports": {
+    "message": "举报"
+  },
+  "layout.action.review-projects": {
+    "message": "审核项目"
   },
   "layout.avatar.alt": {
     "message": "你的头像"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "使用条款"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinth 信息"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth 是<github-link>开源项目</github-link>。"
   },
@@ -795,16 +825,58 @@
     "message": "切换菜单"
   },
   "layout.meta.description": {
-    "message": "在 Modrinth 上畅享 Minecraft 模组、插件、数据包、光影、资源包及整合包的下载体验。通过我们现代化而易用的界面与 API，探索及发布项目。"
+    "message": "在 Modrinth 上畅享 Minecraft 模组、插件、数据包、光影包、资源包及整合包的下载体验。通过我们现代化而易用的界面与 API，探索及发布项目。"
   },
   "layout.meta.og-description": {
     "message": "浏览及发布 Minecraft 内容！"
   },
+  "layout.nav.analytics": {
+    "message": "数据"
+  },
+  "layout.nav.discover": {
+    "message": "探索"
+  },
+  "layout.nav.discover-content": {
+    "message": "探索内容"
+  },
+  "layout.nav.feature-flags": {
+    "message": "功能开关"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "获取 Modrinth App"
+  },
   "layout.nav.home": {
     "message": "首页"
   },
+  "layout.nav.host-a-server": {
+    "message": "托管服务器"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth 首页"
+  },
+  "layout.nav.organizations": {
+    "message": "组织"
+  },
+  "layout.nav.profile": {
+    "message": "主页"
+  },
+  "layout.nav.projects": {
+    "message": "项目"
+  },
+  "layout.nav.revenue": {
+    "message": "收益"
+  },
+  "layout.nav.saved-projects": {
+    "message": "收藏"
+  },
   "layout.nav.search": {
     "message": "搜索"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "升级至 Modrinth+"
   },
   "moderation.filter.by": {
     "message": "筛选"
@@ -843,7 +915,7 @@
     "message": "未找到用户"
   },
   "profile.joined-at": {
-    "message": "加入于 <date>{ago}</date>"
+    "message": "<date>{ago}</date>加入"
   },
   "profile.label.badges": {
     "message": "徽章"
@@ -993,7 +1065,7 @@
     "message": "光影包"
   },
   "project-type.shader.singular": {
-    "message": "光影包"
+    "message": "光影"
   },
   "project.about.details.created": {
     "message": "{date}创建"

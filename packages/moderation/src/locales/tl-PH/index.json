@@ -5,6 +5,9 @@
   "nags.add-description.title": {
     "defaultMessage": "Magdagdag ng paglalarawan"
   },
+  "nags.add-icon.description": {
+    "defaultMessage": "Makatutulong sa pagpapakilala ng iyong panukala ang pagdaragdag ng natatanging, napapanahon, at nakakaakit-akit na lambana."
+  },
   "nags.add-icon.title": {
     "defaultMessage": "Maglagay ng lambana"
   },
@@ -23,8 +26,35 @@
   "nags.edit-title.title": {
     "defaultMessage": "Baguhin ang pamagat"
   },
+  "nags.select-environments.title": {
+    "defaultMessage": "Pumili ng mga kapaligiran"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Bisitahin ang mga kagustuhan sa paglalarawan"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "Bisitahin ang mga kagustuhan sa kapaligiran"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Bisitahin ang mga kagustuhan sa lisensiya"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Bisitahin ang mga kagustuhan sa mga kawingan"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Bisitahin ang mga kagustuhan sa pananda"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Bisitahin ang mga pangkalahatang kagustuhan"
+  },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Hindi maaaring magkapareho ang iyong buod sa Pangalan ng iyong panukala. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit na Buod."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Patunayan ang mga panlabas na kawingan"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Bisitahin ang mga kagustuhan sa mga kawingan"
   }
 }
 

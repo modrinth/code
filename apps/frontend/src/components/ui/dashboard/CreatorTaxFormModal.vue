@@ -49,9 +49,6 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<span class="text-md leading-tight">
-						{{ formatMessage(messages.entityDescription) }}
-					</span>
 					<Chips
 						v-model="entityType"
 						:items="['private-individual', 'foreign-entity']"
@@ -65,6 +62,9 @@
 						:capitalize="false"
 						class="mt-2"
 					/>
+					<span class="text-md mt-2 leading-tight">
+						{{ formatMessage(messages.entityDescription) }}
+					</span>
 				</div>
 			</Transition>
 			<div class="mt-4 flex justify-end gap-3">
@@ -88,8 +88,8 @@ import { Admonition, ButtonStyled, Chips, injectNotificationManager, NewModal } 
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 
+import { type FormRequestResponse, useAvalara1099 } from '@/composables/avalara1099'
 import { normalizeChildren } from '@/utils/vue-children.ts'
-import { type FormRequestResponse, useAvalara1099 } from '~/composables/avalara1099'
 
 const { addNotification } = injectNotificationManager()
 
@@ -212,6 +212,7 @@ async function continueForm() {
 			prefill: {
 				email: (auth.value.user as any)?.email ?? '',
 				account_number: (auth.value.user as any)?.id ?? '',
+				reference_number: (auth.value.user as any)?.id ?? '',
 			},
 		})
 	}

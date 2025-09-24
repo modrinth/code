@@ -87,7 +87,7 @@
     "message": "Apaga uma instância permanentemente do teu dispositivo, incluindo os teus mundos, configurações, e todo o conteúdo instalado. Atenção, após apagar uma instância não consegues recuperá-la."
   },
   "instance.settings.tabs.general.deleting.button": {
-    "message": "Apagando..."
+    "message": "A apagar..."
   },
   "instance.settings.tabs.general.duplicate-button": {
     "message": "Duplicar"

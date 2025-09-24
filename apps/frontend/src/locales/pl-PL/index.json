@@ -36,7 +36,7 @@
     "message": "Pakiety zewnętrzne"
   },
   "app-marketing.download.title": {
-    "message": "Pobierz Aplikację Modrinth (Beta)"
+    "message": "Pobierz Modrinth App (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -93,7 +93,7 @@
     "message": "Launcher Modrinth jest w pełni open source. Kod źródłowy możesz zobaczyć na naszym <github-link>GitHubie</github-link>!"
   },
   "app-marketing.features.open-source.title": {
-    "message": "Otwarty kod źródłowy"
+    "message": "Otwarte oprogramowanie"
   },
   "app-marketing.features.performance.activity-monitor": {
     "message": "Monitor aktywności"
@@ -159,7 +159,7 @@
     "message": "Udostępniaj paczki modów"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Inny niż wszystkie launchery"
+    "message": "Jak żaden inny launcher"
   },
   "app-marketing.features.website.description": {
     "message": "Aplikacja Modrinth jest w pełni zintegrowana z witryną, dzięki czemu możesz uzyskać dostęp do wszystkich swoich ulubionych projektów bezpośrednio z aplikacji!"
@@ -177,13 +177,13 @@
     "message": "Aplikacja Modrinth to wyjątkowy launcher z otwartym kodem źródłowym, który pozwala grać w ulubione mody i utrzymywać je na bieżąco, wszystko w jednym poręcznym pakiecie."
   },
   "app-marketing.hero.download-button": {
-    "message": "Pobierz aplikację Modrinth"
+    "message": "Pobierz Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Pobierz aplikację Modrinth"
+    "message": "Pobierz Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "Pobierz aplikację Modrinth na {os}"
+    "message": "Pobierz Modrinth App dla {os}"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Zrzut ekranu głównego menu instancji Cobblemon."
@@ -405,7 +405,7 @@
     "message": "Właściciel"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> projekty}}"
+    "message": "{count, plural, one {<stat>{count}</stat> projekt} few {<stat>{count}</stat> projekty} other {<stat>{count}</stat> projektów}}"
   },
   "collection.label.updated-at": {
     "message": "Zaktualizowany {ago}"
@@ -414,10 +414,10 @@
     "message": "{name} - Kolekcja"
   },
   "dashboard.collections.button.create-new": {
-    "message": "Utwórz nową"
+    "message": "Stwórz nową"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projekt} other {{count} projekty}}"
+    "message": "{count, plural, one {{count} projekt} few {{count} projekty} other {{count} projektów}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Szukaj swoich kolekcji"
@@ -459,7 +459,7 @@
     "message": "Coś poszło nie tak."
   },
   "error.generic.default.title": {
-    "message": "Uh oh!"
+    "message": "Ojej!"
   },
   "error.organization.404.list_item.1": {
     "message": "Mogłeś źle napisać URL kolekcji."
@@ -513,7 +513,7 @@
     "message": "Fotorealistyczny obraz żabiego labiryntu"
   },
   "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} więcej osób} other {{count} więcej ludzi}} też zostało zżabieni!"
+    "message": "{count, plural, one {{count} osoba też została zżabiona!} other {{count} ludzi też zostało zżabionych!}}"
   },
   "frog.sinceOpened": {
     "message": "Ta strona została otwarta {ago} temu"
@@ -539,8 +539,17 @@
   "landing.creator.feature.data-statistics.title": {
     "message": "Dane i statystyki"
   },
+  "landing.creator.feature.discovery.title": {
+    "message": "Odkrycie"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Zróżnicowany ekosystem"
+  },
   "landing.creator.feature.monetization.title": {
     "message": "Monetyzacja"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Zaproś swoich współpracowników i zarządzaj rolami oraz uprawnieniami z łatwością"
   },
   "landing.creator.feature.team-management.title": {
     "message": "Zarządzanie zespołami"
@@ -549,13 +558,16 @@
     "message": "Nie udało się załadować losowych projektów :("
   },
   "landing.feature.follow.description": {
-    "message": "Otrzymuj powiadomienia o aktualizacjach twoich ulubionych projektów, by być na bieżąco"
+    "message": "Otrzymaj powiadomienie za każdym razem, gdy twój ulubiony projekt dostanie aktualizacje, by być na bieżąco."
   },
   "landing.feature.follow.heading": {
     "message": "Obserwuj projekty, które kochasz"
   },
   "landing.feature.launcher.heading": {
-    "message": "Graj używając swojego ulubionego launchera"
+    "message": "Graj na swoim ulubionym launcherze"
+  },
+  "landing.feature.search.heading": {
+    "message": "Znajdź cokolwiek pragniesz, łatwo i szybko"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "Miejsce dla {content} Minecraft"
@@ -584,14 +596,26 @@
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
   },
+  "landing.launcher.graphic-alt": {
+    "message": "Prostsza reprezentacja okna Minecraft, z logiem Mojang Studios w zielonym kolorze Modrinth."
+  },
   "landing.launcher.modrinth-app-label": {
     "message": "Aplikacja Modrinth"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
   },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} został zaktualizowany!"
+  },
   "landing.notifications.heading": {
     "message": "Powiadomienia"
+  },
+  "landing.notifications.received-time": {
+    "message": "Odebrano o {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "Wersja {version} została wydana na {gameVersion}"
   },
   "landing.search.label": {
     "message": "Szukaj"
@@ -602,17 +626,53 @@
   "landing.search.sort-by.label": {
     "message": "Sortuj według"
   },
+  "landing.section.for-creators.description": {
+    "message": "Daj internetowy dom swoim kreacjom i sięgnij masywnej widowni dedykowanych graczy."
+  },
   "landing.section.for-creators.label": {
     "message": "Dla twórców"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Udostępnij swoją zawartość światu"
   },
   "landing.section.for-players.label": {
     "message": "Dla graczy"
   },
+  "landing.section.for-players.tagline": {
+    "message": "Odkryj ponad {count} kreacji"
+  },
   "layout.action.change-theme": {
     "message": "Zmień motyw"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Pobierz Modrinth App"
+  "layout.action.close-banner": {
+    "message": "Zamknij"
+  },
+  "layout.action.create-new": {
+    "message": "Stwórz nowy..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Wyszukiwarka plików"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Szukaj po e-mailu"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Zarządzaj ogłoszeniami serwera"
+  },
+  "layout.action.new-collection": {
+    "message": "Nowa kolekcja"
+  },
+  "layout.action.new-organization": {
+    "message": "Nowa organizacja"
+  },
+  "layout.action.new-project": {
+    "message": "Nowy projekt"
+  },
+  "layout.action.reports": {
+    "message": "Zgłoszenia"
+  },
+  "layout.action.review-projects": {
+    "message": "Przejrzyj projekty"
   },
   "layout.avatar.alt": {
     "message": "Twój awatar"
@@ -642,7 +702,7 @@
     "message": "Zaktualizuj informacje płatności"
   },
   "layout.banner.subscription-payment-failed.description": {
-    "message": "Jedna lub więcej subskrypcji, nie udała się odnowić. Proszę zaktualizować informację płatności, żeby nie stracić dostępu!"
+    "message": "Nie udało się odnowić jednej lub więcej subskrypcji. Proszę zaktualizować informację płatności, żeby nie stracić dostępu!"
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Wymagana akcja w sprawie płatności."
@@ -691,6 +751,9 @@
   },
   "layout.footer.legal.terms-of-use": {
     "message": "Warunki użytkowania"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "Informacje Modrinth"
   },
   "layout.footer.open-source": {
     "message": "Modrinth to <github-link>otwarte oprogramowanie</github-link>."
@@ -746,11 +809,53 @@
   "layout.meta.og-description": {
     "message": "Odkrywaj i publikuj zawartość Minecraft!"
   },
+  "layout.nav.analytics": {
+    "message": "Analizy"
+  },
+  "layout.nav.discover": {
+    "message": "Odkrywaj"
+  },
+  "layout.nav.discover-content": {
+    "message": "Odkrywaj zawartość"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Flagi funkcji"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Pobierz Modrinth App"
+  },
   "layout.nav.home": {
     "message": "Strona główna"
   },
+  "layout.nav.host-a-server": {
+    "message": "Hostuj serwer"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Strona główna Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizacje"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projekty"
+  },
+  "layout.nav.revenue": {
+    "message": "Przychód"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Zapisane projekty"
+  },
   "layout.nav.search": {
     "message": "Szukaj"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Ulepsz do Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filtruj po"
@@ -819,13 +924,13 @@
     "message": "{bio} - Pobieraj projekty {username} na Modrinth"
   },
   "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> pobrań projektu} other {<stat>{count}</stat> pobrań projektu}}"
+    "message": "{count, plural, one {<stat>{count}</stat> pobranie projektu} few {<stat>{count}</stat> pobrania projektu} other {<stat>{count}</stat> pobrań projektu}}"
   },
   "profile.stats.projects": {
     "message": "{count, plural, one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> projekty}}"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> obserwujących projekt} other {<stat>{count}</stat> obserwujących projekt}}"
+    "message": "{count, plural, one {<stat>{count}</stat> obserwujący projekt} other {<stat>{count}</stat> obserwujących projekt}}"
   },
   "profile.user-id": {
     "message": "ID użytkownika: {id}"
@@ -1047,7 +1152,7 @@
     "message": "Pobierz {title}"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Właśnie wyremontowaliśmy system środowisk na Modrinth i nowe opcje są teraz dostępne. Nie masz uprawnień, aby modyfikować te ustawienia, ale daj znać innemu członkowi projektu, że metadane środowisk muszą zostać zweryfikowane."
+    "message": "Właśnie odnowiliśmy system środowisk na Modrinth i nowe opcje są teraz dostępne. Nie masz uprawnień, aby modyfikować te ustawienia, ale daj znać innemu członkowi projektu, że metadane środowisk muszą zostać zweryfikowane."
   },
   "project.environment.migration-no-permission.title": {
     "message": "Metadane środowiska muszą być sprawdzone"
@@ -1851,7 +1956,7 @@
     "message": "Wyszukaj język..."
   },
   "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Brak pasujących języków} one {# pasujący język} other {# pasujących języków}} twojego wyszukiwania."
+    "message": "{matches, plural, =0 {Brak pasujących języków} one {# pasujący język} few {# pasujące języki} other {# pasujących języków}} do twojego wyszukiwania."
   },
   "settings.language.languages.search.no-results": {
     "message": "Nie znaleziono żadnego języka pasującego do Twojego zapytania."

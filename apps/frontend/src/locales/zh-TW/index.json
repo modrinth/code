@@ -3,7 +3,7 @@
     "message": "找不到使用者"
   },
   "app-marketing.download.description": {
-    "message": "我們的桌面應用程式可在所有平台上使用，請選擇您所需的版本。"
+    "message": "我們的桌面應用程式可在所有平台上使用，請選擇你所需的版本。"
   },
   "app-marketing.download.download-appimage": {
     "message": "下載 AppImage"
@@ -21,7 +21,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Modrinth App 的 Linux 版本在某些系統和配置上<issues-link>存在已知問題</issues-link>。如果 Modrinth App 在您的系統上執行不穩定，我們建議您嘗試使用其他應用程式，例如 <prism-link>Prism Launcher</prism-link>，以便更輕鬆地安裝 Modrinth 內容。"
+    "message": "Modrinth App 的 Linux 版本在某些系統和配置上<issues-link>存在已知問題</issues-link>。如果 Modrinth App 在你的系統上執行不穩定，我們建議你嘗試使用其他應用程式，例如 <prism-link>Prism Launcher</prism-link>，以便更輕鬆地安裝 Modrinth 內容。"
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -30,10 +30,10 @@
     "message": "下載選項"
   },
   "app-marketing.download.terms": {
-    "message": "下載 Modrinth App 即表示您同意我們的《<terms-link>服務條款</terms-link>》與《<privacy-link>隱私權政策</privacy-link>》。"
+    "message": "下載 Modrinth App 即表示您同意我們的《<terms-link>使用條款</terms-link>》及《<privacy-link>隱私權政策</privacy-link>》。"
   },
   "app-marketing.download.third-party-packages": {
-    "message": "第三方安裝包"
+    "message": "第三方套件"
   },
   "app-marketing.download.title": {
     "message": "下載 Modrinth App（Beta 版）"
@@ -42,13 +42,13 @@
     "message": "Windows"
   },
   "app-marketing.features.follow.description": {
-    "message": "收藏您喜愛的內容，並一鍵接收更新。"
+    "message": "收藏你喜愛的內容，並一鍵接收更新。"
   },
   "app-marketing.features.follow.title": {
     "message": "追蹤專案"
   },
   "app-marketing.features.importing.description": {
-    "message": "從您之前使用的啟動器匯入所有您喜愛的設定檔，讓您在幾秒內即可開始使用 Modrinth App！"
+    "message": "從你之前使用的啟動器匯入所有你喜愛的設定檔，讓你在幾秒內即可開始使用 Modrinth App！"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -66,7 +66,7 @@
     "message": "作者：{author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth 讓您可以輕鬆集中管理所有模組。您可以一鍵安裝、移除及更新模組。"
+    "message": "Modrinth 讓你可以輕鬆集中管理所有模組。你可以一鍵安裝、移除及更新模組。"
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "安裝模組"
@@ -84,13 +84,13 @@
     "message": "版本"
   },
   "app-marketing.features.offline.description": {
-    "message": "無論您是否連線到網路，都能遊玩您的模組。"
+    "message": "無論你是否連線到網路，都能遊玩你的模組。"
   },
   "app-marketing.features.offline.title": {
     "message": "離線模式"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth 的啟動器是完全開源的。您可以在我們的 <github-link>GitHub</github-link> 上查看原始碼！"
+    "message": "Modrinth 的啟動器是完全開源的。你可以在我們的 <github-link>GitHub</github-link> 上查看原始碼！"
   },
   "app-marketing.features.open-source.title": {
     "message": "開放原始碼"
@@ -141,13 +141,13 @@
     "message": "高效能"
   },
   "app-marketing.features.play.description": {
-    "message": "使用 Modrinth App 下載並遊玩您喜愛的模組和模組包。"
+    "message": "使用 Modrinth App 下載並遊玩你喜愛的模組和模組包。"
   },
   "app-marketing.features.play.title": {
-    "message": "遊玩您喜愛的模組"
+    "message": "遊玩你喜愛的模組"
   },
   "app-marketing.features.sharing.description": {
-    "message": "透過 Modrinth 上託管的數千種模組與模組包，建立、分享並遊玩您的模組包。"
+    "message": "透過 Modrinth 上託管的數千種模組與模組包，建立、分享並遊玩你的模組包。"
   },
   "app-marketing.features.sharing.modpack": {
     "message": "模組包"
@@ -162,7 +162,7 @@
     "message": "前所未有的"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App 已與網站完全整合，因此您可透過應用程式存取所有喜愛的專案！"
+    "message": "Modrinth App 已與網站完全整合，因此你可透過應用程式存取所有喜愛的專案！"
   },
   "app-marketing.features.website.title": {
     "message": "網站整合"
@@ -174,7 +174,7 @@
     "message": "Modrinth App 的螢幕擷取畫面，顯示已開啟 Cobblemon 實例的「內容」頁面。"
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App 是一款獨特的開源啟動器，它讓您可以輕鬆遊玩並保持您喜愛模組的最新狀態，所有功能都整合在一個簡潔小巧的應用程式中。"
+    "message": "Modrinth App 是一款獨特的開源啟動器，它讓你可以輕鬆遊玩並保持你喜愛模組的最新狀態，所有功能都整合在一個簡潔小巧的應用程式中。"
   },
   "app-marketing.hero.download-button": {
     "message": "下載 Modrinth App"
@@ -351,7 +351,7 @@
     "message": "你現在已加入由創作者與探索者組成的精彩社群，大家都在積極打造、下載並持續掌握優質模組的最新動態。"
   },
   "auth.welcome.label.tos": {
-    "message": "建立帳號即表示您同意 Modrinth 的《<terms-link>使用規定</terms-link>》和《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
+    "message": "建立帳號即表示您同意 Modrinth 的《<terms-link>使用規定</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
   },
   "auth.welcome.long-title": {
     "message": "歡迎使用 Modrinth！"
@@ -426,7 +426,7 @@
     "message": "你的收藏"
   },
   "error.collection.404.list_item.1": {
-    "message": "您可能輸錯了該收藏的網址。"
+    "message": "你可能輸錯了該收藏的網址。"
   },
   "error.collection.404.list_item.2": {
     "message": "該收藏可能已設為私人。"
@@ -441,7 +441,7 @@
     "message": "找不到收藏"
   },
   "error.generic.404.subtitle": {
-    "message": "您要找的頁面似乎不存在。"
+    "message": "你要找的頁面似乎不存在。"
   },
   "error.generic.404.title": {
     "message": "找不到頁面"
@@ -462,7 +462,7 @@
     "message": "糟糕！"
   },
   "error.organization.404.list_item.1": {
-    "message": "您可能輸錯了該組織的網址。"
+    "message": "你可能輸錯了該組織的網址。"
   },
   "error.organization.404.list_item.2": {
     "message": "該組織的擁有者可能已變更網址或已將其刪除。"
@@ -477,7 +477,7 @@
     "message": "找不到組織"
   },
   "error.project.404.list_item.1": {
-    "message": "您可能輸錯了該專案的網址。"
+    "message": "你可能輸錯了該專案的網址。"
   },
   "error.project.404.list_item.2": {
     "message": "該專案的擁有者可能已變更網址或已將其刪除。"
@@ -492,7 +492,7 @@
     "message": "找不到專案"
   },
   "error.user.404.list_item.1": {
-    "message": "您可能輸錯了該使用者的使用者名稱。"
+    "message": "你可能輸錯了該使用者的使用者名稱。"
   },
   "error.user.404.list_item.2": {
     "message": "該使用者可能已變更使用者名稱或已刪除帳號。"
@@ -516,7 +516,7 @@
     "message": "{count, plural, other {還有 {count} 人}}也被這隻青蛙耍了！"
   },
   "frog.sinceOpened": {
-    "message": "本頁面在 {ago}開啟"
+    "message": "本頁面開啟時間：{ago}"
   },
   "frog.title": {
     "message": "青蛙"
@@ -540,25 +540,25 @@
     "message": "數據與統計"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "透過搜尋、我們的首頁、Discord 伺服器以及未來更多方式，讓您的專案被數千名使用者發現！"
+    "message": "透過搜尋、我們的首頁、Discord 伺服器以及未來更多方式，讓你的專案被數千名使用者發現！"
   },
   "landing.creator.feature.discovery.title": {
     "message": "探索與曝光"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "透過 Minotaur 與您的建構工具整合，在您發布新版本時即可自動上傳"
+    "message": "透過 Minotaur 與你的建構工具整合，在你發布新版本時即可自動上傳"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "多元生態系"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "從您的專案頁面獲得廣告收入，並隨時提取您的資金"
+    "message": "從你的專案頁面獲得廣告收入，並隨時提取你的資金"
   },
   "landing.creator.feature.monetization.title": {
     "message": "營利"
   },
   "landing.creator.feature.team-management.description": {
-    "message": "輕鬆邀請您的團隊成員並管理角色與權限"
+    "message": "輕鬆邀請你的團隊成員並管理角色與權限"
   },
   "landing.creator.feature.team-management.title": {
     "message": "團隊管理"
@@ -567,22 +567,22 @@
     "message": "載入隨機專案失敗 :("
   },
   "landing.feature.follow.description": {
-    "message": "隨時接收您喜愛專案的更新通知，掌握最新動態"
+    "message": "隨時接收你喜愛專案的更新通知，掌握最新動態。"
   },
   "landing.feature.follow.heading": {
-    "message": "追蹤您喜愛的專案"
+    "message": "追蹤你喜愛的專案"
   },
   "landing.feature.launcher.description": {
-    "message": "Modrinth 的開源 API 讓啟動器能夠深度整合 Modrinth。您可以透過<link>我們的應用程式</link>，以及 ATLauncher、MultiMC 和 Prism Launcher 等熱門啟動器使用 Modrinth。"
+    "message": "Modrinth 的開源 API 讓啟動器能夠深度整合 Modrinth。你可以透過<link>我們的應用程式</link>，以及 ATLauncher、MultiMC 和 Prism Launcher 等熱門啟動器使用 Modrinth。"
   },
   "landing.feature.launcher.heading": {
-    "message": "使用您偏好的啟動器遊玩"
+    "message": "使用你偏好的啟動器遊玩"
   },
   "landing.feature.search.description": {
-    "message": "Modrinth 閃電般快速搜尋與強大的篩選功能，讓您在輸入時就能輕鬆找到所需內容。"
+    "message": "Modrinth 閃電般快速搜尋與強大的篩選功能，讓你在輸入時就能輕鬆找到所需內容。"
   },
   "landing.feature.search.heading": {
-    "message": "快速輕鬆地找到您想要的內容"
+    "message": "快速輕鬆地找到你想要的內容"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "匯聚 Minecraft 各類{content}"
@@ -642,7 +642,7 @@
     "message": "排序方式："
   },
   "landing.section.for-creators.description": {
-    "message": "為你的創作打造一個線上家園，觸達大量忠實玩家"
+    "message": "為你的創作打造一個線上家園，並觸及廣大的忠實玩家群。"
   },
   "landing.section.for-creators.label": {
     "message": "面向创作者"
@@ -651,7 +651,7 @@
     "message": "讓你的創作走向世界"
   },
   "landing.section.for-players.description": {
-    "message": "從奇幻生態域到受詛咒的地下城，您一定能找到將您的遊戲體驗提升至全新層次的內容。"
+    "message": "從奇幻生態域到受詛咒的地下城，你一定能找到將你的遊戲體驗提升至全新層次的內容。"
   },
   "landing.section.for-players.label": {
     "message": "面向玩家"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "更換主題"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "下載 Modrinth 應用程式"
+  "layout.action.close-banner": {
+    "message": "關閉"
+  },
+  "layout.action.create-new": {
+    "message": "新增..."
+  },
+  "layout.action.file-lookup": {
+    "message": "檔案搜尋"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "使用電子郵件地址搜尋"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "管理伺服器通知"
+  },
+  "layout.action.new-collection": {
+    "message": "新增收藏"
+  },
+  "layout.action.new-organization": {
+    "message": "新增組織"
+  },
+  "layout.action.new-project": {
+    "message": "新增專案"
+  },
+  "layout.action.reports": {
+    "message": "檢舉"
+  },
+  "layout.action.review-projects": {
+    "message": "審核專案"
   },
   "layout.avatar.alt": {
     "message": "你的頭貼"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "使用條款"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinth 資訊"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth 是<github-link>開源專案</github-link>。"
   },
@@ -753,13 +783,13 @@
     "message": "產品"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth 應用程式"
+    "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth 伺服器"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "資源"
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "探索及發布 Minecraft 內容！"
   },
+  "layout.nav.analytics": {
+    "message": "數據分析"
+  },
+  "layout.nav.discover": {
+    "message": "探索"
+  },
+  "layout.nav.discover-content": {
+    "message": "探索內容"
+  },
+  "layout.nav.feature-flags": {
+    "message": "功能開關"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "下載 Modrinth App"
+  },
   "layout.nav.home": {
     "message": "首頁"
   },
+  "layout.nav.host-a-server": {
+    "message": "託管伺服器"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth 首頁"
+  },
+  "layout.nav.organizations": {
+    "message": "組織"
+  },
+  "layout.nav.profile": {
+    "message": "個人檔案"
+  },
+  "layout.nav.projects": {
+    "message": "專案"
+  },
+  "layout.nav.revenue": {
+    "message": "收益"
+  },
+  "layout.nav.saved-projects": {
+    "message": "收藏"
+  },
   "layout.nav.search": {
     "message": "搜尋"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "升級至 Modrinth+"
   },
   "moderation.filter.by": {
     "message": "篩選方式"
@@ -828,7 +900,7 @@
     "message": "排序方式"
   },
   "moderation.technical.search.placeholder": {
-    "message": "搜尋科技評測..."
+    "message": "搜尋技術審查..."
   },
   "profile.button.billing": {
     "message": "管理使用者帳務"
@@ -926,8 +998,17 @@
   "project-moderation-nags.resubmit-for-review": {
     "message": "重新提交審核"
   },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "你的專案已由 Modrinth 的工作人員設為{status}。大部分情況下，在處理了工作人員訊息中提到的問題後，即可重新提交以供審核。"
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "你必須完成發布檢查清單中的必要步驟！"
+  },
   "project-moderation-nags.submit-for-review": {
     "message": "提交審核"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "你的專案只有專案成員才能查看。它必須經過管理員審核才能發布。"
   },
   "project-moderation-nags.suggestion": {
     "message": "建議"
@@ -1016,6 +1097,9 @@
   "project.actions.review-project": {
     "message": "審核專案"
   },
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Servers 是你與朋友輕鬆遊玩的最佳方式！"
+  },
   "project.actions.servers-promo.monthly": {
     "message": " / 月"
   },
@@ -1041,7 +1125,7 @@
     "message": "遊戲版本：{version}"
   },
   "project.download.game-version-error": {
-    "message": "錯誤：沒有合適的遊戲版本"
+    "message": "錯誤：未找到適合的遊戲版本"
   },
   "project.download.game-version-tooltip": {
     "message": "{title} 僅適用於 {version}"
@@ -1088,8 +1172,26 @@
   "project.download.title": {
     "message": "下載 {title}"
   },
+  "project.environment.migration-no-permission.message": {
+    "message": "我們剛徹底更新了 Modrinth 的環境系統，並推出了新選項。你沒有權限修改這些設定，但請通知專案的其他成員，環境中繼資料需要驗證。"
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "環境中繼資料需要審核"
+  },
   "project.environment.migration.learn-more": {
     "message": "深入了解這項變更"
+  },
+  "project.environment.migration.message": {
+    "message": "我們剛徹底更新了 Modrinth 的環境系統，並推出了新選項。請前往你專案的設定，並驗證中繼資料是否正確。"
+  },
+  "project.environment.migration.review-button": {
+    "message": "審核環境設定"
+  },
+  "project.environment.migration.title": {
+    "message": "請審核環境中繼資料"
+  },
+  "project.error.loading": {
+    "message": "載入專案資料時發生錯誤{message}"
   },
   "project.error.page-not-found": {
     "message": "頁面不存在"
@@ -1127,14 +1229,74 @@
   "project.notification.updated.title": {
     "message": "專案已更新"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "你的專案缺少環境中繼資料，請從下方選擇適當的選項。"
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "請選擇你專案的環境"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "message": "你的專案的不同版本已選取不同的環境，因此目前無法全域編輯。"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "你的專案有多種環境"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "我們剛徹底更新了 Modrinth 的環境系統，並推出了新選項。請確認下方已選取正確的選項，然後在完成後按一下「驗證」！"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "message": "請審核以下選項"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "message": "只有模組或模組包專案才能擁有環境中繼資料。"
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "message": "這個專案類型不支援環境中繼資料"
+  },
   "project.settings.environment.verification.verify-button": {
     "message": "驗證"
   },
   "project.settings.environment.verification.verify-text": {
-    "message": "驗證這個專案的執行環境設定是否正確。"
+    "message": "驗證這個專案的環境設定是否正確。"
+  },
+  "project.settings.general.name.description": {
+    "message": "請避免使用前綴、後綴、括弧內容或額外描述，僅填寫專案的實際名稱。"
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "例如：Nether Overhaul 2"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "例如：Construction Equipment"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "例如：Better than Caving"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "例如：Enhanced Portals"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "例如：Dangerous Mobs"
   },
   "project.settings.general.name.title": {
     "message": "名稱"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "用一句話總結你的專案。"
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "例如：Overhauls game progression to revolve around the Nether."
+  },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "例如：Adds wearable construction gear."
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "例如：Adds realistic mineshaft-building mechanics."
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "例如：Improves how Nether portals link to each other."
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "例如：Adds powerful boss versions of the normal mobs to encounter in the night."
   },
   "project.settings.general.tagline.title": {
     "message": "標語"
@@ -1173,7 +1335,7 @@
     "message": "錯誤報告"
   },
   "report.question.content-type": {
-    "message": "您要檢舉什麼類型的內容？"
+    "message": "你要檢舉什麼類型的內容？"
   },
   "report.question.report-reason": {
     "message": "此 {item} 違反了 Modrinth 的哪一條規則？"
@@ -1340,6 +1502,9 @@
   "scopes.reportRead.label": {
     "message": "讀取檢舉"
   },
+  "scopes.sessionAccess.description": {
+    "message": "存取由 Modrinth 提供的工作階段"
+  },
   "scopes.sessionAccess.label": {
     "message": "存取工作階段"
   },
@@ -1421,6 +1586,30 @@
   "scopes.versionWrite.label": {
     "message": "寫入版本"
   },
+  "search.filter.locked.server": {
+    "message": "由該伺服器提供"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "遊戲版本由伺服器提供"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "載入器由伺服器提供"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "與伺服器同步"
+  },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "正在建立備份"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "正在還原備份"
+  },
+  "servers.backups.item.already-preparing": {
+    "message": "備份已經在準備下載"
+  },
+  "servers.backups.item.automated": {
+    "message": "自動"
+  },
   "servers.backups.item.creating-backup": {
     "message": "正在建立備份..."
   },
@@ -1442,6 +1631,15 @@
   "servers.backups.item.prepare-download": {
     "message": "準備下載"
   },
+  "servers.backups.item.prepare-download-again": {
+    "message": "再試一次準備下載"
+  },
+  "servers.backups.item.preparing-download": {
+    "message": "正在準備下載..."
+  },
+  "servers.notice.expires": {
+    "message": "到期日"
+  },
   "servers.notice.id": {
     "message": "ID"
   },
@@ -1452,13 +1650,13 @@
     "message": "Amazon Pay"
   },
   "settings.billing.payment_method_type.amex": {
-    "message": "American Express"
+    "message": "美國運通"
   },
   "settings.billing.payment_method_type.cashapp": {
     "message": "Cash App"
   },
   "settings.billing.payment_method_type.diners": {
-    "message": "Diners Club"
+    "message": "大來國際"
   },
   "settings.billing.payment_method_type.discover": {
     "message": "Discover"
@@ -1470,7 +1668,7 @@
     "message": "JCB"
   },
   "settings.billing.payment_method_type.mastercard": {
-    "message": "MasterCard"
+    "message": "萬事達卡"
   },
   "settings.billing.payment_method_type.paypal": {
     "message": "PayPal"
@@ -1480,6 +1678,27 @@
   },
   "settings.billing.payment_method_type.unknown": {
     "message": "未知的付款方式"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.display.banner.developer-mode.button": {
+    "message": "停用開發人員模式"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "開發人員模式<strong>已啟用</strong>。這個模式可以讓你查看 Modrinth 各項內容的內部 ID，如果你是使用 Modrinth API 的開發人員，這項功能可能會對你有所幫助。按 5 次頁面底部的 Modrinth 標誌即可切換開發人員模式。"
+  },
+  "settings.display.flags.description": {
+    "message": "針對這部裝置，設定要啟用或停用的特定功能。"
+  },
+  "settings.display.flags.title": {
+    "message": "功能開關"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "資料包頁面"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "依你偏好，設定這部裝置的專案清單版面配置。"
   },
   "settings.display.project-list-layouts.mod": {
     "message": "模組頁面"
@@ -1504,5 +1723,23 @@
   },
   "settings.display.project-list.layouts.collection": {
     "message": "收藏"
+  },
+  "settings.display.theme.title": {
+    "message": "色彩主題"
+  },
+  "settings.language.categories.auto": {
+    "message": "自動切換"
+  },
+  "settings.language.categories.default": {
+    "message": "標準語言"
+  },
+  "settings.language.categories.experimental": {
+    "message": "實驗性語言"
+  },
+  "settings.language.categories.fun": {
+    "message": "趣味性語言"
+  },
+  "settings.language.description": {
+    "message": "選擇你偏好的網站語言。翻譯由 <crowdin-link>Crowdin</crowdin-link> 上的志願者所貢獻。"
   }
 }

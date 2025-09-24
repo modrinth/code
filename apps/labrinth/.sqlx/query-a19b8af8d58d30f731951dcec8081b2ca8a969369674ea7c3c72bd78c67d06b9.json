@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tUPDATE payouts_values_notifications\n\t\t\tSET notified = TRUE\n\t\t\tWHERE id = ANY($1)\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a19b8af8d58d30f731951dcec8081b2ca8a969369674ea7c3c72bd78c67d06b9"
+}

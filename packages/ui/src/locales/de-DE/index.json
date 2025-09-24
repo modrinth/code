@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "Alle Projekte"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Datenpaket} other {Datenpakete}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Datenpakete"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {Datenpaket} other {Datenpakete}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mods"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpacks"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Plugins"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Ressourcenpaket} other {Ressourcenpakete}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Ressourcenpaket"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {Ressourcenpaket} other {Ressourcenpakete}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shader}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shader"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shader}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Unterstützte Umgebungen"
   },

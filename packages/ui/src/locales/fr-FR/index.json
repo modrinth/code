@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "Tout"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "{count, plural, one {Pack de données} other {Packs de données}}"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {Pack de données} other {Packs de données}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mods"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpacks"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modPack} other {modPacks}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Plugins"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Ressource Pack} other {Ressource Packs}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Packs de ressources"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {ressource pack} other {ressource packs}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaders"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shaders}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Environnements pris en charge"
   },

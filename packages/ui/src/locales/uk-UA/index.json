@@ -359,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "Усі"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Датапак} few {Датапаки} many {Датапаків} other {Датапаків}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Дата паки"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {датапак} few {датапаки} many {датапаків} other {датапаків}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Мод} few {Мода} many {Модів} other {Модів}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Моди"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {мод} few {мода} many {модів} other {модів}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Збірка модів} few {Збірки модів} many {Збірок модів} other {Збірок модів}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Мод пак"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {збірка модів} few {збірки модів} many {збірок модів} other {збірок модів}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Плагін} few {Плагіни} many {Плагінів} other {Плагінів}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Плагіни"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {плагін} few {плагіни} many {плагінів} other {плагінів}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Пакет ресурсів} few {Пакети ресурсів} many {Пакетів ресурсів} other {Пакетів ресурсів}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Ресурс паки"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {пакет ресурсів} few {пакети ресурсів} many {пакетів ресурсів} other {пакетів ресурсів}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Шейдер} few {Шейдери} many {Шейдирів} other {Шейдирів}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Шейдери"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {шейдер} few {шейдери} many {шейдирів} other {шейдирів}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Підтримувані середовища"
   },

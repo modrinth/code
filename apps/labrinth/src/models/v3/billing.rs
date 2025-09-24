@@ -33,6 +33,20 @@ pub enum ProductMetadata {
     },
 }
 
+impl ProductMetadata {
+    pub fn is_pyro(&self) -> bool {
+        matches!(self, ProductMetadata::Pyro { .. })
+    }
+
+    pub fn is_medal(&self) -> bool {
+        matches!(self, ProductMetadata::Medal { .. })
+    }
+
+    pub fn is_midas(&self) -> bool {
+        matches!(self, ProductMetadata::Midas)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct ProductPrice {
     pub id: ProductPriceId,
