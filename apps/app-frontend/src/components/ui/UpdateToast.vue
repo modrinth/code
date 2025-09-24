@@ -81,7 +81,7 @@ const messages = defineMessages({
 </script>
 <template>
 	<div
-		class="fixed card-shadow rounded-2xl right-6 bottom-6 p-4 z-10 w-[25rem] bg-bg-raised border-divider border-solid border-[2px]"
+		class="fixed card-shadow rounded-2xl top-[--top-bar-height] mt-6 right-6 p-4 z-30 w-[25rem] bg-bg-raised border-divider border-solid border-[2px]"
 		:class="{
 			'download-complete': downloadProgress === 1,
 		}"

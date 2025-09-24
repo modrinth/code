@@ -784,6 +784,9 @@ async function processPendingSurveys() {
 					</NavButton>
 				</div>
 			</Transition>
+			<NavButton :to="() => updateToastDismissed = !updateToastDismissed">
+				T
+			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
 				:to="() => $refs.settingsModal.show()"
@@ -1236,7 +1239,7 @@ async function processPendingSurveys() {
 
 	.toast-enter-from {
 		scale: 0.5;
-		translate: 0 10rem;
+		translate: 0 -10rem;
 		opacity: 0;
 	}
 
