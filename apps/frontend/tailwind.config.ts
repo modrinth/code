@@ -21,6 +21,17 @@ const config: Config = {
 					l4: 'var(--surface-l4)',
 					l5: 'var(--surface-l5)',
 				},
+
+				/// TODO: Clean up these aliases within codebase to use default, primary, tertiary.
+				// text-default
+				primary: 'var(--color-text-default)',
+
+				// text-primary
+				contrast: 'var(--color-text-primary)',
+
+				// text-tertiary
+				secondary: 'var(--color-text-tertiary)',
+
 				red: {
 					DEFAULT: 'var(--color-red)',
 					50: 'var(--color-red-50)',
@@ -106,11 +117,9 @@ const config: Config = {
 					950: 'var(--color-gray-950)',
 				},
 
+				/// === LEGACY ===
 				icon: 'var(--color-base)',
 				// Text
-				primary: 'var(--color-base)',
-				contrast: 'var(--color-contrast)',
-				secondary: 'var(--color-secondary)',
 				inactive: 'var(--color-text-inactive)',
 				dark: 'var(--color-text-dark)',
 				inverted: 'var(--color-text-inverted)',
