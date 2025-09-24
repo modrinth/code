@@ -30,7 +30,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[derive(Debug, Serialize, Deserialize)]
 struct GetRequest {
     time_range: TimeRange,
-    bucket_by: BucketBy,
+    return_metrics: ReturnMetrics,
     // filters: Filters,
 }
 
@@ -43,10 +43,15 @@ struct TimeRange {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct BucketBy {
-    project_views: Option<Vec<ProjectViewsField>>,
-    project_downloads: Option<Vec<ProjectDownloadsField>>,
-    project_playtime: Option<Vec<ProjectPlaytimeField>>,
+struct ReturnMetrics {
+    project_views: Option<ProjectViewsMetrics>,
+    project_downloads: Option<ProjectDownloadsMetrics>,
+    project_playtime: Option<ProjectPlaytimeMetrics>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ProjectViewsMetrics {
+    bucket_by: Vec<ProjectViewsField>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -58,6 +63,11 @@ enum ProjectViewsField {
     Monetized,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct ProjectDownloadsMetrics {
+    bucket_by: Vec<ProjectDownloadsField>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 enum ProjectDownloadsField {
@@ -65,6 +75,11 @@ enum ProjectDownloadsField {
     VersionId,
     Domain,
     SitePath,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ProjectPlaytimeMetrics {
+    bucket_by: Vec<ProjectPlaytimeField>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -293,9 +308,9 @@ async fn get(
         project_ids: &project_ids,
     };
 
-    if let Some(bucket_by) = &req.bucket_by.project_views {
+    if let Some(metrics) = &req.return_metrics.project_views {
         use ProjectViewsField as F;
-        let uses = |field| bucket_by.contains(&field);
+        let uses = |field| metrics.bucket_by.contains(&field);
 
         query_clickhouse::<query::ViewRow>(
             &mut query_clickhouse_cx,
@@ -327,9 +342,9 @@ async fn get(
         .await?;
     }
 
-    if let Some(bucket_by) = &req.bucket_by.project_downloads {
+    if let Some(metrics) = &req.return_metrics.project_downloads {
         use ProjectDownloadsField as F;
-        let uses = |field| bucket_by.contains(&field);
+        let uses = |field| metrics.bucket_by.contains(&field);
 
         query_clickhouse::<query::DownloadRow>(
             &mut query_clickhouse_cx,
@@ -357,9 +372,9 @@ async fn get(
         .await?;
     }
 
-    if let Some(bucket_by) = &req.bucket_by.project_playtime {
+    if let Some(metrics) = &req.return_metrics.project_playtime {
         use ProjectPlaytimeField as F;
-        let uses = |field| bucket_by.contains(&field);
+        let uses = |field| metrics.bucket_by.contains(&field);
 
         query_clickhouse::<query::PlaytimeRow>(
             &mut query_clickhouse_cx,
