@@ -14,15 +14,24 @@ const config: Config = {
 	theme: {
 		extend: {
 			colors: {
-				icon: 'var(--color-base)',
-				// Text
-				primary: 'var(--color-base)',
-				contrast: 'var(--color-contrast)',
-				secondary: 'var(--color-secondary)',
-				inactive: 'var(--color-text-inactive)',
-				dark: 'var(--color-text-dark)',
-				inverted: 'var(--color-text-inverted)',
-				heading: 'var(--color-heading)',
+				surface: {
+					l1: 'var(--surface-l1)',
+					l2: 'var(--surface-l2)',
+					l3: 'var(--surface-l3)',
+					l4: 'var(--surface-l4)',
+					l5: 'var(--surface-l5)',
+				},
+
+				/// TODO: Clean up these aliases within codebase to use default, primary, tertiary.
+				// text-default
+				primary: 'var(--color-text-default)',
+
+				// text-primary
+				contrast: 'var(--color-text-primary)',
+
+				// text-tertiary
+				secondary: 'var(--color-text-tertiary)',
+
 				red: {
 					DEFAULT: 'var(--color-red)',
 					50: 'var(--color-red-50)',
@@ -107,14 +116,22 @@ const config: Config = {
 					900: 'var(--color-gray-900)',
 					950: 'var(--color-gray-950)',
 				},
+
+				/// === LEGACY ===
+				icon: 'var(--color-base)',
+				// Text
+				inactive: 'var(--color-text-inactive)',
+				dark: 'var(--color-text-dark)',
+				inverted: 'var(--color-text-inverted)',
+				heading: 'var(--color-heading)',
 				bg: {
-					DEFAULT: 'var(--color-bg)',
+					DEFAULT: 'var(--surface-l1)', // var(--color-bg)
 					red: 'var(--color-red-bg)',
 					orange: 'var(--color-orange-bg)',
 					green: 'var(--color-green-bg)',
 					blue: 'var(--color-blue-bg)',
 					purple: 'var(--color-purple-bg)',
-					raised: 'var(--color-raised-bg)',
+					raised: 'var(--surface-l3)', // var(--color-raised-bg)
 				},
 				banners: {
 					error: {
