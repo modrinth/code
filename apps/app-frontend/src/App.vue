@@ -784,9 +784,6 @@ async function processPendingSurveys() {
 					</NavButton>
 				</div>
 			</Transition>
-			<NavButton :to="() => updateToastDismissed = !updateToastDismissed">
-				T
-			</NavButton>
 			<NavButton
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
 				:to="() => $refs.settingsModal.show()"

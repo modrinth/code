@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DownloadIcon, ExternalIcon, SpinnerIcon, UpdatedIcon, XIcon } from '@modrinth/assets'
+import { DownloadIcon, ExternalIcon, RefreshCwIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, ProgressBar } from '@modrinth/ui'
 import { formatBytes } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
@@ -81,7 +81,7 @@ const messages = defineMessages({
 </script>
 <template>
 	<div
-		class="fixed card-shadow rounded-2xl top-[--top-bar-height] mt-6 right-6 p-4 z-30 w-[25rem] bg-bg-raised border-divider border-solid border-[2px]"
+		class="fixed card-shadow rounded-2xl top-[--top-bar-height] mt-6 right-6 p-4 z-10 w-[25rem] bg-bg-raised border-divider border-solid border-[2px]"
 		:class="{
 			'download-complete': downloadProgress === 1,
 		}"
@@ -134,7 +134,7 @@ const messages = defineMessages({
 					{{ formatMessage(downloading ? messages.downloading : messages.download) }}
 				</button>
 				<button v-else @click="emit('restart')">
-					<UpdatedIcon /> {{ formatMessage(messages.reload) }}
+					<RefreshCwIcon /> {{ formatMessage(messages.reload) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled>
