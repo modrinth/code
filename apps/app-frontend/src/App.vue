@@ -14,10 +14,10 @@ import {
 	NewspaperIcon,
 	NotepadTextIcon,
 	PlusIcon,
+	RefreshCwIcon,
 	RestoreIcon,
 	RightArrowIcon,
 	SettingsIcon,
-	UpdatedIcon,
 	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -695,7 +695,7 @@ async function processPendingSurveys() {
 					data-tauri-drag-region
 					class="flex items-center gap-4 text-contrast font-semibold text-xl select-none cursor-default"
 				>
-					<UpdatedIcon data-tauri-drag-region class="animate-spin reverse w-6 h-6" />
+					<RefreshCwIcon data-tauri-drag-region class="animate-spin w-6 h-6" />
 					Restarting...
 				</span>
 			</div>
@@ -779,7 +779,7 @@ async function processPendingSurveys() {
 							class="text-brand"
 							:progress="downloadProgress"
 						/>
-						<UpdatedIcon v-else-if="finishedDownloading" class="text-brand" />
+						<RefreshCwIcon v-else-if="finishedDownloading" class="text-brand" />
 						<DownloadIcon v-else class="text-brand" />
 					</NavButton>
 				</div>
@@ -1290,10 +1290,6 @@ async function processPendingSurveys() {
 	.fade-enter-from {
 		opacity: 0;
 	}
-}
-
-.reverse {
-	animation-direction: reverse;
 }
 </style>
 <style>
