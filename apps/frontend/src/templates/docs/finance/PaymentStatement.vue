@@ -1,31 +1,31 @@
 <script setup lang="ts">
-import { Column, Row, Section, Text, Link as VLink } from '@vue-email/components'
+import { Section, Text, Link as VLink } from '@vue-email/components'
 import StyledDoc from '../shared/StyledDoc.vue'
 </script>
 
 <template>
 	<StyledDoc title="Payment Statement">
 		<Section class="mb-8">
-			<div class="flex justify-between items-start">
+			<div class="flex items-start justify-between">
 				<div class="flex-1">
-					<Text class="m-0 mb-2 text-2xl font-bold text-base">Payment Statement</Text>
+					<Text class="m-0 mb-2 text-2xl text-base font-bold">Payment Statement</Text>
 					<Text class="m-0 text-sm text-secondary">Payment ID: { statement.payment_id }</Text>
 					<Text class="m-0 text-sm text-secondary">Date: { statement.payment_date }</Text>
 				</div>
 				<div class="flex-1 text-right">
-					<Text class="m-0 text-3xl font-bold text-brand">USD$ 223.40</Text>
+					<Text class="m-0 text-3xl font-bold text-brand">{ statement.net_amount } </Text>
 					<Text class="m-0 mt-1 text-sm text-secondary">Net Amount Paid</Text>
 				</div>
 			</div>
 		</Section>
 
 		<Section class="mb-8">
-			<div class="flex gap-8 items-start">
+			<div class="flex items-start gap-8">
 				<div class="flex-1">
-					<Text class="m-0 mb-3 border-b border-divider pb-2 text-sm font-semibold text-base">
+					<Text class="m-0 mb-3 border-b border-divider pb-2 text-base text-sm font-semibold">
 						From
 					</Text>
-					<Text class="m-0 mb-1 text-sm font-semibold text-base">Rinth, Inc.</Text>
+					<Text class="m-0 mb-1 text-base text-sm font-semibold">Rinth, Inc.</Text>
 					<Text class="m-0 text-sm leading-tight text-secondary">800 N King St</Text>
 					<Text class="m-0 text-sm leading-tight text-secondary">Suite 304 #3133</Text>
 					<Text class="m-0 text-sm leading-tight text-secondary">Wilmington, DE 19801</Text>
@@ -37,10 +37,10 @@ import StyledDoc from '../shared/StyledDoc.vue'
 				</div>
 
 				<div class="flex-1">
-					<Text class="m-0 mb-3 border-b border-divider pb-2 text-sm font-semibold text-base">
+					<Text class="m-0 mb-3 border-b border-divider pb-2 text-base text-sm font-semibold">
 						To
 					</Text>
-					<Text class="m-0 mb-1 text-sm font-semibold text-base">
+					<Text class="m-0 mb-1 text-base text-sm font-semibold">
 						{ statement.recipient_name }
 					</Text>
 					<Text class="m-0 text-sm leading-tight text-secondary">
@@ -62,30 +62,35 @@ import StyledDoc from '../shared/StyledDoc.vue'
 		</Section>
 
 		<Section class="mb-8">
-			<Text class="m-0 mb-4 border-b border-divider pb-2 text-lg font-semibold text-base">
+			<Text class="m-0 mb-4 border-b border-divider pb-2 text-base text-lg font-semibold">
 				Payment Details
 			</Text>
 
-			<div class="flex justify-between items-center mb-3">
+			<div class="mb-3 flex items-center justify-between">
 				<Text class="m-0 text-sm text-secondary">Gross Amount</Text>
-				<Text class="m-0 text-sm text-base">{ statement.gross_amount }</Text>
+				<Text class="m-0 text-base text-sm">{ statement.gross_amount }</Text>
 			</div>
 
-			<div class="flex justify-between items-center mb-3">
+			<div class="mb-3 flex items-center justify-between">
 				<Text class="m-0 text-sm text-secondary">Processing Fees</Text>
-				<Text class="m-0 text-sm text-base">{ statement.fees }</Text>
+				<Text class="m-0 text-base text-sm">{ statement.fees }</Text>
+			</div>
+
+			<div class="mb-3 flex items-center justify-between">
+				<Text class="m-0 text-sm text-secondary">Payment Processor</Text>
+				<Text class="m-0 text-base text-sm">{ statement.payment_provider }</Text>
 			</div>
 
 			<hr class="my-4 border-divider" />
 
-			<div class="flex justify-between items-center mb-6">
-				<Text class="m-0 text-base font-semibold text-base">Net Amount</Text>
-				<Text class="m-0 text-base font-semibold text-base">{ statement.net_amount }</Text>
+			<div class="mb-6 flex items-center justify-between">
+				<Text class="m-0 text-base font-semibold">Net Amount</Text>
+				<Text class="m-0 text-base font-semibold">{ statement.net_amount }</Text>
 			</div>
 		</Section>
 
 		<Section class="mb-8">
-			<Text class="m-0 mb-4 border-b border-divider pb-2 text-lg font-semibold text-base">
+			<Text class="m-0 mb-4 border-b border-divider pb-2 text-base text-lg font-semibold">
 				Purpose of Payment
 			</Text>
 			<Text class="m-0 text-sm leading-relaxed text-secondary">
