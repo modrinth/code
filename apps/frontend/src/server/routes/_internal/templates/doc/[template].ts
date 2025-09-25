@@ -1,17 +1,17 @@
 import { render } from '@vue-email/render'
 import type { Component } from 'vue'
 
-import emails from '~/templates/emails'
+import docs from '~/templates/docs'
 
 export default defineEventHandler(async (event) => {
 	const template = event.context.params?.template as string
 	try {
-		const component = (await emails[template]()).default as Component | undefined
+		const component = (await docs[template]()).default as Component | undefined
 
 		if (!component) {
 			throw createError({
 				statusCode: 404,
-				message: 'Email template not found',
+				message: 'Document template not found',
 			})
 		}
 
@@ -19,10 +19,10 @@ export default defineEventHandler(async (event) => {
 
 		return html
 	} catch (error) {
-		console.error(`Error rendering email template ${template}:`, error)
+		console.error(`Error rendering document template ${template}:`, error)
 		throw createError({
 			statusCode: 500,
-			message: 'Failed to render email template',
+			message: 'Failed to render document template',
 		})
 	}
 })

@@ -27,7 +27,6 @@ defineProps<{
 							</Column>
 						</Row>
 
-						<!-- Contact Information -->
 						<Row class="mb-6 border-t border-divider pt-4">
 							<Column class="w-1/2">
 								<Text class="m-0 mb-1 text-base text-xs font-semibold">Address</Text>
