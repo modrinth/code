@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Column, Container, Img, Row, Section, Text, Link as VLink } from '@vue-email/components'
+import { Column, Container, Img, Link as VLink, Row, Section, Text } from '@vue-email/components'
+
 import StyledTemplate from '../../shared/StyledTemplate.vue'
 
 defineProps<{

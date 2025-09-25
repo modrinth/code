@@ -1,13 +1,6 @@
 <script setup lang="ts">
-import {
-	Column,
-	Container,
-	Img,
-	Row,
-	Section,
-	Text,
-	Link as VLink,
-} from '@vue-email/components'
+import { Column, Container, Img, Link as VLink, Row, Section, Text } from '@vue-email/components'
+
 import StyledTemplate from '../../shared/StyledTemplate.vue'
 
 defineProps<{
@@ -148,8 +141,8 @@ const socialLinks = Object.freeze<readonly SocialLink[]>([
 			class="text-footerText text-2xs mb-4 pb-0 pl-4 pr-4 pt-0 font-sans"
 		>
 			<small class="text-muted text-2xs"
-				>If you're having trouble with the links above, copy and paste these URLs into your
-				web browser:</small
+				>If you're having trouble with the links above, copy and paste these URLs into your web
+				browser:</small
 			>
 			<Text class="text-2xs text-muted mt-0">
 				<span v-for="(item, index) in manualLinks" :key="index" class="block break-words">
