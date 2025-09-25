@@ -63,3 +63,4 @@ generated
 app-playground-data/*
 
 .astro
+.claude
