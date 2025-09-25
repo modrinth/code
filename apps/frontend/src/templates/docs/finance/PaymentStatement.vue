@@ -77,11 +77,6 @@ import StyledDoc from '../shared/StyledDoc.vue'
 				<Text class="m-0 text-base text-sm">{ statement.fees }</Text>
 			</div>
 
-			<div class="mb-3 flex items-center justify-between">
-				<Text class="m-0 text-sm text-secondary">Payment Processor</Text>
-				<Text class="m-0 text-base text-sm">{ statement.payment_provider }</Text>
-			</div>
-
 			<hr class="my-4 border-divider" />
 
 			<div class="mb-6 flex items-center justify-between">

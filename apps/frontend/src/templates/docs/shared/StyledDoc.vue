@@ -28,28 +28,6 @@ defineProps<{
 							</Column>
 						</Row>
 
-						<Row class="mb-6 border-t border-divider pt-4">
-							<Column class="w-1/2">
-								<Text class="m-0 mb-1 text-base text-xs font-semibold">Address</Text>
-								<Text class="m-0 text-xs leading-tight text-secondary">800 N King St</Text>
-								<Text class="m-0 text-xs leading-tight text-secondary">Suite 304 #3133</Text>
-								<Text class="m-0 text-xs leading-tight text-secondary">Wilmington, DE 19801</Text>
-							</Column>
-							<Column class="w-1/2">
-								<Text class="m-0 mb-1 text-base text-xs font-semibold">Contact</Text>
-								<Text class="m-0 text-xs leading-tight text-secondary">
-									<VLink href="mailto:support@modrinth.com" class="text-blue no-underline">
-										support@modrinth.com
-									</VLink>
-								</Text>
-								<Text class="m-0 text-xs leading-tight text-secondary">
-									<VLink href="https://modrinth.com" class="text-blue no-underline">
-										www.modrinth.com
-									</VLink>
-								</Text>
-							</Column>
-						</Row>
-
 						<Section class="border-t-2 border-brand pt-6">
 							<slot />
 						</Section>
