@@ -349,7 +349,6 @@ impl DBCharge {
 			WHERE
 			  status = 'succeeded'
 			  AND tax_platform_id IS NULL
-			  AND tax_amount <> 0
 			ORDER BY due ASC
 			FOR NO KEY UPDATE SKIP LOCKED
 			LIMIT $1
