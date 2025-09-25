@@ -49,7 +49,14 @@ struct GetRequest {
 struct TimeRange {
     start: DateTime<Utc>,
     end: DateTime<Utc>,
-    resolution_minutes: NonZeroU64,
+    resolution: TimeRangeResolution,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TimeRangeResolution {
+    Minutes(NonZeroU64),
+    Slices(NonZeroU64),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -73,6 +80,7 @@ enum ProjectViewsField {
     Domain,
     SitePath,
     Monetized,
+    Country,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -82,6 +90,7 @@ enum ProjectDownloadsField {
     VersionId,
     Domain,
     SitePath,
+    Country,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -125,6 +134,8 @@ enum ProjectMetrics {
         site_path: Option<String>,
         #[serde(skip_serializing_if = "Option::is_none")]
         monetized: Option<bool>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        country: Option<String>,
         views: u64,
     },
     Downloads {
@@ -134,6 +145,8 @@ enum ProjectMetrics {
         site_path: Option<String>,
         #[serde(skip_serializing_if = "Option::is_none")]
         version_id: Option<VersionId>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        country: Option<String>,
         downloads: u64,
     },
     Playtime {
@@ -174,6 +187,7 @@ mod query {
         pub domain: String,
         pub site_path: String,
         pub monetized: i8,
+        pub country: String,
         pub views: u64,
     }
 
@@ -182,6 +196,7 @@ mod query {
         const USE_DOMAIN: &str = "{use_domain: Bool}";
         const USE_SITE_PATH: &str = "{use_site_path: Bool}";
         const USE_MONETIZED: &str = "{use_monetized: Bool}";
+        const USE_COUNTRY: &str = "{use_country: Bool}";
 
         formatcp!(
             "SELECT
@@ -190,6 +205,7 @@ mod query {
                 if({USE_DOMAIN}, domain, '') AS domain,
                 if({USE_SITE_PATH}, site_path, '') AS site_path,
                 if({USE_MONETIZED}, CAST(monetized AS Int8), -1) AS monetized,
+                if({USE_COUNTRY}, country, '') AS country,
                 COUNT(*) AS views
             FROM views
             WHERE
@@ -199,7 +215,7 @@ mod query {
                 -- by using `views.project_id` instead of `project_id`
                 AND views.project_id IN {PROJECT_IDS}
             GROUP BY
-                bucket, project_id, domain, site_path, monetized"
+                bucket, project_id, domain, site_path, monetized, country"
         )
     };
 
@@ -210,6 +226,7 @@ mod query {
         pub domain: String,
         pub site_path: String,
         pub version_id: DBVersionId,
+        pub country: String,
         pub downloads: u64,
     }
 
@@ -218,6 +235,7 @@ mod query {
         const USE_DOMAIN: &str = "{use_domain: Bool}";
         const USE_SITE_PATH: &str = "{use_site_path: Bool}";
         const USE_VERSION_ID: &str = "{use_version_id: Bool}";
+        const USE_COUNTRY: &str = "{use_country: Bool}";
 
         formatcp!(
             "SELECT
@@ -226,6 +244,7 @@ mod query {
                 if({USE_DOMAIN}, domain, '') AS domain,
                 if({USE_SITE_PATH}, site_path, '') AS site_path,
                 if({USE_VERSION_ID}, version_id, 0) AS version_id,
+                if({USE_COUNTRY}, country, '') AS country,
                 COUNT(*) AS downloads
             FROM downloads
             WHERE
@@ -235,7 +254,7 @@ mod query {
                 -- by using `downloads.project_id` instead of `project_id`
                 AND downloads.project_id IN {PROJECT_IDS}
             GROUP BY
-                bucket, project_id, domain, site_path, version_id"
+                bucket, project_id, domain, site_path, version_id, country"
         )
     };
 
@@ -285,7 +304,7 @@ async fn get(
     clickhouse: web::Data<clickhouse::Client>,
 ) -> Result<web::Json<GetResponse>, ApiError> {
     const MIN_RESOLUTION_MINUTES: u64 = 60;
-    const MAX_TIME_SLICES: usize = 0x10000;
+    const MAX_TIME_SLICES: usize = 1024;
 
     let (scopes, user) = get_user_from_headers(
         &http_req,
@@ -296,23 +315,31 @@ async fn get(
     )
     .await?;
 
-    let resolution_minutes = req.time_range.resolution_minutes.get();
-    if resolution_minutes < MIN_RESOLUTION_MINUTES {
-        return Err(ApiError::InvalidInput(format!(
-            "resolution must be at least {} minutes",
-            MIN_RESOLUTION_MINUTES
-        )));
-    }
+    let num_time_slices = match req.time_range.resolution {
+        TimeRangeResolution::Slices(slices) => slices.get(),
+        TimeRangeResolution::Minutes(resolution_minutes) => {
+            if resolution_minutes.get() < MIN_RESOLUTION_MINUTES {
+                return Err(ApiError::InvalidInput(format!(
+                    "resolution must be at least {} minutes",
+                    MIN_RESOLUTION_MINUTES
+                )));
+            }
 
-    let range_minutes = u64::try_from(
-        (req.time_range.end - req.time_range.start).num_minutes(),
-    )
-    .map_err(|_| {
-        ApiError::InvalidInput("time range end must be after start".into())
-    })?;
+            let range_minutes = u64::try_from(
+                (req.time_range.end - req.time_range.start).num_minutes(),
+            )
+            .map_err(|_| {
+                ApiError::InvalidInput(
+                    "time range end must be after start".into(),
+                )
+            })?;
 
-    let num_time_slices = usize::try_from(range_minutes / resolution_minutes)
+            range_minutes / resolution_minutes
+        }
+    };
+    let num_time_slices = usize::try_from(num_time_slices)
         .expect("u64 should fit within a usize");
+
     if num_time_slices > MAX_TIME_SLICES {
         return Err(ApiError::InvalidInput(format!(
             "resolution is too fine or range is too large - maximum of {MAX_TIME_SLICES} time slices"
@@ -346,9 +373,15 @@ async fn get(
                 ("use_domain", uses(F::Domain)),
                 ("use_site_path", uses(F::SitePath)),
                 ("use_monetized", uses(F::Monetized)),
+                ("use_country", uses(F::Country)),
             ],
             |row| row.bucket,
             |row| {
+                let country = if uses(F::Country) {
+                    Some(condense_country(row.country, row.views))
+                } else {
+                    None
+                };
                 ProjectAnalytics {
                     source_project: row.project_id.into(),
                     metrics: ProjectMetrics::Views {
@@ -359,6 +392,7 @@ async fn get(
                             1 => Some(true),
                             _ => None,
                         },
+                        country,
                         views: row.views,
                     },
                 }
@@ -380,15 +414,22 @@ async fn get(
                 ("use_domain", uses(F::Domain)),
                 ("use_site_path", uses(F::SitePath)),
                 ("use_version_id", uses(F::VersionId)),
+                ("use_country", uses(F::Country)),
             ],
             |row| row.bucket,
             |row| {
+                let country = if uses(F::Country) {
+                    Some(condense_country(row.country, row.downloads))
+                } else {
+                    None
+                };
                 ProjectAnalytics {
                     source_project: row.project_id.into(),
                     metrics: ProjectMetrics::Downloads {
                         domain: none_if_empty(row.domain),
                         site_path: none_if_empty(row.site_path),
                         version_id: none_if_zero_version_id(row.version_id),
+                        country,
                         downloads: row.downloads,
                     },
                 }
@@ -466,8 +507,6 @@ async fn get(
                 )
             })?;
 
-            tracing::info!("bkt = {bucket}");
-
             if let Some(source_project) =
                 row.mod_id.map(DBProjectId).map(ProjectId::from)
                 && let Some(revenue) = row.amount_sum
@@ -494,6 +533,15 @@ fn none_if_empty(s: String) -> Option<String> {
 
 fn none_if_zero_version_id(v: DBVersionId) -> Option<VersionId> {
     if v.0 == 0 { None } else { Some(v.into()) }
+}
+
+fn condense_country(country: String, count: u64) -> String {
+    // Every country under '50' (view or downloads) should be condensed into 'XX'
+    if count < 50 {
+        "XX".to_string()
+    } else {
+        country
+    }
 }
 
 struct QueryClickhouseContext<'a> {
