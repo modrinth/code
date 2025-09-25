@@ -539,6 +539,11 @@ pub async fn create_or_update_payment_intent(
         };
 
         // If the payment request type was done through a confirmation token,
+        // the payment method ID is an invalid placeholder so we don't want
+        // to use it.
+        //
+        // The PaymentIntent will be confirmed using the confirmation token
+        // by the client.
         if let PaymentSession::Interactive {
             payment_request_type: PaymentRequestType::PaymentMethod { .. },
         } = &payment_session
