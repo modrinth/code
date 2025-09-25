@@ -1,10 +1,12 @@
 use crate::database::redis::RedisPool;
+use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
     insert_bank_balances_and_webhook, process_payout,
 };
 use crate::search::indexing::index_projects;
+use crate::util::anrok;
 use crate::{database, search};
 use clap::ValueEnum;
 use sqlx::Postgres;
@@ -24,6 +26,7 @@ pub enum BackgroundTask {
 }
 
 impl BackgroundTask {
+    #[allow(clippy::too_many_arguments)]
     pub async fn run(
         self,
         pool: sqlx::Pool<Postgres>,
@@ -31,6 +34,7 @@ impl BackgroundTask {
         search_config: search::SearchConfig,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
+        anrok_client: anrok::Client,
         email_queue: EmailQueue,
     ) {
         use BackgroundTask::*;
@@ -41,8 +45,9 @@ impl BackgroundTask {
             UpdateVersions => update_versions(pool, redis_pool).await,
             Payouts => payouts(pool, clickhouse, redis_pool).await,
             IndexBilling => {
-                crate::routes::internal::billing::index_billing(
+                index_billing(
                     stripe_client,
+                    anrok_client,
                     pool.clone(),
                     redis_pool,
                 )
@@ -51,8 +56,11 @@ impl BackgroundTask {
                 update_bank_balances(pool).await;
             }
             IndexSubscriptions => {
-                crate::routes::internal::billing::index_subscriptions(
-                    pool, redis_pool,
+                index_subscriptions(
+                    pool,
+                    redis_pool,
+                    stripe_client,
+                    anrok_client,
                 )
                 .await
             }
@@ -64,8 +72,26 @@ impl BackgroundTask {
 }
 
 pub async fn run_email(email_queue: EmailQueue) {
-    if let Err(error) = email_queue.index().await {
-        error!(%error, "Failed to index email queue");
+    // Only index for 5 emails at a time, to reduce transaction length,
+    // for a total of 100 emails.
+    for _ in 0..20 {
+        let then = std::time::Instant::now();
+
+        match email_queue.index(5).await {
+            Ok(true) => {
+                info!(
+                    "Indexed email queue in {}ms",
+                    then.elapsed().as_millis()
+                );
+            }
+            Ok(false) => {
+                info!("No more emails to index");
+                break;
+            }
+            Err(error) => {
+                error!(%error, "Failed to index email queue");
+            }
+        }
     }
 }
 

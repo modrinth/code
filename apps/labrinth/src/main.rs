@@ -8,6 +8,7 @@ use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::{S3BucketConfig, S3Host};
 use labrinth::queue::email::EmailQueue;
 use labrinth::search;
+use labrinth::util::anrok;
 use labrinth::util::env::parse_var;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
@@ -136,6 +137,7 @@ async fn main() -> std::io::Result<()> {
     let stripe_client =
         stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
 
+    let anrok_client = anrok::Client::from_env().unwrap();
     let email_queue =
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
 
@@ -147,6 +149,7 @@ async fn main() -> std::io::Result<()> {
             search_config,
             clickhouse,
             stripe_client,
+            anrok_client.clone(),
             email_queue,
         )
         .await;
@@ -186,6 +189,7 @@ async fn main() -> std::io::Result<()> {
         file_host.clone(),
         maxmind_reader.clone(),
         stripe_client,
+        anrok_client.clone(),
         email_queue,
         !args.no_background_tasks,
     );

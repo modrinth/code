@@ -400,8 +400,9 @@ async fn version_create_inner(
 
     let users = sqlx::query!(
         "
-        SELECT follower_id FROM mod_follows
-        WHERE mod_id = $1
+        SELECT mf.follower_id FROM mod_follows mf
+        INNER JOIN users u ON u.id = follower_id
+        WHERE mf.mod_id = $1
         ",
         builder.project_id as crate::database::models::ids::DBProjectId
     )

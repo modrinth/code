@@ -27,6 +27,7 @@ node_modules
 .idea/*
 !.idea/code.iml
 !.idea/gradle.xml
+!.idea/icon.svg
 !.idea/modules.xml
 !.idea/vcs.xml
 
