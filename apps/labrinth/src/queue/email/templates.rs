@@ -157,7 +157,8 @@ pub async fn build_email(
         ));
     }
 
-    message_builder = message_builder.to(to).subject(&template.subject_line);
+    let subject = fill_template(&template.subject_line, &variables);
+    message_builder = message_builder.to(to).subject(subject);
 
     let plaintext_filled_body =
         fill_template(&template.plaintext_fallback, &variables);

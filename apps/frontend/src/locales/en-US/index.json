@@ -1026,7 +1026,7 @@
     "message": "Invitation to join project"
   },
   "project-member-header.invitation-with-role": {
-    "message": "You've been invited be a member of this project with the role of '{role}'."
+    "message": "You've been invited to be a member of this project with the role of ''{role}''."
   },
   "project-member-header.success": {
     "message": "Success"
@@ -1053,6 +1053,9 @@
     "message": "You must complete the required steps in the publishing checklist!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "Submit for review"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "Submit for review"
   },
   "project-moderation-nags.submit-for-review-desc": {

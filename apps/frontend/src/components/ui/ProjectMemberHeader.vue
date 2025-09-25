@@ -87,7 +87,8 @@ const messages = defineMessages({
 	},
 	invitationWithRole: {
 		id: 'project-member-header.invitation-with-role',
-		defaultMessage: "You've been invited be a member of this project with the role of '{role}'.",
+		defaultMessage:
+			"You've been invited to be a member of this project with the role of ''{role}''.",
 	},
 	invitationNoRole: {
 		id: 'project-member-header.invitation-no-role',
