@@ -34,7 +34,6 @@
 		"vue-tsc": "^2.0.24"
 	},
 	"dependencies": {
-		"@ceereals/vue-pdf": "^0.2.0",
 		"@formatjs/intl-localematcher": "^0.5.4",
 		"@intercom/messenger-js-sdk": "^0.0.14",
 		"@ltd/j-toml": "^1.38.0",

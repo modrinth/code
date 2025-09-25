@@ -1,1 +1,3 @@
-export { default as PaymentStatement } from './payouts/PaymentStatement.vue'
+import type { Component } from 'vue'
+
+export default {} as Record<string, () => Promise<{ default: Component }>>
