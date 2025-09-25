@@ -234,8 +234,7 @@ pub async fn index_subscriptions(
                             // The price of the subscription has changed, we need to insert a notification
                             // for this.
 
-                            let Some(subscription_id) =
-                                charge.subscription_id.clone()
+                            let Some(subscription_id) = charge.subscription_id
                             else {
                                 return Err(ApiError::InvalidInput(
                                     "Charge has no subscription ID".to_owned(),
