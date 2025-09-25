@@ -10,7 +10,7 @@
 use std::num::NonZeroU64;
 
 use actix_web::{HttpRequest, web};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, TimeDelta, Utc};
 use futures::StreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -38,25 +38,40 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 // request
 
+/// Requests analytics data, aggregating over all possible analytics sources
+/// like projects and affiliate codes, returning the data in a list of time
+/// slices.
 #[derive(Debug, Serialize, Deserialize)]
 struct GetRequest {
+    /// What time range to return statistics for.
     time_range: TimeRange,
+    /// What analytics metrics to return data for.
     return_metrics: ReturnMetrics,
-    // filters: Filters,
 }
 
+/// Time range for fetching analytics.
 #[derive(Debug, Serialize, Deserialize)]
 struct TimeRange {
+    /// When to start including data.
     start: DateTime<Utc>,
+    /// When to stop including data.
     end: DateTime<Utc>,
+    /// Determines how many time slices between the start and end will be
+    /// included, and how fine-grained those time slices will be.
     resolution: TimeRangeResolution,
 }
 
+/// Determines how many time slices between the start and end will be
+/// included, and how fine-grained those time slices will be.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TimeRangeResolution {
-    Minutes(NonZeroU64),
+    /// Use a set number of time slices, with the resolution being determined
+    /// automatically.
     Slices(NonZeroU64),
+    /// Each time slice will be a set number of minutes long, and the number of
+    /// slices is determined automatically.
+    Minutes(NonZeroU64),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -303,7 +318,7 @@ async fn get(
     session_queue: web::Data<AuthQueue>,
     clickhouse: web::Data<clickhouse::Client>,
 ) -> Result<web::Json<GetResponse>, ApiError> {
-    const MIN_RESOLUTION_MINUTES: u64 = 60;
+    const MIN_RESOLUTION: TimeDelta = TimeDelta::minutes(60);
     const MAX_TIME_SLICES: usize = 1024;
 
     let (scopes, user) = get_user_from_headers(
@@ -315,36 +330,51 @@ async fn get(
     )
     .await?;
 
-    let num_time_slices = match req.time_range.resolution {
-        TimeRangeResolution::Slices(slices) => slices.get(),
-        TimeRangeResolution::Minutes(resolution_minutes) => {
-            if resolution_minutes.get() < MIN_RESOLUTION_MINUTES {
-                return Err(ApiError::InvalidInput(format!(
-                    "resolution must be at least {} minutes",
-                    MIN_RESOLUTION_MINUTES
-                )));
-            }
+    let full_time_range = req.time_range.end - req.time_range.start;
+    if full_time_range < TimeDelta::zero() {
+        return Err(ApiError::InvalidInput(
+            "end date must be after start date".into(),
+        ));
+    }
 
-            let range_minutes = u64::try_from(
-                (req.time_range.end - req.time_range.start).num_minutes(),
-            )
-            .map_err(|_| {
+    let (num_time_slices, resolution) = match req.time_range.resolution {
+        TimeRangeResolution::Slices(slices) => {
+            let slices = i32::try_from(slices.get()).map_err(|_| {
                 ApiError::InvalidInput(
-                    "time range end must be after start".into(),
+                    "number of slices must fit into an `i32`".into(),
                 )
             })?;
+            (slices, full_time_range / slices)
+        }
+        TimeRangeResolution::Minutes(resolution_minutes) => {
+            let resolution_minutes = i64::try_from(resolution_minutes.get())
+                .map_err(|_| {
+                    ApiError::InvalidInput(
+                        "resolution must fit into a `u64`".into(),
+                    )
+                })?;
+            let resolution = TimeDelta::minutes(resolution_minutes);
 
-            range_minutes / resolution_minutes
+            let num_slices =
+                full_time_range.as_seconds_f64() / resolution.as_seconds_f64();
+
+            (num_slices as i32, resolution)
         }
     };
-    let num_time_slices = usize::try_from(num_time_slices)
-        .expect("u64 should fit within a usize");
 
+    let num_time_slices =
+        usize::try_from(num_time_slices).expect("should fit within a usize");
     if num_time_slices > MAX_TIME_SLICES {
         return Err(ApiError::InvalidInput(format!(
-            "resolution is too fine or range is too large - maximum of {MAX_TIME_SLICES} time slices"
+            "resolution is too fine or range is too large - maximum of {MAX_TIME_SLICES} time slices, was {num_time_slices}"
         )));
     }
+    if resolution < MIN_RESOLUTION {
+        return Err(ApiError::InvalidInput(format!(
+            "resolution must be at least {MIN_RESOLUTION}, was {resolution}",
+        )));
+    }
+
     let mut time_slices = vec![TimeSlice::default(); num_time_slices];
 
     // TODO fetch from req
