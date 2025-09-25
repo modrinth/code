@@ -336,8 +336,7 @@ impl DBCharge {
             .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
-    /// Returns all charges which are missing a tax identifier, that is, are 1. succeeded, 2. have a tax amount and
-    /// 3. haven't been assigned a tax identifier yet.
+    /// Returns all charges which are missing a tax identifier, that is, are succeeded and haven't been assigned a tax identifier yet.
     ///
     /// Charges are locked.
     pub async fn get_missing_tax_identifier_lock(
