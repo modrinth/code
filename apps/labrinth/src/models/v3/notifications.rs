@@ -2,6 +2,7 @@ use super::ids::*;
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notification_item::DBNotificationAction;
 use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
+use crate::models::billing::PriceDuration;
 use crate::models::ids::{
     NotificationId, ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId,
     VersionId,
@@ -46,6 +47,7 @@ pub enum NotificationType {
     PasswordRemoved,
     EmailChanged,
     PaymentFailed,
+    TaxNotification,
     PatCreated,
     ModerationMessageReceived,
     ReportStatusUpdated,
@@ -76,7 +78,9 @@ impl NotificationType {
             NotificationType::PasswordRemoved => "password_removed",
             NotificationType::EmailChanged => "email_changed",
             NotificationType::PaymentFailed => "payment_failed",
+            NotificationType::TaxNotification => "tax_notification",
             NotificationType::PatCreated => "pat_created",
+            NotificationType::PayoutAvailable => "payout_available",
             NotificationType::ModerationMessageReceived => {
                 "moderation_message_received"
             }
@@ -87,7 +91,6 @@ impl NotificationType {
             }
             NotificationType::ProjectStatusNeutral => "project_status_neutral",
             NotificationType::ProjectTransferred => "project_transferred",
-            NotificationType::PayoutAvailable => "payout_available",
             NotificationType::Unknown => "unknown",
         }
     }
@@ -110,18 +113,7 @@ impl NotificationType {
             "password_removed" => NotificationType::PasswordRemoved,
             "email_changed" => NotificationType::EmailChanged,
             "payment_failed" => NotificationType::PaymentFailed,
-            "pat_created" => NotificationType::PatCreated,
-            "moderation_message_received" => {
-                NotificationType::ModerationMessageReceived
-            }
-            "report_status_updated" => NotificationType::ReportStatusUpdated,
-            "report_submitted" => NotificationType::ReportSubmitted,
-            "project_status_approved" => {
-                NotificationType::ProjectStatusApproved
-            }
-            "project_status_neutral" => NotificationType::ProjectStatusNeutral,
-            "project_transferred" => NotificationType::ProjectTransferred,
-            "payout_available" => NotificationType::PayoutAvailable,
+            "tax_notification" => NotificationType::TaxNotification,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -218,6 +210,17 @@ pub enum NotificationBody {
         amount: String,
         service: String,
     },
+    TaxNotification {
+        subscription_id: UserSubscriptionId,
+        new_amount: i64,
+        new_tax_amount: i64,
+        old_amount: i64,
+        old_tax_amount: i64,
+        billing_interval: PriceDuration,
+        currency: String,
+        due: DateTime<Utc>,
+        service: String,
+    },
     PayoutAvailable {
         date_available: DateTime<Utc>,
         amount: f64,
@@ -292,6 +295,9 @@ impl NotificationBody {
             }
             NotificationBody::PaymentFailed { .. } => {
                 NotificationType::PaymentFailed
+            }
+            NotificationBody::TaxNotification { .. } => {
+                NotificationType::TaxNotification
             }
             NotificationBody::PayoutAvailable { .. } => {
                 NotificationType::PayoutAvailable
@@ -522,6 +528,12 @@ impl From<DBNotification> for Notification {
                     "#".to_string(),
                     vec![],
                 ),
+                NotificationBody::TaxNotification { .. } => (
+                    "Tax notification".to_string(),
+                    "You've received a tax notification.".to_string(),
+					"#".to_string(),
+                    vec![],
+				),
                 NotificationBody::PayoutAvailable { .. } => (
                     "Payout available".to_string(),
                     "A payout is available!".to_string(),
