@@ -1,191 +1,71 @@
 <template>
 	<NewModal
 		ref="withdrawModal"
-		:header="currentStageLabel"
 		:noblur="true"
-		:closable="currentStage !== 'confirmation'"
-		:merge-header="!currentStageLabel"
-		@on-hide="currentStage = undefined"
+		:closable="withdrawContext.currentStage.value !== 'completion'"
+		@on-hide="onModalHide"
 	>
-		<div class="flex w-full flex-col gap-4 sm:w-[540px]">
-			<template v-if="currentStage === 'withdraw-limit'">
-				<div class="flex w-full flex-row justify-between">
-					<span class="font-semibold text-contrast">{{
-						formatMessage(messages.withdrawRemaining)
-					}}</span>
-					<div>
-						<span class="text-orange">{{ formatMoney(remainingLimit) }}</span> /
-						{{ formatMoney(600) }}
-					</div>
-				</div>
-				<div class="flex h-2 w-full overflow-hidden rounded-full bg-button-bg">
-					<div class="bg-orange" :style="{ width: `${(usedLimit / 600) * 100}%` }"></div>
-				</div>
-				<template v-if="remainingLimit > 0">
-					<span>
-						<IntlFormatted
-							:message-id="messages.nearingThreshold"
-							:values="{
-								amount600: formatMoney(600),
-								amountRemaining: formatMoney(remainingLimit),
-							}"
-						>
-							<template #b="{ children }">
-								<b><component :is="() => normalizeChildren(children)" /></b>
-							</template>
-						</IntlFormatted>
-					</span>
-					<Admonition
-						type="warning"
-						show-actions-underneath
-						:header="formatMessage(messages.taxFormRequiredHeader)"
+		<template #title>
+			<div v-if="shouldShowTitle" class="flex items-center gap-1 font-bold text-secondary">
+				<template v-if="withdrawContext.currentStage.value === 'tax-form'">
+					<span class="text-contrast">{{ formatMessage(stageLabels['tax-form']) }}</span>
+				</template>
+				<template v-else-if="withdrawContext.currentStage.value === 'method-selection'">
+					<span class="text-contrast">{{ formatMessage(stageLabels['method-selection']) }}</span>
+				</template>
+				<template v-else-if="isDetailsStage">
+					<button
+						class="bg-transparent p-0 font-bold text-secondary active:scale-95"
+						@click="goToBreadcrumbStage('method-selection')"
 					>
-						<span>
-							<IntlFormatted
-								:message-id="messages.taxFormRequiredBody"
-								:values="{ available: formatMoney(balance?.available) }"
-							>
-								<template #b="{ children }">
-									<b><component :is="() => normalizeChildren(children)" /></b>
-								</template>
-							</IntlFormatted>
-						</span>
-						<template #icon="{ iconClass }">
-							<FileTextIcon :class="iconClass" />
-						</template>
-						<template #actions>
-							<ButtonStyled color="orange">
-								<button @click="showTaxFormModal">
-									{{ formatMessage(messages.completeTaxForm) }}
-								</button>
-							</ButtonStyled>
-						</template>
-					</Admonition>
+						{{ formatMessage(stageLabels['method-selection']) }}
+					</button>
+					<ChevronRightIcon class="h-5 w-5 text-secondary" stroke-width="3" />
+					<span class="text-contrast">{{ formatMessage(messages.detailsLabel) }}</span>
 				</template>
-				<template v-else>
-					<span>
-						<IntlFormatted
-							:message-id="messages.withdrawLimitUsed"
-							:values="{ amount600: formatMoney(600) }"
-						>
-							<template #b="{ children }">
-								<b><component :is="() => normalizeChildren(children)" /></b>
-							</template>
-						</IntlFormatted>
-					</span>
-				</template>
-				<div class="ml-auto flex gap-3">
-					<ButtonStyled color="standard">
-						<button @click="withdrawModal?.hide()">
-							<XIcon />{{ formatMessage(messages.cancel) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-if="remainingLimit > 0" color="standard">
-						<button @click="currentStage = 'withdraw-details'">
-							{{ formatMessage(messages.continueWithLimit) }} <ChevronRightIcon />
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else color="orange">
-						<button @click="showTaxFormModal">
-							{{ formatMessage(messages.completeTaxForm) }} <ChevronRightIcon />
-						</button>
-					</ButtonStyled>
-				</div>
-			</template>
-
-			<template v-if="currentStage === 'withdraw-details'">
-				<span class="font-semibold text-contrast">{{ formatMessage(messages.withdrawFrom) }}</span>
-				<div class="flex flex-col rounded-xl bg-bg p-4">
-					<span class="text-sm text-primary">{{ formatMessage(messages.availableBalance) }}</span>
-					<span class="font-semibold text-contrast">{{ formatMoney(balance?.available) }}</span>
-				</div>
-
-				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
-					<span>{{ formatMessage(messages.region) }}</span
-					><span class="text-brand-red">*</span>
-					<UnknownIcon
-						v-tooltip="formatMessage(messages.selectYourCountryOrRegion)"
-						class="my-auto size-4 text-secondary"
-					/>
-				</div>
-				<Combobox
-					v-model="countryId"
-					:listbox="true"
-					:searchable="true"
-					:options="countryOptions"
-					:placeholder="formatMessage(messages.selectCountryPlaceholder)"
-					:display-value="countryProxy?.name ?? formatMessage(messages.selectCountryPlaceholder)"
-				/>
-
-				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
-					<span>{{ formatMessage(messages.withdrawTo) }}</span
-					><span class="text-brand-red">*</span>
-				</div>
-				<div class="relative">
-					<Combobox
-						v-model="paymentMethodId"
-						:listbox="true"
-						class="payment-method-select w-full"
-						:options="paymentMethodOptions"
-						:placeholder="formatMessage(messages.selectMethodPlaceholder)"
-						:display-value="
-							paymentMethod
-								? formatPaymentMethodName(paymentMethod)
-								: formatMessage(messages.selectMethodPlaceholder)
-						"
-					/>
-				</div>
-
-				<div class="flex gap-1 align-middle text-lg font-semibold text-contrast">
-					<span>{{ formatMessage(messages.amount) }}</span
-					><span class="text-brand-red">*</span>
-				</div>
-				<span class="text-secondary">
-					{{
-						formatMessage(messages.minimumTransferAmount, { min: formatMoney(minWithdrawAmount) })
-					}}
-				</span>
-				<div class="flex items-center gap-0">
-					<input
-						v-model="withdrawAmount"
-						type="text"
-						pattern="^\d*(\.\d{0,2})?$"
-						:placeholder="formatMessage(messages.enterAmountPlaceholder)"
-						class="flex-1 rounded-l-xl border-y border-l border-divider bg-button-bg px-4 py-2.5 placeholder-secondary focus:outline-none"
-					/>
-					<ButtonStyled color="standard" class="rounded-l-none">
-						<button @click="withdrawAmount = maxWithdrawAmount.toFixed(2)">
-							{{ formatMessage(messages.max) }}
-						</button>
-					</ButtonStyled>
-				</div>
-
-				<div v-if="withdrawErrors.length > 0" class="space-y-2">
-					<span v-for="error in withdrawErrors" :key="error" class="block text-red">
-						{{ error }}
-					</span>
-				</div>
-
-				<div class="ml-auto mt-2 flex gap-3">
-					<ButtonStyled v-if="isDev" color="standard">
-						<button @click="showTaxFormModal($event)">
-							{{ formatMessage(messages.openTaxDebug) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="standard">
-						<button @click="withdrawModal?.hide()">
-							<XIcon />{{ formatMessage(messages.cancel) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="green" :disabled="!canProceedToWithdraw">
-						<button @click="initiateWithdraw">
-							<TransferIcon />{{ formatMessage(messages.actionWithdraw) }}
-						</button>
-					</ButtonStyled>
-				</div>
-			</template>
-
-			<template v-if="currentStage === 'confirmation'"> </template>
+			</div>
+		</template>
+		<div class="w-[40rem] max-w-full">
+			<TaxFormStage
+				v-if="withdrawContext.currentStage.value === 'tax-form'"
+				:balance="balance"
+				:on-show-tax-form="showTaxFormModal"
+			/>
+			<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'" />
+			<TremendousDetailsStage
+				v-else-if="withdrawContext.currentStage.value === 'tremendous-details'"
+			/>
+			<MuralpayKycStage v-else-if="withdrawContext.currentStage.value === 'muralpay-kyc'" />
+			<MuralpayDetailsStage v-else-if="withdrawContext.currentStage.value === 'muralpay-details'" />
+			<CompletionStage v-else-if="withdrawContext.currentStage.value === 'completion'" />
+			<div v-else>Something went wrong</div>
+		</div>
+		<div class="mt-4 flex justify-between gap-2">
+			<ButtonStyled>
+				<button
+					v-if="withdrawContext.previousStep.value"
+					@click="withdrawContext.setStage(withdrawContext.previousStep.value, true)"
+				>
+					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
+				</button>
+				<button v-else @click="withdrawModal?.hide()">
+					<XIcon />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</button>
+			</ButtonStyled>
+			<ButtonStyled color="brand">
+				<button
+					:disabled="!withdrawContext.canProceed.value"
+					@click="withdrawContext.setStage(withdrawContext.nextStep.value)"
+				>
+					<template v-if="withdrawContext.currentStage.value === 'completion'">
+						<CheckCircleIcon /> Complete
+					</template>
+					<template v-else>
+						{{ formatMessage(commonMessages.nextButton) }} <RightArrowIcon />
+					</template>
+				</button>
+			</ButtonStyled>
 		</div>
 	</NewModal>
 	<CreatorTaxFormModal
@@ -195,20 +75,32 @@
 	/>
 </template>
 
-<script lang="ts" setup>
-import { ChevronRightIcon, FileTextIcon, TransferIcon, UnknownIcon, XIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled, Combobox, NewModal } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
-import { all } from 'iso-3166-1'
-import { nextTick } from 'vue'
+<script setup lang="ts">
+import {
+	CheckCircleIcon,
+	ChevronRightIcon,
+	LeftArrowIcon,
+	RightArrowIcon,
+	XIcon,
+} from '@modrinth/assets'
+import { ButtonStyled, commonMessages, NewModal } from '@modrinth/ui'
+import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
-import { normalizeChildren } from '@/utils/vue-children.ts'
+import {
+	createWithdrawContext,
+	provideWithdrawContext,
+	type WithdrawStage,
+} from '@/providers/creator-withdraw.ts'
 
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
 
-type Stage = 'withdraw-limit' | 'withdraw-details' | 'confirmation'
+import CompletionStage from './withdraw-stages/CompletionStage.vue'
+import MethodSelectionStage from './withdraw-stages/MethodSelectionStage.vue'
+import MuralpayDetailsStage from './withdraw-stages/MuralpayDetailsStage.vue'
+import MuralpayKycStage from './withdraw-stages/MuralpayKycStage.vue'
+import TaxFormStage from './withdraw-stages/TaxFormStage.vue'
+import TremendousDetailsStage from './withdraw-stages/TremendousDetailsStage.vue'
 
 type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'
 
@@ -222,48 +114,10 @@ interface UserBalanceResponse {
 	form_completion_status: FormCompletionStatus | null
 }
 
-type PayoutMethodType = 'venmo' | 'paypal' | 'tremendous' | 'unknown'
-
-type PayoutInterval = { fixed: { values: number[] } } | { standard: { min: number; max: number } }
-
-interface PayoutMethodFee {
-	percentage: number
-	min: number
-	max?: number | null
-}
-
-interface PayoutMethod {
-	id: string
-	name: string
-	type: PayoutMethodType
-	supported_countries: string[]
-	image_url?: string | null
-	interval: PayoutInterval
-	fee: PayoutMethodFee
-}
-
-const countries = computed(() =>
-	all().map((x) => ({
-		id: x.alpha2,
-		name: x.alpha2 === 'TW' ? 'Taiwan' : x.country,
-	})),
-)
-
-const countryOptions = computed(() => countries.value.map((c) => ({ value: c.id, label: c.name })))
-
-const countryId = computed<string | null>({
-	get: () => countryProxy.value?.id ?? null,
-	set: (v) => {
-		const selected = countries.value.find((c) => c.id === v) ?? null
-		emit('update:country', selected)
-	},
-})
-
 const props = defineProps<{
 	auth: any
 	balance: UserBalanceResponse | null
-	payoutMethods?: PayoutMethod[]
-	payoutMethodsPending?: boolean
+	// TODO: Add payout methods and related props when backend is defined
 	country: { id: string; name: string } | null
 	userPayoutData?: {
 		paypal_address?: string
@@ -273,125 +127,39 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	(e: 'update:country', value: { id: string; name: string } | null): void
-	(e: 'withdraw', amount: number, method: PayoutMethod): void
+	(e: 'withdraw', amount: number, method: any): void // TODO: Define proper method type
 	(e: 'refresh-data'): void
+	(e: 'hide'): void
 }>()
 
-const countryProxy = computed({
-	get: () => props.country,
-	set: (v) => emit('update:country', v),
+const { formatMessage } = useVIntl()
+
+const withdrawContext = createWithdrawContext(props.balance, props.userPayoutData)
+provideWithdrawContext(withdrawContext)
+
+const stageLabels = computed<Record<WithdrawStage, MessageDescriptor>>(() => ({
+	'tax-form': messages.taxFormStage,
+	'method-selection': messages.methodSelectionStage,
+	'tremendous-details': messages.tremendousDetailsStage,
+	'muralpay-kyc': messages.muralpayKycStage,
+	'muralpay-details': messages.muralpayDetailsStage,
+	completion: messages.completionStage,
+}))
+
+const shouldShowTitle = computed(() => {
+	return withdrawContext.currentStage.value !== 'completion'
 })
 
-const paymentMethod = ref<PayoutMethod | null>(null)
-const withdrawAmount = ref('')
-
-const availablePaymentMethods = computed<PayoutMethod[]>(() => {
-	if (!props.payoutMethods) return []
-	return props.payoutMethods.filter((m) => {
-		if (countryProxy.value && !m.supported_countries.includes(countryProxy.value.id)) {
-			return false
-		}
-		return true
-	})
+const isDetailsStage = computed(() => {
+	const detailsStages: WithdrawStage[] = ['tremendous-details', 'muralpay-kyc', 'muralpay-details']
+	const currentStage = withdrawContext.currentStage.value
+	return currentStage ? detailsStages.includes(currentStage) : false
 })
 
-const paymentMethodOptions = computed(() =>
-	availablePaymentMethods.value.map((m) => ({ value: m.id, label: formatPaymentMethodName(m) })),
-)
-
-const paymentMethodId = computed<string | null>({
-	get: () => paymentMethod.value?.id ?? null,
-	set: (id) => {
-		paymentMethod.value = availablePaymentMethods.value.find((m) => m.id === id) ?? null
-	},
-})
-
-const maxWithdrawAmount = computed(() => {
-	if (!paymentMethod.value) return props.balance?.available ?? 0
-	const interval = paymentMethod.value.interval
-	const methodMax =
-		'standard' in interval ? interval.standard.max : (interval?.fixed?.values.slice(-1)[0] ?? 0)
-	const max = Math.min(methodMax, props.balance?.available ?? 0, remainingLimit.value)
-	return Math.floor(max * 100) / 100
-})
-
-const minWithdrawAmount = computed(() => {
-	if (!paymentMethod.value) return 0.25
-	const interval = paymentMethod.value.interval
-	return 'standard' in interval ? interval.standard.min : (interval?.fixed?.values?.[0] ?? 0.25)
-})
-
-const parsedWithdrawAmount = computed(() => {
-	const s = (withdrawAmount.value ?? '').trim()
-	const match = s.match(/^\$?(\d*(?:\.\d{1,2})?)$/)
-	return match && match[1] ? parseFloat(match[1]) : 0.0
-})
-
-const usedLimit = computed(() => props.balance?.withdrawn_ytd ?? 0)
-const remainingLimit = computed(() => {
-	const raw = 600 - usedLimit.value
-	if (raw <= 0) return 0
-	const cents = Math.floor(raw * 100)
-	return cents / 100
-})
-
-const withdrawErrors = computed(() => {
-	const errors: string[] = []
-
-	if (!parsedWithdrawAmount.value && withdrawAmount.value.length > 0) {
-		errors.push(formatMessage(messages.errorInvalidAmount, { input: withdrawAmount.value }))
-	} else if (parsedWithdrawAmount.value > maxWithdrawAmount.value) {
-		errors.push(
-			formatMessage(messages.errorMaxAmount, {
-				max: formatMoney(maxWithdrawAmount.value),
-			}),
-		)
-	} else if (
-		parsedWithdrawAmount.value < minWithdrawAmount.value &&
-		parsedWithdrawAmount.value > 0
-	) {
-		errors.push(
-			formatMessage(messages.errorMinAmount, {
-				min: formatMoney(minWithdrawAmount.value),
-			}),
-		)
-	}
-
-	if (paymentMethod.value?.type === 'paypal' && !props.userPayoutData?.paypal_address) {
-		errors.push(formatMessage(messages.errorLinkPaypal))
-	}
-
-	if (paymentMethod.value?.type === 'venmo' && !props.userPayoutData?.venmo_handle) {
-		errors.push(formatMessage(messages.errorLinkVenmo))
-	}
-
-	return errors
-})
-
-const canProceedToWithdraw = computed(() => {
-	return (
-		withdrawErrors.value.length === 0 &&
-		parsedWithdrawAmount.value > 0 &&
-		paymentMethod.value !== null &&
-		countryProxy.value !== null
-	)
-})
-
-function formatPaymentMethodName(method: PayoutMethod | null): string {
-	if (!method) return ''
-	return method.name
-}
-
-async function initiateWithdraw() {
-	if (!canProceedToWithdraw.value || !paymentMethod.value) return
-
-	emit('withdraw', parsedWithdrawAmount.value, paymentMethod.value)
-
-	currentStage.value = 'confirmation'
-}
-
+const withdrawModal = useTemplateRef<InstanceType<typeof NewModal>>('withdrawModal')
 const taxFormModal = ref<InstanceType<typeof CreatorTaxFormModal> | null>(null)
-function showTaxFormModal(e: MouseEvent) {
+
+function showTaxFormModal(e?: MouseEvent) {
 	withdrawModal.value?.hide()
 	taxFormModal.value?.startTaxForm(e)
 }
@@ -399,173 +167,85 @@ function showTaxFormModal(e: MouseEvent) {
 function onTaxFormSuccess() {
 	emit('refresh-data')
 	nextTick(() => {
-		show('withdraw-details')
+		withdrawContext.setStage('method-selection')
+		show()
 	})
 }
 
 function onTaxFormCancelled() {
-	show('withdraw-limit')
+	show('tax-form')
 }
 
-const stageLabels = computed<Record<Stage, string | undefined>>(() => ({
-	'withdraw-limit': formatMessage(messages.withdrawHeader),
-	'withdraw-details': formatMessage(messages.withdrawHeader),
-	confirmation: undefined,
-}))
-
-const currentStageLabel = computed<string | undefined>(() => {
-	if (!currentStage.value) return undefined
-	return stageLabels.value[currentStage.value]
-})
-
-const withdrawModal = ref<InstanceType<typeof NewModal> | null>(null)
-const currentStage = ref<Stage | undefined>()
-
-function open(stage: Stage) {
-	currentStage.value = stage
-	withdrawModal.value?.show()
+function onModalHide() {
+	withdrawContext.resetData()
+	emit('hide')
 }
 
-function show(preferred?: Stage) {
+function goToBreadcrumbStage(stage: WithdrawStage) {
+	withdrawContext.setStage(stage, true)
+}
+
+function show(preferred?: WithdrawStage) {
 	if (preferred) {
-		open(preferred)
+		withdrawContext.setStage(preferred, true)
+		withdrawModal.value?.show()
 		return
 	}
 
+	// Determine initial stage based on balance and tax form status
 	const b = props.balance
 	if (!b || b.available <= 0) {
-		open('withdraw-limit')
+		withdrawContext.setStage('tax-form', true)
+		withdrawModal.value?.show()
 		return
 	}
 
-	const needsCompliance =
-		b.form_completion_status !== null && b.form_completion_status !== 'complete'
-	if (needsCompliance) {
-		open('withdraw-limit')
-		return
+	const usedLimit = b.withdrawn_ytd ?? 0
+	const remainingLimit = Math.max(0, 600 - usedLimit)
+	const needsTaxForm = b.form_completion_status !== 'complete' && remainingLimit <= 0
+
+	if (needsTaxForm) {
+		withdrawContext.setStage('tax-form', true)
+	} else {
+		withdrawContext.setStage('method-selection', true)
 	}
 
-	open('withdraw-details')
+	withdrawModal.value?.show()
 }
-
-watch(
-	() => availablePaymentMethods.value,
-	(list) => {
-		if (!list?.length) {
-			paymentMethod.value = null
-			return
-		}
-		if (!paymentMethod.value || !list.some((m) => m.id === paymentMethod.value?.id)) {
-			paymentMethod.value = list[0]
-		}
-	},
-	{ immediate: true },
-)
 
 defineExpose({
 	show,
 })
 
-const isDev = import.meta.dev
-
-const { formatMessage } = useVIntl()
-
 const messages = defineMessages({
-	withdrawHeader: {
-		id: 'dashboard.creator-withdraw-modal.withdraw.header',
-		defaultMessage: 'Withdraw',
+	// Stage labels for breadcrumb navigation
+	taxFormStage: {
+		id: 'dashboard.creator-withdraw-modal.stage.tax-form',
+		defaultMessage: 'Tax Form',
 	},
-	withdrawRemaining: {
-		id: 'dashboard.creator-withdraw-modal.withdraw-remaining',
-		defaultMessage: 'Withdraw remaining',
+	methodSelectionStage: {
+		id: 'dashboard.creator-withdraw-modal.stage.method-selection',
+		defaultMessage: 'Method',
 	},
-	withdrawFrom: {
-		id: 'dashboard.creator-withdraw-modal.withdraw-from',
-		defaultMessage: 'Withdraw from',
+	tremendousDetailsStage: {
+		id: 'dashboard.creator-withdraw-modal.stage.tremendous-details',
+		defaultMessage: 'Details',
 	},
-	availableBalance: {
-		id: 'dashboard.creator-withdraw-modal.available-balance',
-		defaultMessage: 'Available balance',
+	muralpayKycStage: {
+		id: 'dashboard.creator-withdraw-modal.stage.muralpay-kyc',
+		defaultMessage: 'Verification',
 	},
-	region: { id: 'dashboard.creator-withdraw-modal.region', defaultMessage: 'Region' },
-	withdrawTo: { id: 'dashboard.creator-withdraw-modal.withdraw-to', defaultMessage: 'Withdraw to' },
-	amount: { id: 'dashboard.creator-withdraw-modal.amount', defaultMessage: 'Amount' },
-	selectYourCountryOrRegion: {
-		id: 'dashboard.creator-withdraw-modal.tooltip.select-country-region',
-		defaultMessage: 'Select your country or region',
+	muralpayDetailsStage: {
+		id: 'dashboard.creator-withdraw-modal.stage.muralpay-details',
+		defaultMessage: 'Account Details',
 	},
-	selectCountryPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.placeholder.select-country',
-		defaultMessage: 'Select country...',
+	completionStage: {
+		id: 'dashboard.creator-withdraw-modal.stage.completion',
+		defaultMessage: 'Complete',
 	},
-	selectMethodPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.placeholder.select-method',
-		defaultMessage: 'Select method...',
-	},
-	enterAmountPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.placeholder.enter-amount',
-		defaultMessage: 'Enter amount...',
-	},
-	max: { id: 'action.max', defaultMessage: 'Max' },
-	nearingThreshold: {
-		id: 'dashboard.creator-withdraw-modal.nearing-threshold',
-		defaultMessage:
-			"You're nearing the {amount600} withdrawal threshold. You can withdraw up to <b>{amountRemaining}</b> now, but you'll need to complete a tax form to withdraw more.",
-	},
-	taxFormRequiredHeader: {
-		id: 'dashboard.creator-withdraw-modal.tax-form-required.header',
-		defaultMessage: 'Tax form required',
-	},
-	taxFormRequiredBody: {
-		id: 'dashboard.creator-withdraw-modal.tax-form-required.body',
-		defaultMessage:
-			'To withdraw your full <b>{available}</b> available balance please complete the form below. It is required for tax reporting and only needs to be done once.',
-	},
-	completeTaxForm: {
-		id: 'dashboard.creator-withdraw-modal.complete-tax-form',
-		defaultMessage: 'Complete tax form',
-	},
-	withdrawLimitUsed: {
-		id: 'dashboard.creator-withdraw-modal.withdraw-limit-used',
-		defaultMessage:
-			"You've used up your <b>{amount600}</b> withdrawal limit. You must complete a tax form to withdraw more.",
-	},
-	continueWithLimit: {
-		id: 'dashboard.creator-withdraw-modal.continue-with-limit',
-		defaultMessage: 'Continue with limit',
-	},
-
-	minimumTransferAmount: {
-		id: 'dashboard.creator-withdraw-modal.minimum-transfer-amount',
-		defaultMessage: 'The minimum transfer amount is {min}.',
-	},
-
-	cancel: { id: 'action.cancel', defaultMessage: 'Cancel' },
-	actionWithdraw: { id: 'action.withdraw', defaultMessage: 'Withdraw' },
-
-	errorInvalidAmount: {
-		id: 'dashboard.creator-withdraw-modal.error.invalid-amount',
-		defaultMessage: '{input} is not a valid amount',
-	},
-	errorMaxAmount: {
-		id: 'dashboard.creator-withdraw-modal.error.max-amount',
-		defaultMessage: 'The amount must be no more than {max}',
-	},
-	errorMinAmount: {
-		id: 'dashboard.creator-withdraw-modal.error.min-amount',
-		defaultMessage: 'The amount must be at least {min}',
-	},
-	errorLinkPaypal: {
-		id: 'dashboard.creator-withdraw-modal.error.link-paypal',
-		defaultMessage: 'Please link your PayPal account to proceed.',
-	},
-	errorLinkVenmo: {
-		id: 'dashboard.creator-withdraw-modal.error.link-venmo',
-		defaultMessage: 'Please set your Venmo handle to proceed.',
-	},
-	openTaxDebug: {
-		id: 'creator.withdraw.debug.openTaxForm',
-		defaultMessage: 'Open tax form (debug)',
+	detailsLabel: {
+		id: 'dashboard.creator-withdraw-modal.details-label',
+		defaultMessage: 'Details',
 	},
 })
 </script>

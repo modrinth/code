@@ -95,7 +95,7 @@ const { addNotification } = injectNotificationManager()
 
 const taxFormModal = ref<InstanceType<typeof NewModal> | null>(null)
 
-async function startTaxForm(e: MouseEvent) {
+async function startTaxForm(e?: MouseEvent) {
 	taxFormModal.value?.show(e)
 }
 
