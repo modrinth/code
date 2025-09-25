@@ -52,6 +52,11 @@
         "ordinal": 9,
         "name": "form_type",
         "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "requires_manual_review",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -69,6 +74,7 @@
       false,
       false,
       false,
+      true,
       false
     ]
   },
