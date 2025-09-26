@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "WebFetch(domain:www.thewideformatcompany.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
