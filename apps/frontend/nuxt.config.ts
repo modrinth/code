@@ -469,6 +469,12 @@ export default defineNuxtConfig({
 				'Critical-CH': 'Sec-CH-Prefers-Color-Scheme',
 			},
 		},
+		'/dashboard/revenue/withdraw': {
+			redirect: {
+				to: '/dashboard/revenue',
+				statusCode: 410,
+			},
+		},
 		'/email/**': {
 			prerender: true,
 			headers: {

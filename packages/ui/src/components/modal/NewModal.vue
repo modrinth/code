@@ -21,6 +21,7 @@
 		<div class="modal-container experimental-styles-within" :class="{ shown: visible }">
 			<div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
 				<div
+					v-if="!props.mergeHeader"
 					data-tauri-drag-region
 					class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full"
 				>
@@ -37,7 +38,17 @@
 						</button>
 					</ButtonStyled>
 				</div>
-				<div class="overflow-y-auto p-6">
+
+				<ButtonStyled
+					v-if="props.mergeHeader && closable"
+					class="absolute top-4 right-4 z-10"
+					circular
+				>
+					<button v-tooltip="'Close'" aria-label="Close" @click="hide">
+						<XIcon aria-hidden="true" />
+					</button>
+				</ButtonStyled>
+				<div :class="['overflow-y-auto p-6', { 'pt-12': props.mergeHeader && closable }]">
 					<slot> You just lost the game.</slot>
 				</div>
 			</div>
@@ -63,6 +74,7 @@ const props = withDefaults(
 		header?: string
 		onHide?: () => void
 		onShow?: () => void
+		mergeHeader?: boolean
 	}>(),
 	{
 		type: true,
@@ -74,6 +86,7 @@ const props = withDefaults(
 		header: undefined,
 		onHide: () => {},
 		onShow: () => {},
+		mergeHeader: false,
 	},
 )
 
