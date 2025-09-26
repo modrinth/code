@@ -20,7 +20,7 @@ use crate::{
     auth::{AuthenticationError, get_user_from_headers},
     database::{
         self, DBProject,
-        models::{DBProjectId, DBUser, DBVersionId},
+        models::{DBProjectId, DBUser, DBUserId, DBVersionId},
         redis::RedisPool,
     },
     models::{
@@ -79,21 +79,21 @@ pub enum TimeRangeResolution {
 
 /// What metrics the caller would like to receive from this analytics get
 /// request.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct ReturnMetrics {
     /// How many times a project page has been viewed.
-    project_views: Option<Metrics<ProjectViewsField>>,
+    pub project_views: Option<Metrics<ProjectViewsField>>,
     /// How many times a project has been downloaded.
-    project_downloads: Option<Metrics<ProjectDownloadsField>>,
+    pub project_downloads: Option<Metrics<ProjectDownloadsField>>,
     /// How long users have been playing a project.
-    project_playtime: Option<Metrics<ProjectPlaytimeField>>,
+    pub project_playtime: Option<Metrics<ProjectPlaytimeField>>,
     /// How much payout revenue a project has generated.
-    project_revenue: Option<Metrics<()>>,
+    pub project_revenue: Option<Metrics<()>>,
 }
 
 /// See [`ReturnMetrics`].
 #[derive(Debug, Serialize, Deserialize)]
-struct Metrics<F> {
+pub struct Metrics<F> {
     /// When collecting metrics, what fields do we want to group the results by?
     ///
     /// For example, if we have two views entries:
@@ -108,35 +108,56 @@ struct Metrics<F> {
     /// aggregate of the two rows:
     /// - `{ "project_id": "abcdefgh", "count": 8 }`
     #[serde(default = "Vec::default")]
-    bucket_by: Vec<F>,
+    pub bucket_by: Vec<F>,
 }
 
+/// Fields for [`ReturnMetrics::project_views`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-enum ProjectViewsField {
+pub enum ProjectViewsField {
+    /// Project ID.
     ProjectId,
+    /// Referrer domain which linked to this project.
     Domain,
+    /// Modrinth site path which was visited, e.g. `/mod/foo`.
     SitePath,
+    /// Whether these views were monetized or not.
     Monetized,
+    /// What country these views came from.
+    ///
+    /// To anonymize the data, the country may be reported as `XX`.
     Country,
 }
 
+/// Fields for [`ReturnMetrics::project_downloads`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-enum ProjectDownloadsField {
+pub enum ProjectDownloadsField {
+    /// Project ID.
     ProjectId,
+    /// Version ID of this project.
     VersionId,
+    /// Referrer domain which linked to this project.
     Domain,
+    /// Modrinth site path which was visited, e.g. `/mod/foo`.
     SitePath,
+    /// What country these views came from.
+    ///
+    /// To anonymize the data, the country may be reported as `XX`.
     Country,
 }
 
+/// Fields for [`ReturnMetrics::project_playtime`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-enum ProjectPlaytimeField {
+pub enum ProjectPlaytimeField {
+    /// Project ID.
     ProjectId,
+    /// Version ID of this project.
     VersionId,
+    /// Game mod loader which was used to count this playtime, e.g. Fabric.
     Loader,
+    /// Game version which this project was played on.
     GameVersion,
 }
 
@@ -149,73 +170,117 @@ pub const MAX_TIME_SLICES: usize = 1024;
 
 // response
 
+/// Response for a [`GetRequest`].
+///
+/// This is a list of N [`TimeSlice`]s, where each slice represents an equal
+/// time interval of metrics collection. The number of slices is determined
+/// by [`GetRequest::time_range`].
 #[derive(Debug, Default, Serialize, Deserialize)]
-struct GetResponse(Vec<TimeSlice>);
+pub struct GetResponse(pub Vec<TimeSlice>);
 
+/// Single time interval of metrics collection.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-struct TimeSlice(Vec<AnalyticsData>);
+pub struct TimeSlice(pub Vec<AnalyticsData>);
 
+/// Metrics collected in a single [`TimeSlice`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)] // the presence of `source_project`, `source_affiliate_code` determines the kind
-enum AnalyticsData {
+pub enum AnalyticsData {
+    /// Project metrics.
     Project(ProjectAnalytics),
     // AffiliateCode(AffiliateCodeAnalytics),
 }
 
+/// Project metrics.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct ProjectAnalytics {
+pub struct ProjectAnalytics {
+    /// What project these metrics are for.
     source_project: ProjectId,
+    /// Metrics collected.
     #[serde(flatten)]
     metrics: ProjectMetrics,
 }
 
+/// Project metrics of a specific kind.
+///
+/// If a field is not included in [`Metrics::bucket_by`], it will be [`None`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", tag = "metric_kind")]
-enum ProjectMetrics {
-    Views {
-        #[serde(skip_serializing_if = "Option::is_none")]
-        domain: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        site_path: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        monetized: Option<bool>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        country: Option<String>,
-        views: u64,
-    },
-    Downloads {
-        #[serde(skip_serializing_if = "Option::is_none")]
-        domain: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        site_path: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        version_id: Option<VersionId>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        country: Option<String>,
-        downloads: u64,
-    },
-    Playtime {
-        #[serde(skip_serializing_if = "Option::is_none")]
-        version_id: Option<VersionId>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        loader: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        game_version: Option<String>,
-        seconds: u64,
-    },
-    Revenue {
-        revenue: Decimal,
-    },
+pub enum ProjectMetrics {
+    /// [`ReturnMetrics::project_views`].
+    Views(ProjectViews),
+    /// [`ReturnMetrics::project_downloads`].
+    Downloads(ProjectDownloads),
+    /// [`ReturnMetrics::project_playtime`].
+    Playtime(ProjectPlaytime),
+    /// [`ReturnMetrics::project_revenue`].
+    Revenue(ProjectRevenue),
 }
 
-impl From<ProjectAnalytics> for AnalyticsData {
-    fn from(value: ProjectAnalytics) -> Self {
-        Self::Project(value)
-    }
+/// [`ReturnMetrics::project_views`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ProjectViews {
+    /// [`ProjectViewsField::Domain`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domain: Option<String>,
+    /// [`ProjectViewsField::SitePath`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub site_path: Option<String>,
+    /// [`ProjectViewsField::Monetized`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub monetized: Option<bool>,
+    /// [`ProjectViewsField::Country`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country: Option<String>,
+    /// Total number of views for this bucket.
+    pub views: u64,
+}
+
+/// [`ReturnMetrics::project_downloads`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ProjectDownloads {
+    /// [`ProjectDownloadsField::Domain`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    domain: Option<String>,
+    /// [`ProjectDownloadsField::SitePath`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    site_path: Option<String>,
+    /// [`ProjectDownloadsField::VersionId`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    version_id: Option<VersionId>,
+    /// [`ProjectDownloadsField::Country`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    country: Option<String>,
+    /// Total number of downloads for this bucket.
+    downloads: u64,
+}
+
+/// [`ReturnMetrics::project_playtime`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ProjectPlaytime {
+    /// [`ProjectPlaytimeField::VersionId`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    version_id: Option<VersionId>,
+    /// [`ProjectPlaytimeField::Loader`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    loader: Option<String>,
+    /// [`ProjectPlaytimeField::GameVersion`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    game_version: Option<String>,
+    /// Total number of seconds of playtime for this bucket.
+    seconds: u64,
+}
+
+/// [`ReturnMetrics::project_revenue`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ProjectRevenue {
+    /// Total revenue for this bucket.
+    revenue: Decimal,
 }
 
 // logic
 
+/// Clickhouse queries - separate from [`sqlx`] queries.
 mod query {
     use crate::database::models::{DBProjectId, DBVersionId};
     use const_format::formatcp;
@@ -439,9 +504,9 @@ async fn get(
                 } else {
                     None
                 };
-                ProjectAnalytics {
+                AnalyticsData::Project(ProjectAnalytics {
                     source_project: row.project_id.into(),
-                    metrics: ProjectMetrics::Views {
+                    metrics: ProjectMetrics::Views(ProjectViews {
                         domain: none_if_empty(row.domain),
                         site_path: none_if_empty(row.site_path),
                         monetized: match row.monetized {
@@ -451,9 +516,8 @@ async fn get(
                         },
                         country,
                         views: row.views,
-                    },
-                }
-                .into()
+                    }),
+                })
             },
         )
         .await?;
@@ -480,17 +544,16 @@ async fn get(
                 } else {
                     None
                 };
-                ProjectAnalytics {
+                AnalyticsData::Project(ProjectAnalytics {
                     source_project: row.project_id.into(),
-                    metrics: ProjectMetrics::Downloads {
+                    metrics: ProjectMetrics::Downloads(ProjectDownloads {
                         domain: none_if_empty(row.domain),
                         site_path: none_if_empty(row.site_path),
                         version_id: none_if_zero_version_id(row.version_id),
                         country,
                         downloads: row.downloads,
-                    },
-                }
-                .into()
+                    }),
+                })
             },
         )
         .await?;
@@ -511,16 +574,15 @@ async fn get(
             ],
             |row| row.bucket,
             |row| {
-                ProjectAnalytics {
+                AnalyticsData::Project(ProjectAnalytics {
                     source_project: row.project_id.into(),
-                    metrics: ProjectMetrics::Playtime {
+                    metrics: ProjectMetrics::Playtime(ProjectPlaytime {
                         version_id: none_if_zero_version_id(row.version_id),
                         loader: none_if_empty(row.loader),
                         game_version: none_if_empty(row.game_version),
                         seconds: row.seconds,
-                    },
-                }
-                .into()
+                    }),
+                })
             },
         )
         .await?;
@@ -571,11 +633,12 @@ async fn get(
                 add_to_time_slice(
                     &mut time_slices,
                     bucket,
-                    ProjectAnalytics {
+                    AnalyticsData::Project(ProjectAnalytics {
                         source_project,
-                        metrics: ProjectMetrics::Revenue { revenue },
-                    }
-                    .into(),
+                        metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                            revenue,
+                        }),
+                    }),
                 )?;
             }
         }
@@ -737,74 +800,68 @@ async fn filter_allowed_project_ids(
         .collect::<Vec<_>>())
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use serde_json::json;
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
 
-//     use super::*;
+    use super::*;
 
-//     #[test]
-//     fn response_format() {
-//         let test_project_1 = ProjectId(123);
-//         let test_project_2 = ProjectId(456);
-//         let test_affiliate_code = AffiliateCodeId(789);
+    #[test]
+    fn response_format() {
+        let test_project_1 = ProjectId(123);
+        let test_project_2 = ProjectId(456);
+        let test_project_3 = ProjectId(789);
 
-//         let src = GetResponse(vec![
-//             TimeSlice(vec![
-//                 ProjectAnalytics {
-//                     game_versions: [
-//                         ("1.20.1".to_string(), 400),
-//                         ("1.20.2".to_string(), 300),
-//                     ]
-//                     .into_iter()
-//                     .collect(),
-//                     ..ProjectAnalytics::new(test_project_1)
-//                 }
-//                 .into(),
-//                 ProjectAnalytics {
-//                     game_versions: [
-//                         ("1.20.1".to_string(), 200),
-//                         ("1.20.2".to_string(), 100),
-//                     ]
-//                     .into_iter()
-//                     .collect(),
-//                     ..ProjectAnalytics::new(test_project_2)
-//                 }
-//                 .into(),
-//                 AffiliateCodeAnalytics {
-//                     clicks: Some(300),
-//                     conversions: Some(200),
-//                     ..AffiliateCodeAnalytics::new(test_affiliate_code)
-//                 }
-//                 .into(),
-//             ]),
-//             TimeSlice(vec![]),
-//         ]);
-//         let target = json!([
-//             [
-//                 {
-//                     "source_project": test_project_1.to_string(),
-//                     "game_versions": {
-//                         "1.20.1": 400,
-//                         "1.20.2": 300,
-//                     }
-//                 },
-//                 {
-//                     "source_project": test_project_2.to_string(),
-//                     "game_versions": {
-//                         "1.20.1": 200,
-//                         "1.20.2": 100,
-//                     }
-//                 },
-//                 {
-//                     "source_affiliate_code": test_affiliate_code.to_string(),
-//                     "clicks": 300,
-//                     "conversions": 200
-//                 }
-//             ],
-//             []
-//         ]);
+        let src = GetResponse(vec![
+            TimeSlice(vec![
+                AnalyticsData::Project(ProjectAnalytics {
+                    source_project: test_project_1,
+                    metrics: ProjectMetrics::Views(ProjectViews {
+                        domain: Some("youtube.com".into()),
+                        views: 100,
+                        ..Default::default()
+                    }),
+                }),
+                AnalyticsData::Project(ProjectAnalytics {
+                    source_project: test_project_2,
+                    metrics: ProjectMetrics::Downloads(ProjectDownloads {
+                        domain: Some("discord.com".into()),
+                        downloads: 150,
+                        ..Default::default()
+                    }),
+                }),
+            ]),
+            TimeSlice(vec![AnalyticsData::Project(ProjectAnalytics {
+                source_project: test_project_3,
+                metrics: ProjectMetrics::Revenue(ProjectRevenue {
+                    revenue: Decimal::new(20000, 2),
+                }),
+            })]),
+        ]);
+        let target = json!([
+            [
+                {
+                    "source_project": test_project_1.to_string(),
+                    "metric_kind": "views",
+                    "domain": "youtube.com",
+                    "views": 100,
+                },
+                {
+                    "source_project": test_project_2.to_string(),
+                    "metric_kind": "downloads",
+                    "domain": "discord.com",
+                    "downloads": 150,
+                }
+            ],
+            [
+                {
+                    "source_project": test_project_3.to_string(),
+                    "metric_kind": "revenue",
+                    "revenue": "200.00",
+                }
+            ]
+        ]);
 
-//         assert_eq!(serde_json::to_value(src).unwrap(), target);
-//     }
-// }
+        assert_eq!(serde_json::to_value(src).unwrap(), target);
+    }
+}

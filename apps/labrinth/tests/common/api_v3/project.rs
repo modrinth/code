@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Write};
+use std::{collections::HashMap, fmt::Write, num::NonZeroU32};
 
 use actix_http::StatusCode;
 use actix_web::{
@@ -10,6 +10,7 @@ use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use labrinth::{
     models::{organizations::Organization, projects::Project},
+    routes::v3::analytics_get::{self, TimeRange, TimeRangeResolution},
     search::SearchResults,
     util::actix::AppendsMultipart,
 };
@@ -570,49 +571,28 @@ impl ApiV3 {
 
     pub async fn get_analytics_revenue(
         &self,
-        id_or_slugs: Vec<&str>,
-        ids_are_version_ids: bool,
-        start_date: Option<DateTime<Utc>>,
-        end_date: Option<DateTime<Utc>>,
-        resolution_minutes: Option<u32>,
+        time_range: analytics_get::TimeRange,
         pat: Option<&str>,
-    ) -> ServiceResponse {
-        let pv_string = if ids_are_version_ids {
-            let version_string: String =
-                serde_json::to_string(&id_or_slugs).unwrap();
-            let version_string = urlencoding::encode(&version_string);
-            format!("version_ids={version_string}")
-        } else {
-            let projects_string: String =
-                serde_json::to_string(&id_or_slugs).unwrap();
-            let projects_string = urlencoding::encode(&projects_string);
-            format!("project_ids={projects_string}")
+    ) -> analytics_get::GetResponse {
+        let req = analytics_get::GetRequest {
+            time_range,
+            return_metrics: analytics_get::ReturnMetrics {
+                project_revenue: Some(analytics_get::Metrics {
+                    bucket_by: Vec::new(),
+                }),
+                ..Default::default()
+            },
         };
 
-        let mut extra_args = String::new();
-        if let Some(start_date) = start_date {
-            let start_date = start_date.to_rfc3339();
-            // let start_date = serde_json::to_string(&start_date).unwrap();
-            let start_date = urlencoding::encode(&start_date);
-            write!(&mut extra_args, "&start_date={start_date}").unwrap();
-        }
-        if let Some(end_date) = end_date {
-            let end_date = end_date.to_rfc3339();
-            // let end_date = serde_json::to_string(&end_date).unwrap();
-            let end_date = urlencoding::encode(&end_date);
-            write!(&mut extra_args, "&end_date={end_date}").unwrap();
-        }
-        if let Some(resolution_minutes) = resolution_minutes {
-            write!(&mut extra_args, "&resolution_minutes={resolution_minutes}")
-                .unwrap();
-        }
-
         let req = test::TestRequest::get()
-            .uri(&format!("/v3/analytics/revenue?{pv_string}{extra_args}",))
+            .uri(&format!("/v3/analytics"))
+            .set_json(req)
             .append_pat(pat)
             .to_request();
 
-        self.call(req).await
+        let resp = self.call(req).await;
+        assert_status!(&resp, StatusCode::OK);
+        test::read_body_json(resp).await
     }
 
     pub async fn get_analytics_revenue_deserialized(
