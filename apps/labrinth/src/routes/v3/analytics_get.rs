@@ -20,7 +20,7 @@ use crate::{
     auth::{AuthenticationError, get_user_from_headers},
     database::{
         self, DBProject,
-        models::{DBProjectId, DBUser, DBUserId, DBVersionId},
+        models::{DBProjectId, DBUser, DBVersionId},
         redis::RedisPool,
     },
     models::{
@@ -42,23 +42,26 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 /// like projects and affiliate codes, returning the data in a list of time
 /// slices.
 #[derive(Debug, Serialize, Deserialize)]
-struct GetRequest {
+pub struct GetRequest {
     /// What time range to return statistics for.
-    time_range: TimeRange,
+    pub time_range: TimeRange,
     /// What analytics metrics to return data for.
-    return_metrics: ReturnMetrics,
+    pub return_metrics: ReturnMetrics,
 }
 
 /// Time range for fetching analytics.
 #[derive(Debug, Serialize, Deserialize)]
-struct TimeRange {
+pub struct TimeRange {
     /// When to start including data.
-    start: DateTime<Utc>,
+    pub start: DateTime<Utc>,
     /// When to stop including data.
-    end: DateTime<Utc>,
+    pub end: DateTime<Utc>,
     /// Determines how many time slices between the start and end will be
     /// included, and how fine-grained those time slices will be.
-    resolution: TimeRangeResolution,
+    ///
+    /// This must fall within the bounds of [`MIN_RESOLUTION`] and
+    /// [`MAX_TIME_SLICES`].
+    pub resolution: TimeRangeResolution,
 }
 
 /// Determines how many time slices between the start and end will be
@@ -74,16 +77,36 @@ pub enum TimeRangeResolution {
     Minutes(NonZeroU64),
 }
 
+/// What metrics the caller would like to receive from this analytics get
+/// request.
 #[derive(Debug, Serialize, Deserialize)]
-struct ReturnMetrics {
+pub struct ReturnMetrics {
+    /// How many times a project page has been viewed.
     project_views: Option<Metrics<ProjectViewsField>>,
+    /// How many times a project has been downloaded.
     project_downloads: Option<Metrics<ProjectDownloadsField>>,
+    /// How long users have been playing a project.
     project_playtime: Option<Metrics<ProjectPlaytimeField>>,
+    /// How much payout revenue a project has generated.
     project_revenue: Option<Metrics<()>>,
 }
 
+/// See [`ReturnMetrics`].
 #[derive(Debug, Serialize, Deserialize)]
 struct Metrics<F> {
+    /// When collecting metrics, what fields do we want to group the results by?
+    ///
+    /// For example, if we have two views entries:
+    /// - `{ "project_id": "abcdefgh", "domain": "youtube.com", "count": 5 }`
+    /// - `{ "project_id": "abcdefgh", "domain": "discord.com", "count": 3 }`
+    ///
+    /// If we bucket by `domain`, then we will get two results:
+    /// - `{ "project_id": "abcdefgh", "domain": "youtube.com", "count": 5 }`
+    /// - `{ "project_id": "abcdefgh", "domain": "discord.com", "count": 3 }`
+    ///
+    /// If we do not bucket by `domain`, we will only get one, which is an
+    /// aggregate of the two rows:
+    /// - `{ "project_id": "abcdefgh", "count": 8 }`
     #[serde(default = "Vec::default")]
     bucket_by: Vec<F>,
 }
@@ -116,6 +139,13 @@ enum ProjectPlaytimeField {
     Loader,
     GameVersion,
 }
+
+/// Minimum width of a [`TimeSlice`], controlled by [`TimeRange::resolution`].
+pub const MIN_RESOLUTION: TimeDelta = TimeDelta::minutes(60);
+
+/// Maximum number of [`TimeSlice`]s in a [`GetResponse`], controlled by
+/// [`TimeRange::resolution`].
+pub const MAX_TIME_SLICES: usize = 1024;
 
 // response
 
@@ -318,9 +348,6 @@ async fn get(
     session_queue: web::Data<AuthQueue>,
     clickhouse: web::Data<clickhouse::Client>,
 ) -> Result<web::Json<GetResponse>, ApiError> {
-    const MIN_RESOLUTION: TimeDelta = TimeDelta::minutes(60);
-    const MAX_TIME_SLICES: usize = 1024;
-
     let (scopes, user) = get_user_from_headers(
         &http_req,
         &**pool,
@@ -709,119 +736,6 @@ async fn filter_allowed_project_ids(
         .map(|project| project.inner.id)
         .collect::<Vec<_>>())
 }
-
-// async fn filter_allowed_ids(
-//     mut project_ids: Option<Vec<String>>,
-//     user: crate::models::users::User,
-//     pool: &PgPool,
-//     redis: &RedisPool,
-//     // remove_defaults: Option<bool>,
-// ) -> Result<Option<Vec<ProjectId>>, ApiError> {
-//     // If no project_ids or version_ids are provided, we default to all projects the user has *public* access to
-//     let project_ids = if let Some(ids) = project_ids {
-//         ids.into_iter().filter_map()
-//     } else {
-//         DBUser::get_projects(user.id.into(), &**pool, redis)
-//             .await?
-//             .into_iter()
-//             .map(ProjectId::from)
-//     };
-
-//     if project_ids.is_none() && !remove_defaults.unwrap_or(false) {
-//         project_ids = Some(
-//             user_item::DBUser::get_projects(user.id.into(), &***pool, redis)
-//                 .await?
-//                 .into_iter()
-//                 .map(|x| ProjectId::from(x).to_string())
-//                 .collect(),
-//         );
-//     }
-
-//     // Convert String list to list of ProjectIds or VersionIds
-//     // - Filter out unauthorized projects/versions
-//     let project_ids = if let Some(project_strings) = project_ids {
-//         let projects_data = database::models::DBProject::get_many(
-//             &project_strings,
-//             &***pool,
-//             redis,
-//         )
-//         .await?;
-
-//         let team_ids = projects_data
-//             .iter()
-//             .map(|x| x.inner.team_id)
-//             .collect::<Vec<database::models::DBTeamId>>();
-//         let team_members =
-//             database::models::DBTeamMember::get_from_team_full_many(
-//                 &team_ids, &***pool, redis,
-//             )
-//             .await?;
-
-//         let organization_ids = projects_data
-//             .iter()
-//             .filter_map(|x| x.inner.organization_id)
-//             .collect::<Vec<database::models::DBOrganizationId>>();
-//         let organizations = database::models::DBOrganization::get_many_ids(
-//             &organization_ids,
-//             &***pool,
-//             redis,
-//         )
-//         .await?;
-
-//         let organization_team_ids = organizations
-//             .iter()
-//             .map(|x| x.team_id)
-//             .collect::<Vec<database::models::DBTeamId>>();
-//         let organization_team_members =
-//             database::models::DBTeamMember::get_from_team_full_many(
-//                 &organization_team_ids,
-//                 &***pool,
-//                 redis,
-//             )
-//             .await?;
-
-//         let ids = projects_data
-//             .into_iter()
-//             .filter(|project| {
-//                 let team_member = team_members.iter().find(|x| {
-//                     x.team_id == project.inner.team_id
-//                         && x.user_id == user.id.into()
-//                 });
-
-//                 let organization = project
-//                     .inner
-//                     .organization_id
-//                     .and_then(|oid| organizations.iter().find(|x| x.id == oid));
-
-//                 let organization_team_member =
-//                     if let Some(organization) = organization {
-//                         organization_team_members.iter().find(|x| {
-//                             x.team_id == organization.team_id
-//                                 && x.user_id == user.id.into()
-//                         })
-//                     } else {
-//                         None
-//                     };
-
-//                 let permissions = ProjectPermissions::get_permissions_by_role(
-//                     &user.role,
-//                     &team_member.cloned(),
-//                     &organization_team_member.cloned(),
-//                 )
-//                 .unwrap_or_default();
-
-//                 permissions.contains(ProjectPermissions::VIEW_ANALYTICS)
-//             })
-//             .map(|x| x.inner.id.into())
-//             .collect::<Vec<_>>();
-
-//         Some(ids)
-//     } else {
-//         None
-//     };
-//     // Only one of project_ids or version_ids will be Some
-//     Ok(project_ids)
-// }
 
 // #[cfg(test)]
 // mod tests {
