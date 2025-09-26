@@ -1,11 +1,12 @@
 use crate::database;
-use crate::database::models::DBCollection;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::VersionQueryResult;
+use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
 use crate::models::users::User;
 use crate::routes::ApiError;
+use futures::TryStreamExt;
 use itertools::Itertools;
 use sqlx::PgPool;
 
@@ -131,8 +132,6 @@ pub async fn filter_enlisted_projects_ids(
 
     if let Some(user) = user_option {
         let user_id: models::ids::DBUserId = user.id.into();
-
-        use futures::TryStreamExt;
 
         sqlx::query!(
             "
@@ -363,4 +362,35 @@ pub async fn filter_visible_collections(
     }
 
     Ok(return_collections)
+}
+
+pub async fn is_visible_organization(
+    organization: &DBOrganization,
+    viewing_user: &Option<User>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<bool, ApiError> {
+    let members =
+        DBTeamMember::get_from_team_full(organization.team_id, pool, redis)
+            .await?;
+
+    let has_public_or_archived_projects = sqlx::query_scalar!(
+        "SELECT TRUE FROM mods WHERE organization_id = $1 AND status IN ('public', 'archived') LIMIT 1",
+        organization.id as database::models::ids::DBOrganizationId
+    )
+    .fetch_optional(pool)
+    .await?
+    .flatten()
+    .unwrap_or(false);
+
+    let visible = has_public_or_archived_projects
+        || members.iter().filter(|member| member.accepted).count() >= 2
+        || viewing_user.as_ref().is_some_and(|viewing_user| {
+            viewing_user.role.is_mod()
+                || members
+                    .iter()
+                    .any(|member| member.user_id == viewing_user.id.into())
+        });
+
+    Ok(visible)
 }
