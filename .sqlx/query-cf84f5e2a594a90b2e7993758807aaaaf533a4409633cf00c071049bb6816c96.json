@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM oauth_client_redirect_uris\n            WHERE id IN\n            (SELECT * FROM UNNEST($1::bigint[]))\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cf84f5e2a594a90b2e7993758807aaaaf533a4409633cf00c071049bb6816c96"
+}

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE versions\n                SET author_id = $1\n                WHERE (author_id = $2)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "85463fa221147ee8d409fc92ed681fa27df683e7c80b8dd8616ae94dc1205c24"
+}
