@@ -384,7 +384,7 @@ pub async fn is_visible_organization(
     .unwrap_or(false);
 
     let visible = has_public_or_archived_projects
-        || members.iter().filter(|member| member.accepted).count() >= 2
+        || members.iter().filter(|member| member.accepted).count() > 1
         || viewing_user.as_ref().is_some_and(|viewing_user| {
             viewing_user.role.is_mod()
                 || members
