@@ -36,6 +36,7 @@ rgb.workspace = true
 phf.workspace = true
 itertools.workspace = true
 derive_more = { workspace = true, features = ["display"] }
+cfg-if.workspace = true
 
 chrono = { workspace = true, features = ["serde"] }
 daedalus.workspace = true
@@ -115,6 +116,9 @@ ariadne.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 winreg.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+shlex.workspace = true
 
 [build-dependencies]
 dotenvy.workspace = true
