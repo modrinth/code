@@ -201,6 +201,13 @@ pub struct ProjectAnalytics {
     metrics: ProjectMetrics,
 }
 
+impl ProjectAnalytics {
+    /// Get the project ID for these analytics.
+    pub fn project_id(&self) -> &ProjectId {
+        &self.source_project
+    }
+}
+
 /// Project metrics of a specific kind.
 ///
 /// If a field is not included in [`Metrics::bucket_by`], it will be [`None`].

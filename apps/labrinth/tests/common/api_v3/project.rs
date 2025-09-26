@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Write, num::NonZeroU32};
+use std::{collections::HashMap, fmt::Write};
 
 use actix_http::StatusCode;
 use actix_web::{
@@ -7,14 +7,14 @@ use actix_web::{
 };
 use async_trait::async_trait;
 use bytes::Bytes;
-use chrono::{DateTime, Utc};
 use labrinth::{
     models::{organizations::Organization, projects::Project},
-    routes::v3::analytics_get::{self, TimeRange, TimeRangeResolution},
+    routes::v3::analytics_get::{
+        GetRequest, GetResponse, Metrics, ReturnMetrics, TimeRange,
+    },
     search::SearchResults,
     util::actix::AppendsMultipart,
 };
-use rust_decimal::Decimal;
 use serde_json::json;
 
 use crate::{
@@ -571,13 +571,13 @@ impl ApiV3 {
 
     pub async fn get_analytics_revenue(
         &self,
-        time_range: analytics_get::TimeRange,
+        time_range: TimeRange,
         pat: Option<&str>,
-    ) -> analytics_get::GetResponse {
-        let req = analytics_get::GetRequest {
+    ) -> GetResponse {
+        let req = GetRequest {
             time_range,
-            return_metrics: analytics_get::ReturnMetrics {
-                project_revenue: Some(analytics_get::Metrics {
+            return_metrics: ReturnMetrics {
+                project_revenue: Some(Metrics {
                     bucket_by: Vec::new(),
                 }),
                 ..Default::default()
@@ -585,7 +585,7 @@ impl ApiV3 {
         };
 
         let req = test::TestRequest::get()
-            .uri(&format!("/v3/analytics"))
+            .uri("/v3/analytics")
             .set_json(req)
             .append_pat(pat)
             .to_request();
@@ -595,25 +595,18 @@ impl ApiV3 {
         test::read_body_json(resp).await
     }
 
-    pub async fn get_analytics_revenue_deserialized(
+    pub async fn get_analytics_revenue_new(
         &self,
-        id_or_slugs: Vec<&str>,
-        ids_are_version_ids: bool,
-        start_date: Option<DateTime<Utc>>,
-        end_date: Option<DateTime<Utc>>,
-        resolution_minutes: Option<u32>,
+        request: GetRequest,
         pat: Option<&str>,
-    ) -> HashMap<String, HashMap<i64, Decimal>> {
-        let resp = self
-            .get_analytics_revenue(
-                id_or_slugs,
-                ids_are_version_ids,
-                start_date,
-                end_date,
-                resolution_minutes,
-                pat,
-            )
-            .await;
+    ) -> GetResponse {
+        let req = test::TestRequest::get()
+            .uri("/v3/analytics")
+            .set_json(request)
+            .append_pat(pat)
+            .to_request();
+
+        let resp = self.call(req).await;
         assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
