@@ -1,14 +1,7 @@
 <template>
 	<NewModal ref="modal" header="Creating an organization">
 		<div class="flex flex-col gap-3">
-			<Admonition
-				v-if="disabled"
-				class="max-w-[30rem]"
-				:type="'info'"
-				header="Organization creation temporarily disabled"
-				body="Due to abuse, we've temporarily disabled the creation of new organizations. We're working hard to restore this feature, thank you for your patience."
-			/>
-			<div class="flex flex-col gap-2" :class="{ 'opacity-50': disabled }">
+			<div class="flex flex-col gap-2">
 				<label for="name">
 					<span class="text-lg font-semibold text-contrast">
 						Name
@@ -22,11 +15,10 @@
 					maxlength="64"
 					:placeholder="`Enter organization name...`"
 					autocomplete="off"
-					:disabled="disabled"
 					@input="updateSlug"
 				/>
 			</div>
-			<div class="flex flex-col gap-2" :class="{ 'opacity-50': disabled }">
+			<div class="flex flex-col gap-2">
 				<label for="slug">
 					<span class="text-lg font-semibold text-contrast">
 						URL
@@ -41,12 +33,11 @@
 						type="text"
 						maxlength="64"
 						autocomplete="off"
-						:disabled="disabled"
 						@input="setManualSlug"
 					/>
 				</div>
 			</div>
-			<div class="flex flex-col gap-2" :class="{ 'opacity-50': disabled }">
+			<div class="flex flex-col gap-2">
 				<label for="additional-information" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast">
 						Summary
@@ -55,21 +46,16 @@
 					<span>A sentence or two that describes your organization.</span>
 				</label>
 				<div class="textarea-wrapper">
-					<textarea
-						id="additional-information"
-						v-model="description"
-						:disabled="disabled"
-						maxlength="256"
-					/>
+					<textarea id="additional-information" v-model="description" maxlength="256" />
 				</div>
 			</div>
-			<p class="m-0 max-w-[30rem]" :class="{ 'opacity-50': disabled }">
+			<p class="m-0 max-w-[30rem]">
 				You will be the owner of this organization, but you can invite other members and transfer
 				ownership at any time.
 			</p>
 			<div class="flex gap-2">
 				<ButtonStyled color="brand">
-					<button :disabled="disabled" @click="createOrganization">
+					<button @click="createOrganization">
 						<PlusIcon aria-hidden="true" />
 						Create organization
 					</button>
@@ -87,7 +73,7 @@
 
 <script setup lang="ts">
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { ref } from 'vue'
 
 const router = useNativeRouter()
@@ -98,8 +84,6 @@ const slug = ref<string>('')
 const description = ref<string>('')
 const manualSlug = ref<boolean>(false)
 const modal = ref<InstanceType<typeof NewModal>>()
-
-const disabled = ref(true)
 
 async function createOrganization(): Promise<void> {
 	startLoading()
