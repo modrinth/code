@@ -21,10 +21,12 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     tracing::info!("Initializing app event state...");
     theseus::EventState::init(app.clone()).await?;
 
+    let app_identifier = app.config().identifier.clone();
+
     #[cfg(feature = "updater")]
     'updater: {
         if env::var("MODRINTH_EXTERNAL_UPDATE_PROVIDER").is_ok() {
-            State::init().await?;
+            State::init(app_identifier).await?;
             break 'updater;
         }
 
@@ -35,7 +37,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
         let update_fut = updater.check();
 
         tracing::info!("Initializing app state...");
-        State::init().await?;
+        State::init(app_identifier).await?;
 
         let check_bar = theseus::init_loading(
             theseus::LoadingBarType::CheckingForUpdates,
@@ -86,7 +88,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 
     #[cfg(not(feature = "updater"))]
     {
-        State::init().await?;
+        State::init(app_identifier).await?;
     }
 
     tracing::info!("Finished checking for updates!");
@@ -158,7 +160,10 @@ fn main() {
             RUST_LOG="theseus=trace" {run command}
 
     */
-    let _log_guard = theseus::start_logger();
+
+    let tauri_context = tauri::generate_context!();
+
+    let _log_guard = theseus::start_logger(&tauri_context.config().identifier);
 
     tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
@@ -275,7 +280,7 @@ fn main() {
         ]);
 
     tracing::info!("Initializing app...");
-    let app = builder.build(tauri::generate_context!());
+    let app = builder.build(tauri_context);
 
     match app {
         Ok(app) => {
