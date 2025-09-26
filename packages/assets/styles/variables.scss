@@ -1,9 +1,9 @@
 .light-properties {
-	--surface-l1: #ebebeb;
-	--surface-l2: #f5f5f5;
-	--surface-l3: #f8f8f8;
-	--surface-l4: #ffffff;
-	--surface-l5: #e6e6e6;
+	--surface-1: #ebebeb;
+	--surface-2: #f5f5f5;
+	--surface-3: #f8f8f8;
+	--surface-4: #ffffff;
+	--surface-5: #e6e6e6;
 
 	--color-red-50: #fef2f2;
 	--color-red-100: #fee5e7;
@@ -89,15 +89,15 @@
 
 	// ===
 
-	--color-bg: var(--surface-l1);
-	--color-raised-bg: var(--surface-l3);
-	--color-super-raised-bg: var(--surface-l4);
+	--color-bg: var(--surface-1);
+	--color-raised-bg: var(--surface-3);
+	--color-super-raised-bg: var(--surface-4);
 
-	--color-button-bg: var(--surface-l4);
+	--color-button-bg: var(--surface-4);
 	--color-button-border: rgba(161, 161, 161, 0.35);
 	--color-scrollbar: #96a2b0;
 
-	--color-divider: var(--surface-l2);
+	--color-divider: var(--surface-2);
 	--color-divider-dark: #c8cdd3;
 
 	--color-base: var(--color-text-default);
@@ -217,11 +217,11 @@ html {
 .dark-mode,
 .dark,
 :root[data-theme='dark'] {
-	--surface-l1: #16181c;
-	--surface-l2: #1d1f23;
-	--surface-l3: #27292e;
-	--surface-l4: #34363c;
-	--surface-l5: #42444a;
+	--surface-1: #16181c;
+	--surface-2: #1d1f23;
+	--surface-3: #27292e;
+	--surface-4: #34363c;
+	--surface-5: #42444a;
 
 	--color-red-50: #fff0f1;
 	--color-red-100: #ffe2e6;
@@ -307,11 +307,11 @@ html {
 
 	// ===
 
-	--color-bg: var(--surface-l1);
-	--color-raised-bg: var(--surface-l3);
-	--color-super-raised-bg: var(--surface-l4);
+	--color-bg: var(--surface-1);
+	--color-raised-bg: var(--surface-3);
+	--color-super-raised-bg: var(--surface-4);
 
-	--color-button-bg: var(--surface-l4);
+	--color-button-bg: var(--surface-4);
 	--color-button-border: rgba(193, 190, 209, 0.12);
 	--color-scrollbar: var(--color-button-bg);
 
