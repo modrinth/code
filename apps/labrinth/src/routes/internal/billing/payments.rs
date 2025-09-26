@@ -530,14 +530,27 @@ pub async fn create_or_update_payment_intent(
     }
 
     if let Some(payment_intent_id) = existing_payment_intent {
-        let update_payment_intent = stripe::UpdatePaymentIntent {
+        let mut update_payment_intent = stripe::UpdatePaymentIntent {
             amount: Some(charge_data.amount + tax_amount),
             currency: Some(inferred_stripe_currency),
             customer: Some(customer_id),
             metadata: Some(metadata),
-            payment_method: Some(payment_method.id.clone()),
             ..Default::default()
         };
+
+        // If the payment request type was done through a confirmation token,
+        // the payment method ID is an invalid placeholder so we don't want
+        // to use it.
+        //
+        // The PaymentIntent will be confirmed using the confirmation token
+        // by the client.
+        if let PaymentSession::Interactive {
+            payment_request_type: PaymentRequestType::PaymentMethod { .. },
+        } = &payment_session
+        {
+            update_payment_intent.payment_method =
+                Some(payment_method.id.clone());
+        }
 
         stripe::PaymentIntent::update(
             stripe_client,
