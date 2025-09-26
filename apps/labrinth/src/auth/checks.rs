@@ -374,7 +374,9 @@ pub async fn is_visible_organization(
         DBTeamMember::get_from_team_full(organization.team_id, pool, redis)
             .await?;
 
-    let has_public_or_archived_projects = sqlx::query_scalar!(
+    // This is meant to match the same projects as the `Project::is_searchable` method, but we're not using
+    // it here because that'd entail pulling in all projects for the organization
+    let has_searchable_projects = sqlx::query_scalar!(
         "SELECT TRUE FROM mods WHERE organization_id = $1 AND status IN ('public', 'archived') LIMIT 1",
         organization.id as database::models::ids::DBOrganizationId
     )
@@ -383,7 +385,7 @@ pub async fn is_visible_organization(
     .flatten()
     .unwrap_or(false);
 
-    let visible = has_public_or_archived_projects
+    let visible = has_searchable_projects
         || members.iter().filter(|member| member.accepted).count() > 1
         || viewing_user.as_ref().is_some_and(|viewing_user| {
             viewing_user.role.is_mod()
