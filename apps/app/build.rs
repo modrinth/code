@@ -223,6 +223,7 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "get_os",
+                        "is_network_metered",
                         "should_disable_mouseover",
                         "highlight_in_folder",
                         "open_path",

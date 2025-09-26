@@ -3,7 +3,8 @@
 codegen-backend = true
 
 [profile.dev]
-codegen-backend = "cranelift"
+# Does not work on arm macs
+# codegen-backend = "cranelift"
 
 [build]
 rustflags = ["--cfg", "tokio_unstable"]

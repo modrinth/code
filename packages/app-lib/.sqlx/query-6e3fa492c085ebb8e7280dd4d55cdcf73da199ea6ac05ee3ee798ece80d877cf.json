@@ -41,7 +41,7 @@
       {
         "name": "display_claims!: serde_json::Value",
         "ordinal": 7,
-        "type_info": "Null"
+        "type_info": "Text"
       }
     ],
     "parameters": {

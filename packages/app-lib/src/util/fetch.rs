@@ -1,6 +1,7 @@
 //! Functions for fetching information from the Internet
 use super::io::{self, IOError};
 use crate::ErrorKind;
+use crate::LAUNCHER_USER_AGENT;
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use bytes::Bytes;
@@ -20,11 +21,8 @@ pub struct FetchSemaphore(pub Semaphore);
 
 pub static REQWEST_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
     let mut headers = reqwest::header::HeaderMap::new();
-    let header = reqwest::header::HeaderValue::from_str(&format!(
-        "modrinth/theseus/{} (support@modrinth.com)",
-        env!("CARGO_PKG_VERSION")
-    ))
-    .unwrap();
+    let header =
+        reqwest::header::HeaderValue::from_str(LAUNCHER_USER_AGENT).unwrap();
     headers.insert(reqwest::header::USER_AGENT, header);
     reqwest::Client::builder()
         .tcp_keepalive(Some(time::Duration::from_secs(10)))
