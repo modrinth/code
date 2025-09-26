@@ -154,6 +154,7 @@ import _ServerPlusIcon from './icons/server-plus.svg?component'
 import _SettingsIcon from './icons/settings.svg?component'
 import _ShareIcon from './icons/share.svg?component'
 import _ShieldIcon from './icons/shield.svg?component'
+import _ShieldAlertIcon from './icons/shield-alert.svg?component'
 import _SignalIcon from './icons/signal.svg?component'
 import _SkullIcon from './icons/skull.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
@@ -351,6 +352,7 @@ export const ServerPlusIcon = _ServerPlusIcon
 export const ServerIcon = _ServerIcon
 export const SettingsIcon = _SettingsIcon
 export const ShareIcon = _ShareIcon
+export const ShieldAlertIcon = _ShieldAlertIcon
 export const ShieldIcon = _ShieldIcon
 export const SignalIcon = _SignalIcon
 export const SkullIcon = _SkullIcon
