@@ -199,14 +199,7 @@ pub async fn index_subscriptions(
                                         )
                                     })?;
 
-                            let Ok(customer_id): Result<stripe::CustomerId, _> =
-                                stripe_customer_id.parse()
-                            else {
-                                return Err(ApiError::InvalidInput(
-                                    "Charge's Stripe customer ID was invalid"
-                                        .to_owned(),
-                                ));
-                            };
+                            let customer_id = stripe_customer_id.parse().map_err(|e| ApiError::InvalidInput(format!("Charge's Stripe customer ID was invalid ({e})")))?;
 
                             let customer = stripe::Customer::retrieve(
                                 &stripe_client,
@@ -215,13 +208,12 @@ pub async fn index_subscriptions(
                             )
                             .await?;
 
-                            let Some(stripe_address) = customer.address else {
-                                return Err(ApiError::InvalidInput(
-                                    "Stripe customer had no address".to_owned(),
-                                ));
-                            };
-
-                            stripe_address
+                            customer.address.ok_or_else(|| {
+                                    ApiError::InvalidInput(
+                                        "Stripe customer had no address"
+                                            .to_owned(),
+                                    )
+                                })?
                         };
 
                         let customer_address =
@@ -272,12 +264,13 @@ pub async fn index_subscriptions(
                             // The price of the subscription has changed, we need to insert a notification
                             // for this.
 
-                            let Some(subscription_id) = charge.subscription_id
-                            else {
-                                return Err(ApiError::InvalidInput(
-                                    "Charge has no subscription ID".to_owned(),
-                                ));
-                            };
+                            let subscription_id =
+                                charge.subscription_id.ok_or_else(|| {
+                                    ApiError::InvalidInput(
+                                        "Charge has no subscription ID"
+                                            .to_owned(),
+                                    )
+                                })?;
 
                             NotificationBuilder {
                                 body: NotificationBody::TaxNotification {
@@ -361,20 +354,75 @@ pub async fn index_subscriptions(
                         )
                     })?;
 
-                let stripe_customer_id = DBUser::get_id(c.user_id, &pg, &redis)
-                    .await?
-                    .ok_or_else(|| {
-                        ApiError::from(DatabaseError::Database(
-                            sqlx::Error::RowNotFound,
-                        ))
-                    })
-                    .and_then(|user| {
-                        user.stripe_customer_id.ok_or_else(|| {
+                let customer_address = 'a: {
+                    let stripe_id: stripe::PaymentIntentId = c
+                        .payment_platform_id
+                        .as_ref()
+                        .and_then(|x| x.parse().ok())
+                        .ok_or_else(|| {
                             ApiError::InvalidInput(
-                                "User has no Stripe customer ID".to_owned(),
+                                "Charge has no payment platform ID".to_owned(),
                             )
-                        })
-                    })?;
+                        })?;
+
+                    // Attempt retrieving the address via the payment intent's payment method
+
+                    let pi = stripe::PaymentIntent::retrieve(
+                        &stripe_client,
+                        &stripe_id,
+                        &["payment_method"],
+                    )
+                    .await?;
+
+                    let pi_stripe_address = pi
+                        .payment_method
+                        .and_then(|x| x.into_object())
+                        .and_then(|x| x.billing_details.address);
+
+                    match pi_stripe_address {
+                        Some(address) => break 'a address,
+                        None => {
+                            warn!("PaymentMethod had no address");
+                        }
+                    };
+
+                    let stripe_customer_id =
+                        DBUser::get_id(c.user_id, &pg, &redis)
+                            .await?
+                            .ok_or_else(|| {
+                                ApiError::from(DatabaseError::Database(
+                                    sqlx::Error::RowNotFound,
+                                ))
+                            })
+                            .and_then(|user| {
+                                user.stripe_customer_id.ok_or_else(|| {
+                                    ApiError::InvalidInput(
+                                        "User has no Stripe customer ID"
+                                            .to_owned(),
+                                    )
+                                })
+                            })?;
+
+                    let customer_id =
+                        stripe_customer_id.parse().map_err(|e| {
+                            ApiError::InvalidInput(format!(
+                                "Charge's Stripe customer ID was invalid ({e})"
+                            ))
+                        })?;
+
+                    let customer = stripe::Customer::retrieve(
+                        &stripe_client,
+                        &customer_id,
+                        &[],
+                    )
+                    .await?;
+
+                    customer.address.ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "Stripe customer had no address".to_owned(),
+                        )
+                    })?
+                };
 
                 let tax_id =
                     DBProductsTaxIdentifier::get_price(c.price_id, &pg)
@@ -382,30 +430,6 @@ pub async fn index_subscriptions(
                         .ok_or_else(|| {
                             DatabaseError::Database(sqlx::Error::RowNotFound)
                         })?;
-
-                let Ok(customer_id): Result<stripe::CustomerId, _> =
-                    stripe_customer_id.parse()
-                else {
-                    return Err(ApiError::InvalidInput(
-                        "Charge's Stripe customer ID was invalid".to_owned(),
-                    ));
-                };
-
-                let customer = stripe::Customer::retrieve(
-                    &stripe_client,
-                    &customer_id,
-                    &[],
-                )
-                .await?;
-
-                let Some(stripe_address) = customer.address else {
-                    return Err(ApiError::InvalidInput(
-                        "Stripe customer had no address".to_owned(),
-                    ));
-                };
-
-                let customer_address =
-                    anrok::Address::from_stripe_address(&stripe_address);
 
                 let tax_platform_id =
                     anrok::transaction_id_stripe_pi(&payment_intent_id);
@@ -417,7 +441,10 @@ pub async fn index_subscriptions(
                     .create_or_update_txn(&anrok::Transaction {
                         id: tax_platform_id.clone(),
                         fields: anrok::TransactionFields {
-                            customer_address,
+                            customer_address:
+                                anrok::Address::from_stripe_address(
+                                    &customer_address,
+                                ),
                             currency_code: c.currency_code.clone(),
                             accounting_time: c.due,
                             accounting_time_zone:
