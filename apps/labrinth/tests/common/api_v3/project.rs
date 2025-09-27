@@ -584,7 +584,7 @@ impl ApiV3 {
             },
         };
 
-        let req = test::TestRequest::get()
+        let req = test::TestRequest::post()
             .uri("/v3/analytics")
             .set_json(req)
             .append_pat(pat)
@@ -600,7 +600,7 @@ impl ApiV3 {
         request: GetRequest,
         pat: Option<&str>,
     ) -> GetResponse {
-        let req = test::TestRequest::get()
+        let req = test::TestRequest::post()
             .uri("/v3/analytics")
             .set_json(request)
             .append_pat(pat)
