@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use super::ApiError;
+use crate::auth::checks::is_visible_organization;
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
@@ -70,7 +71,10 @@ pub async fn organization_projects_get(
     .ok();
 
     let organization_data = DBOrganization::get(&id, &**pool, &redis).await?;
-    if let Some(organization) = organization_data {
+    if let Some(organization) = organization_data
+        && is_visible_organization(&organization, &current_user, &pool, &redis)
+            .await?
+    {
         let project_ids = sqlx::query!(
             "
             SELECT m.id FROM organizations o
@@ -232,7 +236,9 @@ pub async fn organization_get(
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
     let organization_data = DBOrganization::get(&id, &**pool, &redis).await?;
-    if let Some(data) = organization_data {
+    if let Some(data) = organization_data
+        && is_visible_organization(&data, &current_user, &pool, &redis).await?
+    {
         let members_data =
             DBTeamMember::get_from_team_full(data.team_id, &**pool, &redis)
                 .await?;
@@ -328,6 +334,11 @@ pub async fn organizations_get(
     }
 
     for data in organizations_data {
+        if !is_visible_organization(&data, &current_user, &pool, &redis).await?
+        {
+            continue;
+        }
+
         let members_data = team_groups.remove(&data.team_id).unwrap_or(vec![]);
         let logged_in = current_user
             .as_ref()
