@@ -571,13 +571,19 @@ pub async fn launch_minecraft(
             let mut command = {
                 cfg_if! {
                     if #[cfg(unix)] {
-                        let cmd = shlex::split(hook).ok_or_else(|| {
-                            crate::ErrorKind::LauncherError(format!(
-                                "Invalid wrapper command: {hook}",
-                            ))
-                        })?;
-                        let mut command = Command::new(cmd[0].clone());
-                        command.args(&cmd[1..]);
+                        let mut cmd = shlex::split(hook)
+                            .ok_or_else(|| {
+                                crate::ErrorKind::LauncherError(format!(
+                                    "Invalid wrapper command: {hook}",
+                                ))
+                            })?
+                            .into_iter();
+                        let mut command = Command::new(cmd.next().ok_or(
+                            crate::ErrorKind::LauncherError(
+                                "Empty wrapper command".to_owned(),
+                            ),
+                        )?);
+                        command.args(cmd);
                         command
                     } else {
                         Command::new(hook)

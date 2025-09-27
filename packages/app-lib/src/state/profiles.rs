@@ -7,6 +7,7 @@ use crate::state::{
 use crate::util;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
 use crate::util::io::{self};
+use cfg_if::cfg_if;
 use chrono::{DateTime, TimeDelta, TimeZone, Utc};
 use dashmap::DashMap;
 use regex::Regex;
@@ -103,10 +104,11 @@ impl ProfileInstallStage {
 pub enum LauncherFeatureVersion {
     None,
     MigratedServerLastPlayTime,
+    MigratedLaunchHooksLinux,
 }
 
 impl LauncherFeatureVersion {
-    pub const MOST_RECENT: Self = Self::MigratedServerLastPlayTime;
+    pub const MOST_RECENT: Self = Self::MigratedLaunchHooksLinux;
 
     pub fn as_str(&self) -> &'static str {
         match *self {
@@ -114,6 +116,7 @@ impl LauncherFeatureVersion {
             Self::MigratedServerLastPlayTime => {
                 "migrated_server_last_play_time"
             }
+            Self::MigratedLaunchHooksLinux => "migrated_launch_hooks_linux",
         }
     }
 
@@ -123,6 +126,7 @@ impl LauncherFeatureVersion {
             "migrated_server_last_play_time" => {
                 Self::MigratedServerLastPlayTime
             }
+            "migrated_launch_hooks_linux" => Self::MigratedLaunchHooksLinux,
             _ => Self::None,
         }
     }
@@ -780,6 +784,34 @@ impl Profile {
                 }
                 self.launcher_feature_version =
                     LauncherFeatureVersion::MigratedServerLastPlayTime;
+            }
+            LauncherFeatureVersion::MigratedServerLastPlayTime => {
+                cfg_if! {
+                    if #[cfg(unix)] {
+                        let quoter = shlex::Quoter::new().allow_nul(true);
+
+                        // Previously split by spaces
+                        if let Some(pre_launch) = self.hooks.pre_launch.as_ref() {
+                            self.hooks.pre_launch =
+                                Some(quoter.join(pre_launch.split(' ')).unwrap())
+                        }
+
+                        // Previously treated as complete path to command
+                        if let Some(wrapper) = self.hooks.wrapper.as_ref() {
+                            self.hooks.wrapper =
+                                Some(quoter.quote(wrapper).unwrap().to_string())
+                        }
+
+                        // Previously split by spaces
+                        if let Some(post_exit) = self.hooks.post_exit.as_ref() {
+                            self.hooks.post_exit =
+                                Some(quoter.join(post_exit.split(' ')).unwrap())
+                        }
+
+                        self.launcher_feature_version =
+                            LauncherFeatureVersion::MigratedLaunchHooksLinux;
+                    }
+                }
             }
             LauncherFeatureVersion::MOST_RECENT => unreachable!(
                 "LauncherFeatureVersion::MOST_RECENT was not updated"
