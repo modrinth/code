@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                                            INSERT INTO moderation_external_files (sha1, external_license_id)\n                                            SELECT * FROM UNNEST ($1::bytea[], $2::bigint[])\n                                            ON CONFLICT (sha1) DO NOTHING\n                                            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "ByteaArray",
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f297b517bc3bbd8628c0c222c0e3daf8f4efbe628ee2e8ddbbb4b9734cc9c915"
+}

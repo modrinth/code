@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE shared_instances\n        SET current_version_id = (\n            SELECT id FROM shared_instance_versions\n            WHERE shared_instance_id = $1\n            ORDER BY created DESC\n            LIMIT 1\n        )\n        WHERE id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f6388b5026e25191840d1a157a9ed48aaedab5db381f4efc389b852d9020a0e6"
+}
