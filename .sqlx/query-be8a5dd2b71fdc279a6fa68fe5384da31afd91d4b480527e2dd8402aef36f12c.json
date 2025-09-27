@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id FROM reports\n            WHERE closed = FALSE AND reporter = $1\n            ORDER BY created ASC\n            OFFSET $3\n            LIMIT $2\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "be8a5dd2b71fdc279a6fa68fe5384da31afd91d4b480527e2dd8402aef36f12c"
+}

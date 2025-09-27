@@ -8,6 +8,7 @@ use labrinth::LabrinthConfig;
 use std::rc::Rc;
 
 pub mod collections;
+pub mod limits;
 pub mod oauth;
 pub mod oauth_clients;
 pub mod organization;

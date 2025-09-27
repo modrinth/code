@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            -- See https://github.com/launchbadge/sqlx/issues/1266 for why we need all the \"as\"\n            SELECT\n                id as \"id!\",\n                title as \"title!\",\n                public as \"public!\",\n                owner_id as \"owner_id!\",\n                current_version_id\n            FROM shared_instances\n            WHERE owner_id = $1\n            UNION\n            SELECT\n                id as \"id!\",\n                title as \"title!\",\n                public as \"public!\",\n                owner_id as \"owner_id!\",\n                current_version_id\n            FROM shared_instances\n            JOIN shared_instance_users ON id = shared_instance_id\n            WHERE user_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "public!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "owner_id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "current_version_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "9c6e18cb19251e54b3b96446ab88d84842152b82c9a0032d1db587d7099b8550"
+}

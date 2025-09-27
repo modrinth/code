@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT lfe.id, lfe.enum_name, lfe.ordering, lfe.hidable\n            FROM loader_field_enums lfe\n            WHERE lfe.enum_name = $1\n            ORDER BY lfe.ordering ASC\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "enum_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "ordering",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "hidable",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "282ec0ee4a4ef739fc24af40d2c9be2a335ea9a32a1d19a450aef02f1c58334e"
+}

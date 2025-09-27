@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT mc.joining_mod_id mod_id, c.category name, mc.is_additional is_additional\n        FROM mods_categories mc\n        INNER JOIN categories c ON mc.joining_category_id = c.id\n        WHERE joining_mod_id = ANY($1)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "is_additional",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "8ef92ce880a7fdac4fc3a5dee50b30dc966b10872581c5932ae36dd28e930c6b"
+}

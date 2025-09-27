@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE payouts\n                    SET status = $1\n                    WHERE platform_id = $2\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bbc96f470cb7819a5c8aa0725e630311cfa8da5b3b119b9ce791e8e978250c6e"
+}
