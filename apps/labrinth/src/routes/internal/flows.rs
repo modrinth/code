@@ -237,6 +237,9 @@ impl TempUser {
                 badges: Badges::default(),
                 allow_friend_requests: true,
                 is_subscribed_to_newsletter: false,
+                max_projects: None,
+                max_organizations: None,
+                max_collections: None,
             }
             .insert(transaction)
             .await?;
@@ -1425,6 +1428,9 @@ pub async fn create_account_with_password(
         is_subscribed_to_newsletter: new_account
             .sign_up_newsletter
             .unwrap_or(false),
+        max_projects: None,
+        max_organizations: None,
+        max_collections: None,
     }
     .insert(&mut transaction)
     .await?;
