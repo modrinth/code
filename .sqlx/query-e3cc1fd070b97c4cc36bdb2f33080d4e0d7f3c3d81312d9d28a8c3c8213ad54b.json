@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM files\n            WHERE files.id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e3cc1fd070b97c4cc36bdb2f33080d4e0d7f3c3d81312d9d28a8c3c8213ad54b"
+}

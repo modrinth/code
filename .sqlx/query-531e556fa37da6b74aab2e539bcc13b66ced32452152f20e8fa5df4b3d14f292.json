@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT t.id\n                FROM threads t\n                INNER JOIN reports r ON t.report_id = r.id AND (r.user_id = $1 OR r.reporter = $1)\n                WHERE report_id IS NOT NULL\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "531e556fa37da6b74aab2e539bcc13b66ced32452152f20e8fa5df4b3d14f292"
+}

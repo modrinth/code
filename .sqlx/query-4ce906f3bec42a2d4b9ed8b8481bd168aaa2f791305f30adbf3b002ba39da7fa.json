@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE mods\n        SET status = requested_status\n        WHERE status = $1 AND approved < CURRENT_DATE AND requested_status IS NOT NULL\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4ce906f3bec42a2d4b9ed8b8481bd168aaa2f791305f30adbf3b002ba39da7fa"
+}

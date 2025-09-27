@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE friends\n            SET accepted = $3\n            WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c6214ac083ee2ff73e437a55112f5669b086b7a66959033847dac6d30a4cf445"
+}

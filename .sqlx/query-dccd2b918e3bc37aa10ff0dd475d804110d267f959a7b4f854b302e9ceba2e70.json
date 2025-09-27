@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE dependencies\n            SET dependency_id = NULL, mod_dependency_id = $2\n            WHERE dependency_id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "dccd2b918e3bc37aa10ff0dd475d804110d267f959a7b4f854b302e9ceba2e70"
+}

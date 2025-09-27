@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT id\n                FROM sessions\n                WHERE user_id = $1\n                ORDER BY created DESC\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "ed47f363296ef7f8b3a8bedfd8108ca692811be1b9dce4a89ad151a6932e44c5"
+}

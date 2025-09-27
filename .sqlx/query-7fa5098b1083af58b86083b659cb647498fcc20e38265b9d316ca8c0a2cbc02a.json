@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT DISTINCT mod_id, version_id, field_id, int_value, enum_value, string_value\n                    FROM versions v\n                    INNER JOIN version_fields vf ON v.id = vf.version_id\n                    WHERE v.id = ANY($1)\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "field_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "int_value",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "enum_value",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "string_value",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "7fa5098b1083af58b86083b659cb647498fcc20e38265b9d316ca8c0a2cbc02a"
+}

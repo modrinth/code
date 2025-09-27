@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE payouts_values\n                SET mod_id = NULL\n                WHERE (mod_id = $1)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b3345991457853c3f4c49dd68239bb23c3502d5c46008eb1b50233546a6ffa5d"
+}

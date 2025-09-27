@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE mods\n            SET summary = $1\n            WHERE (id = $2)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "595f4e7432d5b41002988c6cc6b0b1f09273ad02c319e6631c74d80a9b278328"
+}

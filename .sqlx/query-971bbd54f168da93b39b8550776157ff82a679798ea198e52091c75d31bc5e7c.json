@@ -1,0 +1,42 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT\n                  users.username \"user_name!\",\n                  users.email \"user_email\",\n                  inviter.username \"inviter_name!\",\n                  organization.name \"organization_name!\"\n                FROM users\n                INNER JOIN users inviter ON inviter.id = $1\n                INNER JOIN organizations organization ON organization.id = $2\n                WHERE users.id = $3\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "inviter_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "organization_name!",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "971bbd54f168da93b39b8550776157ff82a679798ea198e52091c75d31bc5e7c"
+}
