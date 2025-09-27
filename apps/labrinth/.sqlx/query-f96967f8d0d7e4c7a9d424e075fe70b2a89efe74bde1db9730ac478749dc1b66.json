@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE reports\n                SET mod_id = NULL\n                WHERE mod_id = $1\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f96967f8d0d7e4c7a9d424e075fe70b2a89efe74bde1db9730ac478749dc1b66"
+}

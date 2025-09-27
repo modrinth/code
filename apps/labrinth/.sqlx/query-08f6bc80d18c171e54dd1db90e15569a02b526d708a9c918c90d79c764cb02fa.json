@@ -1,0 +1,44 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT c.id id, c.category category, c.icon icon, c.header category_header, pt.name project_type\n            FROM categories c\n            INNER JOIN project_types pt ON c.project_type = pt.id\n            ORDER BY c.ordering, c.category\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "category",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "icon",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "category_header",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "project_type",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "08f6bc80d18c171e54dd1db90e15569a02b526d708a9c918c90d79c764cb02fa"
+}
