@@ -973,7 +973,6 @@ impl DBProject {
             return Ok(dependents);
         }
 
-        //             SELECT d.dependency_id, COALESCE(vd.mod_id, 0) mod_id, d.mod_dependency_id
         let dependents: Dependents = sqlx::query!(
             "
             SELECT DISTINCT version.id version_id, mod.id FROM versions version
