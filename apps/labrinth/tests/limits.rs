@@ -2,6 +2,8 @@ use common::api_v3::ApiV3;
 use common::database::USER_USER_PAT;
 use common::environment::{TestEnvironment, with_test_environment};
 
+use crate::common::api_common::ApiProject;
+
 pub mod common;
 
 #[actix_rt::test]
@@ -10,10 +12,15 @@ pub async fn limits() {
         None,
         |test_env: TestEnvironment<ApiV3>| async move {
             let api = &test_env.api;
-            let limits = api.get_limits(USER_USER_PAT).await;
-            assert!(limits.max.projects < u64::MAX);
-            assert!(limits.max.organizations < u64::MAX);
-            assert!(limits.max.collections < u64::MAX);
+
+            let project_limits = api.get_project_limits(USER_USER_PAT).await;
+            assert_eq!(project_limits.current, 0);
+            assert!(project_limits.max < u64::MAX);
+
+            api.add_public_project("foo", None, None, USER_USER_PAT)
+                .await;
+            let project_limits = api.get_project_limits(USER_USER_PAT).await;
+            assert_eq!(project_limits.current, 1);
         },
     )
     .await;

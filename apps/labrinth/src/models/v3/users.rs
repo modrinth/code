@@ -50,10 +50,6 @@ pub struct User {
 
     // DEPRECATED. Always returns None
     pub github_id: Option<u64>,
-
-    pub max_projects: Option<u64>,
-    pub max_organizations: Option<u64>,
-    pub max_collections: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -85,9 +81,6 @@ impl From<DBUser> for User {
             github_id: None,
             stripe_customer_id: None,
             allow_friend_requests: None,
-            max_projects: data.max_projects,
-            max_organizations: data.max_organizations,
-            max_collections: data.max_collections,
         }
     }
 }
@@ -140,9 +133,6 @@ impl User {
             }),
             stripe_customer_id: db_user.stripe_customer_id,
             allow_friend_requests: Some(db_user.allow_friend_requests),
-            max_projects: db_user.max_projects,
-            max_organizations: db_user.max_organizations,
-            max_collections: db_user.max_collections,
         }
     }
 }

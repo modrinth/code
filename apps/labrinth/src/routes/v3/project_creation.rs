@@ -4,7 +4,6 @@ use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
 use crate::database::models::thread_item::ThreadBuilder;
-use crate::database::models::user_limits::UserLimits;
 use crate::database::models::{self, DBUser, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
@@ -18,6 +17,7 @@ use crate::models::projects::{
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
+use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::indexing::IndexingError;
 use crate::util::img::upload_image_optimized;
@@ -352,8 +352,8 @@ async fn project_create_inner(
     )
     .await?;
 
-    let limits = UserLimits::get(&current_user, pool).await?;
-    if limits.current.projects >= limits.max.projects {
+    let limits = UserLimits::get_for_projects(&current_user, pool).await?;
+    if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
     }
 

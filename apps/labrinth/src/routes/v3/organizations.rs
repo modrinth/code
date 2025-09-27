@@ -7,13 +7,13 @@ use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
     DBOrganization, generate_organization_id, team_item,
-    user_limits::UserLimits,
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::OrganizationId;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
+use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::util::img::delete_old_images;
@@ -137,8 +137,9 @@ pub async fn organization_create(
     .await?
     .1;
 
-    let limits = UserLimits::get(&current_user, &pool).await?;
-    if limits.current.organizations >= limits.max.organizations {
+    let limits =
+        UserLimits::get_for_organizations(&current_user, &pool).await?;
+    if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
     }
 

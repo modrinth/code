@@ -51,10 +51,6 @@ pub struct DBUser {
     pub allow_friend_requests: bool,
 
     pub is_subscribed_to_newsletter: bool,
-
-    pub max_projects: Option<u64>,
-    pub max_organizations: Option<u64>,
-    pub max_collections: Option<u64>,
 }
 
 impl DBUser {
@@ -69,15 +65,13 @@ impl DBUser {
                 avatar_url, raw_avatar_url, bio, created,
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                 email_verified, password, paypal_id, paypal_country, paypal_email,
-                venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
-                max_projects, max_organizations, max_collections
+                venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9, $10, $11, $12, $13,
-                $14, $15, $16, $17, $18, $19, $20, $21, $22,
-                $23, $24, $25
+                $14, $15, $16, $17, $18, $19, $20, $21, $22
             )
             ",
             self.id as DBUserId,
@@ -102,9 +96,6 @@ impl DBUser {
             self.stripe_customer_id,
             self.allow_friend_requests,
             self.is_subscribed_to_newsletter,
-            self.max_projects.map(|x| x as i64),
-            self.max_organizations.map(|x| x as i64),
-            self.max_collections.map(|x| x as i64),
         )
         .execute(&mut **transaction)
         .await?;
@@ -190,8 +181,7 @@ impl DBUser {
                         created, role, badges,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                         email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
-                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
-                        max_projects, max_organizations, max_collections
+                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
                     FROM users
                     WHERE id = ANY($1) OR LOWER(username) = ANY($2)
                     ",
@@ -226,9 +216,6 @@ impl DBUser {
                             totp_secret: u.totp_secret,
                             allow_friend_requests: u.allow_friend_requests,
                             is_subscribed_to_newsletter: u.is_subscribed_to_newsletter,
-                            max_projects: u.max_projects.map(|x| x as u64),
-                            max_organizations: u.max_organizations.map(|x| x as u64),
-                            max_collections: u.max_collections.map(|x| x as u64),
                         };
 
                         acc.insert(u.id, (Some(u.username), user));
