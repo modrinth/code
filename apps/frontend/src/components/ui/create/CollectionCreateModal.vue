@@ -1,7 +1,7 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.title)">
-		<div class="flex min-w-96 flex-col gap-3">
-			<CreateLimitAlert type="collection" v-model="hasHitLimit" />
+		<div class="min-w-md flex max-w-md flex-col gap-3">
+			<CreateLimitAlert v-model="hasHitLimit" type="collection" />
 			<div class="flex flex-col gap-2">
 				<label for="name">
 					<span class="text-lg font-semibold text-contrast">
@@ -21,7 +21,9 @@
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="additional-information" class="flex flex-col gap-1">
-					<span class="text-lg font-semibold text-contrast">{{ formatMessage(messages.summaryLabel) }}</span>
+					<span class="text-lg font-semibold text-contrast">{{
+						formatMessage(messages.summaryLabel)
+					}}</span>
 					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
 				<div class="textarea-wrapper">
@@ -45,7 +47,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-36">
-					<button @click="create" :disabled="hasHitLimit">
+					<button :disabled="hasHitLimit" @click="create">
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createCollection) }}
 					</button>
@@ -58,6 +60,7 @@
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { defineMessages } from '@vintl/vintl'
+
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
 const { addNotification } = injectNotificationManager()
@@ -91,7 +94,8 @@ const messages = defineMessages({
 	},
 	collectionInfo: {
 		id: 'create.collection.collection-info',
-		defaultMessage: 'Your new collection will be created as a public collection with {count, plural, =0 {no projects} one {# project} other {# projects}}.',
+		defaultMessage:
+			'Your new collection will be created as a public collection with {count, plural, =0 {no projects} one {# project} other {# projects}}.',
 	},
 	cancel: {
 		id: 'create.collection.cancel',

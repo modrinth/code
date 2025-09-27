@@ -1,7 +1,7 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.title)">
-		<div class="flex min-w-96 flex-col gap-3">
-			<CreateLimitAlert type="project" v-model="hasHitLimit" />
+		<div class="min-w-md flex max-w-md flex-col gap-3">
+			<CreateLimitAlert v-model="hasHitLimit" type="project" />
 			<div class="flex flex-col gap-2">
 				<label for="name">
 					<span class="text-lg font-semibold text-contrast">
@@ -83,7 +83,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-32">
-					<button @click="createProject" :disabled="hasHitLimit">
+					<button :disabled="hasHitLimit" @click="createProject">
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createProject) }}
 					</button>
@@ -97,6 +97,7 @@
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, DropdownSelect, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { defineMessages } from '@vintl/vintl'
+
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
 const { addNotification } = injectNotificationManager()

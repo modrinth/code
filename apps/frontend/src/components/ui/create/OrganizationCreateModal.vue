@@ -1,7 +1,7 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.title)">
-		<div class="flex min-w-96 flex-col gap-3">
-			<CreateLimitAlert type="org" v-model="hasHitLimit" />
+		<div class="min-w-md flex max-w-md flex-col gap-3">
+			<CreateLimitAlert v-model="hasHitLimit" type="org" />
 			<div class="flex flex-col gap-2">
 				<label for="name">
 					<span class="text-lg font-semibold text-contrast">
@@ -69,7 +69,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-40">
-					<button @click="createOrganization" :disabled="hasHitLimit">
+					<button :disabled="hasHitLimit" @click="createOrganization">
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createOrganization) }}
 					</button>
@@ -84,6 +84,7 @@ import { PlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { defineMessages } from '@vintl/vintl'
 import { ref } from 'vue'
+
 import CreateLimitAlert from './CreateLimitAlert.vue'
 
 const router = useNativeRouter()
@@ -121,7 +122,8 @@ const messages = defineMessages({
 	},
 	ownershipInfo: {
 		id: 'create.organization.ownership-info',
-		defaultMessage: 'You will be the owner of this organization, but you can invite other members and transfer ownership at any time.',
+		defaultMessage:
+			'You will be the owner of this organization, but you can invite other members and transfer ownership at any time.',
 	},
 	cancel: {
 		id: 'create.organization.cancel',

@@ -340,8 +340,8 @@ import {
 import { formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
-import Modal from '~/components/ui/Modal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
+import Modal from '~/components/ui/Modal.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
 useHead({ title: 'Projects - Modrinth' })
