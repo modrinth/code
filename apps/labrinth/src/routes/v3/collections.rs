@@ -2,6 +2,7 @@ use crate::auth::checks::is_visible_collection;
 use crate::auth::{filter_visible_collections, get_user_from_headers};
 use crate::database::models::{
     collection_item, generate_collection_id, project_item,
+    user_limits::UserLimits,
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
@@ -75,6 +76,11 @@ pub async fn collection_create(
     )
     .await?
     .1;
+
+    let limits = UserLimits::get(&current_user, &client).await?;
+    if limits.current.collections + 1 >= limits.max.collections {
+        return Err(CreateError::LimitReached);
+    }
 
     collection_create_data.validate().map_err(|err| {
         CreateError::InvalidInput(validation_errors_to_string(err, None))
