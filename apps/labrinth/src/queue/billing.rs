@@ -199,14 +199,7 @@ pub async fn index_subscriptions(
                                         )
                                     })?;
 
-                            let Ok(customer_id): Result<stripe::CustomerId, _> =
-                                stripe_customer_id.parse()
-                            else {
-                                return Err(ApiError::InvalidInput(
-                                    "Charge's Stripe customer ID was invalid"
-                                        .to_owned(),
-                                ));
-                            };
+                            let customer_id = stripe_customer_id.parse().map_err(|e| ApiError::InvalidInput(format!("Charge's Stripe customer ID was invalid ({e})")))?;
 
                             let customer = stripe::Customer::retrieve(
                                 &stripe_client,
@@ -215,13 +208,14 @@ pub async fn index_subscriptions(
                             )
                             .await?;
 
-                            let Some(stripe_address) = customer.address else {
-                                return Err(ApiError::InvalidInput(
-                                    "Stripe customer had no address".to_owned(),
-                                ));
-                            };
+                            
 
-                            stripe_address
+                            customer.address.ok_or_else(|| {
+                                    ApiError::InvalidInput(
+                                        "Stripe customer had no address"
+                                            .to_owned(),
+                                    )
+                                })?
                         };
 
                         let customer_address =
@@ -272,12 +266,13 @@ pub async fn index_subscriptions(
                             // The price of the subscription has changed, we need to insert a notification
                             // for this.
 
-                            let Some(subscription_id) = charge.subscription_id
-                            else {
-                                return Err(ApiError::InvalidInput(
-                                    "Charge has no subscription ID".to_owned(),
-                                ));
-                            };
+                            let subscription_id =
+                                charge.subscription_id.ok_or_else(|| {
+                                    ApiError::InvalidInput(
+                                        "Charge has no subscription ID"
+                                            .to_owned(),
+                                    )
+                                })?;
 
                             NotificationBuilder {
                                 body: NotificationBody::TaxNotification {
@@ -410,14 +405,12 @@ pub async fn index_subscriptions(
                                 })
                             })?;
 
-                    let Ok(customer_id): Result<stripe::CustomerId, _> =
-                        stripe_customer_id.parse()
-                    else {
-                        return Err(ApiError::InvalidInput(
-                            "Charge's Stripe customer ID was invalid"
-                                .to_owned(),
-                        ));
-                    };
+                    let customer_id =
+                        stripe_customer_id.parse().map_err(|e| {
+                            ApiError::InvalidInput(format!(
+                                "Charge's Stripe customer ID was invalid ({e})"
+                            ))
+                        })?;
 
                     let customer = stripe::Customer::retrieve(
                         &stripe_client,
@@ -426,13 +419,11 @@ pub async fn index_subscriptions(
                     )
                     .await?;
 
-                    let Some(stripe_address) = customer.address else {
-                        return Err(ApiError::InvalidInput(
+                    customer.address.ok_or_else(|| {
+                        ApiError::InvalidInput(
                             "Stripe customer had no address".to_owned(),
-                        ));
-                    };
-
-                    stripe_address
+                        )
+                    })?
                 };
 
                 let tax_id =
