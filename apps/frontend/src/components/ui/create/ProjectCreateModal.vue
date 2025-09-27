@@ -48,13 +48,12 @@
 					</span>
 					<span>{{ formatMessage(messages.visibilityDescription) }}</span>
 				</label>
-				<DropdownSelect
+				<Chips
 					id="visibility"
 					v-model="visibility"
-					:options="visibilities"
-					:display-name="(x) => x.display"
+					:items="visibilities"
+					:format-label="(x) => x.display"
 					:disabled="hasHitLimit"
-					:name="formatMessage(messages.visibilityLabel)"
 				/>
 			</div>
 			<div class="flex flex-col gap-2">
@@ -95,7 +94,7 @@
 
 <script setup>
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, DropdownSelect, injectNotificationManager, NewModal } from '@modrinth/ui'
+import { ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { defineMessages } from '@vintl/vintl'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
@@ -196,10 +195,7 @@ const visibilities = ref([
 		display: formatMessage(messages.visibilityPrivate),
 	},
 ])
-const visibility = ref({
-	actual: 'approved',
-	display: formatMessage(messages.visibilityPublic),
-})
+const visibility = ref(visibilities.value[0])
 
 const cancel = () => {
 	modal.value.hide()
