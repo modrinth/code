@@ -34,13 +34,13 @@ impl UserLimits {
                  WHERE user_id = $1) as collections",
             DBUserId::from(user.id) as DBUserId,
         )
-        .fetch_one(&*pool)
+        .fetch_one(pool)
         .await?;
 
         let current = UserLimitCount {
-            projects: current.projects.map(|x| x as u64).unwrap_or(0),
-            organizations: current.organizations.map(|x| x as u64).unwrap_or(0),
-            collections: current.collections.map(|x| x as u64).unwrap_or(0),
+            projects: current.projects.map_or(0, |x| x as u64),
+            organizations: current.organizations.map_or(0, |x| x as u64),
+            collections: current.collections.map_or(0, |x| x as u64),
         };
 
         if user.role.is_admin() {

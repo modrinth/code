@@ -352,7 +352,7 @@ async fn project_create_inner(
     )
     .await?;
 
-    let limits = UserLimits::get(&current_user, &pool).await?;
+    let limits = UserLimits::get(&current_user, pool).await?;
     if limits.current.projects + 1 >= limits.max.projects {
         return Err(CreateError::LimitReached);
     }
