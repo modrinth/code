@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,\n                        max_projects, max_organizations, max_collections\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
+  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
   "describe": {
     "columns": [
       {
@@ -127,21 +127,6 @@
         "ordinal": 24,
         "name": "is_subscribed_to_newsletter",
         "type_info": "Bool"
-      },
-      {
-        "ordinal": 25,
-        "name": "max_projects",
-        "type_info": "Int8"
-      },
-      {
-        "ordinal": 26,
-        "name": "max_organizations",
-        "type_info": "Int8"
-      },
-      {
-        "ordinal": 27,
-        "name": "max_collections",
-        "type_info": "Int8"
       }
     ],
     "parameters": {
@@ -175,11 +160,8 @@
       true,
       true,
       false,
-      false,
-      true,
-      true,
-      true
+      false
     ]
   },
-  "hash": "093597133539b56ddbba5c05733721fa7e7515422c2a7916d3607e2438822402"
+  "hash": "5fcdeeeb820ada62e10feb0beefa29b0535241bbb6d74143925e16cf8cd720c4"
 }

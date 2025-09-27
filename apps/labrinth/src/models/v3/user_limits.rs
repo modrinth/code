@@ -40,8 +40,7 @@ impl UserLimits {
         )
         .fetch_one(pool)
         .await?
-        .map(|x| x as u64)
-        .unwrap_or(0);
+        .map_or(0, |x| x as u64);
 
         Ok(Self {
             current,
@@ -66,8 +65,7 @@ impl UserLimits {
         )
         .fetch_one(pool)
         .await?
-        .map(|x| x as u64)
-        .unwrap_or(0);
+        .map_or(0, |x| x as u64);
 
         Ok(Self {
             current,
@@ -90,8 +88,7 @@ impl UserLimits {
         )
         .fetch_one(pool)
         .await?
-        .map(|x| x as u64)
-        .unwrap_or(0);
+        .map_or(0, |x| x as u64);
 
         Ok(Self {
             current,
