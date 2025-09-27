@@ -1,6 +1,7 @@
 <template>
 	<NewModal ref="modal" header="Creating an organization">
 		<div class="flex flex-col gap-3">
+			<LimitAlert type="org" />
 			<div class="flex flex-col gap-2">
 				<label for="name">
 					<span class="text-lg font-semibold text-contrast">
@@ -75,6 +76,7 @@
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { ref } from 'vue'
+import LimitAlert from './CreateLimitAlert.vue'
 
 const router = useNativeRouter()
 const { addNotification } = injectNotificationManager()

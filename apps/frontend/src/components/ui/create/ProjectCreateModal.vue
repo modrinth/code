@@ -1,6 +1,7 @@
 <template>
 	<NewModal ref="modal" header="Creating a project">
 		<div class="flex flex-col gap-3">
+			<LimitAlert type="project" />
 			<div class="flex flex-col gap-2">
 				<label for="name">
 					<span class="text-lg font-semibold text-contrast">
@@ -86,6 +87,7 @@
 <script setup>
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, DropdownSelect, injectNotificationManager, NewModal } from '@modrinth/ui'
+import LimitAlert from './CreateLimitAlert.vue'
 
 const { addNotification } = injectNotificationManager()
 
