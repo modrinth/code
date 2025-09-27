@@ -14,13 +14,18 @@ pub async fn limits() {
             let api = &test_env.api;
 
             let project_limits = api.get_project_limits(USER_USER_PAT).await;
-            assert_eq!(project_limits.current, 0);
+            assert_eq!(project_limits.current, 2);
             assert!(project_limits.max < u64::MAX);
 
-            api.add_public_project("foo", None, None, USER_USER_PAT)
-                .await;
+            api.add_public_project(
+                "limit-test-project",
+                None,
+                None,
+                USER_USER_PAT,
+            )
+            .await;
             let project_limits = api.get_project_limits(USER_USER_PAT).await;
-            assert_eq!(project_limits.current, 1);
+            assert_eq!(project_limits.current, 3);
         },
     )
     .await;
