@@ -7,6 +7,7 @@ use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
     DBOrganization, generate_organization_id, team_item,
+    user_limits::UserLimits,
 };
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
@@ -135,6 +136,11 @@ pub async fn organization_create(
     )
     .await?
     .1;
+
+    let limits = UserLimits::get(&current_user, &pool).await?;
+    if limits.current.organizations + 1 >= limits.max.organizations {
+        return Err(CreateError::LimitReached);
+    }
 
     new_organization.validate().map_err(|err| {
         CreateError::ValidationError(validation_errors_to_string(err, None))
