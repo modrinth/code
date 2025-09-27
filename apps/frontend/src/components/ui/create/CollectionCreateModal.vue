@@ -1,11 +1,11 @@
 <template>
-	<NewModal ref="modal" header="Creating a collection">
-		<div class="flex flex-col gap-3">
-			<LimitAlert type="collection" />
+	<NewModal ref="modal" :header="formatMessage(messages.title)">
+		<div class="flex min-w-96 flex-col gap-3">
+			<CreateLimitAlert type="collection" v-model="hasHitLimit" />
 			<div class="flex flex-col gap-2">
 				<label for="name">
 					<span class="text-lg font-semibold text-contrast">
-						Name
+						{{ formatMessage(messages.nameLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
@@ -14,35 +14,40 @@
 					v-model="name"
 					type="text"
 					maxlength="64"
-					:placeholder="`Enter collection name...`"
+					:placeholder="formatMessage(messages.namePlaceholder)"
 					autocomplete="off"
+					:disabled="hasHitLimit"
 				/>
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="additional-information" class="flex flex-col gap-1">
-					<span class="text-lg font-semibold text-contrast"> Summary </span>
-					<span>A sentence or two that describes your collection.</span>
+					<span class="text-lg font-semibold text-contrast">{{ formatMessage(messages.summaryLabel) }}</span>
+					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
 				<div class="textarea-wrapper">
-					<textarea id="additional-information" v-model="description" maxlength="256" />
+					<textarea
+						id="additional-information"
+						v-model="description"
+						maxlength="256"
+						:placeholder="formatMessage(messages.summaryPlaceholder)"
+						:disabled="hasHitLimit"
+					/>
 				</div>
 			</div>
-			<p class="m-0 max-w-[30rem]">
-				Your new collection will be created as a public collection with
-				{{ projectIds.length > 0 ? projectIds.length : 'no' }}
-				{{ projectIds.length !== 1 ? 'projects' : 'project' }}.
+			<p class="m-0">
+				{{ formatMessage(messages.collectionInfo, { count: projectIds.length }) }}
 			</p>
-			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button @click="create">
-						<PlusIcon aria-hidden="true" />
-						Create collection
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
+			<div class="flex justify-end gap-2">
+				<ButtonStyled class="w-24">
 					<button @click="modal.hide()">
 						<XIcon aria-hidden="true" />
-						Cancel
+						{{ formatMessage(messages.cancel) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand" class="w-36">
+					<button @click="create" :disabled="hasHitLimit">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.createCollection) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -52,13 +57,59 @@
 <script setup>
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
-import LimitAlert from './CreateLimitAlert.vue'
+import { defineMessages } from '@vintl/vintl'
+import CreateLimitAlert from './CreateLimitAlert.vue'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const router = useNativeRouter()
+
+const messages = defineMessages({
+	title: {
+		id: 'create.collection.title',
+		defaultMessage: 'Creating a collection',
+	},
+	nameLabel: {
+		id: 'create.collection.name-label',
+		defaultMessage: 'Name',
+	},
+	namePlaceholder: {
+		id: 'create.collection.name-placeholder',
+		defaultMessage: 'Enter collection name...',
+	},
+	summaryLabel: {
+		id: 'create.collection.summary-label',
+		defaultMessage: 'Summary',
+	},
+	summaryDescription: {
+		id: 'create.collection.summary-description',
+		defaultMessage: 'A sentence or two that describes your collection.',
+	},
+	summaryPlaceholder: {
+		id: 'create.collection.summary-placeholder',
+		defaultMessage: 'This is a collection of...',
+	},
+	collectionInfo: {
+		id: 'create.collection.collection-info',
+		defaultMessage: 'Your new collection will be created as a public collection with {count, plural, =0 {no projects} one {# project} other {# projects}}.',
+	},
+	cancel: {
+		id: 'create.collection.cancel',
+		defaultMessage: 'Cancel',
+	},
+	createCollection: {
+		id: 'create.collection.create-collection',
+		defaultMessage: 'Create collection',
+	},
+	errorTitle: {
+		id: 'create.collection.error-title',
+		defaultMessage: 'An error occurred',
+	},
+})
 
 const name = ref('')
 const description = ref('')
+const hasHitLimit = ref(false)
 
 const modal = ref()
 
@@ -90,7 +141,7 @@ async function create() {
 		await router.push(`/collection/${result.id}`)
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(messages.errorTitle),
 			text: err?.data?.description || err?.message || err,
 			type: 'error',
 		})
