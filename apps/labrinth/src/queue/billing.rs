@@ -208,8 +208,6 @@ pub async fn index_subscriptions(
                             )
                             .await?;
 
-                            
-
                             customer.address.ok_or_else(|| {
                                     ApiError::InvalidInput(
                                         "Stripe customer had no address"
