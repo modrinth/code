@@ -1,19 +1,17 @@
 use crate::{
     auth::get_user_from_headers,
-    database::models::{User, user_limits::UserLimits},
+    database::{models::user_limits::UserLimits, redis::RedisPool},
     models::pats::Scopes,
+    queue::session::AuthQueue,
     routes::ApiError,
 };
-use actix_web::{HttpRequest, HttpResponse, web};
-use futures::TryStreamExt;
-use serde::{Deserialize, Serialize};
+use actix_web::{HttpRequest, web};
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(get_limits);
+    cfg.service(web::scope("limits").route("", web::get().to(get_limits)));
 }
 
-#[get("limits")]
 async fn get_limits(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -28,6 +26,8 @@ async fn get_limits(
         Scopes::empty(),
     )
     .await?;
+
+    tracing::info!("FASDVNSOVSNRV");
 
     let limits = UserLimits::get(&user, &pool).await?;
     Ok(web::Json(limits))
