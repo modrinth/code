@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tSELECT pti.*\n\t\t\tFROM products_prices pp\n\t\t\tINNER JOIN products_tax_identifiers pti ON pti.product_id = pp.product_id\n\t\t\tWHERE pp.id = $1\n\t\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "tax_processor_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "product_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "9548cc3de06c6090e945af17e9ffe0bd2faa48259745548d41b9f44f5d82e8f2"
+}

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO oauth_client_redirect_uris (id, client_id, uri)\n            SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::varchar[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int8Array",
+        "VarcharArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9dadd6926a8429e60cb5fd53285b81f2f47ccdded1e764c04d8b7651d9796ce0"
+}

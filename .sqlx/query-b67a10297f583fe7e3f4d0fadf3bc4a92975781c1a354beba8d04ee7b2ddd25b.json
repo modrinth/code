@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n          products_tax_identifiers.*,\n          products.metadata product_metadata\n        FROM products_prices\n        INNER JOIN products ON products.id = products_prices.product_id\n        INNER JOIN products_tax_identifiers ON products_tax_identifiers.product_id = products.id\n        WHERE products_prices.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "tax_processor_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "product_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "product_metadata",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "b67a10297f583fe7e3f4d0fadf3bc4a92975781c1a354beba8d04ee7b2ddd25b"
+}

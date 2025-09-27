@@ -59,7 +59,7 @@ sha2.workspace = true
 hmac.workspace = true
 argon2.workspace = true
 murmur2.workspace = true
-bitflags.workspace = true
+bitflags = { workspace = true, features = ["serde"] }
 hex.workspace = true
 zxcvbn.workspace = true
 totp-rs = { workspace = true, features = ["gen_secret"] }
@@ -144,6 +144,8 @@ json-patch.workspace = true
 ariadne.workspace = true
 
 clap = { workspace = true, features = ["derive"] }
+
+const_format.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
 tikv-jemallocator = { workspace = true, features = [

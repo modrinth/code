@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT mf.follower_id FROM mod_follows mf\n        INNER JOIN users u ON u.id = follower_id\n        WHERE mf.mod_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "follower_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "c308d4eb45008d0ff9f2cbc955e06268bc67eb546f9a14354fb668a0b2d2a78a"
+}

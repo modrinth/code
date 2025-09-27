@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id, version_number, version_type\n        FROM versions\n        WHERE mod_id = $1 AND status = ANY($2)\n        ORDER BY ordering ASC NULLS LAST, date_published ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "version_number",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "version_type",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "defc616ab6e602d87695371761563a023a96a860270a2f2afcdd48087e441dad"
+}

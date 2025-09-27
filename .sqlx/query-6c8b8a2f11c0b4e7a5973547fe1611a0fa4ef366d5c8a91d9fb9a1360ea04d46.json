@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT EXISTS(SELECT 1 FROM hashes h\n        INNER JOIN files f ON f.id = h.file_id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash = $1 AND v.mod_id != $3)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bytea",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "6c8b8a2f11c0b4e7a5973547fe1611a0fa4ef366d5c8a91d9fb9a1360ea04d46"
+}

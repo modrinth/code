@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tINSERT INTO payouts_values_notifications (date_available, user_id, notified)\n\t\tSELECT DISTINCT date_available, user_id, false notified\n\t\tFROM payouts_values\n\t\tWHERE date_available > NOW()\n\t\tON CONFLICT (date_available, user_id) DO NOTHING\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "603c1109f8c5a9a5b45b3f531fcb6b597ac01c831fbbcb296fc5ba08cc622482"
+}
