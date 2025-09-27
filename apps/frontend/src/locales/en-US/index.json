@@ -465,7 +465,7 @@
     "message": "You're about to hit the {type} limit, please contact support if you need more than {max} {typePlural}."
   },
   "create.limit-alert.contact-support": {
-    "message": "Contact Support"
+    "message": "Contact support"
   },
   "create.limit-alert.limit-reached": {
     "message": "{type} limit reached"

@@ -166,6 +166,7 @@ import _StopCircleIcon from './icons/stop-circle.svg?component'
 import _StrikethroughIcon from './icons/strikethrough.svg?component'
 import _SunIcon from './icons/sun.svg?component'
 import _SunriseIcon from './icons/sunrise.svg?component'
+import _SupportChatIcon from './icons/support-chat.svg?component'
 import _TagIcon from './icons/tag.svg?component'
 import _TagsIcon from './icons/tags.svg?component'
 import _TerminalSquareIcon from './icons/terminal-square.svg?component'
@@ -364,6 +365,7 @@ export const StopCircleIcon = _StopCircleIcon
 export const StrikethroughIcon = _StrikethroughIcon
 export const SunIcon = _SunIcon
 export const SunriseIcon = _SunriseIcon
+export const SupportChatIcon = _SupportChatIcon
 export const TagIcon = _TagIcon
 export const TagsIcon = _TagsIcon
 export const TerminalSquareIcon = _TerminalSquareIcon

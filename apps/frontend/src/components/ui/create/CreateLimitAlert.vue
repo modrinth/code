@@ -9,13 +9,13 @@
 		"
 		class="mb-4"
 	>
-		<div class="flex w-full flex-col gap-2">
+		<div class="flex w-full flex-col gap-4">
 			<template v-if="hasHitLimit">
 				{{ formatMessage(messages.limitReachedDescription, { type: typeDisplayName, max }) }}
 				<div class="w-min">
 					<ButtonStyled color="red">
 						<NuxtLink to="https://support.modrinth.com" target="_blank">
-							<UnknownIcon /> {{ formatMessage(messages.contactSupport) }}</NuxtLink
+							<MessageIcon />{{ formatMessage(messages.contactSupport) }}</NuxtLink
 						>
 					</ButtonStyled>
 				</div>
@@ -31,7 +31,7 @@
 				<div class="w-min">
 					<ButtonStyled color="orange">
 						<NuxtLink to="https://support.modrinth.com" target="_blank">
-							<UnknownIcon /> {{ formatMessage(messages.contactSupport) }}</NuxtLink
+							<MessageIcon />{{ formatMessage(messages.contactSupport) }}</NuxtLink
 						>
 					</ButtonStyled>
 				</div>
@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { UnknownIcon } from '@modrinth/assets'
+import { MessageIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { defineMessages } from '@vintl/vintl'
@@ -70,7 +70,7 @@ const messages = defineMessages({
 	},
 	contactSupport: {
 		id: 'create.limit-alert.contact-support',
-		defaultMessage: 'Contact Support',
+		defaultMessage: 'Contact support',
 	},
 })
 
