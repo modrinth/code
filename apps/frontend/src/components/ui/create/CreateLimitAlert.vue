@@ -93,39 +93,10 @@ const props = defineProps<{
 
 const model = defineModel<boolean>()
 
-// const { data: limits } = await useAsyncData<LimitsResponse | undefined>('limits', () => {
-// 	try {
-// 		return useBaseFetch('limits', { apiVersion: 3 }) as Promise<LimitsResponse>
-// 	} catch {
-// 		const fallbackLimits: LimitsResponse = {
-// 			current: {
-// 				projects: 10,
-// 				orgs: 4,
-// 				collections: 20,
-// 			},
-// 			max: {
-// 				projects: 10,
-// 				orgs: 4,
-// 				collections: 20,
-// 			},
-// 		}
-
-// 		return new Promise((resolve) => resolve(fallbackLimits))
-// 	}
-// })
-
-const limits = ref<LimitsResponse>({
-	current: {
-		projects: 8,
-		orgs: 3,
-		collections: 19,
-	},
-	max: {
-		projects: 10,
-		orgs: 4,
-		collections: 20,
-	},
-})
+const { data: limits } = await useAsyncData<LimitsResponse | undefined>(
+	'limits',
+	() => useBaseFetch('limits', { apiVersion: 3 }) as Promise<LimitsResponse>,
+)
 
 const limitKey = computed((): keyof LimitsResponse['current'] => {
 	switch (props.type) {
