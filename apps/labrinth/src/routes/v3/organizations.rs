@@ -138,7 +138,7 @@ pub async fn organization_create(
     .1;
 
     let limits = UserLimits::get(&current_user, &pool).await?;
-    if limits.current.organizations + 1 >= limits.max.organizations {
+    if limits.current.organizations >= limits.max.organizations {
         return Err(CreateError::LimitReached);
     }
 

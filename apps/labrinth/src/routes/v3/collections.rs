@@ -78,7 +78,7 @@ pub async fn collection_create(
     .1;
 
     let limits = UserLimits::get(&current_user, &client).await?;
-    if limits.current.collections + 1 >= limits.max.collections {
+    if limits.current.collections >= limits.max.collections {
         return Err(CreateError::LimitReached);
     }
 
