@@ -9,7 +9,7 @@
 		"
 		class="mb-4"
 	>
-		<div class="flex w-full flex-col gap-2">
+		<div class="mt-0 flex w-full flex-col gap-2">
 			<template v-if="hasHitLimit">
 				{{ formatMessage(messages.limitReachedDescription, { type: typeDisplayName, max }) }}
 				<div class="w-min">
@@ -45,7 +45,7 @@ import { UnknownIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { defineMessages } from '@vintl/vintl'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const { formatMessage } = useVIntl()
 
@@ -93,10 +93,18 @@ const props = defineProps<{
 
 const model = defineModel<boolean>()
 
-const { data: limits } = await useAsyncData<LimitsResponse | undefined>(
-	'limits',
-	() => useBaseFetch('limits', { apiVersion: 3 }) as Promise<LimitsResponse>,
-)
+const limits = ref<LimitsResponse>({
+	current: {
+		projects: 8,
+		orgs: 4,
+		collections: 12,
+	},
+	max: {
+		projects: 10,
+		orgs: 5,
+		collections: 15,
+	},
+})
 
 const limitKey = computed((): keyof LimitsResponse['current'] => {
 	switch (props.type) {
