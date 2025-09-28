@@ -575,7 +575,12 @@ pub async fn create_or_update_payment_intent(
         intent.customer = Some(customer_id);
         intent.metadata = Some(metadata);
         intent.receipt_email = user.email.as_deref();
-        intent.payment_method = Some(payment_method.id.clone());
+        if let PaymentSession::Interactive {
+            payment_request_type: PaymentRequestType::PaymentMethod { .. },
+        } = &payment_session
+        {
+            intent.payment_method = Some(payment_method.id.clone());
+        }
 
         payment_session.set_payment_intent_session_options(&mut intent);
 
