@@ -432,7 +432,7 @@ async fn get(
     let full_time_range = req.time_range.end - req.time_range.start;
     if full_time_range < TimeDelta::zero() {
         return Err(ApiError::InvalidInput(
-            "end date must be after start date".into(),
+            "End date must be after start date".into(),
         ));
     }
 
@@ -440,7 +440,7 @@ async fn get(
         TimeRangeResolution::Slices(slices) => {
             let slices = i32::try_from(slices.get()).map_err(|_| {
                 ApiError::InvalidInput(
-                    "number of slices must fit into an `i32`".into(),
+                    "Number of slices must fit into an `i32`".into(),
                 )
             })?;
             let resolution = full_time_range / slices;
@@ -450,12 +450,12 @@ async fn get(
             let resolution_minutes = i64::try_from(resolution_minutes.get())
                 .map_err(|_| {
                     ApiError::InvalidInput(
-                        "resolution must fit into a `u64`".into(),
+                        "Resolution must fit into a `i64`".into(),
                     )
                 })?;
             let resolution = TimeDelta::try_minutes(resolution_minutes)
                 .ok_or_else(|| {
-                    ApiError::InvalidInput("resolution overflow".into())
+                    ApiError::InvalidInput("Resolution overflow".into())
                 })?;
 
             let num_slices =
@@ -467,12 +467,12 @@ async fn get(
 
     if num_time_slices > MAX_TIME_SLICES {
         return Err(ApiError::InvalidInput(format!(
-            "resolution is too fine or range is too large - maximum of {MAX_TIME_SLICES} time slices, was {num_time_slices}"
+            "Resolution is too fine or range is too large - maximum of {MAX_TIME_SLICES} time slices, was {num_time_slices}"
         )));
     }
     if resolution < MIN_RESOLUTION {
         return Err(ApiError::InvalidInput(format!(
-            "resolution must be at least {MIN_RESOLUTION}, was {resolution}",
+            "Resolution must be at least {MIN_RESOLUTION}, was {resolution}",
         )));
     }
 
