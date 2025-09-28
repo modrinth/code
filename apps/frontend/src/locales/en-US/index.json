@@ -1988,23 +1988,11 @@
   "settings.display.theme.title": {
     "message": "Color theme"
   },
-  "settings.language.categories.auto": {
-    "message": "Automatic"
-  },
-  "settings.language.categories.default": {
-    "message": "Standard languages"
-  },
-  "settings.language.categories.experimental": {
-    "message": "Experimental languages"
-  },
-  "settings.language.categories.fun": {
-    "message": "Fun languages"
-  },
-  "settings.language.categories.search-result": {
-    "message": "Search results"
-  },
   "settings.language.description": {
     "message": "Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
+  },
+  "settings.language.experimental-badge": {
+    "message": "Experimental"
   },
   "settings.language.languages.automatic": {
     "message": "Sync with the system language"
@@ -2018,17 +2006,8 @@
   "settings.language.languages.load-failed": {
     "message": "Cannot load this language. Try again in a bit."
   },
-  "settings.language.languages.search-field.description": {
-    "message": "Submit to focus the first search result"
-  },
-  "settings.language.languages.search-field.placeholder": {
-    "message": "Search for a language..."
-  },
-  "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search."
-  },
-  "settings.language.languages.search.no-results": {
-    "message": "No languages match your search."
+  "settings.language.search.placeholder": {
+    "message": "Search languages..."
   },
   "settings.language.warning": {
     "message": "Changing the site language may cause some content to appear in English if a translation is not available. The site is not yet fully translated, so some content may remain in English for certain languages. We are still working on improving our localization system, so occasionally content may appear broken."
