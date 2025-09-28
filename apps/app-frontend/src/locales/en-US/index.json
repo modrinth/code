@@ -63,10 +63,13 @@
     "message": "Version {version} was successfully installed!"
   },
   "app.update.download-update": {
-    "message": "Download Modrinth App update"
+    "message": "Download update"
+  },
+  "app.update.downloading-update": {
+    "message": "Downloading update ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "Reload to update Modrinth App"
+    "message": "Reload to install update"
   },
   "instance.add-server.add-and-play": {
     "message": "Add and play"
