@@ -318,6 +318,14 @@ export default defineNuxtConfig({
 					// doesn't exist - skip
 				}
 
+				try {
+					const indexJsonPath = `src/locales/${tag}/index.json`
+					const indexJson = JSON.parse(await fs.readFile(indexJsonPath, 'utf8'))
+					;(locale.meta ??= {}).keys = Object.keys(indexJson).length
+				} catch {
+					// doesn't exist - skip
+				}
+
 				const omorphiaLocaleData = resolveOmorphiaLocaleImport(tag)
 				if (omorphiaLocaleData != null) {
 					localeFiles.push(...omorphiaLocaleData.files)

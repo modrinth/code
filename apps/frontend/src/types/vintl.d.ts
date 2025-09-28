@@ -14,6 +14,7 @@ declare global {
 
 		interface LocaleMeta {
 			displayName?: string
+			keys?: number
 			category?: string
 			searchTerms?: string
 		}

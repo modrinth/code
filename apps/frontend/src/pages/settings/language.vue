@@ -63,6 +63,7 @@ type CommonLocale = {
 	displayName: string
 	translatedName: string
 	isRTL?: boolean
+	completionPercentage?: number
 }
 
 type Locale = AutomaticLocale | CommonLocale
@@ -81,6 +82,9 @@ const $locales = computed(() => {
 	const currentLocaleData = vintl.availableLocales.find((l) => l.tag === vintl.locale)
 	const currentLanguages = currentLocaleData?.meta?.languages as Record<string, string> | undefined
 
+	const enUSLocale = vintl.availableLocales.find((l) => l.tag === vintl.defaultLocale)
+	const referenceKeyCount = enUSLocale?.meta?.keys as number | undefined
+
 	for (const locale of vintl.availableLocales) {
 		let displayName = locale.meta?.displayName
 		if (displayName == null) {
@@ -92,15 +96,42 @@ const $locales = computed(() => {
 			translatedName = $translatedNames.value.of(locale.tag) ?? locale.tag
 		}
 
+		let completionPercentage: number | undefined
+		if (referenceKeyCount && locale.meta?.keys) {
+			completionPercentage = Math.round((locale.meta.keys / referenceKeyCount) * 100)
+		}
+
+		// Skip languages with undefined or 0 completion percentage
+		if (completionPercentage === undefined || completionPercentage === 0) {
+			continue
+		}
+
 		locales.push({
 			tag: locale.tag,
 			displayName,
 			translatedName,
 			isRTL: locale.meta?.isRTL === true,
+			completionPercentage,
 		})
 	}
 
-	return locales
+	// Sort locales by completion percentage (descending), with auto locale first
+	return locales.sort((a, b) => {
+		// Auto locale always comes first
+		if (a.auto) return -1
+		if (b.auto) return 1
+
+		// Then sort by completion percentage (highest first)
+		const aCompletion = a.completionPercentage ?? 0
+		const bCompletion = b.completionPercentage ?? 0
+
+		if (aCompletion !== bCompletion) {
+			return bCompletion - aCompletion
+		}
+
+		// If completion percentages are equal, sort alphabetically by display name
+		return a.displayName.localeCompare(b.displayName)
+	})
 })
 
 const $query = ref('')
@@ -129,7 +160,21 @@ const $fuse = computed(() => {
 
 const $searchResults = computed(() => {
 	if (!$query.value || !$fuse.value) return null
-	return $fuse.value.search($query.value).map((result) => result.item)
+
+	const results = $fuse.value.search($query.value)
+
+	const autoLocale = $locales.value.find((locale) => locale.auto)
+	const autoLocaleMatches =
+		autoLocale &&
+		formatMessage(messages.automaticLocale).toLowerCase().includes($query.value.toLowerCase())
+
+	const searchResults = results.map((result) => result.item)
+
+	if (autoLocaleMatches && autoLocale) {
+		return [autoLocale, ...searchResults]
+	}
+
+	return searchResults
 })
 
 const $displayedLocales = computed(() => {
@@ -261,16 +306,28 @@ function getItemLabel(locale: Locale) {
 
 						<div class="language-names">
 							<div class="language-name flex gap-2">
-								{{ locale.auto ? formatMessage(messages.automaticLocale) : locale.displayName }}
+								{{ locale.auto ? formatMessage(messages.automaticLocale) : locale.translatedName }}
 								<span
 									v-if="!locale.auto && locale.isRTL"
 									class="my-auto rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
 								>
 									{{ formatMessage(messages.experimentalBadge) }}
 								</span>
+								<span
+									v-if="!locale.auto && locale.completionPercentage !== undefined"
+									class="bg-highlight-gray my-auto rounded-full px-2 text-sm font-medium text-contrast"
+									:class="{
+										'bg-highlight-green !text-brand-green': locale.completionPercentage >= 80,
+										'bg-highlight-orange !text-brand-orange':
+											locale.completionPercentage >= 45 && locale.completionPercentage < 80,
+										'bg-highlight-red !text-brand-red': locale.completionPercentage < 45,
+									}"
+								>
+									{{ locale.completionPercentage }}%
+								</span>
 							</div>
 							<div v-if="!locale.auto" class="language-translated-name">
-								{{ locale.translatedName }}
+								{{ locale.displayName }}
 							</div>
 						</div>
 					</div>
