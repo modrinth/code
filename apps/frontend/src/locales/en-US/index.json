@@ -428,6 +428,147 @@
   "common.yes": {
     "message": "Yes"
   },
+  "create.collection.cancel": {
+    "message": "Cancel"
+  },
+  "create.collection.collection-info": {
+    "message": "Your new collection will be created as a public collection with {count, plural, =0 {no projects} one {# project} other {# projects}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Create collection"
+  },
+  "create.collection.error-title": {
+    "message": "An error occurred"
+  },
+  "create.collection.name-label": {
+    "message": "Name"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Enter collection name..."
+  },
+  "create.collection.summary-description": {
+    "message": "A sentence or two that describes your collection."
+  },
+  "create.collection.summary-label": {
+    "message": "Summary"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "This is a collection of..."
+  },
+  "create.collection.title": {
+    "message": "Creating a collection"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Approaching {type} limit ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "You're about to hit the {type} limit, please contact support if you need more than {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Contact support"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type} limit reached"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "You've reached your {type} limit of {max}. Please contact support to increase your limit."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "collection"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organization"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "collections"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organizations"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projects"
+  },
+  "create.limit-alert.type-project": {
+    "message": "project"
+  },
+  "create.organization.cancel": {
+    "message": "Cancel"
+  },
+  "create.organization.create-organization": {
+    "message": "Create organization"
+  },
+  "create.organization.error-title": {
+    "message": "An error occurred"
+  },
+  "create.organization.name-label": {
+    "message": "Name"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Enter organization name..."
+  },
+  "create.organization.ownership-info": {
+    "message": "You will be the owner of this organization, but you can invite other members and transfer ownership at any time."
+  },
+  "create.organization.summary-description": {
+    "message": "A sentence or two that describes your organization."
+  },
+  "create.organization.summary-label": {
+    "message": "Summary"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "An organization for..."
+  },
+  "create.organization.title": {
+    "message": "Creating an organization"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Cancel"
+  },
+  "create.project.create-project": {
+    "message": "Create project"
+  },
+  "create.project.error-title": {
+    "message": "An error occurred"
+  },
+  "create.project.name-label": {
+    "message": "Name"
+  },
+  "create.project.name-placeholder": {
+    "message": "Enter project name..."
+  },
+  "create.project.summary-description": {
+    "message": "A sentence or two that describes your project."
+  },
+  "create.project.summary-label": {
+    "message": "Summary"
+  },
+  "create.project.summary-placeholder": {
+    "message": "This project adds..."
+  },
+  "create.project.title": {
+    "message": "Creating a project"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "The visibility of your project after it has been approved."
+  },
+  "create.project.visibility-label": {
+    "message": "Visibility"
+  },
+  "create.project.visibility-private": {
+    "message": "Private"
+  },
+  "create.project.visibility-public": {
+    "message": "Public"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Unlisted"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Create new"
   },

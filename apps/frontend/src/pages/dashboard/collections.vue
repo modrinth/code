@@ -108,7 +108,7 @@ import {
 } from '@modrinth/assets'
 import { Avatar, Button, commonMessages } from '@modrinth/ui'
 
-import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
+import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 
 const { formatMessage } = useVIntl()
 const formatCompactNumber = useCompactNumber()
