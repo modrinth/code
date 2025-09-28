@@ -13,6 +13,7 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::OrganizationId;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
+use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::util::img::delete_old_images;
@@ -135,6 +136,12 @@ pub async fn organization_create(
     )
     .await?
     .1;
+
+    let limits =
+        UserLimits::get_for_organizations(&current_user, &pool).await?;
+    if limits.current >= limits.max {
+        return Err(CreateError::LimitReached);
+    }
 
     new_organization.validate().map_err(|err| {
         CreateError::ValidationError(validation_errors_to_string(err, None))

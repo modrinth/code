@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT version_id, field_id, int_value, enum_value, string_value\n        FROM version_fields\n        WHERE version_id = ANY($1)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "field_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "int_value",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "enum_value",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "string_value",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "53c50911a9e98ac6d0c83fec4117d340e5970b27edc76f21b903f362329a6542"
+}

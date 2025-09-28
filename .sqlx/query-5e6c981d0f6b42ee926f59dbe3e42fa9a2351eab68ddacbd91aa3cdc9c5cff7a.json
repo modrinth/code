@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT DISTINCT version_id,\n            ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,\n            ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types\n        FROM versions v\n        INNER JOIN loaders_versions lv ON v.id = lv.version_id\n        INNER JOIN loaders l ON lv.loader_id = l.id\n        INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id\n        INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id\n        WHERE v.id = ANY($1)\n        GROUP BY version_id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "loaders",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 2,
+        "name": "project_types",
+        "type_info": "VarcharArray"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "5e6c981d0f6b42ee926f59dbe3e42fa9a2351eab68ddacbd91aa3cdc9c5cff7a"
+}
