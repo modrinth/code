@@ -72,19 +72,23 @@ const messages = defineMessages({
 		id: 'create.limit-alert.contact-support',
 		defaultMessage: 'Contact support',
 	},
+	typeProject: {
+		id: 'create.limit-alert.type-project',
+		defaultMessage: 'project',
+	},
+	typeOrganization: {
+		id: 'create.limit-alert.type-organization',
+		defaultMessage: 'organization',
+	},
+	typeCollection: {
+		id: 'create.limit-alert.type-collection',
+		defaultMessage: 'collection',
+	},
 })
 
-interface LimitsResponse {
-	current: {
-		projects: number
-		orgs: number
-		collections: number
-	}
-	max: {
-		projects: number | null
-		orgs: number | null
-		collections: number | null
-	}
+interface UserLimits {
+	current: number
+	max: number
 }
 
 const props = defineProps<{
@@ -93,39 +97,39 @@ const props = defineProps<{
 
 const model = defineModel<boolean>()
 
-const { data: limits } = await useAsyncData<LimitsResponse | undefined>(
-	'limits',
-	() => useBaseFetch('limits', { apiVersion: 3 }) as Promise<LimitsResponse>,
-)
-
-const limitKey = computed((): keyof LimitsResponse['current'] => {
+const apiEndpoint = computed(() => {
 	switch (props.type) {
 		case 'project':
-			return 'projects'
+			return 'limits/projects'
 		case 'org':
-			return 'orgs'
+			return 'limits/organizations'
 		case 'collection':
-			return 'collections'
+			return 'limits/collections'
 		default:
-			return 'projects'
+			return 'limits/projects'
 	}
 })
+
+const { data: limits } = await useAsyncData<UserLimits | undefined>(
+	`limits-${props.type}`,
+	() => useBaseFetch(apiEndpoint.value, { apiVersion: 3 }) as Promise<UserLimits>,
+)
 
 const typeDisplayName = computed(() => {
 	switch (props.type) {
 		case 'project':
-			return 'project'
+			return formatMessage(messages.typeProject)
 		case 'org':
-			return 'organization'
+			return formatMessage(messages.typeOrganization)
 		case 'collection':
-			return 'collection'
+			return formatMessage(messages.typeCollection)
 		default:
-			return 'project'
+			return formatMessage(messages.typeProject)
 	}
 })
 
-const current = computed(() => limits.value?.current?.[limitKey.value] ?? 0)
-const max = computed(() => limits.value?.max?.[limitKey.value] ?? null)
+const current = computed(() => limits.value?.current ?? 0)
+const max = computed(() => limits.value?.max ?? null)
 const percentage = computed(() => (max.value ? Math.round((current.value / max.value) * 100) : 0))
 const hasHitLimit = computed(() => max.value !== null && current.value >= max.value)
 const shouldShowAlert = computed(() => max.value !== null && percentage.value >= 75)

@@ -473,6 +473,15 @@
   "create.limit-alert.limit-reached-description": {
     "message": "You've reached your {type} limit of {max}. Please contact support to increase your limit."
   },
+  "create.limit-alert.type-collection": {
+    "message": "collection"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organization"
+  },
+  "create.limit-alert.type-project": {
+    "message": "project"
+  },
   "create.organization.cancel": {
     "message": "Cancel"
   },
