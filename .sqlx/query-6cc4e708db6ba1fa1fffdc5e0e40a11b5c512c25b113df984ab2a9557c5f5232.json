@@ -1,0 +1,82 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    SELECT id, url, raw_url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id\n                    FROM uploaded_images\n                    WHERE id = ANY($1)\n                    GROUP BY id;\n                    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "raw_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "size",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "owner_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "context",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "thread_message_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "report_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "6cc4e708db6ba1fa1fffdc5e0e40a11b5c512c25b113df984ab2a9557c5f5232"
+}

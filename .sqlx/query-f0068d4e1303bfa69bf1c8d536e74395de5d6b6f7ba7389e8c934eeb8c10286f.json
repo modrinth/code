@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT n.id, n.user_id, n.name, n.text, n.link, n.created, n.read, n.type notification_type, n.body,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'name', na.name, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions\n            FROM notifications n\n            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n            WHERE n.id = ANY($1)\n            GROUP BY n.id, n.user_id\n            ORDER BY n.created DESC;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "text",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "link",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "read",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "notification_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "body",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 9,
+        "name": "actions",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      null
+    ]
+  },
+  "hash": "f0068d4e1303bfa69bf1c8d536e74395de5d6b6f7ba7389e8c934eeb8c10286f"
+}

@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                INSERT INTO loader_field_enum_values (enum_id, value, created, metadata)\n                VALUES ($1, $2, COALESCE($3, timezone('utc', now())), $4)\n                ON CONFLICT (enum_id, value) DO UPDATE\n                    SET metadata = jsonb_set(\n                        COALESCE(loader_field_enum_values.metadata, $4),\n                        '{type}', \n                        COALESCE($4->'type', loader_field_enum_values.metadata->'type')\n                    ),\n                    created = COALESCE($3, loader_field_enum_values.created)\n                RETURNING id\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Varchar",
+        "Timestamp",
+        "Jsonb"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "79c73369365ed7a09f4f48a87605d22db4a49ab5fd9943b54865448d0e9a8d67"
+}

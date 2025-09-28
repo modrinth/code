@@ -17,6 +17,7 @@ use crate::models::projects::{
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
+use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::indexing::IndexingError;
 use crate::util::img::upload_image_optimized;
@@ -86,6 +87,8 @@ pub enum CreateError {
     CustomAuthenticationError(String),
     #[error("Image Parsing Error: {0}")]
     ImageError(#[from] ImageError),
+    #[error("Project limit reached")]
+    LimitReached,
 }
 
 impl actix_web::ResponseError for CreateError {
@@ -117,6 +120,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
+            CreateError::LimitReached => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -143,6 +147,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::ValidationError(..) => "invalid_input",
                 CreateError::FileValidationError(..) => "invalid_input",
                 CreateError::ImageError(..) => "invalid_image",
+                CreateError::LimitReached => "limit_reached",
             },
             description: self.to_string(),
         })
@@ -294,8 +299,10 @@ pub async fn project_create(
 /*
 
 Project Creation Steps:
-Get logged in user
+- Get logged in user
     Must match the author in the version creation
+
+- Check they have not exceeded their project limit
 
 1. Data
     - Gets "data" field from multipart form; must be first
@@ -336,15 +343,19 @@ async fn project_create_inner(
     let cdn_url = dotenvy::var("CDN_URL")?;
 
     // The currently logged in user
-    let current_user = get_user_from_headers(
+    let (_, current_user) = get_user_from_headers(
         &req,
         pool,
         redis,
         session_queue,
         Scopes::PROJECT_CREATE,
     )
-    .await?
-    .1;
+    .await?;
+
+    let limits = UserLimits::get_for_projects(&current_user, pool).await?;
+    if limits.current >= limits.max {
+        return Err(CreateError::LimitReached);
+    }
 
     let project_id: ProjectId =
         models::generate_project_id(transaction).await?.into();
