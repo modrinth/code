@@ -453,7 +453,10 @@ async fn get(
                         "resolution must fit into a `u64`".into(),
                     )
                 })?;
-            let resolution = TimeDelta::minutes(resolution_minutes);
+            let resolution = TimeDelta::try_minutes(resolution_minutes)
+                .ok_or_else(|| {
+                    ApiError::InvalidInput("resolution overflow".into())
+                })?;
 
             let num_slices =
                 full_time_range.as_seconds_f64() / resolution.as_seconds_f64();
