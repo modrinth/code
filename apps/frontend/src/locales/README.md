@@ -5,6 +5,7 @@ This directory contains translation files for different languages supported by M
 ## Directory Structure
 
 Each language has its own subdirectory with the following files:
+
 - `index.json` - Main translation strings (auto-generated from Crowdin)
 - `languages.json` - Language name mappings (manual, en-US only)
 
@@ -18,13 +19,15 @@ When adding a new language to Crowdin:
 ### Updating languages.json
 
 Add entries to `en-US/languages.json` following this format:
+
 ```json
 {
-  "locale-code": "English Language Name"
+	"locale-code": "English Language Name"
 }
 ```
 
 **Examples:**
+
 - `"zh-CN": "Chinese Simplified"`
 - `"zh-TW": "Chinese Traditional"`
 - `"ar-SA": "Arabic, Saudi Arabia"`
@@ -35,6 +38,11 @@ Add entries to `en-US/languages.json` following this format:
 ## RTL Language Support
 
 Languages marked as RTL in `nuxt.config.ts` will display an "Experimental" badge in the language selector:
+
 - Arabic (`ar-SA`)
 - Hebrew (`he-IL`)
 - Persian (`fa-IR`)
+
+## TODO:
+
+- Move i18n management, e.g languages.json + the RTL experimental stuff into it's own package so it can be shared between app and web.
