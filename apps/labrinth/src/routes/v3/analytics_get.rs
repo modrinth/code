@@ -443,7 +443,8 @@ async fn get(
                     "number of slices must fit into an `i32`".into(),
                 )
             })?;
-            (slices, full_time_range / slices)
+            let resolution = full_time_range / slices;
+            (slices as usize, resolution)
         }
         TimeRangeResolution::Minutes(resolution_minutes) => {
             let resolution_minutes = i64::try_from(resolution_minutes.get())
@@ -457,12 +458,10 @@ async fn get(
             let num_slices =
                 full_time_range.as_seconds_f64() / resolution.as_seconds_f64();
 
-            (num_slices as i32, resolution)
+            (num_slices as usize, resolution)
         }
     };
 
-    let num_time_slices =
-        usize::try_from(num_time_slices).expect("should fit within a usize");
     if num_time_slices > MAX_TIME_SLICES {
         return Err(ApiError::InvalidInput(format!(
             "resolution is too fine or range is too large - maximum of {MAX_TIME_SLICES} time slices, was {num_time_slices}"
