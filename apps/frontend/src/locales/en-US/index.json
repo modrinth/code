@@ -479,6 +479,15 @@
   "create.limit-alert.type-organization": {
     "message": "organization"
   },
+  "create.limit-alert.type-plural-collection": {
+    "message": "collections"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organizations"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projects"
+  },
   "create.limit-alert.type-project": {
     "message": "project"
   },

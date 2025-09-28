@@ -4,14 +4,14 @@
 		:type="hasHitLimit ? 'critical' : 'warning'"
 		:header="
 			hasHitLimit
-				? formatMessage(messages.limitReached, { type: capitalizeString(typeDisplayName) })
-				: formatMessage(messages.approachingLimit, { type: typeDisplayName, current, max })
+				? formatMessage(messages.limitReached, { type: capitalizeString(typeName.singular) })
+				: formatMessage(messages.approachingLimit, { type: typeName.singular, current, max })
 		"
 		class="mb-4"
 	>
 		<div class="flex w-full flex-col gap-4">
 			<template v-if="hasHitLimit">
-				{{ formatMessage(messages.limitReachedDescription, { type: typeDisplayName, max }) }}
+				{{ formatMessage(messages.limitReachedDescription, { type: typeName.singular, max }) }}
 				<div class="w-min">
 					<ButtonStyled color="red">
 						<NuxtLink to="https://support.modrinth.com" target="_blank">
@@ -23,9 +23,9 @@
 			<template v-else>
 				{{
 					formatMessage(messages.approachingLimitDescription, {
-						type: typeDisplayName,
+						type: typeName.singular,
 						max,
-						typePlural: typeDisplayName + 's',
+						typePlural: typeName.plural,
 					})
 				}}
 				<div class="w-min">
@@ -84,6 +84,18 @@ const messages = defineMessages({
 		id: 'create.limit-alert.type-collection',
 		defaultMessage: 'collection',
 	},
+	typePluralProject: {
+		id: 'create.limit-alert.type-plural-project',
+		defaultMessage: 'projects',
+	},
+	typePluralOrganization: {
+		id: 'create.limit-alert.type-plural-organization',
+		defaultMessage: 'organizations',
+	},
+	typePluralCollection: {
+		id: 'create.limit-alert.type-plural-collection',
+		defaultMessage: 'collections',
+	},
 })
 
 interface UserLimits {
@@ -115,16 +127,28 @@ const { data: limits } = await useAsyncData<UserLimits | undefined>(
 	() => useBaseFetch(apiEndpoint.value, { apiVersion: 3 }) as Promise<UserLimits>,
 )
 
-const typeDisplayName = computed(() => {
+const typeName = computed<{ singular: string; plural: string }>(() => {
 	switch (props.type) {
 		case 'project':
-			return formatMessage(messages.typeProject)
+			return {
+				singular: formatMessage(messages.typeProject),
+				plural: formatMessage(messages.typePluralProject),
+			}
 		case 'org':
-			return formatMessage(messages.typeOrganization)
+			return {
+				singular: formatMessage(messages.typeOrganization),
+				plural: formatMessage(messages.typePluralOrganization),
+			}
 		case 'collection':
-			return formatMessage(messages.typeCollection)
+			return {
+				singular: formatMessage(messages.typeCollection),
+				plural: formatMessage(messages.typePluralCollection),
+			}
 		default:
-			return formatMessage(messages.typeProject)
+			return {
+				singular: formatMessage(messages.typeProject),
+				plural: formatMessage(messages.typePluralProject),
+			}
 	}
 })
 
