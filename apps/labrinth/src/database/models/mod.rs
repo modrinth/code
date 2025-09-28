@@ -30,6 +30,7 @@ pub mod shared_instance_item;
 pub mod team_item;
 pub mod thread_item;
 pub mod user_item;
+pub mod user_limits;
 pub mod user_subscription_item;
 pub mod users_compliance;
 pub mod users_notifications_preferences_item;

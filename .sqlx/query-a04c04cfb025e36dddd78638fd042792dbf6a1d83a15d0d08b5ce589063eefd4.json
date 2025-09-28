@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                id, notification_id, user_id, channel, delivery_priority, status, next_attempt, attempt_count\n            FROM notifications_deliveries\n            WHERE user_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "notification_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "channel",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "delivery_priority",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "next_attempt",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "attempt_count",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "a04c04cfb025e36dddd78638fd042792dbf6a1d83a15d0d08b5ce589063eefd4"
+}
