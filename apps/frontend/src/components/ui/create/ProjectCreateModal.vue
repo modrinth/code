@@ -1,10 +1,11 @@
 <template>
-	<NewModal ref="modal" header="Creating a project">
-		<div class="flex flex-col gap-3">
+	<NewModal ref="modal" :header="formatMessage(messages.title)">
+		<div class="min-w-md flex max-w-md flex-col gap-3">
+			<CreateLimitAlert v-model="hasHitLimit" type="project" />
 			<div class="flex flex-col gap-2">
 				<label for="name">
 					<span class="text-lg font-semibold text-contrast">
-						Name
+						{{ formatMessage(messages.nameLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
@@ -13,15 +14,16 @@
 					v-model="name"
 					type="text"
 					maxlength="64"
-					placeholder="Enter project name..."
+					:placeholder="formatMessage(messages.namePlaceholder)"
 					autocomplete="off"
+					:disabled="hasHitLimit"
 					@input="updatedName()"
 				/>
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="slug">
 					<span class="text-lg font-semibold text-contrast">
-						URL
+						{{ formatMessage(messages.urlLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
@@ -33,6 +35,7 @@
 						type="text"
 						maxlength="64"
 						autocomplete="off"
+						:disabled="hasHitLimit"
 						@input="manualSlug = true"
 					/>
 				</div>
@@ -40,42 +43,48 @@
 			<div class="flex flex-col gap-2">
 				<label for="visibility" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast">
-						Visibility
+						{{ formatMessage(messages.visibilityLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
-					<span> The visibility of your project after it has been approved. </span>
+					<span>{{ formatMessage(messages.visibilityDescription) }}</span>
 				</label>
-				<DropdownSelect
+				<Chips
 					id="visibility"
 					v-model="visibility"
-					:options="visibilities"
-					:display-name="(x) => x.display"
-					name="Visibility"
+					:items="visibilities"
+					:format-label="(x) => x.display"
+					:disabled="hasHitLimit"
 				/>
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="additional-information" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast">
-						Summary
+						{{ formatMessage(messages.summaryLabel) }}
 						<span class="text-brand-red">*</span>
 					</span>
-					<span> A sentence or two that describes your project. </span>
+					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
 				<div class="textarea-wrapper">
-					<textarea id="additional-information" v-model="description" maxlength="256" />
+					<textarea
+						id="additional-information"
+						v-model="description"
+						maxlength="256"
+						:placeholder="formatMessage(messages.summaryPlaceholder)"
+						:disabled="hasHitLimit"
+					/>
 				</div>
 			</div>
-			<div class="flex gap-2">
-				<ButtonStyled color="brand">
-					<button @click="createProject">
-						<PlusIcon aria-hidden="true" />
-						Create project
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
+			<div class="flex justify-end gap-2">
+				<ButtonStyled class="w-24">
 					<button @click="cancel">
 						<XIcon aria-hidden="true" />
-						Cancel
+						{{ formatMessage(messages.cancel) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand" class="w-32">
+					<button :disabled="hasHitLimit" @click="createProject">
+						<PlusIcon aria-hidden="true" />
+						{{ formatMessage(messages.createProject) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -85,11 +94,77 @@
 
 <script setup>
 import { PlusIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, DropdownSelect, injectNotificationManager, NewModal } from '@modrinth/ui'
+import { ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
+import { defineMessages } from '@vintl/vintl'
+
+import CreateLimitAlert from './CreateLimitAlert.vue'
 
 const { addNotification } = injectNotificationManager()
-
+const { formatMessage } = useVIntl()
 const router = useRouter()
+
+const messages = defineMessages({
+	title: {
+		id: 'create.project.title',
+		defaultMessage: 'Creating a project',
+	},
+	nameLabel: {
+		id: 'create.project.name-label',
+		defaultMessage: 'Name',
+	},
+	namePlaceholder: {
+		id: 'create.project.name-placeholder',
+		defaultMessage: 'Enter project name...',
+	},
+	urlLabel: {
+		id: 'create.project.url-label',
+		defaultMessage: 'URL',
+	},
+	visibilityLabel: {
+		id: 'create.project.visibility-label',
+		defaultMessage: 'Visibility',
+	},
+	visibilityDescription: {
+		id: 'create.project.visibility-description',
+		defaultMessage: 'The visibility of your project after it has been approved.',
+	},
+	summaryLabel: {
+		id: 'create.project.summary-label',
+		defaultMessage: 'Summary',
+	},
+	summaryDescription: {
+		id: 'create.project.summary-description',
+		defaultMessage: 'A sentence or two that describes your project.',
+	},
+	summaryPlaceholder: {
+		id: 'create.project.summary-placeholder',
+		defaultMessage: 'This project adds...',
+	},
+	cancel: {
+		id: 'create.project.cancel',
+		defaultMessage: 'Cancel',
+	},
+	createProject: {
+		id: 'create.project.create-project',
+		defaultMessage: 'Create project',
+	},
+	errorTitle: {
+		id: 'create.project.error-title',
+		defaultMessage: 'An error occurred',
+	},
+	visibilityPublic: {
+		id: 'create.project.visibility-public',
+		defaultMessage: 'Public',
+	},
+	visibilityUnlisted: {
+		id: 'create.project.visibility-unlisted',
+		defaultMessage: 'Unlisted',
+	},
+	visibilityPrivate: {
+		id: 'create.project.visibility-private',
+		defaultMessage: 'Private',
+	},
+})
 
 const props = defineProps({
 	organizationId: {
@@ -100,6 +175,7 @@ const props = defineProps({
 })
 
 const modal = ref()
+const hasHitLimit = ref(false)
 
 const name = ref('')
 const slug = ref('')
@@ -108,21 +184,18 @@ const manualSlug = ref(false)
 const visibilities = ref([
 	{
 		actual: 'approved',
-		display: 'Public',
+		display: formatMessage(messages.visibilityPublic),
 	},
 	{
 		actual: 'unlisted',
-		display: 'Unlisted',
+		display: formatMessage(messages.visibilityUnlisted),
 	},
 	{
 		actual: 'private',
-		display: 'Private',
+		display: formatMessage(messages.visibilityPrivate),
 	},
 ])
-const visibility = ref({
-	actual: 'approved',
-	display: 'Public',
-})
+const visibility = ref(visibilities.value[0])
 
 const cancel = () => {
 	modal.value.hide()
@@ -182,7 +255,7 @@ async function createProject() {
 		})
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(messages.errorTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
