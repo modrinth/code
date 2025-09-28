@@ -484,10 +484,16 @@ async function showUpdateToast() {
 	updateToastDismissed.value = false
 }
 
-async function downloadUpdate(versionToDownload = availableUpdate.value) {
+async function downloadAvailableUpdate() {
+	return downloadUpdate(availableUpdate.value)
+}
+
+async function downloadUpdate(versionToDownload) {
 	if (!versionToDownload) {
 		handleError(`Failed to download update: no version available`)
 	}
+
+	console.log('DONLOADING UPDATE')
 
 	try {
 		enqueueUpdateForInstallation(versionToDownload.rid).then(() => {
@@ -681,7 +687,7 @@ async function processPendingSurveys() {
 					:metered="metered"
 					@close="updateToastDismissed = true"
 					@restart="installUpdate"
-					@download="downloadUpdate"
+					@download="downloadAvailableUpdate"
 				/>
 			</Transition>
 		</Suspense>
@@ -771,7 +777,7 @@ async function processPendingSurveys() {
 								? installUpdate
 								: downloadProgress > 0 && downloadProgress < 1
 									? showUpdateToast
-									: downloadUpdate
+									: downloadAvailableUpdate
 						"
 					>
 						<ProgressSpinner
