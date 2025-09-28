@@ -25,28 +25,6 @@ const favicons = {
 	'(prefers-color-scheme:dark)': '/favicon.ico',
 }
 
-/**
- * Tags of locales that are auto-discovered besides the default locale.
- *
- * Preferably only the locales that reach a certain threshold of complete
- * translations would be included in this array.
- */
-const enabledLocales: string[] = []
-
-/**
- * Overrides for the categories of the certain locales.
- */
-const localesCategoriesOverrides: Partial<Record<string, 'fun' | 'experimental'>> = {
-	'en-x-pirate': 'fun',
-	'en-x-updown': 'fun',
-	'en-x-lolcat': 'fun',
-	'en-x-uwu': 'fun',
-	'ru-x-bandit': 'fun',
-	ar: 'experimental',
-	he: 'experimental',
-	pes: 'experimental',
-}
-
 export default defineNuxtConfig({
 	srcDir: 'src/',
 	app: {
@@ -306,7 +284,7 @@ export default defineNuxtConfig({
 
 			for await (const localeDir of globIterate('src/locales/*/', { posix: true })) {
 				const tag = basename(localeDir)
-				if (isProduction && !enabledLocales.includes(tag) && opts.defaultLocale !== tag) continue
+				if (isProduction && opts.defaultLocale !== tag) continue
 
 				const locale =
 					opts.locales.find((locale) => locale.tag === tag) ??
@@ -321,24 +299,23 @@ export default defineNuxtConfig({
 							from: `./${relative('./src', localeFile)}`,
 							format: 'crowdin',
 						})
-					} else if (fileName === 'meta.json') {
-						const meta: Record<string, { message: string }> = await fs
-							.readFile(localeFile, 'utf8')
-							.then((date) => JSON.parse(date))
-						const localeMeta = (locale.meta ??= {})
-						for (const key in meta) {
-							const value = meta[key]
-							if (value === undefined) continue
-							localeMeta[key] = value.message
-						}
-					} else {
-						;(locale.resources ??= {})[fileName] = `./${relative('./src', localeFile)}`
 					}
 				}
 
-				const categoryOverride = localesCategoriesOverrides[tag]
-				if (categoryOverride != null) {
-					;(locale.meta ??= {}).category = categoryOverride
+				const rtlLanguages = ['ar-SA', 'he-IL', 'fa-IR']
+				if (rtlLanguages.includes(tag)) {
+					;(locale.meta ??= {}).isRTL = true
+				}
+
+				try {
+					const languagesJsonPath = `src/locales/${tag}/languages.json`
+					const languagesJson = JSON.parse(await fs.readFile(languagesJsonPath, 'utf8'))
+					;(locale.meta ??= {}).languages = languagesJson
+					if (languagesJson[tag]) {
+						locale.meta.displayName = languagesJson[tag]
+					}
+				} catch {
+					// doesn't exist - skip
 				}
 
 				const omorphiaLocaleData = resolveOmorphiaLocaleImport(tag)
