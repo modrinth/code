@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                tokens.id,\n                tokens.authorization_id,\n                tokens.token_hash,\n                tokens.scopes,\n                tokens.created,\n                tokens.expires,\n                tokens.last_used,\n                auths.client_id,\n                auths.user_id\n            FROM oauth_access_tokens tokens\n            JOIN oauth_client_authorizations auths\n            ON tokens.authorization_id = auths.id\n            WHERE tokens.token_hash = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "authorization_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "token_hash",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "scopes",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "expires",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "last_used",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "client_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 8,
+        "name": "user_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "7174cd941ff95260ad9c564daf92876c5ae253df538f4cd4c3701e63137fb01b"
+}

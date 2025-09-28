@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT date_available, SUM(amount) sum\n        FROM payouts_values\n        WHERE user_id = $1\n        GROUP BY date_available\n        ORDER BY date_available DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "date_available",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 1,
+        "name": "sum",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "58fbda9daed27c5c466849a944ab3df193679cef17e8588ac3be79978b60bdab"
+}

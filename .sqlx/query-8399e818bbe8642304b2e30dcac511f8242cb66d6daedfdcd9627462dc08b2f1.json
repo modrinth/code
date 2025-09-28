@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH\n              channels AS (\n                SELECT channel FROM UNNEST($1::varchar[]) AS t(channel)\n              ),\n              delivery_candidates AS (\n                SELECT\n                  ids.notification_id,\n                  ids.user_id,\n                  channels.channel,\n                  nt.delivery_priority,\n                  uprefs.enabled user_enabled,\n                  dprefs.enabled default_enabled\n                FROM\n                  UNNEST(\n                    $2::bigint[],\n                    $3::bigint[],\n                    $4::varchar[]\n                  ) AS ids(notification_id, user_id, notification_type)\n                CROSS JOIN channels\n                INNER JOIN\n                  notifications_types nt ON nt.name = ids.notification_type\n                LEFT JOIN users_notifications_preferences uprefs\n                  ON uprefs.user_id = ids.user_id\n                  AND uprefs.channel = channels.channel\n                  AND uprefs.notification_type = ids.notification_type\n                LEFT JOIN users_notifications_preferences dprefs\n                  ON dprefs.user_id IS NULL\n                  AND dprefs.channel = channels.channel\n                  AND dprefs.notification_type = ids.notification_type\n              )\n            INSERT INTO notifications_deliveries\n            (notification_id, user_id, channel, delivery_priority, status, next_attempt, attempt_count)\n            SELECT\n              dc.notification_id,\n              dc.user_id,\n              dc.channel,\n              dc.delivery_priority,\n              CASE\n                -- User explicitly enabled\n                WHEN user_enabled = TRUE THEN $5\n\n                -- Is enabled by default, no preference by user\n                WHEN user_enabled IS NULL AND default_enabled = TRUE THEN $5\n\n                -- User explicitly disabled (regardless of default)\n                WHEN user_enabled = FALSE THEN $6\n\n                -- User set no preference, default disabled\n                WHEN user_enabled IS NULL AND default_enabled = FALSE THEN $7\n\n                -- At this point, user set no preference and there is no\n                -- default set, so treat as disabled-by-default.\n                ELSE $7\n              END status,\n              NOW() next_attempt,\n              0 attempt_count\n            FROM\n              delivery_candidates dc\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "VarcharArray",
+        "Int8Array",
+        "Int8Array",
+        "VarcharArray",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8399e818bbe8642304b2e30dcac511f8242cb66d6daedfdcd9627462dc08b2f1"
+}

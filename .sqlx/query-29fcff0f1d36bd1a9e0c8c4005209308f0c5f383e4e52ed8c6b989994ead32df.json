@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE team_members\n                SET ordering = $1\n                WHERE (team_id = $2 AND user_id = $3)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "29fcff0f1d36bd1a9e0c8c4005209308f0c5f383e4e52ed8c6b989994ead32df"
+}
