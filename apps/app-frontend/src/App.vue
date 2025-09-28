@@ -32,7 +32,7 @@ import {
 	ProgressSpinner,
 	provideNotificationManager,
 } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
+import { formatNumber, renderString } from '@modrinth/utils'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
@@ -149,11 +149,15 @@ const messages = defineMessages({
 	},
 	reloadToUpdate: {
 		id: 'app.update.reload-to-update',
-		defaultMessage: 'Reload to update Modrinth App',
+		defaultMessage: 'Reload to install update',
 	},
 	downloadUpdate: {
 		id: 'app.update.download-update',
-		defaultMessage: 'Download Modrinth App update',
+		defaultMessage: 'Download update',
+	},
+	downloadingUpdate: {
+		id: 'app.update.downloading-update',
+		defaultMessage: 'Downloading update ({percent}%)',
 	},
 })
 
@@ -432,6 +436,8 @@ async function handleCommand(e) {
 const downloadProgress = ref(0)
 const unlisten = ref(null)
 
+const downloadPercent = computed(() => Math.trunc(downloadProgress.value * 100))
+
 const metered = ref(true)
 const finishedDownloading = ref(false)
 const restarting = ref(false)
@@ -439,10 +445,6 @@ const updateToastDismissed = ref(false)
 const availableUpdate = ref(null)
 const updateSize = ref(null)
 async function checkUpdates() {
-	downloadProgress.value = 0
-	finishedDownloading.value = false
-	updateToastDismissed.value = false
-
 	if (!(await areUpdatesEnabled())) {
 		console.log('Skipping update check as updates are disabled in this build')
 		return
@@ -452,9 +454,19 @@ async function checkUpdates() {
 		const update = await invoke('plugin:updater|check')
 		const isExistingUpdate = update.version === availableUpdate.value?.version
 
-		if (!update || isExistingUpdate) {
+		if (!update) {
+			console.log('No update available')
 			return
 		}
+
+		if (isExistingUpdate) {
+			console.log('Update is already known')
+			return
+		}
+
+		downloadProgress.value = 0
+		finishedDownloading.value = false
+		updateToastDismissed.value = false
 
 		console.log(`Update ${update.version} is available.`)
 
@@ -476,7 +488,7 @@ async function checkUpdates() {
 		() => {
 			checkUpdates()
 		},
-		5 /* min */ * 60 /* sec */ * 1000 /* ms */,
+		0.5 /* min */ * 60 /* sec */ * 1000 /* ms */,
 	)
 }
 
@@ -770,7 +782,16 @@ async function processPendingSurveys() {
 				>
 					<NavButton
 						v-tooltip.right="
-							formatMessage(finishedDownloading ? messages.reloadToUpdate : messages.downloadUpdate)
+							formatMessage(
+								finishedDownloading
+									? messages.reloadToUpdate
+									: downloadProgress === 0
+										? messages.downloadUpdate
+										: messages.downloadingUpdate,
+								{
+									percent: downloadPercent,
+								},
+							)
 						"
 						:to="
 							finishedDownloading
