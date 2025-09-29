@@ -15,9 +15,17 @@ use labrinth::util::env::parse_var;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use std::ffi::CStr;
+use std::io::{self, stdout};
+use std::str::FromStr;
 use std::sync::Arc;
-use tracing::{error, info};
+use tracing::level_filters::LevelFilter;
+use tracing::{Level, error, info};
 use tracing_actix_web::TracingLogger;
+use tracing_ecs::ECSLayerBuilder;
+use tracing_subscriber::fmt::SubscriberBuilder;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::{EnvFilter, Layer};
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -48,13 +56,67 @@ struct Args {
     run_background_task: Option<BackgroundTask>,
 }
 
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+enum OutputFormat {
+    #[default]
+    Human,
+    Json,
+}
+
+impl FromStr for OutputFormat {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "human" => Ok(Self::Human),
+            "json" => Ok(Self::Json),
+            _ => Err(()),
+        }
+    }
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
     color_eyre::install().expect("failed to install `color-eyre`");
     dotenvy::dotenv().ok();
-    console_subscriber::init();
+    let console_layer = console_subscriber::spawn();
+
+    let output_format =
+        dotenvy::var("LABRINTH_FORMAT").map_or(OutputFormat::Human, |format| {
+            format
+                .parse::<OutputFormat>()
+                .unwrap_or_else(|_| panic!("invalid output format '{format}'"))
+        });
+    match output_format {
+        OutputFormat::Human => {
+            tracing_subscriber::registry()
+                .with(console_layer)
+                .with(
+                    tracing_subscriber::fmt::layer().with_filter(
+                        tracing_subscriber::EnvFilter::builder()
+                            .with_default_directive(LevelFilter::INFO.into())
+                            .from_env_lossy(),
+                    ),
+                )
+                .init();
+        }
+        OutputFormat::Json => {
+            let noout = SubscriberBuilder::default()
+                .with_writer(io::stdout)
+                .with_max_level(Level::TRACE)
+                .with_env_filter(EnvFilter::from_default_env())
+                .finish();
+            let subscriber =
+                ECSLayerBuilder::default().stdout().with_subscriber(noout);
+
+            tracing_subscriber::registry()
+                .with(console_layer)
+                .with(subscriber)
+                .init();
+        }
+    }
 
     if check_env_vars() {
         error!("Some environment variables are missing!");

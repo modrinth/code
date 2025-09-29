@@ -4464,6 +4464,8 @@ dependencies = [
  "totp-rs",
  "tracing",
  "tracing-actix-web",
+ "tracing-ecs",
+ "tracing-subscriber",
  "url",
  "urlencoding",
  "uuid 1.17.0",
@@ -9683,6 +9685,22 @@ checksum = "b9d12581f227e93f094d3af2ae690a574abb8a2b9b7a96e7cfe9647b2b617678"
 dependencies = [
  "once_cell",
  "valuable",
+]
+
+[[package]]
+name = "tracing-ecs"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f3706360b7992c3a147d6a91cd08ce5bfbfdfe59a534eed2df4f9e041e492ec2"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.12",
+ "tracing",
+ "tracing-core",
+ "tracing-log",
+ "tracing-subscriber",
 ]
 
 [[package]]
