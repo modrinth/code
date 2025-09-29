@@ -82,6 +82,9 @@ async fn main() -> std::io::Result<()> {
     color_eyre::install().expect("failed to install `color-eyre`");
     dotenvy::dotenv().ok();
     let console_layer = console_subscriber::spawn();
+    let env_filter = EnvFilter::builder()
+        .with_default_directive(LevelFilter::INFO.into())
+        .from_env_lossy();
 
     let output_format =
         dotenvy::var("LABRINTH_FORMAT").map_or(OutputFormat::Human, |format| {
@@ -89,31 +92,20 @@ async fn main() -> std::io::Result<()> {
                 .parse::<OutputFormat>()
                 .unwrap_or_else(|_| panic!("invalid output format '{format}'"))
         });
+
     match output_format {
         OutputFormat::Human => {
             tracing_subscriber::registry()
                 .with(console_layer)
-                .with(
-                    tracing_subscriber::fmt::layer().with_filter(
-                        tracing_subscriber::EnvFilter::builder()
-                            .with_default_directive(LevelFilter::INFO.into())
-                            .from_env_lossy(),
-                    ),
-                )
+                .with(env_filter)
+                .with(tracing_subscriber::fmt::layer())
                 .init();
         }
         OutputFormat::Json => {
-            let noout = SubscriberBuilder::default()
-                .with_writer(io::stdout)
-                .with_max_level(Level::TRACE)
-                .with_env_filter(EnvFilter::from_default_env())
-                .finish();
-            let subscriber =
-                ECSLayerBuilder::default().stdout().with_subscriber(noout);
-
             tracing_subscriber::registry()
                 .with(console_layer)
-                .with(subscriber)
+                .with(env_filter)
+                .with(ECSLayerBuilder::default().stdout())
                 .init();
         }
     }
