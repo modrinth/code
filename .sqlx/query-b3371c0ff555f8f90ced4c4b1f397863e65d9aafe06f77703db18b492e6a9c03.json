@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT * FROM notifications_templates WHERE channel = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "channel",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "notification_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "subject_line",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "body_fetch_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "plaintext_fallback",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "b3371c0ff555f8f90ced4c4b1f397863e65d9aafe06f77703db18b492e6a9c03"
+}

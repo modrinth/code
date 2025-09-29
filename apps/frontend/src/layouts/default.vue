@@ -676,7 +676,7 @@
 			</div>
 		</header>
 		<main class="min-h-[calc(100vh-4.5rem-310.59px)]">
-			<ModalCreation v-if="auth.user" ref="modal_creation" />
+			<ProjectCreateModal v-if="auth.user" ref="modal_creation" />
 			<CollectionCreateModal ref="modal_collection_creation" />
 			<OrganizationCreateModal ref="modal_organization_creation" />
 			<slot id="main" />
@@ -825,10 +825,10 @@ import { isAdmin, isStaff } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
-import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
+import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
+import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
+import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
-import ModalCreation from '~/components/ui/ModalCreation.vue'
-import OrganizationCreateModal from '~/components/ui/OrganizationCreateModal.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'

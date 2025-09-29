@@ -66,6 +66,15 @@ pub enum Price {
     },
 }
 
+impl Price {
+    pub fn get_interval(&self, interval: PriceDuration) -> Option<i32> {
+        match self {
+            Price::OneTime { .. } => None,
+            Price::Recurring { intervals } => intervals.get(&interval).copied(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Debug, Copy, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub enum PriceDuration {
@@ -173,6 +182,16 @@ impl SubscriptionStatus {
 pub enum SubscriptionMetadata {
     Pyro { id: String, region: Option<String> },
     Medal { id: String },
+}
+
+impl SubscriptionMetadata {
+    pub fn is_medal(&self) -> bool {
+        matches!(self, SubscriptionMetadata::Medal { .. })
+    }
+
+    pub fn is_pyro(&self) -> bool {
+        matches!(self, SubscriptionMetadata::Pyro { .. })
+    }
 }
 
 #[derive(Serialize, Deserialize)]
