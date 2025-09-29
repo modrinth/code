@@ -36,13 +36,10 @@
     "message": "Changelog"
   },
   "app.update-toast.download": {
-    "message": "Download"
+    "message": "Download ({size})"
   },
   "app.update-toast.downloading": {
     "message": "Downloading..."
-  },
-  "app.update-toast.loading-update-size": {
-    "message": "Loading update size..."
   },
   "app.update-toast.reload": {
     "message": "Reload"
@@ -52,9 +49,6 @@
   },
   "app.update-toast.title.download-complete": {
     "message": "Download complete"
-  },
-  "app.update-toast.update-size": {
-    "message": "The update is {size}"
   },
   "app.update.complete-toast.text": {
     "message": "Click here to view the changelog."
