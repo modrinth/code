@@ -79,7 +79,7 @@
 								userBalance.available < minWithdraw || blockedByTax ? 'true' : 'false'
 							"
 							:class="{ 'disabled-link': userBalance.available < minWithdraw || blockedByTax }"
-							:disabled="userBalance.available < minWithdraw || blockedByTax ? 'true' : 'false'"
+							:disabled="!!(userBalance.available < minWithdraw || blockedByTax) || null"
 							:tabindex="userBalance.available < minWithdraw || blockedByTax ? -1 : undefined"
 							to="/dashboard/revenue/withdraw"
 						>
