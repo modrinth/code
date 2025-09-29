@@ -67,7 +67,6 @@ import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { get_user } from '@/helpers/cache.js'
-import { provideAppUpdateDownloadProgress, subscribeToDownloadProgress } from '@/helpers/download_progress.ts'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
@@ -82,6 +81,10 @@ import {
 	isDev,
 	isNetworkMetered,
 } from '@/helpers/utils.js'
+import {
+	provideAppUpdateDownloadProgress,
+	subscribeToDownloadProgress,
+} from '@/providers/download-progress.ts'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
@@ -437,7 +440,7 @@ const appUpdateDownload = {
 	progress: ref(0),
 	version: ref(),
 }
-let unlistenUpdateDownload;
+let unlistenUpdateDownload
 
 const downloadProgress = computed(() => appUpdateDownload.progress.value)
 const downloadPercent = computed(() => Math.trunc(appUpdateDownload.progress.value * 100))
@@ -510,8 +513,8 @@ async function downloadUpdate(versionToDownload) {
 	}
 
 	if (appUpdateDownload.progress.value !== 0) {
-		console.error(`Update ${versionToDownload.version} already downloading`);
-		return;
+		console.error(`Update ${versionToDownload.version} already downloading`)
+		return
 	}
 
 	console.log(`Downloading update ${versionToDownload.version}`)
@@ -524,7 +527,10 @@ async function downloadUpdate(versionToDownload) {
 			})
 			console.log('Finished downloading!')
 		})
-		unlistenUpdateDownload = await subscribeToDownloadProgress(appUpdateDownload, versionToDownload.version)
+		unlistenUpdateDownload = await subscribeToDownloadProgress(
+			appUpdateDownload,
+			versionToDownload.version,
+		)
 	} catch (e) {
 		handleError(e)
 	}

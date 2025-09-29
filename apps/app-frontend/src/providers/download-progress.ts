@@ -9,7 +9,10 @@ export interface AppDownloadProgressContext {
 }
 
 /* returns unlisten function */
-export async function subscribeToDownloadProgress(context: AppDownloadProgressContext, version: string) {
+export async function subscribeToDownloadProgress(
+	context: AppDownloadProgressContext,
+	version: string,
+) {
 	return await loading_listener(
 		(event: {
 			event: {

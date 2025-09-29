@@ -5,7 +5,7 @@ import { formatBytes } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { ref } from 'vue'
 
-import { injectAppUpdateDownloadProgress } from '@/helpers/download_progress.ts'
+import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
 
 const { formatMessage } = useVIntl()
 
@@ -77,9 +77,7 @@ const messages = defineMessages({
 		<div class="flex">
 			<h2 class="text-base text-contrast font-semibold m-0 grow">
 				{{
-					formatMessage(
-						metered && progress === 1 ? messages.downloadCompleteTitle : messages.title,
-					)
+					formatMessage(metered && progress === 1 ? messages.downloadCompleteTitle : messages.title)
 				}}
 			</h2>
 			<ButtonStyled size="small" circular>
@@ -113,7 +111,11 @@ const messages = defineMessages({
 				<button v-if="metered && progress < 1" :disabled="downloading" @click="download">
 					<SpinnerIcon v-if="downloading" class="animate-spin" />
 					<DownloadIcon v-else />
-					{{ formatMessage(downloading ? messages.downloading : messages.download, { size: formatBytes(size ?? 0) }) }}
+					{{
+						formatMessage(downloading ? messages.downloading : messages.download, {
+							size: formatBytes(size ?? 0),
+						})
+					}}
 				</button>
 				<button v-else @click="emit('restart')">
 					<RefreshCwIcon /> {{ formatMessage(messages.reload) }}

@@ -22,8 +22,8 @@ import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vu
 import JavaSettings from '@/components/ui/settings/JavaSettings.vue'
 import PrivacySettings from '@/components/ui/settings/PrivacySettings.vue'
 import ResourceManagementSettings from '@/components/ui/settings/ResourceManagementSettings.vue'
-import { injectAppUpdateDownloadProgress } from '@/helpers/download_progress.ts'
 import { get, set } from '@/helpers/settings.ts'
+import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
 import { useTheming } from '@/store/state'
 
 const themeStore = useTheming()
