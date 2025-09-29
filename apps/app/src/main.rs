@@ -14,6 +14,11 @@ mod error;
 #[cfg(target_os = "macos")]
 mod macos;
 
+#[cfg(feature = "updater")]
+mod updater_impl;
+#[cfg(not(feature = "updater"))]
+mod updater_impl_noop;
+
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
 #[tauri::command]
@@ -127,6 +132,17 @@ fn is_dev() -> bool {
     cfg!(debug_assertions)
 }
 
+#[tauri::command]
+fn are_updates_enabled() -> bool {
+    cfg!(feature = "updater")
+}
+
+#[cfg(feature = "updater")]
+pub use updater_impl::*;
+
+#[cfg(not(feature = "updater"))]
+pub use updater_impl_noop::*;
+
 // Toggles decorations
 #[tauri::command]
 async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
@@ -171,7 +187,17 @@ fn main() {
 
     #[cfg(feature = "updater")]
     {
-        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+        use tauri_plugin_http::reqwest::header::{HeaderValue, USER_AGENT};
+        use theseus::LAUNCHER_USER_AGENT;
+        builder = builder.plugin(
+            tauri_plugin_updater::Builder::new()
+                .header(
+                    USER_AGENT,
+                    HeaderValue::from_str(LAUNCHER_USER_AGENT).unwrap(),
+                )
+                .unwrap()
+                .build(),
+        );
     }
 
     builder = builder
@@ -271,9 +297,14 @@ fn main() {
         .plugin(api::ads::init())
         .plugin(api::friends::init())
         .plugin(api::worlds::init())
+        .manage(PendingUpdateData::default())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
+            are_updates_enabled,
+            get_update_size,
+            enqueue_update_for_installation,
+            remove_enqueued_update,
             toggle_decorations,
             show_window,
             restart_app,
@@ -285,8 +316,41 @@ fn main() {
     match app {
         Ok(app) => {
             app.run(|app, event| {
-                #[cfg(not(target_os = "macos"))]
+                #[cfg(not(any(feature = "updater", target_os = "macos")))]
                 drop((app, event));
+
+                #[cfg(feature = "updater")]
+                if matches!(event, tauri::RunEvent::Exit) {
+                    let update_data = app.state::<PendingUpdateData>().inner();
+                    if let Some((update, data)) = &*update_data.0.lock().unwrap() {
+                        fn set_changelog_toast(version: Option<String>) {
+                            let toast_result: theseus::Result<()> = tauri::async_runtime::block_on(async move {
+                                let mut settings = settings::get().await?;
+                                settings.pending_update_toast_for_version = version;
+                                settings::set(settings).await?;
+                                Ok(())
+                            });
+                            if let Err(e) = toast_result {
+                                tracing::warn!("Failed to set pending_update_toast: {e}")
+                            }
+                        }
+
+                        set_changelog_toast(Some(update.version.clone()));
+                        if let Err(e) = update.install(data) {
+                            tracing::error!("Error while updating: {e}");
+                            set_changelog_toast(None);
+
+                            DialogBuilder::message()
+                                .set_level(MessageLevel::Error)
+                                .set_title("Update error")
+                                .set_text(format!("Failed to install update due to an error:\n{e}"))
+                                .alert()
+                                .show()
+                                .unwrap();
+                        }
+                    }
+                }
+
                 #[cfg(target_os = "macos")]
                 if let tauri::RunEvent::Opened { urls } = event {
                     tracing::info!("Handling webview open {urls:?}");
@@ -314,6 +378,8 @@ fn main() {
             });
         }
         Err(e) => {
+            tracing::error!("Error while running tauri application: {:?}", e);
+
             #[cfg(target_os = "windows")]
             {
                 // tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
@@ -342,7 +408,6 @@ fn main() {
                 .show()
                 .unwrap();
 
-            tracing::error!("Error while running tauri application: {:?}", e);
             panic!("{1}: {:?}", e, "error while running tauri application")
         }
     }
