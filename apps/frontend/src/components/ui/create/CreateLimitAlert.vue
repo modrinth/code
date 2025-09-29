@@ -4,7 +4,7 @@
 		:type="hasHitLimit ? 'critical' : 'warning'"
 		:header="
 			hasHitLimit
-				? formatMessage(messages.limitReached, { type: capitalizeString(typeName.singular) })
+				? capitalizeString(formatMessage(messages.limitReached, { type: typeName.singular }))
 				: formatMessage(messages.approachingLimit, { type: typeName.singular, current, max })
 		"
 		class="mb-4"
