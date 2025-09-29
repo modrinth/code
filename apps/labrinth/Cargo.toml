@@ -23,6 +23,8 @@ actix-web-prom = { workspace = true, features = ["process"] }
 tracing.workspace = true
 tracing-actix-web.workspace = true
 console-subscriber.workspace = true
+eyre.workspace = true
+color-eyre.workspace = true
 
 tokio = { workspace = true, features = ["sync", "rt-multi-thread"] }
 tokio-stream.workspace = true

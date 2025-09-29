@@ -1,7 +1,10 @@
+use actix_web::dev::Service;
+use actix_web::http::StatusCode;
 use actix_web::middleware::from_fn;
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
+use futures::FutureExt;
 use labrinth::app_config;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
@@ -50,6 +53,7 @@ struct Args {
 async fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
+    color_eyre::install().expect("failed to install `color-eyre`");
     dotenvy::dotenv().ok();
     console_subscriber::init();
 
@@ -199,6 +203,13 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
+            .wrap_fn(|req, srv| {
+                srv.call(req).inspect(|result| {
+                    _ = result.as_ref().inspect(|resp| {
+                        resp.response().error().inspect(|err| log_error(*err));
+                    });
+                })
+            })
             .wrap(prometheus.clone())
             .wrap(from_fn(rate_limit_middleware))
             .wrap(actix_web::middleware::Compress::default())
@@ -208,4 +219,19 @@ async fn main() -> std::io::Result<()> {
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
     .run()
     .await
+}
+
+fn log_error(err: &actix_web::Error) {
+    match err.as_response_error().status_code() {
+        StatusCode::NOT_FOUND | StatusCode::BAD_REQUEST => {
+            tracing::debug!(
+                "Error encountered while processing the incoming HTTP request: {err:#?}"
+            );
+        }
+        _ => {
+            tracing::error!(
+                "Error encountered while processing the incoming HTTP request: {err:#?}"
+            );
+        }
+    }
 }
