@@ -53,6 +53,7 @@
 					v-model="visibility"
 					:items="visibilities"
 					:format-label="(x) => x.display"
+					:capitalize="false"
 					:disabled="hasHitLimit"
 				/>
 			</div>
