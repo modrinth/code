@@ -15,17 +15,15 @@ use labrinth::util::env::parse_var;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use std::ffi::CStr;
-use std::io::{self, stdout};
 use std::str::FromStr;
 use std::sync::Arc;
 use tracing::level_filters::LevelFilter;
-use tracing::{Level, error, info};
+use tracing::{error, info};
 use tracing_actix_web::TracingLogger;
 use tracing_ecs::ECSLayerBuilder;
-use tracing_subscriber::fmt::SubscriberBuilder;
+use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::{EnvFilter, Layer};
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -259,7 +257,7 @@ async fn main() -> std::io::Result<()> {
             .wrap_fn(|req, srv| {
                 srv.call(req).inspect(|result| {
                     _ = result.as_ref().inspect(|resp| {
-                        resp.response().error().inspect(|err| log_error(*err));
+                        resp.response().error().inspect(|err| log_error(err));
                     });
                 })
             })
