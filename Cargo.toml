@@ -167,6 +167,7 @@ totp-rs = "5.7.0"
 tracing = "0.1.41"
 tracing-actix-web = { version = "0.7.19", default-features = false }
 tracing-error = "0.2.1"
+tracing-subscriber = "0.3.19"
 eyre = "0.6.12"
 color-eyre = "0.6.5"
 url = "2.5.4"

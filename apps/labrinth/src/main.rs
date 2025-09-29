@@ -1,5 +1,4 @@
 use actix_web::dev::Service;
-use actix_web::http::StatusCode;
 use actix_web::middleware::from_fn;
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
@@ -222,16 +221,13 @@ async fn main() -> std::io::Result<()> {
 }
 
 fn log_error(err: &actix_web::Error) {
-    match err.as_response_error().status_code() {
-        StatusCode::NOT_FOUND | StatusCode::BAD_REQUEST => {
-            tracing::debug!(
-                "Error encountered while processing the incoming HTTP request: {err:#?}"
-            );
-        }
-        _ => {
-            tracing::error!(
-                "Error encountered while processing the incoming HTTP request: {err:#?}"
-            );
-        }
+    if err.as_response_error().status_code().is_client_error() {
+        tracing::debug!(
+            "Error encountered while processing the incoming HTTP request: {err}"
+        );
+    } else {
+        tracing::error!(
+            "Error encountered while processing the incoming HTTP request: {err}"
+        );
     }
 }
