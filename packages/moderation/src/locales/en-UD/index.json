@@ -122,6 +122,9 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "uoᴉʇnlosǝɹ ʇɔǝɹɹoɔ ʇɔǝlǝS"
   },
+  "nags.select-environments.description": {
+    "defaultMessage": "˙uo suoᴉʇɔunɟ {projectType} ɹnoʎ sʇuǝɯuoɹᴉʌuǝ ǝɥʇ ʇɔǝlǝS"
+  },
   "nags.select-environments.title": {
     "defaultMessage": "sʇuǝɯuoɹᴉʌuǝ ʇɔǝlǝS"
   },

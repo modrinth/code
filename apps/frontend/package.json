@@ -10,7 +10,7 @@
 		"postinstall": "nuxi prepare",
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write .",
-		"intl:extract": "formatjs extract \"{,src/components,src/composables,src/layouts,src/middleware,src/modules,src/pages,src/plugins,src/utils}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" \"src/error.vue\" --ignore '**/*.d.ts' --ignore 'node_modules' --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
+		"intl:extract": "formatjs extract \"{,src/components,src/composables,src/layouts,src/middleware,src/modules,src/pages,src/plugins,src/utils}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" \"src/error.vue\" --ignore \"**/*.d.ts\" --ignore node_modules --out-file src/locales/en-US/index.json --format crowdin --preserve-whitespace",
 		"test": "nuxi build"
 	},
 	"devDependencies": {
@@ -45,6 +45,9 @@
 		"@pinia/nuxt": "^0.5.1",
 		"@types/three": "^0.172.0",
 		"@vintl/vintl": "^4.4.1",
+		"@vitejs/plugin-vue": "^5.0.4",
+		"@vue-email/components": "^0.0.21",
+		"@vue-email/render": "^0.0.9",
 		"@vueuse/core": "^11.1.0",
 		"ace-builds": "^1.36.2",
 		"ansi-to-html": "^0.7.2",

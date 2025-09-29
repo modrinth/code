@@ -1,12 +1,13 @@
 pub(crate) mod admin;
+pub mod affiliate;
 pub mod billing;
+pub mod external_notifications;
 pub mod flows;
 pub mod gdpr;
 pub mod medal;
 pub mod moderation;
 pub mod pats;
 pub mod session;
-
 pub mod statuses;
 
 pub use super::ApiError;
@@ -26,6 +27,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(billing::config)
             .configure(gdpr::config)
             .configure(statuses::config)
-            .configure(medal::config),
+            .configure(medal::config)
+            .configure(external_notifications::config)
+            .configure(affiliate::config),
     );
 }

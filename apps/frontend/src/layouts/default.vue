@@ -27,6 +27,21 @@
 		</div>
 	</div>
 	<div ref="main_page" class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
+		<PagewideBanner v-if="showTaxComplianceBanner" variant="warning">
+			<template #title>
+				<span>{{ formatMessage(taxBannerMessages.title) }}</span>
+			</template>
+			<template #description>
+				<span>{{ formatMessage(taxBannerMessages.description) }}</span>
+			</template>
+			<template #actions>
+				<ButtonStyled color="orange">
+					<button @click="openTaxForm">
+						<FileTextIcon /> {{ formatMessage(taxBannerMessages.action) }}
+					</button>
+				</ButtonStyled>
+			</template>
+		</PagewideBanner>
 		<PagewideBanner
 			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
 			variant="warning"
@@ -116,6 +131,11 @@
 				}}
 			</template>
 		</PagewideBanner>
+
+		<CreatorTaxFormModal
+			ref="taxFormModalRef"
+			@success="() => navigateTo('/dashboard/revenue', { external: true })"
+		/>
 		<header
 			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
@@ -665,7 +685,7 @@
 			</div>
 		</header>
 		<main class="min-h-[calc(100vh-4.5rem-310.59px)]">
-			<ModalCreation v-if="auth.user" ref="modal_creation" />
+			<ProjectCreateModal v-if="auth.user" ref="modal_creation" />
 			<CollectionCreateModal ref="modal_collection_creation" />
 			<OrganizationCreateModal ref="modal_organization_creation" />
 			<slot id="main" />
@@ -774,6 +794,7 @@ import {
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
+	FileTextIcon,
 	GithubIcon,
 	GlassesIcon,
 	HamburgerIcon,
@@ -815,9 +836,10 @@ import { isAdmin, isStaff } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
-import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
-import ModalCreation from '~/components/ui/ModalCreation.vue'
-import OrganizationCreateModal from '~/components/ui/OrganizationCreateModal.vue'
+import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
+import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
+import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
+import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
@@ -836,6 +858,43 @@ const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
+
+const { data: payoutBalance } = await useAsyncData('payout/balance', () =>
+	useBaseFetch('payout/balance', { apiVersion: 3 }),
+)
+
+const showTaxComplianceBanner = computed(() => {
+	const bal = payoutBalance.value
+	if (!bal) return false
+	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
+	const status = bal.form_completion_status ?? 'unknown'
+	const isComplete = status === 'complete'
+	return !!auth.value.user && thresholdMet && !isComplete
+})
+
+const taxBannerMessages = defineMessages({
+	title: {
+		id: 'layout.banner.tax.title',
+		defaultMessage: 'Tax form required',
+	},
+	description: {
+		id: 'layout.banner.tax.description',
+		defaultMessage:
+			'You’ve already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.',
+	},
+	action: {
+		id: 'layout.banner.tax.action',
+		defaultMessage: 'Complete tax form',
+	},
+	close: { id: 'common.close', defaultMessage: 'Close' },
+})
+
+const taxFormModalRef = ref(null)
+function openTaxForm(e) {
+	if (taxFormModalRef.value && taxFormModalRef.value.startTaxForm) {
+		taxFormModalRef.value.startTaxForm(e)
+	}
+}
 
 const basePopoutId = useId()
 async function handleResendEmailVerification() {

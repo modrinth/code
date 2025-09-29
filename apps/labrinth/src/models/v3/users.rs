@@ -17,9 +17,7 @@ bitflags::bitflags! {
         const ALPHA_TESTER = 1 << 4;
         const CONTRIBUTOR = 1 << 5;
         const TRANSLATOR = 1 << 6;
-
-        const ALL = 0b1111111;
-        const NONE = 0b0;
+        const AFFILIATE = 1 << 7;
     }
 }
 
@@ -27,7 +25,7 @@ bitflags_serde_impl!(Badges, u64);
 
 impl Default for Badges {
     fn default() -> Badges {
-        Badges::NONE
+        Badges::empty()
     }
 }
 

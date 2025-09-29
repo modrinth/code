@@ -567,7 +567,7 @@
     "message": "Falha a carregar projetos aleatórios :("
   },
   "landing.feature.follow.description": {
-    "message": "Sê notificado sempre que os teus projetos favoritos recebem atualizações e fica a par das novidades"
+    "message": "Sê notificado sempre que os teus projetos favoritos recebem atualizações e mantém-te a par das novidades."
   },
   "landing.feature.follow.heading": {
     "message": "Segue os teus projetos favoritos"
@@ -642,7 +642,7 @@
     "message": "Ordenar por"
   },
   "landing.section.for-creators.description": {
-    "message": "Dá uma casa online às tuas criações e alcança uma audiência gigante de jogadores dedicados"
+    "message": "Dá uma casa online às tuas criações e alcança uma enorme audiência de jogadores dedicados."
   },
   "landing.section.for-creators.label": {
     "message": "Para Criadores"
@@ -665,8 +665,17 @@
   "layout.action.change-theme": {
     "message": "Alterar tema"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Obter a Modrinth App"
+  "layout.action.close-banner": {
+    "message": "Fechar"
+  },
+  "layout.action.new-collection": {
+    "message": "Nova coleção"
+  },
+  "layout.action.new-organization": {
+    "message": "Nova organização"
+  },
+  "layout.action.new-project": {
+    "message": "Novo projeto"
   },
   "layout.avatar.alt": {
     "message": "O teu avatar"
@@ -800,11 +809,38 @@
   "layout.meta.og-description": {
     "message": "Descobre e publica conteúdo de Minecraft!"
   },
+  "layout.nav.discover-content": {
+    "message": "Descobrir conteúdo"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Obter a Modrinth App"
+  },
   "layout.nav.home": {
     "message": "Início"
   },
+  "layout.nav.host-a-server": {
+    "message": "Alojar um servidor"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Página inicial do Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizações"
+  },
+  "layout.nav.profile": {
+    "message": "Perfil"
+  },
+  "layout.nav.projects": {
+    "message": "Projetos"
+  },
   "layout.nav.search": {
     "message": "Pesquisar"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Atualiza para o Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filtrar por"

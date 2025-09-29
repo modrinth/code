@@ -60,7 +60,8 @@ pub struct UserCompliance {
     pub last_checked: DateTime<Utc>,
     pub external_request_id: String,
     pub reference_id: String,
-    pub form_type: FormType,
+    pub form_type: Option<FormType>,
+    pub requires_manual_review: bool,
 }
 
 impl UserCompliance {
@@ -87,13 +88,18 @@ impl UserCompliance {
             last_checked: row.last_checked,
             external_request_id: row.external_request_id,
             reference_id: row.reference_id,
-            form_type: FormType::from_str_or_default(&row.form_type),
+            form_type: row
+                .form_type
+                .as_deref()
+                .map(FormType::from_str_or_default),
+            requires_manual_review: row.requires_manual_review,
         });
 
         Ok(maybe_compliance)
     }
 
-    pub async fn upsert<'a, E>(&mut self, exec: E) -> sqlx::Result<()>
+    /// This either inserts the row into the table or updates the row, *except the requires_manual_review* column.
+    pub async fn upsert_partial<'a, E>(&mut self, exec: E) -> sqlx::Result<()>
     where
         E: sqlx::PgExecutor<'a>,
     {
@@ -109,9 +115,10 @@ impl UserCompliance {
                 last_checked,
                 external_request_id,
                 reference_id,
-                form_type
+                form_type,
+                requires_manual_review
               )
-              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             ON CONFLICT (user_id)
             DO UPDATE SET
               requested = EXCLUDED.requested,
@@ -132,7 +139,8 @@ impl UserCompliance {
             self.last_checked,
             self.external_request_id,
             self.reference_id,
-            self.form_type.as_str(),
+            self.form_type.map(|s| s.as_str()),
+            self.requires_manual_review,
         )
         .fetch_one(exec)
         .await?;
@@ -157,7 +165,8 @@ impl UserCompliance {
               last_checked = $6,
               external_request_id = $7,
               reference_id = $8,
-              form_type = $9
+              form_type = $9,
+              requires_manual_review = $10
             WHERE id = $1
             "#,
             self.id,
@@ -168,7 +177,8 @@ impl UserCompliance {
             self.last_checked,
             self.external_request_id,
             self.reference_id,
-            self.form_type.as_str(),
+            self.form_type.map(|s| s.as_str()),
+            self.requires_manual_review,
         )
         .execute(exec)
         .await?;

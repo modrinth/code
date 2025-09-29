@@ -1,8 +1,12 @@
 use crate::database::redis::RedisPool;
+use crate::queue::billing::{index_billing, index_subscriptions};
+use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
-    PayoutsQueue, insert_bank_balances_and_webhook, process_payout,
+    PayoutsQueue, index_payouts_notifications,
+    insert_bank_balances_and_webhook, process_payout,
 };
 use crate::search::indexing::index_projects;
+use crate::util::anrok;
 use crate::{database, search};
 use clap::ValueEnum;
 use sqlx::Postgres;
@@ -18,9 +22,11 @@ pub enum BackgroundTask {
     IndexBilling,
     IndexSubscriptions,
     Migrations,
+    Mail,
 }
 
 impl BackgroundTask {
+    #[allow(clippy::too_many_arguments)]
     pub async fn run(
         self,
         pool: sqlx::Pool<Postgres>,
@@ -28,6 +34,8 @@ impl BackgroundTask {
         search_config: search::SearchConfig,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
+        anrok_client: anrok::Client,
+        email_queue: EmailQueue,
     ) {
         use BackgroundTask::*;
         match self {
@@ -35,10 +43,11 @@ impl BackgroundTask {
             IndexSearch => index_search(pool, redis_pool, search_config).await,
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
-            Payouts => payouts(pool, clickhouse).await,
+            Payouts => payouts(pool, clickhouse, redis_pool).await,
             IndexBilling => {
-                crate::routes::internal::billing::index_billing(
+                index_billing(
                     stripe_client,
+                    anrok_client,
                     pool.clone(),
                     redis_pool,
                 )
@@ -47,10 +56,40 @@ impl BackgroundTask {
                 update_bank_balances(pool).await;
             }
             IndexSubscriptions => {
-                crate::routes::internal::billing::index_subscriptions(
-                    pool, redis_pool,
+                index_subscriptions(
+                    pool,
+                    redis_pool,
+                    stripe_client,
+                    anrok_client,
                 )
                 .await
+            }
+            Mail => {
+                run_email(email_queue).await;
+            }
+        }
+    }
+}
+
+pub async fn run_email(email_queue: EmailQueue) {
+    // Only index for 5 emails at a time, to reduce transaction length,
+    // for a total of 100 emails.
+    for _ in 0..20 {
+        let then = std::time::Instant::now();
+
+        match email_queue.index(5).await {
+            Ok(true) => {
+                info!(
+                    "Indexed email queue in {}ms",
+                    then.elapsed().as_millis()
+                );
+            }
+            Ok(false) => {
+                info!("No more emails to index");
+                break;
+            }
+            Err(error) => {
+                error!(%error, "Failed to index email queue");
             }
         }
     }
@@ -135,12 +174,19 @@ pub async fn update_versions(
 pub async fn payouts(
     pool: sqlx::Pool<Postgres>,
     clickhouse: clickhouse::Client,
+    redis_pool: RedisPool,
 ) {
     info!("Started running payouts");
     let result = process_payout(&pool, &clickhouse).await;
     if let Err(e) = result {
         warn!("Payouts run failed: {:?}", e);
     }
+
+    let result = index_payouts_notifications(&pool, &redis_pool).await;
+    if let Err(e) = result {
+        warn!("Payouts notifications indexing failed: {:?}", e);
+    }
+
     info!("Done running payouts");
 }
 

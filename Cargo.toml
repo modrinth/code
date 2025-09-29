@@ -40,6 +40,7 @@ bytes = "1.10.1"
 censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.41"
+cidre = { version = "0.11.2", default-features = false, features = ["macos_15_0"] }
 clap = "4.5.43"
 clickhouse = "0.13.3"
 color-thief = "0.2.2"
@@ -87,7 +88,9 @@ lettre = { version = "0.11.18", default-features = false, features = [
 	"ring",
 	"rustls",
 	"rustls-native-certs",
+	"tokio1-rustls",
 	"smtp-transport",
+	"tokio1",
 ] }
 maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.29.1", default-features = false }
@@ -171,9 +174,12 @@ uuid = "1.17.0"
 validator = "0.20.0"
 webp = { version = "0.3.0", default-features = false }
 whoami = "1.6.0"
+windows = "0.61.3"
+windows-core = "0.61.2"
 winreg = "0.55.0"
 woothee = "0.13.0"
 yaserde = "0.12.0"
+zbus = "5.9.0"
 zip = { version = "4.3.0", default-features = false, features = [
 	"bzip2",
 	"deflate",
@@ -215,10 +221,6 @@ redundant_type_annotations = "warn"
 todo = "warn"
 unnested_or_patterns = "warn"
 wildcard_dependencies = "warn"
-
-[workspace.lints.rust]
-# Turn warnings into errors by default
-warnings = "deny"
 
 [patch.crates-io]
 wry = { git = "https://github.com/modrinth/wry", rev = "f2ce0b0" }

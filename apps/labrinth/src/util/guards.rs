@@ -2,6 +2,7 @@ use actix_web::guard::GuardContext;
 
 pub const ADMIN_KEY_HEADER: &str = "Modrinth-Admin";
 pub const MEDAL_KEY_HEADER: &str = "X-Medal-Access-Key";
+pub const EXTERNAL_NOTIFICATION_KEY_HEADER: &str = "External-Notification-Key";
 
 pub fn admin_key_guard(ctx: &GuardContext) -> bool {
     let admin_key = std::env::var("LABRINTH_ADMIN_KEY").expect(
@@ -23,5 +24,21 @@ pub fn medal_key_guard(ctx: &GuardContext) -> bool {
             .headers()
             .get(MEDAL_KEY_HEADER)
             .is_some_and(|it| it.as_bytes() == medal_key.as_bytes()),
+    }
+}
+
+pub fn external_notification_key_guard(ctx: &GuardContext) -> bool {
+    let maybe_external_notification_key =
+        dotenvy::var("LABRINTH_EXTERNAL_NOTIFICATION_KEY").ok();
+
+    match maybe_external_notification_key {
+        None => false,
+        Some(external_notification_key) => ctx
+            .head()
+            .headers()
+            .get(EXTERNAL_NOTIFICATION_KEY_HEADER)
+            .is_some_and(|it| {
+                it.as_bytes() == external_notification_key.as_bytes()
+            }),
     }
 }

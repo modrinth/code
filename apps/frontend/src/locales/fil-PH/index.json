@@ -38,6 +38,9 @@
   "app-marketing.hero.download-button": {
     "message": "I-download ang App ng Modrinth"
   },
+  "auth.verify-email.action.account-settings": {
+    "message": "Mga setting sa account"
+  },
   "collection.button.edit-icon": {
     "message": "Baguhin ang ikono"
   },
@@ -48,13 +51,16 @@
     "message": "Habambuhay na matatanggal ang koleksiyong ito. Hindi mababawi ang pagkilos na ito."
   },
   "landing.feature.launcher.description": {
-    "message": "Binibigyang-daan ng open-source API ng Modrinth ang mga launcher na makadagdag ng malalimang pagsasama sa Modrinth. Maaari mong gamitin ang Modrinth sa <link>aming app</link> at sa iilang pinakasat na mga launcher gaya ng ATLauncher, MultiMC, at Prism Launcher. "
+    "message": "Binibigyang-daan ng open-source API ng Modrinth ang mga launcher na makadagdag ng malalimang pagsasama sa Modrinth. Maaari mong gamitin ang Modrinth sa <link>aming app</link> at sa iilang pinakasikat na mga launcher gaya ng ATLauncher, MultiMC, at Prism Launcher. "
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
     "message": "mga resource pack"
   },
   "landing.subheading": {
     "message": "Magtuklas, maglaro, at magbahagi ng mga Minecraft content sa aming open-source na platapormang ginawa para sa komunidad."
+  },
+  "layout.banner.add-email.button": {
+    "message": "Mga setting sa account"
   },
   "layout.footer.about": {
     "message": "Tungkol"
@@ -145,6 +151,36 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Resource Pack"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "Kakaunlad lang ng aming sistema sa Mga Environment sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Wala kang pahintulot na magbago sa mga setting na ito, mangyaring ipaalam sa isa pang miyembro ng proyekto na kailangang mapatunayan ang metadata ng environment."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Kailangang suriin ang metadata ng environment"
+  },
+  "project.environment.migration.message": {
+    "message": "Kakaunlad lang ng aming sistema sa Mga Environment sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring bisitahin ang mga setting ng iyong proyekto at patunaying tama ang metadata."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Suriin ang mga setting sa environment"
+  },
+  "project.environment.migration.title": {
+    "message": "Pakisuri sa metadata sa environment"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Wala pang metadata sa environment ang iyong proyekto, pakipili ng wasto sa ibaba."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Pakipili sa environment ng inyong proyekto"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "Marami ang environment ng iyong proyekto"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "Kakaunlad lang ng aming sistema sa Mga Environment sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring suriin na tama ang napili sa ibaba at pindutin ang 'Patunayan' kapag tapos ka na!"
+  },
+  "project.settings.title": {
+    "message": "Mga Setting"
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Pahina ng mga Resource Pack"

@@ -1,4 +1,10 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Beta verze"
+  },
   "badge.new": {
     "defaultMessage": "Nový"
   },
@@ -76,6 +82,9 @@
   },
   "button.sign-out": {
     "defaultMessage": "Odhlásit se"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Registrovat se"
   },
   "button.stop": {
     "defaultMessage": "Stop"
@@ -349,6 +358,15 @@
   },
   "project-type.all": {
     "defaultMessage": "Vše"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} few {Data Packy} many {Data Packů} other {Data Packů}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Data Packy"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {data pack} few {data packy} many {data packů} other {data packů}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Podporovaná prostředí"

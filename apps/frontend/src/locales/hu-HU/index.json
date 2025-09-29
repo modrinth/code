@@ -20,11 +20,17 @@
   "app-marketing.download.linux": {
     "message": "Linux"
   },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "A linux verziója a Modrinth App nak <issues-link>vannak problémái</issues-link> bizonyos rendszereken és a konfigurációin. Ha a Modrinth App instabil a rendszereden akkor próbáld ki a <prism-link>Prism Launchert</prism-link> nagyon könnyen lehet Modrinth Kontentet telepíteni."
+  },
   "app-marketing.download.mac": {
     "message": "Mac"
   },
   "app-marketing.download.options-title": {
     "message": "Letöltési opciók"
+  },
+  "app-marketing.download.terms": {
+    "message": "A Modrinth App letöltésével elfogadod <terms-link>feltételeket</terms-link> és a <privacy-link>biztonsági szabályzatot</privacy-link>."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Harmadik féltül származó csomagok"
@@ -52,6 +58,12 @@
   },
   "app-marketing.features.importing.title": {
     "message": "Profil importálás"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Akciók"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "{author} által"
   },
   "app-marketing.features.mod-management.description": {
     "message": "A Modrinth könnyűvé teszi az összes telepített modjaidnak a kezelését egy helyen. Telepíthetsz, eltávolíthatsz és frissíthetsz modokat egyetlen kattintással."
@@ -89,6 +101,9 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
+  "app-marketing.features.performance.description": {
+    "message": "A Modrinth App jobb teljesítményt nyújt, mint sok vezető mod menedzser, és csak 150 MB RAM-ot használ!"
+  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -125,6 +140,9 @@
   "app-marketing.features.performance.title": {
     "message": "Teljesítményes"
   },
+  "app-marketing.features.play.description": {
+    "message": "."
+  },
   "app-marketing.features.play.title": {
     "message": "Játssz a kedvenc modjaiddal"
   },
@@ -143,6 +161,9 @@
   "app-marketing.features.unlike-any-launcher": {
     "message": "Olyan Minecraft inditóprogram"
   },
+  "app-marketing.features.website.title": {
+    "message": "Weboldal integráció"
+  },
   "app-marketing.features.youve-used-before": {
     "message": "ami eltérő"
   },
@@ -152,11 +173,119 @@
   "app-marketing.hero.download-modrinth-app": {
     "message": "Modrinth App letöltése"
   },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Modrinth App letöltése {os} re/ra"
+  },
   "app-marketing.hero.more-download-options": {
     "message": "Több letöltési lehetőség"
   },
+  "auth.authorize.action.authorize": {
+    "message": "Engedélyezés"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Elutasítás"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> <creator-link>{creator}</creator-link> által tudja ezt:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "{appName} Engedélyezése"
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Email vagy felhasználónév"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Email"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Email küldve"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Jelszó visszaállítása"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Jelszó megerősítése"
+  },
+  "auth.reset-password.title": {
+    "message": "Jelszó visszaállítása"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Jelszavad visszaállítása"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Kérlek ad meg a két-faktoros kódot hogy tovább menj."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Két-faktoros kód megadása"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Kód beírása..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Elfelejtted a jelszavad?</forgot-password-link> • <create-account-link>Hozzlétre egy fiókót</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Email vagy felhasználónév"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Jelszó"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Bejelentkezés ezzel"
+  },
+  "auth.sign-in.title": {
+    "message": "Bejelentkezés"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Vagy használj jelszót"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Fiók létrehozása"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Jelszó megerősítése"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Email"
+  },
   "auth.sign-up.label.username": {
     "message": "Felhasználónév"
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "A jelszavak nem jegyeznek!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Jelszó"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Már van fiókod?"
+  },
+  "auth.sign-up.title": {
+    "message": "Regisztráció"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Vagy hoz létre egyet magadnak"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Regisztráció ezzel"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Fiók beállítások"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Bejenlentkezés"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Az email már hítelesítve van!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Email már hítelesítve van"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Hítelesítő email újraküldése"
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Email hítelesítés sikertelen"
   },
   "collection.label.created-at": {
     "message": "Létrehozva {ago}"

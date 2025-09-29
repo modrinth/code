@@ -130,8 +130,8 @@ pub enum ApiError {
     #[error("Password Hashing Error: {0}")]
     PasswordHashing(#[from] argon2::password_hash::Error),
     #[error("{0}")]
-    Mail(#[from] crate::auth::email::MailError),
-    #[error("Error while rerouting request: {0}")]
+    Mail(#[from] crate::queue::email::MailError),
+    #[error("Error while rerouting request: {0:?}")]
     Reroute(#[from] reqwest::Error),
     #[error("Unable to read Zip Archive: {0}")]
     Zip(#[from] zip::result::ZipError),
@@ -143,6 +143,8 @@ pub enum ApiError {
     Conflict(String),
     #[error("External tax compliance API Error")]
     TaxComplianceApi,
+    #[error(transparent)]
+    TaxProcessor(#[from] crate::util::anrok::AnrokError),
     #[error(
         "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
     )]
@@ -184,6 +186,7 @@ impl ApiError {
                 ApiError::Io(..) => "io_error",
                 ApiError::RateLimitError(..) => "ratelimit_error",
                 ApiError::Stripe(..) => "stripe_error",
+                ApiError::TaxProcessor(..) => "tax_processor_error",
                 ApiError::Slack(..) => "slack_error",
             },
             description: self.to_string(),
@@ -223,6 +226,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Io(..) => StatusCode::BAD_REQUEST,
             ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
             ApiError::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
+            ApiError::TaxProcessor(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Slack(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }

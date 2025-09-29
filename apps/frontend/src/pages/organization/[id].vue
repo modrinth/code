@@ -284,7 +284,7 @@ import { formatNumber } from '@modrinth/utils'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
-import ModalCreation from '~/components/ui/ModalCreation.vue'
+import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'

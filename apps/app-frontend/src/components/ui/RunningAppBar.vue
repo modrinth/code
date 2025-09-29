@@ -177,8 +177,8 @@ const currentLoadingBars = ref([])
 
 const refreshInfo = async () => {
 	const currentLoadingBarCount = currentLoadingBars.value.length
-	currentLoadingBars.value = Object.values(await progress_bars_list().catch(handleError)).map(
-		(x) => {
+	currentLoadingBars.value = Object.values(await progress_bars_list().catch(handleError))
+		.map((x) => {
 			if (x.bar_type.type === 'java_download') {
 				x.title = 'Downloading Java ' + x.bar_type.version
 			}
@@ -190,8 +190,8 @@ const refreshInfo = async () => {
 			}
 
 			return x
-		},
-	)
+		})
+		.filter((bar) => bar?.bar_type?.type !== 'launcher_update')
 
 	currentLoadingBars.value.sort((a, b) => {
 		if (a.loading_bar_uuid < b.loading_bar_uuid) {

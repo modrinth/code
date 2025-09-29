@@ -284,6 +284,9 @@
   "project.about.details.updated": {
     "defaultMessage": "In-update {date}"
   },
+  "project.settings.environment.title": {
+    "defaultMessage": "Environment"
+  },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
   },
@@ -316,6 +319,9 @@
   },
   "project.visibility.unknown": {
     "defaultMessage": "Hindi alam"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Environment"
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Open source"

@@ -138,6 +138,7 @@ import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
 import _RedoIcon from './icons/redo.svg?component'
+import _RefreshCwIcon from './icons/refresh-cw.svg?component'
 import _ReplyIcon from './icons/reply.svg?component'
 import _ReportIcon from './icons/report.svg?component'
 import _RestoreIcon from './icons/restore.svg?component'
@@ -168,6 +169,7 @@ import _StopCircleIcon from './icons/stop-circle.svg?component'
 import _StrikethroughIcon from './icons/strikethrough.svg?component'
 import _SunIcon from './icons/sun.svg?component'
 import _SunriseIcon from './icons/sunrise.svg?component'
+import _SupportChatIcon from './icons/support-chat.svg?component'
 import _TagIcon from './icons/tag.svg?component'
 import _TagsIcon from './icons/tags.svg?component'
 import _TerminalSquareIcon from './icons/terminal-square.svg?component'
@@ -339,6 +341,7 @@ export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const ReceiptTextIcon = _ReceiptTextIcon
 export const RedoIcon = _RedoIcon
+export const RefreshCwIcon = _RefreshCwIcon
 export const ReplyIcon = _ReplyIcon
 export const ReportIcon = _ReportIcon
 export const RestoreIcon = _RestoreIcon
@@ -369,6 +372,7 @@ export const StopCircleIcon = _StopCircleIcon
 export const StrikethroughIcon = _StrikethroughIcon
 export const SunIcon = _SunIcon
 export const SunriseIcon = _SunriseIcon
+export const SupportChatIcon = _SupportChatIcon
 export const TagIcon = _TagIcon
 export const TagsIcon = _TagsIcon
 export const TerminalSquareIcon = _TerminalSquareIcon

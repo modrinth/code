@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                users.id,\n                users_redeemals.status AS \"status: Option<String>\"\n            FROM\n                users\n            LEFT JOIN\n                users_redeemals ON users_redeemals.user_id = users.id\n                    AND users_redeemals.offer = $2\n            WHERE\n                users.username = $1\n            ORDER BY\n                users_redeemals.redeemed DESC\n            LIMIT 1\n          ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "status: Option<String>",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "a6422c468cf5121b44ceb33f7cf90c3aebf59dfdbff277533e507ae3ef08c652"
+}

@@ -181,6 +181,123 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderasi"
+  },
+  "label.notifications": {
+    "defaultMessage": "Pemberitahuan"
+  },
+  "label.or": {
+    "defaultMessage": "atau"
+  },
+  "label.password": {
+    "defaultMessage": "Kata sandi"
+  },
+  "label.played": {
+    "defaultMessage": "Bermain selama {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Publik"
+  },
+  "label.rejected": {
+    "defaultMessage": "Ditolak"
+  },
+  "label.saved": {
+    "defaultMessage": "Tersimpan"
+  },
+  "label.scopes": {
+    "defaultMessage": "Cakupan"
+  },
+  "label.server": {
+    "defaultMessage": "Peladen"
+  },
+  "label.servers": {
+    "defaultMessage": "Peladen"
+  },
+  "label.settings": {
+    "defaultMessage": "Pengaturan"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Bermain sendiri"
+  },
+  "label.title": {
+    "defaultMessage": "Judul"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Tidak terdaftar"
+  },
+  "label.visibility": {
+    "defaultMessage": "Visibilitas"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Kunjungi profil Anda"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Tambah metode pembayaran"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Menambah metode pembayaran"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Terjadi kesalahan"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Diterima"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Disetujui"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Diarsipkan"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Ditutup"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Pembuat"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Draf"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Gagal"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Terdaftar"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderator"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Tim Modrinth"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Tertunda"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Pribadi"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Diproses"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Ditolak"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Dikembalikan"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Dijadwalkan"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Dalam tinjauan"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Tidak terdaftar"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Ditahan"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Salin kode ke papan klip"
   }
 }
 

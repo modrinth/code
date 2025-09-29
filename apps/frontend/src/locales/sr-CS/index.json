@@ -332,9 +332,6 @@
   "layout.action.change-theme": {
     "message": "Promeni temu"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Preuzmite Modrinth aplikaciju"
-  },
   "layout.avatar.alt": {
     "message": "Vaš avatar"
   },

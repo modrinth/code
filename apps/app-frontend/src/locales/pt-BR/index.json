@@ -165,7 +165,7 @@
     "message": "Comando auxiliar para iniciar o Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "Digite um comando auxiliar..."
+    "message": "Insira um comando auxiliar..."
   },
   "instance.settings.tabs.installation": {
     "message": "Instalação"

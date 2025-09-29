@@ -84,7 +84,7 @@
     "message": "刪除實例"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "這將從裝置上永久刪除實例，包含您的世界、設定與所有已安裝內容。請注意，一旦刪除，將無法復原。"
+    "message": "這將從裝置上永久刪除實例，包含你的世界、設定與所有已安裝內容。請注意，一旦刪除，將無法復原。"
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "刪除中..."
@@ -216,7 +216,7 @@
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "無法取得連結模組包的詳細資訊。請檢查您的網路連線。"
+    "message": "無法取得連結模組包的詳細資訊。請檢查你的網路連線。"
   },
   "instance.settings.tabs.installation.no-loader-versions": {
     "message": "{loader} 不適用於 Minecraft {version}。請嘗試其他模組載入器。"
@@ -297,7 +297,7 @@
     "message": "如果繼續操作，你將無法在不建立全新實例的情況下重新連結它。你將不再收到模組包更新，而且它將成為一個普通實例。"
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "您確定要解除連結這個實例嗎？"
+    "message": "你確定要解除連結這個實例嗎？"
   },
   "instance.settings.tabs.installation.unlink.description": {
     "message": "這個實例已連結至一個模組包，這表示模組無法更新，你也無法變更模組載入器或 Minecraft 版本。解除連結將會永久中斷這個實例與模組包之間的關係。"

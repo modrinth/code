@@ -1,7 +1,9 @@
 use crate::models::ids::{ThreadMessageId, VersionId};
+use crate::models::v3::billing::PriceDuration;
 use crate::models::{
     ids::{
         NotificationId, OrganizationId, ProjectId, ReportId, TeamId, ThreadId,
+        UserSubscriptionId,
     },
     notifications::{Notification, NotificationAction, NotificationBody},
     projects::ProjectStatus,
@@ -37,6 +39,17 @@ pub struct LegacyNotificationAction {
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum LegacyNotificationBody {
+    TaxNotification {
+        subscription_id: UserSubscriptionId,
+        old_amount: i64,
+        old_tax_amount: i64,
+        new_amount: i64,
+        new_tax_amount: i64,
+        billing_interval: PriceDuration,
+        currency: String,
+        due: DateTime<Utc>,
+        service: String,
+    },
     ProjectUpdate {
         project_id: ProjectId,
         version_id: VersionId,
@@ -72,6 +85,60 @@ pub enum LegacyNotificationBody {
         link: String,
         actions: Vec<NotificationAction>,
     },
+    // In `NotificationBody`, this has the `flow` field, however, don't
+    // include it here, to be 100% certain we don't end up leaking it
+    // in site notifications.
+    ResetPassword,
+    // Idem as ResetPassword
+    VerifyEmail,
+    AuthProviderAdded {
+        provider: String,
+    },
+    AuthProviderRemoved {
+        provider: String,
+    },
+    TwoFactorEnabled,
+    TwoFactorRemoved,
+    PasswordChanged,
+    PasswordRemoved,
+    EmailChanged {
+        new_email: String,
+        to_email: String,
+    },
+    PaymentFailed {
+        amount: String,
+        service: String,
+    },
+    PatCreated {
+        token_name: String,
+    },
+    ModerationMessageReceived {
+        project_id: ProjectId,
+    },
+    ReportStatusUpdated {
+        report_id: ReportId,
+    },
+    ReportSubmitted {
+        report_id: ReportId,
+    },
+    ProjectStatusApproved {
+        project_id: ProjectId,
+    },
+    ProjectStatusNeutral {
+        project_id: ProjectId,
+        old_status: ProjectStatus,
+        new_status: ProjectStatus,
+    },
+    ProjectTransferred {
+        project_id: ProjectId,
+        // Store only the raw identifiers in legacy body
+        new_owner_user_id: Option<UserId>,
+        new_owner_organization_id: Option<OrganizationId>,
+    },
+    PayoutAvailable {
+        amount: f64,
+        date_available: DateTime<Utc>,
+    },
     Unknown,
 }
 
@@ -92,6 +159,63 @@ impl LegacyNotification {
             }
             NotificationBody::ModeratorMessage { .. } => {
                 Some("moderator_message".to_string())
+            }
+            NotificationBody::PatCreated { .. } => {
+                Some("pat_created".to_string())
+            }
+            NotificationBody::ModerationMessageReceived { .. } => {
+                Some("moderation_message_received".to_string())
+            }
+            NotificationBody::ReportStatusUpdated { .. } => {
+                Some("report_status_updated".to_string())
+            }
+            NotificationBody::ReportSubmitted { .. } => {
+                Some("report_submitted".to_string())
+            }
+            NotificationBody::ProjectStatusApproved { .. } => {
+                Some("project_status_approved".to_string())
+            }
+            NotificationBody::ProjectStatusNeutral { .. } => {
+                Some("project_status_neutral".to_string())
+            }
+            NotificationBody::ProjectTransferred { .. } => {
+                Some("project_transferred".to_string())
+            }
+            NotificationBody::ResetPassword { .. } => {
+                Some("reset_password".to_string())
+            }
+            NotificationBody::VerifyEmail { .. } => {
+                Some("verify_email".to_string())
+            }
+            NotificationBody::AuthProviderAdded { .. } => {
+                Some("auth_provider_added".to_string())
+            }
+            NotificationBody::AuthProviderRemoved { .. } => {
+                Some("auth_provider_removed".to_string())
+            }
+            NotificationBody::TwoFactorEnabled => {
+                Some("two_factor_enabled".to_string())
+            }
+            NotificationBody::TwoFactorRemoved => {
+                Some("two_factor_removed".to_string())
+            }
+            NotificationBody::PasswordChanged => {
+                Some("password_changed".to_string())
+            }
+            NotificationBody::PasswordRemoved => {
+                Some("password_removed".to_string())
+            }
+            NotificationBody::EmailChanged { .. } => {
+                Some("email_changed".to_string())
+            }
+            NotificationBody::PaymentFailed { .. } => {
+                Some("payment_failed".to_string())
+            }
+            NotificationBody::TaxNotification { .. } => {
+                Some("tax_notification".to_string())
+            }
+            NotificationBody::PayoutAvailable { .. } => {
+                Some("payout_available".to_string())
             }
             NotificationBody::LegacyMarkdown {
                 notification_type, ..
@@ -149,6 +273,46 @@ impl LegacyNotification {
                 project_id,
                 report_id,
             },
+            NotificationBody::PatCreated { token_name } => {
+                LegacyNotificationBody::PatCreated { token_name }
+            }
+            NotificationBody::ModerationMessageReceived { project_id } => {
+                LegacyNotificationBody::ModerationMessageReceived { project_id }
+            }
+            NotificationBody::ReportStatusUpdated { report_id } => {
+                LegacyNotificationBody::ReportStatusUpdated { report_id }
+            }
+            NotificationBody::ReportSubmitted { report_id } => {
+                LegacyNotificationBody::ReportSubmitted { report_id }
+            }
+            NotificationBody::ProjectStatusApproved { project_id } => {
+                LegacyNotificationBody::ProjectStatusApproved { project_id }
+            }
+            NotificationBody::ProjectStatusNeutral {
+                project_id,
+                old_status,
+                new_status,
+            } => LegacyNotificationBody::ProjectStatusNeutral {
+                project_id,
+                old_status,
+                new_status,
+            },
+            NotificationBody::ProjectTransferred {
+                project_id,
+                new_owner_user_id,
+                new_owner_organization_id,
+            } => LegacyNotificationBody::ProjectTransferred {
+                project_id,
+                new_owner_user_id,
+                new_owner_organization_id,
+            },
+            NotificationBody::PayoutAvailable {
+                amount,
+                date_available,
+            } => LegacyNotificationBody::PayoutAvailable {
+                amount,
+                date_available,
+            },
             NotificationBody::LegacyMarkdown {
                 notification_type,
                 name,
@@ -162,6 +326,61 @@ impl LegacyNotification {
                 link,
                 actions,
             },
+            NotificationBody::ResetPassword { .. } => {
+                LegacyNotificationBody::ResetPassword
+            }
+            NotificationBody::VerifyEmail { .. } => {
+                LegacyNotificationBody::VerifyEmail
+            }
+            NotificationBody::AuthProviderAdded { provider } => {
+                LegacyNotificationBody::AuthProviderAdded { provider }
+            }
+            NotificationBody::AuthProviderRemoved { provider } => {
+                LegacyNotificationBody::AuthProviderRemoved { provider }
+            }
+            NotificationBody::TwoFactorEnabled => {
+                LegacyNotificationBody::TwoFactorEnabled
+            }
+            NotificationBody::TwoFactorRemoved => {
+                LegacyNotificationBody::TwoFactorRemoved
+            }
+            NotificationBody::PasswordChanged => {
+                LegacyNotificationBody::PasswordChanged
+            }
+            NotificationBody::PasswordRemoved => {
+                LegacyNotificationBody::PasswordRemoved
+            }
+            NotificationBody::EmailChanged {
+                new_email,
+                to_email,
+            } => LegacyNotificationBody::EmailChanged {
+                new_email,
+                to_email,
+            },
+            NotificationBody::TaxNotification {
+                subscription_id,
+                old_amount,
+                old_tax_amount,
+                new_amount,
+                new_tax_amount,
+                billing_interval,
+                currency,
+                due,
+                service,
+            } => LegacyNotificationBody::TaxNotification {
+                subscription_id,
+                old_amount,
+                old_tax_amount,
+                new_amount,
+                new_tax_amount,
+                billing_interval,
+                due,
+                service,
+                currency,
+            },
+            NotificationBody::PaymentFailed { amount, service } => {
+                LegacyNotificationBody::PaymentFailed { amount, service }
+            }
             NotificationBody::Unknown => LegacyNotificationBody::Unknown,
         };
 

@@ -567,7 +567,7 @@
     "message": "Не вдалося завантажити випадкові проєкти :("
   },
   "landing.feature.follow.description": {
-    "message": "Отримуйте сповіщення щоразу, коли ваші улюблені проєкти оновлюються й будьте в курсі подій"
+    "message": "Отримуйте сповіщення, як тільки ваші улюблені проєкти оновлюються, і будьте в курсі всіх подій."
   },
   "landing.feature.follow.heading": {
     "message": "Відстежуйте проєкти, які любите"
@@ -642,7 +642,7 @@
     "message": "Сортувати за"
   },
   "landing.section.for-creators.description": {
-    "message": "Зробіть дім для своїх творінь й охоплюйте величезну авдиторію відданих гравців"
+    "message": "Створіть свою домівку для своїх творінь та охоплюйте величезну аудиторію відданих гравців."
   },
   "landing.section.for-creators.label": {
     "message": "Для творців"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "Змінити тему"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Отримати Modrinth App"
+  "layout.action.close-banner": {
+    "message": "Закрити"
+  },
+  "layout.action.create-new": {
+    "message": "Створити новий..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Пошук файлів"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Пошук електронною поштою"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Керування сповіщеннями сервера"
+  },
+  "layout.action.new-collection": {
+    "message": "Нові підбірки"
+  },
+  "layout.action.new-organization": {
+    "message": "Нова організація"
+  },
+  "layout.action.new-project": {
+    "message": "Новий проєкт"
+  },
+  "layout.action.reports": {
+    "message": "Скарги"
+  },
+  "layout.action.review-projects": {
+    "message": "Переглянути проєкти"
   },
   "layout.avatar.alt": {
     "message": "Ваш аватар"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Умови використання"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Інформація про Modrinth"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth має <github-link>відкритий код</github-link>."
   },
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "Досліджуйте інший та публікуйте свій уміст для Minecraft!"
   },
+  "layout.nav.analytics": {
+    "message": "Аналітика"
+  },
+  "layout.nav.discover": {
+    "message": "Дослідити"
+  },
+  "layout.nav.discover-content": {
+    "message": "Дослідити простори"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Перемикачі функцій"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Встановити Modrinth"
+  },
   "layout.nav.home": {
     "message": "Головна"
   },
+  "layout.nav.host-a-server": {
+    "message": "Створити сервер"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Головна сторінка Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Організації"
+  },
+  "layout.nav.profile": {
+    "message": "Профіль"
+  },
+  "layout.nav.projects": {
+    "message": "Проєкти"
+  },
+  "layout.nav.revenue": {
+    "message": "Дохід"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Збережені проєкти"
+  },
   "layout.nav.search": {
     "message": "Пошук"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Оновитись до Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Фільтрувати за"

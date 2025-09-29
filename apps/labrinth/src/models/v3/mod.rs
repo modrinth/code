@@ -1,3 +1,4 @@
+pub mod affiliate_code;
 pub mod analytics;
 pub mod billing;
 pub mod collections;
@@ -15,4 +16,5 @@ pub mod sessions;
 pub mod shared_instances;
 pub mod teams;
 pub mod threads;
+pub mod user_limits;
 pub mod users;

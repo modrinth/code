@@ -1389,6 +1389,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "cidre"
+version = "0.11.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ebe72b7127090407349fdb577f063dc6508e5cce89d9bd21dc77c1c84f5d4703"
+dependencies = [
+ "cidre-macros",
+]
+
+[[package]]
+name = "cidre-macros"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82bc2f84c0baaa09299da3a03864491549685912c1e338a54211e00589dc1e4c"
+
+[[package]]
 name = "cityhash-rs"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4442,11 +4457,13 @@ version = "0.11.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5cb54db6ff7a89efac87dba5baeac57bb9ccd726b49a9b6f21fb92b3966aaf56"
 dependencies = [
+ "async-trait",
  "base64 0.22.1",
  "chumsky",
  "email-encoding",
  "email_address",
  "fastrand 2.3.0",
+ "futures-io",
  "futures-util",
  "hostname",
  "httpdate",
@@ -4459,6 +4476,7 @@ dependencies = [
  "rustls-native-certs 0.8.1",
  "socket2 0.6.0",
  "tokio",
+ "tokio-rustls 0.26.2",
  "url",
 ]
 
@@ -9023,6 +9041,7 @@ dependencies = [
  "bytes",
  "chardetng",
  "chrono",
+ "cidre",
  "daedalus",
  "dashmap",
  "data-url",
@@ -9072,7 +9091,10 @@ dependencies = [
  "url",
  "uuid 1.17.0",
  "whoami",
+ "windows",
+ "windows-core",
  "winreg 0.55.0",
+ "zbus",
  "zip",
 ]
 
@@ -9351,6 +9373,7 @@ dependencies = [
  "futures-io",
  "futures-sink",
  "pin-project-lite",
+ "slab",
  "tokio",
 ]
 
