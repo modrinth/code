@@ -492,7 +492,7 @@ async function checkUpdates() {
 		() => {
 			checkUpdates()
 		},
-		0.5 /* min */ * 60 /* sec */ * 1000 /* ms */,
+		5 /* min */ * 60 /* sec */ * 1000 /* ms */,
 	)
 }
 
