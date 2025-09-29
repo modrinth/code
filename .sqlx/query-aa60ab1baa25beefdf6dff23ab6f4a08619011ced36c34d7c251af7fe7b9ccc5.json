@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT\n                  r.created,\n                  COALESCE(m.name, v.version_number, u.username, 'unknown') \"title!\"\n                FROM reports r\n                LEFT JOIN mods m ON r.mod_id = m.id\n                LEFT JOIN versions v ON r.version_id = v.id\n                LEFT JOIN users u ON r.user_id = u.id\n                WHERE r.id = $1\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 1,
+        "name": "title!",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "aa60ab1baa25beefdf6dff23ab6f4a08619011ced36c34d7c251af7fe7b9ccc5"
+}

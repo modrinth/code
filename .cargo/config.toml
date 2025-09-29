@@ -1,11 +1,3 @@
-# Enable Cranelift for debug builds, improving iterative compile times
-[unstable]
-codegen-backend = true
-
-[profile.dev]
-# Does not work on arm macs
-# codegen-backend = "cranelift"
-
 [build]
 rustflags = ["--cfg", "tokio_unstable"]
 

@@ -15,20 +15,22 @@ pub struct DBProduct {
     pub id: DBProductId,
     pub metadata: ProductMetadata,
     pub unitary: bool,
+    pub name: Option<String>,
 }
 
 struct ProductQueryResult {
     id: i64,
     metadata: serde_json::Value,
     unitary: bool,
+    name: Option<String>,
 }
 
 macro_rules! select_products_with_predicate {
-    ($predicate:tt, $param:ident) => {
+    ($predicate:tt, $param:expr) => {
         sqlx::query_as!(
             ProductQueryResult,
             r#"
-            SELECT id, metadata, unitary
+            SELECT products.id, products.metadata, products.unitary, products.name
             FROM products
             "#
                 + $predicate,
@@ -45,6 +47,7 @@ impl TryFrom<ProductQueryResult> for DBProduct {
             id: DBProductId(r.id),
             metadata: serde_json::from_value(r.metadata)?,
             unitary: r.unitary,
+            name: r.name,
         })
     }
 }
@@ -55,6 +58,23 @@ impl DBProduct {
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Option<DBProduct>, DatabaseError> {
         Ok(Self::get_many(&[id], exec).await?.into_iter().next())
+    }
+
+    pub async fn get_price(
+        id: DBProductPriceId,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Option<DBProduct>, DatabaseError> {
+        let maybe_row = select_products_with_predicate!(
+            "INNER JOIN products_prices pp ON pp.id = $1
+			WHERE products.id = pp.product_id",
+            id.0
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        maybe_row
+            .map(|r| r.try_into().map_err(Into::into))
+            .transpose()
     }
 
     pub async fn get_by_type<'a, E>(
@@ -116,6 +136,8 @@ pub struct QueryProductWithPrices {
     pub id: DBProductId,
     pub metadata: ProductMetadata,
     pub unitary: bool,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub name: Option<String>,
     pub prices: Vec<DBProductPrice>,
 }
 
@@ -152,6 +174,7 @@ impl QueryProductWithPrices {
                 Some(QueryProductWithPrices {
                     id: x.id,
                     metadata: x.metadata,
+                    name: x.name,
                     prices: prices
                         .remove(&x.id)
                         .map(|x| x.1)?
@@ -195,6 +218,7 @@ impl QueryProductWithPrices {
                 Some(QueryProductWithPrices {
                     id: x.id,
                     metadata: x.metadata,
+                    name: x.name,
                     prices: prices
                         .remove(&x.id)
                         .map(|x| x.1)?

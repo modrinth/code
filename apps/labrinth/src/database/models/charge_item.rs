@@ -7,6 +7,7 @@ use crate::models::billing::{
 use chrono::{DateTime, Utc};
 use std::convert::{TryFrom, TryInto};
 
+#[derive(Clone)]
 pub struct DBCharge {
     pub id: DBChargeId,
     pub user_id: DBUserId,
@@ -26,8 +27,13 @@ pub struct DBCharge {
 
     pub parent_charge_id: Option<DBChargeId>,
 
+    pub tax_amount: i64,
+    pub tax_platform_id: Option<String>,
+    pub tax_last_updated: Option<DateTime<Utc>>,
+
     // Net is always in USD
     pub net: Option<i64>,
+    pub tax_drift_loss: Option<i64>,
 }
 
 struct ChargeQueryResult {
@@ -45,7 +51,11 @@ struct ChargeQueryResult {
     payment_platform: String,
     payment_platform_id: Option<String>,
     parent_charge_id: Option<i64>,
+    tax_amount: i64,
+    tax_platform_id: Option<String>,
+    tax_last_updated: Option<DateTime<Utc>>,
     net: Option<i64>,
+    tax_drift_loss: Option<i64>,
 }
 
 impl TryFrom<ChargeQueryResult> for DBCharge {
@@ -69,7 +79,11 @@ impl TryFrom<ChargeQueryResult> for DBCharge {
             payment_platform: PaymentPlatform::from_string(&r.payment_platform),
             payment_platform_id: r.payment_platform_id,
             parent_charge_id: r.parent_charge_id.map(DBChargeId),
+            tax_amount: r.tax_amount,
+            tax_platform_id: r.tax_platform_id,
             net: r.net,
+            tax_last_updated: r.tax_last_updated,
+            tax_drift_loss: r.tax_drift_loss,
         })
     }
 }
@@ -80,14 +94,16 @@ macro_rules! select_charges_with_predicate {
             ChargeQueryResult,
             r#"
             SELECT
-                id, user_id, price_id, amount, currency_code, status, due, last_attempt,
-                charge_type, subscription_id,
+                charges.id, charges.user_id, charges.price_id, charges.amount, charges.currency_code, charges.status, charges.due, charges.last_attempt,
+                charges.charge_type, charges.subscription_id, charges.tax_amount, charges.tax_platform_id,
                 -- Workaround for https://github.com/launchbadge/sqlx/issues/3336
-                subscription_interval AS "subscription_interval?",
-                payment_platform,
-                payment_platform_id AS "payment_platform_id?",
-                parent_charge_id AS "parent_charge_id?",
-                net AS "net?"
+                charges.subscription_interval AS "subscription_interval?",
+                charges.payment_platform,
+                charges.payment_platform_id AS "payment_platform_id?",
+                charges.parent_charge_id AS "parent_charge_id?",
+                charges.net AS "net?",
+				charges.tax_last_updated AS "tax_last_updated?",
+				charges.tax_drift_loss AS "tax_drift_loss?"
             FROM charges
             "#
                 + $predicate,
@@ -103,8 +119,8 @@ impl DBCharge {
     ) -> Result<DBChargeId, DatabaseError> {
         sqlx::query!(
             r#"
-            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net, tax_amount, tax_platform_id, tax_last_updated, tax_drift_loss)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
             ON CONFLICT (id)
             DO UPDATE
                 SET status = EXCLUDED.status,
@@ -116,10 +132,14 @@ impl DBCharge {
                     payment_platform_id = EXCLUDED.payment_platform_id,
                     parent_charge_id = EXCLUDED.parent_charge_id,
                     net = EXCLUDED.net,
+                    tax_amount = EXCLUDED.tax_amount,
+                    tax_platform_id = EXCLUDED.tax_platform_id,
+                    tax_last_updated = EXCLUDED.tax_last_updated,
                     price_id = EXCLUDED.price_id,
                     amount = EXCLUDED.amount,
                     currency_code = EXCLUDED.currency_code,
-                    charge_type = EXCLUDED.charge_type
+                    charge_type = EXCLUDED.charge_type,
+					tax_drift_loss = EXCLUDED.tax_drift_loss
             "#,
             self.id.0,
             self.user_id.0,
@@ -136,6 +156,10 @@ impl DBCharge {
             self.payment_platform_id.as_deref(),
             self.parent_charge_id.map(|x| x.0),
             self.net,
+            self.tax_amount,
+            self.tax_platform_id.as_deref(),
+            self.tax_last_updated,
+            self.tax_drift_loss,
         )
             .execute(&mut **transaction)
         .await?;
@@ -276,6 +300,69 @@ impl DBCharge {
             .collect::<Result<Vec<_>, serde_json::Error>>()?)
     }
 
+    /// Returns all charges that need to have their tax amount updated.
+    ///
+    /// This only selects charges which are:
+    /// - Open;
+    /// - Haven't been updated in the last day;
+    /// - Are due in more than 7 days;
+    /// - Where the user has an email, because we can't notify users without an email about a price change.
+    ///
+    /// This also locks the charges.
+    pub async fn get_updateable_lock(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        limit: i64,
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
+        let res = select_charges_with_predicate!(
+			"
+			INNER JOIN users u ON u.id = charges.user_id
+			WHERE
+			  status = 'open'
+			  AND COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) < NOW() - INTERVAL '1 day'
+			  AND u.email IS NOT NULL
+			  AND due - INTERVAL '7 days' > NOW()
+			ORDER BY COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) ASC
+			FOR NO KEY UPDATE SKIP LOCKED
+			LIMIT $1
+			",
+			limit
+		)
+		.fetch_all(exec)
+		.await?;
+
+        Ok(res
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+    }
+
+    /// Returns all charges which are missing a tax identifier, that is, are succeeded and haven't been assigned a tax identifier yet.
+    ///
+    /// Charges are locked.
+    pub async fn get_missing_tax_identifier_lock(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        limit: i64,
+    ) -> Result<Vec<DBCharge>, DatabaseError> {
+        let res = select_charges_with_predicate!(
+            "
+			WHERE
+			  status = 'succeeded'
+			  AND tax_platform_id IS NULL
+			ORDER BY due ASC
+			FOR NO KEY UPDATE SKIP LOCKED
+			LIMIT $1
+			",
+            limit
+        )
+        .fetch_all(exec)
+        .await?;
+
+        Ok(res
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+    }
+
     pub async fn remove(
         id: DBChargeId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -292,4 +379,10 @@ impl DBCharge {
 
         Ok(())
     }
+}
+
+pub struct CustomerCharge {
+    pub stripe_customer_id: String,
+    pub charge: DBCharge,
+    pub product_tax_id: String,
 }

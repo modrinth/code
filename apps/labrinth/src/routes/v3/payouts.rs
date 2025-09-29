@@ -84,7 +84,8 @@ pub async fn post_compliance_form(
             reference_id: String::new(),
             e_delivery_consented: false,
             tin_matched: false,
-            form_type: body.0.form_type,
+            form_type: Some(body.0.form_type),
+            requires_manual_review: false,
         },
     };
 
@@ -108,10 +109,10 @@ pub async fn post_compliance_form(
             compliance.e_delivery_consented = false;
             compliance.tin_matched = false;
             compliance.signed = None;
-            compliance.form_type = body.0.form_type;
+            compliance.form_type = Some(body.0.form_type);
             compliance.last_checked = Utc::now() - COMPLIANCE_CHECK_DEBOUNCE;
 
-            compliance.upsert(&mut *txn).await?;
+            compliance.upsert_partial(&mut *txn).await?;
             txn.commit().await?;
 
             Ok(HttpResponse::Ok().json(toplevel))
@@ -489,6 +490,8 @@ pub async fn create_payout(
         ));
     }
 
+    let requires_manual_review;
+
     if let Some(threshold) = tax_compliance_payout_threshold() {
         let maybe_compliance = update_compliance_status(&pool, user.id).await?;
 
@@ -501,9 +504,14 @@ pub async fn create_payout(
                     let tin = model.tin_matched;
                     let signed = model.signed.is_some();
 
+                    requires_manual_review = Some(model.requires_manual_review);
+
                     (tin, signed, true, compliance_api_check_failed)
                 }
-                None => (false, false, false, false),
+                None => {
+                    requires_manual_review = None;
+                    (false, false, false, false)
+                }
             };
 
         if !(tin_matched && signed)
@@ -526,6 +534,22 @@ pub async fn create_payout(
                 _ => "Tax compliance form is required to withdraw more!",
             }.to_owned()));
         }
+    } else {
+        requires_manual_review = None;
+    }
+
+    let requires_manual_review = if let Some(r) = requires_manual_review {
+        r
+    } else {
+        users_compliance::UserCompliance::get_by_user_id(&**pool, user.id)
+            .await?
+            .is_some_and(|x| x.requires_manual_review)
+    };
+
+    if requires_manual_review {
+        return Err(ApiError::InvalidInput(
+            "More information is required to proceed. Please contact support (https://support.modrinth.com, support@modrinth.com)".to_string(),
+        ));
     }
 
     let payout_method = payouts_queue
@@ -953,8 +977,9 @@ pub async fn get_balance(
         form_completion_status = Some(
             update_compliance_status(&pool, user.id.into())
                 .await?
+                .filter(|x| x.model.form_type.is_some())
                 .map_or(FormCompletionStatus::Unrequested, |compliance| {
-                    requested_form_type = Some(compliance.model.form_type);
+                    requested_form_type = compliance.model.form_type;
 
                     if compliance.compliance_api_check_failed {
                         FormCompletionStatus::Unknown
@@ -1060,6 +1085,7 @@ async fn update_compliance_status(
     if (compliance.signed.is_some() && compliance.tin_matched)
         || Utc::now().signed_duration_since(compliance.last_checked)
             < COMPLIANCE_CHECK_DEBOUNCE
+        || compliance.form_type.is_none()
     {
         Ok(Some(ComplianceCheck {
             model: compliance,
@@ -1087,7 +1113,10 @@ async fn update_compliance_status(
                 compliance.e_delivery_consented =
                     attributes.e_delivery_consented_at.is_some();
 
-                if compliance.form_type.requires_domestic_tin_match() {
+                if compliance
+                    .form_type
+                    .is_some_and(|x| x.requires_domestic_tin_match())
+                {
                     compliance.tin_matched = attributes
                         .tin_match_status
                         .as_ref()
