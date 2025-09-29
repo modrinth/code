@@ -32,7 +32,7 @@ import {
 	ProgressSpinner,
 	provideNotificationManager,
 } from '@modrinth/ui'
-import { formatNumber, renderString } from '@modrinth/utils'
+import { renderString } from '@modrinth/utils'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'

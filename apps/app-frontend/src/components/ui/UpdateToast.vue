@@ -43,7 +43,7 @@ const messages = defineMessages({
 	},
 	download: {
 		id: 'app.update-toast.download',
-		defaultMessage: 'Download',
+		defaultMessage: 'Download ({size})',
 	},
 	downloading: {
 		id: 'app.update-toast.downloading',
@@ -56,14 +56,6 @@ const messages = defineMessages({
 	meteredBody: {
 		id: 'app.update-toast.body.metered',
 		defaultMessage: `Modrinth App v{version} is available now! Since you're on a metered network, we didn't automatically download it.`,
-	},
-	loadingUpdateSize: {
-		id: 'app.update-toast.loading-update-size',
-		defaultMessage: 'Loading update size...',
-	},
-	updateSize: {
-		id: 'app.update-toast.update-size',
-		defaultMessage: 'The update is {size}',
 	},
 	downloadCompleteTitle: {
 		id: 'app.update-toast.title.download-complete',
@@ -115,19 +107,13 @@ const messages = defineMessages({
 			<template v-if="progress > 0">
 				<ProgressBar :progress="progress" class="max-w-[unset]" />
 			</template>
-			<template v-else-if="size === null">
-				<SpinnerIcon class="animate-spin" /> {{ formatMessage(messages.loadingUpdateSize) }}
-			</template>
-			<template v-else>
-				{{ formatMessage(messages.updateSize, { size: formatBytes(size) }) }}
-			</template>
 		</p>
 		<div class="flex gap-2 mt-4">
 			<ButtonStyled color="brand">
 				<button v-if="metered && progress < 1" :disabled="downloading" @click="download">
 					<SpinnerIcon v-if="downloading" class="animate-spin" />
 					<DownloadIcon v-else />
-					{{ formatMessage(downloading ? messages.downloading : messages.download) }}
+					{{ formatMessage(downloading ? messages.downloading : messages.download, { size: formatBytes(size ?? 0) }) }}
 				</button>
 				<button v-else @click="emit('restart')">
 					<RefreshCwIcon /> {{ formatMessage(messages.reload) }}
