@@ -166,6 +166,13 @@ pub enum ErrorKind {
 
     #[error("RPC error: {0}")]
     RpcError(String),
+
+    #[cfg(windows)]
+    #[error("Windows error: {0}")]
+    WindowsError(#[from] windows_core::Error),
+
+    #[error("zbus error: {0}")]
+    ZbusError(#[from] zbus::Error),
 }
 
 #[derive(Debug)]
