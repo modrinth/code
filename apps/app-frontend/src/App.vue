@@ -64,10 +64,10 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import UpdateToast from '@/components/ui/UpdateToast.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
-import { useDownloadProgress } from '@/composables/useDownloadProgress'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { get_user } from '@/helpers/cache.js'
+import { provideAppUpdateDownloadProgress, subscribeToDownloadProgress } from '@/helpers/download_progress.ts'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
@@ -134,7 +134,7 @@ onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 
-	await unlisten.value?.()
+	await unlistenUpdateDownload?.()
 })
 
 const { formatMessage } = useVIntl()
@@ -433,10 +433,14 @@ async function handleCommand(e) {
 	}
 }
 
-const downloadProgress = ref(0)
-const unlisten = ref(null)
+const appUpdateDownload = {
+	progress: ref(0),
+	version: ref(),
+}
+let unlistenUpdateDownload;
 
-const downloadPercent = computed(() => Math.trunc(downloadProgress.value * 100))
+const downloadProgress = computed(() => appUpdateDownload.progress.value)
+const downloadPercent = computed(() => Math.trunc(appUpdateDownload.progress.value * 100))
 
 const metered = ref(true)
 const finishedDownloading = ref(false)
@@ -464,7 +468,7 @@ async function checkUpdates() {
 			return
 		}
 
-		downloadProgress.value = 0
+		appUpdateDownload.progress.value = 0
 		finishedDownloading.value = false
 		updateToastDismissed.value = false
 
@@ -505,24 +509,22 @@ async function downloadUpdate(versionToDownload) {
 		handleError(`Failed to download update: no version available`)
 	}
 
-	console.log('DONLOADING UPDATE')
+	if (appUpdateDownload.progress.value !== 0) {
+		console.error(`Update ${versionToDownload.version} already downloading`);
+		return;
+	}
+
+	console.log(`Downloading update ${versionToDownload.version}`)
 
 	try {
 		enqueueUpdateForInstallation(versionToDownload.rid).then(() => {
 			finishedDownloading.value = true
-			unlisten.value?.().then(() => {
-				unlisten.value = null
+			unlistenUpdateDownload?.().then(() => {
+				unlistenUpdateDownload = null
 			})
 			console.log('Finished downloading!')
 		})
-		useDownloadProgress(versionToDownload.version).then(
-			({ downloadProgress: progress, unlisten }) => {
-				watch(progress, (newProgress) => {
-					downloadProgress.value = newProgress
-				})
-				unlisten.value = unlisten
-			},
-		)
+		unlistenUpdateDownload = await subscribeToDownloadProgress(appUpdateDownload, versionToDownload.version)
 	} catch (e) {
 		handleError(e)
 	}
@@ -679,6 +681,8 @@ async function processPendingSurveys() {
 		console.info('No user survey to show')
 	}
 }
+
+provideAppUpdateDownloadProgress(appUpdateDownload)
 </script>
 
 <template>

@@ -13,7 +13,7 @@ import { ProgressBar, TabbedModal } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
 import { defineMessage, defineMessages, useVIntl } from '@vintl/vintl'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import AppearanceSettings from '@/components/ui/settings/AppearanceSettings.vue'
@@ -22,7 +22,7 @@ import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vu
 import JavaSettings from '@/components/ui/settings/JavaSettings.vue'
 import PrivacySettings from '@/components/ui/settings/PrivacySettings.vue'
 import ResourceManagementSettings from '@/components/ui/settings/ResourceManagementSettings.vue'
-import { useDownloadProgress } from '@/composables/useDownloadProgress.ts'
+import { injectAppUpdateDownloadProgress } from '@/helpers/download_progress.ts'
 import { get, set } from '@/helpers/settings.ts'
 import { useTheming } from '@/store/state'
 
@@ -99,7 +99,7 @@ const isOpen = computed(() => modal.value?.isOpen)
 
 defineExpose({ show, isOpen })
 
-const { downloadProgress, downloadVersion, unlisten } = await useDownloadProgress()
+const { progress, version: downloadingVersion } = injectAppUpdateDownloadProgress()
 
 const version = await getVersion()
 const osPlatform = getOsPlatform()
@@ -133,10 +133,6 @@ const messages = defineMessages({
 		defaultMessage: 'Downloading v{version}',
 	},
 })
-
-onUnmounted(async () => {
-	await unlisten()
-})
 </script>
 <template>
 	<ModalWrapper ref="modal">
@@ -150,11 +146,11 @@ onUnmounted(async () => {
 			<template #footer>
 				<div class="mt-auto text-secondary text-sm">
 					<div class="mb-3">
-						<template v-if="downloadProgress > 0 && downloadProgress < 1">
+						<template v-if="progress > 0 && progress < 1">
 							<p class="m-0 mb-2">
-								{{ formatMessage(messages.downloading, { version: downloadVersion }) }}
+								{{ formatMessage(messages.downloading, { downloadingVersion }) }}
 							</p>
-							<ProgressBar :progress="downloadProgress" />
+							<ProgressBar :progress="progress" />
 						</template>
 					</div>
 					<p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">
