@@ -453,7 +453,7 @@ const availableUpdate = ref(null)
 const updateSize = ref(null)
 async function checkUpdates() {
 	if (!(await areUpdatesEnabled())) {
-		console.log('Skipping update check as updates are disabled in this build')
+		console.log('Skipping update check as updates are disabled in this build or environment')
 		return
 	}
 
