@@ -35,7 +35,7 @@ impl From<crate::database::models::affiliate_code_item::DBAffiliateCode>
             created_at: data.created_at,
             created_by: data.created_by.into(),
             affiliate: data.affiliate.into(),
-            source_name: data.source_name.into(),
+            source_name: data.source_name,
         }
     }
 }
@@ -69,7 +69,7 @@ impl From<crate::database::models::affiliate_code_item::DBAffiliateCode>
         Self {
             id: data.id.into(),
             affiliate: data.affiliate.into(),
-            source_name: data.source_name.into(),
+            source_name: data.source_name,
         }
     }
 }
