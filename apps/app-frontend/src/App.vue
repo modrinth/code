@@ -282,7 +282,7 @@ async function setupApp() {
 
 		const version = await getVersion()
 		if (pending_update_toast_for_version === version) {
-			notifications.addNotification({
+			addNotification({
 				type: 'success',
 				title: formatMessage(messages.updateInstalledToastTitle, { version }),
 				text: formatMessage(messages.updateInstalledToastText),

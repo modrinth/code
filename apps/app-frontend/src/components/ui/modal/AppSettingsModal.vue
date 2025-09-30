@@ -148,7 +148,7 @@ const messages = defineMessages({
 					<div class="mb-3">
 						<template v-if="progress > 0 && progress < 1">
 							<p class="m-0 mb-2">
-								{{ formatMessage(messages.downloading, { downloadingVersion }) }}
+								{{ formatMessage(messages.downloading, { version: downloadingVersion }) }}
 							</p>
 							<ProgressBar :progress="progress" />
 						</template>
