@@ -130,11 +130,16 @@ mod tests {
     }
 
     // these just test that code written with the above API compiles
-    #[test]
-    fn wrap() -> Result<(), ApiError> {
+    fn propagating() -> Result<(), ApiError> {
         sqlx_result()
             .wrap_internal_err("failed to perform database operation")?;
         sqlx_result().wrap_request_err("invalid request parameter")?;
         Ok(())
+    }
+
+    // just so we don't get a dead code warning
+    #[test]
+    fn test_propagating() {
+        _ = propagating();
     }
 }
