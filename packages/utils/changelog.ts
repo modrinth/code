@@ -11,7 +11,18 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2025-09-29T09:45:00-07:00`,
+		date: `2025-09-29T12:50:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Re-enabled the creation of organizations.
+- Added limits for creating content on Modrinth
+	- Up to 256 projects
+	- Up to 16 organizations
+	- Up to 64 collections
+	- If you need more, please contact [support](https://support.modrinth.com) and explain why, and we can increase your limits.`,
+	},
+	{
+		date: `2025-09-29T12:50:00-07:00`,
 		product: 'app',
 		version: '0.10.8',
 		body: `### Improvements
@@ -33,12 +44,6 @@ const VERSIONS: VersionEntry[] = [
 - Pressing 'Enter' after typing in a friend's username will now send the friend request.
 - Improved error handling from Modrinth API.
 - Fixed the white flash when the app is opened on certain systems. (Contributed by [aervxa](https://github.com/modrinth/code/pull/4177))`,
-	},
-	{
-		date: `2025-09-26T13:00:00+02:00`,
-		product: 'web',
-		body: `### Improvements
-- Re-enabled the creation of Organizations.`,
 	},
 	{
 		date: `2025-09-25T19:15:00-07:00`,
