@@ -136,7 +136,7 @@ pub enum LegacyNotificationBody {
         new_owner_organization_id: Option<OrganizationId>,
     },
     PayoutAvailable {
-        amount: f64,
+        amount: u64,
         date_available: DateTime<Utc>,
     },
     Unknown,
