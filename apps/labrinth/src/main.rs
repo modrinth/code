@@ -18,7 +18,7 @@ use std::ffi::CStr;
 use std::str::FromStr;
 use std::sync::Arc;
 use tracing::level_filters::LevelFilter;
-use tracing::{error, info};
+use tracing::{Instrument, error, info, info_span};
 use tracing_actix_web::TracingLogger;
 use tracing_ecs::ECSLayerBuilder;
 use tracing_subscriber::EnvFilter;
@@ -255,11 +255,30 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(TracingLogger::default())
             .wrap_fn(|req, srv| {
-                srv.call(req).inspect(|result| {
-                    _ = result.as_ref().inspect(|resp| {
-                        resp.response().error().inspect(|err| log_error(err));
-                    });
-                })
+                // We capture the same fields as `tracing-actix-web`'s `RootSpanBuilder`.
+                // See `root_span!` macro.
+                let span = info_span!(
+                    "HTTP request",
+                    http.method = %req.method(),
+                    http.client_ip = %req.connection_info().realip_remote_addr().unwrap_or(""),
+                    http.user_agent = %req.headers().get("User-Agent").map(|h| h.to_str().unwrap_or("")).unwrap_or(""),
+                    http.target = %req.uri().path_and_query().map(|p| p.as_str()).unwrap_or("")
+                );
+
+                srv.call(req)
+                    .instrument(span)
+                    .inspect(|result| {
+                        _ = result.as_ref().inspect(|resp| {
+                            let _span = info_span!(
+                                "HTTP response",
+                                http.status = %resp.response().status().as_u16(),
+                            ).entered();
+
+                            resp.response()
+                                .error()
+                                .inspect(|err| log_error(err));
+                        });
+                    })
             })
             .wrap(prometheus.clone())
             .wrap(from_fn(rate_limit_middleware))
