@@ -31,20 +31,18 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("/admin/{id}", web::get().to(admin_get))
             .route("/admin/{id}", web::delete().to(admin_delete))
             .route("/self", web::get().to(self_get_all))
-            .route("/self", web::put().to(self_patch))
+            .route("/self", web::put().to(self_create))
+            .route("/self", web::patch().to(self_patch))
             .route("/self/{id}", web::delete().to(self_delete)),
     );
 }
-
-#[derive(Serialize)]
-struct AdminGetAllResponse(Vec<AdminAffiliateCode>);
 
 async fn admin_get_all(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<Json<AdminGetAllResponse>, ApiError> {
+) -> Result<Json<Vec<AdminAffiliateCode>>, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -67,7 +65,7 @@ async fn admin_get_all(
         .map(AdminAffiliateCode::from)
         .collect::<Vec<_>>();
 
-    Ok(Json(AdminGetAllResponse(codes)))
+    Ok(Json(codes))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -76,16 +74,13 @@ struct AdminCreateRequest {
     source_name: String,
 }
 
-#[derive(Serialize)]
-struct AdminCreateResponse(AdminAffiliateCode);
-
 async fn admin_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     body: web::Json<AdminCreateRequest>,
-) -> Result<Json<AdminCreateResponse>, ApiError> {
+) -> Result<Json<AdminAffiliateCode>, ApiError> {
     let (_, creator) = get_user_from_headers(
         &req,
         &**pool,
@@ -129,11 +124,8 @@ async fn admin_create(
 
     transaction.commit().await?;
 
-    Ok(Json(AdminCreateResponse(AdminAffiliateCode::from(code))))
+    Ok(Json(AdminAffiliateCode::from(code)))
 }
-
-#[derive(Serialize)]
-struct AdminGetResponse(AdminAffiliateCode);
 
 async fn admin_get(
     req: HttpRequest,
@@ -141,7 +133,7 @@ async fn admin_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<Json<AdminGetResponse>, ApiError> {
+) -> Result<Json<AdminAffiliateCode>, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -164,7 +156,7 @@ async fn admin_get(
         DBAffiliateCode::get_by_id(affiliate_code_id, &**pool).await?
     {
         let model = AdminAffiliateCode::from(model);
-        Ok(Json(AdminGetResponse(model)))
+        Ok(Json(model))
     } else {
         Err(ApiError::NotFound)
     }
@@ -205,15 +197,12 @@ async fn admin_delete(
     }
 }
 
-#[derive(Serialize)]
-struct SelfGetAllResponse(Vec<AffiliateCode>);
-
 async fn self_get_all(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<Json<SelfGetAllResponse>, ApiError> {
+) -> Result<Json<Vec<AffiliateCode>>, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -222,6 +211,8 @@ async fn self_get_all(
         Scopes::SESSION_ACCESS,
     )
     .await?;
+
+    tracing::info!("{:?}", user.badges);
 
     if !user.badges.contains(Badges::AFFILIATE) {
         return Err(ApiError::CustomAuthentication(
@@ -239,7 +230,57 @@ async fn self_get_all(
         .map(AffiliateCode::from)
         .collect::<Vec<_>>();
 
-    Ok(Json(SelfGetAllResponse(codes)))
+    Ok(Json(codes))
+}
+
+#[derive(Deserialize)]
+struct SelfCreateRequest {
+    source_name: String,
+}
+
+async fn self_create(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    body: web::Json<SelfCreateRequest>,
+) -> Result<Json<AffiliateCode>, ApiError> {
+    let (_, user) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await?;
+
+    if !user.badges.contains(Badges::AFFILIATE) {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to create an affiliate code!"
+                .to_string(),
+        ));
+    }
+
+    let user_id = DBUserId::from(user.id);
+
+    let mut transaction = pool.begin().await?;
+
+    let affiliate_code_id =
+        crate::database::models::generate_affiliate_code_id(&mut transaction)
+            .await?;
+
+    let code = DBAffiliateCode {
+        id: affiliate_code_id,
+        created_at: Utc::now(),
+        created_by: user_id,
+        affiliate: user_id,
+        source_name: body.source_name.clone(),
+    };
+    code.insert(&mut *transaction).await?;
+
+    transaction.commit().await?;
+
+    Ok(Json(AffiliateCode::from(code)))
 }
 
 #[derive(Deserialize)]
