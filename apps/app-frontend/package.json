@@ -13,7 +13,7 @@
 		"test": "vue-tsc --noEmit"
 	},
 	"dependencies": {
-		"@geometrically/minecraft-motd-parser": "^1.1.4",
+		"@sfirew/minecraft-motd-parser": "^1.1.6",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/ui": "workspace:*",
 		"@modrinth/utils": "workspace:*",
