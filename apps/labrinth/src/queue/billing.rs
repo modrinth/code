@@ -182,6 +182,8 @@ pub async fn index_subscriptions(
                             )
                             .await?;
 
+                            // A customer should have a default payment method if they have an active subscription.
+
                             let payment_method = customer
                                 .invoice_settings
                                 .and_then(|x| {
@@ -355,24 +357,50 @@ pub async fn index_subscriptions(
                     })?;
 
                 let customer_address = 'a: {
-                    let stripe_id: stripe::PaymentIntentId = c
-                        .payment_platform_id
-                        .as_ref()
-                        .and_then(|x| x.parse().ok())
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(
-                                "Charge has no payment platform ID".to_owned(),
-                            )
-                        })?;
+                    let pi = if c.type_ == ChargeType::Refund {
+                        // the payment_platform_id should be an re or a pyr
 
-                    // Attempt retrieving the address via the payment intent's payment method
+                        let refund_id: stripe::RefundId = c.payment_platform_id.as_ref()
+                            .and_then(|x| x.parse().ok())
+                            .ok_or_else(|| ApiError::InvalidInput("Refund charge has no or an invalid refund ID".to_owned()))?;
 
-                    let pi = stripe::PaymentIntent::retrieve(
-                        &stripe_client,
-                        &stripe_id,
-                        &["payment_method"],
-                    )
-                    .await?;
+                        let refund = stripe::Refund::retrieve(
+                            &stripe_client,
+                            &refund_id,
+                            &["payment_intent.payment_method"],
+                        )
+                        .await?;
+
+                        refund
+                            .payment_intent
+                            .and_then(|x| x.into_object())
+                            .ok_or_else(|| {
+                                ApiError::InvalidInput(
+                                    "Refund charge has no payment intent"
+                                        .to_owned(),
+                                )
+                            })?
+                    } else {
+                        let stripe_id: stripe::PaymentIntentId = c
+                            .payment_platform_id
+                            .as_ref()
+                            .and_then(|x| x.parse().ok())
+                            .ok_or_else(|| {
+                                ApiError::InvalidInput(
+                                    "Charge has no payment platform ID"
+                                        .to_owned(),
+                                )
+                            })?;
+
+                        // Attempt retrieving the address via the payment intent's payment method
+
+                        stripe::PaymentIntent::retrieve(
+                            &stripe_client,
+                            &stripe_id,
+                            &["payment_method"],
+                        )
+                        .await?
+                    };
 
                     let pi_stripe_address = pi
                         .payment_method
