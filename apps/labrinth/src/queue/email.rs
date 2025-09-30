@@ -236,7 +236,7 @@ impl EmailQueue {
                         let update_next_attempt =
                             status == NotificationDeliveryStatus::Pending;
 
-                        let mut delivery = deliveries.remove(idx);
+                        let mut delivery = deliveries.swap_remove(idx);
                         delivery.status = status;
                         delivery.next_attempt += if update_next_attempt {
                             chrono::Duration::seconds(EMAIL_RETRY_DELAY_SECONDS)
