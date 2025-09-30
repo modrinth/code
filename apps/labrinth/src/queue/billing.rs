@@ -236,7 +236,7 @@ async fn update_tax_amounts(
                                 currency: charge.currency_code.clone(),
                             },
                         }
-                        .insert(charge.user_id, &mut txn, &redis)
+                        .insert(charge.user_id, &mut txn, redis)
                         .await?;
 
                         charge.tax_amount = new_tax_amount;
@@ -298,7 +298,7 @@ async fn update_anrok_transactions(
                     })?;
 
                 let refund = stripe::Refund::retrieve(
-                    &stripe_client,
+                    stripe_client,
                     &refund_id,
                     &["payment_intent.payment_method"],
                 )
@@ -328,7 +328,7 @@ async fn update_anrok_transactions(
                 // Attempt retrieving the address via the payment intent's payment method
 
                 let pi = stripe::PaymentIntent::retrieve(
-                    &stripe_client,
+                    stripe_client,
                     &stripe_id,
                     &["payment_method"],
                 )
@@ -355,7 +355,7 @@ async fn update_anrok_transactions(
             };
 
             let stripe_customer_id =
-                DBUser::get_id(c.user_id, &mut **txn, &redis)
+                DBUser::get_id(c.user_id, &mut **txn, redis)
                     .await?
                     .ok_or_else(|| {
                         ApiError::from(DatabaseError::Database(
@@ -377,7 +377,7 @@ async fn update_anrok_transactions(
             })?;
 
             let customer =
-                stripe::Customer::retrieve(&stripe_client, &customer_id, &[])
+                stripe::Customer::retrieve(stripe_client, &customer_id, &[])
                     .await?;
 
             let address = customer.address.ok_or_else(|| {
@@ -450,14 +450,9 @@ async fn update_anrok_transactions(
             let charge_id = to_base62(c.id.0 as u64);
             let user_id = to_base62(c.user_id.0 as u64);
 
-            let result = process_charge(
-                &stripe_client,
-                &mut txn,
-                &redis,
-                &anrok_client,
-                c,
-            )
-            .await;
+            let result =
+                process_charge(stripe_client, &mut txn, redis, anrok_client, c)
+                    .await;
 
             if let Err(e) = result {
                 warn!(
@@ -675,7 +670,7 @@ pub async fn process_chargeable_charges(
             .into_iter()
             .collect::<Vec<_>>(),
         pool,
-        &redis,
+        redis,
     )
     .await?;
 
@@ -703,10 +698,10 @@ pub async fn process_chargeable_charges(
         let user = User::from_full(user.clone());
 
         let result = create_or_update_payment_intent(
-            &pool,
-            &redis,
-            &stripe_client,
-            &anrok_client,
+            pool,
+            redis,
+            stripe_client,
+            anrok_client,
             PaymentBootstrapOptions {
                 user: &user,
                 payment_intent: None,
@@ -922,7 +917,7 @@ async fn unprovision_subscriptions(
             .into_iter()
             .map(|x| (x, None))
             .collect::<Vec<_>>(),
-        &redis,
+        redis,
     )
     .await?;
     transaction.commit().await?;
