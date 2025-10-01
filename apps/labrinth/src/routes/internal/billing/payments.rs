@@ -214,6 +214,8 @@ pub async fn create_or_update_payment_intent(
     )
     .await?;
 
+    let mut intent_uses_confirmation_token = false;
+
     let payment_method = match &payment_session {
         PaymentSession::Interactive {
             payment_request_type: PaymentRequestType::PaymentMethod { id },
@@ -232,6 +234,8 @@ pub async fn create_or_update_payment_intent(
             payment_request_type:
                 PaymentRequestType::ConfirmationToken { token },
         } => {
+            intent_uses_confirmation_token = true;
+
             #[derive(Deserialize)]
             struct ConfirmationToken {
                 payment_method_preview: Option<PaymentMethod>,
@@ -544,10 +548,7 @@ pub async fn create_or_update_payment_intent(
         //
         // The PaymentIntent will be confirmed using the confirmation token
         // by the client.
-        if let PaymentSession::Interactive {
-            payment_request_type: PaymentRequestType::PaymentMethod { .. },
-        } = &payment_session
-        {
+        if !intent_uses_confirmation_token {
             update_payment_intent.payment_method =
                 Some(payment_method.id.clone());
         }
@@ -575,10 +576,7 @@ pub async fn create_or_update_payment_intent(
         intent.customer = Some(customer_id);
         intent.metadata = Some(metadata);
         intent.receipt_email = user.email.as_deref();
-        if let PaymentSession::Interactive {
-            payment_request_type: PaymentRequestType::PaymentMethod { .. },
-        } = &payment_session
-        {
+        if !intent_uses_confirmation_token {
             intent.payment_method = Some(payment_method.id.clone());
         }
 
