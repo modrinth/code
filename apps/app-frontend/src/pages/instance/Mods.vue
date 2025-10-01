@@ -23,19 +23,45 @@
 					<button
 						v-for="filter in filterOptions"
 						:key="`content-filter-${filter.id}`"
-						:class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${selectedFilters.includes(filter.id) ? 'bg-brand-highlight text-brand' : 'bg-bg-raised text-secondary'}`"
-						@click="toggleArray(selectedFilters, filter.id)"
+						:class="`px-2 py-1 rounded-full font-semibold leading-none border-none cursor-pointer active:scale-[0.97] duration-100 transition-all ${
+							filter.id === 'disabled'
+								? hideDisabledProjects
+									? 'bg-highlight-red text-red'
+									: selectedFilters.includes(filter.id)
+										? 'bg-brand-highlight text-brand'
+										: 'bg-bg-raised text-secondary'
+								: selectedFilters.includes(filter.id)
+									? 'bg-brand-highlight text-brand'
+									: 'bg-bg-raised text-secondary'
+						}`"
+						@click="
+							filter.id === 'disabled'
+								? toggleDisabledFilter()
+								: toggleArray(selectedFilters, filter.id)
+						"
 					>
 						{{ filter.formattedName }}
 					</button>
 				</div>
-				<Pagination
-					v-if="search.length > 0"
-					:page="currentPage"
-					:count="Math.ceil(search.length / 20)"
-					:link-function="(page) => `?page=${page}`"
-					@switch-page="(page) => (currentPage = page)"
-				/>
+				<div class="flex gap-2 items-center">
+					<DropdownSelect
+						v-slot="{ selected }"
+						v-model="pageSize"
+						name="Page size"
+						:options="[5, 10, 15, 20, 50, 100, 999]"
+						class="max-w-[9rem]"
+					>
+						<span class="font-semibold text-primary">View: </span>
+						<span class="font-semibold text-secondary">{{ selected }}</span>
+					</DropdownSelect>
+					<Pagination
+						v-if="search.length > 0"
+						:page="currentPage"
+						:count="Math.ceil(search.length / pageSize)"
+						:link-function="(page) => `?page=${page}`"
+						@switch-page="(page) => (currentPage = page)"
+					/>
+				</div>
 			</div>
 
 			<ContentListPanel
@@ -85,6 +111,7 @@
 				:sort-ascending="ascending"
 				:update-sort="sortProjects"
 				:current-page="currentPage"
+				:page-size="pageSize"
 			>
 				<template v-if="selectedProjects.length > 0" #headers>
 					<div class="flex gap-2">
@@ -217,7 +244,7 @@
 				<Pagination
 					v-if="search.length > 0"
 					:page="currentPage"
-					:count="Math.ceil(search.length / 20)"
+					:count="Math.ceil(search.length / pageSize)"
 					:link-function="(page) => `?page=${page}`"
 					@switch-page="(page) => (currentPage = page)"
 				/>
@@ -274,6 +301,7 @@ import {
 	Button,
 	ButtonStyled,
 	ContentListPanel,
+	DropdownSelect,
 	injectNotificationManager,
 	OverflowMenu,
 	Pagination,
@@ -532,6 +560,7 @@ const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
 })
 
 const selectedFilters = ref<string[]>([])
+const hideDisabledProjects = ref(false)
 const filteredProjects = computed(() => {
 	const updatesFilter = selectedFilters.value.includes('updates')
 	const disabledFilter = selectedFilters.value.includes('disabled')
@@ -541,6 +570,11 @@ const filteredProjects = computed(() => {
 	)
 
 	return projects.value.filter((project) => {
+		// If hideDisabledProjects is true, exclude all disabled projects
+		if (hideDisabledProjects.value && project.disabled) {
+			return false
+		}
+
 		return (
 			(typeFilters.length === 0 || typeFilters.includes(project.project_type)) &&
 			(!updatesFilter || project.outdated) &&
@@ -566,12 +600,29 @@ function toggleArray<T>(array: T[], value: T) {
 	}
 }
 
+function toggleDisabledFilter() {
+	const isShowingOnlyDisabled = selectedFilters.value.includes('disabled')
+
+	if (!isShowingOnlyDisabled && !hideDisabledProjects.value) {
+		// State 1 -> State 2: Show only disabled (green)
+		selectedFilters.value.push('disabled')
+	} else if (isShowingOnlyDisabled && !hideDisabledProjects.value) {
+		// State 2 -> State 3: Hide all disabled (red)
+		selectedFilters.value.splice(selectedFilters.value.indexOf('disabled'), 1)
+		hideDisabledProjects.value = true
+	} else {
+		// State 3 -> State 1: Show all (default)
+		hideDisabledProjects.value = false
+	}
+}
+
 const searchFilter = ref('')
 const selectAll = ref(false)
 const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const ascending = ref(true)
 const sortColumn = ref('Name')
 const currentPage = ref(1)
+const pageSize = ref(20)
 
 const selected = computed(() =>
 	Array.from(selectionMap.value)
@@ -607,7 +658,10 @@ const search = computed(() => {
 	}
 })
 
-watch([sortColumn, ascending, selectedFilters.value, searchFilter], () => (currentPage.value = 1))
+watch(
+	[sortColumn, ascending, selectedFilters.value, searchFilter, pageSize],
+	() => (currentPage.value = 1),
+)
 
 const sortProjects = (filter: string) => {
 	if (sortColumn.value === filter) {

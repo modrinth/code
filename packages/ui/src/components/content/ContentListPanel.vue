@@ -14,8 +14,11 @@ const props = withDefaults(
 		sortAscending: boolean
 		updateSort: (column: string) => void
 		currentPage: number
+		pageSize?: number
 	}>(),
-	{},
+	{
+		pageSize: 20,
+	},
 )
 
 const selectionStates: Ref<Record<string, boolean>> = ref({})
@@ -43,7 +46,7 @@ function setSelected(value: boolean) {
 }
 
 const paginatedItems = computed(() =>
-	props.items.slice((props.currentPage - 1) * 20, props.currentPage * 20),
+	props.items.slice((props.currentPage - 1) * props.pageSize, props.currentPage * props.pageSize),
 )
 </script>
 
