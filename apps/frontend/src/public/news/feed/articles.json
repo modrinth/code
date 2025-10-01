@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Standing By Our Values",
+			"summary": "We’re deeply sorry to our LGBTQ+ creators and users, and we stand with you.",
+			"thumbnail": "https://modrinth.com/news/default.webp",
+			"date": "2025-10-02T00:00:00.000Z",
+			"link": "https://modrinth.com/news/article/standing-by-our-values"
+		},
+		{
 			"title": "Russia forced us to do this",
 			"summary": "Update on censorship for Russian users and our continued support for those affected.",
 			"thumbnail": "https://modrinth.com/news/article/russian-censorship/thumbnail.webp",
