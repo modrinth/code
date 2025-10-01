@@ -108,7 +108,8 @@ const messages = {
 		}),
 		subtitle: defineMessage({
 			id: 'error.generic.451.subtitle',
-			defaultMessage: "This page has been blocked for legal reasons, such as government censorship or ongoing legal proceedings.",
+			defaultMessage:
+				'This page has been blocked for legal reasons, such as government censorship or ongoing legal proceedings.',
 		}),
 	},
 	default: {
