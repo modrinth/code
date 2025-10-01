@@ -68,7 +68,7 @@ jobs:
           {
             "productName": "Modrinth App (dev-${GIT_HASH})",
             "mainBinaryName": "Modrinth App (dev-${GIT_HASH})",
-            "identifier": "com.modrinth.app.dev.${GIT_HASH}",
+            "identifier": "ModrinthApp-dev-${GIT_HASH}",
             "bundle": {
               "fileAssociations": []
             }
