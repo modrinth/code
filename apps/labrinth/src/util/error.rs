@@ -1,18 +1,21 @@
-use std::fmt::{Debug, Display};
+use std::{
+    convert::Infallible,
+    fmt::{Debug, Display},
+};
 
 use crate::routes::ApiError;
 
-pub trait WrapErr<T, E>: Sized {
+pub trait Context<T, E>: Sized {
     fn wrap_request_err_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
-        D: Display + Send + Sync + 'static;
+        D: Debug + Display + Send + Sync + 'static;
 
     fn wrap_request_err<D>(self, msg: D) -> Result<T, ApiError>
     where
-        D: Display + Send + Sync + 'static,
+        D: Debug + Display + Send + Sync + 'static,
     {
         self.wrap_request_err_with(|| msg)
     }
@@ -22,17 +25,17 @@ pub trait WrapErr<T, E>: Sized {
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
-        D: Display + Send + Sync + 'static;
+        D: Debug + Display + Send + Sync + 'static;
 
     fn wrap_internal_err<D>(self, msg: D) -> Result<T, ApiError>
     where
-        D: Display + Send + Sync + 'static,
+        D: Debug + Display + Send + Sync + 'static,
     {
         self.wrap_internal_err_with(|| msg)
     }
 }
 
-impl<T, E> WrapErr<T, E> for Result<T, E>
+impl<T, E> Context<T, E> for Result<T, E>
 where
     E: std::error::Error + Send + Sync + Sized + 'static,
 {
@@ -63,61 +66,25 @@ where
     }
 }
 
-pub trait OptionExt<T>: Sized {
-    fn ok_or_request_err_with<D>(
+impl<T> Context<T, Infallible> for Option<T> {
+    fn wrap_request_err_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
-        D: Debug + Display + Send + Sync + 'static;
-
-    fn ok_or_request_err<D>(self, msg: D) -> Result<T, ApiError>
-    where
         D: Debug + Display + Send + Sync + 'static,
     {
-        self.ok_or_request_err_with(|| msg)
+        self.ok_or_else(|| ApiError::Request(eyre::Report::msg(f())))
     }
 
-    fn ok_or_internal_err_with<D>(
-        self,
-        f: impl FnOnce() -> D,
-    ) -> Result<T, ApiError>
-    where
-        D: Debug + Display + Send + Sync + 'static;
-
-    fn ok_or_internal_err<D>(self, msg: D) -> Result<T, ApiError>
-    where
-        D: Debug + Display + Send + Sync + 'static,
-    {
-        self.ok_or_internal_err_with(|| msg)
-    }
-}
-
-impl<T> OptionExt<T> for Option<T> {
-    fn ok_or_request_err_with<D>(
+    fn wrap_internal_err_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
         D: Debug + Display + Send + Sync + 'static,
     {
-        self.ok_or_else(|| {
-            let report = eyre::Report::msg(f());
-            ApiError::Request(report)
-        })
-    }
-
-    fn ok_or_internal_err_with<D>(
-        self,
-        f: impl FnOnce() -> D,
-    ) -> Result<T, ApiError>
-    where
-        D: Debug + Display + Send + Sync + 'static,
-    {
-        self.ok_or_else(|| {
-            let report = eyre::Report::msg(f());
-            ApiError::Internal(report)
-        })
+        self.ok_or_else(|| ApiError::Internal(eyre::Report::msg(f())))
     }
 }
 
@@ -134,6 +101,9 @@ mod tests {
         sqlx_result()
             .wrap_internal_err("failed to perform database operation")?;
         sqlx_result().wrap_request_err("invalid request parameter")?;
+
+        None::<()>.wrap_internal_err("something is missing")?;
+
         Ok(())
     }
 

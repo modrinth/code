@@ -261,8 +261,8 @@ async fn main() -> std::io::Result<()> {
                     "HTTP request",
                     http.method = %req.method(),
                     http.client_ip = %req.connection_info().realip_remote_addr().unwrap_or(""),
-                    http.user_agent = %req.headers().get("User-Agent").map(|h| h.to_str().unwrap_or("")).unwrap_or(""),
-                    http.target = %req.uri().path_and_query().map(|p| p.as_str()).unwrap_or("")
+                    http.user_agent = %req.headers().get("User-Agent").map_or("", |h| h.to_str().unwrap_or("")),
+                    http.target = %req.uri().path_and_query().map_or("", |p| p.as_str())
                 );
 
                 srv.call(req)

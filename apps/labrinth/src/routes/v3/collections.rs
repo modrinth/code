@@ -12,7 +12,7 @@ use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::v3::project_creation::CreateError;
-use crate::util::error::OptionExt;
+use crate::util::error::Context;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
@@ -337,7 +337,7 @@ pub async fn collection_edit(
                     project_id, &**pool, &redis,
                 )
                 .await?
-                .ok_or_request_err_with(|| {
+                .wrap_request_err_with(|| {
                     eyre!("The specified project {project_id} does not exist!")
                 })?;
                 validated_project_ids.push(project.inner.id.0);
