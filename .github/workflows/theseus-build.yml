@@ -133,6 +133,7 @@ jobs:
 
       - name: 🔨 Build Linux app
         run: pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json
+        run: ${{ github.ref == 'refs/heads/main' && 'pnpm --filter=@modrinth/app run tauri build --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --config tauri-dev.conf.json' }}
         if: startsWith(matrix.platform, 'ubuntu')
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -161,8 +162,12 @@ jobs:
             target/release/bundle/appimage/Modrinth App_*.AppImage*
             target/release/bundle/deb/Modrinth App_*.deb*
             target/release/bundle/rpm/Modrinth App-*.rpm*
+            target/release/bundle/appimage/Modrinth App (dev-*)_*.AppImage*
+            target/release/bundle/deb/Modrinth App (dev-*)_*.deb*
+            target/release/bundle/rpm/Modrinth App (dev-*)-*.rpm*
             target/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz*
             target/universal-apple-darwin/release/bundle/macos/Modrinth App (dev-*)*.app.tar.gz
             target/universal-apple-darwin/release/bundle/dmg/Modrinth App (dev-*)*.dmg
+            target/universal-apple-darwin/release/bundle/dmg/Modrinth App_*.dmg*
             target/release/bundle/nsis/Modrinth App_*-setup.exe*
             target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*
