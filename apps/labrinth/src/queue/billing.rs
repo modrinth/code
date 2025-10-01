@@ -343,6 +343,8 @@ pub async fn index_subscriptions(
             }
 
             for mut c in charges {
+                processed_charges += 1;
+
                 let payment_intent_id = c
                     .payment_platform_id
                     .as_deref()
@@ -465,8 +467,6 @@ pub async fn index_subscriptions(
                 c.tax_drift_loss = Some(drift);
                 c.tax_platform_id = Some(tax_platform_id);
                 c.upsert(&mut txn).await?;
-
-                processed_charges += 1;
             }
 
             txn.commit().await?;
@@ -477,14 +477,17 @@ pub async fn index_subscriptions(
         }
     }
 
-    let tax_charges_index_handle = tokio::spawn(anrok_api_operations(
+    anrok_api_operations(
         pool.clone(),
         redis.clone(),
         stripe_client.clone(),
         anrok_client.clone(),
-    ));
+    )
+    .await;
 
     let res = async {
+        info!("Gathering charges to unprovision");
+
         let mut transaction = pool.begin().await?;
         let mut clear_cache_users = Vec::new();
 
@@ -539,6 +542,8 @@ pub async fn index_subscriptions(
         .await?;
 
         for charge in all_charges {
+            info!("Indexing charge '{}'", to_base62(charge.id.0 as u64));
+
             let Some(subscription) = all_subscriptions
                 .iter_mut()
                 .find(|x| Some(x.id) == charge.subscription_id)
@@ -662,12 +667,6 @@ pub async fn index_subscriptions(
 
     if let Err(e) = res.await {
         warn!("Error indexing subscriptions: {:?}", e);
-    }
-
-    if let Err(error) = tax_charges_index_handle.await
-        && error.is_panic()
-    {
-        std::panic::resume_unwind(error.into_panic());
     }
 
     info!("Done indexing subscriptions");

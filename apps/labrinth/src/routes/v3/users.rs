@@ -3,8 +3,8 @@ use std::{collections::HashMap, sync::Arc};
 use super::{ApiError, oauth_clients::get_user_clients};
 use crate::{
     auth::{
-        filter_visible_collections, filter_visible_projects,
-        get_user_from_headers,
+        checks::is_visible_organization, filter_visible_collections,
+        filter_visible_projects, get_user_from_headers,
     },
     database::{models::DBUser, redis::RedisPool},
     file_hosting::{FileHost, FileHostPublicity},
@@ -315,6 +315,10 @@ pub async fn orgs_list(
         }
 
         for data in organizations_data {
+            if !is_visible_organization(&data, &user, &pool, &redis).await? {
+                continue;
+            }
+
             let members_data =
                 team_groups.remove(&data.team_id).unwrap_or(vec![]);
             let logged_in = user

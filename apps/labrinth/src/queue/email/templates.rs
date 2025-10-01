@@ -559,7 +559,7 @@ async fn collect_template_variables(
 
             map.insert(
                 PAYOUTAVAILABLE_AMOUNT,
-                format!("USD${:.2}", (amount * 100.0) as i64),
+                format!("USD${:.2}", *amount as f64 / 100.0),
             );
 
             Ok(map)
