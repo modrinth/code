@@ -3,12 +3,13 @@ use crate::database;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
+use crate::models::error::AsApiError;
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::{PackFile, PackFileHash, PackFormat};
 use crate::models::projects::ProjectStatus;
 use crate::models::threads::MessageBody;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use dashmap::DashSet;
 use hex::ToHex;
 use itertools::Itertools;
@@ -674,9 +675,8 @@ impl AutomatedModerationQueue {
                                                 format!(
                                                     "*<{}/user/AutoMod|AutoMod>* changed project status from *{}* to *Rejected*",
                                                     dotenvy::var("SITE_URL")?,
-                                                    &project.inner.status.as_friendly_str(),
-                                                )
-                                                    .to_string(),
+                                                    &project.inner.status,
+                                                ),
                                             ),
                                         )
                                             .await

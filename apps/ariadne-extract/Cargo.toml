@@ -1,0 +1,22 @@
+[package]
+name = "ariadne-extract"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+clap.workspace = true
+thiserror.workspace = true
+derive_more = { workspace = true, features = ["display"] }
+
+serde_json.workspace = true
+serde.workspace = true
+
+syn = { workspace = true, features = ["visit"] }
+proc-macro2.workspace = true
+walkdir.workspace = true
+
+syn-miette.workspace = true
+miette = { workspace = true, features = ["syntect-highlighter"] }
+
+[lints]
+workspace = true

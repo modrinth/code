@@ -3,7 +3,7 @@ use crate::{
     database::redis::RedisPool,
     models::{pats::Scopes, v3::user_limits::UserLimits},
     queue::session::AuthQueue,
-    routes::ApiError,
+    routes::error::ApiError,
 };
 use actix_web::{HttpRequest, web};
 use sqlx::PgPool;

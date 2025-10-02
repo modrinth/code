@@ -10,7 +10,7 @@ use crate::database::models::users_redeemals::{
 };
 use crate::database::redis::RedisPool;
 use crate::queue::billing::try_process_user_redeemal;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::guards::medal_key_guard;
 
 pub fn config(cfg: &mut web::ServiceConfig) {

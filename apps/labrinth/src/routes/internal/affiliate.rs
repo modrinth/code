@@ -21,7 +21,7 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::routes::ApiError;
+use crate::routes::error::{ApiError, SpecificAuthenticationError};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -55,9 +55,8 @@ async fn admin_get_all(
     .await?;
 
     if !user.role.is_admin() {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to read all affiliate codes!"
-                .to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::ReadAllAffiliateCodes,
         ));
     }
 
@@ -84,7 +83,7 @@ async fn admin_create(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    body: web::Json<AdminCreateRequest>,
+    body: Json<AdminCreateRequest>,
 ) -> Result<Json<AdminCreateResponse>, ApiError> {
     let (_, creator) = get_user_from_headers(
         &req,
@@ -96,9 +95,8 @@ async fn admin_create(
     .await?;
 
     if !creator.role.is_admin() {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to create an affiliate code!"
-                .to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::CreateAffiliateCode,
         ));
     }
 
@@ -107,8 +105,8 @@ async fn admin_create(
     let Some(_affiliate_user) =
         DBUser::get_id(affiliate_id, &**pool, &redis).await?
     else {
-        return Err(ApiError::CustomAuthentication(
-            "Affiliate user not found!".to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::UnknownAffiliateUser,
         ));
     };
 
@@ -152,8 +150,8 @@ async fn admin_get(
     .await?;
 
     if !user.role.is_admin() {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to read an affiliate code!".to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::ReadAffiliateCode,
         ));
     }
 
@@ -187,9 +185,8 @@ async fn admin_delete(
     .await?;
 
     if !user.role.is_admin() {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to delete an affiliate code!"
-                .to_string(),
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::DeleteAffiliateCode,
         ));
     }
 
@@ -224,10 +221,7 @@ async fn self_get_all(
     .await?;
 
     if !user.badges.contains(Badges::AFFILIATE) {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to view your affiliate codes!"
-                .to_string(),
-        ));
+        return Err(ApiError::SpecificAuthentication(SpecificAuthenticationError::ReadOwnAffiliateCodes));
     }
 
     let codes =
@@ -253,7 +247,7 @@ async fn self_patch(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    body: web::Json<SelfPatchRequest>,
+    body: Json<SelfPatchRequest>,
 ) -> Result<HttpResponse, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
@@ -265,10 +259,7 @@ async fn self_patch(
     .await?;
 
     if !user.badges.contains(Badges::AFFILIATE) {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to update your affiliate codes!"
-                .to_string(),
-        ));
+        return Err(ApiError::SpecificAuthentication(SpecificAuthenticationError::UpdateOwnAffiliateCode));
     }
 
     let affiliate_code_id = DBAffiliateCodeId::from(body.id);
@@ -308,10 +299,7 @@ async fn self_delete(
     .await?;
 
     if !user.badges.contains(Badges::AFFILIATE) {
-        return Err(ApiError::CustomAuthentication(
-            "You do not have permission to delete your affiliate codes!"
-                .to_string(),
-        ));
+        return Err(ApiError::SpecificAuthentication(SpecificAuthenticationError::DeleteOwnAffiliateCode));
     }
 
     let (affiliate_code_id,) = path.into_inner();

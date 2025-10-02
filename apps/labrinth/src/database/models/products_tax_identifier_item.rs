@@ -1,6 +1,6 @@
 use crate::database::models::ids::{DBProductId, DBProductPriceId};
 use crate::models::billing::ProductMetadata;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 
 pub struct DBProductsTaxIdentifier {
     pub id: i32,

@@ -12,6 +12,7 @@ use tracing::{info, warn};
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
+use routes::error;
 use util::cors::default_cors;
 
 use crate::background_task::update_versions;
@@ -308,16 +309,16 @@ pub fn app_config(
     labrinth_config: LabrinthConfig,
 ) {
     cfg.app_data(web::FormConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
+        error::ApiError::Validation(err.to_string()).into()
     }))
     .app_data(web::PathConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
+        error::ApiError::Validation(err.to_string()).into()
     }))
     .app_data(web::QueryConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
+        error::ApiError::Validation(err.to_string()).into()
     }))
     .app_data(web::JsonConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Validation(err.to_string()).into()
+        error::ApiError::Validation(err.to_string()).into()
     }))
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))

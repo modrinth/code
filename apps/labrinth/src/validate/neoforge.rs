@@ -1,5 +1,6 @@
 use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult, filter_out_packs,
+    SupportedGameVersions, ValidationError, ValidationResult,
+    ValidationWarning, filter_out_packs,
 };
 use std::io::Cursor;
 use zip::ZipArchive;
@@ -29,7 +30,7 @@ impl super::Validator for NeoForgeValidator {
             && !archive.file_names().any(|x| x.ends_with(".class"))
         {
             return Ok(ValidationResult::Warning(
-                "No neoforge.mods.toml, mods.toml, or valid class files present for NeoForge file.",
+                ValidationWarning::MissingNeoforgeModsToml,
             ));
         }
 

@@ -1,4 +1,4 @@
-use super::project_creation::{CreateError, UploadedFile};
+use super::project_creation::UploadedFile;
 use crate::auth::get_user_from_headers;
 use crate::database::models::loader_fields::{
     LoaderField, LoaderFieldEnumValue, VersionField,
@@ -23,6 +23,10 @@ use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
+use crate::routes::v3::create_error::{
+    CreateError, CreationAuthenticationError, CreationInvalidInput,
+    MissingValuePart,
+};
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{ValidationResult, validate_file};
@@ -109,7 +113,7 @@ pub async fn version_create(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
-    moderation_queue: web::Data<AutomatedModerationQueue>,
+    moderation_queue: Data<AutomatedModerationQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -183,9 +187,10 @@ async fn version_create_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().unwrap().clone();
+            let content_disposition =
+                field.content_disposition().unwrap().clone();
             let name = content_disposition.get_name().ok_or_else(|| {
-                CreateError::MissingValueError("Missing content name".to_string())
+                CreateError::MissingValueError(MissingValuePart::ContentName)
             })?;
 
             if name == "data" {
@@ -194,64 +199,78 @@ async fn version_create_inner(
                     data.extend_from_slice(&chunk?);
                 }
 
-                let version_create_data: InitialVersionData = serde_json::from_slice(&data)?;
+                let version_create_data: InitialVersionData =
+                    serde_json::from_slice(&data)?;
                 initial_version_data = Some(version_create_data);
-                let version_create_data = initial_version_data.as_ref().unwrap();
+                let version_create_data =
+                    initial_version_data.as_ref().unwrap();
                 if version_create_data.project_id.is_none() {
                     return Err(CreateError::MissingValueError(
-                        "Missing project id".to_string(),
+                        MissingValuePart::ProjectId,
                     ));
                 }
 
                 version_create_data.validate().map_err(|err| {
-                    CreateError::ValidationError(validation_errors_to_string(err, None))
+                    CreateError::ValidationError(validation_errors_to_string(
+                        err, None,
+                    ))
                 })?;
 
                 if !version_create_data.status.can_be_requested() {
                     return Err(CreateError::InvalidInput(
-                        "Status specified cannot be requested".to_string(),
+                        CreationInvalidInput::CannotRequestStatus(
+                            version_create_data.status,
+                        ),
                     ));
                 }
 
-                let project_id: models::DBProjectId = version_create_data.project_id.unwrap().into();
+                let project_id: models::DBProjectId =
+                    version_create_data.project_id.unwrap().into();
 
                 // Ensure that the project this version is being added to exists
-                if models::DBProject::get_id(project_id, &mut **transaction, redis)
-                    .await?
-                    .is_none()
+                if models::DBProject::get_id(
+                    project_id,
+                    &mut **transaction,
+                    redis,
+                )
+                .await?
+                .is_none()
                 {
                     return Err(CreateError::InvalidInput(
-                        "An invalid project id was supplied".to_string(),
+                        CreationInvalidInput::InvalidProjectId,
                     ));
                 }
 
                 // Check that the user creating this version is a team member
                 // of the project the version is being added to.
-                let team_member = models::DBTeamMember::get_from_user_id_project(
-                    project_id,
-                    user.id.into(),
-                    false,
-                    &mut **transaction,
-                )
-                .await?;
-
-                // Get organization attached, if exists, and the member project permissions
-                let organization = models::DBOrganization::get_associated_organization_project_id(
-                    project_id,
-                    &mut **transaction,
-                )
-                .await?;
-
-                let organization_team_member = if let Some(organization) = &organization {
-                    models::DBTeamMember::get_from_user_id(
-                        organization.team_id,
+                let team_member =
+                    models::DBTeamMember::get_from_user_id_project(
+                        project_id,
                         user.id.into(),
+                        false,
                         &mut **transaction,
                     )
-                    .await?
-                } else {
-                    None
-                };
+                    .await?;
+
+                // Get organization attached, if exists, and the member project permissions
+                let organization =
+                    DBOrganization::get_associated_organization_project_id(
+                        project_id,
+                        &mut **transaction,
+                    )
+                    .await?;
+
+                let organization_team_member =
+                    if let Some(organization) = &organization {
+                        models::DBTeamMember::get_from_user_id(
+                            organization.team_id,
+                            user.id.into(),
+                            &mut **transaction,
+                        )
+                        .await?
+                    } else {
+                        None
+                    };
 
                 let permissions = ProjectPermissions::get_permissions_by_role(
                     &user.role,
@@ -261,15 +280,19 @@ async fn version_create_inner(
                 .unwrap_or_default();
 
                 if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
-                    return Err(CreateError::CustomAuthenticationError(
-                        "You don't have permission to upload this version!".to_string(),
+                    return Err(CreateError::CreationAuthenticationError(
+                        CreationAuthenticationError::UploadVersion,
                     ));
                 }
 
-                let version_id: VersionId = models::generate_version_id(transaction).await?.into();
+                let version_id: VersionId =
+                    models::generate_version_id(transaction).await?.into();
 
-                let all_loaders =
-                    models::loader_fields::Loader::list(&mut **transaction, redis).await?;
+                let all_loaders = models::loader_fields::Loader::list(
+                    &mut **transaction,
+                    redis,
+                )
+                .await?;
                 let loaders = version_create_data
                     .loaders
                     .iter()
@@ -278,20 +301,28 @@ async fn version_create_inner(
                             .iter()
                             .find(|y| y.loader == x.0)
                             .cloned()
-                            .ok_or_else(|| CreateError::InvalidLoader(x.0.clone()))
+                            .ok_or_else(|| {
+                                CreateError::InvalidLoader(x.0.clone())
+                            })
                     })
                     .collect::<Result<Vec<_>, _>>()?;
                 selected_loaders = Some(loaders.clone());
-                let loader_ids: Vec<models::LoaderId> = loaders.iter().map(|y| y.id).collect_vec();
+                let loader_ids: Vec<models::LoaderId> =
+                    loaders.iter().map(|y| y.id).collect_vec();
 
-                let loader_fields =
-                    LoaderField::get_fields(&loader_ids, &mut **transaction, redis).await?;
-                let mut loader_field_enum_values = LoaderFieldEnumValue::list_many_loader_fields(
-                    &loader_fields,
+                let loader_fields = LoaderField::get_fields(
+                    &loader_ids,
                     &mut **transaction,
                     redis,
                 )
                 .await?;
+                let mut loader_field_enum_values =
+                    LoaderFieldEnumValue::list_many_loader_fields(
+                        &loader_fields,
+                        &mut **transaction,
+                        redis,
+                    )
+                    .await?;
                 let version_fields = try_create_version_fields(
                     version_id,
                     &version_create_data.fields,
@@ -302,7 +333,7 @@ async fn version_create_inner(
                 let dependencies = version_create_data
                     .dependencies
                     .iter()
-                    .map(|d| models::version_item::DependencyBuilder {
+                    .map(|d| DependencyBuilder {
                         version_id: d.version_id.map(|x| x.into()),
                         project_id: d.project_id.map(|x| x.into()),
                         dependency_type: d.dependency_type.to_string(),
@@ -316,12 +347,17 @@ async fn version_create_inner(
                     author_id: user.id.into(),
                     name: version_create_data.version_title.clone(),
                     version_number: version_create_data.version_number.clone(),
-                    changelog: version_create_data.version_body.clone().unwrap_or_default(),
+                    changelog: version_create_data
+                        .version_body
+                        .clone()
+                        .unwrap_or_default(),
                     files: Vec::new(),
                     dependencies,
                     loaders: loader_ids,
                     version_fields,
-                    version_type: version_create_data.release_channel.to_string(),
+                    version_type: version_create_data
+                        .release_channel
+                        .to_string(),
                     featured: version_create_data.featured,
                     status: version_create_data.status,
                     requested_status: None,
@@ -332,21 +368,29 @@ async fn version_create_inner(
             }
 
             let version = version_builder.as_mut().ok_or_else(|| {
-                CreateError::InvalidInput(String::from("`data` field must come before file fields"))
+                CreateError::InvalidInput(
+                    CreationInvalidInput::DataFieldOutOfOrder,
+                )
             })?;
             let loaders = selected_loaders.as_ref().ok_or_else(|| {
-                CreateError::InvalidInput(String::from("`data` field must come before file fields"))
+                CreateError::InvalidInput(
+                    CreationInvalidInput::DataFieldOutOfOrder,
+                )
             })?;
             let loaders = loaders
                 .iter()
                 .map(|x| Loader(x.loader.clone()))
                 .collect::<Vec<_>>();
 
-            let version_data = initial_version_data
-                .clone()
-                .ok_or_else(|| CreateError::InvalidInput("`data` field is required".to_string()))?;
+            let version_data =
+                initial_version_data.clone().ok_or_else(|| {
+                    CreateError::InvalidInput(
+                        CreationInvalidInput::MissingDataField,
+                    )
+                })?;
 
-            let existing_file_names = version.files.iter().map(|x| x.filename.clone()).collect();
+            let existing_file_names =
+                version.files.iter().map(|x| x.filename.clone()).collect();
 
             upload_file(
                 &mut field,
@@ -384,15 +428,15 @@ async fn version_create_inner(
     }
 
     let version_data = initial_version_data.ok_or_else(|| {
-        CreateError::InvalidInput("`data` field is required".to_string())
+        CreateError::InvalidInput(CreationInvalidInput::MissingDataField)
     })?;
     let builder = version_builder.ok_or_else(|| {
-        CreateError::InvalidInput("`data` field is required".to_string())
+        CreateError::InvalidInput(CreationInvalidInput::MissingDataField)
     })?;
 
     if builder.files.is_empty() {
         return Err(CreateError::InvalidInput(
-            "Versions must have at least one file uploaded to them".to_string(),
+            CreationInvalidInput::MissingAnyFiles,
         ));
     }
 
@@ -404,7 +448,7 @@ async fn version_create_inner(
         INNER JOIN users u ON u.id = follower_id
         WHERE mf.mod_id = $1
         ",
-        builder.project_id as crate::database::models::ids::DBProjectId
+        builder.project_id as models::ids::DBProjectId
     )
     .fetch(&mut **transaction)
     .map_ok(|m| models::ids::DBUserId(m.follower_id))
@@ -489,9 +533,11 @@ async fn version_create_inner(
             if !matches!(image.context, ImageContext::Report { .. })
                 || image.context.inner_id().is_some()
             {
-                return Err(CreateError::InvalidInput(format!(
-                    "Image {image_id} is not unused and in the 'version' context"
-                )));
+                return Err(CreateError::InvalidInput(
+                    CreationInvalidInput::ImproperContextImage(
+                        image_id, "report",
+                    ),
+                ));
             }
 
             sqlx::query!(
@@ -508,9 +554,9 @@ async fn version_create_inner(
 
             image_item::DBImage::clear_cache(image.id.into(), redis).await?;
         } else {
-            return Err(CreateError::InvalidInput(format!(
-                "Image {image_id} does not exist"
-            )));
+            return Err(CreateError::InvalidInput(
+                CreationInvalidInput::NonexistentImage(image_id),
+            ));
         }
     }
 
@@ -539,7 +585,7 @@ pub async fn upload_file_to_version(
     client: Data<PgPool>,
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<AuthQueue>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -609,7 +655,7 @@ async fn upload_file_to_version_inner(
 
     let Some(version) = result else {
         return Err(CreateError::InvalidInput(
-            "An invalid version id was supplied".to_string(),
+            CreationInvalidInput::InvalidVersionId,
         ));
     };
 
@@ -636,7 +682,7 @@ async fn upload_file_to_version_inner(
     .is_none()
     {
         return Err(CreateError::InvalidInput(
-            "An invalid project id was supplied".to_string(),
+            CreationInvalidInput::InvalidProjectId,
         ));
     }
 
@@ -676,9 +722,8 @@ async fn upload_file_to_version_inner(
         .unwrap_or_default();
 
         if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
-            return Err(CreateError::CustomAuthenticationError(
-                "You don't have permission to upload files to this version!"
-                    .to_string(),
+            return Err(CreateError::CreationAuthenticationError(
+                CreationAuthenticationError::UploadFilesToVersion,
             ));
         }
     }
@@ -696,9 +741,7 @@ async fn upload_file_to_version_inner(
             let content_disposition =
                 field.content_disposition().unwrap().clone();
             let name = content_disposition.get_name().ok_or_else(|| {
-                CreateError::MissingValueError(
-                    "Missing content name".to_string(),
-                )
+                CreateError::MissingValueError(MissingValuePart::ContentName)
             })?;
 
             if name == "data" {
@@ -713,9 +756,9 @@ async fn upload_file_to_version_inner(
             }
 
             let file_data = initial_file_data.as_ref().ok_or_else(|| {
-                CreateError::InvalidInput(String::from(
-                    "`data` field must come before file fields",
-                ))
+                CreateError::InvalidInput(
+                    CreationInvalidInput::DataFieldOutOfOrder,
+                )
             })?;
 
             let loaders = selected_loaders
@@ -771,7 +814,7 @@ async fn upload_file_to_version_inner(
 
     if file_builders.is_empty() {
         return Err(CreateError::InvalidInput(
-            "At least one file must be specified".to_string(),
+            CreationInvalidInput::NoFilesSpecified,
         ));
     } else {
         for file in file_builders {
@@ -812,14 +855,13 @@ pub async fn upload_file(
 
     if other_file_names.contains(&format!("{file_name}.{file_extension}")) {
         return Err(CreateError::InvalidInput(
-            "Duplicate files are not allowed to be uploaded to Modrinth!"
-                .to_string(),
+            CreationInvalidInput::DuplicateFiles,
         ));
     }
 
     if file_name.contains('/') {
         return Err(CreateError::InvalidInput(
-            "File names must not contain slashes!".to_string(),
+            CreationInvalidInput::FileNameHasSlashes,
         ));
     }
 
@@ -829,9 +871,11 @@ pub async fn upload_file(
         })?;
 
     let data = read_from_field(
-        field, 500 * (1 << 20),
-        "Project file exceeds the maximum of 500MiB. Contact a moderator or admin to request permission to upload larger files."
-    ).await?;
+        field,
+        500 * (1 << 20),
+        CreationInvalidInput::ProjectFileTooLarge("500 MiB"),
+    )
+    .await?;
 
     let hash = sha1::Sha1::digest(&data).encode_hex::<String>();
     let exists = sqlx::query!(
@@ -852,8 +896,7 @@ pub async fn upload_file(
 
     if exists {
         return Err(CreateError::InvalidInput(
-            "Duplicate files are not allowed to be uploaded to Modrinth!"
-                .to_string(),
+            CreationInvalidInput::DuplicateFiles,
         ));
     }
 
@@ -969,15 +1012,16 @@ pub async fn upload_file(
             .any(|y| y.hash == sha1_bytes || y.hash == sha512_bytes)
     }) {
         return Err(CreateError::InvalidInput(
-            "Duplicate files are not allowed to be uploaded to Modrinth!"
-                .to_string(),
+            CreationInvalidInput::DuplicateFiles,
         ));
     }
 
-    if let ValidationResult::Warning(msg) = validation_result
+    if let ValidationResult::Warning(warning) = validation_result
         && primary
     {
-        return Err(CreateError::InvalidInput(msg.to_string()));
+        return Err(CreateError::InvalidInput(
+            CreationInvalidInput::FileValidation(warning),
+        ));
     }
 
     let url = format!("{cdn_url}/{file_path_encode}");
@@ -1033,13 +1077,13 @@ pub fn get_name_ext(
     content_disposition: &actix_web::http::header::ContentDisposition,
 ) -> Result<(&str, &str), CreateError> {
     let file_name = content_disposition.get_filename().ok_or_else(|| {
-        CreateError::MissingValueError("Missing content file name".to_string())
+        CreateError::MissingValueError(MissingValuePart::ContentFileName)
     })?;
     let file_extension = if let Some(last_period) = file_name.rfind('.') {
         file_name.get((last_period + 1)..).unwrap_or("")
     } else {
         return Err(CreateError::MissingValueError(
-            "Missing content file extension".to_string(),
+            MissingValuePart::ContentFileExtension,
         ));
     };
     Ok((file_name, file_extension))
@@ -1067,30 +1111,32 @@ pub fn try_create_version_fields(
             .iter()
             .find(|lf| &lf.field == key)
             .ok_or_else(|| {
-                CreateError::InvalidInput(format!(
-                    "Loader field '{key}' does not exist for any loaders supplied,"
-                ))
+                CreateError::InvalidInput(
+                    CreationInvalidInput::NonexistentLoaderField(
+                        key.to_string(),
+                    ),
+                )
             })?;
         remaining_mandatory_loader_fields.remove(&loader_field.field);
         let enum_variants = loader_field_enum_values
             .remove(&loader_field.id)
             .unwrap_or_default();
 
-        let vf: VersionField = VersionField::check_parse(
+        let vf = VersionField::check_parse(
             version_id.into(),
             loader_field.clone(),
             value.clone(),
             enum_variants,
-        )
-        .map_err(CreateError::InvalidInput)?;
+        )?;
         version_fields.push(vf);
     }
 
     if !remaining_mandatory_loader_fields.is_empty() {
-        return Err(CreateError::InvalidInput(format!(
-            "Missing mandatory loader fields: {}",
-            remaining_mandatory_loader_fields.iter().join(", ")
-        )));
+        return Err(CreateError::InvalidInput(
+            CreationInvalidInput::MissingLoaderFields(
+                remaining_mandatory_loader_fields.iter().join(", "),
+            ),
+        ));
     }
     Ok(version_fields)
 }

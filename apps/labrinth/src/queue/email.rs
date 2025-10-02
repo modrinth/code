@@ -8,7 +8,8 @@ use crate::models::notifications::NotificationBody;
 use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
 };
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
+use ariadne::i18n_enum;
 use chrono::Utc;
 use futures::stream::{FuturesUnordered, StreamExt};
 use lettre::message::Mailbox;
@@ -113,6 +114,17 @@ pub enum MailError {
     #[error("HTTP error fetching template: {0}")]
     HttpTemplate(#[from] reqwest::Error),
 }
+
+i18n_enum!(
+    MailError,
+    root_key: "labrinth.error.mail",
+    Env(..) => "environment",
+    Mail(cause) => "email",
+    Address(cause) => "address",
+    Smtp(cause) => "smtp",
+    Uninitialized! => "uninitialized",
+    HttpTemplate(cause) => "http_template",
+);
 
 #[derive(Clone)]
 pub struct EmailQueue {

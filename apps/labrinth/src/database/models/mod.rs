@@ -1,3 +1,4 @@
+use ariadne::i18n_enum;
 use thiserror::Error;
 
 pub mod affiliate_code_item;
@@ -63,7 +64,49 @@ pub enum DatabaseError {
     #[error("Error while serializing with the cache: {0}")]
     SerdeCacheError(#[from] serde_json::Error),
     #[error("Schema error: {0}")]
-    SchemaError(String),
+    SchemaError(#[from] SchemaError),
     #[error("Timeout when waiting for cache subscriber")]
     CacheTimeout,
 }
+
+i18n_enum!(
+    DatabaseError,
+    root_key: "labrinth.error.database",
+    Database(cause) => "sqlx",
+    RandomId! => "random_id",
+    CacheError(cause) => "cache",
+    RedisPool(cause) => "redis_pool",
+    SerdeCacheError(cause) => "cache_serialization",
+    SchemaError(cause) => "schema",
+    CacheTimeout! => "cache_timeout",
+);
+
+#[derive(Error, Debug)]
+pub enum SchemaError {
+    #[error("Could not find game version enum.")]
+    MissingGameVersionEnum,
+    #[error("Field name {0} is not {1}")]
+    FieldNameMismatch(String, &'static str),
+    #[error("Game version requires field value to be an enum: {0}")]
+    GameVersionFieldNotEnum(Box<loader_fields::VersionField>),
+    #[error("Multiple fields for field {0}")]
+    MultipleFields(&'static str),
+    #[error("No version fields for field {0}")]
+    NoVersionFields(&'static str),
+    #[error("Multiple field ids for field {0}")]
+    MultipleIdsForField(&'static str),
+    #[error("Field name {0} for field {1} in does not exist")]
+    FieldNameDoesNotExist(&'static str, &'static str),
+}
+
+i18n_enum!(
+    SchemaError,
+    root_key: "labrinth.error.database.schema",
+    MissingGameVersionEnum! => "missing_game_version_enum",
+    FieldNameMismatch(expected, actual) => "field_name_mismatch",
+    GameVersionFieldNotEnum(field) => "game_version_field_not_enum",
+    MultipleFields(field) => "multiple_fields",
+    NoVersionFields(field) => "no_version_fields",
+    MultipleIdsForField(field) => "multiple_ids_for_field",
+    FieldNameDoesNotExist(field_name, field) => "field_name_does_not_exist",
+);

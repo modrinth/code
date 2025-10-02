@@ -7,7 +7,7 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::*;
 use crate::models::v3::billing::SubscriptionStatus;
 use crate::models::v3::users::User;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::util::anrok;
 
 use ariadne::ids::base62_impl::to_base62;

@@ -17,7 +17,7 @@ use crate::models::billing::{
 use crate::models::notifications::NotificationBody;
 use crate::models::users::Badges;
 use crate::models::users::User;
-use crate::routes::ApiError;
+use crate::routes::error::ApiError;
 use crate::routes::internal::billing::payments::*;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;

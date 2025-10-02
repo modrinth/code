@@ -12,7 +12,7 @@ mod version_creation;
 pub mod version_file;
 mod versions;
 
-pub use super::ApiError;
+pub use crate::routes::error::ApiError;
 use crate::util::cors::default_cors;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {

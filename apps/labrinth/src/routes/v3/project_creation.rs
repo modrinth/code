@@ -1,5 +1,5 @@
 use super::version_creation::{InitialVersionData, try_create_version_fields};
-use crate::auth::{AuthenticationError, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::database::models::loader_fields::{
     Loader, LoaderField, LoaderFieldEnumValue,
 };
@@ -7,7 +7,6 @@ use crate::database::models::thread_item::ThreadBuilder;
 use crate::database::models::{self, DBUser, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
-use crate::models::error::ApiError;
 use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
@@ -19,139 +18,30 @@ use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
-use crate::search::indexing::IndexingError;
+use crate::routes::v3::create_error::{
+    CreateError, CreationAuthenticationError, CreationInvalidInput,
+    MissingValuePart,
+};
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::{Field, Multipart};
-use actix_web::http::StatusCode;
 use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use futures::stream::StreamExt;
-use image::ImageError;
 use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
-use thiserror::Error;
 use validator::Validate;
 
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("project", web::post().to(project_create));
-}
-
-#[derive(Error, Debug)]
-pub enum CreateError {
-    #[error("Environment Error")]
-    EnvError(#[from] dotenvy::Error),
-    #[error("An unknown database error occurred")]
-    SqlxDatabaseError(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
-    DatabaseError(#[from] models::DatabaseError),
-    #[error("Indexing Error: {0}")]
-    IndexingError(#[from] IndexingError),
-    #[error("Error while parsing multipart payload: {0}")]
-    MultipartError(#[from] actix_multipart::MultipartError),
-    #[error("Error while parsing JSON: {0}")]
-    SerDeError(#[from] serde_json::Error),
-    #[error("Error while validating input: {0}")]
-    ValidationError(String),
-    #[error("Error while uploading file: {0}")]
-    FileHostingError(#[from] FileHostingError),
-    #[error("Error while validating uploaded file: {0}")]
-    FileValidationError(#[from] crate::validate::ValidationError),
-    #[error("{}", .0)]
-    MissingValueError(String),
-    #[error("Invalid format for image: {0}")]
-    InvalidIconFormat(String),
-    #[error("Error with multipart data: {0}")]
-    InvalidInput(String),
-    #[error("Invalid game version: {0}")]
-    InvalidGameVersion(String),
-    #[error("Invalid loader: {0}")]
-    InvalidLoader(String),
-    #[error("Invalid category: {0}")]
-    InvalidCategory(String),
-    #[error("Invalid file type for version file: {0}")]
-    InvalidFileType(String),
-    #[error("Slug is already taken!")]
-    SlugCollision,
-    #[error("Authentication Error: {0}")]
-    Unauthorized(#[from] AuthenticationError),
-    #[error("Authentication Error: {0}")]
-    CustomAuthenticationError(String),
-    #[error("Image Parsing Error: {0}")]
-    ImageError(#[from] ImageError),
-    #[error("Project limit reached")]
-    LimitReached,
-}
-
-impl actix_web::ResponseError for CreateError {
-    fn status_code(&self) -> StatusCode {
-        match self {
-            CreateError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            CreateError::SqlxDatabaseError(..) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
-            CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            CreateError::IndexingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            CreateError::FileHostingError(..) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
-            CreateError::SerDeError(..) => StatusCode::BAD_REQUEST,
-            CreateError::MultipartError(..) => StatusCode::BAD_REQUEST,
-            CreateError::MissingValueError(..) => StatusCode::BAD_REQUEST,
-            CreateError::InvalidIconFormat(..) => StatusCode::BAD_REQUEST,
-            CreateError::InvalidInput(..) => StatusCode::BAD_REQUEST,
-            CreateError::InvalidGameVersion(..) => StatusCode::BAD_REQUEST,
-            CreateError::InvalidLoader(..) => StatusCode::BAD_REQUEST,
-            CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
-            CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
-            CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
-            CreateError::CustomAuthenticationError(..) => {
-                StatusCode::UNAUTHORIZED
-            }
-            CreateError::SlugCollision => StatusCode::BAD_REQUEST,
-            CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
-            CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
-            CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
-            CreateError::LimitReached => StatusCode::BAD_REQUEST,
-        }
-    }
-
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(ApiError {
-            error: match self {
-                CreateError::EnvError(..) => "environment_error",
-                CreateError::SqlxDatabaseError(..) => "database_error",
-                CreateError::DatabaseError(..) => "database_error",
-                CreateError::IndexingError(..) => "indexing_error",
-                CreateError::FileHostingError(..) => "file_hosting_error",
-                CreateError::SerDeError(..) => "invalid_input",
-                CreateError::MultipartError(..) => "invalid_input",
-                CreateError::MissingValueError(..) => "invalid_input",
-                CreateError::InvalidIconFormat(..) => "invalid_input",
-                CreateError::InvalidInput(..) => "invalid_input",
-                CreateError::InvalidGameVersion(..) => "invalid_input",
-                CreateError::InvalidLoader(..) => "invalid_input",
-                CreateError::InvalidCategory(..) => "invalid_input",
-                CreateError::InvalidFileType(..) => "invalid_input",
-                CreateError::Unauthorized(..) => "unauthorized",
-                CreateError::CustomAuthenticationError(..) => "unauthorized",
-                CreateError::SlugCollision => "invalid_input",
-                CreateError::ValidationError(..) => "invalid_input",
-                CreateError::FileValidationError(..) => "invalid_input",
-                CreateError::ImageError(..) => "invalid_image",
-                CreateError::LimitReached => "limit_reached",
-            },
-            description: self.to_string(),
-        })
-    }
 }
 
 pub fn default_project_type() -> String {
@@ -359,34 +249,29 @@ async fn project_create_inner(
 
     let project_id: ProjectId =
         models::generate_project_id(transaction).await?.into();
-    let all_loaders =
-        models::loader_fields::Loader::list(&mut **transaction, redis).await?;
+    let all_loaders = Loader::list(&mut **transaction, redis).await?;
 
     let project_create_data: ProjectCreateData;
     let mut versions;
-    let mut versions_map = std::collections::HashMap::new();
+    let mut versions_map = HashMap::new();
     let mut gallery_urls = Vec::new();
     {
         // The first multipart field must be named "data" and contain a
         // JSON `ProjectCreateData` object.
 
         let mut field = payload.next().await.map_or_else(
-            || {
-                Err(CreateError::MissingValueError(String::from(
-                    "No `data` field in multipart upload",
-                )))
-            },
+            || Err(CreateError::MissingValueError(MissingValuePart::DataField)),
             |m| m.map_err(CreateError::MultipartError),
         )?;
 
         let name = field.name().ok_or_else(|| {
-            CreateError::MissingValueError(String::from("Missing content name"))
+            CreateError::MissingValueError(MissingValuePart::ContentName)
         })?;
 
         if name != "data" {
-            return Err(CreateError::InvalidInput(String::from(
-                "`data` field must come before file fields",
-            )));
+            return Err(CreateError::InvalidInput(
+                CreationInvalidInput::DataFieldOutOfOrder,
+            ));
         }
 
         let mut data = Vec::new();
@@ -398,7 +283,9 @@ async fn project_create_inner(
         let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
 
         create_data.validate().map_err(|err| {
-            CreateError::InvalidInput(validation_errors_to_string(err, None))
+            CreateError::InvalidInput(CreationInvalidInput::Validation(
+                validation_errors_to_string(err, None),
+            ))
         })?;
 
         let slug_project_id_option: Option<ProjectId> =
@@ -445,9 +332,9 @@ async fn project_create_inner(
             for name in &data.file_parts {
                 if versions_map.insert(name.to_owned(), i).is_some() {
                     // If the name is already used
-                    return Err(CreateError::InvalidInput(String::from(
-                        "Duplicate multipart field name",
-                    )));
+                    return Err(CreateError::InvalidInput(
+                        CreationInvalidInput::DuplicateMultipartField,
+                    ));
                 }
             }
             versions.push(
@@ -477,10 +364,11 @@ async fn project_create_inner(
         }
 
         let result = async {
-            let content_disposition = field.content_disposition().unwrap().clone();
+            let content_disposition =
+                field.content_disposition().unwrap().clone();
 
             let name = content_disposition.get_name().ok_or_else(|| {
-                CreateError::MissingValueError("Missing content name".to_string())
+                CreateError::MissingValueError(MissingValuePart::ContentName)
             })?;
 
             let (file_name, file_extension) =
@@ -488,9 +376,9 @@ async fn project_create_inner(
 
             if name == "icon" {
                 if icon_data.is_some() {
-                    return Err(CreateError::InvalidInput(String::from(
-                        "Projects can only have one icon",
-                    )));
+                    return Err(CreateError::InvalidInput(
+                        CreationInvalidInput::MultipleIcons,
+                    ));
                 }
                 // Upload the icon to the cdn
                 icon_data = Some(
@@ -507,20 +395,24 @@ async fn project_create_inner(
             }
             if let Some(gallery_items) = &project_create_data.gallery_items {
                 if gallery_items.iter().filter(|a| a.featured).count() > 1 {
-                    return Err(CreateError::InvalidInput(String::from(
-                        "Only one gallery image can be featured.",
-                    )));
+                    return Err(CreateError::InvalidInput(
+                        CreationInvalidInput::MultipleFeaturedGallery,
+                    ));
                 }
-                if let Some(item) = gallery_items.iter().find(|x| x.item == name) {
+                if let Some(item) =
+                    gallery_items.iter().find(|x| x.item == name)
+                {
                     let data = read_from_field(
                         &mut field,
                         5 * (1 << 20),
-                        "Gallery image exceeds the maximum of 5MiB.",
+                        CreationInvalidInput::GalleryImageTooLarge("5 MiB"),
                     )
                     .await?;
 
                     let (_, file_extension) =
-                        super::version_creation::get_name_ext(&content_disposition)?;
+                        super::version_creation::get_name_ext(
+                            &content_disposition,
+                        )?;
 
                     let url = format!("data/{project_id}/images");
                     let upload_result = upload_image_optimized(
@@ -533,7 +425,7 @@ async fn project_create_inner(
                         file_host,
                     )
                     .await
-                    .map_err(|e| CreateError::InvalidIconFormat(e.to_string()))?;
+                    .map_err(CreateError::InvalidIconFormat)?;
 
                     uploaded_files.push(UploadedFile {
                         name: upload_result.raw_url_path,
@@ -555,9 +447,15 @@ async fn project_create_inner(
             let index = if let Some(i) = versions_map.get(name) {
                 *i
             } else {
-                return Err(CreateError::InvalidInput(format!(
-                    "File `{file_name}` (field {name}) isn't specified in the versions data"
-                )));
+                // return Err(CreateError::InvalidInput(format!(
+                //     "File `{file_name}` (field {name}) isn't specified in the versions data"
+                // )));
+                return Err(CreateError::InvalidInput(
+                    CreationInvalidInput::FileNotSpecified(
+                        file_name.to_string(),
+                        name.to_string(),
+                    ),
+                ));
             };
             // `index` is always valid for these lists
             let created_version = &mut versions[index];
@@ -613,9 +511,9 @@ async fn project_create_inner(
             .zip(versions.iter())
         {
             if version_data.file_parts.len() != builder.files.len() {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Some files were specified in initial_versions but not uploaded",
-                )));
+                return Err(CreateError::InvalidInput(
+                    CreationInvalidInput::InitialVersionsFilesMissing,
+                ));
             }
         }
 
@@ -664,7 +562,7 @@ async fn project_create_inner(
             .await?
             .ok_or_else(|| {
                 CreateError::InvalidInput(
-                    "Invalid organization ID specified!".to_string(),
+                    CreationInvalidInput::InvalidOrganizationId,
                 )
             })?;
 
@@ -683,9 +581,8 @@ async fn project_create_inner(
             if !perms.is_some_and(|x| {
                 x.contains(OrganizationPermissions::ADD_PROJECT)
             }) {
-                return Err(CreateError::CustomAuthenticationError(
-                    "You do not have the permissions to create projects in this organization!"
-                        .to_string(),
+                return Err(CreateError::CreationAuthenticationError(
+                    CreationAuthenticationError::CreateProjectsInOrganization,
                 ));
             }
         } else {
@@ -710,20 +607,15 @@ async fn project_create_inner(
         } else {
             status = ProjectStatus::Processing;
             if project_create_data.initial_versions.is_empty() {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Project submitted for review with no initial versions",
-                )));
+                return Err(CreateError::InvalidInput(
+                    CreationInvalidInput::NoInitialVersions,
+                ));
             }
         }
 
-        let license_id = spdx::Expression::parse(
-            &project_create_data.license_id,
-        )
-        .map_err(|err| {
-            CreateError::InvalidInput(format!(
-                "Invalid SPDX license identifier: {err}"
-            ))
-        })?;
+        let license_id =
+            spdx::Expression::parse(&project_create_data.license_id)
+                .map_err(|err| CreateError::InvalidInput(err.into()))?;
 
         let mut link_urls = vec![];
 
@@ -737,19 +629,21 @@ async fn project_create_inner(
             )
             .await?
             .ok_or_else(|| {
-                CreateError::InvalidInput(format!(
-                    "Link platform {} does not exist.",
-                    platform.clone()
-                ))
+                CreateError::InvalidInput(
+                    CreationInvalidInput::NonexistentLinkPlatform(
+                        platform.clone(),
+                    ),
+                )
             })?;
             let link_platform = link_platforms
                 .iter()
                 .find(|x| x.id == platform_id)
                 .ok_or_else(|| {
-                    CreateError::InvalidInput(format!(
-                        "Link platform {} does not exist.",
-                        platform.clone()
-                    ))
+                    CreateError::InvalidInput(
+                        CreationInvalidInput::NonexistentLinkPlatform(
+                            platform.clone(),
+                        ),
+                    )
                 })?;
             link_urls.push(models::project_item::LinkUrl {
                 platform_id,
@@ -814,9 +708,11 @@ async fn project_create_inner(
                 if !matches!(image.context, ImageContext::Project { .. })
                     || image.context.inner_id().is_some()
                 {
-                    return Err(CreateError::InvalidInput(format!(
-                        "Image {image_id} is not unused and in the 'project' context"
-                    )));
+                    return Err(CreateError::InvalidInput(
+                        CreationInvalidInput::ImproperContextImage(
+                            image_id, "project",
+                        ),
+                    ));
                 }
 
                 sqlx::query!(
@@ -834,9 +730,9 @@ async fn project_create_inner(
                 image_item::DBImage::clear_cache(image.id.into(), redis)
                     .await?;
             } else {
-                return Err(CreateError::InvalidInput(format!(
-                    "Image {image_id} does not exist"
-                )));
+                return Err(CreateError::InvalidInput(
+                    CreationInvalidInput::NonexistentImage(image_id),
+                ));
             }
         }
 
@@ -926,14 +822,14 @@ async fn create_initial_version(
     version_data: &InitialVersionData,
     project_id: ProjectId,
     author: UserId,
-    all_loaders: &[models::loader_fields::Loader],
+    all_loaders: &[Loader],
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     redis: &RedisPool,
 ) -> Result<models::version_item::VersionBuilder, CreateError> {
     if version_data.project_id.is_some() {
-        return Err(CreateError::InvalidInput(String::from(
-            "Found project id in initial version for new project",
-        )));
+        return Err(CreateError::InvalidInput(
+            CreationInvalidInput::ProjectIdInInitialVersion,
+        ));
     }
 
     version_data.validate().map_err(|err| {
@@ -1015,10 +911,10 @@ async fn process_icon_upload(
     let data = read_from_field(
         &mut field,
         262144,
-        "Icons must be smaller than 256KiB",
+        CreationInvalidInput::IconTooLarge("256 KiB"),
     )
     .await?;
-    let upload_result = crate::util::img::upload_image_optimized(
+    let upload_result = upload_image_optimized(
         &format!("data/{}", to_base62(id)),
         FileHostPublicity::Public,
         data.freeze(),
@@ -1028,7 +924,7 @@ async fn process_icon_upload(
         file_host,
     )
     .await
-    .map_err(|e| CreateError::InvalidIconFormat(e.to_string()))?;
+    .map_err(CreateError::InvalidIconFormat)?;
 
     uploaded_files.push(UploadedFile {
         name: upload_result.raw_url_path,

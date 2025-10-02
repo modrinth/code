@@ -17,8 +17,10 @@ use crate::validate::rift::RiftValidator;
 use crate::validate::shader::{
     CanvasShaderValidator, CoreShaderValidator, ShaderValidator,
 };
+use ariadne::i18n_enum;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
+use derive_more::Display;
 use std::io::{self, Cursor};
 use std::mem;
 use std::sync::LazyLock;
@@ -41,18 +43,115 @@ mod shader;
 #[derive(Error, Debug)]
 pub enum ValidationError {
     #[error("Unable to read Zip Archive: {0}")]
-    Zip(#[from] zip::result::ZipError),
+    Zip(#[from] ZipError),
     #[error("IO Error: {0}")]
-    Io(#[from] std::io::Error),
+    Io(#[from] io::Error),
     #[error("Error while validating JSON for uploaded file: {0}")]
     SerDe(#[from] serde_json::Error),
     #[error("Invalid Input: {0}")]
-    InvalidInput(std::borrow::Cow<'static, str>),
+    InvalidInput(std::borrow::Cow<'static, str>), // TODO: Use I18nEnum
     #[error("Error while managing threads")]
     Blocking(#[from] actix_web::error::BlockingError),
     #[error("Error while querying database")]
     Database(#[from] DatabaseError),
 }
+
+i18n_enum!(
+    ValidationError,
+    root_key: "labrinth.error.file_validation",
+    Zip(cause) => "zip",
+    Io(cause) => "io",
+    SerDe(cause) => "serialization",
+    InvalidInput(cause) => "invalid_input",
+    Blocking(..) => "blocking",
+    Database(..) => "database",
+);
+
+#[derive(Eq, PartialEq, Debug, Display)]
+pub enum ValidationWarning {
+    #[display(
+        "No pack.mcmeta present for datapack file. Tip: Make sure pack.mcmeta is in the root directory of your datapack!"
+    )]
+    MissingDatapackPackMcmeta,
+    #[display("No fabric.mod.json present for Fabric file.")]
+    MissingFabricModJson,
+    #[display("No mods.toml or valid class files present for Forge file.")]
+    MissingModsToml,
+    #[display(
+        "Forge mod file does not contain mcmod.info or valid class files!"
+    )]
+    MissingMcmodInfo,
+    #[display("No litemod.json present for LiteLoader file.")]
+    MissingLitemodJson,
+    #[display("Pack manifest is missing.")]
+    MissingPackManifest,
+    #[display(
+        "No neoforge.mods.toml, mods.toml, or valid class files present for NeoForge file."
+    )]
+    MissingNeoforgeModsToml,
+    #[display("No plugin.yml or paper-plugin.yml present for plugin file.")]
+    MissingBukkitPluginYml,
+    #[display("No plugin.yml or bungee.yml present for plugin file.")]
+    MissingBungeecordPluginYml,
+    #[display("No velocity-plugin.json present for plugin file.")]
+    MissingVelocityPluginJson,
+    #[display(
+        "No sponge_plugins.json or mcmod.info present for Sponge plugin."
+    )]
+    MissingSpongePluginsJson,
+    #[display("No quilt.mod.json present for Quilt file.")]
+    MissingQuiltModJson,
+    #[display(
+        "No pack.mcmeta present for resource pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!"
+    )]
+    MissingResourcePackPackMcmeta,
+    #[display("No pack.txt present for pack file.")]
+    MissingPackTxt,
+    #[display("No riftmod.json present for Rift file.")]
+    MissingRiftmodJson,
+    #[display("No shaders folder present for OptiFine/Iris shader.")]
+    MissingShadersFolder,
+    #[display(
+        "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!"
+    )]
+    MissingCanvasPackMcmeta,
+    #[display("No pipeline shaders folder present for canvas shaders.")]
+    MissingPipelinesFolder,
+    #[display(
+        "No pack.mcmeta or vanilla shaders folder present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!"
+    )]
+    MissingVanillaShadersFolder,
+    #[display("File extension is invalid for input file")]
+    WrongFileExtension,
+    #[display("Invalid modpack file. You must upload a valid .mrpack file.")]
+    InvalidMrpack,
+}
+
+i18n_enum!(
+    ValidationWarning,
+    root_key: "labrinth.warning.file_validation",
+    MissingDatapackPackMcmeta! => "missing_datapack_pack_mcmeta",
+    MissingFabricModJson! => "missing_fabric_mod_json",
+    MissingModsToml! => "missing_mods_toml",
+    MissingMcmodInfo! => "missing_mcmod_info",
+    MissingLitemodJson! => "missing_litemod_json",
+    MissingPackManifest! => "missing_pack_manifest",
+    MissingNeoforgeModsToml! => "missing_neoforge_mods_toml",
+    MissingBukkitPluginYml! => "missing_bukkit_plugin_yml",
+    MissingBungeecordPluginYml! => "missing_bungeecord_plugin_yml",
+    MissingVelocityPluginJson! => "missing_velocity_plugin_json",
+    MissingSpongePluginsJson! => "missing_sponge_plugins_json",
+    MissingQuiltModJson! => "missing_quilt_mod_json",
+    MissingResourcePackPackMcmeta! => "missing_resource_pack_pack_mcmeta",
+    MissingPackTxt! => "missing_pack_txt",
+    MissingRiftmodJson! => "missing_riftmod_json",
+    MissingShadersFolder! => "missing_shaders_folder",
+    MissingCanvasPackMcmeta! => "missing_canvas_pack_mcmeta",
+    MissingPipelinesFolder! => "missing_pipelines_folder",
+    MissingVanillaShadersFolder! => "missing_vanilla_shaders_folder",
+    WrongFileExtension! => "wrong_file_extension",
+    InvalidMrpack! => "invalid_mrpack",
+);
 
 #[derive(Eq, PartialEq, Debug)]
 pub enum ValidationResult {
@@ -64,7 +163,7 @@ pub enum ValidationResult {
     /// File should be marked as primary
     Pass,
     /// File should not be marked primary, the reason for which is inside the String
-    Warning(&'static str),
+    Warning(ValidationWarning),
 }
 
 impl ValidationResult {
@@ -96,7 +195,7 @@ pub trait Validator: Sync {
 
     fn validate(
         &self,
-        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+        archive: &mut ZipArchive<Cursor<Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         // By default, any non-protected ZIP archive is valid
         let _ = archive;
@@ -172,7 +271,7 @@ static PLAUSIBLE_PACK_REGEX: LazyLock<regex::bytes::Regex> =
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file
 #[allow(clippy::too_many_arguments)]
 pub async fn validate_file(
-    data: bytes::Bytes,
+    data: Bytes,
     file_extension: String,
     loaders: Vec<Loader>,
     file_type: Option<FileType>,
@@ -182,7 +281,7 @@ pub async fn validate_file(
 ) -> Result<ValidationResult, ValidationError> {
     let game_versions = version_fields
         .into_iter()
-        .find_map(|v| MinecraftGameVersion::try_from_version_field(&v).ok())
+        .find_map(|v| MinecraftGameVersion::try_from_version_field(v).ok())
         .unwrap_or_default();
     let all_game_versions =
         MinecraftGameVersion::list(None, None, &mut *transaction, redis)
@@ -264,9 +363,7 @@ async fn validate_minecraft_file(
 
         if visited {
             if ALWAYS_ALLOWED_EXT.contains(&&*file_extension) {
-                Ok(ValidationResult::Warning(
-                    "File extension is invalid for input file",
-                ))
+                Ok(ValidationResult::Warning(ValidationWarning::WrongFileExtension))
             } else {
                 Err(ValidationError::InvalidInput(
                     format!("File extension {file_extension} is invalid for input file").into(),
@@ -314,7 +411,7 @@ fn game_version_supported(
 }
 
 pub fn filter_out_packs(
-    archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+    archive: &mut ZipArchive<Cursor<Bytes>>,
 ) -> Result<ValidationResult, ValidationError> {
     if (archive.by_name("modlist.html").is_ok()
         && archive.by_name("manifest.json").is_ok())
@@ -325,9 +422,7 @@ pub fn filter_out_packs(
             .file_names()
             .any(|x| x.starts_with("override/mods/") && x.ends_with(".jar"))
     {
-        return Ok(ValidationResult::Warning(
-            "Invalid modpack file. You must upload a valid .MRPACK file.",
-        ));
+        return Ok(ValidationResult::Warning(ValidationWarning::InvalidMrpack));
     }
 
     Ok(ValidationResult::Pass)

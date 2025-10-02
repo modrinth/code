@@ -1,9 +1,9 @@
-use super::ApiError;
 use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
 use crate::models::projects::{Project, Version, VersionType};
 use crate::models::v2::projects::{LegacyProject, LegacyVersion};
 use crate::queue::session::AuthQueue;
+use crate::routes::error::ApiError;
 use crate::routes::v3::version_file::HashQuery;
 use crate::routes::{v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};

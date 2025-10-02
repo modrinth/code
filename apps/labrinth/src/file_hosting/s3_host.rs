@@ -1,6 +1,6 @@
 use crate::file_hosting::{
     DeleteFileData, FileHost, FileHostPublicity, FileHostingError,
-    UploadFileData,
+    S3ErrorAction, UploadFileData,
 };
 use async_trait::async_trait;
 use bytes::Bytes;
@@ -51,7 +51,10 @@ impl S3Host {
                     },
                 )
                 .map_err(|e| {
-                    FileHostingError::S3Error("creating Bucket instance", e)
+                    FileHostingError::S3Error(
+                        S3ErrorAction::CreatingBucketInstance,
+                        e,
+                    )
                 })?;
 
                 bucket.name = config.name;
@@ -97,7 +100,9 @@ impl FileHost for S3Host {
                 content_type,
             )
             .await
-            .map_err(|e| FileHostingError::S3Error("uploading file", e))?;
+            .map_err(|e| {
+                FileHostingError::S3Error(S3ErrorAction::UploadingFile, e)
+            })?;
 
         Ok(UploadFileData {
             file_name: file_name.to_string(),
@@ -121,7 +126,10 @@ impl FileHost for S3Host {
             .presign_get(format!("/{file_name}"), expiry_secs, None)
             .await
             .map_err(|e| {
-                FileHostingError::S3Error("generating presigned URL", e)
+                FileHostingError::S3Error(
+                    S3ErrorAction::GeneratingPresignedUrl,
+                    e,
+                )
             })?;
         Ok(url)
     }
@@ -134,7 +142,9 @@ impl FileHost for S3Host {
         self.get_bucket(file_publicity)
             .delete_object(format!("/{file_name}"))
             .await
-            .map_err(|e| FileHostingError::S3Error("deleting file", e))?;
+            .map_err(|e| {
+                FileHostingError::S3Error(S3ErrorAction::DeletingFile, e)
+            })?;
 
         Ok(DeleteFileData {
             file_name: file_name.to_string(),
