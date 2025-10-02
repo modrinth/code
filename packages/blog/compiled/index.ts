@@ -26,6 +26,7 @@ import { article as redesign } from "./redesign";
 import { article as russian_censorship } from "./russian_censorship";
 import { article as skins_now_in_modrinth_app } from "./skins_now_in_modrinth_app";
 import { article as standing_by_our_values } from "./standing_by_our_values";
+import { article as standing_by_our_values_russian } from "./standing_by_our_values_russian";
 import { article as two_years_of_modrinth } from "./two_years_of_modrinth";
 import { article as two_years_of_modrinth_history } from "./two_years_of_modrinth_history";
 import { article as whats_modrinth } from "./whats_modrinth";
@@ -37,6 +38,7 @@ export const articles = [
   two_years_of_modrinth,
   two_years_of_modrinth_history,
   standing_by_our_values,
+  standing_by_our_values_russian,
   skins_now_in_modrinth_app,
   russian_censorship,
   redesign,

@@ -6,6 +6,7 @@ export const article = {
   date: "2025-03-13T00:00:00.000Z",
   slug: "a-new-chapter-for-modrinth-servers",
   authors: ["MpxzqsyW","Dc7EYhxG"],
+  unlisted: false,
   thumbnail: true,
   
 };
