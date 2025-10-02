@@ -3,7 +3,7 @@ use actix_web::middleware::from_fn;
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
-use futures::FutureExt;
+
 use labrinth::app_config;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
@@ -262,23 +262,24 @@ async fn main() -> std::io::Result<()> {
                     http.method = %req.method(),
                     http.client_ip = %req.connection_info().realip_remote_addr().unwrap_or(""),
                     http.user_agent = %req.headers().get("User-Agent").map_or("", |h| h.to_str().unwrap_or("")),
-                    http.target = %req.uri().path_and_query().map_or("", |p| p.as_str())
+                    http.target = %req.uri().path_and_query().map_or("", |p| p.as_str()),
+                    http.authenticated = %req.headers().get("Authorization").is_some()
                 );
 
-                srv.call(req)
-                    .instrument(span)
-                    .inspect(|result| {
-                        _ = result.as_ref().inspect(|resp| {
-                            let _span = info_span!(
-                                "HTTP response",
-                                http.status = %resp.response().status().as_u16(),
-                            ).entered();
+                let fut = srv.call(req);
+                async move {
+                    fut.await.inspect(|resp| {
+                        let _span = info_span!(
+                            "HTTP response",
+                            http.status = %resp.response().status().as_u16(),
+                        ).entered();
 
-                            resp.response()
-                                .error()
-                                .inspect(|err| log_error(err));
-                        });
+                        resp.response()
+                            .error()
+                            .inspect(|err| log_error(err));
                     })
+                }
+                .instrument(span)
             })
             .wrap(prometheus.clone())
             .wrap(from_fn(rate_limit_middleware))
