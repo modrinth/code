@@ -1,6 +1,6 @@
 ---
 title: Standing By Our Values
-summary: Keeping LGBTQIA+ content visible despite demands from Russia
+summary: Keeping LGBTQIA+ content visible despite demands from Russia.
 date: 2025-10-01T17:00:00-07:00
 ---
 
@@ -46,3 +46,7 @@ Thank you for holding us accountable. Thank you for trusting us to do better. An
 If you are in danger or need resources, please consider reaching out to [Rainbow Railroad](https://www.rainbowrailroad.org/), an organization dedicated to helping LGBTQ+ people escape oppression.
 
 💚 The Modrinth Team
+
+[Also available in Russian / Перевод на русский](../standing-by-our-values-russian)
+
+Our previous, outdated post announcing the Russian censorship can be found archived [here](../russian-censorship).

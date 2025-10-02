@@ -6,6 +6,7 @@ export const article = {
   date: "2024-09-13T20:00:00.000Z",
   slug: "becoming-sustainable",
   authors: ["MpxzqsyW","Dc7EYhxG"],
+  unlisted: false,
   thumbnail: true,
   short_title: "Becoming Sustainable",
   short_summary: "Announcing 5x creator revenue and updates to the monetization program.",

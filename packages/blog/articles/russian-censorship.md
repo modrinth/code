@@ -2,7 +2,10 @@
 title: Russia forced us to do this
 summary: Update on censorship for Russian users and our continued support for those affected.
 date: 2025-09-30T18:30:00-07:00
+unlisted: true
 ---
+
+**This post has been preserved for archival reasons, but no longer reflects Modrinth policy on compliance with government censorship. Please see our updated post [here](../standing-by-our-values) on our choice to stand up to the Russian government.**
 
 Hi everyone,
 

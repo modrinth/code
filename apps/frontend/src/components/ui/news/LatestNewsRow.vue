@@ -46,7 +46,9 @@ const articles = ref(
 			title: article.title,
 			summary: article.summary,
 			date: article.date,
+			unlisted: article.unlisted,
 		}))
+		.filter((a) => !a.unlisted)
 		.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
 )
 
