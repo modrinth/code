@@ -1,6 +1,6 @@
 ---
 title: Standing By Our Values
-summary: We’re deeply sorry to our LGBTQ+ creators and users, and we stand with you.
+summary: Keeping LGBTQIA+ content visible despite demands from Russia
 date: 2025-10-01T17:00:00-07:00
 ---
 
@@ -11,7 +11,8 @@ We had only that day to make a decision. The entire Modrinth team spent over 5 h
 - Restrict all content on Modrinth for over a million Russian users
 - Directly impact creators’ livelihoods, either Russian creators themselves or those whose work is widely played by Russian users
 - Comply with censorship requests that go directly against our values and beliefs
-  Money did not factor into our decision. It costs Modrinth hundreds of dollars a month in bandwidth cost alone to serve content to Russian users while we do not make ad revenue from them.
+
+Money did not factor into our decision. It costs Modrinth hundreds of dollars a month in bandwidth cost alone to serve content to Russian users while we do not make ad revenue from them.
 
 ![A screenshot of the Modrinth ad revenue statistics showcasing Russian Ad revenue in the month of August 2025](./russia-ad-rev.png)
 _Ad revenue from Russian users for the month of September._
