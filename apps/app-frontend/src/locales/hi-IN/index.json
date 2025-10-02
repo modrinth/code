@@ -41,6 +41,12 @@
   "instance.edit-server.title": {
     "message": "सेवक का सम्पादन करें"
   },
+  "instance.edit-world.name": {
+    "message": "Nam"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft ki dunia"
+  },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "चिह्न हटाएँ"
   },

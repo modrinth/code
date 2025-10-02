@@ -16,6 +16,9 @@ export default {
 	'payout-available': () => import('./templates/account/PayoutAvailable.vue'),
 	'personal-access-token-created': () => import('./templates/account/PATCreated.vue'),
 
+	// Subscriptions
+	'subscription-tax-change': () => import('./templates/account/SubscriptionTaxChange.vue'),
+
 	// Moderation
 	'report-submitted': () => import('./templates/moderation/ReportSubmitted.vue'),
 	'report-status-updated': () => import('./templates/moderation/ReportStatusUpdated.vue'),

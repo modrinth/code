@@ -137,6 +137,9 @@
   "labrinth.error.creation.invalid_input.validation": {
     "message": "Error while validating input: {cause}"
   },
+  "labrinth.error.creation.limit_reached": {
+    "message": "Project limit reached"
+  },
   "labrinth.error.creation.missing_value.content_file_extension": {
     "message": "Missing content file extension"
   },
@@ -470,6 +473,9 @@
   "labrinth.error.unauthorized.specific.delete_org": {
     "message": "You don''t have permission to delete this organization!"
   },
+  "labrinth.error.unauthorized.specific.delete_own_affiliate_code": {
+    "message": "You do not have permission to delete your affiliate codes!"
+  },
   "labrinth.error.unauthorized.specific.delete_project": {
     "message": "You don''t have permission to delete this project!"
   },
@@ -629,6 +635,9 @@
   "labrinth.error.unauthorized.specific.read_all_affiliate_codes": {
     "message": "You do not have permission to read all affiliate codes!"
   },
+  "labrinth.error.unauthorized.specific.read_own_affiliate_codes": {
+    "message": "You do not have permission to view your affiliate codes!"
+  },
   "labrinth.error.unauthorized.specific.refund": {
     "message": "You do not have permission to refund a subscription!"
   },
@@ -667,6 +676,9 @@
   },
   "labrinth.error.unauthorized.specific.unknown_user_ip": {
     "message": "Unable to obtain user IP address!"
+  },
+  "labrinth.error.unauthorized.specific.update_own_affiliate_code": {
+    "message": "You do not have permission to update your affiliate codes!"
   },
   "labrinth.error.unauthorized.specific.upload_project_images": {
     "message": "You are not authorized to upload images for this project"
@@ -758,6 +770,9 @@
   "labrinth.notification.body.status_change": {
     "message": "Status has changed from {old_status} to {new_status}"
   },
+  "labrinth.notification.body.tax_notification": {
+    "message": "You''ve received a tax notification."
+  },
   "labrinth.notification.body.team_invite": {
     "message": "An invite has been sent for you to be {role} of a team"
   },
@@ -832,6 +847,9 @@
   },
   "labrinth.notification.type.status_change": {
     "message": "Project status has changed"
+  },
+  "labrinth.notification.type.tax_notification": {
+    "message": "Tax notification"
   },
   "labrinth.notification.type.team_invite": {
     "message": "You have been invited to join a team!"

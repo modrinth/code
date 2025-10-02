@@ -154,21 +154,27 @@ impl EmailQueue {
         })
     }
 
+    /// Works on the email queue for up to `limit` items.
+    ///
+    /// Don't use a value too large for `limit`, as this method uses a single long running transaction to hold locks
+    /// on the deliveries. Something around 5 is good.
+    ///
+    /// Returns `Ok(false)` if no emails were processed, `Ok(true)` if some were processed.
     #[instrument(name = "EmailQueue::index", skip_all)]
-    pub async fn index(&self) -> Result<(), ApiError> {
+    pub async fn index(&self, limit: i64) -> Result<bool, ApiError> {
         let transport = self.mailer.lock().await.to_transport().await?;
 
         let begin = std::time::Instant::now();
 
         let mut deliveries = DBNotificationDelivery::lock_channel_processable(
             NotificationChannel::Email,
-            50,
+            limit,
             &self.pg,
         )
         .await?;
 
         if deliveries.is_empty() {
-            return Ok(());
+            return Ok(false);
         }
 
         let n_to_process = deliveries.len();
@@ -242,7 +248,7 @@ impl EmailQueue {
                         let update_next_attempt =
                             status == NotificationDeliveryStatus::Pending;
 
-                        let mut delivery = deliveries.remove(idx);
+                        let mut delivery = deliveries.swap_remove(idx);
                         delivery.status = status;
                         delivery.next_attempt += if update_next_attempt {
                             chrono::Duration::seconds(EMAIL_RETRY_DELAY_SECONDS)
@@ -275,7 +281,7 @@ impl EmailQueue {
             begin.elapsed().as_millis()
         );
 
-        Ok(())
+        Ok(true)
     }
 
     pub async fn send_one(

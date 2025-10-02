@@ -84,7 +84,7 @@
     "message": "Supprimer l'instance"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Suppression définitive de l’instance du stockage de l’appareil, cela comprend les mondes, configurations et tout le contenu installé. Soyez prudent, car après la suppression d’une instance il n’y a pas de moyen de récupérer les données."
+    "message": "Supprime définitivement une instance de votre appareil, y compris vos mondes, vos paramètres et tout le contenu installé. Attention, une fois supprimée, il est impossible de la récupérer."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Suppression..."
@@ -114,7 +114,7 @@
     "message": "Sélectionner l'icône"
   },
   "instance.settings.tabs.general.library-groups": {
-    "message": "Bibliothèque des groupes"
+    "message": "Groupes de la bibliothèque"
   },
   "instance.settings.tabs.general.library-groups.create": {
     "message": "Créer un nouveau groupe"
@@ -294,13 +294,13 @@
     "message": "Délier l'instance"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Si vous continuez, vous ne pourrez plus relier celle-ci sans créer une nouvelle instance. Vous ne receverez plus de mises à jour de modpack et celle-ci deviendra normalle."
+    "message": "Si vous continuez, vous ne pourrez pas la relier de nouveau sans créer une toute nouvelle instance. Vous ne recevrez plus de mises à jour du modpack et elle deviendra une instance normale."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "Êtes-vous sûr de vouloir délier cette instance ?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Cette instance est liée à un modpack, ce qui veut dire que les mods ne peuvent être mis à jour et vous ne pouvez pas changer le modloader ou la version de Minecraft. Délier va déconnecter l'instance du modpack de façon permanente."
+    "message": "Cette instance est liée à un modpack, ce qui veut dire que les mods ne peuvent être mis à jour et vous ne pouvez pas changer le modloader ou la version de Minecraft. La délier va déconnecter l'instance du modpack de façon permanente."
   },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Délier du modpack"
@@ -327,13 +327,13 @@
     "message": "Fenêtre"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Paramètres custom de fenêtre"
+    "message": "Paramètres de fenêtre personnalisés"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Plein écran"
   },
   "instance.settings.tabs.window.fullscreen.description": {
-    "message": "Faire le jeu démarrer en plein écran au lancement (en utilisant options.txt)."
+    "message": "Faire démarrer le jeu en plein écran au lancement (en utilisant options.txt)."
   },
   "instance.settings.tabs.window.height": {
     "message": "Hauteur"
@@ -399,7 +399,7 @@
     "message": "Solo"
   },
   "instance.worlds.view_instance": {
-    "message": "Montrer l'instance"
+    "message": "Voir l'instance"
   },
   "instance.worlds.world_in_use": {
     "message": "Le monde en cours d'utilisation"

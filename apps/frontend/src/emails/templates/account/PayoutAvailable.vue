@@ -17,7 +17,7 @@ import StyledEmail from '@/emails/shared/StyledEmail.vue'
 		<Text class="text-base">Hi {user.name},</Text>
 
 		<Text class="text-base">
-			The ${payout.amount} earned during {payout.period} has been processed and is now available to
+			The {payout.amount} earned during {payout.period} has been processed and is now available to
 			withdraw from your account.
 		</Text>
 

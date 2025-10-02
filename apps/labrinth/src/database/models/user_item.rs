@@ -579,6 +579,16 @@ impl DBUser {
             .execute(&mut **transaction)
             .await?;
 
+            sqlx::query!(
+                "
+                DELETE FROM notifications_deliveries
+                WHERE notification_id = ANY($1)
+                ",
+                &notifications
+            )
+            .execute(&mut **transaction)
+            .await?;
+
             let user_collections = sqlx::query!(
                 "
                 SELECT id

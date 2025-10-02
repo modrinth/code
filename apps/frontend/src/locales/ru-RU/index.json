@@ -3,7 +3,7 @@
     "message": "Пользователь не найден"
   },
   "app-marketing.download.description": {
-    "message": "Наш продукт доступен на всех платформах, выберите вашу желаемую версию."
+    "message": "Наше приложение доступно на всех платформах — выберите желаемую версию."
   },
   "app-marketing.download.download-appimage": {
     "message": "Скачать AppImage"
@@ -21,7 +21,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Версии Modrinth App для Linux могут работать <issues-link>неправильно</issues-link> на некоторых системах и конфигурациях. Если приложение Modrinth работает нестабильно на вашей системе, мы рекомендуем попробовать другие приложения, такие как <prism-link>Prism Launcher</prism-link>, для простой установки контента с Modrinth."
+    "message": "Версии Modrinth App для Linux могут работать <issues-link>неправильно</issues-link> на некоторых системах и конфигурациях. Если на вашей системе приложение работает нестабильно, рекомендуем попробовать лаунчеры наподобие <prism-link>Prism Launcher</prism-link> для простой установки контента с Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -36,7 +36,7 @@
     "message": "Сторонние пакеты"
   },
   "app-marketing.download.title": {
-    "message": "Скачать Modrinth App (Бета)"
+    "message": "Скачать Modrinth App (бета-версия)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -93,7 +93,7 @@
     "message": "Modrinth App имеет полностью открытый исходный код, доступный на <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
-    "message": "Открытый код"
+    "message": "Открытый исходный код"
   },
   "app-marketing.features.performance.activity-monitor": {
     "message": "Активности"
@@ -144,7 +144,7 @@
     "message": "Скачивайте и играйте в любимые сборки и моды, используя Modrinth App."
   },
   "app-marketing.features.play.title": {
-    "message": "Играйте с вашими любимыми модами"
+    "message": "Играйте с любимыми модами"
   },
   "app-marketing.features.sharing.description": {
     "message": "Создавайте, делитесь и играйте в сборки, используя любую из тысяч модов и сборок на Modrinth."
@@ -567,7 +567,7 @@
     "message": "Не удалось загрузить случайные проекты :("
   },
   "landing.feature.follow.description": {
-    "message": "Узнавайте о каждом обновлении и оставайтесь на связи с любимыми проектами"
+    "message": "Узнавайте о каждом обновлении и оставайтесь на связи с любимыми проектами."
   },
   "landing.feature.follow.heading": {
     "message": "Следите за тем, что нравится"
@@ -642,7 +642,7 @@
     "message": "Сортировать по"
   },
   "landing.section.for-creators.description": {
-    "message": "Разместите свои творения и найдите новых поклонников среди огромного сообщества игроков"
+    "message": "Разместите свои творения и найдите новых поклонников среди огромного сообщества игроков."
   },
   "landing.section.for-creators.label": {
     "message": "Для авторов"
@@ -651,7 +651,7 @@
     "message": "Делитесь творениями с миром"
   },
   "landing.section.for-players.description": {
-    "message": "От магических биомов до проклятых подземелий — найдите контент, который выведет игру на новый уровень."
+    "message": "От магических биомов до проклятых подземелий — вы точно найдёте контент, который выведет игру на новый уровень."
   },
   "landing.section.for-players.label": {
     "message": "Для игроков"
@@ -660,13 +660,40 @@
     "message": "Более {count} творений"
   },
   "landing.subheading": {
-    "message": "Находите, играйте и делитесь творениями для Minecraft на платформе с открытым кодом, созданной для сообщества."
+    "message": "Находите, играйте и делитесь творениями для Minecraft на платформе с открытым исходным кодом, созданной для сообщества."
   },
   "layout.action.change-theme": {
     "message": "Изменить тему"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Получить Modrinth App"
+  "layout.action.close-banner": {
+    "message": "Закрыть"
+  },
+  "layout.action.create-new": {
+    "message": "Создать..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Поиск файла"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Поиск по почте"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Оповещения серверов"
+  },
+  "layout.action.new-collection": {
+    "message": "Новая коллекция"
+  },
+  "layout.action.new-organization": {
+    "message": "Новая организация"
+  },
+  "layout.action.new-project": {
+    "message": "Новый проект"
+  },
+  "layout.action.reports": {
+    "message": "Жалобы"
+  },
+  "layout.action.review-projects": {
+    "message": "Проверка проектов"
   },
   "layout.avatar.alt": {
     "message": "Ваш аватар"
@@ -732,7 +759,7 @@
     "message": "НЕ ЯВЛЯЕТСЯ ОФИЦИАЛЬНЫМ СЕРВИСОМ MINECRAFT. НЕ ОДОБРЕНО И НЕ СВЯЗАНО С КОМПАНИЕЙ MOJANG ИЛИ MICROSOFT."
   },
   "layout.footer.legal.copyright-policy": {
-    "message": "Защита авторских прав и DMCA"
+    "message": "Политика авторских прав и DMCA"
   },
   "layout.footer.legal.privacy-policy": {
     "message": "Политика конфиденциальности"
@@ -746,8 +773,11 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Условия использования"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Информация о Modrinth"
+  },
   "layout.footer.open-source": {
-    "message": "Modrinth с <github-link>открытым кодом</github-link>."
+    "message": "Modrinth — <github-link>открытый проект</github-link>."
   },
   "layout.footer.products": {
     "message": "Продукты"
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "Ищите и публикуйте проекты для Minecraft!"
   },
+  "layout.nav.analytics": {
+    "message": "Аналитика"
+  },
+  "layout.nav.discover": {
+    "message": "Найти"
+  },
+  "layout.nav.discover-content": {
+    "message": "Найти проекты"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Экспериментальные функции"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Скачать Modrinth App"
+  },
   "layout.nav.home": {
     "message": "Главная"
   },
+  "layout.nav.host-a-server": {
+    "message": "Создать сервер"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Главная страница Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Организации"
+  },
+  "layout.nav.profile": {
+    "message": "Профиль"
+  },
+  "layout.nav.projects": {
+    "message": "Проекты"
+  },
+  "layout.nav.revenue": {
+    "message": "Доход"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Сохранённые проекты"
+  },
   "layout.nav.search": {
     "message": "Поиск"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Обновиться до Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Фильтры"
@@ -843,7 +915,7 @@
     "message": "Пользователь не найден"
   },
   "profile.joined-at": {
-    "message": "Регистрация: <date>{ago}</date>"
+    "message": "Присоединился <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Значки"
@@ -900,16 +972,16 @@
     "message": "Не удалось принять приглашение в команду"
   },
   "project-member-header.invitation-no-role": {
-    "message": "Вас пригласили присоединиться к этому проекту. Пожалуйста, примите или отклоните это приглашение."
+    "message": "Вас пригласили стать участником этого проекта. Примите или отклоните приглашение."
   },
   "project-member-header.invitation-title": {
-    "message": "Приглашение присоединиться к проекту"
+    "message": "Приглашение в проект"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Вас пригласили стать участником этого проекта как \"{role}\"."
+    "message": "Вас пригласили стать участником этого проекта в роли «{role}»."
   },
   "project-member-header.success": {
-    "message": "Успех"
+    "message": "Выполнено"
   },
   "project-member-header.success-decline": {
     "message": "Вы отклонили приглашение в команду"
@@ -921,28 +993,28 @@
     "message": "Контрольный список для публикации"
   },
   "project-moderation-nags.required": {
-    "message": "Требуется"
+    "message": "Обязательно"
   },
   "project-moderation-nags.resubmit-for-review": {
-    "message": "Повторно отправить на проверку"
+    "message": "Запросите перепроверку"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
     "message": "Ваш проект был {status} персоналом Modrinth. В большинстве случаев Вы можете повторно отправить на рассмотрение после прочтения сообщения персонала."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
-    "message": "Вы должны выполнить обязательные стадии в контрольном списке!"
+    "message": "Необходимо выполнить обязательные действия в контрольном списке!"
   },
   "project-moderation-nags.submit-for-review": {
-    "message": "Отправить на проверку"
+    "message": "Запросите проверку"
   },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Ваш проект доступен для просмотра только участникам проекта. Для публикации он должен быть проверен модераторами."
   },
   "project-moderation-nags.suggestion": {
-    "message": "Предложения"
+    "message": "Предложение"
   },
   "project-moderation-nags.visit-moderation-page": {
-    "message": "Посетить страницу модерации"
+    "message": "Связаться с модерацией"
   },
   "project-moderation-nags.warning": {
     "message": "Предупреждение"
@@ -999,16 +1071,16 @@
     "message": "Создан {date}"
   },
   "project.about.details.licensed": {
-    "message": "Лицензированно {license}"
+    "message": "Лицензия: {license}"
   },
   "project.about.details.published": {
-    "message": "Опубликовано {date}"
+    "message": "Размещён {date}"
   },
   "project.about.details.submitted": {
-    "message": "Подтверждено {date}"
+    "message": "Отправлен {date}"
   },
   "project.about.details.title": {
-    "message": "Детали"
+    "message": "Сведения"
   },
   "project.about.details.updated": {
     "message": "Обновлён {date}"
@@ -1020,10 +1092,10 @@
     "message": "Создать сервер"
   },
   "project.actions.dont-show-again": {
-    "message": "Не показывать снова"
+    "message": "Больше не показывать"
   },
   "project.actions.review-project": {
-    "message": "Пересмотреть проект"
+    "message": "Проверить проект"
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers это самый простой способ для игры с вашими друзьями без хлопот!"

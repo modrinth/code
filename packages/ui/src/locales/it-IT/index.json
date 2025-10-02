@@ -108,10 +108,10 @@
     "defaultMessage": "Server"
   },
   "changelog.product.web": {
-    "defaultMessage": "Sito Web"
+    "defaultMessage": "Sito web"
   },
   "collection.label.private": {
-    "defaultMessage": "Privata"
+    "defaultMessage": "Privato"
   },
   "icon-select.edit": {
     "defaultMessage": "Modifica icona"
@@ -150,7 +150,7 @@
     "defaultMessage": "Modalità sopravvivenza"
   },
   "instance.worlds.game_mode.unknown": {
-    "defaultMessage": "Modalità sconosciuta"
+    "defaultMessage": "Modalità di gioco sconosciuta"
   },
   "label.changes-saved": {
     "defaultMessage": "Modifiche salvate"
@@ -159,7 +159,7 @@
     "defaultMessage": "Raccolte"
   },
   "label.created-ago": {
-    "defaultMessage": "Creazione {ago}"
+    "defaultMessage": "Creato {ago}"
   },
   "label.dashboard": {
     "defaultMessage": "Bacheca"
@@ -358,6 +358,60 @@
   },
   "project-type.all": {
     "defaultMessage": "Tutti"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} other {Data Pack}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Data Pack"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {data Pack} other {data Pack}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mod}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mod"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} other {mod}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpack}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpack"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpack} other {modpack}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugin}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Plugin"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugin}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Pachetto Risorse} other {Pacchetti Risorse}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Pacchetti Risorse"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {pachetto risorse} other {pacchetti risorse}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shader}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shader"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shader}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Ambienti supportati"

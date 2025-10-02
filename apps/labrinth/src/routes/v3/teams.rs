@@ -1,4 +1,4 @@
-use crate::auth::checks::is_visible_project;
+use crate::auth::checks::{is_visible_organization, is_visible_project};
 use crate::auth::get_user_from_headers;
 use crate::database::DBProject;
 use crate::database::models::notification_item::NotificationBuilder;
@@ -131,18 +131,21 @@ pub async fn team_members_get_organization(
     let organization_data =
         DBOrganization::get(&string, &**pool, &redis).await?;
 
-    if let Some(organization) = organization_data {
-        let current_user = get_user_from_headers(
-            &req,
-            &**pool,
-            &redis,
-            &session_queue,
-            Scopes::ORGANIZATION_READ,
-        )
-        .await
-        .map(|x| x.1)
-        .ok();
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::ORGANIZATION_READ,
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
 
+    if let Some(organization) = organization_data
+        && is_visible_organization(&organization, &current_user, &pool, &redis)
+            .await?
+    {
         let members_data = DBTeamMember::get_from_team_full(
             organization.team_id,
             &**pool,

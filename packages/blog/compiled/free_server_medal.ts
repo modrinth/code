@@ -6,6 +6,7 @@ export const article = {
   date: "2025-08-20T22:25:00.000Z",
   slug: "free-server-medal",
   authors: ["AJfd8YH6"],
+  unlisted: false,
   thumbnail: true,
   
 };

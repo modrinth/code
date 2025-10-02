@@ -73,6 +73,8 @@ pub enum ApiError {
     Conflict(String),
     #[error("External tax compliance API Error")]
     TaxComplianceApi,
+    #[error(transparent)]
+    TaxProcessor(#[from] crate::util::anrok::AnrokError),
     #[error(
         "You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining."
     )]
@@ -114,6 +116,7 @@ i18n_enum!(
     RouteNotFound! => "not_found.route",
     Conflict(cause) => "conflict",
     TaxComplianceApi! => "tax_compliance_api_error",
+    TaxProcessor(transparent cause) => "tax_processor_error",
     RateLimitError(wait_ms, total_allowed_requests) => "ratelimit_error",
     Stripe(cause) => "stripe_error",
 );
@@ -130,6 +133,12 @@ pub enum SpecificAuthenticationError {
     ReadAffiliateCode,
     #[error("You do not have permission to delete an affiliate code!")]
     DeleteAffiliateCode,
+    #[error("You do not have permission to view your affiliate codes!")]
+    ReadOwnAffiliateCodes,
+    #[error("You do not have permission to update your affiliate codes!")]
+    UpdateOwnAffiliateCode,
+    #[error("You do not have permission to delete your affiliate codes!")]
+    DeleteOwnAffiliateCode,
     #[error("You do not have permission to refund a subscription!")]
     Refund,
     #[error("Invalid master key")]
@@ -348,6 +357,9 @@ i18n_enum!(
     UnknownAffiliateUser! => "unknown_affiliate_user",
     ReadAffiliateCode! => "read_affiliate_code",
     DeleteAffiliateCode! => "delete_affiliate_code",
+    ReadOwnAffiliateCodes! => "read_own_affiliate_codes",
+    UpdateOwnAffiliateCode! => "update_own_affiliate_code",
+    DeleteOwnAffiliateCode! => "delete_own_affiliate_code",
     Refund! => "refund",
     InvalidMasterKey! => "invalid_master_key",
     InsufficientOAuthPermissions! => "insufficient_oauth_permissions",
@@ -458,6 +470,7 @@ impl ResponseError for ApiError {
             ApiError::Io(..) => StatusCode::BAD_REQUEST,
             ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
             ApiError::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
+            ApiError::TaxProcessor(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Slack => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }

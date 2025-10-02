@@ -229,8 +229,7 @@
 										.filter(
 											(x) =>
 												(versionFilter && x.includes(versionFilter)) ||
-												(!versionFilter &&
-													(showAllVersions || (!x.includes('w') && !x.includes('-')))),
+												(!versionFilter && (showAllVersions || isReleaseGameVersion(x))),
 										)
 										.slice()
 										.reverse()"
@@ -279,6 +278,7 @@
 								</ButtonStyled>
 							</ScrollablePanel>
 							<Checkbox
+								v-if="showVersionsCheckbox"
 								v-model="showAllVersions"
 								class="mx-1"
 								:label="formatMessage(messages.showAllVersions)"
@@ -497,9 +497,11 @@
 								</nuxt-link>
 							</ButtonStyled>
 							<template #popper>
-								<div class="experimental-styles-within flex max-w-60 flex-col gap-1">
-									<div class="flex items-center justify-between gap-4">
-										<h3 class="m-0 flex items-center gap-2 text-base font-bold text-contrast">
+								<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+									<div class="flex min-w-60 items-center justify-between gap-4">
+										<h3
+											class="m-0 flex items-center gap-2 whitespace-nowrap text-base font-bold text-contrast"
+										>
 											{{ formatMessage(messages.serversPromoTitle) }}
 											<TagItem
 												:style="{
@@ -529,9 +531,18 @@
 									</p>
 
 									<p class="m-0 text-wrap text-sm font-bold text-primary">
-										{{ formatMessage(messages.serversPromoPricing, { monthly: `<span class="text-xs"
-											>${formatMessage(projectPageMessages.monthly)}</span
-										>` }) }}
+										<IntlFormatted
+											:message-id="messages.serversPromoPricing"
+											:values="{
+												price: formatPrice(locale, 500, 'USD', true),
+											}"
+										>
+											<template #small="{ children }">
+												<span class="text-xs">
+													<component :is="() => children" />
+												</span>
+											</template>
+										</IntlFormatted>
 									</p>
 								</div>
 							</template>
@@ -991,7 +1002,8 @@ import {
 	useRelativeTime,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { formatCategory, formatProjectType, renderString } from '@modrinth/utils'
+import { formatCategory, formatPrice, formatProjectType, renderString } from '@modrinth/utils'
+import { IntlFormatted } from '@vintl/vintl/components'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
@@ -1000,7 +1012,7 @@ import { navigateTo } from '#app'
 import Accordion from '~/components/ui/Accordion.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
-import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
+import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
@@ -1024,7 +1036,7 @@ const tags = useTags()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
-const { formatMessage } = useVIntl()
+const { locale, formatMessage } = useVIntl()
 
 const settingsModal = ref()
 const downloadModal = ref()
@@ -1063,6 +1075,40 @@ const currentPlatform = computed(() => {
 	return (
 		userSelectedPlatform.value || (project.value.loaders.length === 1 && project.value.loaders[0])
 	)
+})
+
+const releaseVersions = computed(() => {
+	const set = new Set()
+	for (const gv of tags.value.gameVersions || []) {
+		if (gv?.version && gv.version_type === 'release') set.add(gv.version)
+	}
+	return set
+})
+
+const nonReleaseVersions = computed(() => {
+	const set = new Set()
+	for (const gv of tags.value.gameVersions || []) {
+		if (gv?.version && gv.version_type !== 'release') set.add(gv.version)
+	}
+	return set
+})
+
+function isReleaseGameVersion(ver) {
+	if (releaseVersions.value.has(ver)) return true
+	if (nonReleaseVersions.value.has(ver)) return false
+	return true
+}
+
+const showVersionsCheckbox = computed(() => {
+	const list = project.value?.game_versions || []
+	let hasRelease = false
+	let hasNonRelease = false
+	for (const v of list) {
+		if (isReleaseGameVersion(v)) hasRelease = true
+		else hasNonRelease = true
+		if (hasRelease && hasNonRelease) return true
+	}
+	return false
 })
 
 function installWithApp() {
@@ -1220,10 +1266,6 @@ const messages = defineMessages({
 		id: 'project.moderation.title',
 		defaultMessage: 'Moderation',
 	},
-	monthly: {
-		id: 'project.actions.servers-promo.monthly',
-		defaultMessage: ' / month',
-	},
 	noCollectionsFound: {
 		id: 'project.collections.none-found',
 		defaultMessage: 'No collections found.',
@@ -1302,7 +1344,7 @@ const messages = defineMessages({
 	},
 	serversPromoPricing: {
 		id: 'project.actions.servers-promo.pricing',
-		defaultMessage: 'Starting at $5{monthly}',
+		defaultMessage: 'Starting at {price}<small> / month</small>',
 	},
 	serversPromoTitle: {
 		id: 'project.actions.servers-promo.title',
@@ -1664,9 +1706,18 @@ if (!route.name.startsWith('type-id-settings')) {
 const onUserCollectProject = useClientTry(userCollectProject)
 
 const { version, loader } = route.query
+
+if (
+	project.value.game_versions.length > 0 &&
+	project.value.game_versions.every((v) => !isReleaseGameVersion(v))
+) {
+	showAllVersions.value = true
+}
+
 if (version !== undefined && project.value.game_versions.includes(version)) {
 	userSelectedGameVersion.value = version
 }
+
 if (loader !== undefined && project.value.loaders.includes(loader)) {
 	userSelectedPlatform.value = loader
 }

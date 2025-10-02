@@ -57,6 +57,8 @@ pub enum CreateError {
     CreationAuthenticationError(CreationAuthenticationError),
     #[error("Image Parsing Error: {0}")]
     ImageError(#[from] ImageError),
+    #[error("Project limit reached")]
+    LimitReached,
 }
 
 i18n_enum!(
@@ -82,6 +84,7 @@ i18n_enum!(
     Unauthorized(cause_or_reason) => "unauthorized",
     CreationAuthenticationError(cause_or_reason) => "unauthorized",
     ImageError(cause) => "invalid_image",
+    LimitReached! => "limit_reached",
 );
 
 #[derive(Copy, Clone, Debug, Display)]
@@ -257,6 +260,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
+            CreateError::LimitReached => StatusCode::BAD_REQUEST,
         }
     }
 

@@ -567,7 +567,7 @@
     "message": "Falha ao carregar projetos aleatórios :("
   },
   "landing.feature.follow.description": {
-    "message": "Receba notificações para ficar por dentro das atualizações dos seus projetos favoritos"
+    "message": "Receba notificações para ficar por dentro das atualizações dos seus projetos favoritos."
   },
   "landing.feature.follow.heading": {
     "message": "Siga os projetos que você ama"
@@ -642,7 +642,7 @@
     "message": "Ordenar por"
   },
   "landing.section.for-creators.description": {
-    "message": "Dê um lar online para suas criações e alcance um enorme público de jogadores dedicados"
+    "message": "Dê um lar online para suas criações e alcance um enorme público de jogadores dedicados."
   },
   "landing.section.for-creators.label": {
     "message": "Para criadores"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "Mudar tema"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Baixe o Modrinth App"
+  "layout.action.close-banner": {
+    "message": "Fechar"
+  },
+  "layout.action.create-new": {
+    "message": "Criar novo..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Procurar arquivo"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Procurar por e-mail"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Gerenciar notificações do servidor"
+  },
+  "layout.action.new-collection": {
+    "message": "Nova coleção"
+  },
+  "layout.action.new-organization": {
+    "message": "Nova organização"
+  },
+  "layout.action.new-project": {
+    "message": "Novo projeto"
+  },
+  "layout.action.reports": {
+    "message": "Denúncias"
+  },
+  "layout.action.review-projects": {
+    "message": "Revisar projetos"
   },
   "layout.avatar.alt": {
     "message": "Seu avatar"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Termos de uso"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Informações do Modrinth"
+  },
   "layout.footer.open-source": {
     "message": "O Modrinth é de <github-link>código aberto</github-link>."
   },
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "Descubra e publique conteúdo de Minecraft!"
   },
+  "layout.nav.analytics": {
+    "message": "Estatísticas"
+  },
+  "layout.nav.discover": {
+    "message": "Descubra"
+  },
+  "layout.nav.discover-content": {
+    "message": "Descubra conteúdo"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Sinalização de recursos"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Baixe o Modrinth App"
+  },
   "layout.nav.home": {
     "message": "Início"
   },
+  "layout.nav.host-a-server": {
+    "message": "Hospede um servidor"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Página principal do Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizações"
+  },
+  "layout.nav.profile": {
+    "message": "Perfil"
+  },
+  "layout.nav.projects": {
+    "message": "Projetos"
+  },
+  "layout.nav.revenue": {
+    "message": "Faturamento"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Projetos salvos"
+  },
   "layout.nav.search": {
     "message": "Buscar"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Atualize para o Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filtrar por"
@@ -996,22 +1068,22 @@
     "message": "Shader"
   },
   "project.about.details.created": {
-    "message": "Criado em {date}"
+    "message": "Criado {date}"
   },
   "project.about.details.licensed": {
     "message": "Licenciado como {license}"
   },
   "project.about.details.published": {
-    "message": "Publicado em {date}"
+    "message": "Publicado {date}"
   },
   "project.about.details.submitted": {
-    "message": "Enviado em {date}"
+    "message": "Enviado {date}"
   },
   "project.about.details.title": {
     "message": "Detalhes"
   },
   "project.about.details.updated": {
-    "message": "Atualizado em {date}"
+    "message": "Atualizado {date}"
   },
   "project.actions.create-server": {
     "message": "Criar um servidor"

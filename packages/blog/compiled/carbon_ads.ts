@@ -6,6 +6,7 @@ export const article = {
   date: "2022-09-08T00:00:00.000Z",
   slug: "carbon-ads",
   authors: ["6plzAzU4"],
+  unlisted: false,
   thumbnail: true,
   
 };

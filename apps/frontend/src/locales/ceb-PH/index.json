@@ -38,6 +38,12 @@
   "app-marketing.hero.download-button": {
     "message": "Karganugi ang Aplikasyon sa Modrinth"
   },
+  "auth.verify-email.action.account-settings": {
+    "message": "Mga gusto sa akawnt"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "\n"
+  },
   "collection.button.edit-icon": {
     "message": "Usba ang amoy"
   },
@@ -55,6 +61,9 @@
   },
   "landing.subheading": {
     "message": "Pagkaplag, pagdula, ug pagbahin og mga Minecraft nga kontento sa among bukas nga tinubdan nga plataporma nga gihimo alang sa komunidad."
+  },
+  "layout.banner.add-email.button": {
+    "message": "Mga gusto sa akawnt"
   },
   "layout.footer.about": {
     "message": "Mahitungod"
@@ -145,6 +154,36 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Putos sa Kabtangan"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "Bag-o ra namo gipalambo ang sistema sa Mga Kalikopan sa Modrinth ug ang mga bag-ong kapilian magamit na karon. Wala kay permiso sa pag-usab sa niining mga gusto, apan palihug pahibaloa ang ubang sakop sa proyekto nga kinahanglan nga mapamatud-an ang metadata sa kalikopan."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Kinahanglang masusi ang metadata sa environment"
+  },
+  "project.environment.migration.message": {
+    "message": "Bag-o ra namo gipalambo ang sistema sa Mga Kalikopan sa Modrinth ug ang mga bag-ong kapilian magamit na karon. Mahimo nga bisitahon ang mga gusto sa imong proyekto ug pamatud-i nga husto ang metadata."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Susihon ang mga gusto sa kalikopan"
+  },
+  "project.environment.migration.title": {
+    "message": "Palihug sa pagsusi sa metadata sa kalikopan"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Wala pay metadata sa kalikopan ang imong proyekto, mahimo nga pilia ang husto sa ubos."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Palihug sa pagpili sa kalikopan sa imong proyekto"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "Daghang kalikopan ang imong proyekto"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "Bag-o ra namo gipalambo ang sistema sa Mga Kalikopan sa Modrinth ug ang mga bag-ong kapilian magamit na karon. Mahimo nga susiha nga husto ang  gipili sa ubos ug tuploka ang 'Pamatud-i' sa imong paghuman!"
+  },
+  "project.settings.title": {
+    "message": "Mga Gusto"
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Panid sa mga Putos sa Kabtangan"

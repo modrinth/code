@@ -1,36 +1,7 @@
 <template>
 	<NewModal ref="mrpackModal" header="Uploading mrpack" :closable="!isLoading" @show="onShow">
 		<div class="flex flex-col gap-4 md:w-[600px]">
-			<Transition
-				enter-active-class="transition-all duration-300 ease-out"
-				enter-from-class="opacity-0 max-h-0"
-				enter-to-class="opacity-100 max-h-20"
-				leave-active-class="transition-all duration-200 ease-in"
-				leave-from-class="opacity-100 max-h-20"
-				leave-to-class="opacity-0 max-h-0"
-			>
-				<div v-if="isLoading" class="w-full">
-					<div class="mb-2 flex justify-between text-sm">
-						<Transition name="phrase-fade" mode="out-in">
-							<span :key="currentPhrase" class="text-lg font-medium text-contrast">{{
-								currentPhrase
-							}}</span>
-						</Transition>
-						<div class="flex flex-col items-end">
-							<span class="text-secondary">{{ Math.round(uploadProgress) }}%</span>
-							<span class="text-xs text-secondary"
-								>{{ formatBytes(uploadedBytes) }} / {{ formatBytes(totalBytes) }}</span
-							>
-						</div>
-					</div>
-					<div class="h-2 w-full rounded-full bg-divider">
-						<div
-							class="h-2 animate-pulse rounded-full bg-brand transition-all duration-300 ease-out"
-							:style="{ width: `${uploadProgress}%` }"
-						></div>
-					</div>
-				</div>
-			</Transition>
+			<AppearingProgressBar :max-value="totalBytes" :current-value="uploadedBytes" />
 
 			<Transition
 				enter-active-class="transition-all duration-300 ease-out"
@@ -151,8 +122,14 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { BackupWarning, ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
-import { formatBytes, ModrinthServersFetchError } from '@modrinth/utils'
+import {
+	AppearingProgressBar,
+	BackupWarning,
+	ButtonStyled,
+	injectNotificationManager,
+	NewModal,
+} from '@modrinth/ui'
+import { ModrinthServersFetchError } from '@modrinth/utils'
 import { onMounted, onUnmounted } from 'vue'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers'
@@ -190,49 +167,8 @@ const hardReset = ref(false)
 const isLoading = ref(false)
 const loadingServerCheck = ref(false)
 const mrpackFile = ref<File | null>(null)
-const uploadProgress = ref(0)
 const uploadedBytes = ref(0)
 const totalBytes = ref(0)
-
-const uploadPhrases = [
-	'Removing Herobrine...',
-	'Feeding parrots...',
-	'Teaching villagers new trades...',
-	'Convincing creepers to be friendly...',
-	'Polishing diamonds...',
-	'Training wolves to fetch...',
-	'Building pixel art...',
-	'Explaining redstone to beginners...',
-	'Collecting all the cats...',
-	'Negotiating with endermen...',
-	'Planting suspicious stew ingredients...',
-	'Calibrating TNT blast radius...',
-	'Teaching chickens to fly...',
-	'Sorting inventory alphabetically...',
-	'Convincing iron golems to smile...',
-]
-
-const currentPhrase = ref('Uploading...')
-let phraseInterval: NodeJS.Timeout | null = null
-const usedPhrases = ref(new Set<number>())
-
-const getNextPhrase = () => {
-	if (usedPhrases.value.size >= uploadPhrases.length) {
-		const currentPhraseIndex = uploadPhrases.indexOf(currentPhrase.value)
-		usedPhrases.value.clear()
-		if (currentPhraseIndex !== -1) {
-			usedPhrases.value.add(currentPhraseIndex)
-		}
-	}
-	const availableIndices = uploadPhrases
-		.map((_, index) => index)
-		.filter((index) => !usedPhrases.value.has(index))
-
-	const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)]
-	usedPhrases.value.add(randomIndex)
-
-	return uploadPhrases[randomIndex]
-}
 
 const isDangerous = computed(() => hardReset.value)
 const canInstall = computed(() => !mrpackFile.value || isLoading.value || loadingServerCheck.value)
@@ -261,31 +197,17 @@ const handleReinstall = async () => {
 	}
 
 	isLoading.value = true
-	uploadProgress.value = 0
-	uploadProgress.value = 0
 	uploadedBytes.value = 0
 	totalBytes.value = mrpackFile.value.size
-
-	currentPhrase.value = getNextPhrase()
-	phraseInterval = setInterval(() => {
-		currentPhrase.value = getNextPhrase()
-	}, 4500)
 
 	const { onProgress, promise } = props.server.general.reinstallFromMrpack(
 		mrpackFile.value,
 		hardReset.value,
 	)
 
-	onProgress(({ loaded, total, progress }) => {
-		uploadProgress.value = progress
+	onProgress(({ loaded, total }) => {
 		uploadedBytes.value = loaded
 		totalBytes.value = total
-
-		if (phraseInterval && progress >= 100) {
-			clearInterval(phraseInterval)
-			phraseInterval = null
-			currentPhrase.value = 'Installing modpack...'
-		}
 	})
 
 	try {
@@ -316,10 +238,6 @@ const handleReinstall = async () => {
 		}
 	} finally {
 		isLoading.value = false
-		if (phraseInterval) {
-			clearInterval(phraseInterval)
-			phraseInterval = null
-		}
 	}
 }
 const onShow = () => {
@@ -328,15 +246,8 @@ const onShow = () => {
 	loadingServerCheck.value = false
 	isLoading.value = false
 	mrpackFile.value = null
-	uploadProgress.value = 0
 	uploadedBytes.value = 0
 	totalBytes.value = 0
-	currentPhrase.value = 'Uploading...'
-	usedPhrases.value.clear()
-	if (phraseInterval) {
-		clearInterval(phraseInterval)
-		phraseInterval = null
-	}
 }
 
 const show = () => mrpackModal.value?.show()
@@ -348,15 +259,5 @@ defineExpose({ show, hide })
 <style scoped>
 .stylized-toggle:checked::after {
 	background: var(--color-accent-contrast) !important;
-}
-
-.phrase-fade-enter-active,
-.phrase-fade-leave-active {
-	transition: opacity 0.3s ease;
-}
-
-.phrase-fade-enter-from,
-.phrase-fade-leave-to {
-	opacity: 0;
 }
 </style>

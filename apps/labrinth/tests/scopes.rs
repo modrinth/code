@@ -22,6 +22,7 @@ use common::environment::{
 use common::{database::*, scopes::ScopeTest};
 use labrinth::models::ids::ProjectId;
 use labrinth::models::pats::Scopes;
+use labrinth::models::teams::ProjectPermissions;
 use serde_json::json;
 // For each scope, we (using test_scope):
 // - create a PAT with a given set of scopes for a function
@@ -1093,6 +1094,7 @@ pub async fn organization_scopes() {
                 .await
                 .unwrap();
             let organization_id = success["id"].as_str().unwrap();
+            let organization_team_id = success["team_id"].as_str().unwrap();
 
             // Patch organization
             let organization_edit = Scopes::ORGANIZATION_WRITE;
@@ -1153,6 +1155,27 @@ pub async fn organization_scopes() {
                 .test(req_gen, organization_project_edit)
                 .await
                 .unwrap();
+
+            // Add two members to the organization
+            api.add_user_to_team(
+                organization_team_id,
+                FRIEND_USER_ID,
+                Some(ProjectPermissions::all()),
+                None,
+                USER_USER_PAT,
+            )
+            .await;
+            api.join_team(organization_team_id, FRIEND_USER_PAT).await;
+
+            api.add_user_to_team(
+                organization_team_id,
+                ENEMY_USER_ID,
+                Some(ProjectPermissions::all()),
+                None,
+                USER_USER_PAT,
+            )
+            .await;
+            api.join_team(organization_team_id, ENEMY_USER_PAT).await;
 
             // Organization reads
             let organization_read = Scopes::ORGANIZATION_READ;

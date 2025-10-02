@@ -170,9 +170,6 @@
   "layout.action.change-theme": {
     "message": "Αλλαγή θέματος"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Λήψη Εφαρμογής Modrinth"
-  },
   "layout.avatar.alt": {
     "message": "Το avatar μου"
   },

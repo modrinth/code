@@ -24,7 +24,7 @@ use sqlx::PgPool;
 use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
-use tracing::error;
+use tracing::{error, info};
 
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
@@ -1091,6 +1091,8 @@ pub async fn index_payouts_notifications(
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<(), ApiError> {
+    info!("Updating payout notifications");
+
     let mut transaction = pool.begin().await?;
 
     payouts_values_notifications::synchronize_future_payout_values(

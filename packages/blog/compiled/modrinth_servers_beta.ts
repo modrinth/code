@@ -6,6 +6,7 @@ export const article = {
   date: "2024-11-03T06:00:00.000Z",
   slug: "modrinth-servers-beta",
   authors: ["MpxzqsyW","Dc7EYhxG"],
+  unlisted: false,
   thumbnail: true,
   short_title: "Introducing Modrinth Servers",
   short_summary: "Host your next Minecraft server with Modrinth.",

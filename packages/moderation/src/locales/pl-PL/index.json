@@ -72,13 +72,13 @@
     "defaultMessage": "Twój adres URL licencji wskazuję na domenę {domain}, co nie jest odpowiednie dla informacji o licencji. Adresy URL licencji powinny prowadzić bezpośrednio do twojego pliku licencji, a nie do mediów społecznościowych, platform gamingowych itp."
   },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "Twoje URL licencji wydaje się źle uformowane. Proszę podaj poprawny URL do tekstu twojej licencji."
+    "defaultMessage": "Twój adres URL licencji wydaje się na źle uformowany. Podaj poprawny adres URL do tekstu twojej licencji."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Dodaj poprawny link do licencji"
   },
   "nags.link-shortener-usage.description": {
-    "defaultMessage": "Używanie skracaczy linków lub innych metod ukrywania gdzie prowadzi link w twoich linkach zewnętrznych oraz linku licencji nie jest dozwolone, proszę użyj tylko pełnodługościowych linków."
+    "defaultMessage": "Używanie skracaczy linków lub innych metod ukrywania gdzie prowadzi link w twoich linkach zewnętrznych oraz linku licencji jest niedozwolone, używaj tylko linków o pełnej długości."
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Nie używaj skracaczy linków"
@@ -90,7 +90,7 @@
     "defaultMessage": "Skróć nagłówki"
   },
   "nags.minecraft-title-clause.description": {
-    "defaultMessage": "Projekty nie mogą wykorzystywać marki Minecraft ani zawierać słowa \"Minecraft\" jako znaczącej części nazwy."
+    "defaultMessage": "Projekty nie mogą wykorzystywać marki Minecraft ani zawierać słowa \"Minecraft\" jako znacząca część nazwy."
   },
   "nags.minecraft-title-clause.title": {
     "defaultMessage": "Unikaj naruszenia marki"

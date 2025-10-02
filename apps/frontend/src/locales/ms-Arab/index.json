@@ -552,7 +552,7 @@
     "message": "ايکوسيستم يڠ ڤلباݢاي"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "داڤتکن حاصيل اعلان برباير درڤد هلامن ڤروجيک اندا دان کلوارکن دانا اندا ڤد بيلا‌٢ ماس"
+    "message": "داڤتکن حاصيل ڤنداڤتن اعلان برباير درڤد هلامن ڤروجيک اندا دان کلوارکن دانا اندا ڤد بيلا‌٢ ماس"
   },
   "landing.creator.feature.monetization.title": {
     "message": "ڤڠواڠن"
@@ -567,7 +567,7 @@
     "message": "ݢاݢل ممواتکن ڤروجيک٢ راوق :("
   },
   "landing.feature.follow.description": {
-    "message": "داڤتکن معلومن ستياڤ کالي ڤروجيک کݢمرن اندا دکمس کيني دان ايلقکن درڤد کتيڠݢلن"
+    "message": "داڤتکن معلومن ستياڤ کالي ڤروجيک کݢمرن اندا دکمس کيني دان ايلقکن درڤد کتيڠݢلن."
   },
   "landing.feature.follow.heading": {
     "message": "ايکوتي ڤروجيک يڠ اندا سوکاي"
@@ -642,7 +642,7 @@
     "message": "ايسيه مڠيکوت"
   },
   "landing.section.for-creators.description": {
-    "message": "برايکن تمڤت تيڠݢل دالم تالين اونتوق چيڤتاءن اندا دان جاڠکاو خلايق راماي ڤنوه دڠن ڤماءين يڠ برديديکاسي"
+    "message": "برايکن تمڤت تيڠݢل دالم تالين اونتوق چيڤتاءن اندا دان جاڠکاو خلايق راماي ڤنوه دڠن ڤماءين يڠ برديديکاسي."
   },
   "landing.section.for-creators.label": {
     "message": "اونتوق ڤنچيڤتا"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "توکر تيما"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "داڤتکن Modrinth App"
+  "layout.action.close-banner": {
+    "message": "توتوڤ"
+  },
+  "layout.action.create-new": {
+    "message": "چيڤتا بهارو..."
+  },
+  "layout.action.file-lookup": {
+    "message": "چارين فاءيل"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "چاري ملالوءي إي-ميل"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "اوروس نوتيس ڤلاين"
+  },
+  "layout.action.new-collection": {
+    "message": "کوليکسي بهارو"
+  },
+  "layout.action.new-organization": {
+    "message": "اورݢانيساسي بهارو"
+  },
+  "layout.action.new-project": {
+    "message": "ڤروجيک بهارو"
+  },
+  "layout.action.reports": {
+    "message": "لاڤورن"
+  },
+  "layout.action.review-projects": {
+    "message": "سيمق ڤروجيک"
   },
   "layout.avatar.alt": {
     "message": "اۏاتر اندا"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "ترما ڤڠݢوناءن"
   },
+  "layout.footer.modrinth-information": {
+    "message": "معلومت Modrinth"
+  },
   "layout.footer.open-source": {
     "message": "<github-link>سومبر Modrinth اداله تربوک</github-link>."
   },
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "تموءي دان تربيتکن کاندوڠن ماءينکرف‌ت!"
   },
+  "layout.nav.analytics": {
+    "message": "اناليتيک"
+  },
+  "layout.nav.discover": {
+    "message": "تموءي"
+  },
+  "layout.nav.discover-content": {
+    "message": "تموءي کاندوڠن"
+  },
+  "layout.nav.feature-flags": {
+    "message": "ڤنتڤن چيري"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "داڤتکن Modrinth App"
+  },
   "layout.nav.home": {
     "message": "لامن اوتام"
   },
+  "layout.nav.host-a-server": {
+    "message": "هوس سبواه ڤلاين"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "لامن اوتام Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "اورݢانيساسي"
+  },
+  "layout.nav.profile": {
+    "message": "ڤروفيل"
+  },
+  "layout.nav.projects": {
+    "message": "ڤروجيک"
+  },
+  "layout.nav.revenue": {
+    "message": "ڤنداڤتن"
+  },
+  "layout.nav.saved-projects": {
+    "message": "ڤروجيک يڠ دسيمڤن"
+  },
   "layout.nav.search": {
     "message": "چاري"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "ناءيق طرف کModrinth+"
   },
   "moderation.filter.by": {
     "message": "تاڤيس مڠيکوت"

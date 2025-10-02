@@ -2,6 +2,7 @@ use super::ids::*;
 use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notification_item::DBNotificationAction;
 use crate::database::models::notifications_deliveries_item::DBNotificationDelivery;
+use crate::models::billing::PriceDuration;
 use crate::models::ids::{
     NotificationId, ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId,
     VersionId,
@@ -31,7 +32,7 @@ pub struct Notification {
     pub actions: Vec<NotificationAction>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Display)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Display)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationType {
     // If adding a notification type, add a variant in `NotificationBody` of the same name!
@@ -71,6 +72,8 @@ pub enum NotificationType {
     EmailChanged,
     #[display("Payment failed")]
     PaymentFailed,
+    #[display("Tax notification")]
+    TaxNotification,
     #[display("New personal access token created")]
     PatCreated,
     #[display("New message in moderation thread")]
@@ -110,6 +113,7 @@ i18n_enum!(
     PasswordRemoved! => "password_removed",
     EmailChanged! => "email_changed",
     PaymentFailed! => "payment_failed",
+    TaxNotification! => "tax_notification",
     PatCreated! => "pat_created",
     ModerationMessageReceived! => "moderation_message_received",
     ReportStatusUpdated! => "report_status_updated",
@@ -144,7 +148,8 @@ impl NotificationType {
             "password_removed" => NotificationType::PasswordRemoved,
             "email_changed" => NotificationType::EmailChanged,
             "payment_failed" => NotificationType::PaymentFailed,
-            "pat_created" => NotificationType::PatCreated,
+            "tax_notification" => NotificationType::TaxNotification,
+            "payout_available" => NotificationType::PayoutAvailable,
             "moderation_message_received" => {
                 NotificationType::ModerationMessageReceived
             }
@@ -155,7 +160,6 @@ impl NotificationType {
             }
             "project_status_neutral" => NotificationType::ProjectStatusNeutral,
             "project_transferred" => NotificationType::ProjectTransferred,
-            "payout_available" => NotificationType::PayoutAvailable,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -257,15 +261,33 @@ pub enum NotificationBody {
     #[display("You've removed your account password.")]
     PasswordRemoved,
     #[display("Your account email was changed.")]
-    EmailChanged { new_email: String, to_email: String },
+    EmailChanged {
+        new_email: String,
+        to_email: String,
+    },
     #[display(
         "A payment on your account failed. Please update your billing information."
     )]
-    PaymentFailed { amount: String, service: String },
+    PaymentFailed {
+        amount: String,
+        service: String,
+    },
+    #[display("You've received a tax notification.")]
+    TaxNotification {
+        subscription_id: UserSubscriptionId,
+        new_amount: i64,
+        new_tax_amount: i64,
+        old_amount: i64,
+        old_tax_amount: i64,
+        billing_interval: PriceDuration,
+        currency: String,
+        due: DateTime<Utc>,
+        service: String,
+    },
     #[display("A payout is available!")]
     PayoutAvailable {
         date_available: DateTime<Utc>,
-        amount: f64,
+        amount: u64,
     },
     #[display("")]
     Unknown,
@@ -297,6 +319,7 @@ i18n_enum!(
     PasswordRemoved! => "password_removed",
     EmailChanged { .. } => "email_changed",
     PaymentFailed { .. } => "payment_failed",
+    TaxNotification { .. } => "tax_notification",
     PayoutAvailable { .. } => "payout_available",
     Unknown! => "unknown",
 );
@@ -368,6 +391,9 @@ impl NotificationBody {
             }
             NotificationBody::PaymentFailed { .. } => {
                 NotificationType::PaymentFailed
+            }
+            NotificationBody::TaxNotification { .. } => {
+                NotificationType::TaxNotification
             }
             NotificationBody::PayoutAvailable { .. } => {
                 NotificationType::PayoutAvailable
@@ -501,6 +527,7 @@ impl From<DBNotification> for Notification {
                 NotificationBody::EmailChanged { .. } => {
                     ("#".to_string(), vec![])
                 }
+                NotificationBody::TaxNotification { .. } => ("#".to_string(), vec![],),
                 NotificationBody::PayoutAvailable { .. } => {
                     ("#".to_string(), vec![])
                 }

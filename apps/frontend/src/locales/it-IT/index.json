@@ -24,7 +24,7 @@
     "message": "È noto che nelle versioni per Linux della Modrinth App <issues-link>sussistono certi problemi</issues-link> con alcuni sistemi e configurazioni. Se Modrinth App risultasse instabile sul tuo sistema, potresti voler usare altre app come <prism-link>Prism Launcher</prism-link> per installare facilmente contenuto Modrinth."
   },
   "app-marketing.download.mac": {
-    "message": "macOS"
+    "message": "Mac"
   },
   "app-marketing.download.options-title": {
     "message": "Opzioni download"
@@ -90,10 +90,10 @@
     "message": "Modalità offline"
   },
   "app-marketing.features.open-source.description": {
-    "message": "La Modrinth App è del tutto open-source. Leggi il codice sorgente sul nostro <github-link>GitHub</github-link>!"
+    "message": "La Modrinth App è del tutto open source. Leggi il codice sorgente sul nostro <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
-    "message": "Open-source"
+    "message": "Open source"
   },
   "app-marketing.features.performance.activity-monitor": {
     "message": "Gestore attività"
@@ -567,7 +567,7 @@
     "message": "Impossibile caricare progetti casualmente :("
   },
   "landing.feature.follow.description": {
-    "message": "Ottieni notifiche per essere al corrente di ogni novità dei tuoi progetti preferiti"
+    "message": "Ottieni notifiche per essere al corrente di ogni novità dei tuoi progetti preferiti."
   },
   "landing.feature.follow.heading": {
     "message": "Segui progetti che ami"
@@ -642,7 +642,7 @@
     "message": "Ordina per"
   },
   "landing.section.for-creators.description": {
-    "message": "Dedica alle tue creazioni una dimora online e raggiungi un pubblico vastissimo di giocatori dedicati"
+    "message": "Dedica alle tue creazioni una dimora online e raggiungi un pubblico vastissimo di giocatori dedicati."
   },
   "landing.section.for-creators.label": {
     "message": "Per i Creatori"
@@ -665,8 +665,35 @@
   "layout.action.change-theme": {
     "message": "Cambia tema"
   },
-  "layout.action.get-modrinth-app": {
-    "message": "Scarica Modrinth App"
+  "layout.action.close-banner": {
+    "message": "Chiudi"
+  },
+  "layout.action.create-new": {
+    "message": "Crea nuovo..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Trova file"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Trova con email"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Gestisci avvisi server"
+  },
+  "layout.action.new-collection": {
+    "message": "Nuova raccolta"
+  },
+  "layout.action.new-organization": {
+    "message": "Nuova organizzazione"
+  },
+  "layout.action.new-project": {
+    "message": "Nuovo progetto"
+  },
+  "layout.action.reports": {
+    "message": "Segnalazioni"
+  },
+  "layout.action.review-projects": {
+    "message": "Rivedi progetti"
   },
   "layout.avatar.alt": {
     "message": "Il tuo avatar"
@@ -746,6 +773,9 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Termini d'Uso"
   },
+  "layout.footer.modrinth-information": {
+    "message": "Informazioni Modrinth"
+  },
   "layout.footer.open-source": {
     "message": "Modrinth è <github-link>open-source</github-link>."
   },
@@ -800,11 +830,53 @@
   "layout.meta.og-description": {
     "message": "Scopri e pubblica contenuto per Minecraft!"
   },
+  "layout.nav.analytics": {
+    "message": "Analitiche"
+  },
+  "layout.nav.discover": {
+    "message": "Esplora"
+  },
+  "layout.nav.discover-content": {
+    "message": "Esplora contenuti"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Flag delle funzionalità"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Scarica Modrinth App"
+  },
   "layout.nav.home": {
     "message": "Home"
   },
+  "layout.nav.host-a-server": {
+    "message": "Crea un server"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Pagina home Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizzazioni"
+  },
+  "layout.nav.profile": {
+    "message": "Profilo"
+  },
+  "layout.nav.projects": {
+    "message": "Progetti"
+  },
+  "layout.nav.revenue": {
+    "message": "Profitto"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Progetti Salvati"
+  },
   "layout.nav.search": {
     "message": "Cerca"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Abbonati a Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filtra per"
