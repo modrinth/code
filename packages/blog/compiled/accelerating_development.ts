@@ -6,6 +6,7 @@ export const article = {
   date: "2023-02-01T20:00:00.000Z",
   slug: "accelerating-development",
   authors: ["MpxzqsyW","Dc7EYhxG","6plzAzU4"],
+  unlisted: false,
   thumbnail: false,
   
 };
