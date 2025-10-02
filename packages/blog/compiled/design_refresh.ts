@@ -6,6 +6,7 @@ export const article = {
   date: "2024-08-21T20:00:00.000Z",
   slug: "design-refresh",
   authors: ["MpxzqsyW","Dc7EYhxG"],
+  unlisted: false,
   thumbnail: true,
   short_title: "Modrinth+ and New Ads",
   short_summary: "Introducing a new ad system, a subscription to remove ads, and a redesign of the website!",

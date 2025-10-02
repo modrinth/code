@@ -6,6 +6,7 @@ export const article = {
   date: "2025-10-01T01:30:00.000Z",
   slug: "russian-censorship",
   authors: [],
+  unlisted: true,
   thumbnail: true,
   
 };

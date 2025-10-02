@@ -6,6 +6,7 @@ export const article = {
   date: "2025-08-28T23:50:00.000Z",
   slug: "new-environments",
   authors: ["Dc7EYhxG"],
+  unlisted: false,
   thumbnail: true,
   
 };
