@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
+use path_util::SafeRelativeUtf8UnixPathBuf;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile")
@@ -239,7 +240,7 @@ pub async fn profile_export_mrpack(
 #[tauri::command]
 pub async fn profile_get_pack_export_candidates(
     profile_path: &str,
-) -> Result<Vec<String>> {
+) -> Result<Vec<SafeRelativeUtf8UnixPathBuf>> {
     let candidates = profile::get_pack_export_candidates(profile_path).await?;
     Ok(candidates)
 }

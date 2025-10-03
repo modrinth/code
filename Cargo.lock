@@ -4436,6 +4436,7 @@ dependencies = [
  "meilisearch-sdk",
  "murmur2",
  "paste",
+ "path-util",
  "prometheus",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
@@ -5768,6 +5769,16 @@ name = "paste"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
+
+[[package]]
+name = "path-util"
+version = "0.0.0"
+dependencies = [
+ "derive_more 2.0.1",
+ "itertools 0.14.0",
+ "serde",
+ "typed-path",
+]
 
 [[package]]
 name = "pathdiff"
@@ -9117,6 +9128,7 @@ dependencies = [
  "notify-debouncer-mini",
  "p256",
  "paste",
+ "path-util",
  "phf 0.12.1",
  "png",
  "quartz_nbt",
@@ -9164,6 +9176,7 @@ dependencies = [
  "hyper-util",
  "native-dialog",
  "paste",
+ "path-util",
  "serde",
  "serde_json",
  "serde_with",
@@ -9789,6 +9802,12 @@ dependencies = [
  "thiserror 2.0.12",
  "utf-8",
 ]
+
+[[package]]
+name = "typed-path"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c462d18470a2857aa657d338af5fa67170bb48bcc80a296710ce3b0802a32566"
 
 [[package]]
 name = "typeid"
