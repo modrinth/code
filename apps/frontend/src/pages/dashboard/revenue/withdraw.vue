@@ -237,7 +237,19 @@ const country = ref(
 
 const [{ data: userBalance }, { data: payoutMethods, refresh: refreshPayoutMethods }] =
 	await Promise.all([
-		useAsyncData(`payout/balance`, () => useBaseFetch(`payout/balance`, { apiVersion: 3 })),
+		useAsyncData(`payout/balance`, async () => {
+			const response = await useBaseFetch(`payout/balance`, { apiVersion: 3 })
+			return {
+				...response,
+				available: parseFloat(response.available),
+				withdrawn_lifetime: parseFloat(response.withdrawn_lifetime),
+				withdrawn_ytd: parseFloat(response.withdrawn_ytd),
+				pending: parseFloat(response.pending),
+				dates: Object.fromEntries(
+					Object.entries(response.dates).map(([date, value]) => [date, parseFloat(value)]),
+				),
+			}
+		}),
 		useAsyncData(`payout/methods?country=${country.value.id}`, () =>
 			useBaseFetch(`payout/methods?country=${country.value.id}`, { apiVersion: 3 }),
 		),
