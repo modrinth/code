@@ -6,6 +6,7 @@ export const article = {
   date: "2022-03-09T00:00:00.000Z",
   slug: "knossos-v2.1.0",
   authors: ["Dc7EYhxG"],
+  unlisted: false,
   thumbnail: true,
   
 };

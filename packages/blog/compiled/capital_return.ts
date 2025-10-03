@@ -6,6 +6,7 @@ export const article = {
   date: "2024-04-04T20:00:00.000Z",
   slug: "capital-return",
   authors: ["MpxzqsyW"],
+  unlisted: false,
   thumbnail: false,
   
 };

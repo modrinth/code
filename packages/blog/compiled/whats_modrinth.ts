@@ -6,6 +6,7 @@ export const article = {
   date: "2020-11-27T00:00:00.000Z",
   slug: "whats-modrinth",
   authors: ["aNd6VJql"],
+  unlisted: false,
   thumbnail: false,
   
 };
