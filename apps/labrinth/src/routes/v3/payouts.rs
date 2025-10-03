@@ -10,6 +10,8 @@ use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::avalara1099;
+use crate::util::error::Context;
+use actix_web::body::BodyStream;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use chrono::{DateTime, Duration, Utc};
 use hex::ToHex;
@@ -37,8 +39,63 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(payment_methods)
             .service(get_balance)
             .service(platform_revenue)
+            .service(get_compliance_signed_pdf)
             .service(post_compliance_form),
     );
+}
+
+#[get("compliance/download")]
+pub async fn get_compliance_signed_pdf(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PAYOUTS_READ,
+    )
+    .await?
+    .1;
+
+    let user_id = DBUserId(user.id.0 as i64);
+
+    let mut txn = pool.begin().await?;
+
+    users_compliance::UserCompliance::get_by_user_id(&mut *txn, user_id)
+        .await?
+        .filter(|c| c.signed.is_some())
+        .map(|c| async move {
+            avalara1099::get_form_request(&c.external_request_id).await
+        })
+        .ok_or_else(|| {
+            ApiError::Conflict(
+                "Compliance form hasn't been signed yet!".to_owned(),
+            )
+        })?
+        .await?
+        .inspect_err(|v| {
+            error!(
+                "Error getting form request from track1099: error response: {v}"
+            )
+        })
+        .map_err(|_| ApiError::TaxComplianceApi)?
+        .data
+        .links
+        .wrap_internal_err("missing `links` in track1099 response")?
+        .remove("signed_pdf")
+        .map(reqwest::get)
+        .wrap_internal_err("missing `signed_pdf` in track1099 response links")?
+        .await
+        .map(|resp| {
+            HttpResponse::Ok()
+                .content_type("application/pdf")
+                .body(BodyStream::new(resp.bytes_stream()))
+        })
+        .wrap_internal_err("failed to initiate compliance form download")
 }
 
 #[derive(Deserialize)]
