@@ -6,6 +6,7 @@ export const article = {
   date: "2024-01-06T20:00:00.000Z",
   slug: "creator-update",
   authors: ["6plzAzU4"],
+  unlisted: false,
   thumbnail: true,
   short_title: "The Creator Update",
   short_summary: "Adding analytics, orgs, collections, and more!",

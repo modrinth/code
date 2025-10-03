@@ -6,6 +6,7 @@ export const article = {
   date: "2023-01-07T00:00:00.000Z",
   slug: "two-years-of-modrinth",
   authors: ["6plzAzU4"],
+  unlisted: false,
   thumbnail: true,
   
 };

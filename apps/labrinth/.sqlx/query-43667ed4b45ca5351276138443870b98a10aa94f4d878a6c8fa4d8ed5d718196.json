@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                charges.id, charges.user_id, charges.price_id, charges.amount, charges.currency_code, charges.status, charges.due, charges.last_attempt,\n                charges.charge_type, charges.subscription_id, charges.tax_amount, charges.tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                charges.subscription_interval AS \"subscription_interval?\",\n                charges.payment_platform,\n                charges.payment_platform_id AS \"payment_platform_id?\",\n                charges.parent_charge_id AS \"parent_charge_id?\",\n                charges.net AS \"net?\",\n\t\t\t\tcharges.tax_last_updated AS \"tax_last_updated?\",\n\t\t\t\tcharges.tax_drift_loss AS \"tax_drift_loss?\"\n            FROM charges\n            \n\t\t\tWHERE\n\t\t\t  status = 'succeeded'\n\t\t\t  AND tax_platform_id IS NULL\n\t\t\tORDER BY due ASC\n\t\t\tFOR NO KEY UPDATE SKIP LOCKED\n\t\t\tLIMIT $1\n\t\t\t",
+  "query": "\n            SELECT\n                charges.id, charges.user_id, charges.price_id, charges.amount, charges.currency_code, charges.status, charges.due, charges.last_attempt,\n                charges.charge_type, charges.subscription_id, charges.tax_amount, charges.tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                charges.subscription_interval AS \"subscription_interval?\",\n                charges.payment_platform,\n                charges.payment_platform_id AS \"payment_platform_id?\",\n                charges.parent_charge_id AS \"parent_charge_id?\",\n                charges.net AS \"net?\",\n\t\t\t\tcharges.tax_last_updated AS \"tax_last_updated?\",\n\t\t\t\tcharges.tax_drift_loss AS \"tax_drift_loss?\"\n            FROM charges\n            \n\t\t\tWHERE\n\t\t\t  status = 'succeeded'\n\t\t\t  AND tax_platform_id IS NULL\n              AND payment_platform_id IS NOT NULL\n\t\t\tORDER BY due ASC\n\t\t\tFOR NO KEY UPDATE SKIP LOCKED\n\t\t\tLIMIT $1\n\t\t\t",
   "describe": {
     "columns": [
       {
@@ -126,5 +126,5 @@
       true
     ]
   },
-  "hash": "8b4979c9f0eb427d5f8a0e4c4e89eb8127f1cb3cd07f89fc2d206e3b5c8805f6"
+  "hash": "43667ed4b45ca5351276138443870b98a10aa94f4d878a6c8fa4d8ed5d718196"
 }

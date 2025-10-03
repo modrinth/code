@@ -6,6 +6,7 @@ export const article = {
   date: "2023-08-05T20:00:00.000Z",
   slug: "modrinth-app-beta",
   authors: ["6plzAzU4"],
+  unlisted: false,
   thumbnail: false,
   short_title: "Modrinth App Beta and Upgraded Authentication",
   short_summary: "Launching Modrinth App Beta and upgrading authentication.",

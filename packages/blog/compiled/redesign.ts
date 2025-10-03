@@ -6,6 +6,7 @@ export const article = {
   date: "2022-02-27T00:00:00.000Z",
   slug: "redesign",
   authors: ["6plzAzU4"],
+  unlisted: false,
   thumbnail: true,
   
 };

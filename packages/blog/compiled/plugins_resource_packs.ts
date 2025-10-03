@@ -6,6 +6,7 @@ export const article = {
   date: "2022-08-27T00:00:00.000Z",
   slug: "plugins-resource-packs",
   authors: ["6plzAzU4"],
+  unlisted: false,
   thumbnail: true,
   
 };

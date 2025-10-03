@@ -69,13 +69,13 @@ const messages = defineMessages({
 </script>
 <template>
 	<div
-		class="fixed card-shadow rounded-2xl top-[--top-bar-height] mt-6 right-6 p-4 z-10 w-[25rem] bg-bg-raised border-divider border-solid border-[2px]"
+		class="grid grid-cols-[min-content] fixed card-shadow rounded-2xl top-[--top-bar-height] mt-6 right-6 p-4 z-10 bg-bg-raised border-divider border-solid border-[2px]"
 		:class="{
 			'download-complete': progress === 1,
 		}"
 	>
-		<div class="flex">
-			<h2 class="text-base text-contrast font-semibold m-0 grow">
+		<div class="flex min-w-[25rem] gap-4">
+			<h2 class="whitespace-nowrap text-base text-contrast font-semibold m-0 grow">
 				{{
 					formatMessage(metered && progress === 1 ? messages.downloadCompleteTitle : messages.title)
 				}}
