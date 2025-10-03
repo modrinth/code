@@ -14,6 +14,7 @@ use crate::{
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Duration, Utc};
+use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use sqlx::postgres::types::PgInterval;
@@ -331,7 +332,7 @@ pub async fn revenue_get(
     let duration: PgInterval = Duration::minutes(resolution_minutes as i64)
         .try_into()
         .map_err(|_| {
-            ApiError::InvalidInput("Invalid resolution_minutes".to_string())
+            ApiError::Request(eyre!("Invalid `resolution_minutes`"))
         })?;
     // Get the revenue data
     let project_ids = project_ids.unwrap_or_default();
