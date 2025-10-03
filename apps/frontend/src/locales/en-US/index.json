@@ -419,9 +419,6 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
-  "common.close": {
-    "message": "Close"
-  },
   "common.no": {
     "message": "No"
   },
@@ -850,9 +847,6 @@
   },
   "layout.action.change-theme": {
     "message": "Change theme"
-  },
-  "layout.action.close-banner": {
-    "message": "Close"
   },
   "layout.action.create-new": {
     "message": "Create new..."
