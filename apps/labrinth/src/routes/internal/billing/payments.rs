@@ -715,12 +715,15 @@ struct ChargeData {
 
 impl ChargeData {
     pub fn stripe_currency_code(&self) -> Result<stripe::Currency, ApiError> {
-        self.currency_code.parse::<stripe::Currency>().map_err(|_| {
-            ApiError::InvalidInput(
+        self.currency_code
+            .to_lowercase()
+            .parse::<stripe::Currency>()
+            .map_err(|_| {
+                ApiError::InvalidInput(
                 "Invalid currency code: could not convert to Stripe currency"
                     .to_string(),
             )
-        })
+            })
     }
 }
 
