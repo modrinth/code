@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-01T19:05:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Added banner informing Russian users of our non-compliance with censorship laws that will lead to Modrinth being blocked in Russia. For more info, see [our news article on it](/news/article/standing-by-our-values).`,
+	},
+	{
 		date: `2025-09-29T12:50:00-07:00`,
 		product: 'web',
 		body: `### Improvements

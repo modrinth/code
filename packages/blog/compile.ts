@@ -62,7 +62,15 @@ async function compileArticles() {
 		const src = await fs.readFile(file, 'utf8')
 		const { content, data } = matter(src)
 
-		const { title, summary, date, slug: frontSlug, authors: authorsData, ...rest } = data
+		const {
+			title,
+			summary,
+			date,
+			slug: frontSlug,
+			authors: authorsData,
+			unlisted: unlistedRaw,
+			...rest
+		} = data
 		if (!title || !summary || !date) {
 			console.error(`❌  Missing required frontmatter in ${file}. Required: title, summary, date`)
 			process.exit(1)
@@ -102,6 +110,7 @@ async function compileArticles() {
 		})
 
 		const authors = authorsData ? authorsData : []
+		const unlisted = !!unlistedRaw
 
 		const varName = toVarName(slug)
 		const exportFile = path.posix.join(COMPILED_DIR, `${varName}.ts`)
@@ -123,6 +132,7 @@ export const article = {
   date: ${JSON.stringify(date)},
   slug: ${JSON.stringify(slug)},
   authors: ${JSON.stringify(authors)},
+  unlisted: ${JSON.stringify(unlisted)},
   thumbnail: ${thumbnailPresent},
   ${Object.keys(rest)
 		.map((k) => `${k}: ${JSON.stringify(rest[k])},`)
@@ -134,21 +144,23 @@ export const article = {
 		articleExports.push(`import { article as ${varName} } from "./${varName}";`)
 		articlesArray.push(varName)
 
-		articlesForRss.push({
-			title,
-			summary,
-			date,
-			slug,
-			html: minifiedHtml,
-		} as never)
+		if (!unlisted) {
+			articlesForRss.push({
+				title,
+				summary,
+				date,
+				slug,
+				html: minifiedHtml,
+			} as never)
 
-		articlesForJson.push({
-			title,
-			summary,
-			thumbnail: getThumbnailUrl(slug, thumbnailPresent),
-			date: new Date(date).toISOString(),
-			link: getArticleLink(slug),
-		} as never)
+			articlesForJson.push({
+				title,
+				summary,
+				thumbnail: getThumbnailUrl(slug, thumbnailPresent),
+				date: new Date(date).toISOString(),
+				link: getArticleLink(slug),
+			} as never)
+		}
 	}
 
 	console.log(`📂  Compiled ${files.length} articles.`)

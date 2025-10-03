@@ -1,5 +1,5 @@
-import { autoToHTML } from '@geometrically/minecraft-motd-parser'
 import type { GameVersion } from '@modrinth/ui'
+import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 

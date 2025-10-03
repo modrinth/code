@@ -6,6 +6,7 @@ export const article = {
   date: "2025-07-06T23:45:00.000Z",
   slug: "skins-now-in-modrinth-app",
   authors: ["bOHH0P9Z","Dc7EYhxG"],
+  unlisted: false,
   thumbnail: true,
   
 };

@@ -87,53 +87,57 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
 
 #[derive(thiserror::Error, Debug)]
 pub enum ApiError {
-    #[error("Environment Error")]
+    #[error(transparent)]
+    Internal(eyre::Report),
+    #[error(transparent)]
+    Request(eyre::Report),
+    #[error("Invalid input: {0}")]
+    InvalidInput(String),
+    #[error("Environment error")]
     Env(#[from] dotenvy::Error),
     #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
-    #[error("Database Error: {0}")]
+    #[error("Database error: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
-    #[error("Database Error: {0}")]
+    #[error("SQLx database error: {0}")]
     SqlxDatabase(#[from] sqlx::Error),
-    #[error("Database Error: {0}")]
+    #[error("Redis database error: {0}")]
     RedisDatabase(#[from] redis::RedisError),
-    #[error("Clickhouse Error: {0}")]
+    #[error("Clickhouse error: {0}")]
     Clickhouse(#[from] clickhouse::error::Error),
-    #[error("Internal server error: {0}")]
+    #[error("XML error: {0}")]
     Xml(String),
     #[error("Deserialization error: {0}")]
     Json(#[from] serde_json::Error),
-    #[error("Authentication Error: {0}")]
+    #[error("Authentication error: {0}")]
     Authentication(#[from] crate::auth::AuthenticationError),
-    #[error("Authentication Error: {0}")]
+    #[error("Authentication error: {0}")]
     CustomAuthentication(String),
-    #[error("Invalid Input: {0}")]
-    InvalidInput(String),
     #[error("Error while validating input: {0}")]
     Validation(String),
-    #[error("Search Error: {0}")]
+    #[error("Search error: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
-    #[error("Indexing Error: {0}")]
+    #[error("Indexing error: {0}")]
     Indexing(#[from] crate::search::indexing::IndexingError),
-    #[error("Payments Error: {0}")]
+    #[error("Payments error: {0}")]
     Payments(String),
-    #[error("Discord Error: {0}")]
+    #[error("Discord error: {0}")]
     Discord(String),
-    #[error("Slack Webhook Error: {0}")]
+    #[error("Slack webhook error: {0}")]
     Slack(String),
-    #[error("Captcha Error. Try resubmitting the form.")]
+    #[error("Captcha error. Try resubmitting the form.")]
     Turnstile,
     #[error("Error while decoding Base62: {0}")]
     Decoding(#[from] ariadne::ids::DecodingError),
-    #[error("Image Parsing Error: {0}")]
+    #[error("Image parsing error: {0}")]
     ImageParse(#[from] image::ImageError),
-    #[error("Password Hashing Error: {0}")]
+    #[error("Password hashing error: {0}")]
     PasswordHashing(#[from] argon2::password_hash::Error),
     #[error("{0}")]
     Mail(#[from] crate::queue::email::MailError),
     #[error("Error while rerouting request: {0:?}")]
     Reroute(#[from] reqwest::Error),
-    #[error("Unable to read Zip Archive: {0}")]
+    #[error("Unable to read zip archive: {0}")]
     Zip(#[from] zip::result::ZipError),
     #[error("IO Error: {0}")]
     Io(#[from] std::io::Error),
@@ -141,7 +145,7 @@ pub enum ApiError {
     NotFound,
     #[error("Conflict: {0}")]
     Conflict(String),
-    #[error("External tax compliance API Error")]
+    #[error("External tax compliance API error")]
     TaxComplianceApi,
     #[error(transparent)]
     TaxProcessor(#[from] crate::util::anrok::AnrokError),
@@ -157,6 +161,8 @@ impl ApiError {
     pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
         crate::models::error::ApiError {
             error: match self {
+                ApiError::Internal(..) => "internal_error",
+                Self::Request(..) => "request_error",
                 ApiError::Env(..) => "environment_error",
                 ApiError::Database(..) => "database_error",
                 ApiError::SqlxDatabase(..) => "database_error",
@@ -197,6 +203,9 @@ impl ApiError {
 impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self {
+            ApiError::Internal(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Request(..) => StatusCode::BAD_REQUEST,
+            ApiError::InvalidInput(..) => StatusCode::BAD_REQUEST,
             ApiError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SqlxDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -209,7 +218,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Search(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Indexing(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::FileHosting(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::InvalidInput(..) => StatusCode::BAD_REQUEST,
             ApiError::Validation(..) => StatusCode::BAD_REQUEST,
             ApiError::Payments(..) => StatusCode::FAILED_DEPENDENCY,
             ApiError::Discord(..) => StatusCode::FAILED_DEPENDENCY,

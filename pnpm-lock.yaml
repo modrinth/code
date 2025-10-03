@@ -47,9 +47,6 @@ importers:
 
   apps/app-frontend:
     dependencies:
-      '@geometrically/minecraft-motd-parser':
-        specifier: ^1.1.4
-        version: 1.1.4
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../../packages/assets
@@ -62,6 +59,9 @@ importers:
       '@sentry/vue':
         specifier: ^8.27.0
         version: 8.27.0(vue@3.5.13(typescript@5.5.4))
+      '@sfirew/minecraft-motd-parser':
+        specifier: ^1.1.6
+        version: 1.1.6
       '@tauri-apps/api':
         specifier: ^2.5.0
         version: 2.5.0
@@ -1742,9 +1742,6 @@ packages:
       ts-jest:
         optional: true
 
-  '@geometrically/minecraft-motd-parser@1.1.4':
-    resolution: {integrity: sha512-iW4mddbyLu2j2CUB8ODAuAEVpyf0ryzkDNmHQl3YbUL9s6jzKCBYWkfTqr61Yhse+nfA98JARc2Cw2R/rZebog==}
-
   '@humanfs/core@0.19.0':
     resolution: {integrity: sha512-2cbWIHbZVEweE853g8jymffCA+NCMiuqeECeBBLm8dg2oFdjuGJhgN4UAbI+6v0CKbbhvtXA4qV8YR5Ji86nmw==}
     engines: {node: '>=18.18.0'}
@@ -2524,6 +2521,9 @@ packages:
     engines: {node: '>=14.18'}
     peerDependencies:
       vue: 2.x || 3.x
+
+  '@sfirew/minecraft-motd-parser@1.1.6':
+    resolution: {integrity: sha512-DHh7sOD+o2RhzcCBxZGMwvNIq9ciUWNNuJ4ZYVmmSEzgaEI+dYhU1xp94UkEStH+/FFWNVYQm1cdHpsI8NCu5Q==}
 
   '@shikijs/core@1.29.2':
     resolution: {integrity: sha512-vju0lY9r27jJfOY4Z7+Rt/nIOjzJpZ3y+nYpqtUZInVoXQ/TJZcfGnNOGnKjFdVZb8qexiCuSlZRKcGfhhTTZQ==}
@@ -9474,8 +9474,6 @@ snapshots:
       tslib: 2.6.3
       typescript: 5.8.3
 
-  '@geometrically/minecraft-motd-parser@1.1.4': {}
-
   '@humanfs/core@0.19.0': {}
 
   '@humanfs/core@0.19.1': {}
@@ -10432,6 +10430,8 @@ snapshots:
       '@sentry/types': 8.27.0
       '@sentry/utils': 8.27.0
       vue: 3.5.13(typescript@5.5.4)
+
+  '@sfirew/minecraft-motd-parser@1.1.6': {}
 
   '@shikijs/core@1.29.2':
     dependencies:
