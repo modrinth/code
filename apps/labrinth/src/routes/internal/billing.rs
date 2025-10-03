@@ -290,7 +290,7 @@ pub async fn refund_charge(
                                     currency_code: charge.currency_code.clone(),
                                     accounting_time: Utc::now(),
                                     accounting_time_zone: anrok::AccountingTimeZone::Utc,
-                                    line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, refund_amount)],
+                                    line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, -refund_amount)],
                                 }
                             }
                         ).await;
