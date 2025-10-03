@@ -718,12 +718,9 @@ impl ChargeData {
         self.currency_code
             .to_lowercase()
             .parse::<stripe::Currency>()
-            .map_err(|_| {
-                ApiError::InvalidInput(
-                "Invalid currency code: could not convert to Stripe currency"
-                    .to_string(),
-            )
-            })
+            .map_err(|_| ApiError::InvalidInput(
+                format!("Invalid currency code '{}': could not convert to Stripe currency", &self.currency_code)
+            ))
     }
 }
 
