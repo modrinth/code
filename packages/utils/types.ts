@@ -334,6 +334,7 @@ export enum UserBadge {
 	ALPHA_TESTER = 1 << 4,
 	CONTRIBUTOR = 1 << 5,
 	TRANSLATOR = 1 << 6,
+	AFFILIATE = 1 << 7,
 }
 
 export type UserBadges = number
