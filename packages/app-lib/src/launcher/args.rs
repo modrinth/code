@@ -15,7 +15,7 @@ use daedalus::{
 };
 use dunce::canonicalize;
 use itertools::Itertools;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, ErrorKind};
 use std::net::SocketAddr;
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
@@ -60,7 +60,11 @@ pub fn get_class_paths(
                 return None;
             }
 
-            Some(get_lib_path(libraries_path, &library.name, false))
+            Some(get_lib_path(
+                libraries_path,
+                &library.name,
+                library.natives_os_key_and_classifiers(java_arch).is_some(),
+            ))
         }))
         .process_results(|iter| {
             iter.unique().join(classpath_separator(java_arch))
@@ -85,21 +89,21 @@ pub fn get_lib_path(
     lib: &str,
     allow_not_exist: bool,
 ) -> crate::Result<String> {
-    let path = libraries_path
-        .to_path_buf()
-        .join(get_path_from_artifact(lib)?);
+    let path = libraries_path.join(get_path_from_artifact(lib)?);
 
-    if !path.exists() && allow_not_exist {
-        return Ok(path.to_string_lossy().to_string());
-    }
-
-    let path = &canonicalize(&path).map_err(|_| {
-        crate::ErrorKind::LauncherError(format!(
-            "Library file at path {} does not exist",
-            path.to_string_lossy()
-        ))
-        .as_error()
-    })?;
+    let path = match canonicalize(&path) {
+        Ok(p) => p,
+        Err(err) if err.kind() == ErrorKind::NotFound && allow_not_exist => {
+            path
+        }
+        Err(err) => {
+            return Err(crate::ErrorKind::LauncherError(format!(
+                "Could not canonicalize library path {}: {err}",
+                path.display()
+            ))
+            .as_error());
+        }
+    };
 
     Ok(path.to_string_lossy().to_string())
 }
