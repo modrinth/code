@@ -1,0 +1,112 @@
+use itertools::Itertools;
+use serde::{
+    Deserialize, Deserializer, Serialize, Serializer,
+    de::value::StringDeserializer,
+};
+use typed_path::{Utf8Component, Utf8TypedPathBuf, Utf8UnixPathBuf};
+
+#[derive(
+    Eq, PartialEq, Hash, Debug, Clone, derive_more::Display, derive_more::Deref,
+)]
+#[repr(transparent)]
+pub struct SafeRelativeUtf8UnixPathBuf(Utf8UnixPathBuf);
+
+impl<'de> Deserialize<'de> for SafeRelativeUtf8UnixPathBuf {
+    fn deserialize<D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<Self, D::Error> {
+        // When parsed successfully, the path is guaranteed to be free from leading backslashes
+        // and Windows prefixes (e.g., `C:`)
+        let Utf8TypedPathBuf::Unix(path) =
+            Utf8TypedPathBuf::from(String::deserialize(deserializer)?)
+        else {
+            return Err(serde::de::Error::custom(
+                "File path must be a Unix-style relative path",
+            ));
+        };
+
+        // At this point, we may have a pseudo-Unix path like `my\directory`, which we should reject
+        // to guarantee consistent cross-platform behavior when interpreting component separators
+        if path.as_str().contains('\\') {
+            return Err(serde::de::Error::custom(
+                "File path must not contain backslashes",
+            ));
+        }
+
+        let mut path_components = path.components().peekable();
+
+        if path_components.peek().is_none() {
+            return Err(serde::de::Error::custom("File path cannot be empty"));
+        }
+
+        // All components should be normal: a file or directory name, not `/`, `.`, or `..`
+        if path_components.any(|component| !component.is_normal()) {
+            return Err(serde::de::Error::custom(
+                "File path cannot contain any special component or prefix",
+            ));
+        }
+
+        if path_components.any(|component| {
+            let file_name = component.as_str().to_ascii_uppercase();
+
+            // Windows reserves some special DOS device names in every directory, which may be optionally
+            // followed by an extension or alternate data stream name and be case insensitive. Trying to
+            // write, read, or delete these files is usually not that useful even for malware, since they
+            // mostly refer to console and printer devices, but it's best to avoid them entirely anyway.
+            // References:
+            // https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
+            // https://devblogs.microsoft.com/oldnewthing/20031022-00/?p=42073
+            // https://github.com/wine-mirror/wine/blob/01269452e0fbb1f081d506bd64996590a553e2b9/dlls/ntdll/path.c#L66
+            const RESERVED_WINDOWS_DEVICE_NAMES: &[&str] = &[
+                "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4",
+                "COM5", "COM6", "COM7", "COM8", "COM9", "COM¹", "COM²", "COM³",
+                "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8",
+                "LPT9", "LPT¹", "LPT²", "LPT³", "CONIN$", "CONOUT$",
+            ];
+
+            RESERVED_WINDOWS_DEVICE_NAMES.iter().any(|name| {
+                file_name == *name
+                    || file_name.starts_with(&format!("{name}."))
+                    || file_name.starts_with(&format!("{name}:"))
+            })
+        }) {
+            return Err(serde::de::Error::custom(
+                "File path contains a reserved Windows device name",
+            ));
+        }
+
+        Ok(Self(path))
+    }
+}
+
+impl Serialize for SafeRelativeUtf8UnixPathBuf {
+    fn serialize<S: Serializer>(
+        &self,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        let mut path_components = self.0.components().peekable();
+
+        if path_components.peek().is_none() {
+            return Err(serde::ser::Error::custom("File path cannot be empty"));
+        }
+
+        if path_components.any(|component| !component.is_normal()) {
+            return Err(serde::ser::Error::custom(
+                "File path cannot contain any special component or prefix",
+            ));
+        }
+
+        // Iterating over components does basic normalization by e.g. removing redundant
+        // slashes and collapsing `.` components, so do that to produce a cleaner output
+        // friendlier to the strict deserialization algorithm above
+        self.0.components().join("/").serialize(serializer)
+    }
+}
+
+impl TryFrom<String> for SafeRelativeUtf8UnixPathBuf {
+    type Error = serde::de::value::Error;
+
+    fn try_from(s: String) -> Result<Self, Self::Error> {
+        Self::deserialize(StringDeserializer::new(s))
+    }
+}
