@@ -133,6 +133,7 @@ rusty-money.workspace = true
 json-patch.workspace = true
 
 ariadne.workspace = true
+path-util.workspace = true
 
 clap = { workspace = true, features = ["derive"] }
 
