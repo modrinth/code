@@ -239,6 +239,7 @@ async function continueForm() {
 		}
 	} catch (error) {
 		console.error('Error occurred while continuing tax form:', error)
+		handleCancel()
 	} finally {
 		manualLoading.value = false
 	}
