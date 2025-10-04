@@ -4,7 +4,7 @@ edition.workspace = true
 
 [dependencies]
 typed-path.workspace = true
-serde = { workspace = true, features = ["derive"] }
+serde.workspace = true
 derive_more = { workspace = true, features = ["display", "deref"] }
 itertools.workspace = true
 
