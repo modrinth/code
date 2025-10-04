@@ -38,7 +38,7 @@
 		<div
 			class="mb-6 flex items-center gap-6 border-0 border-b-[1px] border-solid border-divider pb-6"
 		>
-			<h1 class="m-0 grow text-2xl font-extrabold">Manage affiliates</h1>
+			<h1 class="m-0 grow text-2xl font-extrabold">Manage affiliate links</h1>
 			<div class="flex items-center gap-2">
 				<div class="iconified-input">
 					<SearchIcon aria-hidden="true" />
@@ -70,22 +70,11 @@
 			<nuxt-link
 				:to="`/user/${affiliate.username}`"
 				tabindex="-1"
-				class="hover:brightness-[--hover-brightness]"
+				class="flex gap-4 items-center hover:brightness-[--hover-brightness] w-fit text-lg font-bold text-contrast hover:underline"
 			>
 				<Avatar :src="affiliate.avatar_url" circle size="48px" />
+				{{ affiliate.username }}
 			</nuxt-link>
-			<div class="flex flex-col gap-1">
-				<nuxt-link
-					:to="`/user/${affiliate.username}`"
-					class="w-fit text-lg font-bold text-contrast hover:underline"
-				>
-					{{ affiliate.username }}
-				</nuxt-link>
-				<div class="flex items-center gap-2">
-					<CopyCode :text="`https://modrinth.gg?afl=${affiliate.affiliate_codes[0]}`" />
-					<CopyCode :text="affiliate.affiliate_codes[0]" />
-				</div>
-			</div>
 			<div class="ml-auto flex items-center gap-2">
 				<ButtonStyled>
 					<nuxt-link>
@@ -95,7 +84,7 @@
 				</ButtonStyled>
 				<ButtonStyled color="red" color-fill="text">
 					<button @click="revokeAffiliateCode(affiliate.username, affiliate.id)">
-						<XCircleIcon /> Revoke affiliate code
+						<XCircleIcon /> Remove affiliate
 					</button>
 				</ButtonStyled>
 			</div>
@@ -104,10 +93,13 @@
 </template>
 <script setup lang="ts">
 import { ChartIcon, PlusIcon, SearchIcon, UserIcon, XCircleIcon, XIcon } from '@modrinth/assets'
-import { Avatar, Button, ButtonStyled, ConfirmModal, CopyCode, NewModal } from '@modrinth/ui'
+import { Avatar, Button, ButtonStyled, ConfirmModal, NewModal } from '@modrinth/ui'
 
 const createModal = useTemplateRef<typeof NewModal>('createModal')
 const revokeModal = useTemplateRef<typeof ConfirmModal>('revokeModal')
+
+const { data: affiliates, error, refresh } = useAsyncData('affiliates', () => useBaseFetch('affiliate/admin', { internal: true })).then(({ data }) => console.log(data))
+
 
 const filterQuery = ref('')
 

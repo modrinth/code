@@ -60,7 +60,18 @@
 						<Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
 					</template>
 					<template #title>
-						{{ user.username }}
+						<span class="flex items-center gap-2">
+							{{ user.username }}
+							<TagItem
+								v-if="isAdminViewing && isAffiliate"
+								:style="{
+									'--_color': 'var(--color-brand)',
+									'--_bg-color': 'var(--color-brand-highlight)',
+								}"
+								>
+								<AffiliateIcon /> Affiliate
+							</TagItem>
+						</span>
 					</template>
 					<template #summary>
 						{{
@@ -133,12 +144,20 @@
 										shown: auth.user && isStaff(auth.user),
 									},
 									{
+										id: 'toggle-affiliate',
+										action: () => toggleAffiliate(user.id),
+										shown: isAdminViewing,
+										remainOnClick: true,
+										color: isAffiliate ? 'red' : 'orange',
+									},
+									{
 										id: 'open-info',
 										action: () => $refs.userDetailsModal.show(),
 										shown: auth.user && isStaff(auth.user),
 									},
 								]"
 								aria-label="More options"
+								:dropdown-id="`${baseId}-more-options`"
 							>
 								<MoreVerticalIcon aria-hidden="true" />
 								<template #manage-projects>
@@ -164,6 +183,14 @@
 								<template #open-info>
 									<InfoIcon aria-hidden="true" />
 									{{ formatMessage(messages.infoButton) }}
+								</template>
+								<template #toggle-affiliate>
+									<AffiliateIcon aria-hidden="true" />
+									{{
+										formatMessage(
+											isAffiliate ? messages.removeAffiliateButton : messages.setAffiliateButton,
+										)
+									}}
 								</template>
 							</OverflowMenu>
 						</ButtonStyled>
@@ -341,6 +368,7 @@
 </template>
 <script setup>
 import {
+	AffiliateIcon,
 	BoxIcon,
 	CalendarIcon,
 	CheckIcon,
@@ -364,8 +392,10 @@ import {
 	ContentPageHeader,
 	NewModal,
 	OverflowMenu,
+	TagItem,
 	useRelativeTime,
 } from '@modrinth/ui'
+import { isAdmin, UserBadge } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
@@ -397,6 +427,8 @@ const { formatMessage } = vintl
 const formatCompactNumber = useCompactNumber(true)
 
 const formatRelativeTime = useRelativeTime()
+
+const baseId = useId()
 
 const messages = defineMessages({
 	profileProjectsStats: {
@@ -472,44 +504,60 @@ const messages = defineMessages({
 		id: 'profile.button.info',
 		defaultMessage: 'View user details',
 	},
+	setAffiliateButton: {
+		id: 'profile.button.set-affiliate',
+		defaultMessage: 'Set as affiliate',
+	},
+	removeAffiliateButton: {
+		id: 'profile.button.remove-affiliate',
+		defaultMessage: 'Remove as affiliate',
+	},
+	affiliateLabel: {
+		id: 'profile.label.affiliate',
+		defaultMessage: 'Affiliate',
+	},
 	userNotFoundError: {
 		id: 'profile.error.not-found',
 		defaultMessage: 'User not found',
 	},
 })
 
-let user, projects, organizations, collections
+let user, projects, organizations, collections, refreshUser
 try {
-	;[{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
-		await Promise.all([
-			useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
-			useAsyncData(
-				`user/${route.params.id}/projects`,
-				() => useBaseFetch(`user/${route.params.id}/projects`),
-				{
-					transform: (projects) => {
-						for (const project of projects) {
-							project.categories = project.categories.concat(project.loaders)
-							project.project_type = data.$getProjectTypeForUrl(
-								project.project_type,
-								project.categories,
-								tags.value,
-							)
-						}
+	;[
+		{ data: user, refresh: refreshUser },
+		{ data: projects },
+		{ data: organizations },
+		{ data: collections },
+	] = await Promise.all([
+		useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
+		useAsyncData(
+			`user/${route.params.id}/projects`,
+			() => useBaseFetch(`user/${route.params.id}/projects`),
+			{
+				transform: (projects) => {
+					for (const project of projects) {
+						project.categories = project.categories.concat(project.loaders)
+						project.project_type = data.$getProjectTypeForUrl(
+							project.project_type,
+							project.categories,
+							tags.value,
+						)
+					}
 
-						return projects
-					},
+					return projects
 				},
-			),
-			useAsyncData(`user/${route.params.id}/organizations`, () =>
-				useBaseFetch(`user/${route.params.id}/organizations`, {
-					apiVersion: 3,
-				}),
-			),
-			useAsyncData(`user/${route.params.id}/collections`, () =>
-				useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
-			),
-		])
+			},
+		),
+		useAsyncData(`user/${route.params.id}/organizations`, () =>
+			useBaseFetch(`user/${route.params.id}/organizations`, {
+				apiVersion: 3,
+			}),
+		),
+		useAsyncData(`user/${route.params.id}/collections`, () =>
+			useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
+		),
+	])
 } catch {
 	throw createError({
 		fatal: true,
@@ -631,6 +679,17 @@ async function copyId() {
 
 async function copyPermalink() {
 	await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`)
+}
+
+const isAffiliate = computed(() => user.value.badges & UserBadge.AFFILIATE)
+const isAdminViewing = computed(() => isAdmin(auth.value.user))
+
+async function toggleAffiliate(id) {
+	await useBaseFetch(`user/${id}`, {
+		method: 'PATCH',
+		body: { badges: user.value.badges ^ (1 << 7) },
+	})
+	refreshUser()
 }
 
 const navLinks = computed(() => [

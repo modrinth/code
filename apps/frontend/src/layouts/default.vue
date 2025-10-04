@@ -492,6 +492,10 @@
 					<template #organizations>
 						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.organizations) }}
 					</template>
+					<template #affiliate-links>
+						<AffiliateIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.affiliateLinksButton) }}
+					</template>
 					<template #revenue>
 						<CurrencyIcon aria-hidden="true" /> {{ formatMessage(messages.revenue) }}
 					</template>
@@ -832,7 +836,7 @@ import {
 	OverflowMenu,
 	PagewideBanner,
 } from '@modrinth/ui'
-import { isAdmin, isStaff } from '@modrinth/utils'
+import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
@@ -1068,7 +1072,7 @@ const messages = defineMessages({
 	},
 	manageAffiliates: {
 		id: 'layout.action.manage-affiliates',
-		defaultMessage: 'Manage affiliates',
+		defaultMessage: 'Manage affiliate links',
 	},
 	newProject: {
 		id: 'layout.action.new-project',
@@ -1246,6 +1250,11 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'organizations',
 			link: '/dashboard/organizations',
+		},
+		{
+			id: 'affiliate-links',
+			link: '/dashboard/affiliate-links',
+			shown: auth.value.user.badges & UserBadge.AFFILIATE,
 		},
 		{
 			id: 'revenue',

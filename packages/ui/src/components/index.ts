@@ -2,6 +2,7 @@
 export { default as Accordion } from './base/Accordion.vue'
 export { default as Admonition } from './base/Admonition.vue'
 export { default as AppearingProgressBar } from './base/AppearingProgressBar.vue'
+export { default as AutoBrandIcon } from './base/AutoBrandIcon.vue'
 export { default as AutoLink } from './base/AutoLink.vue'
 export { default as Avatar } from './base/Avatar.vue'
 export { default as Badge } from './base/Badge.vue'

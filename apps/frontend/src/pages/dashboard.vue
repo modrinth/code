@@ -30,6 +30,13 @@
 					>
 						<LibraryIcon aria-hidden="true" />
 					</NavStackItem>
+					<NavStackItem
+						v-if="isAffiliate"
+						link="/dashboard/affiliate-links"
+						:label="formatMessage(commonMessages.affiliateLinksButton)"
+					>
+						<AffiliateIcon aria-hidden="true" />
+					</NavStackItem>
 					<NavStackItem link="/dashboard/revenue" label="Revenue">
 						<CurrencyIcon aria-hidden="true" />
 					</NavStackItem>
@@ -41,8 +48,9 @@
 		</div>
 	</div>
 </template>
-<script setup>
+<script setup lang="ts">
 import {
+	AffiliateIcon,
 	BellIcon as NotificationsIcon,
 	ChartIcon,
 	CurrencyIcon,
@@ -53,9 +61,16 @@ import {
 	ReportIcon,
 } from '@modrinth/assets'
 import { commonMessages } from '@modrinth/ui'
+import { type User,UserBadge } from '@modrinth/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
+
+const auth = (await useAuth()) as Ref<{ user: User | null }>
+
+const isAffiliate = computed(() => {
+	return auth.value.user && (auth.value.user.badges & UserBadge.AFFILIATE)
+})
 
 const { formatMessage } = useVIntl()
 
