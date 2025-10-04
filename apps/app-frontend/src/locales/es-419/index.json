@@ -258,7 +258,7 @@
     "message": "¿Reparar instancia?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Reparación en proceso"
+    "message": "Reparación en proceso..."
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Restablecer al actual"

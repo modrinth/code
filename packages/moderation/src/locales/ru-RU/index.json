@@ -126,7 +126,7 @@
     "defaultMessage": "Укажите среду в которой ваш {projectType} работает."
   },
   "nags.select-environments.title": {
-    "defaultMessage": "Укажите среды"
+    "defaultMessage": "Укажите среду"
   },
   "nags.select-license.description": {
     "defaultMessage": "Выберите лицензию, по которой распространяется ваш {projectType}."
@@ -144,7 +144,7 @@
     "defaultMessage": "Настроить описание"
   },
   "nags.settings.environments.title": {
-    "defaultMessage": "Настроить среды"
+    "defaultMessage": "Настроить среду"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Настроить лицензию"

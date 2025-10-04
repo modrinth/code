@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Скасувати"
+  },
+  "action.continue": {
+    "message": "Продовжити"
+  },
   "admin.billing.error.not-found": {
     "message": "Користувача не знайдено"
   },
@@ -413,6 +419,15 @@
   "collection.title": {
     "message": "{name} - Добірка"
   },
+  "common.close": {
+    "message": "Закрити"
+  },
+  "common.no": {
+    "message": "Ні"
+  },
+  "common.yes": {
+    "message": "Так"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Створити нову"
   },
@@ -424,6 +439,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Ваші добірки"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Закордонна організація означає ділову організацію, організовану за межами США (наприклад, неамериканську корпорацію, партнерство, або ТОВ)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Закордонна організація"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Приватна особа"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Чи ви є приватною особою чи частиною закордонної організації?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Податкова форма"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth використовує стороннього постачальника Track1099 для безпечного збору та зберігання ваших податкових форм. <security-link>Дізнайтеся більше тут.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Практики безпеки"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Чи ви громадянин США?"
   },
   "error.collection.404.list_item.1": {
     "message": "Ви, можливо, помилилися під час написання URL добірки."
@@ -728,6 +767,15 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "Необхідні дії щодо оплати рахунків."
   },
+  "layout.banner.tax.action": {
+    "message": "Заповніть податкову форму"
+  },
+  "layout.banner.tax.description": {
+    "message": "Ви вже вивели більше ніж $600 з Modrinth цього року. Щоб дотримуватися податкових форм, ви маєте заповнити податкову форму. Ваші виведення затримані до поки ця форма не буде заповнена."
+  },
+  "layout.banner.tax.title": {
+    "message": "Вимагано податкову форму"
+  },
   "layout.banner.verify-email.action": {
     "message": "Повторно надіслати електронний лист для підтвердження"
   },
@@ -1007,6 +1055,9 @@
   "project-moderation-nags.submit-for-review": {
     "message": "Надіслати на розгляд"
   },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Відправити на розгляд"
+  },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Ваш проєкт доступний для перегляду тільки для учасників проєкту. Він має бути перевіреним модераторами для подальшої публікації."
   },
@@ -1100,11 +1151,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers - це найлегший спосіб грати з друзями без зайвого клопоту!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / місяць"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "Починаючи від $5{monthly}"
+    "message": "Починаючи від {price}<small> / місяць</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Створити сервер"

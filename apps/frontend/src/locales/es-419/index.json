@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Cancelar"
+  },
+  "action.continue": {
+    "message": "Continuar"
+  },
   "admin.billing.error.not-found": {
     "message": "Usuario no encontrado"
   },
@@ -413,6 +419,18 @@
   "collection.title": {
     "message": "{name} - Colección"
   },
+  "common.close": {
+    "message": "Cerrar"
+  },
+  "common.no": {
+    "message": "No"
+  },
+  "common.yes": {
+    "message": "Si"
+  },
+  "create.collection.cancel": {
+    "message": "Cancelar"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Crear nuevo"
   },
@@ -424,6 +442,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Tus colecciones"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Una entidad extranjera es una entidad comercial constituida fuera de Estados Unidos (como una corporación, sociedad o LLC no estadounidense)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entidad extranjera"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Particular"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "¿Eres un particular o formas parte de una entidad extranjera?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Formulario fiscal"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth utiliza al proveedor externo Track1099 para recopilar y almacenar de forma segura tus formularios fiscales. <security-link>Más información aquí.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Prácticas de seguridad"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "¿Eres ciudadano estadounidense?"
   },
   "error.collection.404.list_item.1": {
     "message": "Puede que hayas escrito mal la URL de la colección."
@@ -728,6 +770,15 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "Se requiere una acción en facturación."
   },
+  "layout.banner.tax.action": {
+    "message": "Completar formulario fiscal"
+  },
+  "layout.banner.tax.description": {
+    "message": "Ya retiraste más de \\$600 de Modrinth este año. Para cumplir con las regulaciones fiscales, necesitas completar un formulario fiscal. Tus retiros estarán en pausa hasta que envíes este formulario."
+  },
+  "layout.banner.tax.title": {
+    "message": "Formulario fiscal requerido"
+  },
   "layout.banner.verify-email.action": {
     "message": "Reenviar correo de verificación"
   },
@@ -977,9 +1028,6 @@
   "project-member-header.invitation-title": {
     "message": "Invitación para participar en el proyecto"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "Has sido invitado a formar parte de este proyecto con el rol de '{role}'."
-  },
   "project-member-header.success": {
     "message": "Éxito"
   },
@@ -1100,11 +1148,8 @@
   "project.actions.servers-promo.description": {
     "message": "¡Modrinth Servers es la forma más fácil de jugar con tus amigos sin complicaciones!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / mes"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "A partir de $5{monthly}"
+    "message": "Desde {price}<small> / mes</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Crear un servidor"

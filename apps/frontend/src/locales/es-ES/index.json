@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Cancelar"
+  },
+  "action.continue": {
+    "message": "Continuar"
+  },
   "admin.billing.error.not-found": {
     "message": "Usuario no encontrado"
   },
@@ -413,6 +419,18 @@
   "collection.title": {
     "message": "{name} - Colección"
   },
+  "common.close": {
+    "message": "Cerrar"
+  },
+  "common.no": {
+    "message": "No"
+  },
+  "common.yes": {
+    "message": "Si"
+  },
+  "create.collection.cancel": {
+    "message": "Cancelar"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Crear nuevo"
   },
@@ -785,8 +803,17 @@
   "layout.nav.home": {
     "message": "Inicio"
   },
+  "layout.nav.host-a-server": {
+    "message": "Hostear un servidor"
+  },
+  "layout.nav.profile": {
+    "message": "Perfil"
+  },
   "layout.nav.search": {
     "message": "Buscar"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Actualizar a Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filtrar por"
@@ -799,6 +826,9 @@
   },
   "moderation.search.placeholder": {
     "message": "Buscar..."
+  },
+  "moderation.sort.by": {
+    "message": "Ordenar por"
   },
   "profile.error.not-found": {
     "message": "Usuario no encontrado"
@@ -919,12 +949,6 @@
   },
   "project.actions.servers-promo.description": {
     "message": "¡Modrinth Servers es la forma más fácil de jugar con tus amigos sin complicaciones!"
-  },
-  "project.actions.servers-promo.monthly": {
-    "message": "/ mes"
-  },
-  "project.actions.servers-promo.pricing": {
-    "message": "A partir de $5{monthly}"
   },
   "project.actions.servers-promo.title": {
     "message": "Crear un servidor"

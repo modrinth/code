@@ -428,6 +428,102 @@
   "common.yes": {
     "message": "Ja"
   },
+  "create.collection.cancel": {
+    "message": "Abbrechen"
+  },
+  "create.collection.create-collection": {
+    "message": "Kollektion erstellen"
+  },
+  "create.collection.error-title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "create.collection.name-label": {
+    "message": "Name"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Namen der Kollektion eingeben..."
+  },
+  "create.collection.summary-label": {
+    "message": "Kurzbeschreibung"
+  },
+  "create.collection.title": {
+    "message": "Eine Kollektion erstellen"
+  },
+  "create.limit-alert.type-collection": {
+    "message": "Kollektion"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "Organisation"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "Kollektionen"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "Organisationen"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "Projekte"
+  },
+  "create.limit-alert.type-project": {
+    "message": "Projekt"
+  },
+  "create.organization.cancel": {
+    "message": "Abbrechen"
+  },
+  "create.organization.create-organization": {
+    "message": "Organisation erstellen"
+  },
+  "create.organization.error-title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "create.organization.name-label": {
+    "message": "Name"
+  },
+  "create.organization.summary-label": {
+    "message": "Kurzbeschreibung"
+  },
+  "create.organization.title": {
+    "message": "Eine Organisation erstellen"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Abbrechen"
+  },
+  "create.project.create-project": {
+    "message": "Projekt erstellen"
+  },
+  "create.project.error-title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "create.project.name-label": {
+    "message": "Name"
+  },
+  "create.project.name-placeholder": {
+    "message": "Projektnamen eingeben..."
+  },
+  "create.project.summary-label": {
+    "message": "Kurzbeschreibung"
+  },
+  "create.project.title": {
+    "message": "Ein Projekt erstellen"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-label": {
+    "message": "Sichtbarkeit"
+  },
+  "create.project.visibility-private": {
+    "message": "Privat"
+  },
+  "create.project.visibility-public": {
+    "message": "Öffentlich"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Nicht gelistet"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Erstellen"
   },
@@ -440,6 +536,9 @@
   "dashboard.collections.long-title": {
     "message": "Deine Kollektionen"
   },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Ein ausländisches Unternehmen bezeichnet eine Geschäftseinheit, die außerhalb der Vereinigten Staaten gegründet wurde (z. B. eine nicht-US-amerikanische Kapitalgesellschaft, Personengesellschaft oder LLC)."
+  },
   "dashboard.creator-tax-form-modal.entity.foreign-entity": {
     "message": "Ausländische Einheit"
   },
@@ -451,6 +550,9 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Steuerformular"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth verwendet den Drittanbieter Track1099, um deine Steuerformulare sicher zu erfassen und zu speichern. <security-link>Hier erfährst du mehr.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Sicherheitspraktiken"
@@ -764,6 +866,9 @@
   "layout.banner.tax.action": {
     "message": "Steuerformular ausfüllen"
   },
+  "layout.banner.tax.description": {
+    "message": "Du hast in diesem Jahr bereits über 600 US-Dollar von Modrinth abgehoben. Um den steuerlichen Vorschriften zu entsprechen, musst du ein Steuerformular ausfüllen. Deine Auszahlungen sind pausiert, bis dieses Formular eingereicht wurde."
+  },
   "layout.banner.tax.title": {
     "message": "Steuerformular erforderlich"
   },
@@ -1046,6 +1151,9 @@
   "project-moderation-nags.submit-for-review": {
     "message": "Zur Überprüfung einsenden"
   },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Zur Überprüfung einsenden"
+  },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Dein Projekt kann nur von Mitgliedern dieses Projektes gesehen werden. Es muss erst von der Moderation bestätigt werden, damit es öffentlich zugänglich ist."
   },
@@ -1139,11 +1247,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Server ist der einfachste Weg mit deinen Freunden ohne Aufwand zu spielen!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": "/ Monat"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "Startet ab $5{monthly}"
+    "message": "Ab {price}<small> / Monat</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Erstelle einen Server"

@@ -977,9 +977,6 @@
   "project-member-header.invitation-title": {
     "message": "جمڤوتن اونتوق مڽرتاءي ڤروجيک"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "اندا تله دجمڤوت منجادي اهلي ڤروجيک اين دڠن ڤرانن '{role}'."
-  },
   "project-member-header.success": {
     "message": "برجاي"
   },
@@ -1099,12 +1096,6 @@
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers اياله چارا ڤاليڠ موده اونتوق برماءين دڠن راکن اندا تنڤا ڤرلو برسوسه ڤايه!"
-  },
-  "project.actions.servers-promo.monthly": {
-    "message": " / بولن"
-  },
-  "project.actions.servers-promo.pricing": {
-    "message": "برمولا ڤد هرݢ $5{monthly}"
   },
   "project.actions.servers-promo.title": {
     "message": "چيڤتا سبواه ڤلاين"

@@ -14,6 +14,9 @@
   "app-marketing.download.linux": {
     "message": "Linux"
   },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Ang bersiyong Linux ng Modrinth App ay <issues-link>alam na may suliranin</issues-link> sa iilang mga sistema at konpigurasyon. Kapag ang Modrinth App ay hindi matatag sa iyong sistema, hinihikayat ka namin na subukan ang ibang mga aplikasyon tulad ng <prism-link>Prism Launcher</prism-link> upang mapadali ang pag-i-install ng kontentong Modrinth."
+  },
   "app-marketing.download.mac": {
     "message": "Mac"
   },
@@ -21,7 +24,7 @@
     "message": "Mga pagpipilian sa pagdownload"
   },
   "app-marketing.download.title": {
-    "message": "I-download ang App ng Modrinth (Beta)"
+    "message": "I-download ang Modrinth App (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -30,13 +33,13 @@
     "message": "Open source"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "App ng Modrinth"
+    "message": "Modrinth App"
   },
   "app-marketing.features.play.description": {
-    "message": "Gamitin ang App ng Modrinth sa pagdownload at paglaro ng iyong mga paboritong mods at modpacks."
+    "message": "Gamitin ang Modrinth App sa pagdownload at paglaro ng iyong mga paboritong mods at modpacks."
   },
   "app-marketing.hero.download-button": {
-    "message": "I-download ang App ng Modrinth"
+    "message": "I-download ang Modrinth App"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Mga setting sa account"
@@ -50,6 +53,15 @@
   "collection.delete-modal.description": {
     "message": "Habambuhay na matatanggal ang koleksiyong ito. Hindi mababawi ang pagkilos na ito."
   },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Ang banyagang entidad ay isang kalakalang entidad na nakaayos sa labas ng Estados Unidos (tulod ng di-US na korporasyon, partnership, o LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Banyagang entidad"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Isa ka bang pribadong indibidwal o parte ng isang banyagang entidad?"
+  },
   "landing.feature.launcher.description": {
     "message": "Binibigyang-daan ng open-source API ng Modrinth ang mga launcher na makadagdag ng malalimang pagsasama sa Modrinth. Maaari mong gamitin ang Modrinth sa <link>aming app</link> at sa iilang pinakasikat na mga launcher gaya ng ATLauncher, MultiMC, at Prism Launcher. "
   },
@@ -61,6 +73,12 @@
   },
   "layout.banner.add-email.button": {
     "message": "Mga setting sa account"
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Itong pinakalat na frontend ng Modrinth ay bigong makabuo ng estato galing sa API. Maaaring dahil ito sa isang outage o error sa konpigurasyon. Muling itayo kapag magagamit na ang API. Error codes: {errors}; Kasalukuyang URL ng API ay: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "May error sa pagbuo ng estado galing sa API habang nagpapatayo."
   },
   "layout.footer.about": {
     "message": "Tungkol"
@@ -108,13 +126,13 @@
     "message": "Mga Produkto"
   },
   "layout.footer.products.app": {
-    "message": "App ng Modrinth"
+    "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Mga Modrinth na Serber"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Mga Mapagkukunan"
@@ -181,6 +199,9 @@
   },
   "project.settings.title": {
     "message": "Mga Setting"
+  },
+  "settings.display.flags.description": {
+    "message": "Magpagana o huwag magpagana ng mga tiyak na feature sa iyong device."
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Pahina ng mga Resource Pack"

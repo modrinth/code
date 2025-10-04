@@ -298,6 +298,90 @@
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Salin kode ke papan klip"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Klien"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Klien dan peladen"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Klien atau peladen"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Peladen"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Tidak didukung"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} dengan digit terakhir {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Metode pembayaran tidak dikenal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Semua"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {Paket Data}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Paket Data"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {paket data}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {Mod}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mod"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {mod}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {Paket Mod}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Paket Mod"
   }
 }
 

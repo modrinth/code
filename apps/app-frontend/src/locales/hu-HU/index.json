@@ -21,7 +21,7 @@
     "message": "Erőforráskezelés"
   },
   "instance.add-server.add-and-play": {
-    "message": "Hozzáadás és csatlakozás"
+    "message": "Hozzáadás és játék"
   },
   "instance.add-server.add-server": {
     "message": "Szerver hozzáadása"
@@ -293,6 +293,9 @@
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Példány leválasztása"
   },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": ""
+  },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Modpack-ről való leválasztás"
   },
@@ -381,7 +384,7 @@
     "message": "Csak Minecraft 1.20+ tól tudsz egyből egyjátékos világba belépni"
   },
   "instance.worlds.play_instance": {
-    "message": "Profil indítása"
+    "message": "Példány "
   },
   "instance.worlds.type.server": {
     "message": "Szerver"

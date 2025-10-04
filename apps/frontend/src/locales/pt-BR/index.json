@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Cancelar"
+  },
+  "action.continue": {
+    "message": "Continuar"
+  },
   "admin.billing.error.not-found": {
     "message": "Usuário não encontrado"
   },
@@ -255,7 +261,7 @@
     "message": "Insira o código de dois fatores"
   },
   "auth.sign-in.2fa.placeholder": {
-    "message": "Digite o código..."
+    "message": "Insira o código..."
   },
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Esqueceu sua senha?</forgot-password-link> • <create-account-link>Criar uma conta</create-account-link>"
@@ -413,6 +419,144 @@
   "collection.title": {
     "message": "{name} - Coleção"
   },
+  "common.close": {
+    "message": "Fechar"
+  },
+  "common.no": {
+    "message": "Não"
+  },
+  "common.yes": {
+    "message": "Sim"
+  },
+  "create.collection.cancel": {
+    "message": "Cancelar"
+  },
+  "create.collection.collection-info": {
+    "message": "Sua nova coleção será criada como pública {count, plural, =0 {sem nenhum projeto} one {com # projeto} other {com # projetos}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Criar coleção"
+  },
+  "create.collection.error-title": {
+    "message": "Ocorreu um erro"
+  },
+  "create.collection.name-label": {
+    "message": "Nome"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Insira um nome para a coleção..."
+  },
+  "create.collection.summary-description": {
+    "message": "Uma ou duas frases que descrevam sua coleção."
+  },
+  "create.collection.summary-label": {
+    "message": "Descrição"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Esta é uma coleção de..."
+  },
+  "create.collection.title": {
+    "message": "Criando uma coleção"
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Contatar suporte"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "Limite de {type} atingido"
+  },
+  "create.limit-alert.type-collection": {
+    "message": "coleção"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organização"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "coleções"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organizações"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projetos"
+  },
+  "create.limit-alert.type-project": {
+    "message": "projeto"
+  },
+  "create.organization.cancel": {
+    "message": "Cancelar"
+  },
+  "create.organization.create-organization": {
+    "message": "Criar organização"
+  },
+  "create.organization.error-title": {
+    "message": "Ocorreu um erro"
+  },
+  "create.organization.name-label": {
+    "message": "Nome"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Insira o nome da organização..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Você será o dono desta organização, mas pode convidar outros membros e transferir a propriedade a qualquer momento."
+  },
+  "create.organization.summary-description": {
+    "message": "Escreva uma ou duas frases para descrever sua organização."
+  },
+  "create.organization.summary-label": {
+    "message": "Descrição"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Uma organização para..."
+  },
+  "create.organization.title": {
+    "message": "Criando uma organização"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Cancelar"
+  },
+  "create.project.create-project": {
+    "message": "Criar projeto"
+  },
+  "create.project.error-title": {
+    "message": "Ocorreu um erro"
+  },
+  "create.project.name-label": {
+    "message": "Nome"
+  },
+  "create.project.name-placeholder": {
+    "message": "Insira o nome do projeto..."
+  },
+  "create.project.summary-description": {
+    "message": "Escreva uma ou duas frases para descrever seu projeto."
+  },
+  "create.project.summary-label": {
+    "message": "Descrição"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Este projeto adiciona..."
+  },
+  "create.project.title": {
+    "message": "Criando um projeto"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-label": {
+    "message": "Visibilidade"
+  },
+  "create.project.visibility-private": {
+    "message": "Privado"
+  },
+  "create.project.visibility-public": {
+    "message": "Público"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Não listado"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Criar nova"
   },
@@ -424,6 +568,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Suas coleções"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Uma entidade estrangeira significa uma entidade comercial organizada fora dos Estados Unidos (como uma corporação, parceria ou LLC não americana)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entidade estrangeira"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Pessoa física"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Você é um indivíduo particular ou faz parte de uma entidade estrangeira?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Formulário fiscal"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "A Modrinth utiliza o provedor terceirizado Track1099 para coletar e armazenar com segurança seus formulários fiscais. <security-link>Saiba mais aqui.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Práticas de segurança"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Você é cidadão americano?"
   },
   "error.collection.404.list_item.1": {
     "message": "Você pode ter digitado incorretamente o URL da coleção."
@@ -728,6 +896,15 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "Ação de cobrança necessária."
   },
+  "layout.banner.tax.action": {
+    "message": "Preencha o formulário fiscal"
+  },
+  "layout.banner.tax.description": {
+    "message": "Você já retirou mais de US$ 600 do Modrinth este ano. Para cumprir as normas fiscais, você precisa preencher um formulário fiscal. Suas retiradas ficarão suspensas até que esse formulário seja enviado."
+  },
+  "layout.banner.tax.title": {
+    "message": "Formulário fiscal necessário"
+  },
   "layout.banner.verify-email.action": {
     "message": "Reenviar verificação de e-mail"
   },
@@ -978,7 +1155,7 @@
     "message": "Convite para participar do projeto"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Você foi convidado para ser um membro deste projeto como '{role}'."
+    "message": "Você foi convidado para ser um membro deste projeto como \"{role}''."
   },
   "project-member-header.success": {
     "message": "Sucesso"
@@ -1005,6 +1182,9 @@
     "message": "Você precisa completar as etapas necessárias nas tarefas de publicação!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "Enviar para revisão"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "Enviar para revisão"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1100,11 +1280,8 @@
   "project.actions.servers-promo.description": {
     "message": "O Modrinth Servers é a maneira mais fácil de jogar com seus amigos sem complicações!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / mês"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "A partir de $5{monthly}"
+    "message": "A partir de {price}<small> / mês</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Criar um servidor"

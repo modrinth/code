@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Anuluj"
+  },
+  "action.continue": {
+    "message": "Dalej"
+  },
   "admin.billing.error.not-found": {
     "message": "Nie znaleziono użytkownika"
   },
@@ -21,7 +27,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Wersje Modrinth App dla systemu Linux są <issues-link>znane z występowania problemów</issues-link> na niektórych systemach i konfiguracjach. Jeśli Modrinth App działa niestabilnie na Twoim komputerze, zachęcamy do wypróbowania innych aplikacji, takich jak <prism-link>Prism Launcher</prism-link>, które umożliwiają łatwą instalację treści z Modrinth."
+    "message": "W wersjach Modrinth App dla systemu Linux <issues-link>mogą występywać problemy</issues-link> na niektórych systemach i konfiguracjach. Jeśli Modrinth App działa niestabilnie na Twoim komputerze, zachęcamy do wypróbowania innych aplikacji, takich jak <prism-link>Prism Launcher</prism-link>, które umożliwiają łatwą instalację treści z Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -78,7 +84,7 @@
     "message": "Szukaj modów"
   },
   "app-marketing.features.mod-management.title": {
-    "message": "Zarządzanie modem"
+    "message": "Zarządzanie modami"
   },
   "app-marketing.features.mod-management.version": {
     "message": "Wersja"
@@ -165,7 +171,7 @@
     "message": "Aplikacja Modrinth jest w pełni zintegrowana z witryną, dzięki czemu możesz uzyskać dostęp do wszystkich swoich ulubionych projektów bezpośrednio z aplikacji!"
   },
   "app-marketing.features.website.title": {
-    "message": "Integracja z przeglądarką"
+    "message": "Integracja ze stroną"
   },
   "app-marketing.features.youve-used-before": {
     "message": "które kiedykolwiek użyłeś"
@@ -189,7 +195,7 @@
     "message": "Zrzut ekranu głównego menu instancji Cobblemon."
   },
   "app-marketing.hero.more-download-options": {
-    "message": "Więcej Opcji Pobierania"
+    "message": "Więcej opcji pobierania"
   },
   "auth.authorize.action.authorize": {
     "message": "Autoryzuj"
@@ -249,10 +255,10 @@
     "message": "Zresetuj swoje hasło"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Proszę wprowadzić kod otrzymany kod 2FA by kontynuować."
+    "message": "Proszę wprowadzić kod otrzymany kod 2FA, by kontynuować."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Wprowadź otrzymany kod 2FA by kontynuować"
+    "message": "Wprowadź otrzymany kod 2FA, by kontynuować"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Wprowadź kod..."
@@ -330,7 +336,7 @@
     "message": "Nie mogliśmy zweryfikować Twojego adresu e-mail. Spróbuj ponownie wysłać e-mail weryfikacyjny za pomocą panelu, logując się."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
-    "message": "Nie mogliśmy w stanie zweryfikować twojego adresu e-mail, spróbuj ponownie przyciskiem poniżej."
+    "message": "Nie byliśmy w stanie zweryfikować twojego adresu e-mail, spróbuj ponownie przyciskiem poniżej."
   },
   "auth.verify-email.failed-verification.title": {
     "message": "Weryfikacja e-maila nie powiodła się"
@@ -345,13 +351,13 @@
     "message": "Zweryfikuj e-mail"
   },
   "auth.welcome.checkbox.subscribe": {
-    "message": "Subskrybuj aktualności o Modrinth"
+    "message": "Otrzymuj aktualności o Modrinth"
   },
   "auth.welcome.description": {
     "message": "Teraz jesteś częścią wspaniałej społeczności twórców i odkrywców, którzy już tworzą, pobierają i na bieżąco korzystają z niesamowitych modów."
   },
   "auth.welcome.label.tos": {
-    "message": "Przez stworzenie konta, zaakceptowałeś nasze<terms-link>Warunki</terms-link> oraz <privacy-policy-link>Politykę Prywatności</privacy-policy-link>."
+    "message": "Przez stworzenie konta, zgadzasz się na nasze<terms-link>Warunki</terms-link> oraz <privacy-policy-link>Politykę prywatności</privacy-policy-link>."
   },
   "auth.welcome.long-title": {
     "message": "Witaj w Modrinth!"
@@ -372,16 +378,16 @@
     "message": "Przestań obserwować projekt"
   },
   "collection.delete-modal.description": {
-    "message": "To usunie tą kolecje na zawsze. Nie może być to cofnięte."
+    "message": "To usunie tą kolekcję na zawsze. Nie może być to cofnięte."
   },
   "collection.delete-modal.title": {
-    "message": "Czy jesteś pewny by usunąć tą kolecje?"
+    "message": "Czy na pewno chcesz usunąć tą kolekcję?"
   },
   "collection.description": {
-    "message": "{description} - Zobacz kolekcje {name} od {username} na Modrinth"
+    "message": "{description} - Zobacz kolekcję {name} od {username} na Modrinth"
   },
   "collection.description.following": {
-    "message": "Automatycznie wygenerowano kolekcję wszystkich projektów, które obserwujesz."
+    "message": "Automatycznie wygenerowana kolekcja wszystkich projektów, które obserwujesz."
   },
   "collection.error.not-found": {
     "message": "Nie znaleziono kolekcji"
@@ -396,7 +402,7 @@
     "message": "Wybrane przez"
   },
   "collection.label.no-projects": {
-    "message": "Ta kolekcja nie ma projektów!"
+    "message": "Ta kolekcja nie ma żadnych projektów!"
   },
   "collection.label.no-projects-auth": {
     "message": "Nie masz żadnych projektów. Czy chcesz <create-link>dodać jeden</create-link>?"
@@ -413,6 +419,15 @@
   "collection.title": {
     "message": "{name} - Kolekcja"
   },
+  "common.close": {
+    "message": "Zamknij"
+  },
+  "common.no": {
+    "message": "Nie"
+  },
+  "common.yes": {
+    "message": "Tak"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Stwórz nową"
   },
@@ -425,6 +440,30 @@
   "dashboard.collections.long-title": {
     "message": "Twoje kolekcje"
   },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Podmiot zagraniczny oznacza podmiot gospodarczy zorganizowany poza Stanami Zjednoczonymi (na przykład korporacja spoza Stanów Zjednoczonych, spółka osobowa bądź sp. z o.o.)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Podmiot zagraniczny"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Osoba prywatna"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Czy jesteś osobą prywatną, czy częścią podmiotu zagranicznego?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Formularz podatkowy"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth używa dostawcę będącego stroną trzecią, Track1099, by bezpiecznie zbierać i przechowywać Twoje formularze podatkowe. <security-link>Dowiedz się więcej.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Praktyki bezpieczeństwa"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Czy jesteś obywatelem Stanów Zjednoczonych?"
+  },
   "error.collection.404.list_item.1": {
     "message": "Mogłeś źle napisać URL kolekcji."
   },
@@ -432,7 +471,7 @@
     "message": "Ta kolekcja może być prywatna."
   },
   "error.collection.404.list_item.3": {
-    "message": "Ta kolekcja została zdjęta przez zespół moderacji Modrinth za naruszanie naszych<tou-link>Warunków używania</tou-link>."
+    "message": "Ta kolekcja została usunięta przez zespół moderacji Modrinth za naruszanie naszych <tou-link>Warunków użytkowania</tou-link>."
   },
   "error.collection.404.list_title": {
     "message": "Dlaczego?"
@@ -468,7 +507,7 @@
     "message": "Właściciel organizacji mógł zmienić adres URL lub go usunąć."
   },
   "error.organization.404.list_item.3": {
-    "message": "Organizacja mogła zostać usunięta przez zespół moderacyjny Modrinth za naruszenie naszych zasad<tou-link>Warunki Użytkowania</tou-link>."
+    "message": "Organizacja mogła zostać usunięta przez zespół moderacyjny Modrinth za naruszenie naszych <tou-link>Warunków użytkowania</tou-link>."
   },
   "error.organization.404.list_title": {
     "message": "Dlaczego?"
@@ -483,7 +522,7 @@
     "message": "Właściciel projektu mógł zmienić adres URL, ustawić projekt jako prywatny lub go usunąć."
   },
   "error.project.404.list_item.3": {
-    "message": "Projekt mógł zostać usunięty przez zespół moderacyjny Modrinth za naruszenie naszych zasad<tou-link>Warunki Użytkowania</tou-link>."
+    "message": "Projekt mógł zostać usunięty przez zespół moderacyjny Modrinth za naruszenie naszych <tou-link>Warunków użytkowania</tou-link>."
   },
   "error.project.404.list_title": {
     "message": "Dlaczego?"
@@ -498,7 +537,7 @@
     "message": "Użytkownik mógł zmienić nazwę użytkownika lub usunąć konto."
   },
   "error.user.404.list_item.3": {
-    "message": "Konto użytkownika mogło zostać zamknięte z powodu naruszenia <tou-link>Warunków Używania</tou-link> serwisu Modrinth."
+    "message": "Konto użytkownika mogło zostać zamknięte z powodu naruszenia <tou-link>Warunków używania</tou-link> serwisu Modrinth."
   },
   "error.user.404.list_title": {
     "message": "Dlaczego?"
@@ -513,10 +552,10 @@
     "message": "Fotorealistyczny obraz żabiego labiryntu"
   },
   "frog.froggedPeople": {
-    "message": "{count, plural, one {{count} osoba też została zżabiona!} other {{count} ludzi też zostało zżabionych!}}"
+    "message": "{count, plural, one {{count} osoba też została zżabowana!} other {{count} ludzi też zostało zżabowanych!}}"
   },
   "frog.sinceOpened": {
-    "message": "Ta strona została otwarta {ago} temu"
+    "message": "Ta strona została otwarta {ago}"
   },
   "frog.title": {
     "message": "Żaba"
@@ -531,7 +570,7 @@
     "message": "Uzyskaj najlepsze możliwe doświadczenie w modowaniu dzięki stałym aktualizacjom od zespołu Modrinth"
   },
   "landing.creator.feature.constantly-evolving.title": {
-    "message": "Nieustannie rozwijający"
+    "message": "Nieustanny rozwój"
   },
   "landing.creator.feature.data-statistics.description": {
     "message": "Otrzymuj szczegółowe raporty o liczbie wyświetleń stron, pobrań i przychodach"
@@ -544,6 +583,9 @@
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Zróżnicowany ekosystem"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Otrzymuj przychody z reklam na stronach Twoich projektów i wypłacaj je, kiedy chcesz"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Monetyzacja"
@@ -558,16 +600,22 @@
     "message": "Nie udało się załadować losowych projektów :("
   },
   "landing.feature.follow.description": {
-    "message": "Otrzymaj powiadomienie za każdym razem, gdy twój ulubiony projekt dostanie aktualizacje, by być na bieżąco."
+    "message": "Otrzymuj powiadomienia o aktualizacjach twoich ulubionych projektów, by być na bieżąco."
   },
   "landing.feature.follow.heading": {
     "message": "Obserwuj projekty, które kochasz"
   },
+  "landing.feature.launcher.description": {
+    "message": "Otwarto-źródłowe API Modrinth pozwala launcherom dodać głęboką integrację z Modrinth. Możesz używać Modrinth przez <link>naszą aplikację</link> i inne popularne launchery, takie jak ATLauncher, MultiMC i Prism Launcher."
+  },
   "landing.feature.launcher.heading": {
     "message": "Graj na swoim ulubionym launcherze"
   },
+  "landing.feature.search.description": {
+    "message": "Błyskawicznie szybka wyszukiwarka i wszechstronne filtry pozwalają Ci znaleźć to, czego szukasz, nawet gdy jeszcze piszesz."
+  },
   "landing.feature.search.heading": {
-    "message": "Znajdź cokolwiek pragniesz, łatwo i szybko"
+    "message": "Znajdź to, co pragniesz, łatwo i szybko"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "Miejsce dla {content} Minecraft"
@@ -579,7 +627,7 @@
     "message": "paczek modów"
   },
   "landing.heading.the-place-for-minecraft.mods": {
-    "message": "mody"
+    "message": "modów"
   },
   "landing.heading.the-place-for-minecraft.plugins": {
     "message": "pluginów"
@@ -600,13 +648,13 @@
     "message": "Prostsza reprezentacja okna Minecraft, z logiem Mojang Studios w zielonym kolorze Modrinth."
   },
   "landing.launcher.modrinth-app-label": {
-    "message": "Aplikacja Modrinth"
+    "message": "Modrinth App"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
   },
   "landing.notifications.has-been-updated": {
-    "message": "{title} został zaktualizowany!"
+    "message": "Projekt {title} został zaktualizowany!"
   },
   "landing.notifications.heading": {
     "message": "Powiadomienia"
@@ -634,6 +682,9 @@
   },
   "landing.section.for-creators.tagline": {
     "message": "Udostępnij swoją zawartość światu"
+  },
+  "landing.section.for-players.description": {
+    "message": "Od magicznych biomów po przeklęte lochy, na pewno znajdziesz projekty, które podniosą Twoją grę na następny poziom."
   },
   "landing.section.for-players.label": {
     "message": "Dla graczy"
@@ -706,6 +757,9 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Wymagana akcja w sprawie płatności."
+  },
+  "layout.banner.tax.title": {
+    "message": "Wymagany jest formularz podatkowy"
   },
   "layout.banner.verify-email.action": {
     "message": "Wyślij ponownie e-mail weryfikacyjny"
@@ -804,7 +858,7 @@
     "message": "Przełącz menu"
   },
   "layout.meta.description": {
-    "message": "Pobieraj mody, wtyczki, datapacki, shadery, resourcepacki i modpacki do Minecrafta na Modrinth. Odkrywaj i publikuj projekty na Modrinth dzięki nowoczesnemu, łatwemu w użyciu interfejsowi i API."
+    "message": "Pobieraj mody, pluginy, paczki danych, shadery, paczki zasobów i paczki modów do Minecrafta na Modrinth. Odkrywaj i publikuj projekty na Modrinth dzięki nowoczesnemu, łatwemu w użyciu interfejsowi i API."
   },
   "layout.meta.og-description": {
     "message": "Odkrywaj i publikuj zawartość Minecraft!"
@@ -957,7 +1011,7 @@
     "message": "Zaproszenie do dołączenia do projektu"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Zostałeś zaproszony do udziału w tym projekcie w roli '{role}'."
+    "message": "Zostałeś zaproszony do udziału w tym projekcie w roli '{role}''."
   },
   "project-member-header.success": {
     "message": "Sukces"
@@ -975,7 +1029,7 @@
     "message": "Wymagane"
   },
   "project-moderation-nags.resubmit-for-review": {
-    "message": "Ponownie prześlij do weryfikacji"
+    "message": "Wyślij ponownie do przeglądu"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
     "message": "Twój projekt został {status} przez pracowników Modrinth. W większości przypadków możesz ponownie przesłać go do oceny po uwzględnieniu uwag pracowników."
@@ -984,7 +1038,10 @@
     "message": "Należy wykonać wszystkie czynności wymienione w liście kontrolnej dotyczącej publikacji!"
   },
   "project-moderation-nags.submit-for-review": {
-    "message": "Prześlij do weryfikacji"
+    "message": "Wyślij do przeglądu"
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Wyślij do przeglądu"
   },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Twój projekt jest widoczny tylko dla członków projektu. Aby został opublikowany, musi zostać sprawdzony przez moderatorów."
@@ -1079,11 +1136,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers to najprostszy sposób na zabawę z przyjaciółmi bez żadnych kłopotów!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / miesiąc"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "Od $5 miesięcznie{monthly}"
+    "message": "Od {price}<small> / miesięcznie</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Utwórz serwer"
@@ -1227,7 +1281,7 @@
     "message": "Proszę zapoznać się z poniższymi opcjami"
   },
   "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Tylko projekty modów lub modpacków mogą posiadać metadane środowiska."
+    "message": "Tylko projekty modów lub paczek modów mogą posiadać metadane środowiska."
   },
   "project.settings.environment.notice.wrong-project-type.title": {
     "message": "Ten typ projektu nie obsługuje metadanych środowiska"
@@ -1329,7 +1383,7 @@
     "message": "Nie znaleziono {item}"
   },
   "report.for.violation": {
-    "message": "Naruszenie zasad Modrinth <rules-link>Zasady</rules-link> lub <terms-link>Warunki użytkowania</terms-link>"
+    "message": "Naruszenie <rules-link>zasad Modrinth</rules-link> lub <terms-link>Warunków użytkowania</terms-link>"
   },
   "report.for.violation.description": {
     "message": "Przykłady obejmują treści złośliwe, spam, obraźliwe, wprowadzające w błąd, nieprawdziwe i niezgodne z prawem."
@@ -1374,7 +1428,7 @@
     "message": "Jakiego rodzaju treści zgłaszasz?"
   },
   "report.question.report-reason": {
-    "message": "Które z zasad Modrintha narusza ten {item}?"
+    "message": "Które z zasad Modrinth narusza {item}?"
   },
   "report.report-content": {
     "message": "Zgłoś treści do moderacji"
@@ -1902,7 +1956,7 @@
     "message": "Ukryj reklamy aplikacji Modrinth"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Pasywna ramka wyrównana do lewej strony na stronach z treścią"
+    "message": "Pasek boczny wyrównany do lewej strony na stronach z treścią"
   },
   "settings.display.sidebar.right-aligned-content-sidebar.description": {
     "message": "Wyrównuje pasek boczny po lewej stronie treści strony."
@@ -1960,6 +2014,9 @@
   },
   "settings.language.languages.search.no-results": {
     "message": "Nie znaleziono żadnego języka pasującego do Twojego zapytania."
+  },
+  "settings.language.warning": {
+    "message": "Niektóre treści mogą pojawiać się w języku angielskim, jeśli nie mają dostępnego tłumaczenia. Strona nie jest jeszcze w pełni przetłumaczona, więc niektóre treści w niektórych językach mogą nadal być napisane po angielsku. Wciąż pracujemy nad ulepszeniami dla naszego systemu tłumaczeń, więc czasami treści mogą wyglądać nieprawidłowo."
   },
   "settings.pats.action.create": {
     "message": "Utwórz PAT"

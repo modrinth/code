@@ -24,7 +24,7 @@
     "message": "Добавить и играть"
   },
   "instance.add-server.add-server": {
-    "message": "Добавить"
+    "message": "Добавить сервер"
   },
   "instance.add-server.resource-pack.disabled": {
     "message": "Отключён"
@@ -117,7 +117,7 @@
     "message": "Группировка"
   },
   "instance.settings.tabs.general.library-groups.create": {
-    "message": "Создать новую группу"
+    "message": "Создать группу"
   },
   "instance.settings.tabs.general.library-groups.description": {
     "message": "Разделение по группам позволяет организовать сборки по разным разделам в библиотеке."

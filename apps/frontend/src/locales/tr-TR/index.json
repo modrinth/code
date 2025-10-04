@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "İptal"
+  },
+  "action.continue": {
+    "message": "Devam"
+  },
   "admin.billing.error.not-found": {
     "message": "Kullanıcı bulunamadı"
   },
@@ -413,6 +419,15 @@
   "collection.title": {
     "message": "{name} - Koleksiyon"
   },
+  "common.close": {
+    "message": "Kapat"
+  },
+  "common.no": {
+    "message": "Hayır"
+  },
+  "common.yes": {
+    "message": "Evet"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Yeni oluştur"
   },
@@ -424,6 +439,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Koleksiyonların"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Yabancı kuruluş, Amerika Birleşik Devletleri dışında kurulmuş bir ticari kuruluş (örneğin, ABD dışı şirket, ortaklık veya LLC) anlamına gelir."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Yabancı kuruluş"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Özel şahıs"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Özel şahıs mısınız yoksa yabancı bir kuruluşun parçası mısınız?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Vergi formu"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth, vergi formlarınızı güvenli bir şekilde toplamak ve saklamak için üçüncü taraf sağlayıcı Track1099'u kullanır. <security-link>Buradan daha fazla bilgi edinebilirsiniz.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Güvenlik uygulamaları"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "ABD vatandaşı mısınız?"
   },
   "error.collection.404.list_item.1": {
     "message": "Koleksiyonun URL'ini yanlış yazmış olabilirsin."
@@ -728,6 +767,15 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "Fatura eylemi zorunlu."
   },
+  "layout.banner.tax.action": {
+    "message": "Vergi formunu doldurun"
+  },
+  "layout.banner.tax.description": {
+    "message": "Bu yıl Modrinth'ten 600 doların üzerinde para çektiniz. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekiyor. Bu form gönderilene kadar para çekme işlemleriniz askıya alınacaktır."
+  },
+  "layout.banner.tax.title": {
+    "message": "Vergi formu gereklidir"
+  },
   "layout.banner.verify-email.action": {
     "message": "Doğrulama e-postasını yeniden gönder"
   },
@@ -978,7 +1026,7 @@
     "message": "Projeye katılmaya davet"
   },
   "project-member-header.invitation-with-role": {
-    "message": "'{role}' rolüyle bu projenin bir üyesi olmaya davet edildiniz."
+    "message": "Bu projenin üyesi olmaya \"{role}\" rolüyle davet edildiniz."
   },
   "project-member-header.success": {
     "message": "Başarılı"
@@ -1005,6 +1053,9 @@
     "message": "Yayımlama kontrol listesindeki gerekli adımları tamamlamalısınız!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "İncelemeye gönder"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "İncelemeye gönder"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1100,11 +1151,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Sunucuları uğraşmadan arkadaşlarınla oynamanın en kolay yoludur!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / aylık"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "$5{monthly} ile başlayan fiyatlarla"
+    "message": "{price}<small> / ay</small>'dan başlayan fiyatlarla"
   },
   "project.actions.servers-promo.title": {
     "message": "Sunucu oluştur"

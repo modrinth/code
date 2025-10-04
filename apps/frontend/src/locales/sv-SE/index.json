@@ -962,9 +962,6 @@
   "project-member-header.invitation-title": {
     "message": "Inbjudan till ett projekt"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "Du har blivit inbjuden till det här projektet som rollen \"{role}\"."
-  },
   "project-member-header.success": {
     "message": "Lyckades"
   },
@@ -1084,12 +1081,6 @@
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth servrar är det lättaste sättet att spela med dina vänner utan svårigheter!"
-  },
-  "project.actions.servers-promo.monthly": {
-    "message": " / månad"
-  },
-  "project.actions.servers-promo.pricing": {
-    "message": "Från 5 dollar {monthly}"
   },
   "project.actions.servers-promo.title": {
     "message": "Skapa en server"

@@ -869,9 +869,6 @@
   "project.actions.review-project": {
     "message": "Xem lại dự án"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / tháng"
-  },
   "project.actions.servers-promo.title": {
     "message": "Tạo một máy chủ"
   },

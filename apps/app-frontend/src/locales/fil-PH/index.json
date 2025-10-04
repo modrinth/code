@@ -56,6 +56,9 @@
   "instance.edit-world.title": {
     "message": "Baguhin ang mundo"
   },
+  "instance.filter.disabled": {
+    "message": "Mga hindi pinapagang proyekto"
+  },
   "instance.filter.updates-available": {
     "message": "May bagong mga update"
   },
@@ -68,11 +71,29 @@
   "instance.server-modal.resource-pack": {
     "message": "Resource pack"
   },
+  "instance.settings.tabs.general.delete": {
+    "message": "I-delete ang instansiya"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "I-delete ang instansiya"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Permanenteng matatanggal ang instansiya sa iyong device, kasali na ang iyong mga mundo, konpigurasyon, at lahat ng nakainstall na kontento. Mag-ingat, kapag magtanggal ka ng instansiya ay hindi na ito mababawi."
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Gumawa ng kopya ng instansiyang ito, kasali na ang mga mundo, konpigurasyon, mods, at iba pa."
+  },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Baguhin ang ikono"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Tanggalin ang ikono"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Ang pagrere-install ay maaaring mare-reset ang lahat ng na-install o binago na kontento sa kung anong ibibigay ng modpack, tatanggalin ang mga mods o kontentong idinagdag mo lalo na ang mga orihinal na modpack. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa instansiya, ngunit kung dumedepende na ang iyong mundo sa karagdagang kontento, maaari nitong masira ang mga umiiral na mundo."
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "I-reset ang mga kontento ng instansiya sa orihinal niyang estado, tatanggalin ang mga mods o kontentong idinagdag mo lalo na ang mga orihinal na modpack."
   },
   "instance.settings.tabs.window.custom-window-settings": {
     "message": "Mga setting sa custom na window"

@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Отмена"
+  },
+  "action.continue": {
+    "message": "Продолжить"
+  },
   "admin.billing.error.not-found": {
     "message": "Пользователь не найден"
   },
@@ -147,7 +153,7 @@
     "message": "Играйте с любимыми модами"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Создавайте, делитесь и играйте в сборки, используя любую из тысяч модов и сборок на Modrinth."
+    "message": "Создавайте, делитесь и играйте в сборки, используя любые из тысяч модов и сборок, размещённых на Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Сборка"
@@ -159,7 +165,7 @@
     "message": "Делитесь сборками"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Не похож на лаунчеры,"
+    "message": "Непохоже ни на один лаунчер,"
   },
   "app-marketing.features.website.description": {
     "message": "Modrinth App полностью интегрирован с сайтом — открывайте любимые проекты прямо в приложении!"
@@ -168,7 +174,7 @@
     "message": "Интеграция с сайтом"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "которые вы пробовали"
+    "message": "что вы использовали раньше"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Скриншот Modrinth App с открытой сборкой Cobblemon на странице \"Контент\"."
@@ -252,7 +258,7 @@
     "message": "Введите код двухфакторной аутентификации."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Двухфакторная аутентификация"
+    "message": "Введите код двухфакторной аутентификации"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Введите код..."
@@ -413,6 +419,45 @@
   "collection.title": {
     "message": "{name} - Коллекция"
   },
+  "common.close": {
+    "message": "Закрыть"
+  },
+  "common.no": {
+    "message": "Нет"
+  },
+  "common.yes": {
+    "message": "Да"
+  },
+  "create.collection.cancel": {
+    "message": "Отмена"
+  },
+  "create.collection.collection-info": {
+    "message": "Новая коллекция будет публичной {count, plural, =0 {без проектов} one {с # проектом} other {с # проектами}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Создать коллекцию"
+  },
+  "create.collection.error-title": {
+    "message": "Произошла ошибка"
+  },
+  "create.collection.name-label": {
+    "message": "Название"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Введите название коллекции..."
+  },
+  "create.collection.summary-description": {
+    "message": "Пара предложений о том, что это за коллекция."
+  },
+  "create.collection.summary-label": {
+    "message": "Сводка"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Эта коллекция содержит..."
+  },
+  "create.collection.title": {
+    "message": "Создание коллекции"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Создать"
   },
@@ -424,6 +469,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Ваши коллекции"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Иностранная организация означает коммерческую организацию, созданную за пределами Соединённых Штатов (например, иностранную компанию, партнёрство или ООО)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Иностранная организация"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Физическое лицо"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Вы физическое лицо или из иностранной организации?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Налоговая декларация"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth использует стороннего поставщика Track1099 для безопасного сбора и хранения налоговых деклараций. <security-link>Подробнее...</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Меры безопасности"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Вы гражданин США?"
   },
   "error.collection.404.list_item.1": {
     "message": "URL-адрес коллекции мог быть введён неправильно."
@@ -576,7 +645,7 @@
     "message": "Наш открытый API позволяет глубже интегрироваться с Modrinth — используйте <link>наше приложение</link> или сторонние лаунчеры наподобие ATLauncher, MultiMC и Prism Launcher."
   },
   "landing.feature.launcher.heading": {
-    "message": "Играйте через свой лаунчер"
+    "message": "Играйте с вашим любимым лаунчером"
   },
   "landing.feature.search.description": {
     "message": "Мгновенный поиск и мощные фильтры Modrinth позволяют находить контент уже во время ввода."
@@ -588,7 +657,7 @@
     "message": "Место для Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "наборов данных"
+    "message": "датапаков"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
     "message": "сборок"
@@ -600,7 +669,7 @@
     "message": "плагинов"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "наборов ресурсов"
+    "message": "ресурс-паков"
   },
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "серверов"
@@ -728,6 +797,15 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "Требуются действия с платёжными данными."
   },
+  "layout.banner.tax.action": {
+    "message": "Заполнить налоговую декларацию"
+  },
+  "layout.banner.tax.description": {
+    "message": "В этом году вы вывели уже более $600 из Modrinth. В соответствии с налоговым законодательством необходимо заполнить налоговую декларацию. Вывод средств приостановлен, пока декларация не будет заполнена."
+  },
+  "layout.banner.tax.title": {
+    "message": "Требуется налоговая декларация"
+  },
   "layout.banner.verify-email.action": {
     "message": "Повторно отправить письмо"
   },
@@ -825,7 +903,7 @@
     "message": "Меню"
   },
   "layout.meta.description": {
-    "message": "Скачивайте моды, плагины, наборы данных, шейдеры, наборы ресурсов и сборки для Minecraft на Modrinth. Ищите и публикуйте проекты на Modrinth, используя удобный современный интерфейс и API."
+    "message": "Скачивайте моды, плагины, датапаки, шейдеры, ресурс-паки и сборки для Minecraft на Modrinth. Ищите и публикуйте проекты на Modrinth, используя удобный современный интерфейс и API."
   },
   "layout.meta.og-description": {
     "message": "Ищите и публикуйте проекты для Minecraft!"
@@ -882,7 +960,7 @@
     "message": "Фильтры"
   },
   "moderation.moderate": {
-    "message": "Оценивать"
+    "message": "Модерировать"
   },
   "moderation.page.projects": {
     "message": "Проекты"
@@ -1007,6 +1085,9 @@
   "project-moderation-nags.submit-for-review": {
     "message": "Запросите проверку"
   },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Отправить на проверку"
+  },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Ваш проект доступен для просмотра только участникам проекта. Для публикации он должен быть проверен модераторами."
   },
@@ -1100,26 +1181,23 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers это самый простой способ для игры с вашими друзьями без хлопот!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / месяц"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "Начинается от $5{monthly}"
+    "message": "От {price}<small> / месяц</small>"
   },
   "project.actions.servers-promo.title": {
-    "message": "Создать сервер"
+    "message": "Создайте сервер"
   },
   "project.collections.create-new": {
-    "message": "Создать новую коллекцию"
+    "message": "Создать коллекцию"
   },
   "project.collections.none-found": {
-    "message": "Никаких коллекций не найдено."
+    "message": "Коллекции не найдены."
   },
   "project.description.title": {
     "message": "Описание"
   },
   "project.details.licensed": {
-    "message": "Лицензировано"
+    "message": "Лицензия:"
   },
   "project.download.game-version": {
     "message": "Версия игры: {version}"
@@ -1173,22 +1251,22 @@
     "message": "Скачивание {title}"
   },
   "project.environment.migration-no-permission.message": {
-    "message": "Мы обновили систему Сред на Modrinth, и теперь доступны новые варианты настроек. У вас нет прав на изменение этих настроек, но, пожалуйста, сообщите другому участнику проекта, что необходимо проверить метаданные сред."
+    "message": "Недавно мы переработали систему сред на Modrinth — теперь доступны новые варианты. У вас нет разрешения на изменение этих настроек — сообщите другому участнику проекта, что необходимо проверить метаданные среды."
   },
   "project.environment.migration-no-permission.title": {
-    "message": "Нужно пересмотреть метаданные сред"
+    "message": "Необходимо проверить метаданные среды"
   },
   "project.environment.migration.learn-more": {
     "message": "Узнайте больше об этом изменении"
   },
   "project.environment.migration.message": {
-    "message": "Недавно мы обновили систему Сред в Modrinth и теперь вам доступны новые настройки. Пожалуйста, посетите настройки проекта и подтвердите корректные ли метаданные."
+    "message": "Недавно мы переработали систему сред на Modrinth — теперь доступны новые варианты. Зайдите в настройки проекта и убедитесь, что метаданные указаны правильно."
   },
   "project.environment.migration.review-button": {
-    "message": "Просмотреть настройки среды"
+    "message": "Проверить настройки среды"
   },
   "project.environment.migration.title": {
-    "message": "Пожалуйста, просмотрите метаданные среды"
+    "message": "Проверьте метаданные среды"
   },
   "project.error.loading": {
     "message": "Ошибка загрузки данных проекта{message}"
@@ -1203,7 +1281,7 @@
     "message": "Галерея"
   },
   "project.license.error": {
-    "message": "Невозможно получить текст лицензии."
+    "message": "Не удалось получить текст лицензии."
   },
   "project.license.loading": {
     "message": "Загрузка текста лицензии..."
@@ -1218,85 +1296,85 @@
     "message": "Список изменений"
   },
   "project.notification.icon-updated.message": {
-    "message": "Иконка вашего проекта была обновлена."
+    "message": "Значок вашего проекта обновлён."
   },
   "project.notification.icon-updated.title": {
-    "message": "Иконка проекта обновлена"
+    "message": "Значок проекта обновлён"
   },
   "project.notification.updated.message": {
-    "message": "Ваш проект был обновлен."
+    "message": "Ваш проект обновлён."
   },
   "project.notification.updated.title": {
-    "message": "Проект обновлен"
+    "message": "Проект обновлён"
   },
   "project.settings.environment.notice.missing-env.description": {
-    "message": "В вашем проекте отсутствуют метаданные среды, пожалуйста, выберите нужный вариант снизу."
+    "message": "В проекте отсутствуют метаданные среды — выберите подходящий вариант ниже."
   },
   "project.settings.environment.notice.missing-env.title": {
-    "message": "Выберите среду для своего проекта"
+    "message": "Укажите среду проекта"
   },
   "project.settings.environment.notice.multiple-environments.description": {
-    "message": "В разных версиях вашего проекта выбраны разные среды, поэтому сейчас вы не можете редактировать их глобально."
+    "message": "В разных версиях проекта указаны разные среды — глобальное изменение сред невозможно."
   },
   "project.settings.environment.notice.multiple-environments.title": {
-    "message": "У вашего проекта несколько сред"
+    "message": "У проекта несколько сред"
   },
   "project.settings.environment.notice.review-options.description": {
-    "message": "Мы обновили систему Сред на Modrinth, и теперь доступны новые варианты. Убедитесь, что ниже выбран правильный вариант, и затем нажмите \"Подтвердить\", когда будете готовы!"
+    "message": "Недавно мы переработали систему сред на Modrinth — теперь доступны новые варианты. Убедитесь, что выбран подходящий вариант, и подтвердите его."
   },
   "project.settings.environment.notice.review-options.title": {
-    "message": "Пожалуйста, рассмотрите варианты ниже"
+    "message": "Подтвердите выбранный вариант"
   },
   "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Только мод или сборка могут иметь среды."
+    "message": "Только моды и сборки могут иметь метаданные среды."
   },
   "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "Такой тип проекта не поддерживает среды"
+    "message": "Тип проекта не поддерживает метаданные среды"
   },
   "project.settings.environment.verification.verify-button": {
     "message": "Подтвердить"
   },
   "project.settings.environment.verification.verify-text": {
-    "message": "Подтвердите что среда этого проекта выбрана верно."
+    "message": "Подтвердите, что указана подходящая среда проекта."
   },
   "project.settings.general.name.description": {
-    "message": "Избегайте приставок, суффиксов, пояснений в скобках или дополнительных описаний — только имя проекта."
+    "message": "Избегайте префиксов, суффиксов, скобок и описаний — введите только название проекта."
   },
   "project.settings.general.name.placeholder.1": {
-    "message": "например Nether Overhaul 2"
+    "message": "Например: Nether Overhaul 2"
   },
   "project.settings.general.name.placeholder.2": {
-    "message": "например Construction Equipment"
+    "message": "Например: Construction Equipment"
   },
   "project.settings.general.name.placeholder.3": {
-    "message": "например Better than Caving"
+    "message": "Например: Better than Caving"
   },
   "project.settings.general.name.placeholder.4": {
-    "message": "например Enhanced Portals"
+    "message": "Например: Enhanced Portals"
   },
   "project.settings.general.name.placeholder.5": {
-    "message": "например Dangerous Mobs"
+    "message": "Например: Dangerous Mobs"
   },
   "project.settings.general.name.title": {
-    "message": "Имя"
+    "message": "Название"
   },
   "project.settings.general.tagline.description": {
-    "message": "Кратко опишите ваш проект одним предложением."
+    "message": "Опишите проект одним предложением."
   },
   "project.settings.general.tagline.placeholder.1": {
-    "message": "например Overhauls game progression to revolve around the Nether."
+    "message": "Например: Overhauls game progression to revolve around the Nether."
   },
   "project.settings.general.tagline.placeholder.2": {
-    "message": "например Adds wearable construction gear."
+    "message": "Например: Adds wearable construction gear."
   },
   "project.settings.general.tagline.placeholder.3": {
-    "message": "например Adds realistic mineshaft-building mechanics."
+    "message": "Например: Adds realistic mineshaft-building mechanics."
   },
   "project.settings.general.tagline.placeholder.4": {
-    "message": "например Improves how Nether portals link to each other."
+    "message": "Например: Improves how Nether portals link to each other."
   },
   "project.settings.general.tagline.placeholder.5": {
-    "message": "например Adds powerful boss versions of the normal mobs to encounter in the night."
+    "message": "Например: Adds powerful boss versions of the normal mobs to encounter in the night."
   },
   "project.settings.general.tagline.title": {
     "message": "Слоган"
@@ -1305,76 +1383,76 @@
     "message": "URL"
   },
   "project.settings.title": {
-    "message": "Параметры"
+    "message": "Настройки"
   },
   "project.settings.visit-dashboard": {
-    "message": "Посетите панель управления проектами"
+    "message": "Панель управления проектами"
   },
   "project.stats.downloads-label": {
     "message": "скачиван{count, plural, one {ие} few {ия} many {ий} other {ия}}"
   },
   "project.stats.followers-label": {
-    "message": "подписчик{count, plural, one {} other {а(-ов)}}"
+    "message": "подписчик{count, plural, one {} few {а} many {ов} other {а}}"
   },
   "project.status.archived.message": {
-    "message": "{title} был архивирован. {title} не будет получать будущих обновлений, если автор не решит разархивировать этот проект."
+    "message": "{title} архивирован. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
   },
   "project.version.all-versions": {
     "message": "Все версии"
   },
   "project.version.back-to-versions": {
-    "message": "Вернуться к версии"
+    "message": "Вернуться к версиям"
   },
   "project.versions.title": {
     "message": "Версии"
   },
   "report.already-reported": {
-    "message": "Вы уже сообщали насчёт {title}"
+    "message": "Вы уже пожаловались на {title}"
   },
   "report.already-reported-description": {
-    "message": "Вы уже открыли жалобу на {item}. Вы можете добавить больше информации в вашу жалобу если она у Вас есть."
+    "message": "У вас уже есть открытая жалоба. Если у вас есть дополнительная информация, добавьте её к жалобе."
   },
   "report.back-to-item": {
-    "message": "Вернуться к {item}"
+    "message": "Назад"
   },
   "report.body.description": {
-    "message": "По возможности, прикладывайте ссылки и изображения, если они уместны. Пустые или неполные жалобы будут закрыты и проигнорированы."
+    "message": "При необходимости прикрепите ссылки и изображения. Пустые и неполные жалобы закрываются без рассмотрения."
   },
   "report.body.title": {
-    "message": "Пожалуйста, приведите дополнительные данные о вашей жалобе"
+    "message": "Добавьте подробности к жалобе"
   },
   "report.checking": {
-    "message": "Проверяем {item}..."
+    "message": "Проверка..."
   },
   "report.could-not-find": {
-    "message": "Не удалось найти {item}"
+    "message": "Не удалось найти объект жалобы"
   },
   "report.for.violation": {
-    "message": "Нарушение наших <rules-link>правил</rules-link> или <terms-link>условий использования</terms-link>"
+    "message": "Нарушение наших <rules-link>правил</rules-link> или <terms-link>условий</terms-link>"
   },
   "report.for.violation.description": {
-    "message": "Примеры включают в себя опасные, спам, оскорбительный, обманчивый, заблуждающий и нелегальный контент."
+    "message": "Например, вредоносный, спамный, обманный, оскорбительный или противоправный контент."
   },
   "report.form-not-for": {
-    "message": "Эта форма не для:"
+    "message": "Для чего не предназначена форма:"
   },
   "report.go-to-report": {
     "message": "Перейти к жалобе"
   },
   "report.not-for.bug-reports": {
-    "message": "Отчётов об ошибках"
+    "message": "Отчёты об ошибках"
   },
   "report.not-for.bug-reports.description": {
-    "message": "Вы можете сообщить о багах в <issues-link>трекере проблем</issues-link>."
+    "message": "Сообщайте об ошибках в <issues-link>трекере проекта</issues-link>."
   },
   "report.not-for.dmca": {
-    "message": "Удаление контента по DMCA"
+    "message": "Нарушение DMCA"
   },
   "report.not-for.dmca.description": {
-    "message": "Ознакомьтесь с <policy-link>Политикой авторских прав</policy-link>."
+    "message": "Смотрите нашу <policy-link>политику защиты авторских прав</policy-link>."
   },
   "report.note.copyright.1": {
-    "message": "Обратите внимание, что вы отправляете *не* запрос на удаление по DMCA, а сообщаете об повторно загруженном контенте."
+    "message": "Обратите внимание, что это *не* запрос на удаление по DMCA, а жалоба о повторно загруженном контенте."
   },
   "report.note.copyright.2": {
     "message": "Если вы хотели подать запрос на удаления контента по DMCA (что является юридическим действием), пожалуйста, ознакомьтесь с <copyright-policy-link>Политикой авторских прав</copyright-policy-link>."
@@ -1386,7 +1464,7 @@
     "message": "Отчёты от Microsoft Defender, VirusTotal или AI-детекторов вирусов не считаются доказательством и не принимаются."
   },
   "report.please-report": {
-    "message": "Пожалуйста, обжалуйте:"
+    "message": "На что жаловаться:"
   },
   "report.question.content-id": {
     "message": "Какой ID у {item}?"

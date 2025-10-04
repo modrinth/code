@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Annulla"
+  },
+  "action.continue": {
+    "message": "Continua"
+  },
   "admin.billing.error.not-found": {
     "message": "Utente non trovato"
   },
@@ -24,7 +30,7 @@
     "message": "È noto che nelle versioni per Linux della Modrinth App <issues-link>sussistono certi problemi</issues-link> con alcuni sistemi e configurazioni. Se Modrinth App risultasse instabile sul tuo sistema, potresti voler usare altre app come <prism-link>Prism Launcher</prism-link> per installare facilmente contenuto Modrinth."
   },
   "app-marketing.download.mac": {
-    "message": "Mac"
+    "message": "macOS"
   },
   "app-marketing.download.options-title": {
     "message": "Opzioni download"
@@ -413,6 +419,15 @@
   "collection.title": {
     "message": "{name} - Raccolta"
   },
+  "common.close": {
+    "message": "Chiudi"
+  },
+  "common.no": {
+    "message": "No"
+  },
+  "common.yes": {
+    "message": "Sì"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Crea nuova"
   },
@@ -424,6 +439,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Le tue raccolte"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Entità estera fa riferimento a un'entità commerciale stabilita fuori dagli Stati Uniti (per esempio società, partenariati, o LLC non statunitensi)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entità estera"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Privato"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Sei un privato o parte di un'entità estera?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Modulo fiscale"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth usa Track1099, un fornitore terzo, per raccogliere e memorizzare i moduli fiscali in modo sicuro. <security-link>Scopri di più qui.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Pratiche di sicurezza"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Hai la cittadinanza statunitense?"
   },
   "error.collection.404.list_item.1": {
     "message": "Forse c'è un errore di battitura nell'URL della raccolta."
@@ -507,13 +546,13 @@
     "message": "Utente non trovato"
   },
   "frog": {
-    "message": "Sei stato ranato! 🐸"
+    "message": "Questa rana ha ranato anche te! 🐸"
   },
   "frog.altText": {
     "message": "Un dipinto fotorealistico di un labirinto a forma di rana"
   },
   "frog.froggedPeople": {
-    "message": "{count, plural, one {Un'altra persona è stata ranata} other {{count} altre persone sono state ranate}}!"
+    "message": "{count, plural, one {Un'altra persona è stata ranata} other {Altre {count} persone sono state ranate}}!"
   },
   "frog.sinceOpened": {
     "message": "Questa pagina è stata aperta {ago}"
@@ -669,13 +708,13 @@
     "message": "Chiudi"
   },
   "layout.action.create-new": {
-    "message": "Crea nuovo..."
+    "message": "Crea..."
   },
   "layout.action.file-lookup": {
     "message": "Trova file"
   },
   "layout.action.lookup-by-email": {
-    "message": "Trova con email"
+    "message": "Trova tramite email"
   },
   "layout.action.manage-server-notices": {
     "message": "Gestisci avvisi server"
@@ -727,6 +766,15 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Necessaria azione per il pagamento."
+  },
+  "layout.banner.tax.action": {
+    "message": "Completa il modulo fiscale"
+  },
+  "layout.banner.tax.description": {
+    "message": "Hai già ritirato oltre $600 da Modrinth quest'ano. Per essere in regola con le norme fiscali devi completare un modulo fiscale. I tuoi prelievi saranno sospesi finché questo modulo sarà inviato."
+  },
+  "layout.banner.tax.title": {
+    "message": "Modulo fiscale obbligatorio"
   },
   "layout.banner.verify-email.action": {
     "message": "Reinvia email di verifica"
@@ -867,10 +915,10 @@
     "message": "Progetti"
   },
   "layout.nav.revenue": {
-    "message": "Profitto"
+    "message": "Guadagni"
   },
   "layout.nav.saved-projects": {
-    "message": "Progetti Salvati"
+    "message": "Progetti salvati"
   },
   "layout.nav.search": {
     "message": "Cerca"
@@ -891,7 +939,7 @@
     "message": "Segnalazioni"
   },
   "moderation.page.technicalReview": {
-    "message": "Revisioni Tecniche"
+    "message": "Revisione Tecnica"
   },
   "moderation.search.placeholder": {
     "message": "Cerca..."
@@ -978,7 +1026,7 @@
     "message": "Invito a un progetto"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Hai ricevuto un invito per diventare membro di questo progetto, con il ruolo di '{role}'."
+    "message": "Hai ricevuto un invito per diventare membro di questo progetto, con il ruolo di \"{role}''."
   },
   "project-member-header.success": {
     "message": "Successo"
@@ -1005,6 +1053,9 @@
     "message": "Devi completare i passaggi obbligatori nella checklist di pubblicazione!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "Presenta per la revisione"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "Presenta per la revisione"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1100,11 +1151,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers è il modo più facile per giocare coi tuoi amici senza problemi!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / mese"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "A partire da 5 ${monthly}"
+    "message": "A partire da {price}<small> / mese</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Crea un server"

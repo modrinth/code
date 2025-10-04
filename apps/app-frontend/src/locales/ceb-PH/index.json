@@ -56,6 +56,9 @@
   "instance.edit-world.title": {
     "message": "Usba ang kalibutan"
   },
+  "instance.filter.disabled": {
+    "message": "Di-gagana nga mga proyekto"
+  },
   "instance.filter.updates-available": {
     "message": "Naay bag-ong mga kausaban"
   },
@@ -68,11 +71,29 @@
   "instance.server-modal.resource-pack": {
     "message": "Putos sa kabtangan"
   },
+  "instance.settings.tabs.general.delete": {
+    "message": "Tangtangi ang pananglitan"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Tangtangi ang pananglitan"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Malungtarong matangtang ang pananglitan sa imong himan, apil na ang imong mga kalibutan, paghan-ay, ug tanang gitaod nga sulod. Pag-amping, dili na mabawi kung tangtangon na nimo ang pananglitan."
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Himuag kopya kining pananglitan, apil na ang imong mga kalibutan, paghan-ay, kausaban, ug uban pa."
+  },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Usba ang amoy"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Tangtangi ang amoy"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Mahimo nga mobalik sa sinugdan ang tanang gitaod o giusab nga sulod sa unsay ihatag sa putos sa kausaban, tangtangon ang mga kausaban o sulod nga imong gidugang apil na ang lintunganay nga putos sa kausaban. Mahimo nga maayo ang mga tuhaw nga batasan kon naay pagbag-o sa pananglitan, apan kon gasalig na ang imong kalibutan sa dinugang nga sulod, mahimo nga madaut ani ang daan nga mga kalibutan."
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Ibalik ang mga sulod sa pananglitan sa unang kahimtang, tangtangon ang mga kausaban o sulod nga imong gidugang apil na ang lintunganay nga putos sa kausaban."
   },
   "instance.settings.tabs.window.custom-window-settings": {
     "message": "Mga gusto sa pinatuyo nga tamboanan"

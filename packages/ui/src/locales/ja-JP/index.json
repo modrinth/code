@@ -185,14 +185,23 @@
   "label.notifications": {
     "defaultMessage": "通知"
   },
+  "label.or": {
+    "defaultMessage": "か"
+  },
   "label.password": {
     "defaultMessage": "パスワード"
+  },
+  "label.played": {
+    "defaultMessage": "プレイ済み: {time}"
   },
   "label.public": {
     "defaultMessage": "公開"
   },
   "label.rejected": {
     "defaultMessage": "却下済み"
+  },
+  "label.saved": {
+    "defaultMessage": "保存済み"
   },
   "label.scopes": {
     "defaultMessage": "スコープ"
@@ -284,6 +293,9 @@
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "限定公開"
   },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "非公開"
+  },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "クリップボードにコードをコピー"
   },
@@ -347,6 +359,60 @@
   "project-type.all": {
     "defaultMessage": "すべて"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "データパック"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "データパック"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "データパック"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "モッド"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "モッド"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "モッド"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "モッドパック"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "モッドパック"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "モッドパック"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "プラグイン"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "プラグイン"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "プラグイン"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "リソースパック"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "リソースパック"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "リソースパック"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "シェーダー"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "シェーダー"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "シェーダー"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "対応している環境"
   },
@@ -371,6 +437,12 @@
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "マインクラフト:Java Edition"
   },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "プラットフォーム"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "互換性"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "プロジェクトオーナー"
   },
@@ -380,8 +452,14 @@
   "project.about.details.created": {
     "defaultMessage": "{date} に作成"
   },
+  "project.about.details.licensed": {
+    "defaultMessage": "ライセンス: {license}"
+  },
   "project.about.details.published": {
     "defaultMessage": "{date} に公開"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "決定時刻: {date}"
   },
   "project.about.details.title": {
     "defaultMessage": "詳細"
@@ -434,6 +512,9 @@
   "project.settings.environment.client_and_server.optional_both.title": {
     "defaultMessage": "両方オプション、どちらにインストールしても同じように機能します"
   },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "どちらか一方だけでも使えますが、両側にいれると効果的です"
+  },
   "project.settings.environment.client_and_server.optional_client.title": {
     "defaultMessage": "クライアント側オプション"
   },
@@ -473,6 +554,9 @@
   "project.settings.environment.suboption.accessibility-option-label": {
     "defaultMessage": "{title}：{description}"
   },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "サブオプション {option}"
+  },
   "project.settings.environment.title": {
     "defaultMessage": "動作環境"
   },
@@ -505,6 +589,18 @@
   },
   "project.settings.versions.title": {
     "defaultMessage": "バージョン"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "ビュー"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
   },
   "project.visibility.archived": {
     "defaultMessage": "アーカイブ済み"
@@ -545,8 +641,14 @@
   "search.filter.locked.default.sync": {
     "defaultMessage": "フィルターを同期"
   },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type}はロックされています"
+  },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "フィルターを解除"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "環境"
   },
   "search.filter_type.environment.client": {
     "defaultMessage": "クライアント"
@@ -575,20 +677,56 @@
   "search.filter_type.plugin_loader": {
     "defaultMessage": "ローダー"
   },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "プラットフォーム"
+  },
   "search.filter_type.project_id": {
     "defaultMessage": "プロジェクトID"
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "ローダー"
   },
+  "servers.notice.dismiss": {
+    "defaultMessage": "閉じる"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "閉じられる"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "注意"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "情報"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "クリティカル"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "情報"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "アンケート"
+  },
   "servers.notice.level.warn.name": {
     "defaultMessage": "警告"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "閉じられない"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "まだお支払いは発生しません。"
   },
   "servers.purchase.step.payment.prompt": {
     "defaultMessage": "支払い方法を選択"
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "支払い方法"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "{interval, select, month {1か月ごとに請求} quarterly {3か月ごとに請求}}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "必要な仕様だけのカスタマイズされたプランを選択。"
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "始めましょう"

@@ -569,9 +569,6 @@
   "project-member-header.invitation-title": {
     "message": "Poziv za pridruživanje projektu"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "Pozvani ste da postanete član ovog projekta za ulogom '{role}'."
-  },
   "project-member-header.success": {
     "message": "Uspešno"
   },

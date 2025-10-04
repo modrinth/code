@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "取消"
+  },
+  "action.continue": {
+    "message": "继续"
+  },
   "admin.billing.error.not-found": {
     "message": "未找到用户"
   },
@@ -413,6 +419,15 @@
   "collection.title": {
     "message": "{name} - 收藏夹"
   },
+  "common.close": {
+    "message": "关闭"
+  },
+  "common.no": {
+    "message": "否"
+  },
+  "common.yes": {
+    "message": "是"
+  },
   "dashboard.collections.button.create-new": {
     "message": "新建"
   },
@@ -424,6 +439,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "你的收藏夹"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "外国实体指的是在美国以外组织的企业实体（例如非美国公司、合伙企业或有限责任公司）。"
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "外国实体"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "私人个体"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "您是个人还是外国实体的成员？"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "税务表格"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth 使用第三方提供商 Track1099 来安全地收集和存储你的税务表格。<security-link>在此</security-link>了解更多。"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "安全措施"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "你是美国公民吗？"
   },
   "error.collection.404.list_item.1": {
     "message": "你可能输错了收藏夹的连接。"
@@ -728,6 +767,15 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "需要进行财务操作。"
   },
+  "layout.banner.tax.action": {
+    "message": "填写税务表格"
+  },
+  "layout.banner.tax.description": {
+    "message": "你今年已经从Modrinth提款了超过600美元。为了遵守税务规定，你需要填写一份税务表格。你的提款操作将暂停，直到提交此表格为止。"
+  },
+  "layout.banner.tax.title": {
+    "message": "需要填写税务表格"
+  },
   "layout.banner.verify-email.action": {
     "message": "重新发送验证邮件"
   },
@@ -825,7 +873,7 @@
     "message": "切换菜单"
   },
   "layout.meta.description": {
-    "message": "在 Modrinth 上畅享 Minecraft 模组、插件、数据包、光影包、资源包及整合包的下载体验。通过我们现代化而易用的界面与 API，探索及发布项目。"
+    "message": "在 Modrinth 上畅享 Minecraft 模组、插件、数据包、光影、资源包及整合包的下载体验。通过我们现代化而易用的界面与 API，探索及发布项目。"
   },
   "layout.meta.og-description": {
     "message": "浏览及发布 Minecraft 内容！"
@@ -1007,6 +1055,9 @@
   "project-moderation-nags.submit-for-review": {
     "message": "提交审核"
   },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "提交审核"
+  },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "你的项目现在只能被项目成员查看。必须经过管理员审核才能公开发布项目。"
   },
@@ -1062,7 +1113,7 @@
     "message": "资源包"
   },
   "project-type.shader.plural": {
-    "message": "光影包"
+    "message": "光影"
   },
   "project-type.shader.singular": {
     "message": "光影"
@@ -1098,13 +1149,10 @@
     "message": "审核项目"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth 服务器是你与朋友轻松游玩的最佳方式！"
-  },
-  "project.actions.servers-promo.monthly": {
-    "message": " / 月"
+    "message": "Modrinth Servers是你与朋友轻松游玩的最佳方式！"
   },
   "project.actions.servers-promo.pricing": {
-    "message": "$5{monthly}起"
+    "message": "起价{price}<small> / 每月</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "创建服务器"
@@ -1785,7 +1833,7 @@
     "message": "移除这个付款方式"
   },
   "settings.billing.modal.delete.description": {
-    "message": "这将永久（真的是永远）删除此令牌。"
+    "message": "这将永久（真的是永远）删除此付款方式。"
   },
   "settings.billing.modal.delete.title": {
     "message": "确定要删除这个付款方式吗？"
@@ -1851,10 +1899,10 @@
     "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "管理你的 Modrinth 服务器订阅。"
+    "message": "管理你的Modrinth Servers订阅。"
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Modrinth 服务器订阅"
+    "message": "Modrinth Servers订阅"
   },
   "settings.billing.subscription.description": {
     "message": "管理你的 Modrinth 订阅。"

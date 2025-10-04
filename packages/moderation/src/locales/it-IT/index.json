@@ -18,7 +18,7 @@
     "defaultMessage": "Aggiungi link esterni"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Hai selezionato tutti i tag disponibili ({totalAvailableTags}). Questo rende i tag, che servono ad aiutare gli utenti a trovare progetti pertinenti, del tutto inutili. Si prega di selezionare solo i tag pertinenti al tuo progetto."
+    "defaultMessage": "Hai selezionato tutti i {totalAvailableTags} tag disponibili. Questo rende i tag, che servono ad aiutare gli utenti a trovare progetti pertinenti, del tutto inutili. Si prega di selezionare solo i tag pertinenti al tuo progetto."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Seleziona tag accurati"

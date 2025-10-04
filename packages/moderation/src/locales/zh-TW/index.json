@@ -189,7 +189,7 @@
     "defaultMessage": "選擇精確的標籤"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "你的{type}{resourcepackMessage}至少需要一張圖庫圖片，以展示其內容。"
+    "defaultMessage": "你的{type}至少需要一張圖庫圖片，以展示其內容{resourcepackMessage}。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"

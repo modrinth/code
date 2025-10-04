@@ -366,7 +366,7 @@
     "defaultMessage": "Data Pack"
   },
   "project-type.datapack.lowercase": {
-    "defaultMessage": "{count, plural, one {data Pack} other {data Pack}}"
+    "defaultMessage": "{count, plural, one {data pack} other {data pack}}"
   },
   "project-type.mod.capital": {
     "defaultMessage": "{count, plural, one {Mod} other {Mod}}"
@@ -396,13 +396,13 @@
     "defaultMessage": "{count, plural, one {plugin} other {plugin}}"
   },
   "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, one {Pachetto Risorse} other {Pacchetti Risorse}}"
+    "defaultMessage": "{count, plural, one {Pacchetto Risorse} other {Pacchetti Risorse}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Pacchetti Risorse"
   },
   "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, one {pachetto risorse} other {pacchetti risorse}}"
+    "defaultMessage": "{count, plural, one {pacchetto risorse} other {pacchetti risorse}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shader}}"
@@ -666,7 +666,7 @@
     "defaultMessage": "Licenza"
   },
   "search.filter_type.license.open_source": {
-    "defaultMessage": "Open-source"
+    "defaultMessage": "Open source"
   },
   "search.filter_type.mod_loader": {
     "defaultMessage": "Loader"

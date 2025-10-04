@@ -659,9 +659,6 @@
   "project-member-header.invitation-title": {
     "message": "Pozvánka připojit se k projektu"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "Byli jste pozváni být členem tohoto projektu s rolí '{role}'."
-  },
   "project-member-header.success": {
     "message": "Úspěch"
   },

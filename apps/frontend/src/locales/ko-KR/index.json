@@ -617,9 +617,6 @@
   "project.about.details.updated": {
     "message": "{date} 전에 업데이트됨"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / 월"
-  },
   "project.description.title": {
     "message": "설명"
   },

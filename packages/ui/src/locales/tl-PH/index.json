@@ -128,9 +128,6 @@
   "label.description": {
     "defaultMessage": "Paglalarawan"
   },
-  "label.error": {
-    "defaultMessage": "ate"
-  },
   "label.followed-projects": {
     "defaultMessage": "Mga sinusundang panukala"
   },
@@ -327,7 +324,7 @@
     "defaultMessage": "Kapaligiran"
   },
   "search.filter_type.license.open_source": {
-    "defaultMessage": "Bukas na batis"
+    "defaultMessage": "Bukas na pinagmulan"
   },
   "settings.profile.title": {
     "defaultMessage": "Publiko"

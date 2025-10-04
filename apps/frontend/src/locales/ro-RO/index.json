@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Renunță"
+  },
+  "action.continue": {
+    "message": "Continuă"
+  },
   "admin.billing.error.not-found": {
     "message": "Utilizatorul nu a fost găsit"
   },
@@ -413,6 +419,15 @@
   "collection.title": {
     "message": "{name} - Colecție"
   },
+  "common.close": {
+    "message": "Închide"
+  },
+  "common.no": {
+    "message": "Nu"
+  },
+  "common.yes": {
+    "message": "Da"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Creați nouă"
   },
@@ -424,6 +439,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Colecțiile tale"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "O entitate străină înseamnă o entitate de afaceri organizată în afara Statelor Unite (cum ar fi o corporație, un parteneriat sau un SRL non-SUA)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entitate străină"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Persoană fizică"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Ești o persoană fizică sau faci parte dintr-o entitate străină?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Formular fiscal"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth folosește furnizorul terț Track1099 pentru a colecta și stoca în siguranță formularele tale fiscale. <security-link>Află mai multe aici.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Practici de securitate"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Ești cetățean american?"
   },
   "error.collection.404.list_item.1": {
     "message": "Este posibil să fi tastat greșit URL-ul colecției."
@@ -528,13 +567,13 @@
     "message": "Du-te la panoul principal"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Obține cea mai bună experiență de modare posibilă, cu actualizări constante de la echipa Modrinth"
+    "message": "Obține cea mai bună experiență posibilă, cu actualizări constante de la echipa Modrinth."
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Evoluare Constantă"
   },
   "landing.creator.feature.data-statistics.description": {
-    "message": "Primește raporturi detaliate despre vizualizări, număr de descărcări, și încasări"
+    "message": "Primește raporturi detaliate despre vizualizări, număr de descărcări, și încasări."
   },
   "landing.creator.feature.data-statistics.title": {
     "message": "Date și Statistici"
@@ -546,19 +585,19 @@
     "message": "Descoperă"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Integrează-te cu uneltele tale de construire prin Minotaur pentru încărcări automate imediat ce lansezi o versiune nouă"
+    "message": "Integrează-te cu uneltele tale de construire prin Minotaur pentru încărcări automate imediat ce lansezi o versiune nouă."
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Ecosistem Diversificat"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Primește venituri din reclame de pe paginile proiectului tău și retrage fondurile în orice moment"
+    "message": "Primește venituri din reclame de pe paginile proiectului tău și retrage fondurile în orice moment."
   },
   "landing.creator.feature.monetization.title": {
     "message": "Monetizare"
   },
   "landing.creator.feature.team-management.description": {
-    "message": "Invită-ți colegii și gestionează rolurile și permisiunile cu ușurință"
+    "message": "Invită-ți colegii și gestionează rolurile și permisiunile cu ușurință."
   },
   "landing.creator.feature.team-management.title": {
     "message": "Administrează Echipa"
@@ -728,6 +767,15 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "Acțiunea contului necesară."
   },
+  "layout.banner.tax.action": {
+    "message": "Completează formularul fiscal"
+  },
+  "layout.banner.tax.description": {
+    "message": "Ai retras deja peste $600 de la Modrinth anul acesta. Pentru a respecta reglementările fiscale, trebuie să completezi un formular fiscal. Retragerile tale sunt puse pe pauză până când acest formular este trimis."
+  },
+  "layout.banner.tax.title": {
+    "message": "Formular fiscal necesar"
+  },
   "layout.banner.verify-email.action": {
     "message": "Retrimiteți emailul de verificare"
   },
@@ -789,7 +837,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Serverele Modrinth"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Resurse"
@@ -978,7 +1026,7 @@
     "message": "Invitație de a te alătura proiectului"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Ai fost invitat să devii membru al acestui proiect cu rolul de '{role}'."
+    "message": "Ai fost invitat să devii membru al acestui proiect cu rolul de '{role}''."
   },
   "project-member-header.success": {
     "message": "Succes"
@@ -1005,6 +1053,9 @@
     "message": "Trebuie să completezi pașii necesari din lista de verificare pentru publicare!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "Trimite pentru revizuire"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "Trimite pentru revizuire"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1098,13 +1149,10 @@
     "message": "Revizuiește proiectul"
   },
   "project.actions.servers-promo.description": {
-    "message": "Serverele Modrinth sunt cea mai simplă modalitate de a te juca împreună cu prietenii fără bătăi de cap!"
-  },
-  "project.actions.servers-promo.monthly": {
-    "message": " / lună"
+    "message": "Modrinth Servers sunt cea mai simplă modalitate de a te juca împreună cu prietenii fără bătăi de cap!"
   },
   "project.actions.servers-promo.pricing": {
-    "message": "Începând de la $5{monthly}"
+    "message": "Începând de la {price}<small> / lună</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Creează un server"
@@ -1851,10 +1899,10 @@
     "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Gestionează-ți abonamentele la serverul Modrinth."
+    "message": "Gestionează-ți abonamentele la Modrinth Server."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Abonamente pentru servere Modrinth"
+    "message": "Abonamente pentru Modrinth Servers"
   },
   "settings.billing.subscription.description": {
     "message": "Administrează-ți abonamentele Modrinth."

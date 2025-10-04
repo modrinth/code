@@ -14,6 +14,9 @@
   "app-marketing.download.linux": {
     "message": "Linux"
   },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "<issues-link>Ila nga naay suliranin</issues-link> ang Linux nga bersiyon sa Modrinth App sa pipila nga mga sistema ug paghan-ay. Kung dili lig-on ang Modrinth App sa imong sistema, gidasig ka namo sa pagsulay sa uban nga mga aplikasyon sama sa <prism-link>Prism Launcher</prism-link> aron mapadali ang pagtaod sa sulod nga Modrinth."
+  },
   "app-marketing.download.mac": {
     "message": "Mac"
   },
@@ -21,7 +24,7 @@
     "message": "Mga kapilian sa pagkarganug"
   },
   "app-marketing.download.title": {
-    "message": "Karganugi ang Aplikasyon sa Modrinth (Beta)"
+    "message": "Karganugi ang Modrinth App (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -30,13 +33,13 @@
     "message": "Bukas nga tinubdan"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "Aplikasyon sa Modrinth"
+    "message": "Modrinth App"
   },
   "app-marketing.features.play.description": {
-    "message": "Bagita ang Aplikasyon sa Modrinth sa pagkarganug ug pagdula sa imong paborito nga mga pagbag-o ug putos sa pagbag-o."
+    "message": "Gamita ang Modrinth App sa pagkarganug ug pagdula sa imong paborito nga mga kausaban ug putos sa kausaban."
   },
   "app-marketing.hero.download-button": {
-    "message": "Karganugi ang Aplikasyon sa Modrinth"
+    "message": "Karganugi ang Modrinth App"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Mga gusto sa akawnt"
@@ -53,6 +56,15 @@
   "collection.delete-modal.description": {
     "message": "Hangtod sa kahangturan nga matangtang kining gitipon. Kini nga aksyon dili mabawi."
   },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Usa ka entidad sa negosyo ang langyaw nga entidad nga naghan-ay gawas sa Tinipong Bansa (sama sa di-US nga korporasyon, partnership, o LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Langyaw nga entidad"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Usa ka ba nga pribado nga indibidwal o uban sa usa ka langyaw nga entidad?"
+  },
   "landing.feature.launcher.description": {
     "message": "Ang bukas nga tinubdan nga API sa Modrinth nagtugot sa mga tiglansad nga makadugang sa lawom nga panagsama sa Modrinth. Mahimo nimong magamit ang Modrinth pinaagi sa <link>among aplikasyon</link> ug sa pipila nga labing inila nga mga tiglansad sama sa ATLauncher, MultiMC, ug Prism Launcher."
   },
@@ -64,6 +76,12 @@
   },
   "layout.banner.add-email.button": {
     "message": "Mga gusto sa akawnt"
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Napakyas sa pagmugna og kahimtang gikan sa API kining pagkatap sa frontend sa Modrinth. Basin tungod sa pagkabalda o sayop sa paghan-ay. Pagtukod pag-usab kon magamit na ang API. Mga kalagdaan sa sayop: {errors}; Ang kasamtangan nga URL sa API: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Naay sayup sa pagmugna sa kahimtang gikan sa API samtang gapatukod."
   },
   "layout.footer.about": {
     "message": "Mahitungod"
@@ -111,13 +129,13 @@
     "message": "Mga Produkto"
   },
   "layout.footer.products.app": {
-    "message": "Aplikasyon sa Modrinth"
+    "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth nga mga Tigtagad"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Mga Kabtangan"
@@ -184,6 +202,9 @@
   },
   "project.settings.title": {
     "message": "Mga Gusto"
+  },
+  "settings.display.flags.description": {
+    "message": "Magpagana o di-magpagana og tino nga mga bahin sa imong himan."
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Panid sa mga Putos sa Kabtangan"

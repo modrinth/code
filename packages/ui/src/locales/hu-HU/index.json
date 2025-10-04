@@ -497,6 +497,15 @@
   "project.settings.description.title": {
     "defaultMessage": "Leírás"
   },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Opcionális kliensen"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Opcionális szerveren"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Minda kettön kell"
+  },
   "project.settings.environment.client_and_server.title": {
     "defaultMessage": "Kliens és szerver"
   },
@@ -680,6 +689,12 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Értékelés"
   },
+  "servers.region.central-europe": {
+    "defaultMessage": "Közép Európa"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Észak Amerika"
+  },
   "settings.account.title": {
     "defaultMessage": "Fiók és biztonság"
   },
@@ -707,8 +722,23 @@
   "settings.display.theme.retro": {
     "defaultMessage": "Retro"
   },
+  "settings.display.theme.system": {
+    "defaultMessage": "Rendszer követése"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Szín téma"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Nyelv"
+  },
   "settings.profile.title": {
     "defaultMessage": "Publikus profil"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} kor {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Vannak nem mented változások."
   }
 }
 
