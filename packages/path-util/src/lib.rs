@@ -46,6 +46,35 @@ impl<'de> Deserialize<'de> for SafeRelativeUtf8UnixPathBuf {
             ));
         }
 
+        if path_components.any(|component| {
+            let file_name = component.as_str().to_ascii_uppercase();
+
+            // Windows reserves some special DOS device names in every directory, which may be optionally
+            // followed by an extension or alternate data stream name and be case insensitive. Trying to
+            // write, read, or delete these files is usually not that useful even for malware, since they
+            // mostly refer to console and printer devices, but it's best to avoid them entirely anyway.
+            // References:
+            // https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
+            // https://devblogs.microsoft.com/oldnewthing/20031022-00/?p=42073
+            // https://github.com/wine-mirror/wine/blob/01269452e0fbb1f081d506bd64996590a553e2b9/dlls/ntdll/path.c#L66
+            const RESERVED_WINDOWS_DEVICE_NAMES: &[&str] = &[
+                "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4",
+                "COM5", "COM6", "COM7", "COM8", "COM9", "COM¹", "COM²", "COM³",
+                "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8",
+                "LPT9", "LPT¹", "LPT²", "LPT³", "CONIN$", "CONOUT$",
+            ];
+
+            RESERVED_WINDOWS_DEVICE_NAMES.iter().any(|name| {
+                file_name == *name
+                    || file_name.starts_with(&format!("{name}."))
+                    || file_name.starts_with(&format!("{name}:"))
+            })
+        }) {
+            return Err(serde::de::Error::custom(
+                "File path contains a reserved Windows device name",
+            ));
+        }
+
         Ok(Self(path))
     }
 }
