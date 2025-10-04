@@ -3,9 +3,9 @@ import { CopyIcon, LibraryIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, Card } from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 
-import emails from '~/templates/emails'
+import docs from '~/templates/docs'
 
-const allTemplates = Object.keys(emails).sort()
+const allTemplates = Object.keys(docs).sort()
 const query = ref('')
 const filtered = computed(() =>
 	allTemplates.filter((t) => t.toLowerCase().includes(query.value.toLowerCase().trim())),
@@ -20,17 +20,17 @@ function openAll() {
 }
 
 function copy(id: string) {
-	navigator.clipboard?.writeText(`/_internal/templates/email/${id}`).catch(() => {})
+	navigator.clipboard?.writeText(`/_internal/templates/doc/${id}`).catch(() => {})
 }
 
 function openPreview(id: string, offset = 0) {
-	const width = 600
-	const height = 850
+	const width = 800
+	const height = 1000
 	const left = window.screenX + (window.outerWidth - width) / 2 + ((offset * 28) % 320)
 	const top = window.screenY + (window.outerHeight - height) / 2 + ((offset * 28) % 320)
 	window.open(
-		`/_internal/templates/email/${id}`,
-		`email-${id}`,
+		`/_internal/templates/doc/${id}`,
+		`doc-${id}`,
 		`popup=yes,width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,menubar=no,toolbar=no,location=no,status=no`,
 	)
 }
@@ -41,13 +41,13 @@ const counts = computed(() => ({
 }))
 
 onMounted(() => {
-	document.getElementById('email-search')?.focus()
+	document.getElementById('doc-search')?.focus()
 })
 </script>
 
 <template>
 	<div class="normal-page no-sidebar">
-		<h1 class="mb-4 text-3xl font-extrabold text-heading">Email templates</h1>
+		<h1 class="mb-4 text-3xl font-extrabold text-heading">Document templates</h1>
 		<div class="normal-page__content">
 			<Card class="mb-6 flex flex-col gap-4">
 				<div class="flex flex-wrap items-center gap-3">
@@ -56,7 +56,7 @@ onMounted(() => {
 							class="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary"
 						/>
 						<input
-							id="email-search"
+							id="doc-search"
 							v-model="query"
 							type="text"
 							placeholder="Search templates..."
@@ -95,7 +95,7 @@ onMounted(() => {
 								{{ id }}
 							</div>
 							<div class="mt-1 truncate text-xs text-secondary">
-								/_internal/templates/email/{{ id }}
+								/_internal/templates/doc/{{ id }}
 							</div>
 						</div>
 
@@ -120,10 +120,10 @@ onMounted(() => {
 			<p class="mt-2 text-xs text-secondary">
 				All templates come from
 				<code class="rounded bg-code-bg px-1 py-0.5 text-[11px] text-code-text"
-					>src/emails/index.ts</code
+					>src/templates/docs/index.ts</code
 				>. Popouts render via
 				<code class="rounded bg-code-bg px-1 py-0.5 text-[11px] text-code-text"
-					>/_internal/templates/email/[template]</code
+					>/_internal/templates/doc/[template]</code
 				>.
 			</p>
 		</div>
