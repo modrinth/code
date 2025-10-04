@@ -33,12 +33,12 @@ impl<'de> Deserialize<'de> for SafeRelativeUtf8UnixPathBuf {
             return Err(serde::de::Error::custom("File path cannot be empty"));
         }
 
-        // All components should be normal: a file or directory name, not `/`, `.`, or `..`,
+        // All components should be normal: a file or directory name, not `/`, or `..`,
         // and not refer to any reserved Windows device name. Also, at this point we may have
         // a pseudo-Unix path like `my\directory`, which we should reject by filtering out
         // backslashes to guarantee consistent cross-platform behavior when interpreting component
         // separators
-        if path_components.all(|component| {
+        if !path_components.all(|component| {
             component.is_normal()
                 && !component.as_str().contains('\\')
                 && !is_reserved_windows_device_name(&component)
@@ -63,7 +63,7 @@ impl Serialize for SafeRelativeUtf8UnixPathBuf {
             return Err(serde::ser::Error::custom("File path cannot be empty"));
         }
 
-        if path_components.all(|component| {
+        if !path_components.all(|component| {
             component.is_normal()
                 && !component.as_str().contains('\\')
                 && !is_reserved_windows_device_name(&component)
@@ -112,4 +112,35 @@ fn is_reserved_windows_device_name(component: &Utf8UnixComponent) -> bool {
                 || file_name[name.len()..].starts_with('.')
                 || file_name[name.len()..].starts_with(':'))
     })
+}
+
+#[test]
+fn safe_relative_path_deserialization_contract() {
+    let valid_paths = [
+        "file.txt",
+        "directory/file.txt",
+        "my-directory/file.name.with.dots.tar.gz",
+        "my_directory/123_456-789.file",
+    ];
+    for path in valid_paths {
+        SafeRelativeUtf8UnixPathBuf::try_from(path.to_string())
+            .expect("Path should be considered valid");
+    }
+
+    let invalid_paths = [
+        "",                        // Empty path
+        "/absolute/file.txt",      // Absolute path
+        "C:/absolute/file.txt",    // Absolute path with common Windows prefix
+        "//server/share/file.txt", // Absolute path with Windows UNC prefix
+        "directory/../file.txt",   // Path with `..` component
+        "CON.txt",                 // Reserved Windows device name
+        "NUL/file.txt",            // Reserved Windows device name "directory"
+        "COM1.txt:ads",            // Reserved Windows device name with ADS name
+        "file\\name.txt",          // Backslash in file name
+        "my\\directory/file.txt",  // Backslash in directory name
+    ];
+    for path in invalid_paths {
+        SafeRelativeUtf8UnixPathBuf::try_from(path.to_string())
+            .expect_err("Path should be considered invalid");
+    }
 }
