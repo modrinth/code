@@ -6,6 +6,7 @@ use crate::state::{CachedEntry, LinkedData, ProfileInstallStage, SideType};
 use crate::util::fetch::{fetch, fetch_advanced, write_cached_icon};
 use crate::util::io;
 
+use path_util::SafeRelativeUtf8UnixPathBuf;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -27,7 +28,7 @@ pub struct PackFormat {
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct PackFile {
-    pub path: String,
+    pub path: SafeRelativeUtf8UnixPathBuf,
     pub hashes: HashMap<PackFileHash, String>,
     pub env: Option<HashMap<EnvType, SideType>>,
     pub downloads: Vec<String>,

@@ -1,7 +1,10 @@
 // IO error
 // A wrapper around the tokio IO functions that adds the path to the error message, instead of the uninformative std::io::Error.
 
-use std::{io::Write, path::Path};
+use std::{
+    io::{ErrorKind, Write},
+    path::Path,
+};
 use tempfile::NamedTempFile;
 use tokio::task::spawn_blocking;
 
@@ -30,6 +33,13 @@ impl IOError {
         Self::IOPathError {
             source,
             path: path.to_string_lossy().to_string(),
+        }
+    }
+
+    pub fn kind(&self) -> ErrorKind {
+        match self {
+            IOError::IOPathError { source, .. } => source.kind(),
+            IOError::IOError(source) => source.kind(),
         }
     }
 }

@@ -114,6 +114,7 @@ hickory-resolver.workspace = true
 zbus.workspace = true
 
 ariadne.workspace = true
+path-util.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 winreg.workspace = true
