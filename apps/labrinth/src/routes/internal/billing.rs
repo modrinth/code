@@ -23,8 +23,7 @@ use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{Duration, Utc};
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
-use serde::Serialize;
-use serde_with::serde_derive::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Postgres, Transaction};
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -290,7 +289,7 @@ pub async fn refund_charge(
                                     currency_code: charge.currency_code.clone(),
                                     accounting_time: Utc::now(),
                                     accounting_time_zone: anrok::AccountingTimeZone::Utc,
-                                    line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, refund_amount)],
+                                    line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, -refund_amount)],
                                 }
                             }
                         ).await;

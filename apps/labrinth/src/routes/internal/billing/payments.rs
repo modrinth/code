@@ -536,7 +536,7 @@ pub async fn create_or_update_payment_intent(
     if let Some(payment_intent_id) = existing_payment_intent {
         let mut update_payment_intent = stripe::UpdatePaymentIntent {
             amount: Some(charge_data.amount + tax_amount),
-            currency: Some(inferred_stripe_currency),
+            currency: Some(charge_data.stripe_currency_code()?),
             customer: Some(customer_id),
             metadata: Some(metadata),
             ..Default::default()
@@ -570,7 +570,7 @@ pub async fn create_or_update_payment_intent(
     } else {
         let mut intent = CreatePaymentIntent::new(
             charge_data.amount + tax_amount,
-            inferred_stripe_currency,
+            charge_data.stripe_currency_code()?,
         );
 
         intent.customer = Some(customer_id);
@@ -711,6 +711,17 @@ struct ChargeData {
     pub interval: Option<PriceDuration>,
     pub price_id: ProductPriceId,
     pub charge_type: ChargeType,
+}
+
+impl ChargeData {
+    pub fn stripe_currency_code(&self) -> Result<stripe::Currency, ApiError> {
+        self.currency_code
+            .to_lowercase()
+            .parse::<stripe::Currency>()
+            .map_err(|_| ApiError::InvalidInput(
+                format!("Invalid currency code '{}': could not convert to Stripe currency", &self.currency_code)
+            ))
+    }
 }
 
 async fn derive_charge_data_from_product_selector(

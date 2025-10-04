@@ -1,7 +1,9 @@
+use actix_web::dev::Service;
 use actix_web::middleware::from_fn;
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
+
 use labrinth::app_config;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
@@ -13,9 +15,15 @@ use labrinth::util::env::parse_var;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use std::ffi::CStr;
+use std::str::FromStr;
 use std::sync::Arc;
-use tracing::{error, info};
+use tracing::level_filters::LevelFilter;
+use tracing::{Instrument, error, info, info_span};
 use tracing_actix_web::TracingLogger;
+use tracing_ecs::ECSLayerBuilder;
+use tracing_subscriber::EnvFilter;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -46,12 +54,59 @@ struct Args {
     run_background_task: Option<BackgroundTask>,
 }
 
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+enum OutputFormat {
+    #[default]
+    Human,
+    Json,
+}
+
+impl FromStr for OutputFormat {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "human" => Ok(Self::Human),
+            "json" => Ok(Self::Json),
+            _ => Err(()),
+        }
+    }
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
+    color_eyre::install().expect("failed to install `color-eyre`");
     dotenvy::dotenv().ok();
-    console_subscriber::init();
+    let console_layer = console_subscriber::spawn();
+    let env_filter = EnvFilter::builder()
+        .with_default_directive(LevelFilter::INFO.into())
+        .from_env_lossy();
+
+    let output_format =
+        dotenvy::var("LABRINTH_FORMAT").map_or(OutputFormat::Human, |format| {
+            format
+                .parse::<OutputFormat>()
+                .unwrap_or_else(|_| panic!("invalid output format '{format}'"))
+        });
+
+    match output_format {
+        OutputFormat::Human => {
+            tracing_subscriber::registry()
+                .with(console_layer)
+                .with(env_filter)
+                .with(tracing_subscriber::fmt::layer())
+                .init();
+        }
+        OutputFormat::Json => {
+            tracing_subscriber::registry()
+                .with(console_layer)
+                .with(env_filter)
+                .with(ECSLayerBuilder::default().stdout())
+                .init();
+        }
+    }
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
@@ -199,6 +254,33 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
+            .wrap_fn(|req, srv| {
+                // We capture the same fields as `tracing-actix-web`'s `RootSpanBuilder`.
+                // See `root_span!` macro.
+                let span = info_span!(
+                    "HTTP request",
+                    http.method = %req.method(),
+                    http.client_ip = %req.connection_info().realip_remote_addr().unwrap_or(""),
+                    http.user_agent = %req.headers().get("User-Agent").map_or("", |h| h.to_str().unwrap_or("")),
+                    http.target = %req.uri().path_and_query().map_or("", |p| p.as_str()),
+                    http.authenticated = %req.headers().get("Authorization").is_some()
+                );
+
+                let fut = srv.call(req);
+                async move {
+                    fut.await.inspect(|resp| {
+                        let _span = info_span!(
+                            "HTTP response",
+                            http.status = %resp.response().status().as_u16(),
+                        ).entered();
+
+                        resp.response()
+                            .error()
+                            .inspect(|err| log_error(err));
+                    })
+                }
+                .instrument(span)
+            })
             .wrap(prometheus.clone())
             .wrap(from_fn(rate_limit_middleware))
             .wrap(actix_web::middleware::Compress::default())
@@ -208,4 +290,16 @@ async fn main() -> std::io::Result<()> {
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
     .run()
     .await
+}
+
+fn log_error(err: &actix_web::Error) {
+    if err.as_response_error().status_code().is_client_error() {
+        tracing::debug!(
+            "Error encountered while processing the incoming HTTP request: {err}"
+        );
+    } else {
+        tracing::error!(
+            "Error encountered while processing the incoming HTTP request: {err}"
+        );
+    }
 }
