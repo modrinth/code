@@ -1,13 +1,10 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
-use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::Download;
 use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
-use crate::models::threads::MessageBody;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::maxmind::MaxMindIndexer;
-use crate::queue::moderation::AUTOMOD_ID;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchConfig;
@@ -17,17 +14,14 @@ use actix_web::{HttpRequest, HttpResponse, patch, post, web};
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
-use std::fmt::Write;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
-use tracing::info;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("admin")
             .service(count_download)
-            .service(force_reindex)
-            .service(delphi_result_ingest),
+            .service(force_reindex),
     );
 }
 
