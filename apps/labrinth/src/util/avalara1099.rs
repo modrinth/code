@@ -92,6 +92,23 @@ pub async fn request_form(
     })
 }
 
+pub async fn get_form_request(
+    form_request_id: &str,
+) -> Result<Result<DataWrapper<FormResponse>, serde_json::Value>, ApiError> {
+    let (request_builder, _company_id) = team_request(
+        reqwest::Method::GET,
+        &format!("/form_requests/{form_request_id}"),
+    )?;
+
+    let response = request_builder.send().await?;
+
+    Ok(if response.status().is_success() {
+        Ok(response.json::<DataWrapper<FormResponse>>().await?)
+    } else {
+        Err(response.json().await?)
+    })
+}
+
 pub async fn check_form(
     reference_id: &str,
 ) -> Result<
