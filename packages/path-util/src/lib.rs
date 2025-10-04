@@ -39,7 +39,7 @@ impl<'de> Deserialize<'de> for SafeRelativeUtf8UnixPathBuf {
         // backslashes to guarantee consistent cross-platform behavior when interpreting component
         // separators
         if !path_components.all(|component| {
-            component.is_normal()
+            (component.is_normal() || component.is_current())
                 && !component.as_str().contains('\\')
                 && !is_reserved_windows_device_name(&component)
         }) {
@@ -64,7 +64,7 @@ impl Serialize for SafeRelativeUtf8UnixPathBuf {
         }
 
         if !path_components.all(|component| {
-            component.is_normal()
+            (component.is_normal() || component.is_current())
                 && !component.as_str().contains('\\')
                 && !is_reserved_windows_device_name(&component)
         }) {
@@ -121,6 +121,8 @@ fn safe_relative_path_deserialization_contract() {
         "directory/file.txt",
         "my-directory/file.name.with.dots.tar.gz",
         "my_directory/123_456-789.file",
+        "./my/file.txt",
+        "my/./file.txt",
     ];
     for path in valid_paths {
         SafeRelativeUtf8UnixPathBuf::try_from(path.to_string())
