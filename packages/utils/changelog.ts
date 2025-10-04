@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-044T09:45:00-07:00`,
+		product: 'app',
+		version: '0.10.9',
+		body: `### Security fixes
+- Fixed a couple Modrinth Pack (\`.mrpack\`) importing security vulnerabilities.`,
+	},
+	{
 		date: `2025-10-01T19:05:00-07:00`,
 		product: 'web',
 		body: `### Improvements
