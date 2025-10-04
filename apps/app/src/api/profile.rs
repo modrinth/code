@@ -1,11 +1,11 @@
 use crate::api::Result;
 use dashmap::DashMap;
+use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 use theseus::profile::QuickPlayType;
-use path_util::SafeRelativeUtf8UnixPathBuf;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile")
