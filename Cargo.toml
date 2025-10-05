@@ -182,6 +182,7 @@ webp = { version = "0.3.0", default-features = false }
 whoami = "1.6.0"
 windows = "0.61.3"
 windows-core = "0.61.2"
+webview2-com = "0.38.0" # Should be updated in lockstep with wry
 winreg = "0.55.0"
 woothee = "0.13.0"
 yaserde = "0.12.0"
@@ -227,9 +228,6 @@ redundant_type_annotations = "warn"
 todo = "warn"
 unnested_or_patterns = "warn"
 wildcard_dependencies = "warn"
-
-[patch.crates-io]
-wry = { git = "https://github.com/modrinth/wry", rev = "f2ce0b0" }
 
 # Optimize for speed and reduce size on release builds
 [profile.release]
