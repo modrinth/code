@@ -1,8 +1,8 @@
 pub(crate) mod admin;
 pub mod affiliate;
 pub mod billing;
-pub mod external_notifications;
 pub mod delphi;
+pub mod external_notifications;
 pub mod flows;
 pub mod gdpr;
 pub mod gotenberg;
