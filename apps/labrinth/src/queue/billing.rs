@@ -181,6 +181,8 @@ async fn update_tax_amounts(
                                 tax_id.tax_processor_id,
                                 charge.amount,
                             )],
+                            customer_id: None,
+                            customer_name: None,
                         })
                         .await?
                         .tax_amount_to_collect;
@@ -282,7 +284,7 @@ async fn update_anrok_transactions(
         anrok_client: &anrok::Client,
         mut c: DBCharge,
     ) -> Result<(), ApiError> {
-        let (customer_address, tax_platform_id) = 'a: {
+        let (customer_address, tax_platform_id, customer_id) = 'a: {
             let (pi, tax_platform_id) = if c.type_ == ChargeType::Refund {
                 // the payment_platform_id should be an re or a pyr
 
@@ -344,16 +346,6 @@ async fn update_anrok_transactions(
                 .and_then(|x| x.into_object())
                 .and_then(|x| x.billing_details.address);
 
-            match pi_stripe_address {
-                Some(address) => break 'a (address, tax_platform_id),
-                None => {
-                    warn!(
-                        "A PaymentMethod for '{:?}' has no address; falling back to the customer's address",
-                        pi.customer.map(|x| x.id())
-                    );
-                }
-            };
-
             let stripe_customer_id =
                 DBUser::get_id(c.user_id, &mut **txn, redis)
                     .await?
@@ -376,6 +368,18 @@ async fn update_anrok_transactions(
                 ))
             })?;
 
+            match pi_stripe_address {
+                Some(address) => {
+                    break 'a (address, tax_platform_id, customer_id);
+                }
+                None => {
+                    warn!(
+                        "A PaymentMethod for '{:?}' has no address; falling back to the customer's address",
+                        pi.customer.map(|x| x.id())
+                    );
+                }
+            };
+
             let customer =
                 stripe::Customer::retrieve(stripe_client, &customer_id, &[])
                     .await?;
@@ -386,7 +390,7 @@ async fn update_anrok_transactions(
                 )
             })?;
 
-            (address, tax_platform_id)
+            (address, tax_platform_id, customer_id)
         };
 
         let tax_id = DBProductsTaxIdentifier::get_price(c.price_id, &mut **txn)
@@ -412,6 +416,8 @@ async fn update_anrok_transactions(
                             c.tax_amount + c.amount,
                         ),
                     ],
+                    customer_id: Some(format!("stripe:cust:{customer_id}")),
+                    customer_name: Some("Customer".to_owned()),
                 },
             })
             .await;

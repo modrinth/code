@@ -109,6 +109,8 @@ pub struct TransactionFields {
     pub accounting_time: DateTime<Utc>,
     pub accounting_time_zone: AccountingTimeZone,
     pub line_items: Vec<LineItem>,
+    pub customer_name: Option<String>,
+    pub customer_id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
