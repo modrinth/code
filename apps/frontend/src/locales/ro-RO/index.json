@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Renunță"
+  },
+  "action.continue": {
+    "message": "Continuă"
+  },
   "admin.billing.error.not-found": {
     "message": "Utilizatorul nu a fost găsit"
   },
@@ -413,6 +419,153 @@
   "collection.title": {
     "message": "{name} - Colecție"
   },
+  "common.no": {
+    "message": "Nu"
+  },
+  "common.yes": {
+    "message": "Da"
+  },
+  "create.collection.cancel": {
+    "message": "Renunță"
+  },
+  "create.collection.collection-info": {
+    "message": "Noua ta colecție va fi creată ca o colecție publică cu {count, plural, =0 {niciun proiect} one {# proiect} other {# proiecte}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Creează o colecție"
+  },
+  "create.collection.error-title": {
+    "message": "A avut loc o eroare"
+  },
+  "create.collection.name-label": {
+    "message": "Nume"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Introduceți numele colecției..."
+  },
+  "create.collection.summary-description": {
+    "message": "O propoziție sau două care îți descriu colecția."
+  },
+  "create.collection.summary-label": {
+    "message": "Rezumat"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Aceasta este o colecție de..."
+  },
+  "create.collection.title": {
+    "message": "Crearea unei colecții"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Se apropie limita de {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Ești pe cale să atingi limita de {type}, te rugăm să contactezi suportul dacă ai nevoie de mai mult de {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Contactează suportul"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "Limita de {type} a fost atinsă"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Ai atins limita de {type} de {max}. Te rugăm să contactezi suportul pentru a-ți mări limita."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "colecție"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organizație"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "colecții"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organizații"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "proiecte"
+  },
+  "create.limit-alert.type-project": {
+    "message": "proiect"
+  },
+  "create.organization.cancel": {
+    "message": "Renunță"
+  },
+  "create.organization.create-organization": {
+    "message": "Creează o organizație"
+  },
+  "create.organization.error-title": {
+    "message": "A avut loc o eroare"
+  },
+  "create.organization.name-label": {
+    "message": "Nume"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Introduceți numele organizației..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Vei fi proprietarul acestei organizații, dar poți invita alți membri și poți transfera proprietatea oricând."
+  },
+  "create.organization.summary-description": {
+    "message": "O propoziție sau două care îți descriu organizația."
+  },
+  "create.organization.summary-label": {
+    "message": "Rezumat"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "O organizației pentru..."
+  },
+  "create.organization.title": {
+    "message": "Creează o organizație"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Renunță"
+  },
+  "create.project.create-project": {
+    "message": "Creează un proiect"
+  },
+  "create.project.error-title": {
+    "message": "A avut loc o eroare"
+  },
+  "create.project.name-label": {
+    "message": "Nume"
+  },
+  "create.project.name-placeholder": {
+    "message": "Introduceți numele proiectului..."
+  },
+  "create.project.summary-description": {
+    "message": "O propoziție sau două care îți descriu proiectul."
+  },
+  "create.project.summary-label": {
+    "message": "Rezumat"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Acest proiect adaugă..."
+  },
+  "create.project.title": {
+    "message": "Creează un proiect"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "Vizibilitatea proiectului tău după ce a fost aprobat."
+  },
+  "create.project.visibility-label": {
+    "message": "Vizibilitate"
+  },
+  "create.project.visibility-private": {
+    "message": "Privat"
+  },
+  "create.project.visibility-public": {
+    "message": "Public"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Nelistat"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Creați nouă"
   },
@@ -424,6 +577,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Colecțiile tale"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "O entitate străină înseamnă o entitate de afaceri organizată în afara Statelor Unite (cum ar fi o corporație, un parteneriat sau un SRL non-SUA)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entitate străină"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Persoană fizică"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Ești o persoană fizică sau faci parte dintr-o entitate străină?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Formular fiscal"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth folosește furnizorul terț Track1099 pentru a colecta și stoca în siguranță formularele tale fiscale. <security-link>Află mai multe aici.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Practici de securitate"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Ești cetățean american?"
   },
   "error.collection.404.list_item.1": {
     "message": "Este posibil să fi tastat greșit URL-ul colecției."
@@ -445,6 +622,12 @@
   },
   "error.generic.404.title": {
     "message": "Pagina nu a fost găsită"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Această pagină a fost blocată din motive legale, cum ar fi cenzura guvernamentală sau procesele legale în curs."
+  },
+  "error.generic.451.title": {
+    "message": "Conținut indisponibil din motive legale"
   },
   "error.generic.default.list_item.1": {
     "message": "Verifică dacă Modrinth este picat pe a noastră <status-link>Pagină de status</status-link>."
@@ -528,13 +711,13 @@
     "message": "Du-te la panoul principal"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Obține cea mai bună experiență de modare posibilă, cu actualizări constante de la echipa Modrinth"
+    "message": "Obține cea mai bună experiență posibilă, cu actualizări constante de la echipa Modrinth."
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Evoluare Constantă"
   },
   "landing.creator.feature.data-statistics.description": {
-    "message": "Primește raporturi detaliate despre vizualizări, număr de descărcări, și încasări"
+    "message": "Primește raporturi detaliate despre vizualizări, număr de descărcări, și încasări."
   },
   "landing.creator.feature.data-statistics.title": {
     "message": "Date și Statistici"
@@ -546,19 +729,19 @@
     "message": "Descoperă"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Integrează-te cu uneltele tale de construire prin Minotaur pentru încărcări automate imediat ce lansezi o versiune nouă"
+    "message": "Integrează-te cu uneltele tale de construire prin Minotaur pentru încărcări automate imediat ce lansezi o versiune nouă."
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Ecosistem Diversificat"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Primește venituri din reclame de pe paginile proiectului tău și retrage fondurile în orice moment"
+    "message": "Primește venituri din reclame de pe paginile proiectului tău și retrage fondurile în orice moment."
   },
   "landing.creator.feature.monetization.title": {
     "message": "Monetizare"
   },
   "landing.creator.feature.team-management.description": {
-    "message": "Invită-ți colegii și gestionează rolurile și permisiunile cu ușurință"
+    "message": "Invită-ți colegii și gestionează rolurile și permisiunile cu ușurință."
   },
   "landing.creator.feature.team-management.title": {
     "message": "Administrează Echipa"
@@ -665,9 +848,6 @@
   "layout.action.change-theme": {
     "message": "Schimbă tema"
   },
-  "layout.action.close-banner": {
-    "message": "Închide"
-  },
   "layout.action.create-new": {
     "message": "Creează nou..."
   },
@@ -727,6 +907,15 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Acțiunea contului necesară."
+  },
+  "layout.banner.tax.action": {
+    "message": "Completează formularul fiscal"
+  },
+  "layout.banner.tax.description": {
+    "message": "Ai retras deja peste $600 de la Modrinth anul acesta. Pentru a respecta reglementările fiscale, trebuie să completezi un formular fiscal. Retragerile tale sunt puse pe pauză până când acest formular este trimis."
+  },
+  "layout.banner.tax.title": {
+    "message": "Formular fiscal necesar"
   },
   "layout.banner.verify-email.action": {
     "message": "Retrimiteți emailul de verificare"
@@ -789,7 +978,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Serverele Modrinth"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Resurse"
@@ -978,7 +1167,7 @@
     "message": "Invitație de a te alătura proiectului"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Ai fost invitat să devii membru al acestui proiect cu rolul de '{role}'."
+    "message": "Ai fost invitat să devii membru al acestui proiect cu rolul de '{role}''."
   },
   "project-member-header.success": {
     "message": "Succes"
@@ -1005,6 +1194,9 @@
     "message": "Trebuie să completezi pașii necesari din lista de verificare pentru publicare!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "Trimite pentru revizuire"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "Trimite pentru revizuire"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1098,13 +1290,10 @@
     "message": "Revizuiește proiectul"
   },
   "project.actions.servers-promo.description": {
-    "message": "Serverele Modrinth sunt cea mai simplă modalitate de a te juca împreună cu prietenii fără bătăi de cap!"
-  },
-  "project.actions.servers-promo.monthly": {
-    "message": " / lună"
+    "message": "Modrinth Servers sunt cea mai simplă modalitate de a te juca împreună cu prietenii fără bătăi de cap!"
   },
   "project.actions.servers-promo.pricing": {
-    "message": "Începând de la $5{monthly}"
+    "message": "Începând de la {price}<small> / lună</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Creează un server"
@@ -1851,10 +2040,10 @@
     "message": "Visa"
   },
   "settings.billing.pyro_subscription.description": {
-    "message": "Gestionează-ți abonamentele la serverul Modrinth."
+    "message": "Gestionează-ți abonamentele la Modrinth Server."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Abonamente pentru servere Modrinth"
+    "message": "Abonamente pentru Modrinth Servers"
   },
   "settings.billing.subscription.description": {
     "message": "Administrează-ți abonamentele Modrinth."

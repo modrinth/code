@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Entwicklermodus aktiviert."
   },
+  "app.settings.downloading": {
+    "message": "Lade v{version} herunter"
+  },
   "app.settings.tabs.appearance": {
     "message": "Erscheinungsbild"
   },
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Ressourcenmanagement"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} ist bereit zum Installieren! Lade neu um es jetzt zu updaten, oder automatisch wenn du die Modrinth App schließt."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} ist heruntergeladen. Lade neu um es jetzt zu updaten, oder wenn du die Modrinth App schließt."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Die Modrinth App v{version} ist jetzt verfügbar! Da Sie sich in einem getakteten Netzwerk befinden, haben wir es nicht automatisch heruntergeladen."
+  },
+  "app.update-toast.changelog": {
+    "message": "Änderungen"
+  },
+  "app.update-toast.download": {
+    "message": "Herunterladen ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Wird Heruntergeladen..."
+  },
+  "app.update-toast.reload": {
+    "message": "Neu laden"
+  },
+  "app.update-toast.title": {
+    "message": "Aktualisierung verfügbar"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Herunterladen abgeschlossen"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Drücke hier um die Änderungen zu sehen."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Version {version} wurde erfolgreich installiert!"
+  },
+  "app.update.download-update": {
+    "message": "Lade Update herunter"
+  },
+  "app.update.downloading-update": {
+    "message": "Lade Update Herunter ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Neu laden um Update zu installieren"
   },
   "instance.add-server.add-and-play": {
     "message": "Hinzufügen und spielen"

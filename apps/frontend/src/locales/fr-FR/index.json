@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Annuler"
+  },
+  "action.continue": {
+    "message": "Continuer"
+  },
   "admin.billing.error.not-found": {
     "message": "Utilisateur non trouvé"
   },
@@ -413,6 +419,66 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
+  "common.no": {
+    "message": "Non"
+  },
+  "common.yes": {
+    "message": "Oui"
+  },
+  "create.collection.cancel": {
+    "message": "Annuler"
+  },
+  "create.collection.create-collection": {
+    "message": "Créer une collection"
+  },
+  "create.collection.error-title": {
+    "message": "Une erreur est survenue"
+  },
+  "create.collection.name-label": {
+    "message": "Nom"
+  },
+  "create.collection.summary-description": {
+    "message": "Une ou deux phrases qui décrivent vôtre collection."
+  },
+  "create.collection.summary-label": {
+    "message": "Sommaire"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "C'est une collection de..."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Contacter le support"
+  },
+  "create.limit-alert.type-collection": {
+    "message": "collection"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organisation"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "collections"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organisations"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projets"
+  },
+  "create.limit-alert.type-project": {
+    "message": "projet"
+  },
+  "create.organization.cancel": {
+    "message": "Annuler"
+  },
+  "create.organization.create-organization": {
+    "message": "Créer une organisation"
+  },
+  "create.organization.error-title": {
+    "message": "Une erreur est survenue"
+  },
+  "create.organization.name-label": {
+    "message": "Nom"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Créer un nouveau"
   },
@@ -424,6 +490,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Vos collections"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Une entité étrangère correspond à toute entreprise située en dehors des États-Unis d'Amérique (par exemple, une entreprise non américaine, une entreprise partenaire ou LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entité étrangère"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Particulier"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Êtes-vous un particulier ou faites-vous partie d'une entité étrangère ?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Déclaration de revenus"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth utilise les services d'un tiers, Track1099, pour collecter et enregistrer de manière sécurisée vos déclarations de revenus. <security-link>En savoir plus</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Pratiques de sécurité"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Êtes-vous un citoyen des États-Unis d'Amérique ?"
   },
   "error.collection.404.list_item.1": {
     "message": "Vous avez peut-être mal tapé l'URL de la collection."
@@ -665,9 +755,6 @@
   "layout.action.change-theme": {
     "message": "Changer le thème"
   },
-  "layout.action.close-banner": {
-    "message": "Fermer"
-  },
   "layout.action.create-new": {
     "message": "Créer nouveau..."
   },
@@ -727,6 +814,15 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Action de facturation requise."
+  },
+  "layout.banner.tax.action": {
+    "message": "Remplir la déclaration de revenus"
+  },
+  "layout.banner.tax.description": {
+    "message": "Vous avez désormais retiré plus de 600 $ depuis Modrinth cette année. Pour être en règle avec la législation, vous devez remplir une déclaration de revenus. Vos demandes de retrait sont en attente tant que le formulaire n'a pas été rempli."
+  },
+  "layout.banner.tax.title": {
+    "message": "Déclaration de revenus nécessaire"
   },
   "layout.banner.verify-email.action": {
     "message": "Renvoyer un e-mail de vérification"
@@ -977,9 +1073,6 @@
   "project-member-header.invitation-title": {
     "message": "Invitation à rejoindre un projet"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "Vous avez été invité à être membre de ce projet sous le rôle de '{role}'."
-  },
   "project-member-header.success": {
     "message": "Succès"
   },
@@ -1100,11 +1193,8 @@
   "project.actions.servers-promo.description": {
     "message": "Les serveurs Modrinth sont la solution la plus facile pour jouer entre amis sans ennuis !"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / mois"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "À partir de $5{monthly}"
+    "message": "À partir de {price}<small> / mois</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Créer un serveur"

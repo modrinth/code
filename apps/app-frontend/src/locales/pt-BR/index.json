@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Modo desenvolvedor ativado."
   },
+  "app.settings.downloading": {
+    "message": "Baixando v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Aparência"
   },
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gerenciamento de recursos"
+  },
+  "app.update-toast.body": {
+    "message": "O Modrinth App v{version} está pronto para ser instalado! Você pode recarregar para atualizar agora ou a atualização será feita automaticamente ao fechar o Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "O Modrinth App v{version} baixado. Recarregue para atualizar agora ou a atualização será aplicada automaticamente ao fechar o Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "O Modrinth App v{version} já está disponível! Como você está em uma rede limitada, não o baixamos automaticamente."
+  },
+  "app.update-toast.changelog": {
+    "message": "Mudanças"
+  },
+  "app.update-toast.download": {
+    "message": "Baixar ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Baixando..."
+  },
+  "app.update-toast.reload": {
+    "message": "Atualizar"
+  },
+  "app.update-toast.title": {
+    "message": "Atualização disponível"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Download concluído"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Clique aqui para ver as mudanças."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versão {version} instalada com sucesso!"
+  },
+  "app.update.download-update": {
+    "message": "Baixar atualização"
+  },
+  "app.update.downloading-update": {
+    "message": "Baixando atualização ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Recarregar para instalar a atualização"
   },
   "instance.add-server.add-and-play": {
     "message": "Adicionar e jogar"
@@ -84,7 +129,7 @@
     "message": "Excluir instância"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Exclui permanente a instância do seu dispositivo, incluindo seus mundos, configurações e todo o conteúdo instalado. Tenha cuidado, porque não será possível recuperá-la após excluí-la."
+    "message": "Apaga permanente a instância do seu dispositivo, incluindo seus mundos, configurações e todo o conteúdo instalado. Tenha cuidado, porque não será possível recuperá-la após apaga-la."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Excluindo..."
@@ -264,7 +309,7 @@
     "message": "Retornar ao padrão"
   },
   "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Mostrar todas as versões"
+    "message": "Exibir todas as versões"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
     "message": "mudar a versão"
@@ -339,7 +384,7 @@
     "message": "Altura"
   },
   "instance.settings.tabs.window.height.description": {
-    "message": "Altura da janela do jogo ao abrir."
+    "message": "Altura da janela ao iniciar o jogo."
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Insira a altura..."
@@ -348,7 +393,7 @@
     "message": "Largura"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "Largura da janela do jogo ao abrir."
+    "message": "Largura da janela ao iniciar o jogo."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Insira a largura..."
