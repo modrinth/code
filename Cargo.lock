@@ -9309,7 +9309,6 @@ dependencies = [
  "path-util",
  "serde",
  "serde_json",
- "serde_with",
  "tauri",
  "tauri-build",
  "tauri-plugin-deep-link",
