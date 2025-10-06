@@ -36,7 +36,7 @@ use tracing::{debug, error, info, warn};
 /// Updates charges which need to have their tax amount updated. This is done within a timer to avoid reaching
 /// Anrok API limits.
 ///
-/// The global rate limit for Anrok API operations is 10 RPS, so we run ~6 requests every second up
+/// The global rate limit for Anrok API operations is 10 RPS, so we run ~8 requests every second up
 /// to the specified limit of processed charges.
 async fn update_tax_amounts(
     pg: &PgPool,
@@ -55,7 +55,7 @@ async fn update_tax_amounts(
 
         let mut txn = pg.begin().await?;
 
-        let charges = DBCharge::get_updateable_lock(&mut *txn, 6).await?;
+        let charges = DBCharge::get_updateable_lock(&mut *txn, 8).await?;
 
         if charges.is_empty() {
             info!("No more charges to process");
@@ -268,7 +268,7 @@ async fn update_tax_amounts(
 ///
 /// Same as update_tax_amounts, this is done within a timer to avoid reaching Anrok API limits.
 ///
-/// The global rate limit for Anrok API operations is 10 RPS, so we run ~6 requests every second up
+/// The global rate limit for Anrok API operations is 10 RPS, so we run ~8 requests every second up
 /// to the specified limit of processed charges.
 async fn update_anrok_transactions(
     pg: &PgPool,
@@ -451,39 +451,37 @@ async fn update_anrok_transactions(
         }
     }
 
-    let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
-    interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
-
     let mut processed_charges = 0;
 
-    loop {
-        interval.tick().await;
+    let mut offset = 0;
 
+    loop {
         let mut txn = pg.begin().await?;
 
-        let charges =
-            DBCharge::get_missing_tax_identifier_lock(&mut *txn, 6).await?;
+        let mut charges =
+            DBCharge::get_missing_tax_identifier_lock(&mut *txn, offset, 1)
+                .await?;
 
-        if charges.is_empty() {
+        let Some(c) = charges.pop() else {
             info!("No more charges to process");
             break Ok(());
-        }
+        };
 
-        for c in charges {
-            processed_charges += 1;
+        let charge_id = to_base62(c.id.0 as u64);
+        let user_id = to_base62(c.user_id.0 as u64);
 
-            let charge_id = to_base62(c.id.0 as u64);
-            let user_id = to_base62(c.user_id.0 as u64);
+        let result =
+            process_charge(stripe_client, &mut txn, redis, anrok_client, c)
+                .await;
 
-            let result =
-                process_charge(stripe_client, &mut txn, redis, anrok_client, c)
-                    .await;
+        processed_charges += 1;
 
-            if let Err(e) = result {
-                warn!(
-                    "Error processing charge '{charge_id}' for user '{user_id}': {e}"
-                );
-            }
+        if let Err(e) = result {
+            warn!(
+                "Error processing charge '{charge_id}' for user '{user_id}': {e}"
+            );
+
+            offset += 1;
         }
 
         txn.commit().await?;
@@ -1010,14 +1008,14 @@ pub async fn index_subscriptions(
             &redis,
             &anrok_client,
             &stripe_client,
-            600,
+            750,
         ),
     )
     .await;
 
     run_and_time(
         "update_tax_amounts",
-        update_tax_amounts(&pool, &redis, &anrok_client, &stripe_client, 100),
+        update_tax_amounts(&pool, &redis, &anrok_client, &stripe_client, 50),
     )
     .await;
 
