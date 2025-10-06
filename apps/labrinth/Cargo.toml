@@ -1,116 +1,106 @@
 [package]
-authors           = ["geometrically <jai@modrinth.com>"]
+authors = ["geometrically <jai@modrinth.com>"]
+license = "AGPL-3.0-only"
+name    = "labrinth"
+version = "2.7.0"
+
 edition.workspace = true
-license           = "AGPL-3.0-only"
-name              = "labrinth"
-version           = "2.7.0"
 
 # This seems redundant, but it's necessary for Docker to work
 [[bin]]
 name = "labrinth"
 path = "src/main.rs"
 
+[lints]
+workspace = true
+
+[build-dependencies]
+chrono         = { workspace = true }
+dotenv-build   = { workspace = true }
+iana-time-zone = { workspace = true }
+
 [dependencies]
-actix-cors.workspace      = true
-actix-files.workspace     = true
-actix-multipart.workspace = true
-actix-rt.workspace        = true
-actix-web.workspace       = true
-actix-web-prom            = { workspace = true, features = ["process"] }
-actix-ws.workspace        = true
-prometheus.workspace      = true
-
-color-eyre.workspace         = true
-console-subscriber.workspace = true
-eyre.workspace               = true
-tracing.workspace            = true
-tracing-actix-web.workspace  = true
-tracing-ecs.workspace        = true
-tracing-subscriber.workspace = true
-
-tokio                  = { workspace = true, features = ["sync", "rt-multi-thread"] }
-tokio-stream.workspace = true
-
-async-trait.workspace  = true
-dashmap.workspace      = true
-futures.workspace      = true
-futures-util.workspace = true
-paste.workspace        = true
-
-hyper-rustls.workspace = true
-hyper-util.workspace = true
-meilisearch-sdk = { workspace = true, features = ["reqwest"] }
-reqwest = { workspace = true, features = [
-  "http2",
-  "rustls-tls-webpki-roots",
-  "json",
-  "multipart",
-] }
-rust-s3.workspace = true
-
-chrono               = { workspace = true, features = ["serde"] }
-serde                = { workspace = true, features = ["derive"] }
-serde_json.workspace = true
-serde_with.workspace = true
-yaserde              = { workspace = true, features = ["derive"] }
-
-argon2.workspace      = true
-base64.workspace      = true
-bitflags.workspace    = true
-bytes.workspace       = true
-hex.workspace         = true
-hmac.workspace        = true
-murmur2.workspace     = true
-rand.workspace        = true
-rand_chacha.workspace = true
-sha1.workspace        = true
-sha2.workspace        = true
-totp-rs               = { workspace = true, features = ["gen_secret"] }
-zxcvbn.workspace      = true
-
-url.workspace         = true
-urlencoding.workspace = true
-
-zip.workspace = true
-
-itertools.workspace = true
-
-censor.workspace = true
-regex.workspace  = true
-spdx             = { workspace = true, features = ["text"] }
-validator        = { workspace = true, features = ["derive"] }
-
-dotenvy.workspace   = true
-either.workspace    = true
-thiserror.workspace = true
-
-clickhouse = { workspace = true, features = ["uuid", "time"] }
+actix-cors               = { workspace = true }
+actix-files              = { workspace = true }
+actix-multipart          = { workspace = true }
+actix-rt                 = { workspace = true }
+actix-web                = { workspace = true }
+actix-web-prom           = { workspace = true, features = ["process"] }
+actix-ws                 = { workspace = true }
+argon2                   = { workspace = true }
+ariadne                  = { workspace = true }
+async-trait              = { workspace = true }
+base64                   = { workspace = true }
+bitflags                 = { workspace = true }
+bytes                    = { workspace = true }
+censor                   = { workspace = true }
+chrono                   = { workspace = true, features = ["serde"] }
+clap                     = { workspace = true, features = ["derive"] }
+clickhouse               = { workspace = true, features = ["uuid", "time"] }
+color-eyre               = { workspace = true }
+color-thief              = { workspace = true }
+console-subscriber       = { workspace = true }
+dashmap                  = { workspace = true }
 deadpool-redis.workspace = true
-redis = { workspace = true, features = ["tokio-comp", "ahash", "r2d2"] }
-rust_decimal = { workspace = true, features = [
-  "serde-with-float",
-  "serde-with-str",
+dotenvy                  = { workspace = true }
+either                   = { workspace = true }
+eyre                     = { workspace = true }
+flate2                   = { workspace = true }
+futures                  = { workspace = true }
+futures-util             = { workspace = true }
+hex                      = { workspace = true }
+hmac                     = { workspace = true }
+hyper-rustls             = { workspace = true }
+hyper-util               = { workspace = true }
+itertools                = { workspace = true }
+json-patch               = { workspace = true }
+lettre                   = { workspace = true }
+maxminddb                = { workspace = true }
+meilisearch-sdk          = { workspace = true, features = ["reqwest"] }
+murmur2                  = { workspace = true }
+paste                    = { workspace = true }
+path-util                = { workspace = true }
+prometheus               = { workspace = true }
+rand                     = { workspace = true }
+rand_chacha              = { workspace = true }
+redis                    = { workspace = true, features = ["tokio-comp", "ahash", "r2d2"] }
+regex                    = { workspace = true }
+rust-s3                  = { workspace = true }
+rust_iso3166             = { workspace = true }
+rusty-money              = { workspace = true }
+sentry                   = { workspace = true }
+sentry-actix             = { workspace = true }
+serde                    = { workspace = true, features = ["derive"] }
+serde_json               = { workspace = true }
+serde_with               = { workspace = true }
+sha1                     = { workspace = true }
+sha2                     = { workspace = true }
+spdx                     = { workspace = true, features = ["text"] }
+tar                      = { workspace = true }
+thiserror                = { workspace = true }
+tokio                    = { workspace = true, features = ["sync", "rt-multi-thread"] }
+tokio-stream             = { workspace = true }
+totp-rs                  = { workspace = true, features = ["gen_secret"] }
+tracing                  = { workspace = true }
+tracing-actix-web        = { workspace = true }
+tracing-ecs              = { workspace = true }
+tracing-subscriber       = { workspace = true }
+url                      = { workspace = true }
+urlencoding              = { workspace = true }
+uuid                     = { workspace = true, features = ["v4", "fast-rng", "serde"] }
+validator                = { workspace = true, features = ["derive"] }
+webp                     = { workspace = true }
+woothee                  = { workspace = true }
+yaserde                  = { workspace = true, features = ["derive"] }
+zip                      = { workspace = true }
+zxcvbn                   = { workspace = true }
+
+async-stripe = { workspace = true, features = [
+  "billing",
+  "checkout",
+  "connect",
+  "webhook-events",
 ] }
-sqlx = { workspace = true, features = [
-  "runtime-tokio",
-  "tls-rustls-ring",
-  "postgres",
-  "chrono",
-  "macros",
-  "migrate",
-  "rust_decimal",
-  "json",
-] }
-uuid = { workspace = true, features = ["v4", "fast-rng", "serde"] }
-
-flate2.workspace    = true
-maxminddb.workspace = true
-tar.workspace       = true
-
-sentry.workspace       = true
-sentry-actix.workspace = true
-
-color-thief.workspace = true
 image = { workspace = true, features = [
   "avif",
   "bmp",
@@ -128,43 +118,35 @@ image = { workspace = true, features = [
   "tiff",
   "webp",
 ] }
-webp.workspace = true
-
-woothee.workspace = true
-
-lettre.workspace = true
-
-rust_iso3166.workspace = true
-
-async-stripe = { workspace = true, features = [
-  "billing",
-  "checkout",
-  "connect",
-  "webhook-events",
+reqwest = { workspace = true, features = [
+  "http2",
+  "rustls-tls-webpki-roots",
+  "json",
+  "multipart",
 ] }
-json-patch.workspace = true
-rusty-money.workspace = true
-
-ariadne.workspace   = true
-path-util.workspace = true
-
-clap = { workspace = true, features = ["derive"] }
+rust_decimal = { workspace = true, features = [
+  "serde-with-float",
+  "serde-with-str",
+] }
+sqlx = { workspace = true, features = [
+  "runtime-tokio",
+  "tls-rustls-ring",
+  "postgres",
+  "chrono",
+  "macros",
+  "migrate",
+  "rust_decimal",
+  "json",
+] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
-jemalloc_pprof = { workspace = true, features = ["flamegraph"] }
+jemalloc_pprof    = { workspace = true, features = ["flamegraph"] }
 tikv-jemalloc-ctl = { workspace = true, features = ["stats"] }
+
 tikv-jemallocator = { workspace = true, features = [
   "profiling",
   "unprefixed_malloc_on_supported_platforms",
 ] }
 
 [dev-dependencies]
-actix-http.workspace = true
-
-[build-dependencies]
-chrono.workspace         = true
-dotenv-build.workspace   = true
-iana-time-zone.workspace = true
-
-[lints]
-workspace = true
+actix-http = { workspace = true }

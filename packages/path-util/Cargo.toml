@@ -1,12 +1,13 @@
 [package]
-edition.workspace = true
-name              = "path-util"
+name = "path-util"
 
-[dependencies]
-derive_more          = { workspace = true, features = ["display", "deref"] }
-itertools.workspace  = true
-serde.workspace      = true
-typed-path.workspace = true
+edition.workspace = true
 
 [lints]
 workspace = true
+
+[dependencies]
+derive_more = { workspace = true, features = ["display", "deref"] }
+itertools   = { workspace = true }
+serde       = { workspace = true }
+typed-path  = { workspace = true }

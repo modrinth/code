@@ -3,16 +3,16 @@ edition.workspace = true
 name              = "ariadne"
 version           = "0.1.0"
 
-[dependencies]
-chrono                = { workspace = true, features = ["serde"] }
-either.workspace      = true
-rand.workspace        = true
-serde                 = { workspace = true, features = ["derive"] }
-serde_bytes.workspace = true
-serde_cbor.workspace  = true
-serde_json.workspace  = true
-thiserror.workspace   = true
-uuid                  = { workspace = true, features = ["v4", "fast-rng", "serde"] }
-
 [lints]
 workspace = true
+
+[dependencies]
+chrono      = { workspace = true, features = ["serde"] }
+either      = { workspace = true }
+rand        = { workspace = true }
+serde       = { workspace = true, features = ["derive"] }
+serde_bytes = { workspace = true }
+serde_cbor  = { workspace = true }
+serde_json  = { workspace = true }
+thiserror   = { workspace = true }
+uuid        = { workspace = true, features = ["v4", "fast-rng", "serde"] }

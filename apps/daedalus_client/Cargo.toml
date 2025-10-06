@@ -1,12 +1,33 @@
 [package]
-authors           = ["Jai A <jai@modrinth.com>"]
-edition.workspace = true
-name              = "daedalus_client"
-version           = "0.2.2"
+authors = ["Jai A <jai@modrinth.com>"]
+name    = "daedalus_client"
+version = "0.2.2"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition.workspace = true
+
+[lints]
+workspace = true
 
 [dependencies]
+bytes              = { workspace = true }
+chrono             = { workspace = true, features = ["serde"] }
+daedalus           = { workspace = true }
+dashmap            = { workspace = true }
+dotenvy            = { workspace = true }
+futures            = { workspace = true }
+indexmap           = { workspace = true, features = ["serde"] }
+itertools          = { workspace = true }
+rust-s3            = { workspace = true }
+serde              = { workspace = true, features = ["derive"] }
+serde-xml-rs       = { workspace = true }
+serde_json         = { workspace = true }
+sha1_smol          = { workspace = true }
+thiserror          = { workspace = true }
+tokio              = { workspace = true, features = ["sync", "macros", "rt-multi-thread"] }
+tracing            = { workspace = true }
+tracing-error      = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+
 async_zip = { workspace = true, features = [
   "chrono",
   "tokio-fs",
@@ -15,30 +36,8 @@ async_zip = { workspace = true, features = [
   "zstd",
   "deflate64",
 ] }
-bytes.workspace = true
-chrono = { workspace = true, features = ["serde"] }
-daedalus.workspace = true
-dashmap.workspace = true
-dotenvy.workspace = true
-futures.workspace = true
-indexmap = { workspace = true, features = ["serde"] }
-itertools.workspace = true
 reqwest = { workspace = true, features = [
   "stream",
   "json",
   "rustls-tls-native-roots",
 ] }
-rust-s3.workspace = true
-serde = { workspace = true, features = ["derive"] }
-serde-xml-rs.workspace = true
-serde_json.workspace = true
-sha1_smol.workspace = true
-thiserror.workspace = true
-tokio = { workspace = true, features = ["sync", "macros", "rt-multi-thread"] }
-tracing-error.workspace = true
-
-tracing.workspace  = true
-tracing-subscriber = { workspace = true, features = ["env-filter"] }
-
-[lints]
-workspace = true
