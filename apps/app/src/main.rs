@@ -278,6 +278,7 @@ fn main() {
                                 .show()
                                 .unwrap();
                         }
+                        app.restart();
                     }
                 }
 
