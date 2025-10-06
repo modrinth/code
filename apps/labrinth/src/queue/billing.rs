@@ -396,7 +396,7 @@ async fn update_anrok_transactions(
         // Note: if the tax amount that was charged to the customer is *different* than
         // what it *should* be NOW, we will take on a loss here.
 
-        let should_have_collected = anrok_client
+        let result = anrok_client
             .create_or_update_txn(&anrok::Transaction {
                 id: tax_platform_id.clone(),
                 fields: anrok::TransactionFields {
@@ -414,16 +414,35 @@ async fn update_anrok_transactions(
                     ],
                 },
             })
-            .await?
-            .tax_amount_to_collect;
+            .await;
 
-        let drift = should_have_collected - c.tax_amount;
+        match result {
+            Ok(response) => {
+                let should_have_collected = response.tax_amount_to_collect;
 
-        c.tax_drift_loss = Some(drift);
-        c.tax_platform_id = Some(tax_platform_id);
-        c.upsert(txn).await?;
+                let drift = should_have_collected - c.tax_amount;
 
-        Ok(())
+                c.tax_drift_loss = Some(drift);
+                c.tax_platform_id = Some(tax_platform_id);
+                c.upsert(txn).await?;
+
+                Ok(())
+            }
+
+            Err(error) => {
+                // This isn't gonna be a fixable error, so mark the transaction as unresolvable.
+                if error
+                    .is_conflict_and(|x| x == "customerAddressCouldNotResolve")
+                {
+                    c.tax_platform_id = Some("unresolved".to_owned());
+                    c.upsert(txn).await?;
+
+                    Ok(())
+                } else {
+                    Err(error.into())
+                }
+            }
+        }
     }
 
     let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));

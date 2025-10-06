@@ -131,6 +131,19 @@ pub enum AnrokError {
     Other(#[from] reqwest::Error),
 }
 
+impl AnrokError {
+    pub fn is_conflict_and<F>(&self, pred: F) -> bool
+    where
+        F: FnOnce(&str) -> bool,
+    {
+        if let AnrokError::Conflict(message) = self {
+            pred(message)
+        } else {
+            false
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct Client {
     client: reqwest::Client,
