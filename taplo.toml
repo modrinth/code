@@ -1,0 +1,6 @@
+exclude = ["target/**/*", "**/node_modules/**/*"]
+
+[formatting]
+align_entries       = true
+allowed_blank_lines = 1
+reorder_keys        = true

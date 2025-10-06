@@ -1,23 +1,23 @@
 [package]
-name = "daedalus"
-version = "0.2.3"
-authors = ["Jai A <jai@modrinth.com>"]
+authors           = ["Jai A <jai@modrinth.com>"]
+categories        = ["game-development", "api-bindings"]
+description       = "Utilities for querying and parsing Minecraft metadata"
 edition.workspace = true
-license = "MIT"
-description = "Utilities for querying and parsing Minecraft metadata"
-repository = "https://github.com/modrinth/daedalus/"
-include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
-keywords = ["minecraft", "launcher"]
-categories = ["game-development", "api-bindings"]
-readme = "README.md"
+include           = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
+keywords          = ["minecraft", "launcher"]
+license           = "MIT"
+name              = "daedalus"
+readme            = "README.md"
+repository        = "https://github.com/modrinth/daedalus/"
+version           = "0.2.3"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = { workspace = true, features = ["derive"] }
+chrono               = { workspace = true, features = ["serde"] }
+serde                = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
-chrono = { workspace = true, features = ["serde"] }
-thiserror.workspace = true
+thiserror.workspace  = true
 
 [lints]
 workspace = true
