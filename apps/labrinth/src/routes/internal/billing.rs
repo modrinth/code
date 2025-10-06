@@ -290,6 +290,8 @@ pub async fn refund_charge(
                                     accounting_time: Utc::now(),
                                     accounting_time_zone: anrok::AccountingTimeZone::Utc,
                                     line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, -refund_amount)],
+                                    customer_id: Some(format!("stripe:cust:{}", user.stripe_customer_id.unwrap_or_else(|| "unknown".to_owned()))),
+                                    customer_name: Some("Customer".to_owned()),
                                 }
                             }
                         ).await;
