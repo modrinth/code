@@ -1010,7 +1010,7 @@ pub async fn index_subscriptions(
             &redis,
             &anrok_client,
             &stripe_client,
-            250,
+            600,
         ),
     )
     .await;
