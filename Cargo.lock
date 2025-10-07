@@ -5082,6 +5082,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "muralpay"
+version = "0.1.0"
+dependencies = [
+ "derive_more 2.0.1",
+ "eyre",
+ "reqwest",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "tokio",
+ "uuid 1.18.1",
+]
+
+[[package]]
 name = "murmur2"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7594,6 +7609,15 @@ dependencies = [
  "generic-array",
  "pkcs8",
  "subtle",
+ "zeroize",
+]
+
+[[package]]
+name = "secrecy"
+version = "0.10.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e891af845473308773346dc847b2c23ee78fe442e0472ac50e22a18a93d3ae5a"
+dependencies = [
  "zeroize",
 ]
 

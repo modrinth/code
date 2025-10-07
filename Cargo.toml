@@ -8,6 +8,7 @@ members = [
 	"packages/app-lib",
 	"packages/ariadne",
 	"packages/daedalus",
+	"packages/muralpay",
 	"packages/path-util",
 ]
 
@@ -21,6 +22,7 @@ actix-http = "3.11.0"
 actix-multipart = "0.7.2"
 actix-rt = "2.10.0"
 actix-web = "4.11.0"
+secrecy = "0.10.3"
 actix-web-prom = "0.10.0"
 actix-ws = "0.3.0"
 argon2 = { version = "0.5.3", features = ["std"] }
