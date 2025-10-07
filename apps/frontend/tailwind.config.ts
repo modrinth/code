@@ -15,11 +15,11 @@ const config: Config = {
 		extend: {
 			colors: {
 				surface: {
-					1: 'var(--surface-l1)',
-					2: 'var(--surface-l2)',
-					3: 'var(--surface-l3)',
-					4: 'var(--surface-l4)',
-					5: 'var(--surface-l5)',
+					1: 'var(--surface-1)',
+					2: 'var(--surface-2)',
+					3: 'var(--surface-3)',
+					4: 'var(--surface-4)',
+					5: 'var(--surface-5)',
 				},
 
 				/// TODO: Clean up these aliases within codebase to use default, primary, tertiary.
