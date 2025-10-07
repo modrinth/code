@@ -1,5 +1,6 @@
 use crate::api::Result;
 use dashmap::DashMap;
+use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -239,7 +240,7 @@ pub async fn profile_export_mrpack(
 #[tauri::command]
 pub async fn profile_get_pack_export_candidates(
     profile_path: &str,
-) -> Result<Vec<String>> {
+) -> Result<Vec<SafeRelativeUtf8UnixPathBuf>> {
     let candidates = profile::get_pack_export_candidates(profile_path).await?;
     Ok(candidates)
 }

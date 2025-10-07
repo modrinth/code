@@ -23,6 +23,10 @@ actix-web-prom = { workspace = true, features = ["process"] }
 tracing.workspace = true
 tracing-actix-web.workspace = true
 console-subscriber.workspace = true
+tracing-subscriber.workspace = true
+tracing-ecs.workspace = true
+eyre.workspace = true
+color-eyre.workspace = true
 
 tokio = { workspace = true, features = ["sync", "rt-multi-thread"] }
 tokio-stream.workspace = true
@@ -129,6 +133,7 @@ rusty-money.workspace = true
 json-patch.workspace = true
 
 ariadne.workspace = true
+path-util.workspace = true
 
 clap = { workspace = true, features = ["derive"] }
 

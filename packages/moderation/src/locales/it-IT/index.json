@@ -1,12 +1,12 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "È necessaria una descrizione che chiarisca lo scopo e la funzione del progetto."
+    "defaultMessage": "Una descrizione che descriva chiaramente lo scopo e la funzione del progetto è obbligatoria."
   },
   "nags.add-description.title": {
     "defaultMessage": "Aggiungi una descrizione"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Aggiungere un'icona unica, rilevante e coinvolgente rende il tuo progetto distinto e riconoscibile."
+    "defaultMessage": "Aggiungere un'icona unica, pertinente e accattivante rende il tuo progetto identificabile e lo aiuta a distinguersi."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Aggiungi un'icona"
@@ -18,7 +18,7 @@
     "defaultMessage": "Aggiungi link esterni"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Hai selezionato tutti i tag disponibili ({totalAvailableTags}). Questo rende i tag, che servono ad aiutare gli utenti a trovare progetti pertinenti, del tutto inutili. Si prega di selezionare solo i tag pertinenti al tuo progetto."
+    "defaultMessage": "Hai selezionato tutti i {totalAvailableTags} tag disponibili. Questo rende i tag, che servono ad aiutare gli utenti a trovare progetti pertinenti, del tutto inutili. Si prega di selezionare solo i tag pertinenti al tuo progetto."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Seleziona tag accurati"
@@ -54,7 +54,7 @@
     "defaultMessage": "Visita la galleria"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Il tuo {projectType} utilizza una licenza che necessita che sia disponibile il codice open-source. Si prega di fornire un link al codice sorgente, o un file sorgente per ogni versione aggiuntiva, oppure potresti scegliere un'altra licenza."
+    "defaultMessage": "Il tuo {projectType} utilizza una licenza che necessita che sia disponibile il codice sorgente. Si prega di fornire un link al codice sorgente, o un file sorgente per ogni versione aggiuntiva, oppure potresti scegliere un'altra licenza."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fornisci codice sorgente"
@@ -99,7 +99,7 @@
     "defaultMessage": "Alcune immagini non hanno un testo alternativo, importante per l'accessibilità, soprattutto per utenti ipovedenti."
   },
   "nags.missing-alt-text.title": {
-    "defaultMessage": "Aggiungi testo alternativo"
+    "defaultMessage": "Aggiungi testo alternativo alle immagini"
   },
   "nags.misused-discord-link-description": {
     "defaultMessage": "L'invito a Discord non può essere usato per altri collegamenti. Inserisci solo un link al tuo Discord nella casella Invito a Discord."
@@ -114,7 +114,7 @@
     "defaultMessage": "Controlla e rispondi a tutte le richieste del team di moderazione prima di reinviare."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Rivedi feedback dei moderatori"
+    "defaultMessage": "Controlla il feedback dei moderatori"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero avere un solo tag di risoluzione che corrisponda alla loro risoluzione primaria."
@@ -177,13 +177,13 @@
     "defaultMessage": "Espandi il riepilogo"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Scegliere un nome semplice per il tuo progetto lo rende elegante e più facile da ricordare e cercare. Le informazioni sulla versione e sul loader vengono mostrate automaticamente insieme al progetto."
+    "defaultMessage": "Mantenere il nome del progetto semplice lo rende semplice da memorizzare e trovare. Le informazioni sulla versione e sul loader vengono mostrate automaticamente insieme al progetto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rivedi il nome"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Hai selezionato {tagCount} tag. Prova a sceglierne {maxTagCount} o meno così il tuo progetto apparirà solo per ricerche più rilevanti."
+    "defaultMessage": "Hai selezionato {tagCount} tag. Considera di ridurli a {maxTagCount} o meno per assicurarti che il tuo progetto appaia solo nelle ricerche più rilevanti."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleziona tag accurati"

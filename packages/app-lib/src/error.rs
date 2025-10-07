@@ -173,6 +173,9 @@ pub enum ErrorKind {
 
     #[error("zbus error: {0}")]
     ZbusError(#[from] zbus::Error),
+
+    #[error("Deserialization error: {0}")]
+    DeserializationError(#[from] serde::de::value::Error),
 }
 
 #[derive(Debug)]

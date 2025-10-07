@@ -1,6 +1,93 @@
 {
+  "action.cancel": {
+    "message": "취소"
+  },
+  "action.continue": {
+    "message": "계속"
+  },
   "admin.billing.error.not-found": {
     "message": "사용자를 찾을 수 없습니다"
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "AppImage 다운로드"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "베타 다운로드"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "DEB 다운로드"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "RPM 다운로드"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "다운로드 옵션"
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "제3자 패키지"
+  },
+  "app-marketing.download.title": {
+    "message": "Modrinth App 다운로드 (베타)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "활동"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "이름"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "모드 검색"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "모드 관리"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "버전"
+  },
+  "app-marketing.features.offline.title": {
+    "message": "오프라인 모드"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "오픈 소스"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "프로세스 이름"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "메모리"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "적음"
   },
   "app-marketing.features.sharing.modpack": {
     "message": "모드팩"
@@ -84,7 +171,7 @@
     "message": "이메일 또는 사용자명"
   },
   "auth.sign-in.password.label": {
-    "message": "비밀번호"
+    "message": "암호"
   },
   "auth.sign-in.sign-in-with": {
     "message": "다음을 통해 로그인"
@@ -99,13 +186,13 @@
     "message": "계정 생성"
   },
   "auth.sign-up.confirm-password.label": {
-    "message": "비밀번호 확인"
+    "message": "암호 확인"
   },
   "auth.sign-up.email.label": {
     "message": "이메일"
   },
   "auth.sign-up.label.username": {
-    "message": "사용자명"
+    "message": "사용자 이름"
   },
   "auth.sign-up.legal-dislaimer": {
     "message": "계정을 생성함으로써, Modrinth의 <terms-link>이용 약관</terms-link> 및 <privacy-policy-link>개인정보 보호정책</privacy-policy-link>에 동의합니다."
@@ -114,7 +201,7 @@
     "message": "비밀번호가 일치하지 않습니다!"
   },
   "auth.sign-up.password.label": {
-    "message": "비밀번호"
+    "message": "암호"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "이미 계정이 있으신가요?"
@@ -230,6 +317,54 @@
   "collection.title": {
     "message": "{name} - 컬렉션"
   },
+  "create.limit-alert.type-collection": {
+    "message": "컬렉션"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "조직"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "컬렉션"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "조직"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "프로젝트"
+  },
+  "create.limit-alert.type-project": {
+    "message": "프로젝트"
+  },
+  "create.organization.cancel": {
+    "message": "취소"
+  },
+  "create.organization.create-organization": {
+    "message": "조직 만들기"
+  },
+  "create.organization.name-label": {
+    "message": "이름"
+  },
+  "create.organization.summary-label": {
+    "message": "개요"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "취소"
+  },
+  "create.project.create-project": {
+    "message": "프로젝트 만들기"
+  },
+  "create.project.name-label": {
+    "message": "이름"
+  },
+  "create.project.summary-label": {
+    "message": "개요"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
   "dashboard.collections.button.create-new": {
     "message": "새로 만들기"
   },
@@ -341,8 +476,56 @@
   "landing.button.discover-mods": {
     "message": "모드 탐색"
   },
+  "landing.button.go-to-dashboard": {
+    "message": "대시보드로 가기"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "발견"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "리소스 팩"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "서버"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "셰이더"
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.heading": {
+    "message": "알림"
+  },
+  "landing.search.label": {
+    "message": "검색"
+  },
+  "landing.search.placeholder": {
+    "message": "검색..."
+  },
   "layout.action.change-theme": {
     "message": "테마 변경"
+  },
+  "layout.action.create-new": {
+    "message": "새로 만들기..."
+  },
+  "layout.action.new-collection": {
+    "message": "새 컬렉션"
+  },
+  "layout.action.new-organization": {
+    "message": "새 조직"
+  },
+  "layout.action.new-project": {
+    "message": "새 프로젝트"
+  },
+  "layout.action.reports": {
+    "message": "신고"
+  },
+  "layout.action.review-projects": {
+    "message": "프로젝트 리뷰"
   },
   "layout.avatar.alt": {
     "message": "당신의 아바타"
@@ -616,9 +799,6 @@
   },
   "project.about.details.updated": {
     "message": "{date} 전에 업데이트됨"
-  },
-  "project.actions.servers-promo.monthly": {
-    "message": " / 월"
   },
   "project.description.title": {
     "message": "설명"

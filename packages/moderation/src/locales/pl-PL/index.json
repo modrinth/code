@@ -18,13 +18,13 @@
     "defaultMessage": "Dodaj zewnętrzne linki"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Wybrałeś wszystkie {totalAvailableTags} dostępne tagi. To mija się z celem tagów, które mają pomagać użytkownikom znaleźć trafne projekty. Proszę wybierz jedynie tagi, które dotyczą twojego projektu."
+    "defaultMessage": "Wybrano wszystkie z {totalAvailableTags} dostępnych tagów. To mija się z celem tagów, które mają pomagać użytkownikom znaleźć trafne projekty. Wybierz jedynie tagi, które dotyczą twojego projektu."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Twój opis ma jedynie {length} czytelnych znaków. Przynajmniej {minChars} znaków jest polecane, żeby stworzyć czytelny oraz informatywny opis."
+    "defaultMessage": "Twój opis ma jedynie {length, plural, one {# czytelny znak} few {# czytelne znaki} other {# czytelnych znaków}}. Zalecane jest użycie przynajmniej {minChars, plural, one {# znaku} other {# znaków}}, by stworzyć czytelny i informatywny opis."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Rozwiń opis"
@@ -33,7 +33,7 @@
     "defaultMessage": "Edytuj opis"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "Edytuj licencje"
+    "defaultMessage": "Edytuj licencję"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "Edytuj podsumowanie"
@@ -117,7 +117,7 @@
     "defaultMessage": "Przejrzyj informację zwrotną moderatorów"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Wybrano {count} tagów rozdzielczości ({tags}). Paczki zasobów powinny mieć tylko jeden tag rozdzielczości który pasuje do ich głównej rozdzielczości."
+    "defaultMessage": "Wybrano {count} tagów rozdzielczości ({tags}). Paczki zasobów powinny mieć tylko jeden tag rozdzielczości, który pasuje do ich głównej rozdzielczości."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Wybierz poprawną rozdzielczość"

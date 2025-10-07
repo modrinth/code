@@ -419,14 +419,152 @@
   "collection.title": {
     "message": "{name} - Kollektion"
   },
-  "common.close": {
-    "message": "Schliessen"
-  },
   "common.no": {
     "message": "Nein"
   },
   "common.yes": {
     "message": "Ja"
+  },
+  "create.collection.cancel": {
+    "message": "Abbrechen"
+  },
+  "create.collection.collection-info": {
+    "message": "Deine neue Sammlung wird als eine öffentliche Sammlung {count, plural, =0 {ohne Projekte} one {mit # Projekt} other {mit # Projekten}} erstellt."
+  },
+  "create.collection.create-collection": {
+    "message": "Sammlung erstellen"
+  },
+  "create.collection.error-title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "create.collection.name-label": {
+    "message": "Name"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Namen der Sammlung eingeben..."
+  },
+  "create.collection.summary-description": {
+    "message": "Ein, zwei Sätze um deine Sammlung zu beschreiben."
+  },
+  "create.collection.summary-label": {
+    "message": "Kurzbeschreibung"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Dies ist eine Sammlung für..."
+  },
+  "create.collection.title": {
+    "message": "Sammlung erstellen"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "{type} Grenze wird erreicht ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Du bist kurz davor, das {type} Limit zu erreichen. Kontaktiere den Support wenn du mehr als {max} {typePlural} benötigst."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Support kontaktieren"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type} Limit erreicht"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Du hast dein {type} Limit von {max} erreicht. Bitte kontaktiere den Support um dein Limit zu erhöhen."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "Sammlung"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "Organisation"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "Sammlungen"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "Organisationen"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "Projekte"
+  },
+  "create.limit-alert.type-project": {
+    "message": "Projekt"
+  },
+  "create.organization.cancel": {
+    "message": "Abbrechen"
+  },
+  "create.organization.create-organization": {
+    "message": "Organisation erstellen"
+  },
+  "create.organization.error-title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "create.organization.name-label": {
+    "message": "Name"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Organisationsname eingeben..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Du wirst der Besitzer dieser Organisation sein, kannst aber andere Mitglieder einladen und die Eigentumsrechte übertragen."
+  },
+  "create.organization.summary-description": {
+    "message": "Ein, zwei Sätze um deine Organisation zu beschreiben."
+  },
+  "create.organization.summary-label": {
+    "message": "Kurzbeschreibung"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Eine Organisation für..."
+  },
+  "create.organization.title": {
+    "message": "Eine Organisation erstellen"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Abbrechen"
+  },
+  "create.project.create-project": {
+    "message": "Projekt erstellen"
+  },
+  "create.project.error-title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "create.project.name-label": {
+    "message": "Name"
+  },
+  "create.project.name-placeholder": {
+    "message": "Projektnamen eingeben..."
+  },
+  "create.project.summary-description": {
+    "message": "Ein, zwei Sätze eingeben, um dein Projekt zu beschreiben."
+  },
+  "create.project.summary-label": {
+    "message": "Kurzbeschreibung"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Dieses Projekt..."
+  },
+  "create.project.title": {
+    "message": "Ein Projekt erstellen"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "Die Sichtbarkeit deines Projekts nach der Überprüfung."
+  },
+  "create.project.visibility-label": {
+    "message": "Sichtbarkeit"
+  },
+  "create.project.visibility-private": {
+    "message": "Privat"
+  },
+  "create.project.visibility-public": {
+    "message": "Öffentlich"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Nicht gelistet"
   },
   "dashboard.collections.button.create-new": {
     "message": "Erstellen"
@@ -484,6 +622,12 @@
   },
   "error.generic.404.title": {
     "message": "Seite nicht gefunden"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Diese Seite wurde aus rechtlichen gründen gesperrt, beispielsweise aufgrund staatlicher Zensur oder laufender Gerichtsverfahren."
+  },
+  "error.generic.451.title": {
+    "message": "Inhalt wegen rechtlicher Gründer nicht verfügbar"
   },
   "error.generic.default.list_item.1": {
     "message": "Überprüfe auf unserer <status-link>Status Seite</status-link> ob Modrinth unerreichbar ist."
@@ -703,9 +847,6 @@
   },
   "layout.action.change-theme": {
     "message": "Farbschema ändern"
-  },
-  "layout.action.close-banner": {
-    "message": "Schliessen"
   },
   "layout.action.create-new": {
     "message": "Erstellen..."
@@ -1026,7 +1167,7 @@
     "message": "Einladung zum Beitreten eines Projekts"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Du wurdest eingeladen, ein Mitglied mit der Rolle '{role}' für diese Projekt zu werden."
+    "message": "Du wurdest eingeladen, ein Mitglied mit der Rolle \"{role}\" für dieses Projekt zu werden."
   },
   "project-member-header.success": {
     "message": "Erfolg"
@@ -1054,6 +1195,9 @@
   },
   "project-moderation-nags.submit-for-review": {
     "message": "Zur Überprüfung einsenden"
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Zur Überprüfung einreichen"
   },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Dein Projekt ist nur für Projektmitglieder sichtbar. Es muss von Moderatoren überprüft werden, um veröffentlicht zu werden."
@@ -1148,11 +1292,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers ist der einfachste weg, mit deinen Freunden und ohne Ärger zu spielen!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / Monat"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "Started ab $5{monthly}"
+    "message": "Ab {price}<small> / Monat</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Erstelle einen Server"

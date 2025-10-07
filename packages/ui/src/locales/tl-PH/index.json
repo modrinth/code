@@ -18,10 +18,10 @@
     "defaultMessage": "Lumikha ng panukala"
   },
   "button.download": {
-    "defaultMessage": "Magbaba ng sipi"
+    "defaultMessage": "Idalamba"
   },
   "button.downloading": {
-    "defaultMessage": "Nagbababa ng sipi"
+    "defaultMessage": "Nagdadalamba"
   },
   "button.edit": {
     "defaultMessage": "Baguhin"
@@ -63,7 +63,7 @@
     "defaultMessage": "Maghinto"
   },
   "button.upload-image": {
-    "defaultMessage": "Iluwas ang sipi ng laragway"
+    "defaultMessage": "Idalamtas ang laragway"
   },
   "changelog.justNow": {
     "defaultMessage": "Ngayon lang"
@@ -127,9 +127,6 @@
   },
   "label.description": {
     "defaultMessage": "Paglalarawan"
-  },
-  "label.error": {
-    "defaultMessage": "ate"
   },
   "label.followed-projects": {
     "defaultMessage": "Mga sinusundang panukala"
@@ -272,6 +269,15 @@
   "omorphia.component.purchase_modal.payment_method_type.discover": {
     "defaultMessage": "Discover"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Balot ng Malak} other {Balot ng Malak}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Mga Balot ng Malak"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {balot ng malak} other {balot ng malak}}"
+  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Lathalang Java"
   },
@@ -287,8 +293,14 @@
   "project.about.details.updated": {
     "defaultMessage": "Nagbago {date}"
   },
+  "project.about.links.issues": {
+    "defaultMessage": "Mag-ulat ng mga isyu"
+  },
   "project.settings.environment.title": {
     "defaultMessage": "Kapaligiran"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Dalamtas"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "ᜀ"
@@ -327,7 +339,10 @@
     "defaultMessage": "Kapaligiran"
   },
   "search.filter_type.license.open_source": {
-    "defaultMessage": "Bukas na batis"
+    "defaultMessage": "Bukas na pinagmulan"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Pumili ng iyong gugustohing paksang-kulay para sa Modrinth ng nitong pakasam."
   },
   "settings.profile.title": {
     "defaultMessage": "Publiko"

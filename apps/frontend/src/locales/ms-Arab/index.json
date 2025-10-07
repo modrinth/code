@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "بطل"
+  },
+  "action.continue": {
+    "message": "تروسکن"
+  },
   "admin.billing.error.not-found": {
     "message": "ڤڠݢونا تيدق دجومڤاءي"
   },
@@ -413,6 +419,153 @@
   "collection.title": {
     "message": "{name} - کوليکسي"
   },
+  "common.no": {
+    "message": "تيدق"
+  },
+  "common.yes": {
+    "message": "يا"
+  },
+  "create.collection.cancel": {
+    "message": "بطل"
+  },
+  "create.collection.collection-info": {
+    "message": "کوليکسي بهارو اندا اکن دبوات سباݢاي کوليکسي عوام دڠن {count, plural, =0 {0 ڤروجيک} other {# ڤروجيک}}."
+  },
+  "create.collection.create-collection": {
+    "message": "چيڤتا کوليکسي"
+  },
+  "create.collection.error-title": {
+    "message": "سبواه رالت تله برلاکو"
+  },
+  "create.collection.name-label": {
+    "message": "نام"
+  },
+  "create.collection.name-placeholder": {
+    "message": "ماسوقکن نام کوليکسي..."
+  },
+  "create.collection.summary-description": {
+    "message": "ساتو اتاو دوا ايات يڠ منرڠکن کوليکسي اندا."
+  },
+  "create.collection.summary-label": {
+    "message": "ريڠکسن"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "اين اداله سبواه کوليکسي..."
+  },
+  "create.collection.title": {
+    "message": "منچيڤتا سبواه کوليکسي"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "مڠهمڤيري حد {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "اندا اکن منچاڤاي حد {type}⹁ سيلا هوبوڠي سوکوڠن جک اندا ممرلوکن لبيه درڤد {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "هوبوڠي سوکوڠن"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "حد {type} دچاڤاي"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "اندا تله منچاڤاي حد {type} اندا ياءيت سباڽق {max}. سيلا هوبوڠي سوکوڠن اونتوق منيڠکتکن حد اندا."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "کوليکسي"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "اورݢانيساسي"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "کوليکسي"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "اورݢانيساسي"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "ڤروجيک"
+  },
+  "create.limit-alert.type-project": {
+    "message": "ڤروجيک"
+  },
+  "create.organization.cancel": {
+    "message": "بطل"
+  },
+  "create.organization.create-organization": {
+    "message": "چيڤتا اورݢانيساسي"
+  },
+  "create.organization.error-title": {
+    "message": "سبواه رالت تله برلاکو"
+  },
+  "create.organization.name-label": {
+    "message": "نام"
+  },
+  "create.organization.name-placeholder": {
+    "message": "ماسوقکن نام اورݢانيساسي..."
+  },
+  "create.organization.ownership-info": {
+    "message": "اندا اکن منجادي ڤميليق اورݢانيساسي اين⹁ تتاڤي اندا بوليه منجمڤوت اهلي لاءين دان مميندهکن ڤميليقن ڤد بيلا‌٢ ماس."
+  },
+  "create.organization.summary-description": {
+    "message": "ساتو اتاو دوا ايات يڠ منرڠکن اورݢانيساسي اندا."
+  },
+  "create.organization.summary-label": {
+    "message": "ريڠکسن"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "سبواه اورݢانيساسي اونتوق..."
+  },
+  "create.organization.title": {
+    "message": "منچيڤتا سبواه اورݢانيساسي"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "بطل"
+  },
+  "create.project.create-project": {
+    "message": "چيڤتا ڤروجيک"
+  },
+  "create.project.error-title": {
+    "message": "سبواه رالت تله برلاکو"
+  },
+  "create.project.name-label": {
+    "message": "نام"
+  },
+  "create.project.name-placeholder": {
+    "message": "ماسوقکن نام ڤروجيک..."
+  },
+  "create.project.summary-description": {
+    "message": "ساتو اتاو دوا ايات يڠ منرڠکن ڤروجيک اندا."
+  },
+  "create.project.summary-label": {
+    "message": "ريڠکسن"
+  },
+  "create.project.summary-placeholder": {
+    "message": "ڤروجيک اين منمبه..."
+  },
+  "create.project.title": {
+    "message": "منچيڤتا سبواه ڤروجيک"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "کترليهتن ڤروجيک اندا سلڤس اي دلولوسکن."
+  },
+  "create.project.visibility-label": {
+    "message": "کترليهتن"
+  },
+  "create.project.visibility-private": {
+    "message": "ڤريبادي"
+  },
+  "create.project.visibility-public": {
+    "message": "عوام"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "تيدق دسنارايکن"
+  },
   "dashboard.collections.button.create-new": {
     "message": "چيڤتا بهارو"
   },
@@ -424,6 +577,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "کوليکسي اندا"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "اينتيتي اسيڠ برمقصود اينتيتي ڤرنياݢاءن يڠ دأنجورکن دلوار اميريکا شريکت (سڤرتي ڤربادنن⹁ ڤرکوڠسين اتاو LLC بوکن ا.س.)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "اينتيتي اسيڠ"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "ايديۏيدو ڤرسنديرين"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "اداکه اندا ايديۏيدو ڤرسنديرين اتاو سبهاݢين درڤد اينتيتي اسيڠ؟"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "بورڠ چوکاي"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth مڠݢوناکن ڤڽديا ڤيهق کتيݢ Track1099 اونتوق مڠومڤول دان مڽيمڤن بورڠ چوکاي اندا دڠن سلامت. <security-link>کتاهوءي لبيه لنجوت دسيني.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "عملن کسلامتن"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "اداکه اندا ورݢانݢارا اميريکا شريکت؟"
   },
   "error.collection.404.list_item.1": {
     "message": "اندا موڠکين ترساله تاءيڤ URL کوليکسي."
@@ -445,6 +622,12 @@
   },
   "error.generic.404.title": {
     "message": "هلامن تيدق دجومڤاءي"
+  },
+  "error.generic.451.subtitle": {
+    "message": "هلامن اين تله دسکت اتس سبب اوندڠ‌٢⹁ سڤرتي ڤناڤيسن کراجاءن اتاو ڤروسيديڠ اوندڠ‌٢ يڠ برتروسن."
+  },
+  "error.generic.451.title": {
+    "message": "کاندوڠن تيدق ترسديا اتس سبب اوندڠ‌٢"
   },
   "error.generic.default.list_item.1": {
     "message": "سمق سام اد Modrinth تيدق برفوڠسي ڤد <status-link>هلامن ستاتوس</status-link> کامي."
@@ -665,9 +848,6 @@
   "layout.action.change-theme": {
     "message": "توکر تيما"
   },
-  "layout.action.close-banner": {
-    "message": "توتوڤ"
-  },
   "layout.action.create-new": {
     "message": "چيڤتا بهارو..."
   },
@@ -727,6 +907,15 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "تيندقن ڤڠبيلن دڤرلوکن."
+  },
+  "layout.banner.tax.action": {
+    "message": "لڠکڤکن بورڠ چوکاي"
+  },
+  "layout.banner.tax.description": {
+    "message": "اندا تله مڠلوارکن لبيه $600 درڤد Modrinth تاهون اين. اونتوق مماتوهي ڤراتورن چوکاي⹁ اندا ڤرلو ملڠکڤکن بورڠ چوکاي. ڤڠلوارن اندا دجيدا سهيڠݢ بورڠ اين دسرهکن."
+  },
+  "layout.banner.tax.title": {
+    "message": "بورڠ چوکاي دڤرلوکن"
   },
   "layout.banner.verify-email.action": {
     "message": "هانتر سمولا إي-ميل ڤڠصحن"
@@ -978,7 +1167,7 @@
     "message": "جمڤوتن اونتوق مڽرتاءي ڤروجيک"
   },
   "project-member-header.invitation-with-role": {
-    "message": "اندا تله دجمڤوت منجادي اهلي ڤروجيک اين دڠن ڤرانن '{role}'."
+    "message": "اندا تله دجمڤوت اونتوق منجادي اهلي ڤروجيک اين دڠن ڤرانن '{role}''."
   },
   "project-member-header.success": {
     "message": "برجاي"
@@ -1005,6 +1194,9 @@
     "message": "اندا مستي ملڠکڤکن لڠکه٢ يڠ دڤرلوکن دالم سناراي سيمق ڤنربيتن!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "سره اونتوق ڤنيلاين"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "سره اونتوق ڤنيلاين"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1100,11 +1292,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers اياله چارا ڤاليڠ موده اونتوق برماءين دڠن راکن اندا تنڤا ڤرلو برسوسه ڤايه!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / بولن"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "برمولا ڤد هرݢ $5{monthly}"
+    "message": "برمولا ڤد هرݢ {price}<small> / بولن</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "چيڤتا سبواه ڤلاين"

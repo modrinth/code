@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "İptal"
+  },
+  "action.continue": {
+    "message": "Devam"
+  },
   "admin.billing.error.not-found": {
     "message": "Kullanıcı bulunamadı"
   },
@@ -21,7 +27,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "Modrinth Uygulamasının Linux sürümleri bazı sistemlerde <issues-link>sorunlu olabilir</issues-link>. Modrinth Uygulaması sisteminizde stabil değilse, <prism-link>Prism Launcher</prism-link> gibi başka uygulamalarla Modrinth içeriklerini indirmenizi tavsiye ediyoruz."
+    "message": "Modrinth App'in Linux sürümleri bazı sistemlerde <issues-link>sorunlu olabilir</issues-link>. Modrinth App sisteminizde stabil değilse, <prism-link>Prism Launcher</prism-link> gibi başka uygulamalarla Modrinth içeriklerini indirmenizi tavsiye ediyoruz."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -30,13 +36,13 @@
     "message": "İndirme seçenekleri"
   },
   "app-marketing.download.terms": {
-    "message": "Modrinth Uygulamasını indirerek <terms-link>Koşullarımızı</terms-link> ve <privacy-link>Gizlilik İlkemizi</privacy-link> kabul etmiş olursunuz."
+    "message": "Modrinth App indirerek <terms-link>Koşullarımızı</terms-link> ve <privacy-link>Gizlilik İlkemizi</privacy-link> kabul etmiş olursunuz."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Üçüncü parti paketler"
   },
   "app-marketing.download.title": {
-    "message": "Modrinth Uygulamasını İndir (Beta)"
+    "message": "Modrinth App'i İndir (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
@@ -48,7 +54,7 @@
     "message": "Proje takibi"
   },
   "app-marketing.features.importing.description": {
-    "message": "Sevdiğin profilleri önceki başlatıcından buraya aktar ve saniyeler içinde Modrinth Uygulamasını kullanmaya başla!"
+    "message": "Sevdiğin profilleri önceden kullandığın başlatıcıdan buraya aktar, saniyeler içinde Modrinth App'i kullanmaya başla!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -102,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth Uygulaması öne çıkan çoğu mod yöneticisinden daha hafiftir, sadece 150mb RAM kullanır!"
+    "message": "Modrinth App, öne çıkan çoğu mod yöneticisinden daha hafiftir, sadece 150mb RAM kullanır!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -123,7 +129,7 @@
     "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth Uygulaması"
+    "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "% 1 milyar"
@@ -141,7 +147,7 @@
     "message": "Verimli"
   },
   "app-marketing.features.play.description": {
-    "message": "Modrinth Uygulaması ile favori mod ve mod paketlerinizi indirin ve oynayın."
+    "message": "Modrinth App ile favori mod ve mod paketlerinizi indirin ve oynayın."
   },
   "app-marketing.features.play.title": {
     "message": "Favori modlarınız ile oynayın"
@@ -162,7 +168,7 @@
     "message": "Benzersiz bir"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth Uygulaması web sitesiyle tamamem iç içe, yani uygulamadan favori projelerinizin tamamına erişebilirsiniz!"
+    "message": "Modrinth App, web sitesi ile tamamem bağlantılı, yani uygulamadan favori projelerinizin tamamına erişebilirsiniz!"
   },
   "app-marketing.features.website.title": {
     "message": "Website entegrasyonu"
@@ -171,19 +177,19 @@
     "message": "başlatıcı"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Cobblemon kurulumunun ‘İçerik’ sayfasında olduğu Modrinth Uygulaması’nın ekran görüntüsü."
+    "message": "Cobblemon kurulumunun ‘İçerik’ sayfasında olduğu Modrinth App ekran görüntüsü."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth Uygulaması, favori modlarınızı güncel şekilde oynayabileceğiniz özgün ve açık kaynaklı bir başlatıcı."
+    "message": "Modrinth App, favori modlarınızı güncel şekilde oynayabileceğiniz özgün ve açık kaynaklı bir başlatıcı."
   },
   "app-marketing.hero.download-button": {
-    "message": "Modrinth Uygulamasını İndir"
+    "message": "Modrinth App İndir"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Modrinth Uygulamasını İndir"
+    "message": "Modrinth App İndir"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "{os} için Modrinth Uygulamasını İndir"
+    "message": "{os} için Modrinth App İndir"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Cobblemon kurulumunun ana menü ekranının ekran görüntüsü."
@@ -413,6 +419,153 @@
   "collection.title": {
     "message": "{name} - Koleksiyon"
   },
+  "common.no": {
+    "message": "Hayır"
+  },
+  "common.yes": {
+    "message": "Evet"
+  },
+  "create.collection.cancel": {
+    "message": "İptal"
+  },
+  "create.collection.collection-info": {
+    "message": "Yeni koleksiyonunuz herkese açık olarak {count, plural, =0 {projesiz hâlde} other {# proje ile}} oluşturulacaktır."
+  },
+  "create.collection.create-collection": {
+    "message": "Koleksiyon oluştur"
+  },
+  "create.collection.error-title": {
+    "message": "Bir hata oluştu"
+  },
+  "create.collection.name-label": {
+    "message": "İsim"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Koleksiyonun adını girin..."
+  },
+  "create.collection.summary-description": {
+    "message": "Koleksiyonunuzu anlatan bir iki cümle."
+  },
+  "create.collection.summary-label": {
+    "message": "Özet"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Bu koleksiyonun içeriği..."
+  },
+  "create.collection.title": {
+    "message": "Koleksiyon oluştur"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "{type} limitine yaklaşılıyor ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "{type} limitine ulaşmak üzeresiniz, {max}'den fazla {typePlural} ihtiyacınız varsa lütfen destekle iletişime geçin."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Destekle iletişime geçin"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type} limitine ulaşıldı"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Maksimum {max} olan {type} limitini aşdınız. Limitinizi arttırmak için lütfen destekle iletişime geçin."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "koleksiyon"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organizasyon"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "koleksiyonlar"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organizasyonlar"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projeler"
+  },
+  "create.limit-alert.type-project": {
+    "message": "proje"
+  },
+  "create.organization.cancel": {
+    "message": "İptal"
+  },
+  "create.organization.create-organization": {
+    "message": "Organizasyon oluştur"
+  },
+  "create.organization.error-title": {
+    "message": "Bir hata oluştu"
+  },
+  "create.organization.name-label": {
+    "message": "İsim"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Organizasyonun ismini girin..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Siz bu organizasyonun sahibi olacaksınız fakat dilediğiniz zaman diğer üyeleri davet edebilir ve sahibliğinizi devredebilirsiniz."
+  },
+  "create.organization.summary-description": {
+    "message": "Organizasyonunuzu anlatan bir iki cümle."
+  },
+  "create.organization.summary-label": {
+    "message": "Özet"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Organizasyonun amacı..."
+  },
+  "create.organization.title": {
+    "message": "Bir organizasyon oluştur"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "İptal"
+  },
+  "create.project.create-project": {
+    "message": "Proje oluştur"
+  },
+  "create.project.error-title": {
+    "message": "Bir hata oluştu"
+  },
+  "create.project.name-label": {
+    "message": "İsim"
+  },
+  "create.project.name-placeholder": {
+    "message": "Projenin ismini girin..."
+  },
+  "create.project.summary-description": {
+    "message": "Projenizi anlatan bir iki cümle."
+  },
+  "create.project.summary-label": {
+    "message": "Özet"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Bu projenin ekledikleri..."
+  },
+  "create.project.title": {
+    "message": "Proje oluştur"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "Projenizin onaylandıktan sonraki görünürlük ayarı."
+  },
+  "create.project.visibility-label": {
+    "message": "Görünürlük"
+  },
+  "create.project.visibility-private": {
+    "message": "Gizli"
+  },
+  "create.project.visibility-public": {
+    "message": "Herkese Açık"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Liste dışı"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Yeni oluştur"
   },
@@ -424,6 +577,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Koleksiyonların"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Yabancı kuruluş, Amerika Birleşik Devletleri dışında kurulmuş bir ticari kuruluş (örneğin, ABD dışı şirket, ortaklık veya LLC) anlamına gelir."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Yabancı kuruluş"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Özel şahıs"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Özel şahıs mısınız yoksa yabancı bir kuruluşun parçası mısınız?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Vergi formu"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth, vergi formlarınızı güvenli bir şekilde toplamak ve saklamak için üçüncü taraf sağlayıcı Track1099'u kullanır. <security-link>Buradan daha fazla bilgi edinebilirsiniz.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Güvenlik uygulamaları"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "ABD vatandaşı mısınız?"
   },
   "error.collection.404.list_item.1": {
     "message": "Koleksiyonun URL'ini yanlış yazmış olabilirsin."
@@ -445,6 +622,12 @@
   },
   "error.generic.404.title": {
     "message": "Sayfa bulunamadı"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Bu sayfa, devlet sansürü veya süren yasal işlemlerden dolayı engellendi."
+  },
+  "error.generic.451.title": {
+    "message": "Bu içerik, yasal nedenlerden dolayı erişilemez"
   },
   "error.generic.default.list_item.1": {
     "message": "<status-link>Durum sayfamızdan</status-link> Modrinth'in çöküp çökmediğini kontrol edin."
@@ -597,7 +780,7 @@
     "message": "modları"
   },
   "landing.heading.the-place-for-minecraft.plugins": {
-    "message": "eklentileri"
+    "message": "pluginleri"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
     "message": "kaynak paketleri"
@@ -606,7 +789,7 @@
     "message": "sunucuları"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "gölgelendirmeleri"
+    "message": "shaderları"
   },
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
@@ -615,7 +798,7 @@
     "message": "Basitleştirilmiş bir Minecraft penceresinin temsili, Mojang Studios logosu Modrinth yeşilli."
   },
   "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth Uygulaması"
+    "message": "Modrinth App"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -664,9 +847,6 @@
   },
   "layout.action.change-theme": {
     "message": "Tema değiştir"
-  },
-  "layout.action.close-banner": {
-    "message": "Kapat"
   },
   "layout.action.create-new": {
     "message": "Yeni oluştur..."
@@ -728,6 +908,15 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "Fatura eylemi zorunlu."
   },
+  "layout.banner.tax.action": {
+    "message": "Vergi formunu doldurun"
+  },
+  "layout.banner.tax.description": {
+    "message": "Bu yıl Modrinth'ten 600 doların üzerinde para çektiniz. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekiyor. Bu form gönderilene kadar para çekme işlemleriniz askıya alınacaktır."
+  },
+  "layout.banner.tax.title": {
+    "message": "Vergi formu gereklidir"
+  },
   "layout.banner.verify-email.action": {
     "message": "Doğrulama e-postasını yeniden gönder"
   },
@@ -783,13 +972,13 @@
     "message": "Ürünler"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth Uygulaması"
+    "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Sunucuları"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Kaynaklar"
@@ -825,7 +1014,7 @@
     "message": "Menü aç/kapa"
   },
   "layout.meta.description": {
-    "message": "Modrinth üzerinden Minecraft modları, eklentileri, veri paketleri, gölgelendiricileri, kaynak paketleri ve mod paketleri indir. Modern ve kullanımı kolay bir arayüz ve API ile Modrinth üzerinden projeler keşfet ve yayınla."
+    "message": "Modrinth üzerinden Minecraft modları, pluginleri, veri paketleri, shaderları, kaynak paketleri ve mod paketleri indir. Modern ve kullanımı kolay bir arayüz ve API ile Modrinth üzerinden projeler keşfet ve yayınla."
   },
   "layout.meta.og-description": {
     "message": "Minecraft içeriği keşfet ve yayınla!"
@@ -843,7 +1032,7 @@
     "message": "Özellik bayrakları"
   },
   "layout.nav.get-modrinth-app": {
-    "message": "Modrinth Uygulaması Edin"
+    "message": "Modrinth App Edin"
   },
   "layout.nav.home": {
     "message": "Anasayfa"
@@ -852,7 +1041,7 @@
     "message": "Sunucu kur"
   },
   "layout.nav.modrinth-app": {
-    "message": "Modrinth Uygulaması"
+    "message": "Modrinth App"
   },
   "layout.nav.modrinth-home-page": {
     "message": "Modrinth ana sayfası"
@@ -978,7 +1167,7 @@
     "message": "Projeye katılmaya davet"
   },
   "project-member-header.invitation-with-role": {
-    "message": "'{role}' rolüyle bu projenin bir üyesi olmaya davet edildiniz."
+    "message": "Bu projenin üyesi olmaya \"{role}\" rolüyle davet edildiniz."
   },
   "project-member-header.success": {
     "message": "Başarılı"
@@ -1005,6 +1194,9 @@
     "message": "Yayımlama kontrol listesindeki gerekli adımları tamamlamalısınız!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "İncelemeye gönder"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "İncelemeye gönder"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1044,10 +1236,10 @@
     "message": "Mod Paketi"
   },
   "project-type.plugin.plural": {
-    "message": "Eklentiler"
+    "message": "Pluginler"
   },
   "project-type.plugin.singular": {
-    "message": "Eklenti"
+    "message": "Plugin"
   },
   "project-type.project.plural": {
     "message": "Projeler"
@@ -1062,10 +1254,10 @@
     "message": "Kaynak Paketi"
   },
   "project-type.shader.plural": {
-    "message": "Gölgelendirmeler"
+    "message": "Shaderlar"
   },
   "project-type.shader.singular": {
-    "message": "Gölgelendirme"
+    "message": "Shader"
   },
   "project.about.details.created": {
     "message": "{date} oluşturuldu"
@@ -1100,11 +1292,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Sunucuları uğraşmadan arkadaşlarınla oynamanın en kolay yoludur!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / aylık"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "$5{monthly} ile başlayan fiyatlarla"
+    "message": "{price}<small> / ay</small>'dan başlayan fiyatlarla"
   },
   "project.actions.servers-promo.title": {
     "message": "Sunucu oluştur"
@@ -1134,10 +1323,10 @@
     "message": "{title}, {platform} için {gameVersion} sürümünü desteklemiyor"
   },
   "project.download.install-with-app": {
-    "message": "Modrinth Uygulaması ile yükle"
+    "message": "Modrinth App ile yükle"
   },
   "project.download.no-app": {
-    "message": "Modrinth Uygulamanız Yok Mu?"
+    "message": "Modrinth App Yok Mu?"
   },
   "project.download.no-versions-available": {
     "message": "{gameVersion} ve {platform} için sürüm mevcut değil."
@@ -1482,7 +1671,7 @@
     "message": "Organizasyonlara yaz"
   },
   "scopes.organizationWrite.label": {
-    "message": "Örgüt yaz"
+    "message": "Organizasyon yaz"
   },
   "scopes.patCreate.description": {
     "message": "Kişisel API tokenleri oluştur"
@@ -1887,7 +2076,7 @@
     "message": "Mod paketleri sayfası"
   },
   "settings.display.project-list-layouts.plugin": {
-    "message": "Eklentiler sayfası"
+    "message": "Pluginler sayfası"
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Kaynak Paketleri sayfası"
@@ -1917,10 +2106,10 @@
     "message": "Dış bağlantıları yeni sekmede aç"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "\"Modrinth Uygulaması Edin\" tuşlarını ana navigasyondan gizler. Modrinth Uygulama sayfası hala açılış sayfasında veya alt bilgide bulunabilir."
+    "message": "\"Modrinth App Edin\" tuşlarını ana navigasyondan gizler. Modrinth App sayfası hala açılış sayfasında veya alt bilgide bulunabilir."
   },
   "settings.display.sidebar.hide-app-promos.title": {
-    "message": "Modrinth Uygulaması tanıtımlarını gizle"
+    "message": "Modrinth App tanıtımlarını gizle"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
     "message": "İçerik sayfalarında sola hizalı kenar çubuğu"

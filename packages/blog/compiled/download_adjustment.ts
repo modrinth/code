@@ -6,6 +6,7 @@ export const article = {
   date: "2023-11-10T20:00:00.000Z",
   slug: "download-adjustment",
   authors: ["6plzAzU4","MpxzqsyW"],
+  unlisted: false,
   thumbnail: false,
   short_title: "Correcting Inflated Download Counts",
 };

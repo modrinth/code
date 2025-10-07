@@ -48,7 +48,13 @@
     "defaultMessage": "Bisitahon ang tinanan nga mga gusto"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Dili mahimong mopareho ang imong kalangkoban sa Ngalan sa imong proyekto. Hinungdanon ang paghimo sa mapahibaloon ug madanihon nga Kalangkoban."
+    "defaultMessage": "Dili mahimong mopareho ang imong kalangkoban sa Ngalan sa imong proyekto. Hinungdanon ang pagbuhat sa mapahibaloon ug madanihon nga Kalangkoban."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Pagsakarga og galeriyang hulagway"
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Pagsakarga og bersiyon"
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Pamatud-i ang mga panggawas nga katayan"
