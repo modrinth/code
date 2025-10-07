@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Utviklermodus aktivert."
   },
+  "app.settings.downloading": {
+    "message": "Nedlaster v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Utseende"
   },
@@ -17,8 +20,32 @@
   "app.settings.tabs.privacy": {
     "message": "Personvern"
   },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} er klar for installering! Last inn på nytt for å oppdatere nå, eller automatisk når du lukker Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} er tilgjengelig nå! Siden du er på en forbruksmålt tilkobling, lastet vi den ikke ned automatisk."
+  },
+  "app.update-toast.download": {
+    "message": "Nedlast ({size})"
+  },
+  "app.update-toast.reload": {
+    "message": "Last inn på nytt"
+  },
+  "app.update-toast.title": {
+    "message": "Oppdatering tilgjengelig"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Klikk her for å se endringsloggen."
+  },
+  "app.update.download-update": {
+    "message": "Last ned oppdatering"
+  },
+  "app.update.reload-to-update": {
+    "message": "Last inn på nytt for å installere oppdateringen"
+  },
   "instance.add-server.add-and-play": {
-    "message": "Legg til og spel"
+    "message": "Legg til og spill"
   },
   "instance.add-server.add-server": {
     "message": "Legg til server"
@@ -167,6 +194,9 @@
   "instance.settings.tabs.installation.change-version.in-progress": {
     "message": "Installerer ny versjon"
   },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "For tiden installert"
+  },
   "instance.settings.tabs.installation.debug-information": {
     "message": "Feilsøkingsinformasjon:"
   },
@@ -175,6 +205,9 @@
   },
   "instance.settings.tabs.installation.install": {
     "message": "Installer"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Installasjon pågår"
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} versjon"
@@ -188,6 +221,12 @@
   "instance.settings.tabs.installation.platform": {
     "message": "Platform"
   },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Re-installer modpakke"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Re-installerer modpakke"
+  },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
     "message": "Reinstallering vil tilbakestille alt installert eller endret innhold til det som tilbys av modpakken, og fjerne alle mods eller innhold du har lagt til i tillegg til den opprinnelige installasjonen. Dette kan løse uventet oppførsel hvis det er gjort endringer i instansen, men hvis verdenene dine nå er avhengige av ekstra installert innhold, kan det ødelegge eksisterende verdener."
   },
@@ -199,6 +238,33 @@
   },
   "instance.settings.tabs.installation.repair.button.repairing": {
     "message": "Reparerer"
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Reparer instanse?"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Reset til nåværende"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "endre versjon"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "reinstaller"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Kan ikke {action} mens en installasjon pågår"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Kan ikke {action} mens en reparasjon pågår"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Koble fra instanse"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Er du sikker på at du vil koble fra denne instansen?"
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Koble fra modpakke"
   },
   "instance.settings.tabs.java": {
     "message": "Java og minne"

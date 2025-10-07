@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Modo desarrollador activado."
   },
+  "app.settings.downloading": {
+    "message": "Descargando v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Apariencia"
   },
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestión de recursos"
+  },
+  "app.update-toast.body": {
+    "message": "¡La aplicación Modrinth v{version} está lista para instalarse! Actualiza ahora o automáticamente al cerrar la aplicación Modrinth."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "La descarga de la aplicación Modrinth v{version} ha finalizado. Actualice ahora o automáticamente al cerrar la aplicación Modrinth."
+  },
+  "app.update-toast.body.metered": {
+    "message": "¡La aplicación Modrinth v{version} ya está disponible! Como estás conectado a una red con límite de datos, no la hemos descargado automáticamente."
+  },
+  "app.update-toast.changelog": {
+    "message": "Registro de cambios"
+  },
+  "app.update-toast.download": {
+    "message": "Descargar ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Descargando..."
+  },
+  "app.update-toast.reload": {
+    "message": "Recargar"
+  },
+  "app.update-toast.title": {
+    "message": "Actualización disponible"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Descarga completada"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Haga clic aquí para ver el registro de cambios."
+  },
+  "app.update.complete-toast.title": {
+    "message": "¡La versión {version} se ha instalado correctamente!"
+  },
+  "app.update.download-update": {
+    "message": "Descargar actualización"
+  },
+  "app.update.downloading-update": {
+    "message": "Descargando actualización ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Recarga para instalar la actualización"
   },
   "instance.add-server.add-and-play": {
     "message": "Añadir y jugar"
@@ -258,7 +303,7 @@
     "message": "¿Reparar instancia?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Reparación en proceso"
+    "message": "Reparación en proceso..."
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Restablecer al actual"

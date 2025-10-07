@@ -149,6 +149,12 @@
   "instance.worlds.game_mode.survival": {
     "defaultMessage": "Overlevelsestilstand"
   },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Under gennemgang"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kopiér kode til udklipsholder"
+  },
   "omorphia.component.environment-indicator.label.client": {
     "defaultMessage": "Klient"
   },
@@ -205,6 +211,27 @@
   },
   "project-type.all": {
     "defaultMessage": "Alle"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {modifikation} other {modifikationer}}"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Doner"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Doner på Ko-Fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Doner på Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Doner på PayPal"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Se kildekode"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Beskrivelse"
   },
   "settings.appearance.title": {
     "defaultMessage": "Udseende"

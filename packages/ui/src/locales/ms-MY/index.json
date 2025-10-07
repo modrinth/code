@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Batal"
   },
+  "button.close": {
+    "defaultMessage": "Tutup"
+  },
   "button.continue": {
     "defaultMessage": "Teruskan"
   },

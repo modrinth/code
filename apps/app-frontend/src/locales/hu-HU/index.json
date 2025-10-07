@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Fejlesztői mód bekapcsolva."
   },
+  "app.settings.downloading": {
+    "message": "Letöltés v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Megjelenés"
   },
@@ -20,8 +23,50 @@
   "app.settings.tabs.resource-management": {
     "message": "Erőforráskezelés"
   },
+  "app.update-toast.body": {
+    "message": "A Modrinth App v{version} telepítésre kész! Frissítéshez indítsa újra a programot, vagy zárja be a Modrinth App alkalmazást, és a frissítés automatikusan megtörténik."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "A Modrinth App v{version} letöltése befejeződött. Frissítéshez indítsa újra az alkalmazást, vagy zárja be a Modrinth App alkalmazást, és a frissítés automatikusan megtörténik."
+  },
+  "app.update-toast.body.metered": {
+    "message": "A Modrinth App v{version} már elérhető! Mivel díjköteles hálózaton vagy, így nem töltöttük le automatikusan."
+  },
+  "app.update-toast.changelog": {
+    "message": "Változtatások"
+  },
+  "app.update-toast.download": {
+    "message": "Letöltés ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Letöltés..."
+  },
+  "app.update-toast.reload": {
+    "message": "Újratöltés"
+  },
+  "app.update-toast.title": {
+    "message": "Frissítések elérhetőek"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Letöltés befejezve"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Kattints ide a változások megtekintéséhez."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Verzió {version} sikeresen telepítve!"
+  },
+  "app.update.download-update": {
+    "message": "Frissítés letöltése"
+  },
+  "app.update.downloading-update": {
+    "message": "Frissítés folyamatban ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "A telepítéshez újraindítás szükséges"
+  },
   "instance.add-server.add-and-play": {
-    "message": "Hozzáadás és csatlakozás"
+    "message": "Hozzáadás és játék"
   },
   "instance.add-server.add-server": {
     "message": "Szerver hozzáadása"
@@ -78,16 +123,16 @@
     "message": "Általános"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Profil törlése"
+    "message": "Példány törlése"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Profil törlése"
+    "message": "Példány törlése"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Örökké eltávolít egy profilt az eszközről, beleértve a világait, beállításait és minden telepített tartalmat. Legyen óvatos, mert ha egyszer kitöröl egy profilt azt többé nem lehet visszaállítani."
+    "message": "Örökké eltávolít egy példányt az eszközről, beleértve a világait, beállításait és minden telepített tartalmat. Legyen óvatos, mert ha egyszer kitöröl egy példányt azt többé nem lehet visszaállítani."
   },
   "instance.settings.tabs.general.deleting.button": {
-    "message": "Törlés folyamatban..."
+    "message": "Törlés..."
   },
   "instance.settings.tabs.general.duplicate-button": {
     "message": "Duplikálás"
@@ -96,7 +141,7 @@
     "message": "Telepítés közben nem lehet duplikálni."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Profil duplikálása"
+    "message": "Példány duplikálása"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
     "message": "Készít egy másolatot erről a példányról, beleértve a világokat, beállításokat, modokat, stb."
@@ -141,7 +186,7 @@
     "message": "Kilépés után"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Játék bezárása után futtatni."
+    "message": "Játék bezárása után fut."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
     "message": "Írjon be kilépés utáni parancsokat..."
@@ -293,6 +338,15 @@
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Példány leválasztása"
   },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": ""
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Biztosan szeretné ezt az példányt leválasztani?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Ez az példány egy modpackhoz van kapcsolva, ami azt jelenti, hogy a modok nem frissíthetőek, és nem lehet megváltoztatni a mod betöltőt vagy a Minecraft verziót. A kapcsolódás megszüntetése véglegesen leválasztja ezt a példányt a modpackről."
+  },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Modpack-ről való leválasztás"
   },
@@ -381,7 +435,7 @@
     "message": "Csak Minecraft 1.20+ tól tudsz egyből egyjátékos világba belépni"
   },
   "instance.worlds.play_instance": {
-    "message": "Profil indítása"
+    "message": "Példány "
   },
   "instance.worlds.type.server": {
     "message": "Szerver"
