@@ -141,7 +141,8 @@
 		</div>
 
 		<p v-if="willTriggerTaxForm" class="font-bold text-orange">
-			This withdrawal will exceed $600 for the year. You will be prompted to complete a tax form before proceeding.
+			This withdrawal will exceed $600 for the year. You will be prompted to complete a tax form
+			before proceeding.
 		</p>
 
 		<p v-if="blockedByTax" class="font-bold text-orange">
@@ -386,7 +387,6 @@ const taxFormModalRef = ref(null)
 const taxFormCancelled = ref(false)
 
 async function withdraw() {
-	// Check if withdrawal will trigger tax form
 	if (willTriggerTaxForm.value) {
 		taxFormCancelled.value = false
 		if (taxFormModalRef.value && taxFormModalRef.value.startTaxForm) {
@@ -433,9 +433,7 @@ async function onTaxFormSuccess() {
 	const updatedBalance = await useBaseFetch(`payout/balance`, { apiVersion: 3 })
 	userBalance.value = updatedBalance
 
-	// Check if the form was actually completed
 	if (updatedBalance?.form_completion_status === 'complete') {
-		// Now proceed with the withdrawal
 		await withdraw()
 	} else {
 		addNotification({
