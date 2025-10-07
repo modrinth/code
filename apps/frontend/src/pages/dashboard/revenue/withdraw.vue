@@ -1,6 +1,7 @@
 <template>
 	<CreatorTaxFormModal
 		ref="taxFormModalRef"
+		close-button-text="Continue"
 		@success="onTaxFormSuccess"
 		@cancelled="onTaxFormCancelled"
 	/>
@@ -351,13 +352,17 @@ const agreedTransfer = ref(false)
 const agreedFees = ref(false)
 const agreedTerms = ref(false)
 
+const flags = useFeatureFlags()
+
 const blockedByTax = computed(() => {
+	if (flags.value.testTaxForm) return true
 	const status = userBalance.value?.form_completion_status ?? 'unknown'
 	const thresholdMet = (userBalance.value?.withdrawn_ytd ?? 0) >= 600
 	return thresholdMet && status !== 'complete'
 })
 
 const willTriggerTaxForm = computed(() => {
+	if (flags.value.testTaxForm) return true
 	const status = userBalance.value?.form_completion_status ?? 'unknown'
 	const currentWithdrawn = userBalance.value?.withdrawn_ytd ?? 0
 	const wouldExceedThreshold = currentWithdrawn + parsedAmount.value >= 600
@@ -386,15 +391,7 @@ watch(selectedMethod, () => {
 const taxFormModalRef = ref(null)
 const taxFormCancelled = ref(false)
 
-async function withdraw() {
-	if (willTriggerTaxForm.value) {
-		taxFormCancelled.value = false
-		if (taxFormModalRef.value && taxFormModalRef.value.startTaxForm) {
-			await taxFormModalRef.value.startTaxForm(new MouseEvent('click'))
-		}
-		return
-	}
-
+async function performWithdrawal() {
 	startLoading()
 	try {
 		const auth = await useAuth()
@@ -428,13 +425,31 @@ async function withdraw() {
 	stopLoading()
 }
 
+async function withdraw() {
+	if (willTriggerTaxForm.value) {
+		taxFormCancelled.value = false
+		if (taxFormModalRef.value && taxFormModalRef.value.startTaxForm) {
+			await taxFormModalRef.value.startTaxForm(new MouseEvent('click'))
+		}
+		return
+	}
+
+	await performWithdrawal()
+}
+
 async function onTaxFormSuccess() {
+	// Skip balance check if testTaxForm flag is enabled
+	if (flags.value.testTaxForm) {
+		await performWithdrawal()
+		return
+	}
+
 	// Refresh user balance to get updated form completion status
 	const updatedBalance = await useBaseFetch(`payout/balance`, { apiVersion: 3 })
 	userBalance.value = updatedBalance
 
 	if (updatedBalance?.form_completion_status === 'complete') {
-		await withdraw()
+		await performWithdrawal()
 	} else {
 		addNotification({
 			title: 'Tax form incomplete',

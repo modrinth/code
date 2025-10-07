@@ -31,6 +31,6 @@ export default {
 	'project-invited': () => import('./project/ProjectInvited.vue'),
 	'project-transferred': () => import('./project/ProjectTransferred.vue'),
 
-	// Organization
+	// Organizations
 	'organization-invited': () => import('./organization/OrganizationInvited.vue'),
 } as Record<string, () => Promise<{ default: Component }>>
