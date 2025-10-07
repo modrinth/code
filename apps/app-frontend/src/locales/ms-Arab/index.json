@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "مود ڤمباڠون دداياکن."
   },
+  "app.settings.downloading": {
+    "message": "سدڠ مموات تورون v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "تمڤيلن"
   },
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "ڤڠوروسن سومبر"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} سوده برسديا اونتوق دڤاسڠ! موات سمولا اونتوق کمس کيني سکارڠ⹁ اتاو کمس کيني سچارا اٴوتوماتيک اڤابيلا اندا منوتوڤ Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} سوده سلساي دڤاسڠ! موات سمولا اونتوق کمس کيني سکارڠ⹁ اتاو کمس کيني سچارا اٴوتوماتيک اڤابيلا اندا منوتوڤ Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} کيني ترسديا! ممندڠکن اندا سدڠ مڠݢوناکن رڠکاين برميتر⹁ کامي تيدق مموات تورونڽ سچارا اٴوتوماتيک."
+  },
+  "app.update-toast.changelog": {
+    "message": "لوݢ ڤروبهن"
+  },
+  "app.update-toast.download": {
+    "message": "موات تورون ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "سدڠ مموات تورون..."
+  },
+  "app.update-toast.reload": {
+    "message": "موات سمولا"
+  },
+  "app.update-toast.title": {
+    "message": "کمس کيني ترسديا"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "موات تورون سلساي"
+  },
+  "app.update.complete-toast.text": {
+    "message": "کليک دسيني اونتوق مليهت لوݢ ڤروبهن."
+  },
+  "app.update.complete-toast.title": {
+    "message": "ۏرسي {version} تله برجاي دڤاسڠ!"
+  },
+  "app.update.download-update": {
+    "message": "موات تورون کمس کيني"
+  },
+  "app.update.downloading-update": {
+    "message": "سدڠ مموات تورون کمس کيني ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "موات سمولا اونتوق مماسڠ کمس کيني"
   },
   "instance.add-server.add-and-play": {
     "message": "تمبه دان ماءين"

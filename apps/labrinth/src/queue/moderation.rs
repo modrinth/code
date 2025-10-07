@@ -304,7 +304,7 @@ impl AutomatedModerationQueue {
                                             let hash = x.hashes.get(&PackFileHash::Sha1);
 
                                             if let Some(hash) = hash {
-                                                let path = x.path.clone();
+                                                let path = x.path.to_string();
                                                 Some((hash.clone(), Some(x), path, None))
                                             } else {
                                                 None

@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Cancelar"
+  },
+  "action.continue": {
+    "message": "Continuar"
+  },
   "admin.billing.error.not-found": {
     "message": "Usuário não encontrado"
   },
@@ -255,7 +261,7 @@
     "message": "Insira o código de dois fatores"
   },
   "auth.sign-in.2fa.placeholder": {
-    "message": "Digite o código..."
+    "message": "Insira o código..."
   },
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Esqueceu sua senha?</forgot-password-link> • <create-account-link>Criar uma conta</create-account-link>"
@@ -270,10 +276,10 @@
     "message": "Entrar com"
   },
   "auth.sign-in.title": {
-    "message": "Entrar"
+    "message": "Iniciar sessão"
   },
   "auth.sign-in.use-password": {
-    "message": "Ou use a senha"
+    "message": "Ou com senha"
   },
   "auth.sign-up.action.create-account": {
     "message": "Criar conta"
@@ -315,7 +321,7 @@
     "message": "Configuração da conta"
   },
   "auth.verify-email.action.sign-in": {
-    "message": "Entrar"
+    "message": "Iniciar sessão"
   },
   "auth.verify-email.already-verified.description": {
     "message": "Seu e-mail já está verificado!"
@@ -360,7 +366,7 @@
     "message": "Bem-vindo"
   },
   "collection.button.delete-icon": {
-    "message": "Excluir ícone"
+    "message": "Apagar ícone"
   },
   "collection.button.edit-icon": {
     "message": "Editar ícone"
@@ -372,13 +378,13 @@
     "message": "Deixar de seguir projeto"
   },
   "collection.delete-modal.description": {
-    "message": "Isso excluirá esta coleção para sempre. Esta ação não pode ser desfeita."
+    "message": "Isso apagará esta coleção para sempre. Esta ação não pode ser desfeita."
   },
   "collection.delete-modal.title": {
-    "message": "Tem certeza de que deseja excluir esta coleção?"
+    "message": "Tem certeza de que deseja apagar esta coleção?"
   },
   "collection.description": {
-    "message": "{description} - Veja a coleção {name} por {username} no Modrinth"
+    "message": "{description} - Veja a coleção {name} de {username} no Modrinth"
   },
   "collection.description.following": {
     "message": "Coleção gerada automaticamente com todos os projetos que você está seguindo."
@@ -413,6 +419,153 @@
   "collection.title": {
     "message": "{name} - Coleção"
   },
+  "common.no": {
+    "message": "Não"
+  },
+  "common.yes": {
+    "message": "Sim"
+  },
+  "create.collection.cancel": {
+    "message": "Cancelar"
+  },
+  "create.collection.collection-info": {
+    "message": "Sua nova coleção será criada como pública {count, plural, =0 {sem nenhum projeto} one {com # projeto} other {com # projetos}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Criar coleção"
+  },
+  "create.collection.error-title": {
+    "message": "Ocorreu um erro"
+  },
+  "create.collection.name-label": {
+    "message": "Nome"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Insira um nome para a coleção..."
+  },
+  "create.collection.summary-description": {
+    "message": "Uma ou duas frases que descrevam sua coleção."
+  },
+  "create.collection.summary-label": {
+    "message": "Descrição"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Esta é uma coleção de..."
+  },
+  "create.collection.title": {
+    "message": "Criando uma coleção"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Aproximando do limite de {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Você está prestes a atingir o limite de {type}, entre em contato com o suporte se precisar de mais de {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Contatar suporte"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "Limite de {type} atingido"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Você atingiu seu limite de {type} de {max}. Entre em contato com o suporte para aumentar seu limite."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "coleção"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organização"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "coleções"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organizações"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projetos"
+  },
+  "create.limit-alert.type-project": {
+    "message": "projeto"
+  },
+  "create.organization.cancel": {
+    "message": "Cancelar"
+  },
+  "create.organization.create-organization": {
+    "message": "Criar organização"
+  },
+  "create.organization.error-title": {
+    "message": "Ocorreu um erro"
+  },
+  "create.organization.name-label": {
+    "message": "Nome"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Insira o nome da organização..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Você será o dono desta organização, mas pode convidar outros membros e transferir a propriedade a qualquer momento."
+  },
+  "create.organization.summary-description": {
+    "message": "Escreva uma ou duas frases para descrever sua organização."
+  },
+  "create.organization.summary-label": {
+    "message": "Descrição"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Uma organização para..."
+  },
+  "create.organization.title": {
+    "message": "Criando uma organização"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Cancelar"
+  },
+  "create.project.create-project": {
+    "message": "Criar projeto"
+  },
+  "create.project.error-title": {
+    "message": "Ocorreu um erro"
+  },
+  "create.project.name-label": {
+    "message": "Nome"
+  },
+  "create.project.name-placeholder": {
+    "message": "Insira o nome do projeto..."
+  },
+  "create.project.summary-description": {
+    "message": "Escreva uma ou duas frases para descrever seu projeto."
+  },
+  "create.project.summary-label": {
+    "message": "Descrição"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Este projeto adiciona..."
+  },
+  "create.project.title": {
+    "message": "Criando um projeto"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "A visibilidade do seu projeto após sua aprovação."
+  },
+  "create.project.visibility-label": {
+    "message": "Visibilidade"
+  },
+  "create.project.visibility-private": {
+    "message": "Privado"
+  },
+  "create.project.visibility-public": {
+    "message": "Público"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Não listado"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Criar nova"
   },
@@ -425,6 +578,30 @@
   "dashboard.collections.long-title": {
     "message": "Suas coleções"
   },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Uma entidade estrangeira significa uma entidade comercial organizada fora dos Estados Unidos (como uma corporação, parceria ou LLC não americana)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entidade estrangeira"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Pessoa física"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Você é um indivíduo particular ou faz parte de uma entidade estrangeira?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Formulário fiscal"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "A Modrinth utiliza o provedor terceirizado Track1099 para coletar e armazenar com segurança seus formulários fiscais. <security-link>Saiba mais aqui.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Práticas de segurança"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Você é um cidadão americano?"
+  },
   "error.collection.404.list_item.1": {
     "message": "Você pode ter digitado incorretamente o URL da coleção."
   },
@@ -435,7 +612,7 @@
     "message": "A coleção pode ter sido retirada do ar pela equipe de moderação do Modrinth por violar nossos <tou-link>Termos de Uso</tou-link>."
   },
   "error.collection.404.list_title": {
-    "message": "Por que?"
+    "message": "Porquê?"
   },
   "error.collection.404.title": {
     "message": "Coleção não encontrada"
@@ -445,6 +622,12 @@
   },
   "error.generic.404.title": {
     "message": "Página não encontrada"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Esta página foi bloqueada por razões legais, como censura governamental ou processos judiciais em andamento."
+  },
+  "error.generic.451.title": {
+    "message": "Conteúdo indisponível por razões legais"
   },
   "error.generic.default.list_item.1": {
     "message": "Veja se o Modrinth caiu em nossa <status-link>página de status</status-link>."
@@ -465,13 +648,13 @@
     "message": "Você pode ter digitado incorretamente o URL da organização."
   },
   "error.organization.404.list_item.2": {
-    "message": "O dono da organização pode ter alterado o URL ou o excluiu."
+    "message": "O dono da organização pode ter alterado o URL ou o apagou."
   },
   "error.organization.404.list_item.3": {
     "message": "A organização pode ter sido removida pela equipe de moderação do Modrinth por violar nossos <tou-link>Termos de Uso</tou-link>."
   },
   "error.organization.404.list_title": {
-    "message": "Por que?"
+    "message": "Porquê?"
   },
   "error.organization.404.title": {
     "message": "Organização não encontrada"
@@ -480,13 +663,13 @@
     "message": "Você pode ter digitado incorretamente o URL do projeto."
   },
   "error.project.404.list_item.2": {
-    "message": "O dono do projeto pode ter alterado o URL, deixou o projeto privado ou o excluiu."
+    "message": "O dono do projeto pode ter alterado o URL, deixou o projeto privado ou o apagou."
   },
   "error.project.404.list_item.3": {
     "message": "O projeto pode ter sido removido pela equipe de moderação do Modrinth por violar nossos <tou-link>Termos de Uso</tou-link>."
   },
   "error.project.404.list_title": {
-    "message": "Por que?"
+    "message": "Porquê?"
   },
   "error.project.404.title": {
     "message": "Projeto não encontrado"
@@ -495,13 +678,13 @@
     "message": "Você pode ter digitado incorretamente o nome de usuário."
   },
   "error.user.404.list_item.2": {
-    "message": "O usuário pode ter alterado seu nome de usuário ou excluiu sua conta."
+    "message": "O usuário pode ter alterado seu nome de usuário ou apagou sua conta."
   },
   "error.user.404.list_item.3": {
     "message": "A conta do usuário pode ter sido encerrada por violar os <tou-link>Termos de Uso</tou-link> do Modrinth."
   },
   "error.user.404.list_title": {
-    "message": "Por que?"
+    "message": "Porquê?"
   },
   "error.user.404.title": {
     "message": "Usuário não encontrado"
@@ -621,7 +804,7 @@
     "message": "Prism Launcher"
   },
   "landing.notifications.has-been-updated": {
-    "message": "{title} foi atualizado!"
+    "message": "{title} atualizado!"
   },
   "landing.notifications.heading": {
     "message": "Notificações"
@@ -664,9 +847,6 @@
   },
   "layout.action.change-theme": {
     "message": "Mudar tema"
-  },
-  "layout.action.close-banner": {
-    "message": "Fechar"
   },
   "layout.action.create-new": {
     "message": "Criar novo..."
@@ -727,6 +907,15 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Ação de cobrança necessária."
+  },
+  "layout.banner.tax.action": {
+    "message": "Preencha o formulário fiscal"
+  },
+  "layout.banner.tax.description": {
+    "message": "Você já retirou mais de US$ 600 do Modrinth este ano. Para cumprir as normas fiscais, você precisa preencher um formulário fiscal. Suas retiradas ficarão suspensas até que esse formulário seja enviado."
+  },
+  "layout.banner.tax.title": {
+    "message": "Formulário fiscal necessário"
   },
   "layout.banner.verify-email.action": {
     "message": "Reenviar verificação de e-mail"
@@ -945,7 +1134,7 @@
     "message": "{bio} — Baixe os projetos de {username} no Modrinth"
   },
   "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> download} other {<stat>{count}</stat> downloads}} do projeto"
+    "message": "“{count, plural, one {<stat>{count}</stat> projeto baixado} other {<stat>{count}</stat> projetos baixados}}”"
   },
   "profile.stats.projects": {
     "message": "{count, plural, one {<stat>{count}</stat> projeto} other {<stat>{count}</stat> projetos}}"
@@ -978,7 +1167,7 @@
     "message": "Convite para participar do projeto"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Você foi convidado para ser um membro deste projeto como '{role}'."
+    "message": "Você foi convidado para ser um membro deste projeto como \"{role}''."
   },
   "project-member-header.success": {
     "message": "Sucesso"
@@ -1005,6 +1194,9 @@
     "message": "Você precisa completar as etapas necessárias nas tarefas de publicação!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "Enviar para revisão"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "Enviar para revisão"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1100,11 +1292,8 @@
   "project.actions.servers-promo.description": {
     "message": "O Modrinth Servers é a maneira mais fácil de jogar com seus amigos sem complicações!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / mês"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "A partir de $5{monthly}"
+    "message": "A partir de {price}<small> / mês</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Criar um servidor"
@@ -1167,7 +1356,7 @@
     "message": "Selecionar plataforma"
   },
   "project.download.show-all-versions": {
-    "message": "Mostrar todas as versões"
+    "message": "Exibir todas as versões"
   },
   "project.download.title": {
     "message": "Baixar {title}"
@@ -1431,10 +1620,10 @@
     "message": "Criar coleções"
   },
   "scopes.collectionDelete.description": {
-    "message": "Excluir coleções"
+    "message": "Apagar coleções"
   },
   "scopes.collectionDelete.label": {
-    "message": "Excluir coleções"
+    "message": "Apagar coleções"
   },
   "scopes.collectionRead.description": {
     "message": "Acessar coleções"
@@ -1455,7 +1644,7 @@
     "message": "Acessar notificações"
   },
   "scopes.notificationWrite.description": {
-    "message": "Ver ou excluir suas notificações"
+    "message": "Ver ou apagar suas notificações"
   },
   "scopes.notificationWrite.label": {
     "message": "Modificar notificações"
@@ -1467,10 +1656,10 @@
     "message": "Criar organizações"
   },
   "scopes.organizationDelete.description": {
-    "message": "Excluir organizações"
+    "message": "Apagar organizações"
   },
   "scopes.organizationDelete.label": {
-    "message": "Excluir organizações"
+    "message": "Apagar organizações"
   },
   "scopes.organizationRead.description": {
     "message": "Acessar organizações"
@@ -1491,10 +1680,10 @@
     "message": "Criar TAPs"
   },
   "scopes.patDelete.description": {
-    "message": "Excluir seus tokens pessoais da API"
+    "message": "Apagar seus tokens pessoais da API"
   },
   "scopes.patDelete.label": {
-    "message": "Excluir TAPs"
+    "message": "Apagar TAPs"
   },
   "scopes.patRead.description": {
     "message": "Ver tokens pessoais da API"
@@ -1533,10 +1722,10 @@
     "message": "Criar projetos"
   },
   "scopes.projectDelete.description": {
-    "message": "Excluir seus projetos"
+    "message": "Apagar seus projetos"
   },
   "scopes.projectDelete.label": {
-    "message": "Excluir projetos"
+    "message": "Apagar projetos"
   },
   "scopes.projectRead.description": {
     "message": "Acessar todos os seus projetos"
@@ -1557,10 +1746,10 @@
     "message": "Criar relatórios"
   },
   "scopes.reportDelete.description": {
-    "message": "Excluir relatórios"
+    "message": "Apagar relatórios"
   },
   "scopes.reportDelete.label": {
-    "message": "Excluir relatórios"
+    "message": "Apagar relatórios"
   },
   "scopes.reportRead.description": {
     "message": "Ler relatórios"
@@ -1581,10 +1770,10 @@
     "message": "Acessar sessões"
   },
   "scopes.sessionDelete.description": {
-    "message": "Excluir sessões"
+    "message": "Apagar sessões"
   },
   "scopes.sessionDelete.label": {
-    "message": "Excluir sessões"
+    "message": "Apagar sessões"
   },
   "scopes.sessionRead.description": {
     "message": "Acessar sessões ativas"
@@ -1611,10 +1800,10 @@
     "message": "Modificar dados de autenticação"
   },
   "scopes.userDelete.description": {
-    "message": "Excluir sua conta"
+    "message": "Apagar sua conta"
   },
   "scopes.userDelete.label": {
-    "message": "Excluir sua conta"
+    "message": "Apagar sua conta"
   },
   "scopes.userRead.description": {
     "message": "Acessar suas informações públicas do perfil"
@@ -1641,10 +1830,10 @@
     "message": "Criar versões"
   },
   "scopes.versionDelete.description": {
-    "message": "Excluir uma versão"
+    "message": "Apagar uma versão"
   },
   "scopes.versionDelete.label": {
-    "message": "Excluir versões"
+    "message": "Apagar versões"
   },
   "scopes.versionRead.description": {
     "message": "Acessar todas as versões"
@@ -1761,7 +1950,7 @@
     "message": "Grande"
   },
   "servers.plan.medium.description": {
-    "message": "Bom para 6–15 jogadores e múltiplos mods."
+    "message": "Bom para 6–15 jogadores e vários mods."
   },
   "servers.plan.medium.name": {
     "message": "Médio"
@@ -1896,7 +2085,7 @@
     "message": "Página dos sombreadores"
   },
   "settings.display.project-list-layouts.title": {
-    "message": "Layouts da lista de projetos"
+    "message": "Exibição da lista de projetos"
   },
   "settings.display.project-list-layouts.user": {
     "message": "Páginas de perfil do usuário"
@@ -1959,7 +2148,7 @@
     "message": "Escolha o seu idioma para o site. As traduções são realizadas por voluntários no <crowdin-link>Crowdin</crowdin-link>."
   },
   "settings.language.languages.automatic": {
-    "message": "Sincronizar com o idioma do sistema"
+    "message": "Usar idioma do sistema"
   },
   "settings.language.languages.language-label-applying": {
     "message": "{label}. Aplicando..."
@@ -1977,10 +2166,10 @@
     "message": "Buscar um idioma..."
   },
   "settings.language.languages.search-results-announcement": {
-    "message": "{matches, plural, =0 {Nenhum idioma corresponde} one {# idioma corresponde} other {# idiomas correspondem}} com sua busca."
+    "message": "{matches, plural, =0 {Nenhum idioma corresponde} one {# idioma corresponde} other {# idiomas correspondem}} à sua busca."
   },
   "settings.language.languages.search.no-results": {
-    "message": "Nenhum idioma corresponde com sua busca."
+    "message": "Nenhum idioma corresponde à sua busca."
   },
   "settings.language.warning": {
     "message": "Nosso site ainda não está totalmente traduzido e parte dele ainda pode aparecer em inglês para determinados idiomas. Estamos melhorando nosso sistema de localização e alguns conteúdos também podem estar quebrados."
@@ -2007,13 +2196,13 @@
     "message": "Criar token pessoal de acesso"
   },
   "settings.pats.modal.delete.action": {
-    "message": "Excluir este token"
+    "message": "Apagar este token"
   },
   "settings.pats.modal.delete.description": {
     "message": "Isto removerá esse token para sempre (para sempre mesmo)."
   },
   "settings.pats.modal.delete.title": {
-    "message": "Tem certeza de que deseja excluir este token?"
+    "message": "Tem certeza de que deseja apagar este token?"
   },
   "settings.pats.modal.edit.title": {
     "message": "Editar token pessoal de acesso"
@@ -2040,7 +2229,7 @@
     "message": "Uma breve descrição para falar um pouco sobre você para todos."
   },
   "settings.profile.bio.title": {
-    "message": "Bio"
+    "message": "Sobre"
   },
   "settings.profile.description": {
     "message": "As informações do seu perfil são visíveis publicamente no Modrinth e por meio da <docs-link>API do Modrinth</docs-link>."

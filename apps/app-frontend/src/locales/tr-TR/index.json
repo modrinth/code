@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Geliştirici modu açıldı."
   },
+  "app.settings.downloading": {
+    "message": "V{version} İndiriliyor"
+  },
   "app.settings.tabs.appearance": {
     "message": "Görünüm"
   },
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Kaynak yönetimi"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} yüklemeye hazır! Şimdi güncellemek için uygulamayı yeniden başlat ya da sen Modrinth App'ı kapatınca otomatik olarak güncellensin."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} indirmeyi bitirdi. Şimdi güncellemek için uygulamayı yeniden başlat ya da sen Modrinth App'ı kapatınca otomatik olarak güncellensin."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} artık mevcut! Ölçülü ağda olduğunuzdan otomatik olarak indirmedik."
+  },
+  "app.update-toast.changelog": {
+    "message": "Değişiklikler"
+  },
+  "app.update-toast.download": {
+    "message": "İndir ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "İndiriliyor..."
+  },
+  "app.update-toast.reload": {
+    "message": "Yeniden Yükle"
+  },
+  "app.update-toast.title": {
+    "message": "Güncelleme mevcut"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Yükleme tamamlandı"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Değişiklikleri görüntülemek için buraya tıklayın."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Sürüm {version} başarıyla indirildi!"
+  },
+  "app.update.download-update": {
+    "message": "Güncellemeyi indir"
+  },
+  "app.update.downloading-update": {
+    "message": "Güncelleme indiriliyor({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Güncellemeyi yüklemek için yeniden yükleyin"
   },
   "instance.add-server.add-and-play": {
     "message": "Ekle ve oyna"

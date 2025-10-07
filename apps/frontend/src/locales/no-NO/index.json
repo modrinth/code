@@ -1,6 +1,15 @@
 {
+  "action.cancel": {
+    "message": "Avbryt"
+  },
+  "action.continue": {
+    "message": "Fortsett"
+  },
   "admin.billing.error.not-found": {
     "message": "Bruker ikke funnet"
+  },
+  "app-marketing.download.description": {
+    "message": "Våres applikasjon er tilgjengelig på alle platformer, velg din ønsket versjon."
   },
   "app-marketing.download.download-appimage": {
     "message": "Last ned AppImage"

@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Anulează"
   },
+  "button.close": {
+    "defaultMessage": "Închide"
+  },
   "button.continue": {
     "defaultMessage": "Continuă"
   },
@@ -774,7 +777,7 @@
     "defaultMessage": "Unde ți-ar plăcea ca serverul să fie localizat?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Regiunea nu este listată? <link>Spune-ne unde ți-ar plăcea să vezi Serverele Modrinth în continuare!</link>"
+    "defaultMessage": "Regiunea nu este listată? <link>Spune-ne unde ți-ar plăcea să vezi Modrinth Servers în continuare!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Sud-Estică"

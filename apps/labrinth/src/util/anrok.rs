@@ -109,6 +109,8 @@ pub struct TransactionFields {
     pub accounting_time: DateTime<Utc>,
     pub accounting_time_zone: AccountingTimeZone,
     pub line_items: Vec<LineItem>,
+    pub customer_name: Option<String>,
+    pub customer_id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -129,6 +131,19 @@ pub enum AnrokError {
     RateLimit,
     #[error("Anrok API error: {0}")]
     Other(#[from] reqwest::Error),
+}
+
+impl AnrokError {
+    pub fn is_conflict_and<F>(&self, pred: F) -> bool
+    where
+        F: FnOnce(&str) -> bool,
+    {
+        if let AnrokError::Conflict(message) = self {
+            pred(message)
+        } else {
+            false
+        }
+    }
 }
 
 #[derive(Clone)]

@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Режим разработчика включён."
   },
+  "app.settings.downloading": {
+    "message": "Скачивание v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Внешний вид"
   },
@@ -20,11 +23,53 @@
   "app.settings.tabs.resource-management": {
     "message": "Управление данными"
   },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} готово к установке! Перезапустите приложение, чтобы обновить его, или оно обновится автоматически при закрытии."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Скачивание Modrinth App v{version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически при закрытии."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} доступно к скачиванию! Используется лимитное подключение, поэтому скачивание не началось автоматически."
+  },
+  "app.update-toast.changelog": {
+    "message": "Список изменений"
+  },
+  "app.update-toast.download": {
+    "message": "Скачать ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Скачивание..."
+  },
+  "app.update-toast.reload": {
+    "message": "Перезапустить"
+  },
+  "app.update-toast.title": {
+    "message": "Доступно обновление"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Скачивание завершено"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Нажмите здесь, чтобы посмотреть изменения."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Версия {version} успешно установлена!"
+  },
+  "app.update.download-update": {
+    "message": "Скачать обновление"
+  },
+  "app.update.downloading-update": {
+    "message": "Скачивание обновления ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Перезапустить для обновления"
+  },
   "instance.add-server.add-and-play": {
     "message": "Добавить и играть"
   },
   "instance.add-server.add-server": {
-    "message": "Добавить"
+    "message": "Добавить сервер"
   },
   "instance.add-server.resource-pack.disabled": {
     "message": "Отключён"
@@ -117,7 +162,7 @@
     "message": "Группировка"
   },
   "instance.settings.tabs.general.library-groups.create": {
-    "message": "Создать новую группу"
+    "message": "Создать группу"
   },
   "instance.settings.tabs.general.library-groups.description": {
     "message": "Разделение по группам позволяет организовать сборки по разным разделам в библиотеке."

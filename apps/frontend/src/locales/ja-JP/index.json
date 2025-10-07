@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "キャンセル"
+  },
+  "action.continue": {
+    "message": "続ける"
+  },
   "admin.billing.error.not-found": {
     "message": "ユーザーが見つかりませんでした"
   },
@@ -160,6 +166,12 @@
   },
   "app-marketing.features.unlike-any-launcher": {
     "message": "他のランチャーと異なる点"
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Modrinth アプリをダウンロードする"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Modrinth アプリをダウンロードする"
   },
   "auth.authorize.action.authorize": {
     "message": "認証"
@@ -380,6 +392,12 @@
   "collection.title": {
     "message": "{name} - コレクション"
   },
+  "common.no": {
+    "message": "いいえ"
+  },
+  "common.yes": {
+    "message": "はい"
+  },
   "dashboard.collections.button.create-new": {
     "message": "新規作成"
   },
@@ -509,8 +527,32 @@
   "landing.notifications.heading": {
     "message": "通知"
   },
+  "landing.search.placeholder": {
+    "message": "検索…"
+  },
+  "landing.search.sort-by.label": {
+    "message": "並び替え"
+  },
+  "landing.section.for-players.label": {
+    "message": "プレイヤー向け"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "{count}以上の作品をご覧ください"
+  },
+  "landing.subheading": {
+    "message": "コミュニティ向けに構築されたオープンソース プラットフォームを通じて、Minecraft コンテンツを発見、プレイ、共有できます。"
+  },
   "layout.action.change-theme": {
     "message": "テーマを変える"
+  },
+  "layout.action.create-new": {
+    "message": "新規作成…"
+  },
+  "layout.action.file-lookup": {
+    "message": "ファイル検索"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "メールで探す"
   },
   "layout.avatar.alt": {
     "message": "あなたのアバター"
@@ -690,7 +732,7 @@
     "message": "データパック"
   },
   "project-type.mod.plural": {
-    "message": "Mod"
+    "message": "Mods"
   },
   "project-type.mod.singular": {
     "message": "Mod"

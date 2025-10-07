@@ -75,7 +75,7 @@
 					>
 						<TransferIcon /> Withdraw
 					</nuxt-link>
-					<span v-else class="disabled"> <TransferIcon /> Withdraw </span>
+					<button v-else class="disabled"><TransferIcon /> Withdraw</button>
 				</ButtonStyled>
 				<ButtonStyled>
 					<NuxtLink to="/dashboard/revenue/transfers">

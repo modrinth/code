@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Tühista"
   },
+  "button.close": {
+    "defaultMessage": "Sule"
+  },
   "button.continue": {
     "defaultMessage": "Jätka"
   },
@@ -73,6 +76,36 @@
   },
   "button.save-changes": {
     "defaultMessage": "Salvesta muudatused"
+  },
+  "button.saving": {
+    "defaultMessage": "Salvestab"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Logi sisse"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Logi välja"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Registreeri"
+  },
+  "button.stop": {
+    "defaultMessage": "Peata"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Tühista jälgimine"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Laadi pilt üles"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Just praegu"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Äpp"
   },
   "label.created-ago": {
     "defaultMessage": "Loodud {ago}"

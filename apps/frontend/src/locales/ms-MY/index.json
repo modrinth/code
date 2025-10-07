@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Batal"
+  },
+  "action.continue": {
+    "message": "Teruskan"
+  },
   "admin.billing.error.not-found": {
     "message": "Pengguna tidak dijumpai"
   },
@@ -413,6 +419,153 @@
   "collection.title": {
     "message": "{name} - Koleksi"
   },
+  "common.no": {
+    "message": "Tidak"
+  },
+  "common.yes": {
+    "message": "Ya"
+  },
+  "create.collection.cancel": {
+    "message": "Batal"
+  },
+  "create.collection.collection-info": {
+    "message": "Koleksi baharu anda akan dibuat sebagai koleksi awam dengan {count, plural, =0 {0 projek} other {# projek}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Cipta koleksi"
+  },
+  "create.collection.error-title": {
+    "message": "Sebuah ralat telah berlaku"
+  },
+  "create.collection.name-label": {
+    "message": "Nama"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Masukkan nama koleksi..."
+  },
+  "create.collection.summary-description": {
+    "message": "Satu atau dua ayat yang menerangkan koleksi anda."
+  },
+  "create.collection.summary-label": {
+    "message": "Ringkasan"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Ini adalah sebuah koleksi..."
+  },
+  "create.collection.title": {
+    "message": "Mencipta sebuah koleksi"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Menghampiri had {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Anda akan mencapai had {type}, sila hubungi sokongan jika anda memerlukan lebih daripada {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Hubungi sokongan"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "Had {type} dicapai"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Anda telah mencapai had {type} anda iaitu sebanyak {max}. Sila hubungi sokongan untuk meningkatkan had anda."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "koleksi"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organisasi"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "koleksi"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organisasi"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projek"
+  },
+  "create.limit-alert.type-project": {
+    "message": "projek"
+  },
+  "create.organization.cancel": {
+    "message": "Batal"
+  },
+  "create.organization.create-organization": {
+    "message": "Cipta organisasi"
+  },
+  "create.organization.error-title": {
+    "message": "Sebuah ralat telah berlaku"
+  },
+  "create.organization.name-label": {
+    "message": "Nama"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Masukkan nama organisasi..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Anda akan menjadi pemilik organisasi ini, tetapi anda boleh menjemput ahli lain dan memindahkan pemilikan pada bila-bila masa."
+  },
+  "create.organization.summary-description": {
+    "message": "Satu atau dua ayat yang menerangkan organisasi anda."
+  },
+  "create.organization.summary-label": {
+    "message": "Ringkasan"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Sebuah organisasi untuk..."
+  },
+  "create.organization.title": {
+    "message": "Mencipta sebuah organisasi"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Batal"
+  },
+  "create.project.create-project": {
+    "message": "Cipta projek"
+  },
+  "create.project.error-title": {
+    "message": "Sebuah ralat telah berlaku"
+  },
+  "create.project.name-label": {
+    "message": "Nama"
+  },
+  "create.project.name-placeholder": {
+    "message": "Masukkan nama projek..."
+  },
+  "create.project.summary-description": {
+    "message": "Satu atau dua ayat yang menerangkan projek anda."
+  },
+  "create.project.summary-label": {
+    "message": "Ringkasan"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Projek ini menambah..."
+  },
+  "create.project.title": {
+    "message": "Mencipta sebuah projek"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "Keterlihatan projek anda selepas ia diluluskan."
+  },
+  "create.project.visibility-label": {
+    "message": "Keterlihatan"
+  },
+  "create.project.visibility-private": {
+    "message": "Peribadi"
+  },
+  "create.project.visibility-public": {
+    "message": "Awam"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Tidak disenaraikan"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Cipta baharu"
   },
@@ -424,6 +577,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Koleksi anda"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Entiti asing bermaksud entiti perniagaan yang dianjurkan di luar Amerika Syarikat (seperti perbadanan, perkongsian atau LLC bukan AS)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entiti asing"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Individu persendirian"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Adakah anda individu persendirian atau sebahagian daripada entiti asing?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Borang cukai"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth menggunakan penyedia pihak ketiga Track1099 untuk mengumpul dan menyimpan borang cukai anda dengan selamat. <security-link>Ketahui lebih lanjut di sini.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Amalan keselamatan"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Adakah anda warganegara AS?"
   },
   "error.collection.404.list_item.1": {
     "message": "Anda mungkin tersalah taip URL koleksi."
@@ -445,6 +622,12 @@
   },
   "error.generic.404.title": {
     "message": "Halaman tidak dijumpai"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Halaman ini telah disekat atas sebab undang-undang, seperti penapisan kerajaan atau prosiding undang-undang yang berterusan."
+  },
+  "error.generic.451.title": {
+    "message": "Kandungan tidak tersedia atas sebab undang-undang"
   },
   "error.generic.default.list_item.1": {
     "message": "Semak sama ada Modrinth tidak berfungsi pada <status-link>halaman Status</status-link> kami."
@@ -665,9 +848,6 @@
   "layout.action.change-theme": {
     "message": "Tukar tema"
   },
-  "layout.action.close-banner": {
-    "message": "Tutup"
-  },
   "layout.action.create-new": {
     "message": "Cipta baharu..."
   },
@@ -727,6 +907,15 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Tindakan pengebilan diperlukan."
+  },
+  "layout.banner.tax.action": {
+    "message": "Lengkapkan borang cukai"
+  },
+  "layout.banner.tax.description": {
+    "message": "Anda telah mengeluarkan lebih $600 daripada Modrinth tahun ini. Untuk mematuhi peraturan cukai, anda perlu melengkapkan borang cukai. Pengeluaran anda dijeda sehingga borang ini diserahkan."
+  },
+  "layout.banner.tax.title": {
+    "message": "Borang cukai diperlukan"
   },
   "layout.banner.verify-email.action": {
     "message": "Hantar semula e-mel pengesahan"
@@ -978,7 +1167,7 @@
     "message": "Jemputan untuk menyertai projek"
   },
   "project-member-header.invitation-with-role": {
-    "message": "Anda telah dijemput menjadi ahli projek ini dengan peranan '{role}'."
+    "message": "Anda telah dijemput untuk menjadi ahli projek ini dengan peranan '{role}''."
   },
   "project-member-header.success": {
     "message": "Berjaya"
@@ -1005,6 +1194,9 @@
     "message": "Anda mesti melengkapkan langkah-langkah yang diperlukan dalam senarai semak penerbitan!"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "Serah untuk penilaian"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "Serah untuk penilaian"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1100,11 +1292,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / bulan"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "Bermula pada harga $5{monthly}"
+    "message": "Bermula pada harga {price}<small> / bulan</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Cipta sebuah pelayan"
