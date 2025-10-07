@@ -1,15 +1,15 @@
 [files]
 extend-exclude = [
-	"**/src/locales/",
-	"apps/frontend/",
-	"patches/",
-	"packages/utils/",
-	"packages/ui/",
-	"packages/blog/",
-	# contains licenses like `CC-BY-ND-4.0`
-	"packages/moderation/src/data/stages/license.ts",
-	# contains payment card IDs like `IY1VMST1MOXS` which are flagged
-	"apps/labrinth/src/queue/payouts.rs",
+  "**/src/locales/",
+  "apps/frontend/",
+  "patches/",
+  "packages/utils/",
+  "packages/ui/",
+  "packages/blog/",
+  # contains licenses like `CC-BY-ND-4.0`
+  "packages/moderation/src/data/stages/license.ts",
+  # contains payment card IDs like `IY1VMST1MOXS` which are flagged
+  "apps/labrinth/src/queue/payouts.rs",
 ]
 
 [default.extend-words]
@@ -19,6 +19,4 @@ tou = "tou"
 gam = "gam"
 
 [default]
-extend-ignore-identifiers-re = [
-	"mis-labeling",
-]
+extend-ignore-identifiers-re = ["mis-labeling"]
