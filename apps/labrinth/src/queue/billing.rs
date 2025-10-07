@@ -494,7 +494,7 @@ async fn update_anrok_transactions(
 
 /// Attempts to process a user redeemal.
 ///
-/// Returns `Ok` if the entry has been succesfully processed, or will not be processed.
+/// Returns `Ok` if the entry has been successfully processed, or will not be processed.
 pub async fn try_process_user_redeemal(
     pool: &PgPool,
     redis: &RedisPool,
