@@ -49,6 +49,10 @@ const localesCategoriesOverrides: Partial<Record<string, 'fun' | 'experimental'>
 
 export default defineNuxtConfig({
 	srcDir: 'src/',
+	sourcemap: {
+		server: true,
+		client: true
+	},
 	app: {
 		head: {
 			htmlAttrs: {
@@ -338,13 +342,13 @@ export default defineNuxtConfig({
 							localeMeta[key] = value.message
 						}
 					} else {
-						;(locale.resources ??= {})[fileName] = `./${relative('./src', localeFile)}`
+						; (locale.resources ??= {})[fileName] = `./${relative('./src', localeFile)}`
 					}
 				}
 
 				const categoryOverride = localesCategoriesOverrides[tag]
 				if (categoryOverride != null) {
-					;(locale.meta ??= {}).category = categoryOverride
+					; (locale.meta ??= {}).category = categoryOverride
 				}
 
 				const omorphiaLocaleData = resolveOmorphiaLocaleImport(tag)
@@ -354,7 +358,7 @@ export default defineNuxtConfig({
 
 				const cnDataImport = resolveCompactNumberDataImport(tag)
 				if (cnDataImport != null) {
-					;(locale.additionalImports ??= []).push({
+					; (locale.additionalImports ??= []).push({
 						from: cnDataImport,
 						resolve: false,
 					})
@@ -457,6 +461,10 @@ export default defineNuxtConfig({
 			// @ts-expect-error it's not infinite.
 			plugins: [serverSidedVue()],
 		},
+		logLevel: 4,
+		devErrorHandler: (error, event) => {
+			console.error("Nitro Error", error);
+		}
 	},
 	devtools: {
 		enabled: true,
