@@ -1,0 +1,26 @@
+[package]
+categories  = ["api-bindings"]
+description = "Mural Pay API"
+keywords    = []
+license     = "MIT"
+name        = "muralpay"
+repository  = "https://github.com/modrinth/code/"
+version     = "0.1.0"
+
+edition.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+reqwest    = { workspace = true, features = ["json"] }
+secrecy    = { workspace = true }
+serde      = { workspace = true, features = ["derive"] }
+serde_with      = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true, features = ["serde"] }
+derive_more = { workspace = true, features = ["display", "deref", "error"]}
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full"] }
+eyre = { workspace = true }
