@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Heading, Markdown } from '@vue-email/components';
+import { Heading, Markdown } from '@vue-email/components'
 
-import StyledEmail from '../shared/StyledEmail.vue';
+import StyledEmail from '../shared/StyledEmail.vue'
 
 const props = defineProps<{
 	title: string

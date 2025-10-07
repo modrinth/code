@@ -35,5 +35,5 @@ export default {
 	'organization-invited': () => import('./organization/OrganizationInvited.vue'),
 
 	// Dynamic
-	'dynamic': () => import('./dynamic/MarkdownDynamicEmail.vue'),
+	dynamic: () => import('./dynamic/MarkdownDynamicEmail.vue'),
 } as Record<string, () => Promise<{ default: Component }>>

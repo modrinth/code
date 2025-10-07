@@ -1,6 +1,7 @@
-import { render } from '@vue-email/render';
-import type { Component } from 'vue';
-import emails from '~/templates/emails';
+import { render } from '@vue-email/render'
+import type { Component } from 'vue'
+
+import emails from '~/templates/emails'
 
 export default defineEventHandler(async (event) => {
 	try {
