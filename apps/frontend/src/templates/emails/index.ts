@@ -33,7 +33,4 @@ export default {
 
 	// Organizations
 	'organization-invited': () => import('./organization/OrganizationInvited.vue'),
-
-	// Temporary/One-off emails
-	'tax-form-copy': () => import('./temporary/TaxFormCopy.vue')
 } as Record<string, () => Promise<{ default: Component }>>
