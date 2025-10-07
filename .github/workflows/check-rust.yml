@@ -9,10 +9,8 @@ env:
   SQLX_OFFLINE: true
 
 jobs:
-  # less demanding jobs use 2vcpu runners
-
   fmt:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -21,7 +19,7 @@ jobs:
       - run: cargo fmt --check
 
   shear:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
