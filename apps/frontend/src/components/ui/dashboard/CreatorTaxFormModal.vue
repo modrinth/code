@@ -1,82 +1,74 @@
 <template>
 	<NewModal ref="taxFormModal" :header="formatMessage(messages.taxFormHeader)">
 		<div class="w-full sm:w-[540px]">
-			<Admonition type="info" :header="formatMessage(messages.securityHeader)">
-				<IntlFormatted :message-id="messages.securityDescription">
-					<template #security-link="{ children }">
-						<a
-							href="https://www.track1099.com/info/security"
-							class="flex w-fit flex-row gap-1 align-middle text-link"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<component :is="() => normalizeChildren(children)" />
-							<ExternalIcon class="my-auto" />
-						</a>
-					</template>
-				</IntlFormatted>
-			</Admonition>
-			<div class="mt-4 flex flex-col gap-2">
-				<label>
-					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.usCitizenQuestion) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
-				<Chips
-					v-model="isUSCitizen"
-					:items="['yes', 'no']"
-					:format-label="
-						(item) => (item === 'yes' ? formatMessage(messages.yes) : formatMessage(messages.no))
-					"
-					:never-empty="false"
-					:capitalize="true"
-				/>
-			</div>
-
-			<Transition
-				enter-active-class="transition-all duration-300 ease-in-out"
-				enter-from-class="h-0 overflow-hidden opacity-0"
-				enter-to-class="h-auto overflow-visible opacity-100"
-				leave-active-class="transition-all duration-300 ease-in-out"
-				leave-from-class="h-auto overflow-visible opacity-100"
-				leave-to-class="h-0 overflow-hidden opacity-0"
-			>
-				<div v-if="isUSCitizen === 'no'" class="flex flex-col gap-1">
-					<label class="mt-4">
+			<!-- Form Selection Stage -->
+			<div v-if="currentStage === 'form-selection'">
+				<Admonition type="info" :header="formatMessage(messages.securityHeader)">
+					<IntlFormatted :message-id="messages.securityDescription">
+						<template #security-link="{ children }">
+							<a href="https://www.track1099.com/info/security" class="flex w-fit flex-row gap-1 align-middle text-link"
+								target="_blank" rel="noopener noreferrer">
+								<component :is="() => normalizeChildren(children)" />
+								<ExternalIcon class="my-auto" />
+							</a>
+						</template>
+					</IntlFormatted>
+				</Admonition>
+				<div class="mt-4 flex flex-col gap-2">
+					<label>
 						<span class="text-lg font-semibold text-contrast">
-							{{ formatMessage(messages.entityQuestion) }}
+							{{ formatMessage(messages.usCitizenQuestion) }}
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<Chips
-						v-model="entityType"
-						:items="['private-individual', 'foreign-entity']"
-						:format-label="
-							(item) =>
-								item === 'private-individual'
-									? formatMessage(messages.privateIndividual)
-									: formatMessage(messages.foreignEntity)
-						"
-						:never-empty="false"
-						:capitalize="false"
-						class="mt-2"
-					/>
-					<span class="text-md mt-2 leading-tight">
-						{{ formatMessage(messages.entityDescription) }}
-					</span>
+					<Chips v-model="isUSCitizen" :items="['yes', 'no']" :format-label="(item) => (item === 'yes' ? formatMessage(messages.yes) : formatMessage(messages.no))
+						" :never-empty="false" :capitalize="true" />
 				</div>
-			</Transition>
-			<div class="mt-4 flex justify-end gap-3">
-				<ButtonStyled @click="handleCancel">
-					<button><XIcon /> {{ formatMessage(messages.cancel) }}</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button :disabled="!canContinue || loading" @click="continueForm">
-						{{ formatMessage(messages.continue) }}
-						<RightArrowIcon v-if="!loading" /> <SpinnerIcon v-else class="animate-spin" />
-					</button>
-				</ButtonStyled>
+
+				<Transition enter-active-class="transition-all duration-300 ease-in-out"
+					enter-from-class="h-0 overflow-hidden opacity-0" enter-to-class="h-auto overflow-visible opacity-100"
+					leave-active-class="transition-all duration-300 ease-in-out"
+					leave-from-class="h-auto overflow-visible opacity-100" leave-to-class="h-0 overflow-hidden opacity-0">
+					<div v-if="isUSCitizen === 'no'" class="flex flex-col gap-1">
+						<label class="mt-4">
+							<span class="text-lg font-semibold text-contrast">
+								{{ formatMessage(messages.entityQuestion) }}
+								<span class="text-brand-red">*</span>
+							</span>
+						</label>
+						<Chips v-model="entityType" :items="['private-individual', 'foreign-entity']" :format-label="(item) =>
+							item === 'private-individual'
+								? formatMessage(messages.privateIndividual)
+								: formatMessage(messages.foreignEntity)
+							" :never-empty="false" :capitalize="false" class="mt-2" />
+						<span class="text-md mt-2 leading-tight">
+							{{ formatMessage(messages.entityDescription) }}
+						</span>
+					</div>
+				</Transition>
+				<div class="mt-4 flex justify-end gap-3">
+					<ButtonStyled @click="handleCancel">
+						<button>
+							<XIcon /> {{ formatMessage(messages.cancel) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button :disabled="!canContinue || loading" @click="continueForm">
+							{{ formatMessage(messages.continue) }}
+							<RightArrowIcon v-if="!loading" />
+							<SpinnerIcon v-else class="animate-spin" />
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+
+			<div v-else-if="currentStage === 'download-confirmation'">
+				<p>Download confirmation stage (to be implemented)</p>
+				<div class="mt-4 flex justify-end gap-3">
+					<ButtonStyled @click="handleClose">
+						<button>{{ props.closeButtonText }}</button>
+					</ButtonStyled>
+				</div>
 			</div>
 		</div>
 	</NewModal>
@@ -91,19 +83,38 @@ import { IntlFormatted } from '@vintl/vintl/components'
 import { type FormRequestResponse, useAvalara1099 } from '@/composables/avalara1099'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
+const props = withDefaults(defineProps<{
+	closeButtonText?: string
+	emitSuccessOnClose?: boolean
+}>(), {
+	closeButtonText: 'Close',
+	emitSuccessOnClose: true,
+})
+
 const { addNotification } = injectNotificationManager()
 
 const taxFormModal = ref<InstanceType<typeof NewModal> | null>(null)
 
+type ModalStage = 'form-selection' | 'download-confirmation'
+const currentStage = ref<ModalStage>('form-selection')
+
 async function startTaxForm(e: MouseEvent) {
+	currentStage.value = 'form-selection'
+	taxFormModal.value?.show(e)
+}
+
+async function showDownloadConfirmation(e: MouseEvent) {
+	currentStage.value = 'download-confirmation'
 	taxFormModal.value?.show(e)
 }
 
 defineExpose({
 	startTaxForm,
+	showDownloadConfirmation,
 })
 
 const auth = await useAuth()
+const flags = useFeatureFlags()
 
 const { formatMessage } = useVIntl()
 
@@ -159,6 +170,19 @@ function hideModal() {
 function handleCancel() {
 	emit('cancelled')
 	hideModal()
+	setTimeout(() => {
+		currentStage.value = 'form-selection'
+	}, 300)
+}
+
+function handleClose() {
+	if (currentStage.value === 'download-confirmation' && props.emitSuccessOnClose) {
+		emit('success')
+	}
+	hideModal()
+	setTimeout(() => {
+		currentStage.value = 'form-selection'
+	}, 300)
 }
 
 const determinedFormType = computed(() => {
@@ -199,6 +223,13 @@ async function continueForm() {
 
 	manualLoading.value = true
 
+	// Skip Avalara if testTaxForm flag is enabled
+	if (flags.value.testTaxForm) {
+		currentStage.value = 'download-confirmation'
+		manualLoading.value = false
+		return
+	}
+
 	const response = (await useBaseFetch('payout/compliance', {
 		apiVersion: 3,
 		method: 'POST',
@@ -221,13 +252,8 @@ async function continueForm() {
 		if (avalaraState.value) {
 			await avalaraState.value.start()
 			if (avalaraState.value.status === 'signed') {
-				addNotification({
-					title: 'Tax form submitted',
-					text: 'You can now withdraw your full balance.',
-					type: 'success',
-				})
-				emit('success')
-				hideModal()
+				currentStage.value = 'download-confirmation'
+				manualLoading.value = false
 				return
 			}
 
@@ -264,7 +290,7 @@ dialog[open]:has(> iframe[src*='form_embed']) {
 	padding: 0 !important;
 }
 
-dialog[open] > iframe[src*='form_embed'] {
+dialog[open]>iframe[src*='form_embed'] {
 	position: absolute !important;
 	inset: 0 !important;
 	width: 100% !important;
@@ -280,7 +306,8 @@ dialog[open] > iframe[src*='form_embed'] {
 		height: 95vh !important;
 		border-radius: var(--radius-md) !important;
 	}
-	dialog[open] > iframe[src*='form_embed'] {
+
+	dialog[open]>iframe[src*='form_embed'] {
 		border-radius: var(--radius-md) !important;
 	}
 }
