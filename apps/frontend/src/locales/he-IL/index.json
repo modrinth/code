@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "ביטול"
+  },
+  "action.continue": {
+    "message": "המשך"
+  },
   "admin.billing.error.not-found": {
     "message": "משתמש לא קיים"
   },
@@ -160,6 +166,30 @@
   },
   "app-marketing.features.unlike-any-launcher": {
     "message": "לא כמו שום מפעיל"
+  },
+  "app-marketing.features.website.description": {
+    "message": "יישומון מודרינף נתמך במלואו עם האתר, כך שניתן לגשת לכל הפרויקטים האהובים עליכם מהיישומון!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "אינטגרציה עם האתר"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "השתמשת בעבר"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "תמונה של יישומון מודרינף עם התקנה של קובלמון שנפתחת בעמוד \"התוכן\"."
+  },
+  "app-marketing.hero.description": {
+    "message": "יישומון מודרינף הוא launcher מיוחד, בקוד פתוח, שמאפשר לכם לשחק עם המודים שאתם אוהבים, ושומר עליהם מעודכנים. הכל בחבילה אחת, קומפקטית ומסודרת."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "יישומון מודרינף - לחץ להורדה"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "הורד את יישומון מודרינף"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "הורד את יישומון מודרינף עבור {os}"
   },
   "auth.authorize.action.authorize": {
     "message": "אימות"
@@ -511,9 +541,6 @@
   },
   "layout.action.change-theme": {
     "message": "לשנות מצב צבע"
-  },
-  "layout.action.close-banner": {
-    "message": "סגור"
   },
   "layout.action.create-new": {
     "message": "צור חדש..."

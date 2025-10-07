@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Mégsem"
+  },
+  "action.continue": {
+    "message": "Tovább"
+  },
   "admin.billing.error.not-found": {
     "message": "Felhasználó nem található"
   },
@@ -286,6 +292,30 @@
   },
   "auth.verify-email.failed-verification.title": {
     "message": "Email hítelesítés sikertelen"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Email megerősítés"
+  },
+  "auth.verify-email.title": {
+    "message": "Email-cím megerősítése"
+  },
+  "auth.welcome.long-title": {
+    "message": "Üdvözlünk a Modrinth-onl!"
+  },
+  "auth.welcome.title": {
+    "message": "Üdvözlünk"
+  },
+  "collection.button.delete-icon": {
+    "message": "Ikon törlése"
+  },
+  "collection.button.edit-icon": {
+    "message": "Ikon szerkesztése"
+  },
+  "collection.button.remove-project": {
+    "message": "Projekt eltávolítása"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Projektek kikövetése"
   },
   "collection.label.created-at": {
     "message": "Létrehozva {ago}"

@@ -269,11 +269,20 @@
   "omorphia.component.purchase_modal.payment_method_type.discover": {
     "defaultMessage": "Discover"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} other {Data Pack}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Mga Data Pack"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {data pack} other {data pack}}"
+  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Edisyong Java"
   },
   "project.about.creators.title": {
-    "defaultMessage": "Mg tagagawa"
+    "defaultMessage": "Mga tagagawa"
   },
   "project.about.details.created": {
     "defaultMessage": "Ginawa {date}"
@@ -284,8 +293,14 @@
   "project.about.details.updated": {
     "defaultMessage": "In-update {date}"
   },
+  "project.about.links.issues": {
+    "defaultMessage": "Magreport ng mga isyu"
+  },
   "project.settings.environment.title": {
     "defaultMessage": "Environment"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Upload"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"
@@ -325,6 +340,9 @@
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Open source"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Pumili ng iyong gugustohing paksang-kulay para sa Modrinth ng nitong device."
   },
   "settings.profile.title": {
     "defaultMessage": "Publiko"

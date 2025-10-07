@@ -50,6 +50,12 @@
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Hindi maaaring magkapareho ang iyong buod sa Pangalan ng iyong proyekto. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit na Buod."
   },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Mag-upload ng gallery image"
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Mag-upload ng bersiyon"
+  },
   "nags.verify-external-links.title": {
     "defaultMessage": "Patunayan ang mga external na link"
   },

@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "取消"
   },
+  "button.close": {
+    "defaultMessage": "关闭"
+  },
   "button.continue": {
     "defaultMessage": "继续"
   },
@@ -405,13 +408,13 @@
     "defaultMessage": "{count, plural, other {资源包}}"
   },
   "project-type.shader.capital": {
-    "defaultMessage": "{count, plural, other {光影}}"
+    "defaultMessage": "{count, plural, other {光影包}}"
   },
   "project-type.shader.category": {
     "defaultMessage": "光影包"
   },
   "project-type.shader.lowercase": {
-    "defaultMessage": "{count, plural, other {光影}}"
+    "defaultMessage": "{count, plural, other {光影包}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "支持的环境"
