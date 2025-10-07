@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-07T09:50:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Allow users to fill out tax form when attempting a withdraw that exceeds $600/yr threshold.`,
+	},
+	{
 		date: `2025-10-04T17:20:00-07:00`,
 		product: 'app',
 		version: '0.10.10',
