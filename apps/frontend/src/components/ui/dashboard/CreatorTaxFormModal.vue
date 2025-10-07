@@ -1,13 +1,16 @@
 <template>
 	<NewModal ref="taxFormModal" :header="formatMessage(messages.taxFormHeader)">
 		<div class="w-full sm:w-[540px]">
-			<!-- Form Selection Stage -->
 			<div v-if="currentStage === 'form-selection'">
 				<Admonition type="info" :header="formatMessage(messages.securityHeader)">
 					<IntlFormatted :message-id="messages.securityDescription">
 						<template #security-link="{ children }">
-							<a href="https://www.track1099.com/info/security" class="flex w-fit flex-row gap-1 align-middle text-link"
-								target="_blank" rel="noopener noreferrer">
+							<a
+								href="https://www.track1099.com/info/security"
+								class="flex w-fit flex-row gap-1 align-middle text-link"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
 								<component :is="() => normalizeChildren(children)" />
 								<ExternalIcon class="my-auto" />
 							</a>
@@ -21,14 +24,25 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<Chips v-model="isUSCitizen" :items="['yes', 'no']" :format-label="(item) => (item === 'yes' ? formatMessage(messages.yes) : formatMessage(messages.no))
-						" :never-empty="false" :capitalize="true" />
+					<Chips
+						v-model="isUSCitizen"
+						:items="['yes', 'no']"
+						:format-label="
+							(item) => (item === 'yes' ? formatMessage(messages.yes) : formatMessage(messages.no))
+						"
+						:never-empty="false"
+						:capitalize="true"
+					/>
 				</div>
 
-				<Transition enter-active-class="transition-all duration-300 ease-in-out"
-					enter-from-class="h-0 overflow-hidden opacity-0" enter-to-class="h-auto overflow-visible opacity-100"
+				<Transition
+					enter-active-class="transition-all duration-300 ease-in-out"
+					enter-from-class="h-0 overflow-hidden opacity-0"
+					enter-to-class="h-auto overflow-visible opacity-100"
 					leave-active-class="transition-all duration-300 ease-in-out"
-					leave-from-class="h-auto overflow-visible opacity-100" leave-to-class="h-0 overflow-hidden opacity-0">
+					leave-from-class="h-auto overflow-visible opacity-100"
+					leave-to-class="h-0 overflow-hidden opacity-0"
+				>
 					<div v-if="isUSCitizen === 'no'" class="flex flex-col gap-1">
 						<label class="mt-4">
 							<span class="text-lg font-semibold text-contrast">
@@ -36,11 +50,19 @@
 								<span class="text-brand-red">*</span>
 							</span>
 						</label>
-						<Chips v-model="entityType" :items="['private-individual', 'foreign-entity']" :format-label="(item) =>
-							item === 'private-individual'
-								? formatMessage(messages.privateIndividual)
-								: formatMessage(messages.foreignEntity)
-							" :never-empty="false" :capitalize="false" class="mt-2" />
+						<Chips
+							v-model="entityType"
+							:items="['private-individual', 'foreign-entity']"
+							:format-label="
+								(item) =>
+									item === 'private-individual'
+										? formatMessage(messages.privateIndividual)
+										: formatMessage(messages.foreignEntity)
+							"
+							:never-empty="false"
+							:capitalize="false"
+							class="mt-2"
+						/>
 						<span class="text-md mt-2 leading-tight">
 							{{ formatMessage(messages.entityDescription) }}
 						</span>
@@ -48,9 +70,7 @@
 				</Transition>
 				<div class="mt-4 flex justify-end gap-3">
 					<ButtonStyled @click="handleCancel">
-						<button>
-							<XIcon /> {{ formatMessage(messages.cancel) }}
-						</button>
+						<button><XIcon /> {{ formatMessage(messages.cancel) }}</button>
 					</ButtonStyled>
 					<ButtonStyled>
 						<button :disabled="!canContinue || loading" @click="continueForm">
@@ -83,13 +103,16 @@ import { IntlFormatted } from '@vintl/vintl/components'
 import { type FormRequestResponse, useAvalara1099 } from '@/composables/avalara1099'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
-const props = withDefaults(defineProps<{
-	closeButtonText?: string
-	emitSuccessOnClose?: boolean
-}>(), {
-	closeButtonText: 'Close',
-	emitSuccessOnClose: true,
-})
+const props = withDefaults(
+	defineProps<{
+		closeButtonText?: string
+		emitSuccessOnClose?: boolean
+	}>(),
+	{
+		closeButtonText: 'Close',
+		emitSuccessOnClose: true,
+	},
+)
 
 const { addNotification } = injectNotificationManager()
 
@@ -290,7 +313,7 @@ dialog[open]:has(> iframe[src*='form_embed']) {
 	padding: 0 !important;
 }
 
-dialog[open]>iframe[src*='form_embed'] {
+dialog[open] > iframe[src*='form_embed'] {
 	position: absolute !important;
 	inset: 0 !important;
 	width: 100% !important;
@@ -307,7 +330,7 @@ dialog[open]>iframe[src*='form_embed'] {
 		border-radius: var(--radius-md) !important;
 	}
 
-	dialog[open]>iframe[src*='form_embed'] {
+	dialog[open] > iframe[src*='form_embed'] {
 		border-radius: var(--radius-md) !important;
 	}
 }
