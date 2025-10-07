@@ -12,8 +12,11 @@
 				<div class="grid-display__item">
 					<div class="label">
 						Total pending
-						<nuxt-link v-tooltip="`Click to read about how Modrinth handles your revenue.`"
-							class="align-middle text-link" to="/legal/cmp-info#pending">
+						<nuxt-link
+							v-tooltip="`Click to read about how Modrinth handles your revenue.`"
+							class="align-middle text-link"
+							to="/legal/cmp-info#pending"
+						>
 							<UnknownIcon />
 						</nuxt-link>
 					</div>
@@ -24,23 +27,36 @@
 				<div class="grid-display__item">
 					<h3 class="label m-0">
 						Available soon
-						<nuxt-link v-tooltip="`Click to read about how Modrinth handles your revenue.`"
-							class="align-middle text-link" to="/legal/cmp-info#pending">
+						<nuxt-link
+							v-tooltip="`Click to read about how Modrinth handles your revenue.`"
+							class="align-middle text-link"
+							to="/legal/cmp-info#pending"
+						>
 							<UnknownIcon />
 						</nuxt-link>
 					</h3>
 					<ul class="m-0 list-none p-0">
-						<li v-for="date in availableSoonDateKeys" :key="date"
-							class="flex items-center justify-between border-0 border-solid border-b-divider p-0 [&:not(:last-child)]:mb-1 [&:not(:last-child)]:border-b-[1px] [&:not(:last-child)]:pb-1">
-							<span v-tooltip="availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1
-									? `Revenue period is ongoing. \nThis amount is not yet finalized.`
-									: null
-								" :class="{
+						<li
+							v-for="date in availableSoonDateKeys"
+							:key="date"
+							class="flex items-center justify-between border-0 border-solid border-b-divider p-0 [&:not(:last-child)]:mb-1 [&:not(:last-child)]:border-b-[1px] [&:not(:last-child)]:pb-1"
+						>
+							<span
+								v-tooltip="
+									availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1
+										? `Revenue period is ongoing. \nThis amount is not yet finalized.`
+										: null
+								"
+								:class="{
 									'cursor-help':
 										availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1,
-								}" class="inline-flex items-center gap-1 font-bold">
+								}"
+								class="inline-flex items-center gap-1 font-bold"
+							>
 								{{ $formatMoney(availableSoonDates[date]) }}
-								<template v-if="availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1">
+								<template
+									v-if="availableSoonDateKeys.indexOf(date) === availableSoonDateKeys.length - 1"
+								>
 									<InProgressIcon />
 								</template>
 							</span>
@@ -53,12 +69,13 @@
 			</div>
 			<div class="input-group mt-4">
 				<ButtonStyled color="brand">
-					<nuxt-link v-if="!(userBalance.available < minWithdraw || blockedByTax)" to="/dashboard/revenue/withdraw">
+					<nuxt-link
+						v-if="!(userBalance.available < minWithdraw || blockedByTax)"
+						to="/dashboard/revenue/withdraw"
+					>
 						<TransferIcon /> Withdraw
 					</nuxt-link>
-					<button v-else class="disabled">
-						<TransferIcon /> Withdraw
-					</button>
+					<button v-else class="disabled"><TransferIcon /> Withdraw</button>
 				</ButtonStyled>
 				<ButtonStyled>
 					<NuxtLink to="/dashboard/revenue/transfers">
@@ -111,8 +128,14 @@
 			<h3>Venmo</h3>
 			<p>Enter your Venmo username below to enable withdrawing to your Venmo balance.</p>
 			<label class="hidden" for="venmo">Venmo address</label>
-			<input id="venmo" v-model="auth.user.payout_data.venmo_handle" autocomplete="off" name="search"
-				placeholder="@example" type="search" />
+			<input
+				id="venmo"
+				v-model="auth.user.payout_data.venmo_handle"
+				autocomplete="off"
+				name="search"
+				placeholder="@example"
+				type="search"
+			/>
 			<ButtonStyled color="brand">
 				<button class="mt-4" @click="updateVenmo">
 					<SaveIcon />
