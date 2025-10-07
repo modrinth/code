@@ -1,6 +1,7 @@
 use crate::{
     models::v2::projects::LegacySideType, util::env::parse_strings_from_var,
 };
+use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -23,7 +24,7 @@ pub struct PackFormat {
 #[derive(Serialize, Deserialize, Validate, Eq, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PackFile {
-    pub path: String,
+    pub path: SafeRelativeUtf8UnixPathBuf,
     pub hashes: std::collections::HashMap<PackFileHash, String>,
     pub env: Option<std::collections::HashMap<EnvType, LegacySideType>>, // TODO: Should this use LegacySideType? Will probably require a overhaul of mrpack format to change this
     #[validate(custom(function = "validate_download_url"))]

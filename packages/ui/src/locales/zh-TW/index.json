@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "取消"
   },
+  "button.close": {
+    "defaultMessage": "關閉"
+  },
   "button.continue": {
     "defaultMessage": "繼續"
   },
@@ -177,7 +180,7 @@
     "defaultMessage": "追蹤的專案"
   },
   "label.loading": {
-    "defaultMessage": "載入中……"
+    "defaultMessage": "載入中..."
   },
   "label.moderation": {
     "defaultMessage": "管理"
@@ -756,7 +759,7 @@
     "defaultMessage": "方案"
   },
   "servers.purchase.step.region.title": {
-    "defaultMessage": "區域"
+    "defaultMessage": "地區"
   },
   "servers.purchase.step.review.title": {
     "defaultMessage": "再次確認"

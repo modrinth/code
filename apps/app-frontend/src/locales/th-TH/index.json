@@ -83,6 +83,9 @@
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "ลบไอคอน"
   },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "เปลี่ยนไอคอน"
+  },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "เลือกรูปไอคอน"
   },
@@ -100,5 +103,20 @@
   },
   "instance.settings.tabs.hooks.custom-hooks": {
     "message": "กำหนดเอง"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "การติดตั้ง"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "เปลี่ยนเวอร์ชั่น"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "ติดตั้ง"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "กำลังติดตั้ง"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "เวอร์ชั่น {loader}"
   }
 }

@@ -36,7 +36,7 @@ use tracing::{debug, error, info, warn};
 /// Updates charges which need to have their tax amount updated. This is done within a timer to avoid reaching
 /// Anrok API limits.
 ///
-/// The global rate limit for Anrok API operations is 10 RPS, so we run ~6 requests every second up
+/// The global rate limit for Anrok API operations is 10 RPS, so we run ~8 requests every second up
 /// to the specified limit of processed charges.
 async fn update_tax_amounts(
     pg: &PgPool,
@@ -55,7 +55,7 @@ async fn update_tax_amounts(
 
         let mut txn = pg.begin().await?;
 
-        let charges = DBCharge::get_updateable_lock(&mut *txn, 6).await?;
+        let charges = DBCharge::get_updateable_lock(&mut *txn, 8).await?;
 
         if charges.is_empty() {
             info!("No more charges to process");
@@ -181,6 +181,8 @@ async fn update_tax_amounts(
                                 tax_id.tax_processor_id,
                                 charge.amount,
                             )],
+                            customer_id: None,
+                            customer_name: None,
                         })
                         .await?
                         .tax_amount_to_collect;
@@ -266,7 +268,7 @@ async fn update_tax_amounts(
 ///
 /// Same as update_tax_amounts, this is done within a timer to avoid reaching Anrok API limits.
 ///
-/// The global rate limit for Anrok API operations is 10 RPS, so we run ~6 requests every second up
+/// The global rate limit for Anrok API operations is 10 RPS, so we run ~8 requests every second up
 /// to the specified limit of processed charges.
 async fn update_anrok_transactions(
     pg: &PgPool,
@@ -282,7 +284,7 @@ async fn update_anrok_transactions(
         anrok_client: &anrok::Client,
         mut c: DBCharge,
     ) -> Result<(), ApiError> {
-        let (customer_address, tax_platform_id) = 'a: {
+        let (customer_address, tax_platform_id, customer_id) = 'a: {
             let (pi, tax_platform_id) = if c.type_ == ChargeType::Refund {
                 // the payment_platform_id should be an re or a pyr
 
@@ -344,16 +346,6 @@ async fn update_anrok_transactions(
                 .and_then(|x| x.into_object())
                 .and_then(|x| x.billing_details.address);
 
-            match pi_stripe_address {
-                Some(address) => break 'a (address, tax_platform_id),
-                None => {
-                    warn!(
-                        "A PaymentMethod for '{:?}' has no address; falling back to the customer's address",
-                        pi.customer.map(|x| x.id())
-                    );
-                }
-            };
-
             let stripe_customer_id =
                 DBUser::get_id(c.user_id, &mut **txn, redis)
                     .await?
@@ -376,6 +368,18 @@ async fn update_anrok_transactions(
                 ))
             })?;
 
+            match pi_stripe_address {
+                Some(address) => {
+                    break 'a (address, tax_platform_id, customer_id);
+                }
+                None => {
+                    warn!(
+                        "A PaymentMethod for '{:?}' has no address; falling back to the customer's address",
+                        pi.customer.map(|x| x.id())
+                    );
+                }
+            };
+
             let customer =
                 stripe::Customer::retrieve(stripe_client, &customer_id, &[])
                     .await?;
@@ -386,7 +390,7 @@ async fn update_anrok_transactions(
                 )
             })?;
 
-            (address, tax_platform_id)
+            (address, tax_platform_id, customer_id)
         };
 
         let tax_id = DBProductsTaxIdentifier::get_price(c.price_id, &mut **txn)
@@ -396,7 +400,7 @@ async fn update_anrok_transactions(
         // Note: if the tax amount that was charged to the customer is *different* than
         // what it *should* be NOW, we will take on a loss here.
 
-        let should_have_collected = anrok_client
+        let result = anrok_client
             .create_or_update_txn(&anrok::Transaction {
                 id: tax_platform_id.clone(),
                 fields: anrok::TransactionFields {
@@ -412,53 +416,72 @@ async fn update_anrok_transactions(
                             c.tax_amount + c.amount,
                         ),
                     ],
+                    customer_id: Some(format!("stripe:cust:{customer_id}")),
+                    customer_name: Some("Customer".to_owned()),
                 },
             })
-            .await?
-            .tax_amount_to_collect;
+            .await;
 
-        let drift = should_have_collected - c.tax_amount;
+        match result {
+            Ok(response) => {
+                let should_have_collected = response.tax_amount_to_collect;
 
-        c.tax_drift_loss = Some(drift);
-        c.tax_platform_id = Some(tax_platform_id);
-        c.upsert(txn).await?;
+                let drift = should_have_collected - c.tax_amount;
 
-        Ok(())
+                c.tax_drift_loss = Some(drift);
+                c.tax_platform_id = Some(tax_platform_id);
+                c.upsert(txn).await?;
+
+                Ok(())
+            }
+
+            Err(error) => {
+                // This isn't gonna be a fixable error, so mark the transaction as unresolvable.
+                if error
+                    .is_conflict_and(|x| x == "customerAddressCouldNotResolve")
+                {
+                    c.tax_platform_id = Some("unresolved".to_owned());
+                    c.upsert(txn).await?;
+
+                    Ok(())
+                } else {
+                    Err(error.into())
+                }
+            }
+        }
     }
-
-    let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
-    interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
 
     let mut processed_charges = 0;
 
-    loop {
-        interval.tick().await;
+    let mut offset = 0;
 
+    loop {
         let mut txn = pg.begin().await?;
 
-        let charges =
-            DBCharge::get_missing_tax_identifier_lock(&mut *txn, 6).await?;
+        let mut charges =
+            DBCharge::get_missing_tax_identifier_lock(&mut *txn, offset, 1)
+                .await?;
 
-        if charges.is_empty() {
+        let Some(c) = charges.pop() else {
             info!("No more charges to process");
             break Ok(());
-        }
+        };
 
-        for c in charges {
-            processed_charges += 1;
+        let charge_id = to_base62(c.id.0 as u64);
+        let user_id = to_base62(c.user_id.0 as u64);
 
-            let charge_id = to_base62(c.id.0 as u64);
-            let user_id = to_base62(c.user_id.0 as u64);
+        let result =
+            process_charge(stripe_client, &mut txn, redis, anrok_client, c)
+                .await;
 
-            let result =
-                process_charge(stripe_client, &mut txn, redis, anrok_client, c)
-                    .await;
+        processed_charges += 1;
 
-            if let Err(e) = result {
-                warn!(
-                    "Error processing charge '{charge_id}' for user '{user_id}': {e}"
-                );
-            }
+        if let Err(e) = result {
+            warn!(
+                "Error processing charge '{charge_id}' for user '{user_id}': {e}"
+            );
+
+            offset += 1;
         }
 
         txn.commit().await?;
@@ -985,14 +1008,14 @@ pub async fn index_subscriptions(
             &redis,
             &anrok_client,
             &stripe_client,
-            250,
+            750,
         ),
     )
     .await;
 
     run_and_time(
         "update_tax_amounts",
-        update_tax_amounts(&pool, &redis, &anrok_client, &stripe_client, 100),
+        update_tax_amounts(&pool, &redis, &anrok_client, &stripe_client, 50),
     )
     .await;
 

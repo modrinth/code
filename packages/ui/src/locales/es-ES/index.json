@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Cancelar"
   },
+  "button.close": {
+    "defaultMessage": "Cerrar"
+  },
   "button.continue": {
     "defaultMessage": "Continuar"
   },
@@ -358,6 +361,36 @@
   },
   "project-type.all": {
     "defaultMessage": "Todos"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Paquete de Datos} other {Paquetes de Datos}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Paquetes de Datos"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {paquete de datos} other {paquetes de datos}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Modificación} other {Modificaciones}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Modificaciones"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {modificación} other {modificaciones}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Paquetes de mods"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Complementos"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Paquetes de Recursos"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Sombreadores"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Entornos soportados"

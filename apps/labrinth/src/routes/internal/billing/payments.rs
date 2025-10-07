@@ -416,6 +416,8 @@ pub async fn create_or_update_payment_intent(
                     product_info.tax_identifier.tax_processor_id,
                     charge_data.amount,
                 )],
+                customer_id: None,
+                customer_name: None,
             })
             .await?;
 

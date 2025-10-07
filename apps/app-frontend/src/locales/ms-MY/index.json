@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Mod pembangun didayakan."
   },
+  "app.settings.downloading": {
+    "message": "Sedang memuat turun v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Tampilan"
   },
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Pengurusan sumber"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} sudah bersedia untuk dipasang! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} sudah selesai dipasang! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} kini tersedia! Memandangkan anda sedang menggunakan rangkaian bermeter, kami tidak memuat turunnya secara automatik."
+  },
+  "app.update-toast.changelog": {
+    "message": "Log perubahan"
+  },
+  "app.update-toast.download": {
+    "message": "Muat turun ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Sedang memuat turun..."
+  },
+  "app.update-toast.reload": {
+    "message": "Muat semula"
+  },
+  "app.update-toast.title": {
+    "message": "Kemas kini tersedia"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Muat turun selesai"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Klik di sini untuk melihat log perubahan."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versi {version} telah berjaya dipasang!"
+  },
+  "app.update.download-update": {
+    "message": "Muat turun kemas kini"
+  },
+  "app.update.downloading-update": {
+    "message": "Sedang memuat turun kemas kini ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Muat semula untuk memasang kemas kini"
   },
   "instance.add-server.add-and-play": {
     "message": "Tambah dan main"

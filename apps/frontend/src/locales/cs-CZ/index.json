@@ -1,12 +1,33 @@
 {
+  "action.cancel": {
+    "message": "Zrušit"
+  },
+  "action.continue": {
+    "message": "Pokračovat"
+  },
   "admin.billing.error.not-found": {
     "message": "Uživatel nebyl nalezen"
+  },
+  "app-marketing.download.description": {
+    "message": "Naše aplikace je dostupná pro všechny počítačové platformy, vyberte si požadovanou verzi."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Stáhnout AppImage"
   },
   "app-marketing.download.download-beta": {
     "message": "Stahnout v betě"
   },
+  "app-marketing.download.download-deb": {
+    "message": "Stáhnout DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Stáhnout RPM"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "U linuxových verzí aplikace Modrinth jsou <issues-link>známé problémy</issues-link> na určitých systémech a konfiguracích. Pokud je aplikace Modrinth App ve vašem systému nestabilní, doporučujeme vám vyzkoušet jiné aplikace, například <prism-link>Prism Launcher</prism-link>, které vám umožní snadnou instalaci obsahu Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -14,14 +35,29 @@
   "app-marketing.download.options-title": {
     "message": "Stahovácí možnosti"
   },
+  "app-marketing.download.terms": {
+    "message": "Stažením aplikace Modrinth souhlasíte s našimi <terms-link>Podmínkami</terms-link> a <privacy-link>Zásadami ochrany osobních údajů</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Balíčky třetích stran"
+  },
   "app-marketing.download.title": {
     "message": "Stáhnout Modrinth App (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.follow.description": {
+    "message": "Uložte si oblíbený obsah a dostávejte aktualizace jedním kliknutím."
+  },
   "app-marketing.features.follow.title": {
     "message": "Sledovat projekty"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Importujte všechny své oblíbené profily z launcheru, který jste používali dříve, a začněte používat aplikaci Modrinth během několika sekund!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
@@ -34,6 +70,9 @@
   },
   "app-marketing.features.mod-management.byAuthor": {
     "message": "od {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth umožňuje snadnou správu všech modů na jednom místě. Mody můžete instalovat, odinstalovat a aktualizovat jediným kliknutím."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Nainstalované módy"
@@ -50,11 +89,32 @@
   "app-marketing.features.mod-management.version": {
     "message": "Verze"
   },
+  "app-marketing.features.offline.description": {
+    "message": "Módy můžete hrát, ať už jste připojeni k internetu, nebo ne."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Offline režim"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Spouštěč Modrinth je plně otevřený. Zdrojový kód si můžete prohlédnout na našem <github-link>GitHubu</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Otevřený zdroj"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Monitor aktivity"
+  },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
+  "app-marketing.features.performance.description": {
+    "message": "Aplikace Modrinth je výkonnější než mnoho předních správců modů a využívá pouze 150MB paměti RAM!"
+  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Dobrý výkon"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -68,8 +128,59 @@
   "app-marketing.features.performance.less-than-150mb": {
     "message": "< 150 MB"
   },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth Aplikace"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 miliarda %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Název procesu"
+  },
   "app-marketing.features.performance.ram": {
     "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Malý"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Výkon"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Pomocí aplikace Modrinth můžete stahovat a hrát své oblíbené módy a modpacky."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Hrajte se svými oblíbenými módy"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Vytvářejte, sdílejte a hrajte modpacky s některým z tisíců modů a modpacků hostovaných zde na Modrinthu."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpack"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Sdílet"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Sdílet modpacky"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Na rozdíl od jiných spouštěčů"
+  },
+  "app-marketing.features.website.description": {
+    "message": "Aplikace Modrinth je plně integrovaná s webovými stránkami, takže máte přístup ke všem svým oblíbeným projektům z aplikace!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Integrace webových stránek"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "které jste již dříve použili"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Snímek obrazovky z aplikace Modrinth se spuštěnou instancí Cobblemon na stránce \"Obsah\"."
+  },
+  "app-marketing.hero.description": {
+    "message": "Aplikace Modrinth je jedinečný open source launcher, který vám umožní přehrávat vaše oblíbené mody a udržovat je aktuální, a to vše v jednom malém úhledném balíčku."
   },
   "app-marketing.hero.download-button": {
     "message": "Stáhnout Modrinth App"
@@ -79,6 +190,9 @@
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
     "message": "Stáhnout Modrinth App pro {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Snímek obrazovky hlavní nabídky instance Cobblemon."
   },
   "app-marketing.hero.more-download-options": {
     "message": "Více možností stáhnutí"
@@ -239,6 +353,9 @@
   "auth.welcome.checkbox.subscribe": {
     "message": "Přihlásit se k odběru informací o Modrinthu"
   },
+  "auth.welcome.description": {
+    "message": "Nyní jste součástí úžasné komunity tvůrců a průzkumníků, kteří již vytvářejí, stahují a aktualizují úžasné módy."
+  },
   "auth.welcome.label.tos": {
     "message": "Vytvořením účtu souhlasíte s <terms-link>Podmínkami</terms-link> a <privacy-policy-link>Zásadami ochrany osobních údajů</privacy-policy-link> Modrinthu."
   },
@@ -301,6 +418,51 @@
   },
   "collection.title": {
     "message": "{name} - Kolekce"
+  },
+  "common.no": {
+    "message": "Ne"
+  },
+  "common.yes": {
+    "message": "Ano"
+  },
+  "create.collection.cancel": {
+    "message": "Zrušit"
+  },
+  "create.collection.collection-info": {
+    "message": "Tvá nová kolekce bude vytvořena jako veřejná a bude obsahovat {count, plural, =0 {žádné projekty} one {# projekt} few {# projekty} other {# projektů}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Vytvořit kolekci"
+  },
+  "create.collection.error-title": {
+    "message": "Došlo k chybě"
+  },
+  "create.collection.name-label": {
+    "message": "Název"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Zadejte název sbírky..."
+  },
+  "create.collection.summary-description": {
+    "message": "Věta nebo dvě, které popisují vaši sbírku."
+  },
+  "create.collection.summary-label": {
+    "message": "Souhrn"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projekty"
+  },
+  "create.limit-alert.type-project": {
+    "message": "projekt"
+  },
+  "create.organization.cancel": {
+    "message": "Zrušit"
+  },
+  "create.organization.name-label": {
+    "message": "Název"
+  },
+  "create.project.visibility-public": {
+    "message": "Veřejné"
   },
   "dashboard.collections.button.create-new": {
     "message": "Vytvořit novou"
@@ -410,6 +572,9 @@
   "frog.title": {
     "message": "Žába"
   },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "módy"
+  },
   "landing.heading.the-place-for-minecraft.plugins": {
     "message": "pluginy"
   },
@@ -418,6 +583,18 @@
   },
   "landing.launcher.modrinth-app-label": {
     "message": "Modrinth App"
+  },
+  "landing.notifications.heading": {
+    "message": "Oznámení"
+  },
+  "landing.search.label": {
+    "message": "Hledat"
+  },
+  "landing.search.placeholder": {
+    "message": "Hledat..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Seřadit podle"
   },
   "layout.action.change-theme": {
     "message": "Změnit motiv"
@@ -557,6 +734,15 @@
   "layout.nav.home": {
     "message": "Domů"
   },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projekty"
+  },
   "layout.nav.search": {
     "message": "Hledat"
   },
@@ -659,9 +845,6 @@
   "project-member-header.invitation-title": {
     "message": "Pozvánka připojit se k projektu"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "Byli jste pozváni být členem tohoto projektu s rolí '{role}'."
-  },
   "project-member-header.success": {
     "message": "Úspěch"
   },
@@ -673,6 +856,9 @@
   },
   "project-moderation-nags.required": {
     "message": "Vyžadováno"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Varování"
   },
   "project-type.collection.plural": {
     "message": "Kolekce"
@@ -740,14 +926,38 @@
   "project.about.details.updated": {
     "message": "Aktualizováno {date}"
   },
+  "project.actions.create-server": {
+    "message": "Vytvořit server"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "Vytvořit server"
+  },
   "project.description.title": {
     "message": "Popisek"
+  },
+  "project.details.licensed": {
+    "message": "Licencováno"
+  },
+  "project.download.game-version": {
+    "message": "Verze hry: {version}"
   },
   "project.gallery.title": {
     "message": "Galerie"
   },
   "project.moderation.title": {
     "message": "Moderace"
+  },
+  "project.navigation.changelog": {
+    "message": "Seznam změn"
+  },
+  "project.notification.updated.title": {
+    "message": "Projekt aktualizován"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "message": "Ověřit"
+  },
+  "project.settings.general.name.title": {
+    "message": "Název"
   },
   "project.stats.downloads-label": {
     "message": "stažení{count, plural, one {} few {} many {} other {}}"
@@ -913,5 +1123,29 @@
   },
   "scopes.organizationWrite.description": {
     "message": "Psát do organizací"
+  },
+  "scopes.projectDelete.label": {
+    "message": "Odstranit projekty"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.plan.large.name": {
+    "message": "Velký"
+  },
+  "servers.plan.medium.name": {
+    "message": "Střední"
+  },
+  "servers.plan.small.name": {
+    "message": "Malý"
+  },
+  "settings.profile.bio.title": {
+    "message": "Bio"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Profilový obrázek"
+  },
+  "settings.profile.username.title": {
+    "message": "Uživatelské jméno"
   }
 }
