@@ -6,9 +6,29 @@ export async function isDev() {
 	return await invoke('is_dev')
 }
 
+export async function areUpdatesEnabled() {
+	return await invoke('are_updates_enabled')
+}
+
+export async function getUpdateSize(updateRid) {
+	return await invoke('get_update_size', { rid: updateRid })
+}
+
+export async function enqueueUpdateForInstallation(updateRid) {
+	return await invoke('enqueue_update_for_installation', { rid: updateRid })
+}
+
+export async function removeEnqueuedUpdate() {
+	return await invoke('remove_enqueued_update')
+}
+
 // One of 'Windows', 'Linux', 'MacOS'
 export async function getOS() {
 	return await invoke('plugin:utils|get_os')
+}
+
+export async function isNetworkMetered() {
+	return await invoke('plugin:utils|is_network_metered')
 }
 
 export async function openPath(path) {
@@ -36,13 +56,6 @@ export async function highlightModInProfile(profilePath, projectPath) {
 
 export async function restartApp() {
 	return await invoke('restart_app')
-}
-
-/**
- * @deprecated This method is no longer needed, and just returns its parameter
- */
-export function sanitizePotentialFileUrl(url) {
-	return url
 }
 
 export const releaseColor = (releaseType) => {

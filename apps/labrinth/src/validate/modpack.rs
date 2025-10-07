@@ -4,7 +4,6 @@ use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,
 };
 use std::io::{Cursor, Read};
-use std::path::Component;
 use validator::Validate;
 use zip::ZipArchive;
 
@@ -72,24 +71,6 @@ impl super::Validator for ModpackValidator {
                     "All pack files must provide a SHA512 hash!".into(),
                 ));
             }
-
-            let path = std::path::Path::new(&file.path)
-                .components()
-                .next()
-                .ok_or_else(|| {
-                    ValidationError::InvalidInput(
-                        "Invalid pack file path!".into(),
-                    )
-                })?;
-
-            match path {
-                Component::CurDir | Component::Normal(_) => {}
-                _ => {
-                    return Err(ValidationError::InvalidInput(
-                        "Invalid pack file path!".into(),
-                    ));
-                }
-            };
         }
 
         Ok(ValidationResult::PassWithPackDataAndFiles {

@@ -1,0 +1,73 @@
+{
+	"fill": {
+		"linear-gradient": [
+			"display-p3:0.18127,0.41301,0.28212,1.00000",
+			"display-p3:0.09652,0.20392,0.15411,1.00000"
+		]
+	},
+	"groups": [
+		{
+			"blur-material": 0.5,
+			"layers": [
+				{
+					"blend-mode-specializations": [
+						{
+							"appearance": "tinted",
+							"value": "normal"
+						}
+					],
+					"fill-specializations": [
+						{
+							"value": {
+								"linear-gradient": [
+									"display-p3:0.49491,0.92226,0.57293,1.00000",
+									"display-p3:0.10588,0.85098,0.41569,1.00000"
+								]
+							}
+						},
+						{
+							"appearance": "tinted",
+							"value": "automatic"
+						}
+					],
+					"glass": true,
+					"image-name": "Modrinth logo.svg",
+					"name": "Modrinth logo",
+					"opacity-specializations": [
+						{
+							"appearance": "tinted",
+							"value": 1
+						}
+					],
+					"position": {
+						"scale": 4.1,
+						"translation-in-points": [0, 0]
+					}
+				}
+			],
+			"lighting": "individual",
+			"opacity-specializations": [
+				{
+					"value": 1
+				},
+				{
+					"appearance": "tinted",
+					"value": 1
+				}
+			],
+			"shadow": {
+				"kind": "neutral",
+				"opacity": 0.5
+			},
+			"specular": true,
+			"translucency": {
+				"enabled": true,
+				"value": 0.5
+			}
+		}
+	],
+	"supported-platforms": {
+		"circles": ["watchOS"],
+		"squares": "shared"
+	}
+}

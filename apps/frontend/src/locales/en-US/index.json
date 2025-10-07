@@ -419,9 +419,6 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
-  "common.close": {
-    "message": "Close"
-  },
   "common.no": {
     "message": "No"
   },
@@ -625,6 +622,12 @@
   },
   "error.generic.404.title": {
     "message": "Page not found"
+  },
+  "error.generic.451.subtitle": {
+    "message": "This page has been blocked for legal reasons, such as government censorship or ongoing legal proceedings."
+  },
+  "error.generic.451.title": {
+    "message": "Content unavailable for legal reasons"
   },
   "error.generic.default.list_item.1": {
     "message": "Check if Modrinth is down on our <status-link>Status page</status-link>."
@@ -844,9 +847,6 @@
   },
   "layout.action.change-theme": {
     "message": "Change theme"
-  },
-  "layout.action.close-banner": {
-    "message": "Close"
   },
   "layout.action.create-new": {
     "message": "Create new..."

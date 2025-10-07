@@ -561,20 +561,30 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM notifications
-                WHERE user_id = $1
+                DELETE FROM notifications_actions
+                 WHERE notification_id = ANY($1)
                 ",
-                id as DBUserId,
+                &notifications
             )
             .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
                 "
-                DELETE FROM notifications_actions
-                 WHERE notification_id = ANY($1)
+                DELETE FROM notifications_deliveries
+                WHERE notification_id = ANY($1)
                 ",
                 &notifications
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM notifications
+                WHERE user_id = $1
+                ",
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;

@@ -11,10 +11,59 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2025-09-26T13:00:00+02:00`,
+		date: `2025-10-04T17:20:00-07:00`,
+		product: 'app',
+		version: '0.10.10',
+		body: `## Improvements
+- Fixed Minecraft versions 1.12.2 and earlier failing to install.`,
+	},
+	{
+		date: `2025-10-04T09:45:00-07:00`,
+		product: 'app',
+		version: '0.10.9',
+		body: `### Security fixes
+- Fixed a couple Modrinth Pack (\`.mrpack\`) importing security vulnerabilities.`,
+	},
+	{
+		date: `2025-10-01T19:05:00-07:00`,
 		product: 'web',
 		body: `### Improvements
-- Re-enabled the creation of Organizations.`,
+- Added banner informing Russian users of our non-compliance with censorship laws that will lead to Modrinth being blocked in Russia. For more info, see [our news article on it](/news/article/standing-by-our-values).`,
+	},
+	{
+		date: `2025-09-29T12:50:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Re-enabled the creation of organizations.
+- Added limits for creating content on Modrinth
+	- Up to 256 projects
+	- Up to 16 organizations
+	- Up to 64 collections
+	- If you need more, please contact [support](https://support.modrinth.com) and explain why, and we can increase your limits.`,
+	},
+	{
+		date: `2025-09-29T12:50:00-07:00`,
+		product: 'app',
+		version: '0.10.8',
+		body: `### Improvements
+- Overhauled Modrinth App updater to make it easier to stay up-to-date.
+  - Updates will now be downloaded in the background to make a seamless updating experience.
+  - When an update is downloaded, it will prompt you to reload the app.
+  - If a metered internet connection is detected, it will ask you before downloading the update.
+- Fixed how transparency is handled on the skins page. (Contributed by [Jerozgen](https://github.com/modrinth/code/pull/4373))
+- Removed the 'Advanced' toggle in the Instance creation interface.
+- Improved version selection when installing content.
+	- Installing versions from the Discover content page will now install a version according to your filters, rather than simply the latest.
+	- Dependencies will now download with the same logic as the content being installed.
+	- Non-mod projects and dependencies will now be installed properly.
+- Fixed window dragging issues with the top bar. (Contributed by [aervxa](https://github.com/modrinth/code/pull/4218))
+- Fixed an empty servers.dat file being created when one doesn't already exist, preventing certain mods from providing defaults.
+- Fixed long creator names overflowing on project pages.
+- Strings in Markdown descriptions that look like domain names or IP addresses will no longer automatically be converted to links, such as \`README.md\`.
+- When adding friends, unknown users will now show an error.
+- Pressing 'Enter' after typing in a friend's username will now send the friend request.
+- Improved error handling from Modrinth API.
+- Fixed the white flash when the app is opened on certain systems. (Contributed by [aervxa](https://github.com/modrinth/code/pull/4177))`,
 	},
 	{
 		date: `2025-09-25T19:15:00-07:00`,

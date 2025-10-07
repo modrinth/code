@@ -6,6 +6,7 @@ export const article = {
   date: "2022-11-12T00:00:00.000Z",
   slug: "creator-monetization",
   authors: ["6plzAzU4"],
+  unlisted: false,
   thumbnail: true,
   
 };
