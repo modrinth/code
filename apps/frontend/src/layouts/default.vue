@@ -27,6 +27,61 @@
 		</div>
 	</div>
 	<div ref="main_page" class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
+		<PagewideBanner v-if="isRussia && !flags.hideRussiaCensorshipBanner" variant="error">
+			<template #title>
+				<div class="flex flex-col gap-1 text-contrast">
+					<span lang="ru">К сожалению, Modrinth скоро станет недоступен в России</span>
+					<span class="text-sm font-medium opacity-50" lang="en">
+						Modrinth will soon be unavailable in Russia
+					</span>
+				</div>
+			</template>
+			<template #description>
+				<p class="m-0" lang="ru">
+					Российское правительство потребовало от нас заблокировать некоторые проекты на Modrinth,
+					но мы решили отказать им в цензуре.
+				</p>
+				<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
+					The Russian government has asked us to censor certain topics on Modrinth and we have
+					decided to refuse to comply with their requests.
+				</p>
+
+				<p class="m-0 font-semibold" lang="ru">
+					Пожалуйста, найдите какой-нибудь надёжный VPN или прокси, чтобы не потерять доступ к
+					Modrinth.
+				</p>
+				<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
+					Please seek a reputable VPN or proxy of some kind to continue to access Modrinth in
+					Russia.
+				</p>
+			</template>
+			<template #actions>
+				<div class="mt-2 flex w-fit gap-2">
+					<ButtonStyled color="brand">
+						<nuxt-link to="/news/article/standing-by-our-values-russian">
+							<BookTextIcon /> Прочесть наше полное заявление
+							<span class="text-xs font-medium">(Перевод на русский)</span>
+						</nuxt-link>
+					</ButtonStyled>
+					<ButtonStyled>
+						<nuxt-link to="/news/article/standing-by-our-values">
+							<BookTextIcon /> Read our full statement
+							<span class="text-xs font-medium">(English)</span>
+						</nuxt-link>
+					</ButtonStyled>
+				</div>
+			</template>
+			<template #actions_right>
+				<ButtonStyled circular type="transparent">
+					<button
+						v-tooltip="formatMessage(commonMessages.closeButton)"
+						@click="hideRussiaCensorshipBanner"
+					>
+						<XIcon :aria-label="formatMessage(commonMessages.closeButton)" />
+					</button>
+				</ButtonStyled>
+			</template>
+		</PagewideBanner>
 		<PagewideBanner v-if="showTaxComplianceBanner" variant="warning">
 			<template #title>
 				<span>{{ formatMessage(taxBannerMessages.title) }}</span>
@@ -111,7 +166,7 @@
 				<Button
 					transparent
 					icon-only
-					:aria-label="formatMessage(messages.close)"
+					:aria-label="formatMessage(commonMessages.closeButton)"
 					@click="hideStagingBanner"
 				>
 					<XIcon aria-hidden="true" />
@@ -134,7 +189,8 @@
 
 		<CreatorTaxFormModal
 			ref="taxFormModalRef"
-			@success="() => navigateTo('/dashboard/revenue', { external: true })"
+			close-button-text="Close"
+			:emit-success-on-close="false"
 		/>
 		<header
 			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
@@ -788,6 +844,7 @@ import {
 	BellIcon,
 	BlueskyIcon,
 	BookmarkIcon,
+	BookTextIcon,
 	BoxIcon,
 	BracesIcon,
 	ChartIcon,
@@ -848,6 +905,8 @@ import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.v
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
+const country = useUserCountry()
+
 const { formatMessage } = useVIntl()
 
 const auth = await useAuth()
@@ -868,6 +927,7 @@ const { data: payoutBalance } = await useAsyncData('payout/balance', () =>
 )
 
 const showTaxComplianceBanner = computed(() => {
+	if (flags.value.testTaxForm && auth.value.user) return true
 	const bal = payoutBalance.value
 	if (!bal) return false
 	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
@@ -890,7 +950,6 @@ const taxBannerMessages = defineMessages({
 		id: 'layout.banner.tax.action',
 		defaultMessage: 'Complete tax form',
 	},
-	close: { id: 'common.close', defaultMessage: 'Close' },
 })
 
 const taxFormModalRef = ref(null)
@@ -1033,10 +1092,6 @@ const messages = defineMessages({
 	changeTheme: {
 		id: 'layout.action.change-theme',
 		defaultMessage: 'Change theme',
-	},
-	close: {
-		id: 'layout.action.close-banner',
-		defaultMessage: 'Close',
 	},
 	modrinthHomePage: {
 		id: 'layout.nav.modrinth-home-page',
@@ -1289,6 +1344,8 @@ const isDiscoveringSubpage = computed(
 	() => route.name && route.name.startsWith('type-id') && !route.query.sid,
 )
 
+const isRussia = computed(() => country.value === 'ru')
+
 const rCount = ref(0)
 
 const randomProjects = ref([])
@@ -1425,6 +1482,11 @@ const { cycle: changeTheme } = useTheme()
 
 function hideStagingBanner() {
 	cosmetics.value.hideStagingBanner = true
+}
+
+function hideRussiaCensorshipBanner() {
+	flags.value.hideRussiaCensorshipBanner = true
+	saveFeatureFlags()
 }
 
 const socialLinks = [

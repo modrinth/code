@@ -11,6 +11,32 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-07T09:50:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Allow users to fill out tax form when attempting a withdraw that exceeds $600/yr threshold.`,
+	},
+	{
+		date: `2025-10-04T17:20:00-07:00`,
+		product: 'app',
+		version: '0.10.10',
+		body: `## Improvements
+- Fixed Minecraft versions 1.12.2 and earlier failing to install.`,
+	},
+	{
+		date: `2025-10-04T09:45:00-07:00`,
+		product: 'app',
+		version: '0.10.9',
+		body: `### Security fixes
+- Fixed a couple Modrinth Pack (\`.mrpack\`) importing security vulnerabilities.`,
+	},
+	{
+		date: `2025-10-01T19:05:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Added banner informing Russian users of our non-compliance with censorship laws that will lead to Modrinth being blocked in Russia. For more info, see [our news article on it](/news/article/standing-by-our-values).`,
+	},
+	{
 		date: `2025-09-29T12:50:00-07:00`,
 		product: 'web',
 		body: `### Improvements

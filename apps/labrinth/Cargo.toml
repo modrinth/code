@@ -23,6 +23,10 @@ actix-web-prom = { workspace = true, features = ["process"] }
 tracing.workspace = true
 tracing-actix-web.workspace = true
 console-subscriber.workspace = true
+tracing-subscriber.workspace = true
+tracing-ecs.workspace = true
+eyre.workspace = true
+color-eyre.workspace = true
 
 tokio = { workspace = true, features = ["sync", "rt-multi-thread"] }
 tokio-stream.workspace = true
@@ -54,7 +58,7 @@ sha2.workspace = true
 hmac.workspace = true
 argon2.workspace = true
 murmur2.workspace = true
-bitflags.workspace = true
+bitflags = { workspace = true, features = ["serde"] }
 hex.workspace = true
 zxcvbn.workspace = true
 totp-rs = { workspace = true, features = ["gen_secret"] }
@@ -129,8 +133,11 @@ rusty-money.workspace = true
 json-patch.workspace = true
 
 ariadne.workspace = true
+path-util.workspace = true
 
 clap = { workspace = true, features = ["derive"] }
+
+const_format.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
 tikv-jemallocator = { workspace = true, features = [

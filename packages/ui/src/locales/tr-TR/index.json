@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "İptal"
   },
+  "button.close": {
+    "defaultMessage": "Kapat"
+  },
   "button.continue": {
     "defaultMessage": "Devam"
   },
@@ -387,13 +390,13 @@
     "defaultMessage": "mod paketi"
   },
   "project-type.plugin.capital": {
-    "defaultMessage": "Eklenti"
+    "defaultMessage": "Plugin"
   },
   "project-type.plugin.category": {
-    "defaultMessage": "Eklentiler"
+    "defaultMessage": "Pluginler"
   },
   "project-type.plugin.lowercase": {
-    "defaultMessage": "eklenti"
+    "defaultMessage": "plugin"
   },
   "project-type.resourcepack.capital": {
     "defaultMessage": "Kaynak Paketi"
@@ -405,13 +408,13 @@
     "defaultMessage": "kaynak paketi"
   },
   "project-type.shader.capital": {
-    "defaultMessage": "Gölgelendirme"
+    "defaultMessage": "Shader"
   },
   "project-type.shader.category": {
-    "defaultMessage": "Gölgelendirmeler"
+    "defaultMessage": "Shaderlar"
   },
   "project-type.shader.lowercase": {
-    "defaultMessage": "gölgelendirme"
+    "defaultMessage": "shader"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Desteklenen ortamlar"

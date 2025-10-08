@@ -19,6 +19,25 @@ pub struct AdminAffiliateCode {
     pub created_by: UserId,
     /// User who refers the purchaser.
     pub affiliate: UserId,
+    /// Affiliate-defined name for this affiliate code - where the click came
+    /// from.
+    pub source_name: String,
+}
+
+impl From<crate::database::models::affiliate_code_item::DBAffiliateCode>
+    for AdminAffiliateCode
+{
+    fn from(
+        data: crate::database::models::affiliate_code_item::DBAffiliateCode,
+    ) -> Self {
+        Self {
+            id: data.id.into(),
+            created_at: data.created_at,
+            created_by: data.created_by.into(),
+            affiliate: data.affiliate.into(),
+            source_name: data.source_name,
+        }
+    }
 }
 
 /// Affiliate code used to track referral purchases.
@@ -36,21 +55,9 @@ pub struct AffiliateCode {
     pub id: AffiliateCodeId,
     /// User who refers the purchaser.
     pub affiliate: UserId,
-}
-
-impl From<crate::database::models::affiliate_code_item::DBAffiliateCode>
-    for AdminAffiliateCode
-{
-    fn from(
-        data: crate::database::models::affiliate_code_item::DBAffiliateCode,
-    ) -> Self {
-        Self {
-            id: data.id.into(),
-            created_at: data.created_at,
-            created_by: data.created_by.into(),
-            affiliate: data.affiliate.into(),
-        }
-    }
+    /// Affiliate-defined name for this affiliate code - where the click came
+    /// from.
+    pub source_name: String,
 }
 
 impl From<crate::database::models::affiliate_code_item::DBAffiliateCode>
@@ -62,6 +69,7 @@ impl From<crate::database::models::affiliate_code_item::DBAffiliateCode>
         Self {
             id: data.id.into(),
             affiliate: data.affiliate.into(),
+            source_name: data.source_name,
         }
     }
 }

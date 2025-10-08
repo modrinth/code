@@ -64,7 +64,7 @@ impl NotificationBuilder {
                   ids.notification_id,
                   ids.user_id,
                   ids.date_available,
-                  COALESCE(SUM(pv.amount), 0.0) sum
+                  FLOOR(COALESCE(SUM(pv.amount), 0.0) * 100) :: BIGINT sum -- Convert to cents
                   FROM UNNEST($1::bigint[], $2::bigint[], $3::timestamptz[]) AS ids(notification_id, user_id, date_available)
                 LEFT JOIN payouts_values pv ON pv.user_id = ids.user_id AND pv.date_available = ids.date_available
                 GROUP BY ids.user_id, ids.notification_id, ids.date_available
@@ -81,6 +81,7 @@ impl NotificationBuilder {
                 'amount', to_jsonb(sum)
               ) body
             FROM period_payouts
+            WHERE sum > 0
             ",
             &notification_ids[..],
             &users_raw_ids[..],

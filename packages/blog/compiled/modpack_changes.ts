@@ -6,6 +6,7 @@ export const article = {
   date: "2022-05-28T00:00:00.000Z",
   slug: "modpack-changes",
   authors: ["MpxzqsyW","Dc7EYhxG"],
+  unlisted: false,
   thumbnail: true,
   
 };

@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Увімкнено режим розробника."
   },
+  "app.settings.downloading": {
+    "message": "Завантаження v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Вигляд"
   },
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Керування ресурсами"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} готова до встановлення. Перезапустіть програму, щоб встановити зараз, чи вона оновиться автоматично після закриття."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Завантаження Modrinth App v{version} завершене. Перезапустіть програму щоб оновити зараз, чи вона оновиться автоматично після закриття."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} вже доступна до завантаження! Оскільки ви на лімітному підключенні, ми не завантажили його автоматично."
+  },
+  "app.update-toast.changelog": {
+    "message": "Список змін"
+  },
+  "app.update-toast.download": {
+    "message": "Завантажити ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Завантаження…"
+  },
+  "app.update-toast.reload": {
+    "message": "Перезапустити"
+  },
+  "app.update-toast.title": {
+    "message": "Оновлення доступне"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Завантаження завершено"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Натисніть тут, щоб побачити список змін."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Версію {version} успішно встановлено!"
+  },
+  "app.update.download-update": {
+    "message": "Завантажити оновлення"
+  },
+  "app.update.downloading-update": {
+    "message": "Завантаження оновлення ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Перезавантажте, щоб установити оновлення"
   },
   "instance.add-server.add-and-play": {
     "message": "Додати та грати"
@@ -87,7 +132,7 @@
     "message": "Назавжди видаляє профіль з вашого пристрою, включно з вашими світами, налаштуваннями та всім встановленим контентом.\nБудьте обережні, після видалення, відновити профіль буде неможливо."
   },
   "instance.settings.tabs.general.deleting.button": {
-    "message": "Видалення..."
+    "message": "Видалення…"
   },
   "instance.settings.tabs.general.duplicate-button": {
     "message": "Клонувати"
@@ -189,7 +234,7 @@
     "message": "Отримання версій збірки"
   },
   "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Встановлення нової версії"
+    "message": "Установлення нової версії"
   },
   "instance.settings.tabs.installation.currently-installed": {
     "message": "Наразі встановлено"

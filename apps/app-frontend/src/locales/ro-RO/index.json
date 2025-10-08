@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Modul dezvoltator activat."
   },
+  "app.settings.downloading": {
+    "message": "Se descarcă v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Aspect"
   },
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Administrare resurse"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} este gata de instalare! Reîncarcă pentru a actualiza acum, sau automat când închizi Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} a terminat descărcarea. Reîncarcă pentru a actualiza acum, sau automat când închizi Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} este disponibilă acum! Deoarece ești pe o rețea cu trafic limitat, nu am descărcat-o automat."
+  },
+  "app.update-toast.changelog": {
+    "message": "Istoric modificări"
+  },
+  "app.update-toast.download": {
+    "message": "Descarcă ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Se descarcă..."
+  },
+  "app.update-toast.reload": {
+    "message": "Reîncarcă"
+  },
+  "app.update-toast.title": {
+    "message": "Actualizare disponibilă"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Descărcare completă"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Apasă aici pentru a vedea istoricul de modificări."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versiunea {version} a fost instalată cu succes!"
+  },
+  "app.update.download-update": {
+    "message": "Descarcă actualizarea"
+  },
+  "app.update.downloading-update": {
+    "message": "Se descarcă actualizarea ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Reîncarcă pentru a instala actualizarea"
   },
   "instance.add-server.add-and-play": {
     "message": "Adaugă și joacă"

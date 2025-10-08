@@ -7,7 +7,8 @@ const TEMPLATES_NAMESPACE: &str = "notifications_templates";
 const TEMPLATES_HTML_DATA_NAMESPACE: &str = "notifications_templates_html_data";
 const HTML_DATA_CACHE_EXPIRY: i64 = 60 * 15; // 15 minutes
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+
 pub struct NotificationTemplate {
     pub id: i64,
     pub channel: NotificationChannel,

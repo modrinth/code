@@ -89,7 +89,7 @@ impl TryFrom<ChargeQueryResult> for DBCharge {
 }
 
 macro_rules! select_charges_with_predicate {
-    ($predicate:tt, $param:ident) => {
+    ($predicate:tt $(, $( $param0:expr $(, $param:expr)* $(,)? )?)?) => {
         sqlx::query_as!(
             ChargeQueryResult,
             r#"
@@ -107,7 +107,7 @@ macro_rules! select_charges_with_predicate {
             FROM charges
             "#
                 + $predicate,
-            $param
+            $( $( $param0, $( $param ),* )? )?
         )
     };
 }
@@ -260,13 +260,15 @@ impl DBCharge {
         let charge_type = ChargeType::Subscription.as_str();
         let res = select_charges_with_predicate!(
             r#"
+            INNER JOIN users_subscriptions us ON us.id = charges.subscription_id
             WHERE
-                charge_type = $1 AND
+                charges.charge_type = $1 AND
                 (
-                    (status = 'cancelled' AND due < NOW()) OR
-                    (status = 'expiring' AND due < NOW()) OR
-                    (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')
+                    (charges.status = 'cancelled' AND charges.due < NOW()) OR
+                    (charges.status = 'expiring' AND charges.due < NOW()) OR
+                    (charges.status = 'failed' AND charges.last_attempt < NOW() - INTERVAL '2 days')
                 )
+                AND us.status = 'provisioned'
             "#,
             charge_type
         )
@@ -321,6 +323,7 @@ impl DBCharge {
 			  AND COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) < NOW() - INTERVAL '1 day'
 			  AND u.email IS NOT NULL
 			  AND due - INTERVAL '7 days' > NOW()
+              AND due - INTERVAL '14 days' < NOW() -- Due between 7 and 14 days from now
 			ORDER BY COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) ASC
 			FOR NO KEY UPDATE SKIP LOCKED
 			LIMIT $1
@@ -341,6 +344,7 @@ impl DBCharge {
     /// Charges are locked.
     pub async fn get_missing_tax_identifier_lock(
         exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+        offset: i64,
         limit: i64,
     ) -> Result<Vec<DBCharge>, DatabaseError> {
         let res = select_charges_with_predicate!(
@@ -348,10 +352,13 @@ impl DBCharge {
 			WHERE
 			  status = 'succeeded'
 			  AND tax_platform_id IS NULL
+              AND payment_platform_id IS NOT NULL
 			ORDER BY due ASC
 			FOR NO KEY UPDATE SKIP LOCKED
-			LIMIT $1
+            OFFSET $1
+			LIMIT $2
 			",
+            offset,
             limit
         )
         .fetch_all(exec)

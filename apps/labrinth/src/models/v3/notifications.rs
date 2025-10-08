@@ -27,7 +27,7 @@ pub struct Notification {
     pub actions: Vec<NotificationAction>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationType {
     // If adding a notification type, add a variant in `NotificationBody` of the same name!
@@ -114,6 +114,17 @@ impl NotificationType {
             "email_changed" => NotificationType::EmailChanged,
             "payment_failed" => NotificationType::PaymentFailed,
             "tax_notification" => NotificationType::TaxNotification,
+            "payout_available" => NotificationType::PayoutAvailable,
+            "moderation_message_received" => {
+                NotificationType::ModerationMessageReceived
+            }
+            "report_status_updated" => NotificationType::ReportStatusUpdated,
+            "report_submitted" => NotificationType::ReportSubmitted,
+            "project_status_approved" => {
+                NotificationType::ProjectStatusApproved
+            }
+            "project_status_neutral" => NotificationType::ProjectStatusNeutral,
+            "project_transferred" => NotificationType::ProjectTransferred,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -223,7 +234,7 @@ pub enum NotificationBody {
     },
     PayoutAvailable {
         date_available: DateTime<Utc>,
-        amount: f64,
+        amount: u64,
     },
     Unknown,
 }

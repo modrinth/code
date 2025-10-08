@@ -6,6 +6,7 @@ export const article = {
   date: "2025-09-08T21:45:00.000Z",
   slug: "modrinth-servers-asia",
   authors: ["AJfd8YH6","Dc7EYhxG"],
+  unlisted: false,
   thumbnail: true,
   
 };
