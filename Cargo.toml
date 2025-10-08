@@ -43,7 +43,7 @@ typed-path = "0.12.0"
 censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.42"
-cidre = { version = "0.11.2", default-features = false, features = ["macos_15_0"] }
+cidre = { version = "0.11.3", default-features = false, features = ["macos_15_0"] }
 clap = "4.5.43"
 clickhouse = "0.13.3"
 color-thief = "0.2.2"
