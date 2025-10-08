@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Your collections"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Download {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Your {formType} tax form has been submitted successfully!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "You can freely withdraw now. If you have questions or need to update your details <support-link>contact support</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "You're all set! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "A foreign entity means a business entity organized outside the United States (such as a non-US corporation, partnership, or LLC)."
   },

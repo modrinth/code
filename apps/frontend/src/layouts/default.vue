@@ -189,7 +189,8 @@
 
 		<CreatorTaxFormModal
 			ref="taxFormModalRef"
-			@success="() => navigateTo('/dashboard/revenue', { external: true })"
+			close-button-text="Close"
+			:emit-success-on-close="false"
 		/>
 		<header
 			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
@@ -911,6 +912,7 @@ const { data: payoutBalance } = await useAsyncData('payout/balance', () =>
 )
 
 const showTaxComplianceBanner = computed(() => {
+	if (flags.value.testTaxForm && auth.value.user) return true
 	const bal = payoutBalance.value
 	if (!bal) return false
 	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
