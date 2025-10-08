@@ -1,14 +1,17 @@
 #![doc = include_str!("../README.md")]
 
 mod account;
+mod error;
 mod organization;
 mod payout;
-use std::ops::Deref;
+mod util;
 
-pub use {account::*, organization::*, payout::*};
+pub use {account::*, error::*, organization::*, payout::*};
 
+use rust_decimal::Decimal;
 use secrecy::SecretString;
 use serde::{Deserialize, Serialize};
+use std::ops::Deref;
 use uuid::Uuid;
 
 pub const API_URL: &str = "https://api.muralpay.com";
@@ -19,23 +22,23 @@ pub struct MuralPay {
     pub http: reqwest::Client,
     pub api_url: String,
     pub api_key: SecretString,
+    pub transfer_api_key: Option<SecretString>,
 }
 
 impl MuralPay {
     pub fn new(
         api_url: impl Into<String>,
         api_key: impl Into<SecretString>,
+        transfer_api_key: Option<impl Into<SecretString>>,
     ) -> Self {
         Self {
             http: reqwest::Client::new(),
             api_url: api_url.into(),
             api_key: api_key.into(),
+            transfer_api_key: transfer_api_key.map(Into::into),
         }
     }
 }
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DateTime(pub String);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -91,14 +94,14 @@ pub struct WalletDetails {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TokenAmount {
-    pub token_amount: u64,
+    pub token_amount: Decimal,
     pub token_symbol: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FiatAmount {
-    pub fiat_amount: u64,
+    pub fiat_amount: Decimal,
     pub fiat_currency_code: CurrencyCode,
 }
 

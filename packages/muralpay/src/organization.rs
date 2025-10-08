@@ -1,22 +1,29 @@
+use std::str::FromStr;
+
+use chrono::{DateTime, Utc};
 use derive_more::{Deref, Display};
 use secrecy::ExposeSecret;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{CurrencyCode, DateTime, MuralPay, SearchResponse};
+use crate::{
+    CurrencyCode, MuralError, MuralPay, SearchResponse, util::RequestExt,
+};
 
 impl MuralPay {
     pub async fn search_organizations(
         &self,
         req: SearchRequest,
-    ) -> reqwest::Result<SearchResponse<OrganizationId, Organization>> {
+    ) -> Result<SearchResponse<OrganizationId, Organization>, MuralError> {
         #[derive(Debug, Serialize)]
+        #[serde(rename_all = "camelCase")]
         struct Body {
             #[serde(skip_serializing_if = "Option::is_none")]
             filter: Option<Filter>,
         }
 
         #[derive(Debug, Serialize)]
+        #[serde(rename_all = "camelCase")]
         struct Filter {
             #[serde(rename = "type")]
             ty: FilterType,
@@ -45,29 +52,20 @@ impl MuralPay {
             }),
         };
 
-        self.http
-            .post(format!("{}/api/organizations/search", self.api_url))
+        self.http_post(|base| format!("{base}/api/organizations/search"))
             .bearer_auth(self.api_key.expose_secret())
             .query(&query)
             .json(&body)
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
+            .send_mural()
             .await
     }
 
     pub async fn get_organization(
         &self,
         id: OrganizationId,
-    ) -> reqwest::Result<Organization> {
-        self.http
-            .post(format!("{}/api/organizations/{id}", self.api_url))
-            .bearer_auth(self.api_key.expose_secret())
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
+    ) -> Result<Organization, MuralError> {
+        self.http_post(|base| format!("{base}/api/organizations/{id}"))
+            .send_mural()
             .await
     }
 }
@@ -86,6 +84,14 @@ impl MuralPay {
 )]
 #[display("{}", _0.hyphenated())]
 pub struct OrganizationId(pub Uuid);
+
+impl FromStr for OrganizationId {
+    type Err = <Uuid as FromStr>::Err;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        s.parse::<Uuid>().map(Self)
+    }
+}
 
 #[derive(Debug, Clone, Default)]
 pub struct SearchRequest {
@@ -107,8 +113,8 @@ pub enum Organization {
 #[serde(rename_all = "camelCase")]
 pub struct Individual {
     pub id: OrganizationId,
-    pub created_at: DateTime,
-    pub updated_at: DateTime,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     pub first_name: String,
     pub last_name: String,
     pub tos_status: TosStatus,
@@ -120,8 +126,8 @@ pub struct Individual {
 #[serde(rename_all = "camelCase")]
 pub struct Business {
     pub id: OrganizationId,
-    pub created_at: DateTime,
-    pub updated_at: DateTime,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     pub name: String,
     pub tos_status: TosStatus,
     pub kyc_status: KycStatus,
@@ -132,8 +138,8 @@ pub struct Business {
 #[serde(rename_all = "camelCase")]
 pub struct EndUserCustodialIndividual {
     pub id: OrganizationId,
-    pub created_at: DateTime,
-    pub updated_at: DateTime,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     pub first_name: String,
     pub last_name: String,
     pub approver: Approver,
@@ -146,8 +152,8 @@ pub struct EndUserCustodialIndividual {
 #[serde(rename_all = "camelCase")]
 pub struct EndUserCustodialBusiness {
     pub id: OrganizationId,
-    pub created_at: DateTime,
-    pub updated_at: DateTime,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     pub name: String,
     pub approver: Approver,
     pub tos_status: TosStatus,
@@ -159,7 +165,7 @@ pub struct EndUserCustodialBusiness {
 #[serde(rename_all = "camelCase")]
 pub struct Approver {
     pub id: Uuid,
-    pub created_at: DateTime,
+    pub created_at: DateTime<Utc>,
     pub name: String,
     pub email: String,
     pub auth_methods: Vec<String>,
@@ -179,23 +185,23 @@ pub enum KycStatus {
     Inactive,
     Pending,
     Approved {
-        approved_at: DateTime,
+        approved_at: DateTime<Utc>,
     },
     Errored {
         details: String,
-        errored_at: DateTime,
+        errored_at: DateTime<Utc>,
     },
     Rejected {
         reason: String,
-        rejected_at: DateTime,
+        rejected_at: DateTime<Utc>,
     },
     PreValidationFailed {
         failed_validation_reason: FailedValidationReason,
-        failed_validation_at: DateTime,
+        failed_validation_at: DateTime<Utc>,
     },
     NeedsUpdate {
         needs_update_reason: String,
-        verification_status_updated_at: DateTime,
+        verification_status_updated_at: DateTime<Utc>,
     },
 }
 

@@ -133,6 +133,7 @@ sentry = { version = "0.42.0", default-features = false, features = [
 	"reqwest",
 	"rustls",
 ] }
+foldhash = "0.2.0"
 sentry-actix = "0.42.0"
 const_format = "0.2.34"
 serde = "1.0.219"

@@ -1,14 +1,16 @@
 use std::str::FromStr;
 
+use chrono::{DateTime, Utc};
 use derive_more::{Deref, Display, Error};
-use secrecy::ExposeSecret;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use serde_with::serde_as;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use uuid::Uuid;
 
 use crate::{
-    AccountId, Blockchain, DateTime, FiatAmount, FiatAndRailCode, MuralPay,
-    SearchParams, SearchResponse, TokenAmount, WalletDetails,
+    AccountId, Blockchain, FiatAmount, FiatAndRailCode, MuralError, MuralPay,
+    SearchParams, SearchResponse, TokenAmount, TransferError, WalletDetails,
+    util::RequestExt,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -22,37 +24,29 @@ impl MuralPay {
         &self,
         filter: Option<PayoutStatusFilter>,
         params: Option<SearchParams<PayoutRequestId>>,
-    ) -> reqwest::Result<SearchResponse<PayoutRequestId, PayoutRequest>> {
+    ) -> Result<SearchResponse<PayoutRequestId, PayoutRequest>, MuralError>
+    {
         #[derive(Debug, Serialize)]
+        #[serde(rename_all = "camelCase")]
         struct Body {
             filter: Option<PayoutStatusFilter>,
         }
 
         let body = Body { filter };
 
-        self.http
-            .post(format!("{}/api/payouts/search", self.api_url))
-            .bearer_auth(self.api_key.expose_secret())
+        self.http_post(|base| format!("{base}/api/payouts/search"))
             .query(&params.map(|p| p.to_query()).unwrap_or_default())
             .json(&body)
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
+            .send_mural()
             .await
     }
 
     pub async fn get_payout_request(
         &self,
         id: PayoutRequestId,
-    ) -> reqwest::Result<PayoutRequest> {
-        self.http
-            .get(format!("{}/api/payouts/payout/{id}", self.api_url))
-            .bearer_auth(self.api_key.expose_secret())
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
+    ) -> Result<PayoutRequest, MuralError> {
+        self.http_get(|base| format!("{base}/api/payouts/{id}"))
+            .send_mural()
             .await
     }
 
@@ -60,8 +54,50 @@ impl MuralPay {
         &self,
         source_account_id: AccountId,
         memo: Option<impl AsRef<str>>,
-        payouts: impl IntoIterator<Item = CreatePayout>,
-    ) -> reqwest::Result<PayoutRequest> {
+        payouts: &[CreatePayout],
+    ) -> Result<PayoutRequest, MuralError> {
+        #[derive(Debug, Serialize)]
+        #[serde(rename_all = "camelCase")]
+        struct Body<'a> {
+            source_account_id: AccountId,
+            memo: Option<&'a str>,
+            payouts: &'a [CreatePayout],
+        }
+
+        let body = Body {
+            source_account_id,
+            memo: memo.as_ref().map(|x| x.as_ref()),
+            payouts,
+        };
+
+        println!("{}", serde_json::to_string_pretty(&body).unwrap());
+
+        self.http_post(|base| format!("{base}/api/payouts/payout"))
+            .json(&body)
+            .send_mural()
+            .await
+    }
+
+    pub async fn execute_payout_request(
+        &self,
+        id: PayoutRequestId,
+    ) -> Result<PayoutRequest, TransferError> {
+        self.http_post(|base| format!("{base}/api/payouts/payout/{id}/execute"))
+            .transfer_auth(self)?
+            .send_mural()
+            .await
+            .map_err(From::from)
+    }
+
+    pub async fn cancel_payout_request(
+        &self,
+        id: PayoutRequestId,
+    ) -> Result<PayoutRequest, TransferError> {
+        self.http_post(|base| format!("{base}/api/payouts/payout/{id}/cancel"))
+            .transfer_auth(self)?
+            .send_mural()
+            .await
+            .map_err(From::from)
     }
 }
 
@@ -80,6 +116,14 @@ impl MuralPay {
 #[display("{}", _0.hyphenated())]
 pub struct PayoutRequestId(pub Uuid);
 
+impl FromStr for PayoutRequestId {
+    type Err = <Uuid as FromStr>::Err;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        s.parse::<Uuid>().map(Self)
+    }
+}
+
 #[derive(
     Debug,
     Display,
@@ -95,12 +139,20 @@ pub struct PayoutRequestId(pub Uuid);
 #[display("{}", _0.hyphenated())]
 pub struct PayoutId(pub Uuid);
 
+impl FromStr for PayoutId {
+    type Err = <Uuid as FromStr>::Err;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        s.parse::<Uuid>().map(Self)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PayoutRequest {
     pub id: PayoutRequestId,
-    pub created_at: DateTime,
-    pub updated_at: DateTime,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     pub source_account_id: AccountId,
     pub transaction_hash: Option<String>,
     pub memo: Option<String>,
@@ -122,8 +174,8 @@ pub enum PayoutStatus {
 #[serde(rename_all = "camelCase")]
 pub struct Payout {
     pub id: PayoutId,
-    pub created_at: DateTime,
-    pub updated_at: DateTime,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     pub amount: PayoutAmount,
     pub details: PayoutDetails,
 }
@@ -149,32 +201,32 @@ pub struct FiatPayoutDetails {
     pub fiat_payout_status: FiatPayoutStatus,
     pub fiat_amount: FiatAmount,
     pub transaction_fee: TokenAmount,
-    pub exchange_fee_percentage: f64,
-    pub exchange_rate: f64,
+    pub exchange_fee_percentage: Decimal,
+    pub exchange_rate: Decimal,
     pub fee_total: TokenAmount,
     pub developer_fee: Option<DeveloperFee>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+#[serde(tag = "type", rename_all = "kebab-case")]
 pub enum FiatPayoutStatus {
     Created,
     #[serde(rename_all = "camelCase")]
     Pending {
-        initiated_at: DateTime,
+        initiated_at: DateTime<Utc>,
     },
     #[serde(rename_all = "camelCase")]
     OnHold {
-        initiated_at: DateTime,
+        initiated_at: DateTime<Utc>,
     },
     #[serde(rename_all = "camelCase")]
     Completed {
-        initiated_at: DateTime,
-        completed_at: DateTime,
+        initiated_at: DateTime<Utc>,
+        completed_at: DateTime<Utc>,
     },
     #[serde(rename_all = "camelCase")]
     Failed {
-        initiated_at: DateTime,
+        initiated_at: DateTime<Utc>,
         reason: String,
         error_code: FiatPayoutErrorCode,
     },
@@ -195,7 +247,7 @@ pub enum FiatPayoutErrorCode {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeveloperFee {
-    pub developer_fee_percentage: Option<f64>,
+    pub developer_fee_percentage: Option<Decimal>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -220,23 +272,23 @@ pub enum BlockchainPayoutStatus {
 #[serde(rename_all = "camelCase")]
 pub struct CreatePayout {
     pub amount: TokenAmount,
-    pub payout_details: PayoutCreate,
+    pub payout_details: CreatePayoutDetails,
     pub recipient_info: PayoutRecipientInfo,
     pub supporting_details: Option<SupportingDetails>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
-pub enum PayoutCreate {
+pub enum CreatePayoutDetails {
+    #[serde(rename_all = "camelCase")]
     Fiat {
         bank_name: String,
         bank_account_owner: String,
         developer_fee: Option<DeveloperFee>,
         fiat_and_rail_details: FiatAndRailDetails,
     },
-    Blockchain {
-        wallet_details: WalletDetails,
-    },
+    #[serde(rename_all = "camelCase")]
+    Blockchain { wallet_details: WalletDetails },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -437,18 +489,26 @@ pub enum PixAccountType {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(tag = "type", rename_all = "camelCase")]
 pub enum PayoutRecipientInfo {
+    #[serde(rename_all = "camelCase")]
     Individual {
         first_name: String,
         last_name: String,
         email: String,
         date_of_birth: Dob,
+        physical_address: PhysicalAddress,
+    },
+    #[serde(rename_all = "camelCase")]
+    Business {
+        name: String,
+        email: String,
+        physical_address: PhysicalAddress,
     },
 }
 
-#[derive(Debug, Display, Clone, Copy)]
-#[display("{year}-{month}-{day}")]
+#[derive(Debug, Display, Clone, Copy, SerializeDisplay, DeserializeFromStr)]
+#[display("{year:04}-{month:02}-{day:02}")]
 pub struct Dob {
     year: u16,
     month: u8,
@@ -465,6 +525,8 @@ pub enum InvalidDob {
     MonthNotInt,
     #[display("day is not an integer")]
     DayNotInt,
+    #[display("year out of range")]
+    YearRange,
     #[display("month out of range")]
     MonthRange,
     #[display("day out of range")]
@@ -473,6 +535,9 @@ pub enum InvalidDob {
 
 impl Dob {
     pub fn new(year: u16, month: u8, day: u8) -> Result<Self, InvalidDob> {
+        if !(1000..10000).contains(&year) {
+            return Err(InvalidDob::YearRange);
+        }
         if month > 12 {
             return Err(InvalidDob::MonthRange);
         }
@@ -497,4 +562,42 @@ impl FromStr for Dob {
         let day = day.parse::<u8>().map_err(|_| InvalidDob::DayNotInt)?;
         Self::new(year, month, day)
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PhysicalAddress {
+    pub address1: String,
+    pub address2: Option<String>,
+    pub country: String,
+    pub state: String,
+    pub city: String,
+    pub zip: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SupportingDetails {
+    pub supporting_document: Option<String>, // data:image/jpeg;base64,...
+    pub payout_purpose: Option<PayoutPurpose>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum PayoutPurpose {
+    VendorPayment,
+    Payroll,
+    TaxPayment,
+    RentLeasePayment,
+    SupplierPayment,
+    PersonalGift,
+    FamilySupport,
+    CharitableDonation,
+    ExpenseReimbursement,
+    BillUtilityPayment,
+    TravelExpenses,
+    InvestmentContribution,
+    CashWithdrawal,
+    RealEstatePurchase,
+    Other,
 }
