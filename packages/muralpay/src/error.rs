@@ -33,7 +33,7 @@ pub enum TransferError {
     #[display("no transfer API key")]
     NoTransferKey,
     #[display("API error")]
-    Api(ApiError),
+    Api(Box<ApiError>),
     #[display("request error")]
     Request(reqwest::Error),
     #[display("failed to decode response\n{json:?}")]
@@ -53,7 +53,7 @@ pub enum TransferError {
 impl From<MuralError> for TransferError {
     fn from(value: MuralError) -> Self {
         match value {
-            MuralError::Api(x) => Self::Api(x),
+            MuralError::Api(x) => Self::Api(Box::new(x)),
             MuralError::Request(x) => Self::Request(x),
             MuralError::Decode { source, json } => {
                 Self::Decode { source, json }
