@@ -163,7 +163,15 @@ pub async fn build_email(
             fill_template(&template.subject_line, &variables)
         }
 
-        Either::Right(_) => template.subject_line.clone(),
+        Either::Right(_) => {
+            if let NotificationBody::Custom { title, .. } = body {
+                title.clone()
+            } else {
+                return Err(ApiError::Internal(eyre::eyre!(
+                    "Couldn't determine a subject line for the email: collect_variables did not return variables and the subject line isn't embedded in the notification body"
+                )));
+            }
+        }
     };
 
     message_builder = message_builder.to(to).subject(subject);
