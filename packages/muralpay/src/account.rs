@@ -1,32 +1,30 @@
+use std::str::FromStr;
+
+use chrono::{DateTime, Utc};
 use derive_more::{Deref, Display};
+use rust_decimal::Decimal;
 use secrecy::ExposeSecret;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    Blockchain, DateTime, FiatAmount, MuralPay, TokenAmount, WalletDetails,
+    Blockchain, FiatAmount, MuralError, MuralPay, TokenAmount, WalletDetails,
+    util::RequestExt,
 };
 
 impl MuralPay {
-    pub async fn get_all_accounts(&self) -> reqwest::Result<Vec<Account>> {
-        self.http
-            .get(format!("{}/api/accounts", self.api_url))
-            .bearer_auth(self.api_key.expose_secret())
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
+    pub async fn get_all_accounts(&self) -> Result<Vec<Account>, MuralError> {
+        self.http_get(|base| format!("{base}/api/accounts"))
+            .send_mural()
             .await
     }
 
-    pub async fn get_account(&self, id: AccountId) -> reqwest::Result<Account> {
-        self.http
-            .get(format!("{}/api/accounts/{id}", self.api_url))
-            .bearer_auth(self.api_key.expose_secret())
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
+    pub async fn get_account(
+        &self,
+        id: AccountId,
+    ) -> Result<Account, MuralError> {
+        self.http_get(|base| format!("{base}/api/accounts/{id}"))
+            .send_mural()
             .await
     }
 
@@ -34,8 +32,9 @@ impl MuralPay {
         &self,
         name: impl AsRef<str>,
         description: Option<impl AsRef<str>>,
-    ) -> reqwest::Result<Account> {
+    ) -> Result<Account, MuralError> {
         #[derive(Debug, Serialize)]
+        #[serde(rename_all = "camelCase")]
         struct Body<'a> {
             name: &'a str,
             description: Option<&'a str>,
@@ -50,10 +49,7 @@ impl MuralPay {
             .post(format!("{}/api/accounts", self.api_url))
             .bearer_auth(self.api_key.expose_secret())
             .json(&body)
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
+            .send_mural()
             .await
     }
 }
@@ -73,14 +69,22 @@ impl MuralPay {
 #[display("{}", _0.hyphenated())]
 pub struct AccountId(pub Uuid);
 
+impl FromStr for AccountId {
+    type Err = <Uuid as FromStr>::Err;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        s.parse::<Uuid>().map(Self)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Account {
     pub id: AccountId,
     pub name: String,
     pub description: Option<String>,
-    pub created_at: DateTime,
-    pub updated_at: DateTime,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     pub is_api_enabled: bool,
     pub status: AccountStatus,
     pub account_details: Option<AccountDetails>,
@@ -127,9 +131,9 @@ pub struct DestinationToken {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Fees {
-    pub variable_fee_percentage: f64,
+    pub variable_fee_percentage: Decimal,
     pub fixed_transaction_fee: Option<FiatAmount>,
-    pub developer_fee_percentage: Option<f64>,
+    pub developer_fee_percentage: Option<Decimal>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
