@@ -1,43 +1,40 @@
 [package]
-authors = ["Jai A <jai@modrinth.com>"]
-name    = "daedalus_client"
+name = "daedalus_client"
 version = "0.2.2"
-
 edition.workspace = true
+
+[dependencies]
+async_zip = { workspace = true, features = [
+  "bzip2",
+  "chrono",
+  "deflate",
+  "deflate64",
+  "tokio-fs",
+  "zstd",
+] }
+bytes = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+daedalus = { workspace = true }
+dashmap = { workspace = true }
+dotenvy = { workspace = true }
+futures = { workspace = true }
+indexmap = { workspace = true, features = ["serde"] }
+itertools = { workspace = true }
+reqwest = { workspace = true, features = [
+  "json",
+  "rustls-tls-native-roots",
+  "stream",
+] }
+rust-s3 = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde-xml-rs = { workspace = true }
+sha1_smol = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync"] }
+tracing = { workspace = true }
+tracing-error = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
 
 [lints]
 workspace = true
-
-[dependencies]
-bytes              = { workspace = true }
-chrono             = { workspace = true, features = ["serde"] }
-daedalus           = { workspace = true }
-dashmap            = { workspace = true }
-dotenvy            = { workspace = true }
-futures            = { workspace = true }
-indexmap           = { workspace = true, features = ["serde"] }
-itertools          = { workspace = true }
-rust-s3            = { workspace = true }
-serde              = { workspace = true, features = ["derive"] }
-serde-xml-rs       = { workspace = true }
-serde_json         = { workspace = true }
-sha1_smol          = { workspace = true }
-thiserror          = { workspace = true }
-tokio              = { workspace = true, features = ["sync", "macros", "rt-multi-thread"] }
-tracing            = { workspace = true }
-tracing-error      = { workspace = true }
-tracing-subscriber = { workspace = true, features = ["env-filter"] }
-
-async_zip = { workspace = true, features = [
-  "chrono",
-  "tokio-fs",
-  "deflate",
-  "bzip2",
-  "zstd",
-  "deflate64",
-] }
-reqwest = { workspace = true, features = [
-  "stream",
-  "json",
-  "rustls-tls-native-roots",
-] }
