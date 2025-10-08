@@ -273,6 +273,30 @@
 			</div>
 			<div v-if="isEditing && project.project_type !== 'modpack'" class="add-dependency">
 				<h4>Add dependency</h4>
+				<div class="dependency-filters">
+					<Multiselect
+						v-model="dependencyFilterType"
+						class="filter-select"
+						:options="['all', 'mod', 'plugin', 'resourcepack', 'datapack', 'shader']"
+						:custom-label="(value) => value === 'all' ? 'All Types' : value.charAt(0).toUpperCase() + value.slice(1)"
+						:searchable="false"
+						:close-on-select="true"
+						:show-labels="false"
+						:allow-empty="false"
+						@update:model-value="onFilterChange"
+					/>
+					<Multiselect
+						v-model="dependencyFilterCompatibility"
+						class="filter-select"
+						:options="['all', 'compatible', 'unknown', 'incompatible']"
+						:custom-label="(value) => value === 'all' ? 'All Compatibility' : value.charAt(0).toUpperCase() + value.slice(1)"
+						:searchable="false"
+						:close-on-select="true"
+						:show-labels="false"
+						:allow-empty="false"
+						@update:model-value="onFilterChange"
+					/>
+				</div>
 				<div class="input-group">
 					<Multiselect
 						v-model="dependencyAddMode"
@@ -284,12 +308,80 @@
 						:show-labels="false"
 						:allow-empty="false"
 					/>
+					<Multiselect
+						v-if="dependencyAddMode === 'project'"
+						v-model="selectedProject"
+						class="input dependency-search-select"
+						:options="projectSearchResults"
+						:custom-label="(project) => project?.title || ''"
+						track-by="project_id"
+						:searchable="true"
+						:internal-search="false"
+						:loading="isSearchingProjects"
+						:close-on-select="true"
+						:show-labels="false"
+						:placeholder="'Search for a project...'"
+						@search-change="searchProjects"
+						@select="onProjectSelect"
+					>
+						<template #option="{ option }">
+						<div class="dependency-search-option">
+							<Avatar :src="option.icon_url" alt="Project icon" size="sm" />
+							<div class="dependency-search-info">
+								<div class="dependency-search-title-row">
+									<span class="dependency-search-title">{{ option.title }}</span>
+									<span v-if="option.__matchScore" class="dependency-search-score" :title="'Relevance: ' + option.__matchScore.toFixed(2)">
+										{{ Math.min(100, Math.round(option.__matchScore)).toFixed(0) }}%
+									</span>
+								</div>
+								<span class="dependency-search-meta">
+									by {{ option.author }} • {{ formatNumber(option.downloads) }} downloads
+								</span>
+								<div class="dependency-search-badges">
+									<Badge
+										v-if="computeCompatibility(option).status === 'compatible'"
+										color="green"
+										type="compatibility"
+										:title="'Compatible with your project - Good match for loaders and game versions (Score: ' + computeCompatibility(option).score + '%)'">
+										✓ Compatible
+									</Badge>
+									<Badge
+										v-else-if="computeCompatibility(option).status === 'incompatible'"
+										color="red"
+										type="compatibility"
+										:title="'Incompatible - May not work with your project type, loaders, or game versions'">
+										✗ Incompatible
+									</Badge>
+									<Badge
+										v-else
+										color="gray"
+										type="compatibility"
+										:title="'Unknown compatibility - Limited version/loader overlap (Score: ' + computeCompatibility(option).score + '%)'">
+										? Unknown
+									</Badge>
+									<Badge
+										v-if="option.hasDependencies"
+										color="blue"
+										type="info"
+										:title="'This project requires ' + (option.dependencyCount || 0) + ' other project(s) to work. Use \'Add with dependencies\' to install them automatically.'">
+										{{ (option.dependencyCount || 0) + ' ' + (option.dependencyCount === 1 ? 'dependency' : 'dependencies') }}
+									</Badge>
+								</div>
+						</div>
+						</div>
+					</template>
+					<template #noResult>
+						<span>No projects found</span>
+					</template>
+					<template #noOptions>
+						<span>Start typing to search...</span>
+						</template>
+					</Multiselect>
 					<input
+						v-else
 						v-model="newDependencyId"
 						type="text"
-						:placeholder="`Enter the ${dependencyAddMode} ID${
-							dependencyAddMode === 'project' ? '/slug' : ''
-						}`"
+						:placeholder="`Enter the ${dependencyAddMode} ID`"
 						@keyup.enter="addDependency(dependencyAddMode, newDependencyId, newDependencyType)"
 					/>
 					<Multiselect
@@ -310,6 +402,22 @@
 							Add dependency
 						</button>
 					</ButtonStyled>
+					<ButtonStyled v-if="selectedProject && dependencyAddMode === 'project'">
+						<button @click="addDependencyWithTransitive(newDependencyId, newDependencyType)">
+							<PlusIcon aria-hidden="true" />
+							Add with dependencies
+						</button>
+					</ButtonStyled>
+				</div>
+				<div v-if="transitiveDependencies.length > 0" class="transitive-dependencies">
+					<h5>Dependencies to be added ({{ transitiveDependencies.length }}):</h5>
+					<div class="transitive-list">
+						<div v-for="dep in transitiveDependencies" :key="dep.project_id" class="transitive-item">
+							<Avatar :src="dep.icon_url" alt="dependency icon" size="xs" />
+							<span class="transitive-title">{{ dep.title }}</span>
+							<Badge class="transitive-badge" :color="dep.dependency_type === 'required' ? 'red' : 'orange'" :type="dep.dependency_type"></Badge>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -918,6 +1026,14 @@ export default defineNuxtComponent({
 			dependencyAddMode: 'project',
 			newDependencyType: 'required',
 			newDependencyId: '',
+			selectedProject: null,
+			projectSearchResults: [],
+			isSearchingProjects: false,
+			searchDebounce: null,
+			dependencyFilterType: 'all',
+			dependencyFilterCompatibility: 'all',
+			transitiveDependencies: [],
+			lastSearchQuery: '',
 
 			showSnapshots: false,
 
@@ -960,10 +1076,476 @@ export default defineNuxtComponent({
 
 			this.isEditing = mode === 'edit' || this.$route.params.version === 'create'
 		},
+		dependencyAddMode() {
+			this.selectedProject = null
+			this.projectSearchResults = []
+			this.newDependencyId = ''
+			this.transitiveDependencies = []
+		},
+		selectedProject(newVal) {
+			if (newVal && this.dependencyAddMode === 'project') {
+				this.fetchTransitiveDependencies(newVal.project_id || newVal.slug)
+			} else {
+				this.transitiveDependencies = []
+			}
+		},
 	},
 	methods: {
 		formatBytes,
 		formatCategory,
+		formatNumber(num) {
+			if (num >= 1000000) {
+				return (num / 1000000).toFixed(1) + 'M'
+			} else if (num >= 1000) {
+				return (num / 1000).toFixed(1) + 'K'
+			}
+			return num.toString()
+		},
+		levenshteinDistance(str1, str2) {
+			const s1 = str1.toLowerCase()
+			const s2 = str2.toLowerCase()
+			const len1 = s1.length
+			const len2 = s2.length
+			const matrix = []
+
+			if (len1 === 0) return len2
+			if (len2 === 0) return len1
+
+			for (let i = 0; i <= len2; i++) {
+				matrix[i] = [i]
+			}
+
+			for (let j = 0; j <= len1; j++) {
+				matrix[0][j] = j
+			}
+
+			for (let i = 1; i <= len2; i++) {
+				for (let j = 1; j <= len1; j++) {
+					if (s2.charAt(i - 1) === s1.charAt(j - 1)) {
+						matrix[i][j] = matrix[i - 1][j - 1]
+					} else {
+						matrix[i][j] = Math.min(
+							matrix[i - 1][j - 1] + 1,
+							matrix[i][j - 1] + 1,
+							matrix[i - 1][j] + 1,
+						)
+					}
+				}
+			}
+
+			return matrix[len2][len1]
+		},
+		computeCompatibility(project) {
+			try {
+				let score = 0
+				let maxScore = 0
+				const currentType = this.project?.actualProjectType || this.project?.project_type
+
+				// Project type compatibility (40 points)
+				maxScore += 40
+				if (project?.project_type && currentType) {
+					if (project.project_type === currentType) {
+						score += 40
+					} else {
+						const incompatiblePairs = new Set(['plugin:mod', 'mod:plugin'])
+						const isStrictlyIncompatible = incompatiblePairs.has(`${project.project_type}:${currentType}`)
+						const userExplicitlyWantsThisType =
+							this.dependencyFilterType !== 'all' &&
+							this.dependencyFilterType === project.project_type
+
+						if (isStrictlyIncompatible && !userExplicitlyWantsThisType) {
+							return { status: 'incompatible', score: 0, reasons: ['Incompatible project types'] }
+						}
+
+						// Partial compatibility for related types
+						if (
+							(project.project_type === 'resourcepack' && currentType === 'mod') ||
+							(project.project_type === 'datapack' && currentType === 'mod') ||
+							(project.project_type === 'shader' && currentType === 'mod')
+						) {
+							score += 20
+						} else if (userExplicitlyWantsThisType) {
+							score += 25
+						} else if (isStrictlyIncompatible) {
+							score += 5
+						}
+					}
+				}
+
+				// Game version compatibility (30 points)
+				maxScore += 30
+				if (project?.game_versions && this.version?.game_versions) {
+					const overlap = project.game_versions.filter((v) =>
+						this.version.game_versions.includes(v),
+					)
+					if (overlap.length > 0) {
+						const overlapRatio = overlap.length / Math.max(project.game_versions.length, 1)
+						const points = 30 * overlapRatio
+						score += points
+					}
+				}
+
+				// Loader compatibility (20 points)
+				maxScore += 20
+				if (project?.loaders && this.version?.loaders && this.version.loaders.length > 0) {
+					const loaderOverlap = project.loaders.filter((l) => this.version.loaders.includes(l))
+					if (loaderOverlap.length > 0) {
+						score += 20
+					} else {
+						const userExplicitlyWantsThisType =
+							this.dependencyFilterType !== 'all' &&
+							this.dependencyFilterType === project.project_type
+
+						const crossCompatibleTypes = ['datapack', 'plugin', 'resourcepack', 'shader']
+						if (userExplicitlyWantsThisType && crossCompatibleTypes.includes(project.project_type)) {
+							score += 15
+						}
+					}
+				}
+
+				// Environment compatibility (10 points)
+				maxScore += 10
+				if (project?.client_side && project?.server_side) {
+					if (
+						(project.client_side === 'required' || project.client_side === 'optional') &&
+						(project.server_side === 'required' || project.server_side === 'optional')
+					) {
+						score += 10
+					} else {
+						score += 5
+					}
+				}
+
+				const percentage = Math.round((score / maxScore) * 100)
+
+				if (percentage >= 70) {
+					return { status: 'compatible', score: percentage, reasons: [] }
+				} else if (percentage >= 30) {
+					return { status: 'unknown', score: percentage, reasons: [] }
+				} else {
+					return { status: 'incompatible', score: percentage, reasons: ['Low compatibility score'] }
+				}
+			} catch (err) {
+				console.error('Compatibility check error:', err)
+				return { status: 'unknown', score: 0, reasons: [] }
+			}
+		},
+		rankProject(project, query) {
+			let score = 0
+			const q = (query || '').toLowerCase().trim()
+			const title = (project?.title || '').toLowerCase()
+			const slug = (project?.slug || '').toLowerCase()
+			const description = (project?.description || '').toLowerCase()
+			const author = (project?.author || '').toLowerCase()
+
+			// Exact matches get highest priority (50 points)
+			if (slug && q && slug === q) score += 50
+			if (title && q && title === q) score += 45
+
+			// Fuzzy matching for title (40 points max)
+			if (title && q && q.length > 0 && title !== q) {
+				if (title.startsWith(q)) {
+					const coverageRatio = q.length / title.length
+					score += 35 + (5 * coverageRatio) // 35-40 points based on how much is covered
+				} else if (title.includes(q)) {
+					const coverageRatio = q.length / title.length
+					score += 25 + (10 * coverageRatio) // 25-35 points
+				} else {
+					// Fuzzy matching
+					const distance = this.levenshteinDistance(title, q)
+					const maxLen = Math.max(title.length, q.length)
+					const similarity = 1 - distance / maxLen
+					if (similarity > 0.6) {
+						score += 30 * similarity
+					}
+				}
+			}
+
+			// Slug fuzzy matching (20 points max)
+			if (slug && q && slug !== q && slug.includes(q)) {
+				const coverageRatio = q.length / slug.length
+				score += 15 + (5 * coverageRatio)
+			}
+
+			// Description matching (8 points)
+			if (description && q && description.includes(q)) {
+				score += 8
+			}
+
+			// Author matching (5 points)
+			if (author && q && author.includes(q)) {
+				score += 5
+			}
+
+			// Downloads boost (log scale, 12 points max)
+			const dl = Number(project?.downloads || 0)
+			score += Math.min(12, Math.log10(dl + 1) * 1.2)
+
+			// Follows boost (6 points max)
+			const follows = Number(project?.follows || 0)
+			score += Math.min(6, Math.log10(follows + 1) * 0.6)
+
+			// Recency boost (6 points)
+			const mod = project?.date_modified ? new Date(project.date_modified) : null
+			if (mod && !isNaN(mod)) {
+				const days = (Date.now() - mod.getTime()) / (1000 * 60 * 60 * 24)
+				if (days <= 30) score += 6
+				else if (days <= 90) score += 4
+				else if (days <= 180) score += 2
+			}
+
+			// Compatibility weighting (18 points max)
+			const compat = this.computeCompatibility(project)
+			switch (compat.status) {
+				case 'compatible':
+					score += 18 * (compat.score / 100)
+					break
+				case 'incompatible':
+					score -= 12
+					break
+				case 'unknown':
+					score += 8 * (compat.score / 100)
+					break
+			}
+
+			return score
+		},
+		rerankHits(hits, query) {
+			return [...hits]
+				.map((h) => {
+					const score = this.rankProject(h, query)
+					return { ...h, __score: score, __matchScore: score }
+				})
+				.sort((a, b) => {
+					if (b.__score !== a.__score) return b.__score - a.__score
+					return (b.downloads || 0) - (a.downloads || 0)
+				})
+		},
+		applyFilters(hits) {
+			let filtered = [...hits]
+			if (this.dependencyFilterCompatibility !== 'all') {
+				filtered = filtered.filter((h) => {
+					const compat = this.computeCompatibility(h)
+					return compat.status === this.dependencyFilterCompatibility
+				})
+			}
+
+			return filtered
+		},
+		onFilterChange() {
+			if (this.lastSearchQuery) {
+				this.searchProjects(this.lastSearchQuery)
+			}
+		},
+		async searchProjects(query) {
+			this.lastSearchQuery = query
+
+			if (!query || query.length < 2) {
+				this.projectSearchResults = []
+				return
+			}
+
+			if (this.searchDebounce) {
+				clearTimeout(this.searchDebounce)
+			}
+
+			this.searchDebounce = setTimeout(async () => {
+				this.isSearchingProjects = true
+				try {
+					let allowedTypes = ['mod', 'plugin', 'resourcepack', 'datapack', 'shader']
+					if (this.dependencyFilterType !== 'all') {
+						allowedTypes = [this.dependencyFilterType]
+					}
+
+					const facets = JSON.stringify([allowedTypes.map((t) => `project_type:${t}`)])
+					const baseParams = `query=${encodeURIComponent(query)}&limit=20&index=relevance`
+					let results = await useBaseFetch(
+						`search?${baseParams}&facets=${encodeURIComponent(facets)}`,
+						{},
+						true,
+					)
+
+					let hits = results.hits || []
+
+					hits = await Promise.all(
+						hits.map(async (h) => {
+							try {
+								const projRef = h.project_id || h.id || h.slug
+
+								let versions = []
+								if (projRef) {
+									try {
+										versions = await useBaseFetch(
+											`project/${projRef}/version?limit=50`,
+											{},
+											true,
+										)
+									} catch {}
+								}
+								if (versions && versions.length > 0) {
+									let best = versions[0]
+									let bestScore = -1
+									for (const v of versions) {
+										const gvOverlap = (v.game_versions || []).filter((gv) => (this.version?.game_versions || []).includes(gv)).length
+										const ldOverlap = (v.loaders || []).filter((ld) => (this.version?.loaders || []).includes(ld)).length
+										const s = gvOverlap * 2 + ldOverlap * 3
+										if (s > bestScore) {
+											best = v
+											bestScore = s
+										}
+									}
+
+									// Expose fields
+									h.loaders = best.loaders || h.loaders
+									h.game_versions = best.game_versions || h.game_versions
+
+									// Dependency info for badge
+									h.hasDependencies = Array.isArray(best.dependencies) && best.dependencies.length > 0
+									h.dependencyCount = Array.isArray(best.dependencies) ? best.dependencies.length : 0
+
+
+								} else {
+									try {
+										const proj = await useBaseFetch(`project/${projRef}`, {}, true)
+										h.loaders = proj?.loaders || h.loaders
+										h.game_versions = proj?.game_versions || h.game_versions
+									} catch {}
+								}
+							} catch {
+							}
+							return h
+						}),
+					)
+
+					// Rerank and apply filters
+					const reranked = this.rerankHits(hits, query)
+					this.projectSearchResults = this.applyFilters(reranked)
+
+					// retry without facets
+					if (!this.projectSearchResults.length) {
+						results = await useBaseFetch(`search?${baseParams}`, {}, true)
+						hits = results.hits || []
+						// Enrich again on the fallback path
+						hits = await Promise.all(
+							hits.map(async (h) => {
+								try {
+									const projRef = h.project_id || h.id || h.slug
+									let versions = []
+									if (projRef) {
+										try {
+											versions = await useBaseFetch(
+												`project/${projRef}/version?limit=50`,
+												{},
+												true,
+											)
+										} catch {}
+									}
+									if (versions && versions.length > 0) {
+										let best = versions[0]
+										let bestScore = -1
+										for (const v of versions) {
+											const gvOverlap = (v.game_versions || []).filter((gv) => (this.version?.game_versions || []).includes(gv)).length
+											const ldOverlap = (v.loaders || []).filter((ld) => (this.version?.loaders || []).includes(ld)).length
+											const s = gvOverlap * 2 + ldOverlap * 3
+											if (s > bestScore) {
+												best = v
+												bestScore = s
+											}
+										}
+										h.loaders = best.loaders || h.loaders
+										h.game_versions = best.game_versions || h.game_versions
+										h.hasDependencies = Array.isArray(best.dependencies) && best.dependencies.length > 0
+										h.dependencyCount = Array.isArray(best.dependencies) ? best.dependencies.length : 0
+									} else {
+										try {
+											const proj = await useBaseFetch(`project/${projRef}`, {}, true)
+											h.loaders = proj?.loaders || h.loaders
+											h.game_versions = proj?.game_versions || h.game_versions
+										} catch {}
+									}
+								} catch {}
+								return h
+							}),
+						)
+						const reranked = this.rerankHits(hits, query)
+						this.projectSearchResults = this.applyFilters(reranked)
+					}
+				} catch (err) {
+					console.error('Error searching projects:', err)
+					this.projectSearchResults = []
+				} finally {
+					this.isSearchingProjects = false
+				}
+			}, 300)
+		},
+		onProjectSelect(project) {
+			if (project) {
+				this.newDependencyId = project.slug || project.project_id
+			}
+		},
+		async fetchTransitiveDependencies(projectId) {
+			this.transitiveDependencies = []
+			try {
+				const versions = await useBaseFetch(`project/${projectId}/version`, {}, true)
+				if (!versions || versions.length === 0) return
+
+				let targetVersion = versions.find(
+					(v) =>
+						v.game_versions.some((gv) => this.version.game_versions.includes(gv)) &&
+						v.loaders.some((l) => this.version.loaders.includes(l)),
+				)
+				if (!targetVersion) targetVersion = versions[0]
+
+				if (!targetVersion.dependencies || targetVersion.dependencies.length === 0) return
+
+				const depProjects = await Promise.all(
+					targetVersion.dependencies
+						.filter((d) => d.dependency_type === 'required' || d.dependency_type === 'optional')
+						.filter((d) => !this.version.dependencies.some((vd) => vd.project_id === d.project_id))
+						.map(async (dep) => {
+							try {
+								const proj = await useBaseFetch(`project/${dep.project_id}`, {}, true)
+								return {
+									...proj,
+									dependency_type: dep.dependency_type,
+								}
+							} catch {
+								return null
+							}
+						}),
+				)
+
+				this.transitiveDependencies = depProjects.filter((p) => p !== null)
+			} catch (err) {
+				console.error('Error fetching transitive dependencies:', err)
+			}
+		},
+		async addDependencyWithTransitive(projectId, dependencyType) {
+			try {
+				await this.addDependency('project', projectId, dependencyType)
+
+				for (const dep of this.transitiveDependencies) {
+					await this.addDependency('project', dep.slug || dep.project_id, dep.dependency_type, true)
+				}
+
+				this.addNotification({
+					title: 'Dependencies added',
+					text: `Added ${1 + this.transitiveDependencies.length} dependencies successfully.`,
+					type: 'success',
+				})
+
+				this.selectedProject = null
+				this.projectSearchResults = []
+				this.transitiveDependencies = []
+				this.newDependencyId = ''
+			} catch (err) {
+				this.addNotification({
+					title: 'Error adding dependencies',
+					text: err.message || 'Failed to add some dependencies',
+					type: 'error',
+				})
+			}
+		},
 		async onImageUpload(file) {
 			const response = await useImageUpload(file, { context: 'version' })
 
@@ -1587,6 +2169,146 @@ export default defineNuxtComponent({
 
 	.multiselect {
 		max-width: 20rem;
+	}
+}
+
+.dependency-search-select {
+	:deep(.multiselect__option) {
+		padding: 0;
+		min-height: auto;
+		overflow: hidden;
+	}
+
+	:deep(.multiselect__single) {
+		padding: 0;
+		margin: 0;
+	}
+
+	:deep(.multiselect__content-wrapper) {
+		overflow-x: hidden;
+	}
+}
+
+.dependency-search-option {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.5rem 0.75rem;
+	width: 100%;
+	min-width: 0;
+	max-width: 100%;
+}
+
+.dependency-search-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	flex: 1;
+	min-width: 0;
+}
+
+.dependency-search-meta {
+	font-size: 0.875rem;
+	color: var(--color-secondary);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
+
+.dependency-search-title-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 0.5rem;
+	min-width: 0;
+}
+
+.dependency-search-title {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-weight: 600;
+	color: var(--color-contrast);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	/* Add this to ensure it doesn't push the score off */
+	max-width: calc(100% - 3.5rem); /* Reserve space for score badge */
+}
+
+.dependency-search-score {
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--color-brand);
+	background: var(--color-brand-highlight);
+	padding: 0.125rem 0.375rem;
+	border-radius: 0.25rem;
+	white-space: nowrap;
+	flex-shrink: 0;
+	align-self: flex-start;
+	min-width: fit-content;
+}
+
+.dependency-search-badges {
+	display: flex;
+	gap: 0.375rem;
+	flex-wrap: wrap;
+	margin-top: 0.125rem;
+}
+
+.dependency-filters {
+	display: flex;
+	gap: 0.5rem;
+	margin-bottom: 0.75rem;
+	flex-wrap: wrap;
+
+	.filter-select {
+		flex: 1;
+		min-width: 150px;
+	}
+}
+
+.transitive-dependencies {
+	margin-top: 1rem;
+	padding: 1rem;
+	background: var(--color-bg);
+	border-radius: var(--size-rounded-sm);
+	border: 1px solid var(--color-divider);
+
+	h5 {
+		margin: 0 0 0.75rem 0;
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-contrast);
+	}
+
+	.transitive-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.transitive-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem;
+		background: var(--color-raised-bg);
+		border-radius: var(--size-rounded-sm);
+
+		:deep(.transitive-badge) {
+			font-size: 0.75rem;
+		}
+
+		.transitive-title {
+			flex: 1;
+			font-size: 0.875rem;
+			color: var(--color-contrast);
+		}
 	}
 }
 </style>
