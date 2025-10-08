@@ -51,7 +51,7 @@ console-subscriber = "0.4.1"
 daedalus = { path = "packages/daedalus" }
 path-util = { path = "packages/path-util" }
 dashmap = "6.1.0"
-data-url = "0.3.1"
+data-url = "0.3.2"
 deadpool-redis = "0.22.0"
 derive_more = "2.0.1"
 dirs = "6.0.0"
