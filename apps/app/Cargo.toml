@@ -1,56 +1,50 @@
 [package]
-description = "The Modrinth App is a desktop application for managing your Minecraft mods"
-license     = "GPL-3.0-only"
-name        = "theseus_gui"
-repository  = "https://github.com/modrinth/code/apps/app/"
+name = "theseus_gui"
 # The actual version is set by the theseus-build workflow on tagging
 version = "1.0.0-local"
-
 edition.workspace = true
-
-[lints]
-workspace = true
-
-[build-dependencies]
-tauri-build = { workspace = true, features = ["codegen"] }
+description = "The Modrinth App is a desktop application for managing your Minecraft mods"
+repository = "https://github.com/modrinth/code/apps/app/"
+license = "GPL-3.0-only"
 
 [dependencies]
+chrono = { workspace = true }
+daedalus = { workspace = true }
+dashmap = { workspace = true }
+either = { workspace = true }
+enumset = { workspace = true, features = ["serde"] }
+hyper = { workspace = true, features = ["server"] }
+hyper-util = { workspace = true }
+native-dialog = { workspace = true }
+paste = { workspace = true }
+path-util = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde_with = { workspace = true }
 tauri = { workspace = true, features = [
   "devtools",
   "macos-private-api",
   "protocol-asset",
 ] }
-
-tauri-plugin-deep-link       = { workspace = true }
-tauri-plugin-dialog          = { workspace = true }
-tauri-plugin-http            = { workspace = true }
-tauri-plugin-opener          = { workspace = true }
-tauri-plugin-os              = { workspace = true }
+tauri-plugin-deep-link = { workspace = true }
+tauri-plugin-dialog = { workspace = true }
+tauri-plugin-http = { workspace = true }
+tauri-plugin-opener = { workspace = true }
+tauri-plugin-os = { workspace = true }
 tauri-plugin-single-instance = { workspace = true }
-tauri-plugin-updater         = { workspace = true }
-tauri-plugin-window-state    = { workspace = true }
-
-chrono        = { workspace = true }
-daedalus      = { workspace = true }
-dashmap       = { workspace = true }
-either        = { workspace = true }
-enumset       = { workspace = true, features = ["serde"] }
-hyper         = { workspace = true, features = ["server"] }
-hyper-util    = { workspace = true }
-native-dialog = { workspace = true }
-paste         = { workspace = true }
-path-util     = { workspace = true }
-serde         = { workspace = true, features = ["derive"] }
-serde_json    = { workspace = true }
-serde_with    = { workspace = true }
-theseus       = { workspace = true, features = ["tauri"] }
-thiserror     = { workspace = true }
-tokio         = { workspace = true, features = ["time"] }
-tracing       = { workspace = true }
+tauri-plugin-updater = { workspace = true }
+tauri-plugin-window-state = { workspace = true }
+theseus = { workspace = true, features = ["tauri"] }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["time"] }
+tracing = { workspace = true }
 tracing-error = { workspace = true }
-url           = { workspace = true }
-urlencoding   = { workspace = true }
-uuid          = { workspace = true, features = ["serde", "v4"] }
+url = { workspace = true }
+urlencoding = { workspace = true }
+uuid = { workspace = true, features = ["serde", "v4"] }
+
+[build-dependencies]
+tauri-build = { workspace = true, features = ["codegen"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 tauri-plugin-updater = { workspace = true, optional = true }
@@ -66,4 +60,7 @@ default = ["custom-protocol"]
 # this feature is used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
 custom-protocol = ["tauri/custom-protocol"]
-updater         = []
+updater = []
+
+[lints]
+workspace = true

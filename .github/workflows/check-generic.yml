@@ -21,3 +21,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: tombi-toml/setup-tombi@v1
       - run: tombi lint
+      - run: tombi fmt --check

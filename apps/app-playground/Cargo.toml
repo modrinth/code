@@ -1,12 +1,11 @@
 [package]
 name = "theseus_playground"
-
 edition.workspace = true
-
-[lints]
-workspace = true
 
 [dependencies]
 enumset = { workspace = true }
 theseus = { workspace = true, features = ["cli"] }
-tokio   = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+
+[lints]
+workspace = true
