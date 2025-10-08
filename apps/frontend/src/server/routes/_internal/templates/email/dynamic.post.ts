@@ -1,7 +1,6 @@
 import { render } from '@vue-email/render'
-import type { Component } from 'vue'
 
-import emails from '~/templates/emails'
+import MarkdownDynamicEmail from '~/templates/emails/dynamic/MarkdownDynamicEmail.vue'
 
 export default defineEventHandler(async (event) => {
 	try {
@@ -14,17 +13,7 @@ export default defineEventHandler(async (event) => {
 			})
 		}
 
-		// Hacky, but cant explicitly import vue files in server side
-		const component = (await emails['dynamic']()).default as Component | undefined
-
-		if (!component) {
-			throw createError({
-				statusCode: 500,
-				message: 'Failed to load email template component',
-			})
-		}
-
-		const html = await render(component, {
+		const html = await render(MarkdownDynamicEmail, {
 			title: body.title,
 			body: body.body,
 		})
