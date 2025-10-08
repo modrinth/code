@@ -5,7 +5,9 @@ use serde::{Deserialize, Serialize};
 
 const TEMPLATES_NAMESPACE: &str = "notifications_templates";
 const TEMPLATES_HTML_DATA_NAMESPACE: &str = "notifications_templates_html_data";
+
 const HTML_DATA_CACHE_EXPIRY: i64 = 60 * 15; // 15 minutes
+const TEMPLATES_CACHE_EXPIRY: i64 = 60 * 30; // 30 minutes
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 
@@ -75,7 +77,7 @@ impl NotificationTemplate {
                 TEMPLATES_NAMESPACE,
                 channel.as_str(),
                 &templates,
-                None,
+                Some(TEMPLATES_CACHE_EXPIRY),
             )
             .await?;
 
