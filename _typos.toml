@@ -17,6 +17,3 @@ extend-exclude = [
 tou = "tou"
 # Google Ad Manager
 gam = "gam"
-
-[default]
-extend-ignore-identifiers-re = ["mis-labeling"]
