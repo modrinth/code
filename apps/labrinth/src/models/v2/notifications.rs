@@ -139,6 +139,10 @@ pub enum LegacyNotificationBody {
         amount: u64,
         date_available: DateTime<Utc>,
     },
+    Custom {
+        title: String,
+        body_md: String,
+    },
     Unknown,
 }
 
@@ -217,6 +221,7 @@ impl LegacyNotification {
             NotificationBody::PayoutAvailable { .. } => {
                 Some("payout_available".to_string())
             }
+            NotificationBody::Custom { .. } => Some("custom".to_string()),
             NotificationBody::LegacyMarkdown {
                 notification_type, ..
             } => notification_type.clone(),
@@ -378,6 +383,9 @@ impl LegacyNotification {
                 service,
                 currency,
             },
+            NotificationBody::Custom { title, body_md } => {
+                LegacyNotificationBody::Custom { title, body_md }
+            }
             NotificationBody::PaymentFailed { amount, service } => {
                 LegacyNotificationBody::PaymentFailed { amount, service }
             }
