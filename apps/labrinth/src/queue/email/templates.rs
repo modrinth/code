@@ -160,7 +160,7 @@ pub async fn build_email(
     let subject = match &mut either {
         Either::Left(variables) => {
             variables.insert(USER_EMAIL, to.email.to_string());
-            fill_template(&template.subject_line, &variables)
+            fill_template(&template.subject_line, variables)
         }
 
         Either::Right(_) => {
