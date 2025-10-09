@@ -684,11 +684,12 @@ async fn query_clickhouse<Row>(
     cx: &mut QueryClickhouseContext<'_>,
     query: &str,
     use_columns: &[(&str, bool)],
-    row_get_bucket: impl Fn(&Row) -> u64,
-    row_to_analytics: impl Fn(Row) -> AnalyticsData,
+    // I hate using the hidden type Row::Value here, but it's what next() returns, so I see no other option
+    row_get_bucket: impl Fn(&Row::Value<'_>) -> u64,
+    row_to_analytics: impl Fn(Row::Value<'_>) -> AnalyticsData,
 ) -> Result<(), ApiError>
 where
-    Row: clickhouse::Row + serde::de::DeserializeOwned + std::fmt::Debug,
+    Row: clickhouse::RowRead + serde::de::DeserializeOwned + std::fmt::Debug,
 {
     let mut query = cx
         .clickhouse
