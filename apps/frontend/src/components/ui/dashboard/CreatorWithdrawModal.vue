@@ -94,7 +94,6 @@ import {
 } from '@/providers/creator-withdraw.ts'
 
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
-
 import CompletionStage from './withdraw-stages/CompletionStage.vue'
 import MethodSelectionStage from './withdraw-stages/MethodSelectionStage.vue'
 import MuralpayDetailsStage from './withdraw-stages/MuralpayDetailsStage.vue'

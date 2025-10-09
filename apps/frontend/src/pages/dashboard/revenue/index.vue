@@ -1,5 +1,5 @@
 <template>
-	<CreatorWithdrawModal ref="withdrawModal" v-model:country="withdrawCountry" :auth="auth" :balance="userBalance"
+	<CreatorWithdrawModal ref="withdrawModal" :country="withdrawCountry" :auth="auth" :balance="userBalance"
 		:payout-methods="paymentMethods" :payout-methods-pending="payoutMethodsPending" @withdraw="handleWithdraw"
 		@refresh-data="refreshData" />
 	<div class="mb-6 flex flex-col gap-8 p-12 py-0">

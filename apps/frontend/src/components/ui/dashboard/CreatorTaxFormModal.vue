@@ -1,5 +1,6 @@
 <template>
-	<NewModal ref="taxFormModal" :header="formatMessage(messages.taxFormHeader)"
+	<NewModal
+ref="taxFormModal" :header="formatMessage(messages.taxFormHeader)"
 		:hide-header="currentStage === 'download-confirmation'"
 		:close-on-click-outside="currentStage !== 'download-confirmation'"
 		:close-on-esc="currentStage !== 'download-confirmation'">
@@ -8,7 +9,8 @@
 				<Admonition type="info" :header="formatMessage(messages.securityHeader)">
 					<IntlFormatted :message-id="messages.securityDescription">
 						<template #security-link="{ children }">
-							<a href="https://www.track1099.com/info/security" class="flex w-fit flex-row gap-1 align-middle text-link"
+							<a
+href="https://www.track1099.com/info/security" class="flex w-fit flex-row gap-1 align-middle text-link"
 								target="_blank" rel="noopener noreferrer">
 								<component :is="() => normalizeChildren(children)" />
 								<ExternalIcon class="my-auto" />
@@ -23,11 +25,13 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<Chips v-model="isUSCitizen" :items="['yes', 'no']" :format-label="(item) => (item === 'yes' ? formatMessage(messages.yes) : formatMessage(messages.no))
+					<Chips
+v-model="isUSCitizen" :items="['yes', 'no']" :format-label="(item) => (item === 'yes' ? formatMessage(messages.yes) : formatMessage(messages.no))
 						" :never-empty="false" :capitalize="true" />
 				</div>
 
-				<Transition enter-active-class="transition-all duration-300 ease-in-out"
+				<Transition
+enter-active-class="transition-all duration-300 ease-in-out"
 					enter-from-class="h-0 overflow-hidden opacity-0" enter-to-class="h-auto overflow-visible opacity-100"
 					leave-active-class="transition-all duration-300 ease-in-out"
 					leave-from-class="h-auto overflow-visible opacity-100" leave-to-class="h-0 overflow-hidden opacity-0">
@@ -38,7 +42,8 @@
 								<span class="text-brand-red">*</span>
 							</span>
 						</label>
-						<Chips v-model="entityType" :items="['private-individual', 'foreign-entity']" :format-label="(item) =>
+						<Chips
+v-model="entityType" :items="['private-individual', 'foreign-entity']" :format-label="(item) =>
 								item === 'private-individual'
 									? formatMessage(messages.privateIndividual)
 									: formatMessage(messages.foreignEntity)
@@ -67,7 +72,8 @@
 			<div v-else-if="currentStage === 'download-confirmation'" class="flex flex-col gap-6">
 				<div class="relative block h-[180px] w-[400px] overflow-hidden rounded-xl rounded-b-none">
 					<div class="absolute inset-0 rounded-xl rounded-b-none bg-gradient-to-r from-brand-green to-brand-blue"></div>
-					<div class="absolute inset-0 rounded-xl rounded-b-none" style="
+					<div
+class="absolute inset-0 rounded-xl rounded-b-none" style="
 							background: linear-gradient(
 								180deg,
 								rgba(39, 41, 46, 0.15) 0%,
@@ -86,7 +92,8 @@
 					<span>
 						<IntlFormatted :message-id="messages.confirmationSupportText">
 							<template #support-link="{ children }">
-								<nuxt-link to="https://support.modrinth.com" class="text-link" target="_blank"
+								<nuxt-link
+to="https://support.modrinth.com" class="text-link" target="_blank"
 									rel="noopener noreferrer">
 									<component :is="() => normalizeChildren(children)" />
 								</nuxt-link>
