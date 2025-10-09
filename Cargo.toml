@@ -148,7 +148,7 @@ sqlx = { version = "0.8.6", default-features = false }
 sysinfo = { version = "0.37.2", default-features = false }
 tar = "0.4.44"
 tauri = "2.8.5"
-tauri-build = "2.3.1"
+tauri-build = "2.4.1"
 tauri-plugin-deep-link = "2.4.1"
 tauri-plugin-dialog = "2.3.2"
 tauri-plugin-http = "2.5.1"
