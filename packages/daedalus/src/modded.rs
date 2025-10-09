@@ -34,7 +34,7 @@ where
 
     serde_json::from_str::<DateTime<Utc>>(&format!("\"{s}\""))
         .or_else(|_| {
-            NaiveDateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.9f")
+            NaiveDateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.f")
                 .map(|date| date.and_utc())
         })
         .map_err(serde::de::Error::custom)
