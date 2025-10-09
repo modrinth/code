@@ -179,7 +179,7 @@ url = "2.5.7"
 urlencoding = "2.1.3"
 uuid = "1.18.1"
 validator = "0.20.0"
-webp = { version = "0.3.0", default-features = false }
+webp = { version = "0.3.1", default-features = false }
 whoami = "1.6.0"
 windows = "0.61.3"
 windows-core = "0.61.2"
