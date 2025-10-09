@@ -153,7 +153,7 @@ tauri-plugin-deep-link = "2.4.3"
 tauri-plugin-dialog = "2.4.0"
 tauri-plugin-http = "2.5.2"
 tauri-plugin-opener = "2.5.0"
-tauri-plugin-os = "2.3.0"
+tauri-plugin-os = "2.3.1"
 tauri-plugin-single-instance = "2.3.2"
 tauri-plugin-updater = { version = "2.9.0", default-features = false, features = [
 	"rustls-tls",
