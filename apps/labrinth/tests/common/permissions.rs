@@ -35,7 +35,7 @@ pub struct PermissionsTest<'a, A: Api> {
     user_pat: Option<&'a str>,
 
     // Whether or not the user ID should be removed from the project/organization team after the test
-    // (This is mostly reelvant if you are also using an existing project/organization, and want to do
+    // (This is mostly relevant if you are also using an existing project/organization, and want to do
     // multiple tests with the same user.
     remove_user: bool,
 
@@ -1056,10 +1056,10 @@ async fn create_dummy_org(setup_api: &ApiV3) -> (String, String) {
     let organization = setup_api
         .get_organization_deserialized(&slug, ADMIN_USER_PAT)
         .await;
-    let organizaion_id = organization.id.to_string();
+    let organization_id = organization.id.to_string();
     let team_id = organization.team_id.to_string();
 
-    (organizaion_id, team_id)
+    (organization_id, team_id)
 }
 
 async fn add_project_to_org(

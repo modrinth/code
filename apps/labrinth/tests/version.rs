@@ -439,7 +439,7 @@ pub async fn test_patch_version() {
             assert_status!(&resp, StatusCode::BAD_REQUEST);
         }
 
-        // Sucessful request to patch many fields.
+        // Successful request to patch many fields.
         let resp = api
             .edit_version(
                 alpha_version_id,

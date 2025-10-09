@@ -1,136 +1,129 @@
 [package]
 name = "theseus"
-version = "1.0.0-local"                # The actual version is set by the theseus-build workflow on tagging
-authors = ["Jai A <jaiagr+gpg@pm.me>"]
+# The actual version is set by the theseus-build workflow on tagging
+version = "1.0.0-local"
 edition.workspace = true
 
 [dependencies]
+ariadne = { workspace = true }
+async-compression = { workspace = true, features = ["gzip", "tokio"] }
+async-recursion = { workspace = true }
+async-tungstenite = { workspace = true, features = [
+  "tokio-runtime",
+  "tokio-rustls-webpki-roots",
+] }
+async-walkdir = { workspace = true }
+async_zip = { workspace = true, features = [
+  "bzip2",
+  "chrono",
+  "deflate",
+  "deflate64",
+  "tokio-fs",
+  "zstd",
+] }
+base64 = { workspace = true }
+bytemuck = { workspace = true, features = ["extern_crate_alloc"] }
 bytes = { workspace = true, features = ["serde"] }
+chardetng = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+daedalus = { workspace = true }
+dashmap = { workspace = true, features = ["serde"] }
+data-url = { workspace = true }
+derive_more = { workspace = true, features = ["display"] }
+dirs = { workspace = true }
+discord-rich-presence = { workspace = true }
+dunce = { workspace = true }
+either = { workspace = true }
+encoding_rs = { workspace = true }
+enumset = { workspace = true }
+flate2 = { workspace = true }
+fs4 = { workspace = true, features = ["tokio"] }
+futures = { workspace = true, features = ["alloc", "async-await"] }
+heck = { workspace = true }
+hickory-resolver = { workspace = true }
+indicatif = { workspace = true, optional = true }
+itertools = { workspace = true }
+notify = { workspace = true }
+notify-debouncer-mini = { workspace = true }
+p256 = { workspace = true, features = ["ecdsa"] }
+paste = { workspace = true }
+path-util = { workspace = true }
+phf = { workspace = true }
+png = { workspace = true }
+quartz_nbt = { workspace = true, features = ["serde"] }
+quick-xml = { workspace = true, features = ["async-tokio"] }
+rand = { workspace = true }
+regex = { workspace = true }
+reqwest = { workspace = true, features = [
+  "brotli",
+  "charset",
+  "deflate",
+  "gzip",
+  "http2",
+  "json",
+  "macos-system-configuration",
+  "multipart",
+  "rustls-tls-webpki-roots",
+  "stream",
+] }
+rgb = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-serde_json.workspace = true
-serde_ini.workspace = true
-serde_with.workspace = true
-sha1_smol.workspace = true
-sha2.workspace = true
+serde_ini = { workspace = true }
+serde_json = { workspace = true }
+serde_with = { workspace = true }
+sha1_smol = { workspace = true }
+sha2 = { workspace = true }
+sqlx = { workspace = true, features = [
+  "json",
+  "macros",
+  "migrate",
+  "runtime-tokio",
+  "sqlite",
+  "uuid",
+] }
+sysinfo = { workspace = true, features = ["disk", "system"] }
+tauri = { workspace = true, features = ["unstable"], optional = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = [
+  "fs",
+  "io-util",
+  "macros",
+  "net",
+  "process",
+  "sync",
+  "time",
+] }
+tokio-util = { workspace = true, features = [
+  "compat",
+  "io",
+  "io-util",
+  "time",
+] }
+tracing = { workspace = true }
+tracing-error = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
 url = { workspace = true, features = ["serde"] }
 uuid = { workspace = true, features = ["serde", "v4"] }
-zip.workspace = true
-async_zip = { workspace = true, features = [
-	"chrono",
-	"tokio-fs",
-	"deflate",
-	"bzip2",
-	"zstd",
-	"deflate64",
-] }
-flate2.workspace = true
-tempfile.workspace = true
-dashmap = { workspace = true, features = ["serde"] }
-quick-xml = { workspace = true, features = ["async-tokio"] }
-enumset.workspace = true
-chardetng.workspace = true
-encoding_rs.workspace = true
-png.workspace = true
-bytemuck = { workspace = true, features = ["extern_crate_alloc"] }
-rgb.workspace = true
-phf.workspace = true
-itertools.workspace = true
-derive_more = { workspace = true, features = ["display"] }
-
-chrono = { workspace = true, features = ["serde"] }
-daedalus.workspace = true
-dirs.workspace = true
-
-regex.workspace = true
-sysinfo = { workspace = true, features = ["system", "disk"] }
-thiserror.workspace = true
-either.workspace = true
-data-url.workspace = true
-
-tracing.workspace = true
-tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
-tracing-error.workspace = true
-
-paste.workspace = true
-heck.workspace = true
-
-tauri = { workspace = true, optional = true, features = ["unstable"] }
-indicatif = { workspace = true, optional = true }
-
-async-tungstenite = { workspace = true, features = ["tokio-runtime", "tokio-rustls-webpki-roots"] }
-futures = { workspace = true, features = ["async-await", "alloc"] }
-reqwest = { workspace = true, features = [
-	"json",
-	"stream",
-	"deflate",
-	"gzip",
-	"brotli",
-	"rustls-tls-webpki-roots",
-	"charset",
-	"http2",
-	"macos-system-configuration",
-	"multipart",
-] }
-tokio = { workspace = true, features = [
-	"time",
-	"io-util",
-	"net",
-	"sync",
-	"fs",
-	"macros",
-	"process",
-] }
-tokio-util = { workspace = true, features = ["compat", "io", "io-util", "time"] }
-async-recursion.workspace = true
-fs4 = { workspace = true, features = ["tokio"] }
-async-walkdir.workspace = true
-async-compression = { workspace = true, features = ["tokio", "gzip"] }
-
-notify.workspace = true
-notify-debouncer-mini.workspace = true
-
-dunce.workspace = true
-
-whoami.workspace = true
-
-discord-rich-presence.workspace = true
-
-p256 = { workspace = true, features = ["ecdsa"] }
-rand.workspace = true
-base64.workspace = true
-
-sqlx = { workspace = true, features = [
-	"runtime-tokio",
-	"sqlite",
-	"macros",
-	"migrate",
-	"json",
-	"uuid",
-] }
-
-quartz_nbt = { workspace = true, features = ["serde"] }
-
-hickory-resolver.workspace = true
-zbus.workspace = true
-
-ariadne.workspace = true
-path-util.workspace = true
-
-[target.'cfg(windows)'.dependencies]
-winreg.workspace = true
-windows = { workspace = true, features = ["Networking_Connectivity"] }
-windows-core.workspace = true
-
-[target.'cfg(target_os = "macos")'.dependencies]
-cidre = { workspace = true, features = ["nw", "blocks"] }
+whoami = { workspace = true }
+zbus = { workspace = true }
+zip = { workspace = true }
 
 [build-dependencies]
-dotenvy.workspace = true
-dunce.workspace = true
+dotenvy = { workspace = true }
+dunce = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+cidre = { workspace = true, features = ["blocks", "nw"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true, features = ["Networking_Connectivity"] }
+windows-core = { workspace = true }
+winreg = { workspace = true }
 
 [features]
-tauri = ["dep:tauri"]
 cli = ["dep:indicatif"]
+tauri = ["dep:tauri"]
 
 [lints]
 workspace = true

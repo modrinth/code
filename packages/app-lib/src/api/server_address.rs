@@ -120,11 +120,11 @@ fn parse_server_address_inner(
     let mut port = None;
     if !port_str.is_empty() {
         if port_str.starts_with('+') {
-            return Err(format!("Unparseable port number: {port_str}"));
+            return Err(format!("Unparsable port number: {port_str}"));
         }
         port = port_str.parse::<u16>().ok();
         if port.is_none() {
-            return Err(format!("Unparseable port number: {port_str}"));
+            return Err(format!("Unparsable port number: {port_str}"));
         }
     }
 

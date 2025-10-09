@@ -24,7 +24,7 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
 
     tokio::task::spawn(async move {
         let span = tracing::span!(tracing::Level::INFO, "init_watcher");
-        tracing::info!(parent: &span, "Initting watcher");
+        tracing::info!(parent: &span, "Initing watcher");
         while let Some(res) = rx.recv().await {
             let _span = span.enter();
 

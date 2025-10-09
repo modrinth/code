@@ -1,39 +1,39 @@
 [package]
 name = "daedalus_client"
 version = "0.2.2"
-authors = ["Jai A <jai@modrinth.com>"]
 edition.workspace = true
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-daedalus.workspace = true
-tokio = { workspace = true, features = ["sync", "macros", "rt-multi-thread"] }
-futures.workspace = true
-dotenvy.workspace = true
-serde = { workspace = true, features = ["derive"] }
-serde_json.workspace = true
-serde-xml-rs.workspace = true
-thiserror.workspace = true
-reqwest = { workspace = true, features = ["stream", "json", "rustls-tls-native-roots"] }
 async_zip = { workspace = true, features = [
-	"chrono",
-	"tokio-fs",
-	"deflate",
-	"bzip2",
-	"zstd",
-	"deflate64",
+  "bzip2",
+  "chrono",
+  "deflate",
+  "deflate64",
+  "tokio-fs",
+  "zstd",
 ] }
+bytes = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
-bytes.workspace = true
-rust-s3.workspace = true
-dashmap.workspace = true
-sha1_smol.workspace = true
+daedalus = { workspace = true }
+dashmap = { workspace = true }
+dotenvy = { workspace = true }
+futures = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
-itertools.workspace = true
-tracing-error.workspace = true
-
-tracing.workspace = true
+itertools = { workspace = true }
+reqwest = { workspace = true, features = [
+  "json",
+  "rustls-tls-native-roots",
+  "stream",
+] }
+rust-s3 = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde-xml-rs = { workspace = true }
+sha1_smol = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync"] }
+tracing = { workspace = true }
+tracing-error = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter"] }
 
 [lints]

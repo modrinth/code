@@ -33,7 +33,7 @@ pub struct FormResponse {
     pub company_name: String,
     pub company_email: String,
     pub reference_id: String,
-    /// This is a DateTime, but it's not consistent wether it has a
+    /// This is a DateTime, but it's not consistent whether it has a
     /// timezone or not, so we just parse it as a string and use [`Utc::now()`](fn@chrono::Utc::now)
     /// rather than using the provided DateTime.
     pub signed_at: Option<String>,

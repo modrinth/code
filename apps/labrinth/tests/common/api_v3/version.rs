@@ -129,7 +129,7 @@ impl ApiVersion for ApiV3 {
             modify_json,
         );
 
-        // Add a versiom.
+        // Add a version.
         let req = TestRequest::post()
             .uri("/v3/version")
             .append_pat(pat)

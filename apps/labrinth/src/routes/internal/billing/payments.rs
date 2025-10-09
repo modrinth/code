@@ -75,7 +75,7 @@ pub enum AttachedCharge {
     /// This can be used in the case of resubscription flows. The amount from this
     /// charge will be used, but the tax will be recalculated and the charge updated.
     ///
-    /// The charge's status will NOT be updated - it is the caller's responsability to
+    /// The charge's status will NOT be updated - it is the caller's responsibility to
     /// update the charge's status on failure or success.
     ///
     /// This may be accompanied by an automated payment session.
@@ -160,7 +160,7 @@ pub struct PaymentBootstrapOptions<'a> {
     ///
     /// Taxes will always be collected.
     ///
-    /// Note the charge will NOT be updated. It is the caller's responsability to update the charge
+    /// Note the charge will NOT be updated. It is the caller's responsibility to update the charge
     /// on success or failure.
     pub payment_session: PaymentSession,
     /// The charge the payment intent on should be based upon.
@@ -185,7 +185,7 @@ pub struct PaymentBootstrapResults {
 ///
 /// # Important notes
 ///
-/// - This function does not perform any database writes. It is the caller's responsability to, for
+/// - This function does not perform any database writes. It is the caller's responsibility to, for
 ///   example, update the charge's status on success or failure, or update the charge's tax amount,
 ///   tax eligibility or payment and tax platform IDs.
 /// - You may not update or create a payment intent for an off-session payment flow without

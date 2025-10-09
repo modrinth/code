@@ -50,17 +50,17 @@ const links: Stage = {
 			],
 		} as ButtonAction,
 		{
-			id: 'links_unaccessible',
+			id: 'links_inaccessible',
 			type: 'button',
 			label: 'Links are inaccessible',
 			weight: 510,
 			suggestedStatus: 'flagged',
-			// Theoretically a conditional could go here to prevent overlap of misuse and unaccessible messages repeating while still allowing for a multi-select in each.
+			// Theoretically a conditional could go here to prevent overlap of misuse and inaccessible messages repeating while still allowing for a multi-select in each.
 			// if links_misused was selected, send nothing.
 			message: async () => (await import('../messages/links/not_accessible.md?raw')).default,
 			enablesActions: [
 				{
-					id: 'links_unaccessible_options',
+					id: 'links_inaccessible_options',
 					type: 'multi-select-chips',
 					label: 'Warn of inaccessible link?',
 					shouldShow: (project) => Boolean(project.source_url || project.discord_url),

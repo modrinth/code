@@ -198,7 +198,7 @@ pub async fn delete_old_images(
 
 // check changes to associated images
 // if they no longer exist in the String list, delete them
-// Eg: if description is modified and no longer contains a link to an iamge
+// Eg: if description is modified and no longer contains a link to an image
 pub async fn delete_unused_images(
     context: ImageContext,
     reference_strings: Vec<&str>,

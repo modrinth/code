@@ -635,7 +635,7 @@ impl NotificationDeliveryStatus {
             NotificationDeliveryStatus::Delivered => Ok(()),
             NotificationDeliveryStatus::SkippedPreferences |
             NotificationDeliveryStatus::SkippedDefault |
-            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occured while sending an email to your email address. Please try again later.".to_owned())),
+            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occurred while sending an email to your email address. Please try again later.".to_owned())),
             NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::InvalidInput("This email address doesn't exist! Please try another one.".to_owned())),
         }
     }

@@ -16,14 +16,14 @@ use uuid::Uuid;
 const CLI_PROGRESS_BAR_TOTAL: u64 = 1000;
 
 /*
-   Events are a way we can communciate with the Tauri frontend from the Rust backend.
+   Events are a way we can communicate with the Tauri frontend from the Rust backend.
    We include a feature flag for Tauri, so that we can compile this code without Tauri.
 
    To use events, we need to do the following:
     1) Make sure we are using the tauri feature flag
     2) Initialize the EventState with EventState::init() *before* initializing the theseus State
     3) Call emit_x functions to send events to the frontend
-   For emit_loading() specifically, we need to inialize the loading bar with init_loading() first and pass the received loader in
+   For emit_loading() specifically, we need to initialize the loading bar with init_loading() first and pass the received loader in
 
    For example:
    pub async fn loading_function() -> crate::Result<()> {
@@ -306,7 +306,7 @@ pub async fn emit_friend(payload: FriendPayload) -> crate::Result<()> {
 // loading_join! macro
 // loading_join!(key: Option<&LoadingBarId>, total: f64, message: Option<&str>; task1, task2, task3...)
 // This will submit a loading event with the given message for each task as they complete
-// task1, task2, task3 are async tasks that yuo want to to join on await on
+// task1, task2, task3 are async tasks that you want to to join on await on
 // Key is the key to use for which loading bar to submit these results to- a LoadingBarId. If None, it does nothing
 // Total is the total amount of progress that the loading bar should take up by all futures in this (will be split evenly amongst them).
 // If message is Some(t) you will overwrite this loading bar's message with a custom one

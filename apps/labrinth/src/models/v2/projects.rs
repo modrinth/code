@@ -20,7 +20,7 @@ use validator::Validate;
 /// A project returned from the API
 #[derive(Serialize, Deserialize, Clone)]
 pub struct LegacyProject {
-    /// Relevant V2 fields- these were removed or modfified in V3,
+    /// Relevant V2 fields- these were removed or modified in V3,
     /// and are now part of the dynamic fields system
     /// The support range for the client project*
     pub client_side: LegacySideType,
@@ -269,7 +269,7 @@ impl std::fmt::Display for LegacySideType {
 }
 
 impl LegacySideType {
-    // These are constant, so this can remove unneccessary allocations (`to_string`)
+    // These are constant, so this can remove unnecessary allocations (`to_string`)
     pub fn as_str(&self) -> &'static str {
         match self {
             LegacySideType::Required => "required",
@@ -292,7 +292,7 @@ impl LegacySideType {
 /// A specific version of a project
 #[derive(Serialize, Deserialize, Clone)]
 pub struct LegacyVersion {
-    /// Relevant V2 fields- these were removed or modfified in V3,
+    /// Relevant V2 fields- these were removed or modified in V3,
     /// and are now part of the dynamic fields system
     /// A list of game versions this project supports
     pub game_versions: Vec<String>,

@@ -1,14 +1,11 @@
 [package]
 name = "theseus_playground"
-version = "0.0.0"
 edition.workspace = true
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+enumset = { workspace = true }
 theseus = { workspace = true, features = ["cli"] }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
-enumset.workspace = true
 
 [lints]
 workspace = true
