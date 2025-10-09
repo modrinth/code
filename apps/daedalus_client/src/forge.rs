@@ -92,6 +92,7 @@ pub async fn fetch_forge(
         semaphore,
         upload_files,
         mirror_artifacts,
+        false,
     )
     .await
 }
@@ -190,6 +191,7 @@ pub async fn fetch_neo(
         semaphore,
         upload_files,
         mirror_artifacts,
+        true,
     )
     .await
 }
@@ -208,17 +210,18 @@ async fn fetch(
     semaphore: Arc<Semaphore>,
     upload_files: &DashMap<String, UploadFile>,
     mirror_artifacts: &DashMap<String, MirrorArtifact>,
+    force_all: bool,
 ) -> Result<(), Error> {
-    /*
-    let modrinth_manifest = fetch_json::<daedalus::modded::Manifest>(
+    let mut modrinth_manifest = fetch_json::<daedalus::modded::Manifest>(
         &format_url(&format!("{mod_loader}/v{format_version}/manifest.json",)),
         &semaphore,
     )
     .await
     .ok();
-    */
 
-    let modrinth_manifest: Option<daedalus::modded::Manifest> = None;
+    if force_all {
+        modrinth_manifest = None;
+    }
 
     let fetch_versions = if let Some(modrinth_manifest) = modrinth_manifest {
         let mut fetch_versions = Vec::new();
