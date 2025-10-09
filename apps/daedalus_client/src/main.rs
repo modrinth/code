@@ -48,13 +48,13 @@ async fn main() -> Result<()> {
     // path, mirror artifact
     let mirror_artifacts: DashMap<String, MirrorArtifact> = DashMap::new();
 
+    forge::fetch_neo(semaphore.clone(), &upload_files, &mirror_artifacts)
+        .await?;
     minecraft::fetch(semaphore.clone(), &upload_files, &mirror_artifacts)
         .await?;
     fabric::fetch_fabric(semaphore.clone(), &upload_files, &mirror_artifacts)
         .await?;
     fabric::fetch_quilt(semaphore.clone(), &upload_files, &mirror_artifacts)
-        .await?;
-    forge::fetch_neo(semaphore.clone(), &upload_files, &mirror_artifacts)
         .await?;
     forge::fetch_forge(semaphore.clone(), &upload_files, &mirror_artifacts)
         .await?;

@@ -234,12 +234,21 @@ async fn fetch(
     };
 
     if !fetch_versions.is_empty() {
-        let forge_installers = futures::future::try_join_all(
-            fetch_versions
-                .iter()
-                .map(|x| download_file(&x.installer_url, None, &semaphore)),
-        )
-        .await?;
+        let forge_installers =
+            futures::future::join_all(fetch_versions.iter().map(|x| async {
+                download_file(&x.installer_url, None, &semaphore)
+                    .await
+                    .map_err(|e| (e, x.loader_version.clone()))
+            }))
+            .await;
+
+        let forge_installers = forge_installers.into_iter().filter_map(|x| match x {
+            Ok(x) => Some(x),
+            Err((e, loader_version)) => {
+                tracing::error!("Error downloading forge installer for {loader_version}: {}", e);
+                None
+            }
+        }).collect::<Vec<_>>();
 
         #[tracing::instrument(skip(raw, upload_files, mirror_artifacts))]
         async fn read_forge_installer(
@@ -696,24 +705,37 @@ async fn fetch(
             }
         }
 
-        let forge_version_infos = futures::future::try_join_all(
+        let forge_version_infos = futures::future::join_all(
             forge_installers
                 .into_iter()
                 .enumerate()
                 .map(|(index, raw)| {
                     let loader = fetch_versions[index];
+                    let loader_version = loader.loader_version.clone();
 
-                    read_forge_installer(
-                        raw,
-                        loader,
-                        maven_url,
-                        mod_loader,
-                        upload_files,
-                        mirror_artifacts,
-                    )
+                    async move {
+                        read_forge_installer(
+                            raw,
+                            loader,
+                            maven_url,
+                            mod_loader,
+                            upload_files,
+                            mirror_artifacts,
+                        )
+                        .await
+                        .map_err(move |e| (e, loader_version))
+                    }
                 }),
         )
-        .await?;
+        .await;
+
+        let forge_version_infos = forge_version_infos.into_iter().filter_map(|x| match x {
+            Ok(x) => Some(x),
+            Err((e, loader_version)) => {
+                tracing::error!("Error gathering info for Forge version {loader_version}: {}", e);
+                None
+            }
+        }).collect::<Vec<_>>();
 
         let serialized_version_manifests = forge_version_infos
             .iter()
