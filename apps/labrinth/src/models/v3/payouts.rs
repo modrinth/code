@@ -43,6 +43,7 @@ pub enum PayoutMethodType {
     Venmo,
     PayPal,
     Tremendous,
+    MuralPay,
     Unknown,
 }
 
@@ -58,6 +59,7 @@ impl PayoutMethodType {
             PayoutMethodType::Venmo => "venmo",
             PayoutMethodType::PayPal => "paypal",
             PayoutMethodType::Tremendous => "tremendous",
+            PayoutMethodType::MuralPay => "muralpay",
             PayoutMethodType::Unknown => "unknown",
         }
     }
@@ -67,6 +69,7 @@ impl PayoutMethodType {
             "venmo" => PayoutMethodType::Venmo,
             "paypal" => PayoutMethodType::PayPal,
             "tremendous" => PayoutMethodType::Tremendous,
+            "muralpay" => PayoutMethodType::MuralPay,
             _ => PayoutMethodType::Unknown,
         }
     }

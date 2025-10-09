@@ -128,7 +128,7 @@ async fn main() -> eyre::Result<()> {
                         },
                         supporting_details: Some(SupportingDetails {
                             supporting_document: Some("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA...".into()),
-                            payout_purpose: Some(PayoutPurpose::Payroll),
+                            payout_purpose: Some(PayoutPurpose::VendorPayment),
                         }),
                     }],
                 )

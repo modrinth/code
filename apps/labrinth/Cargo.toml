@@ -132,6 +132,7 @@ rust_iso3166.workspace = true
 async-stripe = { workspace = true, features = ["billing", "checkout", "connect", "webhook-events"] }
 rusty-money.workspace = true
 json-patch.workspace = true
+muralpay.workspace = true
 
 ariadne.workspace = true
 path-util.workspace = true

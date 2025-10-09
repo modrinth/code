@@ -49,6 +49,7 @@ clap = "4.5.43"
 clickhouse = "0.13.3"
 color-thief = "0.2.2"
 console-subscriber = "0.4.1"
+muralpay = { path = "packages/muralpay" }
 daedalus = { path = "packages/daedalus" }
 path-util = { path = "packages/path-util" }
 dashmap = "6.1.0"

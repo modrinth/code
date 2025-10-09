@@ -4556,6 +4556,7 @@ dependencies = [
  "lettre",
  "maxminddb",
  "meilisearch-sdk",
+ "muralpay",
  "murmur2",
  "paste",
  "path-util",

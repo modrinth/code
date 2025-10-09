@@ -7,13 +7,16 @@ use crate::models::payouts::{
 };
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
+use crate::util::env::env_var;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
 };
 use base64::Engine;
 use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
 use dashmap::DashMap;
+use eyre::Result;
 use futures::TryStreamExt;
+use muralpay::MuralPay;
 use reqwest::Method;
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
@@ -24,11 +27,12 @@ use sqlx::PgPool;
 use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
     payout_options: RwLock<Option<PayoutMethods>>,
+    muralpay: RwLock<Option<MuralPay>>,
 }
 
 #[derive(Clone, Debug)]
@@ -55,12 +59,28 @@ impl Default for PayoutsQueue {
         Self::new()
     }
 }
+
+fn muralpay_client() -> Result<MuralPay> {
+    let api_url = env_var("MURALPAY_API_URL")?;
+    let api_key = env_var("MURALPAY_API_KEY")?;
+    let transfer_api_key = env_var("MURALPAY_TRANSFER_API_KEY")?;
+
+    Ok(MuralPay::new(api_url, api_key, Some(transfer_api_key)))
+}
+
 // Batches payouts and handles token refresh
 impl PayoutsQueue {
     pub fn new() -> Self {
+        let muralpay = muralpay_client()
+            .inspect_err(|err| {
+                warn!("Failed to create Mural Pay client: {err:#?}")
+            })
+            .ok();
+
         PayoutsQueue {
             credential: RwLock::new(None),
             payout_options: RwLock::new(None),
+            muralpay: RwLock::new(muralpay),
         }
     }
 
