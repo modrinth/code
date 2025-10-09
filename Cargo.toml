@@ -64,7 +64,7 @@ encoding_rs = "0.8.35"
 enumset = "1.1.10"
 flate2 = "1.1.4"
 fs4 = { version = "0.13.1", default-features = false }
-futures = { version = "0.3.31", default-features = false, features = ["std"] }
+futures = "0.3.31"
 futures-util = "0.3.31"
 heck = "0.5.0"
 hex = "0.4.3"
