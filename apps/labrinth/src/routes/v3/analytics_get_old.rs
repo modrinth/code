@@ -27,6 +27,8 @@ use std::num::NonZeroU32;
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("analytics")
+            // TODO: since our service shadows analytics v2, we have to redirect here
+            .route("", web::post().to(super::analytics_get::get))
             .route("playtime", web::get().to(playtimes_get))
             .route("views", web::get().to(views_get))
             .route("downloads", web::get().to(downloads_get))
