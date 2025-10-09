@@ -8,9 +8,11 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::collections::{Collection, CollectionStatus};
 use crate::models::ids::{CollectionId, ProjectId};
 use crate::models::pats::Scopes;
+use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::v3::project_creation::CreateError;
+use crate::util::error::Context;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
@@ -19,6 +21,7 @@ use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
+use eyre::eyre;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -75,6 +78,12 @@ pub async fn collection_create(
     )
     .await?
     .1;
+
+    let limits =
+        UserLimits::get_for_collections(&current_user, &client).await?;
+    if limits.current >= limits.max {
+        return Err(CreateError::LimitReached);
+    }
 
     collection_create_data.validate().map_err(|err| {
         CreateError::InvalidInput(validation_errors_to_string(err, None))
@@ -328,10 +337,8 @@ pub async fn collection_edit(
                     project_id, &**pool, &redis,
                 )
                 .await?
-                .ok_or_else(|| {
-                    ApiError::InvalidInput(format!(
-                        "The specified project {project_id} does not exist!"
-                    ))
+                .wrap_request_err_with(|| {
+                    eyre!("The specified project {project_id} does not exist!")
                 })?;
                 validated_project_ids.push(project.inner.id.0);
             }

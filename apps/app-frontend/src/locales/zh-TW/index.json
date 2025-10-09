@@ -1,6 +1,9 @@
 {
   "app.settings.developer-mode-enabled": {
-    "message": "已啟用開發人員模式。"
+    "message": "開發人員模式已啟用。"
+  },
+  "app.settings.downloading": {
+    "message": "下載 v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "外觀"
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "資源管理"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} 安裝已準備就緒！重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} 已完成下載。重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} 現已推出！由於你正使用計量付費的網路，我們沒有自動下載它。"
+  },
+  "app.update-toast.changelog": {
+    "message": "變更紀錄"
+  },
+  "app.update-toast.download": {
+    "message": "下載（{size}）"
+  },
+  "app.update-toast.downloading": {
+    "message": "下載中..."
+  },
+  "app.update-toast.reload": {
+    "message": "重新載入"
+  },
+  "app.update-toast.title": {
+    "message": "有可用的更新"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "下載完成"
+  },
+  "app.update.complete-toast.text": {
+    "message": "按這裡查看變更紀錄。"
+  },
+  "app.update.complete-toast.title": {
+    "message": "版本 {version} 已成功安裝！"
+  },
+  "app.update.download-update": {
+    "message": "下載更新"
+  },
+  "app.update.downloading-update": {
+    "message": "正在下載更新（{percent}%）"
+  },
+  "app.update.reload-to-update": {
+    "message": "重新載入即可安裝更新"
   },
   "instance.add-server.add-and-play": {
     "message": "新增並遊玩"
@@ -60,7 +105,7 @@
     "message": "已停用的專案"
   },
   "instance.filter.updates-available": {
-    "message": "更新可用"
+    "message": "有可用的更新"
   },
   "instance.server-modal.address": {
     "message": "位址"

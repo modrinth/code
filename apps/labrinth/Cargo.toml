@@ -23,6 +23,10 @@ actix-web-prom = { workspace = true, features = ["process"] }
 tracing.workspace = true
 tracing-actix-web.workspace = true
 console-subscriber.workspace = true
+tracing-subscriber.workspace = true
+tracing-ecs.workspace = true
+eyre.workspace = true
+color-eyre.workspace = true
 
 tokio = { workspace = true, features = ["sync", "rt-multi-thread"] }
 tokio-stream.workspace = true
@@ -35,12 +39,7 @@ paste.workspace = true
 
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 rust-s3.workspace = true
-reqwest = { workspace = true, features = [
-	"http2",
-	"rustls-tls-webpki-roots",
-	"json",
-	"multipart",
-] }
+reqwest = { workspace = true, features = ["http2", "rustls-tls-webpki-roots", "json", "multipart"] }
 hyper-rustls.workspace = true
 hyper-util.workspace = true
 
@@ -90,10 +89,7 @@ sqlx = { workspace = true, features = [
 	"rust_decimal",
 	"json",
 ] }
-rust_decimal = { workspace = true, features = [
-	"serde-with-float",
-	"serde-with-str",
-] }
+rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 redis = { workspace = true, features = ["tokio-comp", "ahash", "r2d2"] }
 deadpool-redis.workspace = true
 clickhouse = { workspace = true, features = ["uuid", "time"] }
@@ -132,16 +128,12 @@ lettre.workspace = true
 
 rust_iso3166.workspace = true
 
-async-stripe = { workspace = true, features = [
-	"billing",
-	"checkout",
-	"connect",
-	"webhook-events",
-] }
+async-stripe = { workspace = true, features = ["billing", "checkout", "connect", "webhook-events"] }
 rusty-money.workspace = true
 json-patch.workspace = true
 
 ariadne.workspace = true
+path-util.workspace = true
 
 clap = { workspace = true, features = ["derive"] }
 

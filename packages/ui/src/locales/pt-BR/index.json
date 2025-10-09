@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Cancelar"
   },
+  "button.close": {
+    "defaultMessage": "Fechar"
+  },
   "button.continue": {
     "defaultMessage": "Continuar"
   },
@@ -78,7 +81,7 @@
     "defaultMessage": "Salvando"
   },
   "button.sign-in": {
-    "defaultMessage": "Entrar"
+    "defaultMessage": "Iniciar sessão"
   },
   "button.sign-out": {
     "defaultMessage": "Desconectar-se"
@@ -165,7 +168,7 @@
     "defaultMessage": "Painel de controle"
   },
   "label.delete": {
-    "defaultMessage": "Excluir"
+    "defaultMessage": "Apagar"
   },
   "label.description": {
     "defaultMessage": "Descrição"
@@ -576,7 +579,7 @@
     "defaultMessage": "Membros"
   },
   "project.settings.notice.no-permission.description": {
-    "defaultMessage": "Você não tem permissão para editar isso."
+    "defaultMessage": "Você não tem permissão para editar isto."
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Sem permissão"
@@ -660,7 +663,7 @@
     "defaultMessage": "Versão do jogo"
   },
   "search.filter_type.game_version.all_versions": {
-    "defaultMessage": "Mostrar todas as versões"
+    "defaultMessage": "Exibir todas as versões"
   },
   "search.filter_type.license": {
     "defaultMessage": "Licença"
@@ -732,10 +735,10 @@
     "defaultMessage": "Comece agora"
   },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "Ideal para 15–25 jogadores, pacotes de mods ou mods pesadas."
+    "defaultMessage": "Ideal para 15–25 jogadores, pacotes de mods ou mods pesados."
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "Bom para 6–15 jogadores e múltiplos mods."
+    "defaultMessage": "Bom para 6–15 jogadores e vários mods."
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Mais popular"

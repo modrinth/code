@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT products.id, products.metadata, products.unitary, products.name\n            FROM products\n            INNER JOIN products_prices pp ON pp.id = $1\n\t\t\tWHERE products.id = pp.product_id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 2,
+        "name": "unitary",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "0867c10a6e4a2f259c957abfbc8696ef9be817baed61a8b515a07733f9be2f83"
+}

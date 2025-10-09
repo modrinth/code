@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Cancelar"
+  },
+  "action.continue": {
+    "message": "Continuar"
+  },
   "admin.billing.error.not-found": {
     "message": "Utilizador não encontrado"
   },
@@ -413,6 +419,12 @@
   "collection.title": {
     "message": "{name} - Coleção"
   },
+  "common.no": {
+    "message": "Não"
+  },
+  "common.yes": {
+    "message": "Sim"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Criar nova"
   },
@@ -665,8 +677,8 @@
   "layout.action.change-theme": {
     "message": "Alterar tema"
   },
-  "layout.action.close-banner": {
-    "message": "Fechar"
+  "layout.action.create-new": {
+    "message": "Criar novo..."
   },
   "layout.action.new-collection": {
     "message": "Nova coleção"
@@ -812,6 +824,9 @@
   "layout.nav.discover-content": {
     "message": "Descobrir conteúdo"
   },
+  "layout.nav.feature-flags": {
+    "message": "Flags de funcionalidades"
+  },
   "layout.nav.get-modrinth-app": {
     "message": "Obter a Modrinth App"
   },
@@ -941,9 +956,6 @@
   "project-member-header.invitation-title": {
     "message": "Convite para juntar ao projeto"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "Foste convidado a ser membro deste projeto com o cargo de \"{role}\"."
-  },
   "project-member-header.success": {
     "message": "Sucesso"
   },
@@ -1063,12 +1075,6 @@
   },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers é a forma mais fácil de jogares com os teus amigos sem complicações!"
-  },
-  "project.actions.servers-promo.monthly": {
-    "message": " / mês"
-  },
-  "project.actions.servers-promo.pricing": {
-    "message": "A partir de $5{monthly}"
   },
   "project.actions.servers-promo.title": {
     "message": "Cria um servidor"

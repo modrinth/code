@@ -22,6 +22,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showVersionFilesInTable: false,
 	showAdsWithPlus: false,
 	alwaysShowChecklistAsPopup: true,
+	testTaxForm: false,
 
 	// Feature toggles
 	projectTypesPrimaryNav: false,
@@ -37,6 +38,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showProjectPageQuickServerButton: false,
 	newProjectGeneralSettings: false,
 	newProjectEnvironmentSettings: true,
+	hideRussiaCensorshipBanner: false,
 	// advancedRendering: true,
 	// externalLinksNewTab: true,
 	// notUsingBlockers: false,

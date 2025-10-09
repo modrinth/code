@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Отмена"
   },
+  "button.close": {
+    "defaultMessage": "Закрыть"
+  },
   "button.continue": {
     "defaultMessage": "Продолжить"
   },
@@ -687,10 +690,10 @@
     "defaultMessage": "Загрузчик"
   },
   "servers.notice.dismiss": {
-    "defaultMessage": "Отклонить"
+    "defaultMessage": "Закрыть"
   },
   "servers.notice.dismissable": {
-    "defaultMessage": "Отклоняемый"
+    "defaultMessage": "Закрываемое"
   },
   "servers.notice.heading.attention": {
     "defaultMessage": "Внимание"
@@ -699,7 +702,7 @@
     "defaultMessage": "Информация"
   },
   "servers.notice.level.critical.name": {
-    "defaultMessage": "Критическая"
+    "defaultMessage": "Важно"
   },
   "servers.notice.level.info.name": {
     "defaultMessage": "Информация"
@@ -711,7 +714,7 @@
     "defaultMessage": "Предупреждение"
   },
   "servers.notice.undismissable": {
-    "defaultMessage": "Не отклоняемый"
+    "defaultMessage": "Незакрываемое"
   },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "С вас пока что не будет взиматься плата."

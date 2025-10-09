@@ -419,14 +419,152 @@
   "collection.title": {
     "message": "{name} - Kollektion"
   },
-  "common.close": {
-    "message": "Schließen"
-  },
   "common.no": {
     "message": "Nein"
   },
   "common.yes": {
     "message": "Ja"
+  },
+  "create.collection.cancel": {
+    "message": "Abbrechen"
+  },
+  "create.collection.collection-info": {
+    "message": "Deine neue Kollektion wird als eine öffentliche Kollektion mit {count, plural, =0 {keinen Projekten} one {einem Projekt} other {# Projekten}} erstellt."
+  },
+  "create.collection.create-collection": {
+    "message": "Kollektion erstellen"
+  },
+  "create.collection.error-title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "create.collection.name-label": {
+    "message": "Name"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Namen der Kollektion eingeben..."
+  },
+  "create.collection.summary-description": {
+    "message": "Ein oder zwei Sätze die deine Kollektion beschreiben."
+  },
+  "create.collection.summary-label": {
+    "message": "Kurzbeschreibung"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Das ist eine Kollektion aus..."
+  },
+  "create.collection.title": {
+    "message": "Eine Kollektion erstellen"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Baldiges Erreichen des {type} Limits ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Du erreichst bald das {type} Limit, bitte kontaktiere den Support, falls du mehr als {max} {typePlural} benötigst."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Support Kontaktieren"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type} Maximum erreicht"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Du hast dein {type} Maximum von {max} erreicht. Bitte Kontaktiere den Support."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "Kollektion"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "Organisation"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "Kollektionen"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "Organisationen"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "Projekte"
+  },
+  "create.limit-alert.type-project": {
+    "message": "Projekt"
+  },
+  "create.organization.cancel": {
+    "message": "Abbrechen"
+  },
+  "create.organization.create-organization": {
+    "message": "Organisation erstellen"
+  },
+  "create.organization.error-title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "create.organization.name-label": {
+    "message": "Name"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Gebe dein Organisationsname ein..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Du wirst der Besitzer dieser Organisation sein, aber du kannst andere Mitglieder jederzeit einladen und die Eigentümerschaft jederzeit übertragen."
+  },
+  "create.organization.summary-description": {
+    "message": "Ein oder zwei Sätze, die deine Organisation beschreiben."
+  },
+  "create.organization.summary-label": {
+    "message": "Kurzbeschreibung"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Eine Organisation für..."
+  },
+  "create.organization.title": {
+    "message": "Eine Organisation erstellen"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Abbrechen"
+  },
+  "create.project.create-project": {
+    "message": "Projekt erstellen"
+  },
+  "create.project.error-title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "create.project.name-label": {
+    "message": "Name"
+  },
+  "create.project.name-placeholder": {
+    "message": "Projektnamen eingeben..."
+  },
+  "create.project.summary-description": {
+    "message": "Ein oder Zwei Sätze, die dein Projekt beschreiben."
+  },
+  "create.project.summary-label": {
+    "message": "Kurzbeschreibung"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Dieses Projekt fügt folgendes hinzu: ..."
+  },
+  "create.project.title": {
+    "message": "Ein Projekt erstellen"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "Die Sichtbarkeit deines Projektes nachdem es genehmigt wurde."
+  },
+  "create.project.visibility-label": {
+    "message": "Sichtbarkeit"
+  },
+  "create.project.visibility-private": {
+    "message": "Privat"
+  },
+  "create.project.visibility-public": {
+    "message": "Öffentlich"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Nicht gelistet"
   },
   "dashboard.collections.button.create-new": {
     "message": "Erstellen"
@@ -440,6 +578,9 @@
   "dashboard.collections.long-title": {
     "message": "Deine Kollektionen"
   },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Ein ausländisches Unternehmen bezeichnet eine Geschäftseinheit, die außerhalb der Vereinigten Staaten gegründet wurde (z. B. eine nicht-US-amerikanische Kapitalgesellschaft, Personengesellschaft oder LLC)."
+  },
   "dashboard.creator-tax-form-modal.entity.foreign-entity": {
     "message": "Ausländische Einheit"
   },
@@ -451,6 +592,9 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Steuerformular"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth verwendet den Drittanbieter Track1099, um deine Steuerformulare sicher zu erfassen und zu speichern. <security-link>Hier erfährst du mehr.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Sicherheitspraktiken"
@@ -478,6 +622,12 @@
   },
   "error.generic.404.title": {
     "message": "Seite nicht gefunden"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Diese Seite wurde aufgrund rechtlicher Gründe blockiert, zB wegen Regierungszensur oder laufende Gerichtsverfahren."
+  },
+  "error.generic.451.title": {
+    "message": "Inhalt aufgrund rechtlicher Gründe nicht verfügbar"
   },
   "error.generic.default.list_item.1": {
     "message": "Prüfe auf der <status-link>Status-Webseite</status-link> ob Modrinth offline ist."
@@ -698,9 +848,6 @@
   "layout.action.change-theme": {
     "message": "Farbschema ändern"
   },
-  "layout.action.close-banner": {
-    "message": "Schließen"
-  },
   "layout.action.create-new": {
     "message": "Erstellen..."
   },
@@ -763,6 +910,9 @@
   },
   "layout.banner.tax.action": {
     "message": "Steuerformular ausfüllen"
+  },
+  "layout.banner.tax.description": {
+    "message": "Du hast in diesem Jahr bereits über 600 US-Dollar von Modrinth abgehoben. Um den steuerlichen Vorschriften zu entsprechen, musst du ein Steuerformular ausfüllen. Deine Auszahlungen sind pausiert, bis dieses Formular eingereicht wurde."
   },
   "layout.banner.tax.title": {
     "message": "Steuerformular erforderlich"
@@ -1046,6 +1196,9 @@
   "project-moderation-nags.submit-for-review": {
     "message": "Zur Überprüfung einsenden"
   },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Zur Überprüfung einsenden"
+  },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Dein Projekt kann nur von Mitgliedern dieses Projektes gesehen werden. Es muss erst von der Moderation bestätigt werden, damit es öffentlich zugänglich ist."
   },
@@ -1139,11 +1292,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Server ist der einfachste Weg mit deinen Freunden ohne Aufwand zu spielen!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": "/ Monat"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "Startet ab $5{monthly}"
+    "message": "Ab {price}<small> / Monat</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Erstelle einen Server"

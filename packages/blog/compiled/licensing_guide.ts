@@ -6,6 +6,7 @@ export const article = {
   date: "2021-05-16T00:00:00.000Z",
   slug: "licensing-guide",
   authors: ["6plzAzU4","aNd6VJql"],
+  unlisted: false,
   thumbnail: true,
   
 };

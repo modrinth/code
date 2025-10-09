@@ -8,13 +8,13 @@ use crate::{
         emit::{emit_loading, loading_try_for_each_concurrent},
     },
     state::State,
-    util::{fetch::*, io, platform::OsExt},
+    util::{fetch::*, io},
 };
 use daedalus::minecraft::{LoggingConfiguration, LoggingSide};
 use daedalus::{
     self as d,
     minecraft::{
-        Asset, AssetsIndex, Library, Os, Version as GameVersion,
+        Asset, AssetsIndex, Library, Version as GameVersion,
         VersionInfo as GameVersionInfo,
     },
     modded::LoaderVersion,
@@ -288,90 +288,132 @@ pub async fn download_libraries(
     }?;
     let num_files = libraries.len();
     loading_try_for_each_concurrent(
-        stream::iter(libraries.iter())
-            .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
-                if let Some(rules) = &library.rules
-                    && !parse_rules(rules, java_arch, &QuickPlayType::None, minecraft_updated) {
-                        tracing::trace!("Skipped library {}", &library.name);
-                        return Ok(());
-                    }
+        stream::iter(libraries.iter()).map(Ok::<&Library, crate::Error>),
+        None,
+        loading_bar,
+        loading_amount,
+        num_files,
+        None,
+        |library| async move {
+            if let Some(rules) = &library.rules
+                && !parse_rules(
+                    rules,
+                    java_arch,
+                    &QuickPlayType::None,
+                    minecraft_updated,
+                )
+            {
+                tracing::trace!("Skipped library {}", &library.name);
+                return Ok(());
+            }
 
-                if !library.downloadable {
-                    tracing::trace!("Skipped non-downloadable library {}", &library.name);
+            if !library.downloadable {
+                tracing::trace!(
+                    "Skipped non-downloadable library {}",
+                    &library.name
+                );
+                return Ok(());
+            }
+
+            // When a library has natives, we only need to download such natives, as PrismLauncher does
+            if let Some((os_key, classifiers)) =
+                library.natives_os_key_and_classifiers(java_arch)
+            {
+                let parsed_key = os_key
+                    .replace("${arch}", crate::util::platform::ARCH_WIDTH);
+
+                if let Some(native) = classifiers.get(&parsed_key) {
+                    let data = fetch(
+                        &native.url,
+                        Some(&native.sha1),
+                        &st.fetch_semaphore,
+                        &st.pool,
+                    )
+                    .await?;
+
+                    if let Ok(mut archive) =
+                        zip::ZipArchive::new(std::io::Cursor::new(&data))
+                    {
+                        match archive.extract(
+                            st.directories.version_natives_dir(version),
+                        ) {
+                            Ok(_) => tracing::debug!(
+                                "Fetched native {}",
+                                &library.name
+                            ),
+                            Err(err) => tracing::error!(
+                                "Failed extracting native {}. err: {err}",
+                                &library.name
+                            ),
+                        }
+                    } else {
+                        tracing::error!(
+                            "Failed extracting native {}",
+                            &library.name
+                        );
+                    }
+                }
+            } else {
+                let artifact_path = d::get_path_from_artifact(&library.name)?;
+                let path = st.directories.libraries_dir().join(&artifact_path);
+
+                if path.exists() && !force {
                     return Ok(());
                 }
 
-                tokio::try_join! {
-                    async {
-                        let artifact_path = d::get_path_from_artifact(&library.name)?;
-                        let path = st.directories.libraries_dir().join(&artifact_path);
+                if let Some(d::minecraft::LibraryDownloads {
+                    artifact: Some(ref artifact),
+                    ..
+                }) = library.downloads
+                    && !artifact.url.is_empty()
+                {
+                    let bytes = fetch(
+                        &artifact.url,
+                        Some(&artifact.sha1),
+                        &st.fetch_semaphore,
+                        &st.pool,
+                    )
+                    .await?;
+                    write(&path, &bytes, &st.io_semaphore).await?;
 
-                        if path.exists() && !force {
-                            return Ok(());
-                        }
+                    tracing::trace!(
+                        "Fetched library {} to path {:?}",
+                        &library.name,
+                        &path
+                    );
+                } else {
+                    // We lack an artifact URL, so fall back to constructing one ourselves.
+                    // PrismLauncher just ignores the library if this is the case, so it's
+                    // probably not needed, but previous code revisions of the Modrinth App
+                    // intended to do this, so we keep that behavior for compatibility.
 
-                        if let Some(d::minecraft::LibraryDownloads { artifact: Some(ref artifact), ..}) = library.downloads
-                            && !artifact.url.is_empty(){
-                                let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.fetch_semaphore, &st.pool)
-                                    .await?;
-                                write(&path, &bytes, &st.io_semaphore).await?;
-                                tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
-                                return Ok::<_, crate::Error>(());
-                            }
+                    let url = format!(
+                        "{}{artifact_path}",
+                        library
+                            .url
+                            .as_deref()
+                            .unwrap_or("https://libraries.minecraft.net/")
+                    );
 
-                        let url = [
-                            library
-                                .url
-                                .as_deref()
-                                .unwrap_or("https://libraries.minecraft.net/"),
-                            &artifact_path
-                        ].concat();
+                    let bytes =
+                        fetch(&url, None, &st.fetch_semaphore, &st.pool)
+                            .await?;
 
-                        let bytes = fetch(&url, None, &st.fetch_semaphore, &st.pool).await?;
-                        write(&path, &bytes, &st.io_semaphore).await?;
-                        tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
-                        Ok::<_, crate::Error>(())
-                    },
-                    async {
-                        // HACK: pseudo try block using or else
-                        if let Some((os_key, classifiers)) = None.or_else(|| Some((
-                            library
-                                .natives
-                                .as_ref()?
-                                .get(&Os::native_arch(java_arch))?,
-                            library
-                                .downloads
-                                .as_ref()?
-                                .classifiers
-                                .as_ref()?
-                        ))) {
-                            let parsed_key = os_key.replace(
-                                "${arch}",
-                                crate::util::platform::ARCH_WIDTH,
-                            );
+                    write(&path, &bytes, &st.io_semaphore).await?;
 
-                            if let Some(native) = classifiers.get(&parsed_key) {
-                                let data = fetch(&native.url, Some(&native.sha1), &st.fetch_semaphore, &st.pool).await?;
-                                let reader = std::io::Cursor::new(&data);
-                                if let Ok(mut archive) = zip::ZipArchive::new(reader) {
-                                    match archive.extract(st.directories.version_natives_dir(version)) {
-                                        Ok(_) => tracing::debug!("Fetched native {}", &library.name),
-                                        Err(err) => tracing::error!("Failed extracting native {}. err: {}", &library.name, err)
-                                    }
-                                } else {
-                                    tracing::error!("Failed extracting native {}", &library.name)
-                                }
-                            }
-                        }
-
-                        Ok(())
-                    }
-                }?;
-
-                tracing::debug!("Loaded library {}", library.name);
-                Ok(())
+                    tracing::trace!(
+                        "Fetched library {} to path {:?}",
+                        &library.name,
+                        &path
+                    );
+                }
             }
-        ).await?;
+
+            tracing::debug!("Loaded library {}", library.name);
+            Ok(())
+        },
+    )
+    .await?;
 
     tracing::debug!("Done loading libraries!");
     Ok(())

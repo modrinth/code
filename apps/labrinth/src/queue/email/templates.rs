@@ -24,6 +24,20 @@ const VERIFYEMAIL_URL: &str = "verifyemail.url";
 const AUTHPROVIDER_NAME: &str = "authprovider.name";
 const EMAILCHANGED_NEW_EMAIL: &str = "emailchanged.new_email";
 const BILLING_URL: &str = "billing.url";
+const SUBSCRIPTION_ID: &str = "subscription.id";
+
+const TAXNOTIFICATION_OLD_AMOUNT: &str = "taxnotification.old_amount";
+const TAXNOTIFICATION_OLD_TAX_AMOUNT: &str = "taxnotification.old_tax_amount";
+const TAXNOTIFICATION_OLD_TOTAL_AMOUNT: &str =
+    "taxnotification.old_total_amount";
+const TAXNOTIFICATION_NEW_AMOUNT: &str = "taxnotification.new_amount";
+const TAXNOTIFICATION_NEW_TAX_AMOUNT: &str = "taxnotification.new_tax_amount";
+const TAXNOTIFICATION_NEW_TOTAL_AMOUNT: &str =
+    "taxnotification.new_total_amount";
+const TAXNOTIFICATION_BILLING_INTERVAL: &str =
+    "taxnotification.billing_interval";
+const TAXNOTIFICATION_DUE: &str = "taxnotification.due";
+const TAXNOTIFICATION_SERVICE: &str = "taxnotification.service";
 
 const PAYMENTFAILED_AMOUNT: &str = "paymentfailed.amount";
 const PAYMENTFAILED_SERVICE: &str = "paymentfailed.service";
@@ -545,9 +559,54 @@ async fn collect_template_variables(
 
             map.insert(
                 PAYOUTAVAILABLE_AMOUNT,
-                format!("{:.2}", (amount * 100.0) as i64),
+                format!("USD${:.2}", *amount as f64 / 100.0),
             );
 
+            Ok(map)
+        }
+
+        NotificationBody::TaxNotification {
+            subscription_id,
+            old_amount,
+            old_tax_amount,
+            new_amount,
+            new_tax_amount,
+            billing_interval,
+            currency,
+            due,
+            service,
+        } => {
+            map.insert(
+                TAXNOTIFICATION_OLD_AMOUNT,
+                fmt_money(*old_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_OLD_TAX_AMOUNT,
+                fmt_money(*old_tax_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_OLD_TOTAL_AMOUNT,
+                fmt_money(*old_amount + *old_tax_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_NEW_AMOUNT,
+                fmt_money(*new_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_NEW_TAX_AMOUNT,
+                fmt_money(*new_tax_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_NEW_TOTAL_AMOUNT,
+                fmt_money(*new_amount + *new_tax_amount, currency),
+            );
+            map.insert(
+                TAXNOTIFICATION_BILLING_INTERVAL,
+                billing_interval.as_str().to_owned(),
+            );
+            map.insert(TAXNOTIFICATION_DUE, date_human_readable(*due));
+            map.insert(TAXNOTIFICATION_SERVICE, service.clone());
+            map.insert(SUBSCRIPTION_ID, to_base62(subscription_id.0));
             Ok(map)
         }
 
@@ -560,4 +619,12 @@ async fn collect_template_variables(
 
 fn date_human_readable(date: chrono::DateTime<chrono::Utc>) -> String {
     date.format("%B %d, %Y").to_string()
+}
+
+fn fmt_money(amount: i64, currency: &str) -> String {
+    rusty_money::Money::from_minor(
+        amount,
+        rusty_money::iso::find(currency).unwrap_or(rusty_money::iso::USD),
+    )
+    .to_string()
 }

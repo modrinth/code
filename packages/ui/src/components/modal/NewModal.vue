@@ -1,30 +1,17 @@
 <template>
-	<div
-		v-if="open"
-		:style="`${mouseX !== -1 ? `--_mouse-x: ${mouseX};` : ''} ${mouseY !== -1 ? `--_mouse-y: ${mouseY};` : ''}`"
-	>
-		<div
-			:class="{ shown: visible }"
-			class="tauri-overlay"
-			data-tauri-drag-region
-			@click="() => (closeOnClickOutside && closable ? hide() : {})"
-		/>
-		<div
-			:class="{
-				shown: visible,
-				noblur: props.noblur,
-				danger: danger,
-			}"
-			class="modal-overlay"
-			@click="() => (closeOnClickOutside && closable ? hide() : {})"
-		/>
+	<div v-if="open"
+		:style="`${mouseX !== -1 ? `--_mouse-x: ${mouseX};` : ''} ${mouseY !== -1 ? `--_mouse-y: ${mouseY};` : ''}`">
+		<div :class="{ shown: visible }" class="tauri-overlay" data-tauri-drag-region
+			@click="() => (closeOnClickOutside && closable ? hide() : {})" />
+		<div :class="{
+			shown: visible,
+			noblur: props.noblur,
+			danger: danger,
+		}" class="modal-overlay" @click="() => (closeOnClickOutside && closable ? hide() : {})" />
 		<div class="modal-container experimental-styles-within" :class="{ shown: visible }">
 			<div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
-				<div
-					v-if="!props.mergeHeader"
-					data-tauri-drag-region
-					class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full"
-				>
+				<div v-if="!hideHeader" data-tauri-drag-region
+					class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full">
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 						<slot name="title">
 							<span v-if="header" class="text-lg font-extrabold text-contrast">
@@ -39,11 +26,7 @@
 					</ButtonStyled>
 				</div>
 
-				<ButtonStyled
-					v-if="props.mergeHeader && closable"
-					class="absolute top-4 right-4 z-10"
-					circular
-				>
+				<ButtonStyled v-if="props.mergeHeader && closable" class="absolute top-4 right-4 z-10" circular>
 					<button v-tooltip="'Close'" aria-label="Close" @click="hide">
 						<XIcon aria-hidden="true" />
 					</button>
@@ -58,10 +41,10 @@
 </template>
 
 <script setup lang="ts">
-import { XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { XIcon } from '@modrinth/assets';
+import { ref } from 'vue';
 
-import ButtonStyled from '../base/ButtonStyled.vue'
+import ButtonStyled from '../base/ButtonStyled.vue';
 
 const props = withDefaults(
 	defineProps<{
@@ -72,6 +55,7 @@ const props = withDefaults(
 		closeOnClickOutside?: boolean
 		warnOnClose?: boolean
 		header?: string
+		hideHeader?: boolean
 		onHide?: () => void
 		onShow?: () => void
 		mergeHeader?: boolean
@@ -84,8 +68,9 @@ const props = withDefaults(
 		closeOnEsc: true,
 		warnOnClose: false,
 		header: undefined,
-		onHide: () => {},
-		onShow: () => {},
+		hideHeader: false,
+		onHide: () => { },
+		onShow: () => { },
 		mergeHeader: false,
 	},
 )
@@ -148,7 +133,7 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 }
 
 function handleKeyDown(event: KeyboardEvent) {
-	if (props.closeOnEsc && event.key === 'Escape') {
+	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
 		hide()
 		mouseX.value = window.innerWidth / 2
 		mouseY.value = window.innerHeight / 2
@@ -219,24 +204,22 @@ function handleKeyDown(event: KeyboardEvent) {
 	z-index: 21;
 	visibility: hidden;
 	pointer-events: none;
-	transform: translate(
-		calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 16),
-		calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 16)
-	);
+	transform: translate(calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 16),
+			calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 16));
 	transition: all 0.2s ease-out;
 
 	&.shown {
 		visibility: visible;
 		transform: translate(0, 0);
 
-		> .modal-body {
+		>.modal-body {
 			opacity: 1;
 			visibility: visible;
 			scale: 1;
 		}
 	}
 
-	> .modal-body {
+	>.modal-body {
 		position: fixed;
 		box-shadow: 4px 4px 26px 10px rgba(0, 0, 0, 0.08);
 		max-height: calc(100% - 2 * var(--gap-lg));

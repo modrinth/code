@@ -11,6 +11,7 @@ tauri-build = { workspace = true, features = ["codegen"] }
 
 [dependencies]
 theseus = { workspace = true, features = ["tauri"] }
+path-util.workspace = true
 
 serde_json.workspace = true
 serde = { workspace = true, features = ["derive"] }
@@ -49,6 +50,10 @@ native-dialog.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
 tauri-plugin-updater = { workspace = true, optional = true }
+
+[target.'cfg(windows)'.dependencies]
+webview2-com.workspace = true
+windows-core.workspace = true
 
 [features]
 # by default Tauri runs in production mode

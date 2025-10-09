@@ -524,9 +524,13 @@ impl ProjectStatus {
     }
 
     // Project can be displayed in search
-    // IMPORTANT: if this is changed, make sure to update the `mods_searchable_ids_gist`
-    // index in the DB to keep random project queries fast (see the
-    // `20250609134334_spatial-random-project-index.sql` migration)
+    // IMPORTANT: if this is changed, make sure to:
+    // - update the `mods_searchable_ids_gist`
+    //   index in the DB to keep random project queries fast (see the
+    //   `20250609134334_spatial-random-project-index.sql` migration).
+    // - update the `is_visible_organization` function in
+    //   `apps/labrinth/src/auth/checks.rs`, which duplicates this logic
+    //   in a SQL query for efficiency.
     pub fn is_searchable(&self) -> bool {
         matches!(self, ProjectStatus::Approved | ProjectStatus::Archived)
     }
