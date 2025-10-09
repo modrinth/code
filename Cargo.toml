@@ -162,7 +162,7 @@ tauri-plugin-updater = { version = "2.9.0", default-features = false, features =
 tauri-plugin-window-state = "2.4.0"
 tempfile = "3.23.0"
 theseus = { path = "packages/app-lib" }
-thiserror = "2.0.12"
+thiserror = "2.0.17"
 tikv-jemalloc-ctl = "0.6.0"
 tikv-jemallocator = "0.6.0"
 tokio = "1.47.1"
