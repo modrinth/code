@@ -92,7 +92,6 @@ pub async fn fetch_forge(
         semaphore,
         upload_files,
         mirror_artifacts,
-        false,
     )
     .await
 }
@@ -191,7 +190,6 @@ pub async fn fetch_neo(
         semaphore,
         upload_files,
         mirror_artifacts,
-        true,
     )
     .await
 }
@@ -210,18 +208,13 @@ async fn fetch(
     semaphore: Arc<Semaphore>,
     upload_files: &DashMap<String, UploadFile>,
     mirror_artifacts: &DashMap<String, MirrorArtifact>,
-    force_all: bool,
 ) -> Result<(), Error> {
-    let mut modrinth_manifest = fetch_json::<daedalus::modded::Manifest>(
+    let modrinth_manifest = fetch_json::<daedalus::modded::Manifest>(
         &format_url(&format!("{mod_loader}/v{format_version}/manifest.json",)),
         &semaphore,
     )
     .await
     .ok();
-
-    if force_all {
-        modrinth_manifest = None;
-    }
 
     let fetch_versions = if let Some(modrinth_manifest) = modrinth_manifest {
         let mut fetch_versions = Vec::new();
@@ -241,23 +234,13 @@ async fn fetch(
     };
 
     if !fetch_versions.is_empty() {
-        let forge_installers =
-            futures::future::join_all(fetch_versions.iter().map(|x| async {
-                download_file(&x.installer_url, None, &semaphore)
-                    .await
-                    .map_err(|e| (e, x.loader_version.clone()))
-            }))
-            .await;
+        let forge_installers = futures::future::try_join_all(
+            fetch_versions
+                .iter()
+                .map(|x| download_file(&x.installer_url, None, &semaphore)),
+        )
+        .await?;
 
-        let forge_installers = forge_installers.into_iter().filter_map(|x| match x {
-            Ok(x) => Some(x),
-            Err((e, loader_version)) => {
-                tracing::error!("Error downloading forge installer for {loader_version}: {}", e);
-                None
-            }
-        }).collect::<Vec<_>>();
-
-        #[tracing::instrument(skip(raw, upload_files, mirror_artifacts))]
         async fn read_forge_installer(
             raw: bytes::Bytes,
             loader: &ForgeVersion,
@@ -712,37 +695,24 @@ async fn fetch(
             }
         }
 
-        let forge_version_infos = futures::future::join_all(
+        let forge_version_infos = futures::future::try_join_all(
             forge_installers
                 .into_iter()
                 .enumerate()
                 .map(|(index, raw)| {
                     let loader = fetch_versions[index];
-                    let loader_version = loader.loader_version.clone();
 
-                    async move {
-                        read_forge_installer(
-                            raw,
-                            loader,
-                            maven_url,
-                            mod_loader,
-                            upload_files,
-                            mirror_artifacts,
-                        )
-                        .await
-                        .map_err(move |e| (e, loader_version))
-                    }
+                    read_forge_installer(
+                        raw,
+                        loader,
+                        maven_url,
+                        mod_loader,
+                        upload_files,
+                        mirror_artifacts,
+                    )
                 }),
         )
-        .await;
-
-        let forge_version_infos = forge_version_infos.into_iter().filter_map(|x| match x {
-            Ok(x) => Some(x),
-            Err((e, loader_version)) => {
-                tracing::error!("Error gathering info for Forge version {loader_version}: {}", e);
-                None
-            }
-        }).collect::<Vec<_>>();
+        .await?;
 
         let serialized_version_manifests = forge_version_infos
             .iter()
