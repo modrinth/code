@@ -13,7 +13,7 @@ edition.workspace = true
 workspace = true
 
 [dependencies]
-reqwest    = { workspace = true, features = ["json"] }
+reqwest    = { workspace = true, features = ["default-tls", "http2", "json"] }
 secrecy    = { workspace = true }
 serde      = { workspace = true, features = ["derive"] }
 serde_with      = { workspace = true }
@@ -32,3 +32,4 @@ eyre = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 color-eyre = { workspace = true }
 tracing-subscriber = { workspace = true }
+dotenvy = { workspace = true }

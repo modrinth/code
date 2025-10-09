@@ -60,6 +60,7 @@ enum OutputFormat {
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
+    _ = dotenvy::dotenv();
     color_eyre::install().expect("failed to install `color-eyre`");
     tracing_subscriber::fmt().init();
 
