@@ -133,7 +133,7 @@ sentry = { version = "0.42.0", default-features = false, features = [
 	"rustls",
 ] }
 sentry-actix = "0.42.0"
-serde = "1.0.219"
+serde = "1.0.228"
 serde_bytes = "0.11.17"
 serde_cbor = "0.11.2"
 serde_ini = "0.2.0"
