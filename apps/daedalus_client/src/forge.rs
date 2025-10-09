@@ -216,7 +216,9 @@ async fn fetch(
     .await
     .ok();
 
-    let fetch_versions = if let Some(modrinth_manifest) = modrinth_manifest {
+    let fetch_versions = if let Some(modrinth_manifest) = modrinth_manifest
+        && mod_loader != "neo"
+    {
         let mut fetch_versions = Vec::new();
 
         for version in &forge_versions {
