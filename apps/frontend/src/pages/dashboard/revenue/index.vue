@@ -1,7 +1,5 @@
 <template>
-	<CreatorWithdrawModal ref="withdrawModal" :country="withdrawCountry" :auth="auth" :balance="userBalance"
-		:payout-methods="paymentMethods" :payout-methods-pending="payoutMethodsPending" @withdraw="handleWithdraw"
-		@refresh-data="refreshData" />
+	<CreatorWithdrawModal ref="withdrawModal" :balance="userBalance" @refresh-data="refreshData" />
 	<div class="mb-6 flex flex-col gap-8 p-12 py-0">
 		<div class="flex flex-col gap-5">
 			<div class="flex flex-col gap-1">
@@ -177,16 +175,14 @@ import { injectNotificationManager } from '@modrinth/ui'
 import {
 	capitalizeString,
 	formatMoney,
-	formatWallet,
 	type PayoutList,
 	type PayoutMethodType,
-	type PayoutStatus,
+	type PayoutStatus
 } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
-import { all } from 'iso-3166-1'
 
 import { normalizeChildren } from '@/utils/vue-children.ts'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
@@ -224,19 +220,6 @@ interface PayoutMethod {
 	image_url?: string | null
 	interval: PayoutInterval
 	fee: PayoutMethodFee
-}
-
-const countries = computed(() =>
-	all().map((x) => ({
-		id: x.alpha2,
-		name: x.alpha2 === 'TW' ? 'Taiwan' : x.country,
-	})),
-)
-const withdrawCountry = ref<{ id: string; name: string } | null>(null)
-
-if (!withdrawCountry.value) {
-	const us = countries.value.find((c) => c.id === 'US')
-	withdrawCountry.value = us ?? countries.value[0] ?? null
 }
 
 type RevenueBarSegment = {
@@ -344,16 +327,6 @@ const sortedPayouts = computed<PayoutList>(() => {
 	})
 })
 
-// Fetch payout methods based on selected country
-const { data: payoutMethods, pending: payoutMethodsPending } = await useAsyncData(
-	'payout-methods',
-	() =>
-		useBaseFetch(`payout/methods?country=${withdrawCountry.value?.id ?? 'US'}`, { apiVersion: 3 }),
-	{ default: () => [] as PayoutMethod[], watch: [withdrawCountry] },
-)
-
-const paymentMethods = computed<PayoutMethod[]>(() => (payoutMethods.value as PayoutMethod[]) ?? [])
-
 const totalAvailable = computed(() => (userBalance.value ? Number(userBalance.value.available) : 0))
 const nextDate = computed<{ date: string; amount: number }[]>(() => {
 	const dates = userBalance.value?.dates
@@ -377,37 +350,6 @@ const processingDate = computed<{ date: string; amount: number }>(() => {
 const grandTotal = computed(() =>
 	userBalance.value ? Number(userBalance.value.available) + Number(userBalance.value.pending) : 0,
 )
-
-async function handleWithdraw(amount: number, method: PayoutMethod) {
-	startLoading()
-	try {
-		await useBaseFetch(`payout`, {
-			method: 'POST',
-			body: {
-				amount,
-				method: method.type,
-				method_id: method.id,
-			},
-			apiVersion: 3,
-		})
-		addNotification({
-			title: 'Withdrawal complete',
-			text:
-				method.type === 'tremendous'
-					? 'An email has been sent to your account with further instructions on how to redeem your payout!'
-					: `Payment has been sent to your ${formatWallet(method.type)} account!`,
-			type: 'success',
-		})
-		await refreshData()
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: (err as any)?.data ? (err as any)?.data?.description : (err as string),
-			type: 'error',
-		})
-	}
-	stopLoading()
-}
 
 async function refreshData() {
 	try {

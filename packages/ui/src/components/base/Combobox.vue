@@ -40,7 +40,7 @@
 			<div
 				v-if="isOpen"
 				ref="dropdownRef"
-				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-dropdown-bg outline outline-1 outline-offset-[-1px] outline-button-border"
+				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 outline outline-1 outline-offset-[-1px] outline-surface-5"
 				:class="openDirection === 'down' ? 'rounded-t-none' : 'rounded-b-none'"
 				:style="dropdownStyle"
 				:role="listbox ? 'listbox' : 'menu'"
@@ -49,21 +49,21 @@
 			>
 				<div v-if="searchable" class="p-4">
 					<div
-						class="flex items-center gap-2 overflow-hidden rounded-xl bg-bg-raised px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-button-border focus-within:outline-2 focus-within:outline-contrast"
+						class="flex items-center gap-2 overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-surface-5 focus-within:outline-2 focus-within:outline-contrast"
 					>
-						<SearchIcon class="size-5" />
+						<SearchIcon class="size-5 text-secondary" />
 						<input
 							ref="searchInputRef"
 							v-model="searchQuery"
 							type="text"
 							:placeholder="searchPlaceholder"
-							class="flex-1 !bg-bg-raised text-sm font-medium leading-[18px] text-dropdown-text placeholder-secondary !shadow-none !outline-none"
+							class="flex-1 !bg-surface-4 text-sm font-medium leading-[18px] text-contrast placeholder-secondary !shadow-none !outline-none"
 							@keydown.stop="handleSearchKeydown"
 						/>
 					</div>
 				</div>
 
-				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-divider"></div>
+				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-surface-5"></div>
 
 				<div
 					v-if="filteredOptions.length > 0"
@@ -72,7 +72,7 @@
 					:style="{ maxHeight: `${maxHeight}px` }"
 				>
 					<template v-for="(item, index) in filteredOptions" :key="item.key">
-						<div v-if="item.type === 'divider'" class="h-px bg-divider"></div>
+						<div v-if="item.type === 'divider'" class="h-px bg-surface-5"></div>
 						<component
 							:is="item.type === 'link' ? 'a' : 'span'"
 							v-else
@@ -83,14 +83,12 @@
 							:aria-selected="listbox && item.value === modelValue"
 							:aria-disabled="item.disabled || undefined"
 							:data-focused="focusedIndex === index"
-							class="flex items-center gap-2.5 cursor-pointer rounded-xl px-4 py-3 text-left transition-colors duration-150 text-dropdown-text hover:bg-button-bgHover focus:bg-button-bgHover"
+							class="flex items-center gap-2.5 cursor-pointer rounded-xl px-4 py-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
 							:class="[
 								item.class,
 								{
-									'bg-button-bgSelected text-button-textSelected':
-										listbox && item.value === modelValue,
-									'bg-button-bgHover':
-										focusedIndex === index && !(listbox && item.value === modelValue),
+									'bg-surface-5':
+										(listbox && item.value === modelValue) || (focusedIndex === index && !(listbox && item.value === modelValue)),
 									'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
 								},
 							]"
@@ -158,6 +156,7 @@ const props = withDefaults(
 		displayValue?: string
 		extraPosition?: 'top' | 'bottom'
 		triggerClass?: string
+		forceDirection?: 'up' | 'down'
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -258,10 +257,20 @@ async function updateDropdownPosition() {
 	let left = triggerRect.left
 	let opensUp = false
 
-	if (triggerRect.bottom + dropdownRect.height + margin > viewportHeight) {
-		if (triggerRect.top - dropdownRect.height - margin > 0) {
-			top = triggerRect.top - dropdownRect.height
-			opensUp = true
+	// If forceDirection is set, use that; otherwise auto-detect
+	if (props.forceDirection === 'up') {
+		top = triggerRect.top - dropdownRect.height
+		opensUp = true
+	} else if (props.forceDirection === 'down') {
+		top = triggerRect.bottom
+		opensUp = false
+	} else {
+		// Auto-detect based on available space
+		if (triggerRect.bottom + dropdownRect.height + margin > viewportHeight) {
+			if (triggerRect.top - dropdownRect.height - margin > 0) {
+				top = triggerRect.top - dropdownRect.height
+				opensUp = true
+			}
 		}
 	}
 
@@ -291,6 +300,11 @@ async function open() {
 
 	await nextTick()
 	await updateDropdownPosition()
+
+	// Scroll to the selected option if one is selected
+	if (focusedIndex.value >= 0 && optionRefs.value[focusedIndex.value]) {
+		optionRefs.value[focusedIndex.value]?.scrollIntoView({ block: 'center' })
+	}
 
 	if (props.searchable && searchInputRef.value) {
 		searchInputRef.value.focus()

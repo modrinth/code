@@ -1,10 +1,6 @@
 <template>
-	<NewModal
-		ref="withdrawModal"
-		:noblur="true"
-		:closable="withdrawContext.currentStage.value !== 'completion'"
-		@on-hide="onModalHide"
-	>
+	<NewModal ref="withdrawModal" :noblur="true" :closable="withdrawContext.currentStage.value !== 'completion'"
+		@on-hide="onModalHide">
 		<template #title>
 			<div v-if="shouldShowTitle" class="flex items-center gap-1 font-bold text-secondary">
 				<template v-if="withdrawContext.currentStage.value === 'tax-form'">
@@ -14,10 +10,8 @@
 					<span class="text-contrast">{{ formatMessage(stageLabels['method-selection']) }}</span>
 				</template>
 				<template v-else-if="isDetailsStage">
-					<button
-						class="bg-transparent p-0 font-bold text-secondary active:scale-95"
-						@click="goToBreadcrumbStage('method-selection')"
-					>
+					<button class="bg-transparent p-0 font-bold text-secondary active:scale-95"
+						@click="goToBreadcrumbStage('method-selection')">
 						{{ formatMessage(stageLabels['method-selection']) }}
 					</button>
 					<ChevronRightIcon class="h-5 w-5 text-secondary" stroke-width="3" />
@@ -25,16 +19,11 @@
 				</template>
 			</div>
 		</template>
-		<div class="w-[40rem] max-w-full">
-			<TaxFormStage
-				v-if="withdrawContext.currentStage.value === 'tax-form'"
-				:balance="balance"
-				:on-show-tax-form="showTaxFormModal"
-			/>
+		<div class="min-w-[496px] max-w-[496px]">
+			<TaxFormStage v-if="withdrawContext.currentStage.value === 'tax-form'" :balance="balance"
+				:on-show-tax-form="showTaxFormModal" />
 			<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'" />
-			<TremendousDetailsStage
-				v-else-if="withdrawContext.currentStage.value === 'tremendous-details'"
-			/>
+			<TremendousDetailsStage v-else-if="withdrawContext.currentStage.value === 'tremendous-details'" />
 			<MuralpayKycStage v-else-if="withdrawContext.currentStage.value === 'muralpay-kyc'" />
 			<MuralpayDetailsStage v-else-if="withdrawContext.currentStage.value === 'muralpay-details'" />
 			<CompletionStage v-else-if="withdrawContext.currentStage.value === 'completion'" />
@@ -42,10 +31,8 @@
 		</div>
 		<div class="mt-4 flex justify-between gap-2">
 			<ButtonStyled>
-				<button
-					v-if="withdrawContext.previousStep.value"
-					@click="withdrawContext.setStage(withdrawContext.previousStep.value, true)"
-				>
+				<button v-if="withdrawContext.previousStep.value"
+					@click="withdrawContext.setStage(withdrawContext.previousStep.value, true)">
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
 				</button>
 				<button v-else @click="withdrawModal?.hide()">
@@ -54,25 +41,20 @@
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="brand">
-				<button
-					:disabled="!withdrawContext.canProceed.value"
-					@click="withdrawContext.setStage(withdrawContext.nextStep.value)"
-				>
+				<button :disabled="!withdrawContext.canProceed.value"
+					@click="withdrawContext.setStage(withdrawContext.nextStep.value)">
 					<template v-if="withdrawContext.currentStage.value === 'completion'">
 						<CheckCircleIcon /> Complete
 					</template>
 					<template v-else>
-						{{ formatMessage(commonMessages.nextButton) }} <RightArrowIcon />
+						{{ formatMessage(commonMessages.nextButton) }}
+						<RightArrowIcon />
 					</template>
 				</button>
 			</ButtonStyled>
 		</div>
 	</NewModal>
-	<CreatorTaxFormModal
-		ref="taxFormModal"
-		@success="onTaxFormSuccess"
-		@cancelled="onTaxFormCancelled"
-	/>
+	<CreatorTaxFormModal ref="taxFormModal" @success="onTaxFormSuccess" @cancelled="onTaxFormCancelled" />
 </template>
 
 <script setup lang="ts">
@@ -114,19 +96,10 @@ interface UserBalanceResponse {
 }
 
 const props = defineProps<{
-	auth: any
 	balance: UserBalanceResponse | null
-	// TODO: Add payout methods and related props when backend is defined
-	country: { id: string; name: string } | null
-	userPayoutData?: {
-		paypal_address?: string
-		venmo_handle?: string
-	}
 }>()
 
 const emit = defineEmits<{
-	(e: 'update:country', value: { id: string; name: string } | null): void
-	(e: 'withdraw', amount: number, method: any): void // TODO: Define proper method type
 	(e: 'refresh-data'): void
 	(e: 'hide'): void
 }>()
