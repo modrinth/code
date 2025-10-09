@@ -4673,7 +4673,7 @@ dependencies = [
  "webp",
  "woothee",
  "yaserde",
- "zip",
+ "zip 6.0.0",
  "zxcvbn",
 ]
 
@@ -9196,7 +9196,7 @@ dependencies = [
  "tokio",
  "url",
  "windows-sys 0.60.2",
- "zip",
+ "zip 4.6.1",
 ]
 
 [[package]]
@@ -9419,7 +9419,7 @@ dependencies = [
  "windows-core 0.61.2",
  "winreg 0.55.0",
  "zbus",
- "zip",
+ "zip 6.0.0",
 ]
 
 [[package]]
@@ -11669,6 +11669,18 @@ name = "zip"
 version = "4.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "caa8cd6af31c3b31c6631b8f483848b91589021b28fffe50adada48d4f4d2ed1"
+dependencies = [
+ "arbitrary",
+ "crc32fast",
+ "indexmap 2.11.4",
+ "memchr",
+]
+
+[[package]]
+name = "zip"
+version = "6.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eb2a05c7c36fde6c09b08576c9f7fb4cda705990f73b58fe011abf7dfb24168b"
 dependencies = [
  "arbitrary",
  "bzip2",
