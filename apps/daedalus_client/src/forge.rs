@@ -209,12 +209,16 @@ async fn fetch(
     upload_files: &DashMap<String, UploadFile>,
     mirror_artifacts: &DashMap<String, MirrorArtifact>,
 ) -> Result<(), Error> {
+    /*
     let modrinth_manifest = fetch_json::<daedalus::modded::Manifest>(
         &format_url(&format!("{mod_loader}/v{format_version}/manifest.json",)),
         &semaphore,
     )
     .await
     .ok();
+    */
+
+    let modrinth_manifest: Option<daedalus::modded::Manifest> = None;
 
     let fetch_versions = if let Some(modrinth_manifest) = modrinth_manifest {
         let mut fetch_versions = Vec::new();
