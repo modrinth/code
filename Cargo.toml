@@ -106,7 +106,7 @@ notify-debouncer-mini = { version = "0.7.0", default-features = false }
 p256 = "0.13.2"
 paste = "1.0.15"
 phf = { version = "0.13.1", features = ["macros"] }
-png = "0.17.16"
+png = "0.18.0"
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
 quick-xml = "0.38.1"

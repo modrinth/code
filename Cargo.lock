@@ -9297,7 +9297,7 @@ dependencies = [
  "paste",
  "path-util",
  "phf 0.13.1",
- "png 0.17.16",
+ "png 0.18.0",
  "quartz_nbt",
  "quick-xml 0.38.3",
  "rand 0.8.5",
