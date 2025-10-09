@@ -7349,7 +7349,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sha2",
- "sysinfo 0.37.2",
+ "sysinfo",
  "thiserror 2.0.17",
  "time",
  "tokio",
@@ -8766,20 +8766,6 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.36.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "252800745060e7b9ffb7b2badbd8b31cfa4aa2e61af879d0a3bf2a317c20217d"
-dependencies = [
- "libc",
- "memchr",
- "ntapi",
- "objc2-core-foundation",
- "objc2-io-kit",
- "windows",
-]
-
-[[package]]
-name = "sysinfo"
 version = "0.37.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "16607d5caffd1c07ce073528f9ed972d88db15dd44023fa57142963be3feb11f"
@@ -9417,7 +9403,7 @@ dependencies = [
  "sha1_smol",
  "sha2",
  "sqlx",
- "sysinfo 0.36.1",
+ "sysinfo",
  "tauri",
  "tempfile",
  "thiserror 2.0.17",
