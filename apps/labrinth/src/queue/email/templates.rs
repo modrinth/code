@@ -689,7 +689,7 @@ async fn dynamic_email_body(
 
     std::str::from_utf8(
         reqwest::Client::new()
-            .get(url)
+            .post(url)
             .json(&serde_json::json!({
                 "title": title,
                 "body": body_md,

@@ -10,7 +10,6 @@ const HTML_DATA_CACHE_EXPIRY: i64 = 60 * 15; // 15 minutes
 const TEMPLATES_CACHE_EXPIRY: i64 = 60 * 30; // 30 minutes
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-
 pub struct NotificationTemplate {
     pub id: i64,
     pub channel: NotificationChannel,
