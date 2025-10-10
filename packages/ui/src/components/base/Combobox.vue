@@ -1,10 +1,7 @@
 <template>
 	<div ref="containerRef" class="relative inline-block w-full">
-		<span
-			ref="triggerRef"
-			role="button"
-			tabindex="0"
-			class="relative cursor-pointer flex h-11 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left outline outline-1 outline-offset-[-1px] outline-button-border transition-all duration-200 text-button-text hover:bg-button-bgHover active:bg-button-bgActive"
+		<span ref="triggerRef" role="button" tabindex="0"
+			class="relative cursor-pointer flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left transition-all duration-200 text-button-text hover:bg-button-bgHover active:bg-button-bgActive"
 			:class="[
 				triggerClasses,
 				{
@@ -13,13 +10,8 @@
 					'rounded-t-none': isOpen && openDirection === 'up',
 					'cursor-not-allowed opacity-50': disabled,
 				},
-			]"
-			:aria-expanded="isOpen"
-			:aria-haspopup="listbox ? 'listbox' : 'menu'"
-			:aria-disabled="disabled || undefined"
-			@click="handleTriggerClick"
-			@keydown="handleTriggerKeydown"
-		>
+			]" :aria-expanded="isOpen" :aria-haspopup="listbox ? 'listbox' : 'menu'" :aria-disabled="disabled || undefined"
+			@click="handleTriggerClick" @keydown="handleTriggerKeydown">
 			<div class="flex items-center gap-2">
 				<slot name="prefix"></slot>
 				<span class="text-base font-semibold leading-tight">
@@ -28,61 +20,38 @@
 			</div>
 			<div class="flex items-center gap-1">
 				<slot name="suffix"></slot>
-				<ChevronLeftIcon
-					v-if="showChevron"
-					class="size-5 shrink-0 rotate-90 transition-transform duration-200"
-					:class="{ '-rotate-90': isOpen }"
-				/>
+				<ChevronLeftIcon v-if="showChevron" class="size-5 shrink-0 rotate-90 transition-transform duration-200"
+					:class="{ '-rotate-90': isOpen }" />
 			</div>
 		</span>
 
 		<Teleport to="#teleports">
-			<div
-				v-if="isOpen"
-				ref="dropdownRef"
+			<div v-if="isOpen" ref="dropdownRef"
 				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 outline outline-1 outline-offset-[-1px] outline-surface-5"
-				:class="openDirection === 'down' ? 'rounded-t-none' : 'rounded-b-none'"
-				:style="dropdownStyle"
-				:role="listbox ? 'listbox' : 'menu'"
-				@mousedown.stop
-				@keydown="handleDropdownKeydown"
-			>
+				:class="openDirection === 'down' ? 'rounded-t-none' : 'rounded-b-none'" :style="dropdownStyle"
+				:role="listbox ? 'listbox' : 'menu'" @mousedown.stop @keydown="handleDropdownKeydown">
 				<div v-if="searchable" class="p-4">
 					<div
-						class="flex items-center gap-2 overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-surface-5 focus-within:outline-2 focus-within:outline-contrast"
-					>
+						class="flex items-center gap-2 overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-surface-5 focus-within:outline-2 focus-within:outline-contrast">
 						<SearchIcon class="size-5 text-secondary" />
-						<input
-							ref="searchInputRef"
-							v-model="searchQuery"
-							type="text"
-							:placeholder="searchPlaceholder"
+						<input ref="searchInputRef" v-model="searchQuery" type="text" :placeholder="searchPlaceholder"
 							class="flex-1 !bg-surface-4 text-sm font-medium leading-[18px] text-contrast placeholder-secondary !shadow-none !outline-none"
-							@keydown.stop="handleSearchKeydown"
-						/>
+							@keydown.stop="handleSearchKeydown" />
 					</div>
 				</div>
 
 				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-surface-5"></div>
 
-				<div
-					v-if="filteredOptions.length > 0"
-					ref="optionsContainerRef"
-					class="flex flex-col gap-2 overflow-y-auto p-3"
-					:style="{ maxHeight: `${maxHeight}px` }"
-				>
+				<div v-if="filteredOptions.length > 0" ref="optionsContainerRef" class="flex flex-col gap-2 overflow-y-auto p-3"
+					:style="{ maxHeight: `${maxHeight}px` }">
 					<template v-for="(item, index) in filteredOptions" :key="item.key">
 						<div v-if="item.type === 'divider'" class="h-px bg-surface-5"></div>
-						<component
-							:is="item.type === 'link' ? 'a' : 'span'"
-							v-else
+						<component :is="item.type === 'link' ? 'a' : 'span'" v-else
 							:ref="(el: HTMLElement) => setOptionRef(el as HTMLElement, index)"
 							:href="item.type === 'link' && !item.disabled ? item.href : undefined"
 							:target="item.type === 'link' && !item.disabled ? item.target : undefined"
-							:role="listbox ? 'option' : 'menuitem'"
-							:aria-selected="listbox && item.value === modelValue"
-							:aria-disabled="item.disabled || undefined"
-							:data-focused="focusedIndex === index"
+							:role="listbox ? 'option' : 'menuitem'" :aria-selected="listbox && item.value === modelValue"
+							:aria-disabled="item.disabled || undefined" :data-focused="focusedIndex === index"
 							class="flex items-center gap-2.5 cursor-pointer rounded-xl px-4 py-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
 							:class="[
 								item.class,
@@ -91,11 +60,7 @@
 										(listbox && item.value === modelValue) || (focusedIndex === index && !(listbox && item.value === modelValue)),
 									'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
 								},
-							]"
-							tabindex="-1"
-							@click="handleOptionClick(item, index)"
-							@mouseenter="!item.disabled && (focusedIndex = index)"
-						>
+							]" tabindex="-1" @click="handleOptionClick(item, index)" @mouseenter="!item.disabled && (focusedIndex = index)">
 							<slot :name="`option-${item.value}`" :item="item">
 								<div class="flex items-center gap-2">
 									<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />

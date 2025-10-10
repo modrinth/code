@@ -94,6 +94,7 @@ import _IssuesIcon from './icons/issues.svg?component'
 import _ItalicIcon from './icons/italic.svg?component'
 import _KeyIcon from './icons/key.svg?component'
 import _KeyboardIcon from './icons/keyboard.svg?component'
+import _LandmarkIcon from './icons/landmark.svg?component'
 import _LanguagesIcon from './icons/languages.svg?component'
 import _LeftArrowIcon from './icons/left-arrow.svg?component'
 import _LibraryIcon from './icons/library.svg?component'
@@ -296,6 +297,7 @@ export const IssuesIcon = _IssuesIcon
 export const ItalicIcon = _ItalicIcon
 export const KeyIcon = _KeyIcon
 export const KeyboardIcon = _KeyboardIcon
+export const LandmarkIcon = _LandmarkIcon
 export const LanguagesIcon = _LanguagesIcon
 export const LeftArrowIcon = _LeftArrowIcon
 export const LibraryIcon = _LibraryIcon

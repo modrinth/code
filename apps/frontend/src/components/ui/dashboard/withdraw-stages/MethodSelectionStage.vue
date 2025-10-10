@@ -4,20 +4,30 @@
 			<div class="flex flex-row gap-1 align-middle">
 				<span class="text-contrast font-semibold align-middle">Region</span>
 				<UnknownIcon v-tooltip="'Some payout methods are not available in certain regions.'"
-					class="size-4 mt-auto text-secondary" />
+					class="size-5 mt-auto text-secondary" />
 			</div>
 			<Combobox :model-value="selectedCountryCode" :options="countries" placeholder="Select your country" searchable
-				search-placeholder="Search countries..." :max-height="240" force-direction="up" @update:model-value="handleCountryChange" />
+				search-placeholder="Search countries..." :max-height="240" @update:model-value="handleCountryChange" />
+		</div>
+		<div class="flex flex-col gap-2.5">
+			<span class="text-contrast font-semibold align-middle">Available withdraw methods</span>
+			<ButtonStyled v-for="method in paymentMethods" :key="method.value"
+				:color="selectedMethod === method.value ? 'green' : 'standard'"
+				:type="selectedMethod === method.value ? 'highlight-colored-text' : 'standard'">
+				<button @click="selectedMethod = method.value" class="!justify-start !gap-2">
+					<component :is="method.icon" /> {{ method.label }}
+				</button>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { UnknownIcon } from '@modrinth/assets';
+import { CardIcon, CoinsIcon, CurrencyIcon, LandmarkIcon, PayPalIcon, UnknownIcon } from '@modrinth/assets';
 
 import { useUserCountry } from '@/composables/country.ts';
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
-import { Combobox } from '@modrinth/ui';
+import { ButtonStyled, Combobox } from '@modrinth/ui';
 import { useGeolocation } from '@vueuse/core';
 import { all } from 'iso-3166-1';
 
@@ -71,6 +81,16 @@ async function getCountryFromGeoIP(lat: number, lon: number): Promise<string | n
 		return null
 	}
 }
+
+const selectedMethod = ref<string | undefined>(undefined)
+
+const paymentMethods = [
+	{ value: 'bank', label: 'Bank transfer', icon: LandmarkIcon },
+	{ value: 'paypal', label: 'PayPal', icon: PayPalIcon },
+	{ value: 'venmo', label: 'Venmo', icon: CurrencyIcon },
+	{ value: 'crypto', label: 'Crypto', icon: CoinsIcon },
+	{ value: 'gift_card', label: 'Gift card', icon: CardIcon },
+]
 
 onMounted(async () => {
 	if (withdrawContext.withdrawData.value.selectedCountry?.id === 'US' && !userCountry.value) {
