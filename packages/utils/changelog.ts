@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-08T13:45:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Add ability to download tax form after submission.`,
+	},
+	{
 		date: `2025-10-07T09:50:00-07:00`,
 		product: 'web',
 		body: `### Improvements
