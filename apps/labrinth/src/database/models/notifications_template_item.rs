@@ -1,14 +1,18 @@
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
+use crate::routes::ApiError;
 use serde::{Deserialize, Serialize};
 
 const TEMPLATES_NAMESPACE: &str = "notifications_templates";
 const TEMPLATES_HTML_DATA_NAMESPACE: &str = "notifications_templates_html_data";
+const TEMPLATES_DYNAMIC_HTML_NAMESPACE: &str =
+    "notifications_templates_dynamic_html";
+
 const HTML_DATA_CACHE_EXPIRY: i64 = 60 * 15; // 15 minutes
+const TEMPLATES_CACHE_EXPIRY: i64 = 60 * 30; // 30 minutes
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-
 pub struct NotificationTemplate {
     pub id: i64,
     pub channel: NotificationChannel,
@@ -75,7 +79,7 @@ impl NotificationTemplate {
                 TEMPLATES_NAMESPACE,
                 channel.as_str(),
                 &templates,
-                None,
+                Some(TEMPLATES_CACHE_EXPIRY),
             )
             .await?;
 
@@ -110,4 +114,45 @@ impl NotificationTemplate {
             )
             .await
     }
+}
+
+pub async fn get_or_set_cached_dynamic_html<F>(
+    redis: &RedisPool,
+    key: &str,
+    get: impl FnOnce() -> F,
+) -> Result<String, ApiError>
+where
+    F: Future<Output = Result<String, ApiError>>,
+{
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    struct HtmlBody {
+        html: String,
+    }
+
+    let mut redis_conn = redis.connect().await?;
+    if let Some(body) = redis_conn
+        .get_deserialized_from_json::<HtmlBody>(
+            TEMPLATES_DYNAMIC_HTML_NAMESPACE,
+            key,
+        )
+        .await?
+    {
+        return Ok(body.html);
+    }
+
+    drop(redis_conn);
+
+    let cached = HtmlBody { html: get().await? };
+    let mut redis_conn = redis.connect().await?;
+
+    redis_conn
+        .set_serialized_to_json(
+            TEMPLATES_DYNAMIC_HTML_NAMESPACE,
+            key,
+            &cached,
+            Some(HTML_DATA_CACHE_EXPIRY),
+        )
+        .await?;
+
+    Ok(cached.html)
 }

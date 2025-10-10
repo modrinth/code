@@ -56,6 +56,7 @@ pub enum NotificationType {
     ProjectStatusNeutral,
     ProjectTransferred,
     PayoutAvailable,
+    Custom,
     Unknown,
 }
 
@@ -89,6 +90,7 @@ impl NotificationType {
             NotificationType::ProjectStatusApproved => {
                 "project_status_approved"
             }
+            NotificationType::Custom => "custom",
             NotificationType::ProjectStatusNeutral => "project_status_neutral",
             NotificationType::ProjectTransferred => "project_transferred",
             NotificationType::Unknown => "unknown",
@@ -125,6 +127,7 @@ impl NotificationType {
             }
             "project_status_neutral" => NotificationType::ProjectStatusNeutral,
             "project_transferred" => NotificationType::ProjectTransferred,
+            "custom" => NotificationType::Custom,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -236,6 +239,11 @@ pub enum NotificationBody {
         date_available: DateTime<Utc>,
         amount: u64,
     },
+    Custom {
+        key: String,
+        title: String,
+        body_md: String,
+    },
     Unknown,
 }
 
@@ -313,6 +321,7 @@ impl NotificationBody {
             NotificationBody::PayoutAvailable { .. } => {
                 NotificationType::PayoutAvailable
             }
+            NotificationBody::Custom { .. } => NotificationType::Custom,
             NotificationBody::Unknown => NotificationType::Unknown,
         }
     }
@@ -554,6 +563,12 @@ impl From<DBNotification> for Notification {
 				NotificationBody::ModerationMessageReceived { .. } => (
                     "New message in moderation thread".to_string(),
                     "You have a new message in a moderation thread.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
+                NotificationBody::Custom { title, .. } => (
+                    "Notification".to_string(),
+                    title.clone(),
                     "#".to_string(),
                     vec![],
                 ),

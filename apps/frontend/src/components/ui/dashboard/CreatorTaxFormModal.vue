@@ -117,18 +117,20 @@
 					<span>{{
 						formatMessage(messages.confirmationSuccess, { formType: determinedFormType })
 					}}</span>
-					<IntlFormatted :message-id="messages.confirmationSupportText">
-						<template #support-link="{ children }">
-							<nuxt-link
-								to="https://support.modrinth.com"
-								class="text-link"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								<component :is="() => normalizeChildren(children)" />
-							</nuxt-link>
-						</template>
-					</IntlFormatted>
+					<span>
+						<IntlFormatted :message-id="messages.confirmationSupportText">
+							<template #support-link="{ children }">
+								<nuxt-link
+									to="https://support.modrinth.com"
+									class="text-link"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<component :is="() => normalizeChildren(children)" />
+								</nuxt-link>
+							</template>
+						</IntlFormatted>
+					</span>
 				</div>
 				<div class="flex w-full flex-row justify-stretch gap-2">
 					<ButtonStyled>

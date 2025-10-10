@@ -32,6 +32,8 @@ use crate::{
     routes::ApiError,
 };
 
+// TODO: this service `analytics` is shadowed by `analytics_get_old`'s
+// see the TODO in `analytics_get_old.rs`
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("analytics").route("", web::post().to(get)));
 }
@@ -412,7 +414,7 @@ mod query {
     };
 }
 
-async fn get(
+pub async fn get(
     http_req: HttpRequest,
     req: web::Json<GetRequest>,
     pool: web::Data<PgPool>,

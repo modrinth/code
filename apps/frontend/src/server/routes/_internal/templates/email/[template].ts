@@ -5,6 +5,14 @@ import emails from '~/templates/emails'
 
 export default defineEventHandler(async (event) => {
 	const template = event.context.params?.template as string
+
+	if (template === 'dynamic') {
+		throw createError({
+			statusCode: 404,
+			message: 'Email template not found',
+		})
+	}
+
 	try {
 		const component = (await emails[template]()).default as Component | undefined
 
