@@ -4646,6 +4646,7 @@ dependencies = [
  "rust-s3",
  "rust_decimal",
  "rust_iso3166",
+ "rustls 0.23.32",
  "rusty-money",
  "sentry",
  "sentry-actix",
