@@ -10,11 +10,11 @@
 				search-placeholder="Search countries..." :max-height="240" @update:model-value="handleCountryChange" />
 		</div>
 		<div class="flex flex-col gap-2.5">
-			<span class="text-contrast font-semibold align-middle">Available withdraw methods</span>
+			<span class="text-contrast font-semibold align-middle">Select withdraw method</span>
 			<ButtonStyled v-for="method in paymentMethods" :key="method.value"
-				:color="selectedMethod === method.value ? 'green' : 'standard'"
-				:type="selectedMethod === method.value ? 'highlight-colored-text' : 'standard'">
-				<button @click="selectedMethod = method.value" class="!justify-start !gap-2">
+				:color="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'"
+				:type="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'highlight-colored-text' : 'standard'">
+				<button @click="handleMethodSelection(method.value)" class="!justify-start !gap-2">
 					<component :is="method.icon" /> {{ method.label }}
 				</button>
 			</ButtonStyled>
@@ -82,8 +82,6 @@ async function getCountryFromGeoIP(lat: number, lon: number): Promise<string | n
 	}
 }
 
-const selectedMethod = ref<string | undefined>(undefined)
-
 const paymentMethods = [
 	{ value: 'bank', label: 'Bank transfer', icon: LandmarkIcon },
 	{ value: 'paypal', label: 'PayPal', icon: PayPalIcon },
@@ -91,6 +89,19 @@ const paymentMethods = [
 	{ value: 'crypto', label: 'Crypto', icon: CoinsIcon },
 	{ value: 'gift_card', label: 'Gift card', icon: CardIcon },
 ]
+
+function handleMethodSelection(methodValue: string) {
+	const methodToProvider: Record<string, 'tremendous' | 'muralpay'> = {
+		gift_card: 'tremendous',
+		paypal: 'tremendous',
+		venmo: 'tremendous',
+		bank: 'muralpay',
+		crypto: 'muralpay',
+	}
+
+	withdrawContext.withdrawData.value.selectedMethod = methodValue as any
+	withdrawContext.withdrawData.value.selectedProvider = methodToProvider[methodValue]
+}
 
 onMounted(async () => {
 	if (withdrawContext.withdrawData.value.selectedCountry?.id === 'US' && !userCountry.value) {
