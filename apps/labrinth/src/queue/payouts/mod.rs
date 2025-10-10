@@ -8,6 +8,7 @@ use crate::models::payouts::{
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
 use crate::util::env::env_var;
+use crate::util::error::Context;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
 };
@@ -29,10 +30,17 @@ use std::collections::HashMap;
 use tokio::sync::RwLock;
 use tracing::{error, info, warn};
 
+pub mod muralpay_payout;
+
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
     payout_options: RwLock<Option<PayoutMethods>>,
-    muralpay: RwLock<Option<MuralPay>>,
+    muralpay: RwLock<Option<MuralPayConfig>>,
+}
+
+struct MuralPayConfig {
+    client: MuralPay,
+    source_account_id: muralpay::AccountId,
 }
 
 #[derive(Clone, Debug)]
@@ -60,18 +68,26 @@ impl Default for PayoutsQueue {
     }
 }
 
-fn muralpay_client() -> Result<MuralPay> {
+fn create_muralpay() -> Result<MuralPayConfig> {
     let api_url = env_var("MURALPAY_API_URL")?;
     let api_key = env_var("MURALPAY_API_KEY")?;
     let transfer_api_key = env_var("MURALPAY_TRANSFER_API_KEY")?;
+    let source_account_id = env_var("MURALPAY_SOURCE_ACCOUNT_ID")?
+        .parse::<muralpay::AccountId>()
+        .wrap_err("failed to parse source account ID")?;
 
-    Ok(MuralPay::new(api_url, api_key, Some(transfer_api_key)))
+    let client = MuralPay::new(api_url, api_key, Some(transfer_api_key));
+
+    Ok(MuralPayConfig {
+        client,
+        source_account_id,
+    })
 }
 
 // Batches payouts and handles token refresh
 impl PayoutsQueue {
     pub fn new() -> Self {
-        let muralpay = muralpay_client()
+        let muralpay = create_muralpay()
             .inspect_err(|err| {
                 warn!("Failed to create Mural Pay client: {err:#?}")
             })
@@ -303,7 +319,10 @@ impl PayoutsQueue {
                             )
                         })?;
 
-                return Err(ApiError::Payments(err.message));
+                return Err(ApiError::Payments(format!(
+                    "Tremendous error: {}",
+                    err.message
+                )));
             }
 
             return Err(ApiError::Payments(

@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use chrono::{DateTime, Utc};
-use derive_more::{Deref, Display, Error};
+use derive_more::{Deref, Display, Error, From};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
@@ -488,7 +488,7 @@ pub enum PixAccountType {
     BankAccount,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, From)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum PayoutRecipientInfo {
     #[serde(rename_all = "camelCase")]

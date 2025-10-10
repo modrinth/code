@@ -1,4 +1,6 @@
-use crate::models::ids::PayoutId;
+use crate::{
+    models::ids::PayoutId, queue::payouts::muralpay_payout::MuralPayoutRequest,
+};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
@@ -37,20 +39,45 @@ impl Payout {
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "method", rename_all = "lowercase")]
+pub enum PayoutMethodRequest {
+    Venmo,
+    PayPal,
+    Tremendous,
+    MuralPay { method_details: MuralPayDetails },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum PayoutMethodType {
     Venmo,
     PayPal,
     Tremendous,
     MuralPay,
-    Unknown,
+}
+
+impl PayoutMethodRequest {
+    pub fn method_type(&self) -> PayoutMethodType {
+        match self {
+            Self::Venmo => PayoutMethodType::Venmo,
+            Self::PayPal => PayoutMethodType::PayPal,
+            Self::Tremendous => PayoutMethodType::Tremendous,
+            Self::MuralPay { .. } => PayoutMethodType::MuralPay,
+        }
+    }
 }
 
 impl std::fmt::Display for PayoutMethodType {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(fmt, "{}", self.as_str())
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MuralPayDetails {
+    pub payout_details: MuralPayoutRequest,
+    pub recipient_info: muralpay::PayoutRecipientInfo,
 }
 
 impl PayoutMethodType {
@@ -60,17 +87,16 @@ impl PayoutMethodType {
             PayoutMethodType::PayPal => "paypal",
             PayoutMethodType::Tremendous => "tremendous",
             PayoutMethodType::MuralPay => "muralpay",
-            PayoutMethodType::Unknown => "unknown",
         }
     }
 
-    pub fn from_string(string: &str) -> PayoutMethodType {
+    pub fn from_string(string: &str) -> Option<PayoutMethodType> {
         match string {
-            "venmo" => PayoutMethodType::Venmo,
-            "paypal" => PayoutMethodType::PayPal,
-            "tremendous" => PayoutMethodType::Tremendous,
-            "muralpay" => PayoutMethodType::MuralPay,
-            _ => PayoutMethodType::Unknown,
+            "venmo" => Some(PayoutMethodType::Venmo),
+            "paypal" => Some(PayoutMethodType::PayPal),
+            "tremendous" => Some(PayoutMethodType::Tremendous),
+            "muralpay" => Some(PayoutMethodType::MuralPay),
+            _ => None,
         }
     }
 }

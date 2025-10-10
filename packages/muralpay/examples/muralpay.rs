@@ -125,7 +125,7 @@ async fn main() -> eyre::Result<()> {
                                 city: "Springfield".into(),
                                 zip: "90001".into(),
                             },
-                        },
+                        }.into(),
                         supporting_details: Some(SupportingDetails {
                             supporting_document: Some("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA...".into()),
                             payout_purpose: Some(PayoutPurpose::VendorPayment),
