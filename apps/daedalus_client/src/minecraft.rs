@@ -186,6 +186,8 @@ pub struct LibraryPatch {
 }
 
 fn fetch_library_patches() -> Result<Vec<LibraryPatch>, Error> {
+    // The file below is a copy of https://github.com/PrismLauncher/meta/blob/main/meta/common/mojang-library-patches.json.
+    // That file belongs to a repository licensed under the Microsoft Public License (Ms-PL)
     let patches = include_bytes!("../library-patches.json");
     Ok(serde_json::from_slice(patches)?)
 }
