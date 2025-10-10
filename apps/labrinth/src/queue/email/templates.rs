@@ -143,7 +143,7 @@ pub async fn build_email(
 
     let db_user = DBUser::get_id(user_id, &mut **exec, redis)
         .await?
-        .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
+        .ok_or(DatabaseError::Database(sqlx::Error::RowNotFound))?;
 
     let map = [
         (USER_NAME, db_user.username),
