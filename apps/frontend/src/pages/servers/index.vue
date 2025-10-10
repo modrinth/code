@@ -1,4 +1,8 @@
 <template>
+	<div v-if="affiliateCode" class="text-center text-2xl font-bold text-red">
+		Affiliate code: '{{ affiliateCode }}'
+	</div>
+	<div v-else class="text-center text-2xl font-bold text-red">No affiliate code saved</div>
 	<div
 		ref="scrollListener"
 		data-pyro
@@ -664,6 +668,25 @@ import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSele
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 
+const route = useRoute()
+const router = useRouter()
+
+const { setAffiliateCode, getAffiliateCode } = useAffiliates()
+
+const affiliateCode = ref(route.query.afl ?? null)
+
+if (affiliateCode.value) {
+	router.replace({
+		query: {
+			...route.query,
+			afl: undefined,
+		},
+	})
+	setAffiliateCode(affiliateCode.value)
+} else {
+	affiliateCode.value = getAffiliateCode()
+}
+
 const { addNotification } = injectNotificationManager()
 const { locale, formatMessage } = useVIntl()
 const flags = useFeatureFlags()
@@ -853,7 +876,6 @@ async function fetchPaymentData() {
 
 const selectedProjectId = ref()
 
-const route = useRoute()
 const isAtCapacity = computed(
 	() => isSmallAtCapacity.value && isMediumAtCapacity.value && isLargeAtCapacity.value,
 )
