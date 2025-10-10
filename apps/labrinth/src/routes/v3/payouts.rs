@@ -12,7 +12,6 @@ use crate::routes::ApiError;
 use crate::util::avalara1099;
 use crate::util::error::Context;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
-use ariadne::ids::UserId;
 use chrono::{DateTime, Duration, Utc};
 use hex::ToHex;
 use hmac::{Hmac, Mac};
@@ -421,6 +420,15 @@ pub async fn user_payouts(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<crate::models::payouts::Payout>>, ApiError> {
+    let (_, user) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PAYOUTS_READ,
+    )
+    .await?;
+
     let items = transaction_history(req, pool, redis, session_queue)
         .await?
         .0
@@ -436,7 +444,7 @@ pub async fn user_payouts(
                 method_address,
             } => Some(crate::models::payouts::Payout {
                 id,
-                user_id: UserId(0),
+                user_id: user.id,
                 status,
                 created,
                 amount,
