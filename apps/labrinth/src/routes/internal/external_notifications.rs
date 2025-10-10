@@ -59,6 +59,7 @@ pub async fn create(
 #[derive(Deserialize)]
 struct SendEmail {
     pub users: Vec<UserId>,
+    pub key: String,
     pub body_md: String,
     pub title: String,
 }
@@ -91,6 +92,7 @@ pub async fn send_custom_email(
         users,
         body_md,
         title,
+        key,
     } = body.into_inner();
 
     let users = users
@@ -101,7 +103,11 @@ pub async fn send_custom_email(
     let mut txn = pool.begin().await?;
 
     NotificationBuilder {
-        body: NotificationBody::Custom { title, body_md },
+        body: NotificationBody::Custom {
+            title,
+            body_md,
+            key,
+        },
     }
     .insert_many(users, &mut txn, &redis)
     .await?;

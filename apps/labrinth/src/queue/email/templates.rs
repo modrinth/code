@@ -1,6 +1,8 @@
 use super::MailError;
 use crate::database::models::ids::*;
-use crate::database::models::notifications_template_item::NotificationTemplate;
+use crate::database::models::notifications_template_item::{
+    NotificationTemplate, get_or_set_cached_dynamic_html,
+};
 use crate::database::models::{
     DBOrganization, DBProject, DBUser, DatabaseError,
 };
@@ -666,9 +668,13 @@ async fn collect_template_variables(
             Ok(Either::Left(map))
         }
 
-        NotificationBody::Custom { title, body_md } => {
-            Ok(Either::Right(dynamic_email_body(title, body_md).await?))
-        }
+        NotificationBody::Custom {
+            title,
+            body_md,
+            key,
+        } => Ok(Either::Right(
+            dynamic_email_body(redis, title, body_md, key).await?,
+        )),
 
         NotificationBody::ProjectUpdate { .. }
         | NotificationBody::ModeratorMessage { .. }
@@ -678,31 +684,36 @@ async fn collect_template_variables(
 }
 
 async fn dynamic_email_body(
+    redis: &RedisPool,
     title: &str,
     body_md: &str,
+    key: &str,
 ) -> Result<String, ApiError> {
-    let site_url =
-        dotenvy::var("SITE_URL").wrap_internal_err("SITE_URL is not set")?;
-    let site_url = site_url.trim_end_matches('/');
+    get_or_set_cached_dynamic_html(redis, key, || async {
+        let site_url = dotenvy::var("SITE_URL")
+            .wrap_internal_err("SITE_URL is not set")?;
+        let site_url = site_url.trim_end_matches('/');
 
-    let url = format!("{}/_internal/templates/email/dynamic", site_url);
+        let url = format!("{}/_internal/templates/email/dynamic", site_url);
 
-    std::str::from_utf8(
-        reqwest::Client::new()
-            .post(url)
-            .json(&serde_json::json!({
-                "title": title,
-                "body": body_md,
-            }))
-            .send()
-            .await
-            .and_then(|res| res.error_for_status())?
-            .bytes()
-            .await?
-            .as_ref(),
-    )
-    .wrap_internal_err("Email body isn't valid UTF-8")
-    .map(ToOwned::to_owned)
+        std::str::from_utf8(
+            reqwest::Client::new()
+                .post(url)
+                .json(&serde_json::json!({
+                    "title": title,
+                    "body": body_md,
+                }))
+                .send()
+                .await
+                .and_then(|res| res.error_for_status())?
+                .bytes()
+                .await?
+                .as_ref(),
+        )
+        .wrap_internal_err("Email body isn't valid UTF-8")
+        .map(ToOwned::to_owned)
+    })
+    .await
 }
 
 fn date_human_readable(date: chrono::DateTime<chrono::Utc>) -> String {

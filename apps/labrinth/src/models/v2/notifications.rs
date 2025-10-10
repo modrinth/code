@@ -140,6 +140,7 @@ pub enum LegacyNotificationBody {
         date_available: DateTime<Utc>,
     },
     Custom {
+        key: String,
         title: String,
         body_md: String,
     },
@@ -383,9 +384,15 @@ impl LegacyNotification {
                 service,
                 currency,
             },
-            NotificationBody::Custom { title, body_md } => {
-                LegacyNotificationBody::Custom { title, body_md }
-            }
+            NotificationBody::Custom {
+                title,
+                body_md,
+                key,
+            } => LegacyNotificationBody::Custom {
+                title,
+                body_md,
+                key,
+            },
             NotificationBody::PaymentFailed { amount, service } => {
                 LegacyNotificationBody::PaymentFailed { amount, service }
             }

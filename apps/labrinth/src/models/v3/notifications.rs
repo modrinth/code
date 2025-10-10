@@ -240,6 +240,7 @@ pub enum NotificationBody {
         amount: u64,
     },
     Custom {
+        key: String,
         title: String,
         body_md: String,
     },
