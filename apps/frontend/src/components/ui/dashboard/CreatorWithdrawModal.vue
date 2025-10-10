@@ -19,15 +19,27 @@
 				</template>
 			</div>
 		</template>
-		<div class="min-w-[496px] max-w-[496px]">
-			<TaxFormStage v-if="withdrawContext.currentStage.value === 'tax-form'" :balance="balance"
-				:on-show-tax-form="showTaxFormModal" />
-			<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'" />
-			<TremendousDetailsStage v-else-if="withdrawContext.currentStage.value === 'tremendous-details'" />
-			<MuralpayKycStage v-else-if="withdrawContext.currentStage.value === 'muralpay-kyc'" />
-			<MuralpayDetailsStage v-else-if="withdrawContext.currentStage.value === 'muralpay-details'" />
-			<CompletionStage v-else-if="withdrawContext.currentStage.value === 'completion'" />
-			<div v-else>Something went wrong</div>
+		<div class="relative">
+			<!-- Top fade overlay -->
+			<div v-if="showTopFade"
+				class="absolute top-0 left-0 right-0 h-8 pointer-events-none z-10 bg-gradient-to-b from-bg-raised to-transparent transition-opacity duration-200" />
+
+			<!-- Content wrapper with scroll detection -->
+			<div ref="scrollContainer" class="min-w-[496px] max-w-[496px] max-h-[60vh] overflow-y-auto"
+				@scroll="handleScroll">
+				<TaxFormStage v-if="withdrawContext.currentStage.value === 'tax-form'" :balance="balance"
+					:on-show-tax-form="showTaxFormModal" />
+				<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'" />
+				<TremendousDetailsStage v-else-if="withdrawContext.currentStage.value === 'tremendous-details'" />
+				<MuralpayKycStage v-else-if="withdrawContext.currentStage.value === 'muralpay-kyc'" />
+				<MuralpayDetailsStage v-else-if="withdrawContext.currentStage.value === 'muralpay-details'" />
+				<CompletionStage v-else-if="withdrawContext.currentStage.value === 'completion'" />
+				<div v-else>Something went wrong</div>
+			</div>
+
+			<!-- Bottom fade overlay -->
+			<div v-if="showBottomFade"
+				class="absolute bottom-0 left-0 right-0 h-8 pointer-events-none z-10 bg-gradient-to-t from-bg-raised to-transparent transition-opacity duration-200" />
 		</div>
 		<div class="mt-4 flex justify-between gap-2">
 			<ButtonStyled>
@@ -67,7 +79,7 @@ import {
 } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, NewModal } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 import {
 	createWithdrawContext,
@@ -130,6 +142,56 @@ const isDetailsStage = computed(() => {
 
 const withdrawModal = useTemplateRef<InstanceType<typeof NewModal>>('withdrawModal')
 const taxFormModal = ref<InstanceType<typeof CreatorTaxFormModal> | null>(null)
+const scrollContainer = useTemplateRef<HTMLDivElement>('scrollContainer')
+
+// Scroll fade state
+const showTopFade = ref(false)
+const showBottomFade = ref(false)
+
+function updateScrollFades() {
+	const container = scrollContainer.value
+	if (!container) return
+
+	const { scrollTop, scrollHeight, clientHeight } = container
+	const threshold = 5 // Small threshold to account for rounding
+
+	// Show top fade if scrolled down from top
+	showTopFade.value = scrollTop > threshold
+
+	// Show bottom fade if not scrolled to bottom
+	showBottomFade.value = scrollTop < scrollHeight - clientHeight - threshold
+}
+
+function handleScroll() {
+	updateScrollFades()
+}
+
+// Watch for stage changes and content changes
+watch(
+	() => withdrawContext.currentStage.value,
+	async () => {
+		await nextTick()
+		updateScrollFades()
+	},
+)
+
+// Set up ResizeObserver to detect content size changes
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+	if (scrollContainer.value) {
+		resizeObserver = new ResizeObserver(() => {
+			updateScrollFades()
+		})
+		resizeObserver.observe(scrollContainer.value)
+	}
+})
+
+onUnmounted(() => {
+	if (resizeObserver) {
+		resizeObserver.disconnect()
+	}
+})
 
 function showTaxFormModal(e?: MouseEvent) {
 	withdrawModal.value?.hide()

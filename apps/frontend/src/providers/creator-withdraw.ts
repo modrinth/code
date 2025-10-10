@@ -124,11 +124,36 @@ export function createWithdrawContext(balance: any, userPayoutData: any): Withdr
 				}
 				return true // For paypal/venmo, just need method selected
 			case 'muralpay-kyc':
-				return !!(
-					withdrawData.value.kycData?.fullName &&
-					withdrawData.value.kycData?.address &&
-					withdrawData.value.kycData?.phoneNumber
+				if (!withdrawData.value.kycData) return false
+
+				const kycData = withdrawData.value.kycData
+				const hasValidAddress = !!(
+					kycData.physicalAddress?.address1 &&
+					kycData.physicalAddress?.city &&
+					kycData.physicalAddress?.state &&
+					kycData.physicalAddress?.country &&
+					kycData.physicalAddress?.zip
 				)
+
+				if (kycData.type === 'individual') {
+					return !!(
+						kycData.firstName &&
+						kycData.lastName &&
+						kycData.email &&
+						kycData.dateOfBirth?.day &&
+						kycData.dateOfBirth?.month &&
+						kycData.dateOfBirth?.year &&
+						hasValidAddress
+					)
+				} else if (kycData.type === 'business') {
+					return !!(
+						kycData.name &&
+						kycData.email &&
+						hasValidAddress
+					)
+				}
+
+				return false
 			case 'muralpay-details':
 				return !!(
 					withdrawData.value.accountDetails?.bankAccount ||
