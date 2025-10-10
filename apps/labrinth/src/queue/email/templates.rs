@@ -720,7 +720,7 @@ async fn dynamic_email_body(
                 .await?
                 .as_ref(),
         )
-        .wrap_internal_err("Email body isn't valid UTF-8")
+        .wrap_internal_err("email body is not valid UTF-8")
         .map(ToOwned::to_owned)
     })
     .await
