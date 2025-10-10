@@ -138,7 +138,7 @@
 				<nuxt-link class="my-auto font-semibold text-contrast underline underline-offset-2"
 					to="/dashboard/revenue/transfers">{{ formatMessage(messages.seeAll) }}</nuxt-link>
 			</div>
-			<div v-if="sortedPayouts.length > 0">
+			<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-4">
 				<div v-for="transaction in sortedPayouts.slice(0, 3)" :key="transaction.id || transaction.created"
 					class="flex flex-row gap-3">
 					<div
