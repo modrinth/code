@@ -384,11 +384,19 @@ async fn update_anrok_transactions(
                 stripe::Customer::retrieve(stripe_client, &customer_id, &[])
                     .await?;
 
-            let address = customer.address.ok_or_else(|| {
-                ApiError::InvalidInput(
-                    format!("Could not find any address for Stripe customer of user '{}'", to_base62(c.user_id.0 as u64))
-                )
-            })?;
+            let Some(address) = customer.address else {
+                // We won't really be able to do anything about this.
+
+                warn!(
+                    "Could not find any address for Stripe customer of user '{}', marking as unresolved",
+                    to_base62(c.user_id.0 as u64)
+                );
+
+                c.tax_platform_id = Some("unresolved".to_owned());
+                c.upsert(txn).await?;
+
+                return Ok(());
+            };
 
             (address, tax_platform_id, customer_id)
         };
