@@ -41,6 +41,10 @@ impl Payout {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "method", rename_all = "lowercase")]
+#[expect(
+    clippy::large_enum_variant,
+    reason = "acceptable since values of this type are not moved much"
+)]
 pub enum PayoutMethodRequest {
     Venmo,
     PayPal,
