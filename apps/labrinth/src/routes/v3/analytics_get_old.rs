@@ -1,4 +1,4 @@
-//! TODO: this module should be removed; it is superceded by `analytics_get`
+//! TODO: this module should be removed; it is superseded by `analytics_get`
 
 use super::ApiError;
 use crate::database;
@@ -412,7 +412,7 @@ pub async fn revenue_get(
 /// Get country data for a set of projects or versions
 /// Data is returned as a hashmap of project/version ids to a hashmap of coutnry to downloads.
 /// Unknown countries are labeled "".
-/// This is usuable to see significant performing countries per project
+/// This is usable to see significant performing countries per project
 /// eg:
 /// {
 ///     "4N1tEhnO": {
@@ -485,7 +485,7 @@ pub async fn countries_downloads_get(
 /// Get country data for a set of projects or versions
 /// Data is returned as a hashmap of project/version ids to a hashmap of coutnry to views.
 /// Unknown countries are labeled "".
-/// This is usuable to see significant performing countries per project
+/// This is usable to see significant performing countries per project
 /// eg:
 /// {
 ///     "4N1tEhnO": {
