@@ -71,10 +71,27 @@ pub struct ApiError {
     pub error_instance_id: Uuid,
     pub name: String,
     pub message: String,
-    #[serde(default)]
+    #[serde(deserialize_with = "one_or_many")]
     pub details: Vec<String>,
     #[serde(default)]
     pub params: HashMap<String, serde_json::Value>,
+}
+
+fn one_or_many<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum OneOrMany {
+        One(String),
+        Many(Vec<String>),
+    }
+
+    match OneOrMany::deserialize(deserializer)? {
+        OneOrMany::One(s) => Ok(vec![s]),
+        OneOrMany::Many(v) => Ok(v),
+    }
 }
 
 impl fmt::Display for ApiError {

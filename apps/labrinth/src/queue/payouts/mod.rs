@@ -343,192 +343,16 @@ impl PayoutsQueue {
 
             let mut methods = Vec::new();
 
-            #[derive(Deserialize)]
-            pub struct Sku {
-                pub min: Decimal,
-                pub max: Decimal,
-            }
-
-            #[derive(Deserialize, Eq, PartialEq)]
-            #[serde(rename_all = "snake_case")]
-            pub enum ProductImageType {
-                Card,
-                Logo,
-            }
-
-            #[derive(Deserialize)]
-            pub struct ProductImage {
-                pub src: String,
-                #[serde(rename = "type")]
-                pub type_: ProductImageType,
-            }
-
-            #[derive(Deserialize)]
-            pub struct ProductCountry {
-                pub abbr: String,
-            }
-
-            #[derive(Deserialize)]
-            pub struct Product {
-                pub id: String,
-                pub category: String,
-                pub name: String,
-                // pub description: String,
-                // pub disclosure: String,
-                pub skus: Vec<Sku>,
-                pub currency_codes: Vec<String>,
-                pub countries: Vec<ProductCountry>,
-                pub images: Vec<ProductImage>,
-            }
-
-            #[derive(Deserialize)]
-            pub struct TremendousResponse {
-                pub products: Vec<Product>,
-            }
-
-            let response = queue
-                .make_tremendous_request::<(), TremendousResponse>(
-                    Method::GET,
-                    "products",
-                    None,
-                )
-                .await?;
-
-            for product in response.products {
-                const BLACKLISTED_IDS: &[&str] = &[
-                    // physical visa
-                    "A2J05SWPI2QG",
-                    // crypto
-                    "1UOOSHUUYTAM",
-                    "5EVJN47HPDFT",
-                    "NI9M4EVAVGFJ",
-                    "VLY29QHTMNGT",
-                    "7XU98H109Y3A",
-                    "0CGEDFP2UIKV",
-                    "PDYLQU0K073Y",
-                    "HCS5Z7O2NV5G",
-                    "IY1VMST1MOXS",
-                    "VRPZLJ7HCA8X",
-                    // bitcard (crypto)
-                    "GWQQS5RM8IZS",
-                    "896MYD4SGOGZ",
-                    "PWLEN1VZGMZA",
-                    "A2VRM96J5K5W",
-                    "HV9ICIM3JT7P",
-                    "K2KLSPVWC2Q4",
-                    "HRBRQLLTDF95",
-                    "UUBYLZVK7QAB",
-                    "BH8W3XEDEOJN",
-                    "7WGE043X1RYQ",
-                    "2B13MHUZZVTF",
-                    "JN6R44P86EYX",
-                    "DA8H43GU84SO",
-                    "QK2XAQHSDEH4",
-                    "J7K1IQFS76DK",
-                    "NL4JQ2G7UPRZ",
-                    "OEFTMSBA5ELH",
-                    "A3CQK6UHNV27",
-                ];
-                const SUPPORTED_METHODS: &[&str] = &[
-                    "merchant_cards",
-                    "merchant_card",
-                    "visa",
-                    "bank",
-                    "ach",
-                    "visa_card",
-                    "charity",
-                ];
-
-                if !SUPPORTED_METHODS.contains(&&*product.category)
-                    || BLACKLISTED_IDS.contains(&&*product.id)
-                {
-                    continue;
-                };
-
-                let method = PayoutMethod {
-                    id: product.id,
-                    type_: PayoutMethodType::Tremendous,
-                    name: product.name.clone(),
-                    supported_countries: product
-                        .countries
-                        .into_iter()
-                        .map(|x| x.abbr)
-                        .collect(),
-                    image_logo_url: product
-                        .images
-                        .iter()
-                        .find(|x| x.type_ == ProductImageType::Logo)
-                        .map(|x| x.src.clone()),
-                    image_url: product
-                        .images
-                        .into_iter()
-                        .find(|x| x.type_ == ProductImageType::Card)
-                        .map(|x| x.src),
-                    interval: if product.skus.len() > 1 {
-                        let mut values = product
-                            .skus
-                            .into_iter()
-                            .map(|x| PayoutDecimal(x.min))
-                            .collect::<Vec<_>>();
-                        values.sort_by(|a, b| a.0.cmp(&b.0));
-
-                        PayoutInterval::Fixed { values }
-                    } else if let Some(first) = product.skus.first() {
-                        PayoutInterval::Standard {
-                            min: first.min,
-                            max: first.max,
-                        }
-                    } else {
-                        PayoutInterval::Standard {
-                            min: Decimal::ZERO,
-                            max: Decimal::from(5_000),
-                        }
-                    },
-                    fee: if product.category == "ach" {
-                        PayoutMethodFee {
-                            percentage: Decimal::from(4) / Decimal::from(100),
-                            min: Decimal::from(1) / Decimal::from(4),
-                            max: None,
-                        }
-                    } else {
-                        PayoutMethodFee {
-                            percentage: Decimal::default(),
-                            min: Decimal::default(),
-                            max: None,
-                        }
-                    },
-                };
-
-                // we do not support interval gift cards with non US based currencies since we cannot do currency conversions properly
-                if let PayoutInterval::Fixed { .. } = method.interval
-                    && !product.currency_codes.contains(&"USD".to_string())
-                {
-                    continue;
+            match get_tremendous_payout_methods(queue).await {
+                Ok(mut tremendous_methods) => {
+                    methods.append(&mut tremendous_methods);
                 }
-
-                methods.push(method);
-            }
-
-            const UPRANK_IDS: &[&str] =
-                &["ET0ZVETV5ILN", "Q24BD9EZ332JT", "UIL1ZYJU5MKN"];
-            const DOWNRANK_IDS: &[&str] = &["EIPF8Q00EMM1", "OU2MWXYWPNWQ"];
-
-            methods.sort_by(|a, b| {
-                let a_top = UPRANK_IDS.contains(&&*a.id);
-                let a_bottom = DOWNRANK_IDS.contains(&&*a.id);
-                let b_top = UPRANK_IDS.contains(&&*b.id);
-                let b_bottom = DOWNRANK_IDS.contains(&&*b.id);
-
-                match (a_top, a_bottom, b_top, b_bottom) {
-                    (true, _, true, _) => a.name.cmp(&b.name), // Both in top_priority: sort alphabetically
-                    (_, true, _, true) => a.name.cmp(&b.name), // Both in bottom_priority: sort alphabetically
-                    (true, _, _, _) => std::cmp::Ordering::Less, // a in top_priority: a comes first
-                    (_, _, true, _) => std::cmp::Ordering::Greater, // b in top_priority: b comes first
-                    (_, true, _, _) => std::cmp::Ordering::Greater, // a in bottom_priority: b comes first
-                    (_, _, _, true) => std::cmp::Ordering::Less, // b in bottom_priority: a comes first
-                    (_, _, _, _) => a.name.cmp(&b.name), // Neither in priority: sort alphabetically
+                Err(err) => {
+                    warn!(
+                        "Failed to fetch Tremendous payout methods: {err:#?}"
+                    );
                 }
-            });
+            }
 
             {
                 let paypal_us = PayoutMethod {
@@ -582,6 +406,27 @@ impl PayoutsQueue {
                     },
                 },
             );
+
+            methods.push(PayoutMethod {
+                id: "muralpay".to_string(),
+                type_: PayoutMethodType::MuralPay,
+                name: "Mural Pay".to_string(),
+                supported_countries: rust_iso3166::ALL
+                    .iter()
+                    .map(|x| x.alpha2.to_string())
+                    .collect(), // TODO
+                image_url: None,
+                image_logo_url: None,
+                interval: PayoutInterval::Standard {
+                    min: Decimal::from(1),
+                    max: Decimal::from(100_000),
+                },
+                fee: PayoutMethodFee {
+                    percentage: Decimal::ZERO,
+                    min: Decimal::ZERO,
+                    max: Some(Decimal::ZERO),
+                },
+            });
 
             let new_options = PayoutMethods {
                 options: methods,
@@ -738,6 +583,201 @@ impl PayoutsQueue {
                     / Decimal::from(100),
             }))
     }
+}
+
+async fn get_tremendous_payout_methods(
+    queue: &PayoutsQueue,
+) -> Result<Vec<PayoutMethod>> {
+    #[derive(Deserialize)]
+    struct Sku {
+        min: Decimal,
+        max: Decimal,
+    }
+
+    #[derive(Deserialize, Eq, PartialEq)]
+    #[serde(rename_all = "snake_case")]
+    enum ProductImageType {
+        Card,
+        Logo,
+    }
+
+    #[derive(Deserialize)]
+    struct ProductImage {
+        src: String,
+        #[serde(rename = "type")]
+        type_: ProductImageType,
+    }
+
+    #[derive(Deserialize)]
+    struct ProductCountry {
+        abbr: String,
+    }
+
+    #[derive(Deserialize)]
+    struct Product {
+        id: String,
+        category: String,
+        name: String,
+        // description: String,
+        // disclosure: String,
+        skus: Vec<Sku>,
+        currency_codes: Vec<String>,
+        countries: Vec<ProductCountry>,
+        images: Vec<ProductImage>,
+    }
+
+    #[derive(Deserialize)]
+    struct TremendousResponse {
+        products: Vec<Product>,
+    }
+
+    let response = queue
+        .make_tremendous_request::<(), TremendousResponse>(
+            Method::GET,
+            "products",
+            None,
+        )
+        .await?;
+
+    let mut methods = Vec::new();
+
+    for product in response.products {
+        const BLACKLISTED_IDS: &[&str] = &[
+            // physical visa
+            "A2J05SWPI2QG",
+            // crypto
+            "1UOOSHUUYTAM",
+            "5EVJN47HPDFT",
+            "NI9M4EVAVGFJ",
+            "VLY29QHTMNGT",
+            "7XU98H109Y3A",
+            "0CGEDFP2UIKV",
+            "PDYLQU0K073Y",
+            "HCS5Z7O2NV5G",
+            "IY1VMST1MOXS",
+            "VRPZLJ7HCA8X",
+            // bitcard (crypto)
+            "GWQQS5RM8IZS",
+            "896MYD4SGOGZ",
+            "PWLEN1VZGMZA",
+            "A2VRM96J5K5W",
+            "HV9ICIM3JT7P",
+            "K2KLSPVWC2Q4",
+            "HRBRQLLTDF95",
+            "UUBYLZVK7QAB",
+            "BH8W3XEDEOJN",
+            "7WGE043X1RYQ",
+            "2B13MHUZZVTF",
+            "JN6R44P86EYX",
+            "DA8H43GU84SO",
+            "QK2XAQHSDEH4",
+            "J7K1IQFS76DK",
+            "NL4JQ2G7UPRZ",
+            "OEFTMSBA5ELH",
+            "A3CQK6UHNV27",
+        ];
+        const SUPPORTED_METHODS: &[&str] = &[
+            "merchant_cards",
+            "merchant_card",
+            "visa",
+            "bank",
+            "ach",
+            "visa_card",
+            "charity",
+        ];
+
+        if !SUPPORTED_METHODS.contains(&&*product.category)
+            || BLACKLISTED_IDS.contains(&&*product.id)
+        {
+            continue;
+        };
+
+        let method = PayoutMethod {
+            id: product.id,
+            type_: PayoutMethodType::Tremendous,
+            name: product.name.clone(),
+            supported_countries: product
+                .countries
+                .into_iter()
+                .map(|x| x.abbr)
+                .collect(),
+            image_logo_url: product
+                .images
+                .iter()
+                .find(|x| x.type_ == ProductImageType::Logo)
+                .map(|x| x.src.clone()),
+            image_url: product
+                .images
+                .into_iter()
+                .find(|x| x.type_ == ProductImageType::Card)
+                .map(|x| x.src),
+            interval: if product.skus.len() > 1 {
+                let mut values = product
+                    .skus
+                    .into_iter()
+                    .map(|x| PayoutDecimal(x.min))
+                    .collect::<Vec<_>>();
+                values.sort_by(|a, b| a.0.cmp(&b.0));
+
+                PayoutInterval::Fixed { values }
+            } else if let Some(first) = product.skus.first() {
+                PayoutInterval::Standard {
+                    min: first.min,
+                    max: first.max,
+                }
+            } else {
+                PayoutInterval::Standard {
+                    min: Decimal::ZERO,
+                    max: Decimal::from(5_000),
+                }
+            },
+            fee: if product.category == "ach" {
+                PayoutMethodFee {
+                    percentage: Decimal::from(4) / Decimal::from(100),
+                    min: Decimal::from(1) / Decimal::from(4),
+                    max: None,
+                }
+            } else {
+                PayoutMethodFee {
+                    percentage: Decimal::default(),
+                    min: Decimal::default(),
+                    max: None,
+                }
+            },
+        };
+
+        // we do not support interval gift cards with non US based currencies since we cannot do currency conversions properly
+        if let PayoutInterval::Fixed { .. } = method.interval
+            && !product.currency_codes.contains(&"USD".to_string())
+        {
+            continue;
+        }
+
+        methods.push(method);
+    }
+
+    const UPRANK_IDS: &[&str] =
+        &["ET0ZVETV5ILN", "Q24BD9EZ332JT", "UIL1ZYJU5MKN"];
+    const DOWNRANK_IDS: &[&str] = &["EIPF8Q00EMM1", "OU2MWXYWPNWQ"];
+
+    methods.sort_by(|a, b| {
+        let a_top = UPRANK_IDS.contains(&&*a.id);
+        let a_bottom = DOWNRANK_IDS.contains(&&*a.id);
+        let b_top = UPRANK_IDS.contains(&&*b.id);
+        let b_bottom = DOWNRANK_IDS.contains(&&*b.id);
+
+        match (a_top, a_bottom, b_top, b_bottom) {
+            (true, _, true, _) => a.name.cmp(&b.name), // Both in top_priority: sort alphabetically
+            (_, true, _, true) => a.name.cmp(&b.name), // Both in bottom_priority: sort alphabetically
+            (true, _, _, _) => std::cmp::Ordering::Less, // a in top_priority: a comes first
+            (_, _, true, _) => std::cmp::Ordering::Greater, // b in top_priority: b comes first
+            (_, true, _, _) => std::cmp::Ordering::Greater, // a in bottom_priority: b comes first
+            (_, _, _, true) => std::cmp::Ordering::Less, // b in bottom_priority: a comes first
+            (_, _, _, _) => a.name.cmp(&b.name), // Neither in priority: sort alphabetically
+        }
+    });
+
+    Ok(methods)
 }
 
 #[derive(Deserialize)]

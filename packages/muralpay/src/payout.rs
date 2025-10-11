@@ -3,6 +3,7 @@ use std::str::FromStr;
 use chrono::{DateTime, Utc};
 use derive_more::{Deref, Display, Error, From};
 use rust_decimal::Decimal;
+use rust_iso3166::CountryCode;
 use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use uuid::Uuid;
@@ -322,7 +323,8 @@ pub enum FiatAndRailDetails {
         symbol: EurSymbol,
         iban: String,
         swift_bic: String,
-        country: String,
+        #[serde(with = "crate::serde_iso3166")]
+        country: CountryCode,
     },
     #[serde(rename_all = "camelCase")]
     Mxn {
@@ -569,7 +571,8 @@ impl FromStr for Dob {
 pub struct PhysicalAddress {
     pub address1: String,
     pub address2: Option<String>,
-    pub country: String,
+    #[serde(with = "crate::serde_iso3166")]
+    pub country: CountryCode,
     pub state: String,
     pub city: String,
     pub zip: String,

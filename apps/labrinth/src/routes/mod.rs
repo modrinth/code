@@ -213,7 +213,12 @@ impl ApiError {
                 Self::TaxProcessor(..) => "tax_processor_error",
                 Self::Slack(..) => "slack_error",
             },
-            description: self.to_string(),
+            description: match self {
+                Self::Internal(e) => format!("{e:#?}"),
+                Self::Request(e) => format!("{e:#?}"),
+                Self::Auth(e) => format!("{e:#?}"),
+                _ => self.to_string(),
+            },
         }
     }
 }

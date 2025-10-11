@@ -434,7 +434,7 @@ pub async fn user_payouts(
     )
     .await?;
 
-    Ok(HttpResponse::Ok().json(
+    Ok(web::Json(
         payouts
             .into_iter()
             .map(crate::models::payouts::Payout::from)
@@ -654,11 +654,11 @@ async fn venmo_or_paypal_payout(
             }
         } else if let Some(paypal_id) = &user.paypal_id {
             if let Some(paypal_country) = &user.paypal_country {
-                if &*paypal_country == "US" && &*body.method_id != "paypal_us" {
+                if paypal_country == "US" && &*body.method_id != "paypal_us" {
                     return Err(ApiError::InvalidInput(
                         "Please use the US PayPal transfer option!".to_string(),
                     ));
-                } else if &*paypal_country != "US"
+                } else if paypal_country != "US"
                     && &*body.method_id == "paypal_us"
                 {
                     return Err(ApiError::InvalidInput(
@@ -872,8 +872,7 @@ async fn mural_pay_payout(
             details.payout_details.clone(),
             details.recipient_info.clone(),
         )
-        .await
-        .wrap_internal_err("failed to create payout request")?;
+        .await?;
 
     Ok(DBPayout {
         id: payout_id,

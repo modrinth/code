@@ -1,8 +1,12 @@
 use ariadne::ids::UserId;
 use eyre::Result;
+use muralpay::MuralError;
 use serde::{Deserialize, Serialize};
 
-use crate::{queue::payouts::PayoutsQueue, util::error::Context};
+use crate::{
+    queue::payouts::PayoutsQueue,
+    util::error::{ApiError, Context},
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
@@ -24,11 +28,11 @@ impl PayoutsQueue {
         amount: muralpay::TokenAmount,
         payout_details: MuralPayoutRequest,
         recipient_info: muralpay::PayoutRecipientInfo,
-    ) -> Result<muralpay::PayoutRequest> {
+    ) -> Result<muralpay::PayoutRequest, ApiError> {
         let muralpay = self.muralpay.read().await;
         let muralpay = muralpay
             .as_ref()
-            .wrap_err("Mural Pay client not available")?;
+            .wrap_internal_err("Mural Pay client not available")?;
 
         let payout_details = match payout_details {
             MuralPayoutRequest::Fiat {
@@ -55,7 +59,7 @@ impl PayoutsQueue {
         let payout = muralpay::CreatePayout {
             amount,
             payout_details,
-            recipient_info: recipient_info.into(),
+            recipient_info,
             supporting_details: None,
             // TODO
             // Some(muralpay::SupportingDetails {
@@ -71,7 +75,11 @@ impl PayoutsQueue {
                 Some(format!("User {user_id}")),
                 &[payout],
             )
-            .await?;
+            .await
+            .map_err(|err| match err {
+                MuralError::Api(err) => ApiError::Request(err.into()),
+                err => ApiError::Internal(err.into()),
+            })?;
         Ok(payout_request)
     }
 
