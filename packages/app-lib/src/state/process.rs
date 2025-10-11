@@ -516,7 +516,7 @@ impl Process {
                     chrono::DateTime::<Utc>::from_timestamp(secs, nsecs)
                         .unwrap_or_default()
                 } else {
-                    chrono::DateTime::<Utc>::from_timestamp(timestamp_val, 0)
+                    chrono::DateTime::<Utc>::from_timestamp_secs(timestamp_val)
                         .unwrap_or_default()
                 };
 

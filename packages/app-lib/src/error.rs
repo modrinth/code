@@ -176,6 +176,9 @@ pub enum ErrorKind {
 
     #[error("Deserialization error: {0}")]
     DeserializationError(#[from] serde::de::value::Error),
+
+    #[error("Discord IPC error: {0}")]
+    DiscordRichPresenceError(#[from] discord_rich_presence::error::Error),
 }
 
 #[derive(Debug)]

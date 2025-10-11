@@ -20,7 +20,7 @@ impl super::Validator for PackValidator {
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Time since release of 13w24a which replaced texture packs with resource packs
         SupportedGameVersions::PastDate(
-            DateTime::from_timestamp(1371137542, 0).unwrap(),
+            DateTime::from_timestamp_secs(1371137542).unwrap(),
         )
     }
 
@@ -59,8 +59,8 @@ impl super::Validator for TexturePackValidator {
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // a1.2.2a to 13w23b
         SupportedGameVersions::Range(
-            DateTime::from_timestamp(1289339999, 0).unwrap(),
-            DateTime::from_timestamp(1370651522, 0).unwrap(),
+            DateTime::from_timestamp_secs(1289339999).unwrap(),
+            DateTime::from_timestamp_secs(1370651522).unwrap(),
         )
     }
 

@@ -1,6 +1,8 @@
 **/*.rs
 .sqlx
 
+java/build
+
 # Migrations existing before Prettier formatted them shall always be ignored,
 # as any changes to them will break existing deployments
 migrations/20240711194701_init.sql

@@ -27,6 +27,8 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         println!("Some environment variables are missing!");
     }
 
+    let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
+
     let pool = db.pool.clone();
     let ro_pool = db.ro_pool.clone();
     let redis_pool = db.redis_pool.clone();

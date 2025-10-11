@@ -272,7 +272,7 @@ impl FriendsSocket {
     pub async fn disconnect(&self) -> crate::Result<()> {
         let mut write_lock = self.write.write().await;
         if let Some(ref mut write_half) = *write_lock {
-            write_half.close().await?;
+            SinkExt::close(write_half).await?;
             *write_lock = None;
         }
         Ok(())

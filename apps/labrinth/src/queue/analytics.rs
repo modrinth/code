@@ -66,7 +66,7 @@ impl AnalyticsQueue {
         self.playtime_queue.clear();
 
         if !playtime_queue.is_empty() {
-            let mut playtimes = client.insert("playtime")?;
+            let mut playtimes = client.insert::<Playtime>("playtime").await?;
 
             for playtime in playtime_queue {
                 playtimes.write(&playtime).await?;
@@ -132,7 +132,7 @@ impl AnalyticsQueue {
                 .await
                 .map_err(DatabaseError::CacheError)?;
 
-            let mut views = client.insert("views")?;
+            let mut views = client.insert::<PageView>("views").await?;
 
             for (all_views, monetized) in raw_views {
                 for (idx, mut view) in all_views.into_iter().enumerate() {
@@ -200,7 +200,7 @@ impl AnalyticsQueue {
                 .map_err(DatabaseError::CacheError)?;
 
             let mut transaction = pool.begin().await?;
-            let mut downloads = client.insert("downloads")?;
+            let mut downloads = client.insert::<Download>("downloads").await?;
 
             let mut version_downloads: HashMap<i64, i32> = HashMap::new();
             let mut project_downloads: HashMap<i64, i32> = HashMap::new();

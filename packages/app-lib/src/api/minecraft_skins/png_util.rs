@@ -1,6 +1,6 @@
 //! Miscellaneous PNG utilities for Minecraft skins.
 
-use std::io::Read;
+use std::io::{BufRead, Cursor, Seek};
 use std::sync::Arc;
 
 use base64::Engine;
@@ -9,7 +9,8 @@ use data_url::DataUrl;
 use futures::{Stream, TryStreamExt, future::Either, stream};
 use itertools::Itertools;
 use rgb::Rgba;
-use tokio_util::{compat::FuturesAsyncReadCompatExt, io::SyncIoBridge};
+use tokio::io::AsyncReadExt;
+use tokio_util::compat::FuturesAsyncReadCompatExt;
 use url::Url;
 
 use crate::{
@@ -95,7 +96,8 @@ pub fn dimensions(png_data: &[u8]) -> crate::Result<(u32, u32)> {
 pub async fn normalize_skin_texture(
     texture: &UrlOrBlob,
 ) -> crate::Result<Bytes> {
-    let texture_stream = SyncIoBridge::new(Box::pin(
+    let mut texture_data = Vec::with_capacity(8192);
+    Box::pin(
         match texture {
             UrlOrBlob::Url(url) => Either::Left(
                 url_to_data_stream(url)
@@ -112,84 +114,84 @@ pub async fn normalize_skin_texture(
             ),
         }
         .compat(),
-    ));
+    )
+    .read_to_end(&mut texture_data)
+    .await?;
 
-    tokio::task::spawn_blocking(|| {
-        let mut png_reader = {
-            let mut decoder = png::Decoder::new(texture_stream);
-            decoder.set_transformations(
-                png::Transformations::normalize_to_color8(),
-            );
-            decoder.read_info()
-        }?;
+    let mut png_reader = {
+        let mut decoder = png::Decoder::new(Cursor::new(texture_data));
+        decoder
+            .set_transformations(png::Transformations::normalize_to_color8());
+        decoder.read_info()
+    }?;
 
-        // The code below assumes that the skin texture has valid dimensions.
-        // This also serves as a way to bail out early for obviously invalid or
-        // adversarial textures
-        if png_reader.info().width != 64
-            || ![64, 32].contains(&png_reader.info().height)
-        {
-            Err(ErrorKind::InvalidSkinTexture)?;
-        }
+    // The code below assumes that the skin texture has valid dimensions.
+    // This also serves as a way to bail out early for obviously invalid or
+    // adversarial textures
+    if png_reader.info().width != 64
+        || ![64, 32].contains(&png_reader.info().height)
+    {
+        Err(ErrorKind::InvalidSkinTexture)?;
+    }
 
-        let is_legacy_skin = png_reader.info().height == 32;
-        let mut texture_buf =
-            get_skin_texture_buffer(&mut png_reader, is_legacy_skin)?;
-        if is_legacy_skin {
-            convert_legacy_skin_texture(&mut texture_buf, png_reader.info());
-            do_notch_transparency_hack(&mut texture_buf, png_reader.info());
-        }
-        make_inner_parts_opaque(&mut texture_buf, png_reader.info());
+    let is_legacy_skin = png_reader.info().height == 32;
+    let mut texture_buf =
+        get_skin_texture_buffer(&mut png_reader, is_legacy_skin)?;
+    if is_legacy_skin {
+        convert_legacy_skin_texture(&mut texture_buf, png_reader.info());
+        do_notch_transparency_hack(&mut texture_buf, png_reader.info());
+    }
+    make_inner_parts_opaque(&mut texture_buf, png_reader.info());
 
-        let mut encoded_png = vec![];
+    let mut encoded_png = vec![];
 
-        let mut png_encoder = png::Encoder::new(&mut encoded_png, 64, 64);
-        png_encoder.set_color(png::ColorType::Rgba);
-        png_encoder.set_depth(png::BitDepth::Eight);
-        png_encoder.set_filter(png::FilterType::NoFilter);
-        png_encoder.set_compression(png::Compression::Fast);
+    let mut png_encoder = png::Encoder::new(&mut encoded_png, 64, 64);
+    png_encoder.set_color(png::ColorType::Rgba);
+    png_encoder.set_depth(png::BitDepth::Eight);
+    png_encoder.set_filter(png::Filter::NoFilter);
+    png_encoder.set_compression(png::Compression::Fast);
 
-        // Keeping color space information properly set, to handle the occasional
-        // strange PNG with non-sRGB chromaticities and/or different grayscale spaces
-        // that keeps most people wondering, is what sets a carefully crafted image
-        // manipulation routine apart :)
-        if let Some(source_chromaticities) =
-            png_reader.info().source_chromaticities.as_ref().copied()
-        {
-            png_encoder.set_source_chromaticities(source_chromaticities);
-        }
-        if let Some(source_gamma) =
-            png_reader.info().source_gamma.as_ref().copied()
-        {
-            png_encoder.set_source_gamma(source_gamma);
-        }
-        if let Some(source_srgb) = png_reader.info().srgb.as_ref().copied() {
-            png_encoder.set_source_srgb(source_srgb);
-        }
+    // Keeping color space information properly set, to handle the occasional
+    // strange PNG with non-sRGB chromaticities and/or different grayscale spaces
+    // that keeps most people wondering, is what sets a carefully crafted image
+    // manipulation routine apart :)
+    if let Some(source_chromaticities) =
+        png_reader.info().source_chromaticities.as_ref().copied()
+    {
+        png_encoder.set_source_chromaticities(source_chromaticities);
+    }
+    if let Some(source_gamma) = png_reader.info().source_gamma.as_ref().copied()
+    {
+        png_encoder.set_source_gamma(source_gamma);
+    }
+    if let Some(source_srgb) = png_reader.info().srgb.as_ref().copied() {
+        png_encoder.set_source_srgb(source_srgb);
+    }
 
-        let png_buf = bytemuck::try_cast_slice(&texture_buf)
-            .map_err(|_| ErrorKind::InvalidPng)?;
-        let mut png_writer = png_encoder.write_header()?;
-        png_writer.write_image_data(png_buf)?;
-        png_writer.finish()?;
+    let png_buf = bytemuck::try_cast_slice(&texture_buf)
+        .map_err(|_| ErrorKind::InvalidPng)?;
+    let mut png_writer = png_encoder.write_header()?;
+    png_writer.write_image_data(png_buf)?;
+    png_writer.finish()?;
 
-        Ok(encoded_png.into())
-    })
-    .await?
+    Ok(encoded_png.into())
 }
 
 /// Reads a skin texture and returns a 64x64 buffer in RGBA format.
-fn get_skin_texture_buffer<R: Read>(
+fn get_skin_texture_buffer<R: BufRead + Seek>(
     png_reader: &mut png::Reader<R>,
     is_legacy_skin: bool,
 ) -> crate::Result<Vec<Rgba<u8>>> {
+    let output_buffer_size = png_reader
+        .output_buffer_size()
+        .expect("Reasonable skin texture size verified already");
     let mut png_buf = if is_legacy_skin {
         // Legacy skins have half the height, so duplicate the rows to
         // turn them into a 64x64 texture
-        vec![0; png_reader.output_buffer_size() * 2]
+        vec![0; output_buffer_size * 2]
     } else {
         // Modern skins are left as-is
-        vec![0; png_reader.output_buffer_size()]
+        vec![0; output_buffer_size]
     };
     png_reader.next_frame(&mut png_buf)?;
 
@@ -373,9 +375,10 @@ fn set_alpha(
 #[tokio::test]
 async fn normalize_skin_texture_works() {
     let decode_to_pixels = |png_data: &[u8]| {
-        let decoder = png::Decoder::new(png_data);
+        let decoder = png::Decoder::new(Cursor::new(png_data));
         let mut reader = decoder.read_info().expect("Failed to read PNG info");
-        let mut buffer = vec![0; reader.output_buffer_size()];
+        let mut buffer =
+            vec![0; reader.output_buffer_size().expect("Skin size too large")];
         reader
             .next_frame(&mut buffer)
             .expect("Failed to decode PNG");
