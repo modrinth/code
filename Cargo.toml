@@ -51,6 +51,7 @@ clickhouse = "0.13.3"
 color-eyre = "0.6.5"
 color-thief = "0.2.2"
 console-subscriber = "0.4.1"
+const_format = "0.2.34"
 daedalus = { path = "packages/daedalus" }
 dashmap = "6.1.0"
 data-url = "0.3.1"

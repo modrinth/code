@@ -36,6 +36,7 @@ clickhouse = { workspace = true, features = ["time", "uuid"] }
 color-eyre = { workspace = true }
 color-thief = { workspace = true }
 console-subscriber = { workspace = true }
+const_format = { workspace = true }
 dashmap = { workspace = true }
 deadpool-redis.workspace = true
 dotenvy = { workspace = true }
