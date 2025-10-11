@@ -77,12 +77,12 @@
 							/>
 							<label for="show-all-versions" class="text-sm">Show all Java versions</label>
 						</div>
-						<TeleportDropdownMenu
+						<Combobox
 							:id="'java-version-field'"
 							v-model="jdkVersion"
 							name="java-version"
-							:options="displayedJavaVersions"
-							placeholder="Java Version"
+							:options="displayedJavaVersions.map((v) => ({ value: v, label: v }))"
+							:display-value="jdkVersion ?? 'Java Version'"
 						/>
 					</div>
 					<div class="flex flex-col gap-4">
@@ -90,12 +90,12 @@
 							<span class="text-lg font-bold text-contrast">Runtime</span>
 							<span> The Java runtime your server will use. </span>
 						</div>
-						<TeleportDropdownMenu
+						<Combobox
 							:id="'runtime-field'"
 							v-model="jdkBuild"
 							name="runtime"
-							:options="['Corretto', 'Temurin', 'GraalVM']"
-							placeholder="Runtime"
+							:options="['Corretto', 'Temurin', 'GraalVM'].map((v) => ({ value: v, label: v }))"
+							:display-value="jdkBuild ?? 'Runtime'"
 						/>
 					</div>
 				</div>
@@ -113,7 +113,7 @@
 
 <script setup lang="ts">
 import { IssuesIcon, UpdatedIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, TeleportDropdownMenu } from '@modrinth/ui'
+import { ButtonStyled, Combobox, injectNotificationManager } from '@modrinth/ui'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'

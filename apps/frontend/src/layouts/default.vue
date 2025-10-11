@@ -7,20 +7,17 @@
 	</div>
 	<div class="pointer-events-none absolute inset-0 z-50">
 		<div
-			class="over-the-top-random-animation"
-			:style="{ '--_r-count': rCount }"
-			:class="{ threshold: rCount > 20, 'rings-expand': rCount >= 40 }"
-		>
+class="over-the-top-random-animation" :style="{ '--_r-count': rCount }"
+			:class="{ threshold: rCount > 20, 'rings-expand': rCount >= 40 }">
 			<div>
 				<div
-					class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
-				></div>
+					class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40">
+				</div>
 				<div
-					class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
-				></div>
+					class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60">
+				</div>
 				<div
-					class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-9xl font-extrabold text-contrast"
-				>
+					class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight text-9xl font-extrabold text-contrast">
 					?
 				</div>
 			</div>
@@ -73,10 +70,7 @@
 			</template>
 			<template #actions_right>
 				<ButtonStyled circular type="transparent">
-					<button
-						v-tooltip="formatMessage(commonMessages.closeButton)"
-						@click="hideRussiaCensorshipBanner"
-					>
+					<button v-tooltip="formatMessage(commonMessages.closeButton)" @click="hideRussiaCensorshipBanner">
 						<XIcon :aria-label="formatMessage(commonMessages.closeButton)" />
 					</button>
 				</ButtonStyled>
@@ -98,9 +92,8 @@
 			</template>
 		</PagewideBanner>
 		<PagewideBanner
-			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
-			variant="warning"
-		>
+v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
+			variant="warning">
 			<template #title>
 				<span>
 					{{
@@ -130,12 +123,10 @@
 			</template>
 		</PagewideBanner>
 		<PagewideBanner
-			v-if="
-				user.subscriptions.some((x) => x.status === 'payment-failed') &&
-				route.path !== '/settings/billing'
-			"
-			variant="error"
-		>
+v-if="
+			user.subscriptions.some((x) => x.status === 'payment-failed') &&
+			route.path !== '/settings/billing'
+		" variant="error">
 			<template #title>
 				<span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>
 			</template>
@@ -150,12 +141,10 @@
 			</template>
 		</PagewideBanner>
 		<PagewideBanner
-			v-if="
-				config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
-				!cosmetics.hideStagingBanner
-			"
-			variant="warning"
-		>
+v-if="
+			config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
+			!cosmetics.hideStagingBanner
+		" variant="warning">
 			<template #title>
 				<span>{{ formatMessage(stagingBannerMessages.title) }}</span>
 			</template>
@@ -164,11 +153,8 @@
 			</template>
 			<template #actions_right>
 				<Button
-					transparent
-					icon-only
-					:aria-label="formatMessage(commonMessages.closeButton)"
-					@click="hideStagingBanner"
-				>
+transparent icon-only :aria-label="formatMessage(commonMessages.closeButton)"
+					@click="hideStagingBanner">
 					<XIcon aria-hidden="true" />
 				</Button>
 			</template>
@@ -187,92 +173,66 @@
 			</template>
 		</PagewideBanner>
 
-		<CreatorTaxFormModal
-			ref="taxFormModalRef"
-			close-button-text="Close"
-			:emit-success-on-close="false"
-		/>
+		<CreatorTaxFormModal ref="taxFormModalRef" close-button-text="Close" :emit-success-on-close="false" />
 		<header
-			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
-		>
+			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]">
 			<div>
 				<NuxtLink to="/" :aria-label="formatMessage(messages.modrinthHomePage)">
 					<TextLogo aria-hidden="true" class="h-7 w-auto text-contrast" />
 				</NuxtLink>
 			</div>
 			<div
-				:class="`col-span-2 row-start-2 flex flex-wrap justify-center ${flags.projectTypesPrimaryNav ? 'gap-2' : 'gap-4'} lg:col-span-1 lg:row-start-auto`"
-			>
+				:class="`col-span-2 row-start-2 flex flex-wrap justify-center ${flags.projectTypesPrimaryNav ? 'gap-2' : 'gap-4'} lg:col-span-1 lg:row-start-auto`">
 				<template v-if="flags.projectTypesPrimaryNav">
 					<ButtonStyled
-						type="transparent"
-						:highlighted="route.name === 'search-mods' || route.path.startsWith('/mod/')"
-						:highlighted-style="
-							route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
+type="transparent" :highlighted="route.name === 'search-mods' || route.path.startsWith('/mod/')"
+						:highlighted-style="route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+							">
 						<nuxt-link to="/mods">
 							<BoxIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
-						type="transparent"
-						:highlighted="
-							route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
-						"
-						:highlighted-style="
-							route.name === 'search-resourcepacks' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
+type="transparent" :highlighted="route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
+						" :highlighted-style="route.name === 'search-resourcepacks' ? 'main-nav-primary' : 'main-nav-secondary'
+							">
 						<nuxt-link to="/resourcepacks">
 							<PaintbrushIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
-						type="transparent"
-						:highlighted="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
-						:highlighted-style="
-							route.name === 'search-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
+type="transparent"
+						:highlighted="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')" :highlighted-style="route.name === 'search-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
+							">
 						<nuxt-link to="/datapacks">
 							<BracesIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
-						type="transparent"
-						:highlighted="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
-						:highlighted-style="
-							route.name === 'search-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
+type="transparent"
+						:highlighted="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')" :highlighted-style="route.name === 'search-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
+							">
 						<nuxt-link to="/modpacks">
 							<PackageOpenIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
-						type="transparent"
-						:highlighted="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
-						:highlighted-style="
-							route.name === 'search-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
+type="transparent"
+						:highlighted="route.name === 'search-shaders' || route.path.startsWith('/shader/')" :highlighted-style="route.name === 'search-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
+							">
 						<nuxt-link to="/shaders">
 							<GlassesIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
-						type="transparent"
-						:highlighted="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
-						:highlighted-style="
-							route.name === 'search-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
+type="transparent"
+						:highlighted="route.name === 'search-plugins' || route.path.startsWith('/plugin/')" :highlighted-style="route.name === 'search-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
+							">
 						<nuxt-link to="/plugins">
 							<PlugIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
@@ -281,65 +241,52 @@
 				</template>
 				<template v-else>
 					<ButtonStyled
-						type="transparent"
-						:highlighted="isDiscovering || isDiscoveringSubpage"
-						:highlighted-style="isDiscoveringSubpage ? 'main-nav-secondary' : 'main-nav-primary'"
-					>
+type="transparent" :highlighted="isDiscovering || isDiscoveringSubpage"
+						:highlighted-style="isDiscoveringSubpage ? 'main-nav-secondary' : 'main-nav-primary'">
 						<TeleportOverflowMenu
-							:options="[
-								{
-									id: 'mods',
-									action: '/mods',
-								},
-								{
-									id: 'resourcepacks',
-									action: '/resourcepacks',
-								},
-								{
-									id: 'datapacks',
-									action: '/datapacks',
-								},
-								{
-									id: 'shaders',
-									action: '/shaders',
-								},
-								{
-									id: 'modpacks',
-									action: '/modpacks',
-								},
-								{
-									id: 'plugins',
-									action: '/plugins',
-								},
-							]"
-							hoverable
-						>
-							<BoxIcon
-								v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"
-								aria-hidden="true"
-							/>
+:options="[
+							{
+								id: 'mods',
+								action: '/mods',
+							},
+							{
+								id: 'resourcepacks',
+								action: '/resourcepacks',
+							},
+							{
+								id: 'datapacks',
+								action: '/datapacks',
+							},
+							{
+								id: 'shaders',
+								action: '/shaders',
+							},
+							{
+								id: 'modpacks',
+								action: '/modpacks',
+							},
+							{
+								id: 'plugins',
+								action: '/plugins',
+							},
+						]" hoverable>
+							<BoxIcon v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')" aria-hidden="true" />
 							<PaintbrushIcon
-								v-else-if="
-									route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
-								"
-								aria-hidden="true"
-							/>
+v-else-if="
+								route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
+							" aria-hidden="true" />
 							<BracesIcon
-								v-else-if="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
-								aria-hidden="true"
-							/>
+v-else-if="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
+								aria-hidden="true" />
 							<PackageOpenIcon
-								v-else-if="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
-								aria-hidden="true"
-							/>
+v-else-if="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
+								aria-hidden="true" />
 							<GlassesIcon
-								v-else-if="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
-								aria-hidden="true"
-							/>
+v-else-if="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
+								aria-hidden="true" />
 							<PlugIcon
-								v-else-if="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
-								aria-hidden="true"
-							/>
+v-else-if="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
+								aria-hidden="true" />
 							<CompassIcon v-else aria-hidden="true" />
 							<span class="hidden md:contents">{{
 								formatMessage(navMenuMessages.discoverContent)
@@ -374,15 +321,10 @@
 						</TeleportOverflowMenu>
 					</ButtonStyled>
 					<ButtonStyled
-						type="transparent"
-						:highlighted="
-							route.name?.startsWith('servers') ||
-							(route.name?.startsWith('search-') && route.query.sid)
-						"
-						:highlighted-style="
-							route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'
-						"
-					>
+type="transparent" :highlighted="route.name?.startsWith('servers') ||
+						(route.name?.startsWith('search-') && route.query.sid)
+						" :highlighted-style="route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'
+							">
 						<nuxt-link to="/servers">
 							<ServerIcon aria-hidden="true" />
 							{{ formatMessage(navMenuMessages.hostAServer) }}
@@ -404,12 +346,9 @@
 			<div class="flex items-center gap-1">
 				<ButtonStyled type="transparent">
 					<OverflowMenu
-						v-if="auth.user && isStaff(auth.user)"
-						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-						position="bottom"
-						direction="left"
-						:dropdown-id="`${basePopoutId}-staff`"
-						:aria-label="formatMessage(messages.createNew)"
+v-if="auth.user && isStaff(auth.user)"
+						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1" position="bottom"
+						direction="left" :dropdown-id="`${basePopoutId}-staff`" :aria-label="formatMessage(messages.createNew)"
 						:options="[
 							{
 								id: 'review-projects',
@@ -444,8 +383,7 @@
 								link: '/admin/servers/notices',
 								shown: isAdmin(auth.user),
 							},
-						]"
-					>
+						]">
 						<ModrinthIcon aria-hidden="true" />
 						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
 						<template #review-projects>
@@ -467,12 +405,9 @@
 				</ButtonStyled>
 				<ButtonStyled type="transparent">
 					<OverflowMenu
-						v-if="auth.user"
-						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-						position="bottom"
-						direction="left"
-						:dropdown-id="`${basePopoutId}-create`"
-						:aria-label="formatMessage(messages.createNew)"
+v-if="auth.user"
+						class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1" position="bottom"
+						direction="left" :dropdown-id="`${basePopoutId}-create`" :aria-label="formatMessage(messages.createNew)"
 						:options="[
 							{
 								id: 'new-project',
@@ -487,8 +422,7 @@
 								id: 'new-organization',
 								action: (event) => $refs.modal_organization_creation.show(event),
 							},
-						]"
-					>
+						]">
 						<PlusIcon aria-hidden="true" />
 						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
 						<template #new-project>
@@ -504,11 +438,9 @@
 					</OverflowMenu>
 				</ButtonStyled>
 				<OverflowMenu
-					v-if="auth.user"
-					:dropdown-id="`${basePopoutId}-user`"
+v-if="auth.user" :dropdown-id="`${basePopoutId}-user`"
 					class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-					:options="userMenuOptions"
-				>
+					:options="userMenuOptions">
 					<Avatar :src="auth.user.avatar_url" aria-hidden="true" circle />
 					<DropdownIcon class="h-5 w-5 text-secondary" />
 					<template #profile>
@@ -517,11 +449,14 @@
 					<template #notifications>
 						<BellIcon aria-hidden="true" /> {{ formatMessage(commonMessages.notificationsLabel) }}
 					</template>
+					<template #reports>
+						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.activeReports) }}
+					</template>
 					<template #saved>
-						<BookmarkIcon aria-hidden="true" /> {{ formatMessage(messages.savedProjects) }}
+						<LibraryIcon aria-hidden="true" /> {{ formatMessage(commonMessages.collectionsLabel) }}
 					</template>
 					<template #servers>
-						<ServerIcon aria-hidden="true" /> {{ formatMessage(commonMessages.serversLabel) }}
+						<ServerIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
 					</template>
 					<template #plus>
 						<ArrowBigUpDashIcon aria-hidden="true" />
@@ -569,41 +504,22 @@
 		</header>
 		<header class="mobile-navigation mobile-only">
 			<div
-				class="nav-menu nav-menu-browse"
-				:class="{ expanded: isBrowseMenuOpen }"
-				@focusin="isBrowseMenuOpen = true"
-				@focusout="isBrowseMenuOpen = false"
-			>
+class="nav-menu nav-menu-browse" :class="{ expanded: isBrowseMenuOpen }" @focusin="isBrowseMenuOpen = true"
+				@focusout="isBrowseMenuOpen = false">
 				<div class="links cascade-links">
-					<NuxtLink
-						v-for="navRoute in navRoutes"
-						:key="navRoute.href"
-						:to="navRoute.href"
-						class="iconified-button"
-					>
+					<NuxtLink v-for="navRoute in navRoutes" :key="navRoute.href" :to="navRoute.href" class="iconified-button">
 						{{ navRoute.label }}
 					</NuxtLink>
 				</div>
 			</div>
 			<div
-				class="nav-menu nav-menu-mobile"
-				:class="{ expanded: isMobileMenuOpen }"
-				@focusin="isMobileMenuOpen = true"
-				@focusout="isMobileMenuOpen = false"
-			>
+class="nav-menu nav-menu-mobile" :class="{ expanded: isMobileMenuOpen }" @focusin="isMobileMenuOpen = true"
+				@focusout="isMobileMenuOpen = false">
 				<div class="account-container">
-					<NuxtLink
-						v-if="auth.user"
-						:to="`/user/${auth.user.username}`"
-						class="iconified-button account-button"
-					>
+					<NuxtLink v-if="auth.user" :to="`/user/${auth.user.username}`" class="iconified-button account-button">
 						<Avatar
-							:src="auth.user.avatar_url"
-							class="user-icon"
-							:alt="formatMessage(messages.yourAvatarAlt)"
-							aria-hidden="true"
-							circle
-						/>
+:src="auth.user.avatar_url" class="user-icon" :alt="formatMessage(messages.yourAvatarAlt)"
+							aria-hidden="true" circle />
 						<div class="account-text">
 							<div>@{{ auth.user.username }}</div>
 							<div>{{ formatMessage(commonMessages.visitYourProfile) }}</div>
@@ -632,10 +548,8 @@
 							{{ formatMessage(commonMessages.serversLabel) }}
 						</NuxtLink>
 						<NuxtLink
-							v-if="auth.user.role === 'moderator' || auth.user.role === 'admin'"
-							class="iconified-button"
-							to="/moderation"
-						>
+v-if="auth.user.role === 'moderator' || auth.user.role === 'admin'" class="iconified-button"
+							to="/moderation">
 							<ScaleIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.moderationLabel) }}
 						</NuxtLink>
@@ -659,20 +573,14 @@
 			</div>
 			<div class="mobile-navbar" :class="{ expanded: isBrowseMenuOpen || isMobileMenuOpen }">
 				<NuxtLink
-					to="/"
-					class="tab button-animation"
-					:title="formatMessage(navMenuMessages.home)"
-					:aria-label="formatMessage(navMenuMessages.home)"
-				>
+to="/" class="tab button-animation" :title="formatMessage(navMenuMessages.home)"
+					:aria-label="formatMessage(navMenuMessages.home)">
 					<HomeIcon aria-hidden="true" />
 				</NuxtLink>
 				<button
-					class="tab button-animation"
-					:class="{ 'router-link-exact-active': isBrowseMenuOpen }"
-					:title="formatMessage(navMenuMessages.search)"
-					:aria-label="formatMessage(navMenuMessages.search)"
-					@click="toggleBrowseMenu()"
-				>
+class="tab button-animation" :class="{ 'router-link-exact-active': isBrowseMenuOpen }"
+					:title="formatMessage(navMenuMessages.search)" :aria-label="formatMessage(navMenuMessages.search)"
+					@click="toggleBrowseMenu()">
 					<template v-if="auth.user">
 						<SearchIcon aria-hidden="true" />
 					</template>
@@ -683,50 +591,35 @@
 				</button>
 				<template v-if="auth.user">
 					<NuxtLink
-						to="/dashboard/notifications"
-						class="tab button-animation"
-						:aria-label="formatMessage(commonMessages.notificationsLabel)"
-						:class="{
+to="/dashboard/notifications" class="tab button-animation"
+						:aria-label="formatMessage(commonMessages.notificationsLabel)" :class="{
 							'no-active': isMobileMenuOpen || isBrowseMenuOpen,
-						}"
-						:title="formatMessage(commonMessages.notificationsLabel)"
-						@click="
+						}" :title="formatMessage(commonMessages.notificationsLabel)" @click="
 							() => {
 								isMobileMenuOpen = false
 								isBrowseMenuOpen = false
 							}
-						"
-					>
+						">
 						<BellIcon aria-hidden="true" />
 					</NuxtLink>
 					<NuxtLink
-						to="/dashboard"
-						class="tab button-animation"
+to="/dashboard" class="tab button-animation"
 						:aria-label="formatMessage(commonMessages.dashboardLabel)"
-						:title="formatMessage(commonMessages.dashboardLabel)"
-					>
+						:title="formatMessage(commonMessages.dashboardLabel)">
 						<ChartIcon aria-hidden="true" />
 					</NuxtLink>
 				</template>
 				<button
-					class="tab button-animation"
-					:title="formatMessage(messages.toggleMenu)"
-					:aria-label="isMobileMenuOpen ? 'Close menu' : 'Open menu'"
-					@click="toggleMobileMenu()"
-				>
+class="tab button-animation" :title="formatMessage(messages.toggleMenu)" :aria-label="isMobileMenuOpen ? formatMessage(messages.closeMenu) : formatMessage(messages.openMenu)
+					" @click="toggleMobileMenu()">
 					<template v-if="!auth.user">
 						<HamburgerIcon v-if="!isMobileMenuOpen" aria-hidden="true" />
 						<XIcon v-else aria-hidden="true" />
 					</template>
 					<template v-else>
 						<Avatar
-							:src="auth.user.avatar_url"
-							class="user-icon"
-							:class="{ expanded: isMobileMenuOpen }"
-							:alt="formatMessage(messages.yourAvatarAlt)"
-							aria-hidden="true"
-							circle
-						/>
+:src="auth.user.avatar_url" class="user-icon" :class="{ expanded: isMobileMenuOpen }"
+							:alt="formatMessage(messages.yourAvatarAlt)" aria-hidden="true" circle />
 					</template>
 				</button>
 			</div>
@@ -737,36 +630,22 @@
 			<OrganizationCreateModal ref="modal_organization_creation" />
 			<slot id="main" />
 		</main>
-		<footer
-			class="footer-brand-background experimental-styles-within border-0 border-t-[1px] border-solid"
-		>
+		<footer class="footer-brand-background experimental-styles-within border-0 border-t-[1px] border-solid">
 			<div class="mx-auto flex max-w-screen-xl flex-col gap-6 p-6 pb-20 sm:px-12 md:py-12">
-				<div
-					class="grid grid-cols-1 gap-4 text-primary md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]"
-				>
+				<div class="grid grid-cols-1 gap-4 text-primary md:grid-cols-[1fr_2fr] lg:grid-cols-[auto_auto_auto_auto_auto]">
 					<div
-						class="flex flex-col items-center gap-3 md:items-start"
-						role="region"
-						:aria-label="formatMessage(messages.modrinthInformation)"
-					>
+class="flex flex-col items-center gap-3 md:items-start" role="region"
+						:aria-label="formatMessage(messages.modrinthInformation)">
 						<TextLogo
-							aria-hidden="true"
-							class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
-							@click="developerModeIncrement()"
-						/>
+aria-hidden="true" class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
+							@click="developerModeIncrement()" />
 						<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
 							<ButtonStyled
-								v-for="(social, index) in socialLinks"
-								:key="`footer-social-${index}`"
-								circular
-								type="transparent"
-							>
+v-for="(social, index) in socialLinks" :key="`footer-social-${index}`" circular
+								type="transparent">
 								<a
-									v-tooltip="social.label"
-									:href="social.href"
-									target="_blank"
-									:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`"
-								>
+v-tooltip="social.label" :href="social.href" target="_blank"
+									:rel="`noopener${social.rel ? ` ${social.rel}` : ''}`">
 									<component :is="social.icon" class="h-5 w-5" />
 								</a>
 							</ButtonStyled>
@@ -776,41 +655,28 @@
 								<IntlFormatted :message-id="footerMessages.openSource">
 									<template #github-link="{ children }">
 										<a
-											href="https://github.com/modrinth/code"
-											class="text-brand hover:underline"
-											target="_blank"
-											rel="noopener"
-										>
+href="https://github.com/modrinth/code" class="text-brand hover:underline" target="_blank"
+											rel="noopener">
 											<component :is="() => children" />
 										</a>
 									</template>
 								</IntlFormatted>
 							</p>
-							<p class="m-0">© 2025 Rinth, Inc.</p>
+							<p class="m-0">
+								{{ formatMessage(footerMessages.copyright, { year: currentYear }) }}
+							</p>
 						</div>
 					</div>
 					<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
 						<div
-							v-for="group in footerLinks"
-							:key="group.label"
-							class="flex flex-col items-center gap-3 sm:items-start"
-						>
+v-for="group in footerLinks" :key="group.label"
+							class="flex flex-col items-center gap-3 sm:items-start">
 							<h3 class="m-0 text-base text-contrast">{{ group.label }}</h3>
 							<template v-for="item in group.links" :key="item.label">
-								<nuxt-link
-									v-if="item.href.startsWith('/')"
-									:to="item.href"
-									class="w-fit hover:underline"
-								>
+								<nuxt-link v-if="item.href.startsWith('/')" :to="item.href" class="w-fit hover:underline">
 									{{ item.label }}
 								</nuxt-link>
-								<a
-									v-else
-									:href="item.href"
-									class="w-fit hover:underline"
-									target="_blank"
-									rel="noopener"
-								>
+								<a v-else :href="item.href" class="w-fit hover:underline" target="_blank" rel="noopener">
 									{{ item.label }}
 								</a>
 							</template>
@@ -829,7 +695,6 @@ import {
 	ArrowBigUpDashIcon,
 	BellIcon,
 	BlueskyIcon,
-	BookmarkIcon,
 	BookTextIcon,
 	BoxIcon,
 	BracesIcon,
@@ -866,7 +731,7 @@ import {
 	SunIcon,
 	TwitterIcon,
 	UserIcon,
-	XIcon,
+	XIcon
 } from '@modrinth/assets'
 import {
 	Avatar,
@@ -1154,6 +1019,22 @@ const messages = defineMessages({
 		id: 'layout.nav.analytics',
 		defaultMessage: 'Analytics',
 	},
+	activeReports: {
+		id: 'layout.nav.active-reports',
+		defaultMessage: 'Active reports',
+	},
+	myServers: {
+		id: 'layout.nav.my-servers',
+		defaultMessage: 'My servers',
+	},
+	openMenu: {
+		id: 'layout.mobile.open-menu',
+		defaultMessage: 'Open menu',
+	},
+	closeMenu: {
+		id: 'layout.mobile.close-menu',
+		defaultMessage: 'Close menu',
+	},
 })
 
 const footerMessages = defineMessages({
@@ -1165,6 +1046,10 @@ const footerMessages = defineMessages({
 		id: 'layout.footer.legal-disclaimer',
 		defaultMessage:
 			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
+	},
+	copyright: {
+		id: 'layout.footer.copyright',
+		defaultMessage: '© {year} Rinth, Inc.',
 	},
 })
 
@@ -1207,6 +1092,8 @@ useSeoMeta({
 })
 
 const developerModeCounter = ref(0)
+
+const currentYear = new Date().getFullYear()
 
 const isMobileMenuOpen = ref(false)
 const isBrowseMenuOpen = ref(false)
@@ -1251,14 +1138,6 @@ const userMenuOptions = computed(() => {
 			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(auth.value.user.badges, 1 << 0),
 		},
 		{
-			id: 'notifications',
-			link: '/dashboard/notifications',
-		},
-		{
-			id: 'saved',
-			link: '/dashboard/collections',
-		},
-		{
 			id: 'servers',
 			link: '/servers/manage',
 		},
@@ -1276,6 +1155,21 @@ const userMenuOptions = computed(() => {
 	// TODO: Only show if user has projects
 	options = [
 		...options,
+		{
+			divider: true,
+		},
+		{
+			id: 'notifications',
+			link: '/dashboard/notifications',
+		},
+		{
+			id: 'reports',
+			link: '/dashboard/reports',
+		},
+		{
+			id: 'saved',
+			link: '/dashboard/collections',
+		},
 		{
 			divider: true,
 		},
@@ -1433,8 +1327,8 @@ function runAnalytics() {
 					Authorization: auth.value.token,
 				},
 			})
-				.then(() => {})
-				.catch(() => {})
+				.then(() => { })
+				.catch(() => { })
 		})
 	} catch (e) {
 		console.error(`Sending analytics failed (CORS error? If so, ignore)`, e)
@@ -1732,6 +1626,7 @@ const footerLinks = [
 			@media screen and (min-width: 354px) {
 				grid-template-columns: repeat(2, 1fr);
 			}
+
 			@media screen and (min-width: 674px) {
 				grid-template-columns: repeat(3, 1fr);
 			}
@@ -1926,17 +1821,19 @@ const footerLinks = [
 			width: 25rem;
 			height: 25rem;
 		}
+
 		.animation-ring-2 {
 			width: 50rem;
 			height: 50rem;
 		}
+
 		.animation-ring-3 {
 			width: 100rem;
 			height: 100rem;
 		}
 	}
 
-	> div {
+	>div {
 		position: relative;
 		display: flex;
 		justify-content: center;
@@ -1944,7 +1841,7 @@ const footerLinks = [
 		width: fit-content;
 		height: fit-content;
 
-		> * {
+		>* {
 			position: absolute;
 			scale: calc(1 + max((var(--_r-count) - 20), 0) * 0.1);
 			transition: all 0.2s ease-out;
@@ -1958,15 +1855,19 @@ const footerLinks = [
 	0% {
 		rotate: 0deg;
 	}
+
 	25% {
 		rotate: calc(1deg * (var(--_r-count) - 20));
 	}
+
 	50% {
 		rotate: 0deg;
 	}
+
 	75% {
 		rotate: calc(-1deg * (var(--_r-count) - 20));
 	}
+
 	100% {
 		rotate: 0deg;
 	}
@@ -1976,15 +1877,19 @@ const footerLinks = [
 	0% {
 		translate: 0;
 	}
+
 	25% {
 		translate: calc(2px * (var(--_r-count) - 20));
 	}
+
 	50% {
 		translate: 0;
 	}
+
 	75% {
 		translate: calc(-2px * (var(--_r-count) - 20));
 	}
+
 	100% {
 		translate: 0;
 	}
@@ -1994,15 +1899,19 @@ const footerLinks = [
 	0% {
 		transform: translateY(0);
 	}
+
 	25% {
 		transform: translateY(calc(2px * (var(--_r-count) - 20)));
 	}
+
 	50% {
 		transform: translateY(0);
 	}
+
 	75% {
 		transform: translateY(calc(-2px * (var(--_r-count) - 20)));
 	}
+
 	100% {
 		transform: translateY(0);
 	}
