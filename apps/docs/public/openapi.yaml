@@ -3875,6 +3875,13 @@ paths:
   /updates/{id|slug}/forge_updates.json:
     parameters:
       - $ref: '#/components/parameters/ProjectIdentifier'
+      - name: neoforge
+        in: query
+        description: Whether to include NeoForge versions. Can be `only` (NeoForge-only versions), `include` (both Forge and NeoForge versions), or omitted (Forge-only versions).
+        schema:
+          type: string
+          enum: [only, include]
+          example: include
     servers:
       - url: https://api.modrinth.com
         description: Production server
