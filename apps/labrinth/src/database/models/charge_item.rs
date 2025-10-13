@@ -1,5 +1,6 @@
 use crate::database::models::{
-    DBChargeId, DBProductPriceId, DBUserId, DBUserSubscriptionId, DatabaseError,
+    DBAffiliateCodeId, DBChargeId, DBProductPriceId, DBUserId,
+    DBUserSubscriptionId, DatabaseError,
 };
 use crate::models::billing::{
     ChargeStatus, ChargeType, PaymentPlatform, PriceDuration,
@@ -34,6 +35,7 @@ pub struct DBCharge {
     // Net is always in USD
     pub net: Option<i64>,
     pub tax_drift_loss: Option<i64>,
+    pub affiliate_code: Option<DBAffiliateCodeId>,
 }
 
 struct ChargeQueryResult {
@@ -56,6 +58,7 @@ struct ChargeQueryResult {
     tax_last_updated: Option<DateTime<Utc>>,
     net: Option<i64>,
     tax_drift_loss: Option<i64>,
+    affiliate_code: Option<i64>,
 }
 
 impl TryFrom<ChargeQueryResult> for DBCharge {
@@ -84,6 +87,7 @@ impl TryFrom<ChargeQueryResult> for DBCharge {
             net: r.net,
             tax_last_updated: r.tax_last_updated,
             tax_drift_loss: r.tax_drift_loss,
+            affiliate_code: r.affiliate_code.map(DBAffiliateCodeId),
         })
     }
 }
@@ -103,7 +107,8 @@ macro_rules! select_charges_with_predicate {
                 charges.parent_charge_id AS "parent_charge_id?",
                 charges.net AS "net?",
 				charges.tax_last_updated AS "tax_last_updated?",
-				charges.tax_drift_loss AS "tax_drift_loss?"
+				charges.tax_drift_loss AS "tax_drift_loss?",
+				charges.affiliate_code AS "affiliate_code?"
             FROM charges
             "#
                 + $predicate,
@@ -119,8 +124,8 @@ impl DBCharge {
     ) -> Result<DBChargeId, DatabaseError> {
         sqlx::query!(
             r#"
-            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net, tax_amount, tax_platform_id, tax_last_updated, tax_drift_loss)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net, tax_amount, tax_platform_id, tax_last_updated, tax_drift_loss, affiliate_code)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
             ON CONFLICT (id)
             DO UPDATE
                 SET status = EXCLUDED.status,
@@ -139,7 +144,8 @@ impl DBCharge {
                     amount = EXCLUDED.amount,
                     currency_code = EXCLUDED.currency_code,
                     charge_type = EXCLUDED.charge_type,
-					tax_drift_loss = EXCLUDED.tax_drift_loss
+					tax_drift_loss = EXCLUDED.tax_drift_loss,
+					affiliate_code = EXCLUDED.affiliate_code
             "#,
             self.id.0,
             self.user_id.0,
@@ -160,6 +166,7 @@ impl DBCharge {
             self.tax_platform_id.as_deref(),
             self.tax_last_updated,
             self.tax_drift_loss,
+            self.affiliate_code
         )
             .execute(&mut **transaction)
         .await?;
