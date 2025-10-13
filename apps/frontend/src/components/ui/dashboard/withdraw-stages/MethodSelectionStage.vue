@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { CardIcon, CoinsIcon, CurrencyIcon, LandmarkIcon, PayPalIcon, UnknownIcon } from '@modrinth/assets';
+import { GiftIcon, LandmarkIcon, PayPalIcon, PolygonIcon, UnknownIcon, VenmoIcon } from '@modrinth/assets';
 
 import { useUserCountry } from '@/composables/country.ts';
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
@@ -85,9 +85,9 @@ async function getCountryFromGeoIP(lat: number, lon: number): Promise<string | n
 const paymentMethods = [
 	{ value: 'bank', label: 'Bank transfer', icon: LandmarkIcon },
 	{ value: 'paypal', label: 'PayPal', icon: PayPalIcon },
-	{ value: 'venmo', label: 'Venmo', icon: CurrencyIcon },
-	{ value: 'crypto', label: 'Crypto', icon: CoinsIcon },
-	{ value: 'gift_card', label: 'Gift card', icon: CardIcon },
+	{ value: 'venmo', label: 'Venmo', icon: VenmoIcon },
+	{ value: 'crypto', label: 'Polygon (Crypto)', icon: PolygonIcon },
+	{ value: 'gift_card', label: 'Gift card', icon: GiftIcon },
 ]
 
 function handleMethodSelection(methodValue: string) {

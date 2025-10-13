@@ -10,7 +10,7 @@ export type WithdrawStage =
 	| 'completion'
 
 export type PaymentProvider = 'tremendous' | 'muralpay'
-export type PaymentMethod = 'gift-card' | 'paypal' | 'venmo' | 'bank-transfer' | 'crypto'
+export type PaymentMethod = 'gift_card' | 'paypal' | 'venmo' | 'bank' | 'crypto'
 
 // TODO: need backend backend
 export interface WithdrawData {
@@ -18,6 +18,7 @@ export interface WithdrawData {
 	selectedProvider: PaymentProvider | null
 	selectedMethod: PaymentMethod | null
 	amount: number
+	skippedTaxForm: boolean
 	giftCardDetails?: any
 	kycData?: any
 	accountDetails?: any
@@ -33,6 +34,9 @@ export interface WithdrawContextValue {
 	currentStepIndex: ComputedRef<number>
 
 	withdrawData: Ref<WithdrawData>
+	showScrollFade: Ref<boolean>
+	balance: Ref<any>
+	maxWithdrawAmount: ComputedRef<number>
 
 	setStage: (stage: WithdrawStage | undefined, skipValidation?: boolean) => Promise<void>
 	validateCurrentStage: () => boolean
@@ -46,7 +50,11 @@ export function useWithdrawContext() {
 	return injectWithdrawContext()
 }
 
-export function createWithdrawContext(balance: any, userPayoutData: any): WithdrawContextValue {
+export function createWithdrawContext(
+	balance: any,
+	userPayoutData?: any,
+	testTaxForm = false,
+): WithdrawContextValue {
 	const currentStage = ref<WithdrawStage | undefined>()
 
 	const withdrawData = ref<WithdrawData>({
@@ -54,14 +62,20 @@ export function createWithdrawContext(balance: any, userPayoutData: any): Withdr
 		selectedProvider: null,
 		selectedMethod: null,
 		amount: 0,
+		skippedTaxForm: false,
 	})
+
+	const showScrollFade = ref(false)
+	const balanceRef = ref(balance)
 
 	const stages = computed<WithdrawStage[]>(() => {
 		const dynamicStages: WithdrawStage[] = []
 
 		const usedLimit = balance?.withdrawn_ytd ?? 0
 		const remainingLimit = Math.max(0, 600 - usedLimit)
-		const needsTaxForm = balance?.form_completion_status !== 'complete' && remainingLimit <= 0
+		const available = balance?.available ?? 0
+		// Check if tax form is required (don't skip stage when testTaxForm is enabled - we want to test it!)
+		const needsTaxForm = balance?.form_completion_status !== 'complete' && (remainingLimit + available >= 600)
 
 		if (needsTaxForm) {
 			dynamicStages.push('tax-form')
@@ -80,6 +94,26 @@ export function createWithdrawContext(balance: any, userPayoutData: any): Withdr
 		dynamicStages.push('completion')
 
 		return dynamicStages
+	})
+
+	const maxWithdrawAmount = computed(() => {
+		const availableBalance = balance?.available ?? 0
+		const formCompleted = balance?.form_completion_status === 'complete'
+
+		// If tax form is completed, user can withdraw full balance
+		if (formCompleted) {
+			return availableBalance
+		}
+
+		// If user hasn't skipped tax form yet, they can withdraw full balance
+		if (!withdrawData.value.skippedTaxForm) {
+			return availableBalance
+		}
+
+		// If user skipped tax form, limit them to remaining YTD limit
+		const usedLimit = balance?.withdrawn_ytd ?? 0
+		const remainingLimit = Math.max(0, 600 - usedLimit)
+		return Math.min(remainingLimit, availableBalance)
 	})
 
 	const currentStepIndex = computed(() =>
@@ -107,8 +141,17 @@ export function createWithdrawContext(balance: any, userPayoutData: any): Withdr
 	function validateCurrentStage(): boolean {
 		switch (currentStage.value) {
 			case 'tax-form':
-				// Tax form validation is handled by the existing tax form component
-				return true
+				// If no balance data, allow proceeding
+				if (!balanceRef.value) return true
+				const ytd = balanceRef.value.withdrawn_ytd ?? 0
+				const remainingLimit = Math.max(0, 600 - ytd)
+				const status = balanceRef.value.form_completion_status
+				// If they haven't hit $600 yet, they can proceed without completing the form
+				if (ytd < 600) return true
+				// If user skipped tax form to proceed with limited withdrawal
+				if (withdrawData.value.skippedTaxForm && remainingLimit > 0) return true
+				// If they hit $600, they must complete the form to proceed
+				return status === 'complete'
 			case 'method-selection':
 				return !!(
 					withdrawData.value.selectedCountry &&
@@ -116,7 +159,7 @@ export function createWithdrawContext(balance: any, userPayoutData: any): Withdr
 					withdrawData.value.selectedMethod
 				)
 			case 'tremendous-details':
-				if (withdrawData.value.selectedMethod === 'gift-card') {
+				if (withdrawData.value.selectedMethod === 'gift_card') {
 					return !!(
 						withdrawData.value.giftCardDetails?.type &&
 						withdrawData.value.giftCardDetails?.amount > 0
@@ -140,9 +183,7 @@ export function createWithdrawContext(balance: any, userPayoutData: any): Withdr
 						kycData.firstName &&
 						kycData.lastName &&
 						kycData.email &&
-						kycData.dateOfBirth?.day &&
-						kycData.dateOfBirth?.month &&
-						kycData.dateOfBirth?.year &&
+						kycData.dateOfBirth &&
 						hasValidAddress
 					)
 				} else if (kycData.type === 'business') {
@@ -155,10 +196,31 @@ export function createWithdrawContext(balance: any, userPayoutData: any): Withdr
 
 				return false
 			case 'muralpay-details':
-				return !!(
-					withdrawData.value.accountDetails?.bankAccount ||
-					withdrawData.value.accountDetails?.cryptoWallet
-				)
+				const accountDetails = withdrawData.value.accountDetails
+				if (!accountDetails) return false
+
+				// Validate amount (required for both methods)
+				if (!withdrawData.value.amount || withdrawData.value.amount <= 0) return false
+
+				// Validate bank transfer details
+				if (withdrawData.value.selectedMethod === 'bank') {
+					const bank = accountDetails.bankAccount
+					return !!(
+						bank &&
+						bank.bankName &&
+						bank.accountType &&
+						bank.accountNumber &&
+						bank.routingNumber
+					)
+				}
+
+				// Validate crypto wallet details
+				if (withdrawData.value.selectedMethod === 'crypto') {
+					const crypto = accountDetails.cryptoWallet
+					return !!(crypto && crypto.walletAddress)
+				}
+
+				return false
 			case 'completion':
 				return true
 			default:
@@ -187,8 +249,10 @@ export function createWithdrawContext(balance: any, userPayoutData: any): Withdr
 			selectedProvider: null,
 			selectedMethod: null,
 			amount: 0,
+			skippedTaxForm: false,
 		}
 		currentStage.value = undefined
+		showScrollFade.value = false
 	}
 
 	return {
@@ -199,6 +263,9 @@ export function createWithdrawContext(balance: any, userPayoutData: any): Withdr
 		previousStep,
 		currentStepIndex,
 		withdrawData,
+		showScrollFade,
+		balance: balanceRef,
+		maxWithdrawAmount,
 		setStage,
 		validateCurrentStage,
 		resetData,

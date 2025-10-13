@@ -72,6 +72,7 @@ import _FolderSearchIcon from './icons/folder-search.svg?component'
 import _GameIcon from './icons/game.svg?component'
 import _GapIcon from './icons/gap.svg?component'
 import _GaugeIcon from './icons/gauge.svg?component'
+import _GiftIcon from './icons/gift.svg?component'
 import _GitGraphIcon from './icons/git-graph.svg?component'
 import _GlassesIcon from './icons/glasses.svg?component'
 import _GlobeIcon from './icons/globe.svg?component'
@@ -275,6 +276,7 @@ export const FolderSearchIcon = _FolderSearchIcon
 export const GameIcon = _GameIcon
 export const GapIcon = _GapIcon
 export const GaugeIcon = _GaugeIcon
+export const GiftIcon = _GiftIcon
 export const GitGraphIcon = _GitGraphIcon
 export const GlassesIcon = _GlassesIcon
 export const GlobeIcon = _GlobeIcon

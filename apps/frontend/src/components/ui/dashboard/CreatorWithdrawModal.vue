@@ -19,14 +19,11 @@
 				</template>
 			</div>
 		</template>
-		<div class="relative">
-			<!-- Top fade overlay -->
-			<div v-if="showTopFade"
-				class="absolute top-0 left-0 right-0 h-8 pointer-events-none z-10 bg-gradient-to-b from-bg-raised to-transparent transition-opacity duration-200" />
+		<div class="relative min-w-[496px] max-w-[496px]">
+			<div v-show="showTopFade"
+				class="absolute top-0 left-0 right-0 h-10 pointer-events-none z-10 bg-gradient-to-b from-bg-raised to-transparent transition-all duration-300" />
 
-			<!-- Content wrapper with scroll detection -->
-			<div ref="scrollContainer" class="min-w-[496px] max-w-[496px] max-h-[60vh] overflow-y-auto"
-				@scroll="handleScroll">
+			<div ref="scrollContainer" class="max-h-[70vh] overflow-y-auto pl-[2px]" @scroll="checkScrollState">
 				<TaxFormStage v-if="withdrawContext.currentStage.value === 'tax-form'" :balance="balance"
 					:on-show-tax-form="showTaxFormModal" />
 				<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'" />
@@ -37,12 +34,11 @@
 				<div v-else>Something went wrong</div>
 			</div>
 
-			<!-- Bottom fade overlay -->
-			<div v-if="showBottomFade"
-				class="absolute bottom-0 left-0 right-0 h-8 pointer-events-none z-10 bg-gradient-to-t from-bg-raised to-transparent transition-opacity duration-200" />
+			<div v-show="showBottomFade"
+				class="absolute bottom-0 left-0 right-0 h-10 pointer-events-none z-10 bg-gradient-to-t from-bg-raised to-transparent transition-all duration-300" />
 		</div>
-		<div class="mt-4 flex justify-between gap-2">
-			<ButtonStyled>
+		<div class="mt-4 flex justify-end gap-2">
+			<ButtonStyled type="outlined">
 				<button v-if="withdrawContext.previousStep.value"
 					@click="withdrawContext.setStage(withdrawContext.previousStep.value, true)">
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
@@ -52,8 +48,12 @@
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
-			<ButtonStyled color="brand">
-				<button :disabled="!withdrawContext.canProceed.value"
+			<ButtonStyled :color="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm ? 'orange' : 'brand'">
+				<button v-if="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm" @click="showTaxFormModal">
+					<FileTextIcon />
+					{{ formatMessage(messages.completeTaxForm) }}
+				</button>
+				<button v-else :disabled="!withdrawContext.canProceed.value"
 					@click="withdrawContext.setStage(withdrawContext.nextStep.value)">
 					<template v-if="withdrawContext.currentStage.value === 'completion'">
 						<CheckCircleIcon /> Complete
@@ -66,20 +66,22 @@
 			</ButtonStyled>
 		</div>
 	</NewModal>
-	<CreatorTaxFormModal ref="taxFormModal" @success="onTaxFormSuccess" @cancelled="onTaxFormCancelled" />
+	<CreatorTaxFormModal close-button-text="Continue" ref="taxFormModal" @success="onTaxFormSuccess"
+		@cancelled="onTaxFormCancelled" />
 </template>
 
 <script setup lang="ts">
 import {
 	CheckCircleIcon,
 	ChevronRightIcon,
+	FileTextIcon,
 	LeftArrowIcon,
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, NewModal } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
-import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import {
 	createWithdrawContext,
@@ -117,9 +119,19 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const flags = useFeatureFlags()
 
-const withdrawContext = createWithdrawContext(props.balance, props.userPayoutData)
+const withdrawContext = createWithdrawContext(props.balance, undefined, flags.value.testTaxForm)
 provideWithdrawContext(withdrawContext)
+
+const needsTaxForm = computed(() => {
+	if (!props.balance || withdrawContext.currentStage.value !== 'tax-form') return false
+	const ytd = props.balance.withdrawn_ytd ?? 0
+	const remainingLimit = Math.max(0, 600 - ytd)
+	const available = props.balance.available ?? 0
+	const status = props.balance.form_completion_status
+	return status !== 'complete' && (remainingLimit + available >= 600)
+})
 
 const stageLabels = computed<Record<WithdrawStage, MessageDescriptor>>(() => ({
 	'tax-form': messages.taxFormStage,
@@ -142,67 +154,20 @@ const isDetailsStage = computed(() => {
 
 const withdrawModal = useTemplateRef<InstanceType<typeof NewModal>>('withdrawModal')
 const taxFormModal = ref<InstanceType<typeof CreatorTaxFormModal> | null>(null)
-const scrollContainer = useTemplateRef<HTMLDivElement>('scrollContainer')
+const scrollContainer = ref<HTMLElement | null>(null)
 
-// Scroll fade state
 const showTopFade = ref(false)
 const showBottomFade = ref(false)
 
-function updateScrollFades() {
-	const container = scrollContainer.value
-	if (!container) return
-
-	const { scrollTop, scrollHeight, clientHeight } = container
-	const threshold = 5 // Small threshold to account for rounding
-
-	// Show top fade if scrolled down from top
-	showTopFade.value = scrollTop > threshold
-
-	// Show bottom fade if not scrolled to bottom
-	showBottomFade.value = scrollTop < scrollHeight - clientHeight - threshold
-}
-
-function handleScroll() {
-	updateScrollFades()
-}
-
-// Watch for stage changes and content changes
-watch(
-	() => withdrawContext.currentStage.value,
-	async () => {
-		await nextTick()
-		updateScrollFades()
-	},
-)
-
-// Set up ResizeObserver to detect content size changes
-let resizeObserver: ResizeObserver | null = null
-
-onMounted(() => {
-	if (scrollContainer.value) {
-		resizeObserver = new ResizeObserver(() => {
-			updateScrollFades()
-		})
-		resizeObserver.observe(scrollContainer.value)
-	}
-})
-
-onUnmounted(() => {
-	if (resizeObserver) {
-		resizeObserver.disconnect()
-	}
-})
-
 function showTaxFormModal(e?: MouseEvent) {
 	withdrawModal.value?.hide()
-	taxFormModal.value?.startTaxForm(e)
+	taxFormModal.value?.startTaxForm(e ?? new MouseEvent('click'))
 }
 
 function onTaxFormSuccess() {
 	emit('refresh-data')
 	nextTick(() => {
-		withdrawContext.setStage('method-selection')
-		show()
+		show('method-selection')
 	})
 }
 
@@ -219,40 +184,74 @@ function goToBreadcrumbStage(stage: WithdrawStage) {
 	withdrawContext.setStage(stage, true)
 }
 
+function checkScrollState() {
+	if (!withdrawContext.showScrollFade.value || !scrollContainer.value) {
+		showTopFade.value = false
+		showBottomFade.value = false
+		return
+	}
+
+	const container = scrollContainer.value
+	const { scrollTop, scrollHeight, clientHeight } = container
+	showTopFade.value = scrollTop > 0
+	showBottomFade.value = scrollTop + clientHeight < scrollHeight - 1
+}
+
 function show(preferred?: WithdrawStage) {
 	if (preferred) {
 		withdrawContext.setStage(preferred, true)
 		withdrawModal.value?.show()
+		checkScrollState()
 		return
 	}
 
-	// Determine initial stage based on balance and tax form status
 	const b = props.balance
+
 	if (!b || b.available <= 0) {
 		withdrawContext.setStage('tax-form', true)
 		withdrawModal.value?.show()
+		checkScrollState()
 		return
 	}
 
 	const usedLimit = b.withdrawn_ytd ?? 0
 	const remainingLimit = Math.max(0, 600 - usedLimit)
-	const needsTaxForm = b.form_completion_status !== 'complete' && remainingLimit <= 0
 
-	if (needsTaxForm) {
+	const needsTaxForm = b.form_completion_status !== 'complete' && (remainingLimit + b.available >= 600)
+
+	if (needsTaxForm || (flags.value.testTaxForm && b.form_completion_status !== 'complete')) {
 		withdrawContext.setStage('tax-form', true)
 	} else {
 		withdrawContext.setStage('method-selection', true)
 	}
 
 	withdrawModal.value?.show()
+	checkScrollState()
 }
+
+watch(
+	() => withdrawContext.currentStage.value,
+	() => {
+		nextTick(() => {
+			checkScrollState()
+		})
+	},
+)
+
+watch(
+	() => withdrawContext.showScrollFade.value,
+	() => {
+		nextTick(() => {
+			checkScrollState()
+		})
+	},
+)
 
 defineExpose({
 	show,
 })
 
 const messages = defineMessages({
-	// Stage labels for breadcrumb navigation
 	taxFormStage: {
 		id: 'dashboard.creator-withdraw-modal.stage.tax-form',
 		defaultMessage: 'Tax Form',
@@ -280,6 +279,10 @@ const messages = defineMessages({
 	detailsLabel: {
 		id: 'dashboard.creator-withdraw-modal.details-label',
 		defaultMessage: 'Details',
+	},
+	completeTaxForm: {
+		id: 'dashboard.creator-withdraw-modal.complete-tax-form',
+		defaultMessage: 'Complete tax form',
 	},
 })
 </script>
