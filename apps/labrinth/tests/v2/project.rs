@@ -103,7 +103,7 @@ async fn test_project_type_sanity() {
                 );
             }
 
-            // As we get more complicated strucures with as v3 continues to expand, and alpha/beta get more complicated, we should add more tests here,
+            // As we get more complicated structures with as v3 continues to expand, and alpha/beta get more complicated, we should add more tests here,
             // to ensure that projects created with v3 routes are still valid and work with v3 routes.
         },
     )
@@ -413,7 +413,7 @@ pub async fn test_patch_v2() {
 
             let alpha_project_slug = &test_env.dummy.project_alpha.project_slug;
 
-            // Sucessful request to patch many fields.
+            // Successful request to patch many fields.
             let resp = api
                 .edit_project(
                     alpha_project_slug,
@@ -433,7 +433,7 @@ pub async fn test_patch_v2() {
             // Note: the original V2 value of this was "optional",
             // but Required/Optional is no longer a carried combination in v3, as the changes made were lossy.
             // Now, the test Required/Unsupported combination is tested instead.
-            // Setting Required/Optional in v2 will not work, this is known and accepteed.
+            // Setting Required/Optional in v2 will not work, this is known and accepted.
             assert_eq!(project.client_side.as_str(), "unsupported");
             assert_eq!(project.server_side.as_str(), "required");
         },

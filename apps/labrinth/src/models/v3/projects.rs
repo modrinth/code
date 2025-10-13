@@ -20,7 +20,7 @@ pub struct Project {
     pub id: ProjectId,
     /// The slug of a project, used for vanity URLs
     pub slug: Option<String>,
-    /// The aggregated project typs of the versions of this project
+    /// The aggregated project typos of the versions of this project
     pub project_types: Vec<String>,
     /// The aggregated games of the versions of this project
     pub games: Vec<String>,
@@ -49,7 +49,7 @@ pub struct Project {
 
     /// The status of the project
     pub status: ProjectStatus,
-    /// The requested status of this projct
+    /// The requested status of this project
     pub requested_status: Option<ProjectStatus>,
 
     /// DEPRECATED: moved to threads system
