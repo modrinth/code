@@ -23,11 +23,17 @@
   "app.settings.tabs.resource-management": {
     "message": "Pamamahala ng resource"
   },
+  "app.update-toast.body": {
+    "message": "Ang Modrinth App v{version} ay handa nang ma-install. Mag-reload upang ma-update ngayon, o awtomatiko pagsara ng Modrinth App."
+  },
   "app.update-toast.body.download-complete": {
-    "message": "Tapos nang ma-download ang Modrinth App v{version}. Mag-reload upang ma-update ngayon, o mamaya nalang sa pagsara ng Modrinth App."
+    "message": "Tapos nang ma-download ang Modrinth App v{version}. Mag-reload upang ma-update ngayon, o awtomatiko pagsara ng Modrinth App."
   },
   "app.update-toast.body.metered": {
     "message": "Magagamit na ngayon ang Modrinth App v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
+  },
+  "app.update-toast.changelog": {
+    "message": "Changelog"
   },
   "app.update-toast.download": {
     "message": "I-download ({size})"
@@ -35,14 +41,29 @@
   "app.update-toast.downloading": {
     "message": "Nagda-download..."
   },
+  "app.update-toast.reload": {
+    "message": "Mag-reload"
+  },
+  "app.update-toast.title": {
+    "message": "May bagong update"
+  },
   "app.update-toast.title.download-complete": {
     "message": "Nakumpleto ang pagdownload"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Magpindot rito upang matingnan ang changelog."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Tagumpay na na-install ang bersiyong {version}!"
   },
   "app.update.download-update": {
     "message": "I-download ang update"
   },
   "app.update.downloading-update": {
     "message": "Nagdadownload ng update ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Handang ma-install ang update"
   },
   "instance.add-server.add-and-play": {
     "message": "Idagdag at laruin"
@@ -86,6 +107,9 @@
   "instance.filter.updates-available": {
     "message": "May bagong mga update"
   },
+  "instance.server-modal.address": {
+    "message": "Adres"
+  },
   "instance.server-modal.name": {
     "message": "Pangalan"
   },
@@ -94,6 +118,9 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Resource pack"
+  },
+  "instance.settings.tabs.general": {
+    "message": "General"
   },
   "instance.settings.tabs.general.delete": {
     "message": "I-delete ang instansiya"
@@ -104,6 +131,18 @@
   "instance.settings.tabs.general.delete.description": {
     "message": "Permanenteng matatanggal ang instansiya sa iyong device, kasali na ang iyong mga mundo, konpigurasyon, at lahat ng nakainstall na kontento. Mag-ingat, kapag magtanggal ka ng instansiya ay hindi na ito mababawi."
   },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Nagde-delete..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "I-duplicate"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Hindi makaka-duplicate habang nag-i-install."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "I-duplicate ang instansiya"
+  },
   "instance.settings.tabs.general.duplicate-instance.description": {
     "message": "Gagawan ng kopya ng instansiyang ito, kasali na ang mga mundo, konpigurasyon, mods, at iba pa."
   },
@@ -113,17 +152,137 @@
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Tanggalin ang ikono"
   },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Palitan ang ikono"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Pumili ng ikono"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Mga grupo ng librerya"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Gumawa ng bagong grupo"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Binibigyan ng mga grupo ng librerya na iyong maayos ang iyong mga instansiya sa iba't-ibang pangkat in iyong librerya."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Ilagay ang pangalan ng grupo"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Pangalan"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Mga launch hook"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Mga custom na launch hook"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Binibigyan-daan ng mga hook ang mga ekspertong user na makapagtakbo ng mga system command bago at pagkatapos ma-launch ang laro."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Post-exist"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Ipapatakbo pagkatapos magsara ang laro."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Ilagay ang post-exit command..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Pre-launch"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Ipapatakbo bago mai-launch ang instansiya."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Ilagay ang pre-launch command..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Mga launch hook ng laro"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Wrapper"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Wrapper command sa pag-launch ng Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Ilagay ang wrapper command..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Instalasyon"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "Naka-install naman ang {platform} {version} para sa Minecraft {game_version}"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Naka-install naman ang Vanilla {game_version}"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Palitan ang bersiyon"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "I-install"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Ini-install"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Nagfe-fetch ng mga bersiyon ng modpack"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Ini-install ang bagong bersiyon"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Bersiyon ng laro"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Plataporma"
+  },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
     "message": "Ang pagrere-install ay maaaring mare-reset ang lahat ng na-install o binago na kontento sa kung anong ibibigay ng modpack, tatanggalin ang mga mods o kontentong idinagdag mo lalo na ang mga orihinal na modpack. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa instansiya, ngunit kung dumedepende na ang iyong mundo sa karagdagang kontento, maaari nitong masira ang mga umiiral na mundo."
   },
   "instance.settings.tabs.installation.reinstall.description": {
     "message": "I-reset ang mga kontento ng instansiya sa orihinal niyang estado, tatanggalin ang mga mods o kontentong idinagdag mo lalo na ang mga orihinal na modpack."
   },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Sa pagre-repair, mare-reinstall ang mga dependency ng Minecraft at maghahanap ng mga kurapsiyon. Maaaring maresolbe nito ang mga isyu kung hindi malu-launch ang laro dahil sa mga launcher-related error, ngunit hindi nito mareresolbe ang mga isyu o pag-crash na dulot nga mga na-install na mod."
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "i-install"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "i-reinstall"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Hindi makaka-{action} habang nag-i-install"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Kapag ipagpatuloy mo, hindi mo na itong mai-link muli ng hindi gagawa ng bagong instansiya. Hindi ka makakatanggap ng mga update ng modpack at magiging normal na itong."
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Ang instansiyang ito ay naka-link sa isang modpack, ibig sabihin ang mga mod ay hindi mai-update at hindi mo mapapalitan ang mod loader o ang bersiyon ng Minecraft."
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Mga hook"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Instalasyon ng Java"
+  },
   "instance.settings.tabs.window.custom-window-settings": {
     "message": "Mga setting sa custom na window"
   },
   "instance.settings.title": {
     "message": "Mga Setting"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Kopyahin ang adres"
   },
   "instance.worlds.view_instance": {
     "message": "Tingnan ang instansiya"

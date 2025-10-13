@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Ваші добірки"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Завантажити {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Ваша податкова форма {formType} була успішно надіслана!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Ви можете вивести кошти вже зараз. Якщо у вас залишилися питання або вам треба оновити свої дані, <support-link>зв'яжіться з підтримкою</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Все готово! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Закордонна організація означає ділову організацію, організовану за межами США (наприклад, неамериканську корпорацію, партнерство, або ТОВ)."
   },

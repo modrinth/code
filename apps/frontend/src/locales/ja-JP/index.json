@@ -173,6 +173,12 @@
   "app-marketing.hero.download-modrinth-app": {
     "message": "Modrinth アプリをダウンロードする"
   },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "{os}向けのModrinth Appをダウンロード"
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "詳細なダウンロード設定"
+  },
   "auth.authorize.action.authorize": {
     "message": "認証"
   },
@@ -397,6 +403,81 @@
   },
   "common.yes": {
     "message": "はい"
+  },
+  "create.collection.cancel": {
+    "message": "キャンセル"
+  },
+  "create.collection.create-collection": {
+    "message": "コレクションを作成"
+  },
+  "create.collection.error-title": {
+    "message": "エラーが発生しました"
+  },
+  "create.collection.name-label": {
+    "message": "名前"
+  },
+  "create.collection.name-placeholder": {
+    "message": "コレクション名を入力…"
+  },
+  "create.collection.summary-description": {
+    "message": "1~2文程度のコレクションの説明。"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "組織"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "コレクション"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "組織"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "プロジェクト"
+  },
+  "create.limit-alert.type-project": {
+    "message": "プロジェクト"
+  },
+  "create.organization.cancel": {
+    "message": "キャンセル"
+  },
+  "create.organization.create-organization": {
+    "message": "組織を作成"
+  },
+  "create.organization.error-title": {
+    "message": "エラーが発生しました"
+  },
+  "create.organization.name-label": {
+    "message": "名前"
+  },
+  "create.organization.name-placeholder": {
+    "message": "組織名を入力…"
+  },
+  "create.organization.title": {
+    "message": "組織を作成"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "キャンセル"
+  },
+  "create.project.create-project": {
+    "message": "プロジェクトを作成"
+  },
+  "create.project.error-title": {
+    "message": "エラーが発生しました"
+  },
+  "create.project.name-label": {
+    "message": "名前"
+  },
+  "create.project.name-placeholder": {
+    "message": "プロジェクト名を入力…"
+  },
+  "create.project.summary-description": {
+    "message": "1~2文程度のプロジェクトの説明。"
+  },
+  "create.project.url-label": {
+    "message": "URL"
   },
   "dashboard.collections.button.create-new": {
     "message": "新規作成"

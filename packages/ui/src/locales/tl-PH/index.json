@@ -5,14 +5,17 @@
   "button.cancel": {
     "defaultMessage": "Bawiin"
   },
+  "button.close": {
+    "defaultMessage": "Ipinid"
+  },
   "button.continue": {
     "defaultMessage": "Magpatuloy"
   },
   "button.copy-id": {
-    "defaultMessage": "Kunin ang sipi ng pampakilala"
+    "defaultMessage": "Sipiin ang pampakilala"
   },
   "button.copy-permalink": {
-    "defaultMessage": "Kunin ang sipi ng lagiing kawingan"
+    "defaultMessage": "Sipiin ang lagiing kawingan"
   },
   "button.create-a-project": {
     "defaultMessage": "Lumikha ng panukala"
@@ -186,7 +189,7 @@
     "defaultMessage": "Inarkibo"
   },
   "omorphia.component.badge.label.closed": {
-    "defaultMessage": "Sarado"
+    "defaultMessage": "Pininid"
   },
   "omorphia.component.badge.label.creator": {
     "defaultMessage": "Tagalikha"
@@ -281,6 +284,9 @@
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Lathalang Java"
   },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Mga plataproma"
+  },
   "project.about.creators.title": {
     "defaultMessage": "Mga tagalikha"
   },
@@ -291,13 +297,16 @@
     "defaultMessage": "Inilathala {date}"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Nagbago {date}"
+    "defaultMessage": "Naisapanahon {date}"
   },
   "project.about.links.issues": {
     "defaultMessage": "Mag-ulat ng mga isyu"
   },
   "project.settings.environment.title": {
     "defaultMessage": "Kapaligiran"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Pangkalahatan"
   },
   "project.settings.upload.title": {
     "defaultMessage": "Dalamtas"
@@ -340,6 +349,9 @@
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Bukas na pinagmulan"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Plataporma"
   },
   "settings.display.theme.description": {
     "defaultMessage": "Pumili ng iyong gugustohing paksang-kulay para sa Modrinth ng nitong pakasam."

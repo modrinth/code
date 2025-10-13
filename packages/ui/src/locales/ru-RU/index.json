@@ -45,10 +45,10 @@
     "defaultMessage": "Подписаться"
   },
   "button.more-options": {
-    "defaultMessage": "Больше настроек"
+    "defaultMessage": "Дополнительно"
   },
   "button.next": {
-    "defaultMessage": "Вперёд"
+    "defaultMessage": "Далее"
   },
   "button.open-folder": {
     "defaultMessage": "Открыть папку"
@@ -90,7 +90,7 @@
     "defaultMessage": "Зарегистрироваться"
   },
   "button.stop": {
-    "defaultMessage": "Завершить"
+    "defaultMessage": "Остановить"
   },
   "button.unfollow": {
     "defaultMessage": "Отписаться"
@@ -105,28 +105,28 @@
     "defaultMessage": "API"
   },
   "changelog.product.app": {
-    "defaultMessage": "Приложение"
+    "defaultMessage": "App"
   },
   "changelog.product.servers": {
-    "defaultMessage": "Серверы"
+    "defaultMessage": "Servers"
   },
   "changelog.product.web": {
     "defaultMessage": "Сайт"
   },
   "collection.label.private": {
-    "defaultMessage": "Приватный"
+    "defaultMessage": "Приватная"
   },
   "icon-select.edit": {
-    "defaultMessage": "Изменить иконку"
+    "defaultMessage": "Изменить значок"
   },
   "icon-select.remove": {
-    "defaultMessage": "Удалить иконку"
+    "defaultMessage": "Удалить значок"
   },
   "icon-select.replace": {
-    "defaultMessage": "Заменить иконку"
+    "defaultMessage": "Заменить значок"
   },
   "icon-select.select": {
-    "defaultMessage": "Выбрать иконку"
+    "defaultMessage": "Выбрать значок"
   },
   "input.search.placeholder": {
     "defaultMessage": "Поиск..."
@@ -213,7 +213,7 @@
     "defaultMessage": "Сервер"
   },
   "label.servers": {
-    "defaultMessage": "Сервера"
+    "defaultMessage": "Серверы"
   },
   "label.settings": {
     "defaultMessage": "Настройки"
@@ -222,7 +222,7 @@
     "defaultMessage": "Одиночная игра"
   },
   "label.title": {
-    "defaultMessage": "Заголовок"
+    "defaultMessage": "Название"
   },
   "label.unlisted": {
     "defaultMessage": "Скрыт"
@@ -231,13 +231,13 @@
     "defaultMessage": "Видимость"
   },
   "label.visit-your-profile": {
-    "defaultMessage": "Открыть ваш профиль"
+    "defaultMessage": "Открыть профиль"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Добавить способ оплаты"
   },
   "modal.add-payment-method.title": {
-    "defaultMessage": "Добавления способа оплаты"
+    "defaultMessage": "Добавление способа оплаты"
   },
   "notification.error.title": {
     "defaultMessage": "Произошла ошибка"
@@ -246,13 +246,13 @@
     "defaultMessage": "Принят"
   },
   "omorphia.component.badge.label.approved": {
-    "defaultMessage": "Утверждён"
+    "defaultMessage": "Одобрен"
   },
   "omorphia.component.badge.label.archived": {
     "defaultMessage": "Архивирован"
   },
   "omorphia.component.badge.label.closed": {
-    "defaultMessage": "Закрыт"
+    "defaultMessage": "Закрыта"
   },
   "omorphia.component.badge.label.creator": {
     "defaultMessage": "Автор"
@@ -264,7 +264,7 @@
     "defaultMessage": "Ошибка"
   },
   "omorphia.component.badge.label.listed": {
-    "defaultMessage": "Опубликован"
+    "defaultMessage": "Размещён"
   },
   "omorphia.component.badge.label.moderator": {
     "defaultMessage": "Модератор"
@@ -300,7 +300,7 @@
     "defaultMessage": "На удержании"
   },
   "omorphia.component.copy.action.copy": {
-    "defaultMessage": "Скопировать код в буфер обмена"
+    "defaultMessage": "Копировать код"
   },
   "omorphia.component.environment-indicator.label.client": {
     "defaultMessage": "Клиент"
@@ -315,13 +315,13 @@
     "defaultMessage": "Сервер"
   },
   "omorphia.component.environment-indicator.label.type": {
-    "defaultMessage": "{type}"
+    "defaultMessage": "Тип: {type}"
   },
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Не поддерживается"
   },
   "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} заканчивается через {last_four}"
+    "defaultMessage": "{card_brand} ·· {last_four}"
   },
   "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
     "defaultMessage": "Amazon Pay"
@@ -435,7 +435,7 @@
     "defaultMessage": "Одиночная игра"
   },
   "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Только для одиночной игры"
+    "defaultMessage": "Только одиночная игра"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -456,40 +456,40 @@
     "defaultMessage": "Создан {date}"
   },
   "project.about.details.licensed": {
-    "defaultMessage": "Лицензировано {license}"
+    "defaultMessage": "Лицензия: {license}"
   },
   "project.about.details.published": {
-    "defaultMessage": "Опубликовано {date}"
+    "defaultMessage": "Размещён {date}"
   },
   "project.about.details.submitted": {
-    "defaultMessage": "Выложено {date}"
+    "defaultMessage": "Отправлен {date}"
   },
   "project.about.details.title": {
-    "defaultMessage": "Детали"
+    "defaultMessage": "Сведения"
   },
   "project.about.details.updated": {
     "defaultMessage": "Обновлён {date}"
   },
   "project.about.links.discord": {
-    "defaultMessage": "Присоединиться на Discord сервер"
+    "defaultMessage": "Вступить в Discord"
   },
   "project.about.links.donate.bmac": {
     "defaultMessage": "Buy Me a Coffee"
   },
   "project.about.links.donate.generic": {
-    "defaultMessage": "Пожертвовать"
+    "defaultMessage": "Поддержать"
   },
   "project.about.links.donate.github": {
-    "defaultMessage": "Спонсируйте на GitHub"
+    "defaultMessage": "Спонсировать на GitHub"
   },
   "project.about.links.donate.kofi": {
-    "defaultMessage": "Пожертвуйте на Ko-fi"
+    "defaultMessage": "Поддержать на Ko-fi"
   },
   "project.about.links.donate.patreon": {
-    "defaultMessage": "Пожертвуйте на Patreon"
+    "defaultMessage": "Поддержать на Patreon"
   },
   "project.about.links.donate.paypal": {
-    "defaultMessage": "Пожертвуйте на PayPal"
+    "defaultMessage": "Поддержать на PayPal"
   },
   "project.about.links.issues": {
     "defaultMessage": "Сообщить о проблеме"
@@ -501,7 +501,7 @@
     "defaultMessage": "Ссылки"
   },
   "project.about.links.wiki": {
-    "defaultMessage": "Посетить вики"
+    "defaultMessage": "Открыть вики"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Аналитика"

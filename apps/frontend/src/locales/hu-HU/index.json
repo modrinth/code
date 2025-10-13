@@ -206,6 +206,9 @@
   "auth.reset-password.notification.email-sent.title": {
     "message": "Email küldve"
   },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "A jelszavad sikeresen visszaállítva"
+  },
   "auth.reset-password.post-challenge.action": {
     "message": "Jelszó visszaállítása"
   },
@@ -320,8 +323,26 @@
   "collection.label.created-at": {
     "message": "Létrehozva {ago}"
   },
+  "collection.label.owner": {
+    "message": "Tulajdonos"
+  },
   "collection.label.updated-at": {
     "message": "Frissítve {ago}"
+  },
+  "common.no": {
+    "message": "Nem"
+  },
+  "common.yes": {
+    "message": "Igen"
+  },
+  "create.collection.cancel": {
+    "message": "Mégsem"
+  },
+  "create.collection.error-title": {
+    "message": "Hiba történt"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type} limit elérve"
   },
   "layout.action.change-theme": {
     "message": "Kinézet"

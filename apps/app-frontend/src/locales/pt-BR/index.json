@@ -54,7 +54,7 @@
     "message": "Clique aqui para ver as mudanças."
   },
   "app.update.complete-toast.title": {
-    "message": "Versão {version} instalada com sucesso!"
+    "message": "Versão {version} instalada!"
   },
   "app.update.download-update": {
     "message": "Baixar atualização"
@@ -63,7 +63,7 @@
     "message": "Baixando atualização ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "Recarregar para instalar a atualização"
+    "message": "Recarregue para instalar a atualização"
   },
   "instance.add-server.add-and-play": {
     "message": "Adicionar e jogar"
@@ -129,7 +129,7 @@
     "message": "Excluir instância"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Apaga permanente a instância do seu dispositivo, incluindo seus mundos, configurações e todo o conteúdo instalado. Tenha cuidado, porque não será possível recuperá-la após apaga-la."
+    "message": "Exclui permanentemente uma instância do seu dispositivo, incluindo seus mundos, configurações e todo o conteúdo instalado. Tome cuidado, pois, uma vez excluída, a instância não poderá ser recuperada."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Excluindo..."
@@ -237,7 +237,7 @@
     "message": "Instalando nova versão"
   },
   "instance.settings.tabs.installation.currently-installed": {
-    "message": "Instalado atualmente"
+    "message": "Versão instalada"
   },
   "instance.settings.tabs.installation.debug-information": {
     "message": "Informação de depuração:"
