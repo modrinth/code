@@ -1,4 +1,5 @@
 use crate::database::redis::RedisPool;
+use crate::queue::affiliate_codes::process_affiliate_code_revenue;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
@@ -179,12 +180,17 @@ pub async fn payouts(
     info!("Started running payouts");
     let result = process_payout(&pool, &clickhouse).await;
     if let Err(e) = result {
-        warn!("Payouts run failed: {:?}", e);
+        warn!("Payouts run failed: {e:#?}");
     }
 
     let result = index_payouts_notifications(&pool, &redis_pool).await;
     if let Err(e) = result {
-        warn!("Payouts notifications indexing failed: {:?}", e);
+        warn!("Payouts notifications indexing failed: {e:#?}");
+    }
+
+    let result = process_affiliate_code_revenue(&pool).await;
+    if let Err(e) = result {
+        warn!("Affiliate code revenue processing failed: {e:#?}");
     }
 
     info!("Done running payouts");

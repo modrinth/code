@@ -166,7 +166,7 @@ impl DBCharge {
             self.tax_platform_id.as_deref(),
             self.tax_last_updated,
             self.tax_drift_loss,
-            self.affiliate_code
+            self.affiliate_code.map(|x| x.0),
         )
             .execute(&mut **transaction)
         .await?;
