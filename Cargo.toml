@@ -117,7 +117,7 @@ quick-xml = "0.38.3"
 rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
 redis = "0.32.7"
-regex = "1.11.3"
+regex = "1.12.2"
 reqwest = { version = "0.12.23", default-features = false }
 rgb = "0.8.52"
 rust_decimal = { version = "1.38.0", features = [
