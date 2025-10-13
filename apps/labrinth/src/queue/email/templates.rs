@@ -704,7 +704,7 @@ async fn dynamic_email_body(
             .wrap_internal_err("SITE_URL is not set")?;
         let site_url = site_url.trim_end_matches('/');
 
-        let url = format!("{}/_internal/templates/email/dynamic", site_url);
+        let url = format!("{site_url}/_internal/templates/email/dynamic");
 
         std::str::from_utf8(
             reqwest::Client::new()
