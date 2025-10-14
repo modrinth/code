@@ -308,7 +308,16 @@ function formatMethodName(method: PayoutMethodType | null) {
 
 const { data: userBalance, refresh: refreshUserBalance } = await useAsyncData(
 	`payout/balance`,
-	() => useBaseFetch(`payout/balance`, { apiVersion: 3 }) as Promise<UserBalanceResponse>,
+	async () => {
+		const response = await useBaseFetch(`payout/balance`, { apiVersion: 3 }) as UserBalanceResponse
+		return {
+			...response,
+			available: Number(response.available),
+			withdrawn_lifetime: Number(response.withdrawn_lifetime),
+			withdrawn_ytd: Number(response.withdrawn_ytd),
+			pending: Number(response.pending),
+		}
+	},
 )
 
 const { data: payouts, refresh: refreshPayouts } = await useAsyncData<PayoutList>(
@@ -327,7 +336,7 @@ const sortedPayouts = computed<PayoutList>(() => {
 	})
 })
 
-const totalAvailable = computed(() => (userBalance.value ? Number(userBalance.value.available) : 0))
+const totalAvailable = computed(() => (userBalance.value ? userBalance.value.available : 0))
 const nextDate = computed<{ date: string; amount: number }[]>(() => {
 	const dates = userBalance.value?.dates
 	if (!dates) return []
@@ -348,7 +357,7 @@ const processingDate = computed<{ date: string; amount: number }>(() => {
 })
 
 const grandTotal = computed(() =>
-	userBalance.value ? Number(userBalance.value.available) + Number(userBalance.value.pending) : 0,
+	userBalance.value ? userBalance.value.available + userBalance.value.pending : 0,
 )
 
 async function refreshData() {

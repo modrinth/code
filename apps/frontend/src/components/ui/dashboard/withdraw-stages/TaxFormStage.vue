@@ -38,18 +38,11 @@
 					<FileTextIcon :class="iconClass" />
 				</template>
 				<template #actions>
-					<div class="flex gap-2 flex-wrap">
-						<ButtonStyled color="green">
-							<button @click="continueWithLimit">
-								{{ formatMessage(messages.continueWithLimit, { limit: formatMoney(remainingLimit) }) }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="orange">
-							<button @click="showTaxFormModal">
-								{{ formatMessage(messages.completeTaxForm) }}
-							</button>
-						</ButtonStyled>
-					</div>
+					<ButtonStyled color="orange">
+						<button @click="showTaxFormModal">
+							{{ formatMessage(messages.completeTaxForm) }}
+						</button>
+					</ButtonStyled>
 				</template>
 			</Admonition>
 		</template>
@@ -98,11 +91,6 @@ function showTaxFormModal() {
 	props.onShowTaxForm()
 }
 
-function continueWithLimit() {
-	withdrawContext.withdrawData.value.skippedTaxForm = true
-	withdrawContext.setStage(withdrawContext.nextStep.value)
-}
-
 const messages = defineMessages({
 	withdrawRemaining: {
 		id: 'dashboard.creator-withdraw-modal.withdraw-remaining',
@@ -130,10 +118,6 @@ const messages = defineMessages({
 	completeTaxForm: {
 		id: 'dashboard.creator-withdraw-modal.complete-tax-form',
 		defaultMessage: 'Complete tax form',
-	},
-	continueWithLimit: {
-		id: 'dashboard.creator-withdraw-modal.continue-with-limit',
-		defaultMessage: 'Continue with {limit}',
 	},
 	withdrawLimitUsed: {
 		id: 'dashboard.creator-withdraw-modal.withdraw-limit-used',

@@ -72,10 +72,17 @@ export function createWithdrawContext(
 		const dynamicStages: WithdrawStage[] = []
 
 		const usedLimit = balance?.withdrawn_ytd ?? 0
-		const remainingLimit = Math.max(0, 600 - usedLimit)
 		const available = balance?.available ?? 0
-		// Check if tax form is required (don't skip stage when testTaxForm is enabled - we want to test it!)
-		const needsTaxForm = balance?.form_completion_status !== 'complete' && (remainingLimit + available >= 600)
+
+		const needsTaxForm = balance?.form_completion_status !== 'complete' && (usedLimit + available >= 600)
+
+		console.log('Tax form check:', {
+			usedLimit,
+			available,
+			total: usedLimit + available,
+			status: balance?.form_completion_status,
+			needsTaxForm
+		})
 
 		if (needsTaxForm) {
 			dynamicStages.push('tax-form')
@@ -145,13 +152,13 @@ export function createWithdrawContext(
 				if (!balanceRef.value) return true
 				const ytd = balanceRef.value.withdrawn_ytd ?? 0
 				const remainingLimit = Math.max(0, 600 - ytd)
-				const status = balanceRef.value.form_completion_status
+				const form_completion_status = balanceRef.value.form_completion_status
 				// If they haven't hit $600 yet, they can proceed without completing the form
 				if (ytd < 600) return true
 				// If user skipped tax form to proceed with limited withdrawal
 				if (withdrawData.value.skippedTaxForm && remainingLimit > 0) return true
 				// If they hit $600, they must complete the form to proceed
-				return status === 'complete'
+				return form_completion_status === 'complete'
 			case 'method-selection':
 				return !!(
 					withdrawData.value.selectedCountry &&

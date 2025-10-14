@@ -48,8 +48,15 @@
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
-			<ButtonStyled :color="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm ? 'orange' : 'brand'">
-				<button v-if="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm" @click="showTaxFormModal">
+			<ButtonStyled
+				:color="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm ? (remainingLimit > 0 ? 'standard' : 'orange') : 'brand'">
+				<button v-if="withdrawContext.currentStage.value === 'tax-form' &&
+					needsTaxForm && remainingLimit > 0" @click="continueWithLimit">
+					{{ formatMessage(messages.continueWithLimit) }}
+					<RightArrowIcon />
+				</button>
+				<button v-else-if="withdrawContext.currentStage.value === 'tax-form' &&
+					needsTaxForm" @click="showTaxFormModal">
 					<FileTextIcon />
 					{{ formatMessage(messages.completeTaxForm) }}
 				</button>
@@ -130,8 +137,22 @@ const needsTaxForm = computed(() => {
 	const remainingLimit = Math.max(0, 600 - ytd)
 	const available = props.balance.available ?? 0
 	const status = props.balance.form_completion_status
-	return status !== 'complete' && (remainingLimit + available >= 600)
+	return status !== 'complete' && (ytd + available >= 600)
 })
+
+const remainingLimit = computed(() => {
+	if (!props.balance) return 0
+	const ytd = props.balance.withdrawn_ytd ?? 0
+	const raw = 600 - ytd
+	if (raw <= 0) return 0
+	const cents = Math.floor(raw * 100)
+	return cents / 100
+})
+
+function continueWithLimit() {
+	withdrawContext.withdrawData.value.skippedTaxForm = true
+	withdrawContext.setStage(withdrawContext.nextStep.value)
+}
 
 const stageLabels = computed<Record<WithdrawStage, MessageDescriptor>>(() => ({
 	'tax-form': messages.taxFormStage,
@@ -205,24 +226,9 @@ function show(preferred?: WithdrawStage) {
 		return
 	}
 
-	const b = props.balance
-
-	if (!b || b.available <= 0) {
-		withdrawContext.setStage('tax-form', true)
-		withdrawModal.value?.show()
-		checkScrollState()
-		return
-	}
-
-	const usedLimit = b.withdrawn_ytd ?? 0
-	const remainingLimit = Math.max(0, 600 - usedLimit)
-
-	const needsTaxForm = b.form_completion_status !== 'complete' && (remainingLimit + b.available >= 600)
-
-	if (needsTaxForm || (flags.value.testTaxForm && b.form_completion_status !== 'complete')) {
-		withdrawContext.setStage('tax-form', true)
-	} else {
-		withdrawContext.setStage('method-selection', true)
+	const firstStage = withdrawContext.stages.value[0]
+	if (firstStage) {
+		withdrawContext.setStage(firstStage, true)
 	}
 
 	withdrawModal.value?.show()
@@ -283,6 +289,10 @@ const messages = defineMessages({
 	completeTaxForm: {
 		id: 'dashboard.creator-withdraw-modal.complete-tax-form',
 		defaultMessage: 'Complete tax form',
+	},
+	continueWithLimit: {
+		id: 'dashboard.creator-withdraw-modal.continue-with-limit',
+		defaultMessage: 'Continue with limit',
 	},
 })
 </script>
