@@ -1,6 +1,7 @@
 use ariadne::ids::UserId;
 use eyre::Result;
-use muralpay::MuralError;
+use muralpay::{MuralError, TokenFeeRequest};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -21,6 +22,34 @@ pub enum MuralPayoutRequest {
 }
 
 impl PayoutsQueue {
+    pub async fn compute_muralpay_fees(
+        &self,
+        amount: Decimal,
+        fiat_and_rail_code: muralpay::FiatAndRailCode,
+    ) -> Result<muralpay::TokenPayoutFee, ApiError> {
+        let muralpay = self.muralpay.read().await;
+        let muralpay = muralpay
+            .as_ref()
+            .wrap_internal_err("Mural Pay client not available")?;
+
+        let fees = muralpay
+            .client
+            .get_fees_for_token_amount(&[TokenFeeRequest {
+                amount: muralpay::TokenAmount {
+                    token_symbol: "USDC".into(),
+                    token_amount: amount,
+                },
+                fiat_and_rail_code,
+            }])
+            .await
+            .wrap_internal_err("failed to request fees")?;
+        let fee = fees
+            .into_iter()
+            .next()
+            .wrap_internal_err("no fees returned")?;
+        Ok(fee)
+    }
+
     pub async fn create_muralpay_payout_request(
         &self,
         user_id: UserId,

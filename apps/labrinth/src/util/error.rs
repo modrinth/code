@@ -18,7 +18,6 @@ pub trait Context<T, E>: Sized {
         D: Send + Sync + Debug + Display + 'static;
 
     /// Maps the error variant into an [`eyre::Report`] with the given message.
-    /// Maps the error variant into an [`eyre::Report`] with the given message.
     #[inline]
     fn wrap_err<D>(self, msg: D) -> Result<T, eyre::Report>
     where

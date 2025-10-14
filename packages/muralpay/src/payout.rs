@@ -434,6 +434,26 @@ pub enum FiatAndRailDetails {
     },
 }
 
+impl FiatAndRailDetails {
+    pub fn code(&self) -> FiatAndRailCode {
+        match self {
+            Self::Usd { .. } => FiatAndRailCode::Usd,
+            Self::Cop { .. } => FiatAndRailCode::Cop,
+            Self::Ars { .. } => FiatAndRailCode::Ars,
+            Self::Eur { .. } => FiatAndRailCode::Eur,
+            Self::Mxn { .. } => FiatAndRailCode::Mxn,
+            Self::Brl { .. } => FiatAndRailCode::Brl,
+            Self::Clp { .. } => FiatAndRailCode::Clp,
+            Self::Pen { .. } => FiatAndRailCode::Pen,
+            Self::Bob { .. } => FiatAndRailCode::Bob,
+            Self::Crc { .. } => FiatAndRailCode::Crc,
+            Self::Zar { .. } => FiatAndRailCode::Zar,
+            Self::UsdPeru { .. } => FiatAndRailCode::UsdPeru,
+            Self::UsdChina { .. } => FiatAndRailCode::UsdChina,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum UsdSymbol {

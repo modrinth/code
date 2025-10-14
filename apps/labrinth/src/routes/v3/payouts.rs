@@ -10,6 +10,7 @@ use crate::models::payouts::{
     MuralPayDetails, PayoutMethodRequest, PayoutMethodType, PayoutStatus,
 };
 use crate::queue::payouts::PayoutsQueue;
+use crate::queue::payouts::muralpay_payout::MuralPayoutRequest;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::avalara1099;
@@ -49,6 +50,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
                 ),
             )
             .route("history", web::get().to(transaction_history))
+            .service(calculate_fees)
             .service(create_payout)
             .service(cancel_payout)
             .service(payment_methods)
@@ -470,6 +472,77 @@ pub struct Withdrawal {
     #[serde(flatten)]
     method: PayoutMethodRequest,
     method_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WithdrawalFees {
+    pub fee: Option<Decimal>,
+}
+
+#[post("/fees")]
+pub async fn calculate_fees(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    body: web::Json<Withdrawal>,
+    session_queue: web::Data<AuthQueue>,
+    payouts_queue: web::Data<PayoutsQueue>,
+) -> Result<web::Json<WithdrawalFees>, ApiError> {
+    let (_, user) = get_user_record_from_bearer_token(
+        &req,
+        None,
+        &**pool,
+        &redis,
+        &session_queue,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::Authentication(AuthenticationError::InvalidCredentials)
+    })?;
+
+    let resp = match &body.method {
+        PayoutMethodRequest::MuralPay {
+            method_details:
+                MuralPayDetails {
+                    payout_details: MuralPayoutRequest::Blockchain { .. },
+                    ..
+                },
+        } => WithdrawalFees {
+            fee: Some(Decimal::ZERO),
+        },
+        PayoutMethodRequest::MuralPay {
+            method_details:
+                MuralPayDetails {
+                    payout_details:
+                        MuralPayoutRequest::Fiat {
+                            fiat_and_rail_details,
+                            ..
+                        },
+                    ..
+                },
+        } => {
+            let fiat_and_rail_code = fiat_and_rail_details.code();
+            let fee = payouts_queue
+                .compute_muralpay_fees(body.amount, fiat_and_rail_code)
+                .await?;
+
+            match fee {
+                muralpay::TokenPayoutFee::Success { fee_total, .. } => {
+                    WithdrawalFees {
+                        fee: Some(fee_total.token_amount),
+                    }
+                }
+                muralpay::TokenPayoutFee::Error { message, .. } => {
+                    return Err(ApiError::Internal(eyre!(
+                        "failed to compute fee: {message}"
+                    )));
+                }
+            }
+        }
+        _ => todo!(),
+    };
+
+    Ok(web::Json(resp))
 }
 
 #[post("")]
