@@ -1,38 +1,34 @@
 <template>
-	<div class="flex gap-4 flex-col">
-		<div class="flex w-full flex-row justify-between">
-			<span class="font-semibold text-contrast">{{ formatMessage(messages.withdrawRemaining) }}</span>
-			<div>
-				<span class="text-orange">{{ formatMoney(remainingLimit) }}</span> /
-				{{ formatMoney(600) }}
+	<div class="flex gap-3 flex-col">
+		<div class="flex gap-3 flex-col">
+			<div class="flex w-full flex-row justify-between">
+				<span class="font-semibold text-contrast">{{ formatMessage(messages.withdrawLimit) }}</span>
+				<div>
+					<span class="text-orange">{{ formatMoney(usedLimit) }}</span> /
+					{{ formatMoney(600) }}
+				</div>
 			</div>
-		</div>
-		<div class="flex h-2 w-full overflow-hidden rounded-full bg-button-bg">
-			<div class="bg-orange" :style="{ width: `${(usedLimit / 600) * 100}%` }"></div>
+			<div class="flex h-2.5 w-full overflow-hidden rounded-full bg-highlight-orange">
+				<div class="bg-orange gradient-border" :style="{ width: `${(usedLimit / 600) * 100}%` }"></div>
+			</div>
 		</div>
 		<template v-if="remainingLimit > 0">
 			<span>
 				<IntlFormatted :message-id="messages.nearingThreshold" :values="{
-					amount600: formatMoney(600),
 					amountRemaining: formatMoney(remainingLimit),
 				}">
 					<template #b="{ children }">
-						<b>
+						<span class="font-medium">
 							<component :is="() => normalizeChildren(children)" />
-						</b>
+						</span>
 					</template>
 				</IntlFormatted>
 			</span>
 			<Admonition type="warning" show-actions-underneath :header="formatMessage(messages.taxFormRequiredHeader)">
-				<span>
-					<IntlFormatted :message-id="messages.taxFormRequiredBodyWithLimit"
-						:values="{ available: formatMoney(balance?.available), limit: formatMoney(remainingLimit) }">
-						<template #b="{ children }">
-							<b>
-								<component :is="() => normalizeChildren(children)" />
-							</b>
-						</template>
-					</IntlFormatted>
+				<span class="font-normal">
+					{{ formatMessage(messages.taxFormRequiredBodyWithLimit, {
+						limit: formatMoney(remainingLimit)
+					}) }}
 				</span>
 				<template #icon="{ iconClass }">
 					<FileTextIcon :class="iconClass" />
@@ -48,7 +44,7 @@
 		</template>
 		<template v-else>
 			<span>
-				<IntlFormatted :message-id="messages.withdrawLimitUsed" :values="{ amount600: formatMoney(600) }">
+				<IntlFormatted :message-id="messages.withdrawLimitUsed" :values="{ withdrawLimit: formatMoney(600) }">
 					<template #b="{ children }">
 						<b>
 							<component :is="() => normalizeChildren(children)" />
@@ -92,14 +88,14 @@ function showTaxFormModal() {
 }
 
 const messages = defineMessages({
-	withdrawRemaining: {
-		id: 'dashboard.creator-withdraw-modal.withdraw-remaining',
-		defaultMessage: 'Withdraw remaining',
+	withdrawLimit: {
+		id: 'dashboard.creator-withdraw-modal.withdraw-limit',
+		defaultMessage: 'Withdraw limit',
 	},
 	nearingThreshold: {
 		id: 'dashboard.creator-withdraw-modal.nearing-threshold',
 		defaultMessage:
-			"You're nearing the {amount600} withdrawal threshold. You can withdraw up to <b>{amountRemaining}</b> now, but you'll need to complete a tax form to withdraw more.",
+			"You're nearing the withdraw threshold. You can withdraw <b>{amountRemaining}</b> now, but a tax form is required for more.",
 	},
 	taxFormRequiredHeader: {
 		id: 'dashboard.creator-withdraw-modal.tax-form-required.header',
@@ -113,7 +109,7 @@ const messages = defineMessages({
 	taxFormRequiredBodyWithLimit: {
 		id: 'dashboard.creator-withdraw-modal.tax-form-required.body-with-limit',
 		defaultMessage:
-			'You can withdraw up to <b>{limit}</b> now without completing the tax form, or complete the form to withdraw your full <b>{available}</b> available balance.',
+			'You must complete a W-9 or W-8 form for Modrinth\'s tax records so we remain compliant with tax regulations.',
 	},
 	completeTaxForm: {
 		id: 'dashboard.creator-withdraw-modal.complete-tax-form',
@@ -122,7 +118,27 @@ const messages = defineMessages({
 	withdrawLimitUsed: {
 		id: 'dashboard.creator-withdraw-modal.withdraw-limit-used',
 		defaultMessage:
-			"You've used up your <b>{amount600}</b> withdrawal limit. You must complete a tax form to withdraw more.",
+			"You've used up your <b>{withdrawLimit}</b> withdrawal limit. You must complete a tax form to withdraw more.",
 	},
 })
 </script>
+
+<style lang="css" scoped>
+.gradient-border {
+	position: relative;
+
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+		border-radius: inherit;
+		mask:
+			linear-gradient(#fff 0 0) content-box,
+			linear-gradient(#fff 0 0);
+		mask-composite: xor;
+		padding: 2px;
+		pointer-events: none;
+	}
+}
+</style>

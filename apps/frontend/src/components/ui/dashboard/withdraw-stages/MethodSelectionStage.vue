@@ -1,5 +1,10 @@
 <template>
-	<div class="flex flex-col gap-4">
+	<div class="flex flex-col gap-6">
+		<Admonition type="warning" v-if="withdrawContext.maxWithdrawAmount.value <= 600">
+			Your withdraw limit is <span class="font-bold">{{ formatMoney(withdrawContext.maxWithdrawAmount.value) }}</span>,
+			<span class="text-link cursor-pointer" @click="onShowTaxForm">complete a
+				tax form</span> to withdraw more.
+		</Admonition>
 		<div class="flex flex-col gap-2.5">
 			<div class="flex flex-row gap-1 align-middle">
 				<span class="text-contrast font-semibold align-middle">Region</span>
@@ -7,14 +12,15 @@
 					class="size-5 mt-auto text-secondary" />
 			</div>
 			<Combobox :model-value="selectedCountryCode" :options="countries" placeholder="Select your country" searchable
-				search-placeholder="Search countries..." :max-height="240" @update:model-value="handleCountryChange" />
+				search-placeholder="Search countries..." :max-height="240" @update:model-value="handleCountryChange"
+				class="h-10" />
 		</div>
 		<div class="flex flex-col gap-2.5">
 			<span class="text-contrast font-semibold align-middle">Select withdraw method</span>
 			<ButtonStyled v-for="method in paymentMethods" :key="method.value"
 				:color="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'"
 				:type="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'highlight-colored-text' : 'standard'">
-				<button @click="handleMethodSelection(method.value)" class="!justify-start !gap-2">
+				<button @click="handleMethodSelection(method.value)" class="!justify-start !gap-2 !h-10">
 					<component :is="method.icon" /> {{ method.label }}
 				</button>
 			</ButtonStyled>
@@ -23,17 +29,21 @@
 </template>
 
 <script setup lang="ts">
-import { GiftIcon, LandmarkIcon, PayPalIcon, PolygonIcon, UnknownIcon, VenmoIcon } from '@modrinth/assets';
-
 import { useUserCountry } from '@/composables/country.ts';
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
-import { ButtonStyled, Combobox } from '@modrinth/ui';
+import { GiftIcon, LandmarkIcon, PayPalIcon, PolygonIcon, UnknownIcon, VenmoIcon } from '@modrinth/assets';
+import { Admonition, ButtonStyled, Combobox } from '@modrinth/ui';
+import { formatMoney } from '@modrinth/utils';
 import { useGeolocation } from '@vueuse/core';
 import { all } from 'iso-3166-1';
 
 const withdrawContext = useWithdrawContext()
 const userCountry = useUserCountry()
 const { coords } = useGeolocation()
+
+defineProps<{
+	onShowTaxForm: () => void
+}>();
 
 const countries = computed(() =>
 	all().map((x) => ({

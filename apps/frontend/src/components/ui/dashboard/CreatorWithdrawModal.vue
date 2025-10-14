@@ -26,7 +26,8 @@
 			<div ref="scrollContainer" class="max-h-[70vh] overflow-y-auto pl-[2px]" @scroll="checkScrollState">
 				<TaxFormStage v-if="withdrawContext.currentStage.value === 'tax-form'" :balance="balance"
 					:on-show-tax-form="showTaxFormModal" />
-				<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'" />
+				<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'"
+					:on-show-tax-form="showTaxFormModal" />
 				<TremendousDetailsStage v-else-if="withdrawContext.currentStage.value === 'tremendous-details'" />
 				<MuralpayKycStage v-else-if="withdrawContext.currentStage.value === 'muralpay-kyc'" />
 				<MuralpayDetailsStage v-else-if="withdrawContext.currentStage.value === 'muralpay-details'" />
