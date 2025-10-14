@@ -107,7 +107,6 @@
 				:backup="backup"
 				:kyros-url="props.server.general?.node.instance"
 				:jwt="props.server.general?.node.token"
-				@prepare="() => prepareDownload(backup.id)"
 				@download="() => triggerDownloadAnimation()"
 				@rename="() => renameBackupModal?.show(backup)"
 				@restore="() => restoreBackupModal?.show(backup)"
@@ -231,19 +230,6 @@ const showbackupSettingsModal = () => {
 function triggerDownloadAnimation() {
 	overTheTopDownloadAnimation.value = true
 	setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
-}
-
-const prepareDownload = async (backupId: string) => {
-	try {
-		await props.server.backups?.prepare(backupId)
-	} catch (error) {
-		console.error('Failed to prepare download:', error)
-		addNotification({
-			type: 'error',
-			title: 'Failed to prepare backup for download',
-			text: error as string,
-		})
-	}
 }
 
 const lockBackup = async (backupId: string) => {
