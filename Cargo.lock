@@ -4537,7 +4537,6 @@ dependencies = [
  "const_format",
  "dashmap",
  "deadpool-redis",
- "derive_more 2.0.1",
  "dotenv-build",
  "dotenvy",
  "either",

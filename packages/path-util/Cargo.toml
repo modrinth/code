@@ -3,10 +3,10 @@ name = "path-util"
 edition.workspace = true
 
 [dependencies]
-typed-path.workspace = true
-serde.workspace = true
-derive_more = { workspace = true, features = ["display", "deref"] }
-itertools.workspace = true
+derive_more = { workspace = true, features = ["deref", "display"] }
+itertools = { workspace = true }
+serde = { workspace = true }
+typed-path = { workspace = true }
 
 [lints]
 workspace = true

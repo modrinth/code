@@ -38,9 +38,9 @@ Once the user is ready to authorize your application, you need to construct a UR
 | `state`         | A mechanism to prevent certain attacks. Explained further below. Recommended but optional |
 | `redirect_uri`  | The URI the user is redirect to after finishing authorization                             |
 
-You might have noticed the `state` parameter. [CSRF] (Cross-site request forgery), and [clickjacking] are security vulnerabilities that you're recommended to protect against. In OAuth2 this is usually done with the `state` parameter. When the user initiates a request to start authorization, you include a `state` which is unique to this request. This can, for example, be saved in localStorge or a cookie. When the redirect URI is called, you verify that the `state` parameter is the same. Using `state` is optional, but recommended.
+You might have noticed the `state` parameter. [CSRF] (Cross-site request forgery), and [clickjacking] are security vulnerabilities that you're recommended to protect against. In OAuth2 this is usually done with the `state` parameter. When the user initiates a request to start authorization, you include a `state` which is unique to this request. This can, for example, be saved in localStorage or a cookie. When the redirect URI is called, you verify that the `state` parameter is the same. Using `state` is optional, but recommended.
 
-The scope identifiers are currently best found in the backend source code located at [`apps/labrinth/src/models/v3/pats.rs`]. The scope parameter is an array of scope identifiers, seperated by a plus sign (`+`).
+The scope identifiers are currently best found in the backend source code located at [`apps/labrinth/src/models/v3/pats.rs`]. The scope parameter is an array of scope identifiers, separated by a plus sign (`+`).
 
 The redirect URI is the endpoint on your server that will receive the code which can eventually be used to act on the user's behalf. For security reasons the redirect URI used has to be allowlisted in your application settings. The redirect will contain the following query parameters:
 

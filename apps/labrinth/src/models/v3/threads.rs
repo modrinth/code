@@ -65,7 +65,7 @@ impl std::fmt::Display for ThreadType {
 }
 
 impl ThreadType {
-    // These are constant, so this can remove unneccessary allocations (`to_string`)
+    // These are constant, so this can remove unnecessary allocations (`to_string`)
     pub fn as_str(&self) -> &'static str {
         match self {
             ThreadType::Report => "report",

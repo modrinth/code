@@ -419,7 +419,7 @@ pub async fn test_patch_project() {
                 .await;
             assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
-            // Sucessful request to patch many fields.
+            // Successful request to patch many fields.
             let resp = api
                 .edit_project(
                     alpha_project_slug,
@@ -500,7 +500,7 @@ pub async fn test_patch_v3() {
 
             let alpha_project_slug = &test_env.dummy.project_alpha.project_slug;
 
-            // Sucessful request to patch many fields.
+            // Successful request to patch many fields.
             let resp = api
                 .edit_project(
                     alpha_project_slug,
@@ -1141,7 +1141,7 @@ async fn permissions_delete_project() {
 async fn project_permissions_consistency_test() {
     with_test_environment_all(Some(10), |test_env| async move {
         // Test that the permissions are consistent with each other
-        // For example, if we get the projectpermissions directly, from an organization's defaults, overriden, etc, they should all be correct & consistent
+        // For example, if we get the projectpermissions directly, from an organization's defaults, overridden, etc, they should all be correct & consistent
         let api = &test_env.api;
         // Full project permissions test with EDIT_DETAILS
         let success_permissions = ProjectPermissions::EDIT_DETAILS;

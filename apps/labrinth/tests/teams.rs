@@ -535,7 +535,7 @@ async fn test_patch_organization_team_member() {
     }).await;
 }
 
-// trasnfer ownership (requires being owner, etc)
+// transfer ownership (requires being owner, etc)
 #[actix_rt::test]
 async fn transfer_ownership_v3() {
     // Test setup and dummy data
@@ -675,7 +675,7 @@ async fn transfer_ownership_v3() {
 //     // Adding a user to a project team in an organization, when that user is in the organization but not the team,
 //     // should have those permissions apply regardless of whether the user has accepted the invite or not.
 
-//     // This is because project-team permission overrriding must be possible, and this overriding can decrease the number of permissions a user has.
+//     // This is because project-team permission overriding must be possible, and this overriding can decrease the number of permissions a user has.
 
 //     let test_env = TestEnvironment::build(None).await;
 //     let api = &test_env.api;

@@ -26,6 +26,7 @@ use serde_json::json;
 use sha2::Sha256;
 use sqlx::PgPool;
 use std::collections::HashMap;
+use tokio_stream::StreamExt;
 use tracing::error;
 
 const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
@@ -36,7 +37,18 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("payout")
             .service(paypal_webhook)
             .service(tremendous_webhook)
-            .service(user_payouts)
+            // we use `route` instead of `service` because `user_payouts` uses the logic of `transaction_history`
+            .route(
+                "",
+                web::get().to(
+                    #[expect(
+                        deprecated,
+                        reason = "v3 backwards compatibility"
+                    )]
+                    user_payouts,
+                ),
+            )
+            .route("history", web::get().to(transaction_history))
             .service(create_payout)
             .service(cancel_payout)
             .service(payment_methods)
@@ -405,41 +417,50 @@ pub async fn tremendous_webhook(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[get("")]
+#[deprecated = "use `transaction_history` instead"]
 pub async fn user_payouts(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<crate::models::payouts::Payout>>, ApiError> {
-    let user = get_user_from_headers(
+    let (_, user) = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PAYOUTS_READ,
     )
-    .await?
-    .1;
-
-    let payout_ids =
-        crate::database::models::payout_item::DBPayout::get_all_for_user(
-            user.id.into(),
-            &**pool,
-        )
-        .await?;
-    let payouts = crate::database::models::payout_item::DBPayout::get_many(
-        &payout_ids,
-        &**pool,
-    )
     .await?;
 
-    Ok(web::Json(
-        payouts
-            .into_iter()
-            .map(crate::models::payouts::Payout::from)
-            .collect::<Vec<_>>(),
-    ))
+    let items = transaction_history(req, pool, redis, session_queue)
+        .await?
+        .0
+        .into_iter()
+        .filter_map(|txn_item| match txn_item {
+            TransactionItem::Withdrawal {
+                id,
+                status,
+                created,
+                amount,
+                fee,
+                method_type,
+                method_address,
+            } => Some(crate::models::payouts::Payout {
+                id,
+                user_id: user.id,
+                status,
+                created,
+                amount,
+                fee,
+                method: method_type,
+                method_address,
+                platform_id: None,
+            }),
+            TransactionItem::PayoutAvailable { .. } => None,
+        })
+        .collect::<Vec<_>>();
+    Ok(web::Json(items))
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -885,6 +906,110 @@ async fn mural_pay_payout(
         method_address: Some(email.to_string()),
         platform_id: Some(payout_request.id.to_string()),
     })
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum TransactionItem {
+    Withdrawal {
+        id: PayoutId,
+        status: PayoutStatus,
+        created: DateTime<Utc>,
+        amount: Decimal,
+        fee: Option<Decimal>,
+        method_type: Option<PayoutMethodType>,
+        method_address: Option<String>,
+    },
+    PayoutAvailable {
+        created: DateTime<Utc>,
+        payout_source: PayoutSource,
+        amount: Decimal,
+    },
+}
+
+impl TransactionItem {
+    pub fn created(&self) -> DateTime<Utc> {
+        match self {
+            Self::Withdrawal { created, .. } => *created,
+            Self::PayoutAvailable { created, .. } => *created,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+#[non_exhaustive]
+pub enum PayoutSource {
+    CreatorRewards,
+    Affilites,
+}
+
+pub async fn transaction_history(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<TransactionItem>>, ApiError> {
+    let (_, user) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PAYOUTS_READ,
+    )
+    .await?;
+
+    let payout_ids =
+        crate::database::models::payout_item::DBPayout::get_all_for_user(
+            user.id.into(),
+            &**pool,
+        )
+        .await?;
+    let payouts = crate::database::models::payout_item::DBPayout::get_many(
+        &payout_ids,
+        &**pool,
+    )
+    .await?;
+    let withdrawals =
+        payouts
+            .into_iter()
+            .map(|payout| TransactionItem::Withdrawal {
+                id: payout.id.into(),
+                status: payout.status,
+                created: payout.created,
+                amount: payout.amount,
+                fee: payout.fee,
+                method_type: payout.method,
+                method_address: payout.method_address,
+            });
+
+    let mut payouts_available = sqlx::query!(
+        "SELECT created, amount
+        FROM payouts_values
+        WHERE user_id = $1
+        AND NOW() >= date_available",
+        DBUserId::from(user.id) as DBUserId
+    )
+    .fetch(&**pool)
+    .map(|record| {
+        let record = record
+            .wrap_internal_err("failed to fetch available payout record")?;
+        Ok(TransactionItem::PayoutAvailable {
+            created: record.created,
+            payout_source: PayoutSource::CreatorRewards,
+            amount: record.amount,
+        })
+    })
+    .collect::<Result<Vec<_>, ApiError>>()
+    .await
+    .wrap_internal_err("failed to fetch available payouts")?;
+
+    let mut txn_items = Vec::new();
+    txn_items.extend(withdrawals);
+    txn_items.append(&mut payouts_available);
+    txn_items.sort_by_key(|item| item.created());
+
+    Ok(web::Json(txn_items))
 }
 
 #[delete("{id}")]
