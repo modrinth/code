@@ -1,0 +1,47 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            c.id as charge_id,\n            c.affiliate_code,\n            c.net,\n            ac.affiliate as affiliate_user_id,\n            ac.revenue_split\n        FROM charges c\n        INNER JOIN affiliate_codes ac ON c.affiliate_code = ac.id\n        WHERE\n            c.status = 'succeeded'\n            AND c.net > 0\n            AND c.due BETWEEN $1 AND $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "charge_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "affiliate_code",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "net",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "affiliate_user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "revenue_split",
+        "type_info": "Float8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "d0fda4cc7d8562a9152afa29b3a4903293fc12d78db69808190f0e96a51e860e"
+}
