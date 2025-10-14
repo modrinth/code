@@ -1877,9 +1877,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup restore in progress"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Already preparing backup for download"
-  },
   "servers.backups.item.automated": {
     "message": "Automated"
   },
@@ -1889,9 +1886,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Failed to create backup"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Failed to prepare download"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Failed to restore from backup"
   },
@@ -1900,15 +1894,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Locked"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Prepare download"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Try preparing again"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Preparing download..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Queued for backup"
