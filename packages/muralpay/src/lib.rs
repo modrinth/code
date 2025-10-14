@@ -4,6 +4,7 @@ mod account;
 mod error;
 mod organization;
 mod payout;
+mod serde_iso3166;
 mod util;
 
 pub use {account::*, error::*, organization::*, payout::*};
@@ -11,7 +12,7 @@ pub use {account::*, error::*, organization::*, payout::*};
 use rust_decimal::Decimal;
 use secrecy::SecretString;
 use serde::{Deserialize, Serialize};
-use std::ops::Deref;
+use std::{ops::Deref, str::FromStr};
 use uuid::Uuid;
 
 pub const API_URL: &str = "https://api.muralpay.com";
@@ -82,6 +83,14 @@ pub enum FiatAndRailCode {
     UsdPeru,
     UsdChina,
     UsdPanama,
+}
+
+impl FromStr for FiatAndRailCode {
+    type Err = serde_json::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        serde_json::from_value(serde_json::Value::String(s.to_owned()))
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

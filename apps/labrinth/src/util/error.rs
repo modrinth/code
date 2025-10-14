@@ -3,50 +3,7 @@ use std::{
     fmt::{Debug, Display},
 };
 
-use actix_web::{HttpResponse, ResponseError, http::StatusCode};
-use derive_more::{Display, Error};
-use serde::{Deserialize, Serialize};
-
-/// Error when calling an HTTP endpoint.
-#[derive(Debug, Display, Error)]
-pub enum ApiError {
-    /// Error occurred on the server side, which the caller has no fault in.
-    Internal(eyre::Report),
-    /// Caller made an invalid or malformed request.
-    Request(eyre::Report),
-    /// Caller attempted a request which they are not allowed to make.
-    Auth(eyre::Report),
-}
-
-impl ResponseError for ApiError {
-    fn status_code(&self) -> StatusCode {
-        match self {
-            Self::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::Request(_) => StatusCode::BAD_REQUEST,
-            Self::Auth(_) => StatusCode::UNAUTHORIZED,
-        }
-    }
-
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(ErrorResponse {
-            // internal error details are not leaked to the caller
-            description: match self {
-                Self::Internal(_) => None,
-                _ => Some(self.to_string()),
-            },
-        })
-    }
-}
-
-/// How an [`ApiError`] is represented when sending over an HTTP request.
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ErrorResponse {
-    /// Text description of the error that occurred.
-    ///
-    /// [`ApiError::Internal`] errors have their description filtered out, and
-    /// will hold [`None`].
-    pub description: Option<String>,
-}
+use crate::routes::ApiError;
 
 /// Allows wrapping [`Result`]s and [`Option`]s into [`Result<T, ApiError>`]s.
 #[allow(
@@ -152,35 +109,10 @@ impl<T> Context<T, Infallible> for Option<T> {
     }
 }
 
-// impl<T, E, Ty> Context<T, E> for Ty where Ty: eyre::WrapErr<T, E> {}
-
-// impl<T, Ty> Context<T, Infallible> for Ty where Ty: eyre::OptionExt<T> {}
-
-// impl<T, E> Context<T, E> for Result<T, E>
-// where
-//     Self: eyre::WrapErr<T, E>,
-// {
-//     fn wrap_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, eyre::Report>
-//     where
-//         D: Send + Sync + Debug + Display + 'static,
-//     {
-//         self.map_err(|err| eyre::Report::new(err).wrap_err(f()))
-//     }
-// }
-
-// impl<T> Context<T, Infallible> for Option<T> {
-//     fn wrap_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, eyre::Report>
-//     where
-//         D: Send + Sync + Debug + Display + 'static,
-//     {
-//         self.ok_or_else(|| eyre::Report::msg(f()))
-//     }
-// }
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use actix_web::http::StatusCode;
+    use actix_web::{ResponseError, http::StatusCode};
 
     #[test]
     fn test_api_error_display() {

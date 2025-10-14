@@ -1,12 +1,13 @@
 use std::{env, fmt::Debug, io};
 
-use eyre::WrapErr;
+use eyre::{Result, WrapErr, eyre};
 use muralpay::{
-    CreatePayout, CreatePayoutDetails, Dob, FiatAccountType,
-    FiatAndRailDetails, MuralPay, PayoutPurpose, PayoutRecipientInfo,
-    PhysicalAddress, SupportingDetails, TokenAmount, UsdSymbol,
+    CreatePayout, CreatePayoutDetails, Dob, FiatAccountType, FiatAndRailCode,
+    FiatAndRailDetails, FiatFeeRequest, FiatPayoutFee, MuralPay, PayoutPurpose,
+    PayoutRecipientInfo, PhysicalAddress, SupportingDetails, TokenAmount,
+    TokenFeeRequest, TokenPayoutFee, UsdSymbol,
 };
-use rust_decimal::dec;
+use rust_decimal::{Decimal, dec};
 use serde::Serialize;
 
 #[derive(Debug, clap::Parser)]
@@ -50,6 +51,23 @@ enum PayoutCommand {
         /// Description for this payout request
         memo: Option<String>,
     },
+    /// Get fees for a transaction
+    Fees {
+        #[command(subcommand)]
+        command: PayoutFeesCommand,
+    },
+}
+
+#[derive(Debug, clap::Subcommand)]
+enum PayoutFeesCommand {
+    Token {
+        amount: Decimal,
+        fiat_and_rail_code: FiatAndRailCode,
+    },
+    Fiat {
+        amount: Decimal,
+        fiat_and_rail_code: FiatAndRailCode,
+    },
 }
 
 #[derive(Debug, Clone, Copy, clap::ValueEnum)]
@@ -59,7 +77,7 @@ enum OutputFormat {
 }
 
 #[tokio::main]
-async fn main() -> eyre::Result<()> {
+async fn main() -> Result<()> {
     _ = dotenvy::dotenv();
     color_eyre::install().expect("failed to install `color-eyre`");
     tracing_subscriber::fmt().init();
@@ -89,54 +107,139 @@ async fn main() -> eyre::Result<()> {
                 },
         } => run(
             of,
-            muralpay
-                .create_payout_request(
-                    source_account_id
-                        .parse()
-                        .wrap_err("invalid source account ID")?,
-                    memo,
-                    &[CreatePayout {
-                        amount: TokenAmount {
-                            token_amount: dec!(2.00),
-                            token_symbol: "USDC".into(),
+            create_payout_request(
+                &muralpay,
+                &source_account_id,
+                memo.as_deref(),
+            )
+            .await?,
+        ),
+        Command::Payout {
+            command:
+                PayoutCommand::Fees {
+                    command:
+                        PayoutFeesCommand::Token {
+                            amount,
+                            fiat_and_rail_code,
                         },
-                        payout_details: CreatePayoutDetails::Fiat {
-                            bank_name: "Foo Bank".into(),
-                            bank_account_owner: "John Smith".into(),
-                            developer_fee: None,
-                            fiat_and_rail_details: FiatAndRailDetails::Usd {
-                                symbol: UsdSymbol::Usd,
-                                account_type: FiatAccountType::Checking,
-                                bank_account_number: "123456789".into(),
-                                // idk what the format is, https://wise.com/us/routing-number/bank/us-bank
-                                bank_routing_number: "071004200".into(),
-                            },
+                },
+        } => run(
+            of,
+            get_fees_for_token_amount(&muralpay, amount, fiat_and_rail_code)
+                .await?,
+        ),
+        Command::Payout {
+            command:
+                PayoutCommand::Fees {
+                    command:
+                        PayoutFeesCommand::Fiat {
+                            amount,
+                            fiat_and_rail_code,
                         },
-                        recipient_info: PayoutRecipientInfo::Individual {
-                            first_name: "John".into(),
-                            last_name: "Smith".into(),
-                            email: "john.smith@example.com".into(),
-                            date_of_birth: Dob::new(1970, 1, 1).unwrap(),
-                            physical_address: PhysicalAddress {
-                                address1: "1234 Elm Street".into(),
-                                address2: Some("Apt 56B".into()),
-                                country: rust_iso3166::US,
-                                state: "CA".into(),
-                                city: "Springfield".into(),
-                                zip: "90001".into(),
-                            },
-                        },
-                        supporting_details: Some(SupportingDetails {
-                            supporting_document: Some("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA...".into()),
-                            payout_purpose: Some(PayoutPurpose::VendorPayment),
-                        }),
-                    }],
-                )
+                },
+        } => run(
+            of,
+            get_fees_for_fiat_amount(&muralpay, amount, fiat_and_rail_code)
                 .await?,
         ),
     }
 
     Ok(())
+}
+
+async fn create_payout_request(
+    muralpay: &MuralPay,
+    source_account_id: &str,
+    memo: Option<&str>,
+) -> Result<()> {
+    muralpay
+        .create_payout_request(
+            source_account_id
+                .parse()
+                .wrap_err("invalid source account ID")?,
+            memo,
+            &[CreatePayout {
+                amount: TokenAmount {
+                    token_amount: dec!(2.00),
+                    token_symbol: "USDC".into(),
+                },
+                payout_details: CreatePayoutDetails::Fiat {
+                    bank_name: "Foo Bank".into(),
+                    bank_account_owner: "John Smith".into(),
+                    developer_fee: None,
+                    fiat_and_rail_details: FiatAndRailDetails::Usd {
+                        symbol: UsdSymbol::Usd,
+                        account_type: FiatAccountType::Checking,
+                        bank_account_number: "123456789".into(),
+                        // idk what the format is, https://wise.com/us/routing-number/bank/us-bank
+                        bank_routing_number: "071004200".into(),
+                    },
+                },
+                recipient_info: PayoutRecipientInfo::Individual {
+                    first_name: "John".into(),
+                    last_name: "Smith".into(),
+                    email: "john.smith@example.com".into(),
+                    date_of_birth: Dob::new(1970, 1, 1).unwrap(),
+                    physical_address: PhysicalAddress {
+                        address1: "1234 Elm Street".into(),
+                        address2: Some("Apt 56B".into()),
+                        country: rust_iso3166::US,
+                        state: "CA".into(),
+                        city: "Springfield".into(),
+                        zip: "90001".into(),
+                    },
+                },
+                supporting_details: Some(SupportingDetails {
+                    supporting_document: Some(
+                        "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA..."
+                            .into(),
+                    ),
+                    payout_purpose: Some(PayoutPurpose::VendorPayment),
+                }),
+            }],
+        )
+        .await?;
+    Ok(())
+}
+
+async fn get_fees_for_token_amount(
+    muralpay: &MuralPay,
+    amount: Decimal,
+    fiat_and_rail_code: FiatAndRailCode,
+) -> Result<TokenPayoutFee> {
+    let fees = muralpay
+        .get_fees_for_token_amount(&[TokenFeeRequest {
+            amount: TokenAmount {
+                token_amount: amount,
+                token_symbol: "USDC".into(),
+            },
+            fiat_and_rail_code,
+        }])
+        .await?;
+    let fee = fees
+        .into_iter()
+        .next()
+        .ok_or_else(|| eyre!("no fee results returned"))?;
+    Ok(fee)
+}
+
+async fn get_fees_for_fiat_amount(
+    muralpay: &MuralPay,
+    amount: Decimal,
+    fiat_and_rail_code: FiatAndRailCode,
+) -> Result<FiatPayoutFee> {
+    let fees = muralpay
+        .get_fees_for_fiat_amount(&[FiatFeeRequest {
+            fiat_amount: amount,
+            token_symbol: "USDC".into(),
+            fiat_and_rail_code,
+        }])
+        .await?;
+    let fee = fees
+        .into_iter()
+        .next()
+        .ok_or_else(|| eyre!("no fee results returned"))?;
+    Ok(fee)
 }
 
 fn run<T: Debug + Serialize>(output_format: Option<OutputFormat>, value: T) {

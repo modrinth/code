@@ -163,17 +163,6 @@ pub enum ApiError {
     Stripe(#[from] stripe::StripeError),
 }
 
-impl<T: Into<crate::util::error::ApiError>> From<T> for ApiError {
-    fn from(value: T) -> Self {
-        let value = value.into();
-        match value {
-            crate::util::error::ApiError::Internal(e) => Self::Internal(e),
-            crate::util::error::ApiError::Request(e) => Self::Request(e),
-            crate::util::error::ApiError::Auth(e) => Self::Auth(e),
-        }
-    }
-}
-
 impl ApiError {
     pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
         crate::models::error::ApiError {

@@ -51,6 +51,42 @@ impl MuralPay {
             .await
     }
 
+    pub async fn get_fees_for_token_amount(
+        &self,
+        token_fee_requests: &[TokenFeeRequest],
+    ) -> Result<Vec<TokenPayoutFee>, MuralError> {
+        #[derive(Debug, Serialize)]
+        #[serde(rename_all = "camelCase")]
+        struct Body<'a> {
+            token_fee_requests: &'a [TokenFeeRequest],
+        }
+
+        let body = Body { token_fee_requests };
+
+        self.http_post(|base| format!("{base}/api/payouts/fees/token-to-fiat"))
+            .json(&body)
+            .send_mural()
+            .await
+    }
+
+    pub async fn get_fees_for_fiat_amount(
+        &self,
+        fiat_fee_requests: &[FiatFeeRequest],
+    ) -> Result<Vec<FiatPayoutFee>, MuralError> {
+        #[derive(Debug, Serialize)]
+        #[serde(rename_all = "camelCase")]
+        struct Body<'a> {
+            fiat_fee_requests: &'a [FiatFeeRequest],
+        }
+
+        let body = Body { fiat_fee_requests };
+
+        self.http_post(|base| format!("{base}/api/payouts/fees/fiat-to-token"))
+            .json(&body)
+            .send_mural()
+            .await
+    }
+
     pub async fn create_payout_request(
         &self,
         source_account_id: AccountId,
@@ -603,4 +639,64 @@ pub enum PayoutPurpose {
     CashWithdrawal,
     RealEstatePurchase,
     Other,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TokenFeeRequest {
+    pub amount: TokenAmount,
+    pub fiat_and_rail_code: FiatAndRailCode,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum TokenPayoutFee {
+    #[serde(rename_all = "camelCase")]
+    Success {
+        exchange_rate: Decimal,
+        exchange_fee_percentage: Decimal,
+        fiat_and_rail_code: FiatAndRailCode,
+        transaction_fee: TokenAmount,
+        min_transaction_value: TokenAmount,
+        estimated_fiat_amount: FiatAmount,
+        token_amount: TokenAmount,
+        fee_total: TokenAmount,
+    },
+    #[serde(rename_all = "camelCase")]
+    Error {
+        token_amount: TokenAmount,
+        message: String,
+        fiat_and_rail_code: FiatAndRailCode,
+    },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FiatFeeRequest {
+    pub fiat_amount: Decimal,
+    pub token_symbol: String,
+    pub fiat_and_rail_code: FiatAndRailCode,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum FiatPayoutFee {
+    #[serde(rename_all = "camelCase")]
+    Success {
+        token_symbol: String,
+        fiat_amount: FiatAmount,
+        exchange_rate: Decimal,
+        exchange_fee_percentage: Decimal,
+        fiat_and_rail_code: FiatAndRailCode,
+        transaction_fee: TokenAmount,
+        min_transaction_value: TokenAmount,
+        estimated_token_amount_required: TokenAmount,
+        fee_total: TokenAmount,
+    },
+    #[serde(rename_all = "camelCase")]
+    Error {
+        message: String,
+        fiat_and_rail_code: FiatAndRailCode,
+        token_symbol: String,
+    },
 }
