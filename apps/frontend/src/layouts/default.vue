@@ -439,6 +439,12 @@
 								shown: isAdmin(auth.user),
 							},
 							{
+								id: 'affiliates',
+								color: 'primary',
+								link: '/admin/affiliates',
+								shown: isAdmin(auth.user),
+							},
+							{
 								id: 'servers-notices',
 								color: 'primary',
 								link: '/admin/servers/notices',
@@ -455,13 +461,16 @@
 							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
 						</template>
 						<template #user-lookup>
-							<UserIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
+							<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
 						</template>
 						<template #file-lookup>
 							<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
 						</template>
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
+						</template>
+						<template #affiliates>
+							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -538,6 +547,10 @@
 					</template>
 					<template #organizations>
 						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.organizations) }}
+					</template>
+					<template #affiliate-links>
+						<AffiliateIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.affiliateLinksButton) }}
 					</template>
 					<template #revenue>
 						<CurrencyIcon aria-hidden="true" /> {{ formatMessage(messages.revenue) }}
@@ -826,6 +839,7 @@
 </template>
 <script setup>
 import {
+	AffiliateIcon,
 	ArrowBigUpDashIcon,
 	BellIcon,
 	BlueskyIcon,
@@ -866,6 +880,7 @@ import {
 	SunIcon,
 	TwitterIcon,
 	UserIcon,
+	UserSearchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -878,7 +893,7 @@ import {
 	OverflowMenu,
 	PagewideBanner,
 } from '@modrinth/ui'
-import { isAdmin, isStaff } from '@modrinth/utils'
+import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
@@ -1110,6 +1125,10 @@ const messages = defineMessages({
 		id: 'layout.action.manage-server-notices',
 		defaultMessage: 'Manage server notices',
 	},
+	manageAffiliates: {
+		id: 'layout.action.manage-affiliates',
+		defaultMessage: 'Manage affiliate links',
+	},
 	newProject: {
 		id: 'layout.action.new-project',
 		defaultMessage: 'New project',
@@ -1286,6 +1305,11 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'organizations',
 			link: '/dashboard/organizations',
+		},
+		{
+			id: 'affiliate-links',
+			link: '/dashboard/affiliate-links',
+			shown: auth.value.user.badges & UserBadge.AFFILIATE,
 		},
 		{
 			id: 'revenue',

@@ -1,6 +1,10 @@
 import { defineMessages } from '@vintl/vintl'
 
 export const commonMessages = defineMessages({
+	affiliateLinksButton: {
+		id: 'button.affiliate-links',
+		defaultMessage: 'Affiliate links',
+	},
 	analyticsButton: {
 		id: 'button.analytics',
 		defaultMessage: 'Analytics',
