@@ -108,7 +108,7 @@ pub async fn init_ads_window<R: Runtime>(
                         AD_LINK.parse().unwrap(),
                     ),
                 )
-                .initialization_script_for_all_frames(""/*include_str!("ads-init.js")*/)
+                .initialization_script_for_all_frames(include_str!("ads-init.js"))
                 .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
                 .zoom_hotkeys_enabled(false)
                 .transparent(true)
