@@ -5131,7 +5131,6 @@ dependencies = [
  "dotenvy",
  "eyre",
  "foldhash 0.2.0",
- "itertools 0.14.0",
  "reqwest",
  "rust_decimal",
  "rust_iso3166",
