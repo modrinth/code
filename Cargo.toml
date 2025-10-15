@@ -76,9 +76,9 @@ hickory-resolver = "0.25.2"
 hmac = "0.12.1"
 hyper = "1.7.0"
 hyper-rustls = { version = "0.27.7", default-features = false, features = [
+  "aws-lc-rs",
   "http1",
   "native-tokio",
-  "aws-lc-rs",
   "tls12",
 ] }
 hyper-util = "0.1.17"
@@ -90,10 +90,10 @@ itertools = "0.14.0"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.1.0", default-features = false }
 lettre = { version = "0.11.19", default-features = false, features = [
+  "aws-lc-rs",
   "builder",
   "hostname",
   "pool",
-  "aws-lc-rs",
   "rustls",
   "rustls-native-certs",
   "smtp-transport",
