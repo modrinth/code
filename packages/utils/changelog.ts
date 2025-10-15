@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-14T18:45:00-07:00`,
+		product: 'servers',
+		body: `### Improvements
+- Removed 'Prepare download' step for downloading backups, you can now just download them directly.`,
+	},
+	{
 		date: `2025-10-08T13:45:00-07:00`,
 		product: 'web',
 		body: `### Improvements
