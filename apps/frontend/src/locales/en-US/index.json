@@ -1106,6 +1106,9 @@
   "profile.button.billing": {
     "message": "Manage user billing"
   },
+  "profile.button.edit-role": {
+    "message": "Edit role"
+  },
   "profile.button.info": {
     "message": "View user details"
   },

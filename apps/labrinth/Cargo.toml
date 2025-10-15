@@ -91,6 +91,7 @@ rust_decimal = { workspace = true, features = [
 ] }
 rust_iso3166 = { workspace = true }
 rust-s3 = { workspace = true }
+rustls.workspace = true
 rusty-money = { workspace = true }
 sentry = { workspace = true }
 sentry-actix = { workspace = true }
@@ -108,7 +109,7 @@ sqlx = { workspace = true, features = [
   "postgres",
   "runtime-tokio",
   "rust_decimal",
-  "tls-rustls-ring",
+  "tls-rustls-aws-lc-rs",
 ] }
 tar = { workspace = true }
 thiserror = { workspace = true }

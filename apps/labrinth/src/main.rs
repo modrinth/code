@@ -113,6 +113,10 @@ async fn main() -> std::io::Result<()> {
         std::process::exit(1);
     }
 
+    rustls::crypto::aws_lc_rs::default_provider()
+        .install_default()
+        .unwrap();
+
     // DSN is from SENTRY_DSN env variable.
     // Has no effect if not set.
     let sentry = sentry::init(sentry::ClientOptions {

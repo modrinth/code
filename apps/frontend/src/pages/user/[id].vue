@@ -2,6 +2,37 @@
 	<div v-if="user" class="experimental-styles-within">
 		<ModalCreation ref="modal_creation" />
 		<CollectionCreateModal ref="modal_collection_creation" />
+		<NewModal ref="editRoleModal" header="Edit role">
+			<div class="flex w-80 flex-col gap-4">
+				<div class="flex flex-col gap-2">
+					<TeleportDropdownMenu
+						v-model="selectedRole"
+						:options="roleOptions"
+						name="edit-role"
+						placeholder="Select a role"
+					/>
+				</div>
+				<div class="flex justify-end gap-2">
+					<ButtonStyled>
+						<button @click="cancelRoleEdit">
+							<XIcon />
+							Cancel
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button
+							:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
+							@click="saveRoleEdit"
+						>
+							<template v-if="isSavingRole">
+								<SpinnerIcon class="animate-spin" /> Saving...
+							</template>
+							<template v-else> <SaveIcon /> Save changes </template>
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+		</NewModal>
 		<NewModal v-if="auth.user && isStaff(auth.user)" ref="userDetailsModal" header="User details">
 			<div class="flex flex-col gap-3">
 				<div class="flex flex-col gap-1">
@@ -128,6 +159,10 @@
 									{ id: 'copy-id', action: () => copyId() },
 									{ id: 'copy-permalink', action: () => copyPermalink() },
 									{
+										divider: true,
+										shown: auth.user && isAdmin(auth.user),
+									},
+									{
 										id: 'open-billing',
 										action: () => navigateTo(`/admin/billing/${user.id}`),
 										shown: auth.user && isStaff(auth.user),
@@ -136,6 +171,11 @@
 										id: 'open-info',
 										action: () => $refs.userDetailsModal.show(),
 										shown: auth.user && isStaff(auth.user),
+									},
+									{
+										id: 'edit-role',
+										action: () => openRoleEditModal(),
+										shown: auth.user && isAdmin(auth.user),
 									},
 								]"
 								aria-label="More options"
@@ -164,6 +204,10 @@
 								<template #open-info>
 									<InfoIcon aria-hidden="true" />
 									{{ formatMessage(messages.infoButton) }}
+								</template>
+								<template #edit-role>
+									<EditIcon aria-hidden="true" />
+									{{ formatMessage(messages.editRoleButton) }}
 								</template>
 							</OverflowMenu>
 						</ButtonStyled>
@@ -355,6 +399,8 @@ import {
 	LockIcon,
 	MoreVerticalIcon,
 	ReportIcon,
+	SaveIcon,
+	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -362,10 +408,13 @@ import {
 	ButtonStyled,
 	commonMessages,
 	ContentPageHeader,
+	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
+	TeleportDropdownMenu,
 	useRelativeTime,
 } from '@modrinth/ui'
+import { isAdmin } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
@@ -397,6 +446,8 @@ const { formatMessage } = vintl
 const formatCompactNumber = useCompactNumber(true)
 
 const formatRelativeTime = useRelativeTime()
+
+const { addNotification } = injectNotificationManager()
 
 const messages = defineMessages({
 	profileProjectsStats: {
@@ -471,6 +522,10 @@ const messages = defineMessages({
 	infoButton: {
 		id: 'profile.button.info',
 		defaultMessage: 'View user details',
+	},
+	editRoleButton: {
+		id: 'profile.button.edit-role',
+		defaultMessage: 'Edit role',
 	},
 	userNotFoundError: {
 		id: 'profile.error.not-found',
@@ -648,6 +703,55 @@ const navLinks = computed(() => [
 		.slice()
 		.sort((a, b) => a.label.localeCompare(b.label)),
 ])
+
+const selectedRole = ref(user.value.role)
+const isSavingRole = ref(false)
+
+const roleOptions = ['developer', 'moderator', 'admin']
+
+const editRoleModal = useTemplateRef('editRoleModal')
+
+const openRoleEditModal = () => {
+	selectedRole.value = user.value.role
+	editRoleModal.value?.show()
+}
+
+const cancelRoleEdit = () => {
+	selectedRole.value = user.value.role
+	editRoleModal.value?.hide()
+}
+
+function saveRoleEdit() {
+	if (!selectedRole.value || selectedRole.value === user.value.role) {
+		return
+	}
+
+	isSavingRole.value = true
+
+	useBaseFetch(`user/${user.value.id}`, {
+		method: 'PATCH',
+		body: {
+			role: selectedRole.value,
+		},
+	})
+		.then(() => {
+			user.value.role = selectedRole.value
+
+			editRoleModal.value?.hide()
+		})
+		.catch(() => {
+			console.error('Failed to update user role:', error)
+
+			addNotification({
+				type: 'error',
+				title: 'Failed to update role',
+				message: 'An error occurred while updating the user role. Please try again.',
+			})
+		})
+		.finally(() => {
+			isSavingRole.value = false
+		})
+}
 </script>
 <script>
 export default defineNuxtComponent({
