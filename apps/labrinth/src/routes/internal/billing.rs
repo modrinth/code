@@ -276,8 +276,8 @@ pub async fn refund_charge(
                         )) = charge
                             .tax_platform_id
                             .clone()
-                            .zip(charge.tax_transaction_version.clone())
-                            .zip(charge.tax_platform_accounting_time.clone())
+                            .zip(charge.tax_transaction_version)
+                            .zip(charge.tax_platform_accounting_time)
                         else {
                             return Err(ApiError::InvalidInput(
                                 "Charge is missing full tax information. Please wait for the original charge to be synchronized with the tax processor."
