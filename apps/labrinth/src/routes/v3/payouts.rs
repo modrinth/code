@@ -21,11 +21,12 @@ use eyre::eyre;
 use hex::ToHex;
 use hmac::{Hmac, Mac};
 use reqwest::Method;
-use rust_decimal::Decimal;
+use rust_decimal::{Decimal, dec};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Sha256;
 use sqlx::PgPool;
+use std::cmp;
 use std::collections::HashMap;
 use tokio_stream::StreamExt;
 use tracing::error;
@@ -488,7 +489,8 @@ pub async fn calculate_fees(
     session_queue: web::Data<AuthQueue>,
     payouts_queue: web::Data<PayoutsQueue>,
 ) -> Result<web::Json<WithdrawalFees>, ApiError> {
-    let (_, user) = get_user_record_from_bearer_token(
+    // even though we don't use the user, we ensure they're logged in to make API calls
+    let (_, _user) = get_user_record_from_bearer_token(
         &req,
         None,
         &**pool,
@@ -500,16 +502,14 @@ pub async fn calculate_fees(
         ApiError::Authentication(AuthenticationError::InvalidCredentials)
     })?;
 
-    let resp = match &body.method {
+    let fee = match &body.method {
         PayoutMethodRequest::MuralPay {
             method_details:
                 MuralPayDetails {
                     payout_details: MuralPayoutRequest::Blockchain { .. },
                     ..
                 },
-        } => WithdrawalFees {
-            fee: Some(Decimal::ZERO),
-        },
+        } => Some(Decimal::ZERO),
         PayoutMethodRequest::MuralPay {
             method_details:
                 MuralPayDetails {
@@ -528,9 +528,7 @@ pub async fn calculate_fees(
 
             match fee {
                 muralpay::TokenPayoutFee::Success { fee_total, .. } => {
-                    WithdrawalFees {
-                        fee: Some(fee_total.token_amount),
-                    }
+                    Some(fee_total.token_amount)
                 }
                 muralpay::TokenPayoutFee::Error { message, .. } => {
                     return Err(ApiError::Internal(eyre!(
@@ -539,10 +537,32 @@ pub async fn calculate_fees(
                 }
             }
         }
-        _ => todo!(),
+        PayoutMethodRequest::PayPal => match body.method_id.as_str() {
+            "paypal_us" => Some(compute_us_fee(body.amount)),
+            "paypal_in" => {
+                Some(compute_fee(body.amount, dec!(0.02), dec!(0), dec!(20.0)))
+            }
+            _ => None,
+        },
+        PayoutMethodRequest::Venmo => Some(compute_us_fee(body.amount)),
+        PayoutMethodRequest::Tremendous => Some(dec!(0)),
     };
 
-    Ok(web::Json(resp))
+    Ok(web::Json(WithdrawalFees { fee }))
+}
+
+fn compute_us_fee(amount: Decimal) -> Decimal {
+    compute_fee(amount, dec!(0.02), dec!(0.25), dec!(1.0))
+}
+
+fn compute_fee(
+    amount: Decimal,
+    percentage: Decimal,
+    min: Decimal,
+    max: Decimal,
+) -> Decimal {
+    let value = amount * percentage;
+    cmp::min(cmp::max(value, min), max)
 }
 
 #[post("")]

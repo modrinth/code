@@ -681,7 +681,6 @@ async fn get_tremendous_payout_methods(
             "merchant_card",
             "visa",
             "bank",
-            "ach",
             "visa_card",
             "charity",
         ];
@@ -731,18 +730,10 @@ async fn get_tremendous_payout_methods(
                     max: Decimal::from(5_000),
                 }
             },
-            fee: if product.category == "ach" {
-                PayoutMethodFee {
-                    percentage: Decimal::from(4) / Decimal::from(100),
-                    min: Decimal::from(1) / Decimal::from(4),
-                    max: None,
-                }
-            } else {
-                PayoutMethodFee {
-                    percentage: Decimal::default(),
-                    min: Decimal::default(),
-                    max: None,
-                }
+            fee: PayoutMethodFee {
+                percentage: Decimal::default(),
+                min: Decimal::default(),
+                max: None,
             },
         };
 
