@@ -9349,8 +9349,6 @@ dependencies = [
  "url",
  "urlencoding",
  "uuid 1.18.1",
- "webview2-com",
- "windows-core 0.61.2",
 ]
 
 [[package]]
@@ -11700,3 +11698,8 @@ dependencies = [
  "wasm-bindgen",
  "web-sys",
 ]
+
+[[patch.unused]]
+name = "wry"
+version = "0.52.1"
+source = "git+https://github.com/modrinth/wry?rev=f2ce0b0#f2ce0b0105d9d94f482c4f8ecffb4f3c3c325b40"
