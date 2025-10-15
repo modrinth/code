@@ -11,6 +11,20 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-15T12:15:00-07:00`,
+		product: 'app',
+		version: '0.10.12',
+		body: `## Improvements
+- Fixed cache sticking around for way too long (30 hours instead of 30 minutes).`,
+	},
+	{
+		date: `2025-10-15T04:11:00-07:00`,
+		product: 'app',
+		version: '0.10.11',
+		body: `## Improvements
+- Fixed ads being able to play audio.`,
+	},
+	{
 		date: `2025-10-14T18:45:00-07:00`,
 		product: 'servers',
 		body: `### Improvements
