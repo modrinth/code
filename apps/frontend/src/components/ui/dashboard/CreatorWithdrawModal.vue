@@ -1,21 +1,22 @@
 <template>
-	<NewModal ref="withdrawModal" :noblur="true" :closable="withdrawContext.currentStage.value !== 'completion'"
-		@on-hide="onModalHide">
+	<NewModal ref="withdrawModal" :closable="withdrawContext.currentStage.value !== 'completion'" @on-hide="onModalHide">
 		<template #title>
-			<div v-if="shouldShowTitle" class="flex items-center gap-1 font-bold text-secondary">
+			<div v-if="shouldShowTitle" class="flex items-center gap-1 text-secondary">
 				<template v-if="withdrawContext.currentStage.value === 'tax-form'">
-					<span class="text-contrast">{{ formatMessage(stageLabels['tax-form']) }}</span>
+					<span class="font-bold text-contrast text-xl">{{ formatMessage(stageLabels['tax-form']) }}</span>
 				</template>
 				<template v-else-if="withdrawContext.currentStage.value === 'method-selection'">
-					<span class="text-contrast">{{ formatMessage(stageLabels['method-selection']) }}</span>
+					<span class="font-bold text-contrast text-xl">{{ formatMessage(stageLabels['method-selection']) }}</span>
+					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
+					<span class="text-secondary text-xl">{{ formatMessage(messages.detailsLabel) }}</span>
 				</template>
 				<template v-else-if="isDetailsStage">
-					<button class="bg-transparent p-0 font-bold text-secondary active:scale-95"
+					<button class="bg-transparent p-0 text-secondary active:scale-9 text-xl"
 						@click="goToBreadcrumbStage('method-selection')">
 						{{ formatMessage(stageLabels['method-selection']) }}
 					</button>
-					<ChevronRightIcon class="h-5 w-5 text-secondary" stroke-width="3" />
-					<span class="text-contrast">{{ formatMessage(messages.detailsLabel) }}</span>
+					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
+					<span class="font-bold text-contrast text-xl">{{ formatMessage(messages.detailsLabel) }}</span>
 				</template>
 			</div>
 		</template>
@@ -23,7 +24,7 @@
 			<div v-show="showTopFade"
 				class="absolute top-0 left-0 right-0 h-10 pointer-events-none z-10 bg-gradient-to-b from-bg-raised to-transparent transition-all duration-300" />
 
-			<div ref="scrollContainer" class="max-h-[70vh] overflow-y-auto pl-[2px]" @scroll="checkScrollState">
+			<div ref="scrollContainer" class="max-h-[70vh] overflow-y-auto px-1 pb-1" @scroll="checkScrollState">
 				<TaxFormStage v-if="withdrawContext.currentStage.value === 'tax-form'" :balance="balance"
 					:on-show-tax-form="showTaxFormModal" />
 				<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'"
@@ -40,17 +41,17 @@
 		</div>
 		<div class="mt-4 flex justify-end gap-2">
 			<ButtonStyled type="outlined">
-				<button v-if="withdrawContext.previousStep.value"
+				<button v-if="withdrawContext.previousStep.value" class="!border-surface-5"
 					@click="withdrawContext.setStage(withdrawContext.previousStep.value, true)">
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
 				</button>
-				<button v-else @click="withdrawModal?.hide()">
+				<button v-else @click="withdrawModal?.hide()" class="!border-surface-5">
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled
-				:color="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm ? (remainingLimit > 0 ? 'standard' : 'orange') : 'brand'">
+				:color="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm && remainingLimit <= 0 ? 'orange' : 'standard'">
 				<button v-if="withdrawContext.currentStage.value === 'tax-form' &&
 					needsTaxForm && remainingLimit > 0" @click="continueWithLimit">
 					{{ formatMessage(messages.continueWithLimit) }}
@@ -261,7 +262,7 @@ defineExpose({
 const messages = defineMessages({
 	taxFormStage: {
 		id: 'dashboard.creator-withdraw-modal.stage.tax-form',
-		defaultMessage: 'Tax Form',
+		defaultMessage: 'Tax form',
 	},
 	methodSelectionStage: {
 		id: 'dashboard.creator-withdraw-modal.stage.method-selection',

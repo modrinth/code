@@ -28,8 +28,9 @@
 		<Teleport to="#teleports">
 			<div v-if="isOpen" ref="dropdownRef"
 				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 outline outline-1 outline-offset-[-1px] outline-surface-5"
-				:class="openDirection === 'down' ? 'rounded-t-none' : 'rounded-b-none'" :style="dropdownStyle"
-				:role="listbox ? 'listbox' : 'menu'" @mousedown.stop @keydown="handleDropdownKeydown">
+				:class="[
+					openDirection === 'down' ? 'rounded-t-none' : 'rounded-b-none'
+				]" :style="dropdownStyle" :role="listbox ? 'listbox' : 'menu'" @mousedown.stop @keydown="handleDropdownKeydown">
 				<div v-if="searchable" class="p-4">
 					<div
 						class="flex items-center gap-2 overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-surface-5 focus-within:outline-2 focus-within:outline-contrast">
@@ -73,7 +74,7 @@
 					</template>
 				</div>
 
-				<div v-else-if="searchQuery" class="p-4 text-center text-sm text-secondary">
+				<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
 					No results found
 				</div>
 			</div>
@@ -429,16 +430,20 @@ onClickOutside(
 
 onMounted(() => {
 	window.addEventListener('resize', handleResize)
-	window.addEventListener('scroll', handleResize, true)
 })
 
 onUnmounted(() => {
 	window.removeEventListener('resize', handleResize)
-	window.removeEventListener('scroll', handleResize, true)
 })
 
 watch(isOpen, (value) => {
 	if (value) {
+		updateDropdownPosition()
+	}
+})
+
+watch(filteredOptions, () => {
+	if (isOpen.value) {
 		updateDropdownPosition()
 	}
 })

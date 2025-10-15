@@ -7,14 +7,14 @@
 						{{ formatMessage(messages.accountOwner) }}
 					</span>
 				</label>
-				<div class="bg-raised w-full rounded-[14px] px-4 py-2.5">
-					<div class="flex flex-col gap-2">
-						<p class="font-semibold text-contrast">
+				<div class="bg-surface-2 w-full rounded-[14px] p-4">
+					<div class="flex flex-col gap-1">
+						<span class="font-semibold text-contrast">
 							{{ accountOwnerName }}
-						</p>
-						<p class="text-primary">
+						</span>
+						<span class="text-primary">
 							{{ accountOwnerAddress }}
-						</p>
+						</span>
 					</div>
 				</div>
 			</div>
@@ -28,17 +28,6 @@
 				</label>
 				<input v-model="formData.bankName" type="text" :placeholder="formatMessage(messages.bankNamePlaceholder)"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
-			</div>
-
-			<div class="flex flex-col gap-2.5">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.accountType) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
-				<Combobox v-model="formData.accountType" :options="accountTypeOptions"
-					:placeholder="formatMessage(messages.accountTypePlaceholder)" />
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -104,16 +93,13 @@
 			<span class="text-primary">
 				{{ formatMoney(maxAmount) }} {{ formatMessage(messages.available) }}
 			</span>
-			<span v-if="isLimited" class="text-orange text-sm">
-				{{ formatMessage(messages.limitedByTaxRequirement, { limit: formatMoney(maxAmount) }) }}
-			</span>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
-import { Admonition, ButtonStyled, Combobox } from '@modrinth/ui';
+import { Admonition, ButtonStyled } from '@modrinth/ui';
 import { formatMoney } from '@modrinth/utils';
 import { defineMessages, useVIntl } from '@vintl/vintl';
 import { computed, ref, watch } from 'vue';
@@ -143,7 +129,7 @@ interface FormData {
 
 const formData = ref<FormData>({
 	bankName: '',
-	accountType: '',
+	accountType: 'CHECKING',
 	accountNumber: '',
 	routingNumber: '',
 	walletAddress: '',
@@ -283,7 +269,7 @@ const messages = defineMessages({
 	},
 	walletAddressPlaceholder: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.wallet-address-placeholder',
-		defaultMessage: 'Enter your Polygon wallet address',
+		defaultMessage: 'Enter your wallet address',
 	},
 	amount: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.amount',
@@ -303,11 +289,11 @@ const messages = defineMessages({
 	},
 	cryptoWarningHeader: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header',
-		defaultMessage: 'Important: Verify your wallet address',
+		defaultMessage: 'Check your wallet address!',
 	},
 	cryptoWarningBody: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-body',
-		defaultMessage: 'Please ensure your Polygon wallet address is correct. Modrinth cannot retrieve funds sent to an invalid or incorrect wallet address. Double-check before proceeding.',
+		defaultMessage: 'Please ensure your wallet address is correct. Modrinth cannot retrieve funds sent to an invalid or incorrect wallet. Double-check before proceeding.',
 	},
 	limitedByTaxRequirement: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.limited-by-tax',

@@ -732,10 +732,10 @@
     "message": "Checking"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-body": {
-    "message": "Please ensure your Polygon wallet address is correct. Modrinth cannot retrieve funds sent to an invalid or incorrect wallet address. Double-check before proceeding."
+    "message": "Please ensure your wallet address is correct. Modrinth cannot retrieve funds sent to an invalid or incorrect wallet. Double-check before proceeding."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
-    "message": "Important: Verify your wallet address"
+    "message": "Check your wallet address!"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.limited-by-tax": {
     "message": "Due to tax requirements, maximum withdrawal is {limit} without completing tax form."
@@ -774,7 +774,7 @@
     "message": "Verification"
   },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
-    "message": "Tax Form"
+    "message": "Tax form"
   },
   "dashboard.creator-withdraw-modal.stage.tremendous-details": {
     "message": "Details"
@@ -788,11 +788,11 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Tax form required"
   },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Withdraw limit"
+  },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "You've used up your <b>{withdrawLimit}</b> withdrawal limit. You must complete a tax form to withdraw more."
-  },
-  "dashboard.creator-withdraw-modal.withdraw-remaining": {
-    "message": "Withdraw remaining"
   },
   "dashboard.revenue.available-now": {
     "message": "Available now"
