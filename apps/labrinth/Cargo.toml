@@ -109,7 +109,7 @@ sqlx = { workspace = true, features = [
   "postgres",
   "runtime-tokio",
   "rust_decimal",
-  "tls-rustls-ring",
+  "tls-rustls-aws-lc-rs",
 ] }
 tar = { workspace = true }
 thiserror = { workspace = true }

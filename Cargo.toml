@@ -78,7 +78,7 @@ hyper = "1.7.0"
 hyper-rustls = { version = "0.27.7", default-features = false, features = [
   "http1",
   "native-tokio",
-  "ring",
+  "aws-lc-rs",
   "tls12",
 ] }
 hyper-util = "0.1.17"
@@ -93,7 +93,7 @@ lettre = { version = "0.11.19", default-features = false, features = [
   "builder",
   "hostname",
   "pool",
-  "ring",
+  "aws-lc-rs",
   "rustls",
   "rustls-native-certs",
   "smtp-transport",
