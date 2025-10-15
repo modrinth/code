@@ -6,8 +6,8 @@
 				triggerClasses,
 				{
 					'z-[9999]': isOpen,
-					'rounded-b-none': isOpen && openDirection === 'down',
-					'rounded-t-none': isOpen && openDirection === 'up',
+					'rounded-b-none': shouldRoundBottomCorners,
+					'rounded-t-none': shouldRoundTopCorners,
 					'cursor-not-allowed opacity-50': disabled,
 				},
 			]" :aria-expanded="isOpen" :aria-haspopup="listbox ? 'listbox' : 'menu'" :aria-disabled="disabled || undefined"
@@ -29,7 +29,7 @@
 			<div v-if="isOpen" ref="dropdownRef"
 				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 outline outline-1 outline-offset-[-1px] outline-surface-5"
 				:class="[
-					openDirection === 'down' ? 'rounded-t-none' : 'rounded-b-none'
+					shouldRoundBottomCorners ? 'rounded-t-none' : 'rounded-b-none'
 				]" :style="dropdownStyle" :role="listbox ? 'listbox' : 'menu'" @mousedown.stop @keydown="handleDropdownKeydown">
 				<div v-if="searchable" class="p-4">
 					<div
@@ -54,14 +54,7 @@
 							:role="listbox ? 'option' : 'menuitem'" :aria-selected="listbox && item.value === modelValue"
 							:aria-disabled="item.disabled || undefined" :data-focused="focusedIndex === index"
 							class="flex items-center gap-2.5 cursor-pointer rounded-xl px-4 py-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
-							:class="[
-								item.class,
-								{
-									'bg-surface-5':
-										(listbox && item.value === modelValue) || (focusedIndex === index && !(listbox && item.value === modelValue)),
-									'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
-								},
-							]" tabindex="-1" @click="handleOptionClick(item, index)" @mouseenter="!item.disabled && (focusedIndex = index)">
+							:class="getOptionClasses(item, index)" tabindex="-1" @click="handleOptionClick(item, index)" @mouseenter="!item.disabled && (focusedIndex = index)">
 							<slot :name="`option-${item.value}`" :item="item">
 								<div class="flex items-center gap-2">
 									<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
@@ -108,6 +101,17 @@ export interface DropdownOption<T> {
 	action?: () => void
 }
 
+const DROPDOWN_VIEWPORT_MARGIN = 8
+const DEFAULT_MAX_HEIGHT = 300
+
+function isDropdownOption<T>(opt: DropdownOption<T> | { type: 'divider' }): opt is DropdownOption<T> {
+	return 'value' in opt
+}
+
+function isDivider<T>(opt: DropdownOption<T> | { type: 'divider' }): opt is { type: 'divider' } {
+	return opt.type === 'divider'
+}
+
 const props = withDefaults(
 	defineProps<{
 		modelValue?: T
@@ -131,7 +135,7 @@ const props = withDefaults(
 		searchPlaceholder: 'Search...',
 		listbox: true,
 		showChevron: true,
-		maxHeight: 300,
+		maxHeight: DEFAULT_MAX_HEIGHT,
 		extraPosition: 'bottom',
 	},
 )
@@ -177,7 +181,7 @@ const triggerClasses = computed(() => {
 
 const selectedOption = computed<DropdownOption<T> | undefined>(() => {
 	return props.options.find(
-		(opt): opt is DropdownOption<T> => 'value' in opt && opt.value === props.modelValue,
+		(opt): opt is DropdownOption<T> => isDropdownOption(opt) && opt.value === props.modelValue,
 	)
 })
 
@@ -187,25 +191,97 @@ const triggerText = computed(() => {
 	return props.placeholder
 })
 
-const filteredOptions = computed(() => {
-	const opts = props.options.map((opt, index) => ({
+const optionsWithKeys = computed(() => {
+	return props.options.map((opt, index) => ({
 		...opt,
-		key: opt.type === 'divider' ? `divider-${index}` : `option-${(opt as DropdownOption<T>).value}`,
+		key: isDivider(opt) ? `divider-${index}` : `option-${opt.value}`,
 	}))
+})
 
+const filteredOptions = computed(() => {
 	if (!searchQuery.value || !props.searchable) {
-		return opts
+		return optionsWithKeys.value
 	}
 
 	const query = searchQuery.value.toLowerCase()
-	return opts.filter((opt) => {
-		if (opt.type === 'divider') return false
-		return (opt as DropdownOption<T>).label.toLowerCase().includes(query)
+	return optionsWithKeys.value.filter((opt) => {
+		if (isDivider(opt)) return false
+		return opt.label.toLowerCase().includes(query)
 	})
 })
 
+const shouldRoundBottomCorners = computed(() => isOpen.value && openDirection.value === 'down')
+const shouldRoundTopCorners = computed(() => isOpen.value && openDirection.value === 'up')
+
+function getOptionClasses(item: any, index: number) {
+	return [
+		item.class,
+		{
+			'bg-surface-5':
+				(props.listbox && item.value === props.modelValue) ||
+				(focusedIndex.value === index && !(props.listbox && item.value === props.modelValue)),
+			'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
+		},
+	]
+}
+
 function setOptionRef(el: HTMLElement | null, index: number) {
 	optionRefs.value[index] = el
+}
+
+function setInitialFocus() {
+	focusedIndex.value = props.listbox
+		? props.options.findIndex((opt) => isDropdownOption(opt) && opt.value === props.modelValue)
+		: -1
+
+	if (focusedIndex.value >= 0 && optionRefs.value[focusedIndex.value]) {
+		optionRefs.value[focusedIndex.value]?.scrollIntoView({ block: 'center' })
+	}
+}
+
+function focusSearchInput() {
+	if (props.searchable && searchInputRef.value) {
+		searchInputRef.value.focus()
+	}
+}
+
+function determineOpenDirection(
+	triggerRect: DOMRect,
+	dropdownRect: DOMRect,
+	viewportHeight: number,
+): 'up' | 'down' {
+	if (props.forceDirection) {
+		return props.forceDirection
+	}
+
+	const hasSpaceBelow = triggerRect.bottom + dropdownRect.height + DROPDOWN_VIEWPORT_MARGIN <= viewportHeight
+	const hasSpaceAbove = triggerRect.top - dropdownRect.height - DROPDOWN_VIEWPORT_MARGIN > 0
+
+	return !hasSpaceBelow && hasSpaceAbove ? 'up' : 'down'
+}
+
+function calculateVerticalPosition(
+	triggerRect: DOMRect,
+	dropdownRect: DOMRect,
+	direction: 'up' | 'down',
+): number {
+	return direction === 'up'
+		? triggerRect.top - dropdownRect.height
+		: triggerRect.bottom
+}
+
+function calculateHorizontalPosition(
+	triggerRect: DOMRect,
+	dropdownRect: DOMRect,
+	viewportWidth: number,
+): number {
+	let left = triggerRect.left
+
+	if (left + dropdownRect.width > viewportWidth - DROPDOWN_VIEWPORT_MARGIN) {
+		left = Math.max(DROPDOWN_VIEWPORT_MARGIN, viewportWidth - dropdownRect.width - DROPDOWN_VIEWPORT_MARGIN)
+	}
+
+	return left
 }
 
 async function updateDropdownPosition() {
@@ -217,32 +293,10 @@ async function updateDropdownPosition() {
 	const dropdownRect = dropdownRef.value.getBoundingClientRect()
 	const viewportHeight = window.innerHeight
 	const viewportWidth = window.innerWidth
-	const margin = 8
 
-	let top = triggerRect.bottom
-	let left = triggerRect.left
-	let opensUp = false
-
-	// If forceDirection is set, use that; otherwise auto-detect
-	if (props.forceDirection === 'up') {
-		top = triggerRect.top - dropdownRect.height
-		opensUp = true
-	} else if (props.forceDirection === 'down') {
-		top = triggerRect.bottom
-		opensUp = false
-	} else {
-		// Auto-detect based on available space
-		if (triggerRect.bottom + dropdownRect.height + margin > viewportHeight) {
-			if (triggerRect.top - dropdownRect.height - margin > 0) {
-				top = triggerRect.top - dropdownRect.height
-				opensUp = true
-			}
-		}
-	}
-
-	if (left + dropdownRect.width > viewportWidth - margin) {
-		left = Math.max(margin, viewportWidth - dropdownRect.width - margin)
-	}
+	const direction = determineOpenDirection(triggerRect, dropdownRect, viewportHeight)
+	const top = calculateVerticalPosition(triggerRect, dropdownRect, direction)
+	const left = calculateHorizontalPosition(triggerRect, dropdownRect, viewportWidth)
 
 	dropdownStyle.value = {
 		top: `${top}px`,
@@ -250,34 +304,25 @@ async function updateDropdownPosition() {
 		width: `${triggerRect.width}px`,
 	}
 
-	openDirection.value = opensUp ? 'up' : 'down'
+	openDirection.value = direction
 }
 
-async function open() {
+async function openDropdown() {
 	if (props.disabled || isOpen.value) return
 
 	isOpen.value = true
 	searchQuery.value = ''
-	focusedIndex.value = props.listbox
-		? props.options.findIndex((opt) => opt.type !== 'divider' && opt.value === props.modelValue)
-		: -1
 
 	emit('open')
 
 	await nextTick()
 	await updateDropdownPosition()
 
-	// Scroll to the selected option if one is selected
-	if (focusedIndex.value >= 0 && optionRefs.value[focusedIndex.value]) {
-		optionRefs.value[focusedIndex.value]?.scrollIntoView({ block: 'center' })
-	}
-
-	if (props.searchable && searchInputRef.value) {
-		searchInputRef.value.focus()
-	}
+	setInitialFocus()
+	focusSearchInput()
 }
 
-function close() {
+function closeDropdown() {
 	if (!isOpen.value) return
 
 	isOpen.value = false
@@ -292,9 +337,9 @@ function close() {
 
 function handleTriggerClick() {
 	if (isOpen.value) {
-		close()
+		closeDropdown()
 	} else {
-		open()
+		openDropdown()
 	}
 }
 
@@ -314,15 +359,33 @@ function handleOptionClick(option: DropdownOption<T>, index: number) {
 	emit('select', option)
 
 	if (option.type !== 'link') {
-		close()
+		closeDropdown()
 	}
+}
+
+function findNextFocusableOption(currentIndex: number, direction: 'next' | 'previous'): number {
+	const length = filteredOptions.value.length
+	let index = currentIndex
+	let option
+
+	do {
+		index = direction === 'next'
+			? (index + 1) % length
+			: (index - 1 + length) % length
+		option = filteredOptions.value[index]
+	} while (
+		isDivider(option) ||
+		option.disabled
+	)
+
+	return index
 }
 
 function focusOption(index: number) {
 	if (index < 0 || index >= filteredOptions.value.length) return
 
 	const option = filteredOptions.value[index]
-	if (option.type === 'divider' || (option as DropdownOption<T>).disabled) return
+	if (isDivider(option) || option.disabled) return
 
 	focusedIndex.value = index
 	optionRefs.value[index]?.focus()
@@ -330,24 +393,12 @@ function focusOption(index: number) {
 }
 
 function focusNextOption() {
-	let nextIndex = focusedIndex.value
-	do {
-		nextIndex = (nextIndex + 1) % filteredOptions.value.length
-	} while (
-		filteredOptions.value[nextIndex].type === 'divider' ||
-		(filteredOptions.value[nextIndex] as DropdownOption<T>).disabled
-	)
+	const nextIndex = findNextFocusableOption(focusedIndex.value, 'next')
 	focusOption(nextIndex)
 }
 
 function focusPreviousOption() {
-	let prevIndex = focusedIndex.value
-	do {
-		prevIndex = (prevIndex - 1 + filteredOptions.value.length) % filteredOptions.value.length
-	} while (
-		filteredOptions.value[prevIndex].type === 'divider' ||
-		(filteredOptions.value[prevIndex] as DropdownOption<T>).disabled
-	)
+	const prevIndex = findNextFocusableOption(focusedIndex.value, 'previous')
 	focusOption(prevIndex)
 }
 
@@ -357,11 +408,11 @@ function handleTriggerKeydown(event: KeyboardEvent) {
 		case ' ':
 		case 'ArrowDown':
 			event.preventDefault()
-			open()
+			openDropdown()
 			break
 		case 'ArrowUp':
 			event.preventDefault()
-			open()
+			openDropdown()
 			break
 	}
 }
@@ -370,7 +421,7 @@ function handleDropdownKeydown(event: KeyboardEvent) {
 	switch (event.key) {
 		case 'Escape':
 			event.preventDefault()
-			close()
+			closeDropdown()
 			break
 		case 'ArrowDown':
 			event.preventDefault()
@@ -385,8 +436,8 @@ function handleDropdownKeydown(event: KeyboardEvent) {
 			event.preventDefault()
 			if (focusedIndex.value >= 0) {
 				const option = filteredOptions.value[focusedIndex.value]
-				if (option.type !== 'divider') {
-					handleOptionClick(option as DropdownOption<T>, focusedIndex.value)
+				if (!isDivider(option)) {
+					handleOptionClick(option, focusedIndex.value)
 				}
 			}
 			break
@@ -404,7 +455,7 @@ function handleDropdownKeydown(event: KeyboardEvent) {
 function handleSearchKeydown(event: KeyboardEvent) {
 	if (event.key === 'Escape') {
 		event.preventDefault()
-		close()
+		closeDropdown()
 	} else if (event.key === 'ArrowDown') {
 		event.preventDefault()
 		focusNextOption()
@@ -414,7 +465,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
 	}
 }
 
-function handleResize() {
+function handleWindowResize() {
 	if (isOpen.value) {
 		updateDropdownPosition()
 	}
@@ -423,17 +474,17 @@ function handleResize() {
 onClickOutside(
 	dropdownRef,
 	() => {
-		close()
+		closeDropdown()
 	},
 	{ ignore: [triggerRef] },
 )
 
 onMounted(() => {
-	window.addEventListener('resize', handleResize)
+	window.addEventListener('resize', handleWindowResize)
 })
 
 onUnmounted(() => {
-	window.removeEventListener('resize', handleResize)
+	window.removeEventListener('resize', handleWindowResize)
 })
 
 watch(isOpen, (value) => {
