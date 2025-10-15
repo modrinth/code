@@ -1,4 +1,6 @@
-use crate::models::ids::PayoutId;
+use crate::{
+    models::ids::PayoutId, queue::payouts::muralpay_payout::MuralPayoutRequest,
+};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
@@ -37,13 +39,37 @@ impl Payout {
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "method", rename_all = "lowercase")]
+#[expect(
+    clippy::large_enum_variant,
+    reason = "acceptable since values of this type are not moved much"
+)]
+pub enum PayoutMethodRequest {
+    Venmo,
+    PayPal,
+    Tremendous,
+    MuralPay { method_details: MuralPayDetails },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum PayoutMethodType {
     Venmo,
     PayPal,
     Tremendous,
-    Unknown,
+    MuralPay,
+}
+
+impl PayoutMethodRequest {
+    pub fn method_type(&self) -> PayoutMethodType {
+        match self {
+            Self::Venmo => PayoutMethodType::Venmo,
+            Self::PayPal => PayoutMethodType::PayPal,
+            Self::Tremendous => PayoutMethodType::Tremendous,
+            Self::MuralPay { .. } => PayoutMethodType::MuralPay,
+        }
+    }
 }
 
 impl std::fmt::Display for PayoutMethodType {
@@ -52,22 +78,29 @@ impl std::fmt::Display for PayoutMethodType {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MuralPayDetails {
+    pub payout_details: MuralPayoutRequest,
+    pub recipient_info: muralpay::PayoutRecipientInfo,
+}
+
 impl PayoutMethodType {
     pub fn as_str(&self) -> &'static str {
         match self {
             PayoutMethodType::Venmo => "venmo",
             PayoutMethodType::PayPal => "paypal",
             PayoutMethodType::Tremendous => "tremendous",
-            PayoutMethodType::Unknown => "unknown",
+            PayoutMethodType::MuralPay => "muralpay",
         }
     }
 
-    pub fn from_string(string: &str) -> PayoutMethodType {
+    pub fn from_string(string: &str) -> Option<PayoutMethodType> {
         match string {
-            "venmo" => PayoutMethodType::Venmo,
-            "paypal" => PayoutMethodType::PayPal,
-            "tremendous" => PayoutMethodType::Tremendous,
-            _ => PayoutMethodType::Unknown,
+            "venmo" => Some(PayoutMethodType::Venmo),
+            "paypal" => Some(PayoutMethodType::PayPal),
+            "tremendous" => Some(PayoutMethodType::Tremendous),
+            "muralpay" => Some(PayoutMethodType::MuralPay),
+            _ => None,
         }
     }
 }
