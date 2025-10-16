@@ -22,9 +22,9 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
 tauri = { workspace = true, features = [
-	"devtools",
-	"macos-private-api",
-	"protocol-asset",
+  "devtools",
+  "macos-private-api",
+  "protocol-asset",
 ] }
 tauri-plugin-deep-link = { workspace = true }
 tauri-plugin-dialog = { workspace = true }

@@ -1,15 +1,15 @@
 [workspace]
 resolver = "2"
 members = [
-	"apps/app",
-	"apps/app-playground",
-	"apps/ariadne-extract",
-	"apps/daedalus_client",
-	"apps/labrinth",
-	"packages/app-lib",
-	"packages/ariadne",
-	"packages/daedalus",
-	"packages/path-util",
+  "apps/app",
+  "apps/app-playground",
+  "apps/ariadne-extract",
+  "apps/daedalus_client",
+  "apps/labrinth",
+  "packages/app-lib",
+  "packages/ariadne",
+  "packages/daedalus",
+  "packages/path-util",
 ]
 
 [workspace.package]
@@ -29,11 +29,11 @@ ariadne = { path = "packages/ariadne" }
 async-compression = { version = "0.4.32", default-features = false }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
-	"runtime-tokio-hyper-rustls",
+  "runtime-tokio-hyper-rustls",
 ] }
 async-trait = "0.1.89"
 async-tungstenite = { version = "0.31.0", default-features = false, features = [
-	"futures-03-sink",
+  "futures-03-sink",
 ] }
 async-walkdir = "2.1.0"
 async_zip = "0.0.18"
@@ -45,7 +45,7 @@ censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.42"
 cidre = { version = "0.11.3", default-features = false, features = [
-	"macos_15_0",
+  "macos_15_0",
 ] }
 clap = { version = "4.5.48", features = ["derive"] }
 clickhouse = "0.14.0"
@@ -77,10 +77,10 @@ hickory-resolver = "0.25.2"
 hmac = "0.12.1"
 hyper = "1.7.0"
 hyper-rustls = { version = "0.27.7", default-features = false, features = [
-	"aws-lc-rs",
-	"http1",
-	"native-tokio",
-	"tls12",
+  "aws-lc-rs",
+  "http1",
+  "native-tokio",
+  "tls12",
 ] }
 hyper-util = "0.1.17"
 iana-time-zone = "0.1.64"
@@ -91,15 +91,15 @@ itertools = "0.14.0"
 jemalloc_pprof = "0.8.1"
 json-patch = { version = "4.1.0", default-features = false }
 lettre = { version = "0.11.19", default-features = false, features = [
-	"aws-lc-rs",
-	"builder",
-	"hostname",
-	"pool",
-	"rustls",
-	"rustls-native-certs",
-	"smtp-transport",
-	"tokio1",
-	"tokio1-rustls",
+  "aws-lc-rs",
+  "builder",
+  "hostname",
+  "pool",
+  "rustls",
+  "rustls-native-certs",
+  "smtp-transport",
+  "tokio1",
+  "tokio1-rustls",
 ] }
 maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.30.0", default-features = false }
@@ -124,24 +124,24 @@ regex = "1.12.2"
 reqwest = { version = "0.12.24", default-features = false }
 rgb = "0.8.52"
 rust_decimal = { version = "1.39.0", features = [
-	"serde-with-float",
-	"serde-with-str",
+  "serde-with-float",
+  "serde-with-str",
 ] }
 rust_iso3166 = "0.1.14"
 rust-s3 = { version = "0.37.0", default-features = false, features = [
-	"fail-on-err",
-	"tags",
-	"tokio-rustls-tls",
+  "fail-on-err",
+  "tags",
+  "tokio-rustls-tls",
 ] }
 rustls = "0.23.32"
 rusty-money = "0.4.1"
 sentry = { version = "0.45.0", default-features = false, features = [
-	"backtrace",
-	"contexts",
-	"debug-images",
-	"panic",
-	"reqwest",
-	"rustls",
+  "backtrace",
+  "contexts",
+  "debug-images",
+  "panic",
+  "reqwest",
+  "rustls",
 ] }
 sentry-actix = "0.45.0"
 serde = { version = "1.0.228", features = ["derive"] }
@@ -169,8 +169,8 @@ tauri-plugin-opener = "2.5.0"
 tauri-plugin-os = "2.3.1"
 tauri-plugin-single-instance = "2.3.4"
 tauri-plugin-updater = { version = "2.9.0", default-features = false, features = [
-	"rustls-tls",
-	"zip",
+  "rustls-tls",
+  "zip",
 ] }
 tauri-plugin-window-state = "2.4.0"
 tempfile = "3.23.0"
@@ -202,10 +202,10 @@ winreg = "0.55.0"
 woothee = "0.13.0"
 zbus = "5.11.0"
 zip = { version = "6.0.0", default-features = false, features = [
-	"bzip2",
-	"deflate",
-	"deflate64",
-	"zstd",
+  "bzip2",
+  "deflate",
+  "deflate64",
+  "zstd",
 ] }
 zxcvbn = "3.1.0"
 
