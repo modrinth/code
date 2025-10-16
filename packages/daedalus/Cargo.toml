@@ -6,18 +6,18 @@ edition.workspace = true
 license = "MIT"
 description = "Utilities for querying and parsing Minecraft metadata"
 repository = "https://github.com/modrinth/daedalus/"
-include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
-keywords = ["minecraft", "launcher"]
-categories = ["game-development", "api-bindings"]
+include = ["Cargo.toml", "LICENSE", "README.md", "src/**/*.rs"]
+keywords = ["launcher", "minecraft"]
+categories = ["api-bindings", "game-development"]
 readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde.workspace = true
-serde_json.workspace = true
 chrono = { workspace = true, features = ["serde"] }
-thiserror.workspace = true
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
 
 [lints]
 workspace = true
