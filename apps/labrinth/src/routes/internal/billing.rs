@@ -3,7 +3,8 @@ use crate::auth::get_user_from_headers;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::products_tax_identifier_item::product_info_by_product_price_id;
-use crate::database::models::{generate_charge_id, product_item, DBUser};
+use crate::database::models::user_subscription_item::DBUserSubscription;
+use crate::database::models::{DBUser, generate_charge_id, product_item};
 use crate::database::redis::RedisPool;
 use crate::models::billing::{
     Charge, ChargeStatus, ChargeType, PaymentPlatform, Price, PriceDuration,
@@ -21,8 +22,7 @@ use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{Duration, Utc};
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
-use serde::Serialize;
-use serde_with::serde_derive::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Postgres, Transaction};
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -34,7 +34,6 @@ use stripe::{
     Webhook,
 };
 use tracing::warn;
-use crate::database::models::user_subscription_item::DBUserSubscription;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -288,7 +287,9 @@ pub async fn refund_charge(
                                     currency_code: charge.currency_code.clone(),
                                     accounting_time: Utc::now(),
                                     accounting_time_zone: anrok::AccountingTimeZone::Utc,
-                                    line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, refund_amount)],
+                                    line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, -refund_amount)],
+                                    customer_id: Some(format!("stripe:cust:{}", user.stripe_customer_id.unwrap_or_else(|| "unknown".to_owned()))),
+                                    customer_name: Some("Customer".to_owned()),
                                 }
                             }
                         ).await;
@@ -1572,11 +1573,11 @@ pub async fn stripe_webhook(
                                     {
                                         subscription.status =
                                             SubscriptionStatus::Unprovisioned;
-                                    subscription.price_id = price_id;
-                                    subscription.interval = interval;
+                                        subscription.price_id = price_id;
+                                        subscription.interval = interval;
 
-                                    subscription
-                                } else {
+                                        subscription
+                                    } else {
                                         DBUserSubscription {
                                         id: subscription_id,
                                         user_id,
@@ -1586,7 +1587,7 @@ pub async fn stripe_webhook(
                                         status: SubscriptionStatus::Unprovisioned,
                                         metadata: None,
                                     }
-                                };
+                                    };
 
                                     if charge_status != ChargeStatus::Failed {
                                         subscription

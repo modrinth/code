@@ -1,19 +1,16 @@
 [package]
 name = "daedalus_client"
 version = "0.2.2"
-authors = ["Jai A <jai@modrinth.com>"]
 edition.workspace = true
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 async_zip = { workspace = true, features = [
-  "bzip2",
-  "chrono",
-  "deflate",
-  "deflate64",
-  "tokio-fs",
-  "zstd",
+	"bzip2",
+	"chrono",
+	"deflate",
+	"deflate64",
+	"tokio-fs",
+	"zstd",
 ] }
 bytes = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
@@ -24,9 +21,9 @@ futures = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 itertools = { workspace = true }
 reqwest = { workspace = true, features = [
-  "json",
-  "rustls-tls-native-roots",
-  "stream",
+	"json",
+	"rustls-tls-native-roots",
+	"stream",
 ] }
 rust-s3 = { workspace = true }
 serde = { workspace = true }

@@ -12,13 +12,11 @@ use crate::{
     },
     queue::session::AuthQueue,
 };
-use actix_web::{
-    HttpRequest, HttpResponse,
-    web::{self, Json},
-};
+use actix_web::web::Json;
+use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use chrono::Utc;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use sqlx::PgPool;
 
 use crate::routes::error::{ApiError, SpecificAuthenticationError};
@@ -26,25 +24,20 @@ use crate::routes::error::{ApiError, SpecificAuthenticationError};
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("affiliate")
-            .route("/admin", web::get().to(admin_get_all))
-            .route("/admin", web::put().to(admin_create))
-            .route("/admin/{id}", web::get().to(admin_get))
-            .route("/admin/{id}", web::delete().to(admin_delete))
-            .route("/self", web::get().to(self_get_all))
-            .route("/self", web::put().to(self_patch))
-            .route("/self/{id}", web::delete().to(self_delete)),
+            .route("", web::get().to(get_all))
+            .route("", web::put().to(create))
+            .route("/{id}", web::get().to(get))
+            .route("/{id}", web::delete().to(delete))
+            .route("/{id}", web::patch().to(patch)),
     );
 }
 
-#[derive(Serialize)]
-struct AdminGetAllResponse(Vec<AdminAffiliateCode>);
-
-async fn admin_get_all(
+async fn get_all(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<Json<AdminGetAllResponse>, ApiError> {
+) -> Result<HttpResponse, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -54,37 +47,42 @@ async fn admin_get_all(
     )
     .await?;
 
-    if !user.role.is_admin() {
-        return Err(ApiError::SpecificAuthentication(
-            SpecificAuthenticationError::ReadAllAffiliateCodes,
-        ));
+    if user.role.is_admin() {
+        let codes = DBAffiliateCode::get_all(&**pool).await?;
+        let codes = codes
+            .into_iter()
+            .map(AdminAffiliateCode::from)
+            .collect::<Vec<_>>();
+        Ok(HttpResponse::Ok().json(codes))
+    } else if user.badges.contains(Badges::AFFILIATE) {
+        let codes =
+            DBAffiliateCode::get_by_affiliate(DBUserId::from(user.id), &**pool)
+                .await?;
+        let codes = codes
+            .into_iter()
+            .map(AffiliateCode::from)
+            .collect::<Vec<_>>();
+        Ok(HttpResponse::Ok().json(codes))
+    } else {
+        Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::ViewAffiliateCodes,
+        ))
     }
-
-    let codes = DBAffiliateCode::get_all(&**pool).await?;
-    let codes = codes
-        .into_iter()
-        .map(AdminAffiliateCode::from)
-        .collect::<Vec<_>>();
-
-    Ok(Json(AdminGetAllResponse(codes)))
 }
 
-#[derive(Serialize, Deserialize)]
-struct AdminCreateRequest {
-    affiliate: UserId,
+#[derive(Deserialize)]
+struct CreateRequest {
+    affiliate: Option<UserId>,
     source_name: String,
 }
 
-#[derive(Serialize)]
-struct AdminCreateResponse(AdminAffiliateCode);
-
-async fn admin_create(
+async fn create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    body: Json<AdminCreateRequest>,
-) -> Result<Json<AdminCreateResponse>, ApiError> {
+    body: Json<CreateRequest>,
+) -> Result<HttpResponse, ApiError> {
     let (_, creator) = get_user_from_headers(
         &req,
         &**pool,
@@ -94,21 +92,35 @@ async fn admin_create(
     )
     .await?;
 
-    if !creator.role.is_admin() {
+    let is_admin = creator.role.is_admin();
+    let is_affiliate = creator.badges.contains(Badges::AFFILIATE);
+
+    if !is_admin && !is_affiliate {
         return Err(ApiError::SpecificAuthentication(
             SpecificAuthenticationError::CreateAffiliateCode,
         ));
     }
 
     let creator_id = DBUserId::from(creator.id);
-    let affiliate_id = DBUserId::from(body.affiliate);
-    let Some(_affiliate_user) =
-        DBUser::get_id(affiliate_id, &**pool, &redis).await?
-    else {
-        return Err(ApiError::SpecificAuthentication(
-            SpecificAuthenticationError::UnknownAffiliateUser,
-        ));
+    let affiliate_id = if is_admin {
+        if let Some(affiliate) = body.affiliate {
+            DBUserId::from(affiliate)
+        } else {
+            creator_id
+        }
+    } else {
+        creator_id
     };
+
+    if affiliate_id != creator_id {
+        let Some(_affiliate_user) =
+            DBUser::get_id(affiliate_id, &**pool, &redis).await?
+        else {
+            return Err(ApiError::SpecificAuthentication(
+                SpecificAuthenticationError::UnknownAffiliateUser,
+            ));
+        };
+    }
 
     let mut transaction = pool.begin().await?;
 
@@ -127,19 +139,20 @@ async fn admin_create(
 
     transaction.commit().await?;
 
-    Ok(Json(AdminCreateResponse(AdminAffiliateCode::from(code))))
+    if is_admin {
+        Ok(HttpResponse::Created().json(AdminAffiliateCode::from(code)))
+    } else {
+        Ok(HttpResponse::Created().json(AffiliateCode::from(code)))
+    }
 }
 
-#[derive(Serialize)]
-struct AdminGetResponse(AdminAffiliateCode);
-
-async fn admin_get(
+async fn get(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<Json<AdminGetResponse>, ApiError> {
+) -> Result<HttpResponse, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -148,12 +161,6 @@ async fn admin_get(
         Scopes::SESSION_ACCESS,
     )
     .await?;
-
-    if !user.role.is_admin() {
-        return Err(ApiError::SpecificAuthentication(
-            SpecificAuthenticationError::ReadAffiliateCode,
-        ));
-    }
 
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
@@ -161,14 +168,24 @@ async fn admin_get(
     if let Some(model) =
         DBAffiliateCode::get_by_id(affiliate_code_id, &**pool).await?
     {
-        let model = AdminAffiliateCode::from(model);
-        Ok(Json(AdminGetResponse(model)))
+        let is_admin = user.role.is_admin();
+        let is_owner = model.affiliate == DBUserId::from(user.id);
+
+        if is_admin || is_owner {
+            if is_admin {
+                Ok(HttpResponse::Ok().json(AdminAffiliateCode::from(model)))
+            } else {
+                Ok(HttpResponse::Ok().json(AffiliateCode::from(model)))
+            }
+        } else {
+            Err(ApiError::NotFound)
+        }
     } else {
         Err(ApiError::NotFound)
     }
 }
 
-async fn admin_delete(
+async fn delete(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
@@ -184,70 +201,43 @@ async fn admin_delete(
     )
     .await?;
 
-    if !user.role.is_admin() {
-        return Err(ApiError::SpecificAuthentication(
-            SpecificAuthenticationError::DeleteAffiliateCode,
-        ));
-    }
-
     let (affiliate_code_id,) = path.into_inner();
     let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
-    let result = DBAffiliateCode::remove(affiliate_code_id, &**pool).await?;
+    if let Some(model) =
+        DBAffiliateCode::get_by_id(affiliate_code_id, &**pool).await?
+    {
+        let is_admin = user.role.is_admin();
+        let is_owner = model.affiliate == DBUserId::from(user.id);
 
-    if result.is_some() {
-        Ok(HttpResponse::NoContent().finish())
+        if is_admin || is_owner {
+            let result =
+                DBAffiliateCode::remove(affiliate_code_id, &**pool).await?;
+            if result.is_some() {
+                Ok(HttpResponse::NoContent().finish())
+            } else {
+                Err(ApiError::NotFound)
+            }
+        } else {
+            Err(ApiError::NotFound)
+        }
     } else {
         Err(ApiError::NotFound)
     }
 }
 
-#[derive(Serialize)]
-struct SelfGetAllResponse(Vec<AffiliateCode>);
-
-async fn self_get_all(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<Json<SelfGetAllResponse>, ApiError> {
-    let (_, user) = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::SESSION_ACCESS,
-    )
-    .await?;
-
-    if !user.badges.contains(Badges::AFFILIATE) {
-        return Err(ApiError::SpecificAuthentication(SpecificAuthenticationError::ReadOwnAffiliateCodes));
-    }
-
-    let codes =
-        DBAffiliateCode::get_by_affiliate(DBUserId::from(user.id), &**pool)
-            .await?;
-
-    let codes = codes
-        .into_iter()
-        .map(AffiliateCode::from)
-        .collect::<Vec<_>>();
-
-    Ok(Json(SelfGetAllResponse(codes)))
-}
-
 #[derive(Deserialize)]
-struct SelfPatchRequest {
-    id: AffiliateCodeId,
+struct PatchRequest {
     source_name: String,
 }
 
-async fn self_patch(
+async fn patch(
     req: HttpRequest,
+    path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    body: Json<SelfPatchRequest>,
+    body: Json<PatchRequest>,
 ) -> Result<HttpResponse, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
@@ -258,18 +248,24 @@ async fn self_patch(
     )
     .await?;
 
-    if !user.badges.contains(Badges::AFFILIATE) {
-        return Err(ApiError::SpecificAuthentication(SpecificAuthenticationError::UpdateOwnAffiliateCode));
-    }
-
-    let affiliate_code_id = DBAffiliateCodeId::from(body.id);
+    let (affiliate_code_id,) = path.into_inner();
+    let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
 
     let existing_code = DBAffiliateCode::get_by_id(affiliate_code_id, &**pool)
         .await?
         .ok_or(ApiError::NotFound)?;
 
-    if existing_code.affiliate != DBUserId::from(user.id) {
+    let is_admin = user.role.is_admin();
+    let is_owner = existing_code.affiliate == DBUserId::from(user.id);
+
+    if !is_admin && !is_owner {
         return Err(ApiError::NotFound);
+    }
+
+    if !is_admin && !user.badges.contains(Badges::AFFILIATE) {
+        return Err(ApiError::SpecificAuthentication(
+            SpecificAuthenticationError::UpdateAffiliateCodes,
+        ));
     }
 
     DBAffiliateCode::update_source_name(
@@ -280,43 +276,4 @@ async fn self_patch(
     .await?;
 
     Ok(HttpResponse::NoContent().finish())
-}
-
-async fn self_delete(
-    req: HttpRequest,
-    path: web::Path<(AffiliateCodeId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let (_, user) = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::SESSION_ACCESS,
-    )
-    .await?;
-
-    if !user.badges.contains(Badges::AFFILIATE) {
-        return Err(ApiError::SpecificAuthentication(SpecificAuthenticationError::DeleteOwnAffiliateCode));
-    }
-
-    let (affiliate_code_id,) = path.into_inner();
-    let affiliate_code_id = DBAffiliateCodeId::from(affiliate_code_id);
-
-    let code = DBAffiliateCode::get_by_id(affiliate_code_id, &**pool)
-        .await?
-        .ok_or(ApiError::NotFound)?;
-
-    if code.affiliate != DBUserId::from(user.id) {
-        return Err(ApiError::NotFound);
-    }
-
-    let result = DBAffiliateCode::remove(affiliate_code_id, &**pool).await?;
-    if result.is_some() {
-        Ok(HttpResponse::NoContent().finish())
-    } else {
-        Err(ApiError::NotFound)
-    }
 }

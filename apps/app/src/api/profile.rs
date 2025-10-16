@@ -1,5 +1,6 @@
 use crate::api::Result;
 use dashmap::DashMap;
+use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -239,7 +240,7 @@ pub async fn profile_export_mrpack(
 #[tauri::command]
 pub async fn profile_get_pack_export_candidates(
     profile_path: &str,
-) -> Result<Vec<String>> {
+) -> Result<Vec<SafeRelativeUtf8UnixPathBuf>> {
     let candidates = profile::get_pack_export_candidates(profile_path).await?;
     Ok(candidates)
 }
@@ -271,7 +272,7 @@ pub struct EditProfile {
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
+        with = "serde_with::rust::double_option"
     )]
     pub loader_version: Option<Option<String>>,
 
@@ -280,45 +281,45 @@ pub struct EditProfile {
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
+        with = "serde_with::rust::double_option"
     )]
     pub linked_data: Option<Option<LinkedData>>,
 
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
+        with = "serde_with::rust::double_option"
     )]
     pub java_path: Option<Option<String>>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
+        with = "serde_with::rust::double_option"
     )]
     pub extra_launch_args: Option<Option<Vec<String>>>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
+        with = "serde_with::rust::double_option"
     )]
     pub custom_env_vars: Option<Option<Vec<(String, String)>>>,
 
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
+        with = "serde_with::rust::double_option"
     )]
     pub memory: Option<Option<MemorySettings>>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
+        with = "serde_with::rust::double_option"
     )]
     pub force_fullscreen: Option<Option<bool>>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
+        with = "serde_with::rust::double_option"
     )]
     pub game_resolution: Option<Option<WindowSize>>,
     pub hooks: Option<Hooks>,

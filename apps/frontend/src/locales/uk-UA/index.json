@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Скасувати"
+  },
+  "action.continue": {
+    "message": "Продовжити"
+  },
   "admin.billing.error.not-found": {
     "message": "Користувача не знайдено"
   },
@@ -30,7 +36,7 @@
     "message": "Налаштування завантаження"
   },
   "app-marketing.download.terms": {
-    "message": "Встановлюючи Modrinth, ви погоджуєтесь з <terms-link>Умовами користування</terms-link> та <privacy-link>Політикою конфіденційності</privacy-link>."
+    "message": "Завантажуючи Modrinth, ви погоджуєтеся з <terms-link>Умовами користування</terms-link> та <privacy-link>Політикою конфіденційности</privacy-link>."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Сторонні пакети"
@@ -72,7 +78,7 @@
     "message": "Встановленні моди"
   },
   "app-marketing.features.mod-management.name": {
-    "message": "Ім`я"
+    "message": "Ім’я"
   },
   "app-marketing.features.mod-management.search-mods": {
     "message": "Пошук модів"
@@ -108,7 +114,7 @@
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Добра продуктивність"
+    "message": "Гарна продуктивність"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -126,10 +132,10 @@
     "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
-    "message": "1 Мільярд %"
+    "message": "1 мільярд %"
   },
   "app-marketing.features.performance.process-name": {
-    "message": "Ім'я процесу"
+    "message": "Назва процесу"
   },
   "app-marketing.features.performance.ram": {
     "message": "ОЗП"
@@ -411,7 +417,154 @@
     "message": "Оновлено {ago}"
   },
   "collection.title": {
-    "message": "{name} - Добірка"
+    "message": "{name} — добірка"
+  },
+  "common.no": {
+    "message": "Ні"
+  },
+  "common.yes": {
+    "message": "Так"
+  },
+  "create.collection.cancel": {
+    "message": "Скасувати"
+  },
+  "create.collection.collection-info": {
+    "message": "Ваша нова коллекція буде створена як публічна {count, plural,=0 {без проєктів} one {з # проєктом}other {з # проєктами}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Створити колекцію"
+  },
+  "create.collection.error-title": {
+    "message": "Виникла помилка"
+  },
+  "create.collection.name-label": {
+    "message": "Назва"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Введіть назву колекції…"
+  },
+  "create.collection.summary-description": {
+    "message": "Пара речень, які описують вашу колекцію."
+  },
+  "create.collection.summary-label": {
+    "message": "Зведення"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Ця колекція про…"
+  },
+  "create.collection.title": {
+    "message": "Створення колекції"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Майже вичерпано ліміт {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Ви майже досягли ліміту {type}, будь ласка, зв'яжіться з підтримкою якщо вам треба більше ніж {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Зв'язатися з підтримкою"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "Вичерпано ліміт {type}"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Ви досягли ліміт вашого {type} з {max}. Будь ласка, зв'яжіться з підтримкою щоб його підвищити."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "колекція"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "організація"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "колекції"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "огранізації"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "проєкти"
+  },
+  "create.limit-alert.type-project": {
+    "message": "проєкт"
+  },
+  "create.organization.cancel": {
+    "message": "Скасувати"
+  },
+  "create.organization.create-organization": {
+    "message": "Створити організацію"
+  },
+  "create.organization.error-title": {
+    "message": "Виникла помилка"
+  },
+  "create.organization.name-label": {
+    "message": "Назва"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Введіть назву організації…"
+  },
+  "create.organization.ownership-info": {
+    "message": "Ви будете власником цієї організації, але зможете запрошувати інших учасників та передавати власність коли завгодно."
+  },
+  "create.organization.summary-description": {
+    "message": "Пара речень, які описують вашу організацію."
+  },
+  "create.organization.summary-label": {
+    "message": "Зведення"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Організація для…"
+  },
+  "create.organization.title": {
+    "message": "Створення організації"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Скасувати"
+  },
+  "create.project.create-project": {
+    "message": "Створити проєкт"
+  },
+  "create.project.error-title": {
+    "message": "Виникла помилка"
+  },
+  "create.project.name-label": {
+    "message": "Назва"
+  },
+  "create.project.name-placeholder": {
+    "message": "Введіть назву проєкту…"
+  },
+  "create.project.summary-description": {
+    "message": "Пара речень, які описують ваш проєкт."
+  },
+  "create.project.summary-label": {
+    "message": "Зведення"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Цей проєкт додає…"
+  },
+  "create.project.title": {
+    "message": "Створення проєкту"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "Видимість вашого проєкту, після його затвердження."
+  },
+  "create.project.visibility-label": {
+    "message": "Видимість"
+  },
+  "create.project.visibility-private": {
+    "message": "Приватно"
+  },
+  "create.project.visibility-public": {
+    "message": "Публічно"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Поза списком"
   },
   "dashboard.collections.button.create-new": {
     "message": "Створити нову"
@@ -424,6 +577,30 @@
   },
   "dashboard.collections.long-title": {
     "message": "Ваші добірки"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Закордонна організація означає ділову організацію, організовану за межами США (наприклад, неамериканську корпорацію, партнерство, або ТОВ)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Закордонна організація"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Приватна особа"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Чи ви є приватною особою чи частиною закордонної організації?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Податкова форма"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth використовує стороннього постачальника Track1099 для безпечного збору та зберігання ваших податкових форм. <security-link>Дізнайтеся більше тут.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Практики безпеки"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Чи ви громадянин США?"
   },
   "error.collection.404.list_item.1": {
     "message": "Ви, можливо, помилилися під час написання URL добірки."
@@ -445,6 +622,12 @@
   },
   "error.generic.404.title": {
     "message": "Сторінку не знайдено"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Цю сторінку заблоковано з юридичних причин, таких як державна цензура або поточні судові розгляди."
+  },
+  "error.generic.451.title": {
+    "message": "Контент заблоковано з юридичних причин"
   },
   "error.generic.default.list_item.1": {
     "message": "Перевірте, чи працює Modrinth на нашій <status-link>Сторінці статусу</status-link>."
@@ -621,7 +804,7 @@
     "message": "Prism Launcher"
   },
   "landing.notifications.has-been-updated": {
-    "message": "Вийшло оновлення для «{title}»!"
+    "message": "{title} оновлено!"
   },
   "landing.notifications.heading": {
     "message": "Сповіщення"
@@ -665,11 +848,8 @@
   "layout.action.change-theme": {
     "message": "Змінити тему"
   },
-  "layout.action.close-banner": {
-    "message": "Закрити"
-  },
   "layout.action.create-new": {
-    "message": "Створити новий..."
+    "message": "Створити новий…"
   },
   "layout.action.file-lookup": {
     "message": "Пошук файлів"
@@ -727,6 +907,15 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Необхідні дії щодо оплати рахунків."
+  },
+  "layout.banner.tax.action": {
+    "message": "Заповніть податкову форму"
+  },
+  "layout.banner.tax.description": {
+    "message": "Ви вже вивели більше ніж $600 з Modrinth цього року. Щоб дотримуватися податкових форм, ви маєте заповнити податкову форму. Ваші виведення затримані до поки ця форма не буде заповнена."
+  },
+  "layout.banner.tax.title": {
+    "message": "Вимагано податкову форму"
   },
   "layout.banner.verify-email.action": {
     "message": "Повторно надіслати електронний лист для підтвердження"
@@ -999,13 +1188,16 @@
     "message": "Надіслати на повторний розгляд"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Ваш проєкт був {status} персоналом Modrinth's. У більшості випадків ви можете повторно подати проєкт на розгляд після виконання рекомендацій персоналу."
+    "message": "Ваш проєкт був {status} персоналом Modrinth. У більшості випадків ви можете повторно подати проєкт на розгляд після врахування повідомлення персоналу."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Ви повинні завершити всі обов’язкові кроки в контрольному списку для публікації!"
   },
   "project-moderation-nags.submit-for-review": {
     "message": "Надіслати на розгляд"
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Відправити на розгляд"
   },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "Ваш проєкт доступний для перегляду тільки для учасників проєкту. Він має бути перевіреним модераторами для подальшої публікації."
@@ -1100,11 +1292,8 @@
   "project.actions.servers-promo.description": {
     "message": "Modrinth Servers - це найлегший спосіб грати з друзями без зайвого клопоту!"
   },
-  "project.actions.servers-promo.monthly": {
-    "message": " / місяць"
-  },
   "project.actions.servers-promo.pricing": {
-    "message": "Починаючи від $5{monthly}"
+    "message": "Починаючи від {price}<small> / місяць</small>"
   },
   "project.actions.servers-promo.title": {
     "message": "Створити сервер"
@@ -2010,7 +2199,7 @@
     "message": "Видалити цей токен"
   },
   "settings.pats.modal.delete.description": {
-    "message": "Це видалить цей токен назавжди (без жартів, на завжди)."
+    "message": "Це видалить цей токен назавжди (тобто справді навіки)."
   },
   "settings.pats.modal.delete.title": {
     "message": "Ви дійсно впевнені що хочете видалити цей токен?"

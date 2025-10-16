@@ -1,0 +1,19 @@
+[files]
+extend-exclude = [
+  "**/src/locales/",
+  "apps/frontend/",
+  "patches/",
+  "packages/utils/",
+  "packages/ui/",
+  "packages/blog/",
+  # contains licenses like `CC-BY-ND-4.0`
+  "packages/moderation/src/data/stages/license.ts",
+  # contains payment card IDs like `IY1VMST1MOXS` which are flagged
+  "apps/labrinth/src/queue/payouts.rs",
+]
+
+[default.extend-words]
+# Terms Of Use in `tou-link`
+tou = "tou"
+# Google Ad Manager
+gam = "gam"

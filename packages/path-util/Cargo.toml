@@ -1,0 +1,12 @@
+[package]
+name = "path-util"
+edition.workspace = true
+
+[dependencies]
+derive_more = { workspace = true, features = ["deref", "display"] }
+itertools = { workspace = true }
+serde = { workspace = true }
+typed-path = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,7 +1,6 @@
 [package]
 name = "labrinth"
 version = "2.7.0"
-authors = ["geometrically <jai@modrinth.com>"]
 edition.workspace = true
 license = "AGPL-3.0-only"
 
@@ -21,10 +20,10 @@ actix-ws = { workspace = true }
 argon2 = { workspace = true }
 ariadne = { workspace = true }
 async-stripe = { workspace = true, features = [
-  "billing",
-  "checkout",
-  "connect",
-  "webhook-events",
+	"billing",
+	"checkout",
+	"connect",
+	"webhook-events",
 ] }
 async-trait = { workspace = true }
 base64 = { workspace = true }
@@ -34,13 +33,16 @@ censor = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
 clap = { workspace = true }
 clickhouse = { workspace = true, features = ["time", "uuid"] }
+color-eyre = { workspace = true }
 color-thief = { workspace = true }
 console-subscriber = { workspace = true }
+const_format = { workspace = true }
 dashmap = { workspace = true }
 deadpool-redis = { workspace = true }
 derive_more = { workspace = true }
 dotenvy = { workspace = true }
 either = { workspace = true }
+eyre = { workspace = true }
 flate2 = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
@@ -49,21 +51,21 @@ hmac = { workspace = true }
 hyper-rustls = { workspace = true }
 hyper-util = { workspace = true }
 image = { workspace = true, features = [
-  "avif",
-  "bmp",
-  "dds",
-  "exr",
-  "ff",
-  "gif",
-  "hdr",
-  "ico",
-  "jpeg",
-  "png",
-  "pnm",
-  "qoi",
-  "tga",
-  "tiff",
-  "webp",
+	"avif",
+	"bmp",
+	"dds",
+	"exr",
+	"ff",
+	"gif",
+	"hdr",
+	"ico",
+	"jpeg",
+	"png",
+	"pnm",
+	"qoi",
+	"tga",
+	"tiff",
+	"webp",
 ] }
 itertools = { workspace = true }
 json-patch = { workspace = true }
@@ -72,23 +74,25 @@ maxminddb = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 murmur2 = { workspace = true }
 paste = { workspace = true }
+path-util = { workspace = true }
 prometheus = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
 redis = { workspace = true, features = ["ahash", "r2d2", "tokio-comp"] }
 regex = { workspace = true }
 reqwest = { workspace = true, features = [
-  "http2",
-  "json",
-  "multipart",
-  "rustls-tls-webpki-roots",
+	"http2",
+	"json",
+	"multipart",
+	"rustls-tls-webpki-roots",
 ] }
 rust_decimal = { workspace = true, features = [
-  "serde-with-float",
-  "serde-with-str",
+	"serde-with-float",
+	"serde-with-str",
 ] }
 rust_iso3166 = { workspace = true }
 rust-s3 = { workspace = true }
+rustls.workspace = true
 rusty-money = { workspace = true }
 sentry = { workspace = true }
 sentry-actix = { workspace = true }
@@ -100,14 +104,14 @@ sha1 = { workspace = true }
 sha2 = { workspace = true }
 spdx = { workspace = true, features = ["text"] }
 sqlx = { workspace = true, features = [
-  "chrono",
-  "json",
-  "macros",
-  "migrate",
-  "postgres",
-  "runtime-tokio",
-  "rust_decimal",
-  "tls-rustls-ring",
+	"chrono",
+	"json",
+	"macros",
+	"migrate",
+	"postgres",
+	"runtime-tokio",
+	"rust_decimal",
+	"tls-rustls-aws-lc-rs",
 ] }
 tar = { workspace = true }
 thiserror = { workspace = true }
@@ -116,6 +120,8 @@ tokio-stream = { workspace = true }
 totp-rs = { workspace = true, features = ["gen_secret"] }
 tracing = { workspace = true }
 tracing-actix-web = { workspace = true }
+tracing-ecs = { workspace = true }
+tracing-subscriber = { workspace = true }
 url = { workspace = true }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["fast-rng", "serde", "v4"] }
@@ -137,8 +143,8 @@ iana-time-zone = { workspace = true }
 jemalloc_pprof = { workspace = true, features = ["flamegraph"] }
 tikv-jemalloc-ctl = { workspace = true, features = ["stats"] }
 tikv-jemallocator = { workspace = true, features = [
-  "profiling",
-  "unprefixed_malloc_on_supported_platforms",
+	"profiling",
+	"unprefixed_malloc_on_supported_platforms",
 ] }
 
 [lints]

@@ -59,7 +59,7 @@ export interface WSNewModEvent {
 	event: 'new-mod'
 }
 
-export type WSBackupTask = 'file' | 'create' | 'restore'
+export type WSBackupTask = 'create' | 'restore'
 export type WSBackupState = 'ongoing' | 'done' | 'failed' | 'cancelled' | 'unchanged'
 
 export interface WSBackupProgressEvent {

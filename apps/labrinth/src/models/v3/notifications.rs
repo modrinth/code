@@ -32,7 +32,9 @@ pub struct Notification {
     pub actions: Vec<NotificationAction>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Display)]
+#[derive(
+    Debug, Serialize, Deserialize, Clone, Copy, Eq, PartialEq, Display,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationType {
     // If adding a notification type, add a variant in `NotificationBody` of the same name!
@@ -90,6 +92,8 @@ pub enum NotificationType {
     ProjectTransferred,
     #[display("Payout available")]
     PayoutAvailable,
+    #[display("Notification")]
+    Custom,
     #[display("")]
     Unknown,
 }
@@ -122,6 +126,7 @@ i18n_enum!(
     ProjectStatusNeutral! => "project_status_neutral",
     ProjectTransferred! => "project_transferred",
     PayoutAvailable! => "payout_available",
+    Custom! => "custom",
     Unknown! => "unknown",
 );
 
@@ -160,6 +165,7 @@ impl NotificationType {
             }
             "project_status_neutral" => NotificationType::ProjectStatusNeutral,
             "project_transferred" => NotificationType::ProjectTransferred,
+            "custom" => NotificationType::Custom,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -261,17 +267,11 @@ pub enum NotificationBody {
     #[display("You've removed your account password.")]
     PasswordRemoved,
     #[display("Your account email was changed.")]
-    EmailChanged {
-        new_email: String,
-        to_email: String,
-    },
+    EmailChanged { new_email: String, to_email: String },
     #[display(
         "A payment on your account failed. Please update your billing information."
     )]
-    PaymentFailed {
-        amount: String,
-        service: String,
-    },
+    PaymentFailed { amount: String, service: String },
     #[display("You've received a tax notification.")]
     TaxNotification {
         subscription_id: UserSubscriptionId,
@@ -288,6 +288,12 @@ pub enum NotificationBody {
     PayoutAvailable {
         date_available: DateTime<Utc>,
         amount: u64,
+    },
+    #[display("{title}")]
+    Custom {
+        key: String,
+        title: String,
+        body_md: String,
     },
     #[display("")]
     Unknown,
@@ -321,6 +327,7 @@ i18n_enum!(
     PaymentFailed { .. } => "payment_failed",
     TaxNotification { .. } => "tax_notification",
     PayoutAvailable { .. } => "payout_available",
+    Custom { transparent title } => "custom",
     Unknown! => "unknown",
 );
 
@@ -398,6 +405,7 @@ impl NotificationBody {
             NotificationBody::PayoutAvailable { .. } => {
                 NotificationType::PayoutAvailable
             }
+            NotificationBody::Custom { .. } => NotificationType::Custom,
             NotificationBody::Unknown => NotificationType::Unknown,
         }
     }
@@ -483,58 +491,13 @@ impl From<DBNotification> for Notification {
                     },
                     vec![],
                 ),
-                NotificationBody::PatCreated { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::ReportStatusUpdated { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::ReportSubmitted { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::ProjectStatusApproved { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::ProjectStatusNeutral { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::ProjectTransferred { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                // Don't expose the `flow` field
-                NotificationBody::ResetPassword { .. } => {
-                    ("#".to_string(), vec![])
-                }
                 NotificationBody::LegacyMarkdown { link, actions, .. } => {
                     (link.clone(), actions.clone().into_iter().collect())
                 }
                 NotificationBody::PaymentFailed { .. } => {
                     ("/settings/billing".to_string(), vec![])
                 }
-                NotificationBody::VerifyEmail { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::AuthProviderAdded { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::AuthProviderRemoved { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::TwoFactorEnabled => ("#".to_string(), vec![]),
-                NotificationBody::TwoFactorRemoved => ("#".to_string(), vec![]),
-                NotificationBody::PasswordChanged => ("#".to_string(), vec![]),
-                NotificationBody::PasswordRemoved => ("#".to_string(), vec![]),
-                NotificationBody::EmailChanged { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::TaxNotification { .. } => ("#".to_string(), vec![],),
-                NotificationBody::PayoutAvailable { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::ModerationMessageReceived { .. } => {
-                    ("#".to_string(), vec![])
-                }
-                NotificationBody::Unknown => ("#".to_string(), vec![]),
+                _ => ("#".to_string(), vec![]),
             }
         };
         let (name, translatable_name) = match &notif.body {
@@ -623,7 +586,7 @@ impl NotificationDeliveryStatus {
             NotificationDeliveryStatus::Delivered => Ok(()),
             NotificationDeliveryStatus::SkippedPreferences |
             NotificationDeliveryStatus::SkippedDefault |
-            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occured while sending an email to your email address. Please try again later.".to_owned())),
+            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occurred while sending an email to your email address. Please try again later.".to_owned())),
             NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::InvalidInput("This email address doesn't exist! Please try another one.".to_owned())),
         }
     }

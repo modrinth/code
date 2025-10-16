@@ -593,9 +593,6 @@
   "landing.subheading": {
     "message": "Khám phá, chơi và chia sẻ nội dung Minecraft thông qua nền tảng nguồn mở được xây dựng cho cộng đồng."
   },
-  "layout.action.close-banner": {
-    "message": "Đóng"
-  },
   "layout.action.create-new": {
     "message": "Tạo mới..."
   },
@@ -868,9 +865,6 @@
   },
   "project.actions.review-project": {
     "message": "Xem lại dự án"
-  },
-  "project.actions.servers-promo.monthly": {
-    "message": " / tháng"
   },
   "project.actions.servers-promo.title": {
     "message": "Tạo một máy chủ"

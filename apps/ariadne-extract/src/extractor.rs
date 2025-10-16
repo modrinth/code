@@ -381,8 +381,7 @@ impl Visit<'_> for FileExtractor<'_> {
                         let mut error = syn::Error::new(
                             variant.key.span(),
                             format!(
-                                "duplicate variant key {} with differing messages",
-                                duplicate_key
+                                "duplicate variant key {duplicate_key} with differing messages"
                             ),
                         );
                         error.combine(syn::Error::new(

@@ -75,7 +75,7 @@ pub enum AttachedCharge {
     /// This can be used in the case of resubscription flows. The amount from this
     /// charge will be used, but the tax will be recalculated and the charge updated.
     ///
-    /// The charge's status will NOT be updated - it is the caller's responsability to
+    /// The charge's status will NOT be updated - it is the caller's responsibility to
     /// update the charge's status on failure or success.
     ///
     /// This may be accompanied by an automated payment session.
@@ -160,7 +160,7 @@ pub struct PaymentBootstrapOptions<'a> {
     ///
     /// Taxes will always be collected.
     ///
-    /// Note the charge will NOT be updated. It is the caller's responsability to update the charge
+    /// Note the charge will NOT be updated. It is the caller's responsibility to update the charge
     /// on success or failure.
     pub payment_session: PaymentSession,
     /// The charge the payment intent on should be based upon.
@@ -185,7 +185,7 @@ pub struct PaymentBootstrapResults {
 ///
 /// # Important notes
 ///
-/// - This function does not perform any database writes. It is the caller's responsability to, for
+/// - This function does not perform any database writes. It is the caller's responsibility to, for
 ///   example, update the charge's status on success or failure, or update the charge's tax amount,
 ///   tax eligibility or payment and tax platform IDs.
 /// - You may not update or create a payment intent for an off-session payment flow without
@@ -416,6 +416,8 @@ pub async fn create_or_update_payment_intent(
                     product_info.tax_identifier.tax_processor_id,
                     charge_data.amount,
                 )],
+                customer_id: None,
+                customer_name: None,
             })
             .await?;
 
@@ -536,7 +538,7 @@ pub async fn create_or_update_payment_intent(
     if let Some(payment_intent_id) = existing_payment_intent {
         let mut update_payment_intent = stripe::UpdatePaymentIntent {
             amount: Some(charge_data.amount + tax_amount),
-            currency: Some(inferred_stripe_currency),
+            currency: Some(charge_data.stripe_currency_code()?),
             customer: Some(customer_id),
             metadata: Some(metadata),
             ..Default::default()
@@ -570,7 +572,7 @@ pub async fn create_or_update_payment_intent(
     } else {
         let mut intent = CreatePaymentIntent::new(
             charge_data.amount + tax_amount,
-            inferred_stripe_currency,
+            charge_data.stripe_currency_code()?,
         );
 
         intent.customer = Some(customer_id);
@@ -711,6 +713,17 @@ struct ChargeData {
     pub interval: Option<PriceDuration>,
     pub price_id: ProductPriceId,
     pub charge_type: ChargeType,
+}
+
+impl ChargeData {
+    pub fn stripe_currency_code(&self) -> Result<stripe::Currency, ApiError> {
+        self.currency_code
+            .to_lowercase()
+            .parse::<stripe::Currency>()
+            .map_err(|_| ApiError::InvalidInput(
+                format!("Invalid currency code '{}': could not convert to Stripe currency", &self.currency_code)
+            ))
+    }
 }
 
 async fn derive_charge_data_from_product_selector(

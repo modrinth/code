@@ -279,16 +279,6 @@ async function setupApp() {
 		const settings = await getSettings()
 		settings.pending_update_toast_for_version = null
 		await setSettings(settings)
-
-		const version = await getVersion()
-		if (pending_update_toast_for_version === version) {
-			addNotification({
-				type: 'success',
-				title: formatMessage(messages.updateInstalledToastTitle, { version }),
-				text: formatMessage(messages.updateInstalledToastText),
-				clickAction: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
-			})
-		}
 	}
 
 	if (osType === 'windows') {

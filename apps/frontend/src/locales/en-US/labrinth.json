@@ -461,9 +461,6 @@
   "labrinth.error.unauthorized.specific.create_affiliate_code": {
     "message": "You do not have permission to create an affiliate code!"
   },
-  "labrinth.error.unauthorized.specific.delete_affiliate_code": {
-    "message": "You do not have permission to delete an affiliate code!"
-  },
   "labrinth.error.unauthorized.specific.delete_file": {
     "message": "You don''t have permission to delete this file!"
   },
@@ -472,9 +469,6 @@
   },
   "labrinth.error.unauthorized.specific.delete_org": {
     "message": "You don''t have permission to delete this organization!"
-  },
-  "labrinth.error.unauthorized.specific.delete_own_affiliate_code": {
-    "message": "You do not have permission to delete your affiliate codes!"
   },
   "labrinth.error.unauthorized.specific.delete_project": {
     "message": "You don''t have permission to delete this project!"
@@ -629,15 +623,6 @@
   "labrinth.error.unauthorized.specific.override_org_owner_default_project_permissions": {
     "message": "You cannot override the project permissions of the organization owner!"
   },
-  "labrinth.error.unauthorized.specific.read_affiliate_code": {
-    "message": "You do not have permission to read an affiliate code!"
-  },
-  "labrinth.error.unauthorized.specific.read_all_affiliate_codes": {
-    "message": "You do not have permission to read all affiliate codes!"
-  },
-  "labrinth.error.unauthorized.specific.read_own_affiliate_codes": {
-    "message": "You do not have permission to view your affiliate codes!"
-  },
   "labrinth.error.unauthorized.specific.refund": {
     "message": "You do not have permission to refund a subscription!"
   },
@@ -662,6 +647,9 @@
   "labrinth.error.unauthorized.specific.see_user_notifications": {
     "message": "You do not have permission to see the notifications of this user!"
   },
+  "labrinth.error.unauthorized.specific.send_custom_emails": {
+    "message": "You do not have permission to send custom emails!"
+  },
   "labrinth.error.unauthorized.specific.set_mod_downloads": {
     "message": "You don''t have permission to set the downloads of this mod"
   },
@@ -677,8 +665,8 @@
   "labrinth.error.unauthorized.specific.unknown_user_ip": {
     "message": "Unable to obtain user IP address!"
   },
-  "labrinth.error.unauthorized.specific.update_own_affiliate_code": {
-    "message": "You do not have permission to update your affiliate codes!"
+  "labrinth.error.unauthorized.specific.update_affiliate_codes": {
+    "message": "You do not have permission to update affiliate codes!"
   },
   "labrinth.error.unauthorized.specific.upload_project_images": {
     "message": "You are not authorized to upload images for this project"
@@ -691,6 +679,9 @@
   },
   "labrinth.error.unauthorized.specific.upload_version_images": {
     "message": "You are not authorized to upload images for this version"
+  },
+  "labrinth.error.unauthorized.specific.view_affiliate_codes": {
+    "message": "You do not have permission to view affiliate codes!"
   },
   "labrinth.error.unauthorized.url_error": {
     "message": "Invalid callback URL specified"
@@ -793,6 +784,9 @@
   },
   "labrinth.notification.type.auth_provider_removed": {
     "message": "Auth provider removed"
+  },
+  "labrinth.notification.type.custom": {
+    "message": "Notification"
   },
   "labrinth.notification.type.email_changed": {
     "message": "Email changed"

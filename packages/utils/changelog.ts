@@ -11,6 +11,52 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-15T12:15:00-07:00`,
+		product: 'app',
+		version: '0.10.12',
+		body: `## Improvements
+- Fixed cache sticking around for way too long (30 hours instead of 30 minutes).`,
+	},
+	{
+		date: `2025-10-15T04:11:00-07:00`,
+		product: 'app',
+		version: '0.10.11',
+		body: `## Improvements
+- Fixed ads being able to play audio.`,
+	},
+	{
+		date: `2025-10-14T18:45:00-07:00`,
+		product: 'servers',
+		body: `### Improvements
+- Removed 'Prepare download' step for downloading backups, you can now just download them directly.`,
+	},
+	{
+		date: `2025-10-08T13:45:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Add ability to download tax form after submission.`,
+	},
+	{
+		date: `2025-10-07T09:50:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Allow users to fill out tax form when attempting a withdraw that exceeds $600/yr threshold.`,
+	},
+	{
+		date: `2025-10-04T17:20:00-07:00`,
+		product: 'app',
+		version: '0.10.10',
+		body: `## Improvements
+- Fixed Minecraft versions 1.12.2 and earlier failing to install.`,
+	},
+	{
+		date: `2025-10-04T09:45:00-07:00`,
+		product: 'app',
+		version: '0.10.9',
+		body: `### Security fixes
+- Fixed a couple Modrinth Pack (\`.mrpack\`) importing security vulnerabilities.`,
+	},
+	{
 		date: `2025-10-01T19:05:00-07:00`,
 		product: 'web',
 		body: `### Improvements

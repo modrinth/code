@@ -18,6 +18,7 @@ use crate::util::io::{self, IOError};
 pub use crate::{State, state::Profile};
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
+use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde_json::json;
 
 use std::collections::{HashMap, HashSet};
@@ -497,11 +498,12 @@ pub async fn export_mrpack(
     let version_id = version_id.unwrap_or("1.0.0".to_string());
     let mut packfile =
         create_mrpack_json(&profile, version_id, description).await?;
-    let included_candidates_set =
-        HashSet::<_>::from_iter(included_export_candidates.iter());
+    let included_candidates_set = HashSet::<_>::from_iter(
+        included_export_candidates.iter().map(|x| x.as_str()),
+    );
     packfile
         .files
-        .retain(|f| included_candidates_set.contains(&f.path));
+        .retain(|f| included_candidates_set.contains(f.path.as_str()));
 
     // Build vec of all files in the folder
     let mut path_list = Vec::new();
@@ -575,8 +577,8 @@ pub async fn export_mrpack(
 #[tracing::instrument]
 pub async fn get_pack_export_candidates(
     profile_path: &str,
-) -> crate::Result<Vec<String>> {
-    let mut path_list: Vec<String> = Vec::new();
+) -> crate::Result<Vec<SafeRelativeUtf8UnixPathBuf>> {
+    let mut path_list = Vec::new();
 
     let profile_base_dir = get_full_path(profile_path).await?;
     let mut read_dir = io::read_dir(&profile_base_dir).await?;
@@ -610,18 +612,19 @@ pub async fn get_pack_export_candidates(
 fn pack_get_relative_path(
     profile_path: &PathBuf,
     path: &PathBuf,
-) -> crate::Result<String> {
-    Ok(path
-        .strip_prefix(profile_path)
-        .map_err(|_| {
-            crate::ErrorKind::FSError(format!(
-                "Path {path:?} does not correspond to a profile"
-            ))
-        })?
-        .components()
-        .map(|c| c.as_os_str().to_string_lossy().to_string())
-        .collect::<Vec<_>>()
-        .join("/"))
+) -> crate::Result<SafeRelativeUtf8UnixPathBuf> {
+    Ok(SafeRelativeUtf8UnixPathBuf::try_from(
+        path.strip_prefix(profile_path)
+            .map_err(|_| {
+                crate::ErrorKind::FSError(format!(
+                    "Path {path:?} does not correspond to a profile"
+                ))
+            })?
+            .components()
+            .map(|c| c.as_os_str().to_string_lossy())
+            .collect::<Vec<_>>()
+            .join("/"),
+    )?)
 }
 
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
@@ -896,7 +899,15 @@ pub async fn create_mrpack_json(
                     .collect();
 
                 Some(Ok(PackFile {
-                    path,
+                    path: match path.try_into() {
+                        Ok(path) => path,
+                        Err(_) => {
+                            return Some(Err(crate::ErrorKind::OtherError(
+                                "Invalid file path in project".into(),
+                            )
+                            .as_error()));
+                        }
+                    },
                     hashes,
                     env: Some(env),
                     downloads,

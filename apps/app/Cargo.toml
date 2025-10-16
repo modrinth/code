@@ -1,6 +1,7 @@
 [package]
 name = "theseus_gui"
-version = "1.0.0-local"  # The actual version is set by the theseus-build workflow on tagging
+# The actual version is set by the theseus-build workflow on tagging
+version = "1.0.0-local"
 edition.workspace = true
 description = "The Modrinth App is a desktop application for managing your Minecraft mods"
 repository = "https://github.com/modrinth/code/apps/app/"
@@ -16,13 +17,14 @@ hyper = { workspace = true, features = ["server"] }
 hyper-util = { workspace = true }
 native-dialog = { workspace = true }
 paste = { workspace = true }
+path-util = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
 tauri = { workspace = true, features = [
-  "devtools",
-  "macos-private-api",
-  "protocol-asset",
+	"devtools",
+	"macos-private-api",
+	"protocol-asset",
 ] }
 tauri-plugin-deep-link = { workspace = true }
 tauri-plugin-dialog = { workspace = true }
@@ -46,6 +48,10 @@ tauri-build = { workspace = true, features = ["codegen"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 tauri-plugin-updater = { workspace = true, optional = true }
+
+[target.'cfg(windows)'.dependencies]
+webview2-com.workspace = true
+windows-core.workspace = true
 
 [features]
 # by default Tauri runs in production mode

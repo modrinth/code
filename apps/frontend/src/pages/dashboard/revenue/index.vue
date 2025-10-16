@@ -68,25 +68,15 @@
 				</div>
 			</div>
 			<div class="input-group mt-4">
-				<span
-					:class="{
-						'disabled-cursor-wrapper': userBalance.available < minWithdraw || blockedByTax,
-					}"
-				>
-					<ButtonStyled color="brand">
-						<nuxt-link
-							:aria-disabled="
-								userBalance.available < minWithdraw || blockedByTax ? 'true' : 'false'
-							"
-							:class="{ 'disabled-link': userBalance.available < minWithdraw || blockedByTax }"
-							:disabled="!!(userBalance.available < minWithdraw || blockedByTax) || null"
-							:tabindex="userBalance.available < minWithdraw || blockedByTax ? -1 : undefined"
-							to="/dashboard/revenue/withdraw"
-						>
-							<TransferIcon /> Withdraw
-						</nuxt-link>
-					</ButtonStyled>
-				</span>
+				<ButtonStyled color="brand">
+					<nuxt-link
+						v-if="!(userBalance.available < minWithdraw || blockedByTax)"
+						to="/dashboard/revenue/withdraw"
+					>
+						<TransferIcon /> Withdraw
+					</nuxt-link>
+					<button v-else class="disabled"><TransferIcon /> Withdraw</button>
+				</ButtonStyled>
 				<ButtonStyled>
 					<NuxtLink to="/dashboard/revenue/transfers">
 						<HistoryIcon />
@@ -176,9 +166,19 @@ const { addNotification, handleError } = injectNotificationManager()
 const auth = await useAuth()
 const minWithdraw = ref(0.01)
 
-const { data: userBalance } = await useAsyncData(`payout/balance`, () =>
-	useBaseFetch(`payout/balance`, { apiVersion: 3 }),
-)
+const { data: userBalance } = await useAsyncData(`payout/balance`, async () => {
+	const response = await useBaseFetch(`payout/balance`, { apiVersion: 3 })
+	return {
+		...response,
+		available: parseFloat(response.available),
+		withdrawn_lifetime: parseFloat(response.withdrawn_lifetime),
+		withdrawn_ytd: parseFloat(response.withdrawn_ytd),
+		pending: parseFloat(response.pending),
+		dates: Object.fromEntries(
+			Object.entries(response.dates).map(([date, value]) => [date, parseFloat(value)]),
+		),
+	}
+})
 
 const blockedByTax = computed(() => {
 	const status = userBalance.value?.form_completion_status ?? 'unknown'
@@ -248,14 +248,6 @@ async function updateVenmo() {
 strong {
 	color: var(--color-text-dark);
 	font-weight: 500;
-}
-
-.disabled-cursor-wrapper {
-	cursor: not-allowed;
-}
-
-.disabled-link {
-	pointer-events: none;
 }
 
 .grid-display {

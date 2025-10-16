@@ -355,7 +355,7 @@ pub async fn index_local(
                 }
 
                 // SPECIAL BEHAVIOUR:
-                // For consitency with v2 searching, we manually input the
+                // For consistency with v2 searching, we manually input the
                 // client_side and server_side fields from the loader fields into
                 // separate loader fields.
                 // 'client_side' and 'server_side' remain supported by meilisearch even though they are no longer v3 fields.

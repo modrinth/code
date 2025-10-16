@@ -1,7 +1,7 @@
 [package]
 name = "theseus"
-version = "1.0.0-local"  # The actual version is set by the theseus-build workflow on tagging
-authors = ["Jai A <jaiagr+gpg@pm.me>"]
+# The actual version is set by the theseus-build workflow on tagging
+version = "1.0.0-local"
 edition.workspace = true
 
 [dependencies]
@@ -9,17 +9,17 @@ ariadne = { workspace = true }
 async-compression = { workspace = true, features = ["gzip", "tokio"] }
 async-recursion = { workspace = true }
 async-tungstenite = { workspace = true, features = [
-  "tokio-runtime",
-  "tokio-rustls-webpki-roots",
+	"tokio-runtime",
+	"tokio-rustls-webpki-roots",
 ] }
 async-walkdir = { workspace = true }
 async_zip = { workspace = true, features = [
-  "bzip2",
-  "chrono",
-  "deflate",
-  "deflate64",
-  "tokio-fs",
-  "zstd",
+	"bzip2",
+	"chrono",
+	"deflate",
+	"deflate64",
+	"tokio-fs",
+	"zstd",
 ] }
 base64 = { workspace = true }
 bytemuck = { workspace = true, features = ["extern_crate_alloc"] }
@@ -47,6 +47,7 @@ notify = { workspace = true }
 notify-debouncer-mini = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }
 paste = { workspace = true }
+path-util = { workspace = true }
 phf = { workspace = true }
 png = { workspace = true }
 quartz_nbt = { workspace = true, features = ["serde"] }
@@ -54,16 +55,16 @@ quick-xml = { workspace = true, features = ["async-tokio"] }
 rand = { workspace = true }
 regex = { workspace = true }
 reqwest = { workspace = true, features = [
-  "brotli",
-  "charset",
-  "deflate",
-  "gzip",
-  "http2",
-  "json",
-  "macos-system-configuration",
-  "multipart",
-  "rustls-tls-webpki-roots",
-  "stream",
+	"brotli",
+	"charset",
+	"deflate",
+	"gzip",
+	"http2",
+	"json",
+	"macos-system-configuration",
+	"multipart",
+	"rustls-tls-webpki-roots",
+	"stream",
 ] }
 rgb = { workspace = true }
 serde = { workspace = true }
@@ -73,27 +74,32 @@ serde_with = { workspace = true }
 sha1_smol = { workspace = true }
 sha2 = { workspace = true }
 sqlx = { workspace = true, features = [
-  "json",
-  "macros",
-  "migrate",
-  "runtime-tokio",
-  "sqlite",
-  "uuid",
+	"json",
+	"macros",
+	"migrate",
+	"runtime-tokio",
+	"sqlite",
+	"uuid",
 ] }
 sysinfo = { workspace = true, features = ["disk", "system"] }
 tauri = { workspace = true, features = ["unstable"], optional = true }
 tempfile = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = [
-  "fs",
-  "io-util",
-  "macros",
-  "net",
-  "process",
-  "sync",
-  "time",
+	"fs",
+	"io-util",
+	"macros",
+	"net",
+	"process",
+	"sync",
+	"time",
 ] }
-tokio-util = { workspace = true, features = ["compat", "io", "io-util", "time"] }
+tokio-util = { workspace = true, features = [
+	"compat",
+	"io",
+	"io-util",
+	"time",
+] }
 tracing = { workspace = true }
 tracing-error = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }

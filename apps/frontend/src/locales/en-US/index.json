@@ -419,9 +419,6 @@
   "collection.title": {
     "message": "{name} - Collection"
   },
-  "common.close": {
-    "message": "Close"
-  },
   "common.no": {
     "message": "No"
   },
@@ -580,6 +577,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Your collections"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Download {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Your {formType} tax form has been submitted successfully!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "You can freely withdraw now. If you have questions or need to update your details <support-link>contact support</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "You're all set! 🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "A foreign entity means a business entity organized outside the United States (such as a non-US corporation, partnership, or LLC)."
@@ -851,9 +860,6 @@
   "layout.action.change-theme": {
     "message": "Change theme"
   },
-  "layout.action.close-banner": {
-    "message": "Close"
-  },
   "layout.action.create-new": {
     "message": "Create new..."
   },
@@ -1099,6 +1105,9 @@
   },
   "profile.button.billing": {
     "message": "Manage user billing"
+  },
+  "profile.button.edit-role": {
+    "message": "Edit role"
   },
   "profile.button.info": {
     "message": "View user details"
@@ -1871,9 +1880,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup restore in progress"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Already preparing backup for download"
-  },
   "servers.backups.item.automated": {
     "message": "Automated"
   },
@@ -1883,9 +1889,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Failed to create backup"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Failed to prepare download"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Failed to restore from backup"
   },
@@ -1894,15 +1897,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Locked"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Prepare download"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Try preparing again"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Preparing download..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Queued for backup"

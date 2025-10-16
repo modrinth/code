@@ -8,6 +8,10 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ApiError {
+    #[error(transparent)]
+    Internal(eyre::Report),
+    #[error(transparent)]
+    Request(eyre::Report),
     #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
     #[error("Error while uploading file: {0}")]
@@ -86,6 +90,8 @@ pub enum ApiError {
 i18n_enum!(
     ApiError,
     root_key: "labrinth.error",
+    Internal(transparent cause) => "internal_error",
+    Request(transparent cause) => "internal_error",
     Env(..) => "environment_error",
     FileHosting(cause) => "file_hosting_error",
     Database(cause) => "database_error",
@@ -123,22 +129,14 @@ i18n_enum!(
 
 #[derive(Clone, Debug, Error)]
 pub enum SpecificAuthenticationError {
-    #[error("You do not have permission to read all affiliate codes!")]
-    ReadAllAffiliateCodes,
+    #[error("You do not have permission to view affiliate codes!")]
+    ViewAffiliateCodes,
     #[error("You do not have permission to create an affiliate code!")]
     CreateAffiliateCode,
     #[error("Affiliate user not found!")]
     UnknownAffiliateUser,
-    #[error("You do not have permission to read an affiliate code!")]
-    ReadAffiliateCode,
-    #[error("You do not have permission to delete an affiliate code!")]
-    DeleteAffiliateCode,
-    #[error("You do not have permission to view your affiliate codes!")]
-    ReadOwnAffiliateCodes,
-    #[error("You do not have permission to update your affiliate codes!")]
-    UpdateOwnAffiliateCode,
-    #[error("You do not have permission to delete your affiliate codes!")]
-    DeleteOwnAffiliateCode,
+    #[error("You do not have permission to update affiliate codes!")]
+    UpdateAffiliateCodes,
     #[error("You do not have permission to refund a subscription!")]
     Refund,
     #[error("Invalid master key")]
@@ -347,19 +345,17 @@ pub enum SpecificAuthenticationError {
     SetModDownloads,
     #[error("You do not have permission to delete versions in this team")]
     DeleteVersionsInTeam,
+    #[error("You do not have permission to send custom emails!")]
+    SendCustomEmails,
 }
 
 i18n_enum!(
     SpecificAuthenticationError,
     root_key: "labrinth.error.unauthorized.specific",
-    ReadAllAffiliateCodes! => "read_all_affiliate_codes",
+    ViewAffiliateCodes! => "view_affiliate_codes",
     CreateAffiliateCode! => "create_affiliate_code",
     UnknownAffiliateUser! => "unknown_affiliate_user",
-    ReadAffiliateCode! => "read_affiliate_code",
-    DeleteAffiliateCode! => "delete_affiliate_code",
-    ReadOwnAffiliateCodes! => "read_own_affiliate_codes",
-    UpdateOwnAffiliateCode! => "update_own_affiliate_code",
-    DeleteOwnAffiliateCode! => "delete_own_affiliate_code",
+    UpdateAffiliateCodes! => "update_affiliate_codes",
     Refund! => "refund",
     InvalidMasterKey! => "invalid_master_key",
     InsufficientOAuthPermissions! => "insufficient_oauth_permissions",
@@ -434,11 +430,14 @@ i18n_enum!(
     EditVersion! => "edit_version",
     SetModDownloads! => "set_mod_downloads",
     DeleteVersionsInTeam! => "delete_versions_in_team",
+    SendCustomEmails! => "send_custom_emails",
 );
 
 impl ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self {
+            ApiError::Internal(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Request(..) => StatusCode::BAD_REQUEST,
             ApiError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SqlxDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
