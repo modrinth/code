@@ -439,11 +439,7 @@ async fn update_anrok_transactions(
                     )
                 })?;
 
-                let should_have_collected = response.tax_amount_to_collect;
-
-                let drift = should_have_collected - c.tax_amount;
-
-                c.tax_drift_loss = Some(drift);
+                c.tax_drift_loss = Some(response.tax_amount_to_collect);
                 c.tax_platform_id = Some(tax_platform_id);
                 c.tax_transaction_version = Some(version);
                 c.tax_platform_accounting_time = Some(c.due);
