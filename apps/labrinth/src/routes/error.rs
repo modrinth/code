@@ -1,9 +1,11 @@
 use crate::database::models::loader_fields::VersionFieldParseError;
 use crate::file_hosting::FileHostingError;
 use crate::models::error::AsApiError;
+use crate::models::ids::ProjectId;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
 use ariadne::i18n_enum;
+use derive_more::Display;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -12,6 +14,9 @@ pub enum ApiError {
     Internal(eyre::Report),
     #[error(transparent)]
     Request(eyre::Report),
+    // TODO: Use an I18nEnum instead of a String
+    #[error("Invalid Input: {0}")]
+    InvalidInput(ApiInvalidInput),
     #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
     #[error("Error while uploading file: {0}")]
@@ -32,9 +37,6 @@ pub enum ApiError {
     Authentication(#[from] crate::auth::AuthenticationError),
     #[error("Authentication Error: {0}")]
     SpecificAuthentication(#[from] SpecificAuthenticationError),
-    // TODO: Use an I18nEnum instead of a String
-    #[error("Invalid Input: {0}")]
-    InvalidInput(String),
     #[error("Invalid Input: {0}")]
     InvalidLoaderField(#[from] VersionFieldParseError),
     // TODO: Perhaps remove this in favor of InvalidInput?
@@ -92,6 +94,7 @@ i18n_enum!(
     root_key: "labrinth.error",
     Internal(transparent cause) => "internal_error",
     Request(transparent cause) => "internal_error",
+    InvalidInput(cause) => "invalid_input",
     Env(..) => "environment_error",
     FileHosting(cause) => "file_hosting_error",
     Database(cause) => "database_error",
@@ -102,7 +105,6 @@ i18n_enum!(
     Json(cause) => "json_error",
     Authentication(cause) => "unauthorized",
     SpecificAuthentication(cause) => "unauthorized",
-    InvalidInput(cause) => "invalid_input",
     InvalidLoaderField(cause) => "invalid_input",
     Validation(cause) => "invalid_input.validation",
     Search(cause) => "search_error",
@@ -125,6 +127,66 @@ i18n_enum!(
     TaxProcessor(transparent cause) => "tax_processor_error",
     RateLimitError(wait_ms, total_allowed_requests) => "ratelimit_error",
     Stripe(cause) => "stripe_error",
+);
+
+#[derive(Copy, Clone, Debug, Display)]
+pub enum ApiInvalidInput {
+    #[display("Specified version does not exist!")]
+    UnknownVersion,
+    #[display("Invalid download URL specified!")]
+    DownloadUrl,
+    #[display("Project {_0} does not exist")]
+    UnknownProject(ProjectId),
+    #[display("Invalid page view URL specified!")]
+    PageViewUrl,
+    #[display("Too much playtime entered for version!")]
+    TooMuchPlaytime,
+    #[display("Invalid resolution_minutes")]
+    ResolutionMinutes,
+    #[display("You cannot see the subscriptions of other users!")]
+    OtherUsersSubscription,
+    #[display("This charge cannot be refunded!")]
+    NonrefundableCharge,
+    #[display("You cannot refund more than the amount of the charge!")]
+    RefundTooLarge,
+    #[display("Charge does not have attached payment id!")]
+    NoAttachedPaymentId,
+    #[display("This charge was not processed via a payment platform.")]
+    NoPaymentPlatform,
+    #[display("Could not link new product price to product.")]
+    CouldntLinkNewProductPrice,
+    #[display("Could not link current product price to product.")]
+    CouldntLinkCurrentProductPrice,
+    #[display("Could not find a valid price for the user's duration")]
+    NoValidPriceForUserDuration,
+    #[display("Could not convert proration to i32")]
+    ProrationToI32,
+    #[display("Could not find a valid price for the specified duration")]
+    NoValidPriceForSpecifiedDuration,
+    #[display("Invalid currency code")]
+    CurrencyCode,
+}
+
+i18n_enum!(
+    ApiInvalidInput,
+    root_key: "labrinth.error.invalid_input",
+    UnknownVersion! => "unknown_version",
+    DownloadUrl! => "download_url",
+    UnknownProject(project_id) => "unknown_project",
+    PageViewUrl! => "page_view_url",
+    TooMuchPlaytime! => "too_much_playtime",
+    ResolutionMinutes! => "resolution_minutes",
+    OtherUsersSubscription! => "other_users_subscription",
+    NonrefundableCharge! => "nonrefundable_charge",
+    RefundTooLarge! => "refund_too_large",
+    NoAttachedPaymentId! => "no_attached_payment_id",
+    NoPaymentPlatform! => "no_payment_platform",
+    CouldntLinkNewProductPrice! => "couldnt_link_new_product_price",
+    CouldntLinkCurrentProductPrice! => "couldnt_link_current_product_price",
+    NoValidPriceForUserDuration! => "no_valid_price_for_user_duration",
+    ProrationToI32! => "proration_to_i32",
+    NoValidPriceForSpecifiedDuration! => "no_valid_price_for_specified_duration",
+    CurrencyCode! => "currency_code",
 );
 
 #[derive(Clone, Debug, Error)]

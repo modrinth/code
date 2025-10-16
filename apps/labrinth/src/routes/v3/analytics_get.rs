@@ -16,6 +16,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
+use crate::routes::error::ApiInvalidInput;
 use crate::{
     auth::{AuthenticationError, get_user_from_headers},
     database::{
@@ -451,9 +452,7 @@ pub async fn get(
         TimeRangeResolution::Minutes(resolution_minutes) => {
             let resolution_minutes = i64::try_from(resolution_minutes.get())
                 .map_err(|_| {
-                    ApiError::InvalidInput(
-                        "Resolution must fit into a `i64`".into(),
-                    )
+                    ApiError::InvalidInput(ApiInvalidInput::ResolutionMinutes)
                 })?;
             let resolution = TimeDelta::try_minutes(resolution_minutes)
                 .ok_or_else(|| {

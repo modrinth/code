@@ -15,7 +15,9 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::users::Badges;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::{ApiError, SpecificAuthenticationError};
+use crate::routes::error::{
+    ApiError, ApiInvalidInput, SpecificAuthenticationError,
+};
 use crate::util::anrok;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
@@ -115,8 +117,7 @@ pub async fn subscriptions(
                 user_id.into()
             } else {
                 return Err(ApiError::InvalidInput(
-                    "You cannot see the subscriptions of other users!"
-                        .to_string(),
+                    ApiInvalidInput::OtherUsersSubscription,
                 ));
             }
         } else {
@@ -201,14 +202,13 @@ pub async fn refund_charge(
 
         if charge.status != ChargeStatus::Succeeded {
             return Err(ApiError::InvalidInput(
-                "This charge cannot be refunded!".to_string(),
+                ApiInvalidInput::NonrefundableCharge,
             ));
         }
 
         if (refundable - refund_amount) < 0 {
             return Err(ApiError::InvalidInput(
-                "You cannot refund more than the amount of the charge!"
-                    .to_string(),
+                ApiInvalidInput::RefundTooLarge,
             ));
         }
 
@@ -304,15 +304,13 @@ pub async fn refund_charge(
                         )
                     } else {
                         return Err(ApiError::InvalidInput(
-                            "Charge does not have attached payment id!"
-                                .to_string(),
+                            ApiInvalidInput::NoAttachedPaymentId,
                         ));
                     }
                 }
                 PaymentPlatform::None => {
                     return Err(ApiError::InvalidInput(
-                        "This charge was not processed via a payment platform."
-                            .to_owned(),
+                        ApiInvalidInput::NoPaymentPlatform,
                     ));
                 }
             }
@@ -433,9 +431,7 @@ pub async fn edit_subscription(
         )
         .await?
         .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "Could not link new product price to product.".to_owned(),
-            )
+            ApiError::InvalidInput(ApiInvalidInput::CouldntLinkNewProductPrice)
         })?;
         let current_product = product_item::DBProduct::get(
             current_product_price.product_id,
@@ -444,7 +440,7 @@ pub async fn edit_subscription(
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput(
-                "Could not link current product price to product.".to_owned(),
+                ApiInvalidInput::CouldntLinkCurrentProductPrice,
             )
         })?;
 
@@ -499,8 +495,7 @@ pub async fn edit_subscription(
             Price::Recurring { intervals } => {
                 *intervals.get(&duration).ok_or_else(|| {
                     ApiError::InvalidInput(
-                        "Could not find a valid price for the user's duration"
-                            .to_owned(),
+                        ApiInvalidInput::NoValidPriceForUserDuration,
                     )
                 })?
             }
@@ -511,8 +506,7 @@ pub async fn edit_subscription(
             Price::Recurring { intervals } => {
                 *intervals.get(&duration).ok_or_else(|| {
                     ApiError::InvalidInput(
-                        "Could not find a valid price for the user's duration"
-                            .to_owned(),
+                        ApiInvalidInput::NoValidPriceForUserDuration,
                     )
                 })?
             }
@@ -524,9 +518,7 @@ pub async fn edit_subscription(
             .floor()
             .to_i32()
             .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "Could not convert proration to i32".to_owned(),
-                )
+                ApiError::InvalidInput(ApiInvalidInput::ProrationToI32)
             })?;
 
         Ok((

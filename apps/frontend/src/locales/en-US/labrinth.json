@@ -290,6 +290,57 @@
   "labrinth.error.invalid_input": {
     "message": "Invalid Input: {cause}"
   },
+  "labrinth.error.invalid_input.couldnt_link_current_product_price": {
+    "message": "Could not link current product price to product."
+  },
+  "labrinth.error.invalid_input.couldnt_link_new_product_price": {
+    "message": "Could not link new product price to product."
+  },
+  "labrinth.error.invalid_input.currency_code": {
+    "message": "Invalid currency code"
+  },
+  "labrinth.error.invalid_input.download_url": {
+    "message": "Invalid download URL specified!"
+  },
+  "labrinth.error.invalid_input.no_attached_payment_id": {
+    "message": "Charge does not have attached payment id!"
+  },
+  "labrinth.error.invalid_input.no_payment_platform": {
+    "message": "This charge was not processed via a payment platform."
+  },
+  "labrinth.error.invalid_input.no_valid_price_for_specified_duration": {
+    "message": "Could not find a valid price for the specified duration"
+  },
+  "labrinth.error.invalid_input.no_valid_price_for_user_duration": {
+    "message": "Could not find a valid price for the user''s duration"
+  },
+  "labrinth.error.invalid_input.nonrefundable_charge": {
+    "message": "This charge cannot be refunded!"
+  },
+  "labrinth.error.invalid_input.other_users_subscription": {
+    "message": "You cannot see the subscriptions of other users!"
+  },
+  "labrinth.error.invalid_input.page_view_url": {
+    "message": "Invalid page view URL specified!"
+  },
+  "labrinth.error.invalid_input.proration_to_i32": {
+    "message": "Could not convert proration to i32"
+  },
+  "labrinth.error.invalid_input.refund_too_large": {
+    "message": "You cannot refund more than the amount of the charge!"
+  },
+  "labrinth.error.invalid_input.resolution_minutes": {
+    "message": "Invalid resolution_minutes"
+  },
+  "labrinth.error.invalid_input.too_much_playtime": {
+    "message": "Too much playtime entered for version!"
+  },
+  "labrinth.error.invalid_input.unknown_project": {
+    "message": "Project {project_id} does not exist"
+  },
+  "labrinth.error.invalid_input.unknown_version": {
+    "message": "Specified version does not exist!"
+  },
   "labrinth.error.invalid_input.validation": {
     "message": "Error while validating input: {cause}"
   },

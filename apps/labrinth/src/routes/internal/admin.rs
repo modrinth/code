@@ -9,7 +9,7 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::maxmind::MaxMindIndexer;
 use crate::queue::moderation::AUTOMOD_ID;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, ApiInvalidInput};
 use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::guards::admin_key_guard;
@@ -104,14 +104,11 @@ pub async fn count_download(
     {
         (version.id, version.mod_id)
     } else {
-        return Err(ApiError::InvalidInput(
-            "Specified version does not exist!".to_string(),
-        ));
+        return Err(ApiError::InvalidInput(ApiInvalidInput::UnknownVersion));
     };
 
-    let url = url::Url::parse(&download_body.url).map_err(|_| {
-        ApiError::InvalidInput("invalid download URL specified!".to_string())
-    })?;
+    let url = url::Url::parse(&download_body.url)
+        .map_err(|_| ApiError::InvalidInput(ApiInvalidInput::DownloadUrl))?;
 
     let ip = crate::util::ip::convert_to_ip_v6(&download_body.ip)
         .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
@@ -167,7 +164,7 @@ pub async fn force_reindex(
 #[derive(Deserialize)]
 pub struct DelphiIngest {
     pub url: String,
-    pub project_id: crate::models::ids::ProjectId,
+    pub project_id: ProjectId,
     pub version_id: crate::models::ids::VersionId,
     pub issues: HashMap<String, HashMap<String, String>>,
 }
@@ -192,10 +189,7 @@ pub async fn delphi_result_ingest(
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInput(format!(
-            "Project {} does not exist",
-            body.project_id
-        ))
+        ApiError::InvalidInput(ApiInvalidInput::UnknownProject(body.project_id))
     })?;
 
     let mut header = format!("Suspicious traces found at {}", body.url);

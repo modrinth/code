@@ -5,7 +5,7 @@ use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::maxmind::MaxMindIndexer;
 use crate::queue::session::AuthQueue;
-use crate::routes::error::ApiError;
+use crate::routes::error::{ApiError, ApiInvalidInput};
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::env::parse_strings_from_var;
 use actix_web::{HttpRequest, HttpResponse};
@@ -66,12 +66,11 @@ pub async fn page_view_ingest(
     .ok();
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
-    let url = Url::parse(&url_input.url).map_err(|_| {
-        ApiError::InvalidInput("invalid page view URL specified!".to_string())
-    })?;
-    let domain = url.host_str().ok_or_else(|| {
-        ApiError::InvalidInput("invalid page view URL specified!".to_string())
-    })?;
+    let url = Url::parse(&url_input.url)
+        .map_err(|_| ApiError::InvalidInput(ApiInvalidInput::PageViewUrl))?;
+    let domain = url
+        .host_str()
+        .ok_or_else(|| ApiError::InvalidInput(ApiInvalidInput::PageViewUrl))?;
     let url_origin = url.origin().ascii_serialization();
 
     let is_valid_url_origin =
@@ -81,9 +80,7 @@ pub async fn page_view_ingest(
             .any(|origin| origin == "*" || url_origin == *origin);
 
     if !is_valid_url_origin {
-        return Err(ApiError::InvalidInput(
-            "invalid page view URL specified!".to_string(),
-        ));
+        return Err(ApiError::InvalidInput(ApiInvalidInput::PageViewUrl));
     }
 
     let headers = req
@@ -190,9 +187,7 @@ pub async fn playtime_ingest(
     let playtimes = playtime_input.0;
 
     if playtimes.len() > 2000 {
-        return Err(ApiError::InvalidInput(
-            "Too much playtime entered for version!".to_string(),
-        ));
+        return Err(ApiError::InvalidInput(ApiInvalidInput::TooMuchPlaytime));
     }
 
     let versions = crate::database::models::DBVersion::get_many(
