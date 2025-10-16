@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use super::ids::{DBProjectId, DBUserId};
 use super::{DBCollectionId, DBReportId, DBThreadId};
 use crate::database::models;
@@ -38,7 +39,7 @@ pub struct DBUser {
     pub stripe_customer_id: Option<String>,
 
     pub totp_secret: Option<String>,
-    pub webauthn_passkey: Option<Passkey>,
+    pub webauthn_passkeys: HashMap<String, Passkey>,
 
     pub username: String,
     pub email: Option<String>,
@@ -182,7 +183,7 @@ impl DBUser {
                         avatar_url, raw_avatar_url, username, bio,
                         created, role, badges,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
-                        email_verified, password, totp_secret, webauthn_passkey, paypal_id, paypal_country, paypal_email,
+                        email_verified, password, totp_secret, webauthn_passkeys, paypal_id, paypal_country, paypal_email,
                         venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
                     FROM users
                     WHERE id = ANY($1) OR LOWER(username) = ANY($2)
@@ -216,10 +217,7 @@ impl DBUser {
                             venmo_handle: u.venmo_handle,
                             stripe_customer_id: u.stripe_customer_id,
                             totp_secret: u.totp_secret,
-                            webauthn_passkey: u.webauthn_passkey
-                                .map(|v| serde_json::from_value(v))
-                                .transpose()
-                                .unwrap_or_default(),
+                            webauthn_passkeys: serde_json::from_value(u.webauthn_passkeys).unwrap_or_default(),
                             allow_friend_requests: u.allow_friend_requests,
                             is_subscribed_to_newsletter: u.is_subscribed_to_newsletter,
                         };

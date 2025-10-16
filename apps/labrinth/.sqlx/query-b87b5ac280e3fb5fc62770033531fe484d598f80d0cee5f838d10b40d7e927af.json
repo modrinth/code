@@ -1,10 +1,6 @@
 {
   "db_name": "PostgreSQL",
-<<<<<<<< HEAD:apps/labrinth/.sqlx/query-57d72c122f1fea3ea9ebefbcfd5f7cae270a26aa075e1e06f89528739e3f557b.json
-  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, webauthn_passkey, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
-========
-  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
->>>>>>>> upstream/main:apps/labrinth/.sqlx/query-5fcdeeeb820ada62e10feb0beefa29b0535241bbb6d74143925e16cf8cd720c4.json
+  "query": "\n                    SELECT id, email,\n                        avatar_url, raw_avatar_url, username, bio,\n                        created, role, badges,\n                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                        email_verified, password, totp_secret, webauthn_passkeys, paypal_id, paypal_country, paypal_email,\n                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter\n                    FROM users\n                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                    ",
   "describe": {
     "columns": [
       {
@@ -99,7 +95,7 @@
       },
       {
         "ordinal": 18,
-        "name": "webauthn_passkey",
+        "name": "webauthn_passkeys",
         "type_info": "Jsonb"
       },
       {
@@ -133,7 +129,7 @@
         "type_info": "Bool"
       },
       {
-        "ordinal": 24,
+        "ordinal": 25,
         "name": "is_subscribed_to_newsletter",
         "type_info": "Bool"
       }
@@ -163,22 +159,15 @@
       false,
       true,
       true,
+      false,
       true,
       true,
       true,
       true,
       true,
-<<<<<<<< HEAD:apps/labrinth/.sqlx/query-57d72c122f1fea3ea9ebefbcfd5f7cae270a26aa075e1e06f89528739e3f557b.json
-      true,
-      false
-    ]
-  },
-  "hash": "57d72c122f1fea3ea9ebefbcfd5f7cae270a26aa075e1e06f89528739e3f557b"
-========
       false,
       false
     ]
   },
-  "hash": "5fcdeeeb820ada62e10feb0beefa29b0535241bbb6d74143925e16cf8cd720c4"
->>>>>>>> upstream/main:apps/labrinth/.sqlx/query-5fcdeeeb820ada62e10feb0beefa29b0535241bbb6d74143925e16cf8cd720c4.json
+  "hash": "b87b5ac280e3fb5fc62770033531fe484d598f80d0cee5f838d10b40d7e927af"
 }

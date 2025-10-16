@@ -3,8 +3,8 @@ use crate::auth::validate::{
 };
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
 use crate::database::models::flow_item::DBFlow;
-use crate::database::models::{DBUser, DBUserId};
 use crate::database::models::notification_item::NotificationBuilder;
+use crate::database::models::{DBUser, DBUserId};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::notifications::NotificationBody;
@@ -38,8 +38,8 @@ use std::str::FromStr;
 use std::sync::Arc;
 use uuid::Uuid;
 use validator::Validate;
-use webauthn_rs::prelude::{RegisterPublicKeyCredential};
 use webauthn_rs::Webauthn;
+use webauthn_rs::prelude::RegisterPublicKeyCredential;
 use zxcvbn::Score;
 
 pub fn config(cfg: &mut ServiceConfig) {
@@ -231,7 +231,7 @@ impl TempUser {
                 venmo_handle: None,
                 stripe_customer_id: None,
                 totp_secret: None,
-                webauthn_passkey: None,
+                webauthn_passkeys: HashMap::new(),
                 username,
                 email: self.email.clone(),
                 email_verified: self.email.is_some(),
@@ -1418,7 +1418,7 @@ pub async fn create_account_with_password(
         venmo_handle: None,
         stripe_customer_id: None,
         totp_secret: None,
-        webauthn_passkey: None,
+        webauthn_passkeys: HashMap::new(),
         username: new_account.username.clone(),
         email: Some(new_account.email.clone()),
         email_verified: false,
@@ -2156,7 +2156,7 @@ pub async fn change_password(
     }
 
     transaction.commit().await?;
-    crate::database::models::DBUser::clear_caches(&[(user.id, None)], &redis)
+    DBUser::clear_caches(&[(user.id, None)], &redis)
         .await?;
 
     Ok(HttpResponse::Ok().finish())
@@ -2164,6 +2164,7 @@ pub async fn change_password(
 
 #[derive(Deserialize, Validate)]
 pub struct SetupWebauthnFinish {
+    pub name: String,
     pub cred: RegisterPublicKeyCredential,
     pub flow: String,
 }
@@ -2194,10 +2195,13 @@ pub async fn webauthn_register_start(
 
     let (ccr, reg_state) = webauthn
         .start_passkey_registration(
-            user_uuid, &username, &username, None, //exclude_credentials, TODO
+            user_uuid, &username, &username,
+            None, //exclude_credentials, TODO
         )
         .map_err(|e| {
-            tracing::error!("Encountered error while starting passkey reg: {e}");
+            tracing::error!(
+                "Encountered error while starting passkey reg: {e}"
+            );
             ApiError::WebauthnRegistration
         })?;
 
@@ -2226,29 +2230,30 @@ pub async fn webauthn_register_finish(
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-    if let DBFlow::InitializeWebauthn { user_id, reg_state, .. } = flow {
+    if let DBFlow::InitializeWebauthn {
+        user_id, reg_state, ..
+    } = flow
+    {
         let sk = webauthn
             .finish_passkey_registration(&login.cred, &reg_state)
             .map_err(|e| {
-                tracing::error!("Encountered error while finishing passkey reg: {e}");
+                tracing::error!(
+                    "Encountered error while finishing passkey reg: {e}"
+                );
                 ApiError::WebauthnRegistration
             })?;
 
-        let sk_json = serde_json::to_value(&sk)
+        let sk_json = serde_json::to_value(HashMap::from([(login.name.clone(), sk)]))
             .map_err(|_| ApiError::WebauthnRegistration)?;
 
-        sqlx::query!(
-            "
+        sqlx::query("
             UPDATE users
-            SET webauthn_passkey = $2
-            WHERE (id = $1)
-            ",
-            user_id.0,
-            sk_json
+            SET webauthn_passkeys = COALESCE(webauthn_passkeys, '{}'::jsonb) || $1::jsonb
+            WHERE id = $2",
         )
-            .execute(&**pool)
-            .await?;
-
+            .bind(sk_json)
+            .bind(user_id.0)
+            .execute(&**pool).await?;
 
         Ok(HttpResponse::Ok().finish())
     } else {

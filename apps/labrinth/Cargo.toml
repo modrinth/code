@@ -124,6 +124,7 @@ url = { workspace = true }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["fast-rng", "serde", "v4"] }
 validator = { workspace = true, features = ["derive"] }
+webauthn-rs = { workspace = true }
 webp = { workspace = true }
 woothee = { workspace = true }
 yaserde = { workspace = true, features = ["derive"] }
@@ -137,8 +138,6 @@ actix-http = { workspace = true }
 chrono = { workspace = true }
 dotenv-build = { workspace = true }
 iana-time-zone = { workspace = true }
-
-webauthn-rs.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
 jemalloc_pprof = { workspace = true, features = ["flamegraph"] }
