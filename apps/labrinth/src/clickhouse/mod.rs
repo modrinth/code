@@ -1,5 +1,4 @@
-use hyper_tls::{HttpsConnector, native_tls};
-use hyper_util::client::legacy::connect::HttpConnector;
+use hyper_rustls::HttpsConnectorBuilder;
 use hyper_util::rt::TokioExecutor;
 
 mod fetch;
@@ -15,13 +14,11 @@ pub async fn init_client_with_database(
     database: &str,
 ) -> clickhouse::error::Result<clickhouse::Client> {
     let client = {
-        let mut http_connector = HttpConnector::new();
-        http_connector.enforce_http(false); // allow https URLs
-
-        let tls_connector =
-            native_tls::TlsConnector::builder().build().unwrap().into();
-        let https_connector =
-            HttpsConnector::from((http_connector, tls_connector));
+        let https_connector = HttpsConnectorBuilder::new()
+            .with_native_roots()?
+            .https_or_http()
+            .enable_all_versions()
+            .build();
         let hyper_client =
             hyper_util::client::legacy::Client::builder(TokioExecutor::new())
                 .build(https_connector);
@@ -51,6 +48,13 @@ pub async fn init_client_with_database(
         "MergeTree()"
     };
 
+    // For the Clickhouse database on the staging environment, set a TTL to avoid accumulating too much data
+    let ttl = if database == "staging_analytics" {
+        "TTL toDateTime(recorded) + INTERVAL 1 DAY"
+    } else {
+        ""
+    };
+
     client
         .query(&format!(
             "
@@ -70,6 +74,7 @@ pub async fn init_client_with_database(
                 headers Array(Tuple(String, String))
             )
             ENGINE = {engine}
+            {ttl}
             PRIMARY KEY (project_id, recorded, ip)
             SETTINGS index_granularity = 8192
             "
@@ -96,6 +101,7 @@ pub async fn init_client_with_database(
                 headers Array(Tuple(String, String))
             )
             ENGINE = {engine}
+            {ttl}
             PRIMARY KEY (project_id, recorded, ip)
             SETTINGS index_granularity = 8192
             "
@@ -120,6 +126,7 @@ pub async fn init_client_with_database(
                 parent UInt64
             )
             ENGINE = {engine}
+            {ttl}
             PRIMARY KEY (project_id, recorded, user_id)
             SETTINGS index_granularity = 8192
             "

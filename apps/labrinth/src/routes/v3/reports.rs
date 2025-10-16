@@ -1,6 +1,7 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database;
 use crate::database::models::image_item;
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::{
     ThreadBuilder, ThreadMessageBuilder,
 };
@@ -8,17 +9,18 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
+use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::reports::{ItemType, Report};
 use crate::models::threads::{MessageBody, ThreadType};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img;
+use crate::util::routes::read_typed_from_payload;
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
-use futures::StreamExt;
 use serde::Deserialize;
 use sqlx::PgPool;
 use validator::Validate;
@@ -63,15 +65,7 @@ pub async fn report_create(
     .await?
     .1;
 
-    let mut bytes = web::BytesMut::new();
-    while let Some(item) = body.next().await {
-        bytes.extend_from_slice(&item.map_err(|_| {
-            ApiError::InvalidInput(
-                "Error while parsing request payload!".to_string(),
-            )
-        })?);
-    }
-    let new_report: CreateReport = serde_json::from_slice(bytes.as_ref())?;
+    let new_report: CreateReport = read_typed_from_payload(&mut body).await?;
 
     let id =
         crate::database::models::generate_report_id(&mut transaction).await?;
@@ -212,6 +206,15 @@ pub async fn report_create(
     .insert(&mut transaction)
     .await?;
 
+    // Notify the reporter that the report has been submitted
+    NotificationBuilder {
+        body: NotificationBody::ReportSubmitted {
+            report_id: id.into(),
+        },
+    }
+    .insert(current_user.id.into(), &mut transaction, &redis)
+    .await?;
+
     transaction.commit().await?;
 
     Ok(HttpResponse::Ok().json(Report {
@@ -230,12 +233,14 @@ pub async fn report_create(
 #[derive(Deserialize)]
 pub struct ReportsRequestOptions {
     #[serde(default = "default_count")]
-    pub count: i16,
+    pub count: u16,
+    #[serde(default)]
+    pub offset: u32,
     #[serde(default = "default_all")]
     pub all: bool,
 }
 
-fn default_count() -> i16 {
+fn default_count() -> u16 {
     100
 }
 fn default_all() -> bool {
@@ -246,7 +251,7 @@ pub async fn reports(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    count: web::Query<ReportsRequestOptions>,
+    request_opts: web::Query<ReportsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -261,15 +266,17 @@ pub async fn reports(
 
     use futures::stream::TryStreamExt;
 
-    let report_ids = if user.role.is_mod() && count.all {
+    let report_ids = if user.role.is_mod() && request_opts.all {
         sqlx::query!(
             "
             SELECT id FROM reports
             WHERE closed = FALSE
             ORDER BY created ASC
-            LIMIT $1;
+            OFFSET $2
+            LIMIT $1
             ",
-            count.count as i64
+            request_opts.count as i64,
+            request_opts.offset as i64
         )
         .fetch(&**pool)
         .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
@@ -281,10 +288,12 @@ pub async fn reports(
             SELECT id FROM reports
             WHERE closed = FALSE AND reporter = $1
             ORDER BY created ASC
-            LIMIT $2;
+            OFFSET $3
+            LIMIT $2
             ",
             user.id.0 as i64,
-            count.count as i64
+            request_opts.count as i64,
+            request_opts.offset as i64
         )
         .fetch(&**pool)
         .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
@@ -455,6 +464,14 @@ pub async fn report_edit(
                 hide_identity: user.role.is_mod(),
             }
             .insert(&mut transaction)
+            .await?;
+
+            NotificationBuilder {
+                body: NotificationBody::ReportStatusUpdated {
+                    report_id: id.into(),
+                },
+            }
+            .insert(report.reporter, &mut transaction, &redis)
             .await?;
 
             sqlx::query!(

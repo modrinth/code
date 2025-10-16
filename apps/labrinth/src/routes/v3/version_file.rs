@@ -1,6 +1,7 @@
 use super::ApiError;
 use crate::auth::checks::{filter_visible_versions, is_visible_version};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
+use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
 use crate::models::ids::VersionId;
 use crate::models::pats::Scopes;
@@ -121,7 +122,7 @@ pub struct UpdateData {
 pub async fn get_update_from_hash(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     update_data: web::Json<UpdateData>,
@@ -129,7 +130,7 @@ pub async fn get_update_from_hash(
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***pool,
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
@@ -144,69 +145,59 @@ pub async fn get_update_from_hash(
         }),
         hash,
         hash_query.version_id.map(|x| x.into()),
-        &**pool,
+        &***pool,
         &redis,
     )
     .await?
-    {
-        if let Some(project) = database::models::DBProject::get_id(
+        && let Some(project) = database::models::DBProject::get_id(
             file.project_id,
-            &**pool,
+            &***pool,
             &redis,
         )
         .await?
-        {
-            let mut versions = database::models::DBVersion::get_many(
-                &project.versions,
-                &**pool,
-                &redis,
-            )
-            .await?
-            .into_iter()
-            .filter(|x| {
-                let mut bool = true;
-                if let Some(version_types) = &update_data.version_types {
-                    bool &= version_types
-                        .iter()
-                        .any(|y| y.as_str() == x.inner.version_type);
-                }
-                if let Some(loaders) = &update_data.loaders {
-                    bool &= x.loaders.iter().any(|y| loaders.contains(y));
-                }
-                if let Some(loader_fields) = &update_data.loader_fields {
-                    for (key, values) in loader_fields {
-                        bool &= if let Some(x_vf) = x
-                            .version_fields
-                            .iter()
-                            .find(|y| y.field_name == *key)
-                        {
-                            values
-                                .iter()
-                                .any(|v| x_vf.value.contains_json_value(v))
-                        } else {
-                            true
-                        };
-                    }
-                }
-                bool
-            })
-            .sorted();
-
-            if let Some(first) = versions.next_back() {
-                if !is_visible_version(
-                    &first.inner,
-                    &user_option,
-                    &pool,
-                    &redis,
-                )
-                .await?
-                {
-                    return Err(ApiError::NotFound);
-                }
-
-                return Ok(HttpResponse::Ok()
-                    .json(models::projects::Version::from(first)));
+    {
+        let mut versions = database::models::DBVersion::get_many(
+            &project.versions,
+            &***pool,
+            &redis,
+        )
+        .await?
+        .into_iter()
+        .filter(|x| {
+            let mut bool = true;
+            if let Some(version_types) = &update_data.version_types {
+                bool &= version_types
+                    .iter()
+                    .any(|y| y.as_str() == x.inner.version_type);
             }
+            if let Some(loaders) = &update_data.loaders {
+                bool &= x.loaders.iter().any(|y| loaders.contains(y));
+            }
+            if let Some(loader_fields) = &update_data.loader_fields {
+                for (key, values) in loader_fields {
+                    bool &= if let Some(x_vf) =
+                        x.version_fields.iter().find(|y| y.field_name == *key)
+                    {
+                        values.iter().any(|v| x_vf.value.contains_json_value(v))
+                    } else {
+                        true
+                    };
+                }
+            }
+            bool
+        })
+        .sorted();
+
+        if let Some(first) = versions.next_back() {
+            if !is_visible_version(&first.inner, &user_option, &pool, &redis)
+                .await?
+            {
+                return Err(ApiError::NotFound);
+            }
+
+            return Ok(
+                HttpResponse::Ok().json(models::projects::Version::from(first))
+            );
         }
     }
     Err(ApiError::NotFound)
@@ -221,14 +212,14 @@ pub struct FileHashes {
 
 pub async fn get_versions_from_hashes(
     req: HttpRequest,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     file_data: web::Json<FileHashes>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***pool,
         &redis,
         &session_queue,
         Scopes::VERSION_READ,
@@ -245,14 +236,14 @@ pub async fn get_versions_from_hashes(
     let files = database::models::DBVersion::get_files_from_hash(
         algorithm.clone(),
         &file_data.hashes,
-        &**pool,
+        &***pool,
         &redis,
     )
     .await?;
 
     let version_ids = files.iter().map(|x| x.version_id).collect::<Vec<_>>();
     let versions_data = filter_visible_versions(
-        database::models::DBVersion::get_many(&version_ids, &**pool, &redis)
+        database::models::DBVersion::get_many(&version_ids, &***pool, &redis)
             .await?,
         &user_option,
         &pool,
@@ -339,8 +330,9 @@ pub struct ManyUpdateData {
     pub game_versions: Option<Vec<String>>,
     pub version_types: Option<Vec<VersionType>>,
 }
+
 pub async fn update_files(
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
 ) -> Result<HttpResponse, ApiError> {
@@ -351,7 +343,7 @@ pub async fn update_files(
     let files = database::models::DBVersion::get_files_from_hash(
         algorithm.clone(),
         &update_data.hashes,
-        &**pool,
+        &***pool,
         &redis,
     )
     .await?;
@@ -374,7 +366,7 @@ pub async fn update_files(
         &update_data.loaders.clone().unwrap_or_default(),
         &update_data.version_types.clone().unwrap_or_default().iter().map(|x| x.to_string()).collect::<Vec<_>>(),
     )
-        .fetch(&**pool)
+        .fetch(&***pool)
         .try_fold(DashMap::new(), |acc : DashMap<_,Vec<database::models::ids::DBVersionId>>, m| {
             acc.entry(database::models::DBProjectId(m.mod_id))
                 .or_default()
@@ -388,7 +380,7 @@ pub async fn update_files(
             .into_iter()
             .filter_map(|x| x.1.last().copied())
             .collect::<Vec<_>>(),
-        &**pool,
+        &***pool,
         &redis,
     )
     .await?;
@@ -398,13 +390,12 @@ pub async fn update_files(
         if let Some(version) = versions
             .iter()
             .find(|x| x.inner.project_id == file.project_id)
+            && let Some(hash) = file.hashes.get(&algorithm)
         {
-            if let Some(hash) = file.hashes.get(&algorithm) {
-                response.insert(
-                    hash.clone(),
-                    models::projects::Version::from(version.clone()),
-                );
-            }
+            response.insert(
+                hash.clone(),
+                models::projects::Version::from(version.clone()),
+            );
         }
     }
 
@@ -484,69 +475,59 @@ pub async fn update_individual_files(
 
     for project in projects {
         for file in files.iter().filter(|x| x.project_id == project.inner.id) {
-            if let Some(hash) = file.hashes.get(&algorithm) {
-                if let Some(query_file) =
+            if let Some(hash) = file.hashes.get(&algorithm)
+                && let Some(query_file) =
                     update_data.hashes.iter().find(|x| &x.hash == hash)
-                {
-                    let version = all_versions
-                        .iter()
-                        .filter(|x| x.inner.project_id == file.project_id)
-                        .filter(|x| {
-                            let mut bool = true;
+            {
+                let version = all_versions
+                    .iter()
+                    .filter(|x| x.inner.project_id == file.project_id)
+                    .filter(|x| {
+                        let mut bool = true;
 
-                            if let Some(version_types) =
-                                &query_file.version_types
-                            {
-                                bool &= version_types.iter().any(|y| {
-                                    y.as_str() == x.inner.version_type
-                                });
-                            }
-                            if let Some(loaders) = &query_file.loaders {
-                                bool &= x
-                                    .loaders
-                                    .iter()
-                                    .any(|y| loaders.contains(y));
-                            }
-
-                            if let Some(loader_fields) =
-                                &query_file.loader_fields
-                            {
-                                for (key, values) in loader_fields {
-                                    bool &= if let Some(x_vf) = x
-                                        .version_fields
-                                        .iter()
-                                        .find(|y| y.field_name == *key)
-                                    {
-                                        values.iter().any(|v| {
-                                            x_vf.value.contains_json_value(v)
-                                        })
-                                    } else {
-                                        true
-                                    };
-                                }
-                            }
-                            bool
-                        })
-                        .sorted()
-                        .next_back();
-
-                    if let Some(version) = version {
-                        if is_visible_version(
-                            &version.inner,
-                            &user_option,
-                            &pool,
-                            &redis,
-                        )
-                        .await?
-                        {
-                            response.insert(
-                                hash.clone(),
-                                models::projects::Version::from(
-                                    version.clone(),
-                                ),
-                            );
+                        if let Some(version_types) = &query_file.version_types {
+                            bool &= version_types
+                                .iter()
+                                .any(|y| y.as_str() == x.inner.version_type);
                         }
-                    }
+                        if let Some(loaders) = &query_file.loaders {
+                            bool &=
+                                x.loaders.iter().any(|y| loaders.contains(y));
+                        }
+
+                        if let Some(loader_fields) = &query_file.loader_fields {
+                            for (key, values) in loader_fields {
+                                bool &= if let Some(x_vf) = x
+                                    .version_fields
+                                    .iter()
+                                    .find(|y| y.field_name == *key)
+                                {
+                                    values.iter().any(|v| {
+                                        x_vf.value.contains_json_value(v)
+                                    })
+                                } else {
+                                    true
+                                };
+                            }
+                        }
+                        bool
+                    })
+                    .sorted()
+                    .next_back();
+
+                if let Some(version) = version
+                    && is_visible_version(
+                        &version.inner,
+                        &user_option,
+                        &pool,
+                        &redis,
+                    )
+                    .await?
+                {
+                    response.insert(
+                        hash.clone(),
+                        models::projects::Version::from(version.clone()),
+                    );
                 }
             }
         }

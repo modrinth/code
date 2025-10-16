@@ -1,0 +1,774 @@
+{
+  "badge.new": {
+    "defaultMessage": "Novo"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analitika"
+  },
+  "button.back": {
+    "defaultMessage": "Nazad"
+  },
+  "button.cancel": {
+    "defaultMessage": "Poništi"
+  },
+  "button.continue": {
+    "defaultMessage": "Nastavi"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Kopiraj ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Kopiraj trajnu vezu"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Kreiraj projekt"
+  },
+  "button.download": {
+    "defaultMessage": "Preuzmi"
+  },
+  "button.downloading": {
+    "defaultMessage": "Preuzimanje"
+  },
+  "button.edit": {
+    "defaultMessage": "Uredi"
+  },
+  "button.follow": {
+    "defaultMessage": "Prati"
+  },
+  "button.more-options": {
+    "defaultMessage": "Više opcija"
+  },
+  "button.next": {
+    "defaultMessage": "Nastavi"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Otvori mapu"
+  },
+  "button.play": {
+    "defaultMessage": "Igraj"
+  },
+  "button.refresh": {
+    "defaultMessage": "Osvježi"
+  },
+  "button.remove": {
+    "defaultMessage": "Ukloni"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Ukloni sliku"
+  },
+  "button.report": {
+    "defaultMessage": "Prijavi"
+  },
+  "button.reset": {
+    "defaultMessage": "Resetiraj"
+  },
+  "button.save": {
+    "defaultMessage": "Spremi"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Spremi promjene"
+  },
+  "button.saving": {
+    "defaultMessage": "Sačuvaj"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Prijavi se"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Odjavi se"
+  },
+  "button.stop": {
+    "defaultMessage": "Zaustavi"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Prestani pratiti"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Učitaj sliku"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Upravo sada"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Aplikacija"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Serveri"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Website"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Privatno"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Uredi ikonu"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Ukloni ikonu"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Zamijeni ikonu"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Izaberi ikonu"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Pretraži..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Galerijski Prikaz"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Rešetni prikaz"
+  },
+  "input.view.list": {
+    "defaultMessage": "Redni prikaz"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Avanturistički način rada"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Kreativan način rada"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Nadgledajući način rada"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Preživljavajući način rada"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Nepoznat način rada"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Promjene spremljene"
+  },
+  "label.collections": {
+    "defaultMessage": "Kolekcija"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Stvoren {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Nadzorna ploča"
+  },
+  "label.delete": {
+    "defaultMessage": "Izbriši"
+  },
+  "label.description": {
+    "defaultMessage": "Opis"
+  },
+  "label.error": {
+    "defaultMessage": "Pogreška"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Sljedeći projekti"
+  },
+  "label.loading": {
+    "defaultMessage": "Učitavanje..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderacija"
+  },
+  "label.notifications": {
+    "defaultMessage": "Obavijesti"
+  },
+  "label.or": {
+    "defaultMessage": "ili"
+  },
+  "label.password": {
+    "defaultMessage": "Lozinka"
+  },
+  "label.played": {
+    "defaultMessage": "Igrano {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Javno"
+  },
+  "label.rejected": {
+    "defaultMessage": "Odbijeno"
+  },
+  "label.saved": {
+    "defaultMessage": "Sačuvano"
+  },
+  "label.scopes": {
+    "defaultMessage": "Opsezi"
+  },
+  "label.server": {
+    "defaultMessage": "Server"
+  },
+  "label.servers": {
+    "defaultMessage": "Serveri"
+  },
+  "label.settings": {
+    "defaultMessage": "Postavke"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Singleplayer"
+  },
+  "label.title": {
+    "defaultMessage": "Naslov"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Nenavedeno"
+  },
+  "label.visibility": {
+    "defaultMessage": "Vidljivost"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Posjetite svoj profil"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Nadodaj metodu plaćanja"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Nadodavanje metode plaćanja"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Dogodila se Greška"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Prihvaćen"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Odobreno"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Arhiviran"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Zatvoreno"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Kreator"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Skica"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Neuspješno"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Na popisu"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderator"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth tim"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "U tijeku"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Privatno"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Obrađen"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Odbijen"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Vraćen"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Zakazan"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Pregledava se"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Nenavedeno"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Zadržano"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kopirajte kôd u međuspremnik"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Klijent"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Klijent i server"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Klijent ili server"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Server"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Nepodržan"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} završava sa"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Nepoznati način plaćanja"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Sve"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Podržana okruženja"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Klijent i server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Strana Klijenta"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Samo namjenski serveri"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Strana Servera"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Singleplayer"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Samo singleplayer"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java izdanje"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platforme"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Kompatibilnost"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Vlasnik projekta"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Kreatori"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Stvoren {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "Licencirano {license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Objavljeno {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "Podnešeno {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Detalji"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Ažurirano {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Pridruži se Discord serveru"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Doniraj"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponzoriraj na GitHub-u"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Doniraj na Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Doniraj na Patreon-u"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Doniraj na Paypal-u"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Prijavi pitanja"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Pogledaj izvor"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Veze"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Posjeti Wiki"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Analitika"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Opis"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Ima neke funkcionalnosti i na strani klijenta i servera, čak i ako su samo djelomične.\n"
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Neobavezno na obje strane, radi isto ako je instalirano na bilo kojoj strani"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Neobavezno na obje strane, ali najbolje funkcionira kada se instalira na obje strane"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Neobavezno na klijentu"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Neobavezno na serveru"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Obavezno na oboje"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Krijent i server"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "Sve funkcionalnosti se obavljaju na strani klijenta i kompatibilne su s vanilla serverima."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Samo na strani klijenta"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Samo namjenski serveri"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "Sve funkcionalnosti se obavljaju na strani serverai kompatibilne su s vanilla klijentima."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Radi i u singleplayeru"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Samo strana servera"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Radi samo u Singleplayeru ili kada niste povezani s Multiplayer serverom."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Samo singleplayer"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Okruženje"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Galerija"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Općenito"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "Licenca"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Veze"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Članovi"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "Nemate dozvolu da ovo uredite"
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "Nemate dozvolu"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Tagovi"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Prenesi"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Verzije"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Pogledaj"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Arhiviran"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Skica"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Privatno"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Javno"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Odbijeno"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Zakazano"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Pregledava se"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Nepoznato"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Neizlistan"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Neizlistan od osoblja"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Filter blokiran"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Odključavanje ovog filtera omogućiti će instliravanje nekompatibilnog sadržaja."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "skinkroniziraj fiter"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} je zaključan"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Odključaj filter"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Okruženje"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Klijent"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Server"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Verzija igre"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Prikaži sve verzije"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Licenca"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Otvoren izvor"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Učitavatelj"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Učitavatelj"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Učitavatelj"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Platforma"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "ID Projekta"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Učitavatelj"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Odbaci"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Odbaci"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Pozornost"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Kritično"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Anketa"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Upozorenje"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Neodbačeno"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "Nećete biti naplaćeni trenutno."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Izaberite metodu plaćanja"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Metoda plaćanja"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "Naplaćeno {interval}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "Izaberite prilagođeni plan sa samo specifikacijama koje trebate."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Započni"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Idealno za 15-25 igrača, modpackove, ili teško modiranje."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "Super za 6-15 igrača i nekoliko modova."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Najpopularnije"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Izaberite plan"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Izaberi plan"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "Idealno za 1-5 igrača, i nekoliko modova."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "Izaberite količinu RAM-a i specifikacije koje vam trebaju"
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Plan"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Regija"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Pregled"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Centralna Europa"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "Koliko RAM-a želite da vam server ima?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Sjeverna Amerika"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Gdje bih htjeli da vam server bude lociran?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Regija nije nađena na popisu? <link>Recite nam gdje bih htjeli da Modrinth serveri da budu locirani sljedeće!</link>"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Zapadna Europa"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Račun i sigurnost"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Izgled"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Vaše aplikacije"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Ovlaštene aplikacije"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "Naplaćivanje i subskripcije"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Taman"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Odaberite svoju preferiranu temu boja za Modrinth na ovom uređaju."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Svjetli"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Preferirana tamna tema"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Preferirana svjetla tema"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Sinkroniziraj sa sustavom"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Tema boja"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Jezik"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "Osobni pristupni tokeni"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Javni profil"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Sesije"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} u {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Imate nespremljene promjene"
+  }
+}
+

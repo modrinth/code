@@ -1,0 +1,66 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Gikinahanglan ang klaro nga paghulagway sa katuyoan ug kalihokan sa proyekto."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Pagdugang og paghulagway"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Mahimo nga makatabang sa pagkaila sa imong proyekto ang pagdugang sa matalagsaon, mapanahon, ug makapadani nga amoy."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Pagbutang og amoy"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Usba ang paghulagway"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Usba sa lisensya"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Usba ang kalangkoban"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Usba ang mga timailhan"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Usba ang titulo"
+  },
+  "nags.select-environments.title": {
+    "defaultMessage": "Pagpili ug mga kalikopan"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Bisitahon ang mga gusto sa paghulagway"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "Bisitahin ang mga gusto sa kalikopan"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Bisitahon ang mga gusto sa lisensiya"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Bisitahon ang mga gusto sa mga katayan"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Bisitahon ang mga gusto sa timailhan"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Bisitahon ang tinanan nga mga gusto"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Dili mahimong mopareho ang imong kalangkoban sa Ngalan sa imong proyekto. Hinungdanon ang pagbuhat sa mapahibaloon ug madanihon nga Kalangkoban."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Pagsakarga og galeriyang hulagway"
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Pagsakarga og bersiyon"
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Pamatud-i ang mga panggawas nga katayan"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Bisitahon ang mga gusto sa mga katayan"
+  }
+}
+

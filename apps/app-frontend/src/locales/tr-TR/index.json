@@ -1,0 +1,464 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Geliştirici modu açıldı."
+  },
+  "app.settings.downloading": {
+    "message": "V{version} İndiriliyor"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Görünüm"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Varsayılan profil seçenekleri"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Özellik bayrakları"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java kurulumları"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Gizlilik"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Kaynak yönetimi"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} yüklemeye hazır! Şimdi güncellemek için uygulamayı yeniden başlat ya da sen Modrinth App'ı kapatınca otomatik olarak güncellensin."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} indirmeyi bitirdi. Şimdi güncellemek için uygulamayı yeniden başlat ya da sen Modrinth App'ı kapatınca otomatik olarak güncellensin."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} artık mevcut! Ölçülü ağda olduğunuzdan otomatik olarak indirmedik."
+  },
+  "app.update-toast.changelog": {
+    "message": "Değişiklikler"
+  },
+  "app.update-toast.download": {
+    "message": "İndir ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "İndiriliyor..."
+  },
+  "app.update-toast.reload": {
+    "message": "Yeniden Yükle"
+  },
+  "app.update-toast.title": {
+    "message": "Güncelleme mevcut"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Yükleme tamamlandı"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Değişiklikleri görüntülemek için buraya tıklayın."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Sürüm {version} başarıyla indirildi!"
+  },
+  "app.update.download-update": {
+    "message": "Güncellemeyi indir"
+  },
+  "app.update.downloading-update": {
+    "message": "Güncelleme indiriliyor({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Güncellemeyi yüklemek için yeniden yükleyin"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Ekle ve oyna"
+  },
+  "instance.add-server.add-server": {
+    "message": "Sunucu ekle"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Kapalı"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Açık"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Sor"
+  },
+  "instance.add-server.title": {
+    "message": "Sunucu ekle"
+  },
+  "instance.edit-server.title": {
+    "message": "Sunucuyu düzenle"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Ana Sayfadan gizle"
+  },
+  "instance.edit-world.name": {
+    "message": "Dünya Adı"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft Dünyası"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Simgeyi sıfırla"
+  },
+  "instance.edit-world.title": {
+    "message": "Dünyayı düzenle"
+  },
+  "instance.filter.disabled": {
+    "message": "Devre dışı projeler"
+  },
+  "instance.filter.updates-available": {
+    "message": "Güncelleme var"
+  },
+  "instance.server-modal.address": {
+    "message": "Sunucu Adresi"
+  },
+  "instance.server-modal.name": {
+    "message": "Sunucu Adı"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Sunucusu"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Kaynak paketi"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Genel"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Profili sil"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Profili sil"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Profili, içindeki dünyaları, ayarları ve indirilen şeyleri cihazından sonsuza kadar siler. Bir profil silindikten sonra geri dönüşü yok. Dikkatli ol."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Siliniyor..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Klonla"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Kurulurken kopyalanamaz."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Kurulumu klonla"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Mevcut kurulumun kopyasını oluşturur, dünyalar, ayarlar, modlar vb. dahîl."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Simgeyi düzenle"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Simgeli kaldır"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Simgeyi değiştir"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Simge seç"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Gruplar"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Yeni grup oluştur"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Gruplar kurulumlarını kütüphanenin farklı bölümlerine koymanı ve organize etmeni sağlar."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Grup adı gir"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Ad"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Başlatma bağları"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Özel başlantı bağları"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Bağlar kullanıcılara oyunu başlatmadan önce veya başlattıktan sonra sistem komutları çalıştırmalarını sağlar."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Çıkış-sonrası"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Oyun kapandıktan sonra çalışır."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Çıkış-sonrası komutu gir..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Başlatma-öncesi"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Oyunu başlatmadan önce çalıştırır."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Başlatma-öncesi komutu gir..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Oyun başlatma bağları"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Örtü"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Minecraft başlatmak için örtü komutu."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Örtü komutunu girin..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Kurulum"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "Minecraft {game_version} için {platform} {version} zaten kurulmuş"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} zaten kurulu"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Sürüm değiştir"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Kur"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Kuruluyor"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Mod paket sürümleri çekiliyor"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Yeni sürüm kuruluyor"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Şu an kurulu"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Ayıklama bilgisi:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Mod paketi detayları alınıyor"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Oyun sürümü"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Kur"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Kurulum üzerinde çalışılıyor"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} sürümü"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Bağlı modpaketi detayları alınamıyor. Lütfen internet bağlantınızı kontrol edin."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader}, Minecraft {version} için mevcut değil. Başka bir mod yükleyici deneyin."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Bu profil bir mod paketine bağlı ama o mod paketi Modrinth'te bulunamıyor."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Platform"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Mod paketini tekrar indir"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Mod paketi tekrar kuruluyor"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Tekrar indirmek modpack'teki indirilmiş veya değişmiş her şeyi sıfırlar ve senin modpack'in üstüne eklediğin herhangi bir modu veya içeriği siler. Eğer kurulumu değiştirdi isen bu bazı şeyleri düzeltebilir, fakat ekstra indirdiğin modları kullanan dünyalar varsa bozulabilirler."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Bu kurulumu tekrar indirmek istediğine emin misin?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Orijinal modpack'in üstüne eklediğin herşeyi silip kurulumun içeriğini eski haline döndürür."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Modpack'i Tekrar İndir"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Tamir Et"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Tamir Ediliyor"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Tamir etmek Minecraft dosyalarını tekrar indirir ve bozulma varmı diye kontrol eder. Bu oyunun başlatıcısı ile ilgili bazı sorunları çözebilir ama indirilen modlar ile alakalı sorunları çözemez."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Tamir Edilsinmi?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Tamir ediliyor"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Mevcut olana sıfırla"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Bütün sürümleri göster"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "sürümü değiştir"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "indirilemez"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "tekrar indirilemez"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "tamir edilemez"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "İndirirken {action}"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Çevrimdışı iken {action}"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Tamir edilirken {action}"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(bilinmeyen sürüm)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Kurulum bağını koparr"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Eğer devam edersen, yeni bir kurulum oluşturmadan geri bağlayamayacaksın. Modpack güncellemeleri almayacaksın ve bu kurulum normal kuruluma dönüşecek."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Bu kurulumun bağını koparmak istediğine eminmisin?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Bu kurulum bir modpack'e bağlı, bu nedenle modlar güncellenemez ve mod yükleyicisini veya Minecraft sürümünü değiştiremezsin."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Modpack bağını kopar"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java ve bellek"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Ortam değişkenleri"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Bağlar"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java argümanları"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java kurulumu"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Ayrılan bellek"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Pencere"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Özel pencere ayarları"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Tam Ekran"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Oyunu tam ekran olarak başlat (options.txt kullanır)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Yükseklik"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Oyun penceresinin yüksekliği."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Yükseklik gir..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Genişlik"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Oyun penceresinin genişliği."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Genişlik gir..."
+  },
+  "instance.settings.title": {
+    "message": "Ayarlar"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Bir Minecraft Sunucusu"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Sunucuya bağlanılamıyor"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Adresi kopyala"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Ana Sayfada gösterme"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Kullanılabilir"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Bu kurulum zaten açık"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Hardcore modu"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Sunucu uyumlu değil"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Sunucuya erişilemedi"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Yalnızca Minecraft Alpha 1.0.5 veya daha yüksek sunuculara hızlıca girebilirsin"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Yalnızca Minecraft 1.20 veya daha yüksek sürümlerde tek oyunculu dünyalara doğrudan girebilirsin"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Kurulumu oyna"
+  },
+  "instance.worlds.type.server": {
+    "message": "Sunucu"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Tek Oyunculu"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Kurulumu gör"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Dünya şu anda kullanımda"
+  },
+  "search.filter.locked.instance": {
+    "message": "Kurulum tarafından sağlanan"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Oyun sürümü veren kurulumlar"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Yükleyici veren kurulumlar"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Kurulum ile senkronize et"
+  }
+}

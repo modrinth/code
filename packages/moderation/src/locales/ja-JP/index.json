@@ -1,0 +1,216 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "プロジェクトの目的と機能の明確な説明が必要です。"
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "説明を追加する"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "プロジェクトを象徴するアイコンを追加して、一目で分かるようにしましょう。"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "アイコンを追加する"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "ソースコードやバグの報告場所、Discordの招待などの外部リンクを追加してください。"
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "外部リンクを追加する"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "使用できるすべてのタグ {totalAvailableTags} を使用しています。これではタグから関連するプロジェクトを検索することができなくなってしまうので、プロジェクトに関係するタグのみを選択してください。"
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "プロジェクトと関係のあるタグを選択する"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "プロジェクトの説明が{length}文字しかありません。分かりやすく十分な情報を提供するために、少なくとも{minChars}文字以上の説明をおすすめします。"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "さらに説明を追加する"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "説明を編集する"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "ライセンスを編集する"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "概要を編集する"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "タグを編集する"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "タイトルを編集する"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "あなたのプロジェクトの第一印象はギャラリーに含まれる画像に大きく左右されます。"
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "ギャラリーに画像を追加する"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "ギャラリーのページを閲覧する"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "この{projectType}はソースコードの公開が必要なライセンスを使用しています。ソースコードのリンクの追加、バージョンごとのソースファイルの添付またはライセンスの変更を行ってください。"
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "ソースコードのリンクの追加"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "視覚障害のある方やインターネット回線速度の遅い方への配慮のため、十分で分かりやすい説明または画像の代替テキストが必要です。"
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "アクセシビリティを確保する"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "ライセンスのURLが無効です。"
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "ライセンスのURL は {domain} を指していますが、これはライセンス情報には適切ではありません。ライセンスのURL は、ソーシャルメディアやゲームプラットフォームなどではなく、直接ライセンスのファイルにリンクする必要があります。"
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "ライセンスのURLの形式が間違っています。ライセンスの本文にアクセスできる有効なURLを追加してください。"
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "有効なライセンスのリンクを追加する"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "外部リンクやライセンスのリンクにおいて、リンク先を不明確にするためのリンク短縮サービスやその他の方法の使用は禁止されています。適切なフルリンクのみを使用してください。"
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "短縮リンクサービスを使用しないでください"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "説明文内の{count, plural, other {#個}}のヘッダー{count, plural,other {}}は、あまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "ヘッダーを短縮"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "プロジェクトは、Minecraftのブランドを使用したり、「Minecraft」を名称の重要な部分として含めてはなりません。"
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "ブランド侵害を回避"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "一部の画像には代替テキストが設定されていません。これはアクセシビリティの観点から重要であり、特に視覚障害のあるユーザーにとって重要です。"
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "画像の代替テキストを追加"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Discordの招待リンクは、他のリンクタイプには使用できません。Discordのリンクは、Discord招待リンク欄にのみ入力してください。"
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Discordの招待リンクを移動する"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "モデレーションスレッドを表示する"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "モデレーターチームからのすべての懸念事項を確認し、対応した上で再提出してください。"
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "レビューモデレーターからのフィードバックを確認"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "{count}個の解像度タグ（{tags}）を選択しました。リソースパックは通常、主要な解像度と一致する1つの解像度タグのみを含むべきです。"
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "正しい解像度を選択"
+  },
+  "nags.select-environments.description": {
+    "defaultMessage": "{projectType} が機能する環境を選択ください。"
+  },
+  "nags.select-environments.title": {
+    "defaultMessage": "環境を選択"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "{projectType}が配布されているライセンスを選択してください。"
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "ライセンスを選択"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "プロジェクトに適切に適用されるタグを選択し、適切なユーザーがプロジェクトを見つけるのを助けてあげてください。"
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "タグ選択"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "訪問設定の表示"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "環境設定にアクセス"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "ライセンス設定を表示"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "リンクの設定を表示"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "タグの設定を表示"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "一般設定を表示"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "プロジェクトの名前と要約は同じにできません。情報豊富で魅力的な要約を作成することが重要です。"
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "要約を独自のものにしましょう！"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "要約には、フォーマット、改行、特殊文字、またはリンクを含めないでください。要約はプレーンテキストのみ表示されるためです。"
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "要約を整理"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "要約は{length}文字です。情報豊富で魅力的な要約を作成するには、少なくとも{minChars}文字以上を推奨します。"
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "要約を展開"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "プロジェクトの名前はシンプルで覚えやすくすることで、検索しやすくなります。\nバージョンとローダー情報は、プロジェクトと共に自動的に表示されます。"
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "名前を整理"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "{tagCount}個のタグを選択しました。関連する検索結果に表示されるように、{maxTagCount}個以下に減らすことを検討してください。"
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "正確なタグを選択"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "{type}{resourcepackMessage}の内容を展示するために、少なくとも1つのギャラリー画像が必要です。"
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "ギャラリー画像をアップロード"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "プロジェクトを審査に提出するためには、少なくても1つのバージョンが必要です。"
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "バージョンをアップロード"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "一部の外部リンクは、その種類のリンクに適さないドメインを使用している可能性があります。"
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "外部リンクの承認"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "バージョンページを表示"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "リンク設定を表示"
+  }
+}
+

@@ -24,6 +24,8 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
 
 #[tracing::instrument]
 pub async fn cancel_directory_change() -> crate::Result<()> {
+    // This is called to handle state initialization errors due to folder migrations
+    // failing, so fetching a DB connection pool from `State::get` is not reliable here
     let pool = crate::state::db::connect().await?;
     let mut settings = Settings::get(&pool).await?;
 

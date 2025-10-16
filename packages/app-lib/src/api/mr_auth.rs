@@ -1,7 +1,7 @@
 use crate::state::ModrinthCredentials;
 
 #[tracing::instrument]
-pub fn authenticate_begin_flow() -> String {
+pub fn authenticate_begin_flow() -> &'static str {
     crate::state::get_login_url()
 }
 

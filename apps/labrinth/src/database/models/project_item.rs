@@ -6,7 +6,9 @@ use super::{DBUser, ids::*};
 use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
-use crate::models::projects::{MonetizationStatus, ProjectStatus};
+use crate::models::projects::{
+    MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
+};
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
@@ -210,6 +212,8 @@ impl ProjectBuilder {
             webhook_sent: false,
             color: self.color,
             monetization_status: self.monetization_status,
+            side_types_migration_review_status:
+                SideTypesMigrationReviewStatus::Reviewed,
             loaders: vec![],
         };
         project_struct.insert(&mut *transaction).await?;
@@ -288,6 +292,7 @@ pub struct DBProject {
     pub webhook_sent: bool,
     pub color: Option<u32>,
     pub monetization_status: MonetizationStatus,
+    pub side_types_migration_review_status: SideTypesMigrationReviewStatus,
     pub loaders: Vec<String>,
 }
 
@@ -302,13 +307,15 @@ impl DBProject {
                 id, team_id, name, summary, description,
                 published, downloads, icon_url, raw_icon_url, status, requested_status,
                 license_url, license,
-                slug, color, monetization_status, organization_id
+                slug, color, monetization_status, organization_id,
+                side_types_migration_review_status
             )
             VALUES (
                 $1, $2, $3, $4, $5, $6,
                 $7, $8, $9, $10, $11,
                 $12, $13,
-                LOWER($14), $15, $16, $17
+                LOWER($14), $15, $16, $17,
+                $18
             )
             ",
             self.id as DBProjectId,
@@ -328,6 +335,7 @@ impl DBProject {
             self.color.map(|x| x as i32),
             self.monetization_status.as_str(),
             self.organization_id.map(|x| x.0 as i64),
+            self.side_types_migration_review_status.as_str()
         )
         .execute(&mut **transaction)
         .await?;
@@ -545,7 +553,7 @@ impl DBProject {
                 let mut exec = exec.acquire().await?;
                 let project_ids_parsed: Vec<i64> = ids
                     .iter()
-                    .flat_map(|x| parse_base62(&x.to_string()).ok())
+                    .filter_map(|x| parse_base62(&x.to_string()).ok())
                     .map(|x| x as i64)
                     .collect();
                 let slugs = ids
@@ -723,7 +731,7 @@ impl DBProject {
 
                         // Add loader fields to the set we need to fetch
                         let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
-                        for loader_field_id in loader_loader_field_ids.iter() {
+                        for loader_field_id in &loader_loader_field_ids {
                             loader_field_ids.insert(*loader_field_id);
                         }
 
@@ -770,6 +778,7 @@ impl DBProject {
                     m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
                     m.webhook_sent, m.color,
                     t.id thread_id, m.monetization_status monetization_status,
+                    m.side_types_migration_review_status side_types_migration_review_status,
                     ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
                     ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories
                     FROM mods m
@@ -834,6 +843,9 @@ impl DBProject {
                                 queued: m.queued,
                                 monetization_status: MonetizationStatus::from_string(
                                     &m.monetization_status,
+                                ),
+                                side_types_migration_review_status: SideTypesMigrationReviewStatus::from_string(
+                                    &m.side_types_migration_review_status,
                                 ),
                                 loaders,
                             },

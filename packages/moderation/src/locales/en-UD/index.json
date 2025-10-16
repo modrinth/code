@@ -1,0 +1,216 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "˙pǝɹᴉnbǝɹ sᴉ uoᴉʇɔunɟ puɐ ǝsodɹnd s,ʇɔǝſoɹd ǝɥʇ sǝqᴉɹɔsǝp ʎlɹɐǝlɔ ʇɐɥʇ uoᴉʇdᴉɹɔsǝp Ɐ"
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "uoᴉʇdᴉɹɔsǝp ɐ pp∀"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "˙ʇno puɐʇs ʇᴉ sdlǝɥ puɐ ǝlqɐᴉɟᴉʇuǝpᴉ ʇɔǝɾoɹd ɹnoʎ sǝʞɐɯ uoɔᴉ ƃuᴉƃɐƃuǝ puɐ 'ʇuɐʌǝlǝɹ 'ǝnbᴉun ɐ ƃuᴉpp∀"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "uoɔᴉ uɐ pp∀"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "˙ǝʇᴉʌuᴉ pɹoɔsᴉp ɐ ɹo 'ɹǝʞɔɐɹʇ ǝnssᴉ uɐ 'ǝpoɔ ǝɔɹnos sɐ ɥɔns 'ɥʇuᴉɹpoW ɟo ǝpᴉsʇno pǝʇǝƃɹɐʇ sʞuᴉl ʇuɐʌǝlǝɹ ʎuɐ pp∀"
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "sʞuᴉl lɐuɹǝʇxǝ pp∀"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "˙ʇɔǝɾoɹd ɹnoʎ oʇ ʇuɐʌǝlǝɹ ǝɹɐ ʇɐɥʇ sƃɐʇ ǝɥʇ ʎluo ʇɔǝlǝs ǝsɐǝlԀ ˙sʇɔǝɾoɹd ʇuɐʌǝlǝɹ puᴉɟ sɹǝsn dlǝɥ oʇ ʇuɐǝɯ ǝɹɐ ɥɔᴉɥʍ 'sƃɐʇ ɟo ǝsodɹnd ǝɥʇ sʇɐǝɟǝp sᴉɥ┴ ˙sƃɐʇ ǝlqɐlᴉɐʌɐ {totalAvailableTags}  llɐ pǝʇɔǝlǝs ǝʌ,no⅄"
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "sƃɐʇ ǝʇɐɹnɔɔɐ ʇɔǝlǝS"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "˙uoᴉʇdᴉɹɔsǝp ǝʌᴉʇɐɯɹoɟuᴉ puɐ ɹɐǝlɔ ɐ ǝʇɐǝɹɔ oʇ pǝpuǝɯɯoɔǝɹ sᴉ sɹǝʇɔɐɹɐɥɔ {minChars}  ʇsɐǝl ʇ∀ ˙sɹǝʇɔɐɹɐɥɔ ǝlqɐpɐǝɹ {length}  sᴉ uoᴉʇdᴉɹɔsǝp ɹno⅄"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "uoᴉʇdᴉɹɔsǝp ǝɥʇ puɐdxƎ"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "uoᴉʇdᴉɹɔsǝp ʇᴉpƎ"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "ǝsuǝɔᴉl ʇᴉpƎ"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "ʎɹɐɯɯns ʇᴉpƎ"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "sƃɐʇ ʇᴉpƎ"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "ǝlʇᴉʇ ʇᴉpƎ"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "˙uoᴉssǝɹdɯᴉ ʇsɹᴉɟ sʇᴉ sǝʞɐɯ ʇɔǝɾoɹd ɹnoʎ ʍoɥ uǝʇɟo sᴉ ǝƃɐɯᴉ ʎɹǝllɐƃ pǝɹnʇɐǝɟ ǝɥ┴"
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "ǝƃɐɯᴉ ʎɹǝllɐƃ ɐ ǝɹnʇɐǝℲ"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "ǝƃɐd ʎɹǝllɐƃ ʇᴉsᴉΛ"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "˙ǝsuǝɔᴉl ʇuǝɹǝɟɟᴉp ɐ ƃuᴉsn ɹǝpᴉsuoɔ ɹo 'uoᴉsɹǝʌ lɐuoᴉʇᴉppɐ ɥɔɐǝ ɹoɟ ǝlᴉɟ sǝɔɹnos ɹo ʞuᴉl ǝpoɔ ǝɔɹnos ɐ ǝpᴉʌoɹd ǝsɐǝlԀ ˙ǝlqɐlᴉɐʌɐ ǝq oʇ ǝpoɔ ǝɔɹnos sǝɹᴉnbǝɹ ɥɔᴉɥʍ ǝsuǝɔᴉl ɐ sǝsn {projectType} ɹno⅄"
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "ǝpoɔ ǝɔɹnos ǝpᴉʌoɹԀ"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "˙suoᴉʇɔǝuuoɔ ʇǝuɹǝʇuᴉ ʍols ɥʇᴉʍ ɹo sɹǝpɐǝɹ uǝǝɹɔs ƃuᴉsn ǝsoɥʇ oʇ ǝlqᴉssǝɔɔɐ ʇᴉ ƃuᴉdǝǝʞ 'ʇxǝʇ-ʇlɐ ǝƃɐɯᴉ ɹo ʇxǝʇ uᴉɐld ʇuǝᴉɔᴉɟɟns uᴉɐʇuoɔ plnoɥs uoᴉʇdᴉɹɔsǝp ɹno⅄"
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "ʎʇᴉlᴉqᴉssǝɔɔɐ ǝɹnsuƎ"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "˙pᴉlɐʌuᴉ sᴉ ˥ɹ∩ ǝsuǝɔᴉ˥"
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "˙ɔʇǝ 'sɯɹoɟʇɐld ƃuᴉɯɐƃ 'ɐᴉpǝɯ lɐᴉɔos ʇou 'ǝlᴉɟ ǝsuǝɔᴉl ɹnoʎ oʇ ʎlʇɔǝɹᴉp ʞuᴉl plnoɥs s˥ɹ∩ ǝsuǝɔᴉ˥ ˙uoᴉʇɐɯɹoɟuᴉ ǝsuǝɔᴉl ɹoɟ ǝʇɐᴉɹdoɹddɐ ʇou sᴉ ɥɔᴉɥʍ '{domain} oʇ sʇuᴉod ˥ɹ∩ ǝsuǝɔᴉl ɹno⅄"
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "˙ʇxǝʇ ǝsuǝɔᴉl ɹnoʎ oʇ ˥ɹ∩ pᴉlɐʌ ɐ ǝpᴉʌoɹd ǝsɐǝlԀ ˙pǝɯɹoɟlɐɯ ǝq oʇ sɹɐǝddɐ ˥ɹ∩ ǝsuǝɔᴉl ɹno⅄"
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "ʞuᴉl ǝsuǝɔᴉl pᴉlɐʌ ɐ pp∀"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "˙sʞuᴉl ɥʇƃuǝl llnɟ ǝʇɐᴉɹdoɹddɐ ǝsn ʎluo ǝsɐǝld 'pǝʇᴉqᴉɥoɹd sᴉ ʞuᴉl ǝsuǝɔᴉl ɹo sʞuᴉl lɐuɹǝʇxǝ ɹnoʎ uᴉ pɐǝl ʎɐɯ ʞuᴉl ɐ ǝɹǝɥʍ ǝɹnɔsqo oʇ spoɥʇǝɯ ɹǝɥʇo ɹo sɹǝuǝʇɹoɥs ʞuᴉl ɟo ǝs∩"
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "sɹǝuǝʇɹoɥs ʞuᴉl ǝsn ʇ,uop"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "˙sǝɔuǝʇuǝs llnɟ ʇou ˋsǝlʇᴉʇ uoᴉʇɔǝs sɐ ʇɔɐ puɐ ǝsᴉɔuoɔ ǝq plnoɥs sɹǝpɐǝH ˙ɓuol ooʇ {count, plural, one {sᴉ} other {ǝɹɐ}} uoᴉʇdᴉɹɔsǝp ɹnoʎ uᴉ {count, plural, one {ɹǝpɐǝɥ #} other {sɹǝpɐǝɥ #}}"
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "sɹǝpɐǝɥ uǝʇɹoɥS"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "˙ǝɯɐu ǝɥʇ ɟo ʇɹɐd ʇuɐɔᴉɟᴉuɓᴉs ɐ sɐ „ʇɟɐɹɔǝuᴉW„ ǝpnlɔuᴉ ɹo ɓuᴉpuɐɹq s,ʇɟɐɹɔǝuᴉW ǝsn ʇou ʇsnɯ sʇɔǝſoɹԀ"
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "ʇuǝɯǝɓuᴉɹɟuᴉ puɐɹq pᴉoʌⱯ"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "˙sɹǝsn pǝɹᴉɐdɯᴉ ʎllɐnsᴉʌ ɹoɟ ʎllɐᴉɔǝdsǝ ˋʎʇᴉlᴉqᴉssǝɔɔɐ ɹoɟ ʇuɐʇɹodɯᴉ sᴉ ɥɔᴉɥʍ ˋʇxǝʇ ʇlɐ ɓuᴉssᴉɯ ǝɹɐ sǝɓɐɯᴉ ɹnoʎ ɟo ǝɯoS"
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "ʇxǝʇ ʇlɐ ǝɓɐɯᴉ ppⱯ"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "˙ʎluo plǝᴉɟ ʞuᴉl ǝʇᴉʌuI pɹoɔsᴉᗡ ǝɥʇ uᴉ ʞuᴉl pɹoɔsᴉᗡ ɹnoʎ ʇnd ǝsɐǝlԀ ˙sǝdʎʇ ʞuᴉl ɹǝɥʇo ɹoɟ pǝsn ǝq ʇou uɐɔ sǝʇᴉʌuᴉ pɹoɔsᴉᗡ"
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "ǝʇᴉʌuᴉ pɹoɔsᴉᗡ ǝʌoW"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "pɐǝɹɥʇ uoᴉʇɐɹǝpoɯ ʇᴉsᴉΛ"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "˙ɓuᴉʇʇᴉɯqnsǝɹ ǝɹoɟǝq ɯɐǝʇ uoᴉʇɐɹǝpoɯ ǝɥʇ ɯoɹɟ suɹǝɔuoɔ llɐ ssǝɹppɐ puɐ ʍǝᴉʌǝᴚ"
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "ʞɔɐqpǝǝɟ ɹoʇɐɹǝpoɯ ʍǝᴉʌǝᴚ"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "˙uoᴉʇnlosǝɹ ʎɹɐɯᴉɹd ɹᴉǝɥʇ sǝɥɔʇɐɯ ʇɐɥʇ ɓɐʇ uoᴉʇnlosǝɹ ǝuo ǝʌɐɥ ʎluo ʎllɐɔᴉdʎʇ plnoɥs sʞɔɐd ǝɔɹnosǝᴚ ˙({tags}) sɓɐʇ uoᴉʇnlosǝɹ {count} pǝʇɔǝlǝs ǝʌ,no⅄"
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "uoᴉʇnlosǝɹ ʇɔǝɹɹoɔ ʇɔǝlǝS"
+  },
+  "nags.select-environments.description": {
+    "defaultMessage": "˙uo suoᴉʇɔunɟ {projectType} ɹnoʎ sʇuǝɯuoɹᴉʌuǝ ǝɥʇ ʇɔǝlǝS"
+  },
+  "nags.select-environments.title": {
+    "defaultMessage": "sʇuǝɯuoɹᴉʌuǝ ʇɔǝlǝS"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "˙ɹǝpun pǝʇnqᴉɹʇsᴉp sᴉ {projectType} ɹnoʎ ǝsuǝɔᴉl ǝɥʇ ʇɔǝlǝS"
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "ǝsuǝɔᴉl ɐ ʇɔǝlǝS"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "˙ʇᴉ puᴉɟ sɹǝsn ʇɥɓᴉɹ ǝɥʇ dlǝɥ oʇ ʇɔǝſoɹd ɹnoʎ oʇ ʎlddɐ ʎlʇɔǝɹɹoɔ ʇɐɥʇ sɓɐʇ ǝɥʇ ʇɔǝlǝS"
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "sɓɐʇ ʇɔǝlǝS"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "sɓuᴉʇʇǝs uoᴉʇdᴉɹɔsǝp ʇᴉsᴉΛ"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "sƃuᴉʇʇǝs ʇuǝɯuoɹᴉʌuǝ ʇᴉsᴉΛ"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "sɓuᴉʇʇǝs ǝsuǝɔᴉl ʇᴉsᴉΛ"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "sɓuᴉʇʇǝs sʞuᴉl ʇᴉsᴉΛ"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "sɓuᴉʇʇǝs ɓɐʇ ʇᴉsᴉΛ"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "sɓuᴉʇʇǝs lɐɹǝuǝɓ ʇᴉsᴉΛ"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "˙ʎɹɐɯɯnS ɓuᴉɔᴉʇuǝ puɐ ǝʌᴉʇɐɯɹoɟuᴉ uɐ ǝʇɐǝɹɔ oʇ ʇuɐʇɹodɯᴉ s,ʇI ˙ǝɯɐN s,ʇɔǝſoɹd ɹnoʎ sɐ ǝɯɐs ǝɥʇ ǝq ʇou uɐɔ ʎɹɐɯɯns ɹno⅄"
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "ǝnbᴉun ʎɹɐɯɯns ǝɥʇ ǝʞɐW"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "˙ʇxǝʇ uᴉɐld ʎɐldsᴉp ʎluo llᴉʍ ʎɹɐɯɯns ǝɥʇ ǝɔuᴉs ˋsʞuᴉl ɹo ˋsɹǝʇɔɐɹɐɥɔ lɐᴉɔǝds ˋsʞɐǝɹq ǝuᴉl ˋɓuᴉʇʇɐɯɹoɟ uᴉɐʇuoɔ ʇou plnoɥs ʎɹɐɯɯns ɹno⅄"
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "ʎɹɐɯɯns ǝɥʇ dn ɹɐǝlƆ"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "˙ʎɹɐɯɯns ɓuᴉɔᴉʇuǝ puɐ ǝʌᴉʇɐɯɹoɟuᴉ uɐ ǝʇɐǝɹɔ oʇ pǝpuǝɯɯoɔǝɹ sᴉ sɹǝʇɔɐɹɐɥɔ {minChars} ʇsɐǝl ʇⱯ ˙sɹǝʇɔɐɹɐɥɔ {length} sᴉ ʎɹɐɯɯns ɹno⅄"
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "ʎɹɐɯɯns ǝɥʇ puɐdxƎ"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "˙ʇɔǝſoɹd ɹnoʎ ǝpᴉsɓuolɐ pǝʎɐldsᴉp ʎllɐɔᴉʇɐɯoʇnɐ sᴉ uoᴉʇɐɯɹoɟuᴉ ɹǝpɐol puɐ uoᴉsɹǝΛ ˙puᴉɟ oʇ ɹǝᴉsɐǝ ǝlqɐɹoɯǝɯ ʇᴉ sǝʞɐɯ puɐ uɐǝlɔ ǝɯɐN s,ʇɔǝſoɹd ɹnoʎ ɓuᴉdǝǝꓘ"
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "ǝɯɐu ǝɥʇ dn uɐǝlƆ"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "˙sʇlnsǝɹ ɥɔɹɐǝs ʇuɐʌǝlǝɹ uᴉ sɹɐǝddɐ ʇɔǝſoɹd ɹnoʎ ǝɹns ǝʞɐɯ oʇ ɹǝʍǝɟ ɹo {maxTagCount} oʇ ɓuᴉɔnpǝɹ ɹǝpᴉsuoƆ ˙sɓɐʇ {tagCount} pǝʇɔǝlǝs ǝʌ,no⅄"
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "sɓɐʇ ǝʇɐɹnɔɔɐ ʇɔǝlǝS"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "˙{resourcepackMessage}{type} ɹnoʎ ɟo ʇuǝʇuoɔ ǝɥʇ ǝsɐɔʍoɥs oʇ pǝɹᴉnbǝɹ sᴉ ǝɓɐɯᴉ ʎɹǝllɐɓ ǝuo ʇsɐǝl ʇⱯ"
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "ǝɓɐɯᴉ ʎɹǝllɐɓ ɐ pɐold∩"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "˙ʍǝᴉʌǝɹ ɹoɟ pǝʇʇᴉɯqns ǝq oʇ ʇɔǝſoɹd ɐ ɹoɟ pǝɹᴉnbǝɹ sᴉ uoᴉsɹǝʌ ǝuo ʇsɐǝl ʇⱯ"
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "uoᴉsɹǝʌ ɐ pɐold∩"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "˙ʞuᴉl ɟo ǝdʎʇ ʇɐɥʇ ɹoɟ ǝʇɐᴉɹdoɹddɐuᴉ ǝɹɐ ʇɐɥʇ suᴉɐɯop ɓuᴉsn ǝq ʎɐɯ sʞuᴉl lɐuɹǝʇxǝ ɹnoʎ ɟo ǝɯoS"
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "sʞuᴉl lɐuɹǝʇxǝ ʎɟᴉɹǝΛ"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "ǝɓɐd suoᴉsɹǝʌ ʇᴉsᴉΛ"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "sɓuᴉʇʇǝs sʞuᴉl ʇᴉsᴉΛ"
+  }
+}
+

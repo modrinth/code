@@ -506,27 +506,25 @@ async fn fetch(
 
                             return Ok(lib);
                         }
-                    } else if let Some(url) = &lib.url {
-                        if !url.is_empty() {
-                            insert_mirrored_artifact(
-                                &lib.name,
-                                None,
-                                vec![
-                                    url.clone(),
-                                    "https://libraries.minecraft.net/"
-                                        .to_string(),
-                                    "https://maven.creeperhost.net/"
-                                        .to_string(),
-                                    maven_url.to_string(),
-                                ],
-                                false,
-                                mirror_artifacts,
-                            )?;
+                    } else if let Some(url) = &lib.url
+                        && !url.is_empty()
+                    {
+                        insert_mirrored_artifact(
+                            &lib.name,
+                            None,
+                            vec![
+                                url.clone(),
+                                "https://libraries.minecraft.net/".to_string(),
+                                "https://maven.creeperhost.net/".to_string(),
+                                maven_url.to_string(),
+                            ],
+                            false,
+                            mirror_artifacts,
+                        )?;
 
-                            lib.url = Some(format_url("maven/"));
+                        lib.url = Some(format_url("maven/"));
 
-                            return Ok(lib);
-                        }
+                        return Ok(lib);
                     }
 
                     // Other libraries are generally available in the "maven" directory of the installer. If they are

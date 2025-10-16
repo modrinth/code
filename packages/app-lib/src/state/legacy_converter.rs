@@ -19,6 +19,8 @@ use std::path::PathBuf;
 use tokio::sync::Semaphore;
 use uuid::Uuid;
 
+use super::MinecraftProfile;
+
 pub async fn migrate_legacy_data<'a, E>(exec: E) -> crate::Result<()>
 where
     E: sqlx::Executor<'a, Database = sqlx::Sqlite> + Copy,
@@ -29,9 +31,7 @@ where
         return Ok(());
     };
 
-    let old_launcher_root = if let Some(dir) = default_settings_dir() {
-        dir
-    } else {
+    let Some(old_launcher_root) = default_settings_dir() else {
         return Ok(());
     };
     let old_launcher_root_str = old_launcher_root.to_string_lossy().to_string();
@@ -76,16 +76,15 @@ where
             .loaded_config_dir
             .clone()
             .and_then(|x| x.to_str().map(|x| x.to_string()))
+            && path != old_launcher_root_str
         {
-            if path != old_launcher_root_str {
-                settings.custom_dir = Some(path);
-            }
+            settings.custom_dir = Some(path);
         }
 
         settings.prev_custom_dir = Some(old_launcher_root_str.clone());
 
         for (_, legacy_version) in legacy_settings.java_globals.0 {
-            if let Ok(Some(java_version)) =
+            if let Ok(java_version) =
                 check_jre(PathBuf::from(legacy_version.path)).await
             {
                 java_version.upsert(exec).await?;
@@ -119,13 +118,16 @@ where
         .await
         {
             let minecraft_users_len = minecraft_auth.users.len();
-            for (uuid, credential) in minecraft_auth.users {
+            for (uuid, legacy_credentials) in minecraft_auth.users {
                 Credentials {
-                    id: credential.id,
-                    username: credential.username,
-                    access_token: credential.access_token,
-                    refresh_token: credential.refresh_token,
-                    expires: credential.expires,
+                    offline_profile: MinecraftProfile {
+                        id: legacy_credentials.id,
+                        name: legacy_credentials.username,
+                        ..MinecraftProfile::default()
+                    },
+                    access_token: legacy_credentials.access_token,
+                    refresh_token: legacy_credentials.refresh_token,
+                    expires: legacy_credentials.expires,
                     active: minecraft_auth.default_user == Some(uuid)
                         || minecraft_users_len == 1,
                 }
@@ -133,31 +135,27 @@ where
                 .await?;
             }
 
-            if let Some(device_token) = minecraft_auth.token {
-                if let Ok(private_key) =
+            if let Some(device_token) = minecraft_auth.token
+                && let Ok(private_key) =
                     SigningKey::from_pkcs8_pem(&device_token.private_key)
-                {
-                    if let Ok(uuid) = Uuid::parse_str(&device_token.id) {
-                        DeviceTokenPair {
-                            token: DeviceToken {
-                                issue_instant: device_token.token.issue_instant,
-                                not_after: device_token.token.not_after,
-                                token: device_token.token.token,
-                                display_claims: device_token
-                                    .token
-                                    .display_claims,
-                            },
-                            key: DeviceTokenKey {
-                                id: uuid,
-                                key: private_key,
-                                x: device_token.x,
-                                y: device_token.y,
-                            },
-                        }
-                        .upsert(exec)
-                        .await?;
-                    }
+                && let Ok(uuid) = Uuid::parse_str(&device_token.id)
+            {
+                DeviceTokenPair {
+                    token: DeviceToken {
+                        issue_instant: device_token.token.issue_instant,
+                        not_after: device_token.token.not_after,
+                        token: device_token.token.token,
+                        display_claims: device_token.token.display_claims,
+                    },
+                    key: DeviceTokenKey {
+                        id: uuid,
+                        key: private_key,
+                        x: device_token.x,
+                        y: device_token.y,
+                    },
                 }
+                .upsert(exec)
+                .await?;
             }
         }
 
@@ -177,12 +175,10 @@ where
 
                 let profile_path = entry.path().join("profile.json");
 
-                let profile = if let Ok(profile) =
+                let Ok(profile) =
                     read_json::<LegacyProfile>(&profile_path, &io_semaphore)
                         .await
-                {
-                    profile
-                } else {
+                else {
                     continue;
                 };
 
@@ -206,100 +202,93 @@ where
                         update_version,
                         ..
                     } = project.metadata
-                    {
-                        if let Some(file) = version
+                        && let Some(file) = version
                             .files
                             .iter()
                             .find(|x| x.hashes.get("sha512") == Some(&sha512))
-                        {
-                            if let Some(sha1) = file.hashes.get("sha1") {
-                                if let Ok(metadata) = full_path.metadata() {
-                                    let file_name = format!(
-                                        "{}/{}",
-                                        profile.path,
-                                        path.replace('\\', "/")
-                                            .replace(".disabled", "")
-                                    );
+                        && let Some(sha1) = file.hashes.get("sha1")
+                    {
+                        if let Ok(metadata) = full_path.metadata() {
+                            let file_name = format!(
+                                "{}/{}",
+                                profile.path,
+                                path.replace('\\', "/")
+                                    .replace(".disabled", "")
+                            );
 
-                                    cached_entries.push(CacheValue::FileHash(
-                                        CachedFileHash {
-                                            path: file_name,
-                                            size: metadata.len(),
-                                            hash: sha1.clone(),
-                                            project_type: ProjectType::get_from_parent_folder(&full_path),
-                                        },
-                                    ));
-                                }
-
-                                cached_entries.push(CacheValue::File(
-                                    CachedFile {
-                                        hash: sha1.clone(),
-                                        project_id: version.project_id.clone(),
-                                        version_id: version.id.clone(),
-                                    },
-                                ));
-
-                                if let Some(update_version) = update_version {
-                                    let mod_loader: ModLoader =
-                                        profile.metadata.loader.into();
-                                    cached_entries.push(
-                                        CacheValue::FileUpdate(
-                                            CachedFileUpdate {
-                                                hash: sha1.clone(),
-                                                game_version: profile
-                                                    .metadata
-                                                    .game_version
-                                                    .clone(),
-                                                loaders: vec![
-                                                    mod_loader
-                                                        .as_str()
-                                                        .to_string(),
-                                                ],
-                                                update_version_id:
-                                                    update_version.id.clone(),
-                                            },
+                            cached_entries.push(CacheValue::FileHash(
+                                CachedFileHash {
+                                    path: file_name,
+                                    size: metadata.len(),
+                                    hash: sha1.clone(),
+                                    project_type:
+                                        ProjectType::get_from_parent_folder(
+                                            &full_path,
                                         ),
-                                    );
-
-                                    cached_entries.push(CacheValue::Version(
-                                        (*update_version).into(),
-                                    ));
-                                }
-
-                                let members = members
-                                    .into_iter()
-                                    .map(|x| {
-                                        let user = User {
-                                            id: x.user.id,
-                                            username: x.user.username,
-                                            avatar_url: x.user.avatar_url,
-                                            bio: x.user.bio,
-                                            created: x.user.created,
-                                            role: x.user.role,
-                                            badges: 0,
-                                        };
-
-                                        cached_entries.push(CacheValue::User(
-                                            user.clone(),
-                                        ));
-
-                                        TeamMember {
-                                            team_id: x.team_id,
-                                            user: user.clone(),
-                                            is_owner: x.role == "Owner",
-                                            role: x.role,
-                                            ordering: x.ordering,
-                                        }
-                                    })
-                                    .collect::<Vec<_>>();
-
-                                cached_entries.push(CacheValue::Team(members));
-
-                                cached_entries.push(CacheValue::Version(
-                                    (*version).into(),
-                                ));
-                            }
+                                },
+                            ));
                         }
+
+                        cached_entries.push(CacheValue::File(CachedFile {
+                            hash: sha1.clone(),
+                            project_id: version.project_id.clone(),
+                            version_id: version.id.clone(),
+                        }));
+
+                        if let Some(update_version) = update_version {
+                            let mod_loader: ModLoader =
+                                profile.metadata.loader.into();
+                            cached_entries.push(CacheValue::FileUpdate(
+                                CachedFileUpdate {
+                                    hash: sha1.clone(),
+                                    game_version: profile
+                                        .metadata
+                                        .game_version
+                                        .clone(),
+                                    loaders: vec![
+                                        mod_loader.as_str().to_string(),
+                                    ],
+                                    update_version_id: update_version
+                                        .id
+                                        .clone(),
+                                },
+                            ));
+
+                            cached_entries.push(CacheValue::Version(
+                                (*update_version).into(),
+                            ));
+                        }
+
+                        let members = members
+                            .into_iter()
+                            .map(|x| {
+                                let user = User {
+                                    id: x.user.id,
+                                    username: x.user.username,
+                                    avatar_url: x.user.avatar_url,
+                                    bio: x.user.bio,
+                                    created: x.user.created,
+                                    role: x.user.role,
+                                    badges: 0,
+                                };
+
+                                cached_entries
+                                    .push(CacheValue::User(user.clone()));
+
+                                TeamMember {
+                                    team_id: x.team_id,
+                                    user,
+                                    is_owner: x.role == "Owner",
+                                    role: x.role,
+                                    ordering: x.ordering,
+                                }
+                            })
+                            .collect::<Vec<_>>();
+
+                        cached_entries.push(CacheValue::Team(members));
+
+                        cached_entries
+                            .push(CacheValue::Version((*version).into()));
                     }
                 }
 
@@ -331,16 +320,15 @@ where
                         .map(|x| x.id),
                     groups: profile.metadata.groups,
                     linked_data: profile.metadata.linked_data.and_then(|x| {
-                        if let Some(project_id) = x.project_id {
-                            if let Some(version_id) = x.version_id {
-                                if let Some(locked) = x.locked {
-                                    return Some(LinkedData {
-                                        project_id,
-                                        version_id,
-                                        locked,
-                                    });
-                                }
-                            }
+                        if let Some(project_id) = x.project_id
+                            && let Some(version_id) = x.version_id
+                            && let Some(locked) = x.locked
+                        {
+                            return Some(LinkedData {
+                                project_id,
+                                version_id,
+                                locked,
+                            });
                         }
 
                         None

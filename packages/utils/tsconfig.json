@@ -1,9 +1,3 @@
 {
-  "extends": "tsconfig/base.json",
-  "include": [".", ".eslintrc.js"],
-  "exclude": ["dist", "build", "node_modules"],
-  "compilerOptions": {
-    "lib": ["esnext", "dom"],
-    "noImplicitAny": false
-  }
+	"extends": "@modrinth/tooling-config/typescript/vue.json"
 }

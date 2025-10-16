@@ -14,6 +14,11 @@ mod error;
 #[cfg(target_os = "macos")]
 mod macos;
 
+#[cfg(feature = "updater")]
+mod updater_impl;
+#[cfg(not(feature = "updater"))]
+mod updater_impl_noop;
+
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
 #[tauri::command]
@@ -21,75 +26,9 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     tracing::info!("Initializing app event state...");
     theseus::EventState::init(app.clone()).await?;
 
-    #[cfg(feature = "updater")]
-    'updater: {
-        if env::var("MODRINTH_EXTERNAL_UPDATE_PROVIDER").is_ok() {
-            State::init().await?;
-            break 'updater;
-        }
+    tracing::info!("Initializing app state...");
+    State::init().await?;
 
-        use tauri_plugin_updater::UpdaterExt;
-
-        let updater = app.updater_builder().build()?;
-
-        let update_fut = updater.check();
-
-        tracing::info!("Initializing app state...");
-        State::init().await?;
-
-        let check_bar = theseus::init_loading(
-            theseus::LoadingBarType::CheckingForUpdates,
-            1.0,
-            "Checking for updates...",
-        )
-        .await?;
-
-        tracing::info!("Checking for updates...");
-        let update = update_fut.await;
-
-        drop(check_bar);
-
-        if let Some(update) = update.ok().flatten() {
-            tracing::info!("Update found: {:?}", update.download_url);
-            let loader_bar_id = theseus::init_loading(
-                theseus::LoadingBarType::LauncherUpdate {
-                    version: update.version.clone(),
-                    current_version: update.current_version.clone(),
-                },
-                1.0,
-                "Updating Modrinth App...",
-            )
-            .await?;
-
-            // 100 MiB
-            const DEFAULT_CONTENT_LENGTH: u64 = 1024 * 1024 * 100;
-
-            update
-                .download_and_install(
-                    |chunk_length, content_length| {
-                        let _ = theseus::emit_loading(
-                            &loader_bar_id,
-                            (chunk_length as f64)
-                                / (content_length
-                                    .unwrap_or(DEFAULT_CONTENT_LENGTH)
-                                    as f64),
-                            None,
-                        );
-                    },
-                    || {},
-                )
-                .await?;
-
-            app.restart();
-        }
-    }
-
-    #[cfg(not(feature = "updater"))]
-    {
-        State::init().await?;
-    }
-
-    tracing::info!("Finished checking for updates!");
     let state = State::get().await?;
     app.asset_protocol_scope()
         .allow_directory(state.directories.caches_dir(), true)?;
@@ -124,6 +63,18 @@ fn show_window(app: tauri::AppHandle) {
 fn is_dev() -> bool {
     cfg!(debug_assertions)
 }
+
+#[tauri::command]
+fn are_updates_enabled() -> bool {
+    cfg!(feature = "updater")
+        && env::var("MODRINTH_EXTERNAL_UPDATE_PROVIDER").is_err()
+}
+
+#[cfg(feature = "updater")]
+pub use updater_impl::*;
+
+#[cfg(not(feature = "updater"))]
+pub use updater_impl_noop::*;
 
 // Toggles decorations
 #[tauri::command]
@@ -166,7 +117,17 @@ fn main() {
 
     #[cfg(feature = "updater")]
     {
-        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+        use tauri_plugin_http::reqwest::header::{HeaderValue, USER_AGENT};
+        use theseus::LAUNCHER_USER_AGENT;
+        builder = builder.plugin(
+            tauri_plugin_updater::Builder::new()
+                .header(
+                    USER_AGENT,
+                    HeaderValue::from_str(LAUNCHER_USER_AGENT).unwrap(),
+                )
+                .unwrap()
+                .build(),
+        );
     }
 
     builder = builder
@@ -183,6 +144,7 @@ fn main() {
                 let _ = win.set_focus();
             }
         }))
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
@@ -190,6 +152,11 @@ fn main() {
         .plugin(
             tauri_plugin_window_state::Builder::default()
                 .with_filename("app-window-state.json")
+                // Use *only* POSITION and SIZE state flags, because saving VISIBLE causes the `visible: false` to not take effect
+                .with_state_flags(
+                    tauri_plugin_window_state::StateFlags::POSITION
+                        | tauri_plugin_window_state::StateFlags::SIZE,
+                )
                 .build(),
         )
         .setup(|app| {
@@ -197,7 +164,7 @@ fn main() {
             {
                 let payload = macos::deep_link::get_or_init_payload(app);
 
-                let mtx_copy = payload.payload.clone();
+                let mtx_copy = payload.payload;
                 app.listen("deep-link://new-url", move |url| {
                     let mtx_copy_copy = mtx_copy.clone();
                     let request = url.payload().to_owned();
@@ -229,14 +196,13 @@ fn main() {
                 tauri::async_runtime::spawn(api::utils::handle_command(
                     payload,
                 ));
-                dbg!(url);
             });
 
             #[cfg(not(target_os = "linux"))]
-            if let Some(window) = app.get_window("main") {
-                if let Err(e) = window.set_shadow(true) {
-                    tracing::warn!("Failed to set window shadow: {e}");
-                }
+            if let Some(window) = app.get_window("main")
+                && let Err(e) = window.set_shadow(true)
+            {
+                tracing::warn!("Failed to set window shadow: {e}");
             }
 
             Ok(())
@@ -249,6 +215,7 @@ fn main() {
         .plugin(api::logs::init())
         .plugin(api::jre::init())
         .plugin(api::metadata::init())
+        .plugin(api::minecraft_skins::init())
         .plugin(api::pack::init())
         .plugin(api::process::init())
         .plugin(api::profile::init())
@@ -260,9 +227,14 @@ fn main() {
         .plugin(api::ads::init())
         .plugin(api::friends::init())
         .plugin(api::worlds::init())
+        .manage(PendingUpdateData::default())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
+            are_updates_enabled,
+            get_update_size,
+            enqueue_update_for_installation,
+            remove_enqueued_update,
             toggle_decorations,
             show_window,
             restart_app,
@@ -273,22 +245,56 @@ fn main() {
 
     match app {
         Ok(app) => {
-            #[allow(unused_variables)]
             app.run(|app, event| {
+                #[cfg(not(any(feature = "updater", target_os = "macos")))]
+                drop((app, event));
+
+                #[cfg(feature = "updater")]
+                if matches!(event, tauri::RunEvent::Exit) {
+                    let update_data = app.state::<PendingUpdateData>().inner();
+                    if let Some((update, data)) = &*update_data.0.lock().unwrap() {
+                        fn set_changelog_toast(version: Option<String>) {
+                            let toast_result: theseus::Result<()> = tauri::async_runtime::block_on(async move {
+                                let mut settings = settings::get().await?;
+                                settings.pending_update_toast_for_version = version;
+                                settings::set(settings).await?;
+                                Ok(())
+                            });
+                            if let Err(e) = toast_result {
+                                tracing::warn!("Failed to set pending_update_toast: {e}")
+                            }
+                        }
+
+                        set_changelog_toast(Some(update.version.clone()));
+                        if let Err(e) = update.install(data) {
+                            tracing::error!("Error while updating: {e}");
+                            set_changelog_toast(None);
+
+                            DialogBuilder::message()
+                                .set_level(MessageLevel::Error)
+                                .set_title("Update error")
+                                .set_text(format!("Failed to install update due to an error:\n{e}"))
+                                .alert()
+                                .show()
+                                .unwrap();
+                        }
+                        app.restart();
+                    }
+                }
+
                 #[cfg(target_os = "macos")]
                 if let tauri::RunEvent::Opened { urls } = event {
                     tracing::info!("Handling webview open {urls:?}");
 
                     let file = urls
                         .into_iter()
-                        .filter_map(|url| url.to_file_path().ok())
-                        .next();
+                        .find_map(|url| url.to_file_path().ok());
 
                     if let Some(file) = file {
                         let payload =
                             macos::deep_link::get_or_init_payload(app);
 
-                        let mtx_copy = payload.payload.clone();
+                        let mtx_copy = payload.payload;
                         let request = file.to_string_lossy().to_string();
                         tauri::async_runtime::spawn(async move {
                             let mut payload = mtx_copy.lock().await;
@@ -303,6 +309,8 @@ fn main() {
             });
         }
         Err(e) => {
+            tracing::error!("Error while running tauri application: {:?}", e);
+
             #[cfg(target_os = "windows")]
             {
                 // tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
@@ -331,7 +339,6 @@ fn main() {
                 .show()
                 .unwrap();
 
-            tracing::error!("Error while running tauri application: {:?}", e);
             panic!("{1}: {:?}", e, "error while running tauri application")
         }
     }

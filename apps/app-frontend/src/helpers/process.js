@@ -8,16 +8,16 @@ import { invoke } from '@tauri-apps/api/core'
 /// Gets all running process IDs with a given profile path
 /// Returns [u32]
 export async function get_by_profile_path(path) {
-  return await invoke('plugin:process|process_get_by_profile_path', { path })
+	return await invoke('plugin:process|process_get_by_profile_path', { path })
 }
 
 /// Gets all running process IDs with a given profile path
 /// Returns [u32]
 export async function get_all() {
-  return await invoke('plugin:process|process_get_all')
+	return await invoke('plugin:process|process_get_all')
 }
 
 /// Kills a process by UUID
 export async function kill(uuid) {
-  return await invoke('plugin:process|process_kill', { uuid })
+	return await invoke('plugin:process|process_kill', { uuid })
 }

@@ -1,0 +1,351 @@
+{
+  "button.back": {
+    "defaultMessage": "Bumalik"
+  },
+  "button.cancel": {
+    "defaultMessage": "Kanselahin"
+  },
+  "button.continue": {
+    "defaultMessage": "Magpatuloy"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Kopyahin ang ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Kopyahin ang permanenteng link"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Gumawa ng proyekto"
+  },
+  "button.download": {
+    "defaultMessage": "I-download"
+  },
+  "button.downloading": {
+    "defaultMessage": "Nagda-download"
+  },
+  "button.edit": {
+    "defaultMessage": "Baguhin"
+  },
+  "button.next": {
+    "defaultMessage": "Susunod"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Buksan ang folder"
+  },
+  "button.play": {
+    "defaultMessage": "Maglaro"
+  },
+  "button.refresh": {
+    "defaultMessage": "I-refresh"
+  },
+  "button.remove": {
+    "defaultMessage": "Tanggalin"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Tanggalin ang imahe"
+  },
+  "button.report": {
+    "defaultMessage": "I-report"
+  },
+  "button.save": {
+    "defaultMessage": "I-save"
+  },
+  "button.save-changes": {
+    "defaultMessage": "I-save ang mga pagbabago"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Mag-sign-in"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Mag-sign-out"
+  },
+  "button.stop": {
+    "defaultMessage": "Maghinto"
+  },
+  "button.upload-image": {
+    "defaultMessage": "I-upload ang imahe"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Ngayon lang"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "App"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Mga server"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Website"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Pribado"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Baguhin ang ikono"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Tanggalin ang ikono"
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Tanawing gallery"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Tanawing grid"
+  },
+  "input.view.list": {
+    "defaultMessage": "Tanawing row"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Panglakbayan"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Kalikhaan"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Taganood"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Kaligtasan"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Hindi kilalang modo ng laro"
+  },
+  "label.collections": {
+    "defaultMessage": "Mga koleksiyon"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Ginawa {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Dashboard"
+  },
+  "label.delete": {
+    "defaultMessage": "I-delete"
+  },
+  "label.description": {
+    "defaultMessage": "Paglalarawan"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Mga sinusundang proyekto"
+  },
+  "label.loading": {
+    "defaultMessage": "Naglo-load..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderasyon"
+  },
+  "label.notifications": {
+    "defaultMessage": "Mga notipikasyon"
+  },
+  "label.password": {
+    "defaultMessage": "Password"
+  },
+  "label.played": {
+    "defaultMessage": "Naglaro {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Publiko"
+  },
+  "label.rejected": {
+    "defaultMessage": "Tinanggihan"
+  },
+  "label.server": {
+    "defaultMessage": "Server"
+  },
+  "label.servers": {
+    "defaultMessage": "Mga server"
+  },
+  "label.settings": {
+    "defaultMessage": "Mga setting"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Pang-isahang laro"
+  },
+  "label.title": {
+    "defaultMessage": "Titulo"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Unlisted"
+  },
+  "label.visibility": {
+    "defaultMessage": "Bisibilidad"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Bisitahin ang iyong profile"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Tinanggap"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Pinayagan"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Inarkibo"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Sarado"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Tagagawa"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Burador"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Nabigo"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listed"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderator"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Koponan ng Modrinth"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Nakabinbin"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Pribado"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Naproseso"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Tinanggihan"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Ibinalik"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Nakaiskedyul"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Sinusuri"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Unlisted"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Ipinagkait"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kopyahin ang code sa clipboard"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Client"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Client and server"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Client or server"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Server"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "Isang {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Hindi sinusuportahan"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} other {Data Pack}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Mga Data Pack"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {data pack} other {data pack}}"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Edisyong Java"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Mga tagagawa"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Ginawa {date}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Inilathala {date}"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "In-update {date}"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Magreport ng mga isyu"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Environment"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Upload"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Inarkibo"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Burador"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Pribado"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Publiko"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Tinanggihan"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Nakaiskedyul"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Sinusuri"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Hindi alam"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Environment"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Open source"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Pumili ng iyong gugustohing paksang-kulay para sa Modrinth ng nitong device."
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Publiko"
+  }
+}
+

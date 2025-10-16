@@ -1,0 +1,419 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Kehittäjätila käytössä."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Ulkonäkö"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Oletusinstanssin asetukset"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Ominaisuuskytkimet"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java asennukset"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Yksityisyys"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Resurssien hallinta"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Lisää ja pelaa"
+  },
+  "instance.add-server.add-server": {
+    "message": "Lisää palvelin"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Poistettu käytöstä"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Päällä"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Kehote"
+  },
+  "instance.add-server.title": {
+    "message": "Lisää palvelin"
+  },
+  "instance.edit-server.title": {
+    "message": "Muokkaa palvelinta"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Piilota kotisivulta"
+  },
+  "instance.edit-world.name": {
+    "message": "Nimi"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft maailma"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Nollaa kuvake"
+  },
+  "instance.edit-world.title": {
+    "message": "Muokkaa maailmaa"
+  },
+  "instance.filter.disabled": {
+    "message": "Käytöstä poistetut projektit"
+  },
+  "instance.filter.updates-available": {
+    "message": "Päivityksia saatavilla"
+  },
+  "instance.server-modal.address": {
+    "message": "Osoite"
+  },
+  "instance.server-modal.name": {
+    "message": "Nimi"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft palvelin"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resurssipakkaus"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Yleiset"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Poista instanssi"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Poista instanssi"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Pysyvästi poistaa instanssin laitteeltasi sisältäen sinun maailmasi, asetuksesi ja muun asennetun sisällön. Ole varovainen, koska instanssia ei pysty palauttaa poistamisen jälkeen."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Poistetaan..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Kopioi"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Ei pystytä monistamaan asennettaessa."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Monista instanssi"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Luo kopion tästä instanssista sekä kaikista sen maailmoista, asetuksista, modeista yms."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Muokkaa kuvaketta"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Poista kuvake"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Korvaa kuvake"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Valitse kuvake"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Kirjaston ryhmät"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Luo uusi ryhmä"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Kirjaston ryhmät sallivat sinun järjestää instanssisi eri osioihin kirjastossasi."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Syötä ryhmän nimi"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Nimi"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Aloitustoiminnot"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Mukautetut aloitustoiminnot"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Koukut antavat edistyneiden käyttäjien suorittaa tiettyjä järjestelmä komentoja pelin käynnistystä ennen ja sen jälkeen."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Sulkemisen jälkeen"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Suoritetaan pelin sulkeutumisen jälkeen."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Syötä sulkemisen jälkeinen komento..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Ennen käynnistystä"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Suoritetaan ennen instanssin käynnistystä."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Syötä ennen käynnistystä komento..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Pelin laukaisu koukut"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Wrapper"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Wrapper komento Minecraftin käynnistämiseksi."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Syötä wrapper komento..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Asennus"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} Minecraft versiolle {game_version} on jo asennettu"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} on jo asennettu"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Vaihda versiota"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Asenna"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Asennetaan"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Noudetaan modipaketin versioita"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Asennetaan uutta versiota"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Asennettuna"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Virheenkorjaus informaatio:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Noudetaan modipaketin tietoja"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Peli versio"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Asenna"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Asennus käynnissä"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} versio"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Ei voida noutaa linkatun modipaketin tietoja. Tarkista internet yhteytesi."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} ei ole saatavilla Minecraft versiolle {version}. Kokeile toista modi lataajaa."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Tämä instanssi on linkitetty modipakettiin, mutta modipakettia ei löydetty Modrinthista."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Alusta"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Asenna modipaketti uudelleen"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Asennetaan modipakettia uudelleen"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Uudelleen asentaminen palauttaa kaiken asennetun tai muokatun sisällön siihen muotoon missä se on modipaketissa poistaen kaikki modit ja muun sisällön mitä olet lisännyt alkuperäisen asennuksen päälle. Tämä saattaa korjata odottamatonta käytöstä mikäli instanssia on muokattu mutta jos maailmasi ovat nyt riippuvaisia lisätystä sisällöstä se saattaa rikkoa olemassa olevia maailmoja."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Haluatko varmasti asentaa tämän instanssin uudelleen?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Palauttaa instanssin sisällön alkuperäiseen muotoonsa poistaen kaikki modit tai muun sisällön mitä olet lisännyt alkuperäisen modipaketin päälle."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Asenna modipaketti uudelleen"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Korjaa"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Korjataan"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Korjaaminen uudelleen asentaa Minecraftin riippuvuuksia ja tarkistaa korruptiota varten. Tämä saattaa ratkaista ongelmia jos pelisi ei käynnisty launcheriin liittyvien virheiden takia mutta ei ratkaise ongelmia tai kaatumisia liittyen ladattuihin modeihin."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Korjaa instanssi?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Korjaus käynnissä"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Palauta nykyiseen"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Näytä kaikki versiot"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "vaihda versiota"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "asenna"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "asenna uudelleen"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "korjaa"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Et voi {action} asentaessa"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Toimintoa {action} ei voida suorittaa offline tilassa"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Et voi {action} korjatessa"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(tuntematon versio)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Poista instanssin linkitys"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Jos jatkat et voi uudelleen linkata sitä ilman että luot täysin uuden instanssin. Et vastaanota enää modipaketti päivityksiä ja siitä tulee normaali."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Oletko varma että haluat poistaa tämän instanssin linkityksen?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Tämä instanssi on linkitetty modipakettin joka tarkoittaa että modeja ei voida päivittää etkä voi vaihtaa lataaja tai Minecraft versiota. Linkityksen poistaminen katkaisee pysyvästi yhteyden instanssin ja modipaketin välillä."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Poista linkitys modipakettiin"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java ja muisti"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Ympäristö muuttujat"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Koukut"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java argumentit"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java asennus"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Muisti allokoitu"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Ikkuna"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Mukautetut ikkuna asetukset"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Koko näyttö"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Saa peli käynnistymään koko näytön tilassa kun käynnistetty (käyttäen options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Korkeus"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Peli ikkunan korkeus käynnistäessä."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Syötä korkeus..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Leveys"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Peli ikkunan leveys käynnistäessä."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Syötä leveys..."
+  },
+  "instance.settings.title": {
+    "message": "Asetukset"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Minecraft palvelin"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Palvelimeen ei voida yhdistää"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Kopioi osoite"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Älä näytä koti näkymässä"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Saatavilla"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Instanssi on jo avattu"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Kovanaama tila"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Palvelin on yhteensopimaton"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Palvelimeen ei saatu yhteyttä"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Voit hypätä suoraan palvelimille vain versioilla Minecraft Alpha 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Voit hypätä suoraan yksinpeli maailmoihin vain versioilla Minecraft 1.20+"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Pelaa instanssia"
+  },
+  "instance.worlds.type.server": {
+    "message": "Palvelin"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Yksinpeli"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Näytä instanssi"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Maailma on käytössä"
+  },
+  "search.filter.locked.instance": {
+    "message": "Annettu instanssin toimesta"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Peli version antaa instanssi"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Lataajan antaa instanssi"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Synkkaa instanssin kanssa"
+  }
+}

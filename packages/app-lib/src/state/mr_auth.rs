@@ -1,4 +1,3 @@
-use crate::config::{MODRINTH_API_URL, MODRINTH_URL};
 use crate::state::{CacheBehaviour, CachedEntry};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced};
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -31,7 +30,7 @@ impl ModrinthCredentials {
 
                 let resp = fetch_advanced(
                     Method::POST,
-                    &format!("{MODRINTH_API_URL}session/refresh"),
+                    concat!(env!("MODRINTH_API_URL"), "session/refresh"),
                     None,
                     None,
                     Some(("Authorization", &*creds.session)),
@@ -190,8 +189,8 @@ impl ModrinthCredentials {
     }
 }
 
-pub fn get_login_url() -> String {
-    format!("{MODRINTH_URL}auth/sign-in?launcher=true")
+pub const fn get_login_url() -> &'static str {
+    concat!(env!("MODRINTH_URL"), "auth/sign-in")
 }
 
 pub async fn finish_login_flow(
@@ -199,6 +198,12 @@ pub async fn finish_login_flow(
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<ModrinthCredentials> {
+    // The authorization code actually is the access token, since labrinth doesn't
+    // issue separate authorization codes. Therefore, this is equivalent to an
+    // implicit OAuth grant flow, and no additional exchanging or finalization is
+    // needed. TODO not do this for the reasons outlined at
+    // https://oauth.net/2/grant-types/implicit/
+
     let info = fetch_info(code, semaphore, exec).await?;
 
     Ok(ModrinthCredentials {
@@ -216,7 +221,7 @@ async fn fetch_info(
 ) -> crate::Result<crate::state::cache::User> {
     let result = fetch_advanced(
         Method::GET,
-        &format!("{MODRINTH_API_URL}user"),
+        concat!(env!("MODRINTH_API_URL"), "user"),
         None,
         None,
         Some(("Authorization", token)),

@@ -108,7 +108,7 @@ impl DBPersonalAccessToken {
                 |ids| async move {
                     let pat_ids: Vec<i64> = ids
                         .iter()
-                        .flat_map(|x| parse_base62(&x.to_string()).ok())
+                        .filter_map(|x| parse_base62(&x.to_string()).ok())
                         .map(|x| x as i64)
                         .collect();
                     let slugs = ids.into_iter().map(|x| x.to_string()).collect::<Vec<_>>();

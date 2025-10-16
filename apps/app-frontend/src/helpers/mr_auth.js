@@ -6,13 +6,17 @@
 import { invoke } from '@tauri-apps/api/core'
 
 export async function login() {
-  return await invoke('plugin:mr-auth|modrinth_login')
+	return await invoke('plugin:mr-auth|modrinth_login')
 }
 
 export async function logout() {
-  return await invoke('plugin:mr-auth|logout')
+	return await invoke('plugin:mr-auth|logout')
 }
 
 export async function get() {
-  return await invoke('plugin:mr-auth|get')
+	return await invoke('plugin:mr-auth|get')
+}
+
+export async function cancelLogin() {
+	return await invoke('plugin:mr-auth|cancel_modrinth_login')
 }

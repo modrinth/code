@@ -1,0 +1,240 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Beta udgivelse"
+  },
+  "badge.new": {
+    "defaultMessage": "Ny"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analytics"
+  },
+  "button.back": {
+    "defaultMessage": "Tilbage"
+  },
+  "button.cancel": {
+    "defaultMessage": "Annuller"
+  },
+  "button.continue": {
+    "defaultMessage": "Forsæt"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Kopier ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Kopier permanent link"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Opret et projekt"
+  },
+  "button.download": {
+    "defaultMessage": "Download"
+  },
+  "button.downloading": {
+    "defaultMessage": "Downloader"
+  },
+  "button.edit": {
+    "defaultMessage": "Rediger"
+  },
+  "button.follow": {
+    "defaultMessage": "Følg"
+  },
+  "button.more-options": {
+    "defaultMessage": "Flere muligheder"
+  },
+  "button.next": {
+    "defaultMessage": "Næste"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Åben mappe"
+  },
+  "button.play": {
+    "defaultMessage": "Spil"
+  },
+  "button.refresh": {
+    "defaultMessage": "Genindlæs"
+  },
+  "button.remove": {
+    "defaultMessage": "Fjern"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Fjern billede"
+  },
+  "button.report": {
+    "defaultMessage": "Anmeld"
+  },
+  "button.reset": {
+    "defaultMessage": "Nulstil"
+  },
+  "button.save": {
+    "defaultMessage": "Gem"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Gem ændringer"
+  },
+  "button.saving": {
+    "defaultMessage": "Gemmer"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Log ind"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Log ud"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Tilmeld"
+  },
+  "button.stop": {
+    "defaultMessage": "Stop"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Stop med at følge"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Upload billede"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Lige nu"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "App"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Servere"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Hjemmeside"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Privat"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Rediger ikon"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Fjern ikon"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Udskift ikon"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Vælg ikon"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Søg..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Gallerivisning"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Gittervisning"
+  },
+  "input.view.list": {
+    "defaultMessage": "Rækkevisning"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Eventyrstilstand"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Kreativ tilstand"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Tilskuertilstand"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Overlevelsestilstand"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Under gennemgang"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kopiér kode til udklipsholder"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Klient"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Klient og server"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Klient eller server"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Server"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Ikke understøttet"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} slutter med {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "Mastercard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Ukendt betalingsmetode"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Alle"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {modifikation} other {modifikationer}}"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Doner"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Doner på Ko-Fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Doner på Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Doner på PayPal"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Se kildekode"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Beskrivelse"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Udseende"
+  }
+}
+

@@ -1,0 +1,464 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "開發人員模式已啟用。"
+  },
+  "app.settings.downloading": {
+    "message": "下載 v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "外觀"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "預設實例選項"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "功能開關"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java 安裝"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "隱私"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "資源管理"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} 安裝已準備就緒！重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} 已完成下載。重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} 現已推出！由於你正使用計量付費的網路，我們沒有自動下載它。"
+  },
+  "app.update-toast.changelog": {
+    "message": "變更紀錄"
+  },
+  "app.update-toast.download": {
+    "message": "下載（{size}）"
+  },
+  "app.update-toast.downloading": {
+    "message": "下載中..."
+  },
+  "app.update-toast.reload": {
+    "message": "重新載入"
+  },
+  "app.update-toast.title": {
+    "message": "有可用的更新"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "下載完成"
+  },
+  "app.update.complete-toast.text": {
+    "message": "按這裡查看變更紀錄。"
+  },
+  "app.update.complete-toast.title": {
+    "message": "版本 {version} 已成功安裝！"
+  },
+  "app.update.download-update": {
+    "message": "下載更新"
+  },
+  "app.update.downloading-update": {
+    "message": "正在下載更新（{percent}%）"
+  },
+  "app.update.reload-to-update": {
+    "message": "重新載入即可安裝更新"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "新增並遊玩"
+  },
+  "instance.add-server.add-server": {
+    "message": "新增伺服器"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "已停用"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "已啟用"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "提示"
+  },
+  "instance.add-server.title": {
+    "message": "新增伺服器"
+  },
+  "instance.edit-server.title": {
+    "message": "編輯伺服器"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "從首頁隱藏"
+  },
+  "instance.edit-world.name": {
+    "message": "名稱"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft 世界"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "重設圖示"
+  },
+  "instance.edit-world.title": {
+    "message": "編輯世界"
+  },
+  "instance.filter.disabled": {
+    "message": "已停用的專案"
+  },
+  "instance.filter.updates-available": {
+    "message": "有可用的更新"
+  },
+  "instance.server-modal.address": {
+    "message": "位址"
+  },
+  "instance.server-modal.name": {
+    "message": "名稱"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft 伺服器"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "資源包"
+  },
+  "instance.settings.tabs.general": {
+    "message": "一般"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "刪除實例"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "刪除實例"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "這將從裝置上永久刪除實例，包含你的世界、設定與所有已安裝內容。請注意，一旦刪除，將無法復原。"
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "刪除中..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "複製"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "安裝時無法複製。"
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "複製實例"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "建立這個實例的副本，包含世界、設定、模組等。"
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "編輯圖示"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "移除圖示"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "取代圖示"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "選擇圖示"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "遊戲庫群組"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "建立新的群組"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "遊戲庫群組讓你可以將實例整理到遊戲庫中的不同分類。"
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "輸入群組名稱"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "名稱"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "啟動掛勾"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "自訂啟動掛勾"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "掛勾讓進階使用者能在遊戲啟動前和啟動後執行特定的系統命令。"
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "結束後執行"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "遊戲關閉後執行。"
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "輸入結束後指令..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "啟動前"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "實例啟動前執行。"
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "輸入啟動前指令..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "遊戲啟動掛勾"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "包裝指令"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "用於啟動 Minecraft 的包裝指令。"
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "輸入包裝指令..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "安裝"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "適用於 Minecraft {game_version} 的 {platform} {version} 已經安裝"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "原版 {game_version} 已經安裝"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "變更版本"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "安裝"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "安裝中"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "正在取得模組包版本"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "正在安裝新版本"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "目前已安裝"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "除錯資訊："
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "正在取得模組詳細資訊"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "遊戲版本"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "安裝"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "安裝進行中"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} 版本"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "無法取得連結模組包的詳細資訊。請檢查你的網路連線。"
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} 不適用於 Minecraft {version}。請嘗試其他模組載入器。"
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "這個實例已連結至一個模組包，但該模組包無法在 Modrinth 上找到。"
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "平台"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "重新安裝模組包"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "正在重新安裝模組包"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "重新安裝會將所有已安裝或已修改的內容，重設為模組包所提供的內容，並移除你在原始安裝基礎上額外新增的模組或內容。這可能會修復實例在變更後產生的非預期行為，但如果你的世界現在依賴額外安裝的內容，可能會導致現有世界損毀。"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "你確定要重新安裝這個實例嗎？"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "將實例的內容重設為原始狀態，並移除任何在原始模組包之外額外新增的模組或內容。"
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "重新安裝模組包"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "修復"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "修復中"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "修復功能會重新安裝 Minecraft 的相依檔案，並檢查檔案是否損毀。這或許能解決因啟動器相關錯誤而導致遊戲無法啟動的問題，但無法解決與已安裝模組相關的問題或崩潰。"
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "是否要修復實例？"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "修復進行中"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "重設為目前"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "顯示所有版本"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "變更版本"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "安裝"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "重新安裝"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "修復"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "安裝時無法{action}"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "離線時無法{action}"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "修復時無法{action}"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "（未知的版本）"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "解除實例連結"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "如果繼續操作，你將無法在不建立全新實例的情況下重新連結它。你將不再收到模組包更新，而且它將成為一個普通實例。"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "你確定要解除連結這個實例嗎？"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "這個實例已連結至一個模組包，這表示模組無法更新，你也無法變更模組載入器或 Minecraft 版本。解除連結將會永久中斷這個實例與模組包之間的關係。"
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "從模組包解除連結"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java 和記憶體"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "環境變數"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "掛勾"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java 參數"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java 安裝"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "記憶體配置"
+  },
+  "instance.settings.tabs.window": {
+    "message": "視窗"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "自訂視窗設定"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "全螢幕"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "使遊戲啟動時進入全螢幕模式（透過 options.txt）。"
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "高度"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "遊戲啟動時的視窗高度。"
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "輸入高度..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "寬度"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "遊戲啟動時的視窗寬度。"
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "輸入寬度..."
+  },
+  "instance.settings.title": {
+    "message": "設定"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Minecraft 伺服器"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "無法連線到伺服器"
+  },
+  "instance.worlds.copy_address": {
+    "message": "複製位址"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "不要在首頁顯示"
+  },
+  "instance.worlds.filter.available": {
+    "message": "可用"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "實例已經開啟"
+  },
+  "instance.worlds.hardcore": {
+    "message": "極限模式"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "伺服器不相容"
+  },
+  "instance.worlds.no_contact": {
+    "message": "伺服器沒有回應"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "你只能在 Minecraft Alpha 1.0.5 以上版本直接加入伺服器"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "你只能在 Minecraft 1.20 以上版本直接加入伺服器"
+  },
+  "instance.worlds.play_instance": {
+    "message": "遊戲實例"
+  },
+  "instance.worlds.type.server": {
+    "message": "伺服器"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "單人遊戲"
+  },
+  "instance.worlds.view_instance": {
+    "message": "檢視實例"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "世界正在使用中"
+  },
+  "search.filter.locked.instance": {
+    "message": "由該實例提供"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "遊戲版本由實例提供"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "載入器版本由實例提供"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "與實例同步"
+  }
+}

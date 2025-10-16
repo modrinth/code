@@ -1,0 +1,68 @@
+{
+  "action.cancel": {
+    "message": "ยกเลิก"
+  },
+  "action.continue": {
+    "message": "ดำเนินการต่อ"
+  },
+  "admin.billing.error.not-found": {
+    "message": "ไม่พบผู้ใช้นี้"
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "โหลดไฟล์ AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "โหลดตัวเบต้า"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "โหลดไฟล์ DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "โหลดไฟล์ RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.title": {
+    "message": "ติดตามโปรเจค"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "โดย {author}"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "ชื่อ"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "ค้นหามอด"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "การจัดการมอด"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "เวอร์ชัน"
+  },
+  "app-marketing.features.offline.title": {
+    "message": "โหมดออฟไลน์"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "โอเพนซอร์ส"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  }
+}

@@ -1,0 +1,21 @@
+{
+	"name": "@modrinth/moderation",
+	"version": "0.0.0",
+	"private": true,
+	"main": "./src/index.ts",
+	"scripts": {
+		"lint": "eslint . && prettier --check .",
+		"fix": "eslint . --fix && prettier --write .",
+		"intl:extract": "formatjs extract \"**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"**/*.d.ts\" --ignore \"node_modules/**/*\" --out-file src/locales/en-US/index.json --preserve-whitespace"
+	},
+	"dependencies": {
+		"@modrinth/assets": "workspace:*",
+		"@modrinth/utils": "workspace:*",
+		"vue": "^3.5.13"
+	},
+	"devDependencies": {
+		"@formatjs/cli": "^6.2.12",
+		"@vintl/vintl": "^4.4.1",
+		"@modrinth/tooling-config": "workspace:*"
+	}
+}

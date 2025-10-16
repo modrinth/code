@@ -26,7 +26,7 @@ bitflags::bitflags! {
         // read a user's payouts data
         const PAYOUTS_READ = 1 << 7;
         // withdraw money from a user's account
-        const PAYOUTS_WRITE = 1<< 8;
+        const PAYOUTS_WRITE = 1 << 8;
         // access user analytics (payout analytics at the moment)
         const ANALYTICS = 1 << 9;
 
@@ -99,6 +99,24 @@ bitflags::bitflags! {
 
         // only accessible by modrinth-issued sessions
         const SESSION_ACCESS = 1 << 39;
+
+        // create a shared instance
+        const SHARED_INSTANCE_CREATE = 1 << 40;
+        // read a shared instance
+        const SHARED_INSTANCE_READ = 1 << 41;
+        // write to a shared instance
+        const SHARED_INSTANCE_WRITE = 1 << 42;
+        // delete a shared instance
+        const SHARED_INSTANCE_DELETE = 1 << 43;
+
+        // create a shared instance version
+        const SHARED_INSTANCE_VERSION_CREATE = 1 << 44;
+        // read a shared instance version
+        const SHARED_INSTANCE_VERSION_READ = 1 << 45;
+        // write to a shared instance version
+        const SHARED_INSTANCE_VERSION_WRITE = 1 << 46;
+        // delete a shared instance version
+        const SHARED_INSTANCE_VERSION_DELETE = 1 << 47;
 
         const NONE = 0b0;
     }

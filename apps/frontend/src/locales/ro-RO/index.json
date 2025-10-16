@@ -1,0 +1,2279 @@
+{
+  "action.cancel": {
+    "message": "Renunță"
+  },
+  "action.continue": {
+    "message": "Continuă"
+  },
+  "admin.billing.error.not-found": {
+    "message": "Utilizatorul nu a fost găsit"
+  },
+  "app-marketing.download.description": {
+    "message": "Aplicația noastră de desktop este disponibilă pe toate platformele, alege versiunea ta favorită."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Descarcă AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Descarcă beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Descarcă DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Descarcă RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Versiunea de Linux a Modrinth App <issues-link>este cunoscută să aiba probleme</issues-link> pe anumite sisteme și configurări. Dacă Modrinth App este instabilă pe sistemul tău, te încurajăm să încerci și alte aplicații precum <prism-link>Prism Launcher</prism-link> pentru a instala ușor conținut de pe Modrinth."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Opțiuni descărcare"
+  },
+  "app-marketing.download.terms": {
+    "message": "Prin descărcarea Modrinth App ești de acord cu ai noștri <terms-link>Termeni</terms-link> și <privacy-link>Politica de confidențialitate</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Pachete terță"
+  },
+  "app-marketing.download.title": {
+    "message": "Descarcă Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Salvează conținut care îți place și primește actualizări cu un singur click."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Urmărește proiecte"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Importă toate profilurile tale favorite de pe aplicația pe care o foloseai înainte, și începe cu Modrinth App în secunde!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Importare de profil"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Acțiuni"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "de {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth face mai ușor de administrat toate modurile tale într-un singur loc. Poți instala, dezinstala, și actualiza modurile cu un singur click."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Moduri instalate"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Nume"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Caută moduri"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Administrare mod"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Versiune"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Joacă-te cu modurile tale, indiferent dacă ești conectat la internet sau nu."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Modul offline"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Lansatorul Modrinth este complet cu sursă deschisă. Poți vedea codul sursă pe <github-link>GitHub</github-link>-ul nostru!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Sursă deschisă"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Monitor de activitate"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App funcționează mai bine decât multe dintre cele mai populare aplicații de gestionare a modurilor, utilizând doar 150 MB de memorie RAM!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Performanță mai bună"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 miliard %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Nume proces"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Mic"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Performant"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Folosește Modrinth App pentru a descărca și a te juca împreună cu modurile și pachetele de moduri preferate."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Joacă-te cu modurile tale favorite"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Construiește, distribuie și joacă pachete de moduri cu oricare dintre miile de moduri și pachete de moduri găzduite aici pe Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Pachet de Moduri"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Distribuie"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Distribuie pachete de moduri"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Diferit de orice alt lansator pe care l-ai folosit vreodată"
+  },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App este complet integrat cu site-ul, astfel că poți accesa toate proiectele tale preferate direct din aplicație!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Integrare cu site-ul web"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "pe care le-ai folosit anterior"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Captură de ecran a Modrinth App cu o instanță Cobblemon deschisă la pagina 'Conținut'."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App este un lansator unic, cu sursă deschisă, care îți permite să joci modurile tale preferate și să le menții mereu actualizate, totul într-un pachet mic și ordonat."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Descarcă Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Descarcă Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Descarcă Modrinth App pentru {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Captură de ecran a ecranului principal al meniului instanței Cobblemon."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Mai multe Opțiuni de Descărcare"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Autorizează"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Refuză"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> de către <creator-link>{creator}</creator-link> va putea să:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Autorizează {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Nu a fost găsită o locație redirecționată in răspuns"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Veți fi redirecționat către <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Trimite email de recuperare"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Introduceți adresa de email mai jos și vom trimite un link de recuperare pentru a vă permite să vă recuperați contul."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Email sau numele de utilizator"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Email"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Un email cu instrucțiuni ți-a fost trimis, dacă adresa de email a fost salvată anterior în cont."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Email trimis"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Acum te poți autentifica în contul tău folosind noua parolă."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Parolă resetată cu succes"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Resetare parolă"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Confirmă parola"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Introdu noua parolă mai jos pentru a-ți accesa contul."
+  },
+  "auth.reset-password.title": {
+    "message": "Resetare Parolă"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Resetează-ți parola"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Te rugăm să introduci codul de autorizare în doi pași (2FA) pentru a continua."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Introduceți codul 2FA"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Introdu codul..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Ați uitat parola?</forgot-password-link> • <create-account-link>Creați un cont</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Email sau numele de utilizator"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Parolă"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Conectează-te cu"
+  },
+  "auth.sign-in.title": {
+    "message": "Conectare"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Sau folosiți o parolă"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Creare cont"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Confirmați parola"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Email"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Nume de utilizator"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Prin crearea unui cont, ești de acord cu <terms-link>Termenii</terms-link> și <privacy-policy-link>Politica de confidențialitate</privacy-policy-link> Modrinth."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Parolele nu se potrivesc!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Parolă"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Aveți deja un cont?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Abonați-vă la actualizările despre Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "Înregistrare"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Sau creează-ți singur un cont"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Înregistrare cu"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Setările contului"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Autentificare"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Adresa ta de email este deja verificată!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Email deja verificat"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Retrimite emailul de verificare"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Nu am reușit să vă verificăm adresa de e-mail. Vă rugăm să încercați să retrimiteți e-mailul de verificare prin intermediul panoului de control, după ce vă conectați."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Nu am reușit să vă verificăm adresa de e-mail. Vă rugăm să încercați să retrimiteți e-mailul de verificare utilizând butonul de mai jos."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Verificarea email-ului a eșuat"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Adresa ta de email a fost verificată cu succes!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Verificare email"
+  },
+  "auth.verify-email.title": {
+    "message": "Verifică email-ul"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Abonați-vă la actualizările despre Modrinth"
+  },
+  "auth.welcome.description": {
+    "message": "Acum faci parte din minunata comunitate de creatori și exploratori care deja creează, descarcă și rămân la curent cu moduri extraordinare."
+  },
+  "auth.welcome.label.tos": {
+    "message": "Prin crearea unui cont, ești de acord cu <terms-link>Termenii</terms-link> și <privacy-policy-link>Politica de confidențialitate</privacy-policy-link> Modrinth."
+  },
+  "auth.welcome.long-title": {
+    "message": "Bine ați venit pe Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "Bine ați venit"
+  },
+  "collection.button.delete-icon": {
+    "message": "Șterge pictograma"
+  },
+  "collection.button.edit-icon": {
+    "message": "Editează pictograma"
+  },
+  "collection.button.remove-project": {
+    "message": "Șterge proiectul"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Nu mai urmăriți proiectul"
+  },
+  "collection.delete-modal.description": {
+    "message": "Colecția va fi ștearsă pentru totdeauna. Aceasta acțiune nu este reversibilă."
+  },
+  "collection.delete-modal.title": {
+    "message": "Sunteți sigur(ă) că doriți să ștergeți această colecție?"
+  },
+  "collection.description": {
+    "message": "{description} - Vizualizați colecția {name} de la {username} pe Modrinth"
+  },
+  "collection.description.following": {
+    "message": "Colecție generată automat cu toate proiectele pe care le urmăriți."
+  },
+  "collection.error.not-found": {
+    "message": "Colecția nu a fost găsită"
+  },
+  "collection.label.collection": {
+    "message": "Colecție"
+  },
+  "collection.label.created-at": {
+    "message": "Creată acum {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Creat de"
+  },
+  "collection.label.no-projects": {
+    "message": "Această colecție nu are proiecte!"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "Nu ai niciun proiect.\nVrei să <create-link>creezi unul</create-link>?"
+  },
+  "collection.label.owner": {
+    "message": "Deținător"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, one {<stat>{count}</stat> proiect} few {<stat>{count}</stat> proiecte} other {<stat>{count}</stat> de proiecte}}"
+  },
+  "collection.label.updated-at": {
+    "message": "Actualizat acum {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - Colecție"
+  },
+  "common.no": {
+    "message": "Nu"
+  },
+  "common.yes": {
+    "message": "Da"
+  },
+  "create.collection.cancel": {
+    "message": "Renunță"
+  },
+  "create.collection.collection-info": {
+    "message": "Noua ta colecție va fi creată ca o colecție publică cu {count, plural, =0 {niciun proiect} one {# proiect} other {# proiecte}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Creează o colecție"
+  },
+  "create.collection.error-title": {
+    "message": "A avut loc o eroare"
+  },
+  "create.collection.name-label": {
+    "message": "Nume"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Introduceți numele colecției..."
+  },
+  "create.collection.summary-description": {
+    "message": "O propoziție sau două care îți descriu colecția."
+  },
+  "create.collection.summary-label": {
+    "message": "Rezumat"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Aceasta este o colecție de..."
+  },
+  "create.collection.title": {
+    "message": "Crearea unei colecții"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Se apropie limita de {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Ești pe cale să atingi limita de {type}, te rugăm să contactezi suportul dacă ai nevoie de mai mult de {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Contactează suportul"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "Limita de {type} a fost atinsă"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Ai atins limita de {type} de {max}. Te rugăm să contactezi suportul pentru a-ți mări limita."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "colecție"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organizație"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "colecții"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organizații"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "proiecte"
+  },
+  "create.limit-alert.type-project": {
+    "message": "proiect"
+  },
+  "create.organization.cancel": {
+    "message": "Renunță"
+  },
+  "create.organization.create-organization": {
+    "message": "Creează o organizație"
+  },
+  "create.organization.error-title": {
+    "message": "A avut loc o eroare"
+  },
+  "create.organization.name-label": {
+    "message": "Nume"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Introduceți numele organizației..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Vei fi proprietarul acestei organizații, dar poți invita alți membri și poți transfera proprietatea oricând."
+  },
+  "create.organization.summary-description": {
+    "message": "O propoziție sau două care îți descriu organizația."
+  },
+  "create.organization.summary-label": {
+    "message": "Rezumat"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "O organizației pentru..."
+  },
+  "create.organization.title": {
+    "message": "Creează o organizație"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Renunță"
+  },
+  "create.project.create-project": {
+    "message": "Creează un proiect"
+  },
+  "create.project.error-title": {
+    "message": "A avut loc o eroare"
+  },
+  "create.project.name-label": {
+    "message": "Nume"
+  },
+  "create.project.name-placeholder": {
+    "message": "Introduceți numele proiectului..."
+  },
+  "create.project.summary-description": {
+    "message": "O propoziție sau două care îți descriu proiectul."
+  },
+  "create.project.summary-label": {
+    "message": "Rezumat"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Acest proiect adaugă..."
+  },
+  "create.project.title": {
+    "message": "Creează un proiect"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "Vizibilitatea proiectului tău după ce a fost aprobat."
+  },
+  "create.project.visibility-label": {
+    "message": "Vizibilitate"
+  },
+  "create.project.visibility-private": {
+    "message": "Privat"
+  },
+  "create.project.visibility-public": {
+    "message": "Public"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Nelistat"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Creați nouă"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural, one {{count} proiect} other {{count} proiecte}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Caută în colecțiile tale"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Colecțiile tale"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "O entitate străină înseamnă o entitate de afaceri organizată în afara Statelor Unite (cum ar fi o corporație, un parteneriat sau un SRL non-SUA)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entitate străină"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Persoană fizică"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Ești o persoană fizică sau faci parte dintr-o entitate străină?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Formular fiscal"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth folosește furnizorul terț Track1099 pentru a colecta și stoca în siguranță formularele tale fiscale. <security-link>Află mai multe aici.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Practici de securitate"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Ești cetățean american?"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "Este posibil să fi tastat greșit URL-ul colecției."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "Colecția se poate să fie privată."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "Colecția se poate să fie blocată de către moderatorii Modrinth pentru violarea <tou-link>Termenilor de Utilizare</tou-link>."
+  },
+  "error.collection.404.list_title": {
+    "message": "De ce?"
+  },
+  "error.collection.404.title": {
+    "message": "Colecția nu a fost găsită"
+  },
+  "error.generic.404.subtitle": {
+    "message": "Pagina pe care ați încercat să o accesați se pare că nu există."
+  },
+  "error.generic.404.title": {
+    "message": "Pagina nu a fost găsită"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Această pagină a fost blocată din motive legale, cum ar fi cenzura guvernamentală sau procesele legale în curs."
+  },
+  "error.generic.451.title": {
+    "message": "Conținut indisponibil din motive legale"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Verifică dacă Modrinth este picat pe a noastră <status-link>Pagină de status</status-link>."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "Dacă asta continuă să se întâmple, poate vrei să anunți echipa Modrinth alăturându-te serverului nostru de <discord-link>Discord</discord-link>."
+  },
+  "error.generic.default.list_title": {
+    "message": "Te rog încercă din nou în câteva minute."
+  },
+  "error.generic.default.subtitle": {
+    "message": "Ceva nu a funcționat corect."
+  },
+  "error.generic.default.title": {
+    "message": "Uh oh!"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "Este posibil să fi tastat greșit URL-ul organizației."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "Deținătorul organizației a schimbat URL-ul sau l-a șters."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "Organizația se poate să fie ștearsă de către moderatorii Modrinth pentru violarea <tou-link>Termenilor de Utilizare</tou-link>."
+  },
+  "error.organization.404.list_title": {
+    "message": "De ce?"
+  },
+  "error.organization.404.title": {
+    "message": "Organizația nu a putut fi găsită"
+  },
+  "error.project.404.list_item.1": {
+    "message": "Este posibil să fi tastat greșit URL-ul proiectului."
+  },
+  "error.project.404.list_item.2": {
+    "message": "Proprietarul proiectului s-ar putea să fi schimbat URL-ul, să fi făcut proiectul privat sau să-l fi șters."
+  },
+  "error.project.404.list_item.3": {
+    "message": "Proiectul se poate să fie blocat de către moderatorii Modrinth pentru violarea <tou-link>Termenilor de Utilizare</tou-link>."
+  },
+  "error.project.404.list_title": {
+    "message": "De ce?"
+  },
+  "error.project.404.title": {
+    "message": "Proiectul nu a fost găsit"
+  },
+  "error.user.404.list_item.1": {
+    "message": "Poate ați scris greșit numele utilizatorului."
+  },
+  "error.user.404.list_item.2": {
+    "message": "Acest utilizator se poate să-și fi schimbat numele sau șters contul."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Acest utilizator se poate să aibă contul terminat pentru violarea <tou-link>Termenilor de Utilizare</tou-link> Modrinth."
+  },
+  "error.user.404.list_title": {
+    "message": "De ce?"
+  },
+  "error.user.404.title": {
+    "message": "Utilizatorul nu a fost găsit"
+  },
+  "frog": {
+    "message": "Ai fost broscățuit! 🐸"
+  },
+  "frog.altText": {
+    "message": "O pictură fotorealistă a unui labirint de broaște"
+  },
+  "frog.froggedPeople": {
+    "message": "{count, plural, one {Doar {count} om a fost broscăit} few {Alți {count} oameni au fost broscăiți} other {Alți {count} de oameni au fost broscăiți}}!"
+  },
+  "frog.sinceOpened": {
+    "message": "Această pagină a fost deschisă acum {ago}"
+  },
+  "frog.title": {
+    "message": "Broască"
+  },
+  "landing.button.discover-mods": {
+    "message": "Descoperă modurile"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Du-te la panoul principal"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Obține cea mai bună experiență posibilă, cu actualizări constante de la echipa Modrinth."
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "Evoluare Constantă"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Primește raporturi detaliate despre vizualizări, număr de descărcări, și încasări."
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Date și Statistici"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "Fă-ți proiectul descoperit de mii de utilizatori prin căutări, pagina noastră de acasă, serverul de Discord, și mai multe modalități care vor veni în viitor!"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Descoperă"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Integrează-te cu uneltele tale de construire prin Minotaur pentru încărcări automate imediat ce lansezi o versiune nouă."
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Ecosistem Diversificat"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Primește venituri din reclame de pe paginile proiectului tău și retrage fondurile în orice moment."
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Monetizare"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Invită-ți colegii și gestionează rolurile și permisiunile cu ușurință."
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Administrează Echipa"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Încărcarea proiectelor aleatoare a eșuat :("
+  },
+  "landing.feature.follow.description": {
+    "message": "Primește notificări de fiecare dată când proiectele tale preferate se actualizează și rămâi la curent."
+  },
+  "landing.feature.follow.heading": {
+    "message": "Urmărește proiectele pe care le iubești"
+  },
+  "landing.feature.launcher.description": {
+    "message": "API-ul nostru permite lansatoarelor să adauge o integrare avansată cu Modrinth. Poți folosi <link>aplicația noastră</link> sau unul dintre cele mai populare lansatoare, precum ATLauncher, MultiMC și Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Joacă-te cu lansatorul tău preferat"
+  },
+  "landing.feature.search.description": {
+    "message": "Căutarea ultra-rapidă și filtrele puternice îți permit să găsești ceea ce vrei pe măsură ce tastezi."
+  },
+  "landing.feature.search.heading": {
+    "message": "Găsește ce vrei, rapid și ușor"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Locul ideal pentru {content}"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "pachete de date"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "pachete de moduri"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "moduri"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "pluginuri"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "pachete de resurse"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "servere"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "shadere"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "O reprezentare simplificată a unei ferestre Minecraft, cu logo-ul Mojang Studios în verdele Modrinth."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} a fost actualizat!"
+  },
+  "landing.notifications.heading": {
+    "message": "Notificări"
+  },
+  "landing.notifications.received-time": {
+    "message": "Primit {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "Versiunea {version} a fost lansată pentru {gameVersion}"
+  },
+  "landing.search.label": {
+    "message": "Caută"
+  },
+  "landing.search.placeholder": {
+    "message": "Caută..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Ordonează după"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Oferă o casă online creațiilor tale și ajungi la o audiență masivă de jucători dedicați."
+  },
+  "landing.section.for-creators.label": {
+    "message": "Pentru Creatori"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Distribuie conținutul tău cu toată lumea"
+  },
+  "landing.section.for-players.description": {
+    "message": "De la monștrii nemiloși la temnițe blestemate, poți să fi sigur că găsești conținut să-ți aducă satisfacția jocului la următorul nivel."
+  },
+  "landing.section.for-players.label": {
+    "message": "Pentru Jucători"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Descoperă peste {count} creații"
+  },
+  "landing.subheading": {
+    "message": "Descoperă, joacă, și distribuie conținut pentru Minecraft prin platforma noastră deschisă și construită pentru comunitate."
+  },
+  "layout.action.change-theme": {
+    "message": "Schimbă tema"
+  },
+  "layout.action.create-new": {
+    "message": "Creează nou..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Căutare fișier"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Căutare după email"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Administrează notificările serverului"
+  },
+  "layout.action.new-collection": {
+    "message": "Colecție nouă"
+  },
+  "layout.action.new-organization": {
+    "message": "Organizație nouă"
+  },
+  "layout.action.new-project": {
+    "message": "Proiect nou"
+  },
+  "layout.action.reports": {
+    "message": "Rapoarte"
+  },
+  "layout.action.review-projects": {
+    "message": "Revizuiește proiectele"
+  },
+  "layout.avatar.alt": {
+    "message": "Avatarul tău"
+  },
+  "layout.banner.account-action": {
+    "message": "Acțiunea contului necesară"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Vizitați setările contului"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Din motive de securitate, pe Modrinth este necesar să înregistrezi contul cu o adresă de email."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Această implementare a interfeței Modrinth a eșuat în generarea stării din API. Acest lucru poate fi cauzat de o întrerupere sau de o eroare de configurare. Reconstruiește atunci când API-ul este disponibil. Coduri de eroare: {errors}; URL-ul curent al API-ului este: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Eroare la generarea stării din API în timpul construirii."
+  },
+  "layout.banner.staging.description": {
+    "message": "Mediul de stagiu este complet separat de baza de date Modrinth de producție. Acesta este folosit pentru testare și depanare și poate rula versiuni în dezvoltare ale backend-ului sau frontend-ului Modrinth, mai noi decât instanța de producție."
+  },
+  "layout.banner.staging.title": {
+    "message": "Vizualizați mediul de testare Modrinth"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Actualizează informația facturii"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Unul sau mai multe abonamente a eșuat. Te rog actualizează modul de plată pentru a preveni pierderea accesului!"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Acțiunea contului necesară."
+  },
+  "layout.banner.tax.action": {
+    "message": "Completează formularul fiscal"
+  },
+  "layout.banner.tax.description": {
+    "message": "Ai retras deja peste $600 de la Modrinth anul acesta. Pentru a respecta reglementările fiscale, trebuie să completezi un formular fiscal. Retragerile tale sunt puse pe pauză până când acest formular este trimis."
+  },
+  "layout.banner.tax.title": {
+    "message": "Formular fiscal necesar"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Retrimiteți emailul de verificare"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Din motive de securitate, pe Modrinth este necesar să verifici adresa de email asociată contului."
+  },
+  "layout.footer.about": {
+    "message": "Despre"
+  },
+  "layout.footer.about.careers": {
+    "message": "Cariere"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Istoric modificări"
+  },
+  "layout.footer.about.news": {
+    "message": "Noutăți"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Program de recompense"
+  },
+  "layout.footer.about.status": {
+    "message": "Status"
+  },
+  "layout.footer.legal": {
+    "message": "Informații juridice"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "NU ESTE UN SERVICIU OFICIAL MINECRAFT. NU ESTE APROBAT DE SAU ASOCIAT CU MOJANG SAU MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Dreptul de autor și DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Politica de confidențialitate"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Reguli Conținut"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Notificare de Securitate"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Termeni de Utilizare"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "Informații Modrinth"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth are <github-link>sursa deschisă</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "Produse"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
+  },
+  "layout.footer.resources": {
+    "message": "Resurse"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "Documentație API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Centru Ajutor"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Raportează problemă"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Traducere"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Comută meniul"
+  },
+  "layout.meta.description": {
+    "message": "Descarcă moduri, pluginuri, pachete de date, shadere, pachete de resurse și pachete de moduri pentru Minecraft de pe Modrinth. Descoperă și publică proiecte pe Modrinth cu o interfață modernă și ușor de folosit și cu un API accesibil."
+  },
+  "layout.meta.og-description": {
+    "message": "Descoperă și publică conținut pentru Minecraft!"
+  },
+  "layout.nav.analytics": {
+    "message": "Analitice"
+  },
+  "layout.nav.discover": {
+    "message": "Descoperă"
+  },
+  "layout.nav.discover-content": {
+    "message": "Descoperă conținut"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Controale funcționalitate"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Ia-ți Modrinth App"
+  },
+  "layout.nav.home": {
+    "message": "Acasă"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Găzduiește un server"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Pagina de pornire Modrinth"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizații"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Proiecte"
+  },
+  "layout.nav.revenue": {
+    "message": "Venituri"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Proiecte salvate"
+  },
+  "layout.nav.search": {
+    "message": "Caută"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Treci la Modrinth+"
+  },
+  "moderation.filter.by": {
+    "message": "Filtrează după"
+  },
+  "moderation.moderate": {
+    "message": "Moderare"
+  },
+  "moderation.page.projects": {
+    "message": "Proiecte"
+  },
+  "moderation.page.reports": {
+    "message": "Rapoarte"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Revizuire Tehnică"
+  },
+  "moderation.search.placeholder": {
+    "message": "Caută..."
+  },
+  "moderation.sort.by": {
+    "message": "Sortează după"
+  },
+  "moderation.technical.search.placeholder": {
+    "message": "Caută recenzii tehnice..."
+  },
+  "profile.button.billing": {
+    "message": "Administrează facturarea utilizatorului"
+  },
+  "profile.button.info": {
+    "message": "Vizualizează detaliile utilizatorului"
+  },
+  "profile.button.manage-projects": {
+    "message": "Administrează proiectele"
+  },
+  "profile.error.not-found": {
+    "message": "Utilizatorul nu a fost găsit"
+  },
+  "profile.joined-at": {
+    "message": "S-a alăturat în urmă cu <date>{ago}</date>"
+  },
+  "profile.label.badges": {
+    "message": "Insigne"
+  },
+  "profile.label.details": {
+    "message": "Detalii"
+  },
+  "profile.label.no-collections": {
+    "message": "Acest utilizator nu are colecții!"
+  },
+  "profile.label.no-collections-auth": {
+    "message": "Nu ai nicio colecție.\nVrei să <create-link>creezi una</create-link>?"
+  },
+  "profile.label.no-projects": {
+    "message": "Acest utilizator nu are proiecte!"
+  },
+  "profile.label.no-projects-auth": {
+    "message": "Nu aveți proiecte.\nDoriți să <create-link>creați unul</create-link>?"
+  },
+  "profile.label.organizations": {
+    "message": "Organizații"
+  },
+  "profile.meta.description": {
+    "message": "Descarcă proiectele lui {username} pe Modrinth"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} - Descarcă proiectele lui {username} pe Modrinth"
+  },
+  "profile.stats.downloads": {
+    "message": "{count, plural, one {<stat>{count}</stat> descărcare} few {<stat>{count}</stat> descărcări} other {<stat>{count}</stat> de descărcări}}"
+  },
+  "profile.stats.projects": {
+    "message": "{count, plural, one {<stat>{count}</stat> proiect} few {<stat>{count}</stat> proiecte} other {<stat>{count}</stat> de proiecte}}"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> urmăritor} other {<stat>{count}</stat> urmăritori}}"
+  },
+  "profile.user-id": {
+    "message": "ID-ul utilizatorului: {id}"
+  },
+  "project-member-header.accept": {
+    "message": "Acceptă"
+  },
+  "project-member-header.decline": {
+    "message": "Refuză"
+  },
+  "project-member-header.error": {
+    "message": "Eroare"
+  },
+  "project-member-header.error-decline": {
+    "message": "Refuzarea invitației în echipă a eșuat"
+  },
+  "project-member-header.error-join": {
+    "message": "Acceptarea invitației în echipă a eșuat"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "Ai fost invitat să te alături acestui proiect. Te rugăm să accepți sau să refuzi invitația."
+  },
+  "project-member-header.invitation-title": {
+    "message": "Invitație de a te alătura proiectului"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "Ai fost invitat să devii membru al acestui proiect cu rolul de '{role}''."
+  },
+  "project-member-header.success": {
+    "message": "Succes"
+  },
+  "project-member-header.success-decline": {
+    "message": "Ai refuzat invitația în echipă"
+  },
+  "project-member-header.success-join": {
+    "message": "Te-ai alăturat echipei proiectului"
+  },
+  "project-moderation-nags.publishing-checklist": {
+    "message": "Lista de verificare pentru publicare"
+  },
+  "project-moderation-nags.required": {
+    "message": "Necesar"
+  },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "Retrimite pentru revizuire"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Proiectul tău a fost {status} de către echipa Modrinth. În cele mai multe cazuri, poți retrimite pentru revizuire după ce ai rezolvat mesajul echipei."
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "Trebuie să completezi pașii necesari din lista de verificare pentru publicare!"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "Trimite pentru revizuire"
+  },
+  "project-moderation-nags.submit-for-review-button": {
+    "message": "Trimite pentru revizuire"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Proiectul tău poate fi vizualizat doar de membrii proiectului. Trebuie să fie revizuit de moderatori pentru a fi publicat."
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Sugestie"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "Accesează pagina de moderare"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Avertisment"
+  },
+  "project-type.collection.plural": {
+    "message": "Colecții"
+  },
+  "project-type.collection.singular": {
+    "message": "Colecție"
+  },
+  "project-type.datapack.plural": {
+    "message": "Pachete de Date"
+  },
+  "project-type.datapack.singular": {
+    "message": "Pachet de Date"
+  },
+  "project-type.mod.plural": {
+    "message": "Moduri"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Pachete de Moduri"
+  },
+  "project-type.modpack.singular": {
+    "message": "Pachet de Moduri"
+  },
+  "project-type.plugin.plural": {
+    "message": "Pluginuri"
+  },
+  "project-type.plugin.singular": {
+    "message": "Plugin"
+  },
+  "project-type.project.plural": {
+    "message": "Proiecte"
+  },
+  "project-type.project.singular": {
+    "message": "Proiect"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Pachete de Resurse"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Pachet de Resurse"
+  },
+  "project-type.shader.plural": {
+    "message": "Shadere"
+  },
+  "project-type.shader.singular": {
+    "message": "Shader"
+  },
+  "project.about.details.created": {
+    "message": "Creat pe {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "Licențiat cu {license}"
+  },
+  "project.about.details.published": {
+    "message": "Publicat pe {date}"
+  },
+  "project.about.details.submitted": {
+    "message": "Trimis pe {date}"
+  },
+  "project.about.details.title": {
+    "message": "Detalii"
+  },
+  "project.about.details.updated": {
+    "message": "Actualizat pe {date}"
+  },
+  "project.actions.create-server": {
+    "message": "Creează un server"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "Creează un server"
+  },
+  "project.actions.dont-show-again": {
+    "message": "Nu afișa din nou"
+  },
+  "project.actions.review-project": {
+    "message": "Revizuiește proiectul"
+  },
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Servers sunt cea mai simplă modalitate de a te juca împreună cu prietenii fără bătăi de cap!"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "Începând de la {price}<small> / lună</small>"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "Creează un server"
+  },
+  "project.collections.create-new": {
+    "message": "Creează o colecție nouă"
+  },
+  "project.collections.none-found": {
+    "message": "Nu s-au găsit colecții."
+  },
+  "project.description.title": {
+    "message": "Descriere"
+  },
+  "project.details.licensed": {
+    "message": "Licență"
+  },
+  "project.download.game-version": {
+    "message": "Versiunea jocului: {version}"
+  },
+  "project.download.game-version-error": {
+    "message": "Eroare: nu s-au găsit versiuni ale jocului"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{title} este disponibil doar pentru {version}"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{title} nu este compatibil cu {gameVersion} pentru {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Instalează cu Modrinth App"
+  },
+  "project.download.no-app": {
+    "message": "Nu ai Modrinth App?"
+  },
+  "project.download.no-versions-available": {
+    "message": "Nu există versiuni disponibile pentru {gameVersion} și {platform}."
+  },
+  "project.download.platform": {
+    "message": "Platformă: {platform}"
+  },
+  "project.download.platform-error": {
+    "message": "Eroare: nu s-au găsit platforme"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title} este disponibil doar pentru {platform}"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{title} nu este compatibil cu {platform} pentru {gameVersion}"
+  },
+  "project.download.search-game-versions": {
+    "message": "Caută versiuni ale jocului..."
+  },
+  "project.download.search-game-versions-label": {
+    "message": "Caută versiuni ale jocului..."
+  },
+  "project.download.select-game-version": {
+    "message": "Selectează versiunea jocului"
+  },
+  "project.download.select-platform": {
+    "message": "Selectează platforma"
+  },
+  "project.download.show-all-versions": {
+    "message": "Afișează toate versiunile"
+  },
+  "project.download.title": {
+    "message": "Descarcă {title}"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "Am refăcut sistemul de medii pe Modrinth, iar acum sunt disponibile opțiuni noi. Nu ai permisiunea de a modifica aceste setări, dar te rugăm să informezi un alt membru al proiectului că metadatele mediului trebuie verificate."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Metadatele mediului trebuie revizuite"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "Află mai multe despre această schimbare"
+  },
+  "project.environment.migration.message": {
+    "message": "Tocmai am refăcut sistemul de medii pe Modrinth, iar acum sunt disponibile opțiuni noi. Te rugăm să mergi la setările proiectului tău și să verifici dacă metadatele sunt corecte."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Revizuiește setările mediului"
+  },
+  "project.environment.migration.title": {
+    "message": "Te rugăm să revizuiești metadatele mediului"
+  },
+  "project.error.loading": {
+    "message": "Eroare la încărcarea datelor proiectului{message}"
+  },
+  "project.error.page-not-found": {
+    "message": "Pagina nu a putut fi găsită"
+  },
+  "project.error.project-not-found": {
+    "message": "Proiectul nu a fost găsit"
+  },
+  "project.gallery.title": {
+    "message": "Galerie"
+  },
+  "project.license.error": {
+    "message": "Textul licenței nu a putut fi preluat."
+  },
+  "project.license.loading": {
+    "message": "Se încarcă textul licenței..."
+  },
+  "project.license.title": {
+    "message": "Licență"
+  },
+  "project.moderation.title": {
+    "message": "Moderare"
+  },
+  "project.navigation.changelog": {
+    "message": "Istoric modificări"
+  },
+  "project.notification.icon-updated.message": {
+    "message": "Pictograma proiectului tău a fost actualizată."
+  },
+  "project.notification.icon-updated.title": {
+    "message": "Pictograma proiectului s-a actualizat"
+  },
+  "project.notification.updated.message": {
+    "message": "Proiectul tău a fost actualizat."
+  },
+  "project.notification.updated.title": {
+    "message": "Proiect actualizat"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Proiectului tău îi lipsesc metadatele mediului, te rugăm să selectezi opțiunea potrivită de mai jos."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Te rugăm să alegi un mediu pentru proiectul tău"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "message": "Diferite versiuni ale proiectului tău au selectate medii diferite, așa că nu le poți edita la nivel global în acest moment."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "Proiectul tău are mai multe medii"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "Tocmai am refăcut sistemul de medii pe Modrinth, iar acum sunt disponibile opțiuni noi. Te rugăm să te asiguri că ai selectat opțiunea corectă de mai jos și apoi apasă pe \"Verifică\" când ești gata!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "message": "Te rugăm să revizuiești opțiunile de mai jos"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "message": "Doar proiectele de tip mod sau pachet de moduri pot avea metadate despre mediu."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "message": "Acest tip de proiect nu suportă metadate despre mediu"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "message": "Verifică"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "message": "Verifică dacă mediul acestui proiect este setat corect."
+  },
+  "project.settings.general.name.description": {
+    "message": "Nu folosi prefixe, sufixe, paranteze sau descrieri adăugate—doar numele real al proiectului."
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "ex. Nether Overhaul 2"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "ex. Construction Equipment"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "ex. Better than Caving"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "ex. Enhanced Portals"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "ex. Dangerous Mobs"
+  },
+  "project.settings.general.name.title": {
+    "message": "Nume"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "Oferă un rezumat al proiectului tău, care să nu depășească o singură propoziție."
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "ex. Remodelează progresia jocului pentru a se concentra pe Nether."
+  },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "ex. Adaugă echipament de construcții care poate fi purtat."
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "ex. Adaugă mecanici realiste de construire a minelor."
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "ex. Îmbunătățește modul în care portalurile Nether se conectează între ele."
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "ex. Adaugă versiuni puternice de tip boss ale mobilor normali pe care îi poți întâlni noaptea."
+  },
+  "project.settings.general.tagline.title": {
+    "message": "Slogan"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.title": {
+    "message": "Setări"
+  },
+  "project.settings.visit-dashboard": {
+    "message": "Vizitează panoul de control al proiectelor"
+  },
+  "project.stats.downloads-label": {
+    "message": "descărc{count, plural, one {are} other {ări}}"
+  },
+  "project.stats.followers-label": {
+    "message": "urmăritor{count, plural, one {} other {i}}"
+  },
+  "project.status.archived.message": {
+    "message": "Proiectul {title} a fost arhivat. Proiectul {title} nu va mai primi actualizări, cu excepția cazului în care autorul decide să-l dezarhiveze."
+  },
+  "project.version.all-versions": {
+    "message": "Toate versiunile"
+  },
+  "project.version.back-to-versions": {
+    "message": "Înapoi la versiuni"
+  },
+  "project.versions.title": {
+    "message": "Versiuni"
+  },
+  "report.already-reported": {
+    "message": "Ai raportat deja {title}"
+  },
+  "report.already-reported-description": {
+    "message": "Ai deja un raport deschis pentru acest {item}. Poți adăuga mai multe detalii raportului dacă ai informații suplimentare."
+  },
+  "report.back-to-item": {
+    "message": "Înapoi la {item}"
+  },
+  "report.body.description": {
+    "message": "Include linkuri și imagini, dacă este posibil și relevant. Rapoartele goale sau insuficiente vor fi închise și ignorate."
+  },
+  "report.body.title": {
+    "message": "Te rugăm să oferi context suplimentar raportului tău"
+  },
+  "report.checking": {
+    "message": "Se verifică {item}..."
+  },
+  "report.could-not-find": {
+    "message": "Nu s-a putut găsi {item}"
+  },
+  "report.for.violation": {
+    "message": "Încălcarea <rules-link>Regulilor</rules-link> sau a <terms-link>Termenilor de Utilizare</terms-link> Modrinth"
+  },
+  "report.for.violation.description": {
+    "message": "Exemplele includ conținut rău intenționat, spam, ofensator, înșelător, care poate induce în eroare sau ilegal."
+  },
+  "report.form-not-for": {
+    "message": "Acest formular nu este destinat pentru:"
+  },
+  "report.go-to-report": {
+    "message": "Accesează raportul"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Rapoarte de erori"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "Poți raporta erori în <issues-link>tracker-ul de probleme</issues-link> al acestora."
+  },
+  "report.not-for.dmca": {
+    "message": "Retrageri DMCA"
+  },
+  "report.not-for.dmca.description": {
+    "message": "Vezi <policy-link>Politica noastră de Drepturi de Autor</policy-link>."
+  },
+  "report.note.copyright.1": {
+    "message": "Te rugăm să reții că *nu* trimiți o cerere de retragere DMCA, ci mai degrabă un raport privind conținutul reîncărcat."
+  },
+  "report.note.copyright.2": {
+    "message": "Dacă intenționai să depui o cerere de retragere DMCA (care reprezintă o acțiune legală), te rugăm să consulți <copyright-policy-link>Politica noastră de Drepturi de Autor</copyright-policy-link>."
+  },
+  "report.note.malicious.1": {
+    "message": "Rapoartele pentru conținut malițios sau înșelător trebuie să includă dovezi consistente ale comportamentului, cum ar fi exemple de cod."
+  },
+  "report.note.malicious.2": {
+    "message": "Rezumatelor provenite de la Microsoft Defender, VirusTotal sau de la sisteme AI de detectare a malware-ului nu li se acordă suficientă valoare ca dovezi și nu vor fi acceptate."
+  },
+  "report.please-report": {
+    "message": "Te rugăm să raportezi:"
+  },
+  "report.question.content-id": {
+    "message": "Care este ID-ul {item}?"
+  },
+  "report.question.content-type": {
+    "message": "Ce tip de conținut raportezi?"
+  },
+  "report.question.report-reason": {
+    "message": "Care dintre regulile Modrinth încalcă acest {item}?"
+  },
+  "report.report-content": {
+    "message": "Raportează conținutul moderatorilor"
+  },
+  "report.report-item": {
+    "message": "Raportează {title} moderatorilor"
+  },
+  "report.submit": {
+    "message": "Trimite raportul"
+  },
+  "revenue.transfers.total": {
+    "message": "Ați retras în total {amount}."
+  },
+  "revenue.transfers.total.method": {
+    "message": "Ați retras {amount} prin {method}."
+  },
+  "revenue.transfers.total.year": {
+    "message": "Ați retras {amount} în {year}."
+  },
+  "revenue.transfers.total.year_method": {
+    "message": "Ați retras suma de {amount} în anul {year} prin intermediul {method}."
+  },
+  "scopes.analytics.description": {
+    "message": "Accesați-vă datele analitice"
+  },
+  "scopes.analytics.label": {
+    "message": "Citește analizele"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "Creează colecții"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "Creează colecții"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "Șterge colecțiile"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "Șterge colecțiile"
+  },
+  "scopes.collectionRead.description": {
+    "message": "Citește colecțiile"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Citește colecțiile"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Modifică colecțiile"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Modifică colecțiile"
+  },
+  "scopes.notificationRead.description": {
+    "message": "Citește notificările tale"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Citește notificările"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "Șterge/Vizualizează notificările tale"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Scrie notificări"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Creează organizații"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "Creează organizații"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "Șterge organizațiile"
+  },
+  "scopes.organizationDelete.label": {
+    "message": "Ștergere organizații"
+  },
+  "scopes.organizationRead.description": {
+    "message": "Citește organizațiile"
+  },
+  "scopes.organizationRead.label": {
+    "message": "Citește organizațiile"
+  },
+  "scopes.organizationWrite.description": {
+    "message": "Modifică organizații"
+  },
+  "scopes.organizationWrite.label": {
+    "message": "Modifică organizații"
+  },
+  "scopes.patCreate.description": {
+    "message": "Creează token-uri API personale"
+  },
+  "scopes.patCreate.label": {
+    "message": "Creează PAT-uri"
+  },
+  "scopes.patDelete.description": {
+    "message": "Șterge token-urile API personale"
+  },
+  "scopes.patDelete.label": {
+    "message": "Șterge PAT-urile"
+  },
+  "scopes.patRead.description": {
+    "message": "Vizualizează token-urile API create"
+  },
+  "scopes.patRead.label": {
+    "message": "Citește PAT-urile"
+  },
+  "scopes.patWrite.description": {
+    "message": "Editează token-urile API personale"
+  },
+  "scopes.patWrite.label": {
+    "message": "Modifică PAT-urile"
+  },
+  "scopes.payoutsRead.description": {
+    "message": "Citește datele despre plățile tale"
+  },
+  "scopes.payoutsRead.label": {
+    "message": "Citește plățile"
+  },
+  "scopes.payoutsWrite.description": {
+    "message": "Retrage bani"
+  },
+  "scopes.payoutsWrite.label": {
+    "message": "Scrie plățile"
+  },
+  "scopes.performAnalytics.description": {
+    "message": "Efectuează acțiuni de analiză"
+  },
+  "scopes.performAnalytics.label": {
+    "message": "Efectuează analize"
+  },
+  "scopes.projectCreate.description": {
+    "message": "Creați proiecte noi"
+  },
+  "scopes.projectCreate.label": {
+    "message": "Creare proiecte"
+  },
+  "scopes.projectDelete.description": {
+    "message": "Șterge-ți proiectele"
+  },
+  "scopes.projectDelete.label": {
+    "message": "Șterge proiectele"
+  },
+  "scopes.projectRead.description": {
+    "message": "Citește toate proiectele tale"
+  },
+  "scopes.projectRead.label": {
+    "message": "Citește proiectele"
+  },
+  "scopes.projectWrite.description": {
+    "message": "Scrie în datele proiectului"
+  },
+  "scopes.projectWrite.label": {
+    "message": "Scrie proiecte"
+  },
+  "scopes.reportCreate.description": {
+    "message": "Creează rapoarte"
+  },
+  "scopes.reportCreate.label": {
+    "message": "Creează rapoarte"
+  },
+  "scopes.reportDelete.description": {
+    "message": "Șterge rapoarte"
+  },
+  "scopes.reportDelete.label": {
+    "message": "Șterge rapoarte"
+  },
+  "scopes.reportRead.description": {
+    "message": "Citește rapoarte"
+  },
+  "scopes.reportRead.label": {
+    "message": "Citește rapoarte"
+  },
+  "scopes.reportWrite.description": {
+    "message": "Editează rapoarte"
+  },
+  "scopes.reportWrite.label": {
+    "message": "Scrie rapoarte"
+  },
+  "scopes.sessionAccess.description": {
+    "message": "Accesează sesiunile emise de Modrinth"
+  },
+  "scopes.sessionAccess.label": {
+    "message": "Accesează sesiunile"
+  },
+  "scopes.sessionDelete.description": {
+    "message": "Șterge sesiunile"
+  },
+  "scopes.sessionDelete.label": {
+    "message": "Șterge sesiunile"
+  },
+  "scopes.sessionRead.description": {
+    "message": "Citește sesiunile active"
+  },
+  "scopes.sessionRead.label": {
+    "message": "Citește sesiunile"
+  },
+  "scopes.threadRead.description": {
+    "message": "Citește discuțiile"
+  },
+  "scopes.threadRead.label": {
+    "message": "Citește discuțiile"
+  },
+  "scopes.threadWrite.description": {
+    "message": "Scrie in discuții"
+  },
+  "scopes.threadWrite.label": {
+    "message": "Scrie in discuții"
+  },
+  "scopes.userAuthWrite.description": {
+    "message": "Modifică-ți datele de autentificare"
+  },
+  "scopes.userAuthWrite.label": {
+    "message": "Scrie datele de autentificare"
+  },
+  "scopes.userDelete.description": {
+    "message": "Șterge-ți contul"
+  },
+  "scopes.userDelete.label": {
+    "message": "Șterge-ți contul"
+  },
+  "scopes.userRead.description": {
+    "message": "Accesează informațiile publice ale profilului tău"
+  },
+  "scopes.userRead.label": {
+    "message": "Citește datele utilizatorului"
+  },
+  "scopes.userReadEmail.description": {
+    "message": "Citește adresa de email"
+  },
+  "scopes.userReadEmail.label": {
+    "message": "Citește adresa de email a utilizatorului"
+  },
+  "scopes.userWrite.description": {
+    "message": "Scrie pe profilul tău"
+  },
+  "scopes.userWrite.label": {
+    "message": "Scrie datele utilizatorului"
+  },
+  "scopes.versionCreate.description": {
+    "message": "Creează versiuni noi"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Creează versiuni"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Șterge o versiune"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Șterge versiuni"
+  },
+  "scopes.versionRead.description": {
+    "message": "Citește toate versiunile"
+  },
+  "scopes.versionRead.label": {
+    "message": "Citește versiuni"
+  },
+  "scopes.versionWrite.description": {
+    "message": "Modifică datele versiunii"
+  },
+  "scopes.versionWrite.label": {
+    "message": "Modificare versiuni"
+  },
+  "search.filter.locked.server": {
+    "message": "Oferit de server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Versiunea jocului este oferit de server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader-ul este oferit de server"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Sincronizează cu serverul"
+  },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Creare copie de rezervă în curs"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "Restaurare copie de rezervă în curs"
+  },
+  "servers.backups.item.already-preparing": {
+    "message": "Se pregătește deja copia de rezervă pentru descărcare"
+  },
+  "servers.backups.item.automated": {
+    "message": "Automat"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Se creează o copie de rezervă..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Eșec la crearea copiei de rezervă"
+  },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "Eșec la pregătirea descărcării"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Eșec la restaurarea din copie de rezervă"
+  },
+  "servers.backups.item.lock": {
+    "message": "Blochează"
+  },
+  "servers.backups.item.locked": {
+    "message": "Blocat"
+  },
+  "servers.backups.item.prepare-download": {
+    "message": "Pregătește descărcarea"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "Încearcă să pregătești din nou"
+  },
+  "servers.backups.item.preparing-download": {
+    "message": "Se pregătește descărcarea..."
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "Programat pentru copiere de rezervă"
+  },
+  "servers.backups.item.rename": {
+    "message": "Redenumește"
+  },
+  "servers.backups.item.restore": {
+    "message": "Restaurează"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Se restaurează din copie de rezervă..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Reîncearcă"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Deblochează"
+  },
+  "servers.notice.actions": {
+    "message": "Acțiuni"
+  },
+  "servers.notice.begins": {
+    "message": "Începe"
+  },
+  "servers.notice.dismissable": {
+    "message": "Ignorabil"
+  },
+  "servers.notice.expires": {
+    "message": "Expiră"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Nivel"
+  },
+  "servers.notice.undismissable": {
+    "message": "Permanentă"
+  },
+  "servers.notices.create-notice": {
+    "message": "Creează notificare"
+  },
+  "servers.notices.no-notices": {
+    "message": "Nicio notificare"
+  },
+  "servers.plan.large.description": {
+    "message": "Ideal pentru 15–25 de jucători, pachete de moduri sau moduri complexe."
+  },
+  "servers.plan.large.name": {
+    "message": "Larg"
+  },
+  "servers.plan.medium.description": {
+    "message": "Bun pentru 6–15 jucători și multiple moduri."
+  },
+  "servers.plan.medium.name": {
+    "message": "Mediu"
+  },
+  "servers.plan.small.description": {
+    "message": "Perfect pentru 1–5 prieteni cu câteva moduri ușoare."
+  },
+  "servers.plan.small.name": {
+    "message": "Mic"
+  },
+  "settings.billing.modal.cancel.action": {
+    "message": "Anulează abonamentul"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "Prin această acțiune îți vei anula abonamentul. Vei păstra beneficiile până la finalul ciclului de facturare curent."
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "Ești sigur că vrei să anulezi abonamentul?"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Elimină această metodă de plată"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "Această acțiune va elimina această metodă de plată pentru totdeauna (chiar pentru totdeauna)."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Ești sigur că vrei să elimini această metodă de plată?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Adaugă o metodă de plată"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "Vezi plățile anterioare"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Setează ca principală"
+  },
+  "settings.billing.payment_method.card_display": {
+    "message": "{card_brand} care se termină în {last_four}"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Expiră la data de {month}/{year}"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "Nu ai adăugat nicio metodă de plată."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Principală"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Metode de plată"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Discover"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCard"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPay"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "Metodă de plată necunoscută"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Gestionează-ți abonamentele la Modrinth Server."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Abonamente pentru Modrinth Servers"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Administrează-ți abonamentele Modrinth."
+  },
+  "settings.billing.subscription.title": {
+    "message": "Abonamente"
+  },
+  "settings.display.banner.developer-mode.button": {
+    "message": "Dezactivați modul de dezvoltator"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "<strong>Modul de dezvoltator</strong> este activ. Acest lucru vă va permite să vizualizați ID-urile interne ale diverselor lucruri din Modrinth, ceea ce poate fi util dacă sunteți un dezvoltator care folosește API-ul Modrinth. Faceți clic pe sigla Modrinth din partea de jos a paginii de 5 ori pentru a activa sau dezactiva modul de dezvoltator."
+  },
+  "settings.display.flags.description": {
+    "message": "Activați sau dezactivați anumite caracteristici pe acest dispozitiv."
+  },
+  "settings.display.flags.title": {
+    "message": "Comută funcțiile"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Pagina Pachetelor de Date"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Selectează aspectul preferat pentru fiecare pagină care afișează liste de proiecte pe acest dispozitiv."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Pagina Modurilor"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Pagina Pachetelor de Moduri"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Pagina Pluginurilor"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Pagina Pachetelor de Resurse"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Pagina Shaderurilor"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Aspectul listelor de proiecte"
+  },
+  "settings.display.project-list-layouts.user": {
+    "message": "Pagini de profil ale utilizatorilor"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Colecție"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "message": "Activează redarea avansată, cum ar fi efectele de estompare (blur), care pot provoca probleme de performanță fără redare accelerată hardware."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "Redare avansată"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "Deschide linkurile externe de pe Modrinth într-un tab nou. Indiferent de această setare, linkurile de pe același domeniu și din descrierile Markdown se vor deschide în același tab, iar linkurile din reclame și paginile de editare se vor deschide într-un tab nou."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "message": "Deschide linkurile externe într-un tab nou"
+  },
+  "settings.display.sidebar.hide-app-promos.description": {
+    "message": "Ascunde butoanele \"Descarcă Modrinth App\" din navigarea principală. Pagina aplicației Modrinth poate fi găsită în continuare pe pagina de destinație sau în subsol."
+  },
+  "settings.display.sidebar.hide-app-promos.title": {
+    "message": "Ascunde promoțiile Modrinth App"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Bară laterală aliniată la stânga pe paginile de conținut"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Aliniază bara laterală la stânga conținutului paginii."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Aliniază bara laterală de filtre la dreapta rezultatelor căutării."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Aliniază bara laterală de filtre la dreapta rezultatelor căutării"
+  },
+  "settings.display.theme.description": {
+    "message": "Selectează tema de culori preferată pentru Modrinth pe acest dispozitiv."
+  },
+  "settings.display.theme.title": {
+    "message": "Temă de culori"
+  },
+  "settings.language.categories.auto": {
+    "message": "Automat"
+  },
+  "settings.language.categories.default": {
+    "message": "Limbi standard"
+  },
+  "settings.language.categories.experimental": {
+    "message": "Limbi experimentale"
+  },
+  "settings.language.categories.fun": {
+    "message": "Limbi distractive"
+  },
+  "settings.language.categories.search-result": {
+    "message": "Rezultate gasite"
+  },
+  "settings.language.description": {
+    "message": "Alege limba preferată pentru site. Traducerile sunt contribuite de voluntari <crowdin-link>pe Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.automatic": {
+    "message": "Sincronizează cu limba sistemului"
+  },
+  "settings.language.languages.language-label-applying": {
+    "message": "{label}. Se aplică..."
+  },
+  "settings.language.languages.language-label-error": {
+    "message": "{label}. Eroare"
+  },
+  "settings.language.languages.load-failed": {
+    "message": "Nu se poate încărca această limbă. Încercați din nou peste câteva momente."
+  },
+  "settings.language.languages.search-field.description": {
+    "message": "Trimite pentru a focaliza primul rezultat al căutării"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "message": "Caută o limbă..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "message": "{matches, plural, =0 {Nicio limbă nu corespunde} one {# limbă corespunde} other {# limbi corespund}} căutării tale."
+  },
+  "settings.language.languages.search.no-results": {
+    "message": "Nicio limbă nu corespunde căutării tale."
+  },
+  "settings.language.warning": {
+    "message": "Schimbarea limbii site-ului poate face ca o parte din conținut să apară în engleză dacă nu există o traducere disponibilă. Site-ul nu este încă complet tradus, așa că unele conținuturi pot rămâne în engleză pentru anumite limbi. Încă lucrăm la îmbunătățirea sistemului nostru de localizare, așa că, ocazional, conținutul poate apărea incomplet."
+  },
+  "settings.pats.action.create": {
+    "message": "Creează un token PAT"
+  },
+  "settings.pats.description": {
+    "message": "Token-urile PAT pot fi folosite pentru a accesa API-ul Modrinths. Pentru mai multe informații, consultați <doc-link>Documentația API a Modrinth's</doc-link>. Acestea pot fi create și revocate în orice moment."
+  },
+  "settings.pats.modal.create.action": {
+    "message": "Creează token PAT"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Expiră"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Nume"
+  },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "Introduceți numele token-ului PAT..."
+  },
+  "settings.pats.modal.create.title": {
+    "message": "Creează un token de acces"
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "Șterge acest token"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "Acest lucru va șterge acest token pentru totdeauna (chiar pentru totdeauna)."
+  },
+  "settings.pats.modal.delete.title": {
+    "message": "Ești sigur că dorești să ștergi acest token?"
+  },
+  "settings.pats.modal.edit.title": {
+    "message": "Editează token-ul de acces personal"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Editează token-ul"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "Revocă token-ul"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Expirat acum {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Expiră în {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Ultima utilizare acum {ago}"
+  },
+  "settings.pats.token.never-used": {
+    "message": "N-a fost folosit niciodată"
+  },
+  "settings.profile.bio.description": {
+    "message": "O scurtă descriere pentru a le spune tuturor câte ceva despre tine."
+  },
+  "settings.profile.bio.title": {
+    "message": "Biografie"
+  },
+  "settings.profile.description": {
+    "message": "Informațiile profilului tău sunt vizibile public pe Modrinth și prin intermediul <docs-link>API-ului Modrinth</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Informațiile profilului"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Resetează"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Imagine de profil"
+  },
+  "settings.profile.username.description": {
+    "message": "Un nume unic care nu ține cont de majuscule, pentru a-ți identifica profilul."
+  },
+  "settings.profile.username.title": {
+    "message": "Nume de utilizator"
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "Anulează sesiunea"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Creat în urmă cu {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Sesiune curentă"
+  },
+  "settings.sessions.description": {
+    "message": "Acestea sunt toate dispozitivele pe care ești conectat(ă) la contul tău Modrinth. Te poți deconecta de pe fiecare în parte.\n\nDacă observi o intrare pe care nu o recunoști, deconectează-te de pe acel dispozitiv și schimbă imediat parola contului tău Modrinth."
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Ultima accesare în urmă cu {ago}"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "OS necunoscut"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Platformă necunoscută"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Cele mai recente noutăți de pe Modrinth"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Vedeți toate noutățile"
+  }
+}

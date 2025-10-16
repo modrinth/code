@@ -1,0 +1,198 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Een beschrijving die het doel en de functie van het project duidelijk weergeeft is vereist."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Voeg een beschrijving toe"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Door een uniek, relevant en aantrekkelijk icoon toe te voegen, wordt je project herkenbaar en valt het beter op."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Voeg een icoon toe"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Voeg relevante links buiten Modrinth toe, zoals code, een probleemtracker of een Discord uitnodiging."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Voeg externe links toe"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Je hebt alle {totalAvailableTags} beschikbare tags geselecteerd. Dit gaat in tegen het doel van tags, die bedoeld zijn om gebruikers te helpen relevante projecten te vinden. Selecteer alleen de tags die relevant zijn voor je project."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Selecteer relevante tags"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Jouw beschrijving is {length} leesbare karakters. Minstens {minChars} karakters zijn aanbevolen om een duidelijke en informatieve beschrijving te maken."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Verleng de beschrijving"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Pas beschrijving aan"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Pas licentie aan"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Pas samenvatting aan"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Pas tags aan"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Pas titel aan"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "De uitgelichte galerij foto is hoe vaak je project zijn eerste indruk maakt."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Licht een foto uit"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "Bezoek galerij pagina"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Uw {projectType} gebruikt een licentie die vereist dat de bron code beschikbaar is. Voeg alstublieft een link naar de bron code of bron bestand of overweeg een andere licentie te gebruiken."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Bied bron code aan"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "Uw beschrijving moet voldoende platte tekst of alternatieve afbeeldingstekst bevatten, zodat deze ook toegankelijk is voor mensen die een schermlezer gebruiken of een trage internetverbinding hebben."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "Zorg voor toegankelijkheid"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "Licentie URL is ongeldig."
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "Je licentie URL leidt naar {domain}, wat niet geschikt is voor licentieinformatie. Licentie URL's moeten direct naar je licentie bestand wijzen, niet social media, gaming platforms, etc."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "Het ziet ernaar uit dat je licentie URL ongeldig is. Gebruik graag een geldige URL naar je licentietekst."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Voeg een geldige licentie link toe"
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "Gebruik geen link verkorters"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, one {# kop} other {# koppen}} in jouw beschrijving {count, plural, one {is} other {zijn}} te lang. Koppen moeten beknopt zijn en dienen als onderdeeltitels, niet als volledige zinnen."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "Verkort koppen"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "Projecten mogen niet de merknaam van Minecraft gebruiken en \"Minecraft\" mag geen belangrijk onderdeel van de naam zijn."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Voorkom merkinbreuk"
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "Alt-tekst voor afbeelding toevoegen"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Discord-uitnodigingen kunnen niet worden gebruikt voor andere linktypen. Plaats uw Discord-link alleen in het veld 'Discord-uitnodigingslink'."
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Verplaats Discord uitnodiging"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "Bekijk moderatie thread"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "Bekijk en verhelp alle bezwaren van het moderatieteam voordat je het opnieuw indient."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Bekijk moderatie feedback"
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Selecteer juiste resolutie"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Selecteer de licentie waaronder jouw {projectType} is uitgebracht."
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Selecteer een licentie"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "Selecteer de tags van toepassing zijn op jouw project, zodat de juiste gebruiker het kunnen vinden."
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Selecteer tags"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Bekijk beschrijving instellingen"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Bekijk licentie instellingen"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Bekijk linkjes instellingen"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Bekijk tag instellingen"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Bekijk algemene instellingen"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Je samenvatting kan niet dezelfde naam hebben als je projectnaam. Het is belangrijk om een informatieve en interessante samenvatting te maken."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "Maak je samenvatting uniek"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Je samenvatting moet geen opmaak, regeleindes, speciale karakters of links, omdat de samenvatting alleen text, uitlicht."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Verhelder de samenvatting"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Jouw samenvatting is {length} karakters langs. Tenminste {minChars} karakters zijn aanbevolen om een informatieve en aantrekkelijke samenvatting te maken."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "Breidt de samenvatting uit"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "De naam van je project duidelijk houden zorgt ervoor dat het makkelijk te vinden is. Versie en lader informatie is automatisch bij je project uitgelicht."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "Maak de naam duidelijk"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Je hebt {tagCount} tags geselecteerd. Overweeg om het aantal te verlagen naar {maxTagCount} of minder om ervoor te zorgen dat je project in relevante zoekresultaten verschijnt."
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "Selecteer relevante tags"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Minimaal één galerijafbeelding is nodig om de inhoud van uw {type}{resourcepackMessage} te tonen."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Upload een galerijafbeelding"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "Minimaal één versie is nodig om een project in te dienen voor beoordeling."
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Upload een versie"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "Sommige van uw externe links gebruiken mogelijk domeinen die niet geschikt zijn voor dat type link."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Verifieer externe links"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "Bezoek versies pagina"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Bezoek linkjes instellingen"
+  }
+}
+

@@ -4,25 +4,31 @@ use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::launcher::download::download_log_config;
 use crate::launcher::io::IOError;
+use crate::launcher::quick_play_version::{
+    QuickPlayServerVersion, QuickPlayVersion,
+};
 use crate::profile::QuickPlayType;
 use crate::state::{
     Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
 };
 use crate::util::io;
-use crate::{State, process, state as st};
+use crate::util::rpc::RpcServerBuilder;
+use crate::{State, get_resource_file, process, state as st};
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{LoggingSide, RuleAction, VersionInfo};
 use daedalus::modded::LoaderVersion;
+use regex::Regex;
 use serde::Deserialize;
 use st::Profile;
-use std::collections::HashMap;
+use std::fmt::Write;
 use std::path::PathBuf;
 use tokio::process::Command;
 
 mod args;
 
 pub mod download;
+pub mod quick_play_version;
 
 // All nones -> disallowed
 // 1+ true -> allowed
@@ -123,12 +129,10 @@ pub async fn get_java_version_from_profile(
     version_info: &VersionInfo,
 ) -> crate::Result<Option<JavaVersion>> {
     if let Some(java) = profile.java_path.as_ref() {
-        let java = crate::api::jre::check_jre(std::path::PathBuf::from(java))
-            .await
-            .ok()
-            .flatten();
+        let java =
+            crate::api::jre::check_jre(std::path::PathBuf::from(java)).await;
 
-        if let Some(java) = java {
+        if let Ok(java) = java {
             return Ok(Some(java));
         }
     }
@@ -136,8 +140,7 @@ pub async fn get_java_version_from_profile(
     let key = version_info
         .java_version
         .as_ref()
-        .map(|it| it.major_version)
-        .unwrap_or(8);
+        .map_or(8, |it| it.major_version);
 
     let state = State::get().await?;
 
@@ -252,8 +255,7 @@ pub async fn install_minecraft(
 
         let loader_version_id = loader_version.clone();
         crate::api::profile::edit(&profile.path, |prof| {
-            prof.loader_version =
-                loader_version_id.clone().map(|x| x.id.clone());
+            prof.loader_version = loader_version_id.clone().map(|x| x.id);
 
             async { Ok(()) }
         })
@@ -278,8 +280,7 @@ pub async fn install_minecraft(
     let key = version_info
         .java_version
         .as_ref()
-        .map(|it| it.major_version)
-        .unwrap_or(8);
+        .map_or(8, |it| it.major_version);
     let (java_version, set_java) = if let Some(java_version) =
         get_java_version_from_profile(profile, &version_info).await?
     {
@@ -291,13 +292,7 @@ pub async fn install_minecraft(
     };
 
     // Test jre version
-    let java_version = crate::api::jre::check_jre(java_version.clone())
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "Java path invalid or non-functional: {java_version:?}"
-            ))
-        })?;
+    let java_version = crate::api::jre::check_jre(java_version.clone()).await?;
 
     if set_java {
         java_version.upsert(&state.pool).await?;
@@ -346,15 +341,17 @@ pub async fn install_minecraft(
 
             // Forge processors (90-100)
             for (index, processor) in processors.iter().enumerate() {
-                if let Some(sides) = &processor.sides {
-                    if !sides.contains(&String::from("client")) {
-                        continue;
-                    }
+                if let Some(sides) = &processor.sides
+                    && !sides.contains(&String::from("client"))
+                {
+                    continue;
                 }
 
-                let cp = wrap_ref_builder!(cp = processor.classpath.clone() => {
-                    cp.push(processor.jar.clone())
-                });
+                let cp = {
+                    let mut cp = processor.classpath.clone();
+                    cp.push(processor.jar.clone());
+                    cp
+                };
 
                 let child = Command::new(&java_version.path)
                     .arg("-cp")
@@ -426,7 +423,7 @@ pub async fn install_minecraft(
 
 pub async fn read_protocol_version_from_jar(
     path: PathBuf,
-) -> crate::Result<Option<i32>> {
+) -> crate::Result<Option<u32>> {
     let zip = async_zip::tokio::read::fs::ZipFileReader::new(path).await?;
     let Some(entry_index) = zip
         .file()
@@ -439,7 +436,7 @@ pub async fn read_protocol_version_from_jar(
 
     #[derive(Deserialize, Debug)]
     struct VersionData {
-        protocol_version: Option<i32>,
+        protocol_version: Option<u32>,
     }
 
     let mut data = vec![];
@@ -464,7 +461,7 @@ pub async fn launch_minecraft(
     credentials: &Credentials,
     post_exit_hook: Option<String>,
     profile: &Profile,
-    quick_play_type: &QuickPlayType,
+    mut quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
         || profile.install_stage == ProfileInstallStage::MinecraftInstalling
@@ -560,14 +557,7 @@ pub async fn launch_minecraft(
 
     // Test jre version
     let java_version =
-        crate::api::jre::check_jre(java_version.path.clone().into())
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Java path invalid or non-functional: {}",
-                    java_version.path
-                ))
-            })?;
+        crate::api::jre::check_jre(java_version.path.clone().into()).await?;
 
     let client_path = state
         .directories
@@ -577,7 +567,9 @@ pub async fn launch_minecraft(
     let args = version_info.arguments.clone().unwrap_or_default();
     let mut command = match wrapper {
         Some(hook) => {
-            wrap_ref_builder!(it = Command::new(hook) => {it.arg(&java_version.path)})
+            let mut command = Command::new(hook);
+            command.arg(&java_version.path);
+            command
         }
         None => Command::new(&java_version.path),
     };
@@ -601,34 +593,66 @@ pub async fn launch_minecraft(
         io::create_dir_all(&natives_dir).await?;
     }
 
-    command
-        .args(
-            args::get_jvm_arguments(
-                args.get(&d::minecraft::ArgumentType::Jvm)
-                    .map(|x| x.as_slice()),
-                &natives_dir,
+    let quick_play_version =
+        QuickPlayVersion::find_version(version_index, &minecraft.versions);
+    tracing::debug!(
+        "Found QuickPlayVersion for {}: {quick_play_version:?}",
+        profile.game_version
+    );
+    if let QuickPlayType::Server(address) = &mut quick_play_type
+        && quick_play_version.server >= QuickPlayServerVersion::BuiltinLegacy
+    {
+        address.resolve().await?;
+    }
+
+    let (main_class_keep_alive, main_class_path) =
+        get_resource_file!(env "JAVA_JARS_DIR" / "theseus.jar")?;
+
+    let rpc_server = RpcServerBuilder::new().launch().await?;
+
+    command.args(
+        args::get_jvm_arguments(
+            args.get(&d::minecraft::ArgumentType::Jvm)
+                .map(|x| x.as_slice()),
+            &natives_dir,
+            &state.directories.libraries_dir(),
+            &state.directories.log_configs_dir(),
+            &args::get_class_paths(
                 &state.directories.libraries_dir(),
-                &state.directories.log_configs_dir(),
-                &args::get_class_paths(
-                    &state.directories.libraries_dir(),
-                    version_info.libraries.as_slice(),
-                    &client_path,
-                    &java_version.architecture,
-                    minecraft_updated,
-                )?,
-                &version_jar,
-                *memory,
-                Vec::from(java_args),
+                version_info.libraries.as_slice(),
+                &[&main_class_path, &client_path],
                 &java_version.architecture,
-                quick_play_type,
-                version_info
-                    .logging
-                    .as_ref()
-                    .and_then(|x| x.get(&LoggingSide::Client)),
-            )?
-            .into_iter()
-            .collect::<Vec<_>>(),
-        )
+                minecraft_updated,
+            )?,
+            &main_class_path,
+            &version_jar,
+            *memory,
+            Vec::from(java_args),
+            &java_version.architecture,
+            &quick_play_type,
+            quick_play_version,
+            version_info
+                .logging
+                .as_ref()
+                .and_then(|x| x.get(&LoggingSide::Client)),
+            rpc_server.address(),
+        )?
+        .into_iter(),
+    );
+
+    // The java launcher requires access to java.lang.reflect in order to force access in to
+    // whatever module the main class is in
+    if java_version.parsed_version >= 9 {
+        command.arg("--add-opens=java.base/java.lang.reflect=ALL-UNNAMED");
+    }
+
+    // The java launcher code requires internal JDK code in Java 25+ in order to support JEP 512
+    if java_version.parsed_version >= 25 {
+        command.arg("--add-opens=jdk.internal/jdk.internal.misc=ALL-UNNAMED");
+    }
+
+    command
+        .arg("com.modrinth.theseus.MinecraftLaunch")
         .arg(version_info.main_class.clone())
         .args(
             args::get_minecraft_arguments(
@@ -643,10 +667,11 @@ pub async fn launch_minecraft(
                 &version.type_,
                 *resolution,
                 &java_version.architecture,
-                quick_play_type,
-            )?
-            .into_iter()
-            .collect::<Vec<_>>(),
+                &quick_play_type,
+                quick_play_version,
+            )
+            .await?
+            .into_iter(),
         )
         .current_dir(instance_path.clone());
 
@@ -655,27 +680,42 @@ pub async fn launch_minecraft(
     if std::env::var("CARGO").is_ok() {
         command.env_remove("DYLD_FALLBACK_LIBRARY_PATH");
     }
-    // Java options should be set in instance options (the existence of _JAVA_OPTIONS overwites them)
+    // Java options should be set in instance options (the existence of _JAVA_OPTIONS overwrites them)
     command.env_remove("_JAVA_OPTIONS");
 
     command.envs(env_args);
 
     // Overwrites the minecraft options.txt file with the settings from the profile
     // Uses 'a:b' syntax which is not quite yaml
-    use regex::Regex;
-
     if !mc_set_options.is_empty() {
         let options_path = instance_path.join("options.txt");
-        let mut options_string = String::new();
-        if options_path.exists() {
-            options_string = io::read_to_string(&options_path).await?;
+
+        let (mut options_string, input_encoding) = if options_path.exists() {
+            io::read_any_encoding_to_string(&options_path).await?
+        } else {
+            (String::new(), encoding_rs::UTF_8)
+        };
+
+        // UTF-16 encodings may be successfully detected and read, but we cannot encode
+        // them back, and it's technically possible that the game client strongly expects
+        // such encoding
+        if input_encoding != input_encoding.output_encoding() {
+            return Err(crate::ErrorKind::LauncherError(format!(
+                "The instance options.txt file uses an unsupported encoding: {}. \
+                Please either turn off instance options that need to modify this file, \
+                or convert the file to an encoding that both the game and this app support, \
+                such as UTF-8.",
+                input_encoding.name()
+            ))
+            .into());
         }
+
         for (key, value) in mc_set_options {
             let re = Regex::new(&format!(r"(?m)^{}:.*$", regex::escape(key)))?;
             // check if the regex exists in the file
             if !re.is_match(&options_string) {
                 // The key was not found in the file, so append it
-                options_string.push_str(&format!("\n{key}:{value}"));
+                write!(&mut options_string, "\n{key}:{value}").unwrap();
             } else {
                 let replaced_string = re
                     .replace_all(&options_string, &format!("{key}:{value}"))
@@ -684,7 +724,8 @@ pub async fn launch_minecraft(
             }
         }
 
-        io::write(&options_path, options_string).await?;
+        io::write(&options_path, input_encoding.encode(&options_string).0)
+            .await?;
     }
 
     crate::api::profile::edit(&profile.path, |prof| {
@@ -693,31 +734,6 @@ pub async fn launch_minecraft(
         async { Ok(()) }
     })
     .await?;
-
-    let mut censor_strings = HashMap::new();
-    let username = whoami::username();
-    censor_strings
-        .insert(format!("/{username}/"), "/{COMPUTER_USERNAME}/".to_string());
-    censor_strings.insert(
-        format!("\\{username}\\"),
-        "\\{COMPUTER_USERNAME}\\".to_string(),
-    );
-    censor_strings.insert(
-        credentials.access_token.clone(),
-        "{MINECRAFT_ACCESS_TOKEN}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.username.clone(),
-        "{MINECRAFT_USERNAME}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.id.as_simple().to_string(),
-        "{MINECRAFT_UUID}".to_string(),
-    );
-    censor_strings.insert(
-        credentials.id.as_hyphenated().to_string(),
-        "{MINECRAFT_UUID}".to_string(),
-    );
 
     // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
     #[cfg(feature = "tauri")]
@@ -753,6 +769,38 @@ pub async fn launch_minecraft(
             post_exit_hook,
             state.directories.profile_logs_dir(&profile.path),
             version_info.logging.is_some(),
+            main_class_keep_alive,
+            rpc_server,
+            async |process: &ProcessMetadata, rpc_server| {
+                let process_start_time = process.start_time.to_rfc3339();
+                let profile_created_time = profile.created.to_rfc3339();
+                let profile_modified_time = profile.modified.to_rfc3339();
+                let system_properties = [
+                    ("modrinth.process.startTime", Some(&process_start_time)),
+                    ("modrinth.profile.created", Some(&profile_created_time)),
+                    ("modrinth.profile.icon", profile.icon_path.as_ref()),
+                    (
+                        "modrinth.profile.link.project",
+                        profile.linked_data.as_ref().map(|x| &x.project_id),
+                    ),
+                    (
+                        "modrinth.profile.link.version",
+                        profile.linked_data.as_ref().map(|x| &x.version_id),
+                    ),
+                    ("modrinth.profile.modified", Some(&profile_modified_time)),
+                    ("modrinth.profile.name", Some(&profile.name)),
+                ];
+                for (key, value) in system_properties {
+                    let Some(value) = value else {
+                        continue;
+                    };
+                    rpc_server
+                        .call_method_2::<()>("set_system_property", key, value)
+                        .await?;
+                }
+                rpc_server.call_method::<()>("launch").await?;
+                Ok(())
+            },
         )
         .await
 }

@@ -1,0 +1,122 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "กำลังอยู่ในโหมดผู้พัฒนา"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "รูปลักษณ์"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "การจัดการ Java ที่ติดตั้ง"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "ความเป็นส่วนตัว"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "การจัดการทรัพยากร"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "เพิ่มและเล่นทันที"
+  },
+  "instance.add-server.add-server": {
+    "message": "เพิ่มเซิร์ฟเวอร์"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "ปิดการใช้งาน"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "เปิดการใช้งาน"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "แสดงตัวเลือก"
+  },
+  "instance.add-server.title": {
+    "message": "เพิ่มเซิร์ฟเวอร์"
+  },
+  "instance.edit-server.title": {
+    "message": "แก้ไขเซิร์ฟเวอร์"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "ซ่อนจากหน้าแรก"
+  },
+  "instance.edit-world.name": {
+    "message": "ชื่อ"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "โลก Minecraft"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "รีเซ็ตรูปตัวอย่าง"
+  },
+  "instance.edit-world.title": {
+    "message": "แก้ไขโลก"
+  },
+  "instance.filter.updates-available": {
+    "message": "พบอัพเดท"
+  },
+  "instance.server-modal.address": {
+    "message": "ที่อยู่เซิร์ฟเวอร์"
+  },
+  "instance.server-modal.name": {
+    "message": "ชื่อ"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "ชื่อเซิร์ฟเวอร์"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "รีซอร์ซแพ็ก"
+  },
+  "instance.settings.tabs.general": {
+    "message": "ทั่วไป"
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "กำลังลบ..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "ทำซ้ำ"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "ไม่สามารถทำซ้ำได้ขณะติดตั้ง"
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "แก้ไขไอคอน"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "ลบไอคอน"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "เปลี่ยนไอคอน"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "เลือกรูปไอคอน"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "การจัดกลุ่ม"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "สร้างกลุ่มใหม่"
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "ใส่ชื่อกลุ่ม"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "ชื่อ"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "กำหนดเอง"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "การติดตั้ง"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "เปลี่ยนเวอร์ชั่น"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "ติดตั้ง"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "กำลังติดตั้ง"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "เวอร์ชั่น {loader}"
+  }
+}

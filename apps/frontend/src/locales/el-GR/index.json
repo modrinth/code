@@ -1,0 +1,185 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Ο χρήστης δε βρέθηκε"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Εξουσιοδότηση"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Απόρριψη"
+  },
+  "auth.authorize.app-info": {
+    "message": "Η εφαρμογή <strong>{appName}</strong> από τον χρήστη <creator-link>{creator}</creator-link> θα είναι σε θέση να:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Εξουσιοδότηση {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Δε βρέθηκε τοποθεσία ανακατεύθυνσης στην απόκριση"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Θα ανακατευθυνθείτε στο <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Αποστολή email ανάκτησης"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Εισάγετε τη διεύθυνση email σας παρακάτω στην οποία θα στείλουμε έναν σύνδεσμο ανάκτησης του λογαριασμού σας."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Διεύθυνση email ή όνομα χρήστη"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Διεύθυνση email"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Σας έχει αποσταλεί ένα email με οδηγίες, εφόσον η συγκεκριμένη διεύθυνση είχε αποθηκευτεί προηγουμένως στον λογαριασμό σας."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Email εστάλη"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Μπορείτε τώρα να συνδεθείτε στον λογαριασμό σας με τον νέο κωδικό πρόσβασης."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Επιτυχής επαναφορά κωδικού πρόσβασης"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Επαναφορά κωδικού πρόσβασης"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Επιβεβαίωση κωδικού"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Εισάγετε τον νέο κωδικό πρόσβασης παρακάτω για να αποκτήσετε πρόσβαση στον λογαριασμό σας."
+  },
+  "auth.reset-password.title": {
+    "message": "Επαναφορά Κωδικού Πρόσβασης"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Επαναφορά κωδικού πρόσβασης σας"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Παρακαλούμε εισάγετε έναν κωδικό δύο παραγόντων για συνέχεια."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Εισάγετε κωδικό δύο παραγόντων"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Εισαγωγή κωδικού..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Ξέχασα τον κωδικό</forgot-password-link> • <create-account-link>Δημιουργία λογαριασμού</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Email ή όνομα χρήστη"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Κωδικός Πρόσβασης"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Είσοδος με"
+  },
+  "auth.sign-in.title": {
+    "message": "Είσοδος"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Ή χρήση κωδικού πρόσβασης"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Δημιουργία λογαριασμού"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Επιβεβαίωση κωδικού"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Email"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Όνομα Χρήστη"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Με τη δημιουργία λογαριασμού, συμφωνείτε με τους <terms-link>Όρους</terms-link> και την <privacy-policy-link>Πολιτική απορρήτου</privacy-policy-link> του Modrinth."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Οι κωδικοί δεν ταιριάζουν!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Κωδικός Πρόσβασης"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Έχω ήδη λογαριασμό"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Εγγραφή σε ενημερώσεις σχετικά με το Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "Εγγραφή"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Ή δημιουργήστε έναν λογαριασμό μόνοι σας"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Εγγραφή με"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Ρυθμίσεις λογαριασμού"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Είσοδος"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Η διεύθυνση email σας έχει ήδη επαληθευτεί!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Το email έχει ήδη επαληθευτεί"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Επαναποστολή email επαλήθευσης"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Δεν μπορέσαμε να επαληθεύσουμε τη διεύθυνση email σας. Προσπαθήστε να ξαναστείλετε το email επαλήθευσης μέσω του πίνακα ελέγχου λογαριασμού ύστερα από είσοδο σε αυτόν."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Δεν μπορέσαμε να επαληθεύσουμε τη διεύθυνση email σας. Προσπαθήστε να ξαναστείλετε το email επαλήθευσης μέσω του παρακάτω κουμπιού."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Αποτυχία επαλήθευσης email"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Η διεύθυνση email σας έχει επαληθευτεί επιτυχώς!"
+  },
+  "error.project.404.title": {
+    "message": "Δε βρέθηκε έργο"
+  },
+  "error.user.404.list_item.1": {
+    "message": "Μπορεί να υπάρχει τυπογραφικό λάθος στο όνομα χρήστη."
+  },
+  "error.user.404.list_item.2": {
+    "message": "Ο χρήστης μπορεί να έχει αλλάξει το όνομά του ή διαγράψει τον λογαριασμό του."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Ο λογαριασμός του χρήστη μπορεί να έχει τερματιστεί για παραβίαση των <tou-link>Όρων Χρήσης</tou-link> του Modrinth."
+  },
+  "error.user.404.list_title": {
+    "message": "Γιατί;"
+  },
+  "error.user.404.title": {
+    "message": "Ο χρήστης δε βρέθηκε"
+  },
+  "layout.action.change-theme": {
+    "message": "Αλλαγή θέματος"
+  },
+  "layout.avatar.alt": {
+    "message": "Το avatar μου"
+  },
+  "layout.banner.account-action": {
+    "message": "Απαιτείται ενέργεια λογαριασμού"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Επίσκεψη ρυθμίσεων λογαριασμού"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Για λόγους ασφάλειας, το Modrinth χρειάζεται να πρεσθέσετε διεύθυνση email στον λογαριασμό σας."
+  }
+}

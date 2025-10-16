@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use actix_http::StatusCode;
 use actix_web::{dev::ServiceResponse, test};
 use futures::Future;
@@ -36,7 +35,7 @@ pub struct PermissionsTest<'a, A: Api> {
     user_pat: Option<&'a str>,
 
     // Whether or not the user ID should be removed from the project/organization team after the test
-    // (This is mostly reelvant if you are also using an existing project/organization, and want to do
+    // (This is mostly relevant if you are also using an existing project/organization, and want to do
     // multiple tests with the same user.
     remove_user: bool,
 
@@ -223,10 +222,10 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
                 resp.status().as_u16()
             ));
         }
-        if resp.status() == StatusCode::OK {
-            if let Some(failure_json_check) = &self.failure_json_check {
-                failure_json_check(&test::read_body_json(resp).await);
-            }
+        if resp.status() == StatusCode::OK
+            && let Some(failure_json_check) = &self.failure_json_check
+        {
+            failure_json_check(&test::read_body_json(resp).await);
         }
 
         // Failure test- logged in on a non-team user
@@ -247,10 +246,10 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
                 resp.status().as_u16()
             ));
         }
-        if resp.status() == StatusCode::OK {
-            if let Some(failure_json_check) = &self.failure_json_check {
-                failure_json_check(&test::read_body_json(resp).await);
-            }
+        if resp.status() == StatusCode::OK
+            && let Some(failure_json_check) = &self.failure_json_check
+        {
+            failure_json_check(&test::read_body_json(resp).await);
         }
 
         // Failure test- logged in with EVERY non-relevant permission
@@ -271,10 +270,10 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
                 resp.status().as_u16()
             ));
         }
-        if resp.status() == StatusCode::OK {
-            if let Some(failure_json_check) = &self.failure_json_check {
-                failure_json_check(&test::read_body_json(resp).await);
-            }
+        if resp.status() == StatusCode::OK
+            && let Some(failure_json_check) = &self.failure_json_check
+        {
+            failure_json_check(&test::read_body_json(resp).await);
         }
 
         // Patch user's permissions to success permissions
@@ -301,10 +300,10 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
                 resp.status().as_u16()
             ));
         }
-        if resp.status() == StatusCode::OK {
-            if let Some(success_json_check) = &self.success_json_check {
-                success_json_check(&test::read_body_json(resp).await);
-            }
+        if resp.status() == StatusCode::OK
+            && let Some(success_json_check) = &self.success_json_check
+        {
+            success_json_check(&test::read_body_json(resp).await);
         }
 
         // If the remove_user flag is set, remove the user from the project
@@ -1057,10 +1056,10 @@ async fn create_dummy_org(setup_api: &ApiV3) -> (String, String) {
     let organization = setup_api
         .get_organization_deserialized(&slug, ADMIN_USER_PAT)
         .await;
-    let organizaion_id = organization.id.to_string();
+    let organization_id = organization.id.to_string();
     let team_id = organization.team_id.to_string();
 
-    (organizaion_id, team_id)
+    (organization_id, team_id)
 }
 
 async fn add_project_to_org(

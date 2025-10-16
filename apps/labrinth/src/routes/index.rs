@@ -11,7 +11,7 @@ pub async fn index_get() -> HttpResponse {
 
         "build_info": {
             "comp_date": env!("COMPILATION_DATE"),
-            "git_hash":  env!("GIT_HASH", "unknown"),
+            "git_hash": option_env!("GIT_HASH").unwrap_or("unknown"),
             "profile": env!("COMPILATION_PROFILE"),
         }
     });

@@ -1,15 +1,18 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{AuthenticationError, get_user_from_headers};
-use crate::database::models::generate_payout_id;
+use crate::database::models::DBUserId;
+use crate::database::models::{generate_payout_id, users_compliance};
 use crate::database::redis::RedisPool;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{PayoutMethodType, PayoutStatus};
-use crate::queue::payouts::{PayoutsQueue, make_aditude_request};
+use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::avalara1099;
+use crate::util::error::Context;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
-use chrono::{DateTime, Datelike, Duration, TimeZone, Utc, Weekday};
+use chrono::{DateTime, Duration, Utc};
 use hex::ToHex;
 use hmac::{Hmac, Mac};
 use reqwest::Method;
@@ -19,19 +22,128 @@ use serde_json::json;
 use sha2::Sha256;
 use sqlx::PgPool;
 use std::collections::HashMap;
+use tokio_stream::StreamExt;
+use tracing::error;
+
+const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
+    chrono::Duration::seconds(15);
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("payout")
             .service(paypal_webhook)
             .service(tremendous_webhook)
-            .service(user_payouts)
+            // we use `route` instead of `service` because `user_payouts` uses the logic of `transaction_history`
+            .route(
+                "",
+                web::get().to(
+                    #[expect(
+                        deprecated,
+                        reason = "v3 backwards compatibility"
+                    )]
+                    user_payouts,
+                ),
+            )
+            .route("history", web::get().to(transaction_history))
             .service(create_payout)
             .service(cancel_payout)
             .service(payment_methods)
             .service(get_balance)
-            .service(platform_revenue),
+            .service(platform_revenue)
+            .service(post_compliance_form),
     );
+}
+
+#[derive(Deserialize)]
+pub struct RequestForm {
+    form_type: users_compliance::FormType,
+}
+
+#[post("compliance")]
+pub async fn post_compliance_form(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    body: web::Json<RequestForm>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PAYOUTS_WRITE,
+    )
+    .await?
+    .1;
+
+    let user_id = DBUserId(user.id.0 as i64);
+
+    let mut txn = pool.begin().await?;
+
+    let maybe_compliance =
+        users_compliance::UserCompliance::get_by_user_id(&mut *txn, user_id)
+            .await?;
+
+    let mut compliance = match maybe_compliance {
+        Some(c) => c,
+        None => users_compliance::UserCompliance {
+            id: 0,
+            user_id,
+            requested: Utc::now(),
+            signed: None,
+            last_checked: Utc::now() - COMPLIANCE_CHECK_DEBOUNCE,
+            external_request_id: String::new(),
+            reference_id: String::new(),
+            e_delivery_consented: false,
+            tin_matched: false,
+            form_type: Some(body.0.form_type),
+            requires_manual_review: false,
+        },
+    };
+
+    let result = avalara1099::request_form(user_id, body.0.form_type).await?;
+
+    match result {
+        Ok(
+            ref toplevel @ avalara1099::DataWrapper {
+                data:
+                    avalara1099::Data {
+                        r#type: _,
+                        id: Some(ref request_id),
+                        ref attributes,
+                        links: _,
+                    },
+            },
+        ) => {
+            compliance.external_request_id = request_id.clone();
+            compliance.reference_id = attributes.reference_id.clone();
+            compliance.requested = Utc::now();
+            compliance.e_delivery_consented = false;
+            compliance.tin_matched = false;
+            compliance.signed = None;
+            compliance.form_type = Some(body.0.form_type);
+            compliance.last_checked = Utc::now() - COMPLIANCE_CHECK_DEBOUNCE;
+
+            compliance.upsert_partial(&mut *txn).await?;
+            txn.commit().await?;
+
+            Ok(HttpResponse::Ok().json(toplevel))
+        }
+
+        Ok(_) => {
+            error!("Missing form request ID in Avalara response");
+            Err(ApiError::TaxComplianceApi)
+        }
+
+        Err(json_error) => {
+            error!(
+                "Error sending request to Avalara: {}",
+                serde_json::to_string_pretty(&json_error).unwrap()
+            );
+            Err(ApiError::TaxComplianceApi)
+        }
+    }
 }
 
 #[post("_paypal")]
@@ -301,41 +413,50 @@ pub async fn tremendous_webhook(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[get("")]
+#[deprecated = "use `transaction_history` instead"]
 pub async fn user_payouts(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+) -> Result<web::Json<Vec<crate::models::payouts::Payout>>, ApiError> {
+    let (_, user) = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PAYOUTS_READ,
     )
-    .await?
-    .1;
-
-    let payout_ids =
-        crate::database::models::payout_item::DBPayout::get_all_for_user(
-            user.id.into(),
-            &**pool,
-        )
-        .await?;
-    let payouts = crate::database::models::payout_item::DBPayout::get_many(
-        &payout_ids,
-        &**pool,
-    )
     .await?;
 
-    Ok(HttpResponse::Ok().json(
-        payouts
-            .into_iter()
-            .map(crate::models::payouts::Payout::from)
-            .collect::<Vec<_>>(),
-    ))
+    let items = transaction_history(req, pool, redis, session_queue)
+        .await?
+        .0
+        .into_iter()
+        .filter_map(|txn_item| match txn_item {
+            TransactionItem::Withdrawal {
+                id,
+                status,
+                created,
+                amount,
+                fee,
+                method_type,
+                method_address,
+            } => Some(crate::models::payouts::Payout {
+                id,
+                user_id: user.id,
+                status,
+                created,
+                amount,
+                fee,
+                method: method_type,
+                method_address,
+                platform_id: None,
+            }),
+            TransactionItem::PayoutAvailable { .. } => None,
+        })
+        .collect::<Vec<_>>();
+    Ok(web::Json(items))
 }
 
 #[derive(Deserialize)]
@@ -388,6 +509,68 @@ pub async fn create_payout(
     if balance.available < body.amount || body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You do not have enough funds to make this payout!".to_string(),
+        ));
+    }
+
+    let requires_manual_review;
+
+    if let Some(threshold) = tax_compliance_payout_threshold() {
+        let maybe_compliance = update_compliance_status(&pool, user.id).await?;
+
+        let (tin_matched, signed, requested, api_check_failed) =
+            match maybe_compliance {
+                Some(ComplianceCheck {
+                    model,
+                    compliance_api_check_failed,
+                }) => {
+                    let tin = model.tin_matched;
+                    let signed = model.signed.is_some();
+
+                    requires_manual_review = Some(model.requires_manual_review);
+
+                    (tin, signed, true, compliance_api_check_failed)
+                }
+                None => {
+                    requires_manual_review = None;
+                    (false, false, false, false)
+                }
+            };
+
+        if !(tin_matched && signed)
+            && balance.withdrawn_ytd + body.amount >= threshold
+        {
+            // We propagate the error this way because we don't want to block payouts
+            // that would be acceptable regardless of the tax form submission status
+            // if the compliance API is down.
+
+            // In this case the payout is going to be blocked, so do return that we hit an
+            // error with the API, as this is more accurate than saying the form wasn't completed
+            // properly as this might be wrong!
+            if api_check_failed {
+                return Err(ApiError::TaxComplianceApi);
+            }
+
+            return Err(ApiError::InvalidInput(match (tin_matched, signed, requested) {
+                (_, false, true) => "Tax form isn't signed yet!",
+                (false, true, true) => "Tax form is signed, but the Tax Identification Number/SSN didn't match the IRS records. Withdrawals are blocked until the TIN/SSN matches.",
+                _ => "Tax compliance form is required to withdraw more!",
+            }.to_owned()));
+        }
+    } else {
+        requires_manual_review = None;
+    }
+
+    let requires_manual_review = if let Some(r) = requires_manual_review {
+        r
+    } else {
+        users_compliance::UserCompliance::get_by_user_id(&**pool, user.id)
+            .await?
+            .is_some_and(|x| x.requires_manual_review)
+    };
+
+    if requires_manual_review {
+        return Err(ApiError::InvalidInput(
+            "More information is required to proceed. Please contact support (https://support.modrinth.com, support@modrinth.com)".to_string(),
         ));
     }
 
@@ -536,11 +719,9 @@ pub async fn create_payout(
                         Some(true),
                     )
                     .await
+                    && let Some(data) = res.items.first()
                 {
-                    if let Some(data) = res.items.first() {
-                        payout_item.platform_id =
-                            Some(data.payout_item_id.clone());
-                    }
+                    payout_item.platform_id = Some(data.payout_item_id.clone());
                 }
             }
 
@@ -637,6 +818,110 @@ pub async fn create_payout(
         .await?;
 
     Ok(HttpResponse::NoContent().finish())
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum TransactionItem {
+    Withdrawal {
+        id: PayoutId,
+        status: PayoutStatus,
+        created: DateTime<Utc>,
+        amount: Decimal,
+        fee: Option<Decimal>,
+        method_type: Option<PayoutMethodType>,
+        method_address: Option<String>,
+    },
+    PayoutAvailable {
+        created: DateTime<Utc>,
+        payout_source: PayoutSource,
+        amount: Decimal,
+    },
+}
+
+impl TransactionItem {
+    pub fn created(&self) -> DateTime<Utc> {
+        match self {
+            Self::Withdrawal { created, .. } => *created,
+            Self::PayoutAvailable { created, .. } => *created,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+#[non_exhaustive]
+pub enum PayoutSource {
+    CreatorRewards,
+    Affilites,
+}
+
+pub async fn transaction_history(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<TransactionItem>>, ApiError> {
+    let (_, user) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PAYOUTS_READ,
+    )
+    .await?;
+
+    let payout_ids =
+        crate::database::models::payout_item::DBPayout::get_all_for_user(
+            user.id.into(),
+            &**pool,
+        )
+        .await?;
+    let payouts = crate::database::models::payout_item::DBPayout::get_many(
+        &payout_ids,
+        &**pool,
+    )
+    .await?;
+    let withdrawals =
+        payouts
+            .into_iter()
+            .map(|payout| TransactionItem::Withdrawal {
+                id: payout.id.into(),
+                status: payout.status,
+                created: payout.created,
+                amount: payout.amount,
+                fee: payout.fee,
+                method_type: payout.method,
+                method_address: payout.method_address,
+            });
+
+    let mut payouts_available = sqlx::query!(
+        "SELECT created, amount
+        FROM payouts_values
+        WHERE user_id = $1
+        AND NOW() >= date_available",
+        DBUserId::from(user.id) as DBUserId
+    )
+    .fetch(&**pool)
+    .map(|record| {
+        let record = record
+            .wrap_internal_err("failed to fetch available payout record")?;
+        Ok(TransactionItem::PayoutAvailable {
+            created: record.created,
+            payout_source: PayoutSource::CreatorRewards,
+            amount: record.amount,
+        })
+    })
+    .collect::<Result<Vec<_>, ApiError>>()
+    .await
+    .wrap_internal_err("failed to fetch available payouts")?;
+
+    let mut txn_items = Vec::new();
+    txn_items.extend(withdrawals);
+    txn_items.append(&mut payouts_available);
+    txn_items.sort_by_key(|item| item.created());
+
+    Ok(web::Json(txn_items))
 }
 
 #[delete("{id}")]
@@ -741,6 +1026,16 @@ pub struct MethodFilter {
     pub country: Option<String>,
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum FormCompletionStatus {
+    Unknown,
+    Unrequested,
+    Unsigned,
+    TinMismatch,
+    Complete,
+}
+
 #[get("methods")]
 pub async fn payment_methods(
     payouts_queue: web::Data<PayoutsQueue>,
@@ -767,6 +1062,8 @@ pub async fn payment_methods(
 #[derive(Serialize)]
 pub struct UserBalance {
     pub available: Decimal,
+    pub withdrawn_lifetime: Decimal,
+    pub withdrawn_ytd: Decimal,
     pub pending: Decimal,
     pub dates: HashMap<DateTime<Utc>, Decimal>,
 }
@@ -788,15 +1085,54 @@ pub async fn get_balance(
     .await?
     .1;
 
+    #[derive(Serialize)]
+    struct Response {
+        #[serde(flatten)]
+        balance: UserBalance,
+        requested_form_type: Option<users_compliance::FormType>,
+        form_completion_status: Option<FormCompletionStatus>,
+    }
+
     let balance = get_user_balance(user.id.into(), &pool).await?;
 
-    Ok(HttpResponse::Ok().json(balance))
+    let mut requested_form_type = None;
+    let mut form_completion_status = None;
+
+    // Only check compliance status if the compliance check is enabled (by having a value set for it)
+    if tax_compliance_payout_threshold().is_some() {
+        form_completion_status = Some(
+            update_compliance_status(&pool, user.id.into())
+                .await?
+                .filter(|x| x.model.form_type.is_some())
+                .map_or(FormCompletionStatus::Unrequested, |compliance| {
+                    requested_form_type = compliance.model.form_type;
+
+                    if compliance.compliance_api_check_failed {
+                        FormCompletionStatus::Unknown
+                    } else if compliance.model.signed.is_some() {
+                        if compliance.model.tin_matched {
+                            FormCompletionStatus::Complete
+                        } else {
+                            FormCompletionStatus::TinMismatch
+                        }
+                    } else {
+                        FormCompletionStatus::Unsigned
+                    }
+                }),
+        );
+    }
+
+    Ok(HttpResponse::Ok().json(Response {
+        balance,
+        requested_form_type,
+        form_completion_status,
+    }))
 }
 
 async fn get_user_balance(
     user_id: crate::database::models::ids::DBUserId,
     pool: &PgPool,
-) -> Result<UserBalance, sqlx::Error> {
+) -> Result<UserBalance, ApiError> {
     let payouts = sqlx::query!(
         "
         SELECT date_available, SUM(amount) sum
@@ -821,7 +1157,10 @@ async fn get_user_balance(
 
     let withdrawn = sqlx::query!(
         "
-        SELECT SUM(amount) amount, SUM(fee) fee
+        SELECT
+          SUM(amount) amount,
+          SUM(fee) fee,
+          SUM(amount) FILTER (WHERE created >= DATE_TRUNC('year', NOW())) amount_this_year
         FROM payouts
         WHERE user_id = $1 AND (status = 'success' OR status = 'in-transit')
         ",
@@ -830,19 +1169,21 @@ async fn get_user_balance(
     .fetch_optional(pool)
     .await?;
 
-    let (withdrawn, fees) = withdrawn
-        .map(|x| {
+    let (withdrawn, fees, withdrawn_this_year) =
+        withdrawn.map_or((Decimal::ZERO, Decimal::ZERO, Decimal::ZERO), |x| {
             (
                 x.amount.unwrap_or(Decimal::ZERO),
                 x.fee.unwrap_or(Decimal::ZERO),
+                x.amount_this_year.unwrap_or(Decimal::ZERO),
             )
-        })
-        .unwrap_or((Decimal::ZERO, Decimal::ZERO));
+        });
 
     Ok(UserBalance {
         available: available.round_dp(16)
             - withdrawn.round_dp(16)
             - fees.round_dp(16),
+        withdrawn_lifetime: withdrawn.round_dp(16),
+        withdrawn_ytd: withdrawn_this_year.round_dp(16),
         pending,
         dates: payouts
             .iter()
@@ -851,9 +1192,100 @@ async fn get_user_balance(
     })
 }
 
+struct ComplianceCheck {
+    model: users_compliance::UserCompliance,
+    compliance_api_check_failed: bool,
+}
+
+async fn update_compliance_status(
+    pg: &PgPool,
+    user_id: crate::database::models::ids::DBUserId,
+) -> Result<Option<ComplianceCheck>, ApiError> {
+    let maybe_compliance =
+        users_compliance::UserCompliance::get_by_user_id(pg, user_id).await?;
+
+    let Some(mut compliance) = maybe_compliance else {
+        return Ok(None);
+    };
+
+    if (compliance.signed.is_some() && compliance.tin_matched)
+        || Utc::now().signed_duration_since(compliance.last_checked)
+            < COMPLIANCE_CHECK_DEBOUNCE
+        || compliance.form_type.is_none()
+    {
+        Ok(Some(ComplianceCheck {
+            model: compliance,
+            compliance_api_check_failed: false,
+        }))
+    } else {
+        let result = avalara1099::check_form(&compliance.reference_id).await?;
+        let mut compliance_api_check_failed = false;
+
+        compliance.last_checked = Utc::now();
+
+        match result {
+            Ok(None) => {
+                // Means the form wasn't signed yet
+                compliance.signed = None;
+                compliance.e_delivery_consented = false;
+                compliance.tin_matched = false;
+            }
+
+            Ok(Some(avalara1099::DataWrapper {
+                data: avalara1099::Data { attributes, .. },
+            })) => {
+                compliance.signed =
+                    (&attributes.entry_status == "signed").then(Utc::now);
+                compliance.e_delivery_consented =
+                    attributes.e_delivery_consented_at.is_some();
+
+                if compliance
+                    .form_type
+                    .is_some_and(|x| x.requires_domestic_tin_match())
+                {
+                    compliance.tin_matched = attributes
+                        .tin_match_status
+                        .as_ref()
+                        .is_some_and(|x| x == "matched");
+                } else {
+                    compliance.tin_matched = true;
+                }
+            }
+
+            Err(json_error) => {
+                error!(
+                    "Error sending request to Avalara: {}",
+                    serde_json::to_string_pretty(&json_error).unwrap()
+                );
+                compliance_api_check_failed = true;
+            }
+        }
+
+        compliance.update(pg).await?;
+
+        Ok(Some(ComplianceCheck {
+            model: compliance,
+            compliance_api_check_failed,
+        }))
+    }
+}
+
+fn tax_compliance_payout_threshold() -> Option<Decimal> {
+    dotenvy::var("COMPLIANCE_PAYOUT_THRESHOLD")
+        .ok()
+        .and_then(|s| s.parse().ok())
+}
+
+#[derive(Deserialize)]
+pub struct RevenueQuery {
+    pub start: Option<DateTime<Utc>>,
+    pub end: Option<DateTime<Utc>>,
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct RevenueResponse {
     pub all_time: Decimal,
+    pub all_time_available: Decimal,
     pub data: Vec<RevenueData>,
 }
 
@@ -866,21 +1298,9 @@ pub struct RevenueData {
 
 #[get("platform_revenue")]
 pub async fn platform_revenue(
+    query: web::Query<RevenueQuery>,
     pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let mut redis = redis.connect().await?;
-
-    const PLATFORM_REVENUE_NAMESPACE: &str = "platform_revenue";
-
-    let res: Option<RevenueResponse> = redis
-        .get_deserialized_from_json(PLATFORM_REVENUE_NAMESPACE, "0")
-        .await?;
-
-    if let Some(res) = res {
-        return Ok(HttpResponse::Ok().json(res));
-    }
-
     let all_time_payouts = sqlx::query!(
         "
         SELECT SUM(amount) from payouts_values
@@ -891,111 +1311,47 @@ pub async fn platform_revenue(
     .and_then(|x| x.sum)
     .unwrap_or(Decimal::ZERO);
 
-    let points = make_aditude_request(
-        &["METRIC_REVENUE", "METRIC_IMPRESSIONS"],
-        "30d",
-        "1d",
+    let all_available = sqlx::query!(
+        "
+        SELECT SUM(amount) from payouts_values WHERE date_available <= NOW()
+        ",
     )
-    .await?;
+    .fetch_optional(&**pool)
+    .await?
+    .and_then(|x| x.sum)
+    .unwrap_or(Decimal::ZERO);
 
-    let mut points_map = HashMap::new();
+    let utc = Utc::now();
+    let start = query.start.unwrap_or(utc - Duration::days(30));
+    let end = query.end.unwrap_or(utc);
 
-    for point in points {
-        for point in point.points_list {
-            let entry =
-                points_map.entry(point.time.seconds).or_insert((None, None));
-
-            if let Some(revenue) = point.metric.revenue {
-                entry.0 = Some(revenue);
-            }
-
-            if let Some(impressions) = point.metric.impressions {
-                entry.1 = Some(impressions);
-            }
-        }
-    }
-
-    let mut revenue_data = Vec::new();
-    let now = Utc::now();
-
-    for i in 1..=30 {
-        let time = now - Duration::days(i);
-        let start = time
-            .date_naive()
-            .and_hms_opt(0, 0, 0)
-            .unwrap()
-            .and_utc()
-            .timestamp();
-
-        if let Some((revenue, impressions)) = points_map.remove(&(start as u64))
-        {
-            // Before 9/5/24, when legacy payouts were in effect.
-            if start >= 1725494400 {
-                let revenue = revenue.unwrap_or(Decimal::ZERO);
-                let impressions = impressions.unwrap_or(0);
-
-                // Modrinth's share of ad revenue
-                let modrinth_cut = Decimal::from(1) / Decimal::from(4);
-                // Clean.io fee (ad antimalware). Per 1000 impressions.
-                let clean_io_fee = Decimal::from(8) / Decimal::from(1000);
-
-                let net_revenue = revenue
-                    - (clean_io_fee * Decimal::from(impressions)
-                        / Decimal::from(1000));
-
-                let payout = net_revenue * (Decimal::from(1) - modrinth_cut);
-
-                revenue_data.push(RevenueData {
-                    time: start as u64,
-                    revenue: net_revenue,
-                    creator_revenue: payout,
-                });
-
-                continue;
-            }
-        }
-
-        revenue_data.push(get_legacy_data_point(start as u64));
-    }
+    let revenue_data = sqlx::query!(
+        "
+        SELECT created, SUM(amount) sum
+        FROM payouts_values
+        WHERE created BETWEEN $1 AND $2
+        GROUP BY created
+        ORDER BY created DESC
+        ",
+        start,
+        end
+    )
+    .fetch_all(&**pool)
+    .await?
+    .into_iter()
+    .map(|x| RevenueData {
+        time: x.created.timestamp() as u64,
+        revenue: x.sum.unwrap_or(Decimal::ZERO) * Decimal::from(25)
+            / Decimal::from(75),
+        creator_revenue: x.sum.unwrap_or(Decimal::ZERO),
+    })
+    .collect();
 
     let res = RevenueResponse {
         all_time: all_time_payouts,
+        all_time_available: all_available,
         data: revenue_data,
     };
 
-    redis
-        .set_serialized_to_json(
-            PLATFORM_REVENUE_NAMESPACE,
-            0,
-            &res,
-            Some(60 * 60),
-        )
-        .await?;
-
     Ok(HttpResponse::Ok().json(res))
-}
-
-fn get_legacy_data_point(timestamp: u64) -> RevenueData {
-    let start = Utc.timestamp_opt(timestamp as i64, 0).unwrap();
-
-    let old_payouts_budget = Decimal::from(10_000);
-
-    let days = Decimal::from(28);
-    let weekdays = Decimal::from(20);
-    let weekend_bonus = Decimal::from(5) / Decimal::from(4);
-
-    let weekday_amount =
-        old_payouts_budget / (weekdays + (weekend_bonus) * (days - weekdays));
-    let weekend_amount = weekday_amount * weekend_bonus;
-
-    let payout = match start.weekday() {
-        Weekday::Sat | Weekday::Sun => weekend_amount,
-        _ => weekday_amount,
-    };
-
-    RevenueData {
-        time: timestamp,
-        revenue: payout,
-        creator_revenue: payout * (Decimal::from(9) / Decimal::from(10)),
-    }
 }

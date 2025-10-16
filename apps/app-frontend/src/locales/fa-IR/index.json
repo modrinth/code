@@ -1,0 +1,419 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "حالت برنامه‌نویس روشن شد."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "ظاهر"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "گزینه‌های پیش‌فرض اینستنس (نسخهٔ جدا)"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "سوییچ قابلیت‌ها"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "جاواهای نصب‌شده"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "حریم خصوصی"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "مدیریت منابع"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "اضافه کردن و پلی دادن"
+  },
+  "instance.add-server.add-server": {
+    "message": "اضافه کردن سرور"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "غیرفعال"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "فعال"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "درخواست از سرور"
+  },
+  "instance.add-server.title": {
+    "message": "اضافه کردن سرور"
+  },
+  "instance.edit-server.title": {
+    "message": "ویرایش سرور"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "مخفی کردن از صفحه ی اصلی"
+  },
+  "instance.edit-world.name": {
+    "message": "نام"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "جهان ماینکرفت"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "ریست کردن آیکن"
+  },
+  "instance.edit-world.title": {
+    "message": "ویرایش جهان"
+  },
+  "instance.filter.disabled": {
+    "message": "پروزه های غیر فعال"
+  },
+  "instance.filter.updates-available": {
+    "message": "آپدیت موجوده"
+  },
+  "instance.server-modal.address": {
+    "message": "آدرس"
+  },
+  "instance.server-modal.name": {
+    "message": "نام"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "سرور ماینکرفت"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "رسورس پک"
+  },
+  "instance.settings.tabs.general": {
+    "message": "تنظیمات کلی"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "حذف اینستنس (نسخهٔ جدا)"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "حذف اینستنس (نسخهٔ جدا)"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "این کار یه اینستنس (نسخهٔ جدا) رو به‌طور کامل از دستگاهت پاک می‌کنه، شامل دنیاها، تنظیمات و همه محتوای نصب‌شده. مراقب باش، چون بعد از حذف، هیچ راهی برای بازیابی‌ش نیست."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "در حال حذف..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "دوپلیکیت"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "نمیشه هنگام نصب دوپلیکیت کرد."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "دوپلیکیت کردن اینستنس (نسخهٔ جدا)"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "یه کپی از این اینستنس (نسخهٔ جدا) می‌سازه، شامل دنیاها، تنظیمات، مودها و بقیه چیزا."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "ویرایش آیکن"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "حذف آیکن"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "جایگزین آیکن"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "انتخاب آیکن"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "گروه های کتابخانه"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "ساخت گروه کتابخانه ی جدید"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "گروه‌های کتابخانه به شما امکان می‌دهند اینستنس‌های خود را در بخش‌های مختلف کتابخانه مرتب کنید."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "نام گروه رو بنویس"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "نام"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "اجرای پیشرفته"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "شخصی سازی اجرا"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "اجرای پیشرفته به کاربران حرفه‌ای اجازه می‌ده قبل و بعد از اجرای بازی، بعضی کامند های سیستمی رو اجرا کنن."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "پس از خروج"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "پس از بسته شدن بازی اجرا شد."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "کامند بعد خروج رو بنویس..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "قبل از اجرا"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "قبل از اجرا شدن بازی ران میشه."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "کامند قبل اجرا رو بنویس..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "شخصی سازی اجرای بازی"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "دستور میانجی"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "دستور میانجی برای اجرای ماینکرفت."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "کامند میانجی را وارد کنید..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "نسخه‌های نصب‌شده"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} برای ماینکرفت {game_version} قبلاً نصب شده"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "وانیلای {game_version} پیشفرض نصب شده"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "تغییر ورژن"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "نصب"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "در حال نصب"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "دریافت نسخه‌های مودپک"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "نصب نسخه ی جدید"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "در حال حاضر نصب‌شده"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "اطلاعات دیپاگ کردن:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "دریافت جزئیات مودپک"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "ورژن بازی"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "نصب"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "در حال نصب"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "ورژن {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "ماینکرفت {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "نمی‌تونیم جزئیات مودپک لینک‌شده رو بگیریم. لطفاً اتصال اینترنتت رو چک کن."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} برای ماینکرفت {version} در دسترس نیست. یک مود لودر دیگه رو انتخاب کن."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "این اینستنس (نسخهٔ جدا) به یه مودپک لینک شده، ولی مودپک تو Modrinth پیدا نشد."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "پلتفورم"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "نصب مجدد مودپک"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "در حال نصب مجدد مودپک"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "نصب دوباره همه محتواهای نصب‌شده یا تغییر داده‌شده رو برمی‌گردونه به همون چیزی که مودپک ارائه کرده، و هر مود یا محتوایی که خودت اضافه کرده باشی حذف می‌شه. این ممکنه مشکلات غیرمنتظره‌ای که تو اینستنس (نسخهٔ جدا) پیش اومده رو درست کنه، ولی اگه دنیاهای بازی‌ت به محتوای اضافه وابسته باشن، ممکنه اون دنیاها خراب بشن."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "مطمئنی می‌خوای این اینستنس (نسخهٔ جدا) رو دوباره نصب کنی؟"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "محتوای این اینستنس (نسخهٔ جدا) رو برمی‌گردونه به حالت اصلی، و هر مود یا محتوایی که خودت روی مودپک اصلی اضافه کرده باشی حذف می‌شه."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "نصب مجدد مودپک"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "ترمیم کردن"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "در حال ترمیم کردن"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "ترمیم کردن، وابستگی‌های ماینکرفت رو دوباره نصب می‌کنه و سالم بودنشون رو بررسی می‌کنه. این ممکنه مشکلاتی که باعث اجرا نشدن بازی رو حل کنه، ولی مشکلات یا کرش‌های مربوط به مودهای نصب‌شده رو درست نمی‌کنه."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "ترمیم کردن اینستنس (نسخهٔ جدا)؟"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "در حال ترمیم کردن"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "ریست کردن به حالت فعلی"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "نشان دادن تمام ورژن ها"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "تغییر دادن ورژن"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "نصب کردن"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "نصب کردن مجدد"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "ترمیم کردن"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "{action} هنگام نصب غیر ممکنه"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "{action} وقتی آفلاینی غیر ممکنه"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "{action} وقتی داری ترمیم میکنی غیر ممکنه"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(ورژن ناشناس)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "آن لینک کردن اینستنس (نسخهٔ جدا)"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "اگه انجامش بدی، نمی‌تونی دوباره لینکش کنی مگر این‌که یه اینستنس (نسخهٔ جدا) جدید بسازی. دیگه آپدیت‌های مودپک رو هم دریافت نمی‌کنی و به یه نسخهٔ معمولی تبدیل می‌شه."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "مطمئنی می‌خوای این اینستنس (نسخهٔ جدا) رو آن لینک کنی؟"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "این اینستنس (نسخهٔ جدا) به یه مودپک وصل شده، یعنی مودها نمی‌تونن آپدیت بشن و نمی‌تونی مود لودر یا ورژن ماینکرفت رو تغییر بدی. آن لینک کردن باعث می‌شه این اینستنس برای همیشه از مودپک جدا بشه."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "آن لینک کردن از مودپک"
+  },
+  "instance.settings.tabs.java": {
+    "message": "جاوا و مقدار رم"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "متغیرهای محیطی"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "اجرای پیشرفته"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "پارامتر های جاوا"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "جاوا های نصب شده"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "رم گرفته شده"
+  },
+  "instance.settings.tabs.window": {
+    "message": "پنجره"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "شخصی سازی پنجره"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "تمام صفحه"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "بازی وقتی اجرا می‌شه به‌صورت تمام‌صفحه باز بشه (با استفاده از options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "ارتفاع"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "ارتفاع پنجره‌ی بازی وقتی اجرا می‌شه."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "ارتفاع رو وارد کن..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "عرض"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "عرض پنجره ی بازی هنگام اجرا شدن."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "عرض رو وارد کن..."
+  },
+  "instance.settings.title": {
+    "message": "تنظیمات"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "سرور ماینکرفت"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "نمیشه به سرور متصل شد"
+  },
+  "instance.worlds.copy_address": {
+    "message": "کپی کردن آدرس"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "نشون ندادن روی صفحه ی اصلی"
+  },
+  "instance.worlds.filter.available": {
+    "message": "در درسترس"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "این اینستنس (نسخهٔ جدا) در حال اجراست"
+  },
+  "instance.worlds.hardcore": {
+    "message": "حالت هاردکور"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "سرور ناسازگاره"
+  },
+  "instance.worlds.no_contact": {
+    "message": "سرور در دسترس نیست"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "می‌تونی فقط از نسخه‌ی ماینکرفت آلفای 1.0.5 به بعد مستقیم وارد سرورها بشی"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "می‌تونی فقط از نسخه‌ی ماینکرفت 1.20 به بعد مستقیم وارد جهان ماینکرفت بشی"
+  },
+  "instance.worlds.play_instance": {
+    "message": "اجرای اینستنس (نسخهٔ جدا)"
+  },
+  "instance.worlds.type.server": {
+    "message": "سرور"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "سینگل پلیر"
+  },
+  "instance.worlds.view_instance": {
+    "message": "دیدن اینستنس (نسخهٔ جدا)"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "جهان در حال استفادست"
+  },
+  "search.filter.locked.instance": {
+    "message": "ارائه‌شده توسط اینستنس (نسخهٔ جدا)"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "ورژن بازی توسط اینستنس (نسخهٔ جدا) ارائه شده"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "لودر توسط اینستنس (نسخهٔ جدا) ارائه شده"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "سینک کردن با اینستنس"
+  }
+}

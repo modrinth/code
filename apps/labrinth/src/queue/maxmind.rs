@@ -45,17 +45,15 @@ impl MaxMindIndexer {
 
         if let Ok(entries) = archive.entries() {
             for mut file in entries.flatten() {
-                if let Ok(path) = file.header().path() {
-                    if path.extension().and_then(|x| x.to_str()) == Some("mmdb")
-                    {
-                        let mut buf = Vec::new();
-                        file.read_to_end(&mut buf).unwrap();
+                if let Ok(path) = file.header().path()
+                    && path.extension().and_then(|x| x.to_str()) == Some("mmdb")
+                {
+                    let mut buf = Vec::new();
+                    file.read_to_end(&mut buf).unwrap();
 
-                        let reader =
-                            maxminddb::Reader::from_source(buf).unwrap();
+                    let reader = maxminddb::Reader::from_source(buf).unwrap();
 
-                        return Ok(Some(reader));
-                    }
+                    return Ok(Some(reader));
                 }
             }
         }

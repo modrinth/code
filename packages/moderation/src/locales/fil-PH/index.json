@@ -1,0 +1,66 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Kinakailangan ang malinaw na paglalarawan sa layunin at paggana ng proyekto."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Magdagdag ng paglalarawan"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Makatutulong sa pagpapakilala ng iyong proyekto ang pagdaragdag ng natatanging, napapanahon, at nakakaakit-akit na ikono."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Maglagay ng ikono"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Baguhin ang paglalarawan"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Baguhin ang lisensya"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Baguhin ang buod"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Baguhin ang mga pananda"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Baguhin ang pamagat"
+  },
+  "nags.select-environments.title": {
+    "defaultMessage": "Pumili ng mga environment"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Bisitahin ang mga setting sa paglalarawan"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "Bisitahin ang mga setting sa environment"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Bisitahin ang mga setting sa lisensiya"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Bisitahin ang mga setting sa mga link"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Bisitahin ang mga setting sa pananda"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Bisitahin ang mga general na setting"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Hindi maaaring magkapareho ang iyong buod sa Pangalan ng iyong proyekto. Mahalagang gumawa ng isang nagbibigay-kaalaman at nakakaakit na Buod."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Mag-upload ng gallery image"
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Mag-upload ng bersiyon"
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Patunayan ang mga external na link"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Bisitahin ang mga setting sa mga link"
+  }
+}
+

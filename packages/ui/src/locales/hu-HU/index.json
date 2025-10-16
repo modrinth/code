@@ -1,0 +1,744 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Béta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Béta kiadás"
+  },
+  "badge.new": {
+    "defaultMessage": "Új"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analitikák"
+  },
+  "button.back": {
+    "defaultMessage": "Vissza"
+  },
+  "button.cancel": {
+    "defaultMessage": "Mégsem"
+  },
+  "button.continue": {
+    "defaultMessage": "Tovább"
+  },
+  "button.copy-id": {
+    "defaultMessage": "ID másolása"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Állandó link másolása"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Projekt létrehozása"
+  },
+  "button.download": {
+    "defaultMessage": "Letöltés"
+  },
+  "button.downloading": {
+    "defaultMessage": "Letöltés folyamatban"
+  },
+  "button.edit": {
+    "defaultMessage": "Szerkesztés"
+  },
+  "button.follow": {
+    "defaultMessage": "Követés"
+  },
+  "button.more-options": {
+    "defaultMessage": "További opciók"
+  },
+  "button.next": {
+    "defaultMessage": "Következő"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Mappa megnyitása"
+  },
+  "button.play": {
+    "defaultMessage": "Játék"
+  },
+  "button.refresh": {
+    "defaultMessage": "Frissítés"
+  },
+  "button.remove": {
+    "defaultMessage": "Eltávolítás"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Kép törlése"
+  },
+  "button.report": {
+    "defaultMessage": "Jelentés"
+  },
+  "button.reset": {
+    "defaultMessage": "Visszaállítás"
+  },
+  "button.save": {
+    "defaultMessage": "Mentés"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Módosítások mentése"
+  },
+  "button.saving": {
+    "defaultMessage": "Mentés"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Bejelentkezés"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Kijelentkezés"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Regisztráció"
+  },
+  "button.stop": {
+    "defaultMessage": "Megállítás"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Követés törlése"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Kép feltöltése"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Éppen most"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Alkalmazás"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Szerverek"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Weboldal"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Privát"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Ikon szerkesztése"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Ikon eltávolítása"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Ikon kicserélése"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Ikon kiválasztása"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Keresés..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Galéria nézet"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Rácsnézet"
+  },
+  "input.view.list": {
+    "defaultMessage": "Sor nézet"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Kaland mód"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Kreatív mód"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Megfigyelő mód"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Túlélő mód"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Ismeretlen játékmód"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Módosítások elmentve"
+  },
+  "label.collections": {
+    "defaultMessage": "Gyűjtemények"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Létrehozva {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Irányítópult"
+  },
+  "label.delete": {
+    "defaultMessage": "Törlés"
+  },
+  "label.description": {
+    "defaultMessage": "Leírás"
+  },
+  "label.error": {
+    "defaultMessage": "Hiba"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Követett projektek"
+  },
+  "label.loading": {
+    "defaultMessage": "Betöltés..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderáció"
+  },
+  "label.notifications": {
+    "defaultMessage": "Értesítések"
+  },
+  "label.or": {
+    "defaultMessage": "vagy"
+  },
+  "label.password": {
+    "defaultMessage": "Jelszó"
+  },
+  "label.played": {
+    "defaultMessage": "Játszott {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Nyilvános"
+  },
+  "label.rejected": {
+    "defaultMessage": "Elutasítva"
+  },
+  "label.saved": {
+    "defaultMessage": "Mentve"
+  },
+  "label.scopes": {
+    "defaultMessage": "Hatáskörök"
+  },
+  "label.server": {
+    "defaultMessage": "Szerver"
+  },
+  "label.servers": {
+    "defaultMessage": "Szerverek"
+  },
+  "label.settings": {
+    "defaultMessage": "Beállítások"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Egyjátékos"
+  },
+  "label.title": {
+    "defaultMessage": "Cím"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Nem listázott"
+  },
+  "label.visibility": {
+    "defaultMessage": "Láthatóság"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Profil megtekintése"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Adj hozzá fizetési módot"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Fizetési mód hozzáadása"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Hiba történt"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Elfogadva"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Elfogadva"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Archiválva"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Lezárva"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Készítő"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Piszkozat"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Sikertelen"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listázott"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderátor"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth Csapat"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Függőben"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Privát"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Elutasítva"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Visszatérve"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Felülvizsgálat alatt"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Nem listázott"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kód másolása a vágólapra"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Kliens"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Kliens és szerver"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Kliens vagy szerver"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Szerver"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "A {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Nem támogatott"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} végződik {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Ismeretlen fizetési módszer"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Összes"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural,one {Data Pack} other {Data Packek}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Data Packek"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural,one {data pack} other {data packek}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural,one {Mod} other {Modok}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Modok"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural,one {mod} other {modok}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural,one {Modpack} other {Modpackek}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpackek"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural,one {modpack} other {modpacks}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural,one {Plugin} other {Pluginok}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pluginok"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural,one {plugin} other {plugins}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural,one {Forráscsomag} other {Forráscsomagok}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Forráscsomagok"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural,one {forráscsomag}other {forráscsomagok}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural,one {Shader} other {Shaderek}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaderek"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural,one {shader} other {shaderek}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Támogatott környezettek"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Kliens és szerver"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Kliens-oldal"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Dedikálva csak szerveren"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Szerver-oldal"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Egyjátékos"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Csak egyjátékos"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platformok"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Kompatibilitás"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Projekt tulajdonos"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Készítők"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Létrehozva {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "Licenszelve {license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Publikálva {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "Beküldve {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Részletek"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Frissítve {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Csatlakozz a Discord szerverhez"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Donate"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponzoráció GitHubon"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Támogass Ko-fin"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Támogass Patreonon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Támogass PayPalon"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Hibák jelentése"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Forráskód megtekintése"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Linkek"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Wiki megtekintése"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Elemzések"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Leírás"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Opcionális kliensen"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Opcionális szerveren"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Minda kettön kell"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Kliens és szerver"
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Csak kliens-oldal"
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Mükszik Egyjátékos módban is"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Csak Szerver-oldal"
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Csak egyjátékos mód"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "{option} alopciói"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Környezett"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Galéria"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Általános"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "Licenc"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Linkkek"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Tagok"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "Nincsen jogosultságod a projekt szerkeztéséhez."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "Nincsen jogod"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Címkék"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Feltöltés"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Verziók"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Megtekintés"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Archíválva"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Piszkozat"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Privát"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Publikus"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Elutasítva"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Felülvizsgálat alatt"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Ismeretlen"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Nem listázott"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "A személyzet által nem feltüntetve"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Szűrő zárolva"
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Szűrő szinkronizálása"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} zárolva van"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Szűrő feloldása"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Környezet"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Kliens"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Szerver"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Játék verzió"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Összes verzió mutatása"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Licenc"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Nyilt forráskódú"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Betöltő"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Betöltő"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Betöltő"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Platform"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "Projekt ID"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Betöltő"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Figyelem"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Információ"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Kritikus"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Információ"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Felmérés"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Figyelmeztetés"
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Válasz fizetési módot"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Fizetési mód"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Válasz előfizetést"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Válasz előfizetést"
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Előfizetés"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Régió"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Értékelés"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Közép Európa"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Észak Amerika"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Fiók és biztonság"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Megjelenés"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Alkamazásaid"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Azonosított alkamzások"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "Számlázás és előfizetések"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Sötét"
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Világos"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Rendszer követése"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Szín téma"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Nyelv"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Publikus profil"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} kor {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Vannak nem mented változások."
+  }
+}
+

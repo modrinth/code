@@ -18,11 +18,13 @@ use crate::util::io::{self, IOError};
 pub use crate::{State, state::Profile};
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
+use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde_json::json;
 
 use std::collections::{HashMap, HashSet};
 
 use crate::data::Settings;
+use crate::server_address::ServerAddress;
 use dashmap::DashMap;
 use std::iter::FromIterator;
 use std::{
@@ -40,7 +42,7 @@ pub mod update;
 pub enum QuickPlayType {
     None,
     Singleplayer(String),
-    Server(String),
+    Server(ServerAddress),
 }
 
 /// Remove a profile
@@ -336,28 +338,26 @@ pub async fn update_project(
             )
             .await?
             .remove(project_path)
+            && let Some(update_version) = &file.update_version_id
         {
-            if let Some(update_version) = &file.update_version_id {
-                let path = Profile::add_project_version(
-                    profile_path,
-                    update_version,
-                    &state.pool,
-                    &state.fetch_semaphore,
-                    &state.io_semaphore,
-                )
-                .await?;
+            let path = Profile::add_project_version(
+                profile_path,
+                update_version,
+                &state.pool,
+                &state.fetch_semaphore,
+                &state.io_semaphore,
+            )
+            .await?;
 
-                if path != project_path {
-                    Profile::remove_project(profile_path, project_path).await?;
-                }
-
-                if !skip_send_event.unwrap_or(false) {
-                    emit_profile(profile_path, ProfilePayloadType::Edited)
-                        .await?;
-                }
-
-                return Ok(path);
+            if path != project_path {
+                Profile::remove_project(profile_path, project_path).await?;
             }
+
+            if !skip_send_event.unwrap_or(false) {
+                emit_profile(profile_path, ProfilePayloadType::Edited).await?;
+            }
+
+            return Ok(path);
         }
 
         Err(crate::ErrorKind::InputError(
@@ -478,10 +478,10 @@ pub async fn export_mrpack(
     let included_export_candidates = included_export_candidates
         .into_iter()
         .filter(|x| {
-            if let Some(f) = PathBuf::from(x).file_name() {
-                if f.to_string_lossy().starts_with(".DS_Store") {
-                    return false;
-                }
+            if let Some(f) = PathBuf::from(x).file_name()
+                && f.to_string_lossy().starts_with(".DS_Store")
+            {
+                return false;
             }
             true
         })
@@ -498,11 +498,12 @@ pub async fn export_mrpack(
     let version_id = version_id.unwrap_or("1.0.0".to_string());
     let mut packfile =
         create_mrpack_json(&profile, version_id, description).await?;
-    let included_candidates_set =
-        HashSet::<_>::from_iter(included_export_candidates.iter());
+    let included_candidates_set = HashSet::<_>::from_iter(
+        included_export_candidates.iter().map(|x| x.as_str()),
+    );
     packfile
         .files
-        .retain(|f| included_candidates_set.contains(&f.path));
+        .retain(|f| included_candidates_set.contains(f.path.as_str()));
 
     // Build vec of all files in the folder
     let mut path_list = Vec::new();
@@ -576,8 +577,8 @@ pub async fn export_mrpack(
 #[tracing::instrument]
 pub async fn get_pack_export_candidates(
     profile_path: &str,
-) -> crate::Result<Vec<String>> {
-    let mut path_list: Vec<String> = Vec::new();
+) -> crate::Result<Vec<SafeRelativeUtf8UnixPathBuf>> {
+    let mut path_list = Vec::new();
 
     let profile_base_dir = get_full_path(profile_path).await?;
     let mut read_dir = io::read_dir(&profile_base_dir).await?;
@@ -586,7 +587,7 @@ pub async fn get_pack_export_candidates(
         .await
         .map_err(|e| IOError::with_path(e, &profile_base_dir))?
     {
-        let path: PathBuf = entry.path();
+        let path = entry.path();
         if path.is_dir() {
             // Two layers of files/folders if its a folder
             let mut read_dir = io::read_dir(&path).await?;
@@ -595,10 +596,10 @@ pub async fn get_pack_export_candidates(
                 .await
                 .map_err(|e| IOError::with_path(e, &profile_base_dir))?
             {
-                let path: PathBuf = entry.path();
-
-                path_list
-                    .push(pack_get_relative_path(&profile_base_dir, &path)?);
+                path_list.push(pack_get_relative_path(
+                    &profile_base_dir,
+                    &entry.path(),
+                )?);
             }
         } else {
             // One layer of files/folders if its a file
@@ -611,18 +612,19 @@ pub async fn get_pack_export_candidates(
 fn pack_get_relative_path(
     profile_path: &PathBuf,
     path: &PathBuf,
-) -> crate::Result<String> {
-    Ok(path
-        .strip_prefix(profile_path)
-        .map_err(|_| {
-            crate::ErrorKind::FSError(format!(
-                "Path {path:?} does not correspond to a profile"
-            ))
-        })?
-        .components()
-        .map(|c| c.as_os_str().to_string_lossy().to_string())
-        .collect::<Vec<_>>()
-        .join("/"))
+) -> crate::Result<SafeRelativeUtf8UnixPathBuf> {
+    Ok(SafeRelativeUtf8UnixPathBuf::try_from(
+        path.strip_prefix(profile_path)
+            .map_err(|_| {
+                crate::ErrorKind::FSError(format!(
+                    "Path {path:?} does not correspond to a profile"
+                ))
+            })?
+            .components()
+            .map(|c| c.as_os_str().to_string_lossy())
+            .collect::<Vec<_>>()
+            .join("/"),
+    )?)
 }
 
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
@@ -630,7 +632,7 @@ fn pack_get_relative_path(
 #[tracing::instrument]
 pub async fn run(
     path: &str,
-    quick_play_type: &QuickPlayType,
+    quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
 
@@ -642,13 +644,11 @@ pub async fn run(
 }
 
 /// Run Minecraft using a profile, and credentials for authentication
-/// Returns Arc pointer to RwLock to Child
 #[tracing::instrument(skip(credentials))]
-
-pub async fn run_credentials(
+async fn run_credentials(
     path: &str,
     credentials: &Credentials,
-    quick_play_type: &QuickPlayType,
+    quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
     let settings = Settings::get(&state.pool).await?;
@@ -662,14 +662,15 @@ pub async fn run_credentials(
         .hooks
         .pre_launch
         .as_ref()
-        .or(settings.hooks.pre_launch.as_ref());
+        .or(settings.hooks.pre_launch.as_ref())
+        .filter(|hook_command| !hook_command.is_empty());
     if let Some(hook) = pre_launch_hooks {
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
         if let Some(command) = cmd.next() {
             let full_path = get_full_path(&profile.path).await?;
             let result = Command::new(command)
-                .args(cmd.collect::<Vec<&str>>())
+                .args(cmd)
                 .current_dir(&full_path)
                 .spawn()
                 .map_err(|e| IOError::with_path(e, &full_path))?
@@ -692,7 +693,12 @@ pub async fn run_credentials(
         .clone()
         .unwrap_or(settings.extra_launch_args);
 
-    let wrapper = profile.hooks.wrapper.clone().or(settings.hooks.wrapper);
+    let wrapper = profile
+        .hooks
+        .wrapper
+        .clone()
+        .or(settings.hooks.wrapper)
+        .filter(|hook_command| !hook_command.is_empty());
 
     let memory = profile.memory.unwrap_or(settings.memory);
     let resolution =
@@ -704,8 +710,12 @@ pub async fn run_credentials(
         .unwrap_or(settings.custom_env_vars);
 
     // Post post exit hooks
-    let post_exit_hook =
-        profile.hooks.post_exit.clone().or(settings.hooks.post_exit);
+    let post_exit_hook = profile
+        .hooks
+        .post_exit
+        .clone()
+        .or(settings.hooks.post_exit)
+        .filter(|hook_command| !hook_command.is_empty());
 
     // Any options.txt settings that we want set, add here
     let mut mc_set_options: Vec<(String, String)> = vec![];
@@ -756,7 +766,7 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
     let updated_recent_playtime = profile.recent_time_played;
 
     let res = if updated_recent_playtime > 0 {
-        // Create update struct to send to Labrinth
+        // Create update struct to send to labrinth
         let modrinth_pack_version_id =
             profile.linked_data.as_ref().map(|l| l.version_id.clone());
         let playtime_update_json = json!({
@@ -872,15 +882,12 @@ pub async fn create_mrpack_json(
                 env.insert(EnvType::Client, SideType::Required);
                 env.insert(EnvType::Server, SideType::Required);
 
-                let primary_file =
-                    if let Some(primary_file) = version.files.first() {
-                        primary_file
-                    } else {
-                        return Some(Err(crate::ErrorKind::OtherError(
-                            format!("No primary file found for mod at: {path}"),
-                        )
-                        .as_error()));
-                    };
+                let Some(primary_file) = version.files.first() else {
+                    return Some(Err(crate::ErrorKind::OtherError(format!(
+                        "No primary file found for mod at: {path}"
+                    ))
+                    .as_error()));
+                };
 
                 let file_size = primary_file.size;
                 let downloads = vec![primary_file.url.clone()];
@@ -892,7 +899,15 @@ pub async fn create_mrpack_json(
                     .collect();
 
                 Some(Ok(PackFile {
-                    path,
+                    path: match path.try_into() {
+                        Ok(path) => path,
+                        Err(_) => {
+                            return Some(Err(crate::ErrorKind::OtherError(
+                                "Invalid file path in project".into(),
+                            )
+                            .as_error()));
+                        }
+                    },
                     hashes,
                     env: Some(env),
                     downloads,

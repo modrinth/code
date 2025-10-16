@@ -8,7 +8,7 @@ Modrinth allows developers to create applications which, once authorized by a Mo
 If you're familiar with OAuth 2, these are the URLs you will need:
 
 | Name               | URL                                              |
-|--------------------|--------------------------------------------------|
+| ------------------ | ------------------------------------------------ |
 | Authorization page | `https://modrinth.com/auth/authorize`            |
 | Token exchange     | `https://api.modrinth.com/_internal/oauth/token` |
 
@@ -31,21 +31,21 @@ After you've registered your application, it is important that you take note of 
 Once the user is ready to authorize your application, you need to construct a URL to redirect them to. The authorization URL for Modrinth is `https://api.modrinth.com/_internal/oauth/token`. Supply the following query parameters:
 
 | Query parameter | Description                                                                               |
-|-----------------|-------------------------------------------------------------------------------------------|
+| --------------- | ----------------------------------------------------------------------------------------- |
 | `response_type` | In Modrinth this always needs to be `code`, since only code grants are supported          |
 | `client_id`     | The application identifier found in the settings                                          |
 | `scope`         | The permissions you need access to                                                        |
 | `state`         | A mechanism to prevent certain attacks. Explained further below. Recommended but optional |
 | `redirect_uri`  | The URI the user is redirect to after finishing authorization                             |
 
-You might have noticed the `state` parameter. [CSRF] (Cross-site request forgery), and [clickjacking] are security vulnerabilities that you're recommended to protect against. In OAuth2 this is usually done with the `state` parameter. When the user initiates a request to start authorization, you include a `state` which is unique to this request. This can, for example, be saved in localStorge or a cookie. When the redirect URI is called, you verify that the `state` parameter is the same. Using `state` is optional, but recommended.
+You might have noticed the `state` parameter. [CSRF] (Cross-site request forgery), and [clickjacking] are security vulnerabilities that you're recommended to protect against. In OAuth2 this is usually done with the `state` parameter. When the user initiates a request to start authorization, you include a `state` which is unique to this request. This can, for example, be saved in localStorage or a cookie. When the redirect URI is called, you verify that the `state` parameter is the same. Using `state` is optional, but recommended.
 
-The scope identifiers are currently best found in the backend source code located at [`apps/labrinth/src/models/v3/pats.rs`]. The scope parameter is an array of scope identifiers, seperated by a plus sign (`+`).
+The scope identifiers are currently best found in the backend source code located at [`apps/labrinth/src/models/v3/pats.rs`]. The scope parameter is an array of scope identifiers, separated by a plus sign (`+`).
 
 The redirect URI is the endpoint on your server that will receive the code which can eventually be used to act on the user's behalf. For security reasons the redirect URI used has to be allowlisted in your application settings. The redirect will contain the following query parameters:
 
 | Query parameter | Description                                        |
-|-----------------|----------------------------------------------------|
+| --------------- | -------------------------------------------------- |
 | `code`          | The code that can be exchanged for an access token |
 | `client_id`     | Your client id                                     |
 | `redirect_uri`  | The redirect URI which was used                    |
@@ -58,7 +58,7 @@ If you've followed the previous section on getting authorization, you should now
 In the body use these fields:
 
 | Field          | Description                                                  |
-|----------------|--------------------------------------------------------------|
+| -------------- | ------------------------------------------------------------ |
 | `code`         | The authorization code                                       |
 | `client_id`    | Your client id, the same as in the authorization request     |
 | `redirect_uri` | The redirect URI which was redirected to after authorization |
@@ -67,7 +67,7 @@ In the body use these fields:
 If the request succeeds, you should receive a JSON payload with these fields:
 
 | Field          | Description                                          |
-|----------------|------------------------------------------------------|
+| -------------- | ---------------------------------------------------- |
 | `access_token` | The access token you can use to access the API       |
 | `token_type`   | Currently only `Bearer`                              |
 | `expires_in`   | The amount of seconds until the access token expires |
@@ -77,19 +77,11 @@ To use this access token, you attach it to API requests in the `Authorization` h
 If you have any questions, you're welcome to ask in #api-development in the [Discord guild], or create a ticket on the [support portal].
 
 [RFC 6749]: https://datatracker.ietf.org/doc/html/rfc6749
-
 [register an application]: https://modrinth.com/settings/applications
-
 [principle of least privilege]: https://en.wikipedia.org/wiki/Principle_of_least_privilege
-
 [`apps/labrinth/src/models/v3/pats.rs`]: https://github.com/modrinth/code/blob/main/apps/labrinth/src/models/v3/pats.rs
-
 [CSRF]: https://en.wikipedia.org/wiki/Cross-site_request_forgery
-
 [Clickjacking]: https://en.wikipedia.org/wiki/Clickjacking
-
 [`/user` endpoint]: https://docs.modrinth.com/api/operations/getuserfromauth/
-
 [Discord guild]: https://discord.modrinth.com
-
 [support portal]: https://support.modrinth.com/en/

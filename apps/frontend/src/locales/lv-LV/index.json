@@ -1,0 +1,410 @@
+{
+  "action.cancel": {
+    "message": "Atcelt"
+  },
+  "action.continue": {
+    "message": "Turpināt"
+  },
+  "admin.billing.error.not-found": {
+    "message": "Lietotājs nav atrasts"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpaka"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "E -pasts"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Ievadiet kodu ..."
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "E -pasts vai lietotājvārds"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Parole"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Pierakstīties ar"
+  },
+  "auth.sign-in.title": {
+    "message": "Pierakstīties"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Vai arī izmantojiet paroli"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Izveidot kontu"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Apstipriniet paroli"
+  },
+  "auth.sign-up.email.label": {
+    "message": "E -pasts"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Lietotājvārds"
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Paroles nesakrīt!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Parole"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Vai pats izveidojiet kontu"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Konta iestatījumi"
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "E -pasta pārbaude neizdevās"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Jūsu e -pasta adrese ir veiksmīgi pārbaudīta!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "E -pasta pārbaude"
+  },
+  "collection.button.edit-icon": {
+    "message": "Rediģēt ikonu"
+  },
+  "collection.error.not-found": {
+    "message": "Kolekcija nav atrasta"
+  },
+  "collection.label.collection": {
+    "message": "Kolekcija"
+  },
+  "collection.label.created-at": {
+    "message": "Izveidots {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Kurators"
+  },
+  "collection.label.owner": {
+    "message": "Īpašnieks"
+  },
+  "collection.label.updated-at": {
+    "message": "Atjaunināts {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - kolekcija"
+  },
+  "common.no": {
+    "message": "Nē"
+  },
+  "common.yes": {
+    "message": "Jā"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Izveidot jaunu"
+  },
+  "error.user.404.title": {
+    "message": "Lietotājs nav atrasts"
+  },
+  "frog.title": {
+    "message": "Varde"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "datu pakas"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "modi"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "resursu pakas"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "serveri"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "shaders"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.heading": {
+    "message": "Paziņojumi"
+  },
+  "landing.search.sort-by.label": {
+    "message": "Kārtot pēc"
+  },
+  "layout.footer.about": {
+    "message": "Par"
+  },
+  "layout.footer.about.careers": {
+    "message": "Karjera"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Izmaiņas"
+  },
+  "layout.footer.about.news": {
+    "message": "Jaunumi"
+  },
+  "layout.footer.about.status": {
+    "message": "Statuss"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "Nav oficiālais Minecraft pakalpojums. Nav apstiprinājis vai saistīts ar Mojang vai Microsoft."
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Privātuma politika"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth ir <github-Link> atvērtā avota </github-bink>."
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.resources": {
+    "message": "Resursi"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "Iegūstiet modrinth lietotni"
+  },
+  "layout.nav.organizations": {
+    "message": "Organizācijas"
+  },
+  "layout.nav.projects": {
+    "message": "Projekti"
+  },
+  "moderation.page.projects": {
+    "message": "Projekti"
+  },
+  "moderation.sort.by": {
+    "message": "Kārtot pēc"
+  },
+  "profile.error.not-found": {
+    "message": "Lietotājs nav atrasts"
+  },
+  "profile.label.no-collections": {
+    "message": "Šim lietotājam nav kolekciju!"
+  },
+  "profile.label.no-projects": {
+    "message": "Šim lietotājam nav projektu!"
+  },
+  "profile.label.organizations": {
+    "message": "Organizācijas"
+  },
+  "project-member-header.error": {
+    "message": "Kļūda"
+  },
+  "project-moderation-nags.required": {
+    "message": "Nepieciešams"
+  },
+  "project-type.collection.plural": {
+    "message": "Kolekcijas"
+  },
+  "project-type.collection.singular": {
+    "message": "Kolekcija"
+  },
+  "project-type.datapack.plural": {
+    "message": "Datu Pakas"
+  },
+  "project-type.datapack.singular": {
+    "message": "Datu Paka"
+  },
+  "project-type.mod.plural": {
+    "message": "Modi"
+  },
+  "project-type.mod.singular": {
+    "message": "Mods"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modpakas"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modpaka"
+  },
+  "project-type.project.plural": {
+    "message": "Projekti"
+  },
+  "project-type.project.singular": {
+    "message": "Projekts"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Resursu pakas"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Resursu paka"
+  },
+  "project-type.shader.plural": {
+    "message": "Shaders"
+  },
+  "project-type.shader.singular": {
+    "message": "Shader"
+  },
+  "project.about.details.created": {
+    "message": "Izveidots {date}"
+  },
+  "project.about.details.published": {
+    "message": "Publicēts {date}"
+  },
+  "project.about.details.updated": {
+    "message": "Atjaunināts {date}"
+  },
+  "project.description.title": {
+    "message": "Apraksts"
+  },
+  "project.gallery.title": {
+    "message": "Galerija"
+  },
+  "project.moderation.title": {
+    "message": "Moderācija"
+  },
+  "project.navigation.changelog": {
+    "message": "Izmaiņas"
+  },
+  "project.settings.general.name.title": {
+    "message": "Nosaukums"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.title": {
+    "message": "Iestatījumi"
+  },
+  "project.versions.title": {
+    "message": "Versijas"
+  },
+  "scopes.projectCreate.label": {
+    "message": "Izveidot projektus"
+  },
+  "scopes.projectDelete.label": {
+    "message": "Dzēst projektus"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Discover"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCard"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPay"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Datu Paku lapa"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Kolekcija"
+  },
+  "settings.language.categories.auto": {
+    "message": "Automātiski"
+  },
+  "settings.language.categories.experimental": {
+    "message": "Eksperimentālās valodas"
+  },
+  "settings.language.languages.language-label-error": {
+    "message": "{label}. Kļūda"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Pēdējo reizi izmantots {ago}"
+  },
+  "settings.profile.bio.title": {
+    "message": "Biogrāfija"
+  },
+  "settings.profile.profile-info": {
+    "message": "Informācija par profilu"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Atiestatīt"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Profila attēls"
+  },
+  "settings.profile.username.title": {
+    "message": "Lietotājvārds"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Izveidots {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Pašreizējā sesija"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Nezināma OS"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Nezināma platforma"
+  }
+}

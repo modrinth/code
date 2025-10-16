@@ -8,13 +8,13 @@ use crate::database::models::{
     project_item, report_item, thread_item, version_item,
 };
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ReportId, ThreadMessageId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img::upload_image_optimized;
-use crate::util::routes::read_from_payload;
+use crate::util::routes::read_limited_from_payload;
 use actix_web::{HttpRequest, HttpResponse, web};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -176,7 +176,7 @@ pub async fn images_add(
     }
 
     // Upload the image to the file host
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         1_048_576,
         "Icons must be smaller than 1MiB",
@@ -186,6 +186,7 @@ pub async fn images_add(
     let content_length = bytes.len();
     let upload_result = upload_image_optimized(
         "data/cached_images",
+        FileHostPublicity::Public, // FIXME: Maybe use private images for threads
         bytes.freeze(),
         &data.ext,
         None,

@@ -1,0 +1,311 @@
+{
+  "app-marketing.download.description": {
+    "message": "Magagamit ang aming desktop app sa iba’t-ibang plataporma, piliin ang iyong gugustohing bersiyon."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "I-download ang AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "I-download ang beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "I-download ang DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "I-download ang RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Ang bersiyong Linux ng Modrinth App ay <issues-link>alam na may suliranin</issues-link> sa iilang mga sistema at konpigurasyon. Kapag ang Modrinth App ay hindi matatag sa iyong sistema, hinihikayat ka namin na subukan ang ibang mga aplikasyon tulad ng <prism-link>Prism Launcher</prism-link> upang mapadali ang pag-i-install ng kontentong Modrinth."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Mga pagpipilian sa pagdownload"
+  },
+  "app-marketing.download.terms": {
+    "message": "Sa pagdownload ng Modrinth App, sumasang-ayon ka sa aming <terms-link>Mga Tuntunin</terms-link> at <privacy-link>Patakaran sa Pribasya</privacy-link>."
+  },
+  "app-marketing.download.title": {
+    "message": "I-download ang Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Open source"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Gamitin ang Modrinth App sa pagdownload at paglaro ng iyong mga paboritong mods at modpacks."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "I-download ang Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "I-download ang Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "I-download ang Modrinth App para sa {os}"
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Higit na Pagpipilian sa Pagdownload"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Mga setting sa account"
+  },
+  "auth.welcome.description": {
+    "message": "Ikaw ay parte na ngayon ng kahanga-hangang komunidad na ito ng mga tagagawa at manlalalakbay na nagtataguyod, nagda-download, at nananatiling napapanahon sa mga nakamamanghang na mga mod."
+  },
+  "collection.button.edit-icon": {
+    "message": "Baguhin ang ikono"
+  },
+  "collection.button.remove-project": {
+    "message": "Tanggalin ang proyekto"
+  },
+  "collection.delete-modal.description": {
+    "message": "Habambuhay na matatanggal ang koleksiyong ito. Hindi mababawi ang pagkilos na ito."
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Ang banyagang entidad ay isang kalakalang entidad na nakaayos sa labas ng Estados Unidos (tulod ng di-US na korporasyon, partnership, o LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Banyagang entidad"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Isa ka bang pribadong indibidwal o parte ng isang banyagang entidad?"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Makatanggap ng detalyadong reporta ng mga pagtingin ng pahina, bilang ng pagdownload, at revenue"
+  },
+  "landing.feature.launcher.description": {
+    "message": "Binibigyang-daan ng open-source API ng Modrinth ang mga launcher na makadagdag ng malalimang pagsasama sa Modrinth. Maaari mong gamitin ang Modrinth sa <link>aming app</link> at sa iilang pinakasikat na mga launcher gaya ng ATLauncher, MultiMC, at Prism Launcher."
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "mga resource pack"
+  },
+  "landing.subheading": {
+    "message": "Magtuklas, maglaro, at magbahagi ng mga Minecraft content sa aming open-source na platapormang ginawa para sa komunidad."
+  },
+  "layout.action.create-new": {
+    "message": "Gumawa ng bago..."
+  },
+  "layout.action.reports": {
+    "message": "Mga reporta"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Mga setting sa account"
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Itong pinakalat na frontend ng Modrinth ay bigong makabuo ng estato galing sa API. Maaaring dahil ito sa isang outage o error sa konpigurasyon. Muling itayo kapag magagamit na ang API. Error codes: {errors}; Kasalukuyang URL ng API ay: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "May error sa pagbuo ng estado galing sa API habang nagpapatayo."
+  },
+  "layout.footer.about": {
+    "message": "Tungkol"
+  },
+  "layout.footer.about.careers": {
+    "message": "Mga Karera"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Changelog"
+  },
+  "layout.footer.about.news": {
+    "message": "Balita"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Programa ng Gantimpala"
+  },
+  "layout.footer.about.status": {
+    "message": "Istado"
+  },
+  "layout.footer.legal": {
+    "message": "Legal"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "HINDI OPISYAL NA SERBISYO NG MINECRAFT. HINDI APRUBADO O KAAKIBAT NG MOJANG O MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Patakaran sa Copyright at DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Patakaran sa Pribasiya"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Mga Tuntuning sa Content"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Abiso sa Seguridad"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Mga Tuntunin sa Paggamit"
+  },
+  "layout.footer.open-source": {
+    "message": "<github-link>Open source</github-link> ang Modrinth."
+  },
+  "layout.footer.products": {
+    "message": "Mga Produkto"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
+  },
+  "layout.footer.resources": {
+    "message": "Mga Mapagkukunan"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "Dokumentasyon ng API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Help Center"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Magreport ng mga isyu"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Isalin"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.meta.description": {
+    "message": "Mag-download ng mga Minecraft mod, plugin, datapack, shader, resourcepack, at modpack sa Modrinth. Tumuklas at mag-publish ng mga proyekto sa Modrinth na may modernong, madaling gamitin na interface at API."
+  },
+  "moderation.page.projects": {
+    "message": "Mga Proyekto"
+  },
+  "moderation.page.reports": {
+    "message": "Mga Reporta"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Teknikal na Pagsusuri"
+  },
+  "profile.meta.description": {
+    "message": "Magdownload ng mga proyekto ni {username} sa Modrinth"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} - Magdownload ng mga proyekto ni {username} sa Modrinth"
+  },
+  "profile.stats.downloads": {
+    "message": "{count, plural, one {<stat>{count}</stat> download ng proyekto} other {<stat>{count}</stat> na download ng proyekto}}"
+  },
+  "project-type.datapack.plural": {
+    "message": "Mga Data Pack"
+  },
+  "project-type.datapack.singular": {
+    "message": "Data Pack"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Mga Resource Pack"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Resource Pack"
+  },
+  "project.download.game-version": {
+    "message": "Bersiyon ng laro: {version}"
+  },
+  "project.download.no-app": {
+    "message": "Wala kang Modrinth App?"
+  },
+  "project.download.platform": {
+    "message": "Plataporma: {platform}"
+  },
+  "project.download.search-game-versions": {
+    "message": "Maghanap ng mga bersiyon ng laro..."
+  },
+  "project.download.select-game-version": {
+    "message": "Piliin ang lahat ng bersiyon ng laro"
+  },
+  "project.download.show-all-versions": {
+    "message": "Ipakita ang lahat ng bersiyon"
+  },
+  "project.download.title": {
+    "message": "I-download ang {title}"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "Kakaunlad lang ng aming sistema sa Mga Environment sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Wala kang pahintulot na magbago sa mga setting na ito, mangyaring ipaalam sa isa pang miyembro ng proyekto na kailangang mapatunayan ang metadata ng environment."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Kailangang suriin ang metadata ng environment"
+  },
+  "project.environment.migration.message": {
+    "message": "Kakaunlad lang ng aming sistema sa Mga Environment sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring bisitahin ang mga setting ng iyong proyekto at patunaying tama ang metadata."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Suriin ang mga setting sa environment"
+  },
+  "project.environment.migration.title": {
+    "message": "Pakisuri sa metadata sa environment"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Wala pang metadata sa environment ang iyong proyekto, pakipili ng wasto sa ibaba."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Pakipili sa environment ng inyong proyekto"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "Marami ang environment ng iyong proyekto"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "Kakaunlad lang ng aming sistema sa Mga Environment sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring suriin na tama ang napili sa ibaba at pindutin ang 'Patunayan' kapag tapos ka na!"
+  },
+  "project.settings.title": {
+    "message": "Mga Setting"
+  },
+  "project.stats.downloads-label": {
+    "message": "download {count, plural, one {} other {}}"
+  },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "Hindi mahanda ang download"
+  },
+  "servers.backups.item.prepare-download": {
+    "message": "Ihanda ang download"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "Subukang muli ang paghahanda"
+  },
+  "servers.backups.item.preparing-download": {
+    "message": "Hinahanda ang download..."
+  },
+  "settings.display.flags.description": {
+    "message": "Magpagana o huwag magpagana ng mga tiyak na feature sa iyong device."
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Pahina ng mga Data Pack"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Pumili ng iyong gugustohing pag-aayos ng bawat pahinang magpapakita sa mga listahan ng proyekto sa iyong device."
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Pahina ng mga Resource Pack"
+  },
+  "settings.display.theme.description": {
+    "message": "Pumili ng iyong gugustohing paksang-kulay para sa Modrinth ng nitong device."
+  },
+  "settings.sessions.description": {
+    "message": "Narito ang lahat ng mga device na kasalukuyang nakalog-in sa iyong Modrinth account. Maaari mong maisaisang malog-out ang bawat isa.\n\nKung makakita ka ng isang hindi mo nakikilala, maglog-out sa device na iyon at agarang palitan ang password ng iyong Modrinth account."
+  }
+}

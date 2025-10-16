@@ -45,7 +45,7 @@ impl TeamBuilder {
         .await?;
 
         let mut team_member_ids = Vec::new();
-        for _ in self.members.iter() {
+        for _ in &self.members {
             team_member_ids.push(generate_team_member_id(transaction).await?.0);
         }
         let TeamBuilder { members } = self;
@@ -483,20 +483,20 @@ impl DBTeamMember {
             .await?;
         }
 
-        if let Some(accepted) = new_accepted {
-            if accepted {
-                sqlx::query!(
-                    "
+        if let Some(accepted) = new_accepted
+            && accepted
+        {
+            sqlx::query!(
+                "
                     UPDATE team_members
                     SET accepted = TRUE
                     WHERE (team_id = $1 AND user_id = $2)
                     ",
-                    id as DBTeamId,
-                    user_id as DBUserId,
-                )
-                .execute(&mut **transaction)
-                .await?;
-            }
+                id as DBTeamId,
+                user_id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
         }
 
         if let Some(payouts_split) = new_payouts_split {

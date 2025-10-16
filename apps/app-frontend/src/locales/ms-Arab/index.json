@@ -1,0 +1,464 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "مود ڤمباڠون دداياکن."
+  },
+  "app.settings.downloading": {
+    "message": "سدڠ مموات تورون v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "تمڤيلن"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "تتڤن لالاي ڤماسڠن"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "ڤنتڤن چيري"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "ڤماسڠن جاۏا"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "ڤريۏاسي"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "ڤڠوروسن سومبر"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} سوده برسديا اونتوق دڤاسڠ! موات سمولا اونتوق کمس کيني سکارڠ⹁ اتاو کمس کيني سچارا اٴوتوماتيک اڤابيلا اندا منوتوڤ Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} سوده سلساي دڤاسڠ! موات سمولا اونتوق کمس کيني سکارڠ⹁ اتاو کمس کيني سچارا اٴوتوماتيک اڤابيلا اندا منوتوڤ Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} کيني ترسديا! ممندڠکن اندا سدڠ مڠݢوناکن رڠکاين برميتر⹁ کامي تيدق مموات تورونڽ سچارا اٴوتوماتيک."
+  },
+  "app.update-toast.changelog": {
+    "message": "لوݢ ڤروبهن"
+  },
+  "app.update-toast.download": {
+    "message": "موات تورون ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "سدڠ مموات تورون..."
+  },
+  "app.update-toast.reload": {
+    "message": "موات سمولا"
+  },
+  "app.update-toast.title": {
+    "message": "کمس کيني ترسديا"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "موات تورون سلساي"
+  },
+  "app.update.complete-toast.text": {
+    "message": "کليک دسيني اونتوق مليهت لوݢ ڤروبهن."
+  },
+  "app.update.complete-toast.title": {
+    "message": "ۏرسي {version} تله برجاي دڤاسڠ!"
+  },
+  "app.update.download-update": {
+    "message": "موات تورون کمس کيني"
+  },
+  "app.update.downloading-update": {
+    "message": "سدڠ مموات تورون کمس کيني ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "موات سمولا اونتوق مماسڠ کمس کيني"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "تمبه دان ماءين"
+  },
+  "instance.add-server.add-server": {
+    "message": "تمبه ڤلاين"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "دڽهداياکن"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "دداياکن"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "ڤروم"
+  },
+  "instance.add-server.title": {
+    "message": "تمبه ڤلاين"
+  },
+  "instance.edit-server.title": {
+    "message": "سونتيڠ ڤلاين"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "سمبوڽيکن دري لامن اوتام"
+  },
+  "instance.edit-world.name": {
+    "message": "نام"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "دنيا ماءينکرف‌ت"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "تتڤ سمولا ايکون"
+  },
+  "instance.edit-world.title": {
+    "message": "سونتيڠ دنيا"
+  },
+  "instance.filter.disabled": {
+    "message": "ڤروجيک يڠ دڽهداياکن"
+  },
+  "instance.filter.updates-available": {
+    "message": "کمس کيني ترسديا"
+  },
+  "instance.server-modal.address": {
+    "message": "علامت"
+  },
+  "instance.server-modal.name": {
+    "message": "نام"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "ڤلاين ماءينکرف‌ت"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "ڤيک سومبر"
+  },
+  "instance.settings.tabs.general": {
+    "message": "عموم"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "ڤادم ڤماسڠن"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "ڤادم ڤماسڠن"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "ممادمکن ڤماسڠن درڤد ڤرنتي اندا سچارا ککل⹁ ترماسوق دنيا⹁ کونفيݢوراسي دان سموا کاندوڠن يڠ دڤاسڠ. برهاتي-هاتي⹁ کران سباءيق سهاج اندا ممادمکن ڤماسڠن اين⹁ تيدق اد چارا اونتوق مموليهکنڽ."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "سدڠ ممادم..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "چيڤتا سالينن"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "تيدق بوليه منچيڤتا سالينن سماس مماسڠ."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "چيڤتا سالينن ڤماسڠن"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "منچيڤتا سالينن ڤماسڠن اين⹁ ترماسوق دنيا⹁ کونفيݢوراسي⹁ مود⹁ دان سباݢايڽ."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "سونتيڠ ايکون"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "اليه کلوار ايکون"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "ݢنتي ايکون"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "ڤيليه ايکون"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "کومڤولن ڤوستاک"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "چيڤتا کومڤولن بهارو"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "کومڤولن ڤوستاک ممبوليهکن اندا مڽوسون ڤماسڠن اندا کدالم بهاݢين يڠ بربيذا دالم ڤوستاک اندا."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "ماسوقکن نام کومڤولن"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "نام"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "چاڠکوق ڤلنچرن"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "چاڠکوق ڤلنچرن ترسواي"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "چاڠکوق ممبنرکن ڤڠݢونا لنجوتن منجالنکن ڤرينته سيستم ترتنتو سبلوم دان سلڤس ملنچرکن ڤرماءينن."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "سلڤس کلوار"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "دجالنکن سلڤس ڤرماءينن دتوتوڤ."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "ماسوقکن ڤرينته يڠ اکن دجالنکن سلڤس ڤرماءينن دتوتوڤ..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "سبلوم ڤلنچرن"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "دجالنکن سبلوم ڤماسڠن دلنچرکن."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "ماسوقکن ڤرينته يڠ اکن دجالنکن سبلوم ڤماسڠن دلنچرکن..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "چاڠکوق ڤلنچرن ڤرماءينن"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "ڤمبالوت"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "ڤرينته ڤمبالوت اونتوق ملنچرکن ماءينکرف‌ت."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "ماسوقکن ڤرينته ڤمبالوت..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "ڤماسڠن"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} اونتوق ماءينکرف‌ت {game_version} سوده ڤون دڤاسڠ"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "{game_version} ۏانيلا سوده ڤون دڤاسڠ"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "توکر ۏرسي"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "ڤاسڠ"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "سدڠ مماسڠ"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "سدڠ مڠمبيل ۏرسي ڤيک مود"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "سدڠ مماسڠ ۏرسي بهارو"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "دڤاسڠ ڤد ماس اين"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "معلومت ڽهڤڤيجت:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "سدڠ مڠمبيل معلومت ڤيک مود"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "ۏرسي ڤرماءينن"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "ڤاسڠ"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "ڤماسڠن سدڠ دجالنکن"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "ۏرسي {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "ماءينکرف‌ت {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "تيدق داڤت مڠمبيل بوتيرن ڤيک مود يڠ ترڤاءوت. سيلا سمق سامبوڠن اينترنيت اندا."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} تيدق ترسديا اونتوق ماءينکرف‌ت {version}. چوبا ڤموات مود يڠ لاءين."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "ڤماسڠن اين دڤاءوتکن کڤد سبواه ڤيک مود⹁ تتاڤي ڤيک مود ترسبوت تيدق داڤت دجومڤاءي ڤد Modrinth."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "ڤلتفوم"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "ڤاسڠ سمولا ڤيک مود"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "سدڠ مماسڠ سمولا ڤيک مود"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "ڤماسڠن سمولا اکن منتڤکن سمولا سموا کاندوڠن يڠ دڤاسڠ اتاو دأوبه سواي کڤد اڤ يڠ دسدياکن اوليه ڤيک مود⹁ مڠاليه کلوار سبارڠ مود اتاو کاندوڠن يڠ تله اندا تمبهکن د اتس ڤماسڠن اصل. اين موڠکين داڤت ممبتولکن تيڠکه لاکو يڠ تيدق دجڠک جک ڤروبهن تله دبوات ڤد ڤماسڠن⹁ تتاڤي جک دنيا اندا کيني برݢنتوڠ ڤد کاندوڠن تمبهن يڠ دڤاسڠ⹁ اي موڠکين اکن مروسقکن دنيا سديا اد."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "اداکه اندا ڤستي ماهو مماسڠ سمولا ڤماسڠن اين؟"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "منتڤکن سمولا کاندوڠن ڤماسڠن کڤد کأداءن اصلڽ⹁ مڠاليه کلوار سبارڠ مود اتاو کاندوڠن يڠ تله اندا تمبهکن داتس ڤيک مود اصل."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "ڤاسڠ سمولا ڤيک مود"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "ڤرباءيقي"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "سدڠ ممڤرباءيقي"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "ڤمباءيقن اين اکن مماسڠ سمولا کبرݢنتوڠن ماءينکرف‌ت دان ممريقسا کروسقن. اين موڠکين داڤت مڽلسايکن ايسو جک ڤرماءينن اندا تيدق دلنچرکن کران رالت برکاءيتن ڤلنچر⹁ تتاڤي تيدق اکن مڽلسايکن ايسو اتاو رانڤ يڠ برکاءيتن دڠن مود يڠ دڤاسڠ."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "ڤرباءيقي ڤماسڠن؟"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "ڤمباءيقن سدڠ دجالنکن"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "تتڤ سمولا کڤد سماس"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "تونجوقکن سموا ۏرسي"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "مڠوبه ۏرسي"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "مماسڠ"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "مماسڠ سمولا"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "ممڤرباءيقي"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "تيدق بوليه {action} سماس مماسڠ"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "تيدق بوليه {action} سماس براد دلوار تالين"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "تيدق بوليه {action} سماس ممڤرباءيقي"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(ۏرسي تيدق دکتاهوءي)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "ڽهڤاءوتکن ڤماسڠن"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "جک اندا منروسکن⹁ اندا تيدق اکن داڤت مماءوتکنڽ سمولا تنڤا ممبوات ڤماسڠن يڠ بهارو سڤنوهڽ. اندا تيدق اکن منريما کمس کيني ڤيک مود لاݢي دان اي اکن منجادي ڤماسڠن بياسا."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "اداکه اندا ڤستي ماهو مڽهڤاءوتکن ڤماسڠن اين؟"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "ڤماسڠن اين دڤاءوتکن کڤد ڤيک مود⹁ يڠ برمقصود مود تيدق بوليه دکمس کيني دان اندا تيدق بوليه منوکر ڤموات مود اتاو ۏرسي ماءينکرف‌ت. مڽهڤاءوت ڤماسڠن اين اکن مموتوسکن سامبوڠن ڤماسڠن اين سچارا ککل درڤد ڤيک مود."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "ڽهڤاءوت درڤد ڤيک مود"
+  },
+  "instance.settings.tabs.java": {
+    "message": "جاۏا دان ايڠتن"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "ڤمبوليهأوبه ڤرسکيترن"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "چاڠکوق"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "ارݢومن جاۏا"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "ڤماسڠن جاۏا"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "ايڠتن يڠ دڤراونتوقکن"
+  },
+  "instance.settings.tabs.window": {
+    "message": "تتيڠکڤ"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "تتڤن تتيڠکڤ ترسواي"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "سکرين ڤنوه"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "ڤرماءينن اکن دمولاکن دالم سکرين ڤنوه کتيک دلنچرکن (مڠݢوناکن options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "تيڠݢي"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "تيڠݢي تتيڠکڤ ڤرماءينن اڤابيلا دلنچرکن."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "ماسوقکن تيڠݢي..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "ليبر"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "ليبر تتيڠکڤ ڤرماءينن اڤابيلا دلنچرکن."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "ماسوقکن ليبر..."
+  },
+  "instance.settings.title": {
+    "message": "تتڤن"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "ڤلاين ماءينکرف‌ت"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "تيدق داڤت مڽامبوڠ کڤلاين"
+  },
+  "instance.worlds.copy_address": {
+    "message": "سالين علامت"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "جاڠن تونجوقکن ڤد لامن اوتام"
+  },
+  "instance.worlds.filter.available": {
+    "message": "ترسديا"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "ڤماسڠن سوده ڤون دبوک"
+  },
+  "instance.worlds.hardcore": {
+    "message": "مود تݢر"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "ڤلاين تيدق سراسي"
+  },
+  "instance.worlds.no_contact": {
+    "message": "ڤلاين تيدق داڤت دهوبوڠي"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "اندا هاڽ بوليه ماسوق تروس کدالم ڤلاين ڤد ماءينکرف‌ت ۏرسي الفا 1.0.5 دان کاتس"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "اندا هاڽ بوليه ماسوق تروس کدالم دنيا ايکاڤماءين ڤد ماءينکرف‌ت ۏرسي 1.20 دان کاتس"
+  },
+  "instance.worlds.play_instance": {
+    "message": "ماءينکن ڤماسڠن"
+  },
+  "instance.worlds.type.server": {
+    "message": "ڤلاين"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "ايکاڤماءين"
+  },
+  "instance.worlds.view_instance": {
+    "message": "ليهت ڤماسڠن"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "دنيا سدڠ دݢوناکن"
+  },
+  "search.filter.locked.instance": {
+    "message": "دسدياکن اوليه ڤماسڠن اين"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "ۏرسي ڤرماءينن اداله دسدياکن اوليه ڤماسڠن اين"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "ڤموات اداله دسدياکن اوليه ڤماسڠن اين"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "سلارسکن دڠن ڤماسڠن"
+  }
+}

@@ -1,0 +1,419 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "開発者モードがオンになっています。"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "表示設定"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "インスタンスの基本設定"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "機能設定"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Javaのインストール設定"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "プライバシー設定"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "リソース管理"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "追加してプレイ"
+  },
+  "instance.add-server.add-server": {
+    "message": "サーバーを追加する"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "無効"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "有効"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "毎回確認"
+  },
+  "instance.add-server.title": {
+    "message": "サーバーの追加"
+  },
+  "instance.edit-server.title": {
+    "message": "サーバーを編集する"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "ホームページから非表示にする"
+  },
+  "instance.edit-world.name": {
+    "message": "名前"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Mincraft ワールド"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "アイコンをリセット"
+  },
+  "instance.edit-world.title": {
+    "message": "ワールドを編集"
+  },
+  "instance.filter.disabled": {
+    "message": "無効なプロジェクト"
+  },
+  "instance.filter.updates-available": {
+    "message": "アップデートが可能"
+  },
+  "instance.server-modal.address": {
+    "message": "アドレス"
+  },
+  "instance.server-modal.name": {
+    "message": "名前"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraftサーバー"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "リソースパック"
+  },
+  "instance.settings.tabs.general": {
+    "message": "一般"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "インスタンスを削除"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "インスタンスを削除"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "デバイスからインスタンスを削除します。これらには、ワールド、設定、他、全てのインストール済みのファイルが含まれます。インスタンスを削除すると復元することはできません。"
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "削除中…"
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "複製"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "インストール中に複製することはできません。"
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "インスタンスを複製"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "ワールド、設定、Mod等を含めたインスタンスのコピーを作成します。"
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "アイコンを編集"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "アイコンを削除"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "アイコンを置き換え"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "アイコンを選択"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "ライブラリグループ"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "新しいグループを作成"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "ライブラリグループを使用することで、インスタンスをライブラリ内で整理することができます。"
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "グループ名を入力"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "名前"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "起動フック"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "カスタム起動フック"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "フックを使用して、ゲームの起動前後にシステムコマンドを実行するようにできます。"
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "終了後"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "ゲームが閉じられた後に実行されます。"
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "終了後のコマンドを入力"
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "起動前"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "ゲームが起動する前に実行されます。"
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "起動前のコマンドを入力"
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "ゲーム起動フック"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "ラッパー"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Minecraftを起動用のラッパーコマンド。"
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "ラッパーのコマンドを入力…"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "インストール"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "Minecraft {game_version} の {platform} {version} はすでにインストールされています"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} はすでにインストールされています"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "バージョンを変更"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "インストール"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "インストール中"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "ModPackのバージョンを取得しています"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "新しいバージョンをインストール中"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "インストール済"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "デバッグ情報："
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "ModPackの情報を取得しています"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "ゲームバージョン"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "インストール"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "インストール中"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} バージョン"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "リンクされたModpackの情報が取得できませんでした。インターネット接続を確認してください。"
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader}はMinecraft {version}で使用できません。別のローダーを選択してください。"
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "このインスタンスはModpackにリンクされていますが、ModrinthではModpackが見つかりません。"
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "プラットフォーム"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Modpackを再インストール"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Modpackを再インストール中"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "再インストールすると、全てのコンテンツがModpackで提供される内容にリセットされ、元のコンテンツに追加されたMod等やコンテンツは全て削除されます。インスタンスに変更を加えていた場合、予期せぬ動作が修正がされる場合がありますが、ワールドが追加でインストールされたコンテンツに依存している場合、既存のワールドで動かなくなる可能性があります。"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "本当にインスタンスを再インストールしますか？"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "インスタンスの状態をもとの状態にリセットし、元のModpackに追加されたModやコンテンツ等を削除します。"
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Modpackを再インストール"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "修復"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "修復中"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "修復を行うと、Minecraftの依存関係が再インストールされ、破損がないかのチェックが行われます。ランチャー関連の問題の場合は、修復によって解決する可能性がありますが、インストール済みのModに関する問題は解決されません。"
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "インスタンスを修復しますか？"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "修復中"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "現在の状態にリセット"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "全てのバージョンを表示"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "バージョンを変更"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "インストール"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "再インストール"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "修復"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "インストール中に{action}することはできません"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "オフラインの時に{action}することはできません"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "修復中に{action}することはできません"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(不明なバージョン)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "インスタンスのリンク解除"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "この操作を行うと、新しいインスタンスを作らなければ再びリンクすることはできなくなります。通常のインスタンスになるので、modpackのバージョンアップは利用できなくなります。"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "本当にインスタンスのリンクを解除しますか？"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "このインスタンスはmodpackにリンクされているので、modやmodローダー、Minecraftのバージョンを変更することはできません。リンクを解除するとこのインスタンスとmodpackは永久に分離されます。"
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "modpackとのリンクを解除する"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Javaとメモリ"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "環境変数"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "フック"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java コマンドライン引数"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Javaのインストール"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "メモリ割り当て量"
+  },
+  "instance.settings.tabs.window": {
+    "message": "ウィンドウ"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "カスタムウィンドウ設定"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "フルスクリーン"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "起動時に全画面で起動するようにします。(options.txtを使用)"
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "高さ"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "起動時のゲームウィンドウの高さ。"
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "高さを入力…"
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "幅"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "起動時のゲームウィンドウの幅。"
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "幅を入力…"
+  },
+  "instance.settings.title": {
+    "message": "設定"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Minecraftサーバー"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "サーバーに接続できません"
+  },
+  "instance.worlds.copy_address": {
+    "message": "アドレスをコピー"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "ホームに表示しない"
+  },
+  "instance.worlds.filter.available": {
+    "message": "利用可能"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "インスタンスは既に開いています"
+  },
+  "instance.worlds.hardcore": {
+    "message": "ハードコアモード"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "サーバーに互換性がありません"
+  },
+  "instance.worlds.no_contact": {
+    "message": "サーバーに接続できませんでした"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "サーバーに直接入ることができるのはMinecraft Alpha 1.0.5以降です"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Minecraft 1.20以降はシングルプレイヤーワールドのみに直接入ることができます"
+  },
+  "instance.worlds.play_instance": {
+    "message": "インスタンスを起動"
+  },
+  "instance.worlds.type.server": {
+    "message": "サーバー"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "シングルプレイ"
+  },
+  "instance.worlds.view_instance": {
+    "message": "インスタンスを表示する"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "ワールドは使用中"
+  },
+  "search.filter.locked.instance": {
+    "message": "インスタンスより提供"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "ゲームバージョンはインスタンスより提供"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "ローダーはインスタンスにより提供"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "インスタンスと同期"
+  }
+}

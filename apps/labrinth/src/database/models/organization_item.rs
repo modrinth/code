@@ -122,7 +122,7 @@ impl DBOrganization {
                 |ids| async move {
                     let org_ids: Vec<i64> = ids
                         .iter()
-                        .flat_map(|x| parse_base62(&x.to_string()).ok())
+                        .filter_map(|x| parse_base62(&x.to_string()).ok())
                         .map(|x| x as i64)
                         .collect();
                     let slugs = ids

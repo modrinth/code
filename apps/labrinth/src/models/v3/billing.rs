@@ -24,6 +24,27 @@ pub enum ProductMetadata {
         swap: u32,
         storage: u32,
     },
+    Medal {
+        cpu: u32,
+        ram: u32,
+        swap: u32,
+        storage: u32,
+        region: String,
+    },
+}
+
+impl ProductMetadata {
+    pub fn is_pyro(&self) -> bool {
+        matches!(self, ProductMetadata::Pyro { .. })
+    }
+
+    pub fn is_medal(&self) -> bool {
+        matches!(self, ProductMetadata::Medal { .. })
+    }
+
+    pub fn is_midas(&self) -> bool {
+        matches!(self, ProductMetadata::Midas)
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -45,9 +66,19 @@ pub enum Price {
     },
 }
 
+impl Price {
+    pub fn get_interval(&self, interval: PriceDuration) -> Option<i32> {
+        match self {
+            Price::OneTime { .. } => None,
+            Price::Recurring { intervals } => intervals.get(&interval).copied(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Debug, Copy, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub enum PriceDuration {
+    FiveDays,
     Monthly,
     Quarterly,
     Yearly,
@@ -56,6 +87,7 @@ pub enum PriceDuration {
 impl PriceDuration {
     pub fn duration(&self) -> chrono::Duration {
         match self {
+            PriceDuration::FiveDays => chrono::Duration::days(5),
             PriceDuration::Monthly => chrono::Duration::days(30),
             PriceDuration::Quarterly => chrono::Duration::days(90),
             PriceDuration::Yearly => chrono::Duration::days(365),
@@ -64,6 +96,7 @@ impl PriceDuration {
 
     pub fn from_string(string: &str) -> PriceDuration {
         match string {
+            "five-days" => PriceDuration::FiveDays,
             "monthly" => PriceDuration::Monthly,
             "quarterly" => PriceDuration::Quarterly,
             "yearly" => PriceDuration::Yearly,
@@ -76,6 +109,7 @@ impl PriceDuration {
             PriceDuration::Monthly => "monthly",
             PriceDuration::Quarterly => "quarterly",
             PriceDuration::Yearly => "yearly",
+            PriceDuration::FiveDays => "five-days",
         }
     }
 
@@ -84,6 +118,7 @@ impl PriceDuration {
             PriceDuration::Monthly,
             PriceDuration::Quarterly,
             PriceDuration::Yearly,
+            PriceDuration::FiveDays,
         ]
         .into_iter()
     }
@@ -146,6 +181,17 @@ impl SubscriptionStatus {
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum SubscriptionMetadata {
     Pyro { id: String, region: Option<String> },
+    Medal { id: String },
+}
+
+impl SubscriptionMetadata {
+    pub fn is_medal(&self) -> bool {
+        matches!(self, SubscriptionMetadata::Medal { .. })
+    }
+
+    pub fn is_pyro(&self) -> bool {
+        matches!(self, SubscriptionMetadata::Pyro { .. })
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -201,12 +247,16 @@ impl ChargeType {
 #[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub enum ChargeStatus {
-    // Open charges are for the next billing interval
+    /// Open charges are for the next billing interval
     Open,
     Processing,
     Succeeded,
     Failed,
     Cancelled,
+    /// Expiring charges are charges that aren't expected to be processed
+    /// but can be promoted to a full charge, like for trials/freebies. When
+    /// due, the underlying subscription is unprovisioned.
+    Expiring,
 }
 
 impl ChargeStatus {
@@ -217,6 +267,7 @@ impl ChargeStatus {
             "failed" => ChargeStatus::Failed,
             "open" => ChargeStatus::Open,
             "cancelled" => ChargeStatus::Cancelled,
+            "expiring" => ChargeStatus::Expiring,
             _ => ChargeStatus::Failed,
         }
     }
@@ -228,6 +279,7 @@ impl ChargeStatus {
             ChargeStatus::Failed => "failed",
             ChargeStatus::Open => "open",
             ChargeStatus::Cancelled => "cancelled",
+            ChargeStatus::Expiring => "expiring",
         }
     }
 }
@@ -235,12 +287,14 @@ impl ChargeStatus {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PaymentPlatform {
     Stripe,
+    None,
 }
 
 impl PaymentPlatform {
     pub fn from_string(string: &str) -> PaymentPlatform {
         match string {
             "stripe" => PaymentPlatform::Stripe,
+            "none" => PaymentPlatform::None,
             _ => PaymentPlatform::Stripe,
         }
     }
@@ -248,6 +302,7 @@ impl PaymentPlatform {
     pub fn as_str(&self) -> &'static str {
         match self {
             PaymentPlatform::Stripe => "stripe",
+            PaymentPlatform::None => "none",
         }
     }
 }

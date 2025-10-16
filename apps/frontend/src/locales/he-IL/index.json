@@ -1,0 +1,650 @@
+{
+  "action.cancel": {
+    "message": "ביטול"
+  },
+  "action.continue": {
+    "message": "המשך"
+  },
+  "admin.billing.error.not-found": {
+    "message": "משתמש לא קיים"
+  },
+  "app-marketing.download.description": {
+    "message": "היישום השולחני שלנו זמין לכל הפלטפורמות. אנא בחר את הגרסה הרצויה."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "הורד את קובץ ה-AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "הורד את גרסת הבטא"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "הורד את קובץ ה-DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "הורד את קובץ ה-RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "ידוע שלגרסאות Linux של Modrinth App יש <issues-link>בעיות</issues-link> במערכות ובתצורות מסוימות. אם Modrinth App אינו יציב במערכת שלך, אנו ממליצים לך לנסות יישומים אחרים כמו <prism-link>Prism Launcher</prism-link> כדי להתקין בקלות תוכן מ-Modrinth."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "אפשרויות הורדה"
+  },
+  "app-marketing.download.terms": {
+    "message": "בהורדת Modrinth App אתה מסכים ל<terms-link>תנאים</terms-link> ול<privacy-link>מדיניות הפרטיות</privacy-link> שלנו."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "חבילות צד שלישי"
+  },
+  "app-marketing.download.title": {
+    "message": "הורד את Modrinth App (בטא)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "שמור תוכן שאתה אוהב וקבל עדכונים בלחיצה אחת."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "עקוב אחר פרויקטים"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "ייבא את כל הפרופילים המועדפים עליך מהמפעיל שבו השתמשת לפני כן, והתחל להשתמש ב-Modrinth App תוך שניות!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "ייבוא פרופילים"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "פעולות"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "מאת {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth הופך את ניהול כל המודים שלך לפשוט ונוח במקום אחד. באפשרותך להתקין, להסיר ולעדכן מודים בלחיצה אחת."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "מודים מותקנים"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "שם"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "חפש מודים"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "ניהול מודים"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "גרסה"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "שחק עם המודים שלך, בין אם אתה מחובר לאינטרנט ובין אם לאו."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "מצב לא מקוון"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "המפעיל של Modrinth הוא קוד פתוח לחלוטין. באפשרותך לצפות בקוד המקור ב<github-link>GitHub</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "קוד פתוח"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "מנטר פעילות"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% מעבד"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App פועל עם ביצועים טובים יותר ממנהלי מודים מובילים רבים, תוך שימוש ב-150 מגה-בייט RAM בלבד!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "דיסקורד"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "ביצועים טובים"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "גוגל כרום"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ מגה-בייט"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ מגה-בייט"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "פחות מ-150 מגה-בייט"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "אפליקציית Modrinth"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 מיליארד %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "שם תהליך"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "זיכרון RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "קטן"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "ביצועי"
+  },
+  "app-marketing.features.play.description": {
+    "message": "השתמש ב-Modrinth App כדי להוריד ולשחק עם המודים וחבילות המודים המועדפים עליך."
+  },
+  "app-marketing.features.play.title": {
+    "message": "שחק עם המודים האהובים עליך"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "בנה, שתף ושחק בחבילות מודים עם כל אחד מאלפי המודים וחבילות המודים שיש כאן ב-Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "מודפק"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "שתף"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "שתף חבילות מודים"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "לא כמו שום מפעיל"
+  },
+  "app-marketing.features.website.description": {
+    "message": "יישומון מודרינף נתמך במלואו עם האתר, כך שניתן לגשת לכל הפרויקטים האהובים עליכם מהיישומון!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "אינטגרציה עם האתר"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "השתמשת בעבר"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "תמונה של יישומון מודרינף עם התקנה של קובלמון שנפתחת בעמוד \"התוכן\"."
+  },
+  "app-marketing.hero.description": {
+    "message": "יישומון מודרינף הוא launcher מיוחד, בקוד פתוח, שמאפשר לכם לשחק עם המודים שאתם אוהבים, ושומר עליהם מעודכנים. הכל בחבילה אחת, קומפקטית ומסודרת."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "יישומון מודרינף - לחץ להורדה"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "הורד את יישומון מודרינף"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "הורד את יישומון מודרינף עבור {os}"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "אימות"
+  },
+  "auth.authorize.action.decline": {
+    "message": "דחה"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> מ<creator-link>{creator}</creator-link> יוכל לעשות:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "לאשר {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "לא מצוי מקום לנתב בתגובה"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "אתם תנתבו ל<redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "שלח דואר שחזור לאימייל"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "כתבו את הדואר אלקטרוני ואנו נשלח דואר שחזור כדי שאתם תוכלו להכנס לחשבונכם."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "דואר אלקטרוני או שם משתמש"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "דואר אלקטרוני"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "דואר אם הוראות היו שלחו לכם אם הדואר אלקטרוני שלכם היה שמור בחשבונכם."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "דואר שלוח"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "אתם יכולים להיכנס לחשבונכם עכשיו אם הסיסמה החדשה."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "סיסמה היתה מאופסת"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "הפס את הסיסמה"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "אשר סיסמה"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "כתבו את הסיסמתכם כלהשיג גישה לחשבונכם."
+  },
+  "auth.reset-password.title": {
+    "message": "הפס סיסמה"
+  },
+  "auth.reset-password.title.long": {
+    "message": "הפס סיסמתכם"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "כתבו את הקוד אימות דו-שלבי שלכם כדי להמשיך."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "כתבו את האימות דו-שלבי"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "כתבו קוד..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>שככו את הסיסמה?</forgot-password-link>\n<create-account-link>ליצור חשבון</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "דואר אלקטרוני או שם משתמש"
+  },
+  "auth.sign-in.password.label": {
+    "message": "סיסמה"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "הכנס אם"
+  },
+  "auth.sign-in.title": {
+    "message": "הכנס"
+  },
+  "auth.sign-in.use-password": {
+    "message": "או להשתמש בסיסמה"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "ליצור חשבון"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "המת סיסמה"
+  },
+  "auth.sign-up.email.label": {
+    "message": "אימייל"
+  },
+  "auth.sign-up.label.username": {
+    "message": "שם משתמש"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "כליצור את החשבון, אתם מסכימים ל<terms-link>תנאים</terms-link> ו<privacy-policy-link>מדיניות פרטיות</privacy-policy-link> של Modrinth."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "סיסמאות לא תואמות!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "סיסמה"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "כבר יש לכם חשבון?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "להרשם לעדכונים על Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "הרשם"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "או עצרו חשבון בעצמכם"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "הרשם אם"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "הגדרות חשבון"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "הכנס"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "דואר אלקטרוני שלכם הוא כבר מאומת!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "דואר אלקטרוני הוא כבר מאומת"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "שלח דואר שחזור עוד פעם"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "אנכנו לא נוכלנו לאמת דוארכם. נסו לשלוח את הדואר שחזור עוד פעם מהלוח בקרה כלכנס."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "אנכנו לא נוכלנו לאמת דוארכם. נסו לשלוח את הדואר שחזור עוד פעם מהכפתור למתה."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "אמת של הדואר אלקטרוני נכשל"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "דואר אלקטרוני שלכם היה מאומת בהצלחה!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "אימות אימייל"
+  },
+  "auth.verify-email.title": {
+    "message": "אמת אימייל"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "הירשם לעדכונים על Modrinth"
+  },
+  "auth.welcome.long-title": {
+    "message": "ברוכים הבאים ל-Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "ברוכים הבאים"
+  },
+  "collection.button.delete-icon": {
+    "message": "מחק סמל"
+  },
+  "collection.button.edit-icon": {
+    "message": "ערוך סמל"
+  },
+  "collection.button.remove-project": {
+    "message": "מחק פרוייקט"
+  },
+  "collection.button.unfollow-project": {
+    "message": "הסר מעקב מפרוייקט"
+  },
+  "collection.error.not-found": {
+    "message": "אוסף לא נמצא"
+  },
+  "collection.label.collection": {
+    "message": "אוסף"
+  },
+  "collection.label.created-at": {
+    "message": "נוצר {ago}"
+  },
+  "collection.label.no-projects": {
+    "message": "אין לאוסף זה פרוייקטים!"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "אין לך פרוייקטים.\nתרצה <create-link>להוסיף אחד</create-link>?"
+  },
+  "collection.label.owner": {
+    "message": "בעלים"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural,one {<stat>{count}</stat>פרוייקט}other {<stat>{count}</stat>פרוייקטים}}"
+  },
+  "collection.label.updated-at": {
+    "message": "עודכן {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - אוסף"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "צור חדש"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural,one {{count} פרוייקט}other {{count} פרוייקטים}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "חפש את האוספים שלך"
+  },
+  "dashboard.collections.long-title": {
+    "message": "האוספים שלך"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "ייתכן שהקלדת כתובת URL שגויה של האוסף."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "ייתכן שהאוסף פרטי."
+  },
+  "error.generic.404.title": {
+    "message": "עמוד לא קיים"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "בדוק אם Modrinth אינו זמין ב<status-link>דף הסטטוס</status-link> שלנו."
+  },
+  "error.generic.default.subtitle": {
+    "message": "משהו השתבש."
+  },
+  "error.generic.default.title": {
+    "message": "אוי ואבוי!"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "ייתכן שהקלדת כתובת URL שגויה של הארגון."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "ייתכן שבעל הארגון שינה את כתובת ה-URL או מחק אותה."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "ייתכן שצוות הפיקוח והבקרה של Modrinth הסיר את הארגון בשל הפרת <tou-link>תנאי השימוש</tou-link> שלנו."
+  },
+  "error.organization.404.list_title": {
+    "message": "מדוע?"
+  },
+  "error.organization.404.title": {
+    "message": "ארגון לא קיים"
+  },
+  "error.project.404.list_item.1": {
+    "message": "ייתכן שהקלדת כתובת URL שגויה של הפרויקט."
+  },
+  "error.project.404.list_item.2": {
+    "message": "ייתכן שבעל הפרויקט שינה את כתובת ה-URL, הפך את הפרויקט לפרטי או מחק אותו."
+  },
+  "error.project.404.list_item.3": {
+    "message": "ייתכן שצוות הפיקוח והבקרה של Modrinth הסיר את הארגון בשל הפרת <tou-link>תנאי השימוש</tou-link> שלנו."
+  },
+  "error.project.404.list_title": {
+    "message": "מדוע?"
+  },
+  "error.project.404.title": {
+    "message": "פרויקט אינו מצוי"
+  },
+  "error.user.404.list_item.1": {
+    "message": "אולי הקלדת בטעות את השם משתמש של המשתמש."
+  },
+  "error.user.404.list_item.2": {
+    "message": "אולי משתמש זה שונה את השם המשתמש או מחק את החשבון."
+  },
+  "error.user.404.list_item.3": {
+    "message": "אולי חשבון של משתמש זה היה מושעה בגלל <tou-link>תנאי שימוש</tou-link> של Modrinth."
+  },
+  "error.user.404.list_title": {
+    "message": "למה?"
+  },
+  "error.user.404.title": {
+    "message": "משתמש אינו מצוי"
+  },
+  "frog": {
+    "message": "הפכו אותך לצפרדע! 🐸"
+  },
+  "frog.altText": {
+    "message": "ציור פוטוריאליסטי של מבוך צפרדעים"
+  },
+  "frog.froggedPeople": {
+    "message": "{count, plural, one {עוד {count} אדם} other {עוד {count} אנשים}} גם הוצפרדע!"
+  },
+  "frog.sinceOpened": {
+    "message": "עמוד זה היה פתוח {ago}"
+  },
+  "frog.title": {
+    "message": "צפרדע"
+  },
+  "landing.button.discover-mods": {
+    "message": "גלה מודים"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "עבור ללוח הבקרה"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "קבל את חוויית המודים הכי טובה שאפשר עם עדכונים שוטפים מצוות Modrinth"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "בפיתוח מתמיד"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "קבלו דוחות מפורטים על כניסות לדפים, מספר הורדות והכנסות כספיות"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "נתונים וסטטיסטיקות"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "תנו לפרויקט שלכם להתגלות על ידי אלפי משתמשים דרך החיפוש, עמוד הבית שלנו, שרת הדיסקורד, ועוד דרכים נוספות שיגיעו בעתיד!"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "חשיפה"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "שלבו את כלי הבנייה שלכם באמצעות Minotaur, ותיהנו מהעלאות אוטומטיות מיד עם שחרור גרסה חדשה"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "מערכת אקולוגית מגוונת"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "קבלו הכנסות מפרסומות בדפי הפרויקט שלכם ומשכו את הכספים בכל עת"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "ייצור הכנסות"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "הזמינו את חברי הצוות שלכם ונהלו תפקידים והרשאות בקלות"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "ניהול צוות"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "נכשל בניסיון טעינת פרויקטים אקראיים :("
+  },
+  "landing.feature.follow.heading": {
+    "message": "עקבו אחר פרויקטים שאתם אוהבים"
+  },
+  "landing.feature.launcher.description": {
+    "message": "ה-API הפתוח של Modrinth מאפשר למשגרים (Launchers) להוסיף אינטגרציה עמוקה עם הפלטפורמה. אתם יכולים להשתמש ב-Modrinth דרך האפליקציה שלנו, וגם דרך כמה מהמשגרים הפופולריים ביותר כמו ATLauncher, MultiMC ו-Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "שחק עם המפעיל האהוב עליך"
+  },
+  "landing.section.for-players.label": {
+    "message": "בשביל שחקנים"
+  },
+  "layout.action.change-theme": {
+    "message": "לשנות מצב צבע"
+  },
+  "layout.action.create-new": {
+    "message": "צור חדש..."
+  },
+  "layout.action.file-lookup": {
+    "message": "חיפוש קבצים"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "חיפוש על ידי אימייל"
+  },
+  "layout.action.new-collection": {
+    "message": "אוסף חדש"
+  },
+  "layout.action.new-organization": {
+    "message": "ארגון חדש"
+  },
+  "layout.action.new-project": {
+    "message": "פרוייקט חדש"
+  },
+  "layout.action.reports": {
+    "message": "דיווחים"
+  },
+  "layout.avatar.alt": {
+    "message": "אוותר חשבון"
+  },
+  "layout.banner.account-action": {
+    "message": "נדרשת פעולה על החשבון"
+  },
+  "layout.banner.add-email.button": {
+    "message": "בקר הגדרות חשבון"
+  },
+  "layout.footer.about": {
+    "message": "אודות"
+  },
+  "layout.footer.about.careers": {
+    "message": "קריירות"
+  },
+  "layout.footer.about.changelog": {
+    "message": "יומן שינויים"
+  },
+  "layout.footer.about.news": {
+    "message": "חדשות"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "תוכנית תגמולים"
+  },
+  "layout.footer.about.status": {
+    "message": "מצב"
+  },
+  "layout.footer.legal": {
+    "message": "מידע משפטי"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "לא שירות רשמי של Minecraft. לא אושר על ידי או משוייך עם Mojang או Minecraft."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "מדיניות זכויות יוצרים ו-DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "מדיניות הפרטיות"
+  },
+  "layout.footer.legal.rules": {
+    "message": "חוקי תוכן"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "הודעת אבטחה"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "תנאי שימוש"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "מידע על Modrinth"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth הוא <github-link>קוד פתוח</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "מוצרים"
+  },
+  "layout.footer.products.app": {
+    "message": "אפליקציית Modrinth"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "שרתי Modrinth"
+  },
+  "layout.footer.resources": {
+    "message": "משאבים"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "מסמכי API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "מרכז תמיכה"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "דיווח בעיות"
+  },
+  "layout.footer.resources.translate": {
+    "message": "תרגם"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  }
+}

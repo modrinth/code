@@ -1,0 +1,1 @@
+If this is a project-specific License you've written yourself, you must host the full License in a way that makes it publicly available, for instance, in a public source repository on a platform like GitHub.

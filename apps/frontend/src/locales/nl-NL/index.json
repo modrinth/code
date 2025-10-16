@@ -1,0 +1,974 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "Gebruiker niet gevonden"
+  },
+  "app-marketing.download.description": {
+    "message": "Ons bureaublad-app is overal verkrijgbaar, kies de gewenste versie."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Download de AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Download de bètaversie"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Download het DEB-pakket"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Download het RPM-pakket"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "De Linux-versies zijn <issues-link>berucht wegens instabiliteiten</issues-link> op bepaalde systemen en configuraties. Als de Modrinth-app onstabiel functioneert op jou systeem, moedigen wij je aan om alternatieven zoals <prism-link>Prism Launcher</prism-link> te gebruiken, die direct van Modrinth kan downloaden."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Download opties"
+  },
+  "app-marketing.download.terms": {
+    "message": "Door het downloaden van de Modrinth-app gaat uw akkoord met onze <terms-link>algemene voorwaarden</terms-link> en <privacy-link>privacyverklaring</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Derde-partij pakketten"
+  },
+  "app-marketing.download.title": {
+    "message": "Download de Modrinth-app (Bètaversie)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Bewaar je favoriete content en krijg real-time updates met één click."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Volg projecten"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Importeer al je favorieten profielen van je vorige launcher, en begin binnen enkele seconden met de Modrinth-app!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Laat je profielen importeren"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Acties"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "door {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Met Modrinth kun je makkelijk al je mods op één plek beheren. Installeer, verwijder en update je mods in een handomdraai."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Geïnstalleerde mods"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Naam"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Zoek voor mods"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Mod-beheer"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Versie"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Speel met je mods, zonder dat je online hoeft te zijn."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Offline-modus"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "De launcher van Modrinth is volledig Open Source. Je kan de broncode vinden op onze <github-link>GitHub</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Open Source"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Activiteitenweergave"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "De Modrinth-app presteert beter dan veel van de leidende concurrenten, met een geheugengebruik van maar liefst 150mb!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Snelle prestaties"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth-app"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 miljard %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Procesnaam"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "Geheugen"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Klein"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Snelheid gericht"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Download en speel met je favorieten mods en modpacks met de Modrinth-app."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Speel met je favorieten mods"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Verzamel, speel en deel modpacks met de duizenden mods en modpacks verkrijgbaar hier op Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpack"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Deel"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Deel modpacks"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Onvergelijkbaar met de concurrentie "
+  },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App is volledig geïntegreerd met de website, zodat u vanuit de app toegang heeft tot al uw favoriete projecten!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Website integratie "
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "je hebt het al gezien"
+  },
+  "app-marketing.hero.description": {
+    "message": "De Modrinth App is een unieke, openbare launcher waarmee je je favoriete mods kunt spelen en up-to-date houden, allemaal in één handig app."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Download de Modrinth-app"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Download de Modrinth-app "
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Download de Modrinth-app voor {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Schermafbeelding van de Cobblemon instantie's hoofd menu scherm."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Meer download opties"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Toestaan"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Afwijzen"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> door <creator-link>{creator}</creator-link> zal in staat zijn om te:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Machtig {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Geen doorverwijzing locatie gevonden in antwoord"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Je zult worden doorgestuurd naar <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Herstel email verzenden"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Voer hieronder uw e-mailadres in en we sturen een herstel link zodat u uw account kunt herstellen."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "E-mail of gebruikersnaam"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "E-mail"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Als de e-mail eerder op uw account is opgeslagen, is er een email met instructies verzonden."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "E-mail is verzonden"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "U kunt nu inloggen op uw account met uw nieuwe wachtwoord."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Wachtwoord succesvol opnieuw ingesteld"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Wachtwoord opnieuw instellen"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Bevestig wachtwoord"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Vul uw nieuwe wachtwoord hieronder in om toegang te krijgen tot uw account."
+  },
+  "auth.reset-password.title": {
+    "message": "Wachtwoord Opnieuw Instellen"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Uw wachtwoord opnieuw instellen"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Voer een tweestapsverificatie code in om verder te gaan."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Voer twee factor code in"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Voer code in..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Wachtwoord vergeten?</forgot-password-link> • <create-account-link>Maak een account aan</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "E-mail of gebruikersnaam"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Wachtwoord"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Log in met"
+  },
+  "auth.sign-in.title": {
+    "message": "Log in"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Of gebruik een wachtwoord"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Account aanmaken"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Bevestig wachtwoord"
+  },
+  "auth.sign-up.email.label": {
+    "message": "E-mail"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Gebruikersnaam"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Door een account te creëren, ga je akkoord met de <terms-link>Voorwaarden</terms-link> en het </privacy-policy-link>Privacybeleid</privacy-policy-link> van Modrinth."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Wachtwoorden komen niet overeen!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Wachtwoord"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Heb je al een account?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Schrijf je in voor updates van Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "Aanmelden"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Of maak zelf een account"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Meld je aan met"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Account instellingen"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Inloggen"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Je e-mail is al geverifieerd!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "E-mail is al geverifieerd"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Verificatie e-mail opnieuw verzenden"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "We kunnen je e-mail niet verifiëren. Probeer de e-mail opnieuw te verzenden in je dashboard door in te loggen."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "We konden uw emailadres niet verifiëren. Probeer de verificatie e-mail opnieuw te versturen via onderstaande knop."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Email verificatie mislukt"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Je e-mail adres werd bevestigd!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "E-mail verificatie"
+  },
+  "auth.verify-email.title": {
+    "message": "Verifieer e-mail"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Abonneer op updates over Modrinth"
+  },
+  "auth.welcome.description": {
+    "message": "Je bent nu deel van de geweldige community van makers en ontdekkers die mods bouwen, downloaden en up-to-date blijven van geweldige mods."
+  },
+  "auth.welcome.label.tos": {
+    "message": "Door een account te hebben gemaakt, ben je akkoord gegaan met de <terms-link>Voorwaarden</terms-link> en het </privacy-policy-link>Privacybeleid</privacy-policy-link> van Modrinth."
+  },
+  "auth.welcome.long-title": {
+    "message": "Welkom op Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "Welkom"
+  },
+  "collection.button.delete-icon": {
+    "message": "Verwijder icoon"
+  },
+  "collection.button.edit-icon": {
+    "message": "Bewerk icoon"
+  },
+  "collection.button.remove-project": {
+    "message": "Verwijder project"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Ontvolg project"
+  },
+  "collection.delete-modal.description": {
+    "message": "Dit zal de collectie voor altijd verwijderen. Deze actie kan niet ongedaan worden."
+  },
+  "collection.delete-modal.title": {
+    "message": "Weet u zeker dat u deze collectie wilt verwijderen?"
+  },
+  "collection.description": {
+    "message": "{description} - Bekijk de collectie {name} gemaakt door {username} op Modrinth"
+  },
+  "collection.description.following": {
+    "message": "Automatisch gegenereerde collectie van alle projecten die u volgt."
+  },
+  "collection.error.not-found": {
+    "message": "Collectie niet gevonden"
+  },
+  "collection.label.collection": {
+    "message": "Collectie"
+  },
+  "collection.label.created-at": {
+    "message": "{ago} gemaakt"
+  },
+  "collection.label.curated-by": {
+    "message": "Samengesteld door"
+  },
+  "collection.label.no-projects": {
+    "message": "Deze collectie heeft geen projecten!"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "U heeft geen projecten.\nWilt u er een <create-link>toevoegen</create-link>?"
+  },
+  "collection.label.owner": {
+    "message": "Eigenaar"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural,one {<stat>{count}</stat>project}other {<stat>{count}</stat> projecten}}"
+  },
+  "collection.label.updated-at": {
+    "message": "{ago} bijgewerkt"
+  },
+  "collection.title": {
+    "message": "{name} - Collectie"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Maak nieuwe"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural,one {{count} project} other {{count} projecten}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Zoek in je collecties"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Je collecties"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "U heeft mogelijk de URL van de collectie fout ingetypt."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "Deze collectie is mogelijk privé."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "Dit collectie is mogelijk verwijderd door Modrinth's moderationteam wegens schending van onze <tou-link> Servicevoorwaarden </tou-link>."
+  },
+  "error.collection.404.list_title": {
+    "message": "Waarom?"
+  },
+  "error.collection.404.title": {
+    "message": "Collectie niet gevonden"
+  },
+  "error.generic.404.subtitle": {
+    "message": "De pagina die u zoekt, blijkt niet te bestaan."
+  },
+  "error.generic.404.title": {
+    "message": "Pagina niet gevonden"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Controleer of Modrinth een storing heeft op onze <status-link>Status pagina</status-link>."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "Als dit blijft gebeuren zou u waarschijnlijk de Modrinth team moeten inlichten via onze <discord-link>Discord Server</discord-link>."
+  },
+  "error.generic.default.list_title": {
+    "message": "Probeer alstublieft opnieuw in een paar minuten."
+  },
+  "error.generic.default.subtitle": {
+    "message": "Iets ging verkeerd."
+  },
+  "error.generic.default.title": {
+    "message": "Oeps!"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "U heeft misschien de URL van de organisatie verkeerd getypt."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "De eigenaar van de organisatie heeft misschien de URL veranderd of verwijderd."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "De organisatie is misschien verwijderd door Modrinth' moderatie team voor het breken van de <tou-link>Gebruikersvoorwaarden</tou-link>."
+  },
+  "error.organization.404.list_title": {
+    "message": "Waarom?"
+  },
+  "error.organization.404.title": {
+    "message": "Organisatie niet gevonden"
+  },
+  "error.project.404.list_item.1": {
+    "message": "Je hebt misschien de URL van het project verkeerd getypt."
+  },
+  "error.project.404.list_item.2": {
+    "message": "De eigenaar van het project heeft misschien de URL veranderd, het project privé gemaakt of verwijderd."
+  },
+  "error.project.404.list_item.3": {
+    "message": "Het project is mogelijk verwijdert door het moderatie team van Modrinth door het overtreden van onze <tou-link>gebruikersvoorwaarden</tou-link>."
+  },
+  "error.project.404.list_title": {
+    "message": "Waarom?"
+  },
+  "error.project.404.title": {
+    "message": "Project niet gevonden"
+  },
+  "error.user.404.list_item.1": {
+    "message": "Je hebt de gebruikersnaam van de gebruiker mogelijk verkeerd getypt."
+  },
+  "error.user.404.list_item.2": {
+    "message": "De gebruiker heeft mogelijk zijn gebruikersnaam aangepast of zijn account verwijderd."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Het account van de gebruiker is mogelijk opgeheven wegens schendingen van Modrinth's <tou-link>Gebruikers Voorwaarden</tou-link>. "
+  },
+  "error.user.404.list_title": {
+    "message": "Waarom?"
+  },
+  "error.user.404.title": {
+    "message": "Gebruiker niet gevonden"
+  },
+  "frog": {
+    "message": "Je bent gekikkerd! 🐸"
+  },
+  "frog.altText": {
+    "message": "Een fotorealistisch schilderij van een kikker labyrint"
+  },
+  "frog.froggedPeople": {
+    "message": "{count, plural,one {{count} ander persoon was} other {{count} andere personen waren}} ook gekikkerd!"
+  },
+  "frog.sinceOpened": {
+    "message": "Deze pagina is {ago} geopend"
+  },
+  "frog.title": {
+    "message": "Kikker"
+  },
+  "landing.button.discover-mods": {
+    "message": "Ontdek mods"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Naar dashboard "
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Geniet van de beste Minecraft-modding ervaring met regelmatige updates van de Modrinth team."
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "Voortdurende Verbetering "
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Krijg gedetailleerde overzichten over paginaweergaven, aantal downloads en inkomsten"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Cijfers en Statistieken "
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Ontdekken"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Een Diverse Ecosysteem "
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Krijg advertentie geld van jouw project paginas, en neem je winst op elk moment op."
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Maak jouw projecten te gelden"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Team Beheer"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "plugins"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "bronpakketten"
+  },
+  "layout.action.change-theme": {
+    "message": "Thema aanpassen"
+  },
+  "layout.avatar.alt": {
+    "message": "Jouw avatar"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Bekijk account instellingen"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Herverzend verificatie email"
+  },
+  "layout.footer.about": {
+    "message": "Over"
+  },
+  "layout.footer.about.careers": {
+    "message": "Carrières"
+  },
+  "layout.footer.about.news": {
+    "message": "Nieuws"
+  },
+  "layout.footer.about.status": {
+    "message": "Status"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Privacybeleid"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Content regels"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Gebruikersvoorwaarden"
+  },
+  "layout.footer.products": {
+    "message": "Producten"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "API documentatie"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Hulp centrum"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Rapporteer problemen"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Vertaal"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord "
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.nav.home": {
+    "message": "Thuispagina"
+  },
+  "layout.nav.search": {
+    "message": "Zoeken"
+  },
+  "moderation.filter.by": {
+    "message": "Filter bij"
+  },
+  "moderation.moderate": {
+    "message": "Modereer"
+  },
+  "moderation.page.projects": {
+    "message": "Projecten"
+  },
+  "moderation.search.placeholder": {
+    "message": "Zoeken..."
+  },
+  "moderation.sort.by": {
+    "message": "Sorteren op"
+  },
+  "profile.button.info": {
+    "message": "Bekijk gebruikersdetails"
+  },
+  "profile.button.manage-projects": {
+    "message": "Beheer projecten"
+  },
+  "profile.error.not-found": {
+    "message": "Gebruiker niet gevonden"
+  },
+  "profile.label.badges": {
+    "message": "Badges"
+  },
+  "profile.label.details": {
+    "message": "Details"
+  },
+  "profile.label.no-collections": {
+    "message": "Deze gebruiker heeft geen collecties!"
+  },
+  "profile.label.no-projects": {
+    "message": "Deze gebruiker heeft geen projecten!"
+  },
+  "profile.label.organizations": {
+    "message": "Organisaties"
+  },
+  "profile.meta.description": {
+    "message": "Download {username} z'n projecten via Modrinth"
+  },
+  "profile.user-id": {
+    "message": "Gebruiker ID: {id}"
+  },
+  "project-member-header.accept": {
+    "message": "Accepteer"
+  },
+  "project-member-header.decline": {
+    "message": "Afwijzen"
+  },
+  "project-member-header.error": {
+    "message": "Fout"
+  },
+  "project-member-header.success": {
+    "message": "Succes"
+  },
+  "project-type.collection.plural": {
+    "message": "Collecties"
+  },
+  "project-type.collection.singular": {
+    "message": "Collectie"
+  },
+  "project.about.details.published": {
+    "message": "Gepubliceerd op {date}"
+  },
+  "project.about.details.title": {
+    "message": "Details"
+  },
+  "project.description.title": {
+    "message": "Beschrijving"
+  },
+  "project.gallery.title": {
+    "message": "Gallerij"
+  },
+  "project.moderation.title": {
+    "message": "Moderatie"
+  },
+  "project.stats.downloads-label": {
+    "message": "download{count, plural, one {} other {s}}"
+  },
+  "project.stats.followers-label": {
+    "message": "volger{count, plural, one {} other {s}}"
+  },
+  "project.version.all-versions": {
+    "message": "Alle versies"
+  },
+  "project.version.back-to-versions": {
+    "message": "Terug naar versies"
+  },
+  "project.versions.title": {
+    "message": "Versies"
+  },
+  "report.already-reported": {
+    "message": "U heeft al {title} gerapporteerd"
+  },
+  "report.already-reported-description": {
+    "message": "U heeft al een open rapportage voor deze {item}. U kan meer details toevoegen aan uw rapportage als u meer informatie heeft."
+  },
+  "report.back-to-item": {
+    "message": "Terug naar {item}"
+  },
+  "report.body.description": {
+    "message": "Voeg linken en afbeelding als het mogelijk en relevant is. Lege of onvoldoende rapportages zullen gesloten worden en geregeerd worden."
+  },
+  "report.body.title": {
+    "message": "Geef alstublieft aanvoegende context over uw rapportage"
+  },
+  "report.could-not-find": {
+    "message": "Konden niet {item} vinden"
+  },
+  "report.for.violation": {
+    "message": "Het schenden van Modrinth <rules-link> Regels</rules-link> of <terms-link>Termen</terms-link>"
+  },
+  "report.for.violation.description": {
+    "message": "Exemplaren includeren onveilige, spam, offensieve, misleidende en illegale content."
+  },
+  "report.form-not-for": {
+    "message": "Dit formulier is niet voor:"
+  },
+  "report.go-to-report": {
+    "message": "Ga naar rapportage"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Bug rapportage"
+  },
+  "report.not-for.dmca": {
+    "message": "DMCA neerhalingen"
+  },
+  "scopes.sessionRead.description": {
+    "message": "Lees actieve sessies"
+  },
+  "scopes.sessionRead.label": {
+    "message": "Lees sessies"
+  },
+  "scopes.threadRead.description": {
+    "message": "Lees threads"
+  },
+  "scopes.threadRead.label": {
+    "message": "Lees threads"
+  },
+  "scopes.threadWrite.description": {
+    "message": "Schrijf op threads"
+  },
+  "scopes.threadWrite.label": {
+    "message": "Schrijf op threads"
+  },
+  "scopes.userAuthWrite.description": {
+    "message": "Modificeer uw authenticatie data"
+  },
+  "scopes.userAuthWrite.label": {
+    "message": "Schrijf authenticatie data"
+  },
+  "scopes.userDelete.description": {
+    "message": "Verwijder uw account"
+  },
+  "scopes.userDelete.label": {
+    "message": "Verwijder uw account"
+  },
+  "scopes.userRead.description": {
+    "message": "Zie uw publieke profiel informatie"
+  },
+  "scopes.userRead.label": {
+    "message": "Lees gebruokers data"
+  },
+  "scopes.userReadEmail.description": {
+    "message": "Lees uw email"
+  },
+  "scopes.userReadEmail.label": {
+    "message": "Lees gebruiker email"
+  },
+  "scopes.userWrite.description": {
+    "message": "Schrijf bij uw profiel"
+  },
+  "scopes.userWrite.label": {
+    "message": "Schrijf gebruikers data"
+  },
+  "scopes.versionCreate.description": {
+    "message": "Creëer nieuwe versies"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Creëer versies"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Verwijder een versie"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Verwijder versies"
+  },
+  "scopes.versionRead.description": {
+    "message": "Lees alle versies"
+  },
+  "scopes.versionRead.label": {
+    "message": "Lees versies"
+  },
+  "scopes.versionWrite.description": {
+    "message": "Schrijf versies data"
+  },
+  "scopes.versionWrite.label": {
+    "message": "Schrijf versies"
+  },
+  "search.filter.locked.server": {
+    "message": "Gegeven door de server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Spel versie is gegeven door de server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Lader is gegeven door de server"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Synchroniseer met de server"
+  },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Backup creatie in de werken"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "Backup creatie in de werken"
+  },
+  "servers.backups.item.already-preparing": {
+    "message": "Al aan het voorbereiden van backup voor het downloaden"
+  },
+  "servers.backups.item.automated": {
+    "message": "Geautomatiseerd"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Back-up maken..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Maken van back-up mislukt"
+  },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "Voorbereiden van download mislukt"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Terugzetten van back-up mislukt"
+  },
+  "servers.backups.item.prepare-download": {
+    "message": "Download voorbereiden"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "Voorbereiden opnieuw proberen"
+  },
+  "servers.backups.item.preparing-download": {
+    "message": "Download voorbereiden..."
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "Backup in de wachtrij"
+  },
+  "servers.backups.item.rename": {
+    "message": "Hernoem"
+  },
+  "servers.backups.item.restore": {
+    "message": "Herrestoreren"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Herrestoreren van backup"
+  },
+  "servers.backups.item.retry": {
+    "message": "Herproberen"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Heropen"
+  },
+  "servers.notice.actions": {
+    "message": "Acties"
+  },
+  "servers.notice.begins": {
+    "message": "Begint"
+  },
+  "servers.notice.dismissable": {
+    "message": "Negeerbaar"
+  },
+  "servers.notice.expires": {
+    "message": "Overdatum in"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Niveau"
+  },
+  "servers.notice.undismissable": {
+    "message": "Onnegeerbaar"
+  },
+  "servers.plan.large.description": {
+    "message": "Ideaal voor 15-25 spelers, modpacks of zwaar modificeren"
+  },
+  "settings.display.theme.description": {
+    "message": "Selecteer je gewenste kleurschema voor Modrinth op dit apparaat."
+  },
+  "settings.display.theme.title": {
+    "message": "Kleurschema"
+  },
+  "settings.language.categories.auto": {
+    "message": "Automatisch"
+  },
+  "settings.language.categories.search-result": {
+    "message": "Zoekresultaten"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Verloopt"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Naam"
+  },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "Voer de naam in van de PAT..."
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Token bewerken"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "Token intrekken"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Nooit gebruikt"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Profielfoto"
+  },
+  "settings.profile.username.description": {
+    "message": "Een unieke hoofdletterongevoelige naam om je profiel mee te identificeren."
+  },
+  "settings.profile.username.title": {
+    "message": "Gebruikersnaam"
+  },
+  "settings.sessions.current-session": {
+    "message": "Huidige sessie"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Onbekend OS"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Onbekend platform"
+  }
+}

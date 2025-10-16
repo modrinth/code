@@ -4,7 +4,6 @@ use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,
 };
 use std::io::{Cursor, Read};
-use std::path::Component;
 use validator::Validate;
 use zip::ZipArchive;
 
@@ -28,14 +27,11 @@ impl super::Validator for ModpackValidator {
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         let pack: PackFormat = {
-            let mut file =
-                if let Ok(file) = archive.by_name("modrinth.index.json") {
-                    file
-                } else {
-                    return Ok(ValidationResult::Warning(
-                        "Pack manifest is missing.",
-                    ));
-                };
+            let Ok(mut file) = archive.by_name("modrinth.index.json") else {
+                return Ok(ValidationResult::Warning(
+                    "Pack manifest is missing.",
+                ));
+            };
 
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;
@@ -75,24 +71,6 @@ impl super::Validator for ModpackValidator {
                     "All pack files must provide a SHA512 hash!".into(),
                 ));
             }
-
-            let path = std::path::Path::new(&file.path)
-                .components()
-                .next()
-                .ok_or_else(|| {
-                    ValidationError::InvalidInput(
-                        "Invalid pack file path!".into(),
-                    )
-                })?;
-
-            match path {
-                Component::CurDir | Component::Normal(_) => {}
-                _ => {
-                    return Err(ValidationError::InvalidInput(
-                        "Invalid pack file path!".into(),
-                    ));
-                }
-            };
         }
 
         Ok(ValidationResult::PassWithPackDataAndFiles {
@@ -109,7 +87,7 @@ impl super::Validator for ModpackValidator {
                             || x.starts_with("overrides/shaderpacks")
                             || x.starts_with("client-overrides/shaderpacks"))
                 })
-                .flat_map(|x| x.rsplit('/').next().map(|x| x.to_string()))
+                .filter_map(|x| x.rsplit('/').next().map(|x| x.to_string()))
                 .collect::<Vec<String>>(),
         })
     }

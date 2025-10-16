@@ -1,0 +1,155 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Λειτουργία προγραμματιστή ενεργό."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Εμφάνιση"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Προεπιλεγμένες επιλογές στιγμιότυπου"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Σημαίες χαρακτηριστικών"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Εγκαταστάσεις Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Απόρρητο"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Διαχείριση πόρων"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Προσθήκη και παίξε"
+  },
+  "instance.add-server.add-server": {
+    "message": "Προσθήκη διακομιστή"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Ανενεργό"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Ενεργό"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Ειδοποίηση"
+  },
+  "instance.add-server.title": {
+    "message": "Προσθήκη διακομιστή"
+  },
+  "instance.edit-server.title": {
+    "message": "Επεξεργασία διακομιστή"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Απόκρυψη από την Αρχική σελίδα"
+  },
+  "instance.edit-world.name": {
+    "message": "Όνομα"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft Κόσμος"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Επαναφορά εικονιδίου"
+  },
+  "instance.edit-world.title": {
+    "message": "Επεξεργασία κόσμου"
+  },
+  "instance.filter.disabled": {
+    "message": "Ανενεργά έργα"
+  },
+  "instance.filter.updates-available": {
+    "message": "Διαθέσιμη ενημέρωση"
+  },
+  "instance.server-modal.address": {
+    "message": "Διεύθυνση"
+  },
+  "instance.server-modal.name": {
+    "message": "Όνομα"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Διακομιστής"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Πακέτο πόρων"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Γενικά"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Διαγραφή στιγμιότυπου"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Διαγραφή στιγμιότυπου"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Διαγράφει οριστικά ένα στιγμιότυπο από τη συσκευή σας, συμπεριλαμβανομένων των κόσμων, των ρυθμίσεων και όλου του εγκατεστημένου περιεχομένου. Να είστε προσεκτικοί, καθώς μόλις διαγράψετε μια παρουσία, δεν υπάρχει τρόπος να την ανακτήσετε."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Διαγραφή..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Διπλότυπο"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Δεν είναι δυνατή η δημιουργία αντιγράφων κατά την εγκατάσταση."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Διπλότυπο στιγμιότυπο"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Δημιουργεί ένα αντίγραφο αυτού του στιγμιότυπου, συμπεριλαμβάνοντας κόσμους, ρυθμίσεις, mods, κτλ."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Επεξεργασία εικονιδίου"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Αφαίρεση εικονιδίου"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Αντικατάσταση εικονιδίου"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Επιλογή εικονιδίου"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Ομάδες βιβλιοθηκών"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Δημιουργία νέας ομάδας"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Οι ομάδες βιβλιοθήκης σάς επιτρέπουν να οργανώσετε τα στιγμιότυπα σας σε διαφορετικές ενότητες στη βιβλιοθήκη σας."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Εισάγετε το όνομα της ομάδας"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Όνομα"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Άγκιστρα εκκίνησης"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Προσαρμοσμένα άγκιστρα εκκίνησης"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Τα άγκιστρα επιτρέπουν στους προχωρημένους χρήστες να εκτελούν ορισμένες εντολές συστήματος πριν και μετά την εκκίνηση του παιχνιδιού."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Μετά την έξοδο"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Εκτελέστηκε αφού έκλεισε το παιχνίδι."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Εισαγάγετε την εντολή μετά την έξοδο..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Πριν την εκκίνηση"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Εκτελέστηκε πριν από την εκκίνηση του στιγμιότυπου."
+  }
+}

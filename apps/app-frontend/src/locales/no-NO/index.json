@@ -1,0 +1,347 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Utviklermodus aktivert."
+  },
+  "app.settings.downloading": {
+    "message": "Nedlaster v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Utseende"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Standard instansinstillinger"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Funksjonsflagg"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java installasjoner"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Personvern"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} er klar for installering! Last inn på nytt for å oppdatere nå, eller automatisk når du lukker Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} er tilgjengelig nå! Siden du er på en forbruksmålt tilkobling, lastet vi den ikke ned automatisk."
+  },
+  "app.update-toast.download": {
+    "message": "Nedlast ({size})"
+  },
+  "app.update-toast.reload": {
+    "message": "Last inn på nytt"
+  },
+  "app.update-toast.title": {
+    "message": "Oppdatering tilgjengelig"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Klikk her for å se endringsloggen."
+  },
+  "app.update.download-update": {
+    "message": "Last ned oppdatering"
+  },
+  "app.update.reload-to-update": {
+    "message": "Last inn på nytt for å installere oppdateringen"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Legg til og spill"
+  },
+  "instance.add-server.add-server": {
+    "message": "Legg til server"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Deaktivert"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Aktivert"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Spør"
+  },
+  "instance.add-server.title": {
+    "message": "Legg til server"
+  },
+  "instance.edit-server.title": {
+    "message": "Rediger server"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Sjul fra hjemside"
+  },
+  "instance.edit-world.name": {
+    "message": "Navn"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft Verden"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Reset ikon"
+  },
+  "instance.edit-world.title": {
+    "message": "Rediger verden"
+  },
+  "instance.filter.disabled": {
+    "message": "Deaktiverte prosjekt"
+  },
+  "instance.filter.updates-available": {
+    "message": "Oppdateringer tiljengelige"
+  },
+  "instance.server-modal.address": {
+    "message": "Adresse"
+  },
+  "instance.server-modal.name": {
+    "message": "Navn"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Server"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resurspakke"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Generelt"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Slett instans"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Slett instans"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Permanent sletter en instans fra enheten din, inkludert verdener, konfigurasjoner og alt installert innhold. Vær forsiktig, når du sletter en instans er det ingen måte å få den tilbake."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Sletter..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Dupliser"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Kan ikkje dupliseres under installering."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Dupliser instans"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Lager en kopi av instansen, inkludert verdener, konfigurasjoner, mods, osv."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Rediger ikon"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Fjern ikon"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Bytt ut ikon"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Velg ikon"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Bibliotekgrupper"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Lag ny gruppe"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Bibliotekgrupper lar deg organisere instansene dine inn i ulike seksjoner i biblioteket ditt."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Skriv inn gruppenavn"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Navn"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Startkroker"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Egendefinerte startkroker"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Startkroker lar avanserte brukere køre visse systemkommandoer før og etter spillet blir startet."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Etter avslutning"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Kørt etter spillet lukkes."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Før oppstart"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Kørt før instansen startes."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Spillstartkroker"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Installasjon"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} for Minecraft {game_version} er allerede installert"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Endre versjon"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Installer"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Installerer"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Installerer ny versjon"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "For tiden installert"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Feilsøkingsinformasjon:"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Spillversjon"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Installer"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Installasjon pågår"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} versjon"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} er ikke tilgjengelig for Minecraft {version}. Prøv en annen mod laster."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Platform"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Re-installer modpakke"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Re-installerer modpakke"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Reinstallering vil tilbakestille alt installert eller endret innhold til det som tilbys av modpakken, og fjerne alle mods eller innhold du har lagt til i tillegg til den opprinnelige installasjonen. Dette kan løse uventet oppførsel hvis det er gjort endringer i instansen, men hvis verdenene dine nå er avhengige av ekstra installert innhold, kan det ødelegge eksisterende verdener."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Er du sikker på at du vil reinstallere denne instansen?"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Reparer"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Reparerer"
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Reparer instanse?"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Reset til nåværende"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "endre versjon"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "reinstaller"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Kan ikke {action} mens en installasjon pågår"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Kan ikke {action} mens en reparasjon pågår"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Koble fra instanse"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Er du sikker på at du vil koble fra denne instansen?"
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Koble fra modpakke"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java og minne"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Java argumenter"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Java installasjon"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Minne tildelt"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Vindu"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Fullskjerm"
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Høyde"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Høyde av spillvindu når spillet startes."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Angi høyde..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Bredde"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Bredde av spillvindu når spillet startes."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Angi bredde..."
+  },
+  "instance.settings.title": {
+    "message": "Instillinger"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "En Minecraft server"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Kunne ikke koble til serveren"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Kopier addresse"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Tilgjengelig"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Instansen er allerede open"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Hardbarket modus"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Serveren er inkompatibel"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Server kunne ikke kontaktes"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Spill instans"
+  },
+  "instance.worlds.type.server": {
+    "message": "Server"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Enkeltspillermodus"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Vis instans"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Verdenen er i bruk"
+  }
+}

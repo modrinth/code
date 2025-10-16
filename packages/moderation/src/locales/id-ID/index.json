@@ -1,0 +1,216 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "Keterangan yang menjelaskan tujuan dan fungsi proyek secara jelas diperlukan."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "Tambah keterangan"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Menambahkan ikon yang unik, relevan, dan menarik akan membuat proyek Anda mudah dikenali."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Tambah ikon"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Tambahkan tautan relevan yang disasarkan di luar Modrinth, seperti kode sumber, pelacak masalah, atau undangan Discord."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "Tambah tautan eksternal"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Anda memilih {totalAvailableTags} etiket tersedia. Ini bertentangan dengan tujuan etiket, yang bertujuan membantu pengguna mencari proyek yang relevan. Mohon hanya pilih etiket yang relevan dengan proyek Anda."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Pilih etiket yang tepat"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Panjang keterangan Anda adalah {length} karakter yang dapat dibaca. Setidaknya {minChars} karakter disarankan untuk membuat keterangan yang jelas dan informatif."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Kembangkan keterangan"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Sunting keterangan"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Sunting lisensi"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Sunting ringkasan"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Sunting etiket"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Sunting judul"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "Gambar galeri tampilan adalah letak impresi pertama dari proyek Anda."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Tampilkan gambar galeri"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "Kunjungi laman galeri"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "{projectType} Anda menggunakan lisensi yang memerlukan kode sumber agar dapat tersedia. Mohon berikan tautan kode sumber atau berkas sumber untuk setiap versi tambahan, atau pertimbangkan untuk menggunakan lisensi lain."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "Berikan kode sumber"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "Keterangan Anda seharusnya berisi teks biasa atau teks alt gambar yang cukup, agar memastikan aksesibilitas terhadap pengguna pembaca layar atau pengguna dengan koneksi internet yang lambat."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "Pastikan aksesibilitas"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "URL lisensi tidak sah."
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "URL lisensi Anda merujuk ke {domain}, yang tidak sesuai untuk informasi lisensi. URL lisensi seharusnya bertaut langsung pada berkas lisensi Anda, bukan media sosial, platform permainan, dsb."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "URL lisensi Anda tampak cacat. Mohon berikan URL yang sah untuk teks lisensi Anda."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Tambah tautan lisensi yang sah"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "Penggunaan pemendek tautan atau metode lain untuk mengaburkan tujuan tautan pada tautan eksternal atau tautan lisensi Anda tidak diperbolehkan. Mohon hanya menggunakan tautan penuh yang sesuai saja."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "Jangan menggunakan pemendek tautan"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, other {# tajuk}} dalam keterangan Anda{count, plural, other{}} terlalu panjang. Tajuk seharusnya ringkas dan bertindak sebagai judul suatu bagian, bukan kalimat penuh."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "Tajuk hendaklah singkat"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "Proyek tidak diperbolehkan menggunakan permerekan Minecraft atau menyertakan \"Minecraft\" sebagai bagian penting pada nama tersebut."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Hindari pelanggaran merek"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "Beberapa gambar Anda tidak memiliki teks alt yang penting untuk aksesibilitas, terutama untuk pengguna tunanetra."
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "Tambahkan teks alt gambar"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "Undangan Discord tidak dapat digunakan untuk jenis tautan lain. Mohon letakkan tautan Discord pada medan tautan undangan Discord saja."
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Pindahkan tautan undangan Discord"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "Kunjungi utas moderasi"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "Tinjau dan tanggapi semua kekhawatiran dari tim moderasi sebelum menyerahkan ulang."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Tinjau umpan balik moderator"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Anda memilih {count} etiket resolusi ({tags}). Paket sumber seharusnya hanya memiliki satu etiket resolusi yang sepadan dengan resolusi utamanya."
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Pilih resolusi yang benar"
+  },
+  "nags.select-environments.description": {
+    "defaultMessage": "Pilih lingkungan di mana {projectType} Anda berfungsi."
+  },
+  "nags.select-environments.title": {
+    "defaultMessage": "Pilih lingkungan"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "Pilih lisensi yang digunakan untuk distribusi {projectType} Anda."
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "Pilih lisensi"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "Pilih etiket yang sesuai dengan proyek Anda untuk membantu pencarian oleh pengguna yang tepat."
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Pilih etiket"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Kunjungi pengaturan keterangan"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "Kunjungi pengaturan lingkungan"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "Kunjungi pengaturan lisensi"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "Kunjungi pengaturan tautan"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "Kunjungi pengaturan etiket"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "Kunjungi pengaturan umum"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Ringkasan Anda tidak boleh sama dengan nama proyek Anda. Membuat ringkasan yang informatif dan menarik adalah penting."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "Buat ringkasan yang unik"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Ringkasan Anda seharusnya tidak mengandung pemformatan, pemecah baris, karakter khusus, atau tautan, karena ringkasan hanya akan menampilkan teks biasa."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Bersihkan ringkasan"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Panjang ringkasan Anda adalah {length} karakter. Setidaknya {minChars} karakter disarankan untuk membuat ringkasan yang informatif dan menarik."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "Kembangkan ringkasan"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Nama proyek yang ringkas dan mudah diingat akan memudahkan pencarian. Informasi versi dan pemuat akan ditampilkan bersamaan secara otomatis dengan proyek Anda."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "Bersihkan nama"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Anda memilih {tagCount} etiket. Pertimbangkan untuk menguranginya menjadi {maxTagCount} atau kurang untuk memastikan proyek Anda muncul pada hasil pencarian yang relevan."
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "Pilih etiket yang tepat"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "Setidaknya satu gambar galeri diperlukan untuk memamerkan konten dari {type}{resourcepackMessage} Anda."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "Unggah gambar galeri"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "Setidaknya satu versi diperlukan oleh sebuah proyek agar dapat diserahkan untuk peninjauan."
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "Unggah versi"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "Beberapa tautan eksternal Anda mungkin menggunakan domain yang tidak sesuai untuk jenis tautan tersebut."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "Periksa tautan eksternal"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "Kunjungi laman versi"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "Kunjungi pengaturan tautan"
+  }
+}
+

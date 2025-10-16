@@ -2,20 +2,22 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use super::ApiError;
+use crate::auth::checks::is_visible_organization;
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::team_item::DBTeamMember;
 use crate::database::models::{
     DBOrganization, generate_organization_id, team_item,
 };
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::OrganizationId;
 use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
+use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::util::img::delete_old_images;
-use crate::util::routes::read_from_payload;
+use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, web};
@@ -70,7 +72,10 @@ pub async fn organization_projects_get(
     .ok();
 
     let organization_data = DBOrganization::get(&id, &**pool, &redis).await?;
-    if let Some(organization) = organization_data {
+    if let Some(organization) = organization_data
+        && is_visible_organization(&organization, &current_user, &pool, &redis)
+            .await?
+    {
         let project_ids = sqlx::query!(
             "
             SELECT m.id FROM organizations o
@@ -131,6 +136,12 @@ pub async fn organization_create(
     )
     .await?
     .1;
+
+    let limits =
+        UserLimits::get_for_organizations(&current_user, &pool).await?;
+    if limits.current >= limits.max {
+        return Err(CreateError::LimitReached);
+    }
 
     new_organization.validate().map_err(|err| {
         CreateError::ValidationError(validation_errors_to_string(err, None))
@@ -232,7 +243,9 @@ pub async fn organization_get(
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
     let organization_data = DBOrganization::get(&id, &**pool, &redis).await?;
-    if let Some(data) = organization_data {
+    if let Some(data) = organization_data
+        && is_visible_organization(&data, &current_user, &pool, &redis).await?
+    {
         let members_data =
             DBTeamMember::get_from_team_full(data.team_id, &**pool, &redis)
                 .await?;
@@ -256,13 +269,11 @@ pub async fn organization_get(
             .filter(|x| {
                 logged_in
                     || x.accepted
-                    || user_id
-                        .map(|y: crate::database::models::DBUserId| {
-                            y == x.user_id
-                        })
-                        .unwrap_or(false)
+                    || user_id.is_some_and(
+                        |y: crate::database::models::DBUserId| y == x.user_id,
+                    )
             })
-            .flat_map(|data| {
+            .filter_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
                     crate::models::teams::TeamMember::from(
                         data,
@@ -330,6 +341,11 @@ pub async fn organizations_get(
     }
 
     for data in organizations_data {
+        if !is_visible_organization(&data, &current_user, &pool, &redis).await?
+        {
+            continue;
+        }
+
         let members_data = team_groups.remove(&data.team_id).unwrap_or(vec![]);
         let logged_in = current_user
             .as_ref()
@@ -345,13 +361,11 @@ pub async fn organizations_get(
             .filter(|x| {
                 logged_in
                     || x.accepted
-                    || user_id
-                        .map(|y: crate::database::models::DBUserId| {
-                            y == x.user_id
-                        })
-                        .unwrap_or(false)
+                    || user_id.is_some_and(
+                        |y: crate::database::models::DBUserId| y == x.user_id,
+                    )
             })
-            .flat_map(|data| {
+            .filter_map(|data| {
                 users.iter().find(|x| x.id == data.user_id).map(|user| {
                     crate::models::teams::TeamMember::from(
                         data,
@@ -635,7 +649,7 @@ pub async fn organization_delete(
     .try_collect::<Vec<_>>()
     .await?;
 
-    for organization_project_team in organization_project_teams.iter() {
+    for organization_project_team in &organization_project_teams {
         let new_id = crate::database::models::ids::generate_team_member_id(
             &mut transaction,
         )
@@ -671,8 +685,13 @@ pub async fn organization_delete(
     )
     .await?;
 
-    for team_id in organization_project_teams {
-        database::models::DBTeamMember::clear_cache(team_id, &redis).await?;
+    for team_id in &organization_project_teams {
+        database::models::DBTeamMember::clear_cache(*team_id, &redis).await?;
+    }
+
+    if !organization_project_teams.is_empty() {
+        database::models::DBUser::clear_project_cache(&[owner_id], &redis)
+            .await?;
     }
 
     if result.is_some() {
@@ -1092,11 +1111,12 @@ pub async fn organization_icon_edit(
     delete_old_images(
         organization_item.icon_url,
         organization_item.raw_icon_url,
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;
 
-    let bytes = read_from_payload(
+    let bytes = read_limited_from_payload(
         &mut payload,
         262144,
         "Icons must be smaller than 256KiB",
@@ -1106,6 +1126,7 @@ pub async fn organization_icon_edit(
     let organization_id: OrganizationId = organization_item.id.into();
     let upload_result = crate::util::img::upload_image_optimized(
         &format!("data/{organization_id}"),
+        FileHostPublicity::Public,
         bytes.freeze(),
         &ext.ext,
         Some(96),
@@ -1195,6 +1216,7 @@ pub async fn delete_organization_icon(
     delete_old_images(
         organization_item.icon_url,
         organization_item.raw_icon_url,
+        FileHostPublicity::Public,
         &***file_host,
     )
     .await?;

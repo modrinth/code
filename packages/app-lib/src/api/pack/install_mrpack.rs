@@ -18,8 +18,8 @@ use super::install_from::{
     generate_pack_from_version_id,
 };
 use crate::data::ProjectType;
-use std::io::Cursor;
-use std::path::{Component, PathBuf};
+use std::io::{Cursor, ErrorKind};
+use std::path::PathBuf;
 
 /// Install a pack
 /// Wrapper around install_pack_files that generates a pack creation description, and
@@ -149,14 +149,12 @@ pub async fn install_zipped_mrpack_files(
                 let profile_path = profile_path.clone();
                 async move {
                     //TODO: Future update: prompt user for optional files in a modpack
-                    if let Some(env) = project.env {
-                        if env
+                    if let Some(env) = project.env
+                        && env
                             .get(&EnvType::Client)
-                            .map(|x| x == &SideType::Unsupported)
-                            .unwrap_or(false)
-                        {
-                            return Ok(());
-                        }
+                            .is_some_and(|x| x == &SideType::Unsupported)
+                    {
+                        return Ok(());
                     }
 
                     let file = fetch_mirrors(
@@ -171,31 +169,22 @@ pub async fn install_zipped_mrpack_files(
                     )
                     .await?;
 
-                    let project_path = project.path.to_string();
+                    let path = profile::get_full_path(&profile_path)
+                        .await?
+                        .join(project.path.as_str());
 
-                    let path =
-                        std::path::Path::new(&project_path).components().next();
-                    if let Some(Component::CurDir | Component::Normal(_)) = path
-                    {
-                        let path = profile::get_full_path(&profile_path)
-                            .await?
-                            .join(&project_path);
+                    cache_file_hash(
+                        file.clone(),
+                        &profile_path,
+                        project.path.as_str(),
+                        project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
+                        ProjectType::get_from_parent_folder(&path),
+                        &state.pool,
+                    )
+                    .await?;
 
-                        cache_file_hash(
-                            file.clone(),
-                            &profile_path,
-                            &project_path,
-                            project
-                                .hashes
-                                .get(&PackFileHash::Sha1)
-                                .map(|x| &**x),
-                            ProjectType::get_from_parent_folder(&path),
-                            &state.pool,
-                        )
-                        .await?;
+                    write(&path, &file, &state.io_semaphore).await?;
 
-                        write(&path, &file, &state.io_semaphore).await?;
-                    }
                     Ok(())
                 }
             },
@@ -376,12 +365,13 @@ pub async fn remove_all_related_files(
             )
             .await?
         {
-            if let Some(metadata) = &project.metadata {
-                if to_remove.contains(&metadata.project_id) {
-                    let path = profile_full_path.join(file_path);
-                    if path.exists() {
-                        io::remove_file(&path).await?;
-                    }
+            if let Some(metadata) = &project.metadata
+                && to_remove.contains(&metadata.project_id)
+            {
+                match io::remove_file(profile_full_path.join(file_path)).await {
+                    Ok(_) => (),
+                    Err(err) if err.kind() == ErrorKind::NotFound => (),
+                    Err(err) => return Err(err.into()),
                 }
             }
         }
@@ -389,9 +379,12 @@ pub async fn remove_all_related_files(
         // Iterate over all Modrinth project file paths in the json, and remove them
         // (There should be few, but this removes any files the .mrpack intended as Modrinth projects but were unrecognized)
         for file in pack.files {
-            let path: PathBuf = profile_full_path.join(file.path);
-            if path.exists() {
-                io::remove_file(&path).await?;
+            match io::remove_file(profile_full_path.join(file.path.as_str()))
+                .await
+            {
+                Ok(_) => (),
+                Err(err) if err.kind() == ErrorKind::NotFound => (),
+                Err(err) => return Err(err.into()),
             }
         }
 
@@ -414,11 +407,16 @@ pub async fn remove_all_related_files(
                 }
 
                 // Remove this file if a corresponding one exists in the filesystem
-                let existing_file = profile::get_full_path(&profile_path)
-                    .await?
-                    .join(&new_path);
-                if existing_file.exists() {
-                    io::remove_file(&existing_file).await?;
+                match io::remove_file(
+                    profile::get_full_path(&profile_path)
+                        .await?
+                        .join(&new_path),
+                )
+                .await
+                {
+                    Ok(_) => (),
+                    Err(err) if err.kind() == ErrorKind::NotFound => (),
+                    Err(err) => return Err(err.into()),
                 }
             }
         }

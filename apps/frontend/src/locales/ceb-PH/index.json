@@ -1,0 +1,311 @@
+{
+  "app-marketing.download.description": {
+    "message": "Magamit ang among desktop nga aplikasyon sa magkalahi-lahi nga plataporma, pamili sa imong giganahan nga bersiyon."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Karganugi ang AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Karganugi ang beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Karganugi ang DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Karganugi ang RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "<issues-link>Ila nga naay suliranin</issues-link> ang Linux nga bersiyon sa Modrinth App sa pipila nga mga sistema ug paghan-ay. Kung dili lig-on ang Modrinth App sa imong sistema, gidasig ka namo sa pagsulay sa uban nga mga aplikasyon sama sa <prism-link>Prism Launcher</prism-link> aron mapadali ang pagtaod sa sulod nga Modrinth."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Mga kapilian sa pagkarganug"
+  },
+  "app-marketing.download.terms": {
+    "message": "Sa pagkarganug sa Modrinth App, gauyon ka sa among <terms-link>Mga Termino</terms-link> ug <privacy-link>Palisiya sa Pribasiya</privacy-link>."
+  },
+  "app-marketing.download.title": {
+    "message": "Karganugi ang Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Bukas nga tinubdan"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Gamita ang Modrinth App sa pagkarganug ug pagdula sa imong paborito nga mga kausaban ug putos sa kausaban."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Karganugi ang Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Karganugi ang Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Karganugi para sa {os} ang Modrinth App"
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Dugang nga Kapilian sa Pagkarganug"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Mga gusto sa akawnt"
+  },
+  "auth.welcome.description": {
+    "message": "Lakip na ka karon sa niining makapahingangha nga dakbalangay sama sa mga magbubuhat ug manunuhid nga gatukod, gakarganug, ug gasunod sa kapanahonan sa mga makapahibulong nga mga kausaban."
+  },
+  "collection.button.edit-icon": {
+    "message": "Usba ang amoy"
+  },
+  "collection.button.remove-project": {
+    "message": "Tangtangi ang proyekto"
+  },
+  "collection.delete-modal.description": {
+    "message": "Hangtod sa kahangturan nga matangtang kining gitipon. Kini nga aksyon dili mabawi."
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Usa ka entidad sa negosyo ang langyaw nga entidad nga naghan-ay gawas sa Tinipong Bansa (sama sa di-US nga korporasyon, partnership, o LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Langyaw nga entidad"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Usa ka ba nga pribado nga indibidwal o uban sa usa ka langyaw nga entidad?"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Makadawat og detalyado nga pagtaho sa mga paglantaw og panid, ihap sa pagkarganug, ug kinitaan"
+  },
+  "landing.feature.launcher.description": {
+    "message": "Ang bukas nga tinubdan nga API sa Modrinth nagtugot sa mga tiglansad nga makadugang sa lawom nga panagsama sa Modrinth. Mahimo nimong magamit ang Modrinth pinaagi sa <link>among aplikasyon</link> ug sa pipila nga labing inila nga mga tiglansad sama sa ATLauncher, MultiMC, ug Prism Launcher."
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "mga putos sa kabtangan"
+  },
+  "landing.subheading": {
+    "message": "Pagkaplag, pagdula, ug pagbahin og mga Minecraft nga kontento sa among bukas nga tinubdan nga plataporma nga gihimo alang sa dakbalangay."
+  },
+  "layout.action.create-new": {
+    "message": "Pagbuhat og bag-o..."
+  },
+  "layout.action.reports": {
+    "message": "Mga pagtaho"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Mga gusto sa akawnt"
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Napakyas sa pagmugna og kahimtang gikan sa API kining pagkatap sa frontend sa Modrinth. Basin tungod sa pagkabalda o sayop sa paghan-ay. Pagtukod pag-usab kon magamit na ang API. Mga kalagdaan sa sayop: {errors}; Ang kasamtangan nga URL sa API: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Naay sayup sa pagmugna sa kahimtang gikan sa API samtang gapatukod."
+  },
+  "layout.footer.about": {
+    "message": "Mahitungod"
+  },
+  "layout.footer.about.careers": {
+    "message": "Mga Karera"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Talaan sa Kausaban"
+  },
+  "layout.footer.about.news": {
+    "message": "Balita"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Programa sa Pagganti"
+  },
+  "layout.footer.about.status": {
+    "message": "Kahimtang"
+  },
+  "layout.footer.legal": {
+    "message": "Legal"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "DILI OPISYAL NGA SERBISYO SA MINECRAFT. WALA MAAPRUBAHAN UG DILI KAAKIBAT SA MOJANG O MICROSOFT."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Palisiya sa Katungod sa Pagkopya ug DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Palisiya sa Pribasiya"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Mga Lagda sa Content"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Pahibalo sa Kahilwasan"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Mga Kahimtang sa Paggamit"
+  },
+  "layout.footer.open-source": {
+    "message": "<github-link>Bukas nga tinubdan</github-link> ang Modrinth."
+  },
+  "layout.footer.products": {
+    "message": "Mga Produkto"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
+  },
+  "layout.footer.resources": {
+    "message": "Mga Kabtangan"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "Dokumentasyon sa API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Sentro sa Pagtabang"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Pagtaho og mga isyu"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Paghubad"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.meta.description": {
+    "message": "Pagkarganug ug mga pagbag-o, pagsukip, putos sa datos, tigpandong, putos sa kabtangan, ug putos sa pagbag-o sa Modrinth. Pagdiskobre ug pagmantala ug mga proyekto sa Modrinth nga adunay moderno, sayon gamiton nga dunggoanan ug API."
+  },
+  "moderation.page.projects": {
+    "message": "Mga Proyekto"
+  },
+  "moderation.page.reports": {
+    "message": "Mga Pagtaho"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Teknikal ng Pagsusi"
+  },
+  "profile.meta.description": {
+    "message": "Pagkarganug og mga proyekto ni {username} sa Modrinth"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} - Pagkarganug og mga proyekto ni {username} sa Modrinth"
+  },
+  "profile.stats.downloads": {
+    "message": "{count, plural, other {<stat>{count}</stat> ka karganug sa proyekto}}"
+  },
+  "project-type.datapack.plural": {
+    "message": "Mga Putos sa Datos"
+  },
+  "project-type.datapack.singular": {
+    "message": "Putos sa Datos"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Mga Putos sa Kabtangan"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Putos sa Kabtangan"
+  },
+  "project.download.game-version": {
+    "message": "Bersiyon sa dula: {version}"
+  },
+  "project.download.no-app": {
+    "message": "Wala kay Modrinth App?"
+  },
+  "project.download.platform": {
+    "message": "Plataporma: {platform}"
+  },
+  "project.download.search-game-versions": {
+    "message": "Mangita og mga bersiyon sa dula..."
+  },
+  "project.download.select-game-version": {
+    "message": "Pilia tanang bersiyon sa dula"
+  },
+  "project.download.show-all-versions": {
+    "message": "Ipakita ang tanang bersiyon"
+  },
+  "project.download.title": {
+    "message": "Karganugi ang {title}"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "Bag-o ra namo gipalambo ang sistema sa Mga Kalikopan sa Modrinth ug ang mga bag-ong kapilian magamit na karon. Wala kay permiso sa pag-usab sa niining mga gusto, apan palihug pahibaloa ang ubang sakop sa proyekto nga kinahanglan nga mapamatud-an ang metadata sa kalikopan."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Kinahanglang masusi ang metadata sa environment"
+  },
+  "project.environment.migration.message": {
+    "message": "Bag-o ra namo gipalambo ang sistema sa Mga Kalikopan sa Modrinth ug ang mga bag-ong kapilian magamit na karon. Mahimo nga bisitahon ang mga gusto sa imong proyekto ug pamatud-i nga husto ang metadata."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Susihon ang mga gusto sa kalikopan"
+  },
+  "project.environment.migration.title": {
+    "message": "Palihug sa pagsusi sa metadata sa kalikopan"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Wala pay metadata sa kalikopan ang imong proyekto, mahimo nga pilia ang husto sa ubos."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Palihug sa pagpili sa kalikopan sa imong proyekto"
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "Daghang kalikopan ang imong proyekto"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "Bag-o ra namo gipalambo ang sistema sa Mga Kalikopan sa Modrinth ug ang mga bag-ong kapilian magamit na karon. Mahimo nga susiha nga husto ang  gipili sa ubos ug tuploka ang 'Pamatud-i' sa imong paghuman!"
+  },
+  "project.settings.title": {
+    "message": "Mga Gusto"
+  },
+  "project.stats.downloads-label": {
+    "message": "karganug{count, plural, one {} other {}}"
+  },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "Napakyas ang pag-andam sa karganug"
+  },
+  "servers.backups.item.prepare-download": {
+    "message": "Andami ang karganug"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "Sulayi pag-usab ang pag-andam"
+  },
+  "servers.backups.item.preparing-download": {
+    "message": "Gaandam sa karganug..."
+  },
+  "settings.display.flags.description": {
+    "message": "Magpagana o di-magpagana og tino nga mga bahin sa imong himan."
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Panid sa mga Putos sa Datos"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Pamili og imong gigusto nga paghan-ay alang sa matag usa nga panid nga mopakita sa mga listahan sa proyekto sa imong himan."
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Panid sa mga Putos sa Kabtangan"
+  },
+  "settings.display.theme.description": {
+    "message": "Pamili og imong gigusto nga hiligotanong kulay alang sa Modrinth sa kini nga himan."
+  },
+  "settings.sessions.description": {
+    "message": "Ania dini tanan ang mga himan nga karon nakalog-in sa imong akawnt sa Modrinth. Mahimo kang maglog-out sa matag usa.\n\nKung makakita ka og usa nga dili nimo mailhan, paglog-out sa maong himan ug usba dayon ang tinago nga pulong sa imong akawnt sa Modrinth."
+  }
+}

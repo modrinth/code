@@ -56,18 +56,15 @@ impl AsyncRateLimiter {
     }
 
     pub async fn check_rate_limit(&self, key: &str) -> RateLimitDecision {
-        let mut conn = match self.redis_pool.connect().await {
-            Ok(conn) => conn,
-            Err(_) => {
-                // If Redis is unavailable, allow the request but with reduced limit
-                return RateLimitDecision {
-                    allowed: true,
-                    limit: self.params.burst_size,
-                    remaining: 1,
-                    reset_after_ms: 60_000, // 1 minute
-                    retry_after_ms: None,
-                };
-            }
+        let Ok(mut conn) = self.redis_pool.connect().await else {
+            // If Redis is unavailable, allow the request but with reduced limit
+            return RateLimitDecision {
+                allowed: true,
+                limit: self.params.burst_size,
+                remaining: 1,
+                reset_after_ms: 60_000, // 1 minute
+                retry_after_ms: None,
+            };
         };
 
         // Get current time in nanoseconds since UNIX epoch
@@ -136,12 +133,11 @@ pub async fn rate_limit_middleware(
         .expect("Rate limiter not configured properly")
         .clone();
 
-    if let Some(key) = req.headers().get("x-ratelimit-key") {
-        if key.to_str().ok()
+    if let Some(key) = req.headers().get("x-ratelimit-key")
+        && key.to_str().ok()
             == dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok().as_deref()
-        {
-            return Ok(next.call(req).await?.map_into_left_body());
-        }
+    {
+        return Ok(next.call(req).await?.map_into_left_body());
     }
 
     let conn_info = req.connection_info().clone();

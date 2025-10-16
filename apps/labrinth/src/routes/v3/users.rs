@@ -1,20 +1,24 @@
 use std::{collections::HashMap, sync::Arc};
 
 use super::{ApiError, oauth_clients::get_user_clients};
-use crate::util::img::delete_old_images;
 use crate::{
-    auth::{filter_visible_projects, get_user_from_headers},
+    auth::{
+        checks::is_visible_organization, filter_visible_collections,
+        filter_visible_projects, get_user_from_headers,
+    },
     database::{models::DBUser, redis::RedisPool},
-    file_hosting::FileHost,
+    file_hosting::{FileHost, FileHostPublicity},
     models::{
-        collections::{Collection, CollectionStatus},
         notifications::Notification,
         pats::Scopes,
         projects::Project,
         users::{Badges, Role},
     },
     queue::session::AuthQueue,
-    util::{routes::read_from_payload, validate::validation_errors_to_string},
+    util::{
+        img::delete_old_images, routes::read_limited_from_payload,
+        validate::validation_errors_to_string,
+    },
 };
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
@@ -207,7 +211,7 @@ pub async fn user_get(
         .ok();
 
         let response: crate::models::users::User =
-            if auth_user.map(|x| x.role.is_admin()).unwrap_or(false) {
+            if auth_user.is_some_and(|x| x.role.is_admin()) {
                 crate::models::users::User::from_full(data)
             } else {
                 data.into()
@@ -240,28 +244,19 @@ pub async fn collections_list(
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        let user_id: UserId = id.into();
-
-        let can_view_private = user
-            .map(|y| y.role.is_mod() || y.id == user_id)
-            .unwrap_or(false);
-
-        let project_data = DBUser::get_collections(id, &**pool).await?;
+        let collection_data = DBUser::get_collections(id, &**pool).await?;
 
         let response: Vec<_> = crate::database::models::DBCollection::get_many(
-            &project_data,
+            &collection_data,
             &**pool,
             &redis,
         )
-        .await?
-        .into_iter()
-        .filter(|x| {
-            can_view_private || matches!(x.status, CollectionStatus::Listed)
-        })
-        .map(Collection::from)
-        .collect();
+        .await?;
 
-        Ok(HttpResponse::Ok().json(response))
+        let collections =
+            filter_visible_collections(response, &user, true).await?;
+
+        Ok(HttpResponse::Ok().json(collections))
     } else {
         Err(ApiError::NotFound)
     }
@@ -320,6 +315,10 @@ pub async fn orgs_list(
         }
 
         for data in organizations_data {
+            if !is_visible_organization(&data, &user, &pool, &redis).await? {
+                continue;
+            }
+
             let members_data =
                 team_groups.remove(&data.team_id).unwrap_or(vec![]);
             let logged_in = user
@@ -334,7 +333,7 @@ pub async fn orgs_list(
             let team_members: Vec<_> = members_data
                 .into_iter()
                 .filter(|x| logged_in || x.accepted || id == x.user_id)
-                .flat_map(|data| {
+                .filter_map(|data| {
                     users.iter().find(|x| x.id == data.user_id).map(|user| {
                         crate::models::teams::TeamMember::from(
                             data,
@@ -412,8 +411,7 @@ pub async fn user_edit(
 
                 if existing_user_id_option
                     .map(|x| UserId::from(x.id))
-                    .map(|id| id == user.id)
-                    .unwrap_or(true)
+                    .is_none_or(|id| id == user.id)
                 {
                     sqlx::query!(
                         "
@@ -578,11 +576,12 @@ pub async fn user_icon_edit(
         delete_old_images(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
+            FileHostPublicity::Public,
             &***file_host,
         )
         .await?;
 
-        let bytes = read_from_payload(
+        let bytes = read_limited_from_payload(
             &mut payload,
             262144,
             "Icons must be smaller than 256KiB",
@@ -592,6 +591,7 @@ pub async fn user_icon_edit(
         let user_id: UserId = actual_user.id.into();
         let upload_result = crate::util::img::upload_image_optimized(
             &format!("data/{user_id}"),
+            FileHostPublicity::Public,
             bytes.freeze(),
             &ext.ext,
             Some(96),
@@ -650,6 +650,7 @@ pub async fn user_icon_delete(
         delete_old_images(
             actual_user.avatar_url,
             actual_user.raw_avatar_url,
+            FileHostPublicity::Public,
             &***file_host,
         )
         .await?;
@@ -782,7 +783,7 @@ pub async fn user_notifications(
         }
 
         let mut notifications: Vec<Notification> =
-            crate::database::models::notification_item::DBNotification::get_many_user(
+            crate::database::models::notification_item::DBNotification::get_many_user_exposed_on_site(
                 id, &**pool, &redis,
             )
             .await?

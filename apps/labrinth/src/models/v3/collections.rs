@@ -22,7 +22,7 @@ pub struct Collection {
     /// Color of the collection.
     pub color: Option<u32>,
 
-    /// The status of the collectin (eg: whether collection is public or not)
+    /// The status of the collection (eg: whether collection is public or not)
     pub status: CollectionStatus,
 
     /// The date at which the collection was first published.
@@ -92,7 +92,7 @@ impl CollectionStatus {
         }
     }
 
-    // Project pages + info cannot be viewed
+    // Collection pages + info cannot be viewed
     pub fn is_hidden(&self) -> bool {
         match self {
             CollectionStatus::Rejected => true,
@@ -101,6 +101,11 @@ impl CollectionStatus {
             CollectionStatus::Unlisted => false,
             CollectionStatus::Unknown => false,
         }
+    }
+
+    // Collection can be displayed in on user page
+    pub fn is_searchable(&self) -> bool {
+        matches!(self, CollectionStatus::Listed)
     }
 
     pub fn is_approved(&self) -> bool {

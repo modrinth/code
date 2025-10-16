@@ -1,0 +1,849 @@
+{
+  "badge.beta": {
+    "defaultMessage": "测试版"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Beta 版本"
+  },
+  "badge.new": {
+    "defaultMessage": "新"
+  },
+  "button.analytics": {
+    "defaultMessage": "数据"
+  },
+  "button.back": {
+    "defaultMessage": "返回"
+  },
+  "button.cancel": {
+    "defaultMessage": "取消"
+  },
+  "button.close": {
+    "defaultMessage": "关闭"
+  },
+  "button.continue": {
+    "defaultMessage": "继续"
+  },
+  "button.copy-id": {
+    "defaultMessage": "复制ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "复制永久链接"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "创建项目"
+  },
+  "button.download": {
+    "defaultMessage": "下载"
+  },
+  "button.downloading": {
+    "defaultMessage": "下载中"
+  },
+  "button.edit": {
+    "defaultMessage": "编辑"
+  },
+  "button.follow": {
+    "defaultMessage": "关注"
+  },
+  "button.more-options": {
+    "defaultMessage": "更多选项"
+  },
+  "button.next": {
+    "defaultMessage": "下一步"
+  },
+  "button.open-folder": {
+    "defaultMessage": "打开文件夹"
+  },
+  "button.play": {
+    "defaultMessage": "开始游戏"
+  },
+  "button.refresh": {
+    "defaultMessage": "刷新"
+  },
+  "button.remove": {
+    "defaultMessage": "移除"
+  },
+  "button.remove-image": {
+    "defaultMessage": "移除图片"
+  },
+  "button.report": {
+    "defaultMessage": "举报"
+  },
+  "button.reset": {
+    "defaultMessage": "重置"
+  },
+  "button.save": {
+    "defaultMessage": "保存"
+  },
+  "button.save-changes": {
+    "defaultMessage": "保存更改"
+  },
+  "button.saving": {
+    "defaultMessage": "正在保存"
+  },
+  "button.sign-in": {
+    "defaultMessage": "登录"
+  },
+  "button.sign-out": {
+    "defaultMessage": "退出登录"
+  },
+  "button.sign-up": {
+    "defaultMessage": "注册"
+  },
+  "button.stop": {
+    "defaultMessage": "停止"
+  },
+  "button.unfollow": {
+    "defaultMessage": "取消关注"
+  },
+  "button.upload-image": {
+    "defaultMessage": "上传图片"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "刚刚"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "App"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "服务器"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "网站"
+  },
+  "collection.label.private": {
+    "defaultMessage": "私人"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "编辑图标"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "移除图标"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "替换图标"
+  },
+  "icon-select.select": {
+    "defaultMessage": "选择图标"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "搜索……"
+  },
+  "input.view.gallery": {
+    "defaultMessage": "图库视图"
+  },
+  "input.view.grid": {
+    "defaultMessage": "网格视图"
+  },
+  "input.view.list": {
+    "defaultMessage": "行式视图"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "冒险模式"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "创造模式"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "旁观者模式"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "生存模式"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "游戏模式未知"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "更改已保存"
+  },
+  "label.collections": {
+    "defaultMessage": "收藏"
+  },
+  "label.created-ago": {
+    "defaultMessage": "创建于 {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "数据面板"
+  },
+  "label.delete": {
+    "defaultMessage": "删除"
+  },
+  "label.description": {
+    "defaultMessage": "描述"
+  },
+  "label.error": {
+    "defaultMessage": "错误"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "已关注项目"
+  },
+  "label.loading": {
+    "defaultMessage": "加载中……"
+  },
+  "label.moderation": {
+    "defaultMessage": "管理"
+  },
+  "label.notifications": {
+    "defaultMessage": "消息提醒"
+  },
+  "label.or": {
+    "defaultMessage": "或"
+  },
+  "label.password": {
+    "defaultMessage": "密码"
+  },
+  "label.played": {
+    "defaultMessage": "游玩时长：{time}"
+  },
+  "label.public": {
+    "defaultMessage": "公开"
+  },
+  "label.rejected": {
+    "defaultMessage": "已回绝"
+  },
+  "label.saved": {
+    "defaultMessage": "已保存"
+  },
+  "label.scopes": {
+    "defaultMessage": "作用域"
+  },
+  "label.server": {
+    "defaultMessage": "服务端"
+  },
+  "label.servers": {
+    "defaultMessage": "服务器"
+  },
+  "label.settings": {
+    "defaultMessage": "设置"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "单人游戏"
+  },
+  "label.title": {
+    "defaultMessage": "标题"
+  },
+  "label.unlisted": {
+    "defaultMessage": "未列出"
+  },
+  "label.visibility": {
+    "defaultMessage": "可见性"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "查看你的个人资料"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "添加支付方式"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "正在添加支付方式"
+  },
+  "notification.error.title": {
+    "defaultMessage": "发生错误"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "已接受"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "已通过"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "已归档"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "已关闭"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "作者"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "草案"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "失败"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "公开"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "管理者"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth团队"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "待确认"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "私有"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "已处理"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "已回绝"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "已退回"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "定时"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "正在审核"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "未列出"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "暂扣"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "将代码复制到剪贴板"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "客户端"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "客户端和服务端"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "客户端或服务端"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "服务端"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "不支持"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} 尾号 {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "美国运通"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "万事达卡"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "银联"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "未知付款方式"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "全部"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {数据包}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "数据包"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {数据包}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {模组}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "模组"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {模组}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {整合包}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "整合包"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {整合包}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {插件}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "插件"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {插件}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {资源包}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "资源包"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {资源包}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {光影包}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "光影包"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {光影包}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "支持的环境"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "客户端和服务端"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "客户端"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "仅限专用服务端"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "服务端"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "单人游戏"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "仅限单人游戏"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft：Java版"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "平台"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "兼容性"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "项目所有者"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "作者"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "{date}创建"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "许可证：{license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "{date}发布"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "{date}提交"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "详情"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "{date}更新"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "加入 Discord 服务器"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "通过 Buy Me a Coffee 赞助"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "赞助"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "GitHub Sponsors 捐款"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Ko-fi 捐款"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Patreon 捐款"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "PayPal 捐款"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "报告问题"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "查看源代码"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "相关链接"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "前往 Wiki"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "数据"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "描述"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "在客户端和服务器端均具备部分功能。"
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "两者可选，安装在哪边效果都相同"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "两者可选，两侧安装效果最佳"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "客户端可选"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "服务端可选"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "两者皆需"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "客户端和服务端"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "所有功能都在客户端完成，且与原版服务端兼容。"
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "仅限客户端"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "仅限专用服务端"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "所有功能都在服务端完成，且与原版客户端兼容。"
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "单人游戏也可工作"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "仅限服务端"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "仅限单人游戏或未连接到多人游戏服务器时使用。"
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "仅限单人游戏"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}：{description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "{option} 的子选项"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "运行环境"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "图库"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "通用"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "许可证"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "相关链接"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "成员"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "你没有权限编辑这个。"
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "没有权限"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "标签"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "上传"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "版本"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "视图"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "已归档"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "草案"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "私有"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "公开"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "已回绝"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "定时"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "正在审核"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "未知"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "未列出"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "由管理员下架"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "筛选已锁定"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "解锁这个筛选项可能导致安装不兼容的内容。"
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "同步筛选"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} 已锁定"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "解锁筛选"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "运行环境"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "客户端"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "服务端"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "游戏版本"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "列出所有版本"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "许可协议"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "开源"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "加载器"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "加载器"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "加载器"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "平台"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "项目ID"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "加载器"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "隐藏"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "可隐藏"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "注意"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "信息"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "关键重要信息"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "信息"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "调研"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "警告"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "不可隐藏"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "你现在还不会被收费。"
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "请选择付款方式"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "付款方式"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "按{interval}付款"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "按照你特定需要的配置选择一个定制方案。"
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "开始"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "适合 15–25 名玩家使用，加模组包或重量级地加模组。"
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "适合 6–15 名玩家使用，加多个模组。"
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "热门方案"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "选择一个方案"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "选择方案"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "适合 1–5 位朋友使用，加少量轻量模组。"
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "选择适合你需求的运行内存大小和配置。"
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "方案"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "地区"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "再次确认"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "中欧"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "你需要服务器有多少运行内存？"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "北美"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "你希望服务器位于何处？"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "没有想要的地区？<link>请告知我们你希望 Modrinth 之后在哪开设服务器！</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "东南亚"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "西欧"
+  },
+  "settings.account.title": {
+    "defaultMessage": "账户与安全性"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "外观"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "你的应用程序"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "已授权的应用"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "财务及订阅"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "深色"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "对于当前设备，设定你偏好的颜色主题。"
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "浅色"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "首选深色主题"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "首选浅色主题"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "复古"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "跟随系统"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "色彩主题"
+  },
+  "settings.language.title": {
+    "defaultMessage": "语言"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "个人访问令牌"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "公开信息"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "会话"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long}{time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "你有未保存的修改。"
+  }
+}
+

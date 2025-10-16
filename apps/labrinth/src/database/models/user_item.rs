@@ -51,6 +51,8 @@ pub struct DBUser {
     pub badges: Badges,
 
     pub allow_friend_requests: bool,
+
+    pub is_subscribed_to_newsletter: bool,
 }
 
 impl DBUser {
@@ -65,13 +67,13 @@ impl DBUser {
                 avatar_url, raw_avatar_url, bio, created,
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                 email_verified, password, paypal_id, paypal_country, paypal_email,
-                venmo_handle, stripe_customer_id, allow_friend_requests
+                venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9, $10, $11, $12, $13,
-                $14, $15, $16, $17, $18, $19, $20, $21
+                $14, $15, $16, $17, $18, $19, $20, $21, $22
             )
             ",
             self.id as DBUserId,
@@ -95,6 +97,7 @@ impl DBUser {
             self.venmo_handle,
             self.stripe_customer_id,
             self.allow_friend_requests,
+            self.is_subscribed_to_newsletter,
         )
         .execute(&mut **transaction)
         .await?;
@@ -165,7 +168,7 @@ impl DBUser {
             |ids| async move {
                 let user_ids: Vec<i64> = ids
                     .iter()
-                    .flat_map(|x| parse_base62(&x.to_string()).ok())
+                    .filter_map(|x| parse_base62(&x.to_string()).ok())
                     .map(|x| x as i64)
                     .collect();
                 let slugs = ids
@@ -180,7 +183,7 @@ impl DBUser {
                         created, role, badges,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                         email_verified, password, totp_secret, webauthn_passkey, paypal_id, paypal_country, paypal_email,
-                        venmo_handle, stripe_customer_id, allow_friend_requests
+                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter
                     FROM users
                     WHERE id = ANY($1) OR LOWER(username) = ANY($2)
                     ",
@@ -218,6 +221,7 @@ impl DBUser {
                                 .transpose()
                                 .unwrap_or_default(),
                             allow_friend_requests: u.allow_friend_requests,
+                            is_subscribed_to_newsletter: u.is_subscribed_to_newsletter,
                         };
 
                         acc.insert(u.id, (Some(u.username), user));
@@ -235,7 +239,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Option<DBUserId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let user = sqlx::query!(
             "
@@ -256,7 +260,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBUserId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let users = sqlx::query!(
             "
@@ -272,13 +276,32 @@ impl DBUser {
         Ok(users)
     }
 
+    /// Returns `false` if any of the specified user IDs do not exist.
+    pub async fn exists_many<'a, E>(
+        user_ids: &[DBUserId],
+        exec: E,
+    ) -> Result<bool, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let ids = user_ids.iter().map(|x| x.0).collect::<Vec<_>>();
+        let count = sqlx::query_scalar!(
+            r#"SELECT COUNT(*) "count!" FROM users WHERE id = ANY($1)"#,
+            &ids
+        )
+        .fetch_one(exec)
+        .await?;
+
+        Ok(count as usize == user_ids.len())
+    }
+
     pub async fn get_projects<'a, E>(
         user_id: DBUserId,
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<DBProjectId>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -326,7 +349,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBOrganizationId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -351,7 +374,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBCollectionId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -375,7 +398,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBProjectId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -399,7 +422,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<DBReportId>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -423,7 +446,7 @@ impl DBUser {
         exec: E,
     ) -> Result<Vec<String>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -517,6 +540,18 @@ impl DBUser {
             .execute(&mut **transaction)
             .await?;
 
+            sqlx::query!(
+                "
+                UPDATE shared_instances
+                SET owner_id = $1
+                WHERE owner_id = $2
+                ",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
             use futures::TryStreamExt;
             let notifications: Vec<i64> = sqlx::query!(
                 "
@@ -532,20 +567,30 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM notifications
-                WHERE user_id = $1
+                DELETE FROM notifications_actions
+                 WHERE notification_id = ANY($1)
                 ",
-                id as DBUserId,
+                &notifications
             )
             .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
                 "
-                DELETE FROM notifications_actions
-                 WHERE notification_id = ANY($1)
+                DELETE FROM notifications_deliveries
+                WHERE notification_id = ANY($1)
                 ",
                 &notifications
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM notifications
+                WHERE user_id = $1
+                ",
+                id as DBUserId,
             )
             .execute(&mut **transaction)
             .await?;
@@ -589,8 +634,20 @@ impl DBUser {
             sqlx::query!(
                 "
                 DELETE FROM reports
-                WHERE user_id = $1 OR reporter = $1
+                WHERE reporter = $1
                 ",
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                UPDATE reports
+                SET user_id = $1
+                WHERE user_id = $2
+                ",
+                deleted_user as DBUserId,
                 id as DBUserId,
             )
             .execute(&mut **transaction)
@@ -628,9 +685,11 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM payouts
-                WHERE user_id = $1
+                UPDATE payouts
+                SET user_id = $1
+                WHERE user_id = $2
                 ",
+                deleted_user as DBUserId,
                 id as DBUserId,
             )
             .execute(&mut **transaction)
@@ -653,6 +712,18 @@ impl DBUser {
                 DELETE FROM threads_members
                 WHERE user_id = $1
                 ",
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                UPDATE uploaded_images
+                SET owner_id = $1
+                WHERE owner_id = $2
+                ",
+                deleted_user as DBUserId,
                 id as DBUserId,
             )
             .execute(&mut **transaction)

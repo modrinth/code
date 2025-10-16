@@ -1,0 +1,89 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "L'usuari no s'ha trobat"
+  },
+  "app-marketing.download.description": {
+    "message": "El programari és disponible en diverses plataformes, selecciona la teva versió."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Descarrega l'AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Descarrega la beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Descarrega l'arxiu DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Descarrega l'arxiu RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Opcions de descàrrega"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> per <creator-link>{creator}</creator-link> podrà:"
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Correu electrònic o nom d’usuari"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Correu electrònic"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Correu electrònic enviat"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Contrasenya"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Correu electrònic"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Nom d'usuari"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Contrasenya"
+  },
+  "auth.welcome.title": {
+    "message": "Us donem la benvinguda"
+  },
+  "error.collection.404.list_title": {
+    "message": "Per què?"
+  },
+  "error.generic.404.title": {
+    "message": "Pàgina no trobada"
+  },
+  "error.organization.404.list_title": {
+    "message": "Per què?"
+  },
+  "error.project.404.list_title": {
+    "message": "Per què?"
+  },
+  "error.project.404.title": {
+    "message": "Projecte no trobat"
+  },
+  "error.user.404.list_title": {
+    "message": "Per què?"
+  },
+  "error.user.404.title": {
+    "message": "Usuari no trobat"
+  },
+  "frog": {
+    "message": "Has estat granotejat! 🐸"
+  },
+  "frog.title": {
+    "message": "Granota"
+  },
+  "layout.action.change-theme": {
+    "message": "Canviar tema"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Afegir mètode de pagament"
+  }
+}

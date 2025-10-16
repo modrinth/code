@@ -1,7 +1,7 @@
 use crate::database;
 use crate::database::models::image_item;
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::images::ImageContext;
 use crate::routes::ApiError;
 use color_thief::ColorFormat;
@@ -38,11 +38,14 @@ pub struct UploadImageResult {
     pub raw_url: String,
     pub raw_url_path: String,
 
+    pub publicity: FileHostPublicity,
+
     pub color: Option<u32>,
 }
 
 pub async fn upload_image_optimized(
     upload_folder: &str,
+    publicity: FileHostPublicity,
     bytes: bytes::Bytes,
     file_extension: &str,
     target_width: Option<u32>,
@@ -80,6 +83,7 @@ pub async fn upload_image_optimized(
                         target_width.unwrap_or(0),
                         processed_image_ext
                     ),
+                    publicity,
                     processed_image,
                 )
                 .await?,
@@ -92,22 +96,25 @@ pub async fn upload_image_optimized(
         .upload_file(
             content_type,
             &format!("{upload_folder}/{hash}.{file_extension}"),
+            publicity,
             bytes,
         )
         .await?;
 
     let url = format!("{}/{}", cdn_url, upload_data.file_name);
     Ok(UploadImageResult {
-        url: processed_upload_data
-            .clone()
-            .map(|x| format!("{}/{}", cdn_url, x.file_name))
-            .unwrap_or_else(|| url.clone()),
+        url: processed_upload_data.clone().map_or_else(
+            || url.clone(),
+            |x| format!("{}/{}", cdn_url, x.file_name),
+        ),
         url_path: processed_upload_data
-            .map(|x| x.file_name)
-            .unwrap_or_else(|| upload_data.file_name.clone()),
+            .map_or_else(|| upload_data.file_name.clone(), |x| x.file_name),
 
         raw_url: url,
         raw_url_path: upload_data.file_name,
+
+        publicity,
+
         color,
     })
 }
@@ -119,7 +126,7 @@ fn process_image(
     min_aspect_ratio: Option<f32>,
 ) -> Result<(bytes::Bytes, String), ImageError> {
     if content_type.to_lowercase() == "image/gif" {
-        return Ok((image_bytes.clone(), "gif".to_string()));
+        return Ok((image_bytes, "gif".to_string()));
     }
 
     let mut img = image::load_from_memory(&image_bytes)?;
@@ -131,12 +138,11 @@ fn process_image(
     let (orig_width, orig_height) = img.dimensions();
     let aspect_ratio = orig_width as f32 / orig_height as f32;
 
-    if let Some(target_width) = target_width {
-        if img.width() > target_width {
-            let new_height =
-                (target_width as f32 / aspect_ratio).round() as u32;
-            img = img.resize(target_width, new_height, FilterType::Lanczos3);
-        }
+    if let Some(target_width) = target_width
+        && img.width() > target_width
+    {
+        let new_height = (target_width as f32 / aspect_ratio).round() as u32;
+        img = img.resize(target_width, new_height, FilterType::Lanczos3);
     }
 
     if let Some(min_aspect_ratio) = min_aspect_ratio {
@@ -166,6 +172,7 @@ fn convert_to_webp(img: &DynamicImage) -> Result<Vec<u8>, ImageError> {
 pub async fn delete_old_images(
     image_url: Option<String>,
     raw_image_url: Option<String>,
+    publicity: FileHostPublicity,
     file_host: &dyn FileHost,
 ) -> Result<(), ApiError> {
     let cdn_url = dotenvy::var("CDN_URL")?;
@@ -174,7 +181,7 @@ pub async fn delete_old_images(
         let name = image_url.split(&cdn_url_start).nth(1);
 
         if let Some(icon_path) = name {
-            file_host.delete_file_version("", icon_path).await?;
+            file_host.delete_file(icon_path, publicity).await?;
         }
     }
 
@@ -182,7 +189,7 @@ pub async fn delete_old_images(
         let name = raw_image_url.split(&cdn_url_start).nth(1);
 
         if let Some(icon_path) = name {
-            file_host.delete_file_version("", icon_path).await?;
+            file_host.delete_file(icon_path, publicity).await?;
         }
     }
 
@@ -191,7 +198,7 @@ pub async fn delete_old_images(
 
 // check changes to associated images
 // if they no longer exist in the String list, delete them
-// Eg: if description is modified and no longer contains a link to an iamge
+// Eg: if description is modified and no longer contains a link to an image
 pub async fn delete_unused_images(
     context: ImageContext,
     reference_strings: Vec<&str>,

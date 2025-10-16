@@ -1,0 +1,189 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Beeta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Beeta-versioon"
+  },
+  "badge.new": {
+    "defaultMessage": "Uus"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analüütika"
+  },
+  "button.back": {
+    "defaultMessage": "Tagasi"
+  },
+  "button.cancel": {
+    "defaultMessage": "Tühista"
+  },
+  "button.close": {
+    "defaultMessage": "Sule"
+  },
+  "button.continue": {
+    "defaultMessage": "Jätka"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Kopeeri ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Kopeeri püsilink"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Loo projekt"
+  },
+  "button.download": {
+    "defaultMessage": "Laadi alla"
+  },
+  "button.downloading": {
+    "defaultMessage": "Allalaadimine"
+  },
+  "button.edit": {
+    "defaultMessage": "Muuda"
+  },
+  "button.follow": {
+    "defaultMessage": "Jälgi"
+  },
+  "button.more-options": {
+    "defaultMessage": "Rohkem valikuid"
+  },
+  "button.next": {
+    "defaultMessage": "Järgmine"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Ava kaust"
+  },
+  "button.play": {
+    "defaultMessage": "Mängi"
+  },
+  "button.refresh": {
+    "defaultMessage": "Värskenda"
+  },
+  "button.remove": {
+    "defaultMessage": "Eemalda"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Eemalda pilt"
+  },
+  "button.report": {
+    "defaultMessage": "Teata"
+  },
+  "button.reset": {
+    "defaultMessage": "Lähtesta"
+  },
+  "button.save": {
+    "defaultMessage": "Salvesta"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Salvesta muudatused"
+  },
+  "button.saving": {
+    "defaultMessage": "Salvestab"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Logi sisse"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Logi välja"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Registreeri"
+  },
+  "button.stop": {
+    "defaultMessage": "Peata"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Tühista jälgimine"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Laadi pilt üles"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Just praegu"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Äpp"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Loodud {ago}"
+  },
+  "label.description": {
+    "defaultMessage": "Kirjeldus"
+  },
+  "label.moderation": {
+    "defaultMessage": "Haldus"
+  },
+  "label.notifications": {
+    "defaultMessage": "Teavitused"
+  },
+  "label.rejected": {
+    "defaultMessage": "Tagasilükatud"
+  },
+  "label.settings": {
+    "defaultMessage": "Sätted"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Mitteavalik"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Heakskiidetud"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Mustand"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderaator"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Tagasilükatud"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Ülevaatamisel"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Mitteavalik"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Klient"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Mittetoetatud"
+  },
+  "project-type.all": {
+    "defaultMessage": "Kõik"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Loodud {date}"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Uuendatud {date}"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Anneta"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Mustand"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Tagasilükatud"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Ülevaatamisel"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Teadmata"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Mitteavalik"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Klient"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "Projekti ID"
+  }
+}
+

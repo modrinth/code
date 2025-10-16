@@ -23,8 +23,8 @@ pub async fn finish_login(
 #[tracing::instrument]
 pub async fn get_default_user() -> crate::Result<Option<uuid::Uuid>> {
     let state = State::get().await?;
-    let users = Credentials::get_active(&state.pool).await?;
-    Ok(users.map(|x| x.id))
+    let user = Credentials::get_active(&state.pool).await?;
+    Ok(user.map(|user| user.offline_profile.id))
 }
 
 #[tracing::instrument]
@@ -54,11 +54,11 @@ pub async fn remove_user(uuid: uuid::Uuid) -> crate::Result<()> {
     if let Some((uuid, user)) = users.remove(&uuid) {
         Credentials::remove(uuid, &state.pool).await?;
 
-        if user.active {
-            if let Some((_, mut user)) = users.into_iter().next() {
-                user.active = true;
-                user.upsert(&state.pool).await?;
-            }
+        if user.active
+            && let Some((_, mut user)) = users.into_iter().next()
+        {
+            user.active = true;
+            user.upsert(&state.pool).await?;
         }
     }
 

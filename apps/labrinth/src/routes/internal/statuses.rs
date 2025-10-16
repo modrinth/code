@@ -217,8 +217,7 @@ pub async fn ws_init(
                         if status
                             .profile_name
                             .as_ref()
-                            .map(|x| x.len() > 64)
-                            .unwrap_or(false)
+                            .is_some_and(|x| x.len() > 64)
                         {
                             return;
                         }
@@ -402,14 +401,13 @@ async fn broadcast_to_known_local_friends(
             friend.user_id
         };
 
-        if friend.accepted {
-            if let Some(socket_ids) =
+        if friend.accepted
+            && let Some(socket_ids) =
                 sockets.sockets_by_user_id.get(&friend_id.into())
-            {
-                for socket_id in socket_ids.iter() {
-                    if let Some(socket) = sockets.sockets.get(&socket_id) {
-                        let _ = send_message(socket.value(), &message).await;
-                    }
+        {
+            for socket_id in socket_ids.iter() {
+                if let Some(socket) = sockets.sockets.get(&socket_id) {
+                    let _ = send_message(socket.value(), &message).await;
                 }
             }
         }

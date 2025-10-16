@@ -1,0 +1,131 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Nakabukas ang paraan ng tagapagsulong."
+  },
+  "app.settings.downloading": {
+    "message": "Dinadalamba ang v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Kiyas"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Mga pagpipilian sa batayang pangyayari"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Watawat ng mga tampok"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Mga pagkakabit ng Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Pribasiya"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Pamamahala ng mapagkukunan"
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Tapos nang maidalamba ang Modrinth App v{version}. Muling dalhin upang matakda ang pagbabago ngayon, o mamaya nalang sa pagpinid ng Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Magagamit na ngayon ang Modrinth App v{version}! Hindi namin dinalamba kaagad dahil bilang ang inyong kabalagan."
+  },
+  "app.update-toast.download": {
+    "message": "Idalamba ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Nagdadalamba..."
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Natapos ang pagdalamba"
+  },
+  "app.update.download-update": {
+    "message": "Idalamba ang pagbabago"
+  },
+  "app.update.downloading-update": {
+    "message": "Nagdadalamba ng pagbabago ({percent}%)"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Idagdag at laruin"
+  },
+  "instance.add-server.add-server": {
+    "message": "Idagdag ang tagapagsilbi"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Hindi pinahihintulotan"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Pinahihintulotan"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Magpahintulot"
+  },
+  "instance.add-server.title": {
+    "message": "Magdagdag ng tagapagsilbi"
+  },
+  "instance.edit-server.title": {
+    "message": "Baguhin ang tagapagsilbi"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Huwag ipakita sa panig ng Bahay"
+  },
+  "instance.edit-world.name": {
+    "message": "Pangalan"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft na Daigdig"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Walain ang lambana"
+  },
+  "instance.edit-world.title": {
+    "message": "Baguhin ang daigdig"
+  },
+  "instance.filter.disabled": {
+    "message": "Mga hindi pinapagang panukala"
+  },
+  "instance.filter.updates-available": {
+    "message": "May mga bagong pagbabago"
+  },
+  "instance.server-modal.name": {
+    "message": "Pangalan"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft na Tagapagsilbi"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Balot ng mapagkukunan"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Tanggalin ang pangyayari"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Tanggalin ang pangyayari"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Lagiang matatanggal ang pangyayari sa iyong pakasam, kasali na ang iyong mga daigdig, pagsasaayos, at lahat ng kinabitang nilalaman. Mag-ingat, hindi na mababawi kapag magtanggal ka ng pangyayari."
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Gagawan ng sipi ang pangyayaring ito, kasali na ang mga daigdig, pagsasaaayos, pagbabago, at iba pa."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Baguhin ang lambana"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Tanggalin ang lambana"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Maaaring mababalik sa dati ang lahat ng kinabit o binago na nilalaman sa kung anong ibibigay ng balot ng pambago, tatanggalin ang mga pambago o nilalamang idinagdag mo lalo na ang nangunang balot ng pambago. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa pangyayari, ngunit kung nakabatay na ang iyong daigdig sa karagdagang nilalaman, maaari nitong masira ang mga umiiral na daigdig."
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Ibalik ang mga nilalaman ng pangyayari sa pangunahing kalagayan, tatanggalin ang mga pambago o nilalamang idinagdag mo lalo na ang nangunang balot ng pambago."
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Mga kagustuhan sa pasadyang durungawan"
+  },
+  "instance.settings.title": {
+    "message": "Mga Kagustuhan"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Tingnan ang pangyayari"
+  }
+}

@@ -13,6 +13,7 @@ pub struct Settings {
     pub theme: Theme,
     pub default_page: DefaultPage,
     pub collapsed_navigation: bool,
+    pub hide_nametag_skins_page: bool,
     pub advanced_rendering: bool,
     pub native_decorations: bool,
     pub toggle_sidebar: bool,
@@ -37,6 +38,10 @@ pub struct Settings {
 
     pub developer_mode: bool,
     pub feature_flags: HashMap<FeatureFlag, bool>,
+
+    pub skipped_update: Option<String>,
+    pub pending_update_toast_for_version: Option<String>,
+    pub auto_download_updates: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
@@ -56,13 +61,14 @@ impl Settings {
             "
             SELECT
                 max_concurrent_writes, max_concurrent_downloads,
-                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,
+                theme, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,
                 discord_rpc, developer_mode, telemetry, personalized_ads,
                 onboarded,
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
                 hook_pre_launch, hook_wrapper, hook_post_exit,
-                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar
+                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,
+                skipped_update, pending_update_toast_for_version, auto_download_updates
             FROM settings
             "
         )
@@ -75,6 +81,7 @@ impl Settings {
             theme: Theme::from_string(&res.theme),
             default_page: DefaultPage::from_string(&res.default_page),
             collapsed_navigation: res.collapsed_navigation == 1,
+            hide_nametag_skins_page: res.hide_nametag_skins_page == 1,
             advanced_rendering: res.advanced_rendering == 1,
             native_decorations: res.native_decorations == 1,
             toggle_sidebar: res.toggle_sidebar == 1,
@@ -115,6 +122,10 @@ impl Settings {
                 .as_ref()
                 .and_then(|x| serde_json::from_str(x).ok())
                 .unwrap_or_default(),
+            skipped_update: res.skipped_update,
+            pending_update_toast_for_version: res
+                .pending_update_toast_for_version,
+            auto_download_updates: res.auto_download_updates.map(|x| x == 1),
         })
     }
 
@@ -167,7 +178,12 @@ impl Settings {
                 migrated = $25,
 
                 toggle_sidebar = $26,
-                feature_flags = $27
+                feature_flags = $27,
+                hide_nametag_skins_page = $28,
+
+                skipped_update = $29,
+                pending_update_toast_for_version = $30,
+                auto_download_updates = $31
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -195,7 +211,11 @@ impl Settings {
             self.prev_custom_dir,
             self.migrated,
             self.toggle_sidebar,
-            feature_flags
+            feature_flags,
+            self.hide_nametag_skins_page,
+            self.skipped_update,
+            self.pending_update_toast_for_version,
+            self.auto_download_updates,
         )
         .execute(exec)
         .await?;
@@ -247,9 +267,13 @@ pub struct WindowSize(pub u16, pub u16);
 
 /// Game initialization hooks
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde_with::serde_as]
 pub struct Hooks {
+    #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub pre_launch: Option<String>,
+    #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub wrapper: Option<String>,
+    #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub post_exit: Option<String>,
 }
 

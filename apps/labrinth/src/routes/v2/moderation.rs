@@ -15,10 +15,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[derive(Deserialize)]
 pub struct ResultCount {
     #[serde(default = "default_count")]
-    pub count: i16,
+    pub count: u16,
 }
 
-fn default_count() -> i16 {
+fn default_count() -> u16 {
     100
 }
 
@@ -34,7 +34,10 @@ pub async fn get_projects(
         req,
         pool.clone(),
         redis.clone(),
-        web::Query(internal::moderation::ResultCount { count: count.count }),
+        web::Query(internal::moderation::ProjectsRequestOptions {
+            count: count.count,
+            offset: 0,
+        }),
         session_queue,
     )
     .await

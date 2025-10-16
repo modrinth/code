@@ -1,0 +1,464 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Увімкнено режим розробника."
+  },
+  "app.settings.downloading": {
+    "message": "Завантаження v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Вигляд"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Налаштування усталеного профілю"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Спеціальні функції"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Інсталяції Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Конфіденційність"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Керування ресурсами"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} готова до встановлення. Перезапустіть програму, щоб встановити зараз, чи вона оновиться автоматично після закриття."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Завантаження Modrinth App v{version} завершене. Перезапустіть програму щоб оновити зараз, чи вона оновиться автоматично після закриття."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} вже доступна до завантаження! Оскільки ви на лімітному підключенні, ми не завантажили його автоматично."
+  },
+  "app.update-toast.changelog": {
+    "message": "Список змін"
+  },
+  "app.update-toast.download": {
+    "message": "Завантажити ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Завантаження…"
+  },
+  "app.update-toast.reload": {
+    "message": "Перезапустити"
+  },
+  "app.update-toast.title": {
+    "message": "Оновлення доступне"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Завантаження завершено"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Натисніть тут, щоб побачити список змін."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Версію {version} успішно встановлено!"
+  },
+  "app.update.download-update": {
+    "message": "Завантажити оновлення"
+  },
+  "app.update.downloading-update": {
+    "message": "Завантаження оновлення ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Перезавантажте, щоб установити оновлення"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Додати та грати"
+  },
+  "instance.add-server.add-server": {
+    "message": "Додати сервер"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Вимкнено"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Увімкнено"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Запитувати"
+  },
+  "instance.add-server.title": {
+    "message": "Додати сервер"
+  },
+  "instance.edit-server.title": {
+    "message": "Змінити сервер"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Не показувати на головній сторінці"
+  },
+  "instance.edit-world.name": {
+    "message": "Назва"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Світ Minecraft"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Скинути значок"
+  },
+  "instance.edit-world.title": {
+    "message": "Редагувати світ"
+  },
+  "instance.filter.disabled": {
+    "message": "Вимкнені проєкти"
+  },
+  "instance.filter.updates-available": {
+    "message": "Наявні оновлення"
+  },
+  "instance.server-modal.address": {
+    "message": "Адреса"
+  },
+  "instance.server-modal.name": {
+    "message": "Назва"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Сервер Minecraft"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Пакет ресурсів"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Загальні"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Видалити інсталяцію"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Видалити профіль"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Назавжди видаляє профіль з вашого пристрою, включно з вашими світами, налаштуваннями та всім встановленим контентом.\nБудьте обережні, після видалення, відновити профіль буде неможливо."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Видалення…"
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Клонувати"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Неможливо клонувати під час встановлення."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Клонувати профіль"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Створює копію інсталяції, включно зі світами, налаштуваннями, модами тощо."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Редагувати значок"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Прибрати значок"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Замінити значок"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Обрати значок"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Групи бібліотеки"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Створити нову групу"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Групи бібліотеки дозволяють вам упорядковувати профілі в різні секції у вашій бібліотеці."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Уведіть назву групи"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Назва"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Гуки запуску"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Користувацькі гуки запуску"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Гуки дозволяють досвідченим користувачам використовувати певні системні команди до та після запуску гри."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Після виходу"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Запускається після закриття гри."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Уведіть команду, що виконуватиметься після виходу…"
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Перед запуском"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Запускається перед відкриттям профілю."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Уведіть команду, що виконується перед запуском..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Гуки запуску гри"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Обгортач"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Обгортальна команда для запуску Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Уведіть обгортальну команду…"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Інсталяція"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} для Minecraft {game_version} вже встановлена"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Ванільна {game_version} вже встановлена"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Змінити версію"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Установити"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Установлення"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Отримання версій збірки"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Установлення нової версії"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Наразі встановлено"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Інформація налагодження:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Отримання деталей збірки"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Версія гри"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Встановити"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Відбувається встановлення"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "Версія {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Неможливо отримати деталі пов'язаної збірки. Будь ласка, перевірте ваше з'єднання з інтернетом."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} недоступний для Minecraft {version}. Спробуйте інший завантажувач модів."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Ця інсталяція пов'язана зі збіркою, проте саму збірку не вдалося знайти на Modrinth."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Платформа"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Перевстановити збірку"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Перевстановлення збірки"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Перевстановлення скине увесь доданий або модифікований вміст до наданого збіркою, прибираючи будь-які, додатково встановлені вами модифікації чи вміст.\nЯкщо ви змінювали профіль, це може виправити непередбачувану поведінку, однак, якщо ваші світи залежать від додаткового вмісту, це може зламати ці світи."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Ви впевнені, що хочете перевстановити цей профіль?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Скидає вміст інсталяції до початкового стану, прибираючи будь-які модифікації чи вміст, що було додано поверх оригінальної збірки."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Перевстановити збірку"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Полагодити"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Лагодження"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Відновлення перевстановлює залежності Minecraft та перевіряє їх на наявність пошкоджень. Це може розв'язати проблеми, якщо ваша гра не запускається через помилки завантажувача, але не розв'яже проблеми або збої, пов'язані зі встановленими модифікаціями."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Відновити профіль?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Відновлення в процессі"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Скинути до поточного"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Показати всі версії"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "змінити версію"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "установити"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "перевстановити"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "виправити"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Неможливо {action} під час встановлення"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Неможливо {action} без підключення до інтернету"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Неможливо {action} під час виправлення"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(невідома версія)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Відв'язати профіль"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Якщо ви продовжите, ви не зможете повторно підв'язати його без створення повністю нової інсталяції. Ви більше не будете отримувати оновлення збірки та вона стане звичайною."
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Ви впевнені, що хочете відв'язати цю інсталяцію?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Цей профіль пов'язаний зі збіркою, тобто, не можна оновлювати модифікації та не можна змінювати завантажувач чи версію Minecraft. Відв'язання призведе до остаточного відключення цієї інсталяції від збірки."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Відв'язати від збірки"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java та пам'ять"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Змінні середовища"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Гуки"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Аргументи Java"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Інсталяції Java"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Виділена пам'ять"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Вікно"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Користувацькі налаштування вікна"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Повний екран"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Змусити гру запускатися на повний екран (використовуючи options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Висота"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Висота ігрового вікна під час запуску."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Уведіть висоту…"
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Ширина"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Ширина ігрового вікна під час запуску."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Уведіть ширину…"
+  },
+  "instance.settings.title": {
+    "message": "Налаштування"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Сервер Minecraft"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Неможливо під'єднатися до сервера"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Скопіювати адресу"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Не показувати на Головній"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Доступно"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "Профіль вже запущений"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Режим гардкору"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Несумісний сервер"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Не вдалося зв'язатися з сервером"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Запускатися у сервери напряму можливо лише починаючи з версії Minecraft Alpha 1.0.5"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Запускатися у світи напряму можливо лише починаючи з версії Minecraft 1.20"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Грати у профіль"
+  },
+  "instance.worlds.type.server": {
+    "message": "Сервер"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Гра наодинці"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Переглянути профіль"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Світ зараз використовується"
+  },
+  "search.filter.locked.instance": {
+    "message": "Надано профілем"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Версія гри надана профілем"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "Запускач наданий профілем"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Синхронізувати з профілем"
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Gipaandar ang paagi sa tigpalambo."
+  },
+  "app.settings.downloading": {
+    "message": "Gakarganug sa v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Panagway"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Mga kapilian sa sukaranan nga pananglitan"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Bandera sa mga bahin"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Mga pagtaod sa Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Pribasiya"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Pagdumala sa kabtangan"
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Nahuman ang pagkarganug sa Modrinth App v{version}. Pagkarga kausab aron matuman ang kabag-ohan, o unya nalang sa pagsara sa Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Magamit na karon ang Modrinth App! Wala namo karganugi daan kay inihap man ang imong pum-ot."
+  },
+  "app.update-toast.download": {
+    "message": "Karganugi ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Gakarganug..."
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Nahuman ang pagkarganug"
+  },
+  "app.update.download-update": {
+    "message": "Karganugi ang kausaban"
+  },
+  "app.update.downloading-update": {
+    "message": "Gakarganug sa kausaban ({percent}%)"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Idugang ug dulaa"
+  },
+  "instance.add-server.add-server": {
+    "message": "Idugang ang tigtagad"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Dili motugot"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Gitugotan"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Magpatugot"
+  },
+  "instance.add-server.title": {
+    "message": "Pagdugang og tigtagad"
+  },
+  "instance.edit-server.title": {
+    "message": "Usba ang tigtagad"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Ayaw ipakita sa panid sa Balay"
+  },
+  "instance.edit-world.name": {
+    "message": "Ngalan"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft nga Kalibutan"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Walaa ang amoy"
+  },
+  "instance.edit-world.title": {
+    "message": "Usba ang kalibutan"
+  },
+  "instance.filter.disabled": {
+    "message": "Di-gagana nga mga proyekto"
+  },
+  "instance.filter.updates-available": {
+    "message": "Naay bag-ong mga kausaban"
+  },
+  "instance.server-modal.name": {
+    "message": "Ngalan"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft nga Tigtagad"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Putos sa kabtangan"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "Tangtangi ang pananglitan"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "Tangtangi ang pananglitan"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Malungtarong matangtang ang pananglitan sa imong himan, apil na ang imong mga kalibutan, paghan-ay, ug tanang gitaod nga sulod. Pag-amping, dili na mabawi kung tangtangon na nimo ang pananglitan."
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Buhatan og kopya kining pananglitan, apil na ang imong mga kalibutan, paghan-ay, kausaban, ug uban pa."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Usba ang amoy"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Tangtangi ang amoy"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Mahimo nga mobalik sa sinugdan ang tanang gitaod o giusab nga sulod sa unsay ihatag sa putos sa kausaban, tangtangon ang mga kausaban o sulod nga imong gidugang apil na ang lintunganay nga putos sa kausaban. Mahimo nga maayo ang mga tuhaw nga batasan kon naay pagbag-o sa pananglitan, apan kon gasalig na ang imong kalibutan sa dinugang nga sulod, mahimo nga madaut ani ang daan nga mga kalibutan."
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Ibalik ang mga sulod sa pananglitan sa unang kahimtang, tangtangon ang mga kausaban o sulod nga imong gidugang apil na ang lintunganay nga putos sa kausaban."
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Mga gusto sa pinatuyo nga tamboanan"
+  },
+  "instance.settings.title": {
+    "message": "Mga Gusto"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Tan-awa ang pananglitan"
+  }
+}

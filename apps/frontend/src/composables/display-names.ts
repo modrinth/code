@@ -1,92 +1,90 @@
-const safeTags = new Map<string, string>();
+const safeTags = new Map<string, string>()
 
 function safeTagFor(locale: string) {
-  let safeTag = safeTags.get(locale);
-  if (safeTag == null) {
-    safeTag = new Intl.Locale(locale).baseName;
-    safeTags.set(locale, safeTag);
-  }
-  return safeTag;
+	let safeTag = safeTags.get(locale)
+	if (safeTag == null) {
+		safeTag = new Intl.Locale(locale).baseName
+		safeTags.set(locale, safeTag)
+	}
+	return safeTag
 }
 
 type DisplayNamesWrapper = Intl.DisplayNames & {
-  of(tag: string): string | undefined;
-};
+	of(tag: string): string | undefined
+}
 
-const displayNamesDicts = new Map<string, DisplayNamesWrapper>();
+const displayNamesDicts = new Map<string, DisplayNamesWrapper>()
 
 function getWrapperKey(locale: string, options: Intl.DisplayNamesOptions) {
-  return JSON.stringify({ ...options, locale });
+	return JSON.stringify({ ...options, locale })
 }
 
 export function createDisplayNames(
-  locale: string,
-  options: Intl.DisplayNamesOptions = { type: "language" },
+	locale: string,
+	options: Intl.DisplayNamesOptions = { type: 'language' },
 ) {
-  const wrapperKey = getWrapperKey(locale, options);
-  let wrapper = displayNamesDicts.get(wrapperKey);
+	const wrapperKey = getWrapperKey(locale, options)
+	let wrapper = displayNamesDicts.get(wrapperKey)
 
-  if (wrapper == null) {
-    const dict = new Intl.DisplayNames(locale, options);
+	if (wrapper == null) {
+		const dict = new Intl.DisplayNames(locale, options)
 
-    const badTags: string[] = [];
+		const badTags: string[] = []
 
-    wrapper = {
-      resolvedOptions() {
-        return dict.resolvedOptions();
-      },
-      of(tag: string) {
-        let attempt = 0;
+		wrapper = {
+			resolvedOptions() {
+				return dict.resolvedOptions()
+			},
+			of(tag: string) {
+				let attempt = 0
 
-        // eslint-disable-next-line no-labels
-        lookupLoop: do {
-          let lookup: string;
-          switch (attempt) {
-            case 0:
-              lookup = tag;
-              break;
-            case 1:
-              lookup = safeTagFor(tag);
-              break;
-            default:
-              // eslint-disable-next-line no-labels
-              break lookupLoop;
-          }
+				lookupLoop: do {
+					let lookup: string
+					switch (attempt) {
+						case 0:
+							lookup = tag
+							break
+						case 1:
+							lookup = safeTagFor(tag)
+							break
+						default:
+							break lookupLoop
+					}
 
-          if (badTags.includes(lookup)) continue;
+					if (badTags.includes(lookup)) continue
 
-          try {
-            return dict.of(lookup);
-          } catch {
-            console.warn(
-              `Failed to get display name for ${lookup} using dictionary for ${
-                this.resolvedOptions().locale
-              }`,
-            );
-            badTags.push(lookup);
-            continue;
-          }
-        } while (++attempt < 5);
+					try {
+						return dict.of(lookup)
+					} catch {
+						console.warn(
+							`Failed to get display name for ${lookup} using dictionary for ${
+								this.resolvedOptions().locale
+							}`,
+						)
+						badTags.push(lookup)
+						continue
+					}
+				} while (++attempt < 5)
 
-        return undefined;
-      },
-    };
+				return undefined
+			},
+		}
 
-    displayNamesDicts.set(wrapperKey, wrapper);
-  }
+		displayNamesDicts.set(wrapperKey, wrapper)
+	}
 
-  return wrapper;
+	return wrapper
 }
 
 export function useDisplayNames(
-  locale: string | (() => string) | Ref<string>,
-  options?:
-    | (Intl.DisplayNamesOptions | undefined)
-    | (() => Intl.DisplayNamesOptions | undefined)
-    | Ref<Intl.DisplayNamesOptions | undefined>,
+	locale: string | (() => string) | Ref<string>,
+	options?:
+		| (Intl.DisplayNamesOptions | undefined)
+		| (() => Intl.DisplayNamesOptions | undefined)
+		| Ref<Intl.DisplayNamesOptions | undefined>,
 ) {
-  const $locale = toRef(locale);
-  const $options = toRef(options);
+	const $locale = toRef(locale)
+	const $options = toRef(options)
 
-  return computed(() => createDisplayNames($locale.value, $options.value));
+	return computed(() => createDisplayNames($locale.value, $options.value))
 }

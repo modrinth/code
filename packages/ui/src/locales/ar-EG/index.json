@@ -1,0 +1,375 @@
+{
+  "badge.beta": {
+    "defaultMessage": "تجريبي"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "إصدار تجريبي"
+  },
+  "badge.new": {
+    "defaultMessage": "جديد"
+  },
+  "button.analytics": {
+    "defaultMessage": "تحليل"
+  },
+  "button.back": {
+    "defaultMessage": "رجوع"
+  },
+  "button.cancel": {
+    "defaultMessage": "إلغاء"
+  },
+  "button.continue": {
+    "defaultMessage": "استمر"
+  },
+  "button.copy-id": {
+    "defaultMessage": "نسخ المعرف"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "نسخ الرابط الدائم"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "إنشاء مشروع"
+  },
+  "button.download": {
+    "defaultMessage": "تنزيل"
+  },
+  "button.downloading": {
+    "defaultMessage": "جاري التنزيل"
+  },
+  "button.edit": {
+    "defaultMessage": "تعديل"
+  },
+  "button.follow": {
+    "defaultMessage": "متابعة"
+  },
+  "button.more-options": {
+    "defaultMessage": "مزيد من الخيارات"
+  },
+  "button.next": {
+    "defaultMessage": "التالي"
+  },
+  "button.open-folder": {
+    "defaultMessage": "فتح المجلد"
+  },
+  "button.play": {
+    "defaultMessage": "لعب"
+  },
+  "button.refresh": {
+    "defaultMessage": "تحديث"
+  },
+  "button.remove": {
+    "defaultMessage": "إزالة"
+  },
+  "button.remove-image": {
+    "defaultMessage": "إزالة الصورة"
+  },
+  "button.report": {
+    "defaultMessage": "إبلاغ"
+  },
+  "button.reset": {
+    "defaultMessage": "إعادة ضبط"
+  },
+  "button.save": {
+    "defaultMessage": "حفظ"
+  },
+  "button.save-changes": {
+    "defaultMessage": "حفظ التغييرات"
+  },
+  "button.saving": {
+    "defaultMessage": "جاري الحفظ"
+  },
+  "button.sign-in": {
+    "defaultMessage": "تسجيل الدخول"
+  },
+  "button.sign-out": {
+    "defaultMessage": "تسجيل الخروج"
+  },
+  "button.sign-up": {
+    "defaultMessage": "إنشاء حساب"
+  },
+  "button.stop": {
+    "defaultMessage": "إيقاف"
+  },
+  "button.unfollow": {
+    "defaultMessage": "إلغاء المتابعة"
+  },
+  "button.upload-image": {
+    "defaultMessage": "رفع صورة"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "الآن فقط"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "واجهة برمجة التطبيقات"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "تطبيق"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "خوادم"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "موقع إلكتروني"
+  },
+  "collection.label.private": {
+    "defaultMessage": "خاص"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "تعديل الأيقونة"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "إزالة الأيقونة"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "استبدال الأيقونة"
+  },
+  "icon-select.select": {
+    "defaultMessage": "اختيار الأيقونة"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "بحث..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "عرض المعرض"
+  },
+  "input.view.grid": {
+    "defaultMessage": "عرض الشبكة"
+  },
+  "input.view.list": {
+    "defaultMessage": "عرض الصفوف"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "وضع المغامرة"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "وضع الإبداع"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "وضع المشاهد"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "وضع البقاء"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "وضع لعبة غير معروف"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "تم حفظ التغييرات"
+  },
+  "label.collections": {
+    "defaultMessage": "مجموعات"
+  },
+  "label.created-ago": {
+    "defaultMessage": "تم الإنشاء منذ {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "لوحة التحكم"
+  },
+  "label.delete": {
+    "defaultMessage": "حذف"
+  },
+  "label.description": {
+    "defaultMessage": "الوصف"
+  },
+  "label.error": {
+    "defaultMessage": "خطأ"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "المشاريع التي تتابعها"
+  },
+  "label.loading": {
+    "defaultMessage": "جارٍ التحميل..."
+  },
+  "label.moderation": {
+    "defaultMessage": "الإشراف"
+  },
+  "label.notifications": {
+    "defaultMessage": "الإشعارات"
+  },
+  "label.or": {
+    "defaultMessage": "أو"
+  },
+  "label.password": {
+    "defaultMessage": "كلمة المرور"
+  },
+  "label.played": {
+    "defaultMessage": "تم اللعب لمدة {time}"
+  },
+  "label.public": {
+    "defaultMessage": "عام"
+  },
+  "label.rejected": {
+    "defaultMessage": "مرفوض"
+  },
+  "label.saved": {
+    "defaultMessage": "محفوظ"
+  },
+  "label.scopes": {
+    "defaultMessage": "نطاقات"
+  },
+  "label.server": {
+    "defaultMessage": "خادم"
+  },
+  "label.servers": {
+    "defaultMessage": "خوادم"
+  },
+  "label.settings": {
+    "defaultMessage": "الإعدادات"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "اللعب الفردي"
+  },
+  "label.title": {
+    "defaultMessage": "العنوان"
+  },
+  "label.unlisted": {
+    "defaultMessage": "غير مدرج"
+  },
+  "label.visibility": {
+    "defaultMessage": "الرؤية"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "زيارة ملفك الشخصي"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "إضافة طريقة دفع"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "إضافة طريقة دفع"
+  },
+  "notification.error.title": {
+    "defaultMessage": "حدث خطأ"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "مقبول"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "موافق عليه"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "مؤرشف"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "مغلق"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "المنشئ"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "مسودة"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "فشل"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "مدرج"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "مشرف"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "فريق مودرنث"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "قيد الانتظار"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "خاص"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "تمت المعالجة"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "مرفوض"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "مُعاد"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "مجدول"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "قيد المراجعة"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "غير مدرج"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "محجوز"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "نسخ الكود للحافظة"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "عميل"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "العميل والخادم"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "عميل أو خادم"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "خادم"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type} الـ"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "غير مدعوم"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} ينتهي بـ {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Unknown payment method"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "الكل"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "حزم بيانات"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "مودات"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "حزم المودات"
+  }
+}
+

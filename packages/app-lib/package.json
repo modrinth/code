@@ -1,9 +1,12 @@
 {
-  "name": "@modrinth/app-lib",
-  "scripts": {
-    "build": "cargo build --release",
-    "lint": "cargo fmt --check && cargo clippy --all-targets -- -D warnings",
-    "fix": "cargo fmt && cargo clippy --fix",
-    "test": "cargo test"
-  }
+	"name": "@modrinth/app-lib",
+	"scripts": {
+		"build": "cargo build --release",
+		"lint": "cargo fmt --check && cargo clippy --all-targets",
+		"lint:ancillary": "prettier --check .",
+		"fix": "cargo clippy --all-targets --fix --allow-dirty && cargo fmt",
+		"fix:ancillary": "prettier --write .",
+		"test": "cargo nextest run --all-targets --no-fail-fast"
+	},
+	"prettier": "@modrinth/tooling-config/app-lib.prettier.config.cjs"
 }

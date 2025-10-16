@@ -1,0 +1,131 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Nakabukas ang moda ng nagdidibelop."
+  },
+  "app.settings.downloading": {
+    "message": "Dina-download ang v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Itsura"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Mga pagpipilian sa default na instansiya"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Mga feature flag"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Mga instalasyon ng Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Pribasiya"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Pamamahala ng resource"
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Tapos nang ma-download ang Modrinth App v{version}. Mag-reload upang ma-update ngayon, o mamaya nalang sa pagsara ng Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Magagamit na ngayon ang Modrinth App v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
+  },
+  "app.update-toast.download": {
+    "message": "I-download ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Nagda-download..."
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Nakumpleto ang pagdownload"
+  },
+  "app.update.download-update": {
+    "message": "I-download ang update"
+  },
+  "app.update.downloading-update": {
+    "message": "Nagdadownload ng update ({percent}%)"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Idagdag at laruin"
+  },
+  "instance.add-server.add-server": {
+    "message": "Idagdag ang serber"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Hindi pinahihintulotan"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Pinahihintulotan"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Magpahintulot"
+  },
+  "instance.add-server.title": {
+    "message": "Magdagdag ng serber"
+  },
+  "instance.edit-server.title": {
+    "message": "Baguhin ang serber"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Huwag ipakita sa Home na pahina"
+  },
+  "instance.edit-world.name": {
+    "message": "Pangalan"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft na Mundo"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Walain ang ikono"
+  },
+  "instance.edit-world.title": {
+    "message": "Baguhin ang mundo"
+  },
+  "instance.filter.disabled": {
+    "message": "Mga hindi pinapagang proyekto"
+  },
+  "instance.filter.updates-available": {
+    "message": "May bagong mga update"
+  },
+  "instance.server-modal.name": {
+    "message": "Pangalan"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft na Serber"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resource pack"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "I-delete ang instansiya"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "I-delete ang instansiya"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Permanenteng matatanggal ang instansiya sa iyong device, kasali na ang iyong mga mundo, konpigurasyon, at lahat ng nakainstall na kontento. Mag-ingat, kapag magtanggal ka ng instansiya ay hindi na ito mababawi."
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Gagawan ng kopya ng instansiyang ito, kasali na ang mga mundo, konpigurasyon, mods, at iba pa."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Baguhin ang ikono"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Tanggalin ang ikono"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Ang pagrere-install ay maaaring mare-reset ang lahat ng na-install o binago na kontento sa kung anong ibibigay ng modpack, tatanggalin ang mga mods o kontentong idinagdag mo lalo na ang mga orihinal na modpack. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa instansiya, ngunit kung dumedepende na ang iyong mundo sa karagdagang kontento, maaari nitong masira ang mga umiiral na mundo."
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "I-reset ang mga kontento ng instansiya sa orihinal niyang estado, tatanggalin ang mga mods o kontentong idinagdag mo lalo na ang mga orihinal na modpack."
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Mga setting sa custom na window"
+  },
+  "instance.settings.title": {
+    "message": "Mga Setting"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Tingnan ang instansiya"
+  }
+}

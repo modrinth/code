@@ -20,7 +20,7 @@ pub struct Project {
     pub id: ProjectId,
     /// The slug of a project, used for vanity URLs
     pub slug: Option<String>,
-    /// The aggregated project typs of the versions of this project
+    /// The aggregated project typos of the versions of this project
     pub project_types: Vec<String>,
     /// The aggregated games of the versions of this project
     pub games: Vec<String>,
@@ -49,7 +49,7 @@ pub struct Project {
 
     /// The status of the project
     pub status: ProjectStatus,
-    /// The requested status of this projct
+    /// The requested status of this project
     pub requested_status: Option<ProjectStatus>,
 
     /// DEPRECATED: moved to threads system
@@ -92,6 +92,9 @@ pub struct Project {
     /// The monetization status of this project
     pub monetization_status: MonetizationStatus,
 
+    /// The status of the manual review of the migration of side types of this project
+    pub side_types_migration_review_status: SideTypesMigrationReviewStatus,
+
     /// Aggregated loader-fields across its myriad of versions
     #[serde(flatten)]
     pub fields: HashMap<String, Vec<serde_json::Value>>,
@@ -122,7 +125,7 @@ pub fn from_duplicate_version_fields(
     }
 
     // Remove duplicates
-    for (_, v) in fields.iter_mut() {
+    for v in fields.values_mut() {
         *v = mem::take(v).into_iter().unique().collect_vec();
     }
     fields
@@ -163,10 +166,10 @@ impl From<ProjectQueryResult> for Project {
                     Ok(spdx_expr) => {
                         let mut vec: Vec<&str> = Vec::new();
                         for node in spdx_expr.iter() {
-                            if let spdx::expression::ExprNode::Req(req) = node {
-                                if let Some(id) = req.req.license.id() {
-                                    vec.push(id.full_name);
-                                }
+                            if let spdx::expression::ExprNode::Req(req) = node
+                                && let Some(id) = req.req.license.id()
+                            {
+                                vec.push(id.full_name);
                             }
                         }
                         // spdx crate returns AND/OR operations in postfix order
@@ -206,6 +209,8 @@ impl From<ProjectQueryResult> for Project {
             color: m.color,
             thread_id: data.thread_id.into(),
             monetization_status: m.monetization_status,
+            side_types_migration_review_status: m
+                .side_types_migration_review_status,
             fields,
         }
     }
@@ -519,9 +524,13 @@ impl ProjectStatus {
     }
 
     // Project can be displayed in search
-    // IMPORTANT: if this is changed, make sure to update the `mods_searchable_ids_gist`
-    // index in the DB to keep random project queries fast (see the
-    // `20250609134334_spatial-random-project-index.sql` migration)
+    // IMPORTANT: if this is changed, make sure to:
+    // - update the `mods_searchable_ids_gist`
+    //   index in the DB to keep random project queries fast (see the
+    //   `20250609134334_spatial-random-project-index.sql` migration).
+    // - update the `is_visible_organization` function in
+    //   `apps/labrinth/src/auth/checks.rs`, which duplicates this logic
+    //   in a SQL query for efficiency.
     pub fn is_searchable(&self) -> bool {
         matches!(self, ProjectStatus::Approved | ProjectStatus::Archived)
     }
@@ -584,6 +593,35 @@ impl MonetizationStatus {
             MonetizationStatus::ForceDemonetized => "force-demonetized",
             MonetizationStatus::Demonetized => "demonetized",
             MonetizationStatus::Monetized => "monetized",
+        }
+    }
+}
+
+/// Represents the status of the manual review of the migration of side types of this
+/// project to the new environment field.
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, Eq, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum SideTypesMigrationReviewStatus {
+    /// The project has been reviewed to use the new environment side types appropriately.
+    Reviewed,
+    /// The project has been automatically migrated to the new environment side types, but
+    /// the appropriateness of such migration has not been reviewed.
+    Pending,
+}
+
+impl SideTypesMigrationReviewStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            SideTypesMigrationReviewStatus::Reviewed => "reviewed",
+            SideTypesMigrationReviewStatus::Pending => "pending",
+        }
+    }
+
+    pub fn from_string(string: &str) -> SideTypesMigrationReviewStatus {
+        match string {
+            "reviewed" => SideTypesMigrationReviewStatus::Reviewed,
+            "pending" => SideTypesMigrationReviewStatus::Pending,
+            _ => SideTypesMigrationReviewStatus::Reviewed,
         }
     }
 }
@@ -846,7 +884,6 @@ impl std::fmt::Display for VersionType {
 }
 
 impl VersionType {
-    // These are constant, so this can remove unneccessary allocations (`to_string`)
     pub fn as_str(&self) -> &'static str {
         match self {
             VersionType::Release => "release",

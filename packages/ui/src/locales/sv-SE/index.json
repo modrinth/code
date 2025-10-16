@@ -1,0 +1,522 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.new": {
+    "defaultMessage": "Ny"
+  },
+  "button.back": {
+    "defaultMessage": "Tillbaka"
+  },
+  "button.cancel": {
+    "defaultMessage": "Avbryt"
+  },
+  "button.continue": {
+    "defaultMessage": "Fortsätt"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Kopiera ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Kopiera permanent länk"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Skapa ett projekt"
+  },
+  "button.download": {
+    "defaultMessage": "Ladda ner"
+  },
+  "button.downloading": {
+    "defaultMessage": "Laddar ner"
+  },
+  "button.edit": {
+    "defaultMessage": "Redigera"
+  },
+  "button.follow": {
+    "defaultMessage": "Följ"
+  },
+  "button.more-options": {
+    "defaultMessage": "Fler alternativ"
+  },
+  "button.next": {
+    "defaultMessage": "Nästa"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Öppna mapp"
+  },
+  "button.play": {
+    "defaultMessage": "Spela"
+  },
+  "button.remove": {
+    "defaultMessage": "Ta bort"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Ta bort bild"
+  },
+  "button.report": {
+    "defaultMessage": "Rapportera"
+  },
+  "button.reset": {
+    "defaultMessage": "Återställ"
+  },
+  "button.save": {
+    "defaultMessage": "Spara"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Spara ändringar"
+  },
+  "button.saving": {
+    "defaultMessage": "Sparar"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Logga in"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Logga ut"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Registrera"
+  },
+  "button.stop": {
+    "defaultMessage": "Stoppa"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Avfölj"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Ladda upp bild"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Just nu"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "App"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Servrar"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Webbplats"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Privat"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Redigera-ikon"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Ta bort ikon"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Ersätt ikon"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Välj ikon"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Sök..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Gallerivy"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Rutnätsvy"
+  },
+  "input.view.list": {
+    "defaultMessage": "Radvy"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Äventyrsläge"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Kreativt läge"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Åskådarläge"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Överlevnadsläge"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Okänt spelläge"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Ändringar sparade"
+  },
+  "label.collections": {
+    "defaultMessage": "Samlingar"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Skapad {ago}"
+  },
+  "label.delete": {
+    "defaultMessage": "Ta bort"
+  },
+  "label.description": {
+    "defaultMessage": "Beskrivning"
+  },
+  "label.error": {
+    "defaultMessage": "Fel"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Följda projekt"
+  },
+  "label.loading": {
+    "defaultMessage": "Laddar..."
+  },
+  "label.or": {
+    "defaultMessage": "eller"
+  },
+  "label.password": {
+    "defaultMessage": "Lösenord"
+  },
+  "label.server": {
+    "defaultMessage": "Server"
+  },
+  "label.servers": {
+    "defaultMessage": "Servrar"
+  },
+  "label.settings": {
+    "defaultMessage": "Inställningar"
+  },
+  "label.title": {
+    "defaultMessage": "Titel"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Olistad"
+  },
+  "label.visibility": {
+    "defaultMessage": "Synlighet"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Lägg till en betalningsmetod"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Ett fel inträffade"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Accepterad"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Godkänd"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Arkiverad"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Stängd"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Skapare"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Utkast"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth-teamet"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Privat"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Schemalagd"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Olistad"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kopiera kod till urklipp"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Klient"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Klient och server"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Klient eller server"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Server"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Upptäck"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Okänd betalningsmetod"
+  },
+  "project-type.all": {
+    "defaultMessage": "Alla"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Klient och server"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Dedikerade servrar endast"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Plattformar"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Kompatibilitet"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Projektägare"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Skapad {date}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Publicerad {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Detaljer"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Uppdaterad {date}"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Köp en kaffe till mig"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Donera"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponsra på GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Donera på Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Donera på Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Donera på PayPal"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Visa källa"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Länkar"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Besök wiki"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Beskrivning"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Obligatorisk på båda"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Klient och server"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Dedikerad server endast"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Miljö"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Galleri"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Allmänt"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "Licens"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Länkar"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Medlemmar"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Taggar"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Ladda upp"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Versioner"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Visa"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Utkast"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Privat"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Okänt"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Filter låst"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} är låst"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Lås upp filter"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Miljö"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Klient"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Server"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Spelversion"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Visa alla versioner"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Licens"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Öppen källkod"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Plattform"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "Projekt-ID"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Undersökning"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Varning"
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Välj en betalningsmetod"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Betalningsmetod"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "fakturerad {interval}"
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Kom igång"
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Populärast"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Välj en plan"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Välj plan"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Region"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Centraleuropa"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Nordamerika"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Sydostasien"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Västeuropa"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Konto och säkerhet"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Utseende"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Dina applikationer"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Auktoriserade appar"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Mörkt"
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Ljust"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Synka med system"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Färgtema"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Språk"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Offentlig profil"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Sessioner"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Du har osparade ändringar."
+  }
+}
+

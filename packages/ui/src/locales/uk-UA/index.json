@@ -1,0 +1,849 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Бета"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Бета-реліз"
+  },
+  "badge.new": {
+    "defaultMessage": "Новинка"
+  },
+  "button.analytics": {
+    "defaultMessage": "Аналітика"
+  },
+  "button.back": {
+    "defaultMessage": "Назад"
+  },
+  "button.cancel": {
+    "defaultMessage": "Скасувати"
+  },
+  "button.close": {
+    "defaultMessage": "Замкнути"
+  },
+  "button.continue": {
+    "defaultMessage": "Продовжити"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Скопіювати ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Скопіювати постійне посилання"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Створити проєкт"
+  },
+  "button.download": {
+    "defaultMessage": "Завантажити"
+  },
+  "button.downloading": {
+    "defaultMessage": "Завантаження"
+  },
+  "button.edit": {
+    "defaultMessage": "Редагувати"
+  },
+  "button.follow": {
+    "defaultMessage": "Відстежувати"
+  },
+  "button.more-options": {
+    "defaultMessage": "Більше налаштувань"
+  },
+  "button.next": {
+    "defaultMessage": "Далі"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Відкрити теку"
+  },
+  "button.play": {
+    "defaultMessage": "Грати"
+  },
+  "button.refresh": {
+    "defaultMessage": "Оновити"
+  },
+  "button.remove": {
+    "defaultMessage": "Видалити"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Видалити зображення"
+  },
+  "button.report": {
+    "defaultMessage": "Поскаржитися"
+  },
+  "button.reset": {
+    "defaultMessage": "Скинути"
+  },
+  "button.save": {
+    "defaultMessage": "Зберегти"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Зберегти зміни"
+  },
+  "button.saving": {
+    "defaultMessage": "Збереження"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Увійти"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Вийти"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Зареєструватись"
+  },
+  "button.stop": {
+    "defaultMessage": "Зупинити"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Не відстежувати"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Завантажити фото"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Щойно"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Застосунок"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Сервери"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Вебсайт"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Приватно"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Редагувати значок"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Прибрати значок"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Замінити значок"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Обрати значок"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Пошук…"
+  },
+  "input.view.gallery": {
+    "defaultMessage": "У вигляді галереї"
+  },
+  "input.view.grid": {
+    "defaultMessage": "У вигляді таблиці"
+  },
+  "input.view.list": {
+    "defaultMessage": "У вигляді рядків"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Режим пригод"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Творчий режим"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Режим спостерігача"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Режим виживання"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Невідомий режим"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Зміни збережено"
+  },
+  "label.collections": {
+    "defaultMessage": "Колекції"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Створено {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Панель керування"
+  },
+  "label.delete": {
+    "defaultMessage": "Видалити"
+  },
+  "label.description": {
+    "defaultMessage": "Опис"
+  },
+  "label.error": {
+    "defaultMessage": "Помилка"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Відстежуванні проєкти"
+  },
+  "label.loading": {
+    "defaultMessage": "Завантаження…"
+  },
+  "label.moderation": {
+    "defaultMessage": "Модерація"
+  },
+  "label.notifications": {
+    "defaultMessage": "Сповіщення"
+  },
+  "label.or": {
+    "defaultMessage": "або"
+  },
+  "label.password": {
+    "defaultMessage": "Пароль"
+  },
+  "label.played": {
+    "defaultMessage": "Награно {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Публічна"
+  },
+  "label.rejected": {
+    "defaultMessage": "Відхилено"
+  },
+  "label.saved": {
+    "defaultMessage": "Збережено"
+  },
+  "label.scopes": {
+    "defaultMessage": "Цілі"
+  },
+  "label.server": {
+    "defaultMessage": "Для сервера"
+  },
+  "label.servers": {
+    "defaultMessage": "Сервери"
+  },
+  "label.settings": {
+    "defaultMessage": "Налаштування"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Гра наодинці"
+  },
+  "label.title": {
+    "defaultMessage": "Назва"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Поза списком"
+  },
+  "label.visibility": {
+    "defaultMessage": "Видимість"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Відвідати профіль"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Додати спосіб оплати"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Додавання способу оплати"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Виникла помилка"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Прийнято"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Затверджено"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Архівовано"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Закрито"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Автор"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Чернетка"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Невдало"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "У списку"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Модератор"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Команда Modrinth"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "На розгляді"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Приватно"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Оброблено"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Відхилено"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Повернено"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Заплановано"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "На розгляді"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Поза списком"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Утримується"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Скопіювати код у буфер обміну"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Для клієнта"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Для клієнта та сервера"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Для клієнта або сервера"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Для сервера"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Не підтримується"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand}, що закінчується на {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Невідомий спосіб оплати"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Усі"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Датапак} few {Датапаки} many {Датапаків} other {Датапаків}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Дата паки"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {датапак} few {датапаки} many {датапаків} other {датапаків}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Мод} few {Мода} many {Модів} other {Модів}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Моди"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {мод} few {мода} many {модів} other {модів}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Збірка модів} few {Збірки модів} many {Збірок модів} other {Збірок модів}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Мод пак"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {збірка модів} few {збірки модів} many {збірок модів} other {збірок модів}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Плагін} few {Плагіни} many {Плагінів} other {Плагінів}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Плагіни"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {плагін} few {плагіни} many {плагінів} other {плагінів}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Пакет ресурсів} few {Пакети ресурсів} many {Пакетів ресурсів} other {Пакетів ресурсів}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Ресурс паки"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {пакет ресурсів} few {пакети ресурсів} many {пакетів ресурсів} other {пакетів ресурсів}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Шейдер} few {Шейдери} many {Шейдирів} other {Шейдирів}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Шейдери"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {шейдер} few {шейдери} many {шейдирів} other {шейдирів}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Підтримувані середовища"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Клієнт та сервер"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "На стороні клієнта"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Лише виділені сервери"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "На стороні сервера"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Гра наодинці"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Лише гра наодинці"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Платформи"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Сумісність"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Власник проєкту"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Автори"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Створено {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "Ліцензовано {license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Опубліковано {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "Надіслано {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Деталі"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Оновлено {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Приєднатися до Discord-сервера"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Підтримати"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Підтримати на Github"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Підтримати на Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Підтримати на Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Підтримати на PayPal"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Сповістити про проблеми"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Вихідний код"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Посилання"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Відвідати вікі"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Аналітика"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Опис"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Має деяку функціональність як на стороні клієнта, так і на стороні сервера."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Опціонально для обох, працює однаково, якщо встановлено на будь-якій стороні"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Опціонально для обох, краще працює коли встановлено на обох сторонах"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Опціонально для клієнта"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Опціонально для сервера"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Необхідно для обох"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Клієнт та сервер"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "Уся функціональність знаходиться на стороні клієнта та сумісна із не модифікованими серверами."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Лише на стороні клієнта"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Лише виділені сервери"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "Уся функціональність знаходиться на стороні сервера та сумісна із ванільними серверами."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Також працює у грі наодинці"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Лише на стороні сервера"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Працює лише у грі наодинці або коли не підключено до сервера."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Лише у грі наодинці"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Додаткові налаштування {option}"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Середовище"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Галерея"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Загальні"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "Ліцензія"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Посилання"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Учасники"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "У вас немає дозволу редагувати це."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "Немає дозволу"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Теґи"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Вивантажити"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Версії"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Переглянути"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "А"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Архівовано"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Чернетка"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Приватно"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Публічно"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Відхилено"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Заплановано"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "На розгляді"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Невідомо"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Поза списком"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Команда зробила поза списком"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Фільтр заблоковано"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Розблокування цього фільтра може дозволити вам установити несумісний контент."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Синхронізувати фільтр"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} заблоковано"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Розблокувати фільтр"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Середовище"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Для клієнта"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Для сервера"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Версія гри"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Показати всі версії"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Ліцензія"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Початковий код"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Завантажувач"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Завантажувач"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Завантажувач"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Платформа"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "ID проєкту"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Завантажувач"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Відхилити"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Можна відхилити"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Увага"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Інформація"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Критичний"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Інформація"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Опитування"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Попередження"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Не можна відхилити"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "З вас ще не стягуватиметься плата."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Виберіть спосіб оплати"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Спосіб оплати"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "оплачується {interval}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "Виберіть індивідуальний план із необхідними вам характеристиками."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Почнімо"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Ідеально підходить для 15–25 гравців, збірок або великої кількости модифікацій."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "Чудово підходить для 6–15 гравців та кількох модифікацій."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Найпопулярніший"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Виберіть план"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Обрати план"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "Ідеально підходить для 1–5 друзів із кількома легкими модифікаціями."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "Виберіть обсяг оперативної пам'яті та характеристики, які відповідають вашим потребам."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "План"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Регіон"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Огляд"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Центральна Європа"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "Скільки оперативної пам'яті ви хочете мати на своєму сервері?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Північна Америка"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Де б ви хотіли розмістити свій сервер?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Регіону немає в списку? <link>Повідомте нам, де ви хотіли б побачити наступні сервери Modrinth!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Південно-східна Азія"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Західна Європа"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Обліковий запис та безпека"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Вигляд"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Ваші застосунки"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Авторизовані застосунки"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "Спосіб оплати та підписки"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Темна"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Виберіть бажану тему для Modrinth для цього пристрою."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Світла"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Бажано темна тема"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Бажано світла тема"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Ретро"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Синхронізувати з системою"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Колірна тема"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Мова"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "Персональний токен доступу"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Публічний профіль"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Сеанси"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} в {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "У вас є незбережені зміни."
+  }
+}
+

@@ -1,7 +1,7 @@
 {
-  "identifier": "updater",
-  "description": "",
-  "local": true,
-  "windows": ["main"],
-  "permissions": ["updater:default"]
+	"identifier": "updater",
+	"description": "",
+	"local": true,
+	"windows": ["main"],
+	"permissions": ["updater:default"]
 }

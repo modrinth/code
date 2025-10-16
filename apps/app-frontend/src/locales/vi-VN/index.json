@@ -1,0 +1,338 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Chế độ nhà phát triển đã được bật."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Diện mạo"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Các cờ tính năng"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Các bản cài Java"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Quyền riêng tư"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Quản lý tài nguyên"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Thêm và chơi"
+  },
+  "instance.add-server.add-server": {
+    "message": "Thêm máy chủ"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Tắt"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "Bật"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "Hỏi trước"
+  },
+  "instance.add-server.title": {
+    "message": "Thêm máy chủ"
+  },
+  "instance.edit-server.title": {
+    "message": "Sửa máy chủ"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Ẩn khỏi trang chủ"
+  },
+  "instance.edit-world.name": {
+    "message": "Tên"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Thế giới Minecraft"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "Đặt lại biểu tượng"
+  },
+  "instance.edit-world.title": {
+    "message": "Sửa thể giới"
+  },
+  "instance.filter.disabled": {
+    "message": "Các dự án bị tắt"
+  },
+  "instance.filter.updates-available": {
+    "message": "Có bản cập nhật mới"
+  },
+  "instance.server-modal.address": {
+    "message": "Địa chỉ"
+  },
+  "instance.server-modal.name": {
+    "message": "Tên"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Máy chủ Minecraft"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Gói tài nguyên"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Tổng quát"
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Đang xoá..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Nhân đôi"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Không thể nhân đôi trong khi đang cài đặt."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Sửa biểu tượng"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Loại bỏ biểu tượng"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Thay thế biểu tượng"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Chọn biểu tượng"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Nhóm thư viện"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Tạo nhóm mới"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Nhóm thư viện cho phép bạn tổ chức các hiện thể thành các phần khác nhau trong thư viện của bạn."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Nhập tên nhóm"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Tên"
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Sau khi thoát"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Chạy sau khi trò chơi đóng lại."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Nhập lệnh sau khi thoát..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Trước khi chạy"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Cài đặt"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} cho Minecraft {game_version} đã được cài đặt"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} đã được cài đặt"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Thay đổi phiên bản"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Cài đặt"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Đang cài đặt"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Phiên bản trò chơi"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Cài đặt"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Đang cài đặt"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "Phiên bản {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Không thể hiện chi tiết modpack đã liên kết. Vui lòng kiểm tra kết nối mạng."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} không khả dụng cho Minecraft {version}. Hãy thử mod loader khác."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Phiên bản này đã được liên kết với modpack, nhưng không thể tìm thấy modpack trên Modrinth."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Nền tảng"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Cài lại gói mod"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Đang cài lại gói mod"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Cài đặt lại sẽ reset tất cả nội dung đã cài đặt hoặc thay đổi được cung cấp bởi modpack đó, đồng thời xóa các mods hoặc nội dung mà bạn đã thêm vào sau khi cài đặt lúc ban đầu. Thao tác này có thể khắc phục các lỗi phát sinh nếu phiên bản bị thay đổi, nhưng thế giới của bạn có thể bị lỗi nếu chúng phụ thuộc vào nội dung bạn đã tải."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Bạn có chắc là bạn muốn tải lại phiên bản này không?"
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Cài lại gói mod"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Sửa chửa"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Đang sửa chữa"
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Sửa chữa phiên bản?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Đang sửa chữa"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Cài đặt lại về trạng thái ban đầu"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Hiện tất cả phiên bản"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "thay đổi phiên bản"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "cài đặt"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "cài lại"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "sửa chửa"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Không thể {action} trong khi đang cài đặt"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Không thể {action} khi không có mạng"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Không thể {action} khi đang sửa chữa"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(phiên bản không rõ)"
+  },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Xóa liên kết phiên bản"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.title": {
+    "message": "Bạn có chắc là bạn muốn xóa liên kết phiên bản này không?"
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Phiên bản này được liên kết với một modpack, nghĩa là bạn không thể cập nhật mod cũng như thay đổi mod loader hoặc phiên bản Minecraft. Nếu hủy liên kết, phiên bản này sẽ bị ngắt kết nối vĩnh viễn khỏi modpack."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Hủy liên kết khỏi modpack"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java và bộ nhớ"
+  },
+  "instance.settings.tabs.java.environment-variables": {
+    "message": "Biến môi trường"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Hooks"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Tham số Java"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Bản cài đặt Java"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Bộ nhớ cấp phát"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Cửa sổ"
+  },
+  "instance.settings.tabs.window.custom-window-settings": {
+    "message": "Thiết đặt cửa sổ tuỳ chỉnh"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Toàn màn hình"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "Làm cho trò chơi bắt đầu ở dạng toàn màn hình khi khởi chạy (sử dụng options.txt)."
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "Chiều cao"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "Chiều cao cửa sổ trò chơi khi khởi chạy."
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Nhập chiều cao..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Chiều rộng"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "Chiều dài cửa sổ trò chơi khi khởi chạy."
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Nhập chiều dài..."
+  },
+  "instance.settings.title": {
+    "message": "Thiết đặt"
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Một máy chủ Minecraft"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "Không thể kết nối đến máy chủ"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Sao chép địa chỉ"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Có sẵn"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Chế độ siêu khó"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "Máy chủ không tương thích"
+  },
+  "instance.worlds.no_contact": {
+    "message": "Không thể liên lạc với máy chủ"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "Bạn chỉ có thể nhảy thẳng vào servers trên phiên bản Minecraft Alpha 1.0.5+"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "Bạn chỉ có thể nhảy thẳng vào thế giới người chơi đơn trên phiên bản Minecraft 1.20+"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Chơi phiên bản này"
+  },
+  "instance.worlds.type.server": {
+    "message": "Máy chủ"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Chế độ một người chơi"
+  },
+  "instance.worlds.view_instance": {
+    "message": "Xem phiên bản"
+  },
+  "search.filter.locked.instance": {
+    "message": "Được cung cấp bởi phiên bản"
+  },
+  "search.filter.locked.instance-game-version.title": {
+    "message": "Phiên bản trò chơi được cung cấp bởi instance này"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Đồng bộ với phiên bản"
+  }
+}

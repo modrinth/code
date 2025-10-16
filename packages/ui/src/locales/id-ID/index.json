@@ -1,0 +1,444 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Rilisan Beta"
+  },
+  "badge.new": {
+    "defaultMessage": "Baru"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analitik"
+  },
+  "button.back": {
+    "defaultMessage": "Kembali"
+  },
+  "button.cancel": {
+    "defaultMessage": "Batal"
+  },
+  "button.close": {
+    "defaultMessage": "Tutup"
+  },
+  "button.continue": {
+    "defaultMessage": "Lanjutkan"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Salin pengenal"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Salin tautan permanen"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Buat proyek"
+  },
+  "button.download": {
+    "defaultMessage": "Unduh"
+  },
+  "button.downloading": {
+    "defaultMessage": "Mengunduh"
+  },
+  "button.edit": {
+    "defaultMessage": "Sunting"
+  },
+  "button.follow": {
+    "defaultMessage": "Ikuti"
+  },
+  "button.more-options": {
+    "defaultMessage": "Pilihan lainnya"
+  },
+  "button.next": {
+    "defaultMessage": "Berikutnya"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Buka map"
+  },
+  "button.play": {
+    "defaultMessage": "Mainkan"
+  },
+  "button.refresh": {
+    "defaultMessage": "Segarkan"
+  },
+  "button.remove": {
+    "defaultMessage": "Hapus"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Hapus gambar"
+  },
+  "button.report": {
+    "defaultMessage": "Laporkan"
+  },
+  "button.reset": {
+    "defaultMessage": "Atur Ulang"
+  },
+  "button.save": {
+    "defaultMessage": "Simpan"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Simpan perubahan"
+  },
+  "button.saving": {
+    "defaultMessage": "Menyimpan"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Masuk"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Keluar"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Daftar"
+  },
+  "button.stop": {
+    "defaultMessage": "Hentikan"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Batal ikuti"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Unggah gambar"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Baru saja"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Aplikasi"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Peladen"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Situs web"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Pribadi"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Sunting ikon"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Hapus ikon"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Ganti ikon"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Pilih ikon"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Cari..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Tampilan galeri"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Tampilan grid"
+  },
+  "input.view.list": {
+    "defaultMessage": "Tampilan baris"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Mode petualangan"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Mode kreatif"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Mode penonton"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Mode sintas"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Mode permainan tak dikenal"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Perubahan disimpan"
+  },
+  "label.collections": {
+    "defaultMessage": "Koleksi"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Dibuat {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Panel tampilan"
+  },
+  "label.delete": {
+    "defaultMessage": "Hapus"
+  },
+  "label.description": {
+    "defaultMessage": "Keterangan"
+  },
+  "label.error": {
+    "defaultMessage": "Kesalahan"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Proyek yang diikuti"
+  },
+  "label.loading": {
+    "defaultMessage": "Memuat..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderasi"
+  },
+  "label.notifications": {
+    "defaultMessage": "Pemberitahuan"
+  },
+  "label.or": {
+    "defaultMessage": "atau"
+  },
+  "label.password": {
+    "defaultMessage": "Kata sandi"
+  },
+  "label.played": {
+    "defaultMessage": "Bermain selama {time}"
+  },
+  "label.public": {
+    "defaultMessage": "Publik"
+  },
+  "label.rejected": {
+    "defaultMessage": "Ditolak"
+  },
+  "label.saved": {
+    "defaultMessage": "Tersimpan"
+  },
+  "label.scopes": {
+    "defaultMessage": "Cakupan"
+  },
+  "label.server": {
+    "defaultMessage": "Peladen"
+  },
+  "label.servers": {
+    "defaultMessage": "Peladen"
+  },
+  "label.settings": {
+    "defaultMessage": "Pengaturan"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Bermain sendiri"
+  },
+  "label.title": {
+    "defaultMessage": "Judul"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Tidak terdaftar"
+  },
+  "label.visibility": {
+    "defaultMessage": "Visibilitas"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Kunjungi profil Anda"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Tambah metode pembayaran"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Menambah metode pembayaran"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Terjadi kesalahan"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Diterima"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Disetujui"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Diarsipkan"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Ditutup"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Pembuat"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Draf"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Gagal"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Terdaftar"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderator"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Tim Modrinth"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Tertunda"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Pribadi"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Diproses"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Ditolak"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Dikembalikan"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Dijadwalkan"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Dalam tinjauan"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Tidak terdaftar"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Ditahan"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Salin kode ke papan klip"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Klien"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Klien dan peladen"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Klien atau peladen"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Peladen"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Tidak didukung"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} dengan digit terakhir {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Metode pembayaran tidak dikenal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Semua"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {Paket Data}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Paket Data"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {paket data}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {Mod}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mod"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {mod}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {Paket Mod}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Paket Mod"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {paket mod}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {Pasang-masuk}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pasang-masuk"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {pasang-masuk}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {Paket Sumber}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Paket Sumber"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {paket sumber}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Lingkungan yang didukung"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Klien dan peladen"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Sisi klien"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Peladen khusus saja"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Sisi peladen"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Bermain sendiri"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Bermain sendiri saja"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platform"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Kompatibilitas"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Pemilik proyek"
+  }
+}
+

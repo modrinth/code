@@ -4,15 +4,19 @@ use actix_web::{HttpResponse, web};
 use serde_json::json;
 
 pub mod analytics_get;
+pub mod analytics_get_old;
 pub mod collections;
 pub mod friends;
 pub mod images;
+pub mod limits;
 pub mod notifications;
 pub mod organizations;
 pub mod payouts;
 pub mod project_creation;
 pub mod projects;
 pub mod reports;
+pub mod shared_instance_version_creation;
+pub mod shared_instances;
 pub mod statistics;
 pub mod tags;
 pub mod teams;
@@ -28,7 +32,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("v3")
             .wrap(default_cors())
-            .configure(analytics_get::config)
+            .configure(limits::config)
+            // .configure(analytics_get::config) // TODO: see `analytics_get`
+            .configure(analytics_get_old::config)
             .configure(collections::config)
             .configure(images::config)
             .configure(notifications::config)
@@ -36,6 +42,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(project_creation::config)
             .configure(projects::config)
             .configure(reports::config)
+            .configure(shared_instance_version_creation::config)
+            .configure(shared_instances::config)
             .configure(statistics::config)
             .configure(tags::config)
             .configure(teams::config)

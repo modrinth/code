@@ -106,13 +106,12 @@ pub async fn version_project_get_helper(
                 || x.inner.version_number == id.1
         });
 
-        if let Some(version) = version {
-            if is_visible_version(&version.inner, &user_option, &pool, &redis)
+        if let Some(version) = version
+            && is_visible_version(&version.inner, &user_option, &pool, &redis)
                 .await?
-            {
-                return Ok(HttpResponse::Ok()
-                    .json(models::projects::Version::from(version)));
-            }
+        {
+            return Ok(HttpResponse::Ok()
+                .json(models::projects::Version::from(version)));
         }
     }
 
@@ -190,12 +189,12 @@ pub async fn version_get_helper(
     .map(|x| x.1)
     .ok();
 
-    if let Some(data) = version_data {
-        if is_visible_version(&data.inner, &user_option, &pool, &redis).await? {
-            return Ok(
-                HttpResponse::Ok().json(models::projects::Version::from(data))
-            );
-        }
+    if let Some(data) = version_data
+        && is_visible_version(&data.inner, &user_option, &pool, &redis).await?
+    {
+        return Ok(
+            HttpResponse::Ok().json(models::projects::Version::from(data))
+        );
     }
 
     Err(ApiError::NotFound)
@@ -794,8 +793,7 @@ pub async fn version_list(
             .filter(|version| {
                 filters
                     .featured
-                    .map(|featured| featured == version.inner.featured)
-                    .unwrap_or(true)
+                    .is_none_or(|featured| featured == version.inner.featured)
             })
             .cloned()
             .collect::<Vec<_>>();
@@ -830,22 +828,20 @@ pub async fn version_list(
             }
 
             joined_filters.into_iter().for_each(|filter| {
-                versions
-                    .iter()
-                    .find(|version| {
-                        // TODO: This is the bandaid fix for detecting auto-featured versions.
-                        let game_versions = version
-                            .version_fields
-                            .iter()
-                            .find(|vf| vf.field_name == "game_versions")
-                            .map(|vf| vf.value.clone())
-                            .map(|v| v.as_strings())
-                            .unwrap_or_default();
-                        game_versions.contains(&filter.0.version)
-                            && version.loaders.contains(&filter.1.loader)
-                    })
-                    .map(|version| response.push(version.clone()))
-                    .unwrap_or(());
+                if let Some(version) = versions.iter().find(|version| {
+                    // TODO: This is the bandaid fix for detecting auto-featured versions.
+                    let game_versions = version
+                        .version_fields
+                        .iter()
+                        .find(|vf| vf.field_name == "game_versions")
+                        .map(|vf| vf.value.clone())
+                        .map(|v| v.as_strings())
+                        .unwrap_or_default();
+                    game_versions.contains(&filter.0.version)
+                        && version.loaders.contains(&filter.1.loader)
+                }) {
+                    response.push(version.clone());
+                }
             });
 
             if response.is_empty() {
@@ -961,7 +957,7 @@ pub async fn version_delete(
     )
     .await?;
     transaction.commit().await?;
-    remove_documents(&[version.inner.id.into()], &search_config).await?;
+
     database::models::DBProject::clear_cache(
         version.inner.project_id,
         None,
@@ -969,6 +965,7 @@ pub async fn version_delete(
         &redis,
     )
     .await?;
+    remove_documents(&[version.inner.id.into()], &search_config).await?;
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))

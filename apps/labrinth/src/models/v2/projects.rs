@@ -20,7 +20,7 @@ use validator::Validate;
 /// A project returned from the API
 #[derive(Serialize, Deserialize, Clone)]
 pub struct LegacyProject {
-    /// Relevant V2 fields- these were removed or modfified in V3,
+    /// Relevant V2 fields- these were removed or modified in V3,
     /// and are now part of the dynamic fields system
     /// The support range for the client project*
     pub client_side: LegacySideType,
@@ -127,7 +127,7 @@ impl LegacyProject {
             .collect();
 
         if let Some(versions_item) = versions_item {
-            // Extract side types from remaining fields (singleplayer, client_only, etc)
+            // Extract side types from remaining fields
             let fields = versions_item
                 .version_fields
                 .iter()
@@ -135,10 +135,11 @@ impl LegacyProject {
                     (f.field_name.clone(), f.value.clone().serialize_internal())
                 })
                 .collect::<HashMap<_, _>>();
-            (client_side, server_side) = v2_reroute::convert_side_types_v2(
-                &fields,
-                Some(&*og_project_type),
-            );
+            (client_side, server_side) =
+                v2_reroute::convert_v3_side_types_to_v2_side_types(
+                    &fields,
+                    Some(&*og_project_type),
+                );
 
             // - if loader is mrpack, this is a modpack
             // the loaders are whatever the corresponding loader fields are
@@ -268,7 +269,7 @@ impl std::fmt::Display for LegacySideType {
 }
 
 impl LegacySideType {
-    // These are constant, so this can remove unneccessary allocations (`to_string`)
+    // These are constant, so this can remove unnecessary allocations (`to_string`)
     pub fn as_str(&self) -> &'static str {
         match self {
             LegacySideType::Required => "required",
@@ -291,7 +292,7 @@ impl LegacySideType {
 /// A specific version of a project
 #[derive(Serialize, Deserialize, Clone)]
 pub struct LegacyVersion {
-    /// Relevant V2 fields- these were removed or modfified in V3,
+    /// Relevant V2 fields- these were removed or modified in V3,
     /// and are now part of the dynamic fields system
     /// A list of game versions this project supports
     pub game_versions: Vec<String>,
@@ -333,18 +334,14 @@ impl From<Version> for LegacyVersion {
         // the v2 loaders are whatever the corresponding loader fields are
         let mut loaders =
             data.loaders.into_iter().map(|l| l.0).collect::<Vec<_>>();
-        if loaders.contains(&"mrpack".to_string()) {
-            if let Some((_, mrpack_loaders)) = data
+        if loaders.contains(&"mrpack".to_string())
+            && let Some((_, mrpack_loaders)) = data
                 .fields
                 .into_iter()
                 .find(|(key, _)| key == "mrpack_loaders")
-            {
-                if let Ok(mrpack_loaders) =
-                    serde_json::from_value(mrpack_loaders)
-                {
-                    loaders = mrpack_loaders;
-                }
-            }
+            && let Ok(mrpack_loaders) = serde_json::from_value(mrpack_loaders)
+        {
+            loaders = mrpack_loaders;
         }
         let loaders = loaders.into_iter().map(Loader).collect::<Vec<_>>();
 

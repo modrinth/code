@@ -33,12 +33,11 @@ pub fn is_feature_supported_in(
         if part_version == part_first_release {
             continue;
         }
-        if let Ok(part_version) = part_version.parse::<u32>() {
-            if let Ok(part_first_release) = part_first_release.parse::<u32>() {
-                if part_version > part_first_release {
-                    return true;
-                }
-            }
+        if let Ok(part_version) = part_version.parse::<u32>()
+            && let Ok(part_first_release) = part_first_release.parse::<u32>()
+            && part_version > part_first_release
+        {
+            return true;
         }
     }
     false

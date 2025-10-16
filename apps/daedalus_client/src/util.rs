@@ -167,20 +167,18 @@ pub async fn download_file(
                 let bytes = x.bytes().await;
 
                 if let Ok(bytes) = bytes {
-                    if let Some(sha1) = sha1 {
-                        if &*sha1_async(bytes.clone()).await? != sha1 {
-                            if attempt <= 3 {
-                                continue;
-                            } else {
-                                return Err(
-                                    crate::ErrorKind::ChecksumFailure {
-                                        hash: sha1.to_string(),
-                                        url: url.to_string(),
-                                        tries: attempt,
-                                    }
-                                    .into(),
-                                );
+                    if let Some(sha1) = sha1
+                        && &*sha1_async(bytes.clone()).await? != sha1
+                    {
+                        if attempt <= 3 {
+                            continue;
+                        } else {
+                            return Err(crate::ErrorKind::ChecksumFailure {
+                                hash: sha1.to_string(),
+                                url: url.to_string(),
+                                tries: attempt,
                             }
+                            .into());
                         }
                     }
 

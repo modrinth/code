@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use chrono::Utc;
 use labrinth::{
     database::{self, models::generate_pat_id},

@@ -1,0 +1,905 @@
+{
+  "action.cancel": {
+    "message": "Peruuta"
+  },
+  "action.continue": {
+    "message": "Jatka"
+  },
+  "admin.billing.error.not-found": {
+    "message": "Käyttäjää ei löydetty"
+  },
+  "app-marketing.download.description": {
+    "message": "Työpöytä sovelluksemme on saatavilla kaikilla alustoilla, valitse haluamasi versio."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Lataa AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Lataa beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Lataa DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Lataa RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Modrinth Appin Linux versioilla <issues-link>tunnetaan olevan ongelmia</issues-link> tietyillä järjestelmillä ja asetuksilla. Jos Modrinth App on epävakaa järjestelmälläsi, kannustamme sinua kokeilemaan toisia sovelluksia kuten <prism-link>Prism Launcher</prism-link> asentaaksesi helposti Modrinth sisältöä."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Lataus vaihtoehdot"
+  },
+  "app-marketing.download.terms": {
+    "message": "Lataamalla Modrinth Appin hyväksyt meidän <terms-link>Ehdot</terms-link> ja <privacy-link>Tietosuojaselosteen</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Kolmannen osapuolen paketit"
+  },
+  "app-marketing.download.title": {
+    "message": "Lataa Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Tallenna sisältöä jota rakastat ja vastaanota päivityksiä yhdellä klikkauksella."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Seuraa projekteja"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Tuo kaikki lempi profiilisi launcherista jota käytit ennen, ja aloita Modrinth Appin käyttö sekunneissa!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Profiilien tuonti"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Toiminnot"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "käyttäjältä {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth tekee helpoksi hallita kaikkia modejasi yhdessä paikassa. Voit asentaa, poistaa ja päivittää modeja yhdellä klikkauksella."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Asennetut modit"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Nimi"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Hae modeja"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Modien hallinta"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Versio"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Pelaa modeillasi, olit sitten yhdistettynä internettiin tai et."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Offline tila"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth launcherin lähdekoodi on täysin avointa. Voit lukea lähdekoodia meidän <github-link>Githubissa</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Avoin lähdekoodi"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Aktiviteetti monitori"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App on tehokkaampi kuin moni johtavista modin hallitsijoista, käyttäen vain 150mt muistia!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Hyvä suorituskyky"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MT"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MT"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MT"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 miljardi %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Prosessin nimi"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "Muisti"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Pieni"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Suorituskykyinen"
+  },
+  "app-marketing.features.play.title": {
+    "message": "Pelaa lempi modeillasi"
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modipaketti"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Jaa"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Jaa modipaketteja"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Erilainen kuin mikään muu launcheri"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Nettisivu integraatio"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "jota olet käyttänyt ennen"
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Lataa Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Lataa Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Lataa Modrinth App alustalle {os}"
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Lisää lataus vaihtoehtoja"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Valtuuta"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Kieltäydy"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Valtuuta {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Ei uudelleenohjausosoitetta löydetty vastauksesta"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Sinut uudelleenohjataan sivulle <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Lähetä palautus sähköposti"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Kirjoita sähköpostiosoitteesi ja lähetämme palautuslinkin, jonka avulla voit palauttaa tilisi."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Sähköposti tai käyttäjänimi"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Sähköposti"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Sinulle on lähetetty sähköposti, jossa on ohjeita, jos sähköposti on aiemmin tallennettu tilillesi."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Sähköposti lähetetty"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Voit nyt kirjautua tilillesi uudella salasanallasi."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Salasana nollattiin onnistuneesti"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Palauta salasana"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Vahvista salasana"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Kirjoita uusi salasanasi alle päästäksesi tilillesi."
+  },
+  "auth.reset-password.title": {
+    "message": "Palauta salasana"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Palauta salasanasi"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Syötä 2-vaiheisen tunnistautumisen koodi jatkaaksesi."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Syötä 2-vaiheisen tunnistautumisen koodi"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Anna koodi..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-Link> Unohditko salasanasi? </forgot-password-Link> • <create-account-link>Luo tili</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Sähköposti tai käyttäjänimi"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Salasana"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Kirjaudu sisään käyttäen"
+  },
+  "auth.sign-in.title": {
+    "message": "Kirjaudu sisään"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Tai käytä salasanaa"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Luo tili"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Vahvista salasana"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Sähköposti"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Käyttäjänimi"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Luomalla tilin, hyväksyt Modrinthin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Salasanat eivät täsmää!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Salasana"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Onko sinulla jo käyttäjätili?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Tilaa päivityksiä Modrinthista"
+  },
+  "auth.sign-up.title": {
+    "message": "Rekisteröidy"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Tai luo tili itse"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Reskiteröidy käyttäen"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Tilin asetukset"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Kirjaudu sisään"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Sähköpostisi on jo vahvistettu!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Sähköposti on jo vahvistettu"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Lähetä vahvistusviesti uudelleen"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Emme pystyneet vahvistamaan sähköpostiasi. Kokeile lähettää vahvistussähköposti uudelleen tilisi hallintapaneelista kirjautumisen jälkeen."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Emme pystyneet vahvistamaan sähköpostiasi. Kokeile lähettää vahvistussähköposti uudelleen painamalla painiketta alapuolella."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Sähköpostin vahvistus epäonnistui"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Sähköpostiosoitteesi on vahvistettu onnistuneesti!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Sähköpostin vahvistus"
+  },
+  "auth.verify-email.title": {
+    "message": "Vahvista sähköposti"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Tilaa päivityksiä Modrinthista"
+  },
+  "auth.welcome.label.tos": {
+    "message": "Luomalla tilin, olet hyväksynyt Modrinthin <terms-link>-käyttöoikeussopimuksen</terms-link> ja <privacy-policy-link>Tietosuojakäytännön</privacy-policy-link>."
+  },
+  "auth.welcome.long-title": {
+    "message": "Tervetuloa Modrinthiin!"
+  },
+  "auth.welcome.title": {
+    "message": "Tervetuloa"
+  },
+  "collection.button.delete-icon": {
+    "message": "Poista kuvake"
+  },
+  "collection.button.edit-icon": {
+    "message": "Muokkaa kuvaketta"
+  },
+  "collection.button.remove-project": {
+    "message": "Poista projekti"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Lopeta projektin seuraaminen"
+  },
+  "collection.delete-modal.description": {
+    "message": "Tämä poistaa tämän kokoelman ikuisesti. Tätä toimintoa ei voida peruuttaa."
+  },
+  "collection.delete-modal.title": {
+    "message": "Oletko varma että haluat poistaa tämän kokoelman?"
+  },
+  "collection.error.not-found": {
+    "message": "Kokoelmaa ei löydy"
+  },
+  "collection.label.collection": {
+    "message": "Kokoelma"
+  },
+  "collection.label.created-at": {
+    "message": "Luotu {ago}"
+  },
+  "collection.label.no-projects": {
+    "message": "Tässä kokelmassa ei ole projekteja!"
+  },
+  "collection.label.owner": {
+    "message": "Omistaja"
+  },
+  "collection.label.updated-at": {
+    "message": "Päivitetty {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - kokoelma"
+  },
+  "common.no": {
+    "message": "Ei"
+  },
+  "common.yes": {
+    "message": "Kyllä"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Luo uusi"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Hae kokoelmistasi"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Kokoelmasi"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Vero lomake"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "Saatoit kirjoittaa kokoelman URL osoitteen väärin."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "Tämä kokelma saattaa olla yksityinen."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "Tämä kokoelma on saatettu poistaa Modrinthin moderaatio tiimin toimesta koska se on <tou-link>Käyttöehtojamme</tou-link> vastaan."
+  },
+  "error.collection.404.list_title": {
+    "message": "Miksi?"
+  },
+  "error.collection.404.title": {
+    "message": "Kokoelmaa ei löytynyt"
+  },
+  "error.generic.404.subtitle": {
+    "message": "Sivu jota etsit ei näytä olevan olemassa."
+  },
+  "error.generic.404.title": {
+    "message": "Sivua ei löytynyt"
+  },
+  "error.generic.default.subtitle": {
+    "message": "Jokin meni pieleen."
+  },
+  "error.generic.default.title": {
+    "message": "Voi ei!"
+  },
+  "error.organization.404.list_title": {
+    "message": "Miksi?"
+  },
+  "error.project.404.list_title": {
+    "message": "Miksi?"
+  },
+  "error.user.404.list_title": {
+    "message": "Miksi?"
+  },
+  "frog.title": {
+    "message": "Sammakko"
+  },
+  "landing.button.discover-mods": {
+    "message": "Löydä modeja"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "Saa yksityiskohtaisia raportteja sivun katselukerroista, latausten määristä ja tulosta"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Data ja Tilastot"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Tutustuminen"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Monetisointi"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Kutsu tiimiläisesi ja hallinnoi rooleja sekä lupia kätevästi"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Tiimin Hallinta"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Satunnaisten projektien lataaminen epäonnistui :("
+  },
+  "landing.feature.follow.heading": {
+    "message": "Seuraa projekteja joita rakastat"
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Pelaa lempi launcherillasi"
+  },
+  "landing.feature.search.heading": {
+    "message": "Löydä mitä haluat nopeasti ja helposti"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Paikka Minecraft {content}"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "datapaketeille"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "modipaketeille"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "modeille"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "plugineille"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "resurssipaketeille"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "palvelimille"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "shadereille"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.heading": {
+    "message": "Ilmoitukset"
+  },
+  "landing.search.label": {
+    "message": "Hae"
+  },
+  "landing.search.placeholder": {
+    "message": "Hae..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Järjestä"
+  },
+  "landing.section.for-creators.label": {
+    "message": "Luojille"
+  },
+  "landing.section.for-players.label": {
+    "message": "Pelaajille"
+  },
+  "layout.action.change-theme": {
+    "message": "Vaihda teemaa"
+  },
+  "layout.action.create-new": {
+    "message": "Luo uusi..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Etsi tiedosto"
+  },
+  "layout.action.new-project": {
+    "message": "Uusi projekti"
+  },
+  "layout.action.reports": {
+    "message": "Raportit"
+  },
+  "layout.avatar.alt": {
+    "message": "Avatarisi"
+  },
+  "layout.footer.about": {
+    "message": "Tietoa meistä"
+  },
+  "layout.footer.about.careers": {
+    "message": "Urat"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Muutosloki"
+  },
+  "layout.footer.about.news": {
+    "message": "Uutiset"
+  },
+  "layout.footer.about.status": {
+    "message": "Tila"
+  },
+  "layout.footer.legal": {
+    "message": "Oikeudelliset tiedot"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Sisältö Säännöt"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Käyttöehdot"
+  },
+  "layout.footer.products": {
+    "message": "Tuotteet"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.resources": {
+    "message": "Resurssit"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Tuki Keskus"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Raportoi ongelmista"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Käännä"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.nav.analytics": {
+    "message": "Analytiikat"
+  },
+  "layout.nav.discover": {
+    "message": "Löydä"
+  },
+  "layout.nav.home": {
+    "message": "Koti"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Hostaa palvelin"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.organizations": {
+    "message": "Organisaatiot"
+  },
+  "layout.nav.profile": {
+    "message": "Profiili"
+  },
+  "layout.nav.projects": {
+    "message": "Projektit"
+  },
+  "layout.nav.revenue": {
+    "message": "Tulot"
+  },
+  "layout.nav.search": {
+    "message": "Hae"
+  },
+  "moderation.moderate": {
+    "message": "Moderoi"
+  },
+  "moderation.page.projects": {
+    "message": "Projektit"
+  },
+  "moderation.page.reports": {
+    "message": "Raportit"
+  },
+  "moderation.search.placeholder": {
+    "message": "Hae..."
+  },
+  "moderation.sort.by": {
+    "message": "Järjestä"
+  },
+  "profile.label.badges": {
+    "message": "Arvomerkit"
+  },
+  "profile.label.details": {
+    "message": "Yksityiskohdat"
+  },
+  "profile.label.organizations": {
+    "message": "Organisaatiot"
+  },
+  "profile.user-id": {
+    "message": "Käyttäjätunnus: {id}"
+  },
+  "project-member-header.accept": {
+    "message": "Hyväksy"
+  },
+  "project-member-header.decline": {
+    "message": "Hylkää"
+  },
+  "project-member-header.error": {
+    "message": "Virhe"
+  },
+  "project-member-header.success": {
+    "message": "Onnistui"
+  },
+  "project-moderation-nags.required": {
+    "message": "Vaadittu"
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Ehdotus"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Varoitus"
+  },
+  "project-type.collection.plural": {
+    "message": "Kokoelmat"
+  },
+  "project-type.collection.singular": {
+    "message": "Kokoelma"
+  },
+  "project-type.datapack.plural": {
+    "message": "Datapaketit"
+  },
+  "project-type.datapack.singular": {
+    "message": "Datapaketti"
+  },
+  "project-type.mod.plural": {
+    "message": "Modit"
+  },
+  "project-type.mod.singular": {
+    "message": "Mod"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modipaketit"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modipaketti"
+  },
+  "project-type.plugin.plural": {
+    "message": "Pluginit"
+  },
+  "project-type.plugin.singular": {
+    "message": "Plugin"
+  },
+  "project-type.project.plural": {
+    "message": "Projektit"
+  },
+  "project-type.project.singular": {
+    "message": "Projekti"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Resurssipaketti"
+  },
+  "project-type.shader.plural": {
+    "message": "Shaderit"
+  },
+  "project-type.shader.singular": {
+    "message": "Shader"
+  },
+  "project.about.details.title": {
+    "message": "Yksityiskohdat"
+  },
+  "project.description.title": {
+    "message": "Kuvaus"
+  },
+  "project.details.licensed": {
+    "message": "Lisenssoitu"
+  },
+  "project.gallery.title": {
+    "message": "Galleria"
+  },
+  "project.license.title": {
+    "message": "Lisenssi"
+  },
+  "project.moderation.title": {
+    "message": "Moderaatio"
+  },
+  "project.navigation.changelog": {
+    "message": "Muutosloki"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "message": "Vahvista"
+  },
+  "project.settings.general.name.title": {
+    "message": "Nimi"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.title": {
+    "message": "Asetukset"
+  },
+  "project.version.all-versions": {
+    "message": "Kaikki versiot"
+  },
+  "project.versions.title": {
+    "message": "Versiot"
+  },
+  "report.go-to-report": {
+    "message": "Mene raporttiin"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Virhe raportit"
+  },
+  "report.submit": {
+    "message": "Lähetä raportti"
+  },
+  "scopes.payoutsRead.label": {
+    "message": "Lue maksut"
+  },
+  "scopes.reportRead.description": {
+    "message": "Lue raportteja"
+  },
+  "scopes.reportRead.label": {
+    "message": "Lue raportteja"
+  },
+  "scopes.reportWrite.description": {
+    "message": "Muokkaa raportteja"
+  },
+  "servers.backups.item.automated": {
+    "message": "Automatisoitu"
+  },
+  "servers.backups.item.locked": {
+    "message": "Lukittu"
+  },
+  "servers.backups.item.rename": {
+    "message": "Nimeä uudelleen"
+  },
+  "servers.backups.item.restore": {
+    "message": "Palauta"
+  },
+  "servers.backups.item.retry": {
+    "message": "Yritä uudelleen"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Avaa lukitus"
+  },
+  "servers.notice.actions": {
+    "message": "Toiminnot"
+  },
+  "servers.notice.begins": {
+    "message": "Alkaa"
+  },
+  "servers.notice.expires": {
+    "message": "Vanhenee"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Taso"
+  },
+  "servers.notices.no-notices": {
+    "message": "Ei ilmoituksia"
+  },
+  "servers.plan.large.name": {
+    "message": "Suuri"
+  },
+  "servers.plan.medium.name": {
+    "message": "Keskikokoinen"
+  },
+  "servers.plan.small.name": {
+    "message": "Pieni"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Tee ensisijaiseksi"
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Ensisijainen"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Discover"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCard"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPay"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Mods -sivu"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Plugins -sivu"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Shaders -sivu"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Kokoelma"
+  },
+  "settings.display.theme.title": {
+    "message": "Väri teema"
+  },
+  "settings.language.categories.auto": {
+    "message": "Automaattinen"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Vanhenee"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Nimi"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Ei koskaan käytetty"
+  },
+  "settings.profile.bio.title": {
+    "message": "Kuvaus"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Nollaa"
+  },
+  "settings.profile.username.title": {
+    "message": "Käyttäjänimi"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Tuntematon käyttöjärjestelmä"
+  }
+}

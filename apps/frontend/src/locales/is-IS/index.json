@@ -1,0 +1,119 @@
+{
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "eftir {author}"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Nafn"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Útgáfa"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Opinn hugbúnaður"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Góð afköst"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 milljarði %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Nafn ferils"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "Vinnsluminni"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Lítið"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Hagkvæmt"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Netfang"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Netfang sent"
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Lykilorð hefur verið endurstillt"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Endurstilla lykilorð"
+  },
+  "auth.reset-password.title": {
+    "message": "Endurstilla lykilorð"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Endurstilltu lykilorðið þitt"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Sláið inn tveggja þátta kóða til þess að halda áfram."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Sláið inn 2FA kóða"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Sláið inn kóða..."
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Netfang eða notendanafn"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Lykilorð"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Skrá inn með"
+  },
+  "auth.sign-in.title": {
+    "message": "Skrá inn"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Eða notið lykilorð"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Búa til aðgang"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Netfang"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Notendanafn"
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Lykilorð passa ekki saman!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Lykilorð"
+  }
+}

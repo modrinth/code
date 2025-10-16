@@ -1,0 +1,849 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Beta Sürümü"
+  },
+  "badge.new": {
+    "defaultMessage": "Yeni"
+  },
+  "button.analytics": {
+    "defaultMessage": "Veriler"
+  },
+  "button.back": {
+    "defaultMessage": "Geri"
+  },
+  "button.cancel": {
+    "defaultMessage": "İptal"
+  },
+  "button.close": {
+    "defaultMessage": "Kapat"
+  },
+  "button.continue": {
+    "defaultMessage": "Devam"
+  },
+  "button.copy-id": {
+    "defaultMessage": "ID'yi Kopyala"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Kalıcı bağlantı kopyala"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Bir proje oluştur"
+  },
+  "button.download": {
+    "defaultMessage": "İndir"
+  },
+  "button.downloading": {
+    "defaultMessage": "İndiriliyor"
+  },
+  "button.edit": {
+    "defaultMessage": "Düzenle"
+  },
+  "button.follow": {
+    "defaultMessage": "Takip Et"
+  },
+  "button.more-options": {
+    "defaultMessage": "Diğer ayarlar"
+  },
+  "button.next": {
+    "defaultMessage": "İleri"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Klasörü aç"
+  },
+  "button.play": {
+    "defaultMessage": "Oyna"
+  },
+  "button.refresh": {
+    "defaultMessage": "Yenile"
+  },
+  "button.remove": {
+    "defaultMessage": "Kaldır"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Görseli kaldır"
+  },
+  "button.report": {
+    "defaultMessage": "Bildir"
+  },
+  "button.reset": {
+    "defaultMessage": "Sıfırla"
+  },
+  "button.save": {
+    "defaultMessage": "Kaydet"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Değişiklikleri kaydet"
+  },
+  "button.saving": {
+    "defaultMessage": "Kaydediliyor"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Giriş yap"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Çıkış yap"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Kaydol"
+  },
+  "button.stop": {
+    "defaultMessage": "Durdur"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Takibi bırak"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Görsel yükle"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Şimdi"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Uygulama"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Sunucular"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Website"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Gizli"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Simgeyi düzenle"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Simgeyi kaldır"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Simgeyi değiştir"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Simge seç"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Ara..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Galeri görünümü"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Tablo görünümü"
+  },
+  "input.view.list": {
+    "defaultMessage": "Satır görünümü"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Macera modu"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Yaratıcılık modu"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "İzleyici modu"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Hayatta kalma modu"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Bilinmeyen oyun modu"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Değişiklikler kaydedildi"
+  },
+  "label.collections": {
+    "defaultMessage": "Koleksiyonlar"
+  },
+  "label.created-ago": {
+    "defaultMessage": "{ago} önce oluşturuldu"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Panel"
+  },
+  "label.delete": {
+    "defaultMessage": "Sil"
+  },
+  "label.description": {
+    "defaultMessage": "Açıklama"
+  },
+  "label.error": {
+    "defaultMessage": "Hata"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Takip edilen projeler"
+  },
+  "label.loading": {
+    "defaultMessage": "Yükleniyor..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderasyon"
+  },
+  "label.notifications": {
+    "defaultMessage": "Bildirimler"
+  },
+  "label.or": {
+    "defaultMessage": "veya"
+  },
+  "label.password": {
+    "defaultMessage": "Parola"
+  },
+  "label.played": {
+    "defaultMessage": "{time} kez oynandı"
+  },
+  "label.public": {
+    "defaultMessage": "Herkese Açık"
+  },
+  "label.rejected": {
+    "defaultMessage": "Reddedilmiş"
+  },
+  "label.saved": {
+    "defaultMessage": "Kaydedildi"
+  },
+  "label.scopes": {
+    "defaultMessage": "Kapsamlar"
+  },
+  "label.server": {
+    "defaultMessage": "Sunucu"
+  },
+  "label.servers": {
+    "defaultMessage": "Sunucular"
+  },
+  "label.settings": {
+    "defaultMessage": "Ayarlar"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Tek Oyunculu"
+  },
+  "label.title": {
+    "defaultMessage": "Başlık"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Liste Dışı"
+  },
+  "label.visibility": {
+    "defaultMessage": "Görünürlük"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Profilini görüntüle"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Ödeme yöntemi ekle"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Ödeme yöntemi ekleme"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Bir hata oluştu"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Kabul Edildi"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Onaylandı"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Arşivlendi"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Kapatıldı"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Yaratıcı"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Taslak"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Başarısız"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listede"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderatör"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth Ekibi"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Beklemede"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Gizli"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "İşlenmiş"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Reddedildi"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Geri Döndü"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Planlanmış"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "İncelemede"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Liste Dışı"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Tutuluyor"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kodu panoya kopyala"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "İstemci"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "İstemci ve sunucu"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "İstemci veya sunucu"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Sunucu"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "Bir {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Desteklenmiyor"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} {last_four} içinde bitiyor"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Bilinmeyen ödeme yöntemi"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Tümü"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "Veri Paketi"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Veri Paketleri"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "veri paketi"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "Mod"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Modlar"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "mod"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "Mod Paketi"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Mod Paketleri"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "mod paketi"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "Plugin"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pluginler"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "plugin"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "Kaynak Paketi"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Kaynak Paketleri"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "kaynak paketi"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "Shader"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaderlar"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "shader"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Desteklenen ortamlar"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "İstemci ve sunucu"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "İstemci taraflı"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Sadece sunucular için"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Sunucu-Tarafı"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Tek Oyunculu"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Sadece tek oyunculu"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platformlar"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Uyumluluk"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Projenin sahibi"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Yaratıcılar"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "{date} tarihinde yaratıldı"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "{license} lisanslı"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "{date} tarihinde yayımlandı"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "{date} tarihinde yollandı"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Ayrıntılar"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "{date} tarihinde güncellendi"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Discord sunucusuna katıl"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Bağış"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "GitHub'tan Sponsor Ol"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Ko-fi'den Bağış Yap"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Patreon'dan Bağış Yap"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "PayPal'dan Bağış Yap"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Sorunları bildir"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Kaynak göster"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Bağlantılar"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Wikiye git"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Veriler"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Açıklama"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Hem istemci hem sunucu tarafında bazı özellikleri var."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "İkisinde de tercihe bağlı, herhangi tarafa yüklendiğinde aynı çalışır"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "İkisinde de tercihe bağlı, ikisinde de yüklü olduğunda en iyi çalışır"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "İstemcide tercihe bağlı"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Sunucuda tercihe bağlı"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "İkisinde de gerekli"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "İstemci ve sunucu"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "Tüm işlevler istemci tarafında gerçekleştirilir ve vanilla sunucularla uyumludur."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Sadece İstemci taraflı"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Sadece sunucu için"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "Tüm işlevler sunucu tarafında gerçekleştirilir ve vanilla istemcilerle uyumludur."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Tek oyunculuda da çalışır"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Sadece Sunucu-Tarafı"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Sadece Tek Oyunculuda veya Çok Oyunculuya bağlı değilken çalışır."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Sadece Tek Oyunculu"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "{option} Alt Ayarları"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Ortam"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Galeri"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Genel"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "Lisans"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Bağlantılar"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Üyeler"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "Bunu düzenlemek için yetkiniz yok."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "İzin yok"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Etiketler"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Yükle"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Sürümler"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Görüntüle"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Arşivlenmiş"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Taslak"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Özel"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Herkese Açık"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Reddedilmiş"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Planlanmış"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "İncelemede"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Bilinmeyen"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Liste Dışı"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Kadro tarafından liste dışı"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Filtre kilitli"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Bunun kilidini açmak, uyumsuz içerikleri kurmanıza izin verebilir."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Filtre eşle"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} kilitli"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Filtreyi aç"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Ortam"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "İstemci"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Sunucu"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Oyun sürümü"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Tüm sürümleri göster"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Lisans"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Açık kaynak"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Yükleyici"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Yükleyici"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Yükleyici"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Platform"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "Proje ID'si"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Yükleyici"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Görmezden gel"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Görmezden Gelinebilir"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Dikkat"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Bilgi"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Kritik"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Bilgi"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Anket"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Uyarı"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Görmezden gelinemez"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "Şimdilik ödeme almayacağız."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Bir ödeme yöntemi seç"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Ödeme yöntemi"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "{interval} faturalandırılır"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "Sana gereken şeyler için özel bir plan oluştur."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Başla"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "15–25 oyuncu arası mod paketleri veya fazla modlu sunucular için ideal."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "6–15 oyuncu ve birden fazla mod için iyi."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "En Popüler"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Bir plan seç"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Plan seç"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "1–5 arkadaş ve birkaç hafif mod için mükemmel."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "İhtiyaçlarını karşılayan RAM miktarını ve özellikleri seç."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Plan"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Bölge"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "İnceleme"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Merkez Avrupa"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "Sunucun ne kadar RAM'e sahip olsun istersin?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Kuzey Amerika"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Sunucunun nerede bulunmasını istersin?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Bölge listede yok mu? <link>Modrinth Sunucularını ileride nerede görmek istediğini bize bildir!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Güneydoğu Asya"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Batı Avrupa"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Hesap ve güvenlik"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Görünüm"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Senin uygulamaların"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "İzin verilen uygulamalar"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "Faturalar ve abonelikler"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Karanlık"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Modrinth için bu cihazda tercih ettiğiniz renk temasını seçin."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Aydınlık"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Tercih edilen karanlık tema"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Tercih edilen aydınlık tema"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Sistemle eşle"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Renk teması"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Dil"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "Kişisel erişim tokenleri"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Herkese açık profil"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Oturumlar"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Kaydedilmemiş değişikliklerin var."
+  }
+}
+

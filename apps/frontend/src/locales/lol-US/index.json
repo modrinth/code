@@ -1,0 +1,2132 @@
+{
+  "action.cancel": {
+    "message": "No plz"
+  },
+  "action.continue": {
+    "message": "Keepz goinz"
+  },
+  "admin.billing.error.not-found": {
+    "message": "No can haz hooman"
+  },
+  "app-marketing.download.description": {
+    "message": "Desktoop app is on all teh platformz, pick ur fav verzhun."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Downloaf teh AppyThingy"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Downloaf teh testie verzhun"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Downloaf teh DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Downloaf teh RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Nerdnux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Modrinth Appz on Nerdnux <issues-link>haz sum bugz</issues-link> on sum sysytems n setups. If it go boom on ur compooter, try odder appz like <prism-link>Prism Launcher</prism-link> fur easy kitteh installz."
+  },
+  "app-marketing.download.mac": {
+    "message": "Macz"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Downloaf optshunz"
+  },
+  "app-marketing.download.terms": {
+    "message": "If u snatch Modrinth App, u haz agreed to <terms-link>Termz</terms-link> n <privacy-link>Privacy Pawlicy</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Other kitteh ackz"
+  },
+  "app-marketing.download.title": {
+    "message": "Downloaf Modrinth Appz (testie verzhun)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windozeh"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Stash teh stuff u luv n getz updatez wif one click."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Stalk pawject"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Pull in all ur fav kitteh profiles from ur old launcher n start Modrinth App in no time!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Pawfile snatchin'"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Actionz"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "frum {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth makes it ez to handle all ur mods in one spot. U can install, uninstall, n update dem wif one click."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Snugged tweakiez"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Naem"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Search tweakiez"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Tweakiez kontrol"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Verzhun"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Play ur mods, online or offline, kitteh don’t care."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "No-net mode"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth launcher iz full free codez. U can peek teh code on our <github-link>GitHub</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Iz freez codez"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Whut compooter doin monitor"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App iz faster than lotsa mod managers, only nommin 150mb of RAM!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Kittehcord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "App go brrr"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Goggle Chrom"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth Appz"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 billiun %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Pawcess naem"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Lil"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Perfurrmant"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Use Modrinth App to grab n play ur fav mods n modpackz."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Play wif ur fav tweakiez"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Build, spread out, n play tweakie bundlez usin all da kitteh tweakiezs on Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Tweakie bundle"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Spread"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Spread tweakie bundle"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Diffrent from all launcherz"
+  },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App iz all mashed up wif teh website, so u can grab all ur fav pawjectz projects from da app!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Site mashie"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "kitteh stuff u touched befurr"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Pic of Modrinth App wif Cobblemon open on 'Content' pawge."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App iz a special open floof launcher, lets u play ur fav mods n keep dem fresh, all in one tidy pawckage."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Downloaf Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Downloaf Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Downloaf Modrinth App fur {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Pic of Cobblemon main menu."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Moar Downloaf Optshunz"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Gimme permission"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Nope"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> by <creator-link>{creator}</creator-link> iz gonna be able to:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Gib {appName} da paw-thorization"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "Iz no redirect place in da response"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "U iz gonna be zoomin' to <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Sendz teh recoverz emeowl"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Gibz ur emeowl nao! We gonna sendz a magick linkz to getz ur accountz back."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Emeowl or hoominname"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Emeowl"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Oh hai! A emeowl wif instructshuns iz in ur inbox, k? Iz dere if u putted it dere beforez."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "I sended da emeowl"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Oh hai! U can haz login to ur acct wit new secwet."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Secwet haz bin resetz"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Resetted da secwet"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Confirmd da secwet"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Enterz ur new secwet belowz to haz access to ur accountz."
+  },
+  "auth.reset-password.title": {
+    "message": "Resetz secwet"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Resetz hooman secwet"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Gib meh da two-facturz codez nao, plz."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Ih hi intr twofactr code"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Intr code..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>4got passwordz</forgot-password-link> • <create-account-link>Makez a new accounT</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Emeowl or hoominname"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Secwet"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Signz in wif"
+  },
+  "auth.sign-in.title": {
+    "message": "Getw In"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Or haz a secwet"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Makez an accountz"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Confirmz teh secwet"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Emeowl"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Hoominname"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Oh hai! By makin' an account, you agrees to Modrinth's <terms-link>Termz</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Secwet no matchy matchy!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Secwet"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Haz u gots an account already?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Gib teh Modrinth updatz"
+  },
+  "auth.sign-up.title": {
+    "message": "Signz upz"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Or haz yer ownz accountz"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Signz up wit"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Hooman tweakz"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Signz in nao"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Yer emeowl iz alreddy verified!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Emeowl alreddy verified"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Sendz teh verifyin' emeowl againz"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Oh noes! Weez couldn't haz verify ur emeowl. Try sendin' da emeowl againz thru ur dashbordz by signin' in."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Oh noes! Weez couldn't haz verify ur emeowl. Try sendin' da emeowl againz thru ur butn below."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Da mail emeowl verifyin didn't workz"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Oh hai! Ur emeowl iz verified! Yaay!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Emeowl verifyin"
+  },
+  "auth.verify-email.title": {
+    "message": "Verifyz emeowl"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Subscrube teh updaets 'bout Modrinth"
+  },
+  "auth.welcome.description": {
+    "message": "Oh hai! Ur now part of teh amazin' club o' peeps makin' stuff, grabbin' stuff, n' keepin' up wif all teh kewl tweakiez."
+  },
+  "auth.welcome.label.tos": {
+    "message": "Oh hai! By makin' an account, you agrees to Modrinth's <terms-link>Termz</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
+  },
+  "auth.welcome.long-title": {
+    "message": "Oh hai! Welcomez to Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "Hai guise"
+  },
+  "collection.button.delete-icon": {
+    "message": "Shoo away iconz"
+  },
+  "collection.button.edit-icon": {
+    "message": "Pawdit icon"
+  },
+  "collection.button.remove-project": {
+    "message": "Shoo away da pawject"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Stop stalkin' da pawject"
+  },
+  "collection.delete-modal.description": {
+    "message": "Dis will shoo away dis hoardz fur-ever! No can undo dis, so be carefulz."
+  },
+  "collection.delete-modal.title": {
+    "message": "U sure wanna delete dis hoardz?"
+  },
+  "collection.description": {
+    "message": "{description} - Iz lookin' at teh stash {name} by {username} on Modrinth"
+  },
+  "collection.description.following": {
+    "message": "Iz auto-genrated pile o' all teh pawjectz u iz stalkin'."
+  },
+  "collection.error.not-found": {
+    "message": "Hoardz not herez"
+  },
+  "collection.label.collection": {
+    "message": "Hoardz"
+  },
+  "collection.label.created-at": {
+    "message": "Madez {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Made by teh hooman"
+  },
+  "collection.label.no-projects": {
+    "message": "Dis hoardz haz NO pawjectz!"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "U haz no pawjectz!\nWanna <create-link>addz one, yes</create-link>?"
+  },
+  "collection.label.owner": {
+    "message": "Owener"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, one {<stat>{count}</stat> pawject} other {<stat>{count}</stat> pawjetctz}}"
+  },
+  "collection.label.updated-at": {
+    "message": "Remad {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - Hoardz"
+  },
+  "common.close": {
+    "message": "Close"
+  },
+  "common.no": {
+    "message": "Naw"
+  },
+  "common.yes": {
+    "message": "Yaas"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Maek new"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural, one {{count} pawject} other {{count} pawjetctz}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Searchez at yer hoardz"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Yer hoardz"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "An outlandish kittehr meanz a biznez crittur organizd owtzide da US (like non-US corpurrashun, pawtnership or LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Outlandish kittehr"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Loneleh pawson"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Iz u a sneaky kitteh hoomin or a pawt of outlandish kittehr?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Moneh papurrz"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Safez kitteh habitz"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "U belongz to da US pawty?"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "U haz teh wrongz URL fur teh cute kitteh hoardz, maybeh."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "Da hoardz might be secretz."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "Oh noe! Da hoardz iz gone! Modrinth's hoomanz took it down cuz it broke <tou-link>da rulez</tou-link>."
+  },
+  "error.collection.404.list_title": {
+    "message": "Y?"
+  },
+  "error.collection.404.title": {
+    "message": "No haz hoardz here"
+  },
+  "error.generic.404.subtitle": {
+    "message": "Oh hai! Page u iz lookin fur? Iz gone! Can haz find it? Nope."
+  },
+  "error.generic.404.title": {
+    "message": "Page not herez"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Checkses if Modrinth iz downz on our <status-link>Status page</status-link> nao."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "Oh hai! If dis keeps happenin', u mite wanna tell da Modrinth Team by joinin' our <discord-link>Kittehcord</discord-link>."
+  },
+  "error.generic.default.list_title": {
+    "message": "Oh hai! Pwease tryz againz in lik, sum minutez."
+  },
+  "error.generic.default.subtitle": {
+    "message": "Oh noes! Sumthin' went belly up."
+  },
+  "error.generic.default.title": {
+    "message": "Oh noe!"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "U haz mistypez teh kitteh clubz' URL, iz possiblz."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "Oh hai! Da club's hooman probly changed teh URLz or deletd itz. Sad kitteh."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "Oh noes! Da kitteh clubz iz gonez! Modrinth admins tooked it awayz cuz it brokez da rulez, ya knowz, da <tou-link>Termz of Usez</tou-link>."
+  },
+  "error.organization.404.list_title": {
+    "message": "Y?"
+  },
+  "error.organization.404.title": {
+    "message": "No can haz kitteh clubz"
+  },
+  "error.project.404.list_item.1": {
+    "message": "U haz mistypez teh pawject'z URL, mebbe."
+  },
+  "error.project.404.list_item.2": {
+    "message": "Da pawject ownah mebbe changed da URL, madez itz allz privatez, orz evenz deletedz itz."
+  },
+  "error.project.404.list_item.3": {
+    "message": "Da pawject mays has been taked downz by Modrinth's hoomanz cuz it brokez <tou-link>da rulez</tou-link>, ya knowz."
+  },
+  "error.project.404.list_title": {
+    "message": "Y?"
+  },
+  "error.project.404.title": {
+    "message": "No can haz pawject"
+  },
+  "error.user.404.list_item.1": {
+    "message": "You haz maybe meowtyped teh hooman'z hoominname."
+  },
+  "error.user.404.list_item.2": {
+    "message": "Da hooman mite haz changedz da hoominname or iz gone furrevers."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Da hooman's 'count mighta been termin8ed 'cause dey brokez Modrinth's <tou-link>rulez</tou-link>."
+  },
+  "error.user.404.list_title": {
+    "message": "Y?"
+  },
+  "error.user.404.title": {
+    "message": "No can haz hooman"
+  },
+  "frog": {
+    "message": "You haz been fwogged! 🐸"
+  },
+  "frog.altText": {
+    "message": "Photorealistik paintin' ob a froggy labyrinth"
+  },
+  "frog.froggedPeople": {
+    "message": "{count, plural, one {{count} more hooman} other {{count} more hoomans}} haz been frogged!"
+  },
+  "frog.sinceOpened": {
+    "message": "Dis page wuz open nao {ago}"
+  },
+  "frog.title": {
+    "message": "Fwog"
+  },
+  "landing.button.discover-mods": {
+    "message": "Findz tweakiez"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Go to da dashyboard"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "Haz da best modding fun wif constant patchez from Modrinth kittehs"
+  },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "Furrever changin'"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "See all teh numbers: page peeks, nommed downloads, n kitteh cash"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "Nerdy stuffz and numberz"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "Make ur pawject seen by thousands of kittehs via search, home pawge, Kittehcord, n more stuffs later!"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "Findz"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Merge ur kitteh build tools wif Minotaur, uploads happen magically on new verzhun"
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "Lotsa Kitteh Stuff"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "Get paid kitteh cash from ur projectz n withdraw wen u want"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "Kitteh revenue"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "Add ur kitteh crew n pawssign permissions wif no hassle"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "Crew Kontrolz"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Uh oh, no randum pawjectz loadz :("
+  },
+  "landing.feature.follow.description": {
+    "message": "Get pingz when ur fav pawjectz update, stay in da loop."
+  },
+  "landing.feature.follow.heading": {
+    "message": "Stalk pawjectz u luv"
+  },
+  "landing.feature.launcher.description": {
+    "message": "Modrinth’s freez codez API lets launchers snuggle deep into Modrinth. U can use Modrinth thru <link>our own app</link> n also poplar launchers like ATLauncher, MultiMC, n Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Play wif ur fav lawncher"
+  },
+  "landing.feature.search.description": {
+    "message": "Modrinth’s speedy search n strong pawfilters help u find stuff as u type."
+  },
+  "landing.feature.search.heading": {
+    "message": "Findz wut u want, fast n ez"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Da spot for Minecwaft {content}"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "nerdy Packz"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "tweakie bundlez"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "tweakiez"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "pluggiez"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "resource Packz"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "servahz"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "fanceh Lights"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "A smol Minecraft window wif Mojang logo dyed Modrinth green."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth Appz"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} gotz fun patchez!"
+  },
+  "landing.notifications.heading": {
+    "message": "Notifikashuns"
+  },
+  "landing.notifications.received-time": {
+    "message": "Gotz at {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "Verzhun {version} haz been droppd fur {gameVersion}"
+  },
+  "landing.search.label": {
+    "message": "Searchez"
+  },
+  "landing.search.placeholder": {
+    "message": "Searchez..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Sortn'"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Give ur pawjects an online den n show floof to all da kittehs."
+  },
+  "landing.section.for-creators.label": {
+    "message": "For peeps makin' stuff"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Spread ur kitteh creazhuns far n wide"
+  },
+  "landing.section.for-players.description": {
+    "message": "From fanceh biomes to spooky cursed dungeons, find kitteh content to level up ur game."
+  },
+  "landing.section.for-players.label": {
+    "message": "For Kittehs"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Findz over {count} pawjectz"
+  },
+  "landing.subheading": {
+    "message": "Findz, play, n pawt Minecwaft floof thru our freez codez kitteh platform."
+  },
+  "layout.action.change-theme": {
+    "message": "Changez themez"
+  },
+  "layout.action.close-banner": {
+    "message": "Close"
+  },
+  "layout.action.create-new": {
+    "message": "Maek new..."
+  },
+  "layout.action.file-lookup": {
+    "message": "Checkz teh filez"
+  },
+  "layout.action.lookup-by-email": {
+    "message": "Sniff by mailz"
+  },
+  "layout.action.manage-server-notices": {
+    "message": "Kontrol teh server shoutz"
+  },
+  "layout.action.new-collection": {
+    "message": "New hoardz"
+  },
+  "layout.action.new-organization": {
+    "message": "New kitteh clubz"
+  },
+  "layout.action.new-project": {
+    "message": "New pawject"
+  },
+  "layout.action.reports": {
+    "message": "Repurrtz"
+  },
+  "layout.action.review-projects": {
+    "message": "Kitteh check pawject"
+  },
+  "layout.avatar.alt": {
+    "message": "Yur avatarz"
+  },
+  "layout.banner.account-action": {
+    "message": "Account stuffz needs doin'"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Visit teh accownt tweakz"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Oh hai! For teh securitiez, Modrinth needs u to gib ur emeowl to ur accountz."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Oh noes! Da Modrinth frontendy deploy went belly up! Cants haz state from da API. Maybe API is down, or sumthin' is borked! Rebuilds when API is bak! Error codes: {errors}; Current API URL is: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Uh oh! Sumthin' went wrong makin' da state frum da API when I wuz buildin' it."
+  },
+  "layout.banner.staging.description": {
+    "message": "Oh hai! Staging place iz totally 'wayz from da real Modrinth! Iz for testin' and fixin' stuff, maybe runnin' new Modrinth backend or frontend dat's not even on da real site yet."
+  },
+  "layout.banner.staging.title": {
+    "message": "Ur lookin' at Modrinth's stagey place"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Updatin' billin' stuffz"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Oh noes! Sum subscripz didn't renewz! Plz gib meh teh moniez nao so u no lose all teh stuffz!"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Oh hai! Billz needz sum luvin' nao."
+  },
+  "layout.banner.tax.action": {
+    "message": "Fillz out moneh papurrz"
+  },
+  "layout.banner.tax.title": {
+    "message": "Moneh papurrz needz"
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Sendz teh verify emailz againz, plz"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Oh hai! For teh sekurity reasons, Modrinth needs u to make sure teh emeowl addy wiff ur account iz legit."
+  },
+  "layout.footer.about": {
+    "message": "Abawt"
+  },
+  "layout.footer.about.careers": {
+    "message": "Catz Jobz"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Changey Thingz"
+  },
+  "layout.footer.about.news": {
+    "message": "Kitteh Buzz"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Yummy Treatz Pawgram"
+  },
+  "layout.footer.about.status": {
+    "message": "Howz I Dooin"
+  },
+  "layout.footer.legal": {
+    "message": "Lawz n Rulez"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "DIS IZ NOT AN OFFICIAL MINECWAFT SERVICE. MOJANG OR MICROSOFT DIDN’T SAY IZ KAY OR HAZ ANYTHING TO DO WIF DIS."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Copypaw Rights Pawlicy n DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "No Peepz Pawlicy"
+  },
+  "layout.footer.legal.rules": {
+    "message": "No Bad Hoardz Roolz"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Beware da Sneaky Kittehz"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Rulez for Hoominz"
+  },
+  "layout.footer.modrinth-information": {
+    "message": "Modrinth knoledgez"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth iz <github-link>kitteh sorce code</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "Kitteh Stuffz"
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth Appz"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth Pawwers"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servahz"
+  },
+  "layout.footer.resources": {
+    "message": "Kitteh Goodiez"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "Kitteh API Pawcumentz"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Kitteh Hulp Hub"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Tell Kittehz Bout Problemaz"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Kitteh Talkz"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluepaw"
+  },
+  "layout.footer.social.discord": {
+    "message": "Kittehcord"
+  },
+  "layout.footer.social.github": {
+    "message": "CatHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodonk"
+  },
+  "layout.footer.social.x": {
+    "message": "Bad Bird"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Flip flop menu"
+  },
+  "layout.meta.description": {
+    "message": "Downloadz Minecwaft tweakiez, pluginz, nerdy packz, fanceh lights, resource packz, n' wweakie bundlez on Modrinth! Discover n' publish pawject on Modrinth wif a modern, easy-to-use interface n' API."
+  },
+  "layout.meta.og-description": {
+    "message": "Findz and sharez Minecwaft stuffz!"
+  },
+  "layout.nav.analytics": {
+    "message": "Countz"
+  },
+  "layout.nav.discover": {
+    "message": "Findz it"
+  },
+  "layout.nav.discover-content": {
+    "message": "Findz stuffz"
+  },
+  "layout.nav.feature-flags": {
+    "message": "Feeechurrr flaaagz"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "I can haz da Modrinth Appz"
+  },
+  "layout.nav.home": {
+    "message": "Lookin' for stuff"
+  },
+  "layout.nav.host-a-server": {
+    "message": "Throwz a server pawrty"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth Appz"
+  },
+  "layout.nav.modrinth-home-page": {
+    "message": "Modrinth haus pawge"
+  },
+  "layout.nav.organizations": {
+    "message": "Kitteh clubz"
+  },
+  "layout.nav.profile": {
+    "message": "Pawfile"
+  },
+  "layout.nav.projects": {
+    "message": "Pawjects"
+  },
+  "layout.nav.revenue": {
+    "message": "Profitt"
+  },
+  "layout.nav.saved-projects": {
+    "message": "Stashed pawjects"
+  },
+  "layout.nav.search": {
+    "message": "Searchez"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "Levelz up to Modrinth+"
+  },
+  "moderation.filter.by": {
+    "message": "Picn'"
+  },
+  "moderation.moderate": {
+    "message": "Keepz in line"
+  },
+  "moderation.page.projects": {
+    "message": "Pawjectz"
+  },
+  "moderation.page.reports": {
+    "message": "I repurrtd da isshewz"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Howz I dooin kitteh checkz"
+  },
+  "moderation.search.placeholder": {
+    "message": "Searchez..."
+  },
+  "moderation.sort.by": {
+    "message": "Sortn'"
+  },
+  "moderation.technical.search.placeholder": {
+    "message": "Searchez kitteh checkz..."
+  },
+  "profile.button.billing": {
+    "message": "I kontrol da hoomin coinz"
+  },
+  "profile.button.info": {
+    "message": "I look at da hoomin deetz"
+  },
+  "profile.button.manage-projects": {
+    "message": "I kontrol da pawjectz"
+  },
+  "profile.error.not-found": {
+    "message": "No can haz hooman"
+  },
+  "profile.joined-at": {
+    "message": "I joinz dis on <date>{ago}</date>"
+  },
+  "profile.label.badges": {
+    "message": "Hoardz of honor"
+  },
+  "profile.label.details": {
+    "message": "De lil' stuffs"
+  },
+  "profile.label.no-collections": {
+    "message": "Dis hooman haz NO hoardzies!"
+  },
+  "profile.label.no-collections-auth": {
+    "message": "U haz no hoardzies! Oh noes! Wantz to <create-link>maek one, kitteh?</create-link>?"
+  },
+  "profile.label.no-projects": {
+    "message": "Dis hooman haz NO pawjectz!"
+  },
+  "profile.label.no-projects-auth": {
+    "message": "U haz no pawject! Iz sad!\nWanna <create-link>makez one</create-link>, meow?"
+  },
+  "profile.label.organizations": {
+    "message": "Kitteh clubz"
+  },
+  "profile.meta.description": {
+    "message": "I grabz {username}'z pawjectz on Modrinth"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} - I snatchz {username}'z Kitteh pawjectz on Modrinth"
+  },
+  "profile.stats.downloads": {
+    "message": "{count, plural, one {<stat>{count}</stat> pawject grab} other {<stat>{count}</stat> pawject grabz}}"
+  },
+  "profile.stats.projects": {
+    "message": "{count, plural, one {<stat>{count}</stat> pawject} other {<stat>{count}</stat> pawjectz}}"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> pawject furrlover} other {<stat>{count}</stat> pawject furrloverz}}"
+  },
+  "profile.user-id": {
+    "message": "Hoomin ID: {id}"
+  },
+  "project-member-header.accept": {
+    "message": "I gib da paw"
+  },
+  "project-member-header.decline": {
+    "message": "I takz paw away"
+  },
+  "project-member-header.error": {
+    "message": "Kitteh oopsies"
+  },
+  "project-member-header.error-decline": {
+    "message": "I failyed to sez no to da teem invite"
+  },
+  "project-member-header.error-join": {
+    "message": "I failyed to sez ok to da teem invite"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "U haz been invited to join dis pawject. Pwease sez ok or sez no to da invite."
+  },
+  "project-member-header.invitation-title": {
+    "message": "Kitteh invite to join da pawject"
+  },
+  "project-member-header.invitation-with-role": {
+    "message": "U haz been invited to be a member of dis pawject wif da role of '{role}'."
+  },
+  "project-member-header.success": {
+    "message": "It wurked"
+  },
+  "project-member-header.success-decline": {
+    "message": "U sez no to da teem invite"
+  },
+  "project-member-header.success-join": {
+    "message": "U haz become part of da kitteh pawject teem"
+  },
+  "project-moderation-nags.publishing-checklist": {
+    "message": "Kitteh ready-to-post pawlist"
+  },
+  "project-moderation-nags.required": {
+    "message": "Must haz"
+  },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "I sendz pawject again for kitteh check"
+  },
+  "project-moderation-nags.resubmit-for-review-desc": {
+    "message": "Ur pawject got {status} by da Modrinth hoomins. Usually, u can sendz it pawject again for kitteh check after readin da staff note."
+  },
+  "project-moderation-nags.submit-checklist-tooltip": {
+    "message": "U haz to finish all da must haz steps in da Kitteh ready-to-post pawlist!"
+  },
+  "project-moderation-nags.submit-for-review": {
+    "message": "I sendz pawject for kitteh check"
+  },
+  "project-moderation-nags.submit-for-review-desc": {
+    "message": "Only pawject kittehz can see dis pawject. Mod hoomins haz to give it da kitteh check befurr it can be pawblished."
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "Kitteh thinkiez"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "See da mod kittehz page"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Oh noez"
+  },
+  "project-type.collection.plural": {
+    "message": "Hoardzies"
+  },
+  "project-type.collection.singular": {
+    "message": "Hoardz"
+  },
+  "project-type.datapack.plural": {
+    "message": "Nerdy Packz"
+  },
+  "project-type.datapack.singular": {
+    "message": "Nerdy Pack"
+  },
+  "project-type.mod.plural": {
+    "message": "Tweakiez"
+  },
+  "project-type.mod.singular": {
+    "message": "Tweakie"
+  },
+  "project-type.modpack.plural": {
+    "message": "Tweakie bundlez"
+  },
+  "project-type.modpack.singular": {
+    "message": "Tweakie bundle"
+  },
+  "project-type.plugin.plural": {
+    "message": "Pluggiez"
+  },
+  "project-type.plugin.singular": {
+    "message": "Pluggie"
+  },
+  "project-type.project.plural": {
+    "message": "Pawjects"
+  },
+  "project-type.project.singular": {
+    "message": "Pawject"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Resource Packz"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Resource Packz"
+  },
+  "project-type.shader.plural": {
+    "message": "Fanceh Lights"
+  },
+  "project-type.shader.singular": {
+    "message": "Fanceh Lights"
+  },
+  "project.about.details.created": {
+    "message": "Madez on {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "Kitteh rights {license}"
+  },
+  "project.about.details.published": {
+    "message": "Putt'd out on {date}"
+  },
+  "project.about.details.submitted": {
+    "message": "Gibz to da on {date}"
+  },
+  "project.about.details.title": {
+    "message": "De lil' stuffs"
+  },
+  "project.about.details.updated": {
+    "message": "I updaited dis on {date}"
+  },
+  "project.actions.create-server": {
+    "message": "Makez a servah"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "Makez a servah"
+  },
+  "project.actions.dont-show-again": {
+    "message": "Shush furreverrr"
+  },
+  "project.actions.review-project": {
+    "message": "Kitteh check pawject"
+  },
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Servahz is the easiest way to play with your friends without hassle!"
+  },
+  "project.actions.servers-promo.monthly": {
+    "message": " purr munth"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "Starti' at $5{monthly}"
+  },
+  "project.actions.servers-promo.title": {
+    "message": "Makez a servah"
+  },
+  "project.collections.create-new": {
+    "message": "Maek hoardz"
+  },
+  "project.collections.none-found": {
+    "message": "No haz hoardz."
+  },
+  "project.description.title": {
+    "message": "What dis is"
+  },
+  "project.details.licensed": {
+    "message": "Kitteh rights"
+  },
+  "project.download.game-version": {
+    "message": "Gamey verzhun: {version}"
+  },
+  "project.download.game-version-error": {
+    "message": "Oopsie: no haz gamey verzhun"
+  },
+  "project.download.game-version-tooltip": {
+    "message": "{title} available onlee fur {version}"
+  },
+  "project.download.game-version-unsupported-tooltip": {
+    "message": "{title} can’t runz {gameVersion} on {platform}"
+  },
+  "project.download.install-with-app": {
+    "message": "Installz wif Modrinth App"
+  },
+  "project.download.no-app": {
+    "message": "No haz Modrinth App?"
+  },
+  "project.download.no-versions-available": {
+    "message": "No versionz haz for {gameVersion} an {platform}."
+  },
+  "project.download.platform": {
+    "message": "Platfurrm: {platform}"
+  },
+  "project.download.platform-error": {
+    "message": "Oopsie: kitteh dunno platfurrms"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title} available onlee fur {platform}"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{title} can’t runz {platform} on {gameVersion}"
+  },
+  "project.download.search-game-versions": {
+    "message": "Searchez gamey verzhunz..."
+  },
+  "project.download.search-game-versions-label": {
+    "message": "Searchez gamey verzhunz..."
+  },
+  "project.download.select-game-version": {
+    "message": "Choose da gamey verzhunz"
+  },
+  "project.download.select-platform": {
+    "message": "Choose da platfurm"
+  },
+  "project.download.show-all-versions": {
+    "message": "Show all da verzhunz"
+  },
+  "project.download.title": {
+    "message": "Downloaf {title}"
+  },
+  "project.environment.migration-no-permission.message": {
+    "message": "Weez jusht overhauled teh Environmints systemz on Modrinth and new optionz iz now availabull. U dun haz permissionz to pawditz dese settingz, but plz let anuther kitteh of teh pawject knowz dat teh environmint meta needz checkin."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Environmint meta needz to be kitteh checked"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "Findz out moar on dis changz"
+  },
+  "project.environment.migration.message": {
+    "message": "Kittehz did a big overhaul on Modrinth Enviromint an new choicez r here. Peek at ur project settings an verify da metadata."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Kitteh check where da pawject workz tweakz"
+  },
+  "project.environment.migration.title": {
+    "message": "Pwease kitteh check enviromint metadata"
+  },
+  "project.error.loading": {
+    "message": "Oopsie bits no load project info{message}"
+  },
+  "project.error.page-not-found": {
+    "message": "Kitteh dunno pawge"
+  },
+  "project.error.project-not-found": {
+    "message": "No can haz pawject"
+  },
+  "project.gallery.title": {
+    "message": "Pictarzies"
+  },
+  "project.license.error": {
+    "message": "Kitteh no can haz kitteh rights text."
+  },
+  "project.license.loading": {
+    "message": "Loadin' kitteh rights text..."
+  },
+  "project.license.title": {
+    "message": "Kitteh rights"
+  },
+  "project.moderation.title": {
+    "message": "Haz banhammers"
+  },
+  "project.navigation.changelog": {
+    "message": "Changey thingz"
+  },
+  "project.notification.icon-updated.message": {
+    "message": "Ur pawject iconz haz been updatzd."
+  },
+  "project.notification.icon-updated.title": {
+    "message": "Pawject updatzd"
+  },
+  "project.notification.updated.message": {
+    "message": "Ur pawject haz been updatzd."
+  },
+  "project.notification.updated.title": {
+    "message": "Pawject updatz"
+  },
+  "project.settings.environment.notice.missing-env.description": {
+    "message": "Ur pawject iz missin’ environment metadata. Please pick da rite option below."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "message": "Pwease pick where dis pawject wurks"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "message": "Diffurent verzhunz of ur pawject haz diffurent environments picked, so u no can edit all at once."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "message": "Ur pawject haz many environmentz"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "message": "Kittehz remade da Modrinth Environments an new choices r here. Check da correct option below an click ‘Checkz’ wen finished!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "message": "Pwease look at da options below"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "message": "Only mod or modpack pawjects can haz environment metadata."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "message": "Dis pawject type no can haz environment metadata"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "message": "Checkz"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "message": "Checkz dat dis pawject’s environment iz set rite."
+  },
+  "project.settings.general.name.description": {
+    "message": "No addz, just da pawject name."
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "e.g. Netherz Redo 2"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "e.g. Kitteh Construction Gear"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "e.g. Betterz than Caving"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "e.g. Enhanced Meowrtals"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "e.g. Scary Boss Mobs"
+  },
+  "project.settings.general.name.title": {
+    "message": "Naem"
+  },
+  "project.settings.general.tagline.description": {
+    "message": "Keep it brief, one sentence fur da pawject."
+  },
+  "project.settings.general.tagline.placeholder.1": {
+    "message": "e.g. Overhauls game progression to revolve around da Netherz."
+  },
+  "project.settings.general.tagline.placeholder.2": {
+    "message": "e.g. Adds wearable kitteh construction gear."
+  },
+  "project.settings.general.tagline.placeholder.3": {
+    "message": "e.g. Adds realistic mineshaft-buildin’ mechanicz."
+  },
+  "project.settings.general.tagline.placeholder.4": {
+    "message": "e.g. Improves how Nether portals linkz to each other."
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "e.g. Adds scary boss kittehz to meet in da night."
+  },
+  "project.settings.general.tagline.title": {
+    "message": "Kitteh words"
+  },
+  "project.settings.general.url.title": {
+    "message": "Webz pawth"
+  },
+  "project.settings.title": {
+    "message": "Tweakz"
+  },
+  "project.settings.visit-dashboard": {
+    "message": "Peek da pawject dashyboard"
+  },
+  "project.stats.downloads-label": {
+    "message": "pawject grab{count, plural, one {} other {z}}"
+  },
+  "project.stats.followers-label": {
+    "message": "furrlover{count, plural, one {} other {z}}"
+  },
+  "project.status.archived.message": {
+    "message": "{title} haz been put in da box. {title} won’t get any new stuff unless taken out of da box."
+  },
+  "project.version.all-versions": {
+    "message": "All da verzhunz"
+  },
+  "project.version.back-to-versions": {
+    "message": "Go bakk to da verzhunz"
+  },
+  "project.versions.title": {
+    "message": "Verzhunz"
+  },
+  "report.already-reported": {
+    "message": "U alrdy telld 'bout {title}"
+  },
+  "report.already-reported-description": {
+    "message": "Iz seez u haz open repurrt fur dis {item} alreadiez. U can haz add moar detailz to ur repurrt ifz u haz moar infoz to haz addz."
+  },
+  "report.back-to-item": {
+    "message": "Go bakk to {item}"
+  },
+  "report.body.description": {
+    "message": "Gib linkz n shiny picshurz if u can. If ur repurrt iz empty or not enuff, kittehz will close it n nap instead."
+  },
+  "report.body.title": {
+    "message": "Pwease tellz moar stuff bout ur repurrt so kittehz understandz"
+  },
+  "report.checking": {
+    "message": "Checkin {item}..."
+  },
+  "report.could-not-find": {
+    "message": "Kitteh lookd evrywher but no {item}"
+  },
+  "report.for.violation": {
+    "message": "Breakin da Modrinth <rules-link>Roolz</rules-link> or <terms-link>Rulez for Hoominz</terms-link>"
+  },
+  "report.for.violation.description": {
+    "message": "Examplez iz meany stuffs, spamz, rudeness, tricksy hoomin stuffz, confuzin stuffz, and no-no kitteh stuffz."
+  },
+  "report.form-not-for": {
+    "message": "Dis form iz no use fur dis stuffz:"
+  },
+  "report.go-to-report": {
+    "message": "Go to da repurrt"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Sneaky bugz tellz"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "U can report sneaky bugz to der <issues-link>Bugz Tellz Tracker</issues-link>."
+  },
+  "report.not-for.dmca": {
+    "message": "DMCA shoo-awayz"
+  },
+  "report.not-for.dmca.description": {
+    "message": "Check out our <policy-link>No Stealz Pawlicy</policy-link>."
+  },
+  "report.note.copyright.1": {
+    "message": "Pwease note u iz not sendin a DMCA shoo-away, but just tellin bout reuploaded content."
+  },
+  "report.note.copyright.2": {
+    "message": "If u wanted to send a DMCA Shoo-Away (dat iz a legal thingy) instead, pwease see our <copyright-policy-link>Copypaw Rights Pawlicy</copyright-policy-link>."
+  },
+  "report.note.malicious.1": {
+    "message": "If u tellz bout meany or sneaky stuffz, u gotta gib plenty proof, like hoomin codez."
+  },
+  "report.note.malicious.2": {
+    "message": "Reports from Microsoft Defender, VirusTotal, or AI kitteh malware sniffers iz not good enuff and kittehz won’t accept dem."
+  },
+  "report.please-report": {
+    "message": "Pwease tell da kittehz bout:"
+  },
+  "report.question.content-id": {
+    "message": "Wut iz da kitteh ID of da {item}?"
+  },
+  "report.question.content-type": {
+    "message": "Wut kind of kitteh stuff u tellin bout?"
+  },
+  "report.question.report-reason": {
+    "message": "Which of Modrinth's roolz iz dis {item} breakin?"
+  },
+  "report.report-content": {
+    "message": "Send da sneaky stuffz to da mod kittehz"
+  },
+  "report.report-item": {
+    "message": "Send {title} to da mod kittehz"
+  },
+  "report.submit": {
+    "message": "I sendz da repurrt"
+  },
+  "revenue.transfers.total": {
+    "message": "U haz taken out {amount} in total."
+  },
+  "revenue.transfers.total.method": {
+    "message": "U haz taken out {amount} thru {method}."
+  },
+  "revenue.transfers.total.year": {
+    "message": "U haz taken out {amount} in {year}."
+  },
+  "revenue.transfers.total.year_method": {
+    "message": "U haz taken out {amount} in {year} thru {method}."
+  },
+  "scopes.analytics.description": {
+    "message": "Peek at ur kitteh statz"
+  },
+  "scopes.analytics.label": {
+    "message": "I peek at da kitteh statz"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "Maek hoardz"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "Maek hoardz"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "Shoo away da hoardz"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "Shoo away da hoardz"
+  },
+  "scopes.collectionRead.description": {
+    "message": "Peek at da da hoardz"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Peek at da da hoardz"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Mewz tu hoardz"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Mewz tu hoardz"
+  },
+  "scopes.notificationRead.description": {
+    "message": "I peek at ur kitteh pings"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Peek at da kitteh pings"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "Shoo away / peek at ur kitteh pings"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Mewz pings"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Maek kitteh clubz"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "Maek kitteh clubz"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "Shoo away da kitteh clubz"
+  },
+  "scopes.organizationDelete.label": {
+    "message": "Shoo away da kitteh clubz"
+  },
+  "scopes.organizationRead.description": {
+    "message": "Peek at kitteh clubz"
+  },
+  "scopes.organizationRead.label": {
+    "message": "Peek at kitteh clubz"
+  },
+  "scopes.organizationWrite.description": {
+    "message": "Mewz tu da kitteh clubz"
+  },
+  "scopes.organizationWrite.label": {
+    "message": "Mewz tu da kitteh clubz"
+  },
+  "scopes.patCreate.description": {
+    "message": "Maek API pawtken"
+  },
+  "scopes.patCreate.label": {
+    "message": "Maek PAWTz"
+  },
+  "scopes.patDelete.description": {
+    "message": "Shoo away ur Kitteh API pawtkenz"
+  },
+  "scopes.patDelete.label": {
+    "message": "Shoo away PAWTz"
+  },
+  "scopes.patRead.description": {
+    "message": "Peek at API pawtkenz I crafted"
+  },
+  "scopes.patRead.label": {
+    "message": "I peek at da at PAWTz"
+  },
+  "scopes.patWrite.description": {
+    "message": "Pawdit personal API pawtken"
+  },
+  "scopes.patWrite.label": {
+    "message": "Mewz PAWTz"
+  },
+  "scopes.payoutsRead.description": {
+    "message": "I peek at da kitteh coinz statz"
+  },
+  "scopes.payoutsRead.label": {
+    "message": "I peek at da payoutz"
+  },
+  "scopes.payoutsWrite.description": {
+    "message": "Kitteh takez out coinz"
+  },
+  "scopes.payoutsWrite.label": {
+    "message": "Mewz payout"
+  },
+  "scopes.performAnalytics.description": {
+    "message": "Peekz at da stats"
+  },
+  "scopes.performAnalytics.label": {
+    "message": "Peekz at da stats"
+  },
+  "scopes.projectCreate.description": {
+    "message": "Maek new pawjectz"
+  },
+  "scopes.projectCreate.label": {
+    "message": "Maek pawjectz"
+  },
+  "scopes.projectDelete.description": {
+    "message": "Shoo away ur pawjectz"
+  },
+  "scopes.projectDelete.label": {
+    "message": "Shoo away pawjectz"
+  },
+  "scopes.projectRead.description": {
+    "message": "I peek at ur kitteh pawjectz"
+  },
+  "scopes.projectRead.label": {
+    "message": "I peek at da pawjectz"
+  },
+  "scopes.projectWrite.description": {
+    "message": "Mewz pawject info"
+  },
+  "scopes.projectWrite.label": {
+    "message": "Mewz pawject"
+  },
+  "scopes.reportCreate.description": {
+    "message": "Maek da repurrtz"
+  },
+  "scopes.reportCreate.label": {
+    "message": "Maek da repurrtz"
+  },
+  "scopes.reportDelete.description": {
+    "message": "Shoo away repurrtz"
+  },
+  "scopes.reportDelete.label": {
+    "message": "Shoo away repurrtz"
+  },
+  "scopes.reportRead.description": {
+    "message": "Peek at da repurrtz"
+  },
+  "scopes.reportRead.label": {
+    "message": "Peek at da repurrtz"
+  },
+  "scopes.reportWrite.description": {
+    "message": "Pawdit repurrtz"
+  },
+  "scopes.reportWrite.label": {
+    "message": "Mewz repurrtz"
+  },
+  "scopes.sessionAccess.description": {
+    "message": "Scamperin thru modrinth-issued sessionz"
+  },
+  "scopes.sessionAccess.label": {
+    "message": "Checks sessionz"
+  },
+  "scopes.sessionDelete.description": {
+    "message": "Shoo away sessionz"
+  },
+  "scopes.sessionDelete.label": {
+    "message": "Shoo away sessionz"
+  },
+  "scopes.sessionRead.description": {
+    "message": "Peek at da live sessionz"
+  },
+  "scopes.sessionRead.label": {
+    "message": "Peek at da sessionz"
+  },
+  "scopes.threadRead.description": {
+    "message": "Peek at da threadz"
+  },
+  "scopes.threadRead.label": {
+    "message": "Peek at da threadz"
+  },
+  "scopes.threadWrite.description": {
+    "message": "Mewz threadz"
+  },
+  "scopes.threadWrite.label": {
+    "message": "Mewz threadz"
+  },
+  "scopes.userAuthWrite.description": {
+    "message": "Flingz hoomin auth kitteh stuff"
+  },
+  "scopes.userAuthWrite.label": {
+    "message": "Mewz auth info"
+  },
+  "scopes.userDelete.description": {
+    "message": "Shoo away ur account"
+  },
+  "scopes.userDelete.label": {
+    "message": "Shoo away ur account"
+  },
+  "scopes.userRead.description": {
+    "message": "Checks da hoomin’s piblic info"
+  },
+  "scopes.userRead.label": {
+    "message": "Peek at da hoomin info"
+  },
+  "scopes.userReadEmail.description": {
+    "message": "Peek at da emeowl"
+  },
+  "scopes.userReadEmail.label": {
+    "message": "Peek at da hoomin emeowl"
+  },
+  "scopes.userWrite.description": {
+    "message": "Mewz in ur pawfile"
+  },
+  "scopes.userWrite.label": {
+    "message": "Mewz ur data"
+  },
+  "scopes.versionCreate.description": {
+    "message": "Maek da fresh verzhunz"
+  },
+  "scopes.versionCreate.label": {
+    "message": "Maek verzhunz"
+  },
+  "scopes.versionDelete.description": {
+    "message": "Shoo away verzhunz"
+  },
+  "scopes.versionDelete.label": {
+    "message": "Shoo away verzhunz"
+  },
+  "scopes.versionRead.description": {
+    "message": "Peek at all verzhunz"
+  },
+  "scopes.versionRead.label": {
+    "message": "Peek at da verzhunz"
+  },
+  "scopes.versionWrite.description": {
+    "message": "Mewz verzhunz stuffz"
+  },
+  "scopes.versionWrite.label": {
+    "message": "Mewz verzhun"
+  },
+  "search.filter.locked.server": {
+    "message": "Gibbed by da servah"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Game verzhun gibbed by da servah"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader gibbed by da servah"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Paw-sync with da servah"
+  },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Kitteh workz on backup"
+  },
+  "servers.backup.restore.in-progress.tooltip": {
+    "message": "Kitteh workz on bringin backupz bakk"
+  },
+  "servers.backups.item.already-preparing": {
+    "message": "Snappin backupz ready to grab"
+  },
+  "servers.backups.item.automated": {
+    "message": "Pawtomated"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Makin backupz..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Kitteh failz to creat backup"
+  },
+  "servers.backups.item.failed-to-prepare-backup": {
+    "message": "Kitteh failz to preppin download"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Kitteh failz to bring backup back"
+  },
+  "servers.backups.item.lock": {
+    "message": "Sealz it"
+  },
+  "servers.backups.item.locked": {
+    "message": "Sealz tight"
+  },
+  "servers.backups.item.prepare-download": {
+    "message": "Kitteh preppin download"
+  },
+  "servers.backups.item.prepare-download-again": {
+    "message": "Kitteh attemptz to preppin again"
+  },
+  "servers.backups.item.preparing-download": {
+    "message": "Preppin downloadz..."
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "In line fur backup"
+  },
+  "servers.backups.item.rename": {
+    "message": "Changez da naem"
+  },
+  "servers.backups.item.restore": {
+    "message": "Bringz bakk"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Bringing backupz back..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Try againz"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Unsealz it"
+  },
+  "servers.notice.actions": {
+    "message": "Actionz"
+  },
+  "servers.notice.begins": {
+    "message": "Startz"
+  },
+  "servers.notice.dismissable": {
+    "message": "Can be shooed"
+  },
+  "servers.notice.expires": {
+    "message": "Goez away"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Leveel"
+  },
+  "servers.notice.undismissable": {
+    "message": "Can’t be shooed"
+  },
+  "servers.notices.create-notice": {
+    "message": "Maek notice"
+  },
+  "servers.notices.no-notices": {
+    "message": "No noticez here"
+  },
+  "servers.plan.large.description": {
+    "message": "Purrfect fur 15–25 playrz, tweakie bundlez, or heavy moddingz."
+  },
+  "servers.plan.large.name": {
+    "message": "Biggie"
+  },
+  "servers.plan.medium.description": {
+    "message": "Greeeat fur 6–15 playas an' like, ALL da tweakiez."
+  },
+  "servers.plan.medium.name": {
+    "message": "Mid-size"
+  },
+  "servers.plan.small.description": {
+    "message": "Purrfect fur 1–5 frendz wif sum lite twweakiez."
+  },
+  "servers.plan.small.name": {
+    "message": "Lil"
+  },
+  "settings.billing.modal.cancel.action": {
+    "message": "I shoo away subz"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "Dis will shoo away ur subz. U keep ur perkz till da end of dis billin cycle."
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "R u sure u wanna shoo away ur subz?"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Shoo away dis wayz to payz"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "Kitteh warns: shooin' away dis wayz to payz furreverrr."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "R u sure u wanna shoo away dis wayz to payz?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Add sum wayz to payz"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "Peek at old chargez"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Kitteh makes dis da furstie"
+  },
+  "settings.billing.payment_method.card_display": {
+    "message": "{card_brand} endz in {last_four}"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Goez away {month}/{year}"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "U haz no pay methodz yet."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Furstie"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Wayz to payz"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Payz"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "Amurrican Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Catz Appz"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Clubz"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Findz it"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCardz"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPaw"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPayz"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "Unknowz wayz to payz"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Veezah"
+  },
+  "settings.billing.pyro_subscription.description": {
+    "message": "Kitteh manage ur Modrinth Servah sub."
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Kitteh Modrinth Servah subz"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Kitteh manage ur Modrinth Servah sub."
+  },
+  "settings.billing.subscription.title": {
+    "message": "Subz"
+  },
+  "settings.display.banner.developer-mode.button": {
+    "message": "Turnz off dev mode"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "<strong>Developer mode</strong> iz active! Dis lets u peek at internal IDz of stuff all over Modrinth, helpful if u kitteh dev usin da Modrinth API. Click da Modrinth logo 5 times at da bottom to toggle dev mode."
+  },
+  "settings.display.flags.description": {
+    "message": "Turn on or off kitteh features on dis device."
+  },
+  "settings.display.flags.title": {
+    "message": "Flip flop kitteh features"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Nerdy Packz pawge"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Pick ur fav layout fur each pawge dat shows project listz on dis device."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Tweakiez pawge"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Tweakie bundle pawge"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Pluggiez pawge"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Resource Packz pawge"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Fanceh Lights pawge"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Kitteh pawject list layoutz"
+  },
+  "settings.display.project-list-layouts.user": {
+    "message": "Hoomin pawfile pawge"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Hoardz"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "message": "Turnz on fancy renderin like blurz dat may slow down ur device if no hardware boost."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "Fancy renderin"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "Kitteh makes linkz go outside Modrinth open in new tab. Linkz on same site or in Markdown stayz in same tab. Ads n edit page linkz open new tab."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "message": "Kitteh openz outside linkz in new tab"
+  },
+  "settings.display.sidebar.hide-app-promos.description": {
+    "message": "Hidez da \"Get Modrinth App\" buttonz from main nav. U can still find Modrinth App page on da landing page or footer."
+  },
+  "settings.display.sidebar.hide-app-promos.title": {
+    "message": "Hidez da Modrinth App shoutoutz"
+  },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Sidebar snuggled to da left paw"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Puts da sidebar snug on da left side of stuffs."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Filters take a cozy nap on da right side of search resultz."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Filter bar hangs out on da right side of searchy pages"
+  },
+  "settings.display.theme.description": {
+    "message": "Pick ur fave colorz fur Modrinth on dis thingy, plz."
+  },
+  "settings.display.theme.title": {
+    "message": "Da vibe palette"
+  },
+  "settings.language.categories.auto": {
+    "message": "Let it decide"
+  },
+  "settings.language.categories.default": {
+    "message": "Default hoomin speakz"
+  },
+  "settings.language.categories.experimental": {
+    "message": "Experimental hooomin talkz"
+  },
+  "settings.language.categories.fun": {
+    "message": "Silly speakz"
+  },
+  "settings.language.categories.search-result": {
+    "message": "Foundz stuffz"
+  },
+  "settings.language.description": {
+    "message": "Pick ur fav hooomin speakz fur dis site. Volunteerz help wif translations <crowdin-link>on Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.automatic": {
+    "message": "Matchz wit system speak"
+  },
+  "settings.language.languages.language-label-applying": {
+    "message": "{label}. Kitteh applyin..."
+  },
+  "settings.language.languages.language-label-error": {
+    "message": "{label}. Kitteh oopsies"
+  },
+  "settings.language.languages.load-failed": {
+    "message": "Kitteh can’t load dis speakz. Tryz again soon."
+  },
+  "settings.language.languages.search-field.description": {
+    "message": "Hit enter to paw-focus da first resultz"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "message": "Kitteh lookz for a speakz..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "message": "{matches, plural, =0 {No speakz match} one {# speakz match} other {# speakz match}} ur search."
+  },
+  "settings.language.languages.search.no-results": {
+    "message": "No speakz match ur paw-searchez."
+  },
+  "settings.language.warning": {
+    "message": "Hoomin speakz different make thingz in English if translations not herez. Site all translated not yet zo thingz still in English fur zum of dem. We kittehz tryin' to make teh localization system better, zo sumtime thingz ar weird."
+  },
+  "settings.pats.action.create": {
+    "message": "Maek a PAWT"
+  },
+  "settings.pats.description": {
+    "message": "PAWTz can be used to paw-access Modrinth’s API. Fur more info, see <doc-link>Modrinth’s AWPI documentation</doc-link>. U can make or revoke dem anytime."
+  },
+  "settings.pats.modal.create.action": {
+    "message": "Maek PAWT"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Goez away"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Naem"
+  },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "Type da PAWT’s namez..."
+  },
+  "settings.pats.modal.create.title": {
+    "message": "Kitteh crafts personal access pawtken"
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "Shoo away dis pawtken"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "Kitteh warns: shooin' away dis pawtken furreverrr."
+  },
+  "settings.pats.modal.delete.title": {
+    "message": "R u sure u wanna shoo away dis pawtken?"
+  },
+  "settings.pats.modal.edit.title": {
+    "message": "Pawdit personal acces pawtken"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Pawdit pawtken"
+  },
+  "settings.pats.token.action.revoke": {
+    "message": "Take bakk pawtken"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Gone {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Goez away in {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Used dis last {ago}"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Kitteh neva touched"
+  },
+  "settings.profile.bio.description": {
+    "message": "A lil blurb to tell kittehz ‘bout."
+  },
+  "settings.profile.bio.title": {
+    "message": "Mini me story"
+  },
+  "settings.profile.description": {
+    "message": "Kitteh sez: ur profile info iz viewable by all on Modrinth n thru <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "About me stuffs"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Start over"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Pawfile pic"
+  },
+  "settings.profile.username.description": {
+    "message": "Unique hoominname, case don’t matter, fur ur pawfile."
+  },
+  "settings.profile.username.title": {
+    "message": "Hoominname"
+  },
+  "settings.sessions.action.revoke-session": {
+    "message": "I shoo away dis session"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Madez on {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Dis session"
+  },
+  "settings.sessions.description": {
+    "message": "Hai! Herez all teh devicez dat iz curruntly loggd in wit ur Modrinth accountz. Yu can haz logoutz of each one individully. If yu seez an entry yu don't knowz, logoutz of dat device and changez ur Modrinth accountz passwordz rite nao."
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Last peeked {ago}"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Kitteh dunno OS"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Kitteh dunno platfurrms"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Latest buzz frum Modrinth"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Peek all buzz"
+  }
+}

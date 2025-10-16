@@ -1,0 +1,297 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Beta versija"
+  },
+  "badge.new": {
+    "defaultMessage": "Jauns"
+  },
+  "button.back": {
+    "defaultMessage": "Atpakaļ"
+  },
+  "button.cancel": {
+    "defaultMessage": "Atcelt"
+  },
+  "button.continue": {
+    "defaultMessage": "Turpināt"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Kopēt ID"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Izveidot projektu"
+  },
+  "button.download": {
+    "defaultMessage": "Lejupielādēt"
+  },
+  "button.downloading": {
+    "defaultMessage": "Lejupielādē"
+  },
+  "button.edit": {
+    "defaultMessage": "Rediģēt"
+  },
+  "button.follow": {
+    "defaultMessage": "Sekot"
+  },
+  "button.next": {
+    "defaultMessage": "Tālāk"
+  },
+  "button.play": {
+    "defaultMessage": "Spēlēt"
+  },
+  "button.remove": {
+    "defaultMessage": "Noņemt"
+  },
+  "button.report": {
+    "defaultMessage": "Ziņot"
+  },
+  "button.reset": {
+    "defaultMessage": "Atiestatīt"
+  },
+  "button.save": {
+    "defaultMessage": "Saglabāt"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Saglabāt izmaiņas"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Pārstāt sekot"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Augšupielādēt attēlu"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Serveri"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Privāts"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Rediģēt ikonu"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Izvēlēties ikonu"
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Galerijas skats"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Režģa skats"
+  },
+  "input.view.list": {
+    "defaultMessage": "Rindas skats"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Radās kļūda"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Pieņemts"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Apstiprināts"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Arhivēts"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Slēgts"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Radītājs"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Melnraksts"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Neizdevās"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderators"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth komanda"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Privāts"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Noraidīts"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Plānots"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Nerindots"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Kopēt kodu starpliktuvē"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Klients"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Klients un serveris"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Klients vai serveris"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Serveris"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Neatbalstīts"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Visi"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Datu Pakas"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Modi"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpakas"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resursu pakas"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaders"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Klients un serveris"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platformas"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Izveidots {date}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Publicēts {date}"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Atjaunināts {date}"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Ziedot"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Apraksts"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Klients un serveris"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Dalībnieki"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Versijas"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Arhivēts"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Melnraksts"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Privāts"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Publisks"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Noraidīts"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Nerindots"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Klients"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Serveris"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Platforma"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Konts un drošība"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Izskats"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Tumšs"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Krāsu tēma"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Valoda"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Publiskais profils"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Sesijas"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} plkst. {time, time, short}"
+  }
+}
+

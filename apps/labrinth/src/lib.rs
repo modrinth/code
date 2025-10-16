@@ -4,8 +4,8 @@ use std::time::Duration;
 use actix_web::web;
 use database::redis::RedisPool;
 use queue::{
-    analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
-    socket::ActiveSockets,
+    analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
+    session::AuthQueue, socket::ActiveSockets,
 };
 use sqlx::Postgres;
 use tracing::{info, warn};
@@ -16,7 +16,10 @@ use util::cors::default_cors;
 
 use crate::auth::webauthn;
 use crate::background_task::update_versions;
+use crate::database::ReadOnlyPgPool;
+use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
+use crate::util::anrok;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
@@ -43,6 +46,7 @@ pub struct Pepper {
 #[derive(Clone)]
 pub struct LabrinthConfig {
     pub pool: sqlx::Pool<Postgres>,
+    pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
@@ -57,21 +61,26 @@ pub struct LabrinthConfig {
     pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
     pub rate_limiter: web::Data<AsyncRateLimiter>,
     pub stripe_client: stripe::Client,
+    pub anrok_client: anrok::Client,
+    pub email_queue: web::Data<EmailQueue>,
 }
 
 #[allow(clippy::too_many_arguments)]
 pub fn app_setup(
     pool: sqlx::Pool<Postgres>,
+    ro_pool: ReadOnlyPgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     maxmind: Arc<queue::maxmind::MaxMindIndexer>,
     stripe_client: stripe::Client,
+    anrok_client: anrok::Client,
+    email_queue: EmailQueue,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!(
-        "Starting Labrinth on {}",
+        "Starting labrinth on {}",
         dotenvy::var("BIND_ADDR").unwrap()
     );
 
@@ -89,7 +98,7 @@ pub fn app_setup(
         });
     }
 
-    let mut scheduler = scheduler::Scheduler::new();
+    let scheduler = scheduler::Scheduler::new();
 
     let limiter = web::Data::new(AsyncRateLimiter::new(
         redis_pool.clone(),
@@ -144,21 +153,25 @@ pub fn app_setup(
 
         let pool_ref = pool.clone();
         let client_ref = clickhouse.clone();
+        let redis_pool_ref = redis_pool.clone();
         scheduler.run(Duration::from_secs(60 * 60 * 6), move || {
             let pool_ref = pool_ref.clone();
             let client_ref = client_ref.clone();
+            let redis_ref = redis_pool_ref.clone();
             async move {
-                background_task::payouts(pool_ref, client_ref).await;
+                background_task::payouts(pool_ref, client_ref, redis_ref).await;
             }
         });
 
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
         let stripe_client_ref = stripe_client.clone();
+        let anrok_client_ref = anrok_client.clone();
         actix_rt::spawn(async move {
             loop {
-                routes::internal::billing::index_billing(
+                index_billing(
                     stripe_client_ref.clone(),
+                    anrok_client_ref.clone(),
                     pool_ref.clone(),
                     redis_ref.clone(),
                 )
@@ -169,11 +182,16 @@ pub fn app_setup(
 
         let pool_ref = pool.clone();
         let redis_ref = redis_pool.clone();
+        let stripe_client_ref = stripe_client.clone();
+        let anrok_client_ref = anrok_client.clone();
+
         actix_rt::spawn(async move {
             loop {
-                routes::internal::billing::index_subscriptions(
+                index_subscriptions(
                     pool_ref.clone(),
                     redis_ref.clone(),
+                    stripe_client_ref.clone(),
+                    anrok_client_ref.clone(),
                 )
                 .await;
                 tokio::time::sleep(Duration::from_secs(60 * 5)).await;
@@ -252,7 +270,6 @@ pub fn app_setup(
             .to_string(),
     };
 
-    let payouts_queue = web::Data::new(PayoutsQueue::new());
     let active_sockets = web::Data::new(ActiveSockets::default());
 
     {
@@ -267,6 +284,7 @@ pub fn app_setup(
 
     LabrinthConfig {
         pool,
+        ro_pool,
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
@@ -275,12 +293,14 @@ pub fn app_setup(
         ip_salt,
         search_config,
         session_queue,
-        payouts_queue,
+        payouts_queue: web::Data::new(PayoutsQueue::new()),
         analytics_queue,
         active_sockets,
         automated_moderation_queue,
         rate_limiter: limiter,
         stripe_client,
+        anrok_client,
+        email_queue: web::Data::new(email_queue),
     }
 }
 
@@ -302,10 +322,12 @@ pub fn app_config(
     }))
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
+    .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
     .app_data(web::Data::new(labrinth_config.search_config.clone()))
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
+    .app_data(labrinth_config.email_queue.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
     .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
@@ -313,15 +335,19 @@ pub fn app_config(
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
+    .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
     .app_data(webauthn::startup().clone())
-    .configure(
-        #[allow(unused_variables)]
-        |cfg| {
-            #[cfg(target_os = "linux")]
-            routes::debug::config(cfg)
-        },
-    )
+    .configure({
+        #[cfg(target_os = "linux")]
+        {
+            |cfg| routes::debug::config(cfg)
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            |_cfg| ()
+        }
+    })
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)
@@ -333,7 +359,7 @@ pub fn app_config(
 pub fn check_env_vars() -> bool {
     let mut failed = false;
 
-    fn check_var<T: std::str::FromStr>(var: &'static str) -> bool {
+    fn check_var<T: std::str::FromStr>(var: &str) -> bool {
         let check = parse_var::<T>(var).is_none();
         if check {
             warn!(
@@ -348,6 +374,7 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("SITE_URL");
     failed |= check_var::<String>("CDN_URL");
     failed |= check_var::<String>("LABRINTH_ADMIN_KEY");
+    failed |= check_var::<String>("LABRINTH_EXTERNAL_NOTIFICATION_KEY");
     failed |= check_var::<String>("RATE_LIMIT_IGNORE_KEY");
     failed |= check_var::<String>("DATABASE_URL");
     failed |= check_var::<String>("MEILISEARCH_ADDR");
@@ -360,25 +387,33 @@ pub fn check_env_vars() -> bool {
 
     let storage_backend = dotenvy::var("STORAGE_BACKEND").ok();
     match storage_backend.as_deref() {
-        Some("backblaze") => {
-            failed |= check_var::<String>("BACKBLAZE_KEY_ID");
-            failed |= check_var::<String>("BACKBLAZE_KEY");
-            failed |= check_var::<String>("BACKBLAZE_BUCKET_ID");
-        }
         Some("s3") => {
-            failed |= check_var::<String>("S3_ACCESS_TOKEN");
-            failed |= check_var::<String>("S3_SECRET");
-            failed |= check_var::<String>("S3_URL");
-            failed |= check_var::<String>("S3_REGION");
-            failed |= check_var::<String>("S3_BUCKET_NAME");
+            let mut check_var_set = |var_prefix| {
+                failed |= check_var::<String>(&format!(
+                    "S3_{var_prefix}_BUCKET_NAME"
+                ));
+                failed |= check_var::<bool>(&format!(
+                    "S3_{var_prefix}_USES_PATH_STYLE_BUCKET"
+                ));
+                failed |=
+                    check_var::<String>(&format!("S3_{var_prefix}_REGION"));
+                failed |= check_var::<String>(&format!("S3_{var_prefix}_URL"));
+                failed |= check_var::<String>(&format!(
+                    "S3_{var_prefix}_ACCESS_TOKEN"
+                ));
+                failed |=
+                    check_var::<String>(&format!("S3_{var_prefix}_SECRET"));
+            };
+
+            check_var_set("PUBLIC");
+            check_var_set("PRIVATE");
         }
         Some("local") => {
             failed |= check_var::<String>("MOCK_FILE_PATH");
         }
         Some(backend) => {
             warn!(
-                "Variable `STORAGE_BACKEND` contains an invalid value: {}. Expected \"backblaze\", \"s3\", or \"local\".",
-                backend
+                "Variable `STORAGE_BACKEND` contains an invalid value: {backend}. Expected \"s3\" or \"local\"."
             );
             failed |= true;
         }
@@ -436,6 +471,8 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("SMTP_HOST");
     failed |= check_var::<u16>("SMTP_PORT");
     failed |= check_var::<String>("SMTP_TLS");
+    failed |= check_var::<String>("SMTP_FROM_NAME");
+    failed |= check_var::<String>("SMTP_FROM_ADDRESS");
 
     failed |= check_var::<String>("SITE_VERIFY_EMAIL_PATH");
     failed |= check_var::<String>("SITE_RESET_PASSWORD_PATH");
@@ -473,6 +510,18 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("BREX_API_KEY");
 
     failed |= check_var::<String>("DELPHI_URL");
+
+    failed |= check_var::<String>("AVALARA_1099_API_URL");
+    failed |= check_var::<String>("AVALARA_1099_API_KEY");
+    failed |= check_var::<String>("AVALARA_1099_API_TEAM_ID");
+    failed |= check_var::<String>("AVALARA_1099_COMPANY_ID");
+
+    failed |= check_var::<String>("ANROK_API_URL");
+    failed |= check_var::<String>("ANROK_API_KEY");
+
+    failed |= check_var::<String>("COMPLIANCE_PAYOUT_THRESHOLD");
+
+    failed |= check_var::<String>("PAYOUT_ALERT_SLACK_WEBHOOK");
 
     failed |= check_var::<String>("ARCHON_URL");
 

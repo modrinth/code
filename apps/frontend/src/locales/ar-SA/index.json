@@ -1,0 +1,422 @@
+{
+  "admin.billing.error.not-found": {
+    "message": "المستخدم غير موجود"
+  },
+  "app-marketing.download.description": {
+    "message": "تطبيقنا لسطح المكتب متاح على جميع المنصات، اختر الإصدار الذي تريده."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "تنزيل AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "تنزيل النسخة التجريبية"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "تنزيل DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "تنزيل RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "لينكس"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "الإصدارات الخاصة بـ Linux من Modrinth App <issues-link>معروفة بوجود مشاكل</issues-link> على بعض الأنظمة والتكوينات. إذا كان Modrinth App غير مستقر على نظامك، فننصحك بتجربة تطبيقات أخرى مثل <prism-link>Prism Launcher</prism-link> لتثبيت محتوى Modrinth بسهولة."
+  },
+  "app-marketing.download.mac": {
+    "message": "ماك"
+  },
+  "app-marketing.download.options-title": {
+    "message": "خيارات التنزيل"
+  },
+  "app-marketing.download.terms": {
+    "message": "خلال تنزيل Modrinth App فإنك توافق على <terms-link>الشروط</terms-link> و <privacy-link>سياسة الخصوصية</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "حزم الطرف الثالث"
+  },
+  "app-marketing.download.title": {
+    "message": "تنزيل Modrinth App (النسخة التجريبية)"
+  },
+  "app-marketing.download.windows": {
+    "message": "ويندوز"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "احفظ المحتوى الذي تحبه واحصل على التحديثات بنقرة واحدة."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "تابع المشروعات"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "استورد جميع ملفاتك الشخصية المفضلة من المشغل الذي كنت تستخدمه من قبل، وابدأ باستخدام Modrinth App في ثوانٍ!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "استيراد الملفات الشخصية"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "الإجراءات"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "بواسطة {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "يجعل مودرنث من السهل إدارة جميع تعديلاتك في مكان واحد. يمكنك التثبيت، الإزالة، والتحديث بنقرة واحدة."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "المودات المثبتة"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "الاسم"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "بحث عن المودات"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "إدارة المودات"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "الإصدار"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "العب موداتك سواء كنت متصلاً بالإنترنت أو غير متصل."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "الوضع غير المتصل"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "المشغل الخاص بـ مودرنث مفتوح المصدر بالكامل. يمكنك عرض الشيفرة المصدرية على <github-link>GitHub</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "مفتوح المصدر"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "مراقب النشاط"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "يعمل Modrinth App بشكل أفضل من العديد من مديري المودات الرائدين، باستخدام 150 ميغابايت فقط من الذاكرة العشوائية!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "ديسكورد"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "أداء جيد"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "جوجل كروم"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ ميغابايت"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ ميغابايت"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 ميغابايت"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "% 1 مليار"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "اسم العملية"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "الذاكرة العشوائية"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "صغير"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "أداء قوي"
+  },
+  "app-marketing.features.play.description": {
+    "message": "استخدم Modrinth App لتنزيل ولعب موداتك وحزم المودات المفضلة لديك."
+  },
+  "app-marketing.features.play.title": {
+    "message": "العب مع موداتك المفضلة"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "أنشئ، شارك، والعب بحزم المودات مع أي من آلاف المودات والحزم المستضافة هنا على مودرنث."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "حزم المودات"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "مشاركة"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "مشاركة حزم المودات"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "مختلف عن أي مشغل آخر"
+  },
+  "app-marketing.features.website.description": {
+    "message": "تم دمج Modrinth App بالكامل مع الموقع، بحيث يمكنك الوصول إلى جميع مشاريعك المفضلة بواسطة التطبيق!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "تكامل مع الموقع"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "الذي استخدمته من قبل"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "لقطة شاشة لـ Modrinth App مع نسخة Cobblemon مفتوحة في صفحة \"المحتوى\"."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App هو مشغل فريد ومفتوح المصدر يتيح لك لعب موداتك المفضلة والحفاظ عليها محدثة، وكل ذلك في حزمة واحدة بسيطة ومنظمة."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "تنزيل Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "تنزيل Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "تنزيل Modrinth App لـ {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "لقطة شاشة لقائمة Cobblemon الرئيسية."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "المزيد من خيارات التنزيل"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "سماح"
+  },
+  "auth.authorize.action.decline": {
+    "message": "رفض"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> بواسطة <creator-link>{creator}</creator-link> سيكون قادرًا على:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "السماح لـ {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "لم يتم العثور على وجهة إعادة التوجيه في الاستجابة"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "ستتم إعادة توجيهك إلى <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "إرسال بريد استعادة الحساب"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "أدخل بريدك الإلكتروني في الحقل بالأسفل، وسنرسل لك رابطًا لاستعادة حسابك."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "البريد الإلكتروني أو اسم المستخدم"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "البريد الإلكتروني"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "تم إرسال بريد يحتوي على التعليمات إليك، إذا كان بريدك الإلكتروني محفوظًا مسبقًا في حسابك."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "تم إرسال البريد الإلكتروني"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "يمكنك الآن تسجيل الدخول إلى حسابك باستخدام كلمة المرور الجديدة."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "تم تغيير كلمة المرور بنجاح"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "تغيير كلمة المرور"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "تأكيد كلمة المرور"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "أدخل كلمة المرور الجديدة في الحقل بالأسفل للوصول إلى حسابك."
+  },
+  "auth.reset-password.title": {
+    "message": "تغيير كلمة المرور"
+  },
+  "auth.reset-password.title.long": {
+    "message": "تغيير كلمة المرور"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "يرجى إدخال رمز التحقق الثنائي للمتابعة."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "أدخل رمز التحقق الثنائي"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "أدخل الرمز..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>هل نسيت كلمة المرور؟</forgot-password-link> • <create-account-link>إنشاء حساب</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "البريد الإلكتروني أو اسم المستخدم"
+  },
+  "auth.sign-in.password.label": {
+    "message": "كلمة المرور"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "تسجيل الدخول باستخدام"
+  },
+  "auth.sign-in.title": {
+    "message": "تسجيل الدخول"
+  },
+  "auth.sign-in.use-password": {
+    "message": "أو استخدم كلمة المرور"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "إنشاء حساب"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "تأكيد كلمة المرور"
+  },
+  "auth.sign-up.email.label": {
+    "message": "البريد الإلكتروني"
+  },
+  "auth.sign-up.label.username": {
+    "message": "اسم المستخدم"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "بإنشائك حسابًا، فإنك توافق على <terms-link>شروط مودرنث</terms-link> و<privacy-policy-link>سياسة الخصوصية</privacy-policy-link> الخاصة بها."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "كلمتا المرور غير متطابقتين!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "كلمة المرور"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "هل لديك حساب بالفعل؟"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "اشترك لتصلك التحديثات حول مودرنث"
+  },
+  "auth.sign-up.title": {
+    "message": "إنشاء حساب"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "أو أنشئ حسابًا بنفسك"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "سجّل باستخدام"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "إعدادات الحساب"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "تسجيل الدخول"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "تم توثيق بريدك الإلكتروني مسبقًا!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "تم توثيق البريد الإلكتروني مسبقًا"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "إعادة إرسال بريد التحقق"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "اشترك في التحديثات حول مودرنث"
+  },
+  "auth.welcome.description": {
+    "message": "أنت الآن جزء من مجتمع رائع من المبدعين والمستكشفين الذين يقومون بالفعل بإنشاء المودات المذهلة، تثبيتها، والبقاء على اطلاع بآخر التحديثات."
+  },
+  "auth.welcome.label.tos": {
+    "message": "بإنشائك حسابًا، فإنك توافق على <terms-link>شروط مودرنث</terms-link> و<privacy-policy-link>سياسة الخصوصية</privacy-policy-link>."
+  },
+  "auth.welcome.long-title": {
+    "message": "مرحبًا بك في مودرنث!"
+  },
+  "collection.delete-modal.description": {
+    "message": "سيتم حذف هذه المجموعة نهائيًا. لا يمكن التراجع عن هذا الإجراء."
+  },
+  "collection.delete-modal.title": {
+    "message": "هل أنت متأكد أنك تريد حذف هذه المجموعة؟"
+  },
+  "collection.description": {
+    "message": "{description} - عرض المجموعة {name} بواسطة {username} على مودرنث"
+  },
+  "error.collection.404.list_item.3": {
+    "message": "قد تكون هذه المجموعة قد أزالها فريق مراقبة مودرنث لانتهاك <tou-link>شروط الاستخدام</tou-link> الخاصة بنا."
+  },
+  "error.generic.default.list_item.1": {
+    "message": "تحقق مما إذا كان مودرنث متوقفًا على <status-link>صفحة الحالة</status-link> الخاصة بنا."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "إذا استمر حدوث ذلك، قد ترغب في إعلام فريق مودرنث بالانضمام إلى <discord-link>سيرفر ديسكورد</discord-link> الخاص بنا."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "قد تكون هذه المنظمة قد أزالها فريق مراقبة مودرنث لانتهاك <tou-link>شروط الاستخدام</tou-link> الخاصة بنا."
+  },
+  "error.project.404.list_item.3": {
+    "message": "قد يكون هذا المشروع قد أزاله فريق مراقبة مودرنث لانتهاك <tou-link>شروط الاستخدام</tou-link> الخاصة بنا."
+  },
+  "error.user.404.list_item.3": {
+    "message": "تم تعطيل حساب هذا المستخدم لانتهاكه <tou-link>شروط الاستخدام</tou-link> الخاصة بمودرنث."
+  },
+  "landing.button.discover-mods": {
+    "message": "اكتشف المودات"
+  },
+  "landing.creator.feature.constantly-evolving.description": {
+    "message": "احصل على أفضل تجربة مودات ممكنة مع تحديثات مستمرة من فريق مودرنث"
+  },
+  "landing.feature.launcher.description": {
+    "message": "واجهة برمجة التطبيقات مفتوحة المصدر لمودرنث تتيح للّانشرات إضافة تكامل عميق مع مودرنث. يمكنك استخدام مودرنث من خلال <link>تطبيقنا الخاص</link> وبعض أشهر اللانشرات مثل ATLauncher وMultiMC وPrism Launcher."
+  },
+  "landing.feature.search.description": {
+    "message": "تتيح لك ميزة البحث السريع والفلاتر القوية في مودرنث العثور على ما تريد أثناء الكتابة."
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "حزم المودات"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "مودات"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "تمثيل مبسط لنافذة ماين كرافت، مع شعار Mojang Studios باللون الأخضر الخاص بمودرنث."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "layout.banner.add-email.description": {
+    "message": "لأسباب أمنية، يحتاج مودرنث منك تسجيل عنوان بريد إلكتروني في حسابك."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "فشل هذا الإصدار من واجهة مودرنث في توليد الحالة من واجهة برمجة التطبيقات. قد يكون السبب انقطاع الخدمة أو خطأ في الإعدادات. أعد البناء عندما تكون واجهة البرمجة متاحة. رموز الخطأ: {errors}؛ عنوان واجهة البرمجة الحالي: {url}"
+  },
+  "layout.banner.staging.description": {
+    "message": "بيئة الاختبار منفصلة تمامًا عن قاعدة بيانات مودرنث الإنتاجية. تُستخدم هذه البيئة للاختبار وتصحيح الأخطاء، وقد تعمل بإصدارات تطويرية من واجهة مودرنث الأمامية أو الخلفية أحدث من النسخة الإنتاجية."
+  },
+  "layout.banner.staging.title": {
+    "message": "أنت الآن تشاهد بيئة الاختبار الخاصة بمودرنث"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "لأسباب أمنية، يحتاج مودرنث منك التحقق من عنوان البريد الإلكتروني المرتبط بحسابك."
+  },
+  "layout.footer.modrinth-information": {
+    "message": "معلومات مودرنث"
+  },
+  "layout.footer.open-source": {
+    "message": "مودرنث <github-link>مفتوح المصدر</github-link>."
+  },
+  "layout.footer.products.app": {
+    "message": "Modrinth App"
+  },
+  "layout.footer.products.plus": {
+    "message": "مودرنث+"
+  },
+  "layout.footer.products.servers": {
+    "message": "خوادم مودرنث"
+  }
+}

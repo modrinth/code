@@ -1,0 +1,24 @@
+{
+  "nags.add-description.title": {
+    "defaultMessage": "Afegir una descripció"
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "Afegir una icona"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "Expandeix la descripció"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Edita la descripció"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Edita la llicència"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Edita el resum"
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Afegir un enllç de llicència vàlid"
+  }
+}
+

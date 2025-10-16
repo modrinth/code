@@ -1,0 +1,780 @@
+{
+  "badge.beta": {
+    "defaultMessage": "베타"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "베타 출시"
+  },
+  "badge.new": {
+    "defaultMessage": "소식"
+  },
+  "button.analytics": {
+    "defaultMessage": "분석"
+  },
+  "button.back": {
+    "defaultMessage": "이전"
+  },
+  "button.cancel": {
+    "defaultMessage": "취소"
+  },
+  "button.continue": {
+    "defaultMessage": "계속"
+  },
+  "button.copy-id": {
+    "defaultMessage": "ID 복사"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "링크 복사"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "프로젝트 만들기"
+  },
+  "button.download": {
+    "defaultMessage": "다운로드"
+  },
+  "button.downloading": {
+    "defaultMessage": "다운로드하는 중"
+  },
+  "button.edit": {
+    "defaultMessage": "편집"
+  },
+  "button.follow": {
+    "defaultMessage": "팔로우"
+  },
+  "button.more-options": {
+    "defaultMessage": "더 보기"
+  },
+  "button.next": {
+    "defaultMessage": "다음"
+  },
+  "button.open-folder": {
+    "defaultMessage": "폴더 열기"
+  },
+  "button.play": {
+    "defaultMessage": "플레이"
+  },
+  "button.refresh": {
+    "defaultMessage": "새로고침"
+  },
+  "button.remove": {
+    "defaultMessage": "제거"
+  },
+  "button.remove-image": {
+    "defaultMessage": "이미지 제거"
+  },
+  "button.report": {
+    "defaultMessage": "신고"
+  },
+  "button.reset": {
+    "defaultMessage": "초기화"
+  },
+  "button.save": {
+    "defaultMessage": "저장"
+  },
+  "button.save-changes": {
+    "defaultMessage": "변경 사항 저장"
+  },
+  "button.saving": {
+    "defaultMessage": "저장"
+  },
+  "button.sign-in": {
+    "defaultMessage": "로그인"
+  },
+  "button.sign-out": {
+    "defaultMessage": "로그아웃"
+  },
+  "button.sign-up": {
+    "defaultMessage": "회원 가입"
+  },
+  "button.stop": {
+    "defaultMessage": "정지"
+  },
+  "button.unfollow": {
+    "defaultMessage": "언팔로우"
+  },
+  "button.upload-image": {
+    "defaultMessage": "이미지 업로드"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "최근"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "앱"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "서버"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "웹사이트"
+  },
+  "collection.label.private": {
+    "defaultMessage": "비공개"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "아이콘 설정"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "아이콘 제거"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "아이콘 대체"
+  },
+  "icon-select.select": {
+    "defaultMessage": "아이콘 선택"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "검색..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "갤러리 보기"
+  },
+  "input.view.grid": {
+    "defaultMessage": "바둑판식 보기"
+  },
+  "input.view.list": {
+    "defaultMessage": "행 보기"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "모험 모드"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "크리에이티브 모드"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "관전 모드"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "서바이벌 모드"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "알 수 없는 게임 모드"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "변경 내용이 저장됨"
+  },
+  "label.collections": {
+    "defaultMessage": "컬렉션"
+  },
+  "label.created-ago": {
+    "defaultMessage": "{ago} 전에 생성됨"
+  },
+  "label.dashboard": {
+    "defaultMessage": "대시보드"
+  },
+  "label.delete": {
+    "defaultMessage": "삭제"
+  },
+  "label.description": {
+    "defaultMessage": "설명"
+  },
+  "label.error": {
+    "defaultMessage": "오류"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "팔로우한 프로젝트"
+  },
+  "label.loading": {
+    "defaultMessage": "로딩중..."
+  },
+  "label.moderation": {
+    "defaultMessage": "관리"
+  },
+  "label.notifications": {
+    "defaultMessage": "알림"
+  },
+  "label.or": {
+    "defaultMessage": "또는"
+  },
+  "label.password": {
+    "defaultMessage": "비밀번호"
+  },
+  "label.played": {
+    "defaultMessage": "{time} 동안 플레이함"
+  },
+  "label.public": {
+    "defaultMessage": "공개"
+  },
+  "label.rejected": {
+    "defaultMessage": "거부됨"
+  },
+  "label.saved": {
+    "defaultMessage": "저장됨"
+  },
+  "label.scopes": {
+    "defaultMessage": "범위"
+  },
+  "label.server": {
+    "defaultMessage": "서버"
+  },
+  "label.servers": {
+    "defaultMessage": "서버"
+  },
+  "label.settings": {
+    "defaultMessage": "설정"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "싱글 플레이"
+  },
+  "label.title": {
+    "defaultMessage": "제목"
+  },
+  "label.unlisted": {
+    "defaultMessage": "일부 공개"
+  },
+  "label.visibility": {
+    "defaultMessage": "공개 설정"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "내 프로필"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "결제 수단 추가"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "결제 수단 추가"
+  },
+  "notification.error.title": {
+    "defaultMessage": "오류가 발생했습니다"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "수락됨"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "승인됨"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "보관됨"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "닫힘"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "제작자"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "초안"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "실패"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "공개"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "관리자"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth 팀"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "대기중"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "비공개"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "처리됨"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "거부됨"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "반환됨"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "예약됨"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "검토 중"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "일부 공개"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "보류됨"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "클립보드에 코드 복사"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "클라이언트"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "클라이언트 및 서버"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "클라이언트 또는 서버"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "서버"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "지원되지 않음"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{last_four}(으)로 끝나는 {card_brand}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "알 수 없는 결제 수단"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "모두"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "지원되는 실행 환경"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "클라이언트 및 서버"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "클라이언트 측"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "지원되는 서버 전용"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "서버 측"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "싱글 플레이"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "싱글 플레이 전용"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "플랫폼"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "호환성"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "프로젝트 소유자"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "제작자"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "{date} 전에 생성됨"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "{license} 라이선스"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "{date} 전에 게시됨"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "{date} 전에 제출됨"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "세부 사항"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "{date} 전에 업데이트됨"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Discord 서버 참여하기"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "커피 한잔 사주기"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "후원하기"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "GitHub 스폰서 지원하기"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Ko-fi에서 후원하기"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Patreon에서 후원하기"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "PayPal로 후원하기"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "오류 신고"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "소스 코드 보기"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "링크"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "위키"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "분석"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "설명"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "일부 기능은 부분적으로만이라도 클라이언트와 서버 양쪽에서 작동합니다."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "양쪽 모두에서 선택사항이며, 어느 한쪽에 설치해도 동일하게 작동합니다"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "양쪽 모두에서 선택사항이며, 양쪽에 모두 설치했을 때 가장 잘 작동합니다"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "클라이언트에서 선택사항"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "서버에서 선택사항"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "양쪽 모두 필요"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "클라이언트 및 서버"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "모든 기능은 클라이언트 측에서만 처리되며 바닐라 서버와 호환됩니다."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "클라이언트 측 전용"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "지원되는 서버 전용"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "모든 기능은 서버 측에서만 처리되며 바닐라 클라이언트와 호환됩니다."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "싱글 플레이에서도 작동"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "서버 측 전용"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "싱글 플레이거나 멀티 플레이 서버에 접속하지 않았을 때만 작동합니다."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "싱글 플레이 전용"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "갤러리"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "일반"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "라이센스"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "링크"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "멤버"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "태그"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "업로드"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "버전"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "보기"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "보관됨"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "초안"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "비공개"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "공개"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "거부됨"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "예약됨"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "검토 중"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "알 수 없음"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "일부 공개"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "운영진에 의해 숨겨짐"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "필터 잠김"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "필터를 잠금 해제하면 지원되지 않는 콘텐츠의 설치가 허용됩니다."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "필터 동기화"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type}은(는) 잠겨있습니다"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "필터 잠금 해제"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "실행 환경"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "클라이언트"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "서버"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "게임 버전"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "모든 버전 보이기"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "이용 허가"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "오픈 소스"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "로더"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "로더"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "로더"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "플랫폼"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "프로젝트 ID"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "로더"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "무시"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "무시 가능"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "중요"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "정보"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "중요"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "정보"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "설문"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "경고"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "무시 불가"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "아직은 요금이 청구되지 않습니다."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "결제 수단을 선택하십시오"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "결제 수단"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "{interval} 청구"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "필요한 사양만을 갖춘 맞춤형 플랜을 선택하세요."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "시작하기"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "15–25명의 플레이어, 모드팩 또는 무거운 모드에 적합합니다."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "6–15명의 플레이어와 여러개의 모드에 적합합니다."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "가장 인기"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "플랜을 선택하세요"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "플랜 선택"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "1–5명의 친구와 적은 수의 가벼운 모드에 적합합니다."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "필요에 맞는 RAM과 사양을 선택하세요."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "플랜"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "지역"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "검토"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "중앙유럽"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "RAM이 얼마나 있었으면 좋겠나요?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "북아메리카"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "서버가 어디에 위치했으면 좋겠나요?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "원하는 지역이 목록에 없나요? <link>Modrinth 서버를 어디에서 만나고 싶은지 알려주세요!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "동남아시아"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "서유럽"
+  },
+  "settings.account.title": {
+    "defaultMessage": "계정 및 보안"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "모양"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "내 애플리케이션"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "승인된 앱"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "결제 및 구독"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "어둡게"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "이 디바이스에서 선호하는 Modrinth의 색상 테마를 선택합니다."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "밝게"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "어두운 테마 선호"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "밝은 테마 선호"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "레트로"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "시스템과 동기화"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "색상 테마"
+  },
+  "settings.language.title": {
+    "defaultMessage": "언어"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "개인 액세스 토큰"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "공개 프로필"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "세션"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "저장하지 않은 번경사항이 있습니다."
+  }
+}
+

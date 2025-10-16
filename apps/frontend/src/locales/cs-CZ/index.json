@@ -1,0 +1,1151 @@
+{
+  "action.cancel": {
+    "message": "Zrušit"
+  },
+  "action.continue": {
+    "message": "Pokračovat"
+  },
+  "admin.billing.error.not-found": {
+    "message": "Uživatel nebyl nalezen"
+  },
+  "app-marketing.download.description": {
+    "message": "Naše aplikace je dostupná pro všechny počítačové platformy, vyberte si požadovanou verzi."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Stáhnout AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Stahnout v betě"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Stáhnout DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Stáhnout RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "U linuxových verzí aplikace Modrinth jsou <issues-link>známé problémy</issues-link> na určitých systémech a konfiguracích. Pokud je aplikace Modrinth App ve vašem systému nestabilní, doporučujeme vám vyzkoušet jiné aplikace, například <prism-link>Prism Launcher</prism-link>, které vám umožní snadnou instalaci obsahu Modrinth."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Stahovácí možnosti"
+  },
+  "app-marketing.download.terms": {
+    "message": "Stažením aplikace Modrinth souhlasíte s našimi <terms-link>Podmínkami</terms-link> a <privacy-link>Zásadami ochrany osobních údajů</privacy-link>."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Balíčky třetích stran"
+  },
+  "app-marketing.download.title": {
+    "message": "Stáhnout Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Uložte si oblíbený obsah a dostávejte aktualizace jedním kliknutím."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Sledovat projekty"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Importujte všechny své oblíbené profily z launcheru, který jste používali dříve, a začněte používat aplikaci Modrinth během několika sekund!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Importování profilů"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Akce"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "od {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth umožňuje snadnou správu všech modů na jednom místě. Mody můžete instalovat, odinstalovat a aktualizovat jediným kliknutím."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Nainstalované módy"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Jméno"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Hledat módy"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Správa módů"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Verze"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Módy můžete hrát, ať už jste připojeni k internetu, nebo ne."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Offline režim"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Spouštěč Modrinth je plně otevřený. Zdrojový kód si můžete prohlédnout na našem <github-link>GitHubu</github-link>!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Otevřený zdroj"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Monitor aktivity"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Aplikace Modrinth je výkonnější než mnoho předních správců modů a využívá pouze 150MB paměti RAM!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Dobrý výkon"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth Aplikace"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 miliarda %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Název procesu"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Malý"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Výkon"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Pomocí aplikace Modrinth můžete stahovat a hrát své oblíbené módy a modpacky."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Hrajte se svými oblíbenými módy"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Vytvářejte, sdílejte a hrajte modpacky s některým z tisíců modů a modpacků hostovaných zde na Modrinthu."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpack"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Sdílet"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Sdílet modpacky"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Na rozdíl od jiných spouštěčů"
+  },
+  "app-marketing.features.website.description": {
+    "message": "Aplikace Modrinth je plně integrovaná s webovými stránkami, takže máte přístup ke všem svým oblíbeným projektům z aplikace!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Integrace webových stránek"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "které jste již dříve použili"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Snímek obrazovky z aplikace Modrinth se spuštěnou instancí Cobblemon na stránce \"Obsah\"."
+  },
+  "app-marketing.hero.description": {
+    "message": "Aplikace Modrinth je jedinečný open source launcher, který vám umožní přehrávat vaše oblíbené mody a udržovat je aktuální, a to vše v jednom malém úhledném balíčku."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Stáhnout Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Stáhnout Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Stáhnout Modrinth App pro {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Snímek obrazovky hlavní nabídky instance Cobblemon."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Více možností stáhnutí"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Schválit"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Zamítnout"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> od <creator-link>{creator}</creator-link> bude schopen:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Autorizovat {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "V odpovědi nebylo nalezeno umístění přesměrování"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Budete přesměrováni na <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Poslat e-mail pro obnovení"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Zadejte svůj e-mail níže a my vám pošleme odkaz, abyste mohli obnovit heslo k svému účtu."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "E-mail nebo uživatelské jméno"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "E-mail"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Byl vám zaslán e-mail s pokyny, pokud byl e-mail dříve uložen na váš účet."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "E-mail byl odeslán"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Nyní se můžete přihlásit do svého účtu pomocí svého nového hesla."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Heslo bylo úspěšně změněno"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Obnovení hesla"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Potvrďte heslo"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Zadejte nové heslo se kterým se budete přihlašovat do svého účtu."
+  },
+  "auth.reset-password.title": {
+    "message": "Obnovit heslo"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Obnova vašeho hesla"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Pro pokračování zadejte kód dvoufaktorové autorizace."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Zadejte dvoufaktorový kód"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Zadejte kód..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Zapomněli jste heslo?</forgot-password-link> • <create-account-link>Vytvořte si účet</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "E-mail nebo uživatelské jméno"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Heslo"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Přihlášte se pomocí"
+  },
+  "auth.sign-in.title": {
+    "message": "Přihlásit se"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Nebo použijte heslo"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Vytvořte účet"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Potvrďte heslo"
+  },
+  "auth.sign-up.email.label": {
+    "message": "E-mail"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Uživatelské jméno"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Vytvořením účtu souhlasíte s <terms-link>Podmínkami</terms-link> a <privacy-policy-link>Zásadami ochrany osobních údajů</privacy-policy-link> Modrinthu."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Hesla se neshodují!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Heslo"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Již máte účet?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Přihlásit se k odběru informací o Modrinthu"
+  },
+  "auth.sign-up.title": {
+    "message": "Registrace"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Nebo si vytvořte účet"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Registrujte se pomocí"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Nastavení účtu"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Přihlásit se"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "E-mail je již ověřen!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "E-mail je již ověřen"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Znovu poslat ověřovací e-mail"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Nebyli jsme schopni ověřit váš e-mail. Zkuste znovu zaslat ověřovací e-mail prostřednictvím panelu přihlášením se."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Nebyli jsme schopni ověřit váš e-mail. Zkuste znovu zaslat ověřovací e-mail prostřednictvím tlačítka níže."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Ověření e-mailu se nezdařilo"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Vaše e-mailová adresa byla úspěšně ověřena!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Ověření e-mailu"
+  },
+  "auth.verify-email.title": {
+    "message": "Ověřit e-mail"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Přihlásit se k odběru informací o Modrinthu"
+  },
+  "auth.welcome.description": {
+    "message": "Nyní jste součástí úžasné komunity tvůrců a průzkumníků, kteří již vytvářejí, stahují a aktualizují úžasné módy."
+  },
+  "auth.welcome.label.tos": {
+    "message": "Vytvořením účtu souhlasíte s <terms-link>Podmínkami</terms-link> a <privacy-policy-link>Zásadami ochrany osobních údajů</privacy-policy-link> Modrinthu."
+  },
+  "auth.welcome.long-title": {
+    "message": "Vítejte v Modrinthu!"
+  },
+  "auth.welcome.title": {
+    "message": "Vítejte"
+  },
+  "collection.button.delete-icon": {
+    "message": "Odstranit ikonu"
+  },
+  "collection.button.edit-icon": {
+    "message": "Upravit ikonu"
+  },
+  "collection.button.remove-project": {
+    "message": "Odstranit projekt"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Přestat sledovat projekt"
+  },
+  "collection.delete-modal.description": {
+    "message": "Toto odstraní tuto kolekci navždy. Tuto akci nelze vrátit."
+  },
+  "collection.delete-modal.title": {
+    "message": "Opravdu si přejete odstranit tuto kolikci?"
+  },
+  "collection.description": {
+    "message": "{description} - Zobrazit kolekci {name} od {username} na Modrinthu"
+  },
+  "collection.description.following": {
+    "message": "Automaticky generovaná kolekce všech projektů, které sledujete."
+  },
+  "collection.error.not-found": {
+    "message": "Kolekce nenalezena"
+  },
+  "collection.label.collection": {
+    "message": "Kolekce"
+  },
+  "collection.label.created-at": {
+    "message": "Vytvořeno {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Kurátor"
+  },
+  "collection.label.no-projects": {
+    "message": "Tato kolekce nemá žádné projekty!"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "Nemáte žádné projekty.\nChcete nějaký <create-link>vytvořit</create-link>?"
+  },
+  "collection.label.owner": {
+    "message": "Majitel"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, one {<stat>{count}</stat> projekt} few {<stat>{count}</stat> projekty} many {<stat>{count}</stat> projektů} other {<stat>{count}</stat> projektů}}"
+  },
+  "collection.label.updated-at": {
+    "message": "Aktualizováno {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - Kolekce"
+  },
+  "common.no": {
+    "message": "Ne"
+  },
+  "common.yes": {
+    "message": "Ano"
+  },
+  "create.collection.cancel": {
+    "message": "Zrušit"
+  },
+  "create.collection.collection-info": {
+    "message": "Tvá nová kolekce bude vytvořena jako veřejná a bude obsahovat {count, plural, =0 {žádné projekty} one {# projekt} few {# projekty} other {# projektů}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Vytvořit kolekci"
+  },
+  "create.collection.error-title": {
+    "message": "Došlo k chybě"
+  },
+  "create.collection.name-label": {
+    "message": "Název"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Zadejte název sbírky..."
+  },
+  "create.collection.summary-description": {
+    "message": "Věta nebo dvě, které popisují vaši sbírku."
+  },
+  "create.collection.summary-label": {
+    "message": "Souhrn"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projekty"
+  },
+  "create.limit-alert.type-project": {
+    "message": "projekt"
+  },
+  "create.organization.cancel": {
+    "message": "Zrušit"
+  },
+  "create.organization.name-label": {
+    "message": "Název"
+  },
+  "create.project.visibility-public": {
+    "message": "Veřejné"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Vytvořit novou"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural, one {{count} projekt} few {{count} projekty} many {{count} projektů} other {{count} projektů}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Hledat ve vašich kolekcích"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Vaše kolekce"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "Možná jste zadali URL adresu kolekce špatně."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "Tato kolekce je možná soukromá."
+  },
+  "error.collection.404.list_item.3": {
+    "message": "Kolekce mohla být odstraněna moderátorským týmem Modrinth z důvodu porušení našich <tou-link>Podmínek použití</tou-link>."
+  },
+  "error.collection.404.list_title": {
+    "message": "Proč?"
+  },
+  "error.collection.404.title": {
+    "message": "Kolekce nenalezena"
+  },
+  "error.generic.404.subtitle": {
+    "message": "Zdá se, že stránka, kterou jste hledali, neexistuje."
+  },
+  "error.generic.404.title": {
+    "message": "Stránka nenalezena"
+  },
+  "error.generic.default.list_item.1": {
+    "message": "Zkontrolujte, zda je Modrinth offline, na naší <status-link>Stránce statusu</status-link>."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "Pokud se to bude dít i nadále, můžete dát vědět týmu Modrinth připojením se k našemu <discord-link>Discord serveru</discord-link>."
+  },
+  "error.generic.default.list_title": {
+    "message": "Prosím zkuste znovu za pár minut."
+  },
+  "error.generic.default.subtitle": {
+    "message": "Něco se pokazilo."
+  },
+  "error.generic.default.title": {
+    "message": "Uh oh!"
+  },
+  "error.organization.404.list_item.1": {
+    "message": "Možná jste zadali URL adresu organizace špatně."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "Majitel organizace možná změnil URL adresu, nebo ji smazal."
+  },
+  "error.organization.404.list_item.3": {
+    "message": "Organizace mohla být smazána moderátorským týmem Modrinth z důvodu porušení našich <tou-link>Podmínek použití</tou-link>."
+  },
+  "error.organization.404.list_title": {
+    "message": "Proč?"
+  },
+  "error.organization.404.title": {
+    "message": "Organizace nenalezena"
+  },
+  "error.project.404.list_item.1": {
+    "message": "Možná jste zadali URL adresu projektu špatně."
+  },
+  "error.project.404.list_item.2": {
+    "message": "Majitel projektu možná změnil URL adresu, nastavil projekt jako soukromý, nebo jej smazal."
+  },
+  "error.project.404.list_item.3": {
+    "message": "Projekt mohl být odstraněn moderátorským týmem Modrinth z důvodu porušení našich <tou-link>Podmínek použití</tou-link>."
+  },
+  "error.project.404.list_title": {
+    "message": "Proč?"
+  },
+  "error.project.404.title": {
+    "message": "Projekt nenalezen"
+  },
+  "error.user.404.list_item.1": {
+    "message": "Možná jste se spletli při zadávání uživatelského jména uživatele."
+  },
+  "error.user.404.list_item.2": {
+    "message": "Uživatel si možná změnil uživatelské jméno nebo smazal svůj účet."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Uživatelský účet mohl být terminován z důvodu porušení našich <tou-link>Podmínek použití</tou-link>."
+  },
+  "error.user.404.list_title": {
+    "message": "Proč?"
+  },
+  "error.user.404.title": {
+    "message": "Uživatel nenalezen"
+  },
+  "frog": {
+    "message": "Byl jsi ožabkován! 🐸"
+  },
+  "frog.altText": {
+    "message": "Fotorealistické vyobrazení žabího labyrintu"
+  },
+  "frog.froggedPeople": {
+    "message": "{count, plural, one {{count} další člověk byl také ožaben!} few {{count} další lidi byli také ožabeni!} other {{count} dalších lidí bylo také ožabeno!}}"
+  },
+  "frog.sinceOpened": {
+    "message": "Tato stránka byla otevřena {ago}"
+  },
+  "frog.title": {
+    "message": "Žába"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "módy"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "pluginy"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "servery"
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.notifications.heading": {
+    "message": "Oznámení"
+  },
+  "landing.search.label": {
+    "message": "Hledat"
+  },
+  "landing.search.placeholder": {
+    "message": "Hledat..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Seřadit podle"
+  },
+  "layout.action.change-theme": {
+    "message": "Změnit motiv"
+  },
+  "layout.avatar.alt": {
+    "message": "Váš avatar"
+  },
+  "layout.banner.account-action": {
+    "message": "Požadovaná akce účtu"
+  },
+  "layout.banner.add-email.button": {
+    "message": "Navštívit nastavení účtu"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Z bezpečnostních důvodu, Modrinth potřebuje aby jste si zaregistrovaly e-mail adresu k vašemu účtu."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "Nepodařilo se generovat stav z API v této sestavě frontendu Modrinthu. Může to být kvůli výpadku nebo chybě v konfiguraci. Vygenerujte novou sestavu jakmile bude API dostupné. Chybové kódy: {errors}; Aktuální adresa API: {url}"
+  },
+  "layout.banner.build-fail.title": {
+    "message": "Chyba generování stavu z API při sestavování."
+  },
+  "layout.banner.staging.description": {
+    "message": "Vývojové prostředí je oddělené od produkční databáze Modrinthu. Používá se pro testování a odstraňování chyb, a může spouštět právě vyvíjené verze backendu nebo frontendu Modrinthu, které jsou novější než produkční instance."
+  },
+  "layout.banner.staging.title": {
+    "message": "Sledujete vývojové prostředí Modrinthu"
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Aktualizuje fakturační informace"
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Obnovení jednoho nebo více předplatných se nezdařilo. Aktualizujte prosím svou platební metodu, abyste neztratili přístup!"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Požadována fakturační akce."
+  },
+  "layout.banner.verify-email.action": {
+    "message": "Znovu poslat ověřovací e-mail"
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Z bezpečnostních důvodů potřebuje Modrinth ověření e-mailové adresy spojené s vaším účtem."
+  },
+  "layout.footer.about": {
+    "message": "O"
+  },
+  "layout.footer.about.careers": {
+    "message": "Kariéra"
+  },
+  "layout.footer.about.changelog": {
+    "message": "Seznam změn"
+  },
+  "layout.footer.about.news": {
+    "message": "Novinky"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "Program odměn"
+  },
+  "layout.footer.about.status": {
+    "message": "Status"
+  },
+  "layout.footer.legal": {
+    "message": "Právní info"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "TOTO NENÍ OFICIÁLNÍ SLUŽBA MINECRAFTU. NENÍ SCHVÁLENO ANI ASOCIOVÁNO S MOJANG NEBO MICROSOFTEM."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "Zásady autorských práv a DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "Zásady ochrany osobních údajů"
+  },
+  "layout.footer.legal.rules": {
+    "message": "Pravidla obsahu"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "Bezpečnostní upozornění"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "Podmínky Užívání"
+  },
+  "layout.footer.open-source": {
+    "message": "Modrinth je <github-link>open source</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "Produkty"
+  },
+  "layout.footer.products.app": {
+    "message": "Získat aplikaci Modrinth"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth servery"
+  },
+  "layout.footer.resources": {
+    "message": "Zdroje"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "Dokumentace API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "Pomocné centrum"
+  },
+  "layout.footer.resources.report-issues": {
+    "message": "Nahlásit problémy"
+  },
+  "layout.footer.resources.translate": {
+    "message": "Přeložit"
+  },
+  "layout.footer.social.bluesky": {
+    "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "Discord"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "Mastodon"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.menu-toggle.action": {
+    "message": "Přepnout menu"
+  },
+  "layout.meta.description": {
+    "message": "Stáhněte si Minecraft mody, pluginy, datapacky, shadery, resourcepacky a modpacky na Modrinthu. Objevte a publikujte projekty na Modrintu s moderním, snadno použitelným rozhraním a API."
+  },
+  "layout.meta.og-description": {
+    "message": "Objevte a publikujte obsah Minecraftu!"
+  },
+  "layout.nav.home": {
+    "message": "Domů"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "layout.nav.profile": {
+    "message": "Profil"
+  },
+  "layout.nav.projects": {
+    "message": "Projekty"
+  },
+  "layout.nav.search": {
+    "message": "Hledat"
+  },
+  "moderation.filter.by": {
+    "message": "Filtrovat"
+  },
+  "moderation.moderate": {
+    "message": "Moderace"
+  },
+  "moderation.page.projects": {
+    "message": "Projekty"
+  },
+  "moderation.page.reports": {
+    "message": "Hlášení"
+  },
+  "moderation.page.technicalReview": {
+    "message": "Technické hodnocení"
+  },
+  "moderation.search.placeholder": {
+    "message": "Hledat..."
+  },
+  "moderation.sort.by": {
+    "message": "Řadit podle"
+  },
+  "moderation.technical.search.placeholder": {
+    "message": "Hledat technická hodnocení..."
+  },
+  "profile.button.billing": {
+    "message": "Spravujte fakturaci uživatele"
+  },
+  "profile.button.info": {
+    "message": "Podívejte se na detaily uživatele"
+  },
+  "profile.button.manage-projects": {
+    "message": "Spravujte projekty"
+  },
+  "profile.error.not-found": {
+    "message": "Uživatel nenalezen"
+  },
+  "profile.joined-at": {
+    "message": "Připojil/a se <date>{ago}</date>"
+  },
+  "profile.label.badges": {
+    "message": "Odznaky"
+  },
+  "profile.label.details": {
+    "message": "Detaily"
+  },
+  "profile.label.no-collections": {
+    "message": "Tento uživatel nemá žádné kolekce!"
+  },
+  "profile.label.no-collections-auth": {
+    "message": "Nemáte žádné kolekce.\nChcete nějakou <create-link>vytvořit</create-link>?"
+  },
+  "profile.label.no-projects": {
+    "message": "Tento uživatel nemá žádné projekty!"
+  },
+  "profile.label.no-projects-auth": {
+    "message": "Nemáte žádné projekty.\nChcete nějaký <create-link>vytvořit</create-link>?"
+  },
+  "profile.label.organizations": {
+    "message": "Organizace"
+  },
+  "profile.meta.description": {
+    "message": "Stáhněte si projekty od {username} na Modrinthu"
+  },
+  "profile.meta.description-with-bio": {
+    "message": "{bio} - Stáhněte si projekty od {username} na Modrinthu"
+  },
+  "profile.stats.downloads": {
+    "message": "{count, plural,  other {<stat>{count}</stat> stažení}}"
+  },
+  "profile.stats.projects": {
+    "message": "{count, plural, one {<stat>{count}</stat> projekt} few {<stat>{count}</stat> projekty} other {<stat>{count}</stat> projektů}}"
+  },
+  "profile.stats.projects-followers": {
+    "message": "{count, plural, one {<stat>{count}</stat> sledující projektu} few {<stat>{count}</stat> sledující projektu} other {<stat>{count}</stat> sledujících projektu}}"
+  },
+  "profile.user-id": {
+    "message": "ID uživatele: {id}"
+  },
+  "project-member-header.accept": {
+    "message": "Přijato"
+  },
+  "project-member-header.decline": {
+    "message": "Zamítnout"
+  },
+  "project-member-header.error": {
+    "message": "Chyba"
+  },
+  "project-member-header.error-decline": {
+    "message": "Nepodařilo se zamítnout pozvánku do týmu"
+  },
+  "project-member-header.error-join": {
+    "message": "Nepodařilo se přijat pozvánku do týmu"
+  },
+  "project-member-header.invitation-no-role": {
+    "message": "Byli jste pozváni připojit se k tomuto projektu. Prosím přijměte nebo zamítněte pozvánku."
+  },
+  "project-member-header.invitation-title": {
+    "message": "Pozvánka připojit se k projektu"
+  },
+  "project-member-header.success": {
+    "message": "Úspěch"
+  },
+  "project-member-header.success-decline": {
+    "message": "Odmítli jste pozvánku do týmu"
+  },
+  "project-member-header.success-join": {
+    "message": "Připojili jste se k týmu"
+  },
+  "project-moderation-nags.required": {
+    "message": "Vyžadováno"
+  },
+  "project-moderation-nags.warning": {
+    "message": "Varování"
+  },
+  "project-type.collection.plural": {
+    "message": "Kolekce"
+  },
+  "project-type.collection.singular": {
+    "message": "Kolekce"
+  },
+  "project-type.datapack.plural": {
+    "message": "Datapacky"
+  },
+  "project-type.datapack.singular": {
+    "message": "Datapack"
+  },
+  "project-type.mod.plural": {
+    "message": "Módy"
+  },
+  "project-type.mod.singular": {
+    "message": "Mód"
+  },
+  "project-type.modpack.plural": {
+    "message": "Modpacky"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modpack"
+  },
+  "project-type.plugin.plural": {
+    "message": "Pluginy"
+  },
+  "project-type.plugin.singular": {
+    "message": "Plugin"
+  },
+  "project-type.project.plural": {
+    "message": "Projekty"
+  },
+  "project-type.project.singular": {
+    "message": "Projekt"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "Resourcepacky"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "Resourcepack"
+  },
+  "project-type.shader.plural": {
+    "message": "Shadery"
+  },
+  "project-type.shader.singular": {
+    "message": "Shader"
+  },
+  "project.about.details.created": {
+    "message": "Vytvořeno {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "License {license}"
+  },
+  "project.about.details.published": {
+    "message": "Publikováno {date}"
+  },
+  "project.about.details.submitted": {
+    "message": "Odesláno {date}"
+  },
+  "project.about.details.title": {
+    "message": "Detaily"
+  },
+  "project.about.details.updated": {
+    "message": "Aktualizováno {date}"
+  },
+  "project.actions.create-server": {
+    "message": "Vytvořit server"
+  },
+  "project.actions.create-server-tooltip": {
+    "message": "Vytvořit server"
+  },
+  "project.description.title": {
+    "message": "Popisek"
+  },
+  "project.details.licensed": {
+    "message": "Licencováno"
+  },
+  "project.download.game-version": {
+    "message": "Verze hry: {version}"
+  },
+  "project.gallery.title": {
+    "message": "Galerie"
+  },
+  "project.moderation.title": {
+    "message": "Moderace"
+  },
+  "project.navigation.changelog": {
+    "message": "Seznam změn"
+  },
+  "project.notification.updated.title": {
+    "message": "Projekt aktualizován"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "message": "Ověřit"
+  },
+  "project.settings.general.name.title": {
+    "message": "Název"
+  },
+  "project.stats.downloads-label": {
+    "message": "stažení{count, plural, one {} few {} many {} other {}}"
+  },
+  "project.stats.followers-label": {
+    "message": "sledující{count, plural, one {} few {} other{ch}}"
+  },
+  "project.version.all-versions": {
+    "message": "Všechny verze"
+  },
+  "project.version.back-to-versions": {
+    "message": "Zpět k verzím"
+  },
+  "project.versions.title": {
+    "message": "Verze"
+  },
+  "report.already-reported": {
+    "message": "Již jste nahlásili {title}"
+  },
+  "report.already-reported-description": {
+    "message": "Už máte otevřené hlášení pro tento {item}. Můžete přidat detaily k vašemu hlášení pokud máte více informací."
+  },
+  "report.back-to-item": {
+    "message": "Zpět k {item}"
+  },
+  "report.body.description": {
+    "message": "Přidejte odkazy a obrázky, pokud je to možné a relevantní. Prázdná nebo nedostatečná hlášení budou uzavřena a ignorována."
+  },
+  "report.body.title": {
+    "message": "Uveďte prosím další kontext k vaší zprávě"
+  },
+  "report.checking": {
+    "message": "Kontroluje se {item}..."
+  },
+  "report.could-not-find": {
+    "message": "Nepodařilo se najít {item}"
+  },
+  "report.for.violation": {
+    "message": "Porušení <rules-link>Pravidel</rules-link> nebo <terms-link>Podmínek Užívání</terms-link> Modrinthu"
+  },
+  "report.for.violation.description": {
+    "message": "Příklady zahrnují podvodný, urážlivý, klamný, zavádějící, nelegální obsah, a spam."
+  },
+  "report.form-not-for": {
+    "message": "Tento formulář není pro:"
+  },
+  "report.go-to-report": {
+    "message": "Jděte na hlášení"
+  },
+  "report.not-for.bug-reports": {
+    "message": "Hlášení chyb"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "Můžete nahlásit chyby na jejich <issues-link>issue trackeru</issues-link>."
+  },
+  "report.not-for.dmca": {
+    "message": "Stažení kvůli DMCA"
+  },
+  "report.not-for.dmca.description": {
+    "message": "Podívejte se na naše <policy-link>Zásady autorských práv</policy-link>."
+  },
+  "report.note.copyright.1": {
+    "message": "Mějte na vědomí, že *neodesíláte* žádost o stažení kvůli DMCA, ale hlášení o znovunahraném obsahu."
+  },
+  "report.note.copyright.2": {
+    "message": "Pokud jste místo toho chtěli odeslat žádost o stažení kvůli DMCA (což je právní úkon), prosím podívejte se na naše <copyright-policy-link> Zásady autorských práv</copyright-policy-link>."
+  },
+  "report.note.malicious.1": {
+    "message": "Hlášení o podvodném nebo klamném obsahu musí obashovat značné důkazy o takovém chování, jako například části kódu."
+  },
+  "report.note.malicious.2": {
+    "message": "Shrnutí z Microsot Defenderu, VirusTotalu, nebo AI malware deketčního programu nejsou dostatečné formy důkazů a nebudou akceptovány."
+  },
+  "report.please-report": {
+    "message": "Prosím nahlaste:"
+  },
+  "report.question.content-id": {
+    "message": "Jaké je ID {item}?"
+  },
+  "report.question.content-type": {
+    "message": "Jaký druh obsahu nahlašujete?"
+  },
+  "report.question.report-reason": {
+    "message": "Které z pravidel Modrinthu {item} porušuje?"
+  },
+  "report.report-content": {
+    "message": "Nahlašte obsah moderátorům"
+  },
+  "report.report-item": {
+    "message": "Nahlašte {title} moderátorům"
+  },
+  "report.submit": {
+    "message": "Odeslat hlášení"
+  },
+  "revenue.transfers.total": {
+    "message": "Vybrali jste celkem {amount}."
+  },
+  "revenue.transfers.total.method": {
+    "message": "Vybrali jste {amount} skrze {method}."
+  },
+  "revenue.transfers.total.year": {
+    "message": "V roce {year} jste vybrali {amount}."
+  },
+  "revenue.transfers.total.year_method": {
+    "message": "V roce {year} jste vybrali {amount} skrze {method}."
+  },
+  "scopes.analytics.label": {
+    "message": "Přečíst analytiku"
+  },
+  "scopes.collectionCreate.description": {
+    "message": "Vytvořit kolekce"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "Vytvořit kolekce"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "Smazat kolekce"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "Smazat kolekce"
+  },
+  "scopes.collectionRead.description": {
+    "message": "Přečíst kolekce"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Přečíst kolekce"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Psát do kolekcí"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Psát do kolekcí"
+  },
+  "scopes.notificationRead.description": {
+    "message": "Přečíst vaše notifikace"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Přečíst notifikace"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "Smazat/podívat se na vaše notifikace"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Psát notifikace"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Vytvářet organizace"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "Vytvářet organizace"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "Smazat organizace"
+  },
+  "scopes.organizationDelete.label": {
+    "message": "Smazat organizace"
+  },
+  "scopes.organizationRead.description": {
+    "message": "Přečíst organizace"
+  },
+  "scopes.organizationRead.label": {
+    "message": "Přečíst organizace"
+  },
+  "scopes.organizationWrite.description": {
+    "message": "Psát do organizací"
+  },
+  "scopes.projectDelete.label": {
+    "message": "Odstranit projekty"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.plan.large.name": {
+    "message": "Velký"
+  },
+  "servers.plan.medium.name": {
+    "message": "Střední"
+  },
+  "servers.plan.small.name": {
+    "message": "Malý"
+  },
+  "settings.profile.bio.title": {
+    "message": "Bio"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Profilový obrázek"
+  },
+  "settings.profile.username.title": {
+    "message": "Uživatelské jméno"
+  }
+}

@@ -31,13 +31,12 @@ use serde::Deserialize;
 // as the environment generator for both uses common fields.
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct CommonProject {
     // For example, for CommonProject, we do not include:
     // - game_versions (v2 only)
     // - loader_fields (v3 only)
     // - etc.
-    // For any tests that require those fields, we make a separate test with separate API functions tht do not use Common models.
+    // For any tests that require those fields, we make a separate test with separate API functions that do not use Common models.
     pub id: ProjectId,
     pub slug: Option<String>,
     pub organization: Option<OrganizationId>,
@@ -62,7 +61,6 @@ pub struct CommonProject {
     pub monetization_status: MonetizationStatus,
 }
 #[derive(Deserialize, Clone)]
-#[allow(dead_code)]
 pub struct CommonVersion {
     pub id: VersionId,
     pub loaders: Vec<String>,
@@ -82,7 +80,6 @@ pub struct CommonVersion {
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct CommonLoaderData {
     pub icon: String,
     pub name: String,
@@ -90,7 +87,6 @@ pub struct CommonLoaderData {
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct CommonCategoryData {
     pub icon: String,
     pub name: String,
@@ -100,7 +96,6 @@ pub struct CommonCategoryData {
 
 /// A member of a team
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct CommonTeamMember {
     pub team_id: TeamId,
     pub user: User,
@@ -114,7 +109,6 @@ pub struct CommonTeamMember {
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct CommonNotification {
     pub id: NotificationId,
     pub user_id: UserId,
@@ -127,7 +121,6 @@ pub struct CommonNotification {
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct CommonNotificationAction {
     pub action_route: (String, String),
 }
@@ -153,7 +146,6 @@ impl CommonItemType {
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct CommonReport {
     pub id: ReportId,
     pub report_type: String,
@@ -175,7 +167,6 @@ pub enum LegacyItemType {
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct CommonThread {
     pub id: ThreadId,
     #[serde(rename = "type")]
@@ -187,7 +178,6 @@ pub struct CommonThread {
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct CommonThreadMessage {
     pub id: ThreadMessageId,
     pub author_id: Option<UserId>,
@@ -196,7 +186,6 @@ pub struct CommonThreadMessage {
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub enum CommonMessageBody {
     Text {
         body: String,
@@ -216,7 +205,6 @@ pub enum CommonMessageBody {
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub enum CommonThreadType {
     Report,
     Project,
@@ -224,7 +212,6 @@ pub enum CommonThreadType {
 }
 
 #[derive(Deserialize)]
-#[allow(dead_code)]
 pub struct CommonUser {
     pub id: UserId,
     pub username: String,

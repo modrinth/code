@@ -1,0 +1,305 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Ontwikkelaarmodus geaktiveer."
+  },
+  "app.settings.downloading": {
+    "message": "Aflaai v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Voorkoms"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "Verstek instansie opsies"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "Kenmerk vlae"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java installasies"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privaatheid"
+  },
+  "app.settings.tabs.resource-management": {
+    "message": "Hulpbronbestuur"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} is gereed om te installeer! Herlaai nou werk, of outomaties wanneer jy naby Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} klaar afgelaai. Herlaai nou werk, of outomaties wanneer jy naby Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} is nou beskikbaar! Aangesien jy op'n gemeterde netwerk, ons het nie outomaties laai dit."
+  },
+  "app.update-toast.changelog": {
+    "message": "Alle veranderinge"
+  },
+  "app.update-toast.download": {
+    "message": "Laai ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Aflaai..."
+  },
+  "app.update-toast.reload": {
+    "message": "Herlaai"
+  },
+  "app.update-toast.title": {
+    "message": "Die opdatering is beskikbaar"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Aflaai voltooi"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Klik hier om die veranderinge te sien."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Weergawe {version} is suksesvol geïnstalleer!"
+  },
+  "app.update.download-update": {
+    "message": "Laai die opdatering af"
+  },
+  "app.update.downloading-update": {
+    "message": "Laai tans opdatering af ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Herlaai om opdatering te installeer"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "voeg by en speel"
+  },
+  "instance.add-server.add-server": {
+    "message": "bediener byvoeg"
+  },
+  "instance.add-server.resource-pack.disabled": {
+    "message": "Gestrem"
+  },
+  "instance.add-server.resource-pack.enabled": {
+    "message": "aangeskakel"
+  },
+  "instance.add-server.resource-pack.prompt": {
+    "message": "spoed"
+  },
+  "instance.add-server.title": {
+    "message": "voeg 'n bediener by"
+  },
+  "instance.edit-server.title": {
+    "message": "wysig bediener"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "versteek van die tuisblad"
+  },
+  "instance.edit-world.name": {
+    "message": "Naam"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft Wêreld"
+  },
+  "instance.edit-world.reset-icon": {
+    "message": "herstel ikoon"
+  },
+  "instance.edit-world.title": {
+    "message": "wêreld wysig"
+  },
+  "instance.filter.disabled": {
+    "message": "gestremde projekte"
+  },
+  "instance.filter.updates-available": {
+    "message": "opdaterings beskikbaar"
+  },
+  "instance.server-modal.address": {
+    "message": "adres"
+  },
+  "instance.server-modal.name": {
+    "message": "Naam"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft-bediener"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Hulpbronpakket"
+  },
+  "instance.settings.tabs.general": {
+    "message": "Algemeen"
+  },
+  "instance.settings.tabs.general.delete": {
+    "message": "verwyder instansie"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "verwyder instansie"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "Vee 'n instansie permanent van jou toestel uit, insluitend jou wêrelde, konfigurasies en alle geïnstalleerde inhoud. Wees versigtig, want sodra jy 'n instansie verwyder het, is daar geen manier om dit te herstel nie."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Vee tans uit …"
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Duplikaat"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Kan nie dupliseer tydens installasie nie."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Duplikaat instansie"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "Skep 'n kopie van hierdie instansie, insluitend wêrelde, konfigurasies, mods, ens."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Wwysig ikoon"
+  },
+  "instance.settings.tabs.general.edit-icon.remove": {
+    "message": "Verwyder ikoon"
+  },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Vervang ikoon"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Kies ikoon"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Biblioteekgroepe"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Skep nuwe groep"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Biblioteekgroepe laat jou toe om jou instansies in verskillende afdelings in jou biblioteek te organiseer."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Voer groepnaam in"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Naam"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Lanseerhake"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Pasgemaakte lanseerhake"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Hooks laat gevorderde gebruikers toe om sekere stelselopdragte uit te voer voor en na die bekendstelling van die spel."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Na-uitgang"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Het gehardloop nadat die wedstryd geëindig het."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Voer die na-uitgang-opdrag in..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Voorbekendstelling"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Het gehardloop voordat die instansie geloods is."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Voer pre-lanceringsopdrag in..."
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Verpakking"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Verpakking opdrag vir die bekendstelling Van Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Voer die Verpakking-opdrag in..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Installation"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} vir Minecraft {game_version} reeds geïnstalleer"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Vanilla {game_version} reeds geïnstalleer"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Verander weergawe"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Installeer"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Installasie"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Haal modpack weergawes"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Installeer nuwe weergawe"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Huidiglik geïnstalleer"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Ontfoutinligting:"
+  },
+  "instance.settings.tabs.installation.fetching-modpack-details": {
+    "message": "Haal modpack besonderhede"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Spel weergawe"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Installeer"
+  },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Installasie aan die gang"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "{loader} weergawe"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-connection": {
+    "message": "Kan nie gekoppelde modpack-besonderhede haal nie. Kontroleer asseblief u internetverbinding."
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "{loader} is nie beskikbaar Vir Minecraft {version} nie. Probeer'n ander mod loader."
+  },
+  "instance.settings.tabs.installation.no-modpack-found": {
+    "message": "Hierdie geval is gekoppel aan'n modpack, maar die modpack kon nie gevind word op Modrinth."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Basis"
+  },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Herinstalleer modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Herinstalleer modpack weer"
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.description": {
+    "message": "Herinstalleer sal alle geïnstalleerde of gewysigde inhoud terugstel na wat deur die modpack verskaf word, en enige mods of inhoud wat jy bo-op die oorspronklike installasie bygevoeg het, verwyder. Dit kan onverwagte gedrag regstel as veranderinge aan die instansie aangebring is, maar as jou wêrelde nou afhanklik is van addisionele geïnstalleerde inhoud, kan dit bestaande wêrelde breek."
+  },
+  "instance.settings.tabs.installation.reinstall.confirm.title": {
+    "message": "Wil u definitief hierdie instansie herinstalleer?"
+  },
+  "instance.settings.tabs.installation.reinstall.description": {
+    "message": "Stel die inhoud van die instansie terug na sy oorspronklike toestand, en verwyder enige mods of inhoud wat u bo-op die oorspronklike modpack bygevoeg het."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Herinstalleer modpack"
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Herstel"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Herstel"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Herstel herinstalleer Minecraft afhanklikhede en tjeks vir korrupsie. Dit kan probleme oplos as u speletjie nie begin nie weens foute wat verband hou met die lanseerder, maar dit sal nie probleme of ineenstortings wat verband hou met geïnstalleerde mods oplos nie."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Herstel geval?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Herstelwerk aan die gang"
+  }
+}

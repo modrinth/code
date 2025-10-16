@@ -93,22 +93,22 @@ async fn main() -> Result<()> {
         .ok()
         .and_then(|x| x.parse::<bool>().ok())
         .unwrap_or(false)
+        && let Ok(token) = dotenvy::var("CLOUDFLARE_TOKEN")
+        && let Ok(zone_id) = dotenvy::var("CLOUDFLARE_ZONE_ID")
     {
-        if let Ok(token) = dotenvy::var("CLOUDFLARE_TOKEN") {
-            if let Ok(zone_id) = dotenvy::var("CLOUDFLARE_ZONE_ID") {
-                let cache_clears = upload_files
+        let cache_clears = upload_files
+            .into_iter()
+            .map(|x| format_url(&x.0))
+            .chain(
+                mirror_artifacts
                     .into_iter()
-                    .map(|x| format_url(&x.0))
-                    .chain(
-                        mirror_artifacts
-                            .into_iter()
-                            .map(|x| format_url(&format!("maven/{}", x.0))),
-                    )
-                    .collect::<Vec<_>>();
+                    .map(|x| format_url(&format!("maven/{}", x.0))),
+            )
+            .collect::<Vec<_>>();
 
-                // Cloudflare ratelimits cache clears to 500 files per request
-                for chunk in cache_clears.chunks(500) {
-                    REQWEST_CLIENT.post(format!("https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache"))
+        // Cloudflare ratelimits cache clears to 500 files per request
+        for chunk in cache_clears.chunks(500) {
+            REQWEST_CLIENT.post(format!("https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache"))
                         .bearer_auth(&token)
                         .json(&serde_json::json!({
                         "files": chunk
@@ -128,8 +128,6 @@ async fn main() -> Result<()> {
                                 item: "cloudflare clear cache".to_string(),
                             }
                         })?;
-                }
-            }
         }
     }
 

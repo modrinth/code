@@ -41,8 +41,8 @@ pub async fn jre_find_filtered_jres(
 // Validates JRE at a given path
 // Returns None if the path is not a valid JRE
 #[tauri::command]
-pub async fn jre_get_jre(path: PathBuf) -> Result<Option<JavaVersion>> {
-    jre::check_jre(path).await.map_err(|e| e.into())
+pub async fn jre_get_jre(path: PathBuf) -> Result<JavaVersion> {
+    Ok(jre::check_jre(path).await?)
 }
 
 // Tests JRE of a certain version

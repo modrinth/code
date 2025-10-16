@@ -13,7 +13,6 @@ pub struct MultipartSegment {
 }
 
 #[derive(Debug, Clone)]
-#[allow(dead_code)]
 pub enum MultipartSegmentData {
     Text(String),
     Binary(Vec<u8>),

@@ -250,7 +250,7 @@ fn find_file<'a>(
     // Minecraft mods are not going to be both a mod and a modpack, so this minecraft-specific handling is fine
     // As there can be multiple project types, returns the first allowable match
     let mut fileexts = vec![];
-    for project_type in version.project_types.iter() {
+    for project_type in &version.project_types {
         match project_type.as_str() {
             "mod" => fileexts.push("jar"),
             "modpack" => fileexts.push("mrpack"),
@@ -381,8 +381,10 @@ pub async fn version_file_sha1(
 
     Ok(find_file(&project_id, &vnum, &version, &file)
         .and_then(|file| file.hashes.get("sha1"))
-        .map(|hash_str| HttpResponse::Ok().body(hash_str.clone()))
-        .unwrap_or_else(|| HttpResponse::NotFound().body("")))
+        .map_or_else(
+            || HttpResponse::NotFound().body(""),
+            |hash_str| HttpResponse::Ok().body(hash_str.clone()),
+        ))
 }
 
 #[get("maven/modrinth/{id}/{versionnum}/{file}.sha512")]
@@ -426,6 +428,8 @@ pub async fn version_file_sha512(
 
     Ok(find_file(&project_id, &vnum, &version, &file)
         .and_then(|file| file.hashes.get("sha512"))
-        .map(|hash_str| HttpResponse::Ok().body(hash_str.clone()))
-        .unwrap_or_else(|| HttpResponse::NotFound().body("")))
+        .map_or_else(
+            || HttpResponse::NotFound().body(""),
+            |hash_str| HttpResponse::Ok().body(hash_str.clone()),
+        ))
 }

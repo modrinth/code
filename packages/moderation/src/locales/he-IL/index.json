@@ -1,0 +1,159 @@
+{
+  "nags.add-description.description": {
+    "defaultMessage": "יש להזין תיאור שמתאר באופן ברור את מטרת הפרויקט ואת תפקודו."
+  },
+  "nags.add-description.title": {
+    "defaultMessage": "הוסף תיאור"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "הוספת אייקון ייחודי, רלוונטי ומושך גורמת לפרויקט שלך להיות קל לזיהוי ועוזרת לו להתבלט."
+  },
+  "nags.add-icon.title": {
+    "defaultMessage": "הוסף אייקון"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "הוסף קישורים רלוונטיים מחוץ ל-Modrinth, כגון קוד מקור, מעקב אחר בעיות או הזמנה לשרת דיסקורד."
+  },
+  "nags.add-links.title": {
+    "defaultMessage": "הוסף קישורים חיצוניים"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "בחרת בכל {totalAvailableTags} התגיות הזמינות. הדבר מנוגד למטרת התגיות, שנועדו לעזור למשתמשים למצוא פרויקטים רלוונטיים. אנא בחר רק את התגיות הרלוונטיות לפרויקט שלך."
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "בחר תגיות מדויקות"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "התיאור שלך מכיל {length} תווים קריאים. מומלץ לכלול לפחות {minChars} תווים כדי ליצור תיאור ברור ואינפורמטיבי."
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "הרחב את התיאור"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "ערוך תיאור"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "ערוך רישיון"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "ערוך סיכום"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "ערוך תגיות"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "עריכת כותרת"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "תמונת הגלריה המובלטת היא לרוב הרושם הראשוני של הפרויקט שלך."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "הבלט תמונה בגלריה"
+  },
+  "nags.gallery.title": {
+    "defaultMessage": "בקר בדף הגלריה"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "ה-{projectType} שלך משתמש ברישיון הדורש קוד מקור זמין. אנא ספק קישור לקוד המקור או קובץ מקורות עבור כל גרסה נוספת, או שקול להשתמש ברישיון אחר."
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "ספק קוד מקור"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "התיאור שלך צריך להכיל מספיק טקסט פשוט או טקסט חלופי לתמונה, כדי שיישאר נגיש למשתמשים עם הקראות מסך או חיבורי אינטרנט איטיים."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "הבטח נגישות"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "כתובת ה-URL של הרישיון אינה חוקית."
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "כתובת ה-URL של הרישיון מפנה אל {domain}, ואינה מתאימה לרישיון. כתובות רישיון צריכות להוביל ישירות לקובץ הרישיון, ולא לרשתות חברתיות, פלטפורמות משחקים וכדומה."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "כתובת ה-URL של הרישיון נראית פגומה. אנא ספק כתובת URL חוקית לטקסט הרישיון שלך."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "הוסף קישור רישיון חוקי"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "שימוש במקצרי קישורים או בשיטות אחרות כדי לטשטש את היעד של קישור אסור בקישורים חיצוניים או בקישור הרישיון. אנא השתמש רק בקישורים מלאים ומתאימים."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "אל תשתמש במקצרי קישורים"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{כמות, plural, one {כותרת אחת בתיאור שלך ארוכה מדי.} other {{כמות} כותרות בתיאור שלך ארוכות מדי.}} כותרות צריכות להיות תמציתיות ולשמש ככותרות סעיפים, ולא כמשפטים שלמים."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "קצר כותרות"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "פרויקטים אינם רשאים להשתמש במיתוג של מיינקראפט או לכלול את \"מיינקראפט\" כחלק משמעותי בשם."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "הימנע מהפרת זכויות מותג"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "בחלק מן התמונות שלך חסר טקסט חלופי, שהוא חשוב לנגישות, במיוחד עבור משתמשים עם לקות ראייה."
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "הוסף טקסט חלופי לתמונה"
+  },
+  "nags.misused-discord-link-description": {
+    "defaultMessage": "הזמנות לדיסקורד אינן יכולות לשמש עבור סוגי קישורים אחרים. אנא הזן את קישור הדיסקורד שלך בשדה המיועד לקישורי הזמנה לדיסקורד בלבד."
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "העבר את הזמנת הדיסקורד"
+  },
+  "nags.moderation.title": {
+    "defaultMessage": "בקר בשרשור פיקוח ובקרה"
+  },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "עיין בחוות הדעת של צוות הפיקוח והבקרה וטפל בכל הבעיות לפני הגשה חוזרת."
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "עיין בחוות דעת של מפקחים"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "בחרת ב-{count} תגיות רזולוציה ({tags}). חבילות משאבים צריכות בדרך כלל לכלול תגית רזולוציה אחת בלבד, התואמת לרזולוציה הראשית שלהן."
+  },
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "בחר רזולוציה נכונה"
+  },
+  "nags.select-environments.description": {
+    "defaultMessage": "בחר את הסביבות שבהן ה-{projectType} שלך פועל."
+  },
+  "nags.select-environments.title": {
+    "defaultMessage": "בחר סביבות"
+  },
+  "nags.select-license.description": {
+    "defaultMessage": "בחר את הרישיון שבו מופץ ה-{projectType} שלך."
+  },
+  "nags.select-license.title": {
+    "defaultMessage": "בחירת רישיון"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "בחר את התגיות המתאימות לפרויקט שלך כדי לסייע למשתמשים הנכונים למצוא אותו."
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "בחר תגיות"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "בקר בהגדרות התיאור"
+  },
+  "nags.settings.environments.title": {
+    "defaultMessage": "בקר בהגדרות הסביבה"
+  },
+  "nags.settings.license.title": {
+    "defaultMessage": "בקר בהגדרות הרישיון"
+  },
+  "nags.settings.links.title": {
+    "defaultMessage": "בקר בהגדרות הקישורים"
+  },
+  "nags.settings.tags.title": {
+    "defaultMessage": "בקר בהגדרות התגיות"
+  }
+}
+

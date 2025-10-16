@@ -1,0 +1,849 @@
+{
+  "badge.beta": {
+    "defaultMessage": "بيتا"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "تربيتن بيتا"
+  },
+  "badge.new": {
+    "defaultMessage": "بهارو"
+  },
+  "button.analytics": {
+    "defaultMessage": "اناليتيک"
+  },
+  "button.back": {
+    "defaultMessage": "کمبالي"
+  },
+  "button.cancel": {
+    "defaultMessage": "بطل"
+  },
+  "button.close": {
+    "defaultMessage": "توتوڤ"
+  },
+  "button.continue": {
+    "defaultMessage": "تروسکن"
+  },
+  "button.copy-id": {
+    "defaultMessage": "سالين ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "سالين ڤاءوتن ککل"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "چيڤتا ڤروجيک"
+  },
+  "button.download": {
+    "defaultMessage": "موات تورون"
+  },
+  "button.downloading": {
+    "defaultMessage": "سدڠ مموات تورون"
+  },
+  "button.edit": {
+    "defaultMessage": "سونتيڠ"
+  },
+  "button.follow": {
+    "defaultMessage": "ايکوت"
+  },
+  "button.more-options": {
+    "defaultMessage": "لبيه باڽق ڤيليهن"
+  },
+  "button.next": {
+    "defaultMessage": "ستروسڽ"
+  },
+  "button.open-folder": {
+    "defaultMessage": "بوک فولدر"
+  },
+  "button.play": {
+    "defaultMessage": "ماءين"
+  },
+  "button.refresh": {
+    "defaultMessage": "سݢر سمولا"
+  },
+  "button.remove": {
+    "defaultMessage": "اليه کلوار"
+  },
+  "button.remove-image": {
+    "defaultMessage": "اليه کلوار ݢمبر"
+  },
+  "button.report": {
+    "defaultMessage": "لاڤور"
+  },
+  "button.reset": {
+    "defaultMessage": "تتڤ سمولا"
+  },
+  "button.save": {
+    "defaultMessage": "سيمڤن"
+  },
+  "button.save-changes": {
+    "defaultMessage": "سيمڤن ڤروبهن"
+  },
+  "button.saving": {
+    "defaultMessage": "سدڠ مڽيمڤن"
+  },
+  "button.sign-in": {
+    "defaultMessage": "دفتر ماسوق"
+  },
+  "button.sign-out": {
+    "defaultMessage": "دفتر کلوار"
+  },
+  "button.sign-up": {
+    "defaultMessage": "دفتر"
+  },
+  "button.stop": {
+    "defaultMessage": "برهنتي"
+  },
+  "button.unfollow": {
+    "defaultMessage": "ڽهأيکوت"
+  },
+  "button.upload-image": {
+    "defaultMessage": "موات ناءيق ݢمبر"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "تادي"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "اڤليکاسي"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "ڤلاين"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "لامن سساوڠ"
+  },
+  "collection.label.private": {
+    "defaultMessage": "ڤريبادي"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "سونتيڠ ايکون"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "اليه کلوار ايکون"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "ݢنتي ايکون"
+  },
+  "icon-select.select": {
+    "defaultMessage": "ڤيليه ايکون"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "چاري..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "بنتوق ݢالري"
+  },
+  "input.view.grid": {
+    "defaultMessage": "بنتوق ݢريد"
+  },
+  "input.view.list": {
+    "defaultMessage": "بنتوق باريسن"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "مود ڤڠمباراءن"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "مود کرياتيف"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "مود ڤنونتون"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "مود کمنديرين"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "مود ڤرماءينن يڠ تيدق دکتاهوءي"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "ڤروبهن دسيمڤن"
+  },
+  "label.collections": {
+    "defaultMessage": "کوليکسي"
+  },
+  "label.created-ago": {
+    "defaultMessage": "دچيڤتا {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "ڤاڤن ڤموک"
+  },
+  "label.delete": {
+    "defaultMessage": "ڤادم"
+  },
+  "label.description": {
+    "defaultMessage": "کترڠن"
+  },
+  "label.error": {
+    "defaultMessage": "رالت"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "ڤروجيک يڠ دأيکوتي"
+  },
+  "label.loading": {
+    "defaultMessage": "سدڠ مموات..."
+  },
+  "label.moderation": {
+    "defaultMessage": "ڤڽدرهاناءن"
+  },
+  "label.notifications": {
+    "defaultMessage": "ڤمبريتاهوان"
+  },
+  "label.or": {
+    "defaultMessage": "اتاو"
+  },
+  "label.password": {
+    "defaultMessage": "کات لالوان"
+  },
+  "label.played": {
+    "defaultMessage": "دماءينکن سلاما {time}"
+  },
+  "label.public": {
+    "defaultMessage": "عوام"
+  },
+  "label.rejected": {
+    "defaultMessage": "دتولق"
+  },
+  "label.saved": {
+    "defaultMessage": "دسيمڤن"
+  },
+  "label.scopes": {
+    "defaultMessage": "سکوڤ"
+  },
+  "label.server": {
+    "defaultMessage": "ڤلاين"
+  },
+  "label.servers": {
+    "defaultMessage": "ڤلاين"
+  },
+  "label.settings": {
+    "defaultMessage": "تتڤن"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "ايکاڤماءين"
+  },
+  "label.title": {
+    "defaultMessage": "تاجوق"
+  },
+  "label.unlisted": {
+    "defaultMessage": "تيدق دسنارايکن"
+  },
+  "label.visibility": {
+    "defaultMessage": "کترليهتن"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "لاوت ڤروفيل اندا"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "تمبه قاعده ڤمبايرن"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "سدڠ منمبه قاعده ڤمبايرن"
+  },
+  "notification.error.title": {
+    "defaultMessage": "سبواه رالت تله برلاکو"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "دتريما"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "دلولوسکن"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "دارکيبکن"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "دتوتوڤ"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "ڤنچيڤتا"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "درف"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "ݢاݢل"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "دسنارايکن"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "ڤڽدرهانا"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "ڤاسوقن Modrinth"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "منوڠݢو"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "ڤريبادي"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "دڤروسيس"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "دتولق"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "دکمباليکن"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "دجدوالکن"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "سدڠ دنيلاي"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "تيدق دسنارايکن"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "دتاهن"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "سالين کود کڤاڤن کرتن"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "ڤلڠݢن"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "ڤلڠݢن دان ڤلاين"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "ڤلڠݢن اتاو ڤلاين"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "ڤلاين"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "سبواه {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "تيدق دسوکوڠ"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} دڠن ديݢيت تراخير {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "قاعده ڤمبايرن يڠ تيدق دکتاهوءي"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "سموا"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, other {ڤيک داتا}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "ڤيک داتا"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, other {ڤيک داتا}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, other {مود}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "مود"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, other {مود}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, other {ڤيک مود}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "ڤيک مود"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, other {ڤيک مود}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, other {ڤمالم}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "ڤمالم"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, other {ڤمالم}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, other {ڤيک سومبر}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "ڤيک سومبر"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, other {ڤيک سومبر}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, other {ڤمبايڠ}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "ڤمبايڠ"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, other {ڤمبايڠ}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "ڤرسکيترن يڠ دسوکوڠ"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "ڤلڠݢن دان ڤلاين"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "بهاݢين ڤلڠݢن"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "ڤلاين خصوس سهاج"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "بهاݢين ڤلاين"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "ايکاڤماءين"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "ايکاڤماءين سهاج"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "ماءينکرف‌ت: ايديسي جاۏا"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "ڤلتفوم"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "کسراسين"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "ڤميليق ڤروجيک"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "ڤنچيڤتا"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "دچيڤتا {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "برليسين {license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "دتربيتکن {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "دسرهکن {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "بوتيرن"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "دکمس کيني {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "سرتاي ڤلاين ديسکورد"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "درما"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "تاجا دGitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "درما دKo-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "درما دPatreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "درما دPayPal"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "لاڤورکن ايسو"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "ليهت سومبر"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "ڤاءوتن"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "لاوت ويکي"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "اناليتيک"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "کترڠن"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "ممڤوڽاءي ببراڤ فوڠسي ڤد کدوا-دوا ڤلڠݢن دان ڤلاين⹁ والاوڤون هاڽ سبهاݢينڽ."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "تيدق واجب ڤد کدوا-دواڽ⹁ برفوڠسي سام جک دڤاسڠ ڤد کدوا-دوا بهاݢين"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "تيدق واجب ڤد کدوا-دواڽ⹁ برفوڠسي ڤاليڠ باءيق اڤابيلا دڤاسڠ ڤد کدوا-دوا بهاݢين"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "تيدق واجب ڤد ڤلڠݢن"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "تيدق واجب ڤد ڤلاين"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "دڤرلوکن ڤد کدوا-دواڽ"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "ڤلڠݢن دان ڤلاين"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "سموا فوڠسي دلاکوکن ڤد بهاݢين ڤلڠݢن دان سراسي دڠن ڤلاين ۏانيلا."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "بهاݢين ڤلڠݢن سهاج"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "ڤلاين خصوس سهاج"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "سموا فوڠسي دلاکوکن ڤد بهاݢين ڤلاين دان سراسي دڠن ڤلڠݢن ۏانيلا."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "برفوڠسي دالم ايکاڤماءين جوݢ"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "بهاݢين ڤلاين سهاج"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "هاڽ برفوڠسي دالم ايکاڤماءين اتاو اڤابيلا تيدق برسامبوڠ کڤلاين مولتيڤماءين."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "ايکاڤماءين سهاج"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "سوبڤيليهن {option}"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "ڤرسکيترن"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "ݢالري"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "عموم"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "ليسين"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "ڤاءوتن"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "اهلي"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "اندا تيدق ممڤوڽاءي کبنرن اونتوق مڽونتيڠ اين."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "تياد کبنرن"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "تݢ"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "موات ناءيق"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "ۏرسي"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "ليهت"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "T"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "دارکيبکن"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "درف"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "ڤريبادي"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "عوام"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "دتولق"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "دجدوالکن"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "سدڠ دنيلاي"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "تيدق دکتاهوءي"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "تيدق دسنارايکن"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "تيدق دسنارايکن اوليه ستف"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "ڤناڤيس دکونچي"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "ممبوک کونچي ڤناڤيس اين موڠکين ممبنرکن اندا مماسڠ کاندوڠن يڠ تيدق سراسي."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "سلارسکن ڤناڤيس"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} دکونچي"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "بوک کونچي ڤناڤيس"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "ڤرسکيترن"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "ڤلڠݢن"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "ڤلاين"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "ۏرسي ڤرماءينن"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "تونجوقکن سموا ۏرسي"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "ليسين"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "سومبر تربوک"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "ڤموات"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "ڤموات"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "ڤموات"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "ڤلتفوم"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "ID ڤروجيک"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "ڤموات"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "کتڤيکن"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "بوليه دکتڤيکن"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "ڤرهاتين"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "معلومت"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "کريتيکل"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "معلومت"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "تينجاوان"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "امرن"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "تيدق بوليه دکتڤيکن"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "اندا بلوم اکن دچج لاݢي."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "ڤيليه قاعده ڤمبايرن"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "قاعده ڤمبايرن"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "دبيلکن {interval}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "ڤيليه ڤلن ترسواي دڠن هاڽ سڤيسيفيکاسي يڠ اندا ڤرلوکن."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "ماري مولاکن"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "سسواي اونتوق 15–25 ڤماءين⹁ ڤيک مود اتاو ڤڠوبهسواين يڠ برت."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "باݢوس اونتوق 6–15 ڤماءين دان بربيلڠ مود."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "ڤاليڠ ڤوڤولر"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "ڤيليه ڤلن"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "ڤيليه ڤلن"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "سسواي اونتوق 1–5 راکن دڠن ببراڤ مود ريڠن."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "ڤيليه جومله RAM دان سڤيسيفيکاسي يڠ سسواي دڠن کڤرلوان اندا."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "ڤلن"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "رنتاو"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "سيمق"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "ايروڤه تڠه"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "براڤ باڽق RAM يڠ اندا ماهو ڤلاين اندا اد؟"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "اميريکا اوتارا"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "دمانکه اندا ماهو ڤلاين اندا دتمڤتکن؟"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "رنتاو تيدق دسنارايکن؟ <link>بريتاهو کامي دمان اندا ايڠين مليهت Modrinth Servers ستروسڽ!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "اسيا تڠݢارا"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "ايروڤه بارت"
+  },
+  "settings.account.title": {
+    "defaultMessage": "اکاءون دان کسلامتن"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "تمڤيلن"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "اڤليکاسي اندا"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "اڤليکاسي يڠ دصحکن"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "ڤڠبيلن دان لڠݢنن"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "ݢلڤ"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "ڤيليه تيما ورنا ڤيليهن اندا اونتوق Modrinth ڤد ڤرنتي اين."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "چره"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "لبيه ڤيليه تيما ݢلڤ"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "لبيه ڤيليه تيما چره"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "ريترو"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "سلارسکن دڠن سيستم"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "تيما ورنا"
+  },
+  "settings.language.title": {
+    "defaultMessage": "بهاس"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "توکن اکسيس ڤريبادي"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "ڤروفيل عوام"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "سيسي"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} ڤد جم {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "اندا ممڤوڽاءي ڤروبهن يڠ بلوم دسيمڤن."
+  }
+}
+

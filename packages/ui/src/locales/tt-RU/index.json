@@ -1,0 +1,195 @@
+{
+  "button.continue": {
+    "defaultMessage": "Дәвам итү"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Проектны ясау"
+  },
+  "button.download": {
+    "defaultMessage": "Йөкләнү"
+  },
+  "button.downloading": {
+    "defaultMessage": "Йөкләнү"
+  },
+  "button.edit": {
+    "defaultMessage": "Үзгәртү"
+  },
+  "button.follow": {
+    "defaultMessage": "Язылу"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Папканы ачу"
+  },
+  "button.play": {
+    "defaultMessage": "Уйнау"
+  },
+  "button.refresh": {
+    "defaultMessage": "Яңарту"
+  },
+  "button.remove": {
+    "defaultMessage": "Бетерү"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Сурәтне бетерү"
+  },
+  "button.report": {
+    "defaultMessage": "Шикаять итү"
+  },
+  "button.reset": {
+    "defaultMessage": "Ташлату"
+  },
+  "button.save": {
+    "defaultMessage": "Саклау"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Үзгәрешләрне саклау"
+  },
+  "button.saving": {
+    "defaultMessage": "Саклау"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Керү"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Чыгу"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Теркәлү"
+  },
+  "button.stop": {
+    "defaultMessage": "Туктату"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Язылуны туктату"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Сурәтне йөкләтү"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Кушымта"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Серверлар"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Сайт"
+  },
+  "label.settings": {
+    "defaultMessage": "Көйләүләр"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth төркеме"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Клиент"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Клиент һәм сервер"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Клиент яки сервер"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Сервер"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Билгесез туләү ысулы"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Барлык"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Клиент һәм сервер"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Берлек уен"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Берлек уен генә"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Платформалар"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Клиент һәм сервер"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Галерея"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Сылтамалар"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Катнашучылар"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "Ә"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "Б"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "С"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Клиент"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Сервер"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Уен версиясе"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Лицензия"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Платформа"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Регион"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Тышкы күренеш"
+  }
+}
+

@@ -1,0 +1,284 @@
+{
+  "action.cancel": {
+    "message": "Avbryt"
+  },
+  "action.continue": {
+    "message": "Fortsett"
+  },
+  "admin.billing.error.not-found": {
+    "message": "Bruker ikke funnet"
+  },
+  "app-marketing.download.description": {
+    "message": "Våres applikasjon er tilgjengelig på alle platformer, velg din ønsket versjon."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Last ned AppImage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Last ned betaversjon"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Last ned DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Last ned RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Tredjepartspakker"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "av {author}"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Navn"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Søk mods"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Versjon"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "God ytelse"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 milliard %"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Lite"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Del"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Last ned Modrinth App for {os}"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Godkjenn"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Avslå"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> av <creator-link>{creator}</creator-link> vil kunne:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Autoriser {appName}"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "Du vil bli videresendt til <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Send gjenopprettings-e-post"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Skriv inn e-posten din nedenfor, så sender vi en gjenopprettingslenke som lar deg gjenopprette kontoen din."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "E-post eller brukernavn"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "E-post"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "En e-post med instruksjoner er sendt til deg hvis e-posten tidligere var lagret på kontoen din."
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "E-post sendt"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Du kan nå logge inn på kontoen din med det nye passordet ditt."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Passordet er tilbakestilt"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Tilbakestill passord"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Bekreft passord"
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Skriv inn ditt nye passord nedenfor for å få tilgang til kontoen din."
+  },
+  "auth.reset-password.title": {
+    "message": "Tilbakestill passord"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Tilbakestill passordet dit"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Vennligst skriv inn en tofaktor-kode for å fortsette."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Skriv inn tofaktor-kode"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Skriv inn kode..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Glemt passord?</forgot-password-link> • <create-account-link>Opprett en konto</create-account-link>"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "E-post eller brukernavn"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Passord"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Logg inn med"
+  },
+  "auth.sign-in.title": {
+    "message": "Logg inn"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Eller bruk et passord"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Opprett konto"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Bekreft passord"
+  },
+  "auth.sign-up.email.label": {
+    "message": "E-post"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Brukernavn"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Ved å opprette en konto godtar du Modrinths <terms-link>Vilkår</terms-link> og <privacy-policy-link>Personvernpolicy</privacy-policy-link>."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Passordene stemmer ikke overens!"
+  },
+  "auth.sign-up.password.label": {
+    "message": "Passord"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Har du allerede en konto?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Abonner på oppdateringer om Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "Registrer deg"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Eller lag en konko selv"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Registrer deg med"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Kontoinstillinger"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Logg inn"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "E-posten din er allerede bekreftet!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "E-posten er allerede bekreftet"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Send brekreftelsesepost på nytt"
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Emailverifisering mislykkes"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Email verifisering"
+  },
+  "auth.verify-email.title": {
+    "message": "Verifiser Email"
+  },
+  "collection.button.remove-project": {
+    "message": "Fjern prosjekt"
+  },
+  "collection.label.owner": {
+    "message": "Eier"
+  },
+  "collection.label.updated-at": {
+    "message": "Oppdatert {ago}"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Lag ny"
+  },
+  "error.collection.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "error.organization.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "error.user.404.list_title": {
+    "message": "Hvorfor?"
+  },
+  "frog.title": {
+    "message": "Frosk"
+  },
+  "landing.button.discover-mods": {
+    "message": "Oppdag mods"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Gå til dashbord"
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.search.label": {
+    "message": "Søk"
+  },
+  "landing.search.placeholder": {
+    "message": "Søk..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Sorter etter"
+  },
+  "layout.footer.products.plus": {
+    "message": "Modrinth+"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "API dokumentasjon"
+  }
+}

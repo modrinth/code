@@ -1,0 +1,62 @@
+{
+  "app.settings.developer-mode-enabled": {
+    "message": "Izstrādātājs mods ieslēgts."
+  },
+  "app.settings.downloading": {
+    "message": "Lejuplādē v{version}"
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Izskats"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Konfidencialitāte"
+  },
+  "instance.add-server.add-and-play": {
+    "message": "Pievienot un spēlēt"
+  },
+  "instance.add-server.add-server": {
+    "message": "Pievienot serveri"
+  },
+  "instance.add-server.title": {
+    "message": "Pievienot Serveri"
+  },
+  "instance.edit-server.title": {
+    "message": "Rediģēt serveri"
+  },
+  "instance.edit-world.name": {
+    "message": "Nosaukums"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft Pasaule"
+  },
+  "instance.server-modal.address": {
+    "message": "Adrese"
+  },
+  "instance.server-modal.name": {
+    "message": "Nosaukums"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Serveris"
+  },
+  "instance.server-modal.resource-pack": {
+    "message": "Resursu paka"
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Dzēš..."
+  },
+  "instance.settings.tabs.general.edit-icon": {
+    "message": "Rediģēt ikonu"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Izvēlēties ikonu"
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Instalācija"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "{platform} {version} priekš Minecraft {game_version} ir jau ieinstalēta"
+  },
+  "instance.settings.title": {
+    "message": "Iestatījumi"
+  }
+}

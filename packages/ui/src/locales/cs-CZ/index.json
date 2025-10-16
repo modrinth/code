@@ -1,0 +1,849 @@
+{
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "Beta verze"
+  },
+  "badge.new": {
+    "defaultMessage": "Nový"
+  },
+  "button.analytics": {
+    "defaultMessage": "Analytika"
+  },
+  "button.back": {
+    "defaultMessage": "Zpět"
+  },
+  "button.cancel": {
+    "defaultMessage": "Zrušit"
+  },
+  "button.close": {
+    "defaultMessage": "Zavřít"
+  },
+  "button.continue": {
+    "defaultMessage": "Pokračovat"
+  },
+  "button.copy-id": {
+    "defaultMessage": "Kopírovat ID"
+  },
+  "button.copy-permalink": {
+    "defaultMessage": "Kopírovat permanentní odkaz"
+  },
+  "button.create-a-project": {
+    "defaultMessage": "Vytvořit projekt"
+  },
+  "button.download": {
+    "defaultMessage": "Stáhnout"
+  },
+  "button.downloading": {
+    "defaultMessage": "Stahování"
+  },
+  "button.edit": {
+    "defaultMessage": "Upravit"
+  },
+  "button.follow": {
+    "defaultMessage": "Sledovat"
+  },
+  "button.more-options": {
+    "defaultMessage": "Více možností"
+  },
+  "button.next": {
+    "defaultMessage": "Další"
+  },
+  "button.open-folder": {
+    "defaultMessage": "Otevřit složku"
+  },
+  "button.play": {
+    "defaultMessage": "Hrát"
+  },
+  "button.refresh": {
+    "defaultMessage": "Obnovit"
+  },
+  "button.remove": {
+    "defaultMessage": "Odstranit"
+  },
+  "button.remove-image": {
+    "defaultMessage": "Odstranit obrázek"
+  },
+  "button.report": {
+    "defaultMessage": "Nahlásit"
+  },
+  "button.reset": {
+    "defaultMessage": "Obnovit"
+  },
+  "button.save": {
+    "defaultMessage": "Uložit"
+  },
+  "button.save-changes": {
+    "defaultMessage": "Uložit změny"
+  },
+  "button.saving": {
+    "defaultMessage": "Ukládání"
+  },
+  "button.sign-in": {
+    "defaultMessage": "Přihlásit se"
+  },
+  "button.sign-out": {
+    "defaultMessage": "Odhlásit se"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Registrovat se"
+  },
+  "button.stop": {
+    "defaultMessage": "Stop"
+  },
+  "button.unfollow": {
+    "defaultMessage": "Přestat sledovat"
+  },
+  "button.upload-image": {
+    "defaultMessage": "Nahrát obrázek"
+  },
+  "changelog.justNow": {
+    "defaultMessage": "Právě teď"
+  },
+  "changelog.product.api": {
+    "defaultMessage": "API"
+  },
+  "changelog.product.app": {
+    "defaultMessage": "Aplikace"
+  },
+  "changelog.product.servers": {
+    "defaultMessage": "Servery"
+  },
+  "changelog.product.web": {
+    "defaultMessage": "Webová stránka"
+  },
+  "collection.label.private": {
+    "defaultMessage": "Soukromá"
+  },
+  "icon-select.edit": {
+    "defaultMessage": "Upravit ikonu"
+  },
+  "icon-select.remove": {
+    "defaultMessage": "Odstranit ikonu"
+  },
+  "icon-select.replace": {
+    "defaultMessage": "Změnit ikonu"
+  },
+  "icon-select.select": {
+    "defaultMessage": "Vybrat ikonu"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Hledat..."
+  },
+  "input.view.gallery": {
+    "defaultMessage": "Zobrazení v galerii"
+  },
+  "input.view.grid": {
+    "defaultMessage": "Zobrazení v mřížce"
+  },
+  "input.view.list": {
+    "defaultMessage": "Zobrazení v řádcích"
+  },
+  "instance.worlds.game_mode.adventure": {
+    "defaultMessage": "Dobrodružná hra"
+  },
+  "instance.worlds.game_mode.creative": {
+    "defaultMessage": "Tvořivá hra"
+  },
+  "instance.worlds.game_mode.spectator": {
+    "defaultMessage": "Pozorovací hra"
+  },
+  "instance.worlds.game_mode.survival": {
+    "defaultMessage": "Hra o přežití"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Neznámý typ hry"
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Změny uloženy"
+  },
+  "label.collections": {
+    "defaultMessage": "Kolekce"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Vytvořeno {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Nástěnka"
+  },
+  "label.delete": {
+    "defaultMessage": "Smazat"
+  },
+  "label.description": {
+    "defaultMessage": "Popisek"
+  },
+  "label.error": {
+    "defaultMessage": "Chyba"
+  },
+  "label.followed-projects": {
+    "defaultMessage": "Sledované projekty"
+  },
+  "label.loading": {
+    "defaultMessage": "Načítání..."
+  },
+  "label.moderation": {
+    "defaultMessage": "Moderace"
+  },
+  "label.notifications": {
+    "defaultMessage": "Oznámení"
+  },
+  "label.or": {
+    "defaultMessage": "nebo"
+  },
+  "label.password": {
+    "defaultMessage": "Heslo"
+  },
+  "label.played": {
+    "defaultMessage": "Hráno {time}"
+  },
+  "label.public": {
+    "defaultMessage": ""
+  },
+  "label.rejected": {
+    "defaultMessage": "Zamítnuto"
+  },
+  "label.saved": {
+    "defaultMessage": "Uloženo"
+  },
+  "label.scopes": {
+    "defaultMessage": "Pravomoce"
+  },
+  "label.server": {
+    "defaultMessage": "Server"
+  },
+  "label.servers": {
+    "defaultMessage": "Servery"
+  },
+  "label.settings": {
+    "defaultMessage": "Nastavení"
+  },
+  "label.singleplayer": {
+    "defaultMessage": "Hra pro jednoho hráče"
+  },
+  "label.title": {
+    "defaultMessage": "Název"
+  },
+  "label.unlisted": {
+    "defaultMessage": "Nezařazeno"
+  },
+  "label.visibility": {
+    "defaultMessage": "Viditelnost"
+  },
+  "label.visit-your-profile": {
+    "defaultMessage": "Navštívit váš profil"
+  },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Přidat platební metodu"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Přidávání platební metody"
+  },
+  "notification.error.title": {
+    "defaultMessage": "Došlo k chybě"
+  },
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Přijato"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Schváleno"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Archivováno"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Uzavřeno"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Autor"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Koncept"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Selhalo"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Zařazeno"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderátor"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth tým"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Čekající"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Soukromé"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Zpracováno"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Zamítnuto"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Vráceno"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Naplánováno"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Probíhá kontrola"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Nezařazeno"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Odmítnuto"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Zkopírovat kód do schránky"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Klient"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Klient a server"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Klient nebo server"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Server"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "{type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Nepodporováno"
+  },
+  "omorphia.component.purchase_modal.payment_method_card_display": {
+    "defaultMessage": "{card_brand} končící {last_four}"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.amex": {
+    "defaultMessage": "American Express"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.discover": {
+    "defaultMessage": "Discover"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Neznámá platební metoda"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Vše"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} few {Data Packy} many {Data Packů} other {Data Packů}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Data Packy"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {data pack} few {data packy} many {data packů} other {data packů}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mód} other {Módy}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Módy"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mód} other {módy}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacky}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpacky"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpack} other {modpacky}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Pluginy}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pluginy"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {pluginy}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packy}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resource Packy"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shadery}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shadery"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shadery}}"
+  },
+  "project.about.compatibility.environments": {
+    "defaultMessage": "Podporovaná prostředí"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": "Klient a server"
+  },
+  "project.about.compatibility.environments.client-side": {
+    "defaultMessage": "Na straně klienta"
+  },
+  "project.about.compatibility.environments.dedicated-servers-only": {
+    "defaultMessage": "Pouze dedikované servery"
+  },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Na straně serveru"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Hra jednoho hráče"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Pouze hra jednoho hráče"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "defaultMessage": "Minecraft: Java Edice"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Platformy"
+  },
+  "project.about.compatibility.title": {
+    "defaultMessage": "Kompatibilita"
+  },
+  "project.about.creators.owner": {
+    "defaultMessage": "Majitel projektu"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Autoři"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Vytvořeno {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "License {license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Publikováno {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "Odesláno {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Detaily"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Aktualizováno {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Připojit k Discord serveru"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Kup mi kávu"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Přispět"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponsorujte na GitHubu"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Přispějte na Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Přispějte na Patreonu"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Přispějte na PayPalu"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Nahlaste chyby"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Zobrazit zdroj"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Odkazy"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Navštivte wiki"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Analytika"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Popis"
+  },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Volitelné na obou, funguje stejně je-li instalován na kterékoliv straně"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Volitelné na obou, funguje nejlépe je-li instalován na obou stranách"
+  },
+  "project.settings.environment.client_and_server.optional_client.title": {
+    "defaultMessage": "Volitelné na klientovi"
+  },
+  "project.settings.environment.client_and_server.optional_server.title": {
+    "defaultMessage": "Volitelné na serveru"
+  },
+  "project.settings.environment.client_and_server.required_both.title": {
+    "defaultMessage": "Vyžadováno na obou"
+  },
+  "project.settings.environment.client_and_server.title": {
+    "defaultMessage": "Klient a server"
+  },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "Veškerá funkcionalita je udělána na straně klienta a je kompatibilní s vanilla servery."
+  },
+  "project.settings.environment.client_only.title": {
+    "defaultMessage": "Pouze na straně klienta"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Pouze dedikovaný server"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "Veškerá funkcionalita je udělána na straně serveru a je kompatibilní s vanilla klienty."
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Funguje také ve hře jednoho hráče"
+  },
+  "project.settings.environment.server_only.title": {
+    "defaultMessage": "Pouze na straně serveru"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Funguje pouze ve hře jednoho hráče nebo když není připojen na server s více hráči."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Pouze hra jednoho hráče"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Dílčí možnosti {option}"
+  },
+  "project.settings.environment.title": {
+    "defaultMessage": "Prostředí"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Galerie"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Obecné"
+  },
+  "project.settings.license.title": {
+    "defaultMessage": "Licence"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Odkazy"
+  },
+  "project.settings.members.title": {
+    "defaultMessage": "Členové"
+  },
+  "project.settings.notice.no-permission.description": {
+    "defaultMessage": "Nemáš práva na úpravu tohoto."
+  },
+  "project.settings.notice.no-permission.title": {
+    "defaultMessage": "Žádná práva"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Štítky"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Nahrát"
+  },
+  "project.settings.versions.title": {
+    "defaultMessage": "Verze"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Pohled"
+  },
+  "project.versions.channel.alpha.symbol": {
+    "defaultMessage": "A"
+  },
+  "project.versions.channel.beta.symbol": {
+    "defaultMessage": "B"
+  },
+  "project.versions.channel.release.symbol": {
+    "defaultMessage": "R"
+  },
+  "project.visibility.archived": {
+    "defaultMessage": "Archivováno"
+  },
+  "project.visibility.draft": {
+    "defaultMessage": "Koncept"
+  },
+  "project.visibility.private": {
+    "defaultMessage": "Soukromé"
+  },
+  "project.visibility.public": {
+    "defaultMessage": "Veřejné"
+  },
+  "project.visibility.rejected": {
+    "defaultMessage": "Zamítnuto"
+  },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Naplánováno"
+  },
+  "project.visibility.under-review": {
+    "defaultMessage": "Probíhá kontrola"
+  },
+  "project.visibility.unknown": {
+    "defaultMessage": "Neznámé"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Nezařazeno"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Odstraněno moderátory"
+  },
+  "search.filter.locked.default": {
+    "defaultMessage": "Filtr uzamčen"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "Odemknutí tohoto filtru vám může umožnit instalaci nekompatibilního obsahu."
+  },
+  "search.filter.locked.default.sync": {
+    "defaultMessage": "Synchronizovat filtr"
+  },
+  "search.filter.locked.default.title": {
+    "defaultMessage": "{type} je uzamčen"
+  },
+  "search.filter.locked.default.unlock": {
+    "defaultMessage": "Odemknout filtr"
+  },
+  "search.filter_type.environment": {
+    "defaultMessage": "Prostředí"
+  },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Klient"
+  },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Server"
+  },
+  "search.filter_type.game_version": {
+    "defaultMessage": "Verze hry"
+  },
+  "search.filter_type.game_version.all_versions": {
+    "defaultMessage": "Ukázat všechny verze"
+  },
+  "search.filter_type.license": {
+    "defaultMessage": "Licence"
+  },
+  "search.filter_type.license.open_source": {
+    "defaultMessage": "Zobrazit zdroj"
+  },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Načítač"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Načítač"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Načítač"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Platforma"
+  },
+  "search.filter_type.project_id": {
+    "defaultMessage": "ID projektu"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Načítač"
+  },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Zavřít"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Zavíratelné"
+  },
+  "servers.notice.heading.attention": {
+    "defaultMessage": "Pozor"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.critical.name": {
+    "defaultMessage": "Kritické"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Info"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Dotazník"
+  },
+  "servers.notice.level.warn.name": {
+    "defaultMessage": "Varování"
+  },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Neuzavíratelné"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "Zatím vám nic nebude účtováno."
+  },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Vyberte platební metodu"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Platební metoda"
+  },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "fakturováno {interval}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "Vyberte si plán na míru s přesně těmi specifikacemi, které potřebujete."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Začít"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Ideální pro 15–25 hráčů, modpacky nebo náročné moddingy."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "Skvělé pro 6–15 hráčů a více modů."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Nejoblíbenější"
+  },
+  "servers.purchase.step.plan.prompt": {
+    "defaultMessage": "Vyberte si plán"
+  },
+  "servers.purchase.step.plan.select": {
+    "defaultMessage": "Vyberte si plán"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "Ideální pro 1–5 přátel s pár lehkými módámi."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "Vyberte si množství RAM a specifikace, které odpovídají vašim potřebám."
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Plán"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Region"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Ověření"
+  },
+  "servers.region.central-europe": {
+    "defaultMessage": "Centrální Evropa"
+  },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "Kolik RAM chcete, aby váš server měl?"
+  },
+  "servers.region.north-america": {
+    "defaultMessage": "Severní Amerika"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Kde byste chtěli umístit svůj server?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Region není uveden? <link>Dejte nám vědět, kde byste chtěli vidět další Modrinth servery!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Jihovýchodní Asie"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Západní Evropa"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Účet a zabezpečení"
+  },
+  "settings.appearance.title": {
+    "defaultMessage": "Vzhled"
+  },
+  "settings.applications.title": {
+    "defaultMessage": "Vaše aplikace"
+  },
+  "settings.authorized-apps.title": {
+    "defaultMessage": "Autorizované aplikace"
+  },
+  "settings.billing.title": {
+    "defaultMessage": "Fakturace a předplatné"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "Tmavý"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Vyberte si preferovaný barevný motiv pro Modrinth na tomto zařízení."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Světlý"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Preferovat tmavý motiv"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Preferovat světlý motiv"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Synchronizovat se systémem"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Barevný motiv"
+  },
+  "settings.language.title": {
+    "defaultMessage": "Jazyk"
+  },
+  "settings.pats.title": {
+    "defaultMessage": "Osobní přístupové tokeny"
+  },
+  "settings.profile.title": {
+    "defaultMessage": "Veřejný profil"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Relace"
+  },
+  "tooltip.date-at-time": {
+    "defaultMessage": "{date, date, long} v {time, time, short}"
+  },
+  "ui.component.unsaved-changes-popup.body": {
+    "defaultMessage": "Máš neuložené změny."
+  }
+}
+
