@@ -11,8 +11,5 @@
 		"source.fixAll.eslint": "explicit",
 		"source.organizeImports": "always"
 	},
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"[vue]": {
-		"editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
-	}
+	"editor.defaultFormatter": "esbenp.prettier-vscode"
 }
