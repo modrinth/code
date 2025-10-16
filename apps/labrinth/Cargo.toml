@@ -86,6 +86,7 @@ reqwest = { workspace = true, features = [
   "rustls-tls-webpki-roots",
 ] }
 rust_decimal = { workspace = true, features = [
+  "macros",
   "serde-with-float",
   "serde-with-str",
 ] }

@@ -4,7 +4,8 @@ use crate::database::models::charge_item::DBCharge;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::products_tax_identifier_item::product_info_by_product_price_id;
 use crate::database::models::{
-    charge_item, generate_charge_id, product_item, user_subscription_item,
+    DBAffiliateCodeId, charge_item, generate_charge_id, product_item,
+    user_subscription_item,
 };
 use crate::database::redis::RedisPool;
 use crate::models::billing::{
@@ -12,6 +13,7 @@ use crate::models::billing::{
     Product, ProductMetadata, ProductPrice, SubscriptionMetadata,
     SubscriptionStatus, UserSubscription,
 };
+use crate::models::ids::AffiliateCodeId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::users::Badges;
@@ -347,6 +349,8 @@ pub async fn refund_charge(
             currency_code: charge.currency_code,
             tax_last_updated: Some(Utc::now()),
             tax_drift_loss: Some(0),
+            // Refunds have no affiliate code
+            affiliate_code: None,
         }
         .upsert(&mut transaction)
         .await?;
@@ -1283,8 +1287,15 @@ pub enum ChargeRequestType {
 }
 
 #[derive(Deserialize, Serialize)]
+pub struct PaymentRequestMetadata {
+    #[serde(flatten)]
+    kind: PaymentRequestMetadataKind,
+    affiliate_code: Option<AffiliateCodeId>,
+}
+
+#[derive(Deserialize, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
-pub enum PaymentRequestMetadata {
+pub enum PaymentRequestMetadataKind {
     Pyro {
         server_name: Option<String>,
         server_region: Option<String>,
@@ -1425,9 +1436,10 @@ pub async fn stripe_webhook(
                     break 'metadata;
                 };
 
-                let payment_metadata = metadata
-                    .get(MODRINTH_PAYMENT_METADATA)
-                    .and_then(|x| serde_json::from_str(x).ok());
+                let payment_metadata =
+                    metadata.get(MODRINTH_PAYMENT_METADATA).and_then(|x| {
+                        serde_json::from_str::<PaymentRequestMetadata>(x).ok()
+                    });
 
                 let Some(charge_id) = metadata
                     .get(MODRINTH_CHARGE_ID)
@@ -1576,13 +1588,13 @@ pub async fn stripe_webhook(
 
                                 if intervals.get(&interval).is_some() {
                                     let Some(subscription_id) = metadata
-                                    .get(MODRINTH_SUBSCRIPTION_ID)
-                                    .and_then(|x| parse_base62(x).ok())
-                                    .map(|x| {
-                                        crate::database::models::ids::DBUserSubscriptionId(x as i64)
-                                    }) else {
-                                    break 'metadata;
-                                };
+                                        .get(MODRINTH_SUBSCRIPTION_ID)
+                                        .and_then(|x| parse_base62(x).ok())
+                                        .map(|x| {
+                                            crate::database::models::ids::DBUserSubscriptionId(x as i64)
+                                        }) else {
+                                            break 'metadata;
+                                        };
 
                                     let subscription = if let Some(mut subscription) = user_subscription_item::DBUserSubscription::get(subscription_id, pool).await? {
                                     subscription.status = SubscriptionStatus::Unprovisioned;
@@ -1615,6 +1627,11 @@ pub async fn stripe_webhook(
                             }
                         };
 
+                        let affiliate_code = payment_metadata
+                            .as_ref()
+                            .and_then(|m| m.affiliate_code)
+                            .map(DBAffiliateCodeId::from);
+
                         let charge = DBCharge {
                             id: charge_id,
                             user_id,
@@ -1641,6 +1658,7 @@ pub async fn stripe_webhook(
                             net: None,
                             tax_last_updated: Some(Utc::now()),
                             tax_drift_loss: Some(0),
+                            affiliate_code,
                         };
 
                         if charge_status != ChargeStatus::Failed {
@@ -1820,12 +1838,12 @@ pub async fn stripe_webhook(
                                 } else {
                                     let (server_name, server_region, source) =
                                         if let Some(
-                                            PaymentRequestMetadata::Pyro {
-                                                ref server_name,
-                                                ref server_region,
-                                                ref source,
+                                            PaymentRequestMetadataKind::Pyro {
+                                                server_name,
+                                                server_region,
+                                                source,
                                             },
-                                        ) = metadata.payment_metadata
+                                        ) = metadata.payment_metadata.as_ref().map(|m| &m.kind)
                                         {
                                             (
                                                 server_name.clone(),
@@ -1908,6 +1926,12 @@ pub async fn stripe_webhook(
                             }
                         }
                     }
+
+                    let affiliate_code = metadata
+                        .payment_metadata
+                        .as_ref()
+                        .and_then(|m| m.affiliate_code)
+                        .map(DBAffiliateCodeId::from);
 
                     if let Some(mut subscription) =
                         metadata.user_subscription_item
@@ -2004,6 +2028,7 @@ pub async fn stripe_webhook(
                                 tax_platform_id: None,
                                 tax_last_updated: Some(Utc::now()),
                                 tax_drift_loss: Some(0),
+                                affiliate_code,
                             }
                             .upsert(&mut transaction)
                             .await?;

@@ -647,6 +647,8 @@ pub async fn try_process_user_redeemal(
         net: None,
         tax_last_updated: Some(Utc::now()),
         tax_drift_loss: Some(0),
+        // Medal redeemals never have an affiliate code.
+        affiliate_code: None,
     }
     .upsert(&mut txn)
     .await?;
