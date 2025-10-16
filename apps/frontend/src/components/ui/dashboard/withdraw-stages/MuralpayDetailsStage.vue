@@ -56,7 +56,7 @@
 		</template>
 
 		<template v-else-if="withdrawContext.withdrawData.value.selectedMethod === 'crypto'">
-			<Admonition type="critical" :header="formatMessage(messages.cryptoWarningHeader)">
+			<Admonition type="warning" :header="formatMessage(messages.cryptoWarningHeader)">
 				<span>{{ formatMessage(messages.cryptoWarningBody) }}</span>
 			</Admonition>
 
