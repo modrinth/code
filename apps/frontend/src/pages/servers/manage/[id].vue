@@ -147,7 +147,7 @@
 								:is-online="isServerRunning"
 								:is-actioning="isActioning"
 								:is-installing="serverData.status === 'installing'"
-								:disabled="isActioning || !!error"
+								:disabled="isActioning || !!error || !!backupInProgress"
 								:server-name="serverData.name"
 								:server-data="serverData"
 								:uptime-seconds="uptimeSeconds"
@@ -354,7 +354,7 @@
 	>
 		<h2 class="m-0 text-lg font-extrabold text-contrast">Server data</h2>
 		<pre class="markdown-body w-full overflow-auto rounded-2xl bg-bg-raised p-4 text-sm">{{
-			JSON.stringify(server, null, '  ')
+			JSON.stringify(server, null, ' ')
 		}}</pre>
 	</div>
 </template>
@@ -1277,6 +1277,7 @@ useHead({
 		opacity: 0;
 		transform: translateX(1rem);
 	}
+
 	100% {
 		opacity: 1;
 		transform: none;
