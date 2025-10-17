@@ -2344,6 +2344,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "directories"
+version = "6.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16f5094c54661b38d03bd7e50df373292118db60b585c08a411c6d840017fe7d"
+dependencies = [
+ "dirs-sys",
+]
+
+[[package]]
 name = "dirs"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5150,6 +5159,35 @@ dependencies = [
  "log",
  "wasi 0.11.1+wasi-snapshot-preview1",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "modrinth-maxmind"
+version = "0.0.0"
+dependencies = [
+ "bytes",
+ "clap",
+ "directories",
+ "eyre",
+ "flate2",
+ "maxminddb",
+ "modrinth-util",
+ "reqwest",
+ "tar",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "modrinth-util"
+version = "0.0.0"
+dependencies = [
+ "actix-web",
+ "derive_more 2.0.1",
+ "dotenvy",
+ "eyre",
+ "serde",
 ]
 
 [[package]]

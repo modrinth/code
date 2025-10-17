@@ -8,13 +8,19 @@ members = [
   "packages/app-lib",
   "packages/ariadne",
   "packages/daedalus",
+  "packages/modrinth-maxmind",
+  "packages/modrinth-util",
   "packages/path-util",
 ]
 
 [workspace.package]
 edition = "2024"
+repository = "https://github.com/modrinth/code"
+rust-version = "1.90.0"
 
 [workspace.dependencies]
+modrinth-util = { path = "packages/modrinth-util" }
+directories = "6.0.0"
 actix-cors = "0.7.1"
 actix-files = "0.6.8"
 actix-http = "3.11.2"
