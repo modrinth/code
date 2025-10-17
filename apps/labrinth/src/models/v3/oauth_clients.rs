@@ -57,8 +57,8 @@ pub struct OAuthClientAuthorization {
     pub created: DateTime<Utc>,
 }
 
-#[serde_as]
 #[derive(Deserialize, Serialize)]
+#[serde_as]
 pub struct GetOAuthClientsRequest {
     #[serde_as(
         as = "serde_with::StringWithSeparator::<serde_with::formats::CommaSeparator, String>"
