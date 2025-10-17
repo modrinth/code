@@ -1,6 +1,13 @@
 use crate::routes::ApiError;
 use crate::util::error::Context;
+use actix_web::http::header::HeaderName;
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
+
+pub const MODRINTH_GENERATED_PDF_TYPE: HeaderName =
+    HeaderName::from_static("modrinth-generated-pdf-type");
+pub const MODRINTH_PAYMENT_ID: HeaderName =
+    HeaderName::from_static("modrinth-payment-id");
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PaymentStatement {
@@ -16,12 +23,36 @@ pub struct PaymentStatement {
     pub currency_code: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum GeneratedPdfType {
+    PaymentStatement,
+}
+
+impl GeneratedPdfType {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            GeneratedPdfType::PaymentStatement => "payment-statement",
+        }
+    }
+}
+
+impl FromStr for GeneratedPdfType {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "payment-statement" => Ok(GeneratedPdfType::PaymentStatement),
+            _ => Err(s.to_owned()),
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct GotenbergClient {
     client: reqwest::Client,
     gotenberg_url: String,
     site_url: String,
-    self_addr: String,
+    callback_base: String,
 }
 
 impl GotenbergClient {
@@ -36,18 +67,18 @@ impl GotenbergClient {
             .wrap_internal_err("GOTENBERG_URL is not set")?;
         let site_url = dotenvy::var("SITE_URL")
             .wrap_internal_err("SITE_URL is not set")?;
-        let self_addr = dotenvy::var("SELF_ADDR")
-            .wrap_internal_err("SELF_ADDR is not set")?;
+        let callback_base = dotenvy::var("GOTENBERG_CALLBACK_BASE")
+            .wrap_internal_err("GOTENBERG_CALLBACK_BASE is not set")?;
 
         Ok(Self {
             client,
             gotenberg_url: gotenberg_url.trim_end_matches('/').to_owned(),
             site_url: site_url.trim_end_matches('/').to_owned(),
-            self_addr: self_addr.trim_end_matches('/').to_owned(),
+            callback_base: callback_base.trim_end_matches('/').to_owned(),
         })
     }
 
-    /// Generate a PDF payment statement asynchronously via Gotenberg.
+    /// Generate a PDF payment statement via Gotenberg.
     ///
     /// This will:
     /// - Fetch the HTML template from `{SITE_URL}/_internal/templates/doc/payment-statement`.
@@ -89,10 +120,8 @@ impl GotenbergClient {
                 .wrap_internal_err("invalid mime type for html part")?,
         );
 
-        let success_webhook =
-            format!("{}/_internal/gotenberg/success", self.self_addr);
-        let error_webhook =
-            format!("{}/_internal/gotenberg/error", self.self_addr);
+        let success_webhook = format!("{}/success", self.callback_base);
+        let error_webhook = format!("{}/error", self.callback_base);
 
         self
             .client
@@ -104,7 +133,10 @@ impl GotenbergClient {
             .header("Gotenberg-Webhook-Error-Url", error_webhook)
             .header(
                 "Gotenberg-Webhook-Extra-Http-Headers",
-                serde_json::json!({"Modrinth-Payment-Id": statement.payment_id}).to_string(),
+                serde_json::json!({
+					"Modrinth-Payment-Id": statement.payment_id,
+					"Modrinth-Generated-Pdf-Type": GeneratedPdfType::PaymentStatement.as_str(),
+				}).to_string(),
             )
             .header(
                 "Modrinth-Payment-Id",
@@ -128,7 +160,6 @@ impl GotenbergClient {
 fn fill_statement_template(html: &str, s: &PaymentStatement) -> String {
     let mut variables: Vec<(&str, String)> = Vec::new();
 
-    // Map `{ statement.payment_id }` and similar keys
     variables.push(("statement.payment_id", s.payment_id.clone()));
     variables.push((
         "statement.recipient_address_line_1",
@@ -156,8 +187,6 @@ fn fill_statement_template(html: &str, s: &PaymentStatement) -> String {
         "statement.fees",
         format_money(s.fees_cents, &s.currency_code),
     ));
-
-    // Additional fields can be added as the template evolves
 
     let mut out = String::with_capacity(html.len());
     let mut remaining = html;

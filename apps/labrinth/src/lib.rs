@@ -13,6 +13,7 @@ use tracing::{info, warn};
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
 use util::cors::default_cors;
+use util::gotenberg::GotenbergClient;
 
 use crate::background_task::update_versions;
 use crate::database::ReadOnlyPgPool;
@@ -62,6 +63,7 @@ pub struct LabrinthConfig {
     pub stripe_client: stripe::Client,
     pub anrok_client: anrok::Client,
     pub email_queue: web::Data<EmailQueue>,
+    pub gotenberg_client: GotenbergClient,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -76,6 +78,7 @@ pub fn app_setup(
     stripe_client: stripe::Client,
     anrok_client: anrok::Client,
     email_queue: EmailQueue,
+    gotenberg_client: GotenbergClient,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!(
@@ -299,6 +302,7 @@ pub fn app_setup(
         rate_limiter: limiter,
         stripe_client,
         anrok_client,
+        gotenberg_client,
         email_queue: web::Data::new(email_queue),
     }
 }
@@ -324,6 +328,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
     .app_data(web::Data::new(labrinth_config.search_config.clone()))
+    .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(labrinth_config.email_queue.clone())

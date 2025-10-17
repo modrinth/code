@@ -12,6 +12,7 @@ use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::anrok;
 use labrinth::util::env::parse_var;
+use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use std::ffi::CStr;
@@ -200,6 +201,27 @@ async fn main() -> std::io::Result<()> {
     let email_queue =
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
 
+    let gotenberg_client =
+        GotenbergClient::from_env().expect("Failed to create Gotenberg client");
+
+    gotenberg_client
+        .generate_payment_statement(
+            &labrinth::util::gotenberg::PaymentStatement {
+                payment_id: "abcdefg".to_owned(),
+                recipient_address_line_1: Some("123 Main St".to_owned()),
+                recipient_address_line_2: Some("Apt 1".to_string()),
+                recipient_address_line_3: Some("City, State, ZIP".to_owned()),
+                recipient_email: "test@example.com".to_owned(),
+                payment_date: "2021-01-01".to_owned(),
+                gross_amount_cents: 10000,
+                net_amount_cents: 9950,
+                fees_cents: 50,
+                currency_code: "USD".to_owned(),
+            },
+        )
+        .await
+        .expect("Failed to generate payment statement");
+
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
         task.run(
@@ -250,6 +272,7 @@ async fn main() -> std::io::Result<()> {
         stripe_client,
         anrok_client.clone(),
         email_queue,
+        gotenberg_client,
         !args.no_background_tasks,
     );
 
