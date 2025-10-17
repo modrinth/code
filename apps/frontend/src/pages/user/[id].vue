@@ -5,8 +5,12 @@
 		<NewModal ref="editRoleModal" header="Edit role">
 			<div class="flex w-80 flex-col gap-4">
 				<div class="flex flex-col gap-2">
-					<TeleportDropdownMenu v-model="selectedRole" :options="roleOptions" name="edit-role"
-						placeholder="Select a role" />
+					<TeleportDropdownMenu
+						v-model="selectedRole"
+						:options="roleOptions"
+						name="edit-role"
+						placeholder="Select a role"
+					/>
 				</div>
 				<div class="flex justify-end gap-2">
 					<ButtonStyled>
@@ -16,7 +20,10 @@
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button :disabled="!selectedRole || selectedRole === user.role || isSavingRole" @click="saveRoleEdit">
+						<button
+							:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
+							@click="saveRoleEdit"
+						>
 							<template v-if="isSavingRole">
 								<SpinnerIcon class="animate-spin" /> {{ formatMessage(messages.savingLabel) }}
 							</template>
@@ -31,12 +38,18 @@
 		<NewModal v-if="auth.user && isStaff(auth.user)" ref="userDetailsModal" header="User details">
 			<div class="flex flex-col gap-3">
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary">{{ formatMessage(messages.emailLabel) }}</span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.emailLabel)
+					}}</span>
 					<div>
-						<span v-tooltip="user.email_verified
-							? formatMessage(messages.emailVerifiedTooltip)
-							: formatMessage(messages.emailNotVerifiedTooltip)
-						" class="flex w-fit items-center gap-1">
+						<span
+							v-tooltip="
+								user.email_verified
+									? formatMessage(messages.emailVerifiedTooltip)
+									: formatMessage(messages.emailNotVerifiedTooltip)
+							"
+							class="flex w-fit items-center gap-1"
+						>
 							<span>{{ user.email }}</span>
 							<CheckIcon v-if="user.email_verified" class="h-4 w-4 text-brand" />
 							<XIcon v-else class="h-4 w-4 text-red" />
@@ -45,12 +58,16 @@
 				</div>
 
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary">{{ formatMessage(messages.authProvidersLabel) }}</span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.authProvidersLabel)
+					}}</span>
 					<span>{{ user.auth_providers.join(', ') }}</span>
 				</div>
 
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary">{{ formatMessage(messages.paymentMethodsLabel) }}</span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.paymentMethodsLabel)
+					}}</span>
 					<span>
 						<template v-if="user.payout_data?.paypal_address">
 							Paypal ({{ user.payout_data.paypal_address }} - {{ user.payout_data.paypal_country }})
@@ -65,14 +82,20 @@
 				</div>
 
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary">{{ formatMessage(messages.hasPasswordLabel) }}</span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.hasPasswordLabel)
+					}}</span>
 					<span>
-						{{ user.has_password ? formatMessage(messages.yesLabel) : formatMessage(messages.noLabel) }}
+						{{
+							user.has_password ? formatMessage(messages.yesLabel) : formatMessage(messages.noLabel)
+						}}
 					</span>
 				</div>
 
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary">{{ formatMessage(messages.hasTotpLabel) }}</span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.hasTotpLabel)
+					}}</span>
 					<span>
 						{{ user.has_totp ? formatMessage(messages.yesLabel) : formatMessage(messages.noLabel) }}
 					</span>
@@ -98,7 +121,9 @@
 						}}
 					</template>
 					<template #stats>
-						<div class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold">
+						<div
+							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+						>
 							<BoxIcon class="h-6 w-6 text-secondary" />
 							{{
 								formatMessage(messages.profileProjectsLabel, {
@@ -106,8 +131,10 @@
 								})
 							}}
 						</div>
-						<div v-tooltip="sumDownloads.toLocaleString()"
-							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold">
+						<div
+							v-tooltip="sumDownloads.toLocaleString()"
+							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
+						>
 							<DownloadIcon class="h-6 w-6 text-secondary" />
 							{{
 								formatMessage(messages.profileDownloadsLabel, {
@@ -115,11 +142,15 @@
 								})
 							}}
 						</div>
-						<div v-tooltip="formatMessage(commonMessages.dateAtTimeTooltip, {
-							date: new Date(user.created),
-							time: new Date(user.created),
-						})
-							" class="flex items-center gap-2 font-semibold">
+						<div
+							v-tooltip="
+								formatMessage(commonMessages.dateAtTimeTooltip, {
+									date: new Date(user.created),
+									time: new Date(user.created),
+								})
+							"
+							class="flex items-center gap-2 font-semibold"
+						>
 							<CalendarIcon class="h-6 w-6 text-secondary" />
 							{{ formatMessage(messages.profileJoinedLabel) }}
 							{{ formatRelativeTime(user.created) }}
@@ -133,43 +164,46 @@
 							</NuxtLink>
 						</ButtonStyled>
 						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu :options="[
-								{
-									id: 'manage-projects',
-									action: () => navigateTo('/dashboard/projects'),
-									hoverOnly: true,
-									shown: auth.user && auth.user.id === user.id,
-								},
-								{ divider: true, shown: auth.user && auth.user.id === user.id },
-								{
-									id: 'report',
-									action: () => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in')),
-									color: 'red',
-									hoverOnly: true,
-									shown: auth.user?.id !== user.id,
-								},
-								{ id: 'copy-id', action: () => copyId() },
-								{ id: 'copy-permalink', action: () => copyPermalink() },
-								{
-									divider: true,
-									shown: auth.user && isAdmin(auth.user),
-								},
-								{
-									id: 'open-billing',
-									action: () => navigateTo(`/admin/billing/${user.id}`),
-									shown: auth.user && isStaff(auth.user),
-								},
-								{
-									id: 'open-info',
-									action: () => $refs.userDetailsModal.show(),
-									shown: auth.user && isStaff(auth.user),
-								},
-								{
-									id: 'edit-role',
-									action: () => openRoleEditModal(),
-									shown: auth.user && isAdmin(auth.user),
-								},
-							]" aria-label="More options">
+							<OverflowMenu
+								:options="[
+									{
+										id: 'manage-projects',
+										action: () => navigateTo('/dashboard/projects'),
+										hoverOnly: true,
+										shown: auth.user && auth.user.id === user.id,
+									},
+									{ divider: true, shown: auth.user && auth.user.id === user.id },
+									{
+										id: 'report',
+										action: () => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in')),
+										color: 'red',
+										hoverOnly: true,
+										shown: auth.user?.id !== user.id,
+									},
+									{ id: 'copy-id', action: () => copyId() },
+									{ id: 'copy-permalink', action: () => copyPermalink() },
+									{
+										divider: true,
+										shown: auth.user && isAdmin(auth.user),
+									},
+									{
+										id: 'open-billing',
+										action: () => navigateTo(`/admin/billing/${user.id}`),
+										shown: auth.user && isStaff(auth.user),
+									},
+									{
+										id: 'open-info',
+										action: () => $refs.userDetailsModal.show(),
+										shown: auth.user && isStaff(auth.user),
+									},
+									{
+										id: 'edit-role',
+										action: () => openRoleEditModal(),
+										shown: auth.user && isAdmin(auth.user),
+									},
+								]"
+								aria-label="More options"
+							>
 								<MoreVerticalIcon aria-hidden="true" />
 								<template #manage-projects>
 									<BoxIcon aria-hidden="true" />
@@ -209,27 +243,43 @@
 					<NavTabs :links="navLinks" />
 				</div>
 				<div v-if="projects.length > 0">
-					<div v-if="route.params.projectType !== 'collections'"
-						:class="'project-list display-mode--' + cosmetics.searchDisplayMode.user">
-						<ProjectCard v-for="project in (route.params.projectType !== undefined
-							? projects.filter(
-								(x) =>
-									x.project_type ===
-									route.params.projectType.substr(0, route.params.projectType.length - 1),
+					<div
+						v-if="route.params.projectType !== 'collections'"
+						:class="'project-list display-mode--' + cosmetics.searchDisplayMode.user"
+					>
+						<ProjectCard
+							v-for="project in (route.params.projectType !== undefined
+								? projects.filter(
+										(x) =>
+											x.project_type ===
+											route.params.projectType.substr(0, route.params.projectType.length - 1),
+									)
+								: projects
 							)
-							: projects
-						)
-							.slice()
-							.sort((a, b) => b.downloads - a.downloads)" :id="project.slug || project.id" :key="project.id"
-							:name="project.title" :display="cosmetics.searchDisplayMode.user"
+								.slice()
+								.sort((a, b) => b.downloads - a.downloads)"
+							:id="project.slug || project.id"
+							:key="project.id"
+							:name="project.title"
+							:display="cosmetics.searchDisplayMode.user"
 							:featured-image="project.gallery.find((element) => element.featured)?.url"
-							:description="project.description" :created-at="project.published" :updated-at="project.updated"
-							:downloads="project.downloads.toString()" :follows="project.followers.toString()"
-							:icon-url="project.icon_url" :categories="project.categories" :client-side="project.client_side"
-							:server-side="project.server_side" :status="auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
+							:description="project.description"
+							:created-at="project.published"
+							:updated-at="project.updated"
+							:downloads="project.downloads.toString()"
+							:follows="project.followers.toString()"
+							:icon-url="project.icon_url"
+							:categories="project.categories"
+							:client-side="project.client_side"
+							:server-side="project.server_side"
+							:status="
+								auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
 									? project.status
 									: null
-								" :type="project.project_type" :color="project.color" />
+							"
+							:type="project.project_type"
+							:color="project.color"
+						/>
 					</div>
 				</div>
 				<div v-else-if="route.params.projectType !== 'collections'" class="error">
@@ -247,9 +297,14 @@
 					<span v-else class="text">{{ formatMessage(messages.profileNoProjectsLabel) }}</span>
 				</div>
 				<div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
-					<nuxt-link v-for="collection in collections.sort(
-						(a, b) => new Date(b.created) - new Date(a.created),
-					)" :key="collection.id" :to="`/collection/${collection.id}`" class="card collection-item">
+					<nuxt-link
+						v-for="collection in collections.sort(
+							(a, b) => new Date(b.created) - new Date(a.created),
+						)"
+						:key="collection.id"
+						:to="`/collection/${collection.id}`"
+						class="card collection-item"
+					>
 						<div class="collection">
 							<Avatar :src="collection.icon_url" class="icon" />
 							<div class="details">
@@ -267,9 +322,9 @@
 							<div class="stats">
 								<BoxIcon />
 								{{
-									`${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0)
-										!== 1
-										? 's' : ''}`
+									`${$formatNumber(collection.projects?.length || 0, false)} project${
+										(collection.projects?.length || 0) !== 1 ? 's' : ''
+									}`
 								}}
 							</div>
 							<div class="stats">
@@ -293,13 +348,19 @@
 						</div>
 					</nuxt-link>
 				</div>
-				<div v-if="route.params.projectType === 'collections' && collections.length === 0" class="error">
+				<div
+					v-if="route.params.projectType === 'collections' && collections.length === 0"
+					class="error"
+				>
 					<UpToDate class="icon" />
 					<br />
 					<span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
 						<IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
 							<template #create-link="{ children }">
-								<a class="link" @click.prevent="(event) => $refs.modal_collection_creation.show(event)">
+								<a
+									class="link"
+									@click.prevent="(event) => $refs.modal_collection_creation.show(event)"
+								>
 									<component :is="() => children" />
 								</a>
 							</template>
@@ -314,8 +375,13 @@
 						{{ formatMessage(messages.profileOrganizations) }}
 					</h2>
 					<div class="flex flex-wrap gap-2">
-						<nuxt-link v-for="org in sortedOrgs" :key="org.id" v-tooltip="org.name" class="organization"
-							:to="`/organization/${org.slug}`">
+						<nuxt-link
+							v-for="org in sortedOrgs"
+							:key="org.id"
+							v-tooltip="org.name"
+							class="organization"
+							:to="`/organization/${org.slug}`"
+						>
 							<Avatar :src="org.icon_url" :alt="'Icon for ' + org.name" size="3rem" />
 						</nuxt-link>
 					</div>
@@ -603,9 +669,9 @@ const title = computed(() => `${user.value.username} - Modrinth`)
 const description = computed(() =>
 	user.value.bio
 		? formatMessage(messages.profileMetaDescriptionWithBio, {
-			bio: user.value.bio,
-			username: user.value.username,
-		})
+				bio: user.value.bio,
+				username: user.value.username,
+			})
 		: formatMessage(messages.profileMetaDescription, { username: user.value.username }),
 )
 
