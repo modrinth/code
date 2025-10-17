@@ -100,7 +100,7 @@ impl header::TryIntoHeaderValue for ModrinthGeneratedPdfType {
     type Error = header::InvalidHeaderValue;
 
     fn try_into_value(self) -> Result<header::HeaderValue, Self::Error> {
-        header::HeaderValue::from_str(&self.0.as_str())
+        header::HeaderValue::from_str(self.0.as_str())
     }
 }
 
