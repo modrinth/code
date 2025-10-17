@@ -73,6 +73,7 @@ services:
       retries: 3
   gotenberg:
     image: gotenberg/gotenberg:8
+    container_name: labrinth-gotenberg
     ports:
       - "3000:13000"
   labrinth:
