@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-6">
-		<Admonition type="warning" v-if="withdrawContext.maxWithdrawAmount.value <= 600">
+		<Admonition type="warning" v-if="shouldShowTaxLimitWarning">
 			Your withdraw limit is <span class="font-bold">{{ formatMoney(withdrawContext.maxWithdrawAmount.value) }}</span>,
 			<span class="text-link cursor-pointer" @click="onShowTaxForm">complete a
 				tax form</span> to withdraw more.
@@ -54,6 +54,16 @@ const countries = computed(() =>
 )
 
 const selectedCountryCode = computed(() => withdrawContext.withdrawData.value.selectedCountry?.id)
+
+const shouldShowTaxLimitWarning = computed(() => {
+	const balance = withdrawContext.balance.value
+	if (!balance) return false
+
+	const formIncomplete = balance.form_completion_status !== 'complete'
+	const wouldHitLimit = (balance.withdrawn_ytd ?? 0) + (balance.available ?? 0) >= 600
+
+	return formIncomplete && wouldHitLimit
+})
 
 function handleCountryChange(countryCode: string | null) {
 	console.log('handleCountryChange called with:', countryCode)
