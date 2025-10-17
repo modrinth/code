@@ -1,6 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 mod account;
+mod counterparty;
 mod error;
 mod organization;
 mod payout;
