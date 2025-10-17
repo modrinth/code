@@ -69,7 +69,7 @@ image = { workspace = true, features = [
 itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
-maxminddb = { workspace = true }
+modrinth-maxmind = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 murmur2 = { workspace = true }
 paste = { workspace = true }

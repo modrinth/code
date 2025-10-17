@@ -20,6 +20,7 @@ rust-version = "1.90.0"
 
 [workspace.dependencies]
 modrinth-util = { path = "packages/modrinth-util" }
+modrinth-maxmind = { path = "packages/modrinth-maxmind" }
 directories = "6.0.0"
 actix-cors = "0.7.1"
 actix-files = "0.6.8"
