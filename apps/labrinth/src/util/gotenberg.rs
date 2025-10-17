@@ -158,35 +158,35 @@ impl GotenbergClient {
 }
 
 fn fill_statement_template(html: &str, s: &PaymentStatement) -> String {
-    let mut variables: Vec<(&str, String)> = Vec::new();
-
-    variables.push(("statement.payment_id", s.payment_id.clone()));
-    variables.push((
-        "statement.recipient_address_line_1",
-        s.recipient_address_line_1.clone().unwrap_or_default(),
-    ));
-    variables.push((
-        "statement.recipient_address_line_2",
-        s.recipient_address_line_2.clone().unwrap_or_default(),
-    ));
-    variables.push((
-        "statement.recipient_address_line_3",
-        s.recipient_address_line_3.clone().unwrap_or_default(),
-    ));
-    variables.push(("statement.recipient_email", s.recipient_email.clone()));
-    variables.push(("statement.payment_date", s.payment_date.clone()));
-    variables.push((
-        "statement.gross_amount",
-        format_money(s.gross_amount_cents, &s.currency_code),
-    ));
-    variables.push((
-        "statement.net_amount",
-        format_money(s.net_amount_cents, &s.currency_code),
-    ));
-    variables.push((
-        "statement.fees",
-        format_money(s.fees_cents, &s.currency_code),
-    ));
+    let variables: Vec<(&str, String)> = vec![
+        ("statement.payment_id", s.payment_id.clone()),
+        (
+            "statement.recipient_address_line_1",
+            s.recipient_address_line_1.clone().unwrap_or_default(),
+        ),
+        (
+            "statement.recipient_address_line_2",
+            s.recipient_address_line_2.clone().unwrap_or_default(),
+        ),
+        (
+            "statement.recipient_address_line_3",
+            s.recipient_address_line_3.clone().unwrap_or_default(),
+        ),
+        ("statement.recipient_email", s.recipient_email.clone()),
+        ("statement.payment_date", s.payment_date.clone()),
+        (
+            "statement.gross_amount",
+            format_money(s.gross_amount_cents, &s.currency_code),
+        ),
+        (
+            "statement.net_amount",
+            format_money(s.net_amount_cents, &s.currency_code),
+        ),
+        (
+            "statement.fees",
+            format_money(s.fees_cents, &s.currency_code),
+        ),
+    ];
 
     let mut out = String::with_capacity(html.len());
     let mut remaining = html;
