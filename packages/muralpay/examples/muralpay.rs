@@ -2,10 +2,10 @@ use std::{env, fmt::Debug, io};
 
 use eyre::{Result, WrapErr, eyre};
 use muralpay::{
-    CreatePayout, CreatePayoutDetails, Dob, FiatAccountType, FiatAndRailCode,
-    FiatAndRailDetails, FiatFeeRequest, FiatPayoutFee, MuralPay, PayoutPurpose,
-    PayoutRecipientInfo, PhysicalAddress, SupportingDetails, TokenAmount,
-    TokenFeeRequest, TokenPayoutFee, UsdSymbol,
+    AccountId, CounterpartyId, CreatePayout, CreatePayoutDetails, Dob,
+    FiatAccountType, FiatAndRailCode, FiatAndRailDetails, FiatFeeRequest,
+    FiatPayoutFee, MuralPay, PayoutMethodId, PayoutRecipientInfo,
+    PhysicalAddress, TokenAmount, TokenFeeRequest, TokenPayoutFee, UsdSymbol,
 };
 use rust_decimal::{Decimal, dec};
 use serde::Serialize;
@@ -30,6 +30,16 @@ enum Command {
         #[command(subcommand)]
         command: PayoutCommand,
     },
+    /// Counterparty management
+    Counterparty {
+        #[command(subcommand)]
+        command: CounterpartyCommand,
+    },
+    /// Payout method management
+    PayoutMethod {
+        #[command(subcommand)]
+        command: PayoutMethodCommand,
+    },
 }
 
 #[derive(Debug, clap::Subcommand)]
@@ -47,7 +57,7 @@ enum PayoutCommand {
     /// Create a payout request
     Create {
         /// ID of the Mural account to send from
-        source_account_id: String,
+        source_account_id: AccountId,
         /// Description for this payout request
         memo: Option<String>,
     },
@@ -60,13 +70,39 @@ enum PayoutCommand {
 
 #[derive(Debug, clap::Subcommand)]
 enum PayoutFeesCommand {
+    /// Get fees for a token-to-fiat transaction
     Token {
         amount: Decimal,
         fiat_and_rail_code: FiatAndRailCode,
     },
+    /// Get fees for a fiat-to-token transaction
     Fiat {
         amount: Decimal,
         fiat_and_rail_code: FiatAndRailCode,
+    },
+}
+
+#[derive(Debug, clap::Subcommand)]
+enum CounterpartyCommand {
+    /// List all counterparties
+    #[clap(alias = "ls")]
+    List,
+}
+
+#[derive(Debug, clap::Subcommand)]
+enum PayoutMethodCommand {
+    /// List payout methods for a counterparty
+    #[clap(alias = "ls")]
+    List {
+        /// ID of the counterparty
+        counterparty_id: CounterpartyId,
+    },
+    /// Delete a payout method
+    Delete {
+        /// ID of the counterparty
+        counterparty_id: CounterpartyId,
+        /// ID of the payout method to delete
+        payout_method_id: PayoutMethodId,
     },
 }
 
@@ -109,7 +145,7 @@ async fn main() -> Result<()> {
             of,
             create_payout_request(
                 &muralpay,
-                &source_account_id,
+                source_account_id,
                 memo.as_deref(),
             )
             .await?,
@@ -142,6 +178,29 @@ async fn main() -> Result<()> {
             get_fees_for_fiat_amount(&muralpay, amount, fiat_and_rail_code)
                 .await?,
         ),
+        Command::Counterparty {
+            command: CounterpartyCommand::List,
+        } => run(of, list_counterparties(&muralpay).await?),
+        Command::PayoutMethod {
+            command: PayoutMethodCommand::List { counterparty_id },
+        } => run(
+            of,
+            muralpay
+                .search_payout_methods(counterparty_id, None)
+                .await?,
+        ),
+        Command::PayoutMethod {
+            command:
+                PayoutMethodCommand::Delete {
+                    counterparty_id,
+                    payout_method_id,
+                },
+        } => run(
+            of,
+            muralpay
+                .delete_payout_method(counterparty_id, payout_method_id)
+                .await?,
+        ),
     }
 
     Ok(())
@@ -149,14 +208,12 @@ async fn main() -> Result<()> {
 
 async fn create_payout_request(
     muralpay: &MuralPay,
-    source_account_id: &str,
+    source_account_id: AccountId,
     memo: Option<&str>,
 ) -> Result<()> {
     muralpay
         .create_payout_request(
-            source_account_id
-                .parse()
-                .wrap_err("invalid source account ID")?,
+            source_account_id,
             memo,
             &[CreatePayout {
                 amount: TokenAmount {
@@ -189,13 +246,7 @@ async fn create_payout_request(
                         zip: "90001".into(),
                     },
                 },
-                supporting_details: Some(SupportingDetails {
-                    supporting_document: Some(
-                        "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA..."
-                            .into(),
-                    ),
-                    payout_purpose: Some(PayoutPurpose::VendorPayment),
-                }),
+                supporting_details: None,
             }],
         )
         .await?;
@@ -240,6 +291,11 @@ async fn get_fees_for_fiat_amount(
         .next()
         .ok_or_else(|| eyre!("no fee results returned"))?;
     Ok(fee)
+}
+
+async fn list_counterparties(muralpay: &MuralPay) -> Result<()> {
+    let _counterparties = muralpay.search_counterparties(None).await?;
+    Ok(())
 }
 
 fn run<T: Debug + Serialize>(output_format: Option<OutputFormat>, value: T) {

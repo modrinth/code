@@ -5,26 +5,42 @@ use serde::de::DeserializeOwned;
 use crate::{ApiError, MuralError, MuralPay, TransferError};
 
 impl MuralPay {
+    fn http_req(
+        &self,
+        make_req: impl FnOnce() -> RequestBuilder,
+    ) -> RequestBuilder {
+        make_req()
+            .bearer_auth(self.api_key.expose_secret())
+            .header("accept", "application/json")
+            .header("content-type", "application/json")
+    }
+
     pub(crate) fn http_get<U: IntoUrl>(
         &self,
         make_url: impl FnOnce(&str) -> U,
     ) -> RequestBuilder {
-        self.http
-            .get(make_url(&self.api_url))
-            .bearer_auth(self.api_key.expose_secret())
-            .header("accept", "application/json")
-            .header("content-type", "application/json")
+        self.http_req(|| self.http.get(make_url(&self.api_url)))
     }
 
     pub(crate) fn http_post<U: IntoUrl>(
         &self,
         make_url: impl FnOnce(&str) -> U,
     ) -> RequestBuilder {
-        self.http
-            .post(make_url(&self.api_url))
-            .bearer_auth(self.api_key.expose_secret())
-            .header("accept", "application/json")
-            .header("content-type", "application/json")
+        self.http_req(|| self.http.post(make_url(&self.api_url)))
+    }
+
+    pub(crate) fn http_put<U: IntoUrl>(
+        &self,
+        make_url: impl FnOnce(&str) -> U,
+    ) -> RequestBuilder {
+        self.http_req(|| self.http.put(make_url(&self.api_url)))
+    }
+
+    pub(crate) fn http_delete<U: IntoUrl>(
+        &self,
+        make_url: impl FnOnce(&str) -> U,
+    ) -> RequestBuilder {
+        self.http_req(|| self.http.delete(make_url(&self.api_url)))
     }
 }
 

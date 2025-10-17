@@ -5,10 +5,14 @@ mod counterparty;
 mod error;
 mod organization;
 mod payout;
+mod payout_method;
 mod serde_iso3166;
 mod util;
 
-pub use {account::*, error::*, organization::*, payout::*};
+pub use {
+    account::*, counterparty::*, error::*, organization::*, payout::*,
+    payout_method::*,
+};
 
 use rust_decimal::Decimal;
 use secrecy::SecretString;
@@ -65,6 +69,13 @@ pub enum CurrencyCode {
     Bob,
     Crc,
     Zar,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING-KEBAB-CASE")]
+pub enum FiatAccountType {
+    Checking,
+    Savings,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]

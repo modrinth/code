@@ -72,6 +72,7 @@ pub struct ApiError {
     pub name: String,
     pub message: String,
     #[serde(deserialize_with = "one_or_many")]
+    #[serde(default)]
     pub details: Vec<String>,
     #[serde(default)]
     pub params: HashMap<String, serde_json::Value>,

@@ -9,9 +9,9 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use uuid::Uuid;
 
 use crate::{
-    AccountId, Blockchain, FiatAmount, FiatAndRailCode, MuralError, MuralPay,
-    SearchParams, SearchResponse, TokenAmount, TransferError, WalletDetails,
-    util::RequestExt,
+    AccountId, Blockchain, FiatAccountType, FiatAmount, FiatAndRailCode,
+    MuralError, MuralPay, SearchParams, SearchResponse, TokenAmount,
+    TransferError, WalletDetails, util::RequestExt,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -106,8 +106,6 @@ impl MuralPay {
             memo: memo.as_ref().map(|x| x.as_ref()),
             payouts,
         };
-
-        println!("{}", serde_json::to_string_pretty(&body).unwrap());
 
         self.http_post(|base| format!("{base}/api/payouts/payout"))
             .json(&body)
@@ -518,13 +516,6 @@ pub enum CrcSymbol {
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum ZarSymbol {
     Zar,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "SCREAMING-KEBAB-CASE")]
-pub enum FiatAccountType {
-    Checking,
-    Savings,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
