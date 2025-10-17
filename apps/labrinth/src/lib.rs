@@ -503,6 +503,7 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("FLAME_ANVIL_URL");
 
     failed |= check_var::<String>("GOTENBERG_URL");
+    failed |= check_var::<String>("GOTENBERG_CALLBACK_BASE");
 
     failed |= check_var::<String>("STRIPE_API_KEY");
     failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");
