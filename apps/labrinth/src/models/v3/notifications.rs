@@ -46,6 +46,7 @@ pub enum NotificationType {
     PasswordChanged,
     PasswordRemoved,
     EmailChanged,
+    SubscriptionCredited,
     PaymentFailed,
     TaxNotification,
     PatCreated,
@@ -78,6 +79,7 @@ impl NotificationType {
             NotificationType::PasswordChanged => "password_changed",
             NotificationType::PasswordRemoved => "password_removed",
             NotificationType::EmailChanged => "email_changed",
+            NotificationType::SubscriptionCredited => "subscription_credited",
             NotificationType::PaymentFailed => "payment_failed",
             NotificationType::TaxNotification => "tax_notification",
             NotificationType::PatCreated => "pat_created",
@@ -114,6 +116,7 @@ impl NotificationType {
             "password_changed" => NotificationType::PasswordChanged,
             "password_removed" => NotificationType::PasswordRemoved,
             "email_changed" => NotificationType::EmailChanged,
+            "subscription_credited" => NotificationType::SubscriptionCredited,
             "payment_failed" => NotificationType::PaymentFailed,
             "tax_notification" => NotificationType::TaxNotification,
             "payout_available" => NotificationType::PayoutAvailable,
@@ -220,6 +223,12 @@ pub enum NotificationBody {
         new_email: String,
         to_email: String,
     },
+    SubscriptionCredited {
+        subscription_id: UserSubscriptionId,
+        days: i32,
+        previous_due: DateTime<Utc>,
+        next_due: DateTime<Utc>,
+    },
     PaymentFailed {
         amount: String,
         service: String,
@@ -311,6 +320,9 @@ impl NotificationBody {
             }
             NotificationBody::EmailChanged { .. } => {
                 NotificationType::EmailChanged
+            }
+            NotificationBody::SubscriptionCredited { .. } => {
+                NotificationType::SubscriptionCredited
             }
             NotificationBody::PaymentFailed { .. } => {
                 NotificationType::PaymentFailed
@@ -554,6 +566,12 @@ impl From<DBNotification> for Notification {
 					"#".to_string(),
                     vec![],
 				),
+                NotificationBody::SubscriptionCredited { .. } => (
+                    "Subscription credited".to_string(),
+                    "Your subscription has been credited with additional service time.".to_string(),
+                    "#".to_string(),
+                    vec![],
+                ),
                 NotificationBody::PayoutAvailable { .. } => (
                     "Payout available".to_string(),
                     "A payout is available!".to_string(),

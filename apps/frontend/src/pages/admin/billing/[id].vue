@@ -97,6 +97,41 @@
 			</div>
 		</div>
 	</NewModal>
+	<NewModal ref="creditModal">
+		<template #title>
+			<span class="text-lg font-extrabold text-contrast">Credit subscription</span>
+		</template>
+		<div class="flex flex-col gap-3">
+			<div class="flex flex-col gap-2">
+				<label for="days" class="flex flex-col gap-1">
+					<span class="text-lg font-semibold text-contrast">Days to credit</span>
+					<span>Enter the number of days to add to the next due date.</span>
+				</label>
+				<input id="days" v-model.number="creditDays" type="number" min="1" autocomplete="off" />
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="sendEmail" class="flex flex-col gap-1">
+					<span class="text-lg font-semibold text-contrast">Send email to user</span>
+					<span>Notify the user about the credited days.</span>
+				</label>
+				<Toggle id="sendEmail" v-model="creditSendEmail" />
+			</div>
+			<div class="flex gap-2">
+				<ButtonStyled color="brand">
+					<button :disabled="crediting" @click="applyCredit">
+						<CheckIcon aria-hidden="true" />
+						Apply credit
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button @click="creditModal.hide()">
+						<XIcon aria-hidden="true" />
+						Cancel
+					</button>
+				</ButtonStyled>
+			</div>
+		</div>
+	</NewModal>
 	<div class="page experimental-styles-within">
 		<div
 			class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
@@ -154,6 +189,12 @@
 							</nuxt-link>
 						</ButtonStyled>
 						<CopyCode :text="subscription.metadata.id" />
+						<ButtonStyled>
+							<button @click="showCreditModal(subscription)">
+								<CurrencyIcon />
+								Credit
+							</button>
+						</ButtonStyled>
 					</div>
 				</div>
 				<div class="flex flex-col gap-2">
@@ -370,6 +411,11 @@ const modifying = ref(false)
 const modifyModal = ref()
 const cancel = ref(false)
 
+const crediting = ref(false)
+const creditModal = ref()
+const creditDays = ref(7)
+const creditSendEmail = ref(true)
+
 function showRefundModal(charge) {
 	selectedCharge.value = charge
 	refundType.value = 'full'
@@ -383,6 +429,43 @@ function showModifyModal(charge, subscription) {
 	selectedSubscription.value = subscription
 	cancel.value = false
 	modifyModal.value.show()
+}
+
+function showCreditModal(subscription) {
+	selectedSubscription.value = subscription
+	creditDays.value = 7
+	creditSendEmail.value = true
+	creditModal.value.show()
+}
+
+async function applyCredit() {
+	crediting.value = true
+	try {
+		const daysParsed = Math.max(1, Math.floor(Number(creditDays.value) || 1))
+		await useBaseFetch('billing/credit', {
+			method: 'POST',
+			body: JSON.stringify({
+				subscription_ids: [selectedSubscription.value.id],
+				days: daysParsed,
+				send_email: creditSendEmail.value,
+			}),
+			internal: true,
+		})
+		addNotification({
+			title: 'Credit applied',
+			text: 'The subscription due date has been updated.',
+			type: 'success',
+		})
+		await refreshCharges()
+		creditModal.value.hide()
+	} catch (err) {
+		addNotification({
+			title: 'Error applying credit',
+			text: err.data?.description ?? String(err),
+			type: 'error',
+		})
+	}
+	crediting.value = false
 }
 
 async function refundCharge() {

@@ -48,6 +48,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(edit_payment_method)
             .service(remove_payment_method)
             .service(charges)
+            .service(credit)
             .service(active_servers)
             .service(initiate_payment)
             .service(stripe_webhook)
@@ -2170,3 +2171,132 @@ pub async fn stripe_webhook(
 }
 
 pub mod payments;
+
+#[derive(Deserialize)]
+pub struct CreditRequest {
+    pub subscription_ids: Vec<crate::models::ids::UserSubscriptionId>,
+    pub days: i32,
+    pub send_email: bool,
+}
+
+#[post("credit")]
+pub async fn credit(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    body: web::Json<CreditRequest>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await?
+    .1;
+
+    if !user.role.is_admin() {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to credit subscriptions!".to_string(),
+        ));
+    }
+
+    let CreditRequest {
+        subscription_ids,
+        days,
+        send_email,
+    } = body.into_inner();
+
+    if days <= 0 {
+        return Err(ApiError::InvalidInput(
+            "Days must be greater than zero".to_string(),
+        ));
+    }
+    if subscription_ids.is_empty() {
+        return Err(ApiError::InvalidInput(
+            "You must specify at least one subscription id".to_string(),
+        ));
+    }
+
+    let mut transaction = pool.begin().await?;
+
+    for sub_id in subscription_ids {
+        let Some(subscription) =
+            user_subscription_item::DBUserSubscription::get(
+                sub_id.into(),
+                &mut *transaction,
+            )
+            .await?
+        else {
+            return Err(ApiError::InvalidInput(
+                "Subscription not found".to_string(),
+            ));
+        };
+
+        let mut open_charge = charge_item::DBCharge::get_open_subscription(
+            subscription.id,
+            &mut *transaction,
+        )
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(
+                "Could not find open charge for this subscription".to_string(),
+            )
+        })?;
+
+        let previous_due = open_charge.due;
+        open_charge.due = previous_due + Duration::days(days as i64);
+        let next_due = open_charge.due;
+
+        open_charge.upsert(&mut transaction).await?;
+
+        // Audit row via model
+        {
+            use crate::database::models::users_subscriptions_credits::DBUserSubscriptionCredit;
+            let mut credit = DBUserSubscriptionCredit {
+                id: 0,
+                subscription_id: subscription.id,
+                user_id: subscription.user_id,
+                creditor_id: crate::database::models::ids::DBUserId(
+                    user.id.0 as i64,
+                ),
+                days,
+                previous_due,
+                next_due,
+                created: Utc::now(),
+            };
+            credit.insert(&mut *transaction).await?;
+        }
+
+        if send_email {
+            if let Some(db_user) =
+                crate::database::models::user_item::DBUser::get_id(
+                    subscription.user_id,
+                    &mut *transaction,
+                    &redis,
+                )
+                .await?
+            {
+                if db_user.email.is_some() {
+                    let builder = NotificationBuilder {
+                        body: NotificationBody::SubscriptionCredited {
+                            subscription_id: subscription.id.into(),
+                            days,
+                            previous_due,
+                            next_due,
+                        },
+                    };
+                    builder
+                        .insert(subscription.user_id, &mut transaction, &redis)
+                        .await?;
+                }
+            }
+        }
+    }
+
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().finish())
+}
