@@ -2270,29 +2270,27 @@ pub async fn credit(
             credit.insert(&mut *transaction).await?;
         }
 
-        if send_email {
-            if let Some(db_user) =
+        if send_email
+            && let Some(db_user) =
                 crate::database::models::user_item::DBUser::get_id(
                     subscription.user_id,
                     &mut *transaction,
                     &redis,
                 )
                 .await?
-            {
-                if db_user.email.is_some() {
-                    let builder = NotificationBuilder {
-                        body: NotificationBody::SubscriptionCredited {
-                            subscription_id: subscription.id.into(),
-                            days,
-                            previous_due,
-                            next_due,
-                        },
-                    };
-                    builder
-                        .insert(subscription.user_id, &mut transaction, &redis)
-                        .await?;
-                }
-            }
+            && db_user.email.is_some()
+        {
+            let builder = NotificationBuilder {
+                body: NotificationBody::SubscriptionCredited {
+                    subscription_id: subscription.id.into(),
+                    days,
+                    previous_due,
+                    next_due,
+                },
+            };
+            builder
+                .insert(subscription.user_id, &mut transaction, &redis)
+                .await?;
         }
     }
 
