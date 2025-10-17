@@ -175,6 +175,7 @@
 						</div>
 					</div>
 					<div v-if="subscription.metadata?.id" class="flex flex-col items-end gap-2">
+						<CopyCode :text="subscription.metadata.id" />
 						<ButtonStyled
 							v-if="
 								subscription.metadata?.type === 'pyro' || subscription.metadata?.type === 'medal'
@@ -188,7 +189,6 @@
 								<ServerIcon /> Server panel <ExternalIcon class="h-4 w-4" />
 							</nuxt-link>
 						</ButtonStyled>
-						<CopyCode :text="subscription.metadata.id" />
 						<ButtonStyled>
 							<button @click="showCreditModal(subscription)">
 								<CurrencyIcon />
