@@ -80,25 +80,32 @@
 					<span class="text-lg font-bold text-primary"> Has TOTP </span>
 					<span>
 						{{ user.has_totp ? 'Yes' : 'No' }}
-					</span>
-				</div>
-			</div>
-		</NewModal>
-		<div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
-			<div class="normal-page__header py-4">
-				<ContentPageHeader>
-					<template #icon>
-						<Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
-					</template>
-					<template #title>
-						{{ user.username }}
-					</template>
-					<template #summary>
-						{{
-							user.bio
-								? user.bio
-								: projects.length === 0
-									? 'A Modrinth user.'
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-lg font-bold text-primary"> Has Hardware Security Key </span>
+          <span>
+            {{ user.has_webauthn ? "Yes" : "No" }}
+          </span>
+        </div>
+      </div>
+    </NewModal>
+    <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
+      <div class="normal-page__header py-4">
+        <ContentPageHeader>
+          <template #icon>
+            <Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
+          </template>
+          <template #title>
+            {{ user.username }}
+          </template>
+          <template #summary>
+            {{
+              user.bio
+                ? user.bio
+                : projects.length === 0
+                  ? 'A Modrinth user.'
 									: 'A Modrinth creator.'
 						}}
 					</template>

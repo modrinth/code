@@ -22,6 +22,7 @@ pub struct LegacyUser {
     pub email_verified: Option<bool>,
     pub has_password: Option<bool>,
     pub has_totp: Option<bool>,
+    pub has_webauthn: Option<bool>,
     pub payout_data: Option<UserPayoutData>, // this was changed in v3, but not ones we want to keep out of v2
 
     // DEPRECATED. Always returns None
@@ -45,6 +46,7 @@ impl From<crate::models::v3::users::User> for LegacyUser {
             auth_providers: data.auth_providers,
             has_password: data.has_password,
             has_totp: data.has_totp,
+            has_webauthn: data.has_webauthn,
             github_id: data.github_id,
         }
     }

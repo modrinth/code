@@ -2,6 +2,8 @@ pub mod checks;
 pub mod oauth;
 pub mod templates;
 pub mod validate;
+pub mod webauthn;
+
 pub use checks::{
     filter_enlisted_projects_ids, filter_enlisted_version_ids,
     filter_visible_collections, filter_visible_project_ids,

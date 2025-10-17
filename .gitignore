@@ -65,3 +65,5 @@ app-playground-data/*
 
 .astro
 .claude
+
+container_data/

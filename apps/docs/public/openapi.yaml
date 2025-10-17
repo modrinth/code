@@ -1290,6 +1290,10 @@ components:
               type: boolean
               description: Whether you have TOTP two-factor authentication connected to your account (only displayed if requesting your own account)
               nullable: true
+            has_webauthn:
+              type: boolean
+              description: Whether you have Webauthn authentication connected to your account (only displayed if requesting your own account)
+              nullable: true
             github_id:
               deprecated: true
               type: integer

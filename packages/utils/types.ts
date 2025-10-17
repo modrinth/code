@@ -352,6 +352,7 @@ export interface User {
 	email_verified?: boolean
 	has_password?: boolean
 	has_totp?: boolean
+    has_webauthn?: boolean
 }
 
 export enum TeamMemberPermission {

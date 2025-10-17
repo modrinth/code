@@ -14,6 +14,7 @@ extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
 use util::cors::default_cors;
 
+use crate::auth::webauthn;
 use crate::background_task::update_versions;
 use crate::database::ReadOnlyPgPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
@@ -336,6 +337,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
+    .app_data(webauthn::startup().clone())
     .configure({
         #[cfg(target_os = "linux")]
         {
