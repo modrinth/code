@@ -139,25 +139,11 @@
 					to="/dashboard/revenue/transfers">{{ formatMessage(messages.seeAll) }}</nuxt-link>
 			</div>
 			<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-4">
-				<div v-for="transaction in sortedPayouts.slice(0, 3)" :key="transaction.id || transaction.created"
-					class="flex flex-row gap-3">
-					<div
-						class="flex h-12 min-h-12 w-12 min-w-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md">
-						<ArrowUpIcon class="my-auto size-8 text-secondary" />
-					</div>
-					<div class="flex w-full flex-row justify-between">
-						<div class="flex flex-col">
-							<span class="text-lg font-semibold text-contrast">{{
-								formatMethodName(transaction.method)
-							}}</span>
-							<span class="text-secondary">{{ formatTransactionStatus(transaction.status) }} |
-								{{ dayjs(transaction.created).format('MMM DD YYYY') }}</span>
-						</div>
-						<span class="my-auto text-lg font-semibold text-contrast">{{
-							formatMoney(transaction.amount)
-						}}</span>
-					</div>
-				</div>
+				<RevenueTransaction
+					v-for="transaction in sortedPayouts.slice(0, 3)"
+					:key="transaction.id || transaction.created"
+					:transaction="transaction"
+					@cancelled="refreshPayouts" />
 			</div>
 			<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
 				<span class="text-xl text-contrast">{{ formatMessage(messages.noTransactions) }}</span>
@@ -170,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowUpIcon, ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
+import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
 import { injectNotificationManager } from '@modrinth/ui'
 import {
 	capitalizeString,
@@ -186,6 +172,8 @@ import { Tooltip } from 'floating-vue'
 
 import { normalizeChildren } from '@/utils/vue-children.ts'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
+import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
+
 const { formatMessage } = useVIntl()
 
 // TODO: Deduplicate in @modrinth/api-client PR.
@@ -282,29 +270,6 @@ const messages = defineMessages({
 		defaultMessage: 'Your payouts and withdrawals will appear here.',
 	},
 })
-
-function formatTransactionStatus(status: PayoutStatus) {
-	switch (status) {
-		case 'in-transit':
-			return 'In Transit'
-		default:
-			return capitalizeString(status)
-	}
-}
-
-function formatMethodName(method: PayoutMethodType | null) {
-	if (!method) return 'Unknown'
-	switch (method) {
-		case 'paypal':
-			return 'PayPal'
-		case 'venmo':
-			return 'Venmo'
-		case 'tremendous':
-			return 'Tremendous'
-		default:
-			return capitalizeString(method)
-	}
-}
 
 const { data: userBalance, refresh: refreshUserBalance } = await useAsyncData(
 	`payout/balance`,

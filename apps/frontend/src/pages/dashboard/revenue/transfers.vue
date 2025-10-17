@@ -7,20 +7,10 @@
 		</div>
 
 		<div class="flex flex-wrap items-center gap-2">
-			<DropdownSelect
-				v-model="selectedYear"
-				:options="years"
-				:display-name="(x) => (x === 'all' ? 'All years' : x)"
-				name="Year filter"
-			/>
-			<DropdownSelect
-				v-model="selectedMethod"
-				:options="methods"
-				:display-name="
-					(x) => (x === 'all' ? 'Any method' : x === 'paypal' ? 'PayPal' : capitalizeString(x))
-				"
-				name="Method filter"
-			/>
+			<DropdownSelect v-model="selectedYear" :options="years" :display-name="(x) => (x === 'all' ? 'All years' : x)"
+				name="Year filter" />
+			<DropdownSelect v-model="selectedMethod" :options="methods" :display-name="(x) => (x === 'all' ? 'Any method' : x === 'paypal' ? 'PayPal' : capitalizeString(x))
+				" name="Method filter" />
 		</div>
 
 		<p class="text-secondary">
@@ -28,61 +18,31 @@
 				selectedYear !== 'all'
 					? selectedMethod !== 'all'
 						? formatMessage(messages.transfersTotalYearMethod, {
-								amount: $formatMoney(totalAmount),
-								year: selectedYear,
-								method: selectedMethod,
-							})
+							amount: $formatMoney(totalAmount),
+							year: selectedYear,
+							method: selectedMethod,
+						})
 						: formatMessage(messages.transfersTotalYear, {
-								amount: $formatMoney(totalAmount),
-								year: selectedYear,
-							})
+							amount: $formatMoney(totalAmount),
+							year: selectedYear,
+						})
 					: selectedMethod !== 'all'
 						? formatMessage(messages.transfersTotalMethod, {
-								amount: $formatMoney(totalAmount),
-								method: selectedMethod,
-							})
+							amount: $formatMoney(totalAmount),
+							method: selectedMethod,
+						})
 						: formatMessage(messages.transfersTotal, {
-								amount: $formatMoney(totalAmount),
-							})
+							amount: $formatMoney(totalAmount),
+						})
 			}}
 		</p>
 
 		<div v-if="filteredPayouts.length > 0" class="flex flex-col gap-3">
-			<div v-for="payout in filteredPayouts" :key="payout.id" class="flex flex-row gap-3">
-				<div
-					class="flex h-12 min-h-12 w-12 min-w-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md"
-				>
-					<ArrowUpIcon class="my-auto size-8 text-secondary" />
-				</div>
-				<div class="flex w-full flex-row justify-between">
-					<div class="flex flex-col">
-						<span class="text-lg font-semibold text-contrast">{{
-							formatMethodName(payout.method)
-						}}</span>
-						<span class="text-secondary">
-							{{ formatTransactionStatus(payout.status) }} |
-							{{ $dayjs(payout.created).format('MMM DD YYYY') }}
-							<template v-if="payout.fee"> | Fee {{ $formatMoney(payout.fee) }}</template>
-							<template v-if="payout.method_address">
-								| {{ formatWallet(payout.method) }} ({{ payout.method_address }})
-							</template>
-						</span>
-					</div>
-					<div class="my-auto flex flex-col items-end">
-						<span class="text-lg font-semibold text-contrast">{{
-							$formatMoney(payout.amount)
-						}}</span>
-						<button
-							v-if="payout.status === 'in-transit'"
-							class="mt-1 inline-flex items-center gap-1 rounded-md border border-button-bg bg-button-bg px-3 py-1 text-sm text-contrast hover:brightness-110"
-							@click="cancelPayout(payout.id)"
-						>
-							<XIcon class="size-4" />
-							Cancel payment
-						</button>
-					</div>
-				</div>
-			</div>
+			<RevenueTransaction
+				v-for="payout in filteredPayouts"
+				:key="payout.id"
+				:transaction="payout"
+				@cancelled="refresh" />
 		</div>
 		<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
 			<span class="text-xl text-contrast">{{ formatMessage(messages.noTransactions) }}</span>
@@ -93,20 +53,18 @@
 	</div>
 </template>
 <script setup>
-import { ArrowUpIcon, XIcon } from '@modrinth/assets'
-import { DropdownSelect, injectNotificationManager } from '@modrinth/ui'
-import { capitalizeString, formatWallet } from '@modrinth/utils'
+import { DropdownSelect } from '@modrinth/ui'
+import { capitalizeString } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 
-const { addNotification } = injectNotificationManager()
+import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
+
 const { formatMessage } = useVIntl()
 
 useHead({
 	title: 'Transfer history - Modrinth',
 })
-
-const auth = await useAuth()
 
 const { data: payouts, refresh } = await useAsyncData(`payout`, () =>
 	useBaseFetch(`payout`, {
@@ -141,44 +99,6 @@ const filteredPayouts = computed(() =>
 const totalAmount = computed(() =>
 	filteredPayouts.value.reduce((sum, payout) => sum + payout.amount, 0),
 )
-
-async function cancelPayout(id) {
-	startLoading()
-	try {
-		await useBaseFetch(`payout/${id}`, {
-			method: 'DELETE',
-			apiVersion: 3,
-		})
-		await refresh()
-		await useAuth(auth.value.token)
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
-	stopLoading()
-}
-
-function formatTransactionStatus(status) {
-	if (status === 'in-transit') return 'In Transit'
-	return capitalizeString(status)
-}
-
-function formatMethodName(method) {
-	if (!method) return 'Unknown'
-	switch (method) {
-		case 'paypal':
-			return 'PayPal'
-		case 'venmo':
-			return 'Venmo'
-		case 'tremendous':
-			return 'Tremendous'
-		default:
-			return capitalizeString(method)
-	}
-}
 
 const messages = defineMessages({
 	transactionsHeader: {
