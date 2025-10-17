@@ -199,7 +199,7 @@ const formData = ref<PayoutRecipientInfoMerged>({
 	physicalAddress: {
 		address1: '',
 		address2: null,
-		country: '',
+		country: withdrawContext.withdrawData.value.selectedCountry?.id ?? '',
 		state: '',
 		city: '',
 		zip: '',

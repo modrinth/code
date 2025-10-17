@@ -172,8 +172,8 @@ const colorVariables = computed(() => {
 					: 'var(--color-button-bg)',
 			text: 'var(--color-contrast)',
 			icon:
-				props.type === 'chip' && colorVar.value
-					? colorVar.value
+				props.type === 'chip'
+					? 'var(--color-contrast)'
 					: props.highlightedStyle === 'main-nav-primary'
 						? 'var(--color-brand)'
 						: 'var(--color-contrast)',
@@ -258,7 +258,8 @@ const fontSize = computed(() => {
 	transition:
 		scale 0.125s ease-in-out,
 		background-color 0.25s ease-in-out,
-		color 0.25s ease-in-out;
+		color 0.25s ease-in-out,
+		filter 0.25s ease-in-out;
 
 	svg:first-child {
 		color: var(--_icon, var(--_text));

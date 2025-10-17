@@ -14,29 +14,26 @@
 			@click="handleTriggerClick" @keydown="handleTriggerKeydown">
 			<div class="flex items-center gap-2">
 				<slot name="prefix"></slot>
-				<span class="text-base font-semibold leading-tight">
+				<span class="text-primary font-semibold leading-tight">
 					<slot name="selected">{{ triggerText }}</slot>
 				</span>
 			</div>
 			<div class="flex items-center gap-1">
 				<slot name="suffix"></slot>
-				<ChevronLeftIcon v-if="showChevron" class="size-5 shrink-0 rotate-90 transition-transform duration-200"
-					:class="{ '-rotate-90': isOpen }" />
+				<ChevronLeftIcon v-if="showChevron" class="size-5 shrink-0 transition-transform duration-200"
+					:class="isOpen ? (openDirection === 'down' ? '-rotate-90' : 'rotate-90') : 'rotate-90'" />
 			</div>
 		</span>
 
 		<Teleport to="#teleports">
 			<div v-if="isOpen" ref="dropdownRef"
-				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 outline outline-1 outline-offset-[-1px] outline-surface-5"
-				:class="[
-					shouldRoundBottomCorners ? 'rounded-t-none' : 'rounded-b-none'
+				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 !border-solid border-0" :class="[
+					shouldRoundBottomCorners ? 'rounded-t-none !border-t-[1px] !border-t-surface-5' : 'rounded-b-none !border-b-[1px] !border-b-surface-5'
 				]" :style="dropdownStyle" :role="listbox ? 'listbox' : 'menu'" @mousedown.stop @keydown="handleDropdownKeydown">
 				<div v-if="searchable" class="p-4">
-					<div
-						class="flex items-center gap-2 overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 outline outline-1 outline-offset-[-1px] outline-surface-5 focus-within:outline-2 focus-within:outline-contrast">
-						<SearchIcon class="size-5 text-secondary" />
-						<input ref="searchInputRef" v-model="searchQuery" type="text" :placeholder="searchPlaceholder"
-							class="flex-1 !bg-surface-4 text-sm font-medium leading-[18px] text-contrast placeholder-secondary !shadow-none !outline-none"
+					<div class="iconified-input w-full border-surface-5 border-[1px] border-solid rounded-xl">
+						<SearchIcon aria-hidden="true" />
+						<input ref="searchInputRef" v-model="searchQuery" type="text" :placeholder="searchPlaceholder" class=""
 							@keydown.stop="handleSearchKeydown" />
 					</div>
 				</div>
@@ -54,11 +51,13 @@
 							:role="listbox ? 'option' : 'menuitem'" :aria-selected="listbox && item.value === modelValue"
 							:aria-disabled="item.disabled || undefined" :data-focused="focusedIndex === index"
 							class="flex items-center gap-2.5 cursor-pointer rounded-xl px-4 py-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
-							:class="getOptionClasses(item, index)" tabindex="-1" @click="handleOptionClick(item, index)" @mouseenter="!item.disabled && (focusedIndex = index)">
+							:class="getOptionClasses(item, index)" tabindex="-1" @click="handleOptionClick(item, index)"
+							@mouseenter="!item.disabled && (focusedIndex = index)">
 							<slot :name="`option-${item.value}`" :item="item">
 								<div class="flex items-center gap-2">
 									<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
-									<span class="text-base font-semibold leading-tight">
+									<span class="font-semibold leading-tight"
+										:class="item.value === modelValue ? 'text-contrast' : 'text-primary'">
 										{{ item.label }}
 									</span>
 								</div>
