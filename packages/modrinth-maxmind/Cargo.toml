@@ -17,9 +17,9 @@ tokio = { workspace = true, features = ["fs"] }
 tracing = { workspace = true }
 
 [dev-dependencies]
+clap = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full"] }
 tracing-subscriber = { workspace = true }
-clap = { workspace = true, features = ["derive"] }
 
 [lints]
 workspace = true
