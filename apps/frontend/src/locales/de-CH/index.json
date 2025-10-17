@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Deine Kollektionen"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "{formType} herunterladen"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Dein {formType} Steuerformular wurde erfolgreich eingereicht!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Du kannst nun frei abheben. Falls du fragen hast oder deine Daten aktualisieren musst <support-link>kontaktiere den Support</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Alles ist bereit! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Eine ausländische Einheit bezeichnet eine ausserhalb der Vereinigten Staaten gegründete Geschäftseinheit (z.B. eine nicht US-amerikanische Kapitalgesellschaft, Personengesellschaft oder LLC)."
   },

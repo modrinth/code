@@ -5,14 +5,17 @@
   "button.cancel": {
     "defaultMessage": "Paphai"
   },
+  "button.close": {
+    "defaultMessage": "Tak-opi"
+  },
   "button.continue": {
     "defaultMessage": "Magpadayon"
   },
   "button.copy-id": {
-    "defaultMessage": "Kuhai ang bili sa tigpaila"
+    "defaultMessage": "Awata ang tigpaila"
   },
   "button.copy-permalink": {
-    "defaultMessage": "Kuhai ang bili sa kununay nga katayan"
+    "defaultMessage": "Awata ang kununay nga katayan"
   },
   "button.create-a-project": {
     "defaultMessage": "Pagbuhat og proyekto"
@@ -123,7 +126,7 @@
     "defaultMessage": "Talad sa Pagsubay"
   },
   "label.delete": {
-    "defaultMessage": "Tangtangi"
+    "defaultMessage": "Panas-i"
   },
   "label.description": {
     "defaultMessage": "Paghulagway"
@@ -186,7 +189,7 @@
     "defaultMessage": "Inarkibo"
   },
   "omorphia.component.badge.label.closed": {
-    "defaultMessage": "Sirado"
+    "defaultMessage": "Gitak-op"
   },
   "omorphia.component.badge.label.creator": {
     "defaultMessage": "Magbubuhat"
@@ -234,7 +237,7 @@
     "defaultMessage": "Gipugngan"
   },
   "omorphia.component.copy.action.copy": {
-    "defaultMessage": "Kopyaha ang kalagdaan sa clipboard"
+    "defaultMessage": "Awata ang kalagdaan sa clipboard"
   },
   "omorphia.component.environment-indicator.label.client": {
     "defaultMessage": "Kliyente"
@@ -281,6 +284,9 @@
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java nga Edisyon"
   },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Mga plataproma"
+  },
   "project.about.creators.title": {
     "defaultMessage": "Mga magbubuhat"
   },
@@ -291,13 +297,16 @@
     "defaultMessage": "Gimantala {date}"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Nagbag-o {date}"
+    "defaultMessage": "Nasibo {date}"
   },
   "project.about.links.issues": {
     "defaultMessage": "Pagtaho og mga isyu"
   },
   "project.settings.environment.title": {
     "defaultMessage": "Kalikopan"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "Tinanan"
   },
   "project.settings.upload.title": {
     "defaultMessage": "Sakarga"
@@ -340,6 +349,9 @@
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Bukas nga tinubdan"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Plataporma"
   },
   "settings.display.theme.description": {
     "defaultMessage": "Pamili og imong gigusto nga hiligotanong kulay alang sa Modrinth sa kini nga himan."

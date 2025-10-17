@@ -357,7 +357,7 @@
     "message": "你現在已加入由創作者與探索者組成的精彩社群，大家都在積極打造、下載並持續掌握優質模組的最新動態。"
   },
   "auth.welcome.label.tos": {
-    "message": "建立帳號即表示您同意 Modrinth 的《<terms-link>使用規定</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
+    "message": "建立帳號即表示您已同意 Modrinth 的《<terms-link>使用規定</terms-link>》及《<privacy-policy-link>隱私權政策</privacy-policy-link>》。"
   },
   "auth.welcome.long-title": {
     "message": "歡迎使用 Modrinth！"
@@ -456,7 +456,7 @@
     "message": "建立收藏"
   },
   "create.limit-alert.approaching-limit": {
-    "message": "即將達到{type}上限（{current}/{max}）"
+    "message": "即將達到{type}上限 ({current}/{max})"
   },
   "create.limit-alert.approaching-limit-description": {
     "message": "你即將達到{type}上限，如果你需要超過 {max} 個 {typePlural}，請聯絡客服。"
@@ -577,6 +577,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "你的收藏"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "下載 {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "你的 {formType} 稅表已成功送出！"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "你現在可以自由提領了。如果你有任何疑問，或需要更新你的資料，請<support-link>聯絡客服</support-link>。"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "一切就緒！🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "「外國實體」係指在美國境外設立的商業實體（例如非美國公司、合夥事業或有限責任公司）。"

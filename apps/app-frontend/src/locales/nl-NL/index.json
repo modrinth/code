@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
   },
+  "app.settings.downloading": {
+    "message": "v{version} wordt gedownload"
+  },
   "app.settings.tabs.appearance": {
     "message": "Uiterlijk"
   },
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Bronnenbeheer"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} is klaar om geïnstalleerd te worden! Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} is nu beschikbaar! Omdat je nu op een netwerk met datalimiet zit, is de download niet automatisch gestart."
+  },
+  "app.update-toast.changelog": {
+    "message": "Changelog"
+  },
+  "app.update-toast.download": {
+    "message": "Download ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Aan het downloaden..."
+  },
+  "app.update-toast.reload": {
+    "message": "Herlaad"
+  },
+  "app.update-toast.title": {
+    "message": "Update beschikbaar"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Downloaden voltooid"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Klik hier om de changelog te bekijken."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versie {version} is succesvol geïnstalleerd!"
+  },
+  "app.update.download-update": {
+    "message": "Download update"
+  },
+  "app.update.downloading-update": {
+    "message": "Update downloaden ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Herlaad om de update te installeren"
   },
   "instance.add-server.add-and-play": {
     "message": "Toevoegen en spelen"

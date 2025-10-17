@@ -407,6 +407,15 @@
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, other {paket sumber}}"
   },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Pencorak} other {Pencorak}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Pencorak (\"Shader\")"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {pencorak} other {pencorak}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Lingkungan yang didukung"
   },
@@ -439,6 +448,66 @@
   },
   "project.about.creators.owner": {
     "defaultMessage": "Pemilik proyek"
+  },
+  "project.about.creators.title": {
+    "defaultMessage": "Kreator"
+  },
+  "project.about.details.created": {
+    "defaultMessage": "Dibuat pada {date}"
+  },
+  "project.about.details.licensed": {
+    "defaultMessage": "Berlisensi {license}"
+  },
+  "project.about.details.published": {
+    "defaultMessage": "Diterbitkan pada {date}"
+  },
+  "project.about.details.submitted": {
+    "defaultMessage": "Diserahkan pada {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Perincian"
+  },
+  "project.about.details.updated": {
+    "defaultMessage": "Diperbarui pada {date}"
+  },
+  "project.about.links.discord": {
+    "defaultMessage": "Gabung ke peladen Discord"
+  },
+  "project.about.links.donate.bmac": {
+    "defaultMessage": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Donasi"
+  },
+  "project.about.links.donate.github": {
+    "defaultMessage": "Sponsori di GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "defaultMessage": "Buat donasi pada Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "defaultMessage": "Buat donasi pada Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "defaultMessage": "Buat donasi pada PayPal"
+  },
+  "project.about.links.issues": {
+    "defaultMessage": "Laporkan masalah"
+  },
+  "project.about.links.source": {
+    "defaultMessage": "Lihat sumber"
+  },
+  "project.about.links.title": {
+    "defaultMessage": "Tautan"
+  },
+  "project.about.links.wiki": {
+    "defaultMessage": "Kunjungi wiki"
+  },
+  "project.settings.analytics.title": {
+    "defaultMessage": "Analitik"
+  },
+  "project.settings.description.title": {
+    "defaultMessage": "Keterangan"
   }
 }
 

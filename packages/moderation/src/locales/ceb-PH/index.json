@@ -11,6 +11,9 @@
   "nags.add-icon.title": {
     "defaultMessage": "Pagbutang og amoy"
   },
+  "nags.add-links.title": {
+    "defaultMessage": "Pagdugang og mga panggawas nga katayan"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "Usba ang paghulagway"
   },
@@ -25,6 +28,9 @@
   },
   "nags.edit-title.title": {
     "defaultMessage": "Usba ang titulo"
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Pagpasundayag og galeriyang hulagway"
   },
   "nags.select-environments.title": {
     "defaultMessage": "Pagpili ug mga kalikopan"

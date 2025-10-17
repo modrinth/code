@@ -36,7 +36,7 @@
     "message": "變更紀錄"
   },
   "app.update-toast.download": {
-    "message": "下載（{size}）"
+    "message": "下載 ({size})"
   },
   "app.update-toast.downloading": {
     "message": "下載中..."
@@ -60,7 +60,7 @@
     "message": "下載更新"
   },
   "app.update.downloading-update": {
-    "message": "正在下載更新（{percent}%）"
+    "message": "正在下載更新 ({percent}%)"
   },
   "app.update.reload-to-update": {
     "message": "重新載入即可安裝更新"

@@ -84,7 +84,7 @@
     "defaultMessage": "請勿使用短網址"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}{count, plural, other {}}過長。標題應該簡潔，並作為區塊的標題，而非完整的句子。"
+    "defaultMessage": "你的描述中有 {count, plural, other {# 個標題}}過長。標題應該簡潔，並作為區塊的標題，而非完整的句子。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "縮短標題"
