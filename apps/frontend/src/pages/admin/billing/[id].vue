@@ -433,7 +433,7 @@ function showModifyModal(charge, subscription) {
 
 function showCreditModal(subscription) {
 	selectedSubscription.value = subscription
-	creditDays.value = 7
+	creditDays.value = 1
 	creditSendEmail.value = true
 	creditModal.value.show()
 }

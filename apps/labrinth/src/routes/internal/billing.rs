@@ -3,6 +3,7 @@ use crate::auth::get_user_from_headers;
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::products_tax_identifier_item::product_info_by_product_price_id;
+use crate::database::models::users_subscriptions_credits::DBUserSubscriptionCredit;
 use crate::database::models::{
     charge_item, generate_charge_id, product_item, user_subscription_item,
 };
@@ -2252,23 +2253,19 @@ pub async fn credit(
 
         open_charge.upsert(&mut transaction).await?;
 
-        // Audit row via model
-        {
-            use crate::database::models::users_subscriptions_credits::DBUserSubscriptionCredit;
-            let mut credit = DBUserSubscriptionCredit {
-                id: 0,
-                subscription_id: subscription.id,
-                user_id: subscription.user_id,
-                creditor_id: crate::database::models::ids::DBUserId(
-                    user.id.0 as i64,
-                ),
-                days,
-                previous_due,
-                next_due,
-                created: Utc::now(),
-            };
-            credit.insert(&mut *transaction).await?;
-        }
+        let mut credit = DBUserSubscriptionCredit {
+            id: 0,
+            subscription_id: subscription.id,
+            user_id: subscription.user_id,
+            creditor_id: crate::database::models::ids::DBUserId(
+                user.id.0 as i64,
+            ),
+            days,
+            previous_due,
+            next_due,
+            created: Utc::now(),
+        };
+        credit.insert(&mut *transaction).await?;
 
         if send_email
             && let Some(db_user) =
@@ -2280,17 +2277,16 @@ pub async fn credit(
                 .await?
             && db_user.email.is_some()
         {
-            let builder = NotificationBuilder {
+            NotificationBuilder {
                 body: NotificationBody::SubscriptionCredited {
                     subscription_id: subscription.id.into(),
                     days,
                     previous_due,
                     next_due,
                 },
-            };
-            builder
-                .insert(subscription.user_id, &mut transaction, &redis)
-                .await?;
+            }
+            .insert(subscription.user_id, &mut transaction, &redis)
+            .await?;
         }
     }
 
