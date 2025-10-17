@@ -1103,6 +1103,12 @@
   "moderation.technical.search.placeholder": {
     "message": "Search tech reviews..."
   },
+  "profile.bio.fallback.creator": {
+    "message": "A Modrinth creator."
+  },
+  "profile.bio.fallback.user": {
+    "message": "A Modrinth user."
+  },
   "profile.button.billing": {
     "message": "Manage user billing"
   },
@@ -1115,17 +1121,47 @@
   "profile.button.manage-projects": {
     "message": "Manage projects"
   },
+  "profile.details.label.auth-providers": {
+    "message": "Auth providers"
+  },
+  "profile.details.label.email": {
+    "message": "Email"
+  },
+  "profile.details.label.has-password": {
+    "message": "Has password"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Has TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Payment methods"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "Email not verified"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "Email verified"
+  },
   "profile.error.not-found": {
     "message": "User not found"
-  },
-  "profile.joined-at": {
-    "message": "Joined <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Badges"
   },
+  "profile.label.collection": {
+    "message": "Collection"
+  },
   "profile.label.details": {
     "message": "Details"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, one {download} other {downloads}}"
+  },
+  "profile.label.joined": {
+    "message": "Joined"
+  },
+  "profile.label.no": {
+    "message": "No"
   },
   "profile.label.no-collections": {
     "message": "This user has no collections!"
@@ -1142,17 +1178,20 @@
   "profile.label.organizations": {
     "message": "Organizations"
   },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, one {project} other {projects}}"
+  },
+  "profile.label.saving": {
+    "message": "Saving..."
+  },
+  "profile.label.yes": {
+    "message": "Yes"
+  },
   "profile.meta.description": {
     "message": "Download {username}'s projects on Modrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Download {username}'s projects on Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> project download} other {<stat>{count}</stat> project downloads}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
