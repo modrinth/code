@@ -19,6 +19,7 @@
 			<span class="text-contrast font-semibold align-middle">Select withdraw method</span>
 			<ButtonStyled v-for="method in paymentMethods" :key="method.value"
 				:color="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'"
+				:highlighted="withdrawContext.withdrawData.value.selectedMethod === method.value"
 				type="chip">
 				<button @click="handleMethodSelection(method.value)" class="!justify-start !gap-2 !h-10">
 					<component :is="method.icon" /> {{ method.label }}

@@ -1,6 +1,6 @@
 <template>
 	<CreatorWithdrawModal ref="withdrawModal" :balance="userBalance" @refresh-data="refreshData" />
-	<div class="mb-6 flex flex-col gap-8 p-12 py-0">
+	<div class="mb-16 flex flex-col gap-8 p-12 py-0">
 		<div class="flex flex-col gap-5">
 			<div class="flex flex-col gap-1">
 				<span class="text-2xl font-semibold text-contrast">{{
@@ -139,11 +139,8 @@
 					to="/dashboard/revenue/transfers">{{ formatMessage(messages.seeAll) }}</nuxt-link>
 			</div>
 			<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-4">
-				<RevenueTransaction
-					v-for="transaction in sortedPayouts.slice(0, 3)"
-					:key="transaction.id || transaction.created"
-					:transaction="transaction"
-					@cancelled="refreshPayouts" />
+				<RevenueTransaction v-for="transaction in sortedPayouts.slice(0, 3)"
+					:key="transaction.id || transaction.created" :transaction="transaction" @cancelled="refreshPayouts" />
 			</div>
 			<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
 				<span class="text-xl text-contrast">{{ formatMessage(messages.noTransactions) }}</span>
@@ -159,11 +156,9 @@
 import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
 import { injectNotificationManager } from '@modrinth/ui'
 import {
-	capitalizeString,
 	formatMoney,
 	type PayoutList,
-	type PayoutMethodType,
-	type PayoutStatus
+	type PayoutMethodType
 } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'

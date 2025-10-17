@@ -172,12 +172,15 @@ const colorVariables = computed(() => {
 					: 'var(--color-button-bg)',
 			text: 'var(--color-contrast)',
 			icon:
-				props.highlightedStyle === 'main-nav-primary'
-					? 'var(--color-brand)'
-					: 'var(--color-contrast)',
+				props.type === 'chip' && colorVar.value
+					? colorVar.value
+					: props.highlightedStyle === 'main-nav-primary'
+						? 'var(--color-brand)'
+						: 'var(--color-contrast)',
 		}
 		const hoverColors = JSON.parse(JSON.stringify(colors))
-		return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon};`
+		const boxShadow = props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : 'none'
+		return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon}; --_box-shadow: ${boxShadow};`
 	}
 
 	let colors = {
