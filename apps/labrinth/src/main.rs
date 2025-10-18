@@ -13,7 +13,7 @@ use labrinth::search;
 use labrinth::util::anrok;
 use labrinth::util::env::parse_var;
 use labrinth::util::ratelimit::rate_limit_middleware;
-use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
+use labrinth::{check_env_vars, clickhouse, database, file_hosting};
 use std::ffi::CStr;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -215,8 +215,7 @@ async fn main() -> std::io::Result<()> {
         return Ok(());
     }
 
-    let maxmind_reader =
-        Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
+    let maxmind_reader = modrinth_maxmind::MaxMind::new().await;
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
         .endpoint("/metrics")

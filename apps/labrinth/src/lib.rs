@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use actix_web::web;
 use database::redis::RedisPool;
+use modrinth_maxmind::MaxMind;
 use queue::{
     analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
     session::AuthQueue, socket::ActiveSockets,
@@ -49,7 +50,7 @@ pub struct LabrinthConfig {
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
-    pub maxmind: Arc<queue::maxmind::MaxMindIndexer>,
+    pub maxmind: web::Data<MaxMind>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
     pub search_config: search::SearchConfig,
@@ -72,7 +73,7 @@ pub fn app_setup(
     search_config: search::SearchConfig,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
-    maxmind: Arc<queue::maxmind::MaxMindIndexer>,
+    maxmind: MaxMind,
     stripe_client: stripe::Client,
     anrok_client: anrok::Client,
     email_queue: EmailQueue,
@@ -218,27 +219,6 @@ pub fn app_setup(
         }
     });
 
-    let reader = maxmind.clone();
-    {
-        let reader_ref = reader;
-        scheduler.run(Duration::from_secs(60 * 60 * 24), move || {
-            let reader_ref = reader_ref.clone();
-
-            async move {
-                info!("Downloading MaxMind GeoLite2 country database");
-                let result = reader_ref.index().await;
-                if let Err(e) = result {
-                    warn!(
-                        "Downloading MaxMind GeoLite2 country database failed: {:?}",
-                        e
-                    );
-                }
-                info!("Done downloading MaxMind GeoLite2 country database");
-            }
-        });
-    }
-    info!("Downloading MaxMind GeoLite2 country database");
-
     let analytics_queue = Arc::new(AnalyticsQueue::new());
     {
         let client_ref = clickhouse.clone();
@@ -287,7 +267,7 @@ pub fn app_setup(
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
-        maxmind,
+        maxmind: web::Data::new(maxmind),
         scheduler: Arc::new(scheduler),
         ip_salt,
         search_config,
