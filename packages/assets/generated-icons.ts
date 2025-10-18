@@ -5,6 +5,8 @@ import _AlignLeftIcon from './icons/align-left.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
 import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
+import _ArrowUpIcon from './icons/arrow-up.svg?component'
+import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
 import _AsteriskIcon from './icons/asterisk.svg?component'
 import _BadgeCheckIcon from './icons/badge-check.svg?component'
 import _BanIcon from './icons/ban.svg?component'
@@ -70,6 +72,7 @@ import _FolderSearchIcon from './icons/folder-search.svg?component'
 import _GameIcon from './icons/game.svg?component'
 import _GapIcon from './icons/gap.svg?component'
 import _GaugeIcon from './icons/gauge.svg?component'
+import _GiftIcon from './icons/gift.svg?component'
 import _GitGraphIcon from './icons/git-graph.svg?component'
 import _GlassesIcon from './icons/glasses.svg?component'
 import _GlobeIcon from './icons/globe.svg?component'
@@ -92,6 +95,7 @@ import _IssuesIcon from './icons/issues.svg?component'
 import _ItalicIcon from './icons/italic.svg?component'
 import _KeyIcon from './icons/key.svg?component'
 import _KeyboardIcon from './icons/keyboard.svg?component'
+import _LandmarkIcon from './icons/landmark.svg?component'
 import _LanguagesIcon from './icons/languages.svg?component'
 import _LeftArrowIcon from './icons/left-arrow.svg?component'
 import _LibraryIcon from './icons/library.svg?component'
@@ -205,6 +209,8 @@ export const AlignLeftIcon = _AlignLeftIcon
 export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
+export const ArrowUpRightIcon = _ArrowUpRightIcon
+export const ArrowUpIcon = _ArrowUpIcon
 export const AsteriskIcon = _AsteriskIcon
 export const BadgeCheckIcon = _BadgeCheckIcon
 export const BanIcon = _BanIcon
@@ -270,6 +276,7 @@ export const FolderSearchIcon = _FolderSearchIcon
 export const GameIcon = _GameIcon
 export const GapIcon = _GapIcon
 export const GaugeIcon = _GaugeIcon
+export const GiftIcon = _GiftIcon
 export const GitGraphIcon = _GitGraphIcon
 export const GlassesIcon = _GlassesIcon
 export const GlobeIcon = _GlobeIcon
@@ -292,6 +299,7 @@ export const IssuesIcon = _IssuesIcon
 export const ItalicIcon = _ItalicIcon
 export const KeyIcon = _KeyIcon
 export const KeyboardIcon = _KeyboardIcon
+export const LandmarkIcon = _LandmarkIcon
 export const LanguagesIcon = _LanguagesIcon
 export const LeftArrowIcon = _LeftArrowIcon
 export const LibraryIcon = _LibraryIcon

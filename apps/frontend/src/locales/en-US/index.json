@@ -614,6 +614,231 @@
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Are you a US citizen?"
   },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Complete tax form"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Continue with limit"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Details"
+  },
+  "dashboard.creator-withdraw-modal.kyc.address-2-placeholder": {
+    "message": "Apartment, suite, etc."
+  },
+  "dashboard.creator-withdraw-modal.kyc.address-line": {
+    "message": "Address line"
+  },
+  "dashboard.creator-withdraw-modal.kyc.address-line-2": {
+    "message": "Address line 2 (optional)"
+  },
+  "dashboard.creator-withdraw-modal.kyc.address-placeholder": {
+    "message": "Enter address"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Business entity"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-name": {
+    "message": "Business name"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-name-placeholder": {
+    "message": "Enter business name"
+  },
+  "dashboard.creator-withdraw-modal.kyc.city": {
+    "message": "City"
+  },
+  "dashboard.creator-withdraw-modal.kyc.city-placeholder": {
+    "message": "Enter city"
+  },
+  "dashboard.creator-withdraw-modal.kyc.country": {
+    "message": "Country"
+  },
+  "dashboard.creator-withdraw-modal.kyc.country-placeholder": {
+    "message": "Select country"
+  },
+  "dashboard.creator-withdraw-modal.kyc.date-of-birth": {
+    "message": "Date of birth"
+  },
+  "dashboard.creator-withdraw-modal.kyc.email": {
+    "message": "Email"
+  },
+  "dashboard.creator-withdraw-modal.kyc.email-placeholder": {
+    "message": "Enter email address"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "A business entity refers to a registered organization such as a corporation, partnership, or LLC."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Are you a private individual or business foreign entity?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.first-name": {
+    "message": "First name"
+  },
+  "dashboard.creator-withdraw-modal.kyc.first-name-placeholder": {
+    "message": "Enter first name"
+  },
+  "dashboard.creator-withdraw-modal.kyc.last-name": {
+    "message": "Last name"
+  },
+  "dashboard.creator-withdraw-modal.kyc.last-name-placeholder": {
+    "message": "Enter last name"
+  },
+  "dashboard.creator-withdraw-modal.kyc.postal-code": {
+    "message": "Postal code"
+  },
+  "dashboard.creator-withdraw-modal.kyc.postal-code-placeholder": {
+    "message": "Enter postal code"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Private individual"
+  },
+  "dashboard.creator-withdraw-modal.kyc.state-placeholder": {
+    "message": "Enter state/province"
+  },
+  "dashboard.creator-withdraw-modal.kyc.state-province": {
+    "message": "State/province"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-number": {
+    "message": "Account number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-number-placeholder": {
+    "message": "Enter account number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Account owner"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-type": {
+    "message": "Account type"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-type-placeholder": {
+    "message": "Select account type"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.amount": {
+    "message": "Amount"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.amount-placeholder": {
+    "message": "Enter amount"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.available": {
+    "message": "available."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-name": {
+    "message": "Bank name"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-name-placeholder": {
+    "message": "Enter bank name"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.checking": {
+    "message": "Checking"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-body": {
+    "message": "Please ensure your wallet address is correct. Modrinth cannot retrieve funds sent to an invalid or incorrect wallet. Double-check before proceeding."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Check your wallet address!"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.limited-by-tax": {
+    "message": "Due to tax requirements, maximum withdrawal is {limit} without completing tax form."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.max-button": {
+    "message": "Max"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.routing-number": {
+    "message": "Routing number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.routing-number-placeholder": {
+    "message": "Enter 9-digit routing number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.savings": {
+    "message": "Savings"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.wallet-address": {
+    "message": "Wallet Address"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.wallet-address-placeholder": {
+    "message": "Enter your Polygon wallet address"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "You're nearing the withdraw threshold. You can withdraw <b>{amountRemaining}</b> now, but a tax form is required for more."
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Complete"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Method"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Account Details"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Verification"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Tax form"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Details"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "To withdraw your full <b>{available}</b> available balance please complete the form below. It is required for tax reporting and only needs to be done once."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "You must complete a W-9 or W-8 form for Modrinth's tax records so we remain compliant with tax regulations."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Tax form required"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Withdraw limit"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "You've used up your <b>{withdrawLimit}</b> withdrawal limit. You must complete a tax form to withdraw more."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Available now"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Balance"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Estimated revenue may be subject to change until it is made available."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Click to read about how Modrinth handles your revenue."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Estimated {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Processing"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Revenue stays in processing until the end of the month, then becomes available 60 days later."
+  },
+  "dashboard.revenue.tos": {
+    "message": "By uploading projects to Modrinth and withdrawing money from your account, you agree to our <terms-link>Rewards Program Terms</terms-link>. Learn more about the <info-link>Reward Program</info-link>."
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transactions"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "No transactions"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Your payouts and withdrawals will appear here."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "See all"
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Withdraw from your available balance to any payout method."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Withdraw"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Withdraw"
+  },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
   },
@@ -953,6 +1178,9 @@
   "layout.footer.about.status": {
     "message": "Status"
   },
+  "layout.footer.copyright": {
+    "message": "© {year} Rinth, Inc."
+  },
   "layout.footer.legal": {
     "message": "Legal"
   },
@@ -1031,6 +1259,15 @@
   "layout.meta.og-description": {
     "message": "Discover and publish Minecraft content!"
   },
+  "layout.mobile.close-menu": {
+    "message": "Close menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Open menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Active reports"
+  },
   "layout.nav.analytics": {
     "message": "Analytics"
   },
@@ -1057,6 +1294,9 @@
   },
   "layout.nav.modrinth-home-page": {
     "message": "Modrinth home page"
+  },
+  "layout.nav.my-servers": {
+    "message": "My servers"
   },
   "layout.nav.organizations": {
     "message": "Organizations"

@@ -34,6 +34,7 @@ import _MastodonIcon from './external/mastodon.svg?component'
 import _OpenCollectiveIcon from './external/opencollective.svg?component'
 import _PatreonIcon from './external/patreon.svg?component'
 import _PayPalIcon from './external/paypal.svg?component'
+import _PolygonIcon from './external/polygon.svg?component'
 import _RedditIcon from './external/reddit.svg?component'
 // External Icons
 import _SSODiscordIcon from './external/sso/discord.svg?component'
@@ -44,6 +45,7 @@ import _SSOMicrosoftIcon from './external/sso/microsoft.svg?component'
 import _SSOSteamIcon from './external/sso/steam.svg?component'
 import _TumblrIcon from './external/tumblr.svg?component'
 import _TwitterIcon from './external/twitter.svg?component'
+import _VenmoIcon from './external/venmo.svg?component'
 import _WindowsIcon from './external/windows.svg?component'
 import _YouTubeIcon from './external/youtube.svg?component'
 
@@ -83,6 +85,8 @@ export const TumblrIcon = _TumblrIcon
 export const TwitterIcon = _TwitterIcon
 export const WindowsIcon = _WindowsIcon
 export const YouTubeIcon = _YouTubeIcon
+export const VenmoIcon = _VenmoIcon
+export const PolygonIcon = _PolygonIcon
 
 export * from './generated-icons'
 export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'
