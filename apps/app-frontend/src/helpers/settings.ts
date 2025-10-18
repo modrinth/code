@@ -63,6 +63,7 @@ export type AppSettings = {
 
 	developer_mode: boolean
 	feature_flags: Record<FeatureFlag, boolean>
+	version: number
 }
 
 // Get full settings object

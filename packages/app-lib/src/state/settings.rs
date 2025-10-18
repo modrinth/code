@@ -38,6 +38,8 @@ pub struct Settings {
 
     pub developer_mode: bool,
     pub feature_flags: HashMap<FeatureFlag, bool>,
+
+    pub version: usize,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
@@ -63,7 +65,8 @@ impl Settings {
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
                 hook_pre_launch, hook_wrapper, hook_post_exit,
-                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar
+                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,
+                version
             FROM settings
             "
         )
@@ -117,6 +120,7 @@ impl Settings {
                 .as_ref()
                 .and_then(|x| serde_json::from_str(x).ok())
                 .unwrap_or_default(),
+            version: res.version as usize,
         })
     }
 
@@ -131,6 +135,7 @@ impl Settings {
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
         let feature_flags = serde_json::to_string(&self.feature_flags)?;
+        let version = self.version as i64;
 
         sqlx::query!(
             "
@@ -170,7 +175,8 @@ impl Settings {
 
                 toggle_sidebar = $26,
                 feature_flags = $27,
-                hide_nametag_skins_page = $28
+                hide_nametag_skins_page = $28,
+                version = $29
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -199,7 +205,8 @@ impl Settings {
             self.migrated,
             self.toggle_sidebar,
             feature_flags,
-            self.hide_nametag_skins_page
+            self.hide_nametag_skins_page,
+            version,
         )
         .execute(exec)
         .await?;
