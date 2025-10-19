@@ -918,7 +918,8 @@ const showTaxComplianceBanner = computed(() => {
 	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
 	const status = bal.form_completion_status ?? 'unknown'
 	const isComplete = status === 'complete'
-	return !!auth.value.user && thresholdMet && !isComplete
+	const isTinMismatch = status === 'tin-mismatch'
+	return !!auth.value.user && thresholdMet && !isComplete && !isTinMismatch
 })
 
 const taxBannerMessages = defineMessages({
