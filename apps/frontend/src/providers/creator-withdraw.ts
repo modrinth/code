@@ -17,6 +17,7 @@ export interface WithdrawData {
 	selectedCountry: { id: string; name: string } | null
 	selectedProvider: PaymentProvider | null
 	selectedMethod: PaymentMethod | null
+	selectedMethodId: string | null
 	amount: number
 	skippedTaxForm: boolean
 	giftCardDetails?: any
@@ -57,6 +58,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 		selectedCountry: null,
 		selectedProvider: null,
 		selectedMethod: null,
+		selectedMethodId: null,
 		amount: 0,
 		skippedTaxForm: false,
 	})
@@ -160,7 +162,8 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				return !!(
 					withdrawData.value.selectedCountry &&
 					withdrawData.value.selectedProvider &&
-					withdrawData.value.selectedMethod
+					withdrawData.value.selectedMethod &&
+					withdrawData.value.selectedMethodId
 				)
 			case 'tremendous-details':
 				if (withdrawData.value.selectedMethod === 'gift_card') {
@@ -250,6 +253,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			selectedCountry: null,
 			selectedProvider: null,
 			selectedMethod: null,
+			selectedMethodId: null,
 			amount: 0,
 			skippedTaxForm: false,
 		}

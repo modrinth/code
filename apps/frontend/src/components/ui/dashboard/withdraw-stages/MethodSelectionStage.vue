@@ -2,40 +2,24 @@
 	<div class="flex flex-col gap-6">
 		<Admonition v-if="shouldShowTaxLimitWarning" type="warning">
 			Your withdraw limit is
-			<span class="font-bold">{{ formatMoney(withdrawContext.maxWithdrawAmount.value) }}</span
-			>, <span class="cursor-pointer text-link" @click="onShowTaxForm">complete a tax form</span> to
+			<span class="font-bold">{{ formatMoney(withdrawContext.maxWithdrawAmount.value) }}</span>, <span
+				class="cursor-pointer text-link" @click="onShowTaxForm">complete a tax form</span> to
 			withdraw more.
 		</Admonition>
 		<div class="flex flex-col gap-2.5">
 			<div class="flex flex-row gap-1 align-middle">
 				<span class="align-middle font-semibold text-contrast">Region</span>
-				<UnknownIcon
-					v-tooltip="'Some payout methods are not available in certain regions.'"
-					class="mt-auto size-5 text-secondary"
-				/>
+				<UnknownIcon v-tooltip="'Some payout methods are not available in certain regions.'"
+					class="mt-auto size-5 text-secondary" />
 			</div>
-			<Combobox
-				:model-value="selectedCountryCode"
-				:options="countries"
-				placeholder="Select your country"
-				searchable
-				search-placeholder="Search countries..."
-				:max-height="240"
-				class="h-10"
-				@update:model-value="handleCountryChange"
-			/>
+			<Combobox :model-value="selectedCountryCode" :options="countries" placeholder="Select your country" searchable
+				search-placeholder="Search countries..." :max-height="240" class="h-10"
+				@update:model-value="handleCountryChange" />
 		</div>
 		<div class="flex flex-col gap-2.5">
 			<span class="align-middle font-semibold text-contrast">Select withdraw method</span>
-			<ButtonStyled
-				v-for="method in paymentMethods"
-				:key="method.value"
-				:color="
-					withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'
-				"
-				:highlighted="withdrawContext.withdrawData.value.selectedMethod === method.value"
-				type="chip"
-			>
+			<ButtonStyled v-for="method in paymentMethods" :key="method.value" :color="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'
+				" :highlighted="withdrawContext.withdrawData.value.selectedMethod === method.value" type="chip">
 				<button class="!h-10 !justify-start !gap-2" @click="handleMethodSelection(method.value)">
 					<component :is="method.icon" /> {{ method.label }}
 				</button>
@@ -46,14 +30,11 @@
 
 <script setup lang="ts">
 import {
-	GiftIcon,
 	LandmarkIcon,
-	PayPalIcon,
 	PolygonIcon,
-	UnknownIcon,
-	VenmoIcon,
+	UnknownIcon
 } from '@modrinth/assets'
-import { Admonition, ButtonStyled, Combobox, useDebugLogger } from '@modrinth/ui'
+import { Admonition, ButtonStyled, Combobox, injectNotificationManager, useDebugLogger } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { useGeolocation } from '@vueuse/core'
 import { all } from 'iso-3166-1'
@@ -65,10 +46,29 @@ const debug = useDebugLogger('MethodSelectionStage')
 const withdrawContext = useWithdrawContext()
 const userCountry = useUserCountry()
 const { coords } = useGeolocation()
+const { addNotification } = injectNotificationManager()
 
-defineProps<{
+const props = defineProps<{
 	onShowTaxForm: () => void
 }>()
+
+const emit = defineEmits<{
+	(e: 'close-modal'): void
+}>();
+
+interface PayoutMethod {
+	id: string
+	type_: string
+	name: string
+	supported_countries: string[]
+	image_url: string | null
+	image_logo_url: string | null
+	fee: {
+		percentage: number
+		min: number
+		max: number | null
+	}
+}
 
 const countries = computed(() =>
 	all().map((x) => ({
@@ -87,6 +87,81 @@ const shouldShowTaxLimitWarning = computed(() => {
 	const wouldHitLimit = (balance.withdrawn_ytd ?? 0) + (balance.available ?? 0) >= 600
 
 	return formIncomplete && wouldHitLimit
+})
+
+const availableMethods = ref<PayoutMethod[]>([])
+const loading = ref(false)
+
+watch(
+	() => withdrawContext.withdrawData.value.selectedCountry,
+	async (country) => {
+		console.debug('[MethodSelectionStage] Watch triggered, country:', country)
+		if (!country) {
+			availableMethods.value = []
+			return
+		}
+
+		loading.value = true
+		console.debug('[MethodSelectionStage] Fetching payout methods for country:', country.id)
+
+		try {
+			const methods = await useBaseFetch('payout/methods', {
+				apiVersion: 3,
+				query: { country: country.id }
+			}) as PayoutMethod[]
+			console.debug('[MethodSelectionStage] Received payout methods:', methods)
+			availableMethods.value = methods
+		} catch (e) {
+			console.error('[MethodSelectionStage] Failed to fetch payout methods:', e)
+			addNotification({
+				title: 'Failed to load payment methods',
+				text: 'Unable to fetch available payment methods. Please try again later.',
+				type: 'error',
+			})
+			emit('close-modal')
+		} finally {
+			loading.value = false
+		}
+	},
+	{ immediate: true }
+)
+
+const muralPayMethod = computed(() =>
+	availableMethods.value.find(m => m.type_ === 'mural_pay' || m.id === 'muralpay')
+)
+
+const paymentOptions = computed(() => {
+	if (!muralPayMethod.value) return []
+
+	return [
+		{
+			value: 'bank',
+			label: 'Bank transfer',
+			icon: LandmarkIcon,
+			methodId: muralPayMethod.value.id
+		},
+		{
+			value: 'crypto',
+			label: 'Polygon (Crypto)',
+			icon: PolygonIcon,
+			methodId: muralPayMethod.value.id
+		},
+	]
+})
+
+function handleMethodSelection(option: { value: string, methodId: string }) {
+	withdrawContext.withdrawData.value.selectedMethod = option.value as any
+	withdrawContext.withdrawData.value.selectedMethodId = option.methodId
+	withdrawContext.withdrawData.value.selectedProvider = 'muralpay'
+}
+
+watch(paymentOptions, (newOptions) => {
+	const currentMethod = withdrawContext.withdrawData.value.selectedMethod
+	if (currentMethod && !newOptions.find(o => o.value === currentMethod)) {
+		withdrawContext.withdrawData.value.selectedMethod = null
+		withdrawContext.withdrawData.value.selectedMethodId = null
+		withdrawContext.withdrawData.value.selectedProvider = null
+	}
 })
 
 function handleCountryChange(countryCode: string | null) {
@@ -127,27 +202,6 @@ async function getCountryFromGeoIP(lat: number, lon: number): Promise<string | n
 	} catch {
 		return null
 	}
-}
-
-const paymentMethods = [
-	{ value: 'bank', label: 'Bank transfer', icon: LandmarkIcon },
-	{ value: 'paypal', label: 'PayPal', icon: PayPalIcon },
-	{ value: 'venmo', label: 'Venmo', icon: VenmoIcon },
-	{ value: 'crypto', label: 'Polygon (Crypto)', icon: PolygonIcon },
-	{ value: 'gift_card', label: 'Gift card', icon: GiftIcon },
-]
-
-function handleMethodSelection(methodValue: string) {
-	const methodToProvider: Record<string, 'tremendous' | 'muralpay'> = {
-		gift_card: 'tremendous',
-		paypal: 'tremendous',
-		venmo: 'tremendous',
-		bank: 'muralpay',
-		crypto: 'muralpay',
-	}
-
-	withdrawContext.withdrawData.value.selectedMethod = methodValue as any
-	withdrawContext.withdrawData.value.selectedProvider = methodToProvider[methodValue]
 }
 
 onMounted(async () => {

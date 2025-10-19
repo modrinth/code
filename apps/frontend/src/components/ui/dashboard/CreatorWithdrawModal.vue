@@ -35,7 +35,7 @@
 				<TaxFormStage v-if="withdrawContext.currentStage.value === 'tax-form'" :balance="balance"
 					:on-show-tax-form="showTaxFormModal" />
 				<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'"
-					:on-show-tax-form="showTaxFormModal" />
+					:on-show-tax-form="showTaxFormModal" @close-modal="withdrawModal?.hide()" />
 				<TremendousDetailsStage v-else-if="withdrawContext.currentStage.value === 'tremendous-details'" />
 				<MuralpayKycStage v-else-if="withdrawContext.currentStage.value === 'muralpay-kyc'" />
 				<MuralpayDetailsStage v-else-if="withdrawContext.currentStage.value === 'muralpay-details'" />
