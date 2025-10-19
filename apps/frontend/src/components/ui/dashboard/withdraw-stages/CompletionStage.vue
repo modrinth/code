@@ -12,9 +12,6 @@
 import { onMounted, ref } from 'vue'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
-import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
-
-const withdrawContext = useWithdrawContext()
 const showConfetti = ref(false)
 
 onMounted(() => {

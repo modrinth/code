@@ -8,11 +8,19 @@
 
 		<div class="flex flex-wrap items-center gap-2">
 			<DropdownSelect
-v-model="selectedYear" :options="years" :display-name="(x) => (x === 'all' ? 'All years' : x)"
-				name="Year filter" />
+				v-model="selectedYear"
+				:options="years"
+				:display-name="(x) => (x === 'all' ? 'All years' : x)"
+				name="Year filter"
+			/>
 			<DropdownSelect
-v-model="selectedMethod" :options="methods" :display-name="(x) => (x === 'all' ? 'Any method' : x === 'paypal' ? 'PayPal' : capitalizeString(x))
-				" name="Method filter" />
+				v-model="selectedMethod"
+				:options="methods"
+				:display-name="
+					(x) => (x === 'all' ? 'Any method' : x === 'paypal' ? 'PayPal' : capitalizeString(x))
+				"
+				name="Method filter"
+			/>
 		</div>
 
 		<p class="text-secondary">
@@ -20,22 +28,22 @@ v-model="selectedMethod" :options="methods" :display-name="(x) => (x === 'all' ?
 				selectedYear !== 'all'
 					? selectedMethod !== 'all'
 						? formatMessage(messages.transfersTotalYearMethod, {
-							amount: $formatMoney(totalAmount),
-							year: selectedYear,
-							method: selectedMethod,
-						})
+								amount: $formatMoney(totalAmount),
+								year: selectedYear,
+								method: selectedMethod,
+							})
 						: formatMessage(messages.transfersTotalYear, {
-							amount: $formatMoney(totalAmount),
-							year: selectedYear,
-						})
+								amount: $formatMoney(totalAmount),
+								year: selectedYear,
+							})
 					: selectedMethod !== 'all'
 						? formatMessage(messages.transfersTotalMethod, {
-							amount: $formatMoney(totalAmount),
-							method: selectedMethod,
-						})
+								amount: $formatMoney(totalAmount),
+								method: selectedMethod,
+							})
 						: formatMessage(messages.transfersTotal, {
-							amount: $formatMoney(totalAmount),
-						})
+								amount: $formatMoney(totalAmount),
+							})
 			}}
 		</p>
 
@@ -44,7 +52,8 @@ v-model="selectedMethod" :options="methods" :display-name="(x) => (x === 'all' ?
 				v-for="payout in filteredPayouts"
 				:key="payout.id"
 				:transaction="payout"
-				@cancelled="refresh" />
+				@cancelled="refresh"
+			/>
 		</div>
 		<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
 			<span class="text-xl text-contrast">{{ formatMessage(messages.noTransactions) }}</span>

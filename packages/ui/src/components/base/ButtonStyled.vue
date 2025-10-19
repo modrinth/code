@@ -179,7 +179,8 @@ const colorVariables = computed(() => {
 						: 'var(--color-contrast)',
 		}
 		const hoverColors = JSON.parse(JSON.stringify(colors))
-		const boxShadow = props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : 'none'
+		const boxShadow =
+			props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : 'none'
 		return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon}; --_box-shadow: ${boxShadow};`
 	}
 

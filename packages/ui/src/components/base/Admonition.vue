@@ -1,13 +1,12 @@
 <template>
-	<div :class="[
-		'flex flex-col rounded-2xl border-[1px] border-solid p-4 gap-3 text-contrast',
-		typeClasses[type],
-	]">
-		<div :class="[
-			'flex gap-2 items-start',
-			(header || $slots.header) && 'flex-col',
-		]">
-			<div class="flex gap-2 items-start" :class="(header || $slots.header) ? 'w-full' : 'contents'">
+	<div
+		:class="[
+			'flex flex-col rounded-2xl border-[1px] border-solid p-4 gap-3 text-contrast',
+			typeClasses[type],
+		]"
+	>
+		<div :class="['flex gap-2 items-start', (header || $slots.header) && 'flex-col']">
+			<div class="flex gap-2 items-start" :class="header || $slots.header ? 'w-full' : 'contents'">
 				<slot name="icon" :icon-class="['h-6 w-6 flex-none', iconClasses[type]]">
 					<component :is="icons[type]" :class="['h-6 w-6 flex-none', iconClasses[type]]" />
 				</slot>
@@ -26,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { InfoIcon, IssuesIcon, XCircleIcon } from '@modrinth/assets';
+import { InfoIcon, IssuesIcon, XCircleIcon } from '@modrinth/assets'
 
 withDefaults(
 	defineProps<{

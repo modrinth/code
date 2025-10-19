@@ -49,9 +49,7 @@ export function useWithdrawContext() {
 	return injectWithdrawContext()
 }
 
-export function createWithdrawContext(
-	balance: any
-): WithdrawContextValue {
+export function createWithdrawContext(balance: any): WithdrawContextValue {
 	const debug = useDebugLogger('CreatorWithdraw')
 	const currentStage = ref<WithdrawStage | undefined>()
 
@@ -71,14 +69,15 @@ export function createWithdrawContext(
 		const usedLimit = balance?.withdrawn_ytd ?? 0
 		const available = balance?.available ?? 0
 
-		const needsTaxForm = balance?.form_completion_status !== 'complete' && (usedLimit + available >= 600)
+		const needsTaxForm =
+			balance?.form_completion_status !== 'complete' && usedLimit + available >= 600
 
 		debug('Tax form check:', {
 			usedLimit,
 			available,
 			total: usedLimit + available,
 			status: balance?.form_completion_status,
-			needsTaxForm
+			needsTaxForm,
 		})
 
 		if (needsTaxForm) {
@@ -144,7 +143,7 @@ export function createWithdrawContext(
 
 	function validateCurrentStage(): boolean {
 		switch (currentStage.value) {
-			case 'tax-form':
+			case 'tax-form': {
 				// If no balance data, allow proceeding
 				if (!balanceRef.value) return true
 				const ytd = balanceRef.value.withdrawn_ytd ?? 0
@@ -156,6 +155,7 @@ export function createWithdrawContext(
 				if (withdrawData.value.skippedTaxForm && remainingLimit > 0) return true
 				// If they hit $600, they must complete the form to proceed
 				return form_completion_status === 'complete'
+			}
 			case 'method-selection':
 				return !!(
 					withdrawData.value.selectedCountry &&
@@ -170,7 +170,7 @@ export function createWithdrawContext(
 					)
 				}
 				return true // For paypal/venmo, just need method selected
-			case 'muralpay-kyc':
+			case 'muralpay-kyc': {
 				if (!withdrawData.value.kycData) return false
 
 				const kycData = withdrawData.value.kycData
@@ -191,15 +191,12 @@ export function createWithdrawContext(
 						hasValidAddress
 					)
 				} else if (kycData.type === 'business') {
-					return !!(
-						kycData.name &&
-						kycData.email &&
-						hasValidAddress
-					)
+					return !!(kycData.name && kycData.email && hasValidAddress)
 				}
 
 				return false
-			case 'muralpay-details':
+			}
+			case 'muralpay-details': {
 				const accountDetails = withdrawData.value.accountDetails
 				if (!accountDetails) return false
 
@@ -225,6 +222,7 @@ export function createWithdrawContext(
 				}
 
 				return false
+			}
 			case 'completion':
 				return true
 			default:

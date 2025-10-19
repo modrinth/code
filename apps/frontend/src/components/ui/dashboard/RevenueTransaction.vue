@@ -1,7 +1,8 @@
 <template>
 	<div class="flex flex-row gap-3">
 		<div
-			class="flex h-12 min-h-12 w-12 min-w-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md">
+			class="flex h-12 min-h-12 w-12 min-w-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md"
+		>
 			<ArrowUpIcon class="my-auto size-8 text-secondary" />
 		</div>
 		<div class="flex w-full flex-row justify-between">
@@ -12,9 +13,7 @@
 				<span class="text-secondary">
 					{{ formatTransactionStatus(transaction.status) }} |
 					{{ $dayjs(transaction.created).format('MMM DD YYYY') }}
-					<template v-if="transaction.fee">
-						| Fee {{ $formatMoney(transaction.fee) }}
-					</template>
+					<template v-if="transaction.fee"> | Fee {{ $formatMoney(transaction.fee) }} </template>
 					<template v-if="transaction.method_address">
 						| {{ formatWallet(transaction.method) }} ({{ transaction.method_address }})
 					</template>

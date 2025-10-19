@@ -8,7 +8,7 @@
 		<template v-if="routeHasSettings">
 			<div class="normal-page__sidebar">
 				<div
-					class="bg-surface border-surface-4 mb-4 flex flex-col rounded-xl border border-solid p-4"
+					class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
 				>
 					<div class="flex items-center gap-4">
 						<Avatar size="sm" :src="organization.icon_url" />

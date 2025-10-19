@@ -1,17 +1,25 @@
 <template>
 	<NewModal
-ref="taxFormModal" :header="formatMessage(messages.taxFormHeader)"
+		ref="taxFormModal"
+		:header="formatMessage(messages.taxFormHeader)"
 		:hide-header="currentStage === 'download-confirmation'"
 		:close-on-click-outside="currentStage !== 'download-confirmation'"
-		:close-on-esc="currentStage !== 'download-confirmation'">
-		<div class="w-full" :class="[currentStage === 'form-selection' ? 'sm:w-[540px]' : 'sm:w-[400px]']">
+		:close-on-esc="currentStage !== 'download-confirmation'"
+	>
+		<div
+			class="w-full"
+			:class="[currentStage === 'form-selection' ? 'sm:w-[540px]' : 'sm:w-[400px]']"
+		>
 			<div v-if="currentStage === 'form-selection'">
 				<Admonition type="info" :header="formatMessage(messages.securityHeader)">
 					<IntlFormatted :message-id="messages.securityDescription">
 						<template #security-link="{ children }">
 							<a
-href="https://www.track1099.com/info/security" class="flex w-fit flex-row gap-1 align-middle text-link"
-								target="_blank" rel="noopener noreferrer">
+								href="https://www.track1099.com/info/security"
+								class="flex w-fit flex-row gap-1 align-middle text-link"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
 								<component :is="() => normalizeChildren(children)" />
 								<ExternalIcon class="my-auto" />
 							</a>
@@ -26,15 +34,24 @@ href="https://www.track1099.com/info/security" class="flex w-fit flex-row gap-1 
 						</span>
 					</label>
 					<Chips
-v-model="isUSCitizen" :items="['yes', 'no']" :format-label="(item) => (item === 'yes' ? formatMessage(messages.yes) : formatMessage(messages.no))
-						" :never-empty="false" :capitalize="true" />
+						v-model="isUSCitizen"
+						:items="['yes', 'no']"
+						:format-label="
+							(item) => (item === 'yes' ? formatMessage(messages.yes) : formatMessage(messages.no))
+						"
+						:never-empty="false"
+						:capitalize="true"
+					/>
 				</div>
 
 				<Transition
-enter-active-class="transition-all duration-300 ease-in-out"
-					enter-from-class="h-0 overflow-hidden opacity-0" enter-to-class="h-auto overflow-visible opacity-100"
+					enter-active-class="transition-all duration-300 ease-in-out"
+					enter-from-class="h-0 overflow-hidden opacity-0"
+					enter-to-class="h-auto overflow-visible opacity-100"
 					leave-active-class="transition-all duration-300 ease-in-out"
-					leave-from-class="h-auto overflow-visible opacity-100" leave-to-class="h-0 overflow-hidden opacity-0">
+					leave-from-class="h-auto overflow-visible opacity-100"
+					leave-to-class="h-0 overflow-hidden opacity-0"
+				>
 					<div v-if="isUSCitizen === 'no'" class="flex flex-col gap-1">
 						<label class="mt-4">
 							<span class="text-lg font-semibold text-contrast">
@@ -43,11 +60,18 @@ enter-active-class="transition-all duration-300 ease-in-out"
 							</span>
 						</label>
 						<Chips
-v-model="entityType" :items="['private-individual', 'foreign-entity']" :format-label="(item) =>
-								item === 'private-individual'
-									? formatMessage(messages.privateIndividual)
-									: formatMessage(messages.foreignEntity)
-							" :never-empty="false" :capitalize="false" class="mt-2" />
+							v-model="entityType"
+							:items="['private-individual', 'foreign-entity']"
+							:format-label="
+								(item) =>
+									item === 'private-individual'
+										? formatMessage(messages.privateIndividual)
+										: formatMessage(messages.foreignEntity)
+							"
+							:never-empty="false"
+							:capitalize="false"
+							class="mt-2"
+						/>
 						<span class="text-md mt-2 leading-tight">
 							{{ formatMessage(messages.entityDescription) }}
 						</span>
@@ -55,9 +79,7 @@ v-model="entityType" :items="['private-individual', 'foreign-entity']" :format-l
 				</Transition>
 				<div class="mt-4 flex justify-end gap-3">
 					<ButtonStyled @click="handleCancel">
-						<button>
-							<XIcon /> {{ formatMessage(messages.cancel) }}
-						</button>
+						<button><XIcon /> {{ formatMessage(messages.cancel) }}</button>
 					</ButtonStyled>
 					<ButtonStyled>
 						<button :disabled="!canContinue || loading" @click="continueForm">
@@ -71,16 +93,22 @@ v-model="entityType" :items="['private-individual', 'foreign-entity']" :format-l
 
 			<div v-else-if="currentStage === 'download-confirmation'" class="flex flex-col gap-6">
 				<div class="relative block h-[180px] w-[400px] overflow-hidden rounded-xl rounded-b-none">
-					<div class="absolute inset-0 rounded-xl rounded-b-none bg-gradient-to-r from-brand-green to-brand-blue"></div>
 					<div
-class="absolute inset-0 rounded-xl rounded-b-none" style="
+						class="absolute inset-0 rounded-xl rounded-b-none bg-gradient-to-r from-brand-green to-brand-blue"
+					></div>
+					<div
+						class="absolute inset-0 rounded-xl rounded-b-none"
+						style="
 							background: linear-gradient(
 								180deg,
 								rgba(39, 41, 46, 0.15) 0%,
 								var(--color-raised-bg) 100%
 							);
-						"></div>
-					<BrowserWindowSuccessIllustration class="absolute left-[90px] top-[48px] h-[140px] w-[220px]" />
+						"
+					></div>
+					<BrowserWindowSuccessIllustration
+						class="absolute left-[90px] top-[48px] h-[140px] w-[220px]"
+					/>
 				</div>
 				<div class="flex flex-col gap-2">
 					<span class="text-2xl font-semibold text-contrast">{{
@@ -93,8 +121,11 @@ class="absolute inset-0 rounded-xl rounded-b-none" style="
 						<IntlFormatted :message-id="messages.confirmationSupportText">
 							<template #support-link="{ children }">
 								<nuxt-link
-to="https://support.modrinth.com" class="text-link" target="_blank"
-									rel="noopener noreferrer">
+									to="https://support.modrinth.com"
+									class="text-link"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
 									<component :is="() => normalizeChildren(children)" />
 								</nuxt-link>
 							</template>
@@ -372,7 +403,7 @@ dialog[open]:has(> iframe[src*='form_embed']) {
 	padding: 0 !important;
 }
 
-dialog[open]>iframe[src*='form_embed'] {
+dialog[open] > iframe[src*='form_embed'] {
 	position: absolute !important;
 	inset: 0 !important;
 	width: 100% !important;
@@ -389,7 +420,7 @@ dialog[open]>iframe[src*='form_embed'] {
 		border-radius: var(--radius-md) !important;
 	}
 
-	dialog[open]>iframe[src*='form_embed'] {
+	dialog[open] > iframe[src*='form_embed'] {
 		border-radius: var(--radius-md) !important;
 	}
 }

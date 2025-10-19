@@ -1,30 +1,42 @@
 <template>
 	<div class="flex flex-col gap-6">
 		<Admonition v-if="shouldShowTaxLimitWarning" type="warning">
-			Your withdraw limit is <span class="font-bold">{{ formatMoney(withdrawContext.maxWithdrawAmount.value) }}</span>,
-			<span class="text-link cursor-pointer" @click="onShowTaxForm">complete a
-				tax form</span> to withdraw more.
+			Your withdraw limit is
+			<span class="font-bold">{{ formatMoney(withdrawContext.maxWithdrawAmount.value) }}</span
+			>, <span class="cursor-pointer text-link" @click="onShowTaxForm">complete a tax form</span> to
+			withdraw more.
 		</Admonition>
 		<div class="flex flex-col gap-2.5">
 			<div class="flex flex-row gap-1 align-middle">
-				<span class="text-contrast font-semibold align-middle">Region</span>
+				<span class="align-middle font-semibold text-contrast">Region</span>
 				<UnknownIcon
-v-tooltip="'Some payout methods are not available in certain regions.'"
-					class="size-5 mt-auto text-secondary" />
+					v-tooltip="'Some payout methods are not available in certain regions.'"
+					class="mt-auto size-5 text-secondary"
+				/>
 			</div>
 			<Combobox
-:model-value="selectedCountryCode" :options="countries" placeholder="Select your country" searchable
-				search-placeholder="Search countries..." :max-height="240" class="h-10"
-				@update:model-value="handleCountryChange" />
+				:model-value="selectedCountryCode"
+				:options="countries"
+				placeholder="Select your country"
+				searchable
+				search-placeholder="Search countries..."
+				:max-height="240"
+				class="h-10"
+				@update:model-value="handleCountryChange"
+			/>
 		</div>
 		<div class="flex flex-col gap-2.5">
-			<span class="text-contrast font-semibold align-middle">Select withdraw method</span>
+			<span class="align-middle font-semibold text-contrast">Select withdraw method</span>
 			<ButtonStyled
-v-for="method in paymentMethods" :key="method.value"
-				:color="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'"
+				v-for="method in paymentMethods"
+				:key="method.value"
+				:color="
+					withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'
+				"
 				:highlighted="withdrawContext.withdrawData.value.selectedMethod === method.value"
-				type="chip">
-				<button class="!justify-start !gap-2 !h-10" @click="handleMethodSelection(method.value)">
+				type="chip"
+			>
+				<button class="!h-10 !justify-start !gap-2" @click="handleMethodSelection(method.value)">
 					<component :is="method.icon" /> {{ method.label }}
 				</button>
 			</ButtonStyled>
@@ -33,14 +45,21 @@ v-for="method in paymentMethods" :key="method.value"
 </template>
 
 <script setup lang="ts">
-import { GiftIcon, LandmarkIcon, PayPalIcon, PolygonIcon, UnknownIcon, VenmoIcon } from '@modrinth/assets';
-import { Admonition, ButtonStyled, Combobox, useDebugLogger } from '@modrinth/ui';
-import { formatMoney } from '@modrinth/utils';
-import { useGeolocation } from '@vueuse/core';
-import { all } from 'iso-3166-1';
+import {
+	GiftIcon,
+	LandmarkIcon,
+	PayPalIcon,
+	PolygonIcon,
+	UnknownIcon,
+	VenmoIcon,
+} from '@modrinth/assets'
+import { Admonition, ButtonStyled, Combobox, useDebugLogger } from '@modrinth/ui'
+import { formatMoney } from '@modrinth/utils'
+import { useGeolocation } from '@vueuse/core'
+import { all } from 'iso-3166-1'
 
-import { useUserCountry } from '@/composables/country.ts';
-import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
+import { useUserCountry } from '@/composables/country.ts'
+import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
 const debug = useDebugLogger('MethodSelectionStage')
 const withdrawContext = useWithdrawContext()
@@ -49,7 +68,7 @@ const { coords } = useGeolocation()
 
 defineProps<{
 	onShowTaxForm: () => void
-}>();
+}>()
 
 const countries = computed(() =>
 	all().map((x) => ({
@@ -100,7 +119,9 @@ if (!withdrawContext.withdrawData.value.selectedCountry) {
 
 async function getCountryFromGeoIP(lat: number, lon: number): Promise<string | null> {
 	try {
-		const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`)
+		const response = await fetch(
+			`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
+		)
 		const data = await response.json()
 		return data.countryCode || null
 	} catch {

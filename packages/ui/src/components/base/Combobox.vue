@@ -1,6 +1,9 @@
 <template>
 	<div ref="containerRef" class="relative inline-block w-full">
-		<span ref="triggerRef" role="button" tabindex="0"
+		<span
+			ref="triggerRef"
+			role="button"
+			tabindex="0"
 			class="relative cursor-pointer flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left transition-all duration-200 text-button-text hover:bg-button-bgHover active:bg-button-bgActive"
 			:class="[
 				triggerClasses,
@@ -10,8 +13,13 @@
 					'rounded-t-none': shouldRoundTopCorners,
 					'cursor-not-allowed opacity-50': disabled,
 				},
-			]" :aria-expanded="isOpen" :aria-haspopup="listbox ? 'listbox' : 'menu'" :aria-disabled="disabled || undefined"
-			@click="handleTriggerClick" @keydown="handleTriggerKeydown">
+			]"
+			:aria-expanded="isOpen"
+			:aria-haspopup="listbox ? 'listbox' : 'menu'"
+			:aria-disabled="disabled || undefined"
+			@click="handleTriggerClick"
+			@keydown="handleTriggerKeydown"
+		>
 			<div class="flex items-center gap-2">
 				<slot name="prefix"></slot>
 				<span class="text-primary font-semibold leading-tight">
@@ -20,44 +28,76 @@
 			</div>
 			<div class="flex items-center gap-1">
 				<slot name="suffix"></slot>
-				<ChevronLeftIcon v-if="showChevron" class="size-5 shrink-0 transition-transform duration-200"
-					:class="isOpen ? (openDirection === 'down' ? '-rotate-90' : 'rotate-90') : 'rotate-90'" />
+				<ChevronLeftIcon
+					v-if="showChevron"
+					class="size-5 shrink-0 transition-transform duration-200"
+					:class="isOpen ? (openDirection === 'down' ? '-rotate-90' : 'rotate-90') : 'rotate-90'"
+				/>
 			</div>
 		</span>
 
 		<Teleport to="#teleports">
-			<div v-if="isOpen" ref="dropdownRef"
-				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 !border-solid border-0" :class="[
-					shouldRoundBottomCorners ? 'rounded-t-none !border-t-[1px] !border-t-surface-5' : 'rounded-b-none !border-b-[1px] !border-b-surface-5'
-				]" :style="dropdownStyle" :role="listbox ? 'listbox' : 'menu'" @mousedown.stop @keydown="handleDropdownKeydown">
+			<div
+				v-if="isOpen"
+				ref="dropdownRef"
+				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 !border-solid border-0"
+				:class="[
+					shouldRoundBottomCorners
+						? 'rounded-t-none !border-t-[1px] !border-t-surface-5'
+						: 'rounded-b-none !border-b-[1px] !border-b-surface-5',
+				]"
+				:style="dropdownStyle"
+				:role="listbox ? 'listbox' : 'menu'"
+				@mousedown.stop
+				@keydown="handleDropdownKeydown"
+			>
 				<div v-if="searchable" class="p-4">
 					<div class="iconified-input w-full border-surface-5 border-[1px] border-solid rounded-xl">
 						<SearchIcon aria-hidden="true" />
-						<input ref="searchInputRef" v-model="searchQuery" type="text" :placeholder="searchPlaceholder" class=""
-							@keydown.stop="handleSearchKeydown" />
+						<input
+							ref="searchInputRef"
+							v-model="searchQuery"
+							type="text"
+							:placeholder="searchPlaceholder"
+							class=""
+							@keydown.stop="handleSearchKeydown"
+						/>
 					</div>
 				</div>
 
 				<div v-if="searchable && filteredOptions.length > 0" class="h-px bg-surface-5"></div>
 
-				<div v-if="filteredOptions.length > 0" ref="optionsContainerRef" class="flex flex-col gap-2 overflow-y-auto p-3"
-					:style="{ maxHeight: `${maxHeight}px` }">
+				<div
+					v-if="filteredOptions.length > 0"
+					ref="optionsContainerRef"
+					class="flex flex-col gap-2 overflow-y-auto p-3"
+					:style="{ maxHeight: `${maxHeight}px` }"
+				>
 					<template v-for="(item, index) in filteredOptions" :key="item.key">
 						<div v-if="item.type === 'divider'" class="h-px bg-surface-5"></div>
-						<component :is="item.type === 'link' ? 'a' : 'span'" v-else
+						<component
+							:is="item.type === 'link' ? 'a' : 'span'"
+							v-else
 							:ref="(el: HTMLElement) => setOptionRef(el as HTMLElement, index)"
 							:href="item.type === 'link' && !item.disabled ? item.href : undefined"
 							:target="item.type === 'link' && !item.disabled ? item.target : undefined"
-							:role="listbox ? 'option' : 'menuitem'" :aria-selected="listbox && item.value === modelValue"
-							:aria-disabled="item.disabled || undefined" :data-focused="focusedIndex === index"
+							:role="listbox ? 'option' : 'menuitem'"
+							:aria-selected="listbox && item.value === modelValue"
+							:aria-disabled="item.disabled || undefined"
+							:data-focused="focusedIndex === index"
 							class="flex items-center gap-2.5 cursor-pointer rounded-xl px-4 py-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
-							:class="getOptionClasses(item, index)" tabindex="-1" @click="handleOptionClick(item, index)"
-							@mouseenter="!item.disabled && (focusedIndex = index)">
+							:class="getOptionClasses(item, index)"
+							tabindex="-1"
+							@click="handleOptionClick(item, index)"
+							@mouseenter="!item.disabled && (focusedIndex = index)"
+						>
 							<slot :name="`option-${item.value}`" :item="item">
 								<div class="flex items-center gap-2">
 									<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
-									<span class="font-semibold leading-tight"
-										:class="item.value === modelValue ? 'text-contrast' : 'text-primary'">
+									<span
+										class="font-semibold leading-tight"
+										:class="item.value === modelValue ? 'text-contrast' : 'text-primary'"
+									>
 										{{ item.label }}
 									</span>
 								</div>
@@ -103,7 +143,9 @@ export interface DropdownOption<T> {
 const DROPDOWN_VIEWPORT_MARGIN = 8
 const DEFAULT_MAX_HEIGHT = 300
 
-function isDropdownOption<T>(opt: DropdownOption<T> | { type: 'divider' }): opt is DropdownOption<T> {
+function isDropdownOption<T>(
+	opt: DropdownOption<T> | { type: 'divider' },
+): opt is DropdownOption<T> {
 	return 'value' in opt
 }
 
@@ -212,7 +254,7 @@ const filteredOptions = computed(() => {
 const shouldRoundBottomCorners = computed(() => isOpen.value && openDirection.value === 'down')
 const shouldRoundTopCorners = computed(() => isOpen.value && openDirection.value === 'up')
 
-function getOptionClasses(item: any, index: number) {
+function getOptionClasses(item: DropdownOption<T> & { key: string }, index: number) {
 	return [
 		item.class,
 		{
@@ -253,7 +295,8 @@ function determineOpenDirection(
 		return props.forceDirection
 	}
 
-	const hasSpaceBelow = triggerRect.bottom + dropdownRect.height + DROPDOWN_VIEWPORT_MARGIN <= viewportHeight
+	const hasSpaceBelow =
+		triggerRect.bottom + dropdownRect.height + DROPDOWN_VIEWPORT_MARGIN <= viewportHeight
 	const hasSpaceAbove = triggerRect.top - dropdownRect.height - DROPDOWN_VIEWPORT_MARGIN > 0
 
 	return !hasSpaceBelow && hasSpaceAbove ? 'up' : 'down'
@@ -264,9 +307,7 @@ function calculateVerticalPosition(
 	dropdownRect: DOMRect,
 	direction: 'up' | 'down',
 ): number {
-	return direction === 'up'
-		? triggerRect.top - dropdownRect.height
-		: triggerRect.bottom
+	return direction === 'up' ? triggerRect.top - dropdownRect.height : triggerRect.bottom
 }
 
 function calculateHorizontalPosition(
@@ -277,7 +318,10 @@ function calculateHorizontalPosition(
 	let left = triggerRect.left
 
 	if (left + dropdownRect.width > viewportWidth - DROPDOWN_VIEWPORT_MARGIN) {
-		left = Math.max(DROPDOWN_VIEWPORT_MARGIN, viewportWidth - dropdownRect.width - DROPDOWN_VIEWPORT_MARGIN)
+		left = Math.max(
+			DROPDOWN_VIEWPORT_MARGIN,
+			viewportWidth - dropdownRect.width - DROPDOWN_VIEWPORT_MARGIN,
+		)
 	}
 
 	return left
@@ -368,14 +412,9 @@ function findNextFocusableOption(currentIndex: number, direction: 'next' | 'prev
 	let option
 
 	do {
-		index = direction === 'next'
-			? (index + 1) % length
-			: (index - 1 + length) % length
+		index = direction === 'next' ? (index + 1) % length : (index - 1 + length) % length
 		option = filteredOptions.value[index]
-	} while (
-		isDivider(option) ||
-		option.disabled
-	)
+	} while (isDivider(option) || option.disabled)
 
 	return index
 }

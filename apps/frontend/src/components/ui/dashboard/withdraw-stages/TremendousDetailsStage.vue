@@ -9,10 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
-
-const withdrawContext = useWithdrawContext()
-
 // TBD: Implement gift card type selection
 // TBD: Implement amount input for gift cards
 // TBD: Implement selected method display for PayPal/Venmo

@@ -19,6 +19,7 @@ function getCallerLocation(): string {
 }
 
 export function useDebugLogger(namespace: string) {
+	// eslint-disable-next-line
 	return (...args: any[]) => {
 		const location = getCallerLocation()
 		const prefix = location ? `[${namespace}] [${location}]` : `[${namespace}]`

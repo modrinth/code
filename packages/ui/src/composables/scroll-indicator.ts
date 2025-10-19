@@ -18,7 +18,7 @@ export interface ScrollIndicator {
 
 export function useScrollIndicator(
 	containerRef: Ref<HTMLElement | null>,
-	options: ScrollIndicatorOptions = {}
+	options: ScrollIndicatorOptions = {},
 ): ScrollIndicator {
 	const { watchContent = true, debounceMs = 10, tolerance = 1, debug = false } = options
 
@@ -54,7 +54,7 @@ export function useScrollIndicator(
 					scrollTop,
 					scrollHeight,
 					clientHeight,
-					isScrollable
+					isScrollable,
 				})
 			}
 
@@ -69,7 +69,7 @@ export function useScrollIndicator(
 				if (debug) {
 					log('Fades updated', {
 						showTop: showTopFade.value,
-						showBottom: showBottomFade.value
+						showBottom: showBottomFade.value,
 					})
 				}
 			}
@@ -123,7 +123,7 @@ export function useScrollIndicator(
 				childList: true,
 				subtree: true,
 				characterData: true,
-				attributes: false
+				attributes: false,
 			})
 		}
 
@@ -176,6 +176,6 @@ export function useScrollIndicator(
 		showTopFade,
 		showBottomFade,
 		checkScrollState,
-		forceCheck
+		forceCheck,
 	}
 }

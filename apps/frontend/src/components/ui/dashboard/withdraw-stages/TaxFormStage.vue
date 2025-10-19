@@ -1,6 +1,6 @@
 <template>
-	<div class="flex gap-3 flex-col">
-		<div class="flex gap-3 flex-col">
+	<div class="flex flex-col gap-3">
+		<div class="flex flex-col gap-3">
 			<div class="flex w-full flex-row justify-between">
 				<span class="font-semibold text-contrast">{{ formatMessage(messages.withdrawLimit) }}</span>
 				<div>
@@ -9,15 +9,20 @@
 				</div>
 			</div>
 			<div class="flex h-2.5 w-full overflow-hidden rounded-full bg-highlight-orange">
-				<div class="bg-orange gradient-border" :style="{ width: `${(usedLimit / 600) * 100}%` }"></div>
+				<div
+					class="gradient-border bg-orange"
+					:style="{ width: `${(usedLimit / 600) * 100}%` }"
+				></div>
 			</div>
 		</div>
 		<template v-if="remainingLimit > 0">
 			<span>
 				<IntlFormatted
-:message-id="messages.nearingThreshold" :values="{
-					amountRemaining: formatMoney(remainingLimit),
-				}">
+					:message-id="messages.nearingThreshold"
+					:values="{
+						amountRemaining: formatMoney(remainingLimit),
+					}"
+				>
 					<template #b="{ children }">
 						<span class="font-medium">
 							<component :is="() => normalizeChildren(children)" />
@@ -25,11 +30,17 @@
 					</template>
 				</IntlFormatted>
 			</span>
-			<Admonition type="warning" show-actions-underneath :header="formatMessage(messages.taxFormRequiredHeader)">
+			<Admonition
+				type="warning"
+				show-actions-underneath
+				:header="formatMessage(messages.taxFormRequiredHeader)"
+			>
 				<span class="font-normal">
-					{{ formatMessage(messages.taxFormRequiredBodyWithLimit, {
-						limit: formatMoney(remainingLimit)
-					}) }}
+					{{
+						formatMessage(messages.taxFormRequiredBodyWithLimit, {
+							limit: formatMoney(remainingLimit),
+						})
+					}}
 				</span>
 				<template #icon="{ iconClass }">
 					<FileTextIcon :class="iconClass" />
@@ -45,7 +56,10 @@
 		</template>
 		<template v-else>
 			<span>
-				<IntlFormatted :message-id="messages.withdrawLimitUsed" :values="{ withdrawLimit: formatMoney(600) }">
+				<IntlFormatted
+					:message-id="messages.withdrawLimitUsed"
+					:values="{ withdrawLimit: formatMoney(600) }"
+				>
 					<template #b="{ children }">
 						<b>
 							<component :is="() => normalizeChildren(children)" />
@@ -65,7 +79,6 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 import { computed } from 'vue'
 
-import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const props = defineProps<{
@@ -74,7 +87,6 @@ const props = defineProps<{
 }>()
 
 const { formatMessage } = useVIntl()
-const withdrawContext = useWithdrawContext()
 
 const usedLimit = computed(() => props.balance?.withdrawn_ytd ?? 0)
 const remainingLimit = computed(() => {
@@ -110,7 +122,7 @@ const messages = defineMessages({
 	taxFormRequiredBodyWithLimit: {
 		id: 'dashboard.creator-withdraw-modal.tax-form-required.body-with-limit',
 		defaultMessage:
-			'You must complete a W-9 or W-8 form for Modrinth\'s tax records so we remain compliant with tax regulations.',
+			"You must complete a W-9 or W-8 form for Modrinth's tax records so we remain compliant with tax regulations.",
 	},
 	completeTaxForm: {
 		id: 'dashboard.creator-withdraw-modal.complete-tax-form',

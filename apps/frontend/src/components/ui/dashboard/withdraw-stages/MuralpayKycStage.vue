@@ -8,159 +8,190 @@
 				</span>
 			</label>
 			<Chips
-v-model="entityType" :items="['individual', 'business']" :format-label="(item: string) =>
-				item === 'individual'
-					? formatMessage(messages.privateIndividual)
-					: formatMessage(messages.businessEntity)
-				" :never-empty="false" :capitalize="false" />
-			<span class="text-primary leading-tight">
+				v-model="entityType"
+				:items="['individual', 'business']"
+				:format-label="
+					(item: string) =>
+						item === 'individual'
+							? formatMessage(messages.privateIndividual)
+							: formatMessage(messages.businessEntity)
+				"
+				:never-empty="false"
+				:capitalize="false"
+			/>
+			<span class="leading-tight text-primary">
 				{{ formatMessage(messages.entityDescription) }}
 			</span>
 		</div>
 
 		<div v-if="entityType" class="flex flex-col gap-4">
 			<div v-if="entityType === 'business'" class="flex flex-col gap-2.5">
-			<label>
-				<span class="text-md font-semibold text-contrast">
-					{{ formatMessage(messages.businessName) }}
-					<span class="text-brand-red">*</span>
-				</span>
-			</label>
-			<input
-v-model="formData.businessName" type="text"
-				:placeholder="formatMessage(messages.businessNamePlaceholder)"
-				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
-		</div>
+				<label>
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.businessName) }}
+						<span class="text-brand-red">*</span>
+					</span>
+				</label>
+				<input
+					v-model="formData.businessName"
+					type="text"
+					:placeholder="formatMessage(messages.businessNamePlaceholder)"
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+				/>
+			</div>
 
-		<div class="flex flex-col gap-2.5">
-			<label>
-				<span class="text-md font-semibold text-contrast">
-					{{ formatMessage(messages.email) }}
-					<span class="text-brand-red">*</span>
-				</span>
-			</label>
-			<input
-v-model="formData.email" type="email" :placeholder="formatMessage(messages.emailPlaceholder)"
-				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+			<div class="flex flex-col gap-2.5">
+				<label>
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.email) }}
+						<span class="text-brand-red">*</span>
+					</span>
+				</label>
+				<input
+					v-model="formData.email"
+					type="email"
+					:placeholder="formatMessage(messages.emailPlaceholder)"
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+				/>
 			</div>
 
 			<div v-if="entityType === 'individual'" class="flex flex-col gap-6">
 				<div class="flex gap-4">
-				<div class="flex flex-col gap-2.5 flex-1">
-					<label>
-						<span class="text-md font-semibold text-contrast">
-							{{ formatMessage(messages.firstName) }}
-							<span class="text-brand-red">*</span>
-						</span>
-					</label>
-					<input
-v-model="formData.firstName" type="text"
-						:placeholder="formatMessage(messages.firstNamePlaceholder)"
-						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
-				</div>
-				<div class="flex flex-col gap-2.5 flex-1">
-					<label>
-						<span class="text-md font-semibold text-contrast">
-							{{ formatMessage(messages.lastName) }}
-							<span class="text-brand-red">*</span>
-						</span>
-					</label>
-					<input
-v-model="formData.lastName" type="text"
-						:placeholder="formatMessage(messages.lastNamePlaceholder)"
-						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
-				</div>
-			</div>
-
-			<div class="flex flex-col gap-2.5">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.dateOfBirth) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
-				<input
-v-model="formData.dateOfBirth" type="date" :max="maxDate"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+					<div class="flex flex-1 flex-col gap-2.5">
+						<label>
+							<span class="text-md font-semibold text-contrast">
+								{{ formatMessage(messages.firstName) }}
+								<span class="text-brand-red">*</span>
+							</span>
+						</label>
+						<input
+							v-model="formData.firstName"
+							type="text"
+							:placeholder="formatMessage(messages.firstNamePlaceholder)"
+							class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+						/>
 					</div>
+					<div class="flex flex-1 flex-col gap-2.5">
+						<label>
+							<span class="text-md font-semibold text-contrast">
+								{{ formatMessage(messages.lastName) }}
+								<span class="text-brand-red">*</span>
+							</span>
+						</label>
+						<input
+							v-model="formData.lastName"
+							type="text"
+							:placeholder="formatMessage(messages.lastNamePlaceholder)"
+							class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+						/>
+					</div>
+				</div>
+
+				<div class="flex flex-col gap-2.5">
+					<label>
+						<span class="text-md font-semibold text-contrast">
+							{{ formatMessage(messages.dateOfBirth) }}
+							<span class="text-brand-red">*</span>
+						</span>
+					</label>
+					<input
+						v-model="formData.dateOfBirth"
+						type="date"
+						:max="maxDate"
+						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+					/>
+				</div>
 			</div>
 
 			<div class="flex flex-col gap-2.5">
 				<label>
-				<span class="text-md font-semibold text-contrast">
-					{{ formatMessage(messages.addressLine) }}
-					<span class="text-brand-red">*</span>
-				</span>
-			</label>
-			<input
-v-model="formData.physicalAddress.address1" type="text"
-				:placeholder="formatMessage(messages.addressPlaceholder)"
-				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
-		</div>
-
-		<div class="flex flex-col gap-2.5">
-			<label>
-				<span class="text-md font-semibold text-contrast">
-					{{ formatMessage(messages.addressLine2) }}
-				</span>
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.addressLine) }}
+						<span class="text-brand-red">*</span>
+					</span>
 				</label>
 				<input
-v-model="formData.physicalAddress.address2" type="text"
+					v-model="formData.physicalAddress.address1"
+					type="text"
+					:placeholder="formatMessage(messages.addressPlaceholder)"
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+				/>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<label>
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.addressLine2) }}
+					</span>
+				</label>
+				<input
+					v-model="formData.physicalAddress.address2"
+					type="text"
 					:placeholder="formatMessage(messages.address2Placeholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+				/>
 			</div>
 
 			<div class="flex gap-4">
-				<div class="flex flex-col gap-2.5 flex-1">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.city) }}
-						<span class="text-brand-red">*</span>
-					</span>
+				<div class="flex flex-1 flex-col gap-2.5">
+					<label>
+						<span class="text-md font-semibold text-contrast">
+							{{ formatMessage(messages.city) }}
+							<span class="text-brand-red">*</span>
+						</span>
 					</label>
 					<input
-v-model="formData.physicalAddress.city" type="text"
+						v-model="formData.physicalAddress.city"
+						type="text"
 						:placeholder="formatMessage(messages.cityPlaceholder)"
-						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+					/>
 				</div>
-				<div class="flex flex-col gap-2.5 flex-1">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.stateProvince) }}
-						<span class="text-brand-red">*</span>
-					</span>
+				<div class="flex flex-1 flex-col gap-2.5">
+					<label>
+						<span class="text-md font-semibold text-contrast">
+							{{ formatMessage(messages.stateProvince) }}
+							<span class="text-brand-red">*</span>
+						</span>
 					</label>
 					<input
-v-model="formData.physicalAddress.state" type="text"
+						v-model="formData.physicalAddress.state"
+						type="text"
 						:placeholder="formatMessage(messages.statePlaceholder)"
-						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+					/>
 				</div>
 			</div>
 
 			<div class="flex gap-4">
-				<div class="flex flex-col gap-2.5 flex-1">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.postalCode) }}
-						<span class="text-brand-red">*</span>
-					</span>
+				<div class="flex flex-1 flex-col gap-2.5">
+					<label>
+						<span class="text-md font-semibold text-contrast">
+							{{ formatMessage(messages.postalCode) }}
+							<span class="text-brand-red">*</span>
+						</span>
 					</label>
 					<input
-v-model="formData.physicalAddress.zip" type="text"
+						v-model="formData.physicalAddress.zip"
+						type="text"
 						:placeholder="formatMessage(messages.postalCodePlaceholder)"
-						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+					/>
 				</div>
-				<div class="flex flex-col gap-2.5 flex-1">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.country) }}
-						<span class="text-brand-red">*</span>
-					</span>
+				<div class="flex flex-1 flex-col gap-2.5">
+					<label>
+						<span class="text-md font-semibold text-contrast">
+							{{ formatMessage(messages.country) }}
+							<span class="text-brand-red">*</span>
+						</span>
 					</label>
 					<Combobox
-v-model="formData.physicalAddress.country" :options="countryOptions"
-						:placeholder="formatMessage(messages.countryPlaceholder)" searchable
-						search-placeholder="Search countries..." />
+						v-model="formData.physicalAddress.country"
+						:options="countryOptions"
+						:placeholder="formatMessage(messages.countryPlaceholder)"
+						searchable
+						search-placeholder="Search countries..."
+					/>
 				</div>
 			</div>
 		</div>
@@ -168,36 +199,36 @@ v-model="formData.physicalAddress.country" :options="countryOptions"
 </template>
 
 <script setup lang="ts">
-import { Chips, Combobox } from '@modrinth/ui';
-import { useVIntl } from '@vintl/vintl';
-import { all } from 'iso-3166-1';
+import { Chips, Combobox } from '@modrinth/ui'
+import { useVIntl } from '@vintl/vintl'
+import { all } from 'iso-3166-1'
 
-import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
+import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
 const withdrawContext = useWithdrawContext()
-const { formatMessage } = useVIntl();
+const { formatMessage } = useVIntl()
 
-const entityType = ref<'individual' | 'business' | null>(null);
+const entityType = ref<'individual' | 'business' | null>(null)
 
 // Scroll fade is now handled automatically by the scroll overflow indicator composable
 
 interface PayoutRecipientInfoMerged {
-	email: string;
-	firstName?: string;
-	lastName?: string;
-	dateOfBirth?: string;
-	businessName?: string;
+	email: string
+	firstName?: string
+	lastName?: string
+	dateOfBirth?: string
+	businessName?: string
 	physicalAddress: {
-		address1: string;
-		address2: string | null;
-		country: string;
-		state: string;
-		city: string;
-		zip: string;
-	};
+		address1: string
+		address2: string | null
+		country: string
+		state: string
+		city: string
+		zip: string
+	}
 }
 
-const auth = await useAuth();
+const auth = await useAuth()
 
 const formData = ref<PayoutRecipientInfoMerged>({
 	email: `${(auth.value.user as any)?.email}`,
@@ -213,29 +244,29 @@ const formData = ref<PayoutRecipientInfoMerged>({
 		city: '',
 		zip: '',
 	},
-});
+})
 
 const maxDate = computed(() => {
-	const today = new Date();
-	const year = today.getFullYear() - 18;
-	const month = String(today.getMonth() + 1).padStart(2, '0');
-	const day = String(today.getDate()).padStart(2, '0');
-	return `${year}-${month}-${day}`;
-});
+	const today = new Date()
+	const year = today.getFullYear() - 18
+	const month = String(today.getMonth() + 1).padStart(2, '0')
+	const day = String(today.getDate()).padStart(2, '0')
+	return `${year}-${month}-${day}`
+})
 
 const countryOptions = computed(() =>
 	all().map((x) => ({
 		value: x.alpha2,
 		label: x.alpha2 === 'TW' ? 'Taiwan' : x.country,
 	})),
-);
+)
 
 watch(
 	[entityType, formData],
 	() => {
 		if (!entityType.value) {
-			withdrawContext.withdrawData.value.kycData = null;
-			return;
+			withdrawContext.withdrawData.value.kycData = null
+			return
 		}
 
 		if (entityType.value === 'individual') {
@@ -254,7 +285,7 @@ watch(
 						city: formData.value.physicalAddress.city,
 						zip: formData.value.physicalAddress.zip,
 					},
-				};
+				}
 			}
 		} else {
 			withdrawContext.withdrawData.value.kycData = {
@@ -269,11 +300,11 @@ watch(
 					city: formData.value.physicalAddress.city,
 					zip: formData.value.physicalAddress.zip,
 				},
-			};
+			}
 		}
 	},
 	{ deep: true },
-);
+)
 
 const messages = defineMessages({
 	entityQuestion: {
