@@ -711,14 +711,6 @@ pub async fn edit_subscription(
                     }));
                 }
 
-                let payment_request_type =
-                    PaymentRequestType::from_stripe_id(payment_method)
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(
-                                "Invalid payment method ID".to_owned(),
-                            )
-                        })?;
-
                 if req == PaymentRequirement::RequiresPayment {
                     let results = create_or_update_payment_intent(
                         &pool,
@@ -729,7 +721,10 @@ pub async fn edit_subscription(
                             user: &user,
                             payment_intent: None,
                             payment_session: PaymentSession::Interactive {
-                                payment_request_type,
+                                payment_request_type:
+                                    PaymentRequestType::PaymentMethod {
+                                        id: payment_method,
+                                    },
                             },
                             attached_charge: AttachedCharge::Promotion {
                                 product_id: new_product_price.product_id.into(),
@@ -1296,19 +1291,6 @@ pub async fn active_servers(
 pub enum PaymentRequestType {
     PaymentMethod { id: String },
     ConfirmationToken { token: String },
-}
-
-impl PaymentRequestType {
-    pub fn from_stripe_id(id: String) -> Option<Self> {
-        let prefix = id.split_at(id.split_once('_')?.0.len() + 1).0;
-        if stripe::PaymentMethodId::is_valid_prefix(prefix) {
-            Some(Self::PaymentMethod { id })
-        } else if prefix == "ctoken_" {
-            Some(Self::ConfirmationToken { token: id })
-        } else {
-            None
-        }
-    }
 }
 
 #[derive(Deserialize)]
