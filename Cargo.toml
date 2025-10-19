@@ -36,7 +36,7 @@ async-stripe = { version = "0.41.0", default-features = false, features = [
 ] }
 async-trait = "0.1.89"
 async-tungstenite = { version = "0.31.0", default-features = false, features = [
-  "futures-03-sink",
+  "futures-03-sink"
 ] }
 async-walkdir = "2.1.0"
 async_zip = "0.0.18"
@@ -48,7 +48,7 @@ censor = "0.3.0"
 chardetng = "0.1.17"
 chrono = "0.4.42"
 cidre = { version = "0.11.3", default-features = false, features = [
-  "macos_15_0",
+  "macos_15_0"
 ] }
 clap = "4.5.48"
 clickhouse = "0.14.0"
@@ -129,7 +129,7 @@ reqwest = { version = "0.12.24", default-features = false }
 rgb = "0.8.52"
 rust_decimal = { version = "1.39.0", features = [
   "serde-with-float",
-  "serde-with-str",
+  "serde-with-str"
 ] }
 rust_iso3166 = "0.1.14"
 rust-s3 = { version = "0.37.0", default-features = false, features = [
