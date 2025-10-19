@@ -7,9 +7,11 @@
 		</div>
 
 		<div class="flex flex-wrap items-center gap-2">
-			<DropdownSelect v-model="selectedYear" :options="years" :display-name="(x) => (x === 'all' ? 'All years' : x)"
+			<DropdownSelect
+v-model="selectedYear" :options="years" :display-name="(x) => (x === 'all' ? 'All years' : x)"
 				name="Year filter" />
-			<DropdownSelect v-model="selectedMethod" :options="methods" :display-name="(x) => (x === 'all' ? 'Any method' : x === 'paypal' ? 'PayPal' : capitalizeString(x))
+			<DropdownSelect
+v-model="selectedMethod" :options="methods" :display-name="(x) => (x === 'all' ? 'Any method' : x === 'paypal' ? 'PayPal' : capitalizeString(x))
 				" name="Method filter" />
 		</div>
 

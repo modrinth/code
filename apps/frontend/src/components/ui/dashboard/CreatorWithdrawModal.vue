@@ -11,7 +11,8 @@
 					<span class="text-secondary text-xl">{{ formatMessage(messages.detailsLabel) }}</span>
 				</template>
 				<template v-else-if="isDetailsStage">
-					<button class="bg-transparent p-0 text-secondary active:scale-9 text-xl"
+					<button
+class="bg-transparent p-0 text-secondary active:scale-9 text-xl"
 						@click="goToBreadcrumbStage('method-selection')">
 						{{ formatMessage(stageLabels['method-selection']) }}
 					</button>
@@ -21,13 +22,16 @@
 			</div>
 		</template>
 		<div class="relative min-w-[496px] max-w-[496px]">
-			<div v-show="showTopFade"
+			<div
+v-show="showTopFade"
 				class="absolute top-0 left-0 right-0 h-10 pointer-events-none z-10 bg-gradient-to-b from-bg-raised to-transparent transition-all duration-300" />
 
 			<div ref="scrollContainer" class="max-h-[70vh] overflow-y-auto px-1 pb-1" @scroll="checkScrollState">
-				<TaxFormStage v-if="withdrawContext.currentStage.value === 'tax-form'" :balance="balance"
+				<TaxFormStage
+v-if="withdrawContext.currentStage.value === 'tax-form'" :balance="balance"
 					:on-show-tax-form="showTaxFormModal" />
-				<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'"
+				<MethodSelectionStage
+v-else-if="withdrawContext.currentStage.value === 'method-selection'"
 					:on-show-tax-form="showTaxFormModal" />
 				<TremendousDetailsStage v-else-if="withdrawContext.currentStage.value === 'tremendous-details'" />
 				<MuralpayKycStage v-else-if="withdrawContext.currentStage.value === 'muralpay-kyc'" />
@@ -36,33 +40,38 @@
 				<div v-else>Something went wrong</div>
 			</div>
 
-			<div v-show="showBottomFade"
+			<div
+v-show="showBottomFade"
 				class="absolute bottom-0 left-0 right-0 h-10 pointer-events-none z-10 bg-gradient-to-t from-bg-raised to-transparent transition-all duration-300" />
 		</div>
 		<div class="mt-4 flex justify-end gap-2">
 			<ButtonStyled type="outlined">
-				<button v-if="withdrawContext.previousStep.value" class="!border-surface-5"
+				<button
+v-if="withdrawContext.previousStep.value" class="!border-surface-5"
 					@click="withdrawContext.setStage(withdrawContext.previousStep.value, true)">
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
 				</button>
-				<button v-else @click="withdrawModal?.hide()" class="!border-surface-5">
+				<button v-else class="!border-surface-5" @click="withdrawModal?.hide()">
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled
 				:color="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm && remainingLimit <= 0 ? 'orange' : 'standard'">
-				<button v-if="withdrawContext.currentStage.value === 'tax-form' &&
+				<button
+v-if="withdrawContext.currentStage.value === 'tax-form' &&
 					needsTaxForm && remainingLimit > 0" @click="continueWithLimit">
 					{{ formatMessage(messages.continueWithLimit) }}
 					<RightArrowIcon />
 				</button>
-				<button v-else-if="withdrawContext.currentStage.value === 'tax-form' &&
+				<button
+v-else-if="withdrawContext.currentStage.value === 'tax-form' &&
 					needsTaxForm" @click="showTaxFormModal">
 					<FileTextIcon />
 					{{ formatMessage(messages.completeTaxForm) }}
 				</button>
-				<button v-else :disabled="!withdrawContext.canProceed.value"
+				<button
+v-else :disabled="!withdrawContext.canProceed.value"
 					@click="withdrawContext.setStage(withdrawContext.nextStep.value)">
 					<template v-if="withdrawContext.currentStage.value === 'completion'">
 						<CheckCircleIcon /> Complete
@@ -75,7 +84,8 @@
 			</ButtonStyled>
 		</div>
 	</NewModal>
-	<CreatorTaxFormModal close-button-text="Continue" ref="taxFormModal" @success="onTaxFormSuccess"
+	<CreatorTaxFormModal
+ref="taxFormModal" close-button-text="Continue" @success="onTaxFormSuccess"
 		@cancelled="onTaxFormCancelled" />
 </template>
 
@@ -88,7 +98,7 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, NewModal } from '@modrinth/ui'
+import { ButtonStyled, commonMessages, NewModal, useScrollIndicator } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
@@ -179,8 +189,7 @@ const withdrawModal = useTemplateRef<InstanceType<typeof NewModal>>('withdrawMod
 const taxFormModal = ref<InstanceType<typeof CreatorTaxFormModal> | null>(null)
 const scrollContainer = ref<HTMLElement | null>(null)
 
-const showTopFade = ref(false)
-const showBottomFade = ref(false)
+const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
 
 function showTaxFormModal(e?: MouseEvent) {
 	withdrawModal.value?.hide()
@@ -207,19 +216,6 @@ function goToBreadcrumbStage(stage: WithdrawStage) {
 	withdrawContext.setStage(stage, true)
 }
 
-function checkScrollState() {
-	if (!withdrawContext.showScrollFade.value || !scrollContainer.value) {
-		showTopFade.value = false
-		showBottomFade.value = false
-		return
-	}
-
-	const container = scrollContainer.value
-	const { scrollTop, scrollHeight, clientHeight } = container
-	showTopFade.value = scrollTop > 0
-	showBottomFade.value = scrollTop + clientHeight < scrollHeight - 1
-}
-
 function show(preferred?: WithdrawStage) {
 	if (preferred) {
 		withdrawContext.setStage(preferred, true)
@@ -236,24 +232,6 @@ function show(preferred?: WithdrawStage) {
 	withdrawModal.value?.show()
 	checkScrollState()
 }
-
-watch(
-	() => withdrawContext.currentStage.value,
-	() => {
-		nextTick(() => {
-			checkScrollState()
-		})
-	},
-)
-
-watch(
-	() => withdrawContext.showScrollFade.value,
-	() => {
-		nextTick(() => {
-			checkScrollState()
-		})
-	},
-)
 
 defineExpose({
 	show,

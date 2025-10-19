@@ -7,7 +7,8 @@
 					<span class="text-brand-red">*</span>
 				</span>
 			</label>
-			<Chips v-model="entityType" :items="['individual', 'business']" :format-label="(item: string) =>
+			<Chips
+v-model="entityType" :items="['individual', 'business']" :format-label="(item: string) =>
 				item === 'individual'
 					? formatMessage(messages.privateIndividual)
 					: formatMessage(messages.businessEntity)
@@ -25,7 +26,8 @@
 					<span class="text-brand-red">*</span>
 				</span>
 			</label>
-			<input v-model="formData.businessName" type="text"
+			<input
+v-model="formData.businessName" type="text"
 				:placeholder="formatMessage(messages.businessNamePlaceholder)"
 				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 		</div>
@@ -37,7 +39,8 @@
 					<span class="text-brand-red">*</span>
 				</span>
 			</label>
-			<input v-model="formData.email" type="email" :placeholder="formatMessage(messages.emailPlaceholder)"
+			<input
+v-model="formData.email" type="email" :placeholder="formatMessage(messages.emailPlaceholder)"
 				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
 
@@ -50,7 +53,8 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<input v-model="formData.firstName" type="text"
+					<input
+v-model="formData.firstName" type="text"
 						:placeholder="formatMessage(messages.firstNamePlaceholder)"
 						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				</div>
@@ -61,7 +65,8 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<input v-model="formData.lastName" type="text"
+					<input
+v-model="formData.lastName" type="text"
 						:placeholder="formatMessage(messages.lastNamePlaceholder)"
 						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				</div>
@@ -74,7 +79,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input v-model="formData.dateOfBirth" type="date" :max="maxDate"
+				<input
+v-model="formData.dateOfBirth" type="date" :max="maxDate"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 					</div>
 			</div>
@@ -86,7 +92,8 @@
 					<span class="text-brand-red">*</span>
 				</span>
 			</label>
-			<input v-model="formData.physicalAddress.address1" type="text"
+			<input
+v-model="formData.physicalAddress.address1" type="text"
 				:placeholder="formatMessage(messages.addressPlaceholder)"
 				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 		</div>
@@ -97,7 +104,8 @@
 					{{ formatMessage(messages.addressLine2) }}
 				</span>
 				</label>
-				<input v-model="formData.physicalAddress.address2" type="text"
+				<input
+v-model="formData.physicalAddress.address2" type="text"
 					:placeholder="formatMessage(messages.address2Placeholder)"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
@@ -110,7 +118,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 					</label>
-					<input v-model="formData.physicalAddress.city" type="text"
+					<input
+v-model="formData.physicalAddress.city" type="text"
 						:placeholder="formatMessage(messages.cityPlaceholder)"
 						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				</div>
@@ -121,7 +130,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 					</label>
-					<input v-model="formData.physicalAddress.state" type="text"
+					<input
+v-model="formData.physicalAddress.state" type="text"
 						:placeholder="formatMessage(messages.statePlaceholder)"
 						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				</div>
@@ -135,7 +145,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 					</label>
-					<input v-model="formData.physicalAddress.zip" type="text"
+					<input
+v-model="formData.physicalAddress.zip" type="text"
 						:placeholder="formatMessage(messages.postalCodePlaceholder)"
 						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				</div>
@@ -146,7 +157,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 					</label>
-					<Combobox v-model="formData.physicalAddress.country" :options="countryOptions"
+					<Combobox
+v-model="formData.physicalAddress.country" :options="countryOptions"
 						:placeholder="formatMessage(messages.countryPlaceholder)" searchable
 						search-placeholder="Search countries..." />
 				</div>
@@ -156,21 +168,18 @@
 </template>
 
 <script setup lang="ts">
-import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
 import { Chips, Combobox } from '@modrinth/ui';
 import { useVIntl } from '@vintl/vintl';
 import { all } from 'iso-3166-1';
+
+import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
 
 const withdrawContext = useWithdrawContext()
 const { formatMessage } = useVIntl();
 
 const entityType = ref<'individual' | 'business' | null>(null);
 
-watch(entityType, (newValue) => {
-	if (newValue) {
-		withdrawContext.showScrollFade.value = true;
-	}
-});
+// Scroll fade is now handled automatically by the scroll overflow indicator composable
 
 interface PayoutRecipientInfoMerged {
 	email: string;

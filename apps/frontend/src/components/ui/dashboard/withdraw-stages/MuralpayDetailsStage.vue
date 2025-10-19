@@ -26,7 +26,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input v-model="formData.bankName" type="text" :placeholder="formatMessage(messages.bankNamePlaceholder)"
+				<input
+v-model="formData.bankName" type="text" :placeholder="formatMessage(messages.bankNamePlaceholder)"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
 
@@ -37,7 +38,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input v-model="formData.accountNumber" type="text"
+				<input
+v-model="formData.accountNumber" type="text"
 					:placeholder="formatMessage(messages.accountNumberPlaceholder)"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
@@ -49,7 +51,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input v-model="formData.routingNumber" type="text"
+				<input
+v-model="formData.routingNumber" type="text"
 					:placeholder="formatMessage(messages.routingNumberPlaceholder)"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
@@ -67,7 +70,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input v-model="formData.walletAddress" type="text"
+				<input
+v-model="formData.walletAddress" type="text"
 					:placeholder="formatMessage(messages.walletAddressPlaceholder)"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
@@ -81,11 +85,12 @@
 				</span>
 			</label>
 			<div class="flex gap-2 items-center">
-				<input v-model.number="formData.amount" type="number" step="0.01" min="0" :max="maxAmount"
+				<input
+v-model.number="formData.amount" type="number" step="0.01" min="0" :max="maxAmount"
 					:placeholder="formatMessage(messages.amountPlaceholder)"
 					class="bg-raised flex-1 rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				<ButtonStyled>
-					<button @click="setMaxAmount" class="px-4 py-2">
+					<button class="px-4 py-2" @click="setMaxAmount">
 						{{ formatMessage(messages.maxButton) }}
 					</button>
 				</ButtonStyled>
@@ -98,11 +103,12 @@
 </template>
 
 <script setup lang="ts">
-import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
 import { Admonition, ButtonStyled } from '@modrinth/ui';
 import { formatMoney } from '@modrinth/utils';
 import { defineMessages, useVIntl } from '@vintl/vintl';
 import { computed, ref, watch } from 'vue';
+
+import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
 
 const withdrawContext = useWithdrawContext();
 const { formatMessage } = useVIntl();

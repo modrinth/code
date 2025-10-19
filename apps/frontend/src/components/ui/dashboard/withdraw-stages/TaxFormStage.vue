@@ -14,7 +14,8 @@
 		</div>
 		<template v-if="remainingLimit > 0">
 			<span>
-				<IntlFormatted :message-id="messages.nearingThreshold" :values="{
+				<IntlFormatted
+:message-id="messages.nearingThreshold" :values="{
 					amountRemaining: formatMoney(remainingLimit),
 				}">
 					<template #b="{ children }">

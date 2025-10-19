@@ -12,9 +12,11 @@
 			</div>
 
 			<div class="flex h-4 w-full gap-2 overflow-hidden rounded-full bg-bg-raised">
-				<div v-for="(seg, index) in segments" :key="seg.key" class="h-full hover:brightness-150"
+				<div
+v-for="(seg, index) in segments" :key="seg.key" class="h-full hover:brightness-150"
 					:style="{ width: seg.widthPct }" @mouseenter="hoveredSeg = seg.key" @mouseleave="hoveredSeg = null">
-					<span class="block h-full w-full transition duration-150" :class="[
+					<span
+class="block h-full w-full transition duration-150" :class="[
 						seg.class,
 						seg.key === 'available' ? 'gradient-border' : '',
 						index === 0 ? 'rounded-l-full' : '',
@@ -32,10 +34,12 @@
 						formatMoney(totalAvailable) }}</span>
 				</div>
 
-				<div v-for="(date, i) in dateSegments" :key="date.date"
+				<div
+v-for="(date, i) in dateSegments" :key="date.date"
 					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2">
 					<span class="text-md my-auto flex flex-row items-center gap-2 leading-none">
-						<span class="zone--striped-small my-auto block size-4 rounded-full"
+						<span
+class="zone--striped-small my-auto block size-4 rounded-full"
 							:class="[date.stripeClass, date.highlightClass]"></span>
 						{{
 							formatMessage(messages.estimatedWithDate, {
@@ -55,7 +59,8 @@
 							</template>
 						</Tooltip>
 					</span>
-					<span class="text-lg font-semibold text-contrast"
+					<span
+class="text-lg font-semibold text-contrast"
 						:class="{ [date.textClass]: hoveredSeg === `upcoming-${date.date}-${i}` }">{{ formatMoney(date?.amount ?? 0)
 						}}</span>
 				</div>
@@ -97,9 +102,11 @@
 					<div class="relative z-10 text-left text-sm font-medium">
 						{{ formatMessage(messages.withdrawCardDescription) }}
 					</div>
-					<svg aria-hidden="true" class="pointer-events-none absolute bottom-0 right-0 z-0 h-full w-auto"
+					<svg
+aria-hidden="true" class="pointer-events-none absolute bottom-0 right-0 z-0 h-full w-auto"
 						xmlns="http://www.w3.org/2000/svg" viewBox="0 0 266 100" fill="none">
-						<path fill-rule="evenodd" clip-rule="evenodd"
+						<path
+fill-rule="evenodd" clip-rule="evenodd"
 							d="M319.052 54.2233C319.058 37.6952 315.689 21.3441 309.156 6.19864C302.624 -8.94682 293.07 -22.559 281.094 -33.7816C269.119 -45.0042 254.982 -53.5944 239.573 -59.012C224.164 -64.4295 207.815 -66.5571 191.556 -65.2609C175.297 -63.9648 159.479 -59.2729 145.097 -51.4805C130.715 -43.688 118.08 -32.9636 107.987 -19.9818C97.8942 -6.99995 90.5617 7.95837 86.4509 23.9523C82.3401 39.9462 81.5398 56.6297 84.1004 72.9533L103.415 67.7101C100.452 45.7823 104.805 23.4811 115.783 4.35031C126.761 -14.7805 143.734 -29.6435 164.005 -37.8768C184.275 -46.1102 206.681 -47.2415 227.661 -41.0911C248.641 -34.9407 266.991 -21.8613 279.797 -3.93146L262.376 6.25239C255.476 -2.83248 246.698 -10.2779 236.659 -15.5617C226.619 -20.8455 215.561 -23.8398 204.26 -24.3345L206.032 -3.60929C217.266 -2.58081 227.949 1.79213 236.737 8.95915C245.524 16.1262 252.024 25.767 255.418 36.6684C258.812 47.5697 258.949 59.2444 255.81 70.223C252.672 81.2017 246.398 90.9937 237.78 98.3668L248.048 116.384C261.575 105.867 271.303 91.124 275.725 74.437C280.146 57.7501 279.016 40.0505 272.507 24.079L289.873 13.9453C295.192 26.0533 298.028 39.1299 298.209 52.3816L319.052 54.2233Z"
 							fill="#1BD96A" fill-opacity="0.16" />
 						<path
@@ -135,11 +142,13 @@
 				<span class="text-3xl font-semibold text-contrast">{{
 					formatMessage(messages.transactionsHeader)
 				}}</span>
-				<nuxt-link class="my-auto font-semibold text-contrast underline underline-offset-2"
+				<nuxt-link
+class="my-auto font-semibold text-contrast underline underline-offset-2"
 					to="/dashboard/revenue/transfers">{{ formatMessage(messages.seeAll) }}</nuxt-link>
 			</div>
 			<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-4">
-				<RevenueTransaction v-for="transaction in sortedPayouts.slice(0, 3)"
+				<RevenueTransaction
+v-for="transaction in sortedPayouts.slice(0, 3)"
 					:key="transaction.id || transaction.created" :transaction="transaction" @cancelled="refreshPayouts" />
 			</div>
 			<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">

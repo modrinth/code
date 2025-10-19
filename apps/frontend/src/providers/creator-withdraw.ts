@@ -1,4 +1,4 @@
-import { createContext } from '@modrinth/ui'
+import { createContext, useDebugLogger } from '@modrinth/ui'
 import { computed, type ComputedRef, type Ref, ref } from 'vue'
 
 export type WithdrawStage =
@@ -34,7 +34,6 @@ export interface WithdrawContextValue {
 	currentStepIndex: ComputedRef<number>
 
 	withdrawData: Ref<WithdrawData>
-	showScrollFade: Ref<boolean>
 	balance: Ref<any>
 	maxWithdrawAmount: ComputedRef<number>
 
@@ -51,10 +50,9 @@ export function useWithdrawContext() {
 }
 
 export function createWithdrawContext(
-	balance: any,
-	userPayoutData?: any,
-	testTaxForm = false,
+	balance: any
 ): WithdrawContextValue {
+	const debug = useDebugLogger('CreatorWithdraw')
 	const currentStage = ref<WithdrawStage | undefined>()
 
 	const withdrawData = ref<WithdrawData>({
@@ -65,7 +63,6 @@ export function createWithdrawContext(
 		skippedTaxForm: false,
 	})
 
-	const showScrollFade = ref(false)
 	const balanceRef = ref(balance)
 
 	const stages = computed<WithdrawStage[]>(() => {
@@ -76,7 +73,7 @@ export function createWithdrawContext(
 
 		const needsTaxForm = balance?.form_completion_status !== 'complete' && (usedLimit + available >= 600)
 
-		console.log('Tax form check:', {
+		debug('Tax form check:', {
 			usedLimit,
 			available,
 			total: usedLimit + available,
@@ -243,7 +240,7 @@ export function createWithdrawContext(
 		// If completing the withdraw process (no more stages)
 		if (!stage) {
 			// TBD: Handle final withdraw submission
-			console.log('Withdraw process completed!', withdrawData.value)
+			debug('Withdraw process completed!', withdrawData.value)
 			return
 		}
 
@@ -259,7 +256,6 @@ export function createWithdrawContext(
 			skippedTaxForm: false,
 		}
 		currentStage.value = undefined
-		showScrollFade.value = false
 	}
 
 	return {
@@ -270,7 +266,6 @@ export function createWithdrawContext(
 		previousStep,
 		currentStepIndex,
 		withdrawData,
-		showScrollFade,
 		balance: balanceRef,
 		maxWithdrawAmount,
 		setStage,

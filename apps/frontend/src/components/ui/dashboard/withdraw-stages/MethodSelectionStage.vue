@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-6">
-		<Admonition type="warning" v-if="shouldShowTaxLimitWarning">
+		<Admonition v-if="shouldShowTaxLimitWarning" type="warning">
 			Your withdraw limit is <span class="font-bold">{{ formatMoney(withdrawContext.maxWithdrawAmount.value) }}</span>,
 			<span class="text-link cursor-pointer" @click="onShowTaxForm">complete a
 				tax form</span> to withdraw more.
@@ -8,20 +8,23 @@
 		<div class="flex flex-col gap-2.5">
 			<div class="flex flex-row gap-1 align-middle">
 				<span class="text-contrast font-semibold align-middle">Region</span>
-				<UnknownIcon v-tooltip="'Some payout methods are not available in certain regions.'"
+				<UnknownIcon
+v-tooltip="'Some payout methods are not available in certain regions.'"
 					class="size-5 mt-auto text-secondary" />
 			</div>
-			<Combobox :model-value="selectedCountryCode" :options="countries" placeholder="Select your country" searchable
-				search-placeholder="Search countries..." :max-height="240" @update:model-value="handleCountryChange"
-				class="h-10" />
+			<Combobox
+:model-value="selectedCountryCode" :options="countries" placeholder="Select your country" searchable
+				search-placeholder="Search countries..." :max-height="240" class="h-10"
+				@update:model-value="handleCountryChange" />
 		</div>
 		<div class="flex flex-col gap-2.5">
 			<span class="text-contrast font-semibold align-middle">Select withdraw method</span>
-			<ButtonStyled v-for="method in paymentMethods" :key="method.value"
+			<ButtonStyled
+v-for="method in paymentMethods" :key="method.value"
 				:color="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'"
 				:highlighted="withdrawContext.withdrawData.value.selectedMethod === method.value"
 				type="chip">
-				<button @click="handleMethodSelection(method.value)" class="!justify-start !gap-2 !h-10">
+				<button class="!justify-start !gap-2 !h-10" @click="handleMethodSelection(method.value)">
 					<component :is="method.icon" /> {{ method.label }}
 				</button>
 			</ButtonStyled>
@@ -30,14 +33,16 @@
 </template>
 
 <script setup lang="ts">
-import { useUserCountry } from '@/composables/country.ts';
-import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
 import { GiftIcon, LandmarkIcon, PayPalIcon, PolygonIcon, UnknownIcon, VenmoIcon } from '@modrinth/assets';
-import { Admonition, ButtonStyled, Combobox } from '@modrinth/ui';
+import { Admonition, ButtonStyled, Combobox, useDebugLogger } from '@modrinth/ui';
 import { formatMoney } from '@modrinth/utils';
 import { useGeolocation } from '@vueuse/core';
 import { all } from 'iso-3166-1';
 
+import { useUserCountry } from '@/composables/country.ts';
+import { useWithdrawContext } from '@/providers/creator-withdraw.ts';
+
+const debug = useDebugLogger('MethodSelectionStage')
 const withdrawContext = useWithdrawContext()
 const userCountry = useUserCountry()
 const { coords } = useGeolocation()
@@ -66,31 +71,31 @@ const shouldShowTaxLimitWarning = computed(() => {
 })
 
 function handleCountryChange(countryCode: string | null) {
-	console.log('handleCountryChange called with:', countryCode)
+	debug('handleCountryChange called with:', countryCode)
 	if (countryCode) {
 		const normalizedCode = countryCode.toUpperCase()
 		const country = all().find((c) => c.alpha2 === normalizedCode)
-		console.log('Found country:', country)
+		debug('Found country:', country)
 		if (country) {
 			withdrawContext.withdrawData.value.selectedCountry = {
 				id: country.alpha2,
 				name: country.alpha2 === 'TW' ? 'Taiwan' : country.country,
 			}
-			console.log('Set selectedCountry to:', withdrawContext.withdrawData.value.selectedCountry)
+			debug('Set selectedCountry to:', withdrawContext.withdrawData.value.selectedCountry)
 		}
 	} else {
 		withdrawContext.withdrawData.value.selectedCountry = null
 	}
 }
 
-console.log('Setup: userCountry.value =', userCountry.value)
-console.log('Setup: current selectedCountry =', withdrawContext.withdrawData.value.selectedCountry)
+debug('Setup: userCountry.value =', userCountry.value)
+debug('Setup: current selectedCountry =', withdrawContext.withdrawData.value.selectedCountry)
 
 if (!withdrawContext.withdrawData.value.selectedCountry) {
 	const defaultCountryCode = userCountry.value || 'US'
-	console.log('Setup: calling handleCountryChange with', defaultCountryCode)
+	debug('Setup: calling handleCountryChange with', defaultCountryCode)
 	handleCountryChange(defaultCountryCode)
-	console.log('Setup: selectedCountryCode computed =', selectedCountryCode.value)
+	debug('Setup: selectedCountryCode computed =', selectedCountryCode.value)
 }
 
 async function getCountryFromGeoIP(lat: number, lon: number): Promise<string | null> {
