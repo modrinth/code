@@ -1,7 +1,7 @@
 use labrinth::queue::email::EmailQueue;
 use labrinth::util::anrok;
 use labrinth::util::gotenberg::GotenbergClient;
-use labrinth::{LabrinthConfig, file_hosting, queue};
+use labrinth::{LabrinthConfig, file_hosting};
 use labrinth::{check_env_vars, clickhouse};
 use modrinth_maxmind::MaxMind;
 use std::sync::Arc;
