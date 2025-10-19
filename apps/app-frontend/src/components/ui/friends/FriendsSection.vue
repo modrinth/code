@@ -107,7 +107,7 @@ const messages = defineMessages({
 											{
 												name: 'remove-friend',
 												color: 'danger',
-											}
+											},
 										]
 									: [
 											{
@@ -115,7 +115,7 @@ const messages = defineMessages({
 											},
 											{
 												name: 'cancel-request',
-											}
+											},
 										],
 							)
 					"
