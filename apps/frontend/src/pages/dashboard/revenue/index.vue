@@ -84,15 +84,7 @@
 					</NuxtLink>
 				</ButtonStyled>
 			</div>
-			<p v-if="blockedByTin" class="text-red">
-				<span class="font-bold">Your TIN/SSN did not match IRS records.</span>
-				To continue withdrawing, you must
-				<a href="https://support.modrinth.com" class="font-bold underline"
-					>contact Modrinth support</a
-				>
-				and resolve this.
-			</p>
-			<p v-else-if="blockedByTax" class="text-sm font-bold text-orange">
+			<p v-if="blockedByTax" class="text-sm font-bold text-orange">
 				You have withdrawn over $600 this year. To continue withdrawing, you must complete a tax
 				form.
 			</p>
@@ -192,11 +184,6 @@ const blockedByTax = computed(() => {
 	const status = userBalance.value?.form_completion_status ?? 'unknown'
 	const thresholdMet = (userBalance.value?.withdrawn_ytd ?? 0) >= 600
 	return thresholdMet && status !== 'complete'
-})
-
-const blockedByTin = computed(() => {
-	const status = userBalance.value?.form_completion_status ?? 'unknown'
-	return status === 'tin-mismatch'
 })
 
 const deadlineEnding = computed(() => {

@@ -93,7 +93,7 @@
 				<div class="flex w-fit flex-row">
 					<ButtonStyled color="red">
 						<nuxt-link to="https://support.modrinth.com" target="_blank" rel="noopener">
-							<FileTextIcon /> {{ formatMessage(tinMismatchBannerMessages.action) }}
+							<MessageIcon /> {{ formatMessage(tinMismatchBannerMessages.action) }}
 						</nuxt-link>
 					</ButtonStyled>
 				</div>
@@ -868,6 +868,7 @@ import {
 	LogInIcon,
 	LogOutIcon,
 	MastodonIcon,
+	MessageIcon,
 	ModrinthIcon,
 	MoonIcon,
 	OrganizationIcon,
@@ -966,12 +967,12 @@ const taxBannerMessages = defineMessages({
 const tinMismatchBannerMessages = defineMessages({
 	title: {
 		id: 'layout.banner.tin-mismatch.title',
-		defaultMessage: 'TIN/SSN verification failed',
+		defaultMessage: 'Tax form failed',
 	},
 	description: {
 		id: 'layout.banner.tin-mismatch.description',
 		defaultMessage:
-			'Your TIN/SSN did not match IRS records. Your withdrawals are currently disabled. To continue withdrawing, you must contact Modrinth support and resolve this.',
+			"Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form.",
 	},
 	action: {
 		id: 'layout.banner.tin-mismatch.action',

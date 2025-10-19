@@ -933,10 +933,10 @@
     "message": "Contact support"
   },
   "layout.banner.tin-mismatch.description": {
-    "message": "Your TIN/SSN did not match IRS records. Your withdrawals are currently disabled. To continue withdrawing, you must contact Modrinth support and resolve this."
+    "message": "Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form."
   },
   "layout.banner.tin-mismatch.title": {
-    "message": "TIN/SSN verification failed"
+    "message": "Tax form failed"
   },
   "layout.banner.verify-email.action": {
     "message": "Re-send verification email"
