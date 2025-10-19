@@ -444,6 +444,12 @@
 								link: '/admin/servers/notices',
 								shown: isAdmin(auth.user),
 							},
+							{
+								id: 'servers-nodes',
+								color: 'primary',
+								link: '/admin/servers/nodes',
+								shown: isAdmin(auth.user),
+							},
 						]"
 					>
 						<ModrinthIcon aria-hidden="true" />
@@ -463,6 +469,7 @@
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
 						</template>
+						<template #servers-nodes> <ServerIcon aria-hidden="true" /> Server Nodes </template>
 					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled type="transparent">

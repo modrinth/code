@@ -160,6 +160,32 @@ impl DBUserSubscription {
 
         Ok(())
     }
+
+    pub async fn get_many_by_server_ids(
+        server_ids: &[String],
+        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<DBUserSubscription>, DatabaseError> {
+        if server_ids.is_empty() {
+            return Ok(vec![]);
+        }
+
+        let results = sqlx::query_as!(
+            UserSubscriptionQueryResult,
+            r#"
+            SELECT us.id, us.user_id, us.price_id, us.interval, us.created, us.status, us.metadata
+            FROM users_subscriptions us
+            WHERE us.metadata->>'type' = 'pyro' AND us.metadata->>'id' = ANY($1::text[])
+            "#,
+            server_ids
+        )
+        .fetch_all(exec)
+        .await?;
+
+        Ok(results
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<Result<Vec<_>, serde_json::Error>>()?)
+    }
 }
 
 pub struct SubscriptionWithCharge {

@@ -228,6 +228,7 @@ pub enum NotificationBody {
         days: i32,
         previous_due: DateTime<Utc>,
         next_due: DateTime<Utc>,
+        header_message: Option<String>,
     },
     PaymentFailed {
         amount: String,

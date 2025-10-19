@@ -1,4 +1,3 @@
--- Audit table for subscription credits
 CREATE TABLE users_subscriptions_credits (
 	id SERIAL PRIMARY KEY,
 	subscription_id BIGINT NOT NULL REFERENCES users_subscriptions (id),
@@ -29,19 +28,23 @@ VALUES
 	(
 		'email',
 		'subscription_credited',
-		'We added {credit.days} days to your subscription',
+		'We’ve added time to your server',
 		'https://modrinth.com/email/subscription-credited',
 		CONCAT(
 			'Hi {user.name},',
 			CHR(10),
 			CHR(10),
-			'We have credited your subscription by {credit.days} days.',
-			CHR(10),
-			'Previous due date: {credit.previous_due}',
-			CHR(10),
-			'New due date: {credit.next_due}',
+			'{credit.header_message}',
 			CHR(10),
 			CHR(10),
-			'Thank you for using Modrinth.'
+			'To make up for it, we''ve added {credit.days} days to your {credit.subscription.type} subscription.',
+			CHR(10),
+			CHR(10),
+			'Your next charge was scheduled for {credit.previous_due} and will now be on {credit.next_due}.',
+			CHR(10),
+			CHR(10),
+			'Thank you for supporting us,',
+			CHR(10),
+			'The Modrinth Team'
 		)
 	);

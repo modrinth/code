@@ -12,6 +12,7 @@ use tracing::{info, warn};
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
+use util::archon::ArchonClient;
 use util::cors::default_cors;
 
 use crate::background_task::update_versions;
@@ -62,6 +63,7 @@ pub struct LabrinthConfig {
     pub stripe_client: stripe::Client,
     pub anrok_client: anrok::Client,
     pub email_queue: web::Data<EmailQueue>,
+    pub archon_client: web::Data<ArchonClient>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -300,6 +302,10 @@ pub fn app_setup(
         stripe_client,
         anrok_client,
         email_queue: web::Data::new(email_queue),
+        archon_client: web::Data::new(
+            ArchonClient::from_env()
+                .expect("ARCHON_URL and PYRO_API_KEY must be set"),
+        ),
     }
 }
 
@@ -331,6 +337,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
     .app_data(web::Data::new(labrinth_config.maxmind.clone()))
+    .app_data(labrinth_config.archon_client.clone())
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))

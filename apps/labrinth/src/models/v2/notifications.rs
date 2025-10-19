@@ -114,6 +114,7 @@ pub enum LegacyNotificationBody {
         days: i32,
         previous_due: DateTime<Utc>,
         next_due: DateTime<Utc>,
+        header_message: Option<String>,
     },
     PatCreated {
         token_name: String,
@@ -410,11 +411,13 @@ impl LegacyNotification {
                 days,
                 previous_due,
                 next_due,
+                header_message,
             } => LegacyNotificationBody::SubscriptionCredited {
                 subscription_id,
                 days,
                 previous_due,
                 next_due,
+                header_message,
             },
             NotificationBody::Unknown => LegacyNotificationBody::Unknown,
         };

@@ -1645,6 +1645,7 @@ pub async fn stripe_webhook(
                             user_id,
                             price_id,
                             amount: subtotal_amount,
+                            tax_amount,
                             currency_code: currency,
                             status: charge_status,
                             due: Utc::now(),
@@ -1657,13 +1658,10 @@ pub async fn stripe_webhook(
                                 .as_ref()
                                 .map(|x| x.interval),
                             payment_platform: PaymentPlatform::Stripe,
-                            payment_platform_id: Some(
-                                payment_intent_id.to_string(),
-                            ),
-                            tax_amount,
-                            tax_platform_id: None,
+                            payment_platform_id: None,
                             parent_charge_id: None,
                             net: None,
+                            tax_platform_id: None,
                             tax_last_updated: Some(Utc::now()),
                             tax_drift_loss: Some(0),
                             tax_transaction_version: None,
@@ -2173,11 +2171,116 @@ pub async fn stripe_webhook(
 
 pub mod payments;
 
+#[allow(clippy::too_many_arguments)]
+async fn apply_credit_many_in_txn(
+    transaction: &mut Transaction<'_, Postgres>,
+    redis: &RedisPool,
+    current_user_id: crate::database::models::ids::DBUserId,
+    subscription_ids: Vec<crate::models::ids::UserSubscriptionId>,
+    days: i32,
+    send_email: bool,
+    message: String,
+) -> Result<(), ApiError> {
+    use crate::database::models::ids::DBUserSubscriptionId;
+
+    let mut credit_sub_ids: Vec<DBUserSubscriptionId> =
+        Vec::with_capacity(subscription_ids.len());
+    let mut credit_user_ids: Vec<crate::database::models::ids::DBUserId> =
+        Vec::with_capacity(subscription_ids.len());
+    let mut credit_creditor_ids: Vec<crate::database::models::ids::DBUserId> =
+        Vec::with_capacity(subscription_ids.len());
+    let mut credit_days: Vec<i32> = Vec::with_capacity(subscription_ids.len());
+    let mut credit_prev_dues: Vec<chrono::DateTime<chrono::Utc>> =
+        Vec::with_capacity(subscription_ids.len());
+    let mut credit_next_dues: Vec<chrono::DateTime<chrono::Utc>> =
+        Vec::with_capacity(subscription_ids.len());
+
+    let subs_ids: Vec<DBUserSubscriptionId> = subscription_ids
+        .iter()
+        .map(|id| DBUserSubscriptionId(id.0 as i64))
+        .collect();
+    let subs = user_subscription_item::DBUserSubscription::get_many(
+        &subs_ids,
+        &mut **transaction,
+    )
+    .await?;
+
+    for subscription in subs {
+        let mut open_charge = charge_item::DBCharge::get_open_subscription(
+            subscription.id,
+            &mut **transaction,
+        )
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(format!(
+                "Could not find open charge for subscription {}",
+                to_base62(subscription.id.0 as u64)
+            ))
+        })?;
+
+        let previous_due = open_charge.due;
+        open_charge.due = previous_due + Duration::days(days as i64);
+        let next_due = open_charge.due;
+        open_charge.upsert(&mut *transaction).await?;
+
+        credit_sub_ids.push(subscription.id);
+        credit_user_ids.push(subscription.user_id);
+        credit_creditor_ids.push(current_user_id);
+        credit_days.push(days);
+        credit_prev_dues.push(previous_due);
+        credit_next_dues.push(next_due);
+
+        if send_email {
+            NotificationBuilder {
+                body: NotificationBody::SubscriptionCredited {
+                    subscription_id: subscription.id.into(),
+                    days,
+                    previous_due: previous_due,
+                    next_due: next_due,
+                    header_message: Some(message.clone()),
+                },
+            }
+            .insert(subscription.user_id, &mut *transaction, &redis)
+            .await?;
+        }
+    }
+
+    DBUserSubscriptionCredit::insert_many(
+        &mut *transaction,
+        &credit_sub_ids,
+        &credit_user_ids,
+        &credit_creditor_ids,
+        &credit_days,
+        &credit_prev_dues,
+        &credit_next_dues,
+    )
+    .await
+    .map_err(|e| ApiError::Internal(eyre::eyre!(e)))?;
+
+    Ok(())
+}
+
 #[derive(Deserialize)]
 pub struct CreditRequest {
-    pub subscription_ids: Vec<crate::models::ids::UserSubscriptionId>,
+    #[serde(flatten)]
+    pub target: CreditTarget,
     pub days: i32,
     pub send_email: bool,
+    pub message: String,
+}
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+pub enum CreditTarget {
+    Subscriptions {
+        subscription_ids: Vec<crate::models::ids::UserSubscriptionId>,
+    },
+    Nodes {
+        nodes: Vec<String>,
+    },
+    Region {
+        region: String,
+    },
 }
 
 #[post("credit")]
@@ -2186,6 +2289,7 @@ pub async fn credit(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    archon_client: web::Data<crate::util::archon::ArchonClient>,
     body: web::Json<CreditRequest>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -2205,9 +2309,10 @@ pub async fn credit(
     }
 
     let CreditRequest {
-        subscription_ids,
+        target,
         days,
         send_email,
+        message,
     } = body.into_inner();
 
     if days <= 0 {
@@ -2215,77 +2320,83 @@ pub async fn credit(
             "Days must be greater than zero".to_string(),
         ));
     }
-    if subscription_ids.is_empty() {
-        return Err(ApiError::InvalidInput(
-            "You must specify at least one subscription id".to_string(),
-        ));
-    }
-
     let mut transaction = pool.begin().await?;
 
-    for sub_id in subscription_ids {
-        let Some(subscription) =
-            user_subscription_item::DBUserSubscription::get(
-                sub_id.into(),
+    match target {
+        CreditTarget::Subscriptions { subscription_ids } => {
+            if subscription_ids.is_empty() {
+                return Err(ApiError::InvalidInput(
+                    "You must specify at least one subscription id".to_string(),
+                ));
+            }
+            apply_credit_many_in_txn(
+                &mut transaction,
+                &redis,
+                crate::database::models::ids::DBUserId(user.id.0 as i64),
+                subscription_ids,
+                days,
+                send_email,
+                message,
+            )
+            .await?;
+        }
+        CreditTarget::Nodes { nodes } => {
+            if nodes.is_empty() {
+                return Err(ApiError::InvalidInput(
+                    "You must specify at least one node hostname".to_string(),
+                ));
+            }
+            let mut server_ids: Vec<String> = Vec::new();
+            for hostname in nodes {
+                let ids =
+                    archon_client.get_servers_by_hostname(&hostname).await?;
+                server_ids.extend(ids);
+            }
+            server_ids.sort();
+            server_ids.dedup();
+            let subs = user_subscription_item::DBUserSubscription::get_many_by_server_ids(
+                &server_ids,
                 &mut *transaction,
             )
-            .await?
-        else {
-            return Err(ApiError::InvalidInput(
-                "Subscription not found".to_string(),
-            ));
-        };
-
-        let mut open_charge = charge_item::DBCharge::get_open_subscription(
-            subscription.id,
-            &mut *transaction,
-        )
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "Could not find open charge for this subscription".to_string(),
-            )
-        })?;
-
-        let previous_due = open_charge.due;
-        open_charge.due = previous_due + Duration::days(days as i64);
-        let next_due = open_charge.due;
-
-        open_charge.upsert(&mut transaction).await?;
-
-        let mut credit = DBUserSubscriptionCredit {
-            id: 0,
-            subscription_id: subscription.id,
-            user_id: subscription.user_id,
-            creditor_id: crate::database::models::ids::DBUserId(
-                user.id.0 as i64,
-            ),
-            days,
-            previous_due,
-            next_due,
-            created: Utc::now(),
-        };
-        credit.insert(&mut *transaction).await?;
-
-        if send_email
-            && let Some(db_user) =
-                crate::database::models::user_item::DBUser::get_id(
-                    subscription.user_id,
-                    &mut *transaction,
-                    &redis,
-                )
-                .await?
-            && db_user.email.is_some()
-        {
-            NotificationBuilder {
-                body: NotificationBody::SubscriptionCredited {
-                    subscription_id: subscription.id.into(),
-                    days,
-                    previous_due,
-                    next_due,
-                },
+            .await?;
+            if subs.is_empty() {
+                return Err(ApiError::InvalidInput(
+                    "No subscriptions found for provided nodes".to_string(),
+                ));
             }
-            .insert(subscription.user_id, &mut transaction, &redis)
+            apply_credit_many_in_txn(
+                &mut transaction,
+                &redis,
+                crate::database::models::ids::DBUserId(user.id.0 as i64),
+                subs.into_iter().map(|s| s.id.into()).collect(),
+                days,
+                send_email,
+                message,
+            )
+            .await?;
+        }
+        CreditTarget::Region { region } => {
+            let parsed_active =
+                archon_client.get_active_servers_by_region(&region).await?;
+            let subs = user_subscription_item::DBUserSubscription::get_many_by_server_ids(
+                &parsed_active,
+                &mut *transaction,
+            )
+            .await?;
+            if subs.is_empty() {
+                return Err(ApiError::InvalidInput(
+                    "No subscriptions found for provided region".to_string(),
+                ));
+            }
+            apply_credit_many_in_txn(
+                &mut transaction,
+                &redis,
+                crate::database::models::ids::DBUserId(user.id.0 as i64),
+                subs.into_iter().map(|s| s.id.into()).collect(),
+                days,
+                send_email,
+                message,
+            )
             .await?;
         }
     }

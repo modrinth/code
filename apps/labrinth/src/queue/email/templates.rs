@@ -45,6 +45,8 @@ const TAXNOTIFICATION_SERVICE: &str = "taxnotification.service";
 const CREDIT_DAYS: &str = "credit.days";
 const CREDIT_PREVIOUS_DUE: &str = "credit.previous_due";
 const CREDIT_NEXT_DUE: &str = "credit.next_due";
+const CREDIT_HEADER_MESSAGE: &str = "credit.header_message";
+const CREDIT_SUBSCRIPTION_TYPE: &str = "credit.subscription.type";
 
 const PAYMENTFAILED_AMOUNT: &str = "paymentfailed.amount";
 const PAYMENTFAILED_SERVICE: &str = "paymentfailed.service";
@@ -685,11 +687,38 @@ async fn collect_template_variables(
             days,
             previous_due,
             next_due,
+            header_message,
         } => {
             map.insert(CREDIT_DAYS, days.to_string());
             map.insert(CREDIT_PREVIOUS_DUE, date_human_readable(*previous_due));
             map.insert(CREDIT_NEXT_DUE, date_human_readable(*next_due));
             map.insert(SUBSCRIPTION_ID, to_base62(subscription_id.0));
+
+            // Only insert header message if provided; frontend sets default fallback
+            if let Some(h) = header_message.clone() {
+                map.insert(CREDIT_HEADER_MESSAGE, h);
+            }
+
+            // Derive subscription type label for templates
+            // Resolve product metadata via price_id join
+            if let Some(info) = crate::database::models::user_subscription_item::DBUserSubscription::get(
+                (*subscription_id).into(),
+                &mut **exec,
+            )
+            .await
+            .ok()
+            .flatten()
+            {
+                if let Ok(Some(pinfo)) = crate::database::models::products_tax_identifier_item::product_info_by_product_price_id(info.price_id, &mut **exec).await {
+                    let label = match pinfo.product_metadata {
+                        crate::models::billing::ProductMetadata::Pyro { .. } => "server".to_string(),
+                        crate::models::billing::ProductMetadata::Medal { .. } => "server".to_string(),
+                        crate::models::billing::ProductMetadata::Midas => "Modrinth+".to_string(),
+                    };
+                    map.insert(CREDIT_SUBSCRIPTION_TYPE, label);
+                }
+            }
+
             Ok(EmailTemplate::Static(map))
         }
 
