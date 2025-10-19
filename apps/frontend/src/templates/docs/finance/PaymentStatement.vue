@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Section, Text, Link as VLink } from '@vue-email/components'
+import { Link as VLink, Section, Text } from '@vue-email/components'
 
 import StyledDoc from '../shared/StyledDoc.vue'
 </script>
