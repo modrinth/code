@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/usr/src/labrinth/target \
 	&& cp -r /usr/src/labrinth/apps/labrinth/migrations /labrinth \
 	&& cp -r /usr/src/labrinth/apps/labrinth/assets /labrinth
 
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 LABEL org.opencontainers.image.source=https://github.com/modrinth/code
 LABEL org.opencontainers.image.title=labrinth
