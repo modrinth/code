@@ -24,6 +24,10 @@ const props = withDefaults(
 	},
 )
 
+function openProfile(username: string) {
+	openUrl('https://modrinth.com/user/' + username)
+}
+
 const friendOptions = useTemplateRef('friendOptions')
 async function handleFriendOptions(args: { item: FriendWithUserData; option: string }) {
 	switch (args.option) {
@@ -31,6 +35,8 @@ async function handleFriendOptions(args: { item: FriendWithUserData; option: str
 		case 'cancel-request':
 			await props.removeFriend(args.item)
 			break
+		case 'view-profile':
+			openProfile(args.item.username)
 	}
 }
 
@@ -60,6 +66,10 @@ const messages = defineMessages({
 
 <template>
 	<ContextMenu ref="friendOptions" @option-clicked="handleFriendOptions">
+		<template #view-profile>
+			<UserIcon />
+			{{ formatMessage(messages.viewProfile) }}
+		</template>
 		<template #remove-friend> <TrashIcon /> {{ formatMessage(messages.removeFriend) }} </template>
 		<template #cancel-request> <XIcon /> {{ formatMessage(messages.cancelRequest) }} </template>
 	</ContextMenu>
@@ -83,7 +93,7 @@ const messages = defineMessages({
 				<div
 					v-for="friend in friends"
 					:key="friend.username"
-					class="grid items-center grid-cols-[auto_1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full ml-4 mr-2"
+					class="group grid items-center grid-cols-[auto_1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full ml-4 mr-2"
 					@contextmenu.prevent.stop="
 						(event) =>
 							friendOptions?.showMenu(
@@ -92,14 +102,20 @@ const messages = defineMessages({
 								friend.accepted
 									? [
 											{
+												name: 'view-profile',
+											},
+											{
 												name: 'remove-friend',
 												color: 'danger',
-											},
+											}
 										]
 									: [
 											{
-												name: 'cancel-request',
+												name: 'view-profile',
 											},
+											{
+												name: 'cancel-request',
+											}
 										],
 							)
 					"
@@ -132,10 +148,11 @@ const messages = defineMessages({
 					</div>
 					<ButtonStyled v-if="friend.accepted" circular type="transparent">
 						<OverflowMenu
+							class="opacity-0 group-hover:opacity-100 transition-opacity"
 							:options="[
 								{
 									id: 'view-profile',
-									action: () => openUrl('https://modrinth.com/user/' + friend.username),
+									action: () => openProfile(friend.username),
 								},
 								{
 									id: 'remove-friend',
