@@ -924,10 +924,19 @@
     "message": "Complete tax form"
   },
   "layout.banner.tax.description": {
-    "message": "You’ve already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted."
+    "message": "You've already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted."
   },
   "layout.banner.tax.title": {
     "message": "Tax form required"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Contact support"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Tax form failed"
   },
   "layout.banner.verify-email.action": {
     "message": "Re-send verification email"
