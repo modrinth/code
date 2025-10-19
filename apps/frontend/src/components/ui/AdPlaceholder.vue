@@ -3,7 +3,7 @@
 		<AutoLink
 			:to="currentAd.link"
 			:aria-label="currentAd.description"
-			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]  bg-bg-raised"
+			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit] bg-bg-raised"
 		>
 			<img
 				:src="currentAd.light"
@@ -75,7 +75,9 @@ const AD_PRESETS = {
 	},
 }
 
-const currentAd = computed(() => flags.value.enableMedalPromotion ? AD_PRESETS.medal : AD_PRESETS['modrinth-servers'])
+const currentAd = computed(() =>
+	flags.value.enableMedalPromotion ? AD_PRESETS.medal : AD_PRESETS['modrinth-servers'],
+)
 
 onMounted(() => {
 	window.tude = window.tude || { cmd: [] }
