@@ -8,12 +8,13 @@ use crate::routes::ApiError;
 use crate::util::gotenberg::{
     GeneratedPdfType, MODRINTH_GENERATED_PDF_TYPE, MODRINTH_PAYMENT_ID,
 };
+use crate::util::guards::internal_network_guard;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(success).service(error);
 }
 
-#[post("/gotenberg/success")]
+#[post("/gotenberg/success", guard = "internal_network_guard")]
 pub async fn success(
     web::Header(header::ContentDisposition {
         disposition,
@@ -46,7 +47,7 @@ pub struct ErrorBody {
     message: Option<String>,
 }
 
-#[post("/gotenberg/error")]
+#[post("/gotenberg/error", guard = "internal_network_guard")]
 pub async fn error(
     web::Header(GotenbergTrace(trace)): web::Header<GotenbergTrace>,
     web::Header(ModrinthGeneratedPdfType(r#type)): web::Header<
