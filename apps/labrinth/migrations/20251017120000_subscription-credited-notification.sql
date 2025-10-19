@@ -16,7 +16,6 @@ VALUES ('subscription_credited', 1, FALSE, FALSE);
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'subscription_credited', TRUE);
 
--- Register email template
 INSERT INTO notifications_templates
 	(channel, notification_type, subject_line, body_fetch_url, plaintext_fallback)
 VALUES
