@@ -1,9 +1,5 @@
 <template>
-	<NewModal
-		ref="withdrawModal"
-		:closable="withdrawContext.currentStage.value !== 'completion'"
-		@on-hide="onModalHide"
-	>
+	<NewModal ref="withdrawModal" :closable="withdrawContext.currentStage.value !== 'completion'" @on-hide="onModalHide">
 		<template #title>
 			<div v-if="shouldShowTitle" class="flex items-center gap-1 text-secondary">
 				<template v-if="withdrawContext.currentStage.value === 'tax-form'">
@@ -20,9 +16,8 @@
 				</template>
 				<template v-else-if="isDetailsStage">
 					<button
-						class="active:scale-9 bg-transparent p-0 text-xl text-secondary"
-						@click="goToBreadcrumbStage('method-selection')"
-					>
+						class="active:scale-9 hover:text-primary transition-colors duration-200 bg-transparent p-0 text-xl text-secondary"
+						@click="goToBreadcrumbStage('method-selection')">
 						{{ formatMessage(stageLabels['method-selection']) }}
 					</button>
 					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
@@ -33,48 +28,28 @@
 			</div>
 		</template>
 		<div class="relative min-w-[496px] max-w-[496px]">
-			<div
-				v-show="showTopFade"
-				class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-10 bg-gradient-to-b from-bg-raised to-transparent transition-all duration-300"
-			/>
+			<div v-show="showTopFade"
+				class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-10 bg-gradient-to-b from-bg-raised to-transparent transition-all duration-300" />
 
-			<div
-				ref="scrollContainer"
-				class="max-h-[70vh] overflow-y-auto px-1 pb-1"
-				@scroll="checkScrollState"
-			>
-				<TaxFormStage
-					v-if="withdrawContext.currentStage.value === 'tax-form'"
-					:balance="balance"
-					:on-show-tax-form="showTaxFormModal"
-				/>
-				<MethodSelectionStage
-					v-else-if="withdrawContext.currentStage.value === 'method-selection'"
-					:on-show-tax-form="showTaxFormModal"
-				/>
-				<TremendousDetailsStage
-					v-else-if="withdrawContext.currentStage.value === 'tremendous-details'"
-				/>
+			<div ref="scrollContainer" class="max-h-[70vh] overflow-y-auto px-1 pb-1" @scroll="checkScrollState">
+				<TaxFormStage v-if="withdrawContext.currentStage.value === 'tax-form'" :balance="balance"
+					:on-show-tax-form="showTaxFormModal" />
+				<MethodSelectionStage v-else-if="withdrawContext.currentStage.value === 'method-selection'"
+					:on-show-tax-form="showTaxFormModal" />
+				<TremendousDetailsStage v-else-if="withdrawContext.currentStage.value === 'tremendous-details'" />
 				<MuralpayKycStage v-else-if="withdrawContext.currentStage.value === 'muralpay-kyc'" />
-				<MuralpayDetailsStage
-					v-else-if="withdrawContext.currentStage.value === 'muralpay-details'"
-				/>
+				<MuralpayDetailsStage v-else-if="withdrawContext.currentStage.value === 'muralpay-details'" />
 				<CompletionStage v-else-if="withdrawContext.currentStage.value === 'completion'" />
 				<div v-else>Something went wrong</div>
 			</div>
 
-			<div
-				v-show="showBottomFade"
-				class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-10 bg-gradient-to-t from-bg-raised to-transparent transition-all duration-300"
-			/>
+			<div v-show="showBottomFade"
+				class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-10 bg-gradient-to-t from-bg-raised to-transparent transition-all duration-300" />
 		</div>
 		<div class="mt-4 flex justify-end gap-2">
 			<ButtonStyled type="outlined">
-				<button
-					v-if="withdrawContext.previousStep.value"
-					class="!border-surface-5"
-					@click="withdrawContext.setStage(withdrawContext.previousStep.value, true)"
-				>
+				<button v-if="withdrawContext.previousStep.value" class="!border-surface-5"
+					@click="withdrawContext.setStage(withdrawContext.previousStep.value, true)">
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
 				</button>
 				<button v-else class="!border-surface-5" @click="withdrawModal?.hide()">
@@ -82,34 +57,22 @@
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
-			<ButtonStyled
-				:color="
-					withdrawContext.currentStage.value === 'tax-form' && needsTaxForm && remainingLimit <= 0
-						? 'orange'
-						: 'standard'
-				"
-			>
-				<button
-					v-if="
-						withdrawContext.currentStage.value === 'tax-form' && needsTaxForm && remainingLimit > 0
-					"
-					@click="continueWithLimit"
-				>
+			<ButtonStyled :color="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm && remainingLimit <= 0
+				? 'orange'
+				: 'standard'
+				">
+				<button v-if="
+					withdrawContext.currentStage.value === 'tax-form' && needsTaxForm && remainingLimit > 0
+				" @click="continueWithLimit">
 					{{ formatMessage(messages.continueWithLimit) }}
 					<RightArrowIcon />
 				</button>
-				<button
-					v-else-if="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm"
-					@click="showTaxFormModal"
-				>
+				<button v-else-if="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm" @click="showTaxFormModal">
 					<FileTextIcon />
 					{{ formatMessage(messages.completeTaxForm) }}
 				</button>
-				<button
-					v-else
-					:disabled="!withdrawContext.canProceed.value"
-					@click="withdrawContext.setStage(withdrawContext.nextStep.value)"
-				>
+				<button v-else :disabled="!withdrawContext.canProceed.value"
+					@click="withdrawContext.setStage(withdrawContext.nextStep.value)">
 					<template v-if="withdrawContext.currentStage.value === 'completion'">
 						<CheckCircleIcon /> Complete
 					</template>
@@ -121,12 +84,8 @@
 			</ButtonStyled>
 		</div>
 	</NewModal>
-	<CreatorTaxFormModal
-		ref="taxFormModal"
-		close-button-text="Continue"
-		@success="onTaxFormSuccess"
-		@cancelled="onTaxFormCancelled"
-	/>
+	<CreatorTaxFormModal ref="taxFormModal" close-button-text="Continue" @success="onTaxFormSuccess"
+		@cancelled="onTaxFormCancelled" />
 </template>
 
 <script setup lang="ts">
@@ -179,7 +138,7 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const flags = useFeatureFlags()
 
-const withdrawContext = createWithdrawContext(props.balance, undefined, flags.value.testTaxForm)
+const withdrawContext = createWithdrawContext(props.balance)
 provideWithdrawContext(withdrawContext)
 
 const needsTaxForm = computed(() => {

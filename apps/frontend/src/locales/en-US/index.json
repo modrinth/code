@@ -669,7 +669,7 @@
     "message": "A business entity refers to a registered organization such as a corporation, partnership, or LLC."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Are you a private individual or business foreign entity?"
+    "message": "Are you a withdrawing as an individual or business?"
   },
   "dashboard.creator-withdraw-modal.kyc.first-name": {
     "message": "First name"
@@ -732,10 +732,10 @@
     "message": "Checking"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-body": {
-    "message": "Please ensure your wallet address is correct. Modrinth cannot retrieve funds sent to an invalid or incorrect wallet. Double-check before proceeding."
+    "message": "Double-check your wallet address. Funds sent to an incorrect address cannot be recovered."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
-    "message": "Check your wallet address!"
+    "message": "Confirm your wallet address"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.limited-by-tax": {
     "message": "Due to tax requirements, maximum withdrawal is {limit} without completing tax form."
@@ -756,7 +756,7 @@
     "message": "Wallet Address"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.wallet-address-placeholder": {
-    "message": "Enter your Polygon wallet address"
+    "message": "Enter your wallet address"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
     "message": "You're nearing the withdraw threshold. You can withdraw <b>{amountRemaining}</b> now, but a tax form is required for more."

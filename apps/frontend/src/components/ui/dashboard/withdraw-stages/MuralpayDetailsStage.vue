@@ -26,12 +26,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
-					v-model="formData.bankName"
-					type="text"
-					:placeholder="formatMessage(messages.bankNamePlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-				/>
+				<input v-model="formData.bankName" type="text" :placeholder="formatMessage(messages.bankNamePlaceholder)"
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -41,12 +37,9 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
-					v-model="formData.accountNumber"
-					type="text"
+				<input v-model="formData.accountNumber" type="text"
 					:placeholder="formatMessage(messages.accountNumberPlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-				/>
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -56,12 +49,9 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
-					v-model="formData.routingNumber"
-					type="text"
+				<input v-model="formData.routingNumber" type="text"
 					:placeholder="formatMessage(messages.routingNumberPlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-				/>
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
 		</template>
 
@@ -77,12 +67,9 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
-					v-model="formData.walletAddress"
-					type="text"
+				<input v-model="formData.walletAddress" type="text"
 					:placeholder="formatMessage(messages.walletAddressPlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-				/>
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
 		</template>
 
@@ -94,15 +81,9 @@
 				</span>
 			</label>
 			<div class="flex items-center gap-2">
-				<input
-					v-model.number="formData.amount"
-					type="number"
-					step="0.01"
-					min="0"
-					:max="maxAmount"
+				<input v-model.number="formData.amount" type="number" step="0.01" min="0" :max="maxAmount"
 					:placeholder="formatMessage(messages.amountPlaceholder)"
-					class="bg-raised flex-1 rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-				/>
+					class="bg-raised flex-1 rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				<ButtonStyled>
 					<button class="px-4 py-2" @click="setMaxAmount">
 						{{ formatMessage(messages.maxButton) }}
@@ -144,7 +125,7 @@ interface FormData {
 	accountNumber: string
 	routingNumber: string
 	walletAddress: string
-	amount: number
+	amount?: number
 }
 
 const formData = ref<FormData>({
@@ -153,7 +134,7 @@ const formData = ref<FormData>({
 	accountNumber: '',
 	routingNumber: '',
 	walletAddress: '',
-	amount: 0,
+	amount: undefined,
 })
 
 const maxAmount = computed(() => withdrawContext.maxWithdrawAmount.value)
@@ -204,7 +185,7 @@ watch(
 	() => {
 		const method = withdrawContext.withdrawData.value.selectedMethod
 
-		withdrawContext.withdrawData.value.amount = formData.value.amount
+		withdrawContext.withdrawData.value.amount = formData.value.amount ?? 0
 
 		if (method === 'bank') {
 			const bankDetails: BankAccountDetails = {
@@ -299,12 +280,12 @@ const messages = defineMessages({
 	},
 	cryptoWarningHeader: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header',
-		defaultMessage: 'Check your wallet address!',
+		defaultMessage: 'Confirm your wallet address',
 	},
 	cryptoWarningBody: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-body',
 		defaultMessage:
-			'Please ensure your wallet address is correct. Modrinth cannot retrieve funds sent to an invalid or incorrect wallet. Double-check before proceeding.',
+			'Double-check your wallet address. Funds sent to an incorrect address cannot be recovered.',
 	},
 	limitedByTaxRequirement: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.limited-by-tax',

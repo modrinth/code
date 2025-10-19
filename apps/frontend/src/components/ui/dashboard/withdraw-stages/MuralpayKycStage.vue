@@ -7,18 +7,11 @@
 					<span class="text-brand-red">*</span>
 				</span>
 			</label>
-			<Chips
-				v-model="entityType"
-				:items="['individual', 'business']"
-				:format-label="
-					(item: string) =>
-						item === 'individual'
-							? formatMessage(messages.privateIndividual)
-							: formatMessage(messages.businessEntity)
-				"
-				:never-empty="false"
-				:capitalize="false"
-			/>
+			<Chips v-model="entityType" :items="['individual', 'business']" :format-label="(item: string) =>
+					item === 'individual'
+						? formatMessage(messages.privateIndividual)
+						: formatMessage(messages.businessEntity)
+				" :never-empty="false" :capitalize="false" />
 			<span class="leading-tight text-primary">
 				{{ formatMessage(messages.entityDescription) }}
 			</span>
@@ -32,12 +25,9 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
-					v-model="formData.businessName"
-					type="text"
+				<input v-model="formData.businessName" type="text"
 					:placeholder="formatMessage(messages.businessNamePlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-				/>
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -47,12 +37,8 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
-					v-model="formData.email"
-					type="email"
-					:placeholder="formatMessage(messages.emailPlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-				/>
+				<input v-model="formData.email" type="email" :placeholder="formatMessage(messages.emailPlaceholder)"
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
 
 			<div v-if="entityType === 'individual'" class="flex flex-col gap-6">
@@ -64,12 +50,8 @@
 								<span class="text-brand-red">*</span>
 							</span>
 						</label>
-						<input
-							v-model="formData.firstName"
-							type="text"
-							:placeholder="formatMessage(messages.firstNamePlaceholder)"
-							class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-						/>
+						<input v-model="formData.firstName" type="text" :placeholder="formatMessage(messages.firstNamePlaceholder)"
+							class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 					</div>
 					<div class="flex flex-1 flex-col gap-2.5">
 						<label>
@@ -78,12 +60,8 @@
 								<span class="text-brand-red">*</span>
 							</span>
 						</label>
-						<input
-							v-model="formData.lastName"
-							type="text"
-							:placeholder="formatMessage(messages.lastNamePlaceholder)"
-							class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-						/>
+						<input v-model="formData.lastName" type="text" :placeholder="formatMessage(messages.lastNamePlaceholder)"
+							class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 					</div>
 				</div>
 
@@ -94,12 +72,8 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<input
-						v-model="formData.dateOfBirth"
-						type="date"
-						:max="maxDate"
-						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-					/>
+					<input v-model="formData.dateOfBirth" type="date" :max="maxDate"
+						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				</div>
 			</div>
 
@@ -110,12 +84,9 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
-					v-model="formData.physicalAddress.address1"
-					type="text"
+				<input v-model="formData.physicalAddress.address1" type="text"
 					:placeholder="formatMessage(messages.addressPlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-				/>
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
 
 			<div class="flex flex-col gap-2.5">
@@ -124,12 +95,9 @@
 						{{ formatMessage(messages.addressLine2) }}
 					</span>
 				</label>
-				<input
-					v-model="formData.physicalAddress.address2"
-					type="text"
+				<input v-model="formData.physicalAddress.address2" type="text"
 					:placeholder="formatMessage(messages.address2Placeholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-				/>
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 			</div>
 
 			<div class="flex gap-4">
@@ -140,12 +108,9 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<input
-						v-model="formData.physicalAddress.city"
-						type="text"
+					<input v-model="formData.physicalAddress.city" type="text"
 						:placeholder="formatMessage(messages.cityPlaceholder)"
-						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-					/>
+						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				</div>
 				<div class="flex flex-1 flex-col gap-2.5">
 					<label>
@@ -154,12 +119,9 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<input
-						v-model="formData.physicalAddress.state"
-						type="text"
+					<input v-model="formData.physicalAddress.state" type="text"
 						:placeholder="formatMessage(messages.statePlaceholder)"
-						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-					/>
+						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				</div>
 			</div>
 
@@ -171,12 +133,9 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<input
-						v-model="formData.physicalAddress.zip"
-						type="text"
+					<input v-model="formData.physicalAddress.zip" type="text"
 						:placeholder="formatMessage(messages.postalCodePlaceholder)"
-						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-					/>
+						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
 				</div>
 				<div class="flex flex-1 flex-col gap-2.5">
 					<label>
@@ -185,13 +144,9 @@
 							<span class="text-brand-red">*</span>
 						</span>
 					</label>
-					<Combobox
-						v-model="formData.physicalAddress.country"
-						:options="countryOptions"
-						:placeholder="formatMessage(messages.countryPlaceholder)"
-						searchable
-						search-placeholder="Search countries..."
-					/>
+					<Combobox v-model="formData.physicalAddress.country" :options="countryOptions"
+						:placeholder="formatMessage(messages.countryPlaceholder)" searchable
+						search-placeholder="Search countries..." />
 				</div>
 			</div>
 		</div>
@@ -309,7 +264,7 @@ watch(
 const messages = defineMessages({
 	entityQuestion: {
 		id: 'dashboard.creator-withdraw-modal.kyc.entity-question',
-		defaultMessage: 'Are you a private individual or business foreign entity?',
+		defaultMessage: 'Are you a withdrawing as an individual or business?',
 	},
 	entityDescription: {
 		id: 'dashboard.creator-withdraw-modal.kyc.entity-description',
