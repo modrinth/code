@@ -24,6 +24,29 @@ const props = withDefaults(
 	},
 )
 
+function createContextMenuOptions(friend: FriendWithUserData) {
+	if (friend.accepted) {
+		return [
+			{
+				name: 'view-profile',
+			},
+			{
+				name: 'remove-friend',
+				color: 'danger',
+			},
+		]
+	} else {
+		return [
+			{
+				name: 'view-profile',
+			},
+			{
+				name: 'cancel-request',
+			},
+		]
+	}
+}
+
 function openProfile(username: string) {
 	openUrl('https://modrinth.com/user/' + username)
 }
@@ -95,29 +118,7 @@ const messages = defineMessages({
 					:key="friend.username"
 					class="group grid items-center grid-cols-[auto_1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full ml-4 mr-2"
 					@contextmenu.prevent.stop="
-						(event) =>
-							friendOptions?.showMenu(
-								event,
-								friend,
-								friend.accepted
-									? [
-											{
-												name: 'view-profile',
-											},
-											{
-												name: 'remove-friend',
-												color: 'danger',
-											},
-										]
-									: [
-											{
-												name: 'view-profile',
-											},
-											{
-												name: 'cancel-request',
-											},
-										],
-							)
+						(event) => friendOptions?.showMenu(event, friend, createContextMenuOptions(friend))
 					"
 				>
 					<div class="relative">
