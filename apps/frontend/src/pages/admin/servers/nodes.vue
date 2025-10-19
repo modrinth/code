@@ -27,12 +27,6 @@
 						class="max-w-[12rem]"
 					/>
 				</div>
-				<div class="between flex items-center gap-4">
-					<label for="send-email-nodes" class="flex flex-col gap-1">
-						<span class="text-lg font-semibold text-contrast"> Send email </span>
-					</label>
-					<Toggle id="send-email-nodes" v-model="sendEmail" />
-				</div>
 				<div class="flex flex-col gap-2">
 					<label for="days" class="flex flex-col gap-1">
 						<span class="text-lg font-semibold text-contrast"> Days to credit </span>
@@ -74,14 +68,6 @@
 							</TagItem>
 						</div>
 					</div>
-					<div class="flex flex-col gap-2">
-						<label for="message-nodes" class="flex flex-col gap-1">
-							<span class="text-lg font-semibold text-contrast"> Message </span>
-						</label>
-						<div class="textarea-wrapper h-32">
-							<textarea id="message-nodes" v-model="message" />
-						</div>
-					</div>
 				</div>
 
 				<div v-else class="flex flex-col gap-3">
@@ -99,18 +85,41 @@
 							class="max-w-[16rem]"
 						/>
 					</div>
+				</div>
 
-					<div class="flex flex-col gap-2">
-						<label for="message-region" class="flex flex-col gap-1">
-							<span class="text-lg font-semibold text-contrast"> Message </span>
-							<span>
-								Unless a particularly bad or out of the ordinary event happened, keep this to the
-								default
-							</span>
-						</label>
-						<div class="textarea-wrapper h-32">
-							<textarea id="message-region" v-model="message" />
+				<div class="between flex items-center gap-4">
+					<label for="send-email-nodes" class="flex flex-col gap-1">
+						<span class="text-lg font-semibold text-contrast"> Send email </span>
+					</label>
+					<Toggle id="send-email-nodes" v-model="sendEmail" />
+				</div>
+
+				<div v-if="sendEmail" class="flex flex-col gap-2">
+					<label for="message-region" class="flex flex-col gap-1">
+						<span class="text-lg font-semibold text-contrast"> Customize Email </span>
+						<span>
+							Unless a particularly bad or out of the ordinary event happened, keep this to the
+							default
+						</span>
+					</label>
+					<div class="text-muted rounded-lg border border-divider bg-button-bg p-4">
+						<p>Hi {user.name},</p>
+						<div class="textarea-wrapper">
+							<textarea
+								id="message-region"
+								v-model="message"
+								rows="3"
+								class="w-full overflow-hidden"
+							/>
 						</div>
+						<p>
+							To make up for it, we've added {{ days }} day{{ pluralize(days) }} to your Modrinth
+							Servers subscription.
+						</p>
+						<p>
+							Your next charge was scheduled for {credit.previous_due} and will now be on
+							{credit.next_due}.
+						</p>
 					</div>
 				</div>
 
@@ -251,6 +260,10 @@ async function apply() {
 			type: 'error',
 		})
 	}
+}
+
+function pluralize(n: number): string {
+	return n === 1 ? '' : 's'
 }
 </script>
 
