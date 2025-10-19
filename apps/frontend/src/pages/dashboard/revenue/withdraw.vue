@@ -1,33 +1,61 @@
 <template>
-	<CreatorTaxFormModal ref="taxFormModalRef" close-button-text="Continue" @success="onTaxFormSuccess"
-		@cancelled="onTaxFormCancelled" />
+	<CreatorTaxFormModal
+		ref="taxFormModalRef"
+		close-button-text="Continue"
+		@success="onTaxFormSuccess"
+		@cancelled="onTaxFormCancelled"
+	/>
 	<section class="universal-card">
-		<Breadcrumbs current-title="Withdraw" :link-stack="[{ href: '/dashboard/revenue', label: 'Revenue' }]" />
+		<Breadcrumbs
+			current-title="Withdraw"
+			:link-stack="[{ href: '/dashboard/revenue', label: 'Revenue' }]"
+		/>
 
 		<h2>Withdraw</h2>
 
 		<h3>Region</h3>
-		<Multiselect id="country-multiselect" v-model="country" class="country-multiselect" placeholder="Select country..."
-			track-by="id" label="name" :options="countries" :searchable="true" :close-on-select="true" :show-labels="false"
-			:allow-empty="false" />
+		<Multiselect
+			id="country-multiselect"
+			v-model="country"
+			class="country-multiselect"
+			placeholder="Select country..."
+			track-by="id"
+			label="name"
+			:options="countries"
+			:searchable="true"
+			:close-on-select="true"
+			:show-labels="false"
+			:allow-empty="false"
+		/>
 
 		<h3>Withdraw method</h3>
 
 		<div class="iconified-input">
 			<label class="hidden" for="search">Search</label>
 			<SearchIcon aria-hidden="true" />
-			<input id="search" v-model="search" name="search" placeholder="Search options..." autocomplete="off" />
+			<input
+				id="search"
+				v-model="search"
+				name="search"
+				placeholder="Search options..."
+				autocomplete="off"
+			/>
 		</div>
 		<div class="withdraw-options-scroll">
 			<div class="withdraw-options">
-				<button v-for="method in payoutMethods
-					.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
-					.sort((a, b) =>
-						a.type !== 'tremendous'
-							? -1
-							: a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
-					)" :key="method.id" class="withdraw-option button-base" :class="{ selected: selectedMethodId === method.id }"
-					@click="() => (selectedMethodId = method.id)">
+				<button
+					v-for="method in payoutMethods
+						.filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
+						.sort((a, b) =>
+							a.type !== 'tremendous'
+								? -1
+								: a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+						)"
+					:key="method.id"
+					class="withdraw-option button-base"
+					:class="{ selected: selectedMethodId === method.id }"
+					@click="() => (selectedMethodId = method.id)"
+				>
 					<div class="preview" :class="{ 'show-bg': !method.image_url || method.name === 'ACH' }">
 						<template v-if="method.image_url && method.name !== 'ACH'">
 							<div class="preview-badges">
@@ -40,8 +68,12 @@
 									}}
 								</span>
 							</div>
-							<img v-if="method.image_url && method.name !== 'ACH'" class="preview-img" :src="method.image_url"
-								:alt="method.name" />
+							<img
+								v-if="method.image_url && method.name !== 'ACH'"
+								class="preview-img"
+								:src="method.image_url"
+								:alt="method.name"
+							/>
 						</template>
 						<div v-else class="placeholder">
 							<template v-if="method.type === 'venmo'">
@@ -71,13 +103,18 @@
 		</p>
 		<div class="confirmation-input">
 			<template v-if="selectedMethod.interval.fixed">
-				<Chips v-model="amount" :items="selectedMethod.interval.fixed.values" :format-label="(val) => '$' + val" />
+				<Chips
+					v-model="amount"
+					:items="selectedMethod.interval.fixed.values"
+					:format-label="(val) => '$' + val"
+				/>
 			</template>
 			<template v-else-if="minWithdrawAmount == maxWithdrawAmount">
 				<div>
 					<p>
 						This method has a fixed transfer amount of
-						<strong>{{ $formatMoney(minWithdrawAmount) }}</strong>.
+						<strong>{{ $formatMoney(minWithdrawAmount) }}</strong
+						>.
 					</p>
 				</div>
 			</template>
@@ -86,10 +123,17 @@
 					<p>
 						This method has a minimum transfer amount of
 						<strong>{{ $formatMoney(minWithdrawAmount) }}</strong> and a maximum transfer amount of
-						<strong>{{ $formatMoney(maxWithdrawAmount) }}</strong>.
+						<strong>{{ $formatMoney(maxWithdrawAmount) }}</strong
+						>.
 					</p>
-					<input id="confirmation" v-model="amount" type="text" pattern="^\d*(\.\d{0,2})?$" autocomplete="off"
-						placeholder="Amount to transfer..." />
+					<input
+						id="confirmation"
+						v-model="amount"
+						type="text"
+						pattern="^\d*(\.\d{0,2})?$"
+						autocomplete="off"
+						placeholder="Amount to transfer..."
+					/>
 					<p>
 						You have entered <strong>{{ $formatMoney(parsedAmount) }}</strong> to transfer.
 					</p>
@@ -105,7 +149,9 @@
 		<p v-else-if="blockedByTin" class="text-red">
 			<span class="font-bold">Your TIN/SSN did not match IRS records.</span>
 			To continue withdrawing, you must
-			<a href="https://support.modrinth.com" class="font-bold underline">contact Modrinth support</a>
+			<a href="https://support.modrinth.com" class="font-bold underline"
+				>contact Modrinth support</a
+			>
 			and resolve this.
 		</p>
 
@@ -147,13 +193,18 @@
 				<XIcon />
 				Cancel
 			</nuxt-link>
-			<button :disabled="knownErrors.length > 0 ||
-				!amount ||
-				!agreedTransfer ||
-				!agreedTerms ||
-				(fees > 0 && !agreedFees) ||
-				blockedByTax
-				" class="iconified-button brand-button" @click="withdraw">
+			<button
+				:disabled="
+					knownErrors.length > 0 ||
+					!amount ||
+					!agreedTransfer ||
+					!agreedTerms ||
+					(fees > 0 && !agreedFees) ||
+					blockedByTax
+				"
+				class="iconified-button brand-button"
+				@click="withdraw"
+			>
 				<TransferIcon />
 				Withdraw
 			</button>
