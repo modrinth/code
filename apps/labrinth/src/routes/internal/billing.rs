@@ -1645,7 +1645,6 @@ pub async fn stripe_webhook(
                             user_id,
                             price_id,
                             amount: subtotal_amount,
-                            tax_amount,
                             currency_code: currency,
                             status: charge_status,
                             due: Utc::now(),
@@ -1658,10 +1657,13 @@ pub async fn stripe_webhook(
                                 .as_ref()
                                 .map(|x| x.interval),
                             payment_platform: PaymentPlatform::Stripe,
-                            payment_platform_id: None,
+                            payment_platform_id: Some(
+                                payment_intent_id.to_string(),
+                            ),
+                            tax_amount,
+                            tax_platform_id: None,
                             parent_charge_id: None,
                             net: None,
-                            tax_platform_id: None,
                             tax_last_updated: Some(Utc::now()),
                             tax_drift_loss: Some(0),
                             tax_transaction_version: None,
