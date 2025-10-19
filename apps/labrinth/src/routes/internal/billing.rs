@@ -2235,12 +2235,12 @@ async fn apply_credit_many_in_txn(
                 body: NotificationBody::SubscriptionCredited {
                     subscription_id: subscription.id.into(),
                     days,
-                    previous_due: previous_due,
-                    next_due: next_due,
+                    previous_due,
+                    next_due,
                     header_message: Some(message.clone()),
                 },
             }
-            .insert(subscription.user_id, &mut *transaction, &redis)
+            .insert(subscription.user_id, &mut *transaction, redis)
             .await?;
         }
     }

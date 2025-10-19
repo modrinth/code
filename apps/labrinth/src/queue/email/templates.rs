@@ -708,8 +708,7 @@ async fn collect_template_variables(
             .await
             .ok()
             .flatten()
-            {
-                if let Ok(Some(pinfo)) = crate::database::models::products_tax_identifier_item::product_info_by_product_price_id(info.price_id, &mut **exec).await {
+                && let Ok(Some(pinfo)) = crate::database::models::products_tax_identifier_item::product_info_by_product_price_id(info.price_id, &mut **exec).await {
                     let label = match pinfo.product_metadata {
                         crate::models::billing::ProductMetadata::Pyro { .. } => "server".to_string(),
                         crate::models::billing::ProductMetadata::Medal { .. } => "server".to_string(),
@@ -717,7 +716,6 @@ async fn collect_template_variables(
                     };
                     map.insert(CREDIT_SUBSCRIPTION_TYPE, label);
                 }
-            }
 
             Ok(EmailTemplate::Static(map))
         }
