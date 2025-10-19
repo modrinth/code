@@ -162,7 +162,7 @@ async function initiatePayment(body: any): Promise<any> {
 	if (subscription.value) {
 		const transformedBody = {
 			interval: body.charge?.interval,
-			payment_method: body.id,
+			payment_method: body.type === 'confirmation_token' ? body.token : body.id,
 			product: body.charge?.product_id,
 			region: body.metadata?.server_region,
 		}
