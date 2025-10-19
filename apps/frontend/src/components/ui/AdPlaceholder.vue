@@ -1,9 +1,9 @@
 <template>
-	<div class="ad-parent relative mb-3 flex w-full justify-center rounded-2xl bg-bg-raised">
+	<div class="wrapper relative mb-3 flex w-full justify-center rounded-2xl">
 		<AutoLink
 			:to="currentAd.link"
 			:aria-label="currentAd.description"
-			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]"
+			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]  bg-bg-raised"
 		>
 			<img
 				:src="currentAd.light"
@@ -159,9 +159,13 @@ iframe[id^='google_ads_iframe'] {
 }
 
 @media (max-width: 1024px) {
-	.ad-parent {
+	.wrapper {
 		display: none;
 	}
+}
+
+.wrapper > * {
+	box-shadow: var(--shadow-card);
 }
 </style>
 
