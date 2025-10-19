@@ -82,6 +82,23 @@
 				</ButtonStyled>
 			</template>
 		</PagewideBanner>
+		<PagewideBanner v-if="showTinMismatchBanner" variant="error">
+			<template #title>
+				<span>{{ formatMessage(tinMismatchBannerMessages.title) }}</span>
+			</template>
+			<template #description>
+				<span>{{ formatMessage(tinMismatchBannerMessages.description) }}</span>
+			</template>
+			<template #actions>
+				<div class="flex w-fit flex-row">
+					<ButtonStyled color="red">
+						<nuxt-link to="https://support.modrinth.com" target="_blank" rel="noopener">
+							<MessageIcon /> {{ formatMessage(tinMismatchBannerMessages.action) }}
+						</nuxt-link>
+					</ButtonStyled>
+				</div>
+			</template>
+		</PagewideBanner>
 		<PagewideBanner v-if="showTaxComplianceBanner" variant="warning">
 			<template #title>
 				<span>{{ formatMessage(taxBannerMessages.title) }}</span>
@@ -851,6 +868,7 @@ import {
 	LogInIcon,
 	LogOutIcon,
 	MastodonIcon,
+	MessageIcon,
 	ModrinthIcon,
 	MoonIcon,
 	OrganizationIcon,
@@ -918,7 +936,15 @@ const showTaxComplianceBanner = computed(() => {
 	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
 	const status = bal.form_completion_status ?? 'unknown'
 	const isComplete = status === 'complete'
-	return !!auth.value.user && thresholdMet && !isComplete
+	const isTinMismatch = status === 'tin-mismatch'
+	return !!auth.value.user && thresholdMet && !isComplete && !isTinMismatch
+})
+
+const showTinMismatchBanner = computed(() => {
+	const bal = payoutBalance.value
+	if (!bal) return false
+	const status = bal.form_completion_status ?? 'unknown'
+	return !!auth.value.user && status === 'tin-mismatch'
 })
 
 const taxBannerMessages = defineMessages({
@@ -929,11 +955,27 @@ const taxBannerMessages = defineMessages({
 	description: {
 		id: 'layout.banner.tax.description',
 		defaultMessage:
-			'You’ve already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.',
+			"You've already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.",
 	},
 	action: {
 		id: 'layout.banner.tax.action',
 		defaultMessage: 'Complete tax form',
+	},
+})
+
+const tinMismatchBannerMessages = defineMessages({
+	title: {
+		id: 'layout.banner.tin-mismatch.title',
+		defaultMessage: 'Tax form failed',
+	},
+	description: {
+		id: 'layout.banner.tin-mismatch.description',
+		defaultMessage:
+			"Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form.",
+	},
+	action: {
+		id: 'layout.banner.tin-mismatch.action',
+		defaultMessage: 'Contact support',
 	},
 })
 
@@ -1732,6 +1774,7 @@ const footerLinks = [
 			@media screen and (min-width: 354px) {
 				grid-template-columns: repeat(2, 1fr);
 			}
+
 			@media screen and (min-width: 674px) {
 				grid-template-columns: repeat(3, 1fr);
 			}
@@ -1926,10 +1969,12 @@ const footerLinks = [
 			width: 25rem;
 			height: 25rem;
 		}
+
 		.animation-ring-2 {
 			width: 50rem;
 			height: 50rem;
 		}
+
 		.animation-ring-3 {
 			width: 100rem;
 			height: 100rem;
@@ -1958,15 +2003,19 @@ const footerLinks = [
 	0% {
 		rotate: 0deg;
 	}
+
 	25% {
 		rotate: calc(1deg * (var(--_r-count) - 20));
 	}
+
 	50% {
 		rotate: 0deg;
 	}
+
 	75% {
 		rotate: calc(-1deg * (var(--_r-count) - 20));
 	}
+
 	100% {
 		rotate: 0deg;
 	}
@@ -1976,15 +2025,19 @@ const footerLinks = [
 	0% {
 		translate: 0;
 	}
+
 	25% {
 		translate: calc(2px * (var(--_r-count) - 20));
 	}
+
 	50% {
 		translate: 0;
 	}
+
 	75% {
 		translate: calc(-2px * (var(--_r-count) - 20));
 	}
+
 	100% {
 		translate: 0;
 	}
@@ -1994,15 +2047,19 @@ const footerLinks = [
 	0% {
 		transform: translateY(0);
 	}
+
 	25% {
 		transform: translateY(calc(2px * (var(--_r-count) - 20)));
 	}
+
 	50% {
 		transform: translateY(0);
 	}
+
 	75% {
 		transform: translateY(calc(-2px * (var(--_r-count) - 20)));
 	}
+
 	100% {
 		transform: translateY(0);
 	}

@@ -1,0 +1,25 @@
+[package]
+name = "modrinth-maxmind"
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+bytes = { workspace = true }
+directories = { workspace = true }
+eyre = { workspace = true }
+flate2 = { workspace = true }
+maxminddb = { workspace = true }
+modrinth-util = { workspace = true }
+reqwest = { workspace = true, features = ["json"] }
+tar = { workspace = true }
+tokio = { workspace = true, features = ["fs"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+clap = { workspace = true, features = ["derive"] }
+tokio = { workspace = true, features = ["full"] }
+tracing-subscriber = { workspace = true }
+
+[lints]
+workspace = true

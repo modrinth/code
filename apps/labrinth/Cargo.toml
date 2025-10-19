@@ -42,7 +42,6 @@ deadpool-redis.workspace = true
 dotenvy = { workspace = true }
 either = { workspace = true }
 eyre = { workspace = true }
-flate2 = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
 hex = { workspace = true }
@@ -69,8 +68,8 @@ image = { workspace = true, features = [
 itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
-maxminddb = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
+modrinth-maxmind = { workspace = true }
 murmur2 = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
@@ -111,7 +110,6 @@ sqlx = { workspace = true, features = [
   "rust_decimal",
   "tls-rustls-aws-lc-rs",
 ] }
-tar = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tokio-stream = { workspace = true }

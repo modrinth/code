@@ -182,6 +182,60 @@ impl Client {
         .await
     }
 
+    pub async fn negate_or_create_partial_negation(
+        &self,
+        original_txn_anrok_id: String,
+        original_txn_version: i32,
+        original_txn_tax_amount_with_tax: i64,
+        body: &Transaction,
+    ) -> Result<(), AnrokError> {
+        let refund_amount = body
+            .fields
+            .line_items
+            .iter()
+            .map(|l| l.amount_in_smallest_denominations)
+            .sum::<i64>();
+
+        if -refund_amount == original_txn_tax_amount_with_tax {
+            self.create_full_negation(
+                original_txn_anrok_id,
+                original_txn_version,
+                body.id.clone(),
+            )
+            .await?;
+        } else {
+            self.create_or_update_txn(body).await?;
+        }
+
+        Ok(())
+    }
+
+    pub async fn create_full_negation(
+        &self,
+        original_txn_anrok_id: String,
+        original_txn_version: i32,
+        new_txn_id: String,
+    ) -> Result<EmptyResponse, AnrokError> {
+        #[derive(Serialize)]
+        #[serde(rename_all = "camelCase")]
+        struct NegationBody {
+            original_transaction_id: String,
+            new_transaction_id: String,
+            original_transaction_expected_version: i32,
+        }
+
+        self.make_request(
+            Method::POST,
+            "/v1/seller/transactions/createNegation",
+            Some(&NegationBody {
+                original_transaction_id: original_txn_anrok_id,
+                new_transaction_id: new_txn_id,
+                original_transaction_expected_version: original_txn_version,
+            }),
+        )
+        .await
+    }
+
     pub async fn create_or_update_txn(
         &self,
         body: &Transaction,

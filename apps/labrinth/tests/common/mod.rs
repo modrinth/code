@@ -3,6 +3,7 @@ use labrinth::util::anrok;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::{LabrinthConfig, file_hosting, queue};
 use labrinth::{check_env_vars, clickhouse};
+use modrinth_maxmind::MaxMind;
 use std::sync::Arc;
 
 pub mod api_common;
@@ -38,8 +39,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         Arc::new(file_hosting::MockHost::new());
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
-    let maxmind_reader =
-        Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
+    let maxmind_reader = MaxMind::new().await;
 
     let stripe_client =
         stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());

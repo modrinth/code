@@ -8,11 +8,15 @@ members = [
   "packages/app-lib",
   "packages/ariadne",
   "packages/daedalus",
+  "packages/modrinth-maxmind",
+  "packages/modrinth-util",
   "packages/path-util",
 ]
 
 [workspace.package]
 edition = "2024"
+rust-version = "1.90.0"
+repository = "https://github.com/modrinth/code"
 
 [workspace.dependencies]
 actix-cors = "0.7.1"
@@ -57,6 +61,7 @@ dashmap = "6.1.0"
 data-url = "0.3.2"
 deadpool-redis = "0.22.0"
 derive_more = "2.0.1"
+directories = "6.0.0"
 dirs = "6.0.0"
 discord-rich-presence = "1.0.0"
 dotenv-build = "0.1.1"
@@ -102,6 +107,8 @@ lettre = { version = "0.11.19", default-features = false, features = [
 ] }
 maxminddb = "0.26.0"
 meilisearch-sdk = { version = "0.30.0", default-features = false }
+modrinth-maxmind = { path = "packages/modrinth-maxmind" }
+modrinth-util = { path = "packages/modrinth-util" }
 murmur2 = "0.1.0"
 native-dialog = "0.9.2"
 notify = { version = "8.2.0", default-features = false }
