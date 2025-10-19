@@ -18,9 +18,9 @@
 		</div>
 		<div class="flex flex-col gap-2.5">
 			<span class="align-middle font-semibold text-contrast">Select withdraw method</span>
-			<ButtonStyled v-for="method in paymentMethods" :key="method.value" :color="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'
+			<ButtonStyled v-for="method in paymentOptions" :key="method.value" :color="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'
 				" :highlighted="withdrawContext.withdrawData.value.selectedMethod === method.value" type="chip">
-				<button class="!h-10 !justify-start !gap-2" @click="handleMethodSelection(method.value)">
+				<button class="!h-10 !justify-start !gap-2" @click="handleMethodSelection(method)">
 					<component :is="method.icon" /> {{ method.label }}
 				</button>
 			</ButtonStyled>
@@ -41,6 +41,8 @@ import { all } from 'iso-3166-1'
 
 import { useUserCountry } from '@/composables/country.ts'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { getBlockchainIcon } from '@/utils/blockchain-icons'
+import { getRailConfig } from '@/utils/muralpay-rails'
 
 const debug = useDebugLogger('MethodSelectionStage')
 const withdrawContext = useWithdrawContext()
@@ -67,6 +69,10 @@ interface PayoutMethod {
 		percentage: number
 		min: number
 		max: number | null
+	}
+	config?: {
+		fiat?: string | null
+		blockchain?: string[]
 	}
 }
 
@@ -131,26 +137,41 @@ const muralPayMethod = computed(() =>
 )
 
 const paymentOptions = computed(() => {
-	if (!muralPayMethod.value) return []
+	const muralpay = muralPayMethod.value
+	if (!muralpay?.config) return []
 
-	return [
-		{
-			value: 'bank',
+	const options = []
+
+	if (muralpay.config.fiat) {
+		const fiatRailId = muralpay.config.fiat.toLowerCase()
+		options.push({
+			value: fiatRailId,
 			label: 'Bank transfer',
 			icon: LandmarkIcon,
-			methodId: muralPayMethod.value.id
-		},
-		{
-			value: 'crypto',
-			label: 'Polygon (Crypto)',
-			icon: PolygonIcon,
-			methodId: muralPayMethod.value.id
-		},
-	]
+			methodId: muralpay.id,
+			type: 'fiat'
+		})
+	}
+
+	for (const blockchain of muralpay.config.blockchain || []) {
+		const blockchainName = blockchain.replace('usdc_', '')
+		const railId = `${blockchainName}-usdc`
+		const rail = getRailConfig(railId)
+
+		options.push({
+			value: railId,
+			label: rail?.name || blockchain,
+			icon: getBlockchainIcon(blockchain) || PolygonIcon,
+			methodId: muralpay.id,
+			type: 'crypto'
+		})
+	}
+
+	return options
 })
 
-function handleMethodSelection(option: { value: string, methodId: string }) {
-	withdrawContext.withdrawData.value.selectedMethod = option.value as any
+function handleMethodSelection(option: { value: string; methodId: string }) {
+	withdrawContext.withdrawData.value.selectedMethod = option.value
 	withdrawContext.withdrawData.value.selectedMethodId = option.methodId
 	withdrawContext.withdrawData.value.selectedProvider = 'muralpay'
 }

@@ -1,77 +1,96 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<template v-if="withdrawContext.withdrawData.value.selectedMethod === 'bank'">
-			<div class="flex flex-col gap-2.5">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.accountOwner) }}
+		<Admonition v-if="selectedRail?.warningMessage" type="warning"
+			:header="formatMessage(messages.cryptoWarningHeader)">
+			{{ selectedRail.warningMessage }}
+		</Admonition>
+
+
+		<div v-if="selectedRail?.type === 'crypto'" class="flex flex-col gap-2.5">
+			<label>
+				<span class="text-md font-semibold text-contrast">
+					{{ formatMessage(messages.coin) }}
+				</span>
+			</label>
+			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
+
+				<span class="font-semibold text-contrast">{{ selectedRail.currency }}</span>
+				<span class="text-primary">{{ selectedRail.name }}</span>
+			</div>
+		</div>
+
+
+		<div v-if="selectedRail?.type === 'fiat'" class="flex flex-col gap-2.5">
+			<label>
+				<span class="text-md font-semibold text-contrast">
+					{{ formatMessage(messages.accountOwner) }}
+				</span>
+			</label>
+			<div class="w-full rounded-[14px] bg-surface-2 p-4">
+				<div class="flex flex-col gap-1">
+					<span class="font-semibold text-contrast">
+						{{ accountOwnerName }}
 					</span>
-				</label>
-				<div class="w-full rounded-[14px] bg-surface-2 p-4">
-					<div class="flex flex-col gap-1">
-						<span class="font-semibold text-contrast">
-							{{ accountOwnerName }}
-						</span>
-						<span class="text-primary">
-							{{ accountOwnerAddress }}
-						</span>
-					</div>
+					<span class="text-primary">
+						{{ accountOwnerAddress }}
+					</span>
 				</div>
 			</div>
+		</div>
 
-			<div class="flex flex-col gap-2.5">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.bankName) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
-				<input v-model="formData.bankName" type="text" :placeholder="formatMessage(messages.bankNamePlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+
+		<div v-if="selectedRail?.requiresBankName" class="flex flex-col gap-2.5">
+			<label>
+				<span class="text-md font-semibold text-contrast">
+					{{ formatMessage(messages.bankName) }}
+					<span class="text-brand-red">*</span>
+				</span>
+			</label>
+			<input v-model="formData.bankName" type="text" :placeholder="formatMessage(messages.bankNamePlaceholder)"
+				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+		</div>
+
+
+		<div v-for="field in selectedRail?.fields" :key="field.name" class="flex flex-col gap-2.5">
+			<label>
+				<span class="text-md font-semibold text-contrast">
+					{{ field.label }}
+					<span v-if="field.required" class="text-brand-red">*</span>
+				</span>
+			</label>
+
+
+			<input v-if="['text', 'email', 'tel'].includes(field.type)" v-model="formData[field.name]" :type="field.type"
+				:placeholder="field.placeholder" :pattern="field.pattern"
+				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+
+
+			<Combobox v-else-if="field.type === 'select'" v-model="formData[field.name]" :options="field.options || []"
+				:placeholder="field.placeholder" class="h-10" />
+
+
+			<input v-else-if="field.type === 'date'" v-model="formData[field.name]" type="date"
+				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+
+
+			<span v-if="field.helpText" class="text-sm text-secondary">
+				{{ field.helpText }}
+			</span>
+		</div>
+
+
+		<div v-if="selectedRail?.blockchain" class="flex flex-col gap-2.5">
+			<label>
+				<span class="text-md font-semibold text-contrast">
+					{{ formatMessage(messages.network) }}
+				</span>
+			</label>
+			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
+
+				<span class="font-semibold text-contrast">{{ selectedRail.blockchain }}</span>
 			</div>
+		</div>
 
-			<div class="flex flex-col gap-2.5">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.accountNumber) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
-				<input v-model="formData.accountNumber" type="text"
-					:placeholder="formatMessage(messages.accountNumberPlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
-			</div>
-
-			<div class="flex flex-col gap-2.5">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.routingNumber) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
-				<input v-model="formData.routingNumber" type="text"
-					:placeholder="formatMessage(messages.routingNumberPlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
-			</div>
-		</template>
-
-		<template v-else-if="withdrawContext.withdrawData.value.selectedMethod === 'crypto'">
-			<Admonition type="warning" :header="formatMessage(messages.cryptoWarningHeader)">
-				<span>{{ formatMessage(messages.cryptoWarningBody) }}</span>
-			</Admonition>
-
-			<div class="flex flex-col gap-2.5">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.walletAddress) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
-				<input v-model="formData.walletAddress" type="text"
-					:placeholder="formatMessage(messages.walletAddressPlaceholder)"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
-			</div>
-		</template>
 
 		<div class="flex flex-col gap-2.5">
 			<label>
@@ -93,51 +112,50 @@
 			<span class="text-primary">
 				{{ formatMoney(maxAmount) }} {{ formatMessage(messages.available) }}
 			</span>
+
+
+			<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
+				<div class="flex items-center justify-between">
+					<span class="text-primary">{{ formatMessage(messages.feeBreakdownAmount) }}</span>
+					<span class="font-semibold text-contrast">{{ formatMoney(formData.amount || 0) }}</span>
+				</div>
+				<div class="flex items-center justify-between">
+					<span class="text-primary">{{ formatMessage(messages.feeBreakdownFee) }}</span>
+					<span class="font-semibold text-contrast">-{{ formatMoney(0) }}</span>
+				</div>
+				<div class="h-px bg-surface-5" />
+				<div class="flex items-center justify-between">
+					<span class="text-primary">{{ formatMessage(messages.feeBreakdownNetAmount) }}</span>
+					<span class="font-semibold text-contrast">{{ formatMoney(formData.amount || 0) }}</span>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Admonition, ButtonStyled } from '@modrinth/ui'
+import { Admonition, ButtonStyled, Combobox } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { getRailConfig } from '@/utils/muralpay-rails'
 
 const withdrawContext = useWithdrawContext()
 const { formatMessage } = useVIntl()
 
-interface BankAccountDetails {
-	bankName: string
-	accountType: string
-	accountNumber: string
-	routingNumber: string
-}
-
-interface CryptoWalletDetails {
-	walletAddress: string
-}
-
-interface FormData {
-	bankName: string
-	accountType: string
-	accountNumber: string
-	routingNumber: string
-	walletAddress: string
-	amount?: number
-}
-
-const formData = ref<FormData>({
-	bankName: '',
-	accountType: 'CHECKING',
-	accountNumber: '',
-	routingNumber: '',
-	walletAddress: '',
-	amount: undefined,
+const selectedRail = computed(() => {
+	const railId = withdrawContext.withdrawData.value.selectedMethod
+	return railId ? getRailConfig(railId) : null
 })
 
 const maxAmount = computed(() => withdrawContext.maxWithdrawAmount.value)
+
+const formData = ref<Record<string, any>>({
+	amount: undefined,
+	bankName: '',
+})
 
 const accountOwnerName = computed(() => {
 	const kycData = withdrawContext.withdrawData.value.kycData
@@ -173,38 +191,10 @@ function setMaxAmount() {
 }
 
 watch(
-	[
-		() => formData.value.bankName,
-		() => formData.value.accountType,
-		() => formData.value.accountNumber,
-		() => formData.value.routingNumber,
-		() => formData.value.walletAddress,
-		() => formData.value.amount,
-		() => withdrawContext.withdrawData.value.selectedMethod,
-	],
+	formData,
 	() => {
-		const method = withdrawContext.withdrawData.value.selectedMethod
-
 		withdrawContext.withdrawData.value.amount = formData.value.amount ?? 0
-
-		if (method === 'bank') {
-			const bankDetails: BankAccountDetails = {
-				bankName: formData.value.bankName,
-				accountType: formData.value.accountType,
-				accountNumber: formData.value.accountNumber,
-				routingNumber: formData.value.routingNumber,
-			}
-			withdrawContext.withdrawData.value.accountDetails = {
-				bankAccount: bankDetails,
-			}
-		} else if (method === 'crypto') {
-			const cryptoDetails: CryptoWalletDetails = {
-				walletAddress: formData.value.walletAddress,
-			}
-			withdrawContext.withdrawData.value.accountDetails = {
-				cryptoWallet: cryptoDetails,
-			}
-		}
+		withdrawContext.withdrawData.value.accountDetails = { ...formData.value }
 	},
 	{ deep: true },
 )
@@ -221,46 +211,6 @@ const messages = defineMessages({
 	bankNamePlaceholder: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.bank-name-placeholder',
 		defaultMessage: 'Enter bank name',
-	},
-	accountType: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.account-type',
-		defaultMessage: 'Account type',
-	},
-	accountTypePlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.account-type-placeholder',
-		defaultMessage: 'Select account type',
-	},
-	checking: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.checking',
-		defaultMessage: 'Checking',
-	},
-	savings: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.savings',
-		defaultMessage: 'Savings',
-	},
-	accountNumber: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.account-number',
-		defaultMessage: 'Account number',
-	},
-	accountNumberPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.account-number-placeholder',
-		defaultMessage: 'Enter account number',
-	},
-	routingNumber: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.routing-number',
-		defaultMessage: 'Routing number',
-	},
-	routingNumberPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.routing-number-placeholder',
-		defaultMessage: 'Enter 9-digit routing number',
-	},
-	walletAddress: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.wallet-address',
-		defaultMessage: 'Wallet Address',
-	},
-	walletAddressPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.wallet-address-placeholder',
-		defaultMessage: 'Enter your wallet address',
 	},
 	amount: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.amount',
@@ -282,15 +232,25 @@ const messages = defineMessages({
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header',
 		defaultMessage: 'Confirm your wallet address',
 	},
-	cryptoWarningBody: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-body',
-		defaultMessage:
-			'Double-check your wallet address. Funds sent to an incorrect address cannot be recovered.',
+	coin: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.coin',
+		defaultMessage: 'Coin',
 	},
-	limitedByTaxRequirement: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.limited-by-tax',
-		defaultMessage:
-			'Due to tax requirements, maximum withdrawal is {limit} without completing tax form.',
+	network: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.network',
+		defaultMessage: 'Network',
+	},
+	feeBreakdownAmount: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.fee-breakdown-amount',
+		defaultMessage: 'Amount',
+	},
+	feeBreakdownFee: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.fee-breakdown-fee',
+		defaultMessage: 'Fee',
+	},
+	feeBreakdownNetAmount: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.fee-breakdown-net-amount',
+		defaultMessage: 'Net amount',
 	},
 })
 </script>

@@ -1,5 +1,6 @@
 import { createContext, useDebugLogger } from '@modrinth/ui'
 import { computed, type ComputedRef, type Ref, ref } from 'vue'
+import { getRailConfig } from '@/utils/muralpay-rails'
 
 export type WithdrawStage =
 	| 'tax-form'
@@ -16,7 +17,7 @@ export type PaymentMethod = 'gift_card' | 'paypal' | 'venmo' | 'bank' | 'crypto'
 export interface WithdrawData {
 	selectedCountry: { id: string; name: string } | null
 	selectedProvider: PaymentProvider | null
-	selectedMethod: PaymentMethod | null
+	selectedMethod: string | null // Rail ID (e.g., 'usd', 'polygon-usdc') or legacy method
 	selectedMethodId: string | null
 	amount: number
 	skippedTaxForm: boolean
@@ -200,31 +201,27 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				return false
 			}
 			case 'muralpay-details': {
+				const railId = withdrawData.value.selectedMethod
+				const rail = getRailConfig(railId as string)
+				if (!rail) return false
+
+				// Validate amount
+				if (!withdrawData.value.amount || withdrawData.value.amount <= 0) return false
+
 				const accountDetails = withdrawData.value.accountDetails
 				if (!accountDetails) return false
 
-				// Validate amount (required for both methods)
-				if (!withdrawData.value.amount || withdrawData.value.amount <= 0) return false
+				// Validate bank name if required
+				if (rail.requiresBankName && !accountDetails.bankName) return false
 
-				// Validate bank transfer details
-				if (withdrawData.value.selectedMethod === 'bank') {
-					const bank = accountDetails.bankAccount
-					return !!(
-						bank &&
-						bank.bankName &&
-						bank.accountType &&
-						bank.accountNumber &&
-						bank.routingNumber
-					)
-				}
+				// Validate all required fields from rail config
+				const requiredFields = rail.fields.filter((f) => f.required)
+				const allRequiredPresent = requiredFields.every((f) => {
+					const value = accountDetails[f.name]
+					return value !== undefined && value !== null && value !== ''
+				})
 
-				// Validate crypto wallet details
-				if (withdrawData.value.selectedMethod === 'crypto') {
-					const crypto = accountDetails.cryptoWallet
-					return !!(crypto && crypto.walletAddress)
-				}
-
-				return false
+				return allRequiredPresent
 			}
 			case 'completion':
 				return true
