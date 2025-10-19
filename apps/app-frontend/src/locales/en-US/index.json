@@ -65,6 +65,63 @@
   "app.update.reload-to-update": {
     "message": "Reload to install update"
   },
+  "friends.action.add-friend": {
+    "message": "Add a friend"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} friend requests"
+  },
+  "friends.add-friend.submit": {
+    "message": "Send friend request"
+  },
+  "friends.add-friend.title": {
+    "message": "Adding a friend"
+  },
+  "friends.add-friend.username.description": {
+    "message": "It may be different from their Minecraft username!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Enter Modrinth username..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "What's your friend's Modrinth username?"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Cancel request"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Remove friend"
+  },
+  "friends.friend.request-sent": {
+    "message": "Friend request sent"
+  },
+  "friends.friend.view-profile": {
+    "message": "View profile"
+  },
+  "friends.heading": {
+    "message": "Friends"
+  },
+  "friends.heading.active": {
+    "message": "Active"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Pending"
+  },
+  "friends.no-friends-match": {
+    "message": "No friends matching ''{query}''"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Search friends..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
   "instance.add-server.add-and-play": {
     "message": "Add and play"
   },
