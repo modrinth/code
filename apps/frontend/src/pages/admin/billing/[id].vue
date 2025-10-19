@@ -334,6 +334,7 @@ import {
 } from '@modrinth/ui'
 import { formatCategory, formatPrice } from '@modrinth/utils'
 import dayjs from 'dayjs'
+
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
 import { DEFAULT_EMAIL_MESSAGE } from '~/composables/admin.ts'
 

@@ -32,9 +32,9 @@
 						<span class="text-lg font-semibold text-contrast"> Days to credit </span>
 					</label>
 					<input
-						class="w-32"
 						id="days"
 						v-model.number="days"
+						class="w-32"
 						type="number"
 						min="1"
 						autocomplete="off"
@@ -143,17 +143,18 @@
 </template>
 
 <script setup lang="ts">
-import { useBaseFetch } from '#imports'
 import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	injectNotificationManager,
 	NewModal,
 	TagItem,
 	TeleportDropdownMenu,
 	Toggle,
-	injectNotificationManager,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
+
+import { useBaseFetch } from '#imports'
 import { DEFAULT_EMAIL_MESSAGE } from '~/composables/admin.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
