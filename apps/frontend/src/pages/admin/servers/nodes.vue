@@ -155,7 +155,7 @@ import {
 import { computed, ref } from 'vue'
 
 import { useBaseFetch } from '#imports'
-import { DEFAULT_EMAIL_MESSAGE } from '~/composables/admin.ts'
+import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 const { addNotification } = injectNotificationManager()
@@ -183,7 +183,7 @@ const nodeHostnames = ref<string[]>([])
 function openBatchModal() {
 	void ensureOverview()
 
-	message.value = DEFAULT_EMAIL_MESSAGE
+	message.value = DEFAULT_CREDIT_EMAIL_MESSAGE
 	batchModal.value?.show()
 }
 
@@ -235,13 +235,13 @@ async function apply() {
 						nodes: selectedNodes.value.slice(),
 						days: Math.max(1, Math.floor(days.value)),
 						send_email: sendEmail.value,
-						message: message.value?.trim() || DEFAULT_EMAIL_MESSAGE,
+						message: message.value?.trim() || DEFAULT_CREDIT_EMAIL_MESSAGE,
 					}
 				: {
 						region: selectedRegion.value!.key,
 						days: Math.max(1, Math.floor(days.value)),
 						send_email: sendEmail.value,
-						message: message.value?.trim() || DEFAULT_EMAIL_MESSAGE,
+						message: message.value?.trim() || DEFAULT_CREDIT_EMAIL_MESSAGE,
 					}
 		await useBaseFetch('billing/credit', {
 			method: 'POST',
