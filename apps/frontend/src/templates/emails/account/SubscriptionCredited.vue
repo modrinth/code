@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Heading, Text } from '@vue-email/components';
+import { Heading, Text } from '@vue-email/components'
 
-import StyledEmail from '../shared/StyledEmail.vue';
+import StyledEmail from '../shared/StyledEmail.vue'
 </script>
 
 <template>
@@ -12,7 +12,7 @@ import StyledEmail from '../shared/StyledEmail.vue';
 		<Text class="text-muted text-base">{credit.header_message}</Text>
 
 		<Text class="text-muted text-base">
-			To make up for it, we've added {credit.days} days to your {credit.subscription.type}
+			To make up for it, we've added {credit.days_formatted} to your {credit.subscription.type}
 			subscription.
 		</Text>
 		<Text class="text-muted text-base">

@@ -24,7 +24,7 @@
 						:options="modeOptions"
 						:display-name="(x) => x.name"
 						name="Type"
-						class="max-w-[12rem]"
+						class="max-w-[8rem]"
 					/>
 				</div>
 				<div class="flex flex-col gap-2">
@@ -82,7 +82,7 @@
 							:options="regions"
 							:display-name="(x) => x.display"
 							name="Region"
-							class="max-w-[16rem]"
+							class="max-w-[24rem]"
 						/>
 					</div>
 				</div>
@@ -154,13 +154,12 @@ import {
 	injectNotificationManager,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
+import { DEFAULT_EMAIL_MESSAGE } from '~/composables/admin.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 const { addNotification } = injectNotificationManager()
 
 const batchModal = ref<InstanceType<typeof NewModal>>()
-
-const defaultEmailMessage = "We're really sorry about the recent issues with your server."
 
 const days = ref(1)
 const sendEmail = ref(true)
@@ -183,7 +182,7 @@ const nodeHostnames = ref<string[]>([])
 function openBatchModal() {
 	void ensureOverview()
 
-	message.value = defaultEmailMessage
+	message.value = DEFAULT_EMAIL_MESSAGE
 	batchModal.value?.show()
 }
 
@@ -235,13 +234,13 @@ async function apply() {
 						nodes: selectedNodes.value.slice(),
 						days: Math.max(1, Math.floor(days.value)),
 						send_email: sendEmail.value,
-						message: message.value?.trim() || defaultEmailMessage,
+						message: message.value?.trim() || DEFAULT_EMAIL_MESSAGE,
 					}
 				: {
 						region: selectedRegion.value!.key,
 						days: Math.max(1, Math.floor(days.value)),
 						send_email: sendEmail.value,
-						message: message.value?.trim() || defaultEmailMessage,
+						message: message.value?.trim() || DEFAULT_EMAIL_MESSAGE,
 					}
 		await useBaseFetch('billing/credit', {
 			method: 'POST',

@@ -42,7 +42,7 @@ const TAXNOTIFICATION_BILLING_INTERVAL: &str =
 const TAXNOTIFICATION_DUE: &str = "taxnotification.due";
 const TAXNOTIFICATION_SERVICE: &str = "taxnotification.service";
 
-const CREDIT_DAYS: &str = "credit.days";
+const CREDIT_DAYS: &str = "credit.days_formatted";
 const CREDIT_PREVIOUS_DUE: &str = "credit.previous_due";
 const CREDIT_NEXT_DUE: &str = "credit.next_due";
 const CREDIT_HEADER_MESSAGE: &str = "credit.header_message";
@@ -689,7 +689,10 @@ async fn collect_template_variables(
             next_due,
             header_message,
         } => {
-            map.insert(CREDIT_DAYS, days.to_string());
+            map.insert(
+                CREDIT_DAYS,
+                format!("{days} day{}", if *days == 1 { "" } else { "s" }),
+            );
             map.insert(CREDIT_PREVIOUS_DUE, date_human_readable(*previous_due));
             map.insert(CREDIT_NEXT_DUE, date_human_readable(*next_due));
             map.insert(SUBSCRIPTION_ID, to_base62(subscription_id.0));
