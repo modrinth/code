@@ -9,14 +9,9 @@ CREATE TABLE users_subscriptions_credits (
 	created TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX users_subscriptions_credits_subscription_created_idx ON users_subscriptions_credits (
-	subscription_id,
-	created
-);
-
 INSERT INTO notifications_types
 	(name, delivery_priority, expose_in_user_preferences, expose_in_site_notifications)
-VALUES ('subscription_credited', 2, FALSE, FALSE);
+VALUES ('subscription_credited', 1, FALSE, FALSE);
 
 INSERT INTO users_notifications_preferences (user_id, channel, notification_type, enabled)
 VALUES (NULL, 'email', 'subscription_credited', TRUE);
@@ -29,7 +24,7 @@ VALUES
 		'email',
 		'subscription_credited',
 		'We’ve added time to your server',
-		'https://modrinth.com/email/subscription-credited',
+		'https://modrinth.com/_internal/templates/email/subscription-credited',
 		CONCAT(
 			'Hi {user.name},',
 			CHR(10),
@@ -37,7 +32,7 @@ VALUES
 			'{credit.header_message}',
 			CHR(10),
 			CHR(10),
-			'To make up for it, we''ve added {credit.days} days to your {credit.subscription.type} subscription.',
+			'To make up for it, we''ve added {credit.days_formatted} to your {credit.subscription.type} subscription.',
 			CHR(10),
 			CHR(10),
 			'Your next charge was scheduled for {credit.previous_due} and will now be on {credit.next_due}.',
