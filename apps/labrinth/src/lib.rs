@@ -13,7 +13,6 @@ use tracing::{info, warn};
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
-use util::archon::ArchonClient;
 use util::cors::default_cors;
 use util::gotenberg::GotenbergClient;
 
@@ -22,6 +21,7 @@ use crate::database::ReadOnlyPgPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::anrok;
+use crate::util::archon::ArchonClient;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
@@ -285,11 +285,11 @@ pub fn app_setup(
         stripe_client,
         anrok_client,
         gotenberg_client,
-        email_queue: web::Data::new(email_queue),
         archon_client: web::Data::new(
             ArchonClient::from_env()
                 .expect("ARCHON_URL and PYRO_API_KEY must be set"),
         ),
+        email_queue: web::Data::new(email_queue),
     }
 }
 
@@ -321,11 +321,9 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
     .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
-    .app_data(web::Data::new(labrinth_config.maxmind.clone()))
-    .app_data(labrinth_config.archon_client.clone())
-    .app_data(labrinth_config.maxmind.clone())
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
+    .app_data(labrinth_config.archon_client.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
@@ -486,7 +484,6 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("CLICKHOUSE_PASSWORD");
     failed |= check_var::<String>("CLICKHOUSE_DATABASE");
 
-    failed |= check_var::<String>("MAXMIND_ACCOUNT_ID");
     failed |= check_var::<String>("MAXMIND_LICENSE_KEY");
 
     failed |= check_var::<String>("FLAME_ANVIL_URL");
