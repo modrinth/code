@@ -188,6 +188,7 @@ import _UnplugIcon from './icons/unplug.svg?component'
 import _UpdatedIcon from './icons/updated.svg?component'
 import _UploadIcon from './icons/upload.svg?component'
 import _UserIcon from './icons/user.svg?component'
+import _UserCogIcon from './icons/user-cog.svg?component'
 import _UserPlusIcon from './icons/user-plus.svg?component'
 import _UserXIcon from './icons/user-x.svg?component'
 import _UsersIcon from './icons/users.svg?component'
@@ -387,6 +388,7 @@ export const UnlinkIcon = _UnlinkIcon
 export const UnplugIcon = _UnplugIcon
 export const UpdatedIcon = _UpdatedIcon
 export const UploadIcon = _UploadIcon
+export const UserCogIcon = _UserCogIcon
 export const UserPlusIcon = _UserPlusIcon
 export const UserXIcon = _UserXIcon
 export const UserIcon = _UserIcon

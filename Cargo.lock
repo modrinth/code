@@ -1514,17 +1514,16 @@ checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
 name = "clickhouse"
-version = "0.14.0"
+version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52d6ac02411e84914fdf4e0565bfe02fc4bebdf375bd1fc58168bad74b3707a2"
+checksum = "9a9a81a1dffadd762ee662635ce409232258ce9beebd7cc0fa227df0b5e7efc0"
 dependencies = [
  "bstr",
  "bytes",
  "cityhash-rs",
- "clickhouse-macros",
- "clickhouse-types",
+ "clickhouse-derive",
+ "futures",
  "futures-channel",
- "futures-util",
  "http-body-util",
  "hyper 1.7.0",
  "hyper-util",
@@ -1533,7 +1532,7 @@ dependencies = [
  "sealed",
  "serde",
  "static_assertions",
- "thiserror 2.0.17",
+ "thiserror 1.0.69",
  "time",
  "tokio",
  "url",
@@ -1541,25 +1540,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "clickhouse-macros"
-version = "0.3.0"
+name = "clickhouse-derive"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff6669899e23cb87b43daf7996f0ea3b9c07d0fb933d745bb7b815b052515ae3"
+checksum = "d70f3e2893f7d3e017eeacdc9a708fbc29a10488e3ebca21f9df6a5d2b616dbb"
 dependencies = [
  "proc-macro2",
  "quote",
  "serde_derive_internals",
  "syn 2.0.106",
-]
-
-[[package]]
-name = "clickhouse-types"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "235f72141cfbe1d2d930d8156a34814c8a3d60491febb9af64cc52a203444764"
-dependencies = [
- "bytes",
- "thiserror 2.0.17",
 ]
 
 [[package]]
@@ -2341,6 +2330,15 @@ dependencies = [
  "const-oid",
  "crypto-common",
  "subtle",
+]
+
+[[package]]
+name = "directories"
+version = "6.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16f5094c54661b38d03bd7e50df373292118db60b585c08a411c6d840017fe7d"
+dependencies = [
+ "dirs-sys",
 ]
 
 [[package]]
@@ -4620,7 +4618,6 @@ dependencies = [
  "dotenvy",
  "either",
  "eyre",
- "flate2",
  "futures",
  "futures-util",
  "hex",
@@ -4633,8 +4630,8 @@ dependencies = [
  "jemalloc_pprof",
  "json-patch 4.1.0",
  "lettre",
- "maxminddb",
  "meilisearch-sdk",
+ "modrinth-maxmind",
  "murmur2",
  "paste",
  "path-util",
@@ -4658,7 +4655,6 @@ dependencies = [
  "sha2",
  "spdx",
  "sqlx",
- "tar",
  "thiserror 2.0.17",
  "tikv-jemalloc-ctl",
  "tikv-jemallocator",
@@ -5150,6 +5146,35 @@ dependencies = [
  "log",
  "wasi 0.11.1+wasi-snapshot-preview1",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "modrinth-maxmind"
+version = "0.0.0"
+dependencies = [
+ "bytes",
+ "clap",
+ "directories",
+ "eyre",
+ "flate2",
+ "maxminddb",
+ "modrinth-util",
+ "reqwest",
+ "tar",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "modrinth-util"
+version = "0.0.0"
+dependencies = [
+ "actix-web",
+ "derive_more 2.0.1",
+ "dotenvy",
+ "eyre",
+ "serde",
 ]
 
 [[package]]

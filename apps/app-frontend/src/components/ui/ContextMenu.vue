@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 
 const emit = defineEmits(['menu-closed', 'option-clicked'])
 
@@ -40,22 +40,27 @@ defineExpose({
 		item.value = passedItem
 		options.value = passedOptions
 
-		const menuWidth = contextMenu.value.clientWidth
-		const menuHeight = contextMenu.value.clientHeight
-
-		if (menuWidth + event.pageX >= window.innerWidth) {
-			left.value = event.pageX - menuWidth + 2 + 'px'
-		} else {
-			left.value = event.pageX - 2 + 'px'
-		}
-
-		if (menuHeight + event.pageY >= window.innerHeight) {
-			top.value = event.pageY - menuHeight + 2 + 'px'
-		} else {
-			top.value = event.pageY - 2 + 'px'
-		}
-
+		// show to get dimensions
 		shown.value = true
+
+		// then, adjust position if overflowing
+		nextTick(() => {
+			const menuWidth = contextMenu.value?.clientWidth || 200
+			const menuHeight = contextMenu.value?.clientHeight || 100
+			const minFromEdge = 10
+
+			if (event.pageX + menuWidth + minFromEdge >= window.innerWidth) {
+				left.value = Math.max(minFromEdge, event.pageX - menuWidth - minFromEdge) + 'px'
+			} else {
+				left.value = event.pageX + minFromEdge + 'px'
+			}
+
+			if (event.pageY + menuHeight + minFromEdge >= window.innerHeight) {
+				top.value = Math.max(minFromEdge, event.pageY - menuHeight - minFromEdge) + 'px'
+			} else {
+				top.value = event.pageY + minFromEdge + 'px'
+			}
+		})
 	},
 })
 
