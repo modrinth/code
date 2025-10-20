@@ -691,7 +691,7 @@ async fn query_clickhouse<Row>(
     row_to_analytics: impl Fn(Row::Value<'_>) -> AnalyticsData,
 ) -> Result<(), ApiError>
 where
-    Row: clickhouse::RowRead + serde::de::DeserializeOwned + std::fmt::Debug,
+    Row: clickhouse::Row + serde::de::DeserializeOwned + std::fmt::Debug,
 {
     let mut query = cx
         .clickhouse
