@@ -169,7 +169,7 @@ const messages = defineMessages({
 	},
 	viewFriendRequests: {
 		id: 'friends.action.view-friend-requests',
-		defaultMessage: '{count} friend requests',
+		defaultMessage: '{count} friend {count, plural, one {request} other {requests}}',
 	},
 	searchFriends: {
 		id: 'friends.search-friends-placeholder',
@@ -353,7 +353,7 @@ const messages = defineMessages({
 				:is-searching="!!search"
 				open-by-default
 				:friends="activeFriends"
-				:heading="formatMessage(messages.pending)"
+				:heading="formatMessage(messages.active)"
 				:remove-friend="removeFriend"
 			/>
 			<FriendsSection
