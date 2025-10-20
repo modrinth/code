@@ -27,6 +27,7 @@ pub async fn init_client_with_database(
             .with_url(dotenvy::var("CLICKHOUSE_URL").unwrap())
             .with_user(dotenvy::var("CLICKHOUSE_USER").unwrap())
             .with_password(dotenvy::var("CLICKHOUSE_PASSWORD").unwrap())
+            .with_validation(false)
     };
 
     client
