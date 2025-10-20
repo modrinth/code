@@ -138,7 +138,16 @@ const muralPayMethod = computed(() =>
 
 const paymentOptions = computed(() => {
 	const muralpay = muralPayMethod.value
-	if (!muralpay?.config) return []
+	if (!muralpay?.config) {
+		if (muralpay) {
+			muralpay.config = {
+				fiat: "usd",
+				blockchain: ["usdc_polygon"]
+			}
+		} else {
+			return [];
+		}
+	}
 
 	const options = []
 

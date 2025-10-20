@@ -36,6 +36,7 @@ import _PatreonIcon from './external/patreon.svg?component'
 import _PayPalIcon from './external/paypal.svg?component'
 import _PolygonIcon from './external/polygon.svg?component'
 import _RedditIcon from './external/reddit.svg?component'
+import _USDCIcon from './external/usdc.svg?component'
 // External Icons
 import _SSODiscordIcon from './external/sso/discord.svg?component'
 import _SSOGitHubIcon from './external/sso/github.svg?component'
@@ -87,7 +88,9 @@ export const WindowsIcon = _WindowsIcon
 export const YouTubeIcon = _YouTubeIcon
 export const VenmoIcon = _VenmoIcon
 export const PolygonIcon = _PolygonIcon
+export const USDCIcon = _USDCIcon
 
 export * from './generated-icons'
 export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'
 export { default as SlimPlayerModel } from './models/slim-player.gltf?url'
+

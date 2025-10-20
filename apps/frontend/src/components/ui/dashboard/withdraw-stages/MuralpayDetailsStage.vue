@@ -13,9 +13,9 @@
 				</span>
 			</label>
 			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
-
+				<component class="size-5" :class="getCurrencyColor(selectedRail.currency)"
+					:is="getCurrencyIcon(selectedRail.currency)" />
 				<span class="font-semibold text-contrast">{{ selectedRail.currency }}</span>
-				<span class="text-primary">{{ selectedRail.name }}</span>
 			</div>
 		</div>
 
@@ -86,7 +86,8 @@
 				</span>
 			</label>
 			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
-
+				<component class="size-5" :class="getBlockchainColor(selectedRail.blockchain)"
+					:is="getBlockchainIcon(selectedRail.blockchain)" />
 				<span class="font-semibold text-contrast">{{ selectedRail.blockchain }}</span>
 			</div>
 		</div>
@@ -140,6 +141,7 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { getBlockchainColor, getBlockchainIcon } from "@/utils/blockchain-icons.ts"
 import { getRailConfig } from '@/utils/muralpay-rails'
 
 const withdrawContext = useWithdrawContext()
@@ -149,6 +151,8 @@ const selectedRail = computed(() => {
 	const railId = withdrawContext.withdrawData.value.selectedMethod
 	return railId ? getRailConfig(railId) : null
 })
+
+console.log(selectedRail);
 
 const maxAmount = computed(() => withdrawContext.maxWithdrawAmount.value)
 
