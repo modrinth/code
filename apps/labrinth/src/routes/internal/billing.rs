@@ -1,6 +1,7 @@
 use self::payments::*;
 use crate::auth::get_user_from_headers;
 use crate::database::models::charge_item::DBCharge;
+use crate::database::models::ids::DBUserSubscriptionId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::products_tax_identifier_item::product_info_by_product_price_id;
 use crate::database::models::users_subscriptions_credits::DBUserSubscriptionCredit;
@@ -2189,10 +2190,8 @@ pub async fn stripe_webhook(
     Ok(HttpResponse::Ok().finish())
 }
 
-pub mod payments;
-
 #[allow(clippy::too_many_arguments)]
-async fn apply_credit_many_in_txn(
+async fn apply_credit_many(
     transaction: &mut Transaction<'_, Postgres>,
     redis: &RedisPool,
     current_user_id: crate::database::models::ids::DBUserId,
@@ -2201,20 +2200,6 @@ async fn apply_credit_many_in_txn(
     send_email: bool,
     message: String,
 ) -> Result<(), ApiError> {
-    use crate::database::models::ids::DBUserSubscriptionId;
-
-    let mut credit_sub_ids: Vec<DBUserSubscriptionId> =
-        Vec::with_capacity(subscription_ids.len());
-    let mut credit_user_ids: Vec<crate::database::models::ids::DBUserId> =
-        Vec::with_capacity(subscription_ids.len());
-    let mut credit_creditor_ids: Vec<crate::database::models::ids::DBUserId> =
-        Vec::with_capacity(subscription_ids.len());
-    let mut credit_days: Vec<i32> = Vec::with_capacity(subscription_ids.len());
-    let mut credit_prev_dues: Vec<chrono::DateTime<chrono::Utc>> =
-        Vec::with_capacity(subscription_ids.len());
-    let mut credit_next_dues: Vec<chrono::DateTime<chrono::Utc>> =
-        Vec::with_capacity(subscription_ids.len());
-
     let subs_ids: Vec<DBUserSubscriptionId> = subscription_ids
         .iter()
         .map(|id| DBUserSubscriptionId(id.0 as i64))
@@ -2225,7 +2210,28 @@ async fn apply_credit_many_in_txn(
     )
     .await?;
 
+    let provisioned_count = subs
+        .iter()
+        .filter(|s| s.status == SubscriptionStatus::Provisioned)
+        .count();
+
+    let mut credit_sub_ids: Vec<DBUserSubscriptionId> =
+        Vec::with_capacity(provisioned_count);
+    let mut credit_user_ids: Vec<crate::database::models::ids::DBUserId> =
+        Vec::with_capacity(provisioned_count);
+    let mut credit_creditor_ids: Vec<crate::database::models::ids::DBUserId> =
+        Vec::with_capacity(provisioned_count);
+    let mut credit_days: Vec<i32> = Vec::with_capacity(provisioned_count);
+    let mut credit_prev_dues: Vec<chrono::DateTime<chrono::Utc>> =
+        Vec::with_capacity(provisioned_count);
+    let mut credit_next_dues: Vec<chrono::DateTime<chrono::Utc>> =
+        Vec::with_capacity(provisioned_count);
+
     for subscription in subs {
+        if subscription.status != SubscriptionStatus::Provisioned {
+            continue;
+        }
+
         let mut open_charge = charge_item::DBCharge::get_open_subscription(
             subscription.id,
             &mut **transaction,
@@ -2349,7 +2355,7 @@ pub async fn credit(
                     "You must specify at least one subscription id".to_string(),
                 ));
             }
-            apply_credit_many_in_txn(
+            apply_credit_many(
                 &mut transaction,
                 &redis,
                 crate::database::models::ids::DBUserId(user.id.0 as i64),
@@ -2370,7 +2376,7 @@ pub async fn credit(
             for hostname in nodes {
                 let ids =
                     archon_client.get_servers_by_hostname(&hostname).await?;
-                server_ids.extend(ids);
+                server_ids.extend(ids.into_iter().map(|id| id.to_string()));
             }
             server_ids.dedup();
             let subs = user_subscription_item::DBUserSubscription::get_many_by_server_ids(
@@ -2383,7 +2389,7 @@ pub async fn credit(
                     "No subscriptions found for provided nodes".to_string(),
                 ));
             }
-            apply_credit_many_in_txn(
+            apply_credit_many(
                 &mut transaction,
                 &redis,
                 crate::database::models::ids::DBUserId(user.id.0 as i64),
@@ -2395,10 +2401,10 @@ pub async fn credit(
             .await?;
         }
         CreditTarget::Region { region } => {
-            let parsed_active =
+            let servers =
                 archon_client.get_active_servers_by_region(&region).await?;
             let subs = user_subscription_item::DBUserSubscription::get_many_by_server_ids(
-                &parsed_active,
+                &servers.into_iter().map(|id| id.to_string()).collect::<Vec<String>>(),
                 &mut *transaction,
             )
             .await?;
@@ -2407,7 +2413,7 @@ pub async fn credit(
                     "No subscriptions found for provided region".to_string(),
                 ));
             }
-            apply_credit_many_in_txn(
+            apply_credit_many(
                 &mut transaction,
                 &redis,
                 crate::database::models::ids::DBUserId(user.id.0 as i64),
@@ -2424,3 +2430,5 @@ pub async fn credit(
 
     Ok(HttpResponse::NoContent().finish())
 }
+
+pub mod payments;

@@ -76,14 +76,14 @@ impl ArchonClient {
     pub async fn get_servers_by_hostname(
         &self,
         hostname: &str,
-    ) -> Result<Vec<String>, reqwest::Error> {
+    ) -> Result<Vec<Uuid>, reqwest::Error> {
         #[derive(Deserialize)]
         struct NodeByHostnameResponse {
             servers: Vec<NodeServerEntry>,
         }
         #[derive(Deserialize)]
         struct NodeServerEntry {
-            id: String,
+            id: Uuid,
             #[allow(dead_code)]
             available: Option<bool>,
         }
@@ -106,10 +106,10 @@ impl ArchonClient {
     pub async fn get_active_servers_by_region(
         &self,
         region: &str,
-    ) -> Result<Vec<String>, reqwest::Error> {
+    ) -> Result<Vec<Uuid>, reqwest::Error> {
         #[derive(Deserialize)]
         struct RegionResponse {
-            active_servers: Vec<String>,
+            active_servers: Vec<Uuid>,
         }
 
         let res = self
