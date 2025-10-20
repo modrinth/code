@@ -18,6 +18,7 @@ export default {
 
 	// Subscriptions
 	'subscription-tax-change': () => import('./account/SubscriptionTaxChange.vue'),
+	'subscription-credited': () => import('./account/SubscriptionCredited.vue'),
 
 	// Moderation
 	'report-submitted': () => import('./moderation/ReportSubmitted.vue'),

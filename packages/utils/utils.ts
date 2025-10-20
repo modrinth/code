@@ -373,3 +373,5 @@ export function arrayBufferToBase64(buffer: Uint8Array | ArrayBuffer): string {
 	const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer)
 	return btoa(String.fromCharCode(...bytes))
 }
+export const DEFAULT_CREDIT_EMAIL_MESSAGE =
+	"We're really sorry about the recent issues with your server."

@@ -109,6 +109,13 @@ pub enum LegacyNotificationBody {
         amount: String,
         service: String,
     },
+    SubscriptionCredited {
+        subscription_id: UserSubscriptionId,
+        days: i32,
+        previous_due: DateTime<Utc>,
+        next_due: DateTime<Utc>,
+        header_message: Option<String>,
+    },
     PatCreated {
         token_name: String,
     },
@@ -218,6 +225,9 @@ impl LegacyNotification {
             }
             NotificationBody::TaxNotification { .. } => {
                 Some("tax_notification".to_string())
+            }
+            NotificationBody::SubscriptionCredited { .. } => {
+                Some("subscription_credited".to_string())
             }
             NotificationBody::PayoutAvailable { .. } => {
                 Some("payout_available".to_string())
@@ -396,6 +406,19 @@ impl LegacyNotification {
             NotificationBody::PaymentFailed { amount, service } => {
                 LegacyNotificationBody::PaymentFailed { amount, service }
             }
+            NotificationBody::SubscriptionCredited {
+                subscription_id,
+                days,
+                previous_due,
+                next_due,
+                header_message,
+            } => LegacyNotificationBody::SubscriptionCredited {
+                subscription_id,
+                days,
+                previous_due,
+                next_due,
+                header_message,
+            },
             NotificationBody::Unknown => LegacyNotificationBody::Unknown,
         };
 
