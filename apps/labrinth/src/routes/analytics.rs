@@ -3,18 +3,19 @@ use crate::database::redis::RedisPool;
 use crate::models::analytics::{PageView, Playtime};
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
-use crate::queue::maxmind::MaxMindIndexer;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::env::parse_strings_from_var;
 use actix_web::{HttpRequest, HttpResponse};
 use actix_web::{post, web};
+use modrinth_maxmind::MaxMind;
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
+use tracing::trace;
 use url::Url;
 
 pub const FILTERED_HEADERS: &[&str] = &[
@@ -48,7 +49,7 @@ pub struct UrlInput {
 #[post("view")]
 pub async fn page_view_ingest(
     req: HttpRequest,
-    maxmind: web::Data<Arc<MaxMindIndexer>>,
+    maxmind: web::Data<MaxMind>,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
     url_input: web::Json<UrlInput>,
@@ -113,7 +114,7 @@ pub async fn page_view_ingest(
         user_id: 0,
         project_id: 0,
         ip,
-        country: maxmind.query(ip).await.unwrap_or_default(),
+        country: maxmind.query_country(ip).await.unwrap_or_default(),
         user_agent: headers.get("user-agent").cloned().unwrap_or_default(),
         headers: headers
             .into_iter()
@@ -154,6 +155,7 @@ pub async fn page_view_ingest(
         view.user_id = user.id.0;
     }
 
+    trace!("Ingested page view {view:?}");
     analytics_queue.add_view(view);
 
     Ok(HttpResponse::NoContent().body(""))
