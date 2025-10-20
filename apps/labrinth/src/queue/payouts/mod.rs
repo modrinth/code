@@ -84,6 +84,51 @@ fn create_muralpay() -> Result<MuralPayConfig> {
     })
 }
 
+fn create_muralpay_methods() -> Vec<PayoutMethod> {
+    let all_countries = rust_iso3166::ALL
+        .iter()
+        .map(|x| x.alpha2.to_string())
+        .collect::<Vec<_>>();
+
+    let currencies = vec![
+        ("blockchain_usdc_polygon", "USDC on Polygon"),
+        ("fiat_mxn", "MXN"),
+        ("fiat_brl", "BRL"),
+        ("fiat_clp", "CLP"),
+        ("fiat_crc", "CRC"),
+        ("fiat_pen", "PEN"),
+        // ("fiat_dop", "DOP"), // unsupported in API
+        // ("fiat_uyu", "UYU"), // unsupported in API
+        ("fiat_ars", "ARS"),
+        ("fiat_cop", "COP"),
+        ("fiat_usd", "USD"),
+        ("fiat_usd-peru", "USD Peru"),
+        // ("fiat_usd-panama", "USD Panama"), // by request
+        ("fiat_eur", "EUR"),
+    ];
+
+    currencies
+        .into_iter()
+        .map(|(id, currency)| PayoutMethod {
+            id: id.to_string(),
+            type_: PayoutMethodType::MuralPay,
+            name: format!("Mural Pay - {}", currency),
+            supported_countries: all_countries.clone(),
+            image_url: None,
+            image_logo_url: None,
+            interval: PayoutInterval::Standard {
+                min: Decimal::from(1),
+                max: Decimal::from(100_000),
+            },
+            fee: PayoutMethodFee {
+                percentage: Decimal::ZERO,
+                min: Decimal::ZERO,
+                max: Some(Decimal::ZERO),
+            },
+        })
+        .collect()
+}
+
 // Batches payouts and handles token refresh
 impl PayoutsQueue {
     pub fn new() -> Self {
@@ -407,26 +452,7 @@ impl PayoutsQueue {
             //     },
             // );
 
-            methods.push(PayoutMethod {
-                id: "muralpay".to_string(),
-                type_: PayoutMethodType::MuralPay,
-                name: "Mural Pay".to_string(),
-                supported_countries: rust_iso3166::ALL
-                    .iter()
-                    .map(|x| x.alpha2.to_string())
-                    .collect(), // TODO
-                image_url: None,
-                image_logo_url: None,
-                interval: PayoutInterval::Standard {
-                    min: Decimal::from(1),
-                    max: Decimal::from(100_000),
-                },
-                fee: PayoutMethodFee {
-                    percentage: Decimal::ZERO,
-                    min: Decimal::ZERO,
-                    max: Some(Decimal::ZERO),
-                },
-            });
+            methods.extend(create_muralpay_methods());
 
             let new_options = PayoutMethods {
                 options: methods,
