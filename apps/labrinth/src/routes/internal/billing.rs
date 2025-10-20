@@ -2372,7 +2372,6 @@ pub async fn credit(
                     archon_client.get_servers_by_hostname(&hostname).await?;
                 server_ids.extend(ids);
             }
-            server_ids.sort();
             server_ids.dedup();
             let subs = user_subscription_item::DBUserSubscription::get_many_by_server_ids(
                 &server_ids,
