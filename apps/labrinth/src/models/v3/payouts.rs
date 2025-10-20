@@ -152,6 +152,7 @@ pub struct PayoutMethod {
     #[serde(rename = "type")]
     pub type_: PayoutMethodType,
     pub name: String,
+    #[serde(skip_serializing)]
     pub supported_countries: Vec<String>,
     pub image_url: Option<String>,
     pub image_logo_url: Option<String>,
