@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::hash::Hash;
 use std::net::Ipv6Addr;
 
-#[derive(Row, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Row, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
 pub struct Download {
     pub recorded: i64,
     pub domain: String,
@@ -24,7 +24,7 @@ pub struct Download {
     pub headers: Vec<(String, String)>,
 }
 
-#[derive(Row, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Row, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
 pub struct PageView {
     pub recorded: i64,
     pub domain: String,
