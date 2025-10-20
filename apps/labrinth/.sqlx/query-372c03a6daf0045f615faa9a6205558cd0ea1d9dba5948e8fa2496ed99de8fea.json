@@ -1,0 +1,142 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                charges.id, charges.user_id, charges.price_id, charges.amount, charges.currency_code, charges.status, charges.due, charges.last_attempt,\n                charges.charge_type, charges.subscription_id, charges.tax_amount, charges.tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                charges.subscription_interval AS \"subscription_interval?\",\n                charges.payment_platform,\n                charges.payment_platform_id AS \"payment_platform_id?\",\n                charges.parent_charge_id AS \"parent_charge_id?\",\n                charges.net AS \"net?\",\n\t\t\t\tcharges.tax_last_updated AS \"tax_last_updated?\",\n\t\t\t\tcharges.tax_drift_loss AS \"tax_drift_loss?\",\n                charges.tax_transaction_version AS \"tax_transaction_version?\",\n                charges.tax_platform_accounting_time AS \"tax_platform_accounting_time?\"\n            FROM charges\n            \n            INNER JOIN users_subscriptions us ON us.id = charges.subscription_id\n            WHERE\n                charges.charge_type = $1 AND\n                (\n                    (charges.status = 'cancelled' AND charges.due < NOW()) OR\n                    (charges.status = 'expiring' AND charges.due < NOW()) OR\n                    (charges.status = 'failed' AND charges.last_attempt < NOW() - INTERVAL '2 days')\n                )\n                AND us.status = 'provisioned'\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "price_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "amount",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "currency_code",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "due",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "last_attempt",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "charge_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "subscription_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 10,
+        "name": "tax_amount",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "tax_platform_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "subscription_interval?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "payment_platform",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "payment_platform_id?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
+        "name": "parent_charge_id?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 16,
+        "name": "net?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 17,
+        "name": "tax_last_updated?",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 18,
+        "name": "tax_drift_loss?",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 19,
+        "name": "tax_transaction_version?",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 20,
+        "name": "tax_platform_accounting_time?",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "372c03a6daf0045f615faa9a6205558cd0ea1d9dba5948e8fa2496ed99de8fea"
+}

@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Zrušit"
   },
+  "button.close": {
+    "defaultMessage": "Zavřít"
+  },
   "button.continue": {
     "defaultMessage": "Pokračovat"
   },
@@ -368,6 +371,51 @@
   "project-type.datapack.lowercase": {
     "defaultMessage": "{count, plural, one {data pack} few {data packy} many {data packů} other {data packů}}"
   },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mód} other {Módy}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Módy"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mód} other {módy}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacky}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpacky"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpack} other {modpacky}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Pluginy}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Pluginy"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {pluginy}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packy}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resource Packy"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shadery}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shadery"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shadery}}"
+  },
   "project.about.compatibility.environments": {
     "defaultMessage": "Podporovaná prostředí"
   },
@@ -505,6 +553,12 @@
   },
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Pouze hra jednoho hráče"
+  },
+  "project.settings.environment.suboption.accessibility-option-label": {
+    "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Dílčí možnosti {option}"
   },
   "project.settings.environment.title": {
     "defaultMessage": "Prostředí"
@@ -724,6 +778,9 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Region není uveden? <link>Dejte nám vědět, kde byste chtěli vidět další Modrinth servery!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Jihovýchodní Asie"
   },
   "servers.region.western-europe": {
     "defaultMessage": "Západní Evropa"

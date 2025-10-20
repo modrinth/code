@@ -101,6 +101,17 @@ const messages = {
 			defaultMessage: "The page you were looking for doesn't seem to exist.",
 		}),
 	},
+	451: {
+		title: defineMessage({
+			id: 'error.generic.451.title',
+			defaultMessage: 'Content unavailable for legal reasons',
+		}),
+		subtitle: defineMessage({
+			id: 'error.generic.451.subtitle',
+			defaultMessage:
+				'This page has been blocked for legal reasons, such as government censorship or ongoing legal proceedings.',
+		}),
+	},
 	default: {
 		title: defineMessage({
 			id: 'error.generic.default.title',

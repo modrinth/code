@@ -27,7 +27,7 @@ pub struct Notification {
     pub actions: Vec<NotificationAction>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum NotificationType {
     // If adding a notification type, add a variant in `NotificationBody` of the same name!
@@ -56,6 +56,7 @@ pub enum NotificationType {
     ProjectStatusNeutral,
     ProjectTransferred,
     PayoutAvailable,
+    Custom,
     Unknown,
 }
 
@@ -89,6 +90,7 @@ impl NotificationType {
             NotificationType::ProjectStatusApproved => {
                 "project_status_approved"
             }
+            NotificationType::Custom => "custom",
             NotificationType::ProjectStatusNeutral => "project_status_neutral",
             NotificationType::ProjectTransferred => "project_transferred",
             NotificationType::Unknown => "unknown",
@@ -114,6 +116,18 @@ impl NotificationType {
             "email_changed" => NotificationType::EmailChanged,
             "payment_failed" => NotificationType::PaymentFailed,
             "tax_notification" => NotificationType::TaxNotification,
+            "payout_available" => NotificationType::PayoutAvailable,
+            "moderation_message_received" => {
+                NotificationType::ModerationMessageReceived
+            }
+            "report_status_updated" => NotificationType::ReportStatusUpdated,
+            "report_submitted" => NotificationType::ReportSubmitted,
+            "project_status_approved" => {
+                NotificationType::ProjectStatusApproved
+            }
+            "project_status_neutral" => NotificationType::ProjectStatusNeutral,
+            "project_transferred" => NotificationType::ProjectTransferred,
+            "custom" => NotificationType::Custom,
             "unknown" => NotificationType::Unknown,
             _ => NotificationType::Unknown,
         }
@@ -223,7 +237,12 @@ pub enum NotificationBody {
     },
     PayoutAvailable {
         date_available: DateTime<Utc>,
-        amount: f64,
+        amount: u64,
+    },
+    Custom {
+        key: String,
+        title: String,
+        body_md: String,
     },
     Unknown,
 }
@@ -302,6 +321,7 @@ impl NotificationBody {
             NotificationBody::PayoutAvailable { .. } => {
                 NotificationType::PayoutAvailable
             }
+            NotificationBody::Custom { .. } => NotificationType::Custom,
             NotificationBody::Unknown => NotificationType::Unknown,
         }
     }
@@ -546,6 +566,12 @@ impl From<DBNotification> for Notification {
                     "#".to_string(),
                     vec![],
                 ),
+                NotificationBody::Custom { title, .. } => (
+                    "Notification".to_string(),
+                    title.clone(),
+                    "#".to_string(),
+                    vec![],
+                ),
                 NotificationBody::Unknown => {
                     ("".to_string(), "".to_string(), "#".to_string(), vec![])
                 }
@@ -624,7 +650,7 @@ impl NotificationDeliveryStatus {
             NotificationDeliveryStatus::Delivered => Ok(()),
             NotificationDeliveryStatus::SkippedPreferences |
             NotificationDeliveryStatus::SkippedDefault |
-            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occured while sending an email to your email address. Please try again later.".to_owned())),
+            NotificationDeliveryStatus::Pending => Err(ApiError::InvalidInput("An error occurred while sending an email to your email address. Please try again later.".to_owned())),
             NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::InvalidInput("This email address doesn't exist! Please try another one.".to_owned())),
         }
     }

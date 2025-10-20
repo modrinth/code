@@ -59,7 +59,7 @@ impl TemporaryDatabase {
         let database_url =
             dotenvy::var("DATABASE_URL").expect("No database URL");
 
-        // Create the temporary (and template datbase, if needed)
+        // Create the temporary (and template database, if needed)
         Self::create_temporary(&database_url, &temp_database_name).await;
 
         // Pool to the temporary database
@@ -102,7 +102,7 @@ impl TemporaryDatabase {
         }
     }
 
-    // Creates a template and temporary databse (panics)
+    // Creates a template and temporary database (panics)
     // 1. Waits to obtain a pg lock on the main database
     // 2. Creates a new template database called 'TEMPLATE_DATABASE_NAME', if needed
     // 3. Switches to the template database

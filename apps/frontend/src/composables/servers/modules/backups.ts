@@ -41,12 +41,6 @@ export class BackupsModule extends ServerModule {
 		await this.fetch() // Refresh this module
 	}
 
-	async prepare(backupId: string): Promise<void> {
-		await useServersFetch(`servers/${this.serverId}/backups/${backupId}/prepare-download`, {
-			method: 'POST',
-		})
-	}
-
 	async lock(backupId: string): Promise<void> {
 		await useServersFetch(`servers/${this.serverId}/backups/${backupId}/lock`, {
 			method: 'POST',

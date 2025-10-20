@@ -127,6 +127,7 @@ pub async fn swap_index(
     let index_name = config.get_index_name(index_name, false);
     let swap_indices = SwapIndexes {
         indexes: (index_name_next, index_name),
+        rename: None,
     };
     client
         .swap_indexes([&swap_indices])

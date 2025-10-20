@@ -4,9 +4,11 @@ use actix_web::{HttpResponse, web};
 use serde_json::json;
 
 pub mod analytics_get;
+pub mod analytics_get_old;
 pub mod collections;
 pub mod friends;
 pub mod images;
+pub mod limits;
 pub mod notifications;
 pub mod organizations;
 pub mod payouts;
@@ -30,7 +32,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("v3")
             .wrap(default_cors())
-            .configure(analytics_get::config)
+            .configure(limits::config)
+            // .configure(analytics_get::config) // TODO: see `analytics_get`
+            .configure(analytics_get_old::config)
             .configure(collections::config)
             .configure(images::config)
             .configure(notifications::config)

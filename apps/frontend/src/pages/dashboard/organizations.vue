@@ -52,7 +52,7 @@
 import { PlusIcon, UsersIcon } from '@modrinth/assets'
 import { Avatar } from '@modrinth/ui'
 
-import OrganizationCreateModal from '~/components/ui/OrganizationCreateModal.vue'
+import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import { useAuth } from '~/composables/auth.js'
 
 const createOrgModal = ref(null)

@@ -18,7 +18,7 @@ impl super::Validator for DataPackValidator {
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Time since release of 17w43a, 2017-10-25, which introduced datapacks
         SupportedGameVersions::PastDate(
-            DateTime::from_timestamp(1508889600, 0).unwrap(),
+            DateTime::from_timestamp_secs(1508889600).unwrap(),
         )
     }
 

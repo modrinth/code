@@ -14,28 +14,124 @@ const config: Config = {
 	theme: {
 		extend: {
 			colors: {
+				surface: {
+					1: 'var(--surface-1)',
+					2: 'var(--surface-2)',
+					3: 'var(--surface-3)',
+					4: 'var(--surface-4)',
+					5: 'var(--surface-5)',
+				},
+
+				/// TODO: Clean up these aliases within codebase to use default, primary, tertiary.
+				// text-default
+				primary: 'var(--color-text-default)',
+
+				// text-primary
+				contrast: 'var(--color-text-primary)',
+
+				// text-tertiary
+				secondary: 'var(--color-text-tertiary)',
+
+				red: {
+					DEFAULT: 'var(--color-red)',
+					50: 'var(--color-red-50)',
+					100: 'var(--color-red-100)',
+					200: 'var(--color-red-200)',
+					300: 'var(--color-red-300)',
+					400: 'var(--color-red-400)',
+					500: 'var(--color-red-500)',
+					600: 'var(--color-red-600)',
+					700: 'var(--color-red-700)',
+					800: 'var(--color-red-800)',
+					900: 'var(--color-red-900)',
+					950: 'var(--color-red-950)',
+				},
+				orange: {
+					DEFAULT: 'var(--color-orange)',
+					50: 'var(--color-orange-50)',
+					100: 'var(--color-orange-100)',
+					200: 'var(--color-orange-200)',
+					300: 'var(--color-orange-300)',
+					400: 'var(--color-orange-400)',
+					500: 'var(--color-orange-500)',
+					600: 'var(--color-orange-600)',
+					700: 'var(--color-orange-700)',
+					800: 'var(--color-orange-800)',
+					900: 'var(--color-orange-900)',
+					950: 'var(--color-orange-950)',
+				},
+				green: {
+					DEFAULT: 'var(--color-green)',
+					50: 'var(--color-green-50)',
+					100: 'var(--color-green-100)',
+					200: 'var(--color-green-200)',
+					300: 'var(--color-green-300)',
+					400: 'var(--color-green-400)',
+					500: 'var(--color-green-500)',
+					600: 'var(--color-green-600)',
+					700: 'var(--color-green-700)',
+					800: 'var(--color-green-800)',
+					900: 'var(--color-green-900)',
+					950: 'var(--color-green-950)',
+				},
+				blue: {
+					DEFAULT: 'var(--color-blue)',
+					50: 'var(--color-blue-50)',
+					100: 'var(--color-blue-100)',
+					200: 'var(--color-blue-200)',
+					300: 'var(--color-blue-300)',
+					400: 'var(--color-blue-400)',
+					500: 'var(--color-blue-500)',
+					600: 'var(--color-blue-600)',
+					700: 'var(--color-blue-700)',
+					800: 'var(--color-blue-800)',
+					900: 'var(--color-blue-900)',
+					950: 'var(--color-blue-950)',
+				},
+				purple: {
+					DEFAULT: 'var(--color-purple)',
+					50: 'var(--color-purple-50)',
+					100: 'var(--color-purple-100)',
+					200: 'var(--color-purple-200)',
+					300: 'var(--color-purple-300)',
+					400: 'var(--color-purple-400)',
+					500: 'var(--color-purple-500)',
+					600: 'var(--color-purple-600)',
+					700: 'var(--color-purple-700)',
+					800: 'var(--color-purple-800)',
+					900: 'var(--color-purple-900)',
+					950: 'var(--color-purple-950)',
+				},
+				gray: {
+					DEFAULT: 'var(--color-gray)',
+					50: 'var(--color-gray-50)',
+					100: 'var(--color-gray-100)',
+					200: 'var(--color-gray-200)',
+					300: 'var(--color-gray-300)',
+					400: 'var(--color-gray-400)',
+					500: 'var(--color-gray-500)',
+					600: 'var(--color-gray-600)',
+					700: 'var(--color-gray-700)',
+					800: 'var(--color-gray-800)',
+					900: 'var(--color-gray-900)',
+					950: 'var(--color-gray-950)',
+				},
+
+				/// === LEGACY ===
 				icon: 'var(--color-base)',
 				// Text
-				primary: 'var(--color-base)',
-				contrast: 'var(--color-contrast)',
-				secondary: 'var(--color-secondary)',
 				inactive: 'var(--color-text-inactive)',
 				dark: 'var(--color-text-dark)',
 				inverted: 'var(--color-text-inverted)',
 				heading: 'var(--color-heading)',
-				red: 'var(--color-red)',
-				orange: 'var(--color-orange)',
-				green: 'var(--color-green)',
-				blue: 'var(--color-blue)',
-				purple: 'var(--color-purple)',
 				bg: {
-					DEFAULT: 'var(--color-bg)',
+					DEFAULT: 'var(--surface-1)', // var(--color-bg)
 					red: 'var(--color-red-bg)',
 					orange: 'var(--color-orange-bg)',
 					green: 'var(--color-green-bg)',
 					blue: 'var(--color-blue-bg)',
 					purple: 'var(--color-purple-bg)',
-					raised: 'var(--color-raised-bg)',
+					raised: 'var(--surface-3)', // var(--color-raised-bg)
 				},
 				banners: {
 					error: {

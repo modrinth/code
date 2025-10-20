@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "开发者模式已启用。"
   },
+  "app.settings.downloading": {
+    "message": "下载{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "外观"
   },
@@ -19,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "资源管理"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} 准备好更新。现在重新启动以更新，或在您关闭Modrinth App时自动更新。"
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} 已经完成下载好。现在重新启动以更新，或在您关闭Modrinth App时自动更新。"
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} 现在可用。自从您处在按流量计费的网络环境，我们没有自动下载更新。"
+  },
+  "app.update-toast.changelog": {
+    "message": "变更日志"
+  },
+  "app.update-toast.download": {
+    "message": "下载（{size}）"
+  },
+  "app.update-toast.downloading": {
+    "message": "下载中... ..."
+  },
+  "app.update-toast.reload": {
+    "message": "重新启动"
+  },
+  "app.update-toast.title": {
+    "message": "更新可用"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "下载完成"
+  },
+  "app.update.complete-toast.text": {
+    "message": "点击此处查看变更日志。"
+  },
+  "app.update.complete-toast.title": {
+    "message": "版本{version}已成功安装！"
+  },
+  "app.update.download-update": {
+    "message": "下载完成"
+  },
+  "app.update.downloading-update": {
+    "message": "更新下载中({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "重新启动以安装更新"
   },
   "instance.add-server.add-and-play": {
     "message": "添加并游玩"
@@ -171,7 +216,7 @@
     "message": "安装"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version}（适用于 Minecraft {game_version}）已安装"
+    "message": "适用于 Minecraft {game_version} 的{platform} {version}已安装"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "原版 {game_version} 已安装"

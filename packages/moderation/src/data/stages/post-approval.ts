@@ -54,7 +54,7 @@ const postApproval: Stage = {
 					weight: 1,
 					severity: 'low',
 					message: async () =>
-						(await import('../messages/misc-metadata/dependancies.md?raw')).default,
+						(await import('../messages/misc-metadata/dependencies.md?raw')).default,
 					relevantExtraInput: [
 						{
 							label: 'Dependency Name',

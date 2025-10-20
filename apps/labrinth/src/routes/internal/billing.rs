@@ -23,8 +23,7 @@ use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{Duration, Utc};
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
-use serde::Serialize;
-use serde_with::serde_derive::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Postgres, Transaction};
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -268,6 +267,24 @@ pub async fn refund_charge(
                         .tax_identifier
                         .tax_processor_id;
 
+                        let Some((
+                            (
+                                original_tax_platform_id,
+                                original_tax_transaction_version,
+                            ),
+                            original_tax_platform_accounting_time,
+                        )) = charge
+                            .tax_platform_id
+                            .clone()
+                            .zip(charge.tax_transaction_version)
+                            .zip(charge.tax_platform_accounting_time)
+                        else {
+                            return Err(ApiError::InvalidInput(
+                                "Charge is missing full tax information. Please wait for the original charge to be synchronized with the tax processor."
+                                    .to_owned(),
+                            ));
+                        };
+
                         let refund = stripe::Refund::create(
                             &stripe_client,
                             CreateRefund {
@@ -282,15 +299,20 @@ pub async fn refund_charge(
                         )
                         .await?;
 
-                        let anrok_txn_result = anrok_client.create_or_update_txn(
+                        let anrok_txn_result = anrok_client.negate_or_create_partial_negation(
+                            original_tax_platform_id,
+                            original_tax_transaction_version,
+                            charge.amount + charge.tax_amount,
                             &anrok::Transaction {
                                 id: anrok::transaction_id_stripe_pyr(&refund.id),
                                 fields: anrok::TransactionFields {
                                     customer_address: anrok::Address::from_stripe_address(&billing_address),
                                     currency_code: charge.currency_code.clone(),
-                                    accounting_time: Utc::now(),
+                                    accounting_time: original_tax_platform_accounting_time,
                                     accounting_time_zone: anrok::AccountingTimeZone::Utc,
-                                    line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, refund_amount)],
+                                    line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, -refund_amount)],
+                                    customer_id: Some(format!("stripe:cust:{}", user.stripe_customer_id.unwrap_or_else(|| "unknown".to_owned()))),
+                                    customer_name: Some("Customer".to_owned()),
                                 }
                             }
                         ).await;
@@ -346,6 +368,8 @@ pub async fn refund_charge(
             currency_code: charge.currency_code,
             tax_last_updated: Some(Utc::now()),
             tax_drift_loss: Some(0),
+            tax_transaction_version: None,
+            tax_platform_accounting_time: None,
         }
         .upsert(&mut transaction)
         .await?;
@@ -1640,6 +1664,8 @@ pub async fn stripe_webhook(
                             net: None,
                             tax_last_updated: Some(Utc::now()),
                             tax_drift_loss: Some(0),
+                            tax_transaction_version: None,
+                            tax_platform_accounting_time: None,
                         };
 
                         if charge_status != ChargeStatus::Failed {
@@ -2003,6 +2029,8 @@ pub async fn stripe_webhook(
                                 tax_platform_id: None,
                                 tax_last_updated: Some(Utc::now()),
                                 tax_drift_loss: Some(0),
+                                tax_transaction_version: None,
+                                tax_platform_accounting_time: None,
                             }
                             .upsert(&mut transaction)
                             .await?;

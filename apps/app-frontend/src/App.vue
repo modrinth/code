@@ -4,6 +4,7 @@ import {
 	ChangeSkinIcon,
 	CompassIcon,
 	DownloadIcon,
+	ExternalIcon,
 	HomeIcon,
 	LeftArrowIcon,
 	LibraryIcon,
@@ -14,9 +15,11 @@ import {
 	NewspaperIcon,
 	NotepadTextIcon,
 	PlusIcon,
+	RefreshCwIcon,
 	RestoreIcon,
 	RightArrowIcon,
 	SettingsIcon,
+	UserIcon,
 	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -24,9 +27,11 @@ import {
 	Avatar,
 	Button,
 	ButtonStyled,
+	commonMessages,
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
+	ProgressSpinner,
 	provideNotificationManager,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
@@ -35,8 +40,8 @@ import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
-import { check } from '@tauri-apps/plugin-updater'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import { $fetch } from 'ofetch'
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
@@ -58,6 +63,7 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import UpdateToast from '@/components/ui/UpdateToast.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -65,11 +71,22 @@ import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/he
 import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
+import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { list } from '@/helpers/profile.js'
-import { get } from '@/helpers/settings.ts'
+import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
-import { getOS, isDev, restartApp } from '@/helpers/utils.js'
+import {
+	areUpdatesEnabled,
+	enqueueUpdateForInstallation,
+	getOS,
+	getUpdateSize,
+	isDev,
+	isNetworkMetered,
+} from '@/helpers/utils.js'
+import {
+	provideAppUpdateDownloadProgress,
+	subscribeToDownloadProgress,
+} from '@/providers/download-progress.ts'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
@@ -114,11 +131,39 @@ onMounted(async () => {
 
 	document.querySelector('body').addEventListener('click', handleClick)
 	document.querySelector('body').addEventListener('auxclick', handleAuxClick)
+
+	checkUpdates()
 })
 
-onUnmounted(() => {
+onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('click', handleClick)
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
+
+	await unlistenUpdateDownload?.()
+})
+
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	updateInstalledToastTitle: {
+		id: 'app.update.complete-toast.title',
+		defaultMessage: 'Version {version} was successfully installed!',
+	},
+	updateInstalledToastText: {
+		id: 'app.update.complete-toast.text',
+		defaultMessage: 'Click here to view the changelog.',
+	},
+	reloadToUpdate: {
+		id: 'app.update.reload-to-update',
+		defaultMessage: 'Reload to install update',
+	},
+	downloadUpdate: {
+		id: 'app.update.download-update',
+		defaultMessage: 'Download update',
+	},
+	downloadingUpdate: {
+		id: 'app.update.downloading-update',
+		defaultMessage: 'Downloading update ({percent}%)',
+	},
 })
 
 async function setupApp() {
@@ -134,7 +179,8 @@ async function setupApp() {
 		toggle_sidebar,
 		developer_mode,
 		feature_flags,
-	} = await get()
+		pending_update_toast_for_version,
+	} = await getSettings()
 
 	if (default_page === 'Library') {
 		await router.push('/library')
@@ -221,7 +267,6 @@ async function setupApp() {
 		})
 
 	get_opening_command().then(handleCommand)
-	checkUpdates()
 	fetchCredentials()
 
 	try {
@@ -230,6 +275,12 @@ async function setupApp() {
 		generateSkinPreviews(skins, capes)
 	} catch (error) {
 		console.warn('Failed to generate skin previews in app setup.', error)
+	}
+
+	if (pending_update_toast_for_version !== null) {
+		const settings = await getSettings()
+		settings.pending_update_toast_for_version = null
+		await setSettings(settings)
 	}
 
 	if (osType === 'windows') {
@@ -377,17 +428,111 @@ async function handleCommand(e) {
 	}
 }
 
-const updateAvailable = ref(false)
-async function checkUpdates() {
-	const update = await check()
-	updateAvailable.value = !!update
+const appUpdateDownload = {
+	progress: ref(0),
+	version: ref(),
+}
+let unlistenUpdateDownload
 
+const downloadProgress = computed(() => appUpdateDownload.progress.value)
+const downloadPercent = computed(() => Math.trunc(appUpdateDownload.progress.value * 100))
+
+const metered = ref(true)
+const finishedDownloading = ref(false)
+const restarting = ref(false)
+const updateToastDismissed = ref(false)
+const availableUpdate = ref(null)
+const updateSize = ref(null)
+async function checkUpdates() {
+	if (!(await areUpdatesEnabled())) {
+		console.log('Skipping update check as updates are disabled in this build or environment')
+		return
+	}
+
+	async function performCheck() {
+		const update = await invoke('plugin:updater|check')
+		const isExistingUpdate = update.version === availableUpdate.value?.version
+
+		if (!update) {
+			console.log('No update available')
+			return
+		}
+
+		if (isExistingUpdate) {
+			console.log('Update is already known')
+			return
+		}
+
+		appUpdateDownload.progress.value = 0
+		finishedDownloading.value = false
+		updateToastDismissed.value = false
+
+		console.log(`Update ${update.version} is available.`)
+
+		metered.value = await isNetworkMetered()
+		if (!metered.value) {
+			console.log('Starting download of update')
+			downloadUpdate(update)
+		} else {
+			console.log(`Metered connection detected, not auto-downloading update.`)
+		}
+
+		getUpdateSize(update.rid).then((size) => (updateSize.value = size))
+
+		availableUpdate.value = update
+	}
+
+	await performCheck()
 	setTimeout(
 		() => {
 			checkUpdates()
 		},
-		5 * 1000 * 60,
+		5 /* min */ * 60 /* sec */ * 1000 /* ms */,
 	)
+}
+
+async function showUpdateToast() {
+	updateToastDismissed.value = false
+}
+
+async function downloadAvailableUpdate() {
+	return downloadUpdate(availableUpdate.value)
+}
+
+async function downloadUpdate(versionToDownload) {
+	if (!versionToDownload) {
+		handleError(`Failed to download update: no version available`)
+	}
+
+	if (appUpdateDownload.progress.value !== 0) {
+		console.error(`Update ${versionToDownload.version} already downloading`)
+		return
+	}
+
+	console.log(`Downloading update ${versionToDownload.version}`)
+
+	try {
+		enqueueUpdateForInstallation(versionToDownload.rid).then(() => {
+			finishedDownloading.value = true
+			unlistenUpdateDownload?.().then(() => {
+				unlistenUpdateDownload = null
+			})
+			console.log('Finished downloading!')
+		})
+		unlistenUpdateDownload = await subscribeToDownloadProgress(
+			appUpdateDownload,
+			versionToDownload.version,
+		)
+	} catch (e) {
+		handleError(e)
+	}
+}
+
+async function installUpdate() {
+	restarting.value = true
+	setTimeout(async () => {
+		await handleClose()
+	}, 250)
 }
 
 function handleClick(e) {
@@ -534,12 +679,47 @@ async function processPendingSurveys() {
 		console.info('No user survey to show')
 	}
 }
+
+provideAppUpdateDownloadProgress(appUpdateDownload)
 </script>
 
 <template>
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
 	<div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
+		<Suspense>
+			<Transition name="toast">
+				<UpdateToast
+					v-if="
+						!!availableUpdate &&
+						!updateToastDismissed &&
+						!restarting &&
+						(finishedDownloading || metered)
+					"
+					:version="availableUpdate.version"
+					:size="updateSize"
+					:metered="metered"
+					@close="updateToastDismissed = true"
+					@restart="installUpdate"
+					@download="downloadAvailableUpdate"
+				/>
+			</Transition>
+		</Suspense>
+		<Transition name="fade">
+			<div
+				v-if="restarting"
+				data-tauri-drag-region
+				class="inset-0 fixed bg-black/80 backdrop-blur z-[200] flex items-center justify-center"
+			>
+				<span
+					data-tauri-drag-region
+					class="flex items-center gap-4 text-contrast font-semibold text-xl select-none cursor-default"
+				>
+					<RefreshCwIcon data-tauri-drag-region class="animate-spin w-6 h-6" />
+					Restarting...
+				</span>
+			</div>
+		</Transition>
 		<Suspense>
 			<AppSettingsModal ref="settingsModal" />
 		</Suspense>
@@ -593,35 +773,85 @@ async function processPendingSurveys() {
 				<PlusIcon />
 			</NavButton>
 			<div class="flex flex-grow"></div>
-			<NavButton v-if="updateAvailable" v-tooltip.right="'Install update'" :to="() => restartApp()">
-				<DownloadIcon />
-			</NavButton>
-			<NavButton v-tooltip.right="'Settings'" :to="() => $refs.settingsModal.show()">
+			<Transition name="nav-button-animated">
+				<div
+					v-if="
+						availableUpdate &&
+						updateToastDismissed &&
+						!restarting &&
+						(finishedDownloading || metered)
+					"
+				>
+					<NavButton
+						v-tooltip.right="
+							formatMessage(
+								finishedDownloading
+									? messages.reloadToUpdate
+									: downloadProgress === 0
+										? messages.downloadUpdate
+										: messages.downloadingUpdate,
+								{
+									percent: downloadPercent,
+								},
+							)
+						"
+						:to="
+							finishedDownloading
+								? installUpdate
+								: downloadProgress > 0 && downloadProgress < 1
+									? showUpdateToast
+									: downloadAvailableUpdate
+						"
+					>
+						<ProgressSpinner
+							v-if="downloadProgress > 0 && downloadProgress < 1"
+							class="text-brand"
+							:progress="downloadProgress"
+						/>
+						<RefreshCwIcon v-else-if="finishedDownloading" class="text-brand" />
+						<DownloadIcon v-else class="text-brand" />
+					</NavButton>
+				</div>
+			</Transition>
+			<NavButton
+				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
+				:to="() => $refs.settingsModal.show()"
+			>
 				<SettingsIcon />
 			</NavButton>
-			<ButtonStyled v-if="credentials" type="transparent" circular>
-				<OverflowMenu
-					:options="[
-						{
-							id: 'sign-out',
-							action: () => logOut(),
-							color: 'danger',
-						},
-					]"
-					direction="left"
-				>
-					<Avatar
-						:src="credentials.user.avatar_url"
-						:alt="credentials.user.username"
-						size="32px"
-						circle
-					/>
-					<template #sign-out> <LogOutIcon /> Sign out </template>
-				</OverflowMenu>
-			</ButtonStyled>
-			<NavButton v-else v-tooltip.right="'Sign in'" :to="() => signIn()">
-				<LogInIcon />
-				<template #label>Sign in</template>
+			<OverflowMenu
+				v-if="credentials"
+				v-tooltip.right="`Modrinth account`"
+				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
+				:options="[
+					{
+						id: 'view-profile',
+						action: () => openUrl('https://modrinth.com/user/' + credentials.user.username),
+					},
+					{
+						id: 'sign-out',
+						action: () => logOut(),
+						color: 'danger',
+					},
+				]"
+				placement="right-end"
+			>
+				<Avatar :src="credentials.user.avatar_url" alt="" size="32px" circle />
+				<template #view-profile>
+					<UserIcon />
+					<span class="inline-flex items-center gap-1">
+						Signed in as
+						<span class="inline-flex items-center gap-1 text-contrast font-semibold">
+							<Avatar :src="credentials.user.avatar_url" alt="" size="20px" circle />
+							{{ credentials.user.username }}
+						</span>
+					</span>
+					<ExternalIcon />
+				</template>
+				<template #sign-out> <LogOutIcon /> Sign out </template>
+			</OverflowMenu>
+			<NavButton v-else v-tooltip.right="'Sign in to a Modrinth account'" :to="() => signIn()">
+				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
@@ -761,19 +991,19 @@ async function processPendingSurveys() {
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
 				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-						<h3 class="text-lg m-0">Playing as</h3>
+						<h3 class="text-base text-primary font-medium m-0">Playing as</h3>
 						<suspense>
 							<AccountsCard ref="accounts" mode="small" />
 						</suspense>
 					</div>
-					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+					<div class="py-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<suspense>
 							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
 						</suspense>
 					</div>
-					<div v-if="news && news.length > 0" class="pt-4 flex flex-col items-center">
-						<h3 class="px-4 text-lg m-0 text-left w-full">News</h3>
-						<div class="px-4 pt-2 space-y-4 flex flex-col items-center w-full">
+					<div v-if="news && news.length > 0" class="p-4 flex flex-col items-center">
+						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">News</h3>
+						<div class="space-y-4 flex flex-col items-center w-full">
 							<NewsArticleCard
 								v-for="(item, index) in news"
 								:key="`news-${index}`"
@@ -1021,6 +1251,84 @@ async function processPendingSurveys() {
 .popup-survey-leave-to {
 	opacity: 0;
 	transform: translateY(10rem) scale(0.8) scaleY(1.6);
+}
+
+.toast-enter-active {
+	transition: opacity 0.25s linear;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+	opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.toast-enter-active,
+	.nav-button-animated-enter-active {
+		transition: all 0.5s cubic-bezier(0.15, 1.4, 0.64, 0.96);
+	}
+
+	.toast-leave-active,
+	.nav-button-animated-leave-active {
+		transition: all 0.25s ease;
+	}
+
+	.toast-enter-from {
+		scale: 0.5;
+		translate: 0 -10rem;
+		opacity: 0;
+	}
+
+	.toast-leave-to {
+		scale: 0.96;
+		translate: 20rem 0;
+		opacity: 0;
+	}
+
+	.nav-button-animated-enter-active {
+		position: relative;
+	}
+
+	.nav-button-animated-enter-active::before {
+		content: '';
+		inset: 0;
+		border-radius: 100vw;
+		background-color: var(--color-brand-highlight);
+		position: absolute;
+		animation: pop 0.5s ease-in forwards;
+		opacity: 0;
+	}
+
+	@keyframes pop {
+		0% {
+			scale: 0.5;
+		}
+		50% {
+			opacity: 0.5;
+		}
+		100% {
+			scale: 1.5;
+		}
+	}
+
+	.nav-button-animated-enter-from {
+		scale: 0.5;
+		translate: -2rem 0;
+		opacity: 0;
+	}
+
+	.nav-button-animated-leave-to {
+		scale: 0.75;
+		opacity: 0;
+	}
+
+	.fade-enter-active {
+		transition: 0.25s ease-in-out;
+	}
+
+	.fade-enter-from {
+		opacity: 0;
+	}
 }
 </style>
 <style>

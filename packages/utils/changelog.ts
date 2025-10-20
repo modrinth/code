@@ -11,6 +11,109 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-19T17:45:00-07:00`,
+		product: 'app',
+		version: '0.10.13',
+		body: `## Improvements
+- Revamped the app sidebar and friends UI to be more straightforward and easier to use.
+- Improved the UI of the Modrinth account button in the bottom left corner. It's now more visually consistent with the other navigation buttons and it has a link to your profile.
+- Updated the ad fallback to be green again instead of blue.
+- Fixed 'Open folder' in the instance page context menu having the wrong icon.`,
+	},
+	{
+		date: `2025-10-15T12:15:00-07:00`,
+		product: 'app',
+		version: '0.10.12',
+		body: `## Improvements
+- Fixed cache sticking around for way too long (30 hours instead of 30 minutes).`,
+	},
+	{
+		date: `2025-10-15T04:11:00-07:00`,
+		product: 'app',
+		version: '0.10.11',
+		body: `## Improvements
+- Fixed ads being able to play audio.`,
+	},
+	{
+		date: `2025-10-14T18:45:00-07:00`,
+		product: 'servers',
+		body: `### Improvements
+- Removed 'Prepare download' step for downloading backups, you can now just download them directly.`,
+	},
+	{
+		date: `2025-10-08T13:45:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Add ability to download tax form after submission.`,
+	},
+	{
+		date: `2025-10-07T09:50:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Allow users to fill out tax form when attempting a withdraw that exceeds $600/yr threshold.`,
+	},
+	{
+		date: `2025-10-04T17:20:00-07:00`,
+		product: 'app',
+		version: '0.10.10',
+		body: `## Improvements
+- Fixed Minecraft versions 1.12.2 and earlier failing to install.`,
+	},
+	{
+		date: `2025-10-04T09:45:00-07:00`,
+		product: 'app',
+		version: '0.10.9',
+		body: `### Security fixes
+- Fixed a couple Modrinth Pack (\`.mrpack\`) importing security vulnerabilities.`,
+	},
+	{
+		date: `2025-10-01T19:05:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Added banner informing Russian users of our non-compliance with censorship laws that will lead to Modrinth being blocked in Russia. For more info, see [our news article on it](/news/article/standing-by-our-values).`,
+	},
+	{
+		date: `2025-09-29T12:50:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Re-enabled the creation of organizations.
+- Added limits for creating content on Modrinth
+	- Up to 256 projects
+	- Up to 16 organizations
+	- Up to 64 collections
+	- If you need more, please contact [support](https://support.modrinth.com) and explain why, and we can increase your limits.`,
+	},
+	{
+		date: `2025-09-29T12:50:00-07:00`,
+		product: 'app',
+		version: '0.10.8',
+		body: `### Improvements
+- Overhauled Modrinth App updater to make it easier to stay up-to-date.
+  - Updates will now be downloaded in the background to make a seamless updating experience.
+  - When an update is downloaded, it will prompt you to reload the app.
+  - If a metered internet connection is detected, it will ask you before downloading the update.
+- Fixed how transparency is handled on the skins page. (Contributed by [Jerozgen](https://github.com/modrinth/code/pull/4373))
+- Removed the 'Advanced' toggle in the Instance creation interface.
+- Improved version selection when installing content.
+	- Installing versions from the Discover content page will now install a version according to your filters, rather than simply the latest.
+	- Dependencies will now download with the same logic as the content being installed.
+	- Non-mod projects and dependencies will now be installed properly.
+- Fixed window dragging issues with the top bar. (Contributed by [aervxa](https://github.com/modrinth/code/pull/4218))
+- Fixed an empty servers.dat file being created when one doesn't already exist, preventing certain mods from providing defaults.
+- Fixed long creator names overflowing on project pages.
+- Strings in Markdown descriptions that look like domain names or IP addresses will no longer automatically be converted to links, such as \`README.md\`.
+- When adding friends, unknown users will now show an error.
+- Pressing 'Enter' after typing in a friend's username will now send the friend request.
+- Improved error handling from Modrinth API.
+- Fixed the white flash when the app is opened on certain systems. (Contributed by [aervxa](https://github.com/modrinth/code/pull/4177))`,
+	},
+	{
+		date: `2025-09-25T19:15:00-07:00`,
+		product: 'web',
+		body: `### Improvements
+- Temporarily disabled the creation of Organizations.`,
+	},
+	{
 		date: `2025-09-21T15:45:00-07:00`,
 		product: 'web',
 		body: `### Improvements

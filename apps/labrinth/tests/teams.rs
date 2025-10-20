@@ -176,7 +176,7 @@ async fn test_get_team_organization() {
                 &test_env.dummy.organization_zeta.organization_id;
             let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
 
-            // A non-member of the team should get basic info but not be able to see private data
+            // A non-member of the team should get basic team info
             let members = api
                 .get_team_members_deserialized_common(
                     zeta_team_id,
@@ -186,15 +186,6 @@ async fn test_get_team_organization() {
             assert_eq!(members.len(), 1);
             assert_eq!(members[0].user.id.0, USER_USER_ID_PARSED as u64);
             assert!(members[0].permissions.is_none());
-
-            let members = api
-                .get_organization_members_deserialized_common(
-                    zeta_organization_id,
-                    FRIEND_USER_PAT,
-                )
-                .await;
-            assert_eq!(members.len(), 1);
-            assert_eq!(members[0].user.id.0, USER_USER_ID_PARSED as u64);
 
             // A non-accepted member of the team should:
             // - not be able to see private data about the team, but see all members including themselves
@@ -257,15 +248,6 @@ async fn test_get_team_organization() {
             let members = api
                 .get_team_members_deserialized_common(
                     zeta_team_id,
-                    ENEMY_USER_PAT,
-                )
-                .await;
-            assert_eq!(members.len(), 1); // Only USER_USER_ID should be in the team
-
-            // enemy team check via association
-            let members = api
-                .get_organization_members_deserialized_common(
-                    zeta_organization_id,
                     ENEMY_USER_PAT,
                 )
                 .await;
@@ -553,7 +535,7 @@ async fn test_patch_organization_team_member() {
     }).await;
 }
 
-// trasnfer ownership (requires being owner, etc)
+// transfer ownership (requires being owner, etc)
 #[actix_rt::test]
 async fn transfer_ownership_v3() {
     // Test setup and dummy data
@@ -693,7 +675,7 @@ async fn transfer_ownership_v3() {
 //     // Adding a user to a project team in an organization, when that user is in the organization but not the team,
 //     // should have those permissions apply regardless of whether the user has accepted the invite or not.
 
-//     // This is because project-team permission overrriding must be possible, and this overriding can decrease the number of permissions a user has.
+//     // This is because project-team permission overriding must be possible, and this overriding can decrease the number of permissions a user has.
 
 //     let test_env = TestEnvironment::build(None).await;
 //     let api = &test_env.api;

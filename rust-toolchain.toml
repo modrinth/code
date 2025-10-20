@@ -1,9 +1,3 @@
 [toolchain]
-channel = "nightly-2025-09-18"
+channel = "1.90.0"
 profile = "default"
-components = [
-	"rust-analyzer",
-	# use cranelift in debug builds to improve compile times
-	# also see `.cargo/config.toml`
-	"rustc-codegen-cranelift-preview"
-]

@@ -27,6 +27,78 @@
 		</div>
 	</div>
 	<div ref="main_page" class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
+		<PagewideBanner v-if="isRussia && !flags.hideRussiaCensorshipBanner" variant="error">
+			<template #title>
+				<div class="flex flex-col gap-1 text-contrast">
+					<span lang="ru">К сожалению, Modrinth скоро станет недоступен в России</span>
+					<span class="text-sm font-medium opacity-50" lang="en">
+						Modrinth will soon be unavailable in Russia
+					</span>
+				</div>
+			</template>
+			<template #description>
+				<p class="m-0" lang="ru">
+					Российское правительство потребовало от нас заблокировать некоторые проекты на Modrinth,
+					но мы решили отказать им в цензуре.
+				</p>
+				<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
+					The Russian government has asked us to censor certain topics on Modrinth and we have
+					decided to refuse to comply with their requests.
+				</p>
+
+				<p class="m-0 font-semibold" lang="ru">
+					Пожалуйста, найдите какой-нибудь надёжный VPN или прокси, чтобы не потерять доступ к
+					Modrinth.
+				</p>
+				<p class="-mt-2 mb-0 text-sm opacity-50" lang="en">
+					Please seek a reputable VPN or proxy of some kind to continue to access Modrinth in
+					Russia.
+				</p>
+			</template>
+			<template #actions>
+				<div class="mt-2 flex w-fit gap-2">
+					<ButtonStyled color="brand">
+						<nuxt-link to="/news/article/standing-by-our-values-russian">
+							<BookTextIcon /> Прочесть наше полное заявление
+							<span class="text-xs font-medium">(Перевод на русский)</span>
+						</nuxt-link>
+					</ButtonStyled>
+					<ButtonStyled>
+						<nuxt-link to="/news/article/standing-by-our-values">
+							<BookTextIcon /> Read our full statement
+							<span class="text-xs font-medium">(English)</span>
+						</nuxt-link>
+					</ButtonStyled>
+				</div>
+			</template>
+			<template #actions_right>
+				<ButtonStyled circular type="transparent">
+					<button
+						v-tooltip="formatMessage(commonMessages.closeButton)"
+						@click="hideRussiaCensorshipBanner"
+					>
+						<XIcon :aria-label="formatMessage(commonMessages.closeButton)" />
+					</button>
+				</ButtonStyled>
+			</template>
+		</PagewideBanner>
+		<PagewideBanner v-if="showTinMismatchBanner" variant="error">
+			<template #title>
+				<span>{{ formatMessage(tinMismatchBannerMessages.title) }}</span>
+			</template>
+			<template #description>
+				<span>{{ formatMessage(tinMismatchBannerMessages.description) }}</span>
+			</template>
+			<template #actions>
+				<div class="flex w-fit flex-row">
+					<ButtonStyled color="red">
+						<nuxt-link to="https://support.modrinth.com" target="_blank" rel="noopener">
+							<MessageIcon /> {{ formatMessage(tinMismatchBannerMessages.action) }}
+						</nuxt-link>
+					</ButtonStyled>
+				</div>
+			</template>
+		</PagewideBanner>
 		<PagewideBanner v-if="showTaxComplianceBanner" variant="warning">
 			<template #title>
 				<span>{{ formatMessage(taxBannerMessages.title) }}</span>
@@ -111,7 +183,7 @@
 				<Button
 					transparent
 					icon-only
-					:aria-label="formatMessage(messages.close)"
+					:aria-label="formatMessage(commonMessages.closeButton)"
 					@click="hideStagingBanner"
 				>
 					<XIcon aria-hidden="true" />
@@ -134,7 +206,8 @@
 
 		<CreatorTaxFormModal
 			ref="taxFormModalRef"
-			@success="() => navigateTo('/dashboard/revenue', { external: true })"
+			close-button-text="Close"
+			:emit-success-on-close="false"
 		/>
 		<header
 			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
@@ -676,7 +749,7 @@
 			</div>
 		</header>
 		<main class="min-h-[calc(100vh-4.5rem-310.59px)]">
-			<ModalCreation v-if="auth.user" ref="modal_creation" />
+			<ProjectCreateModal v-if="auth.user" ref="modal_creation" />
 			<CollectionCreateModal ref="modal_collection_creation" />
 			<OrganizationCreateModal ref="modal_organization_creation" />
 			<slot id="main" />
@@ -774,6 +847,7 @@ import {
 	BellIcon,
 	BlueskyIcon,
 	BookmarkIcon,
+	BookTextIcon,
 	BoxIcon,
 	BracesIcon,
 	ChartIcon,
@@ -794,6 +868,7 @@ import {
 	LogInIcon,
 	LogOutIcon,
 	MastodonIcon,
+	MessageIcon,
 	ModrinthIcon,
 	MoonIcon,
 	OrganizationIcon,
@@ -825,13 +900,15 @@ import { isAdmin, isStaff } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
-import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
+import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
+import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
+import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
-import ModalCreation from '~/components/ui/ModalCreation.vue'
-import OrganizationCreateModal from '~/components/ui/OrganizationCreateModal.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
+
+const country = useUserCountry()
 
 const { formatMessage } = useVIntl()
 
@@ -853,12 +930,21 @@ const { data: payoutBalance } = await useAsyncData('payout/balance', () =>
 )
 
 const showTaxComplianceBanner = computed(() => {
+	if (flags.value.testTaxForm && auth.value.user) return true
 	const bal = payoutBalance.value
 	if (!bal) return false
 	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
 	const status = bal.form_completion_status ?? 'unknown'
 	const isComplete = status === 'complete'
-	return !!auth.value.user && thresholdMet && !isComplete
+	const isTinMismatch = status === 'tin-mismatch'
+	return !!auth.value.user && thresholdMet && !isComplete && !isTinMismatch
+})
+
+const showTinMismatchBanner = computed(() => {
+	const bal = payoutBalance.value
+	if (!bal) return false
+	const status = bal.form_completion_status ?? 'unknown'
+	return !!auth.value.user && status === 'tin-mismatch'
 })
 
 const taxBannerMessages = defineMessages({
@@ -869,13 +955,28 @@ const taxBannerMessages = defineMessages({
 	description: {
 		id: 'layout.banner.tax.description',
 		defaultMessage:
-			'You’ve already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.',
+			"You've already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.",
 	},
 	action: {
 		id: 'layout.banner.tax.action',
 		defaultMessage: 'Complete tax form',
 	},
-	close: { id: 'common.close', defaultMessage: 'Close' },
+})
+
+const tinMismatchBannerMessages = defineMessages({
+	title: {
+		id: 'layout.banner.tin-mismatch.title',
+		defaultMessage: 'Tax form failed',
+	},
+	description: {
+		id: 'layout.banner.tin-mismatch.description',
+		defaultMessage:
+			"Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form.",
+	},
+	action: {
+		id: 'layout.banner.tin-mismatch.action',
+		defaultMessage: 'Contact support',
+	},
 })
 
 const taxFormModalRef = ref(null)
@@ -1018,10 +1119,6 @@ const messages = defineMessages({
 	changeTheme: {
 		id: 'layout.action.change-theme',
 		defaultMessage: 'Change theme',
-	},
-	close: {
-		id: 'layout.action.close-banner',
-		defaultMessage: 'Close',
 	},
 	modrinthHomePage: {
 		id: 'layout.nav.modrinth-home-page',
@@ -1265,6 +1362,8 @@ const isDiscoveringSubpage = computed(
 	() => route.name && route.name.startsWith('type-id') && !route.query.sid,
 )
 
+const isRussia = computed(() => country.value === 'ru')
+
 const rCount = ref(0)
 
 const randomProjects = ref([])
@@ -1401,6 +1500,11 @@ const { cycle: changeTheme } = useTheme()
 
 function hideStagingBanner() {
 	cosmetics.value.hideStagingBanner = true
+}
+
+function hideRussiaCensorshipBanner() {
+	flags.value.hideRussiaCensorshipBanner = true
+	saveFeatureFlags()
 }
 
 const socialLinks = [
@@ -1670,6 +1774,7 @@ const footerLinks = [
 			@media screen and (min-width: 354px) {
 				grid-template-columns: repeat(2, 1fr);
 			}
+
 			@media screen and (min-width: 674px) {
 				grid-template-columns: repeat(3, 1fr);
 			}
@@ -1864,10 +1969,12 @@ const footerLinks = [
 			width: 25rem;
 			height: 25rem;
 		}
+
 		.animation-ring-2 {
 			width: 50rem;
 			height: 50rem;
 		}
+
 		.animation-ring-3 {
 			width: 100rem;
 			height: 100rem;
@@ -1896,15 +2003,19 @@ const footerLinks = [
 	0% {
 		rotate: 0deg;
 	}
+
 	25% {
 		rotate: calc(1deg * (var(--_r-count) - 20));
 	}
+
 	50% {
 		rotate: 0deg;
 	}
+
 	75% {
 		rotate: calc(-1deg * (var(--_r-count) - 20));
 	}
+
 	100% {
 		rotate: 0deg;
 	}
@@ -1914,15 +2025,19 @@ const footerLinks = [
 	0% {
 		translate: 0;
 	}
+
 	25% {
 		translate: calc(2px * (var(--_r-count) - 20));
 	}
+
 	50% {
 		translate: 0;
 	}
+
 	75% {
 		translate: calc(-2px * (var(--_r-count) - 20));
 	}
+
 	100% {
 		translate: 0;
 	}
@@ -1932,15 +2047,19 @@ const footerLinks = [
 	0% {
 		transform: translateY(0);
 	}
+
 	25% {
 		transform: translateY(calc(2px * (var(--_r-count) - 20)));
 	}
+
 	50% {
 		transform: translateY(0);
 	}
+
 	75% {
 		transform: translateY(calc(-2px * (var(--_r-count) - 20)));
 	}
+
 	100% {
 		transform: translateY(0);
 	}

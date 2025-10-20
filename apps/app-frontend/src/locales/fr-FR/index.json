@@ -20,6 +20,21 @@
   "app.settings.tabs.resource-management": {
     "message": "Gestion des ressources"
   },
+  "app.update-toast.downloading": {
+    "message": "Téléchargement..."
+  },
+  "app.update-toast.reload": {
+    "message": "Rechargement"
+  },
+  "app.update-toast.title": {
+    "message": "Mise à jour disponible"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Téléchargement terminé"
+  },
+  "app.update.download-update": {
+    "message": "Télécharger la mise à jour"
+  },
   "instance.add-server.add-and-play": {
     "message": "Ajouter et jouer"
   },

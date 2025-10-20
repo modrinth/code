@@ -1,20 +1,23 @@
 <template>
-	<div class="ad-parent relative mb-3 flex w-full justify-center rounded-2xl bg-bg-raised">
-		<nuxt-link
-			:to="flags.enableMedalPromotion ? '/servers?plan&ref=medal' : '/servers'"
-			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]"
+	<div class="wrapper relative mb-3 flex w-full justify-center rounded-2xl">
+		<AutoLink
+			:to="currentAd.link"
+			:aria-label="currentAd.description"
+			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit] bg-bg-raised"
 		>
 			<img
-				:src="`https://cdn-raw.modrinth.com/${flags.enableMedalPromotion ? 'medal-modrinth-servers' : 'modrinth-servers-placeholder'}-light.webp`"
-				alt="Host your next server with Modrinth Servers"
+				:src="currentAd.light"
+				aria-hidden="true"
+				:alt="currentAd.description"
 				class="light-image hidden rounded-[inherit]"
 			/>
 			<img
-				:src="`https://cdn-raw.modrinth.com/${flags.enableMedalPromotion ? 'medal-modrinth-servers' : 'modrinth-servers-placeholder'}-dark.webp`"
-				alt="Host your next server with Modrinth Servers"
+				:src="currentAd.dark"
+				aria-hidden="true"
+				:alt="currentAd.description"
 				class="dark-image rounded-[inherit]"
 			/>
-		</nuxt-link>
+		</AutoLink>
 		<div
 			class="absolute top-0 flex items-center justify-center overflow-hidden rounded-2xl bg-bg-raised"
 		>
@@ -23,6 +26,8 @@
 	</div>
 </template>
 <script setup>
+import { AutoLink } from '@modrinth/ui'
+
 const flags = useFeatureFlags()
 
 useHead({
@@ -54,6 +59,25 @@ useHead({
 		},
 	],
 })
+
+const AD_PRESETS = {
+	medal: {
+		light: 'https://cdn-raw.modrinth.com/medal-modrinth-servers-light-new.webp',
+		dark: 'https://cdn-raw.modrinth.com/medal-modrinth-servers-dark-new.webp',
+		description: 'Host your next server with Modrinth Servers',
+		link: '/servers?plan&ref=medal',
+	},
+	'modrinth-servers': {
+		light: 'https://cdn-raw.modrinth.com/modrinth-servers-placeholder-light.webp',
+		dark: 'https://cdn-raw.modrinth.com/modrinth-servers-placeholder-dark.webp',
+		description: 'Host your next server with Modrinth Servers',
+		link: '/servers',
+	},
+}
+
+const currentAd = computed(() =>
+	flags.value.enableMedalPromotion ? AD_PRESETS.medal : AD_PRESETS['modrinth-servers'],
+)
 
 onMounted(() => {
 	window.tude = window.tude || { cmd: [] }
@@ -137,9 +161,13 @@ iframe[id^='google_ads_iframe'] {
 }
 
 @media (max-width: 1024px) {
-	.ad-parent {
+	.wrapper {
 		display: none;
 	}
+}
+
+.wrapper > * {
+	box-shadow: var(--shadow-card);
 }
 </style>
 

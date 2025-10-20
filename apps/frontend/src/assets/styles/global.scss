@@ -258,17 +258,17 @@ html {
 	--hover-filter: brightness(120%);
 	--active-filter: brightness(140%);
 
-	--banner-error-bg: #4c1515;
+	--banner-error-bg: #45222c;
 	--banner-error-text: #fee2e2;
-	--banner-error-border: #7f1d1d;
+	--banner-error-border: var(--color-red);
 
-	--banner-warning-bg: #4a2a0a;
-	--banner-warning-text: #ffe6c0;
-	--banner-warning-border: #b54708;
+	--banner-warning-bg: #453425;
+	--banner-warning-text: #e4d9ca;
+	--banner-warning-border: var(--color-orange);
 
-	--banner-info-bg: #1e2a44;
+	--banner-info-bg: #28374b;
 	--banner-info-text: #dbeafe;
-	--banner-info-border: #2563eb;
+	--banner-info-border: var(--color-blue);
 }
 
 .oled-mode {

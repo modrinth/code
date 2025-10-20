@@ -20,7 +20,7 @@ pub struct Project {
     pub id: ProjectId,
     /// The slug of a project, used for vanity URLs
     pub slug: Option<String>,
-    /// The aggregated project typs of the versions of this project
+    /// The aggregated project typos of the versions of this project
     pub project_types: Vec<String>,
     /// The aggregated games of the versions of this project
     pub games: Vec<String>,
@@ -49,7 +49,7 @@ pub struct Project {
 
     /// The status of the project
     pub status: ProjectStatus,
-    /// The requested status of this projct
+    /// The requested status of this project
     pub requested_status: Option<ProjectStatus>,
 
     /// DEPRECATED: moved to threads system
@@ -524,9 +524,13 @@ impl ProjectStatus {
     }
 
     // Project can be displayed in search
-    // IMPORTANT: if this is changed, make sure to update the `mods_searchable_ids_gist`
-    // index in the DB to keep random project queries fast (see the
-    // `20250609134334_spatial-random-project-index.sql` migration)
+    // IMPORTANT: if this is changed, make sure to:
+    // - update the `mods_searchable_ids_gist`
+    //   index in the DB to keep random project queries fast (see the
+    //   `20250609134334_spatial-random-project-index.sql` migration).
+    // - update the `is_visible_organization` function in
+    //   `apps/labrinth/src/auth/checks.rs`, which duplicates this logic
+    //   in a SQL query for efficiency.
     pub fn is_searchable(&self) -> bool {
         matches!(self, ProjectStatus::Approved | ProjectStatus::Archived)
     }

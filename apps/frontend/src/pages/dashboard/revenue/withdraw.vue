@@ -1,4 +1,10 @@
 <template>
+	<CreatorTaxFormModal
+		ref="taxFormModalRef"
+		close-button-text="Continue"
+		@success="onTaxFormSuccess"
+		@cancelled="onTaxFormCancelled"
+	/>
 	<section class="universal-card">
 		<Breadcrumbs
 			current-title="Withdraw"
@@ -135,7 +141,12 @@
 			</template>
 		</div>
 
-		<p v-if="blockedByTax" class="font-bold text-orange">
+		<p v-if="willTriggerTaxForm" class="font-bold text-orange">
+			This withdrawal will exceed $600 for the year. You will be prompted to complete a tax form
+			before proceeding.
+		</p>
+
+		<p v-else-if="blockedByTax" class="font-bold text-orange">
 			You have withdrawn over $600 this year. To continue withdrawing, you must complete a tax form.
 		</p>
 
@@ -207,6 +218,7 @@ import { all } from 'iso-3166-1'
 import { Multiselect } from 'vue-multiselect'
 
 import VenmoIcon from '~/assets/images/external/venmo.svg?component'
+import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
 
 const { addNotification } = injectNotificationManager()
 const auth = await useAuth()
@@ -227,7 +239,19 @@ const country = ref(
 
 const [{ data: userBalance }, { data: payoutMethods, refresh: refreshPayoutMethods }] =
 	await Promise.all([
-		useAsyncData(`payout/balance`, () => useBaseFetch(`payout/balance`, { apiVersion: 3 })),
+		useAsyncData(`payout/balance`, async () => {
+			const response = await useBaseFetch(`payout/balance`, { apiVersion: 3 })
+			return {
+				...response,
+				available: parseFloat(response.available),
+				withdrawn_lifetime: parseFloat(response.withdrawn_lifetime),
+				withdrawn_ytd: parseFloat(response.withdrawn_ytd),
+				pending: parseFloat(response.pending),
+				dates: Object.fromEntries(
+					Object.entries(response.dates).map(([date, value]) => [date, parseFloat(value)]),
+				),
+			}
+		}),
 		useAsyncData(`payout/methods?country=${country.value.id}`, () =>
 			useBaseFetch(`payout/methods?country=${country.value.id}`, { apiVersion: 3 }),
 		),
@@ -328,10 +352,21 @@ const agreedTransfer = ref(false)
 const agreedFees = ref(false)
 const agreedTerms = ref(false)
 
+const flags = useFeatureFlags()
+
 const blockedByTax = computed(() => {
+	if (flags.value.testTaxForm) return true
 	const status = userBalance.value?.form_completion_status ?? 'unknown'
 	const thresholdMet = (userBalance.value?.withdrawn_ytd ?? 0) >= 600
 	return thresholdMet && status !== 'complete'
+})
+
+const willTriggerTaxForm = computed(() => {
+	if (flags.value.testTaxForm) return true
+	const status = userBalance.value?.form_completion_status ?? 'unknown'
+	const currentWithdrawn = userBalance.value?.withdrawn_ytd ?? 0
+	const wouldExceedThreshold = currentWithdrawn + parsedAmount.value >= 600
+	return wouldExceedThreshold && status !== 'complete' && !blockedByTax.value
 })
 
 watch(country, async () => {
@@ -353,7 +388,10 @@ watch(selectedMethod, () => {
 	agreedTerms.value = false
 })
 
-async function withdraw() {
+const taxFormModalRef = ref(null)
+const taxFormCancelled = ref(false)
+
+async function performWithdrawal() {
 	startLoading()
 	try {
 		const auth = await useAuth()
@@ -385,6 +423,49 @@ async function withdraw() {
 		})
 	}
 	stopLoading()
+}
+
+async function withdraw() {
+	if (willTriggerTaxForm.value) {
+		taxFormCancelled.value = false
+		if (taxFormModalRef.value && taxFormModalRef.value.startTaxForm) {
+			await taxFormModalRef.value.startTaxForm(new MouseEvent('click'))
+		}
+		return
+	}
+
+	await performWithdrawal()
+}
+
+async function onTaxFormSuccess() {
+	// Skip balance check if testTaxForm flag is enabled
+	if (flags.value.testTaxForm) {
+		await performWithdrawal()
+		return
+	}
+
+	// Refresh user balance to get updated form completion status
+	const updatedBalance = await useBaseFetch(`payout/balance`, { apiVersion: 3 })
+	userBalance.value = updatedBalance
+
+	if (updatedBalance?.form_completion_status === 'complete') {
+		await performWithdrawal()
+	} else {
+		addNotification({
+			title: 'Tax form incomplete',
+			text: 'You must complete a tax form for this withdrawal.',
+			type: 'error',
+		})
+	}
+}
+
+function onTaxFormCancelled() {
+	taxFormCancelled.value = true
+	addNotification({
+		title: 'Withdrawal canceled',
+		text: 'You must complete a tax form for this withdrawal.',
+		type: 'error',
+	})
 }
 </script>
 

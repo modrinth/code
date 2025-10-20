@@ -68,6 +68,12 @@
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licentie URL is ongeldig."
   },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "Je licentie URL leidt naar {domain}, wat niet geschikt is voor licentieinformatie. Licentie URL's moeten direct naar je licentie bestand wijzen, niet social media, gaming platforms, etc."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "Het ziet ernaar uit dat je licentie URL ongeldig is. Gebruik graag een geldige URL naar je licentietekst."
+  },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Voeg een geldige licentie link toe"
   },
@@ -134,8 +140,14 @@
   "nags.settings.title": {
     "defaultMessage": "Bekijk algemene instellingen"
   },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Je samenvatting kan niet dezelfde naam hebben als je projectnaam. Het is belangrijk om een informatieve en interessante samenvatting te maken."
+  },
   "nags.summary-same-as-title.title": {
     "defaultMessage": "Maak je samenvatting uniek"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Je samenvatting moet geen opmaak, regeleindes, speciale karakters of links, omdat de samenvatting alleen text, uitlicht."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Verhelder de samenvatting"
@@ -145,6 +157,12 @@
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Breidt de samenvatting uit"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "De naam van je project duidelijk houden zorgt ervoor dat het makkelijk te vinden is. Versie en lader informatie is automatisch bij je project uitgelicht."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "Maak de naam duidelijk"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Je hebt {tagCount} tags geselecteerd. Overweeg om het aantal te verlagen naar {maxTagCount} of minder om ervoor te zorgen dat je project in relevante zoekresultaten verschijnt."

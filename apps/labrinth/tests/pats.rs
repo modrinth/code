@@ -61,7 +61,7 @@ pub async fn pat_full_test() {
         let mock_pat_test = |token: &str| {
             let token = token.to_string();
             async {
-                // This uses a route directly instead of an api call because it doesn't relaly matter and we
+                // This uses a route directly instead of an api call because it doesn't really matter and we
                 // want it to succeed no matter what.
                 // This is an arbitrary request.
                 let req = test::TestRequest::post()

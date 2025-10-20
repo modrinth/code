@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "개발자 모드가 활성화되어 있습니다."
   },
+  "app.settings.downloading": {
+    "message": "v{version} 다운로드 중"
+  },
   "app.settings.tabs.appearance": {
     "message": "모양"
   },

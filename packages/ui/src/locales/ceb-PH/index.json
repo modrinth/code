@@ -269,6 +269,15 @@
   "omorphia.component.purchase_modal.payment_method_type.discover": {
     "defaultMessage": "Discover"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Putos sa Datos} other {Putos sa Datos}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Mga Putos sa Datos"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {putos sa datos} other {putos sa datos}}"
+  },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java nga Edisyon"
   },
@@ -284,8 +293,14 @@
   "project.about.details.updated": {
     "defaultMessage": "Nagbag-o {date}"
   },
+  "project.about.links.issues": {
+    "defaultMessage": "Pagtaho og mga isyu"
+  },
   "project.settings.environment.title": {
     "defaultMessage": "Kalikopan"
+  },
+  "project.settings.upload.title": {
+    "defaultMessage": "Sakarga"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "ᜀ"
@@ -325,6 +340,9 @@
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Bukas nga tinubdan"
+  },
+  "settings.display.theme.description": {
+    "defaultMessage": "Pamili og imong gigusto nga hiligotanong kulay alang sa Modrinth sa kini nga himan."
   },
   "settings.profile.title": {
     "defaultMessage": "Publiko"

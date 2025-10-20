@@ -25,6 +25,14 @@ export const commonMessages = defineMessages({
 		id: 'button.cancel',
 		defaultMessage: 'Cancel',
 	},
+	clearButton: {
+		id: 'button.clear',
+		defaultMessage: 'Clear',
+	},
+	closeButton: {
+		id: 'button.close',
+		defaultMessage: 'Close',
+	},
 	changesSavedLabel: {
 		id: 'label.changes-saved',
 		defaultMessage: 'Changes saved',
