@@ -113,6 +113,10 @@ migrations/20250725230041_reports-closed-status-index.sql
 migrations/20250727184120_user-newsletter-subscription-column.sql
 migrations/20250804221014_users-redeemals.sql
 migrations/20250805001654_product-prices-public.sql
+migrations/20250823233518_user-compliance.sql
+migrations/20250902133943_notification-extension.sql
+migrations/20250914190749_affiliate_codes.sql
+migrations/20250927120742_user_limits.sql
 
 # Prettier reformats some of the PostgreSQL-specific COPY syntax here,
 # which is very likely to break things

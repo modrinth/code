@@ -72,4 +72,58 @@ impl ArchonClient {
 
         Ok(response.json::<CreateServerResponse>().await?.uuid)
     }
+
+    pub async fn get_servers_by_hostname(
+        &self,
+        hostname: &str,
+    ) -> Result<Vec<Uuid>, reqwest::Error> {
+        #[derive(Deserialize)]
+        struct NodeByHostnameResponse {
+            servers: Vec<NodeServerEntry>,
+        }
+        #[derive(Deserialize)]
+        struct NodeServerEntry {
+            id: Uuid,
+            #[allow(dead_code)]
+            available: Option<bool>,
+        }
+
+        let res = self
+            .client
+            .get(format!(
+                "{}/_internal/nodes/by-hostname/{}",
+                self.base_url, hostname
+            ))
+            .header(X_MASTER_KEY, &self.pyro_api_key)
+            .send()
+            .await?
+            .error_for_status()?;
+
+        let parsed: NodeByHostnameResponse = res.json().await?;
+        Ok(parsed.servers.into_iter().map(|s| s.id).collect())
+    }
+
+    pub async fn get_active_servers_by_region(
+        &self,
+        region: &str,
+    ) -> Result<Vec<Uuid>, reqwest::Error> {
+        #[derive(Deserialize)]
+        struct RegionResponse {
+            active_servers: Vec<Uuid>,
+        }
+
+        let res = self
+            .client
+            .get(format!(
+                "{}/_internal/nodes/regions/{}",
+                self.base_url, region
+            ))
+            .header(X_MASTER_KEY, &self.pyro_api_key)
+            .send()
+            .await?
+            .error_for_status()?;
+
+        let parsed: RegionResponse = res.json().await?;
+        Ok(parsed.active_servers)
+    }
 }

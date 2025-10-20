@@ -7,11 +7,15 @@ on:
     paths:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'
+      - Cargo.toml
+      - Cargo.lock
   pull_request:
     types: [opened, synchronize]
     paths:
       - .github/workflows/labrinth-docker.yml
       - 'apps/labrinth/**'
+      - Cargo.toml
+      - Cargo.lock
   merge_group:
     types: [checks_requested]
 

@@ -4,6 +4,7 @@ import {
 	ChangeSkinIcon,
 	CompassIcon,
 	DownloadIcon,
+	ExternalIcon,
 	HomeIcon,
 	LeftArrowIcon,
 	LibraryIcon,
@@ -18,6 +19,7 @@ import {
 	RestoreIcon,
 	RightArrowIcon,
 	SettingsIcon,
+	UserIcon,
 	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -69,7 +71,7 @@ import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/he
 import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
-import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.js'
+import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { list } from '@/helpers/profile.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -817,29 +819,39 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<SettingsIcon />
 			</NavButton>
-			<ButtonStyled v-if="credentials" type="transparent" circular>
-				<OverflowMenu
-					:options="[
-						{
-							id: 'sign-out',
-							action: () => logOut(),
-							color: 'danger',
-						},
-					]"
-					direction="left"
-				>
-					<Avatar
-						:src="credentials.user.avatar_url"
-						:alt="credentials.user.username"
-						size="32px"
-						circle
-					/>
-					<template #sign-out> <LogOutIcon /> Sign out </template>
-				</OverflowMenu>
-			</ButtonStyled>
-			<NavButton v-else v-tooltip.right="'Sign in'" :to="() => signIn()">
-				<LogInIcon />
-				<template #label>Sign in</template>
+			<OverflowMenu
+				v-if="credentials"
+				v-tooltip.right="`Modrinth account`"
+				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
+				:options="[
+					{
+						id: 'view-profile',
+						action: () => openUrl('https://modrinth.com/user/' + credentials.user.username),
+					},
+					{
+						id: 'sign-out',
+						action: () => logOut(),
+						color: 'danger',
+					},
+				]"
+				placement="right-end"
+			>
+				<Avatar :src="credentials.user.avatar_url" alt="" size="32px" circle />
+				<template #view-profile>
+					<UserIcon />
+					<span class="inline-flex items-center gap-1">
+						Signed in as
+						<span class="inline-flex items-center gap-1 text-contrast font-semibold">
+							<Avatar :src="credentials.user.avatar_url" alt="" size="20px" circle />
+							{{ credentials.user.username }}
+						</span>
+					</span>
+					<ExternalIcon />
+				</template>
+				<template #sign-out> <LogOutIcon /> Sign out </template>
+			</OverflowMenu>
+			<NavButton v-else v-tooltip.right="'Sign in to a Modrinth account'" :to="() => signIn()">
+				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
@@ -979,19 +991,19 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
 				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
 					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
-						<h3 class="text-lg m-0">Playing as</h3>
+						<h3 class="text-base text-primary font-medium m-0">Playing as</h3>
 						<suspense>
 							<AccountsCard ref="accounts" mode="small" />
 						</suspense>
 					</div>
-					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+					<div class="py-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<suspense>
 							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
 						</suspense>
 					</div>
-					<div v-if="news && news.length > 0" class="pt-4 flex flex-col items-center">
-						<h3 class="px-4 text-lg m-0 text-left w-full">News</h3>
-						<div class="px-4 pt-2 space-y-4 flex flex-col items-center w-full">
+					<div v-if="news && news.length > 0" class="p-4 flex flex-col items-center">
+						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">News</h3>
+						<div class="space-y-4 flex flex-col items-center w-full">
 							<NewsArticleCard
 								v-for="(item, index) in news"
 								:key="`news-${index}`"

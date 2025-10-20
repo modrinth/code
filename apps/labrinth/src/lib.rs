@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use actix_web::web;
 use database::redis::RedisPool;
+use modrinth_maxmind::MaxMind;
 use queue::{
     analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
     session::AuthQueue, socket::ActiveSockets,
@@ -13,12 +14,14 @@ use tracing::{info, warn};
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
 use util::cors::default_cors;
+use util::gotenberg::GotenbergClient;
 
 use crate::background_task::update_versions;
 use crate::database::ReadOnlyPgPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::anrok;
+use crate::util::archon::ArchonClient;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
@@ -49,7 +52,7 @@ pub struct LabrinthConfig {
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
-    pub maxmind: Arc<queue::maxmind::MaxMindIndexer>,
+    pub maxmind: web::Data<MaxMind>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
     pub search_config: search::SearchConfig,
@@ -62,6 +65,8 @@ pub struct LabrinthConfig {
     pub stripe_client: stripe::Client,
     pub anrok_client: anrok::Client,
     pub email_queue: web::Data<EmailQueue>,
+    pub archon_client: web::Data<ArchonClient>,
+    pub gotenberg_client: GotenbergClient,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -72,10 +77,11 @@ pub fn app_setup(
     search_config: search::SearchConfig,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
-    maxmind: Arc<queue::maxmind::MaxMindIndexer>,
+    maxmind: MaxMind,
     stripe_client: stripe::Client,
     anrok_client: anrok::Client,
     email_queue: EmailQueue,
+    gotenberg_client: GotenbergClient,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
     info!(
@@ -218,27 +224,6 @@ pub fn app_setup(
         }
     });
 
-    let reader = maxmind.clone();
-    {
-        let reader_ref = reader;
-        scheduler.run(Duration::from_secs(60 * 60 * 24), move || {
-            let reader_ref = reader_ref.clone();
-
-            async move {
-                info!("Downloading MaxMind GeoLite2 country database");
-                let result = reader_ref.index().await;
-                if let Err(e) = result {
-                    warn!(
-                        "Downloading MaxMind GeoLite2 country database failed: {:?}",
-                        e
-                    );
-                }
-                info!("Done downloading MaxMind GeoLite2 country database");
-            }
-        });
-    }
-    info!("Downloading MaxMind GeoLite2 country database");
-
     let analytics_queue = Arc::new(AnalyticsQueue::new());
     {
         let client_ref = clickhouse.clone();
@@ -287,7 +272,7 @@ pub fn app_setup(
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
-        maxmind,
+        maxmind: web::Data::new(maxmind),
         scheduler: Arc::new(scheduler),
         ip_salt,
         search_config,
@@ -299,6 +284,11 @@ pub fn app_setup(
         rate_limiter: limiter,
         stripe_client,
         anrok_client,
+        gotenberg_client,
+        archon_client: web::Data::new(
+            ArchonClient::from_env()
+                .expect("ARCHON_URL and PYRO_API_KEY must be set"),
+        ),
         email_queue: web::Data::new(email_queue),
     }
 }
@@ -324,15 +314,16 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
     .app_data(web::Data::new(labrinth_config.search_config.clone()))
+    .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(labrinth_config.email_queue.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
     .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
-    .app_data(web::Data::new(labrinth_config.maxmind.clone()))
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
+    .app_data(labrinth_config.archon_client.clone())
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
@@ -496,6 +487,9 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("MAXMIND_LICENSE_KEY");
 
     failed |= check_var::<String>("FLAME_ANVIL_URL");
+
+    failed |= check_var::<String>("GOTENBERG_URL");
+    failed |= check_var::<String>("GOTENBERG_CALLBACK_BASE");
 
     failed |= check_var::<String>("STRIPE_API_KEY");
     failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");

@@ -18,12 +18,17 @@
 			<section class="auth-form">
 				<p>{{ formatMessage(postVerificationMessages.description) }}</p>
 
-				<NuxtLink v-if="auth.user" class="btn" link="/settings/account">
-					<SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
-				</NuxtLink>
-				<NuxtLink v-else to="/auth/sign-in" class="btn btn-primary continue-btn centered-btn">
-					{{ formatMessage(messages.signIn) }} <RightArrowIcon />
-				</NuxtLink>
+				<ButtonStyled v-if="auth.user">
+					<NuxtLink to="/settings/account">
+						<SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
+					</NuxtLink>
+				</ButtonStyled>
+				<ButtonStyled v-else>
+					<NuxtLink to="/auth/sign-in">
+						{{ formatMessage(messages.signIn) }}
+						<RightArrowIcon />
+					</NuxtLink>
+				</ButtonStyled>
 			</section>
 		</template>
 
@@ -40,24 +45,26 @@
 					</template>
 				</p>
 
-				<button
-					v-if="auth.user"
-					class="btn btn-primary continue-btn"
-					@click="handleResendEmailVerification"
-				>
-					{{ formatMessage(failedVerificationMessages.action) }} <RightArrowIcon />
-				</button>
+				<ButtonStyled v-if="auth.user" color="brand">
+					<button @click="handleResendEmailVerification">
+						{{ formatMessage(failedVerificationMessages.action) }}
+						<RightArrowIcon />
+					</button>
+				</ButtonStyled>
 
-				<NuxtLink v-else to="/auth/sign-in" class="btn btn-primary continue-btn centered-btn">
-					{{ formatMessage(messages.signIn) }} <RightArrowIcon />
-				</NuxtLink>
+				<ButtonStyled v-else color="brand">
+					<NuxtLink to="/auth/sign-in">
+						{{ formatMessage(messages.signIn) }}
+						<RightArrowIcon />
+					</NuxtLink>
+				</ButtonStyled>
 			</section>
 		</template>
 	</div>
 </template>
 <script setup>
 import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
-import { injectNotificationManager } from '@modrinth/ui'
+import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

@@ -139,9 +139,9 @@
 			<template #add_content> <PlusIcon /> Add content </template>
 			<template #edit> <EditIcon /> Edit </template>
 			<template #copy_path> <ClipboardCopyIcon /> Copy path </template>
-			<template #open_folder> <ClipboardCopyIcon /> Open folder </template>
+			<template #open_folder> <FolderOpenIcon /> Open folder </template>
 			<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
-			<template #open_link> <ClipboardCopyIcon /> Open in Modrinth <ExternalIcon /> </template>
+			<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
 			<template #copy_names><EditIcon />Copy names</template>
 			<template #copy_slugs><HashIcon />Copy slugs</template>
 			<template #copy_links><GlobeIcon />Copy links</template>

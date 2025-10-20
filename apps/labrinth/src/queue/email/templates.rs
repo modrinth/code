@@ -42,6 +42,12 @@ const TAXNOTIFICATION_BILLING_INTERVAL: &str =
 const TAXNOTIFICATION_DUE: &str = "taxnotification.due";
 const TAXNOTIFICATION_SERVICE: &str = "taxnotification.service";
 
+const CREDIT_DAYS: &str = "credit.days_formatted";
+const CREDIT_PREVIOUS_DUE: &str = "credit.previous_due";
+const CREDIT_NEXT_DUE: &str = "credit.next_due";
+const CREDIT_HEADER_MESSAGE: &str = "credit.header_message";
+const CREDIT_SUBSCRIPTION_TYPE: &str = "credit.subscription.type";
+
 const PAYMENTFAILED_AMOUNT: &str = "paymentfailed.amount";
 const PAYMENTFAILED_SERVICE: &str = "paymentfailed.service";
 
@@ -676,6 +682,47 @@ async fn collect_template_variables(
             Ok(EmailTemplate::Static(map))
         }
 
+        NotificationBody::SubscriptionCredited {
+            subscription_id,
+            days,
+            previous_due,
+            next_due,
+            header_message,
+        } => {
+            map.insert(
+                CREDIT_DAYS,
+                format!("{days} day{}", if *days == 1 { "" } else { "s" }),
+            );
+            map.insert(CREDIT_PREVIOUS_DUE, date_human_readable(*previous_due));
+            map.insert(CREDIT_NEXT_DUE, date_human_readable(*next_due));
+            map.insert(SUBSCRIPTION_ID, to_base62(subscription_id.0));
+
+            // Only insert header message if provided; frontend sets default fallback
+            if let Some(h) = header_message.clone() {
+                map.insert(CREDIT_HEADER_MESSAGE, h);
+            }
+
+            // Derive subscription type label for templates
+            // Resolve product metadata via price_id join
+            if let Some(info) = crate::database::models::user_subscription_item::DBUserSubscription::get(
+                (*subscription_id).into(),
+                &mut **exec,
+            )
+            .await
+            .ok()
+            .flatten()
+                && let Ok(Some(pinfo)) = crate::database::models::products_tax_identifier_item::product_info_by_product_price_id(info.price_id, &mut **exec).await {
+                    let label = match pinfo.product_metadata {
+                        crate::models::billing::ProductMetadata::Pyro { .. } => "server".to_string(),
+                        crate::models::billing::ProductMetadata::Medal { .. } => "server".to_string(),
+                        crate::models::billing::ProductMetadata::Midas => "Modrinth+".to_string(),
+                    };
+                    map.insert(CREDIT_SUBSCRIPTION_TYPE, label);
+                }
+
+            Ok(EmailTemplate::Static(map))
+        }
+
         NotificationBody::Custom {
             title,
             body_md,
@@ -704,7 +751,7 @@ async fn dynamic_email_body(
             .wrap_internal_err("SITE_URL is not set")?;
         let site_url = site_url.trim_end_matches('/');
 
-        let url = format!("{}/_internal/templates/email/dynamic", site_url);
+        let url = format!("{site_url}/_internal/templates/email/dynamic");
 
         std::str::from_utf8(
             reqwest::Client::new()

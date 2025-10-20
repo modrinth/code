@@ -2762,10 +2762,7 @@
 	},
 	{
 		"_comment": "Replace glfw from 3.3.1 with version from 3.3.2 to prevent stack smashing",
-		"match": [
-			"org.lwjgl:lwjgl-glfw-natives-linux:3.3.1",
-			"org.lwjgl:lwjgl-glfw:3.3.1:natives-linux"
-		],
+		"match": ["org.lwjgl:lwjgl-glfw-natives-linux:3.3.1"],
 		"override": {
 			"downloads": {
 				"artifact": {
@@ -2776,5 +2773,115 @@
 			},
 			"name": "org.lwjgl:lwjgl-glfw-natives-linux:3.3.2-lwjgl.1"
 		}
+	},
+	{
+		"_comment": "Use newer JNA on macOS to prevent crashes due to faulty assertion",
+		"match": [
+			"net.java.dev.jna:jna:5.6.0",
+			"net.java.dev.jna:jna:5.8.0",
+			"net.java.dev.jna:jna:5.9.0",
+			"net.java.dev.jna:jna:5.10.0",
+			"net.java.dev.jna:jna:5.12.1"
+		],
+		"override": {
+			"rules": [
+				{
+					"action": "allow"
+				},
+				{
+					"action": "disallow",
+					"os": {
+						"name": "osx"
+					}
+				},
+				{
+					"action": "disallow",
+					"os": {
+						"name": "osx-arm64"
+					}
+				}
+			]
+		},
+		"additionalLibraries": [
+			{
+				"downloads": {
+					"artifact": {
+						"sha1": "1200e7ebeedbe0d10062093f32925a912020e747",
+						"size": 1879325,
+						"url": "https://libraries.minecraft.net/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar"
+					}
+				},
+				"name": "net.java.dev.jna:jna:5.13.0",
+				"rules": [
+					{
+						"action": "allow",
+						"os": {
+							"name": "osx"
+						}
+					},
+					{
+						"action": "allow",
+						"os": {
+							"name": "osx-arm64"
+						}
+					}
+				]
+			}
+		]
+	},
+	{
+		"_comment": "Use newer JNA on macOS to prevent crashes due to faulty assertion",
+		"match": [
+			"net.java.dev.jna:jna-platform:5.6.0",
+			"net.java.dev.jna:jna-platform:5.8.0",
+			"net.java.dev.jna:jna-platform:5.9.0",
+			"net.java.dev.jna:jna-platform:5.10.0",
+			"net.java.dev.jna:jna-platform:5.12.1"
+		],
+		"override": {
+			"rules": [
+				{
+					"action": "allow"
+				},
+				{
+					"action": "disallow",
+					"os": {
+						"name": "osx"
+					}
+				},
+				{
+					"action": "disallow",
+					"os": {
+						"name": "osx-arm64"
+					}
+				}
+			]
+		},
+		"additionalLibraries": [
+			{
+				"downloads": {
+					"artifact": {
+						"sha1": "88e9a306715e9379f3122415ef4ae759a352640d",
+						"size": 1363209,
+						"url": "https://libraries.minecraft.net/net/java/dev/jna/jna-platform/5.13.0/jna-platform-5.13.0.jar"
+					}
+				},
+				"name": "net.java.dev.jna:jna-platform:5.13.0",
+				"rules": [
+					{
+						"action": "allow",
+						"os": {
+							"name": "osx"
+						}
+					},
+					{
+						"action": "allow",
+						"os": {
+							"name": "osx-arm64"
+						}
+					}
+				]
+			}
+		]
 	}
 ]

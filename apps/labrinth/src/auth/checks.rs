@@ -377,7 +377,7 @@ pub async fn is_visible_organization(
     // This is meant to match the same projects as the `Project::is_searchable` method, but we're not using
     // it here because that'd entail pulling in all projects for the organization
     let has_searchable_projects = sqlx::query_scalar!(
-        "SELECT TRUE FROM mods WHERE organization_id = $1 AND status IN ('public', 'archived') LIMIT 1",
+        "SELECT TRUE FROM mods WHERE organization_id = $1 AND status IN ('approved', 'archived') LIMIT 1",
         organization.id as database::models::ids::DBOrganizationId
     )
     .fetch_optional(pool)
