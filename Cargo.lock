@@ -1514,16 +1514,17 @@ checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
 name = "clickhouse"
-version = "0.13.3"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a9a81a1dffadd762ee662635ce409232258ce9beebd7cc0fa227df0b5e7efc0"
+checksum = "52d6ac02411e84914fdf4e0565bfe02fc4bebdf375bd1fc58168bad74b3707a2"
 dependencies = [
  "bstr",
  "bytes",
  "cityhash-rs",
- "clickhouse-derive",
- "futures",
+ "clickhouse-macros",
+ "clickhouse-types",
  "futures-channel",
+ "futures-util",
  "http-body-util",
  "hyper 1.7.0",
  "hyper-util",
@@ -1532,7 +1533,7 @@ dependencies = [
  "sealed",
  "serde",
  "static_assertions",
- "thiserror 1.0.69",
+ "thiserror 2.0.17",
  "time",
  "tokio",
  "url",
@@ -1540,15 +1541,25 @@ dependencies = [
 ]
 
 [[package]]
-name = "clickhouse-derive"
-version = "0.2.0"
+name = "clickhouse-macros"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d70f3e2893f7d3e017eeacdc9a708fbc29a10488e3ebca21f9df6a5d2b616dbb"
+checksum = "ff6669899e23cb87b43daf7996f0ea3b9c07d0fb933d745bb7b815b052515ae3"
 dependencies = [
  "proc-macro2",
  "quote",
  "serde_derive_internals",
  "syn 2.0.106",
+]
+
+[[package]]
+name = "clickhouse-types"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "235f72141cfbe1d2d930d8156a34814c8a3d60491febb9af64cc52a203444764"
+dependencies = [
+ "bytes",
+ "thiserror 2.0.17",
 ]
 
 [[package]]
