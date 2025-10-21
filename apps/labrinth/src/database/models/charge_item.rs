@@ -338,7 +338,7 @@ impl DBCharge {
 			  AND COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) < NOW() - INTERVAL '1 day'
 			  AND u.email IS NOT NULL
 			  AND due - INTERVAL '7 days' > NOW()
-              AND due - INTERVAL '14 days' < NOW() -- Due between 7 and 14 days from now
+              AND due - INTERVAL '30 days' < NOW() -- Due between 7 and 30 days from now
 			ORDER BY COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) ASC
 			FOR NO KEY UPDATE SKIP LOCKED
 			LIMIT $1
