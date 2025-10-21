@@ -87,7 +87,7 @@ fn create_muralpay() -> Result<MuralPayConfig> {
 fn create_muralpay_methods() -> Vec<PayoutMethod> {
     let all_countries = rust_iso3166::ALL
         .iter()
-        .map(|x| x.alpha2.to_string())
+        .map(|x| x.alpha2)
         .collect::<Vec<_>>();
 
     let currencies = vec![
@@ -119,7 +119,7 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
         .map(|(id, currency, countries)| PayoutMethod {
             id: id.to_string(),
             type_: PayoutMethodType::MuralPay,
-            name: format!("Mural Pay - {}", currency),
+            name: format!("Mural Pay - {currency}"),
             supported_countries: countries
                 .iter()
                 .map(|s| s.to_string())
