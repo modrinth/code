@@ -14,7 +14,8 @@ export type WithdrawStage =
 export type PaymentProvider = 'tremendous' | 'muralpay'
 
 /**
- * only used for the withdraw modal stage logic - not actually for API requests  */
+ * only used for the withdraw modal stage logic - not actually for API requests
+ **/
 export type PaymentMethod = 'gift_card' | 'paypal' | 'venmo' | 'bank' | 'crypto'
 
 export interface WithdrawData {
