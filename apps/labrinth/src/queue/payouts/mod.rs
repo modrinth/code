@@ -91,29 +91,39 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
         .collect::<Vec<_>>();
 
     let currencies = vec![
-        ("blockchain_usdc_polygon", "USDC on Polygon"),
-        ("fiat_mxn", "MXN"),
-        ("fiat_brl", "BRL"),
-        ("fiat_clp", "CLP"),
-        ("fiat_crc", "CRC"),
-        ("fiat_pen", "PEN"),
+        ("blockchain_usdc_polygon", "USDC on Polygon", all_countries),
+        ("fiat_mxn", "MXN", vec!["MX"]),
+        ("fiat_brl", "BRL", vec!["BR"]),
+        ("fiat_clp", "CLP", vec!["CL"]),
+        ("fiat_crc", "CRC", vec!["CR"]),
+        ("fiat_pen", "PEN", vec!["PE"]),
         // ("fiat_dop", "DOP"), // unsupported in API
         // ("fiat_uyu", "UYU"), // unsupported in API
-        ("fiat_ars", "ARS"),
-        ("fiat_cop", "COP"),
-        ("fiat_usd", "USD"),
-        ("fiat_usd-peru", "USD Peru"),
+        ("fiat_ars", "ARS", vec!["AR"]),
+        ("fiat_cop", "COP", vec!["CO"]),
+        ("fiat_usd", "USD", vec!["US"]),
+        ("fiat_usd-peru", "USD Peru", vec!["PE"]),
         // ("fiat_usd-panama", "USD Panama"), // by request
-        ("fiat_eur", "EUR"),
+        (
+            "fiat_eur",
+            "EUR",
+            vec![
+                "DE", "FR", "IT", "ES", "NL", "BE", "AT", "PT", "FI", "IE",
+                "GR", "LU", "CY", "MT", "SK", "SI", "EE", "LV", "LT",
+            ],
+        ),
     ];
 
     currencies
         .into_iter()
-        .map(|(id, currency)| PayoutMethod {
+        .map(|(id, currency, countries)| PayoutMethod {
             id: id.to_string(),
             type_: PayoutMethodType::MuralPay,
             name: format!("Mural Pay - {}", currency),
-            supported_countries: all_countries.clone(),
+            supported_countries: countries
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
             image_url: None,
             image_logo_url: None,
             interval: PayoutInterval::Standard {

@@ -4679,11 +4679,8 @@ dependencies = [
  "json-patch 4.1.0",
  "lettre",
  "meilisearch-sdk",
-<<<<<<< HEAD
- "muralpay",
-=======
  "modrinth-maxmind",
->>>>>>> main
+ "muralpay",
  "murmur2",
  "paste",
  "path-util",
