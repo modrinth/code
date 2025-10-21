@@ -318,6 +318,7 @@ pub fn app_config(
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(labrinth_config.email_queue.clone())
+    .app_data(labrinth_config.maxmind.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
     .app_data(web::Data::new(labrinth_config.analytics_queue.clone()))
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
@@ -484,6 +485,7 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("CLICKHOUSE_PASSWORD");
     failed |= check_var::<String>("CLICKHOUSE_DATABASE");
 
+    failed |= check_var::<String>("MAXMIND_ACCOUNT_ID");
     failed |= check_var::<String>("MAXMIND_LICENSE_KEY");
 
     failed |= check_var::<String>("FLAME_ANVIL_URL");
