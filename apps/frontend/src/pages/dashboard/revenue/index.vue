@@ -116,7 +116,8 @@
 			}}</span>
 			<div class="grid grid-cols-3 gap-x-4 gap-y-2">
 				<button
-					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-700 p-5 text-inverted shadow-md transition-all duration-200 hover:brightness-110"
+					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-700 p-5 text-inverted shadow-md transition-all duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100"
+					:disabled="hasTinMismatch"
 					@click="openWithdrawModal"
 				>
 					<div class="relative z-10 flex flex-row justify-between">
@@ -160,6 +161,9 @@
 					</svg>
 				</button>
 			</div>
+			<span v-if="hasTinMismatch" class="text-sm font-semibold text-red">
+				{{ formatMessage(messages.withdrawBlockedTinMismatch) }}
+			</span>
 			<span class="text-sm text-secondary">
 				<IntlFormatted :message-id="messages.tosLabel">
 					<template #terms-link="{ children }">
@@ -277,6 +281,11 @@ const messages = defineMessages({
 		id: 'dashboard.revenue.withdraw.card.description',
 		defaultMessage: 'Withdraw from your available balance to any payout method.',
 	},
+	withdrawBlockedTinMismatch: {
+		id: 'dashboard.revenue.withdraw.blocked-tin-mismatch',
+		defaultMessage:
+			"Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form.",
+	},
 	tosLabel: {
 		id: 'dashboard.revenue.tos',
 		defaultMessage:
@@ -352,6 +361,13 @@ const processingDate = computed<{ date: string; amount: number }>(() => {
 const grandTotal = computed(() =>
 	userBalance.value ? userBalance.value.available + userBalance.value.pending : 0,
 )
+
+const hasTinMismatch = computed(() => {
+	const bal = userBalance.value
+	if (!bal) return false
+	const status = bal.form_completion_status ?? 'unknown'
+	return status === 'tin-mismatch'
+})
 
 async function refreshData() {
 	try {
