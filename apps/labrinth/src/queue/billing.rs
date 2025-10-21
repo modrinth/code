@@ -432,12 +432,17 @@ async fn update_anrok_transactions(
 
         match result {
             Ok(response) => {
-                let should_have_collected = response.tax_amount_to_collect;
+                let version = response.version.ok_or_else(|| {
+                    ApiError::InvalidInput(
+                        "Anrok response is missing tax transaction version"
+                            .to_owned(),
+                    )
+                })?;
 
-                let drift = should_have_collected - c.tax_amount;
-
-                c.tax_drift_loss = Some(drift);
+                c.tax_drift_loss = Some(response.tax_amount_to_collect);
                 c.tax_platform_id = Some(tax_platform_id);
+                c.tax_transaction_version = Some(version);
+                c.tax_platform_accounting_time = Some(c.due);
                 c.upsert(txn).await?;
 
                 Ok(())
@@ -647,6 +652,8 @@ pub async fn try_process_user_redeemal(
         net: None,
         tax_last_updated: Some(Utc::now()),
         tax_drift_loss: Some(0),
+        tax_transaction_version: None,
+        tax_platform_accounting_time: None,
     }
     .upsert(&mut txn)
     .await?;
@@ -1016,7 +1023,7 @@ pub async fn index_subscriptions(
             &redis,
             &anrok_client,
             &stripe_client,
-            750,
+            1000,
         ),
     )
     .await;

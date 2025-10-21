@@ -35,6 +35,7 @@ pub mod user_subscription_item;
 pub mod users_compliance;
 pub mod users_notifications_preferences_item;
 pub mod users_redeemals;
+pub mod users_subscriptions_credits;
 pub mod version_item;
 
 pub use affiliate_code_item::DBAffiliateCode;

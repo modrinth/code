@@ -82,6 +82,23 @@
 				</ButtonStyled>
 			</template>
 		</PagewideBanner>
+		<PagewideBanner v-if="showTinMismatchBanner" variant="error">
+			<template #title>
+				<span>{{ formatMessage(tinMismatchBannerMessages.title) }}</span>
+			</template>
+			<template #description>
+				<span>{{ formatMessage(tinMismatchBannerMessages.description) }}</span>
+			</template>
+			<template #actions>
+				<div class="flex w-fit flex-row">
+					<ButtonStyled color="red">
+						<nuxt-link to="https://support.modrinth.com" target="_blank" rel="noopener">
+							<MessageIcon /> {{ formatMessage(tinMismatchBannerMessages.action) }}
+						</nuxt-link>
+					</ButtonStyled>
+				</div>
+			</template>
+		</PagewideBanner>
 		<PagewideBanner v-if="showTaxComplianceBanner" variant="warning">
 			<template #title>
 				<span>{{ formatMessage(taxBannerMessages.title) }}</span>
@@ -444,6 +461,12 @@
 								link: '/admin/servers/notices',
 								shown: isAdmin(auth.user),
 							},
+							{
+								id: 'servers-nodes',
+								color: 'primary',
+								link: '/admin/servers/nodes',
+								shown: isAdmin(auth.user),
+							},
 						]"
 					>
 						<ModrinthIcon aria-hidden="true" />
@@ -463,6 +486,7 @@
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
 						</template>
+						<template #servers-nodes> <ServerIcon aria-hidden="true" /> Server Nodes </template>
 					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled type="transparent">
@@ -857,6 +881,7 @@ import {
 	LogInIcon,
 	LogOutIcon,
 	MastodonIcon,
+	MessageIcon,
 	ModrinthIcon,
 	MoonIcon,
 	OrganizationIcon,
@@ -924,7 +949,15 @@ const showTaxComplianceBanner = computed(() => {
 	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
 	const status = bal.form_completion_status ?? 'unknown'
 	const isComplete = status === 'complete'
-	return !!auth.value.user && thresholdMet && !isComplete
+	const isTinMismatch = status === 'tin-mismatch'
+	return !!auth.value.user && thresholdMet && !isComplete && !isTinMismatch
+})
+
+const showTinMismatchBanner = computed(() => {
+	const bal = payoutBalance.value
+	if (!bal) return false
+	const status = bal.form_completion_status ?? 'unknown'
+	return !!auth.value.user && status === 'tin-mismatch'
 })
 
 const taxBannerMessages = defineMessages({
@@ -935,11 +968,27 @@ const taxBannerMessages = defineMessages({
 	description: {
 		id: 'layout.banner.tax.description',
 		defaultMessage:
-			'You’ve already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.',
+			"You've already withdrawn over $600 from Modrinth this year. To comply with tax regulations, you need to complete a tax form. Your withdrawals are paused until this form is submitted.",
 	},
 	action: {
 		id: 'layout.banner.tax.action',
 		defaultMessage: 'Complete tax form',
+	},
+})
+
+const tinMismatchBannerMessages = defineMessages({
+	title: {
+		id: 'layout.banner.tin-mismatch.title',
+		defaultMessage: 'Tax form failed',
+	},
+	description: {
+		id: 'layout.banner.tin-mismatch.description',
+		defaultMessage:
+			"Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form.",
+	},
+	action: {
+		id: 'layout.banner.tin-mismatch.action',
+		defaultMessage: 'Contact support',
 	},
 })
 

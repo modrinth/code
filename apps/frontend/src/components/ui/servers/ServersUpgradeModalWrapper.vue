@@ -158,11 +158,20 @@ const currentPlanFromSubscription = computed<ServerPlan | undefined>(() => {
 		: undefined
 })
 
+const currentInterval = computed(() => {
+	const interval = subscription.value?.interval
+
+	if (interval === 'monthly' || interval === 'quarterly') {
+		return interval
+	}
+	return 'monthly'
+})
+
 async function initiatePayment(body: any): Promise<any> {
 	if (subscription.value) {
 		const transformedBody = {
 			interval: body.charge?.interval,
-			payment_method: body.id,
+			payment_method: body.type === 'confirmation_token' ? body.token : body.id,
 			product: body.charge?.product_id,
 			region: body.metadata?.server_region,
 		}
@@ -247,7 +256,7 @@ async function open(id?: string) {
 		subscription.value = null
 	}
 
-	purchaseModal.value?.show('quarterly')
+	purchaseModal.value?.show(currentInterval.value)
 }
 
 defineExpose({
