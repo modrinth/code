@@ -84,7 +84,7 @@ export async function useServersFetch<T>(
 			? `${base}/modrinth/v${version}/${path.replace(/^\//, '')}`
 			: version === 'internal'
 				? `${base}/_internal/${path.replace(/^\//, '')}`
-				: `${base}/modrinth/v${version}/${path.replace(/^\//, '')}`
+				: `${base}/v${version}/${path.replace(/^\//, '')}`
 
 	const headers: Record<string, string> = {
 		'User-Agent': 'Modrinth/1.0 (https://modrinth.com)',
