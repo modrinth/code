@@ -866,6 +866,9 @@
   "dashboard.revenue.transactions.see-all": {
     "message": "See all"
   },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form."
+  },
   "dashboard.revenue.withdraw.card.description": {
     "message": "Withdraw from your available balance to any payout method."
   },
