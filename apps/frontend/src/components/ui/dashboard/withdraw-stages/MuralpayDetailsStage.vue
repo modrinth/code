@@ -16,9 +16,9 @@
 			</label>
 			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
 				<component
+					:is="getCurrencyIcon(selectedRail.currency)"
 					class="size-5"
 					:class="getCurrencyColor(selectedRail.currency)"
-					:is="getCurrencyIcon(selectedRail.currency)"
 				/>
 				<span class="font-semibold text-contrast">{{ selectedRail.currency }}</span>
 			</div>
@@ -124,9 +124,9 @@
 			</label>
 			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
 				<component
+					:is="getBlockchainIcon(selectedRail.blockchain)"
 					class="size-5"
 					:class="getBlockchainColor(selectedRail.blockchain)"
-					:is="getBlockchainIcon(selectedRail.blockchain)"
 				/>
 				<span class="font-semibold text-contrast">{{ selectedRail.blockchain }}</span>
 			</div>
@@ -148,8 +148,8 @@
 						min="0.01"
 						:max="roundedMaxAmount"
 						:placeholder="formatMessage(messages.amountPlaceholder)"
-						@input="enforceDecimalPlaces"
 						class="bg-raised w-full rounded-[14px] py-2.5 pl-8 pr-4 text-contrast placeholder:text-secondary"
+						@input="enforceDecimalPlaces"
 					/>
 				</div>
 				<ButtonStyled>
@@ -174,13 +174,13 @@
 </template>
 
 <script setup lang="ts">
-import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { Admonition, ButtonStyled, Combobox } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
+import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import {
 	getBlockchainColor,

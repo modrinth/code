@@ -1,5 +1,6 @@
 import { createContext, useDebugLogger } from '@modrinth/ui'
 import { computed, type ComputedRef, type Ref, ref } from 'vue'
+
 import { getRailConfig } from '@/utils/muralpay-rails'
 
 export type WithdrawStage =
@@ -11,13 +12,15 @@ export type WithdrawStage =
 	| 'completion'
 
 export type PaymentProvider = 'tremendous' | 'muralpay'
+
+/**
+ * only used for the withdraw modal stage logic - not actually for API requests  */
 export type PaymentMethod = 'gift_card' | 'paypal' | 'venmo' | 'bank' | 'crypto'
 
-// TODO: need backend backend
 export interface WithdrawData {
 	selectedCountry: { id: string; name: string } | null
 	selectedProvider: PaymentProvider | null
-	selectedMethod: string | null // Rail ID (e.g., 'usd', 'polygon-usdc') or legacy method
+	selectedMethod: string | null
 	selectedMethodId: string | null
 	amount: number
 	skippedTaxForm: boolean
@@ -106,17 +109,14 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 		const availableBalance = balance?.available ?? 0
 		const formCompleted = balance?.form_completion_status === 'complete'
 
-		// If tax form is completed, user can withdraw full balance
 		if (formCompleted) {
 			return availableBalance
 		}
 
-		// If user hasn't skipped tax form yet, they can withdraw full balance
 		if (!withdrawData.value.skippedTaxForm) {
 			return availableBalance
 		}
 
-		// If user skipped tax form, limit them to remaining YTD limit
 		const usedLimit = balance?.withdrawn_ytd ?? 0
 		const remainingLimit = Math.max(0, 600 - usedLimit)
 		return Math.min(remainingLimit, availableBalance)
@@ -164,16 +164,14 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 					withdrawData.value.selectedCountry &&
 					withdrawData.value.selectedProvider &&
 					withdrawData.value.selectedMethod &&
-					(withdrawData.value.selectedMethod === 'gift_cards' || withdrawData.value.selectedMethodId)
+					(withdrawData.value.selectedMethod === 'gift_cards' ||
+						withdrawData.value.selectedMethodId)
 				)
 			case 'tremendous-details':
 				if (withdrawData.value.selectedMethod === 'gift_cards') {
-					return !!(
-						withdrawData.value.selectedMethodId &&
-						withdrawData.value.amount > 0
-					)
+					return !!(withdrawData.value.selectedMethodId && withdrawData.value.amount > 0)
 				}
-				return !!(withdrawData.value.amount > 0) // For paypal/venmo, need amount
+				return !!(withdrawData.value.amount > 0) // for paypal/venmo, only need amount
 			case 'muralpay-kyc': {
 				if (!withdrawData.value.kycData) return false
 
@@ -205,16 +203,13 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				const rail = getRailConfig(railId as string)
 				if (!rail) return false
 
-				// Validate amount
 				if (!withdrawData.value.amount || withdrawData.value.amount <= 0) return false
 
 				const accountDetails = withdrawData.value.accountDetails
 				if (!accountDetails) return false
 
-				// Validate bank name if required
 				if (rail.requiresBankName && !accountDetails.bankName) return false
 
-				// Validate all required fields from rail config
 				const requiredFields = rail.fields.filter((f) => f.required)
 				const allRequiredPresent = requiredFields.every((f) => {
 					const value = accountDetails[f.name]
@@ -235,7 +230,6 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			return
 		}
 
-		// If completing the withdraw process (no more stages)
 		if (!stage) {
 			// TBD: Handle final withdraw submission
 			debug('Withdraw process completed!', withdrawData.value)

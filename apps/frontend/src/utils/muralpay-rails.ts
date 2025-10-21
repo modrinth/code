@@ -409,7 +409,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 
 	fiat_ars: {
 		id: 'fiat_ars',
-		name: defineMessage({ id: 'muralpay.rail.fiat-ars.name', defaultMessage: 'Bank Transfer (ARS)' }),
+		name: defineMessage({
+			id: 'muralpay.rail.fiat-ars.name',
+			defaultMessage: 'Bank Transfer (ARS)',
+		}),
 		currency: 'ARS',
 		type: 'fiat',
 		railCode: 'ars',
@@ -418,32 +421,56 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'bankAccountNumber',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.account-number-cbu-cvu', defaultMessage: 'Account Number (CBU/CVU)' }),
+				label: defineMessage({
+					id: 'muralpay.field.account-number-cbu-cvu',
+					defaultMessage: 'Account Number (CBU/CVU)',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.cbu-cvu', defaultMessage: 'Enter CBU or CVU' }),
-				helpText: defineMessage({ id: 'muralpay.help.cbu-cvu', defaultMessage: 'Clave Bancaria Uniforme or Clave Virtual Uniforme' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.cbu-cvu',
+					defaultMessage: 'Enter CBU or CVU',
+				}),
+				helpText: defineMessage({
+					id: 'muralpay.help.cbu-cvu',
+					defaultMessage: 'Clave Bancaria Uniforme or Clave Virtual Uniforme',
+				}),
 			},
 			{
 				name: 'documentNumber',
 				type: 'text',
 				label: defineMessage({ id: 'muralpay.field.cuit-cuil', defaultMessage: 'CUIT/CUIL' }),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.cuit-cuil', defaultMessage: 'Enter CUIT or CUIL' }),
-				helpText: defineMessage({ id: 'muralpay.help.cuit-cuil', defaultMessage: 'Argentine tax ID' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.cuit-cuil',
+					defaultMessage: 'Enter CUIT or CUIL',
+				}),
+				helpText: defineMessage({
+					id: 'muralpay.help.cuit-cuil',
+					defaultMessage: 'Argentine tax ID',
+				}),
 			},
 			{
 				name: 'bankAccountNumberType',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.account-number-type', defaultMessage: 'Account Number Type' }),
+				label: defineMessage({
+					id: 'muralpay.field.account-number-type',
+					defaultMessage: 'Account Number Type',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.cbu-cvu-type', defaultMessage: 'CBU or CVU' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.cbu-cvu-type',
+					defaultMessage: 'CBU or CVU',
+				}),
 			},
 		],
 	},
 
 	fiat_clp: {
 		id: 'fiat_clp',
-		name: defineMessage({ id: 'muralpay.rail.fiat-clp.name', defaultMessage: 'Bank Transfer (CLP)' }),
+		name: defineMessage({
+			id: 'muralpay.rail.fiat-clp.name',
+			defaultMessage: 'Bank Transfer (CLP)',
+		}),
 		currency: 'CLP',
 		type: 'fiat',
 		railCode: 'clp',
@@ -459,14 +486,23 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'bankAccountNumber',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.account-number', defaultMessage: 'Account Number' }),
+				label: defineMessage({
+					id: 'muralpay.field.account-number',
+					defaultMessage: 'Account Number',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.account-number', defaultMessage: 'Enter account number' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.account-number',
+					defaultMessage: 'Enter account number',
+				}),
 			},
 			{
 				name: 'documentType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.document-type', defaultMessage: 'Document Type' }),
+				label: defineMessage({
+					id: 'muralpay.field.document-type',
+					defaultMessage: 'Document Type',
+				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
 			},
@@ -475,7 +511,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 
 	fiat_crc: {
 		id: 'fiat_crc',
-		name: defineMessage({ id: 'muralpay.rail.fiat-crc.name', defaultMessage: 'Bank Transfer (CRC)' }),
+		name: defineMessage({
+			id: 'muralpay.rail.fiat-crc.name',
+			defaultMessage: 'Bank Transfer (CRC)',
+		}),
 		currency: 'CRC',
 		type: 'fiat',
 		railCode: 'crc',
@@ -486,12 +525,18 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({ id: 'muralpay.field.iban', defaultMessage: 'IBAN' }),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.iban-crc', defaultMessage: 'Enter Costa Rican IBAN' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.iban-crc',
+					defaultMessage: 'Enter Costa Rican IBAN',
+				}),
 			},
 			{
 				name: 'documentType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.document-type', defaultMessage: 'Document Type' }),
+				label: defineMessage({
+					id: 'muralpay.field.document-type',
+					defaultMessage: 'Document Type',
+				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
 			},
@@ -500,7 +545,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 
 	fiat_pen: {
 		id: 'fiat_pen',
-		name: defineMessage({ id: 'muralpay.rail.fiat-pen.name', defaultMessage: 'Bank Transfer (PEN)' }),
+		name: defineMessage({
+			id: 'muralpay.rail.fiat-pen.name',
+			defaultMessage: 'Bank Transfer (PEN)',
+		}),
 		currency: 'PEN',
 		type: 'fiat',
 		railCode: 'pen',
@@ -509,17 +557,29 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'documentType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.document-type', defaultMessage: 'Document Type' }),
+				label: defineMessage({
+					id: 'muralpay.field.document-type',
+					defaultMessage: 'Document Type',
+				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
 			},
 			{
 				name: 'bankAccountNumber',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.account-number-cci', defaultMessage: 'Account Number (CCI)' }),
+				label: defineMessage({
+					id: 'muralpay.field.account-number-cci',
+					defaultMessage: 'Account Number (CCI)',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.cci', defaultMessage: 'Enter 20-digit CCI' }),
-				helpText: defineMessage({ id: 'muralpay.help.cci', defaultMessage: 'Código de Cuenta Interbancaria' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.cci',
+					defaultMessage: 'Enter 20-digit CCI',
+				}),
+				helpText: defineMessage({
+					id: 'muralpay.help.cci',
+					defaultMessage: 'Código de Cuenta Interbancaria',
+				}),
 			},
 			{
 				name: 'accountType',
@@ -533,7 +593,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 
 	fiat_bob: {
 		id: 'fiat_bob',
-		name: defineMessage({ id: 'muralpay.rail.fiat-bob.name', defaultMessage: 'Bank Transfer (BOB)' }),
+		name: defineMessage({
+			id: 'muralpay.rail.fiat-bob.name',
+			defaultMessage: 'Bank Transfer (BOB)',
+		}),
 		currency: 'BOB',
 		type: 'fiat',
 		railCode: 'bob',
@@ -542,14 +605,23 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'bankAccountNumber',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.account-number', defaultMessage: 'Account Number' }),
+				label: defineMessage({
+					id: 'muralpay.field.account-number',
+					defaultMessage: 'Account Number',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.account-number', defaultMessage: 'Enter account number' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.account-number',
+					defaultMessage: 'Enter account number',
+				}),
 			},
 			{
 				name: 'documentType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.document-type', defaultMessage: 'Document Type' }),
+				label: defineMessage({
+					id: 'muralpay.field.document-type',
+					defaultMessage: 'Document Type',
+				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
 			},
@@ -558,7 +630,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 
 	fiat_zar: {
 		id: 'fiat_zar',
-		name: defineMessage({ id: 'muralpay.rail.fiat-zar.name', defaultMessage: 'Bank Transfer (ZAR)' }),
+		name: defineMessage({
+			id: 'muralpay.rail.fiat-zar.name',
+			defaultMessage: 'Bank Transfer (ZAR)',
+		}),
 		currency: 'ZAR',
 		type: 'fiat',
 		railCode: 'zar',
@@ -574,16 +649,25 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'bankAccountNumber',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.account-number', defaultMessage: 'Account Number' }),
+				label: defineMessage({
+					id: 'muralpay.field.account-number',
+					defaultMessage: 'Account Number',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.account-number', defaultMessage: 'Enter account number' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.account-number',
+					defaultMessage: 'Enter account number',
+				}),
 			},
 		],
 	},
 
 	'fiat_usd-peru': {
 		id: 'fiat_usd-peru',
-		name: defineMessage({ id: 'muralpay.rail.fiat-usd-peru.name', defaultMessage: 'Bank Transfer (USD - Peru)' }),
+		name: defineMessage({
+			id: 'muralpay.rail.fiat-usd-peru.name',
+			defaultMessage: 'Bank Transfer (USD - Peru)',
+		}),
 		currency: 'USD',
 		type: 'fiat',
 		railCode: 'usd-peru',
@@ -599,14 +683,23 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'bankAccountNumber',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.account-number', defaultMessage: 'Account Number' }),
+				label: defineMessage({
+					id: 'muralpay.field.account-number',
+					defaultMessage: 'Account Number',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.account-number', defaultMessage: 'Enter account number' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.account-number',
+					defaultMessage: 'Enter account number',
+				}),
 			},
 			{
 				name: 'documentType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.document-type', defaultMessage: 'Document Type' }),
+				label: defineMessage({
+					id: 'muralpay.field.document-type',
+					defaultMessage: 'Document Type',
+				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
 			},
@@ -615,7 +708,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 
 	'fiat_usd-china': {
 		id: 'fiat_usd-china',
-		name: defineMessage({ id: 'muralpay.rail.fiat-usd-china.name', defaultMessage: 'Bank Transfer (USD - China)' }),
+		name: defineMessage({
+			id: 'muralpay.rail.fiat-usd-china.name',
+			defaultMessage: 'Bank Transfer (USD - China)',
+		}),
 		currency: 'USD',
 		type: 'fiat',
 		railCode: 'usd-china',
@@ -626,7 +722,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({ id: 'muralpay.field.bank-name', defaultMessage: 'Bank Name' }),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.bank-name', defaultMessage: 'Enter bank name' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.bank-name',
+					defaultMessage: 'Enter bank name',
+				}),
 			},
 			{
 				name: 'accountType',
@@ -638,14 +737,23 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'bankAccountNumber',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.account-number', defaultMessage: 'Account Number' }),
+				label: defineMessage({
+					id: 'muralpay.field.account-number',
+					defaultMessage: 'Account Number',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.account-number', defaultMessage: 'Enter account number' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.account-number',
+					defaultMessage: 'Enter account number',
+				}),
 			},
 			{
 				name: 'documentType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.document-type', defaultMessage: 'Document Type' }),
+				label: defineMessage({
+					id: 'muralpay.field.document-type',
+					defaultMessage: 'Document Type',
+				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
 			},
@@ -654,42 +762,61 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'tel',
 				label: defineMessage({ id: 'muralpay.field.phone-number', defaultMessage: 'Phone Number' }),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.phone-china', defaultMessage: '+86...' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.phone-china',
+					defaultMessage: '+86...',
+				}),
 			},
 			{
 				name: 'address',
 				type: 'text',
 				label: defineMessage({ id: 'muralpay.field.address', defaultMessage: 'Address' }),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.address', defaultMessage: 'Enter address' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.address',
+					defaultMessage: 'Enter address',
+				}),
 			},
 			{
 				name: 'swiftBic',
 				type: 'text',
 				label: defineMessage({ id: 'muralpay.field.swift-bic', defaultMessage: 'SWIFT/BIC' }),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.swift-bic', defaultMessage: 'Enter SWIFT/BIC code' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.swift-bic',
+					defaultMessage: 'Enter SWIFT/BIC code',
+				}),
 			},
 		],
 	},
 
 	blockchain_usdc_polygon: {
 		id: 'blockchain_usdc_polygon',
-		name: defineMessage({ id: 'muralpay.rail.usdc-polygon.name', defaultMessage: 'USDC (Polygon)' }),
+		name: defineMessage({
+			id: 'muralpay.rail.usdc-polygon.name',
+			defaultMessage: 'USDC (Polygon)',
+		}),
 		currency: 'USDC',
 		type: 'crypto',
 		blockchain: 'POLYGON',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
-			defaultMessage: 'Double-check your wallet address. Funds sent to an incorrect address cannot be recovered.',
+			defaultMessage:
+				'Double-check your wallet address. Funds sent to an incorrect address cannot be recovered.',
 		}),
 		fields: [
 			{
 				name: 'walletAddress',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.wallet-address', defaultMessage: 'Wallet Address' }),
+				label: defineMessage({
+					id: 'muralpay.field.wallet-address',
+					defaultMessage: 'Wallet Address',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.wallet-address-eth', defaultMessage: '0x...' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.wallet-address-eth',
+					defaultMessage: '0x...',
+				}),
 				pattern: '^0x[a-fA-F0-9]{40}$',
 				validate: (val) =>
 					/^0x[a-fA-F0-9]{40}$/.test(val) ? null : 'Must be a valid Ethereum address (0x...)',
@@ -705,15 +832,22 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		blockchain: 'BASE',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
-			defaultMessage: 'Double-check your wallet address. Funds sent to an incorrect address cannot be recovered.',
+			defaultMessage:
+				'Double-check your wallet address. Funds sent to an incorrect address cannot be recovered.',
 		}),
 		fields: [
 			{
 				name: 'walletAddress',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.wallet-address', defaultMessage: 'Wallet Address' }),
+				label: defineMessage({
+					id: 'muralpay.field.wallet-address',
+					defaultMessage: 'Wallet Address',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.wallet-address-eth', defaultMessage: '0x...' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.wallet-address-eth',
+					defaultMessage: '0x...',
+				}),
 				pattern: '^0x[a-fA-F0-9]{40}$',
 				validate: (val) =>
 					/^0x[a-fA-F0-9]{40}$/.test(val) ? null : 'Must be a valid Ethereum address (0x...)',
@@ -723,21 +857,31 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 
 	blockchain_usdc_ethereum: {
 		id: 'blockchain_usdc_ethereum',
-		name: defineMessage({ id: 'muralpay.rail.usdc-ethereum.name', defaultMessage: 'USDC (Ethereum)' }),
+		name: defineMessage({
+			id: 'muralpay.rail.usdc-ethereum.name',
+			defaultMessage: 'USDC (Ethereum)',
+		}),
 		currency: 'USDC',
 		type: 'crypto',
 		blockchain: 'ETHEREUM',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
-			defaultMessage: 'Double-check your wallet address. Funds sent to an incorrect address cannot be recovered.',
+			defaultMessage:
+				'Double-check your wallet address. Funds sent to an incorrect address cannot be recovered.',
 		}),
 		fields: [
 			{
 				name: 'walletAddress',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.wallet-address', defaultMessage: 'Wallet Address' }),
+				label: defineMessage({
+					id: 'muralpay.field.wallet-address',
+					defaultMessage: 'Wallet Address',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.wallet-address-eth', defaultMessage: '0x...' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.wallet-address-eth',
+					defaultMessage: '0x...',
+				}),
 				pattern: '^0x[a-fA-F0-9]{40}$',
 				validate: (val) =>
 					/^0x[a-fA-F0-9]{40}$/.test(val) ? null : 'Must be a valid Ethereum address (0x...)',
@@ -753,15 +897,22 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		blockchain: 'CELO',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
-			defaultMessage: 'Double-check your wallet address. Funds sent to an incorrect address cannot be recovered.',
+			defaultMessage:
+				'Double-check your wallet address. Funds sent to an incorrect address cannot be recovered.',
 		}),
 		fields: [
 			{
 				name: 'walletAddress',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.wallet-address', defaultMessage: 'Wallet Address' }),
+				label: defineMessage({
+					id: 'muralpay.field.wallet-address',
+					defaultMessage: 'Wallet Address',
+				}),
 				required: true,
-				placeholder: defineMessage({ id: 'muralpay.placeholder.wallet-address-eth', defaultMessage: '0x...' }),
+				placeholder: defineMessage({
+					id: 'muralpay.placeholder.wallet-address-eth',
+					defaultMessage: '0x...',
+				}),
 				pattern: '^0x[a-fA-F0-9]{40}$',
 				validate: (val) =>
 					/^0x[a-fA-F0-9]{40}$/.test(val) ? null : 'Must be a valid Ethereum address (0x...)',

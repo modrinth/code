@@ -71,8 +71,8 @@
 							:min="selectedMethodDetails?.interval?.standard?.min || 0.01"
 							:max="roundedMaxAmount"
 							:placeholder="formatMessage(messages.amountPlaceholder)"
-							@input="enforceDecimalPlaces"
 							class="w-full rounded-[14px] bg-surface-4 py-2.5 pl-4 pr-4 text-contrast placeholder:text-secondary"
+							@input="enforceDecimalPlaces"
 						/>
 					</div>
 					<ButtonStyled>
@@ -102,8 +102,8 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 
-import { useAuth } from '@/composables/auth.js'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
+import { useAuth } from '@/composables/auth.js'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
 const debug = useDebugLogger('TremendousDetailsStage')

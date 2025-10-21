@@ -1,21 +1,21 @@
-import { PolygonIcon, USDCIcon } from '@modrinth/assets';
-import type { Component } from 'vue';
+import { PolygonIcon, USDCIcon } from '@modrinth/assets'
+import type { Component } from 'vue'
 
 export function getCurrencyIcon(currency: string): Component | null {
-	const lower = currency.toLocaleLowerCase();
-	console.log(lower);
+	const lower = currency.toLocaleLowerCase()
+	console.log(lower)
 
-	if (lower.includes('usdc')) return USDCIcon;
+	if (lower.includes('usdc')) return USDCIcon
 
-	return null;
+	return null
 }
 
 export function getCurrencyColor(currency: string): string {
-	const lower = currency.toLowerCase();
+	const lower = currency.toLowerCase()
 
 	if (lower.includes('usdc')) return 'text-blue'
 
-	return 'text-contrast';
+	return 'text-contrast'
 }
 
 export function getBlockchainIcon(blockchain: string): Component | null {
@@ -30,10 +30,10 @@ export function getBlockchainIcon(blockchain: string): Component | null {
 }
 
 export function getBlockchainColor(blockchain: string): string {
-	const lower = blockchain.toLowerCase();
+	const lower = blockchain.toLowerCase()
 
-	if (lower.includes('polygon')) return 'text-blue';
+	if (lower.includes('polygon')) return 'text-blue'
 	if (lower.includes('ethereum')) return 'text-purple'
 
-	return 'text-contrast';
+	return 'text-contrast'
 }

@@ -27,7 +27,9 @@
 			<div class="h-px bg-surface-5" />
 			<div class="flex items-center justify-between">
 				<span class="text-primary">{{ formatMessage(messages.feeBreakdownExchangeRate) }}</span>
-				<span class="text-secondary">1 USD = {{ exchangeRate?.toFixed(4) }} {{ localCurrency }}</span>
+				<span class="text-secondary"
+					>1 USD = {{ exchangeRate?.toFixed(4) }} {{ localCurrency }}</span
+				>
 			</div>
 		</template>
 	</div>
@@ -83,7 +85,7 @@ const formattedLocalCurrency = computed(() => {
 			minimumFractionDigits: 2,
 			maximumFractionDigits: 2,
 		}).format(netAmountInLocalCurrency.value)
-	} catch (error) {
+	} catch {
 		return `${props.localCurrency} ${netAmountInLocalCurrency.value.toFixed(2)}`
 	}
 })

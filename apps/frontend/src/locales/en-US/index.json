@@ -623,6 +623,18 @@
   "dashboard.creator-withdraw-modal.details-label": {
     "message": "Details"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Amount"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Exchange rate"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Fee"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Net amount"
+  },
   "dashboard.creator-withdraw-modal.kyc.address-2-placeholder": {
     "message": "Apartment, suite, etc."
   },
@@ -698,20 +710,8 @@
   "dashboard.creator-withdraw-modal.kyc.state-province": {
     "message": "State/province"
   },
-  "dashboard.creator-withdraw-modal.muralpay-details.account-number": {
-    "message": "Account number"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.account-number-placeholder": {
-    "message": "Enter account number"
-  },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Account owner"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.account-type": {
-    "message": "Account type"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.account-type-placeholder": {
-    "message": "Select account type"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.amount": {
     "message": "Amount"
@@ -728,35 +728,47 @@
   "dashboard.creator-withdraw-modal.muralpay-details.bank-name-placeholder": {
     "message": "Enter bank name"
   },
-  "dashboard.creator-withdraw-modal.muralpay-details.checking": {
-    "message": "Checking"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-body": {
-    "message": "Double-check your wallet address. Funds sent to an incorrect address cannot be recovered."
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Coin"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
     "message": "Confirm your wallet address"
   },
-  "dashboard.creator-withdraw-modal.muralpay-details.limited-by-tax": {
-    "message": "Due to tax requirements, maximum withdrawal is {limit} without completing tax form."
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "National ID Number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Enter national ID number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Passport Number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Enter passport number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Resident ID Number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Enter resident ID number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "RUC Number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Enter RUC number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Tax ID Number"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Enter tax ID number"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.max-button": {
     "message": "Max"
   },
-  "dashboard.creator-withdraw-modal.muralpay-details.routing-number": {
-    "message": "Routing number"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.routing-number-placeholder": {
-    "message": "Enter 9-digit routing number"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.savings": {
-    "message": "Savings"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.wallet-address": {
-    "message": "Wallet Address"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.wallet-address-placeholder": {
-    "message": "Enter your wallet address"
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Network"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
     "message": "You're nearing the withdraw threshold. You can withdraw <b>{amountRemaining}</b> now, but a tax form is required for more."
@@ -787,6 +799,30 @@
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Tax form required"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.amount": {
+    "message": "Amount"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.amount-placeholder": {
+    "message": "Enter amount"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available": {
+    "message": "available."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.email": {
+    "message": "Email"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.max-button": {
+    "message": "Max"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Reward"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Select reward"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Withdraw"
   },
   "dashboard.creator-withdraw-modal.withdraw-limit": {
     "message": "Withdraw limit"
@@ -1351,6 +1387,297 @@
   },
   "moderation.technical.search.placeholder": {
     "message": "Search tech reviews..."
+  },
+  "muralpay.account-type.checking": {
+    "message": "Checking"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Savings"
+  },
+  "muralpay.country.at": {
+    "message": "Austria"
+  },
+  "muralpay.country.be": {
+    "message": "Belgium"
+  },
+  "muralpay.country.cy": {
+    "message": "Cyprus"
+  },
+  "muralpay.country.de": {
+    "message": "Germany"
+  },
+  "muralpay.country.ee": {
+    "message": "Estonia"
+  },
+  "muralpay.country.es": {
+    "message": "Spain"
+  },
+  "muralpay.country.fi": {
+    "message": "Finland"
+  },
+  "muralpay.country.fr": {
+    "message": "France"
+  },
+  "muralpay.country.gr": {
+    "message": "Greece"
+  },
+  "muralpay.country.ie": {
+    "message": "Ireland"
+  },
+  "muralpay.country.it": {
+    "message": "Italy"
+  },
+  "muralpay.country.lt": {
+    "message": "Lithuania"
+  },
+  "muralpay.country.lu": {
+    "message": "Luxembourg"
+  },
+  "muralpay.country.lv": {
+    "message": "Latvia"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Netherlands"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Slovakia"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "National ID"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Passport"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Resident ID"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "Tax ID"
+  },
+  "muralpay.field.account-number": {
+    "message": "Account Number"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Account Number (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Account Number (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Account Number Type"
+  },
+  "muralpay.field.account-type": {
+    "message": "Account Type"
+  },
+  "muralpay.field.address": {
+    "message": "Address"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Account Number"
+  },
+  "muralpay.field.bank-name": {
+    "message": "Bank Name"
+  },
+  "muralpay.field.branch-code": {
+    "message": "Branch Code"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "Country"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "Document Type"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Phone Number"
+  },
+  "muralpay.field.pix-email": {
+    "message": "PIX Email"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "PIX Key Type"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "PIX Phone"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Routing Number"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Wallet Address"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme or Clave Virtual Uniforme"
+  },
+  "muralpay.help.cci": {
+    "message": "Código de Cuenta Interbancaria"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (Mexican bank account number)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Brazilian tax identification number"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Argentine tax ID"
+  },
+  "muralpay.help.iban": {
+    "message": "International Bank Account Number"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Bank Identifier Code"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Bank Account"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Email"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Phone Number"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Enter account number"
+  },
+  "muralpay.placeholder.address": {
+    "message": "Enter address"
+  },
+  "muralpay.placeholder.bank-name": {
+    "message": "Enter bank name"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Enter CBU or CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU or CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Enter 20-digit CCI"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Enter CUIT or CUIL"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Enter account number"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Enter branch code"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Enter 18-digit CLABE"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Enter CPF or CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Enter IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Enter PIX email"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Enter 9-digit routing number"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Enter SWIFT/BIC code"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Enter Costa Rican IBAN"
+  },
+  "muralpay.placeholder.phone-china": {
+    "message": "+86..."
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.swift-bic": {
+    "message": "Enter SWIFT/BIC code"
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Bank Transfer (ARS)"
+  },
+  "muralpay.rail.fiat-bob.name": {
+    "message": "Bank Transfer (BOB)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "PIX Transfer (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Bank Transfer (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Bank Transfer (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Bank Transfer (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Bank Transfer (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Bank Transfer (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Bank Transfer (PEN)"
+  },
+  "muralpay.rail.fiat-usd-china.name": {
+    "message": "Bank Transfer (USD - China)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Bank Transfer (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Bank Transfer (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Bank Transfer (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "USDC (Polygon)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Double-check your wallet address. Funds sent to an incorrect address cannot be recovered."
   },
   "profile.bio.fallback.creator": {
     "message": "A Modrinth creator."

@@ -9,14 +9,20 @@
 				</div>
 			</div>
 			<div class="flex h-2.5 w-full overflow-hidden rounded-full bg-surface-2">
-				<div class="gradient-border bg-orange" :style="{ width: `${(usedLimit / 600) * 100}%` }"></div>
+				<div
+					class="gradient-border bg-orange"
+					:style="{ width: `${(usedLimit / 600) * 100}%` }"
+				></div>
 			</div>
 		</div>
 		<template v-if="remainingLimit > 0">
 			<span>
-				<IntlFormatted :message-id="messages.nearingThreshold" :values="{
-					amountRemaining: formatMoney(remainingLimit),
-				}">
+				<IntlFormatted
+					:message-id="messages.nearingThreshold"
+					:values="{
+						amountRemaining: formatMoney(remainingLimit),
+					}"
+				>
 					<template #b="{ children }">
 						<span class="font-medium">
 							<component :is="() => normalizeChildren(children)" />
@@ -24,7 +30,11 @@
 					</template>
 				</IntlFormatted>
 			</span>
-			<Admonition type="warning" show-actions-underneath :header="formatMessage(messages.taxFormRequiredHeader)">
+			<Admonition
+				type="warning"
+				show-actions-underneath
+				:header="formatMessage(messages.taxFormRequiredHeader)"
+			>
 				<span class="font-normal">
 					{{
 						formatMessage(messages.taxFormRequiredBodyWithLimit, {
@@ -46,7 +56,10 @@
 		</template>
 		<template v-else>
 			<span>
-				<IntlFormatted :message-id="messages.withdrawLimitUsed" :values="{ withdrawLimit: formatMoney(600) }">
+				<IntlFormatted
+					:message-id="messages.withdrawLimitUsed"
+					:values="{ withdrawLimit: formatMoney(600) }"
+				>
 					<template #b="{ children }">
 						<b>
 							<component :is="() => normalizeChildren(children)" />
