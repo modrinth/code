@@ -1,10 +1,12 @@
 <template>
 	<div class="flex flex-col gap-4">
-		<Admonition v-if="selectedRail?.warningMessage" type="warning"
-			:header="formatMessage(messages.cryptoWarningHeader)">
-			{{ selectedRail.warningMessage }}
+		<Admonition
+			v-if="selectedRail?.warningMessage"
+			type="warning"
+			:header="formatMessage(messages.cryptoWarningHeader)"
+		>
+			{{ formatMessage(selectedRail.warningMessage) }}
 		</Admonition>
-
 
 		<div v-if="selectedRail?.type === 'crypto'" class="flex flex-col gap-2.5">
 			<label>
@@ -13,12 +15,14 @@
 				</span>
 			</label>
 			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
-				<component class="size-5" :class="getCurrencyColor(selectedRail.currency)"
-					:is="getCurrencyIcon(selectedRail.currency)" />
+				<component
+					class="size-5"
+					:class="getCurrencyColor(selectedRail.currency)"
+					:is="getCurrencyIcon(selectedRail.currency)"
+				/>
 				<span class="font-semibold text-contrast">{{ selectedRail.currency }}</span>
 			</div>
 		</div>
-
 
 		<div v-if="selectedRail?.type === 'fiat'" class="flex flex-col gap-2.5">
 			<label>
@@ -38,7 +42,6 @@
 			</div>
 		</div>
 
-
 		<div v-if="selectedRail?.requiresBankName" class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
@@ -46,38 +49,67 @@
 					<span class="text-brand-red">*</span>
 				</span>
 			</label>
-			<input v-model="formData.bankName" type="text" :placeholder="formatMessage(messages.bankNamePlaceholder)"
-				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+			<input
+				v-model="formData.bankName"
+				type="text"
+				:placeholder="formatMessage(messages.bankNamePlaceholder)"
+				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+			/>
 		</div>
-
 
 		<div v-for="field in selectedRail?.fields" :key="field.name" class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
-					{{ field.label }}
+					{{ formatMessage(field.label) }}
 					<span v-if="field.required" class="text-brand-red">*</span>
 				</span>
 			</label>
 
+			<input
+				v-if="['text', 'email', 'tel'].includes(field.type)"
+				v-model="formData[field.name]"
+				:type="field.type"
+				:placeholder="field.placeholder ? formatMessage(field.placeholder) : undefined"
+				:pattern="field.pattern"
+				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+			/>
 
-			<input v-if="['text', 'email', 'tel'].includes(field.type)" v-model="formData[field.name]" :type="field.type"
-				:placeholder="field.placeholder" :pattern="field.pattern"
-				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+			<Combobox
+				v-else-if="field.type === 'select'"
+				v-model="formData[field.name]"
+				:options="(field.options || []).map(opt => ({ value: opt.value, label: formatMessage(opt.label) }))"
+				:placeholder="field.placeholder ? formatMessage(field.placeholder) : undefined"
+				class="h-10"
+			/>
 
-
-			<Combobox v-else-if="field.type === 'select'" v-model="formData[field.name]" :options="field.options || []"
-				:placeholder="field.placeholder" class="h-10" />
-
-
-			<input v-else-if="field.type === 'date'" v-model="formData[field.name]" type="date"
-				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
-
+			<input
+				v-else-if="field.type === 'date'"
+				v-model="formData[field.name]"
+				type="date"
+				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+			/>
 
 			<span v-if="field.helpText" class="text-sm text-secondary">
-				{{ field.helpText }}
+				{{ formatMessage(field.helpText) }}
 			</span>
 		</div>
 
+		<Transition name="fade">
+			<div v-if="dynamicDocumentNumberField" class="flex flex-col gap-2.5">
+				<label>
+					<span class="text-md font-semibold text-contrast">
+						{{ dynamicDocumentNumberField.label }}
+						<span v-if="dynamicDocumentNumberField.required" class="text-brand-red">*</span>
+					</span>
+				</label>
+				<input
+					v-model="formData.documentNumber"
+					:type="dynamicDocumentNumberField.type"
+					:placeholder="dynamicDocumentNumberField.placeholder"
+					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+				/>
+			</div>
+		</Transition>
 
 		<div v-if="selectedRail?.blockchain" class="flex flex-col gap-2.5">
 			<label>
@@ -86,12 +118,14 @@
 				</span>
 			</label>
 			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
-				<component class="size-5" :class="getBlockchainColor(selectedRail.blockchain)"
-					:is="getBlockchainIcon(selectedRail.blockchain)" />
+				<component
+					class="size-5"
+					:class="getBlockchainColor(selectedRail.blockchain)"
+					:is="getBlockchainIcon(selectedRail.blockchain)"
+				/>
 				<span class="font-semibold text-contrast">{{ selectedRail.blockchain }}</span>
 			</div>
 		</div>
-
 
 		<div class="flex flex-col gap-2.5">
 			<label>
@@ -102,10 +136,16 @@
 			</label>
 			<div class="flex items-center gap-2">
 				<div class="relative flex-1">
-					<input v-model.number="formData.amount" type="number" step="0.01" min="0.01" :max="roundedMaxAmount"
+					<input
+						v-model.number="formData.amount"
+						type="number"
+						step="0.01"
+						min="0.01"
+						:max="roundedMaxAmount"
 						:placeholder="formatMessage(messages.amountPlaceholder)"
 						@input="enforceDecimalPlaces"
-						class="bg-raised w-full rounded-[14px] pl-8 pr-4 py-2.5 text-contrast placeholder:text-secondary" />
+						class="bg-raised w-full rounded-[14px] py-2.5 pl-8 pr-4 text-contrast placeholder:text-secondary"
+					/>
 				</div>
 				<ButtonStyled>
 					<button class="px-4 py-2" @click="setMaxAmount">
@@ -117,7 +157,6 @@
 				{{ formatMoney(roundedMaxAmount) }} {{ formatMessage(messages.available) }}
 			</span>
 
-
 			<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
 				<div class="flex items-center justify-between">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownAmount) }}</span>
@@ -125,9 +164,9 @@
 				</div>
 				<div class="flex items-center justify-between">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownFee) }}</span>
-					<span class="font-semibold text-contrast h-4">
+					<span class="h-4 font-semibold text-contrast">
 						<template v-if="feeLoading">
-							<LoaderCircleIcon class="animate-spin size-5 !text-secondary" />
+							<LoaderCircleIcon class="size-5 animate-spin !text-secondary" />
 						</template>
 						<template v-else>-{{ formatMoney(calculatedFee || 0) }}</template>
 					</span>
@@ -135,8 +174,22 @@
 				<div class="h-px bg-surface-5" />
 				<div class="flex items-center justify-between">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownNetAmount) }}</span>
-					<span class="font-semibold text-contrast">{{ formatMoney(netAmount) }}</span>
+					<span class="font-semibold text-contrast">
+						{{ formatMoney(netAmount) }}
+						<template v-if="shouldShowExchangeRate">
+							<span class="text-secondary"> ({{ formattedLocalCurrency }})</span>
+						</template>
+					</span>
 				</div>
+				<template v-if="shouldShowExchangeRate">
+					<div class="h-px bg-surface-5" />
+					<div class="flex items-center justify-between">
+						<span class="text-primary">{{ formatMessage(messages.feeBreakdownExchangeRate) }}</span>
+						<span class="text-secondary"
+							>1 USD = {{ exchangeRate?.toFixed(4) }} {{ selectedRail?.currency }}</span
+						>
+					</div>
+				</template>
 			</div>
 		</div>
 	</div>
@@ -150,7 +203,12 @@ import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import { getBlockchainColor, getBlockchainIcon, getCurrencyColor, getCurrencyIcon } from '@/utils/finance-icons.ts'
+import {
+	getBlockchainColor,
+	getBlockchainIcon,
+	getCurrencyColor,
+	getCurrencyIcon,
+} from '@/utils/finance-icons.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
 import { LoaderCircleIcon } from '@modrinth/assets'
 
@@ -161,8 +219,6 @@ const selectedRail = computed(() => {
 	const railId = withdrawContext.withdrawData.value.selectedMethod
 	return railId ? getRailConfig(railId) : null
 })
-
-console.log(selectedRail);
 
 const maxAmount = computed(() => withdrawContext.maxWithdrawAmount.value)
 const roundedMaxAmount = computed(() => Math.floor(maxAmount.value * 100) / 100)
@@ -177,12 +233,79 @@ const formData = ref<Record<string, any>>({
 })
 
 const calculatedFee = ref<number | null>(null)
+const exchangeRate = ref<number | null>(null)
 const feeLoading = ref(false)
 
 const netAmount = computed(() => {
 	const amount = formData.value.amount || 0
 	const fee = calculatedFee.value || 0
 	return Math.max(0, amount - fee)
+})
+
+const shouldShowExchangeRate = computed(() => {
+	const rail = selectedRail.value
+	if (!rail || rail.type !== 'fiat') return false
+	if (rail.currency === 'USD') return false
+	return exchangeRate.value !== null && exchangeRate.value > 0
+})
+
+const netAmountInLocalCurrency = computed(() => {
+	if (!shouldShowExchangeRate.value) return null
+	return netAmount.value * (exchangeRate.value || 0)
+})
+
+const formattedLocalCurrency = computed(() => {
+	if (!shouldShowExchangeRate.value || !netAmountInLocalCurrency.value) return ''
+	const rail = selectedRail.value
+	if (!rail) return ''
+
+	try {
+		return new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: rail.currency,
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		}).format(netAmountInLocalCurrency.value)
+	} catch (error) {
+		return `${rail.currency} ${netAmountInLocalCurrency.value.toFixed(2)}`
+	}
+})
+
+const hasDocumentTypeField = computed(() => {
+	const rail = selectedRail.value
+	if (!rail) return false
+	return rail.fields.some((field) => field.name === 'documentType')
+})
+
+const dynamicDocumentNumberField = computed(() => {
+	if (!hasDocumentTypeField.value) return null
+
+	const documentType = formData.value.documentType
+	if (!documentType) return null
+
+	const labelMap: Record<string, string> = {
+		NATIONAL_ID: formatMessage(messages.documentNumberNationalId),
+		PASSPORT: formatMessage(messages.documentNumberPassport),
+		RESIDENT_ID: formatMessage(messages.documentNumberResidentId),
+		RUC: formatMessage(messages.documentNumberRuc),
+		TAX_ID: formatMessage(messages.documentNumberTaxId),
+	}
+
+	const placeholderMap: Record<string, string> = {
+		NATIONAL_ID: formatMessage(messages.documentNumberNationalIdPlaceholder),
+		PASSPORT: formatMessage(messages.documentNumberPassportPlaceholder),
+		RESIDENT_ID: formatMessage(messages.documentNumberResidentIdPlaceholder),
+		RUC: formatMessage(messages.documentNumberRucPlaceholder),
+		TAX_ID: formatMessage(messages.documentNumberTaxIdPlaceholder),
+	}
+
+	return {
+		name: 'documentNumber',
+		type: 'text' as const,
+		label: labelMap[documentType] || 'Document Number',
+		placeholder: placeholderMap[documentType] || 'Enter document number',
+		required: true,
+	}
 })
 
 const accountOwnerName = computed(() => {
@@ -239,6 +362,7 @@ const calculateFees = useDebounceFn(async () => {
 
 	if (!amount || amount <= 0 || !rail || !kycData) {
 		calculatedFee.value = null
+		exchangeRate.value = null
 		return
 	}
 
@@ -249,7 +373,8 @@ const calculateFees = useDebounceFn(async () => {
 		if (rail.type === 'crypto') {
 			payout_details = {
 				type: 'blockchain',
-				wallet_address: formData.value.walletAddress || '0x0000000000000000000000000000000000000000'
+				wallet_address:
+					formData.value.walletAddress || '0x0000000000000000000000000000000000000000',
 			}
 		} else {
 			const fiatAndRailDetails: Record<string, any> = {
@@ -267,24 +392,27 @@ const calculateFees = useDebounceFn(async () => {
 			payout_details = {
 				type: 'fiat',
 				bank_name: formData.value.bankName || '',
-				bank_account_owner: kycData.type === 'individual'
-					? `${kycData.firstName} ${kycData.lastName}`
-					: kycData.name || '',
-				fiat_and_rail_details: fiatAndRailDetails
+				bank_account_owner:
+					kycData.type === 'individual'
+						? `${kycData.firstName} ${kycData.lastName}`
+						: kycData.name || '',
+				fiat_and_rail_details: fiatAndRailDetails,
 			}
 		}
 
 		const recipient_info = {
 			type: kycData.type,
-			...(kycData.type === 'individual' ? {
-				firstName: kycData.firstName,
-				lastName: kycData.lastName,
-				dateOfBirth: kycData.dateOfBirth,
-			} : {
-				name: kycData.name,
-			}),
+			...(kycData.type === 'individual'
+				? {
+						firstName: kycData.firstName,
+						lastName: kycData.lastName,
+						dateOfBirth: kycData.dateOfBirth,
+					}
+				: {
+						name: kycData.name,
+					}),
 			email: kycData.email,
-			physicalAddress: kycData.physicalAddress
+			physicalAddress: kycData.physicalAddress,
 		}
 
 		const payload = {
@@ -292,21 +420,23 @@ const calculateFees = useDebounceFn(async () => {
 			method: 'muralpay',
 			method_details: {
 				payout_details,
-				recipient_info
+				recipient_info,
 			},
-			method_id: 'muralpay'
+			method_id: 'muralpay',
 		}
 
-		const response = await useBaseFetch('payout/fees', {
+		const response = (await useBaseFetch('payout/fees', {
 			apiVersion: 3,
 			method: 'POST',
-			body: payload
-		}) as { fee: number | null }
+			body: payload,
+		})) as { fee: number | null; exchange_rate: number | null }
 
 		calculatedFee.value = response.fee || 0
+		exchangeRate.value = response.exchange_rate || null
 	} catch (error) {
 		console.error('Failed to calculate fees:', error)
 		calculatedFee.value = 0
+		exchangeRate.value = null
 	} finally {
 		feeLoading.value = false
 	}
@@ -344,6 +474,23 @@ watch(
 if (formData.value.amount) {
 	calculateFees()
 }
+
+// reset all the values if the selected method changes
+watch(
+	() => withdrawContext.withdrawData.value.selectedMethod,
+	(newMethod, oldMethod) => {
+		if (oldMethod && newMethod !== oldMethod) {
+			formData.value = {
+				amount: undefined,
+				bankName: '',
+			}
+			withdrawContext.withdrawData.value.accountDetails = {}
+			withdrawContext.withdrawData.value.amount = 0
+			calculatedFee.value = null
+			exchangeRate.value = null
+		}
+	},
+)
 
 const messages = defineMessages({
 	accountOwner: {
@@ -398,5 +545,68 @@ const messages = defineMessages({
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.fee-breakdown-net-amount',
 		defaultMessage: 'Net amount',
 	},
+	feeBreakdownExchangeRate: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.fee-breakdown-exchange-rate',
+		defaultMessage: 'Exchange rate',
+	},
+	documentNumberNationalId: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id',
+		defaultMessage: 'National ID Number',
+	},
+	documentNumberPassport: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-passport',
+		defaultMessage: 'Passport Number',
+	},
+	documentNumberResidentId: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id',
+		defaultMessage: 'Resident ID Number',
+	},
+	documentNumberRuc: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc',
+		defaultMessage: 'RUC Number',
+	},
+	documentNumberTaxId: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id',
+		defaultMessage: 'Tax ID Number',
+	},
+	documentNumberNationalIdPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder',
+		defaultMessage: 'Enter national ID number',
+	},
+	documentNumberPassportPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder',
+		defaultMessage: 'Enter passport number',
+	},
+	documentNumberResidentIdPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder',
+		defaultMessage: 'Enter resident ID number',
+	},
+	documentNumberRucPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder',
+		defaultMessage: 'Enter RUC number',
+	},
+	documentNumberTaxIdPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder',
+		defaultMessage: 'Enter tax ID number',
+	},
 })
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+	transition:
+		opacity 0.3s ease,
+		transform 0.3s ease;
+}
+
+.fade-enter-from {
+	opacity: 0;
+	transform: translateY(-10px);
+}
+
+.fade-leave-to {
+	opacity: 0;
+	transform: translateY(-10px);
+}
+</style>
