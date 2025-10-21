@@ -5,10 +5,9 @@
 		<NewModal ref="editRoleModal" header="Edit role">
 			<div class="flex w-80 flex-col gap-4">
 				<div class="flex flex-col gap-2">
-					<TeleportDropdownMenu
+					<Combobox
 						v-model="selectedRole"
 						:options="roleOptions"
-						name="edit-role"
 						placeholder="Select a role"
 					/>
 				</div>
@@ -432,12 +431,12 @@ import {
 import {
 	Avatar,
 	ButtonStyled,
+	Combobox,
 	commonMessages,
 	ContentPageHeader,
 	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
-	TeleportDropdownMenu,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
@@ -783,7 +782,11 @@ const navLinks = computed(() => [
 const selectedRole = ref(user.value.role)
 const isSavingRole = ref(false)
 
-const roleOptions = ['developer', 'moderator', 'admin']
+const roleOptions = [
+	{ value: 'developer', label: 'Developer' },
+	{ value: 'moderator', label: 'Moderator' },
+	{ value: 'admin', label: 'Admin' },
+]
 
 const editRoleModal = useTemplateRef('editRoleModal')
 
