@@ -200,7 +200,7 @@ pub enum UsdPayoutDetails {
         symbol: UsdSymbol,
         account_type: FiatAccountType,
         document_type: DocumentType,
-        bank_naame: String,
+        bank_name: String,
         bank_account_number_truncated: TruncatedString,
         document_number_truncated: TruncatedString,
     },

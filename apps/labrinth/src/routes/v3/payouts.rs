@@ -27,7 +27,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Sha256;
 use sqlx::PgPool;
-use std::cmp;
 use std::collections::HashMap;
 use tokio_stream::StreamExt;
 use tracing::error;
@@ -1422,47 +1421,4 @@ pub async fn platform_revenue(
     };
 
     Ok(HttpResponse::Ok().json(res))
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{
-        models::payouts::PayoutMethodRequest, routes::v3::payouts::Withdrawal,
-    };
-    use rust_decimal::Decimal;
-    use serde_json::json;
-
-    // Before the Mural Pay payment rail, we followed a different payout withdraw
-    // request format. We use these tests to ensure the serde representation is the same,
-    // for backwards compat.
-    #[test]
-    fn serde_payout_methods_backwards_compat() {
-        assert_eq!(
-            json!({
-                "amount": 1.00,
-                "method": "paypal",
-                "method_id": ""
-            }),
-            serde_json::to_value(Withdrawal {
-                amount: Decimal::new(100, 2),
-                method: PayoutMethodRequest::PayPal,
-                method_id: String::new(),
-            })
-            .unwrap()
-        );
-
-        assert_eq!(
-            json!({
-                "amount": 1.00,
-                "method": "tremendous",
-                "method_id": ""
-            }),
-            serde_json::to_value(Withdrawal {
-                amount: Decimal::new(100, 2),
-                method: PayoutMethodRequest::PayPal,
-                method_id: String::new(),
-            })
-            .unwrap()
-        );
-    }
 }

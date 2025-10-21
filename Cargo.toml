@@ -71,8 +71,8 @@ either = "1.15.0"
 encoding_rs = "0.8.35"
 enumset = "1.1.10"
 eyre = "0.6.12"
-foldhash = "0.2.0"
 flate2 = "1.1.4"
+foldhash = "0.2.0"
 fs4 = { version = "0.13.1", default-features = false }
 futures = "0.3.31"
 futures-util = "0.3.31"
@@ -107,10 +107,10 @@ lettre = { version = "0.11.19", default-features = false, features = [
   "tokio1-rustls",
 ] }
 maxminddb = "0.26.0"
-muralpay = { path = "packages/muralpay" }
 meilisearch-sdk = { version = "0.30.0", default-features = false }
 modrinth-maxmind = { path = "packages/modrinth-maxmind" }
 modrinth-util = { path = "packages/modrinth-util" }
+muralpay = { path = "packages/muralpay" }
 murmur2 = "0.1.0"
 native-dialog = "0.9.2"
 notify = { version = "8.2.0", default-features = false }
