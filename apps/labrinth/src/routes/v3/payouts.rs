@@ -489,6 +489,7 @@ pub struct Withdrawal {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WithdrawalFees {
     pub fee: Option<Decimal>,
+    pub exchange_rate: Option<Decimal>,
 }
 
 #[post("/fees")]
@@ -520,7 +521,10 @@ pub async fn calculate_fees(
                     payout_details: MuralPayoutRequest::Blockchain { .. },
                     ..
                 },
-        } => Some(Decimal::ZERO),
+        } => WithdrawalFees {
+            fee: Some(dec!(0)),
+            exchange_rate: None,
+        },
         PayoutMethodRequest::MuralPay {
             method_details:
                 MuralPayDetails {
@@ -538,9 +542,14 @@ pub async fn calculate_fees(
                 .await?;
 
             match fee {
-                muralpay::TokenPayoutFee::Success { fee_total, .. } => {
-                    Some(fee_total.token_amount)
-                }
+                muralpay::TokenPayoutFee::Success {
+                    exchange_rate,
+                    fee_total,
+                    ..
+                } => WithdrawalFees {
+                    fee: Some(fee_total.token_amount),
+                    exchange_rate: Some(exchange_rate),
+                },
                 muralpay::TokenPayoutFee::Error { message, .. } => {
                     return Err(ApiError::Internal(eyre!(
                         "failed to compute fee: {message}"
@@ -548,18 +557,30 @@ pub async fn calculate_fees(
                 }
             }
         }
-        PayoutMethodRequest::PayPal => match body.method_id.as_str() {
-            "paypal_us" => Some(compute_us_fee(body.amount)),
-            "paypal_in" => {
-                Some(compute_fee(body.amount, dec!(0.02), dec!(0), dec!(20.0)))
-            }
-            _ => None,
+        PayoutMethodRequest::PayPal => WithdrawalFees {
+            fee: match body.method_id.as_str() {
+                "paypal_us" => Some(compute_us_fee(body.amount)),
+                "paypal_in" => Some(compute_fee(
+                    body.amount,
+                    dec!(0.02),
+                    dec!(0),
+                    dec!(20.0),
+                )),
+                _ => None,
+            },
+            exchange_rate: None,
         },
-        PayoutMethodRequest::Venmo => Some(compute_us_fee(body.amount)),
-        PayoutMethodRequest::Tremendous => Some(dec!(0)),
+        PayoutMethodRequest::Venmo => WithdrawalFees {
+            fee: Some(compute_us_fee(body.amount)),
+            exchange_rate: None,
+        },
+        PayoutMethodRequest::Tremendous => WithdrawalFees {
+            fee: Some(dec!(0)),
+            exchange_rate: None,
+        },
     };
 
-    Ok(web::Json(WithdrawalFees { fee }))
+    Ok(web::Json(fee))
 }
 
 fn compute_us_fee(amount: Decimal) -> Decimal {
