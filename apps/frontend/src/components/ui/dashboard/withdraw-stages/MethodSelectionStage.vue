@@ -152,24 +152,11 @@ const paymentOptions = computed(() => {
 	debug('Available methods:', methods)
 
 	const options = []
-
-	// TEMPORARY FIX: Group fiat methods by currency and only use the first one
-	// TODO: Remove this when backend bug is fixed
-	const seenFiatCurrencies = new Set<string>()
-
 	for (const method of methods) {
 		const methodId = method.id
 
 		if (methodId.startsWith('fiat_')) {
 			const railCode = methodId.replace('fiat_', '')
-
-			// TEMPORARY FIX: Skip duplicate fiat currencies
-			// TODO: Remove this when backend bug is fixed
-			if (seenFiatCurrencies.has(railCode)) {
-				debug('Skipping duplicate fiat method:', methodId)
-				continue
-			}
-			seenFiatCurrencies.add(railCode)
 
 			const rail = getRailConfig(methodId)
 
