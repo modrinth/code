@@ -101,9 +101,12 @@
 				</span>
 			</label>
 			<div class="flex items-center gap-2">
-				<input v-model.number="formData.amount" type="number" step="0.01" min="0" :max="maxAmount"
-					:placeholder="formatMessage(messages.amountPlaceholder)"
-					class="bg-raised flex-1 rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary" />
+				<div class="relative flex-1">
+					<input v-model.number="formData.amount" type="number" step="0.01" min="0.01" :max="roundedMaxAmount"
+						:placeholder="formatMessage(messages.amountPlaceholder)"
+						@input="enforceDecimalPlaces"
+						class="bg-raised w-full rounded-[14px] pl-8 pr-4 py-2.5 text-contrast placeholder:text-secondary" />
+				</div>
 				<ButtonStyled>
 					<button class="px-4 py-2" @click="setMaxAmount">
 						{{ formatMessage(messages.maxButton) }}
@@ -111,7 +114,7 @@
 				</ButtonStyled>
 			</div>
 			<span class="text-primary">
-				{{ formatMoney(maxAmount) }} {{ formatMessage(messages.available) }}
+				{{ formatMoney(roundedMaxAmount) }} {{ formatMessage(messages.available) }}
 			</span>
 
 
@@ -122,9 +125,9 @@
 				</div>
 				<div class="flex items-center justify-between">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownFee) }}</span>
-					<span class="font-semibold text-contrast">
+					<span class="font-semibold text-contrast h-4">
 						<template v-if="feeLoading">
-							<LoaderCircleIcon class="animate-spin size-4" />
+							<LoaderCircleIcon class="animate-spin size-5 !text-secondary" />
 						</template>
 						<template v-else>-{{ formatMoney(calculatedFee || 0) }}</template>
 					</span>
@@ -162,10 +165,15 @@ const selectedRail = computed(() => {
 console.log(selectedRail);
 
 const maxAmount = computed(() => withdrawContext.maxWithdrawAmount.value)
+const roundedMaxAmount = computed(() => Math.floor(maxAmount.value * 100) / 100)
 
+// if user has switched stages use what was in withdraw context
+const existingAccountDetails = withdrawContext.withdrawData.value.accountDetails
+const existingAmount = withdrawContext.withdrawData.value.amount
 const formData = ref<Record<string, any>>({
-	amount: undefined,
-	bankName: '',
+	amount: existingAmount || undefined,
+	bankName: existingAccountDetails?.bankName ?? '',
+	...existingAccountDetails,
 })
 
 const calculatedFee = ref<number | null>(null)
@@ -207,7 +215,21 @@ const accountOwnerAddress = computed(() => {
 })
 
 function setMaxAmount() {
-	formData.value.amount = maxAmount.value
+	formData.value.amount = roundedMaxAmount.value
+}
+
+function enforceDecimalPlaces(event: Event) {
+	const input = event.target as HTMLInputElement
+	const value = input.value
+
+	if (value && value.includes('.')) {
+		const parts = value.split('.')
+		if (parts[1] && parts[1].length > 2) {
+			const rounded = Math.floor(parseFloat(value) * 100) / 100
+			formData.value.amount = rounded
+			input.value = rounded.toString()
+		}
+	}
 }
 
 const calculateFees = useDebounceFn(async () => {
@@ -291,6 +313,22 @@ const calculateFees = useDebounceFn(async () => {
 }, 500)
 
 watch(
+	() => formData.value.amount,
+	(newAmount) => {
+		if (newAmount !== undefined && newAmount !== null) {
+			if (newAmount > roundedMaxAmount.value) {
+				formData.value.amount = roundedMaxAmount.value
+				return
+			}
+			if (newAmount < 0) {
+				formData.value.amount = 0
+				return
+			}
+		}
+	},
+)
+
+watch(
 	formData,
 	() => {
 		withdrawContext.withdrawData.value.amount = formData.value.amount ?? 0
@@ -302,6 +340,10 @@ watch(
 	},
 	{ deep: true },
 )
+
+if (formData.value.amount) {
+	calculateFees()
+}
 
 const messages = defineMessages({
 	accountOwner: {

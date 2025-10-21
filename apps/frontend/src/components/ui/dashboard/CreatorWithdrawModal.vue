@@ -59,6 +59,8 @@
 			</ButtonStyled>
 			<ButtonStyled :color="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm && remainingLimit <= 0
 				? 'orange'
+				: (withdrawContext.currentStage.value === 'muralpay-details' || withdrawContext.currentStage.value === 'tremendous-details')
+				? 'brand'
 				: 'standard'
 				">
 				<button v-if="
@@ -76,6 +78,11 @@
 					<template v-if="withdrawContext.currentStage.value === 'completion'">
 						<CheckCircleIcon /> Complete
 					</template>
+					<template
+						v-else-if="withdrawContext.currentStage.value === 'muralpay-details' || withdrawContext.currentStage.value === 'tremendous-details'">
+						<ArrowLeftRightIcon />
+						{{ formatMessage(messages.withdrawButton) }}
+					</template>
 					<template v-else>
 						{{ formatMessage(commonMessages.nextButton) }}
 						<RightArrowIcon />
@@ -90,12 +97,13 @@
 
 <script setup lang="ts">
 import {
+	ArrowLeftRightIcon,
 	CheckCircleIcon,
 	ChevronRightIcon,
 	FileTextIcon,
 	LeftArrowIcon,
 	RightArrowIcon,
-	XIcon,
+	XIcon
 } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, NewModal, useScrollIndicator } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
@@ -270,6 +278,10 @@ const messages = defineMessages({
 	continueWithLimit: {
 		id: 'dashboard.creator-withdraw-modal.continue-with-limit',
 		defaultMessage: 'Continue with limit',
+	},
+	withdrawButton: {
+		id: 'dashboard.creator-withdraw-modal.withdraw-button',
+		defaultMessage: 'Withdraw',
 	},
 })
 </script>

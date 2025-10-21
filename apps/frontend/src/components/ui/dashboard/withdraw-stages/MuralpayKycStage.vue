@@ -8,9 +8,9 @@
 				</span>
 			</label>
 			<Chips v-model="entityType" :items="['individual', 'business']" :format-label="(item: string) =>
-					item === 'individual'
-						? formatMessage(messages.privateIndividual)
-						: formatMessage(messages.businessEntity)
+				item === 'individual'
+					? formatMessage(messages.privateIndividual)
+					: formatMessage(messages.businessEntity)
 				" :never-empty="false" :capitalize="false" />
 			<span class="leading-tight text-primary">
 				{{ formatMessage(messages.entityDescription) }}
@@ -163,7 +163,9 @@ import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 const withdrawContext = useWithdrawContext()
 const { formatMessage } = useVIntl()
 
-const entityType = ref<'individual' | 'business' | null>(null)
+const entityType = ref<'individual' | 'business' | null>(
+	withdrawContext.withdrawData.value.kycData?.type ?? null
+)
 
 // Scroll fade is now handled automatically by the scroll overflow indicator composable
 
@@ -185,19 +187,21 @@ interface PayoutRecipientInfoMerged {
 
 const auth = await useAuth()
 
+// if user has switched stages use what was in withdraw context
+const existingKycData = withdrawContext.withdrawData.value.kycData
 const formData = ref<PayoutRecipientInfoMerged>({
-	email: `${(auth.value.user as any)?.email}`,
-	firstName: '',
-	lastName: '',
-	dateOfBirth: '',
-	businessName: '',
+	email: existingKycData?.email ?? `${(auth.value.user as any)?.email}`,
+	firstName: existingKycData?.type === 'individual' ? existingKycData.firstName : '',
+	lastName: existingKycData?.type === 'individual' ? existingKycData.lastName : '',
+	dateOfBirth: existingKycData?.type === 'individual' ? existingKycData.dateOfBirth : '',
+	businessName: existingKycData?.type === 'business' ? existingKycData.name : '',
 	physicalAddress: {
-		address1: '',
-		address2: null,
-		country: withdrawContext.withdrawData.value.selectedCountry?.id ?? '',
-		state: '',
-		city: '',
-		zip: '',
+		address1: existingKycData?.physicalAddress?.address1 ?? '',
+		address2: existingKycData?.physicalAddress?.address2 ?? null,
+		country: existingKycData?.physicalAddress?.country ?? withdrawContext.withdrawData.value.selectedCountry?.id ?? '',
+		state: existingKycData?.physicalAddress?.state ?? '',
+		city: existingKycData?.physicalAddress?.city ?? '',
+		zip: existingKycData?.physicalAddress?.zip ?? '',
 	},
 })
 
