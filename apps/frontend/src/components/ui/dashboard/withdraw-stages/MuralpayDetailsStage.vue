@@ -77,7 +77,12 @@
 			<Combobox
 				v-else-if="field.type === 'select'"
 				v-model="formData[field.name]"
-				:options="(field.options || []).map(opt => ({ value: opt.value, label: formatMessage(opt.label) }))"
+				:options="
+					(field.options || []).map((opt) => ({
+						value: opt.value,
+						label: formatMessage(opt.label),
+					}))
+				"
 				:placeholder="field.placeholder ? formatMessage(field.placeholder) : undefined"
 				class="h-10"
 			/>
@@ -153,49 +158,23 @@
 					</button>
 				</ButtonStyled>
 			</div>
-			<span class="text-primary">
+			<span class="text-secondary">
 				{{ formatMoney(roundedMaxAmount) }} {{ formatMessage(messages.available) }}
 			</span>
 
-			<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
-				<div class="flex items-center justify-between">
-					<span class="text-primary">{{ formatMessage(messages.feeBreakdownAmount) }}</span>
-					<span class="font-semibold text-contrast">{{ formatMoney(formData.amount || 0) }}</span>
-				</div>
-				<div class="flex items-center justify-between">
-					<span class="text-primary">{{ formatMessage(messages.feeBreakdownFee) }}</span>
-					<span class="h-4 font-semibold text-contrast">
-						<template v-if="feeLoading">
-							<LoaderCircleIcon class="size-5 animate-spin !text-secondary" />
-						</template>
-						<template v-else>-{{ formatMoney(calculatedFee || 0) }}</template>
-					</span>
-				</div>
-				<div class="h-px bg-surface-5" />
-				<div class="flex items-center justify-between">
-					<span class="text-primary">{{ formatMessage(messages.feeBreakdownNetAmount) }}</span>
-					<span class="font-semibold text-contrast">
-						{{ formatMoney(netAmount) }}
-						<template v-if="shouldShowExchangeRate">
-							<span class="text-secondary"> ({{ formattedLocalCurrency }})</span>
-						</template>
-					</span>
-				</div>
-				<template v-if="shouldShowExchangeRate">
-					<div class="h-px bg-surface-5" />
-					<div class="flex items-center justify-between">
-						<span class="text-primary">{{ formatMessage(messages.feeBreakdownExchangeRate) }}</span>
-						<span class="text-secondary"
-							>1 USD = {{ exchangeRate?.toFixed(4) }} {{ selectedRail?.currency }}</span
-						>
-					</div>
-				</template>
-			</div>
+			<WithdrawFeeBreakdown
+				:amount="formData.amount || 0"
+				:fee="calculatedFee"
+				:fee-loading="feeLoading"
+				:exchange-rate="exchangeRate"
+				:local-currency="selectedRail?.currency"
+			/>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { Admonition, ButtonStyled, Combobox } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
@@ -210,7 +189,6 @@ import {
 	getCurrencyIcon,
 } from '@/utils/finance-icons.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
-import { LoaderCircleIcon } from '@modrinth/assets'
 
 const withdrawContext = useWithdrawContext()
 const { formatMessage } = useVIntl()
@@ -235,41 +213,6 @@ const formData = ref<Record<string, any>>({
 const calculatedFee = ref<number | null>(null)
 const exchangeRate = ref<number | null>(null)
 const feeLoading = ref(false)
-
-const netAmount = computed(() => {
-	const amount = formData.value.amount || 0
-	const fee = calculatedFee.value || 0
-	return Math.max(0, amount - fee)
-})
-
-const shouldShowExchangeRate = computed(() => {
-	const rail = selectedRail.value
-	if (!rail || rail.type !== 'fiat') return false
-	if (rail.currency === 'USD') return false
-	return exchangeRate.value !== null && exchangeRate.value > 0
-})
-
-const netAmountInLocalCurrency = computed(() => {
-	if (!shouldShowExchangeRate.value) return null
-	return netAmount.value * (exchangeRate.value || 0)
-})
-
-const formattedLocalCurrency = computed(() => {
-	if (!shouldShowExchangeRate.value || !netAmountInLocalCurrency.value) return ''
-	const rail = selectedRail.value
-	if (!rail) return ''
-
-	try {
-		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: rail.currency,
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		}).format(netAmountInLocalCurrency.value)
-	} catch (error) {
-		return `${rail.currency} ${netAmountInLocalCurrency.value.toFixed(2)}`
-	}
-})
 
 const hasDocumentTypeField = computed(() => {
 	const rail = selectedRail.value
@@ -373,8 +316,7 @@ const calculateFees = useDebounceFn(async () => {
 		if (rail.type === 'crypto') {
 			payout_details = {
 				type: 'blockchain',
-				wallet_address:
-					formData.value.walletAddress || '0x0000000000000000000000000000000000000000',
+				wallet_address: formData.value.walletAddress || null,
 			}
 		} else {
 			const fiatAndRailDetails: Record<string, any> = {
@@ -532,22 +474,6 @@ const messages = defineMessages({
 	network: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.network',
 		defaultMessage: 'Network',
-	},
-	feeBreakdownAmount: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.fee-breakdown-amount',
-		defaultMessage: 'Amount',
-	},
-	feeBreakdownFee: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.fee-breakdown-fee',
-		defaultMessage: 'Fee',
-	},
-	feeBreakdownNetAmount: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.fee-breakdown-net-amount',
-		defaultMessage: 'Net amount',
-	},
-	feeBreakdownExchangeRate: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.fee-breakdown-exchange-rate',
-		defaultMessage: 'Exchange rate',
 	},
 	documentNumberNationalId: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id',

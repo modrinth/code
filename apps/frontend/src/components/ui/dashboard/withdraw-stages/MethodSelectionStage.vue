@@ -2,26 +2,43 @@
 	<div class="flex flex-col gap-6">
 		<Admonition v-if="shouldShowTaxLimitWarning" type="warning">
 			Your withdraw limit is
-			<span class="font-bold">{{ formatMoney(withdrawContext.maxWithdrawAmount.value) }}</span>, <span
-				class="cursor-pointer text-link" @click="onShowTaxForm">complete a tax form</span> to
+			<span class="font-bold">{{ formatMoney(withdrawContext.maxWithdrawAmount.value) }}</span
+			>, <span class="cursor-pointer text-link" @click="onShowTaxForm">complete a tax form</span> to
 			withdraw more.
 		</Admonition>
 		<div class="flex flex-col gap-2.5">
 			<div class="flex flex-row gap-1 align-middle">
 				<span class="align-middle font-semibold text-contrast">Region</span>
-				<UnknownIcon v-tooltip="'Some payout methods are not available in certain regions.'"
-					class="mt-auto size-5 text-secondary" />
+				<UnknownIcon
+					v-tooltip="'Some payout methods are not available in certain regions.'"
+					class="mt-auto size-5 text-secondary"
+				/>
 			</div>
-			<Combobox :model-value="selectedCountryCode" :options="countries" placeholder="Select your country" searchable
-				search-placeholder="Search countries..." :max-height="240" class="h-10"
-				@update:model-value="handleCountryChange" />
+			<Combobox
+				:model-value="selectedCountryCode"
+				:options="countries"
+				placeholder="Select your country"
+				searchable
+				search-placeholder="Search countries..."
+				:max-height="240"
+				class="h-10"
+				@update:model-value="handleCountryChange"
+			/>
 		</div>
 		<div class="flex flex-col gap-2.5">
 			<span class="align-middle font-semibold text-contrast">Select withdraw method</span>
-			<ButtonStyled v-for="method in paymentOptions" :key="method.value" :color="withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'
-				" :highlighted="withdrawContext.withdrawData.value.selectedMethod === method.value" type="chip">
+			<ButtonStyled
+				v-for="method in paymentOptions"
+				:key="method.value"
+				:color="
+					withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'
+				"
+				:highlighted="withdrawContext.withdrawData.value.selectedMethod === method.value"
+				type="chip"
+			>
 				<button class="!h-10 !justify-start !gap-2" @click="handleMethodSelection(method)">
-					<component :is="method.icon" /> {{ method.label }}
+					<component :is="method.icon" />
+					{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
 				</button>
 			</ButtonStyled>
 		</div>
@@ -30,11 +47,20 @@
 
 <script setup lang="ts">
 import {
+	GiftIcon,
 	LandmarkIcon,
+	PayPalIcon,
 	PolygonIcon,
-	UnknownIcon
+	UnknownIcon,
+	VenmoIcon,
 } from '@modrinth/assets'
-import { Admonition, ButtonStyled, Combobox, injectNotificationManager, useDebugLogger } from '@modrinth/ui'
+import {
+	Admonition,
+	ButtonStyled,
+	Combobox,
+	injectNotificationManager,
+	useDebugLogger,
+} from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { useGeolocation } from '@vueuse/core'
 import { all } from 'iso-3166-1'
@@ -48,6 +74,7 @@ const debug = useDebugLogger('MethodSelectionStage')
 const withdrawContext = useWithdrawContext()
 const userCountry = useUserCountry()
 const { coords } = useGeolocation()
+const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 
 defineProps<{
@@ -56,7 +83,7 @@ defineProps<{
 
 const emit = defineEmits<{
 	(e: 'close-modal'): void
-}>();
+}>()
 
 interface PayoutMethod {
 	id: string
@@ -117,10 +144,10 @@ watch(
 		console.debug('[MethodSelectionStage] Fetching payout methods for country:', country.id)
 
 		try {
-			const methods = await useBaseFetch('payout/methods', {
+			const methods = (await useBaseFetch('payout/methods', {
 				apiVersion: 3,
-				query: { country: country.id }
-			}) as PayoutMethod[]
+				query: { country: country.id },
+			})) as PayoutMethod[]
 			console.debug('[MethodSelectionStage] Received payout methods:', methods)
 			availableMethods.value = methods
 		} catch (e) {
@@ -135,29 +162,63 @@ watch(
 			loading.value = false
 		}
 	},
-	{ immediate: true }
-)
-
-const muralPayMethods = computed(() =>
-	availableMethods.value.filter(m => m.type === 'muralpay')
+	{ immediate: true },
 )
 
 const paymentOptions = computed(() => {
-	const methods = muralPayMethods.value
+	const methods = availableMethods.value
 	if (!methods || methods.length === 0) {
-		debug('No muralpay methods available')
+		debug('No payment methods available')
 		return []
 	}
 
 	debug('Available methods:', methods)
 
 	const options = []
-	for (const method of methods) {
+
+	const tremendousMethods = methods.filter((m) => m.type === 'tremendous')
+
+	const paypalMethods = tremendousMethods.filter((m) => m.name.toLowerCase().includes('paypal'))
+	if (paypalMethods.length > 0) {
+		options.push({
+			value: 'paypal',
+			label: 'PayPal',
+			icon: PayPalIcon,
+			methodId: paypalMethods[0].id,
+			type: 'tremendous',
+		})
+	}
+
+	const venmoMethods = tremendousMethods.filter((m) => m.name.toLowerCase().includes('venmo'))
+	if (venmoMethods.length > 0) {
+		options.push({
+			value: 'venmo',
+			label: 'Venmo',
+			icon: VenmoIcon,
+			methodId: venmoMethods[0].id,
+			type: 'tremendous',
+		})
+	}
+
+	const giftCardMethods = tremendousMethods.filter(
+		(m) => !m.name.toLowerCase().includes('paypal') && !m.name.toLowerCase().includes('venmo'),
+	)
+	if (giftCardMethods.length > 0) {
+		options.push({
+			value: 'gift_cards',
+			label: 'Gift card',
+			icon: GiftIcon,
+			methodId: undefined,
+			type: 'tremendous',
+		})
+	}
+
+	const muralPayMethods = methods.filter((m) => m.type === 'muralpay')
+	for (const method of muralPayMethods) {
 		const methodId = method.id
 
 		if (methodId.startsWith('fiat_')) {
 			const railCode = methodId.replace('fiat_', '')
-
 			const rail = getRailConfig(methodId)
 
 			options.push({
@@ -165,7 +226,7 @@ const paymentOptions = computed(() => {
 				label: rail?.name || `Bank transfer (${railCode.toUpperCase()})`,
 				icon: LandmarkIcon,
 				methodId: method.id,
-				type: 'fiat'
+				type: 'fiat',
 			})
 
 			if (!rail) {
@@ -176,7 +237,7 @@ const paymentOptions = computed(() => {
 
 			if (!rail) {
 				debug('Warning: No rail config found for', methodId)
-				continue;
+				continue
 			}
 
 			options.push({
@@ -184,24 +245,48 @@ const paymentOptions = computed(() => {
 				label: rail?.name || method.name,
 				icon: getBlockchainIcon(rail?.blockchain || 'POLYGON') || PolygonIcon,
 				methodId: method.id,
-				type: 'crypto'
+				type: 'crypto',
 			})
 		}
 	}
+
+	const sortOrder: Record<string, number> = {
+		fiat: 1,
+		paypal: 2,
+		venmo: 3,
+		crypto: 4,
+		gift_cards: 5,
+	}
+	options.sort((a, b) => {
+		const aOrder = sortOrder[a.type] ?? sortOrder[a.value] ?? 999
+		const bOrder = sortOrder[b.type] ?? sortOrder[b.value] ?? 999
+		return aOrder - bOrder
+	})
 
 	debug('Payment options computed:', options)
 	return options
 })
 
-function handleMethodSelection(option: { value: string; methodId: string }) {
+function handleMethodSelection(option: {
+	value: string
+	methodId: string | undefined
+	type: string
+}) {
 	withdrawContext.withdrawData.value.selectedMethod = option.value
-	withdrawContext.withdrawData.value.selectedMethodId = option.methodId
-	withdrawContext.withdrawData.value.selectedProvider = 'muralpay'
+	withdrawContext.withdrawData.value.selectedMethodId = option.methodId ?? null
+
+	if (option.type === 'tremendous') {
+		withdrawContext.withdrawData.value.selectedProvider = 'tremendous'
+	} else if (option.type === 'fiat' || option.type === 'crypto') {
+		withdrawContext.withdrawData.value.selectedProvider = 'muralpay'
+	} else {
+		withdrawContext.withdrawData.value.selectedProvider = 'muralpay'
+	}
 }
 
 watch(paymentOptions, (newOptions) => {
 	const currentMethod = withdrawContext.withdrawData.value.selectedMethod
-	if (currentMethod && !newOptions.find(o => o.value === currentMethod)) {
+	if (currentMethod && !newOptions.find((o) => o.value === currentMethod)) {
 		withdrawContext.withdrawData.value.selectedMethod = null
 		withdrawContext.withdrawData.value.selectedMethodId = null
 		withdrawContext.withdrawData.value.selectedProvider = null

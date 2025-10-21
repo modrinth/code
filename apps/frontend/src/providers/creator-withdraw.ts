@@ -164,16 +164,16 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 					withdrawData.value.selectedCountry &&
 					withdrawData.value.selectedProvider &&
 					withdrawData.value.selectedMethod &&
-					withdrawData.value.selectedMethodId
+					(withdrawData.value.selectedMethod === 'gift_cards' || withdrawData.value.selectedMethodId)
 				)
 			case 'tremendous-details':
-				if (withdrawData.value.selectedMethod === 'gift_card') {
+				if (withdrawData.value.selectedMethod === 'gift_cards') {
 					return !!(
-						withdrawData.value.giftCardDetails?.type &&
-						withdrawData.value.giftCardDetails?.amount > 0
+						withdrawData.value.selectedMethodId &&
+						withdrawData.value.amount > 0
 					)
 				}
-				return true // For paypal/venmo, just need method selected
+				return !!(withdrawData.value.amount > 0) // For paypal/venmo, need amount
 			case 'muralpay-kyc': {
 				if (!withdrawData.value.kycData) return false
 
