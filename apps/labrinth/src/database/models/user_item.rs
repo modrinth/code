@@ -786,10 +786,8 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                UPDATE payouts_values_notifications
-                SET user_id = $1
-                WHERE user_id = $2",
-                deleted_user as DBUserId,
+                DELETE FROM payouts_values_notifications
+                WHERE user_id = $1",
                 id as DBUserId,
             )
             .execute(&mut **transaction)
