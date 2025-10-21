@@ -122,12 +122,17 @@
 				</div>
 				<div class="flex items-center justify-between">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownFee) }}</span>
-					<span class="font-semibold text-contrast">-{{ formatMoney(0) }}</span>
+					<span class="font-semibold text-contrast">
+						<template v-if="feeLoading">
+							<LoaderCircleIcon class="animate-spin size-4" />
+						</template>
+						<template v-else>-{{ formatMoney(calculatedFee || 0) }}</template>
+					</span>
 				</div>
 				<div class="h-px bg-surface-5" />
 				<div class="flex items-center justify-between">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownNetAmount) }}</span>
-					<span class="font-semibold text-contrast">{{ formatMoney(formData.amount || 0) }}</span>
+					<span class="font-semibold text-contrast">{{ formatMoney(netAmount) }}</span>
 				</div>
 			</div>
 		</div>
@@ -138,11 +143,13 @@
 import { Admonition, ButtonStyled, Combobox } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import { getBlockchainColor, getBlockchainIcon } from "@/utils/blockchain-icons.ts"
+import { getBlockchainColor, getBlockchainIcon, getCurrencyColor, getCurrencyIcon } from '@/utils/finance-icons.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
+import { LoaderCircleIcon } from '@modrinth/assets'
 
 const withdrawContext = useWithdrawContext()
 const { formatMessage } = useVIntl()
@@ -159,6 +166,15 @@ const maxAmount = computed(() => withdrawContext.maxWithdrawAmount.value)
 const formData = ref<Record<string, any>>({
 	amount: undefined,
 	bankName: '',
+})
+
+const calculatedFee = ref<number | null>(null)
+const feeLoading = ref(false)
+
+const netAmount = computed(() => {
+	const amount = formData.value.amount || 0
+	const fee = calculatedFee.value || 0
+	return Math.max(0, amount - fee)
 })
 
 const accountOwnerName = computed(() => {
@@ -194,11 +210,95 @@ function setMaxAmount() {
 	formData.value.amount = maxAmount.value
 }
 
+const calculateFees = useDebounceFn(async () => {
+	const amount = formData.value.amount
+	const rail = selectedRail.value
+	const kycData = withdrawContext.withdrawData.value.kycData
+
+	if (!amount || amount <= 0 || !rail || !kycData) {
+		calculatedFee.value = null
+		return
+	}
+
+	feeLoading.value = true
+	try {
+		let payout_details
+
+		if (rail.type === 'crypto') {
+			payout_details = {
+				type: 'blockchain',
+				wallet_address: formData.value.walletAddress || '0x0000000000000000000000000000000000000000'
+			}
+		} else {
+			const fiatAndRailDetails: Record<string, any> = {
+				type: rail.railCode || '',
+				symbol: rail.currency || '',
+			}
+
+			for (const field of rail.fields) {
+				const value = formData.value[field.name]
+				if (value !== undefined && value !== null && value !== '') {
+					fiatAndRailDetails[field.name] = value
+				}
+			}
+
+			payout_details = {
+				type: 'fiat',
+				bank_name: formData.value.bankName || '',
+				bank_account_owner: kycData.type === 'individual'
+					? `${kycData.firstName} ${kycData.lastName}`
+					: kycData.name || '',
+				fiat_and_rail_details: fiatAndRailDetails
+			}
+		}
+
+		const recipient_info = {
+			type: kycData.type,
+			...(kycData.type === 'individual' ? {
+				firstName: kycData.firstName,
+				lastName: kycData.lastName,
+				dateOfBirth: kycData.dateOfBirth,
+			} : {
+				name: kycData.name,
+			}),
+			email: kycData.email,
+			physicalAddress: kycData.physicalAddress
+		}
+
+		const payload = {
+			amount,
+			method: 'muralpay',
+			method_details: {
+				payout_details,
+				recipient_info
+			},
+			method_id: 'muralpay'
+		}
+
+		const response = await useBaseFetch('payout/fees', {
+			apiVersion: 3,
+			method: 'POST',
+			body: payload
+		}) as { fee: number | null }
+
+		calculatedFee.value = response.fee || 0
+	} catch (error) {
+		console.error('Failed to calculate fees:', error)
+		calculatedFee.value = 0
+	} finally {
+		feeLoading.value = false
+	}
+}, 500)
+
 watch(
 	formData,
 	() => {
 		withdrawContext.withdrawData.value.amount = formData.value.amount ?? 0
 		withdrawContext.withdrawData.value.accountDetails = { ...formData.value }
+
+		if (formData.value.amount) {
+			calculateFees()
+		}
 	},
 	{ deep: true },
 )

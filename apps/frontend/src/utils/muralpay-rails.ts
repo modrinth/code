@@ -39,7 +39,7 @@ const ACCOUNT_TYPE_OPTIONS = [
 
 export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	fiat_usd: {
-		id: 'muralpay_usd',
+		id: 'fiat_usd',
 		name: 'Bank Transfer (USD)',
 		currency: 'USD',
 		type: 'fiat',
@@ -73,7 +73,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	fiat_eur: {
-		id: 'muralpay_eur',
+		id: 'fiat_eur',
 		name: 'Bank Transfer (EUR)',
 		currency: 'EUR',
 		type: 'fiat',
@@ -126,7 +126,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	fiat_mxn: {
-		id: 'muralpay_mxn',
+		id: 'fiat_mxn',
 		name: 'Bank Transfer (MXN)',
 		currency: 'MXN',
 		type: 'fiat',
@@ -147,7 +147,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	fiat_brl: {
-		id: 'muralpay_brl',
+		id: 'fiat_brl',
 		name: 'PIX Transfer (BRL)',
 		currency: 'BRL',
 		type: 'fiat',
@@ -199,7 +199,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	fiat_cop: {
-		id: 'muralpay_cop',
+		id: 'fiat_cop',
 		name: 'Bank Transfer (COP)',
 		currency: 'COP',
 		type: 'fiat',
@@ -245,7 +245,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	fiat_ars: {
-		id: 'muralpay_ars',
+		id: 'fiat_ars',
 		name: 'Bank Transfer (ARS)',
 		currency: 'ARS',
 		type: 'fiat',
@@ -279,7 +279,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	fiat_clp: {
-		id: 'muralpay_clp',
+		id: 'fiat_clp',
 		name: 'Bank Transfer (CLP)',
 		currency: 'CLP',
 		type: 'fiat',
@@ -318,7 +318,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	fiat_crc: {
-		id: 'muralpay_crc',
+		id: 'fiat_crc',
 		name: 'Bank Transfer (CRC)',
 		currency: 'CRC',
 		type: 'fiat',
@@ -350,7 +350,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	fiat_pen: {
-		id: 'muralpay_pen',
+		id: 'fiat_pen',
 		name: 'Bank Transfer (PEN)',
 		currency: 'PEN',
 		type: 'fiat',
@@ -390,7 +390,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	fiat_bob: {
-		id: 'muralpay_bob',
+		id: 'fiat_bob',
 		name: 'Bank Transfer (BOB)',
 		currency: 'BOB',
 		type: 'fiat',
@@ -423,7 +423,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	fiat_zar: {
-		id: 'muralpay_zar',
+		id: 'fiat_zar',
 		name: 'Bank Transfer (ZAR)',
 		currency: 'ZAR',
 		type: 'fiat',
@@ -448,7 +448,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	'fiat_usd-peru': {
-		id: 'muralpay_usd_peru',
+		id: 'fiat_usd-peru',
 		name: 'Bank Transfer (USD - Peru)',
 		currency: 'USD',
 		type: 'fiat',
@@ -487,7 +487,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	'fiat_usd-china': {
-		id: 'muralpay_usd_china',
+		id: 'fiat_usd-china',
 		name: 'Bank Transfer (USD - China)',
 		currency: 'USD',
 		type: 'fiat',
@@ -554,7 +554,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	'blockchain_usdc_polygon': {
-		id: 'muralpay_polygon_usdc',
+		id: 'blockchain_usdc_polygon',
 		name: 'USDC (Polygon)',
 		currency: 'USDC',
 		type: 'crypto',
@@ -576,7 +576,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	'blockchain_usdc_base': {
-		id: 'muralpay_base_usdc',
+		id: 'blockchain_usdc_base',
 		name: 'USDC (Base)',
 		currency: 'USDC',
 		type: 'crypto',
@@ -598,7 +598,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	},
 
 	'blockchain_usdc_ethereum': {
-		id: 'muralpay_ethereum_usdc',
+		id: 'blockchain_usdc_ethereum',
 		name: 'USDC (Ethereum)',
 		currency: 'USDC',
 		type: 'crypto',
@@ -619,8 +619,8 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		],
 	},
 
-	'blockchain_usdc_cello': {
-		id: 'muralpay_celo_usdc',
+	'blockchain_usdc_celo': {
+		id: 'blockchain_usdc_celo',
 		name: 'USDC (Celo)',
 		currency: 'USDC',
 		type: 'crypto',

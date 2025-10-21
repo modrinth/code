@@ -106,6 +106,7 @@ import _ListBulletedIcon from './icons/list-bulleted.svg?component'
 import _ListEndIcon from './icons/list-end.svg?component'
 import _ListOrderedIcon from './icons/list-ordered.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
+import _LoaderCircleIcon from './icons/loader-circle.svg?component'
 import _LockIcon from './icons/lock.svg?component'
 import _LockOpenIcon from './icons/lock-open.svg?component'
 import _LogInIcon from './icons/log-in.svg?component'
@@ -309,6 +310,7 @@ export const ListBulletedIcon = _ListBulletedIcon
 export const ListEndIcon = _ListEndIcon
 export const ListOrderedIcon = _ListOrderedIcon
 export const ListIcon = _ListIcon
+export const LoaderCircleIcon = _LoaderCircleIcon
 export const LoaderIcon = _LoaderIcon
 export const LockOpenIcon = _LockOpenIcon
 export const LockIcon = _LockIcon

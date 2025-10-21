@@ -41,7 +41,7 @@ import { all } from 'iso-3166-1'
 
 import { useUserCountry } from '@/composables/country.ts'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import { getBlockchainIcon } from '@/utils/blockchain-icons'
+import { getBlockchainIcon } from '@/utils/finance-icons'
 import { getRailConfig } from '@/utils/muralpay-rails'
 
 const debug = useDebugLogger('MethodSelectionStage')
@@ -50,7 +50,7 @@ const userCountry = useUserCountry()
 const { coords } = useGeolocation()
 const { addNotification } = injectNotificationManager()
 
-const props = defineProps<{
+defineProps<{
 	onShowTaxForm: () => void
 }>()
 
@@ -60,7 +60,7 @@ const emit = defineEmits<{
 
 interface PayoutMethod {
 	id: string
-	type_: string
+	type: string // Backend sends "type", not "type_"
 	name: string
 	supported_countries: string[]
 	image_url: string | null
@@ -69,6 +69,12 @@ interface PayoutMethod {
 		percentage: number
 		min: number
 		max: number | null
+	}
+	interval: {
+		standard: {
+			min: number
+			max: number
+		}
 	}
 	config?: {
 		fiat?: string | null
@@ -132,50 +138,71 @@ watch(
 	{ immediate: true }
 )
 
-const muralPayMethod = computed(() =>
-	availableMethods.value.find(m => m.type_ === 'mural_pay' || m.id === 'muralpay')
+const muralPayMethods = computed(() =>
+	availableMethods.value.filter(m => m.type === 'muralpay')
 )
 
 const paymentOptions = computed(() => {
-	const muralpay = muralPayMethod.value
-	if (!muralpay?.config) {
-		if (muralpay) {
-			muralpay.config = {
-				fiat: "usd",
-				blockchain: ["usdc_polygon"]
-			}
-		} else {
-			return [];
-		}
+	const methods = muralPayMethods.value
+	if (!methods || methods.length === 0) {
+		debug('No muralpay methods available')
+		return []
 	}
+
+	debug('Available methods:', methods)
 
 	const options = []
 
-	if (muralpay.config.fiat) {
-		const fiatRailId = muralpay.config.fiat.toLowerCase()
-		options.push({
-			value: fiatRailId,
-			label: 'Bank transfer',
-			icon: LandmarkIcon,
-			methodId: muralpay.id,
-			type: 'fiat'
-		})
+	// TEMPORARY FIX: Group fiat methods by currency and only use the first one
+	// TODO: Remove this when backend bug is fixed
+	const seenFiatCurrencies = new Set<string>()
+
+	for (const method of methods) {
+		const methodId = method.id
+
+		if (methodId.startsWith('fiat_')) {
+			const railCode = methodId.replace('fiat_', '')
+
+			// TEMPORARY FIX: Skip duplicate fiat currencies
+			// TODO: Remove this when backend bug is fixed
+			if (seenFiatCurrencies.has(railCode)) {
+				debug('Skipping duplicate fiat method:', methodId)
+				continue
+			}
+			seenFiatCurrencies.add(railCode)
+
+			const rail = getRailConfig(methodId)
+
+			options.push({
+				value: methodId,
+				label: rail?.name || `Bank transfer (${railCode.toUpperCase()})`,
+				icon: LandmarkIcon,
+				methodId: method.id,
+				type: 'fiat'
+			})
+
+			if (!rail) {
+				debug('Warning: No rail config found for', methodId)
+			}
+		} else if (methodId.startsWith('blockchain_')) {
+			const rail = getRailConfig(methodId)
+
+			if (!rail) {
+				debug('Warning: No rail config found for', methodId)
+				continue;
+			}
+
+			options.push({
+				value: methodId,
+				label: rail?.name || method.name,
+				icon: getBlockchainIcon(rail?.blockchain || 'POLYGON') || PolygonIcon,
+				methodId: method.id,
+				type: 'crypto'
+			})
+		}
 	}
 
-	for (const blockchain of muralpay.config.blockchain || []) {
-		const blockchainName = blockchain.replace('usdc_', '')
-		const railId = `${blockchainName}-usdc`
-		const rail = getRailConfig(railId)
-
-		options.push({
-			value: railId,
-			label: rail?.name || blockchain,
-			icon: getBlockchainIcon(blockchain) || PolygonIcon,
-			methodId: muralpay.id,
-			type: 'crypto'
-		})
-	}
-
+	debug('Payment options computed:', options)
 	return options
 })
 
