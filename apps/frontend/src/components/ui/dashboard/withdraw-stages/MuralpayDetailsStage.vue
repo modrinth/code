@@ -169,12 +169,19 @@
 				:exchange-rate="exchangeRate"
 				:local-currency="selectedRail?.currency"
 			/>
+
+			<Checkbox v-model="agreedTerms" class="rewards-checkbox">
+				<span
+					>I agree to the
+					<nuxt-link to="/legal/cmp" class="text-link">Rewards Program Terms</nuxt-link></span
+				>
+			</Checkbox>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Admonition, ButtonStyled, Combobox } from '@modrinth/ui'
+import { Admonition, ButtonStyled, Checkbox, Combobox } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useDebounceFn } from '@vueuse/core'
@@ -209,6 +216,8 @@ const formData = ref<Record<string, any>>({
 	bankName: existingAccountDetails?.bankName ?? '',
 	...existingAccountDetails,
 })
+
+const agreedTerms = ref<boolean>(false)
 
 const calculatedFee = ref<number | null>(null)
 const exchangeRate = ref<number | null>(null)

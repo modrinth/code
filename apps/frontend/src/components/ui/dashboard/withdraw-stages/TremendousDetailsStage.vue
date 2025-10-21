@@ -90,12 +90,19 @@
 				:fee="calculatedFee"
 				:fee-loading="feeLoading"
 			/>
+
+			<Checkbox v-model="agreedTerms" class="rewards-checkbox">
+				<span
+					>I agree to the
+					<nuxt-link to="/legal/cmp" class="text-link">Rewards Program Terms</nuxt-link></span
+				>
+			</Checkbox>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, Chips, Combobox, useDebugLogger } from '@modrinth/ui'
+import { ButtonStyled, Checkbox, Chips, Combobox, useDebugLogger } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useDebounceFn } from '@vueuse/core'
@@ -128,6 +135,8 @@ const formData = ref<Record<string, any>>({
 const selectedGiftCardId = ref<string | null>(
 	withdrawContext.withdrawData.value.selectedMethodId || null,
 )
+
+const agreedTerms = ref<boolean>(false)
 
 const calculatedFee = ref<number>(0)
 const feeLoading = ref(false)
