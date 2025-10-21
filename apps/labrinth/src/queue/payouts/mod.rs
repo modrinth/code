@@ -120,6 +120,7 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
             id: id.to_string(),
             type_: PayoutMethodType::MuralPay,
             name: format!("Mural Pay - {currency}"),
+            category: None,
             supported_countries: countries
                 .iter()
                 .map(|s| s.to_string())
@@ -747,6 +748,7 @@ async fn get_tremendous_payout_methods(
             id: product.id,
             type_: PayoutMethodType::Tremendous,
             name: product.name.clone(),
+            category: Some(product.category.clone()),
             supported_countries: product
                 .countries
                 .into_iter()
