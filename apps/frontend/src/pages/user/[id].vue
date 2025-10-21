@@ -5,11 +5,7 @@
 		<NewModal ref="editRoleModal" header="Edit role">
 			<div class="flex w-80 flex-col gap-4">
 				<div class="flex flex-col gap-2">
-					<Combobox
-						v-model="selectedRole"
-						:options="roleOptions"
-						placeholder="Select a role"
-					/>
+					<Combobox v-model="selectedRole" :options="roleOptions" placeholder="Select a role" />
 				</div>
 				<div class="flex justify-end gap-2">
 					<ButtonStyled>
