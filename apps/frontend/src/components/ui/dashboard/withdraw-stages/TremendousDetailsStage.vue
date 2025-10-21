@@ -2,8 +2,9 @@
 	<div class="flex flex-col gap-6">
 		<div class="flex flex-col gap-2.5">
 			<label>
-				<span class="text-md font-semibold text-contrast">{{ formatMessage(messages.email) }}</span>
-				<span class="text-brand-red">*</span>
+				<span class="text-md font-semibold text-contrast"
+					>{{ formatMessage(messages.email) }} <span class="text-red">*</span></span
+				>
 			</label>
 			<div class="rounded-[14px] bg-surface-2 px-4 py-2.5">
 				<span class="text-primary">{{ userEmail }}</span>
@@ -12,10 +13,9 @@
 
 		<div v-if="showGiftCardSelector" class="flex flex-col gap-2.5">
 			<label>
-				<span class="text-md font-semibold text-contrast">{{
-					formatMessage(messages.reward)
-				}}</span>
-				<span class="text-brand-red">*</span>
+				<span class="text-md font-semibold text-contrast"
+					>{{ formatMessage(messages.reward) }} <span class="text-red">*</span></span
+				>
 			</label>
 			<Combobox
 				v-model="selectedGiftCardId"
@@ -42,10 +42,9 @@
 
 		<div class="flex flex-col gap-2.5">
 			<label>
-				<span class="text-md font-semibold text-contrast">{{
-					formatMessage(messages.amount)
-				}}</span>
-				<span class="text-brand-red">*</span>
+				<span class="text-md font-semibold text-contrast"
+					>{{ formatMessage(messages.amount) }} <span class="text-red">*</span></span
+				>
 			</label>
 
 			<div v-if="showGiftCardSelector && useFixedDenominations" class="flex flex-col gap-2.5">

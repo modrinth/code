@@ -46,7 +46,7 @@
 			<label>
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.bankName) }}
-					<span class="text-brand-red">*</span>
+					<span class="text-red">*</span>
 				</span>
 			</label>
 			<input
@@ -61,7 +61,7 @@
 			<label>
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(field.label) }}
-					<span v-if="field.required" class="text-brand-red">*</span>
+					<span v-if="field.required" class="text-red">*</span>
 				</span>
 			</label>
 
@@ -104,7 +104,7 @@
 				<label>
 					<span class="text-md font-semibold text-contrast">
 						{{ dynamicDocumentNumberField.label }}
-						<span v-if="dynamicDocumentNumberField.required" class="text-brand-red">*</span>
+						<span v-if="dynamicDocumentNumberField.required" class="text-red">*</span>
 					</span>
 				</label>
 				<input
@@ -136,7 +136,7 @@
 			<label>
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.amount) }}
-					<span class="text-brand-red">*</span>
+					<span class="text-red">*</span>
 				</span>
 			</label>
 			<div class="flex items-center gap-2">

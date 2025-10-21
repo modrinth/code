@@ -4,7 +4,7 @@
 			<label>
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(messages.entityQuestion) }}
-					<span class="text-brand-red">*</span>
+					<span class="text-red">*</span>
 				</span>
 			</label>
 			<Chips
@@ -29,7 +29,7 @@
 				<label>
 					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.businessName) }}
-						<span class="text-brand-red">*</span>
+						<span class="text-red">*</span>
 					</span>
 				</label>
 				<input
@@ -44,7 +44,7 @@
 				<label>
 					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.email) }}
-						<span class="text-brand-red">*</span>
+						<span class="text-red">*</span>
 					</span>
 				</label>
 				<input
@@ -61,7 +61,7 @@
 						<label>
 							<span class="text-md font-semibold text-contrast">
 								{{ formatMessage(messages.firstName) }}
-								<span class="text-brand-red">*</span>
+								<span class="text-red">*</span>
 							</span>
 						</label>
 						<input
@@ -75,7 +75,7 @@
 						<label>
 							<span class="text-md font-semibold text-contrast">
 								{{ formatMessage(messages.lastName) }}
-								<span class="text-brand-red">*</span>
+								<span class="text-red">*</span>
 							</span>
 						</label>
 						<input
@@ -91,7 +91,7 @@
 					<label>
 						<span class="text-md font-semibold text-contrast">
 							{{ formatMessage(messages.dateOfBirth) }}
-							<span class="text-brand-red">*</span>
+							<span class="text-red">*</span>
 						</span>
 					</label>
 					<input
@@ -107,7 +107,7 @@
 				<label>
 					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.addressLine) }}
-						<span class="text-brand-red">*</span>
+						<span class="text-red">*</span>
 					</span>
 				</label>
 				<input
@@ -137,7 +137,7 @@
 					<label>
 						<span class="text-md font-semibold text-contrast">
 							{{ formatMessage(messages.city) }}
-							<span class="text-brand-red">*</span>
+							<span class="text-red">*</span>
 						</span>
 					</label>
 					<input
@@ -151,7 +151,7 @@
 					<label>
 						<span class="text-md font-semibold text-contrast">
 							{{ formatMessage(messages.stateProvince) }}
-							<span class="text-brand-red">*</span>
+							<span class="text-red">*</span>
 						</span>
 					</label>
 					<input
@@ -168,7 +168,7 @@
 					<label>
 						<span class="text-md font-semibold text-contrast">
 							{{ formatMessage(messages.postalCode) }}
-							<span class="text-brand-red">*</span>
+							<span class="text-red">*</span>
 						</span>
 					</label>
 					<input
@@ -182,7 +182,7 @@
 					<label>
 						<span class="text-md font-semibold text-contrast">
 							{{ formatMessage(messages.country) }}
-							<span class="text-brand-red">*</span>
+							<span class="text-red">*</span>
 						</span>
 					</label>
 					<Combobox
@@ -211,8 +211,6 @@ const { formatMessage } = useVIntl()
 const entityType = ref<'individual' | 'business' | null>(
 	withdrawContext.withdrawData.value.kycData?.type ?? null,
 )
-
-// Scroll fade is now handled automatically by the scroll overflow indicator composable
 
 interface PayoutRecipientInfoMerged {
 	email: string
