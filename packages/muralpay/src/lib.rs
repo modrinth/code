@@ -97,6 +97,8 @@ pub enum FiatAndRailCode {
     UsdPanama,
 }
 
+crate::util::display_as_serialize!(FiatAndRailCode);
+
 impl FromStr for FiatAndRailCode {
     type Err = serde_json::Error;
 

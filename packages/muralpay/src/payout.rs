@@ -134,6 +134,21 @@ impl MuralPay {
             .await
             .map_err(From::from)
     }
+
+    pub async fn get_bank_details(
+        &self,
+        fiat_currency_and_rail: &[FiatAndRailCode],
+    ) -> Result<BankDetailsResponse, MuralError> {
+        let query = fiat_currency_and_rail
+            .iter()
+            .map(|code| ("fiatCurrencyAndRail", code.to_string()))
+            .collect::<Vec<_>>();
+
+        self.http_get(|base| format!("{base}/api/payouts/bank-details"))
+            .query(&query)
+            .send_mural()
+            .await
+    }
 }
 
 #[derive(
@@ -710,4 +725,49 @@ pub enum FiatPayoutFee {
         fiat_and_rail_code: FiatAndRailCode,
         token_symbol: String,
     },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BankDetailsResponse {
+    pub bank_details: CurrenciesBankDetails,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct CurrenciesBankDetails {
+    #[serde(default)]
+    pub usd: CurrencyBankDetails,
+    #[serde(default)]
+    pub cop: CurrencyBankDetails,
+    #[serde(default)]
+    pub ars: CurrencyBankDetails,
+    #[serde(default)]
+    pub eur: CurrencyBankDetails,
+    #[serde(default)]
+    pub mxn: CurrencyBankDetails,
+    #[serde(default)]
+    pub brl: CurrencyBankDetails,
+    #[serde(default)]
+    pub clp: CurrencyBankDetails,
+    #[serde(default)]
+    pub pen: CurrencyBankDetails,
+    #[serde(default)]
+    pub bob: CurrencyBankDetails,
+    #[serde(default)]
+    pub crc: CurrencyBankDetails,
+    #[serde(default)]
+    pub zar: CurrencyBankDetails,
+    #[serde(default)]
+    pub usd_peru: CurrencyBankDetails,
+    #[serde(default)]
+    pub usd_china: CurrencyBankDetails,
+    #[serde(default)]
+    pub usd_panama: CurrencyBankDetails,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CurrencyBankDetails {
+    pub bank_names: Vec<String>,
 }
