@@ -19,8 +19,8 @@ use eyre::Result;
 use futures::TryStreamExt;
 use muralpay::MuralPay;
 use reqwest::Method;
-use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
+use rust_decimal::{Decimal, dec};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -729,6 +729,20 @@ async fn get_tremendous_payout_methods(
             continue;
         };
 
+        // https://help.tremendous.com/hc/en-us/articles/41472317536787-Premium-reward-options
+        let fee = match product.category.as_str() {
+            "paypal" | "venmo" => PayoutMethodFee {
+                percentage: dec!(0.06),
+                min: dec!(1.00),
+                max: Some(dec!(25.00)),
+            },
+            _ => PayoutMethodFee {
+                percentage: dec!(0),
+                min: dec!(0),
+                max: None,
+            },
+        };
+
         let method = PayoutMethod {
             id: product.id,
             type_: PayoutMethodType::Tremendous,
@@ -768,11 +782,7 @@ async fn get_tremendous_payout_methods(
                     max: Decimal::from(5_000),
                 }
             },
-            fee: PayoutMethodFee {
-                percentage: Decimal::default(),
-                min: Decimal::default(),
-                max: None,
-            },
+            fee,
         };
 
         // we do not support interval gift cards with non US based currencies since we cannot do currency conversions properly
