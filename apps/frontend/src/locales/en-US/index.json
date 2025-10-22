@@ -710,6 +710,48 @@
   "dashboard.creator-withdraw-modal.kyc.state-province": {
     "message": "State/province"
   },
+  "dashboard.creator-withdraw-modal.method-selection.bank-transfer-fallback": {
+    "message": "Bank transfer ({code})"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.charity": {
+    "message": "Charity"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Select your country"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Search countries..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Unable to fetch available payment methods. Please try again later."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Failed to load payment methods"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.gift-card": {
+    "message": "Gift card"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.paypal": {
+    "message": "PayPal"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Region"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Some payout methods are not available in certain regions."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Select withdraw method"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Your withdraw limit is <b>{amount}</b>, <tax-link>complete a tax form</tax-link> to withdraw more."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.venmo": {
+    "message": "Venmo"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.virtual-visa": {
+    "message": "Virtual Visa"
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Account owner"
   },
@@ -770,6 +812,9 @@
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "Network"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.terms-agreement": {
+    "message": "I agree to the <terms-link>Rewards Program Terms</terms-link>"
+  },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
     "message": "You're nearing the withdraw threshold. You can withdraw <b>{amountRemaining}</b> now, but a tax form is required for more."
   },
@@ -812,6 +857,9 @@
   "dashboard.creator-withdraw-modal.tremendous-details.email": {
     "message": "Email"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.email-placeholder": {
+    "message": "Enter email address"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.max-button": {
     "message": "Max"
   },
@@ -820,6 +868,15 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
     "message": "Select reward"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.terms-agreement": {
+    "message": "I agree to the <terms-link>Rewards Program Terms</terms-link>"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Unverified email"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "The delivery email you have entered is not associated with your Modrinth account. Modrinth cannot recover rewards sent to an incorrect email address."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Withdraw"

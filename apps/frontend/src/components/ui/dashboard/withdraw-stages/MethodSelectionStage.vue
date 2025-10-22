@@ -1,32 +1,45 @@
 <template>
 	<div class="flex flex-col gap-6">
 		<Admonition v-if="shouldShowTaxLimitWarning" type="warning">
-			Your withdraw limit is
-			<span class="font-bold">{{ formatMoney(withdrawContext.maxWithdrawAmount.value) }}</span
-			>, <span class="cursor-pointer text-link" @click="onShowTaxForm">complete a tax form</span> to
-			withdraw more.
+			<IntlFormatted
+				:message-id="messages.taxLimitWarning"
+				:values="{
+					amount: formatMoney(withdrawContext.maxWithdrawAmount.value),
+				}"
+			>
+				<template #b="{ children }">
+					<span class="font-bold">
+						<component :is="() => normalizeChildren(children)" />
+					</span>
+				</template>
+				<template #tax-link="{ children }">
+					<span class="cursor-pointer text-link" @click="onShowTaxForm">
+						<component :is="() => normalizeChildren(children)" />
+					</span>
+				</template>
+			</IntlFormatted>
 		</Admonition>
 		<div class="flex flex-col gap-2.5">
 			<div class="flex flex-row gap-1 align-middle">
-				<span class="align-middle font-semibold text-contrast">Region</span>
+				<span class="align-middle font-semibold text-contrast">{{ formatMessage(messages.region) }}</span>
 				<UnknownIcon
-					v-tooltip="'Some payout methods are not available in certain regions.'"
+					v-tooltip="formatMessage(messages.regionTooltip)"
 					class="mt-auto size-5 text-secondary"
 				/>
 			</div>
 			<Combobox
 				:model-value="selectedCountryCode"
 				:options="countries"
-				placeholder="Select your country"
+				:placeholder="formatMessage(messages.countryPlaceholder)"
 				searchable
-				search-placeholder="Search countries..."
+				:search-placeholder="formatMessage(messages.countrySearchPlaceholder)"
 				:max-height="240"
 				class="h-10"
 				@update:model-value="handleCountryChange"
 			/>
 		</div>
 		<div class="flex flex-col gap-2.5">
-			<span class="align-middle font-semibold text-contrast">Select withdraw method</span>
+			<span class="align-middle font-semibold text-contrast">{{ formatMessage(messages.selectMethod) }}</span>
 			<ButtonStyled
 				v-for="method in paymentOptions"
 				:key="method.value"
@@ -64,6 +77,8 @@ import {
 	useDebugLogger,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
+import { defineMessages, useVIntl } from '@vintl/vintl'
+import { IntlFormatted } from '@vintl/vintl/components'
 import { useGeolocation } from '@vueuse/core'
 import { all } from 'iso-3166-1'
 
@@ -71,6 +86,7 @@ import { useUserCountry } from '@/composables/country.ts'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { getBlockchainIcon } from '@/utils/finance-icons'
 import { getRailConfig } from '@/utils/muralpay-rails'
+import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const debug = useDebugLogger('MethodSelectionStage')
 const withdrawContext = useWithdrawContext()
@@ -156,8 +172,8 @@ watch(
 		} catch (e) {
 			console.error('[MethodSelectionStage] Failed to fetch payout methods:', e)
 			addNotification({
-				title: 'Failed to load payment methods',
-				text: 'Unable to fetch available payment methods. Please try again later.',
+				title: formatMessage(messages.errorTitle),
+				text: formatMessage(messages.errorText),
 				type: 'error',
 			})
 			emit('close-modal')
@@ -185,7 +201,7 @@ const paymentOptions = computed(() => {
 	if (paypalMethods.length > 0) {
 		options.push({
 			value: 'paypal',
-			label: 'PayPal',
+			label: messages.paypal,
 			icon: PayPalIcon,
 			methodId: paypalMethods[0].id,
 			type: 'tremendous',
@@ -196,7 +212,7 @@ const paymentOptions = computed(() => {
 	if (venmoMethods.length > 0) {
 		options.push({
 			value: 'venmo',
-			label: 'Venmo',
+			label: messages.venmo,
 			icon: VenmoIcon,
 			methodId: venmoMethods[0].id,
 			type: 'tremendous',
@@ -207,7 +223,7 @@ const paymentOptions = computed(() => {
 	if (visaMethods.length > 0) {
 		options.push({
 			value: 'visa_card',
-			label: 'Virtual Visa',
+			label: messages.virtualVisa,
 			icon: VisaIcon,
 			methodId: visaMethods[0].id,
 			type: 'tremendous',
@@ -220,7 +236,7 @@ const paymentOptions = computed(() => {
 	if (merchantMethods.length > 0) {
 		options.push({
 			value: 'merchant_card',
-			label: 'Gift card',
+			label: messages.giftCard,
 			icon: GiftIcon,
 			methodId: undefined,
 			type: 'tremendous',
@@ -231,7 +247,7 @@ const paymentOptions = computed(() => {
 	if (charityMethods.length > 0) {
 		options.push({
 			value: 'charity',
-			label: 'Charity',
+			label: messages.charity,
 			icon: HeartIcon,
 			methodId: undefined,
 			type: 'tremendous',
@@ -248,7 +264,9 @@ const paymentOptions = computed(() => {
 
 			options.push({
 				value: methodId,
-				label: rail?.name || `Bank transfer (${railCode.toUpperCase()})`,
+				label:
+					rail?.name ||
+					formatMessage(messages.bankTransferFallback, { code: railCode.toUpperCase() }),
 				icon: LandmarkIcon,
 				methodId: method.id,
 				type: 'fiat',
@@ -371,5 +389,65 @@ onMounted(async () => {
 			}
 		}
 	}
+})
+
+const messages = defineMessages({
+	taxLimitWarning: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.tax-limit-warning',
+		defaultMessage:
+			'Your withdraw limit is <b>{amount}</b>, <tax-link>complete a tax form</tax-link> to withdraw more.',
+	},
+	region: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.region',
+		defaultMessage: 'Region',
+	},
+	regionTooltip: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.region-tooltip',
+		defaultMessage: 'Some payout methods are not available in certain regions.',
+	},
+	countryPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.country-placeholder',
+		defaultMessage: 'Select your country',
+	},
+	countrySearchPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.country-search-placeholder',
+		defaultMessage: 'Search countries...',
+	},
+	selectMethod: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.select-method',
+		defaultMessage: 'Select withdraw method',
+	},
+	errorTitle: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.error-title',
+		defaultMessage: 'Failed to load payment methods',
+	},
+	errorText: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.error-text',
+		defaultMessage: 'Unable to fetch available payment methods. Please try again later.',
+	},
+	paypal: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.paypal',
+		defaultMessage: 'PayPal',
+	},
+	venmo: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.venmo',
+		defaultMessage: 'Venmo',
+	},
+	virtualVisa: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.virtual-visa',
+		defaultMessage: 'Virtual Visa',
+	},
+	giftCard: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.gift-card',
+		defaultMessage: 'Gift card',
+	},
+	charity: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.charity',
+		defaultMessage: 'Charity',
+	},
+	bankTransferFallback: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.bank-transfer-fallback',
+		defaultMessage: 'Bank transfer ({code})',
+	},
 })
 </script>

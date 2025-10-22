@@ -122,10 +122,13 @@
 			/>
 
 			<Checkbox v-model="agreedTerms" class="rewards-checkbox">
-				<span
-					>I agree to the
-					<nuxt-link to="/legal/cmp" class="text-link">Rewards Program Terms</nuxt-link></span
-				>
+				<IntlFormatted :message-id="messages.termsAgreement">
+					<template #terms-link="{ children }">
+						<nuxt-link to="/legal/cmp" class="text-link">
+							<component :is="() => normalizeChildren(children)" />
+						</nuxt-link>
+					</template>
+				</IntlFormatted>
 			</Checkbox>
 		</div>
 	</div>
@@ -135,12 +138,14 @@
 import { Admonition, ButtonStyled, Checkbox, Chips, Combobox, useDebugLogger } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { useAuth } from '@/composables/auth.js'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const debug = useDebugLogger('TremendousDetailsStage')
 const withdrawContext = useWithdrawContext()
@@ -470,6 +475,10 @@ const messages = defineMessages({
 	available: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.available',
 		defaultMessage: 'available.',
+	},
+	termsAgreement: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.terms-agreement',
+		defaultMessage: 'I agree to the <terms-link>Rewards Program Terms</terms-link>',
 	},
 })
 </script>

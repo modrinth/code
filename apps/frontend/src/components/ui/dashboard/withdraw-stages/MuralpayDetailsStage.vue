@@ -180,10 +180,13 @@
 			/>
 
 			<Checkbox v-model="agreedTerms" class="rewards-checkbox">
-				<span
-					>I agree to the
-					<nuxt-link to="/legal/cmp" class="text-link">Rewards Program Terms</nuxt-link></span
-				>
+				<IntlFormatted :message-id="messages.termsAgreement">
+					<template #terms-link="{ children }">
+						<nuxt-link to="/legal/cmp" class="text-link">
+							<component :is="() => normalizeChildren(children)" />
+						</nuxt-link>
+					</template>
+				</IntlFormatted>
 			</Checkbox>
 		</div>
 	</div>
@@ -193,6 +196,7 @@
 import { Admonition, ButtonStyled, Checkbox, Combobox } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
@@ -205,6 +209,7 @@ import {
 	getCurrencyIcon,
 } from '@/utils/finance-icons.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
+import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const withdrawContext = useWithdrawContext()
 const { formatMessage } = useVIntl()
@@ -532,6 +537,10 @@ const messages = defineMessages({
 	documentNumberTaxIdPlaceholder: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder',
 		defaultMessage: 'Enter tax ID number',
+	},
+	termsAgreement: {
+		id: 'dashboard.creator-withdraw-modal.muralpay-details.terms-agreement',
+		defaultMessage: 'I agree to the <terms-link>Rewards Program Terms</terms-link>',
 	},
 })
 </script>
