@@ -134,6 +134,21 @@ impl MuralPay {
             .await
             .map_err(From::from)
     }
+
+    pub async fn get_bank_details(
+        &self,
+        fiat_currency_and_rail: &[FiatAndRailCode],
+    ) -> Result<BankDetailsResponse, MuralError> {
+        let query = fiat_currency_and_rail
+            .iter()
+            .map(|code| ("fiatCurrencyAndRail", code.to_string()))
+            .collect::<Vec<_>>();
+
+        self.http_get(|base| format!("{base}/api/payouts/bank-details"))
+            .query(&query)
+            .send_mural()
+            .await
+    }
 }
 
 #[derive(
@@ -236,7 +251,9 @@ pub struct FiatPayoutDetails {
     pub fiat_payout_status: FiatPayoutStatus,
     pub fiat_amount: FiatAmount,
     pub transaction_fee: TokenAmount,
+    #[serde(with = "rust_decimal::serde::float")]
     pub exchange_fee_percentage: Decimal,
+    #[serde(with = "rust_decimal::serde::float")]
     pub exchange_rate: Decimal,
     pub fee_total: TokenAmount,
     pub developer_fee: Option<DeveloperFee>,
@@ -282,6 +299,7 @@ pub enum FiatPayoutErrorCode {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeveloperFee {
+    #[serde(with = "rust_decimal::serde::float_option")]
     pub developer_fee_percentage: Option<Decimal>,
 }
 
@@ -664,7 +682,9 @@ pub struct TokenFeeRequest {
 pub enum TokenPayoutFee {
     #[serde(rename_all = "camelCase")]
     Success {
+        #[serde(with = "rust_decimal::serde::float")]
         exchange_rate: Decimal,
+        #[serde(with = "rust_decimal::serde::float")]
         exchange_fee_percentage: Decimal,
         fiat_and_rail_code: FiatAndRailCode,
         transaction_fee: TokenAmount,
@@ -684,6 +704,7 @@ pub enum TokenPayoutFee {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FiatFeeRequest {
+    #[serde(with = "rust_decimal::serde::float")]
     pub fiat_amount: Decimal,
     pub token_symbol: String,
     pub fiat_and_rail_code: FiatAndRailCode,
@@ -696,7 +717,9 @@ pub enum FiatPayoutFee {
     Success {
         token_symbol: String,
         fiat_amount: FiatAmount,
+        #[serde(with = "rust_decimal::serde::float")]
         exchange_rate: Decimal,
+        #[serde(with = "rust_decimal::serde::float")]
         exchange_fee_percentage: Decimal,
         fiat_and_rail_code: FiatAndRailCode,
         transaction_fee: TokenAmount,
@@ -710,4 +733,49 @@ pub enum FiatPayoutFee {
         fiat_and_rail_code: FiatAndRailCode,
         token_symbol: String,
     },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BankDetailsResponse {
+    pub bank_details: CurrenciesBankDetails,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct CurrenciesBankDetails {
+    #[serde(default)]
+    pub usd: CurrencyBankDetails,
+    #[serde(default)]
+    pub cop: CurrencyBankDetails,
+    #[serde(default)]
+    pub ars: CurrencyBankDetails,
+    #[serde(default)]
+    pub eur: CurrencyBankDetails,
+    #[serde(default)]
+    pub mxn: CurrencyBankDetails,
+    #[serde(default)]
+    pub brl: CurrencyBankDetails,
+    #[serde(default)]
+    pub clp: CurrencyBankDetails,
+    #[serde(default)]
+    pub pen: CurrencyBankDetails,
+    #[serde(default)]
+    pub bob: CurrencyBankDetails,
+    #[serde(default)]
+    pub crc: CurrencyBankDetails,
+    #[serde(default)]
+    pub zar: CurrencyBankDetails,
+    #[serde(default)]
+    pub usd_peru: CurrencyBankDetails,
+    #[serde(default)]
+    pub usd_china: CurrencyBankDetails,
+    #[serde(default)]
+    pub usd_panama: CurrencyBankDetails,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CurrencyBankDetails {
+    pub bank_names: Vec<String>,
 }

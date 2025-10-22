@@ -69,8 +69,8 @@ itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
-muralpay = { workspace = true }
 modrinth-maxmind = { workspace = true }
+muralpay = { workspace = true }
 murmur2 = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }

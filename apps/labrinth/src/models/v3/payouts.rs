@@ -46,9 +46,7 @@ impl Payout {
     reason = "acceptable since values of this type are not moved much"
 )]
 pub enum PayoutMethodRequest {
-    Venmo,
-    PayPal,
-    Tremendous,
+    Tremendous { method_details: TremendousDetails },
     MuralPay { method_details: MuralPayDetails },
 }
 
@@ -64,9 +62,7 @@ pub enum PayoutMethodType {
 impl PayoutMethodRequest {
     pub fn method_type(&self) -> PayoutMethodType {
         match self {
-            Self::Venmo => PayoutMethodType::Venmo,
-            Self::PayPal => PayoutMethodType::PayPal,
-            Self::Tremendous => PayoutMethodType::Tremendous,
+            Self::Tremendous { .. } => PayoutMethodType::Tremendous,
             Self::MuralPay { .. } => PayoutMethodType::MuralPay,
         }
     }
@@ -76,6 +72,11 @@ impl std::fmt::Display for PayoutMethodType {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(fmt, "{}", self.as_str())
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TremendousDetails {
+    pub delivery_email: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -152,6 +153,7 @@ pub struct PayoutMethod {
     #[serde(rename = "type")]
     pub type_: PayoutMethodType,
     pub name: String,
+    pub category: Option<String>,
     #[serde(skip_serializing)]
     pub supported_countries: Vec<String>,
     pub image_url: Option<String>,

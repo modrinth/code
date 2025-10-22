@@ -66,6 +66,11 @@ enum PayoutCommand {
         #[command(subcommand)]
         command: PayoutFeesCommand,
     },
+    /// Get bank details for a fiat and rail code
+    BankDetails {
+        /// Fiat and rail code to fetch bank details for
+        fiat_and_rail_code: FiatAndRailCode,
+    },
 }
 
 #[derive(Debug, clap::Subcommand)]
@@ -178,6 +183,9 @@ async fn main() -> Result<()> {
             get_fees_for_fiat_amount(&muralpay, amount, fiat_and_rail_code)
                 .await?,
         ),
+        Command::Payout {
+            command: PayoutCommand::BankDetails { fiat_and_rail_code },
+        } => run(of, muralpay.get_bank_details(&[fiat_and_rail_code]).await?),
         Command::Counterparty {
             command: CounterpartyCommand::List,
         } => run(of, list_counterparties(&muralpay).await?),

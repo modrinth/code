@@ -8,6 +8,7 @@ use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{
     MuralPayDetails, PayoutMethodRequest, PayoutMethodType, PayoutStatus,
+    TremendousDetails,
 };
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::payouts::muralpay_payout::MuralPayoutRequest;
@@ -26,7 +27,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Sha256;
 use sqlx::PgPool;
-use std::cmp;
 use std::collections::HashMap;
 use tokio_stream::StreamExt;
 use tracing::error;
@@ -557,44 +557,13 @@ pub async fn calculate_fees(
                 }
             }
         }
-        PayoutMethodRequest::PayPal => WithdrawalFees {
-            fee: match body.method_id.as_str() {
-                "paypal_us" => Some(compute_us_fee(body.amount)),
-                "paypal_in" => Some(compute_fee(
-                    body.amount,
-                    dec!(0.02),
-                    dec!(0),
-                    dec!(20.0),
-                )),
-                _ => None,
-            },
-            exchange_rate: None,
-        },
-        PayoutMethodRequest::Venmo => WithdrawalFees {
-            fee: Some(compute_us_fee(body.amount)),
-            exchange_rate: None,
-        },
-        PayoutMethodRequest::Tremendous => WithdrawalFees {
+        PayoutMethodRequest::Tremendous { .. } => WithdrawalFees {
             fee: Some(dec!(0)),
             exchange_rate: None,
         },
     };
 
     Ok(web::Json(fee))
-}
-
-fn compute_us_fee(amount: Decimal) -> Decimal {
-    compute_fee(amount, dec!(0.02), dec!(0.25), dec!(1.0))
-}
-
-fn compute_fee(
-    amount: Decimal,
-    percentage: Decimal,
-    min: Decimal,
-    max: Decimal,
-) -> Decimal {
-    let value = amount * percentage;
-    cmp::min(cmp::max(value, min), max)
 }
 
 #[post("")]
@@ -744,10 +713,9 @@ pub async fn create_payout(
     };
 
     let payout_item = match &body.method {
-        PayoutMethodRequest::Venmo | PayoutMethodRequest::PayPal => {
-            venmo_or_paypal_payout(payout_cx).await?
+        PayoutMethodRequest::Tremendous { method_details } => {
+            tremendous_payout(payout_cx, method_details).await?
         }
-        PayoutMethodRequest::Tremendous => tremendous_payout(payout_cx).await?,
         PayoutMethodRequest::MuralPay { method_details } => {
             mural_pay_payout(payout_cx, method_details).await?
         }
@@ -779,135 +747,6 @@ struct PayoutContext<'a> {
     payouts_queue: &'a PayoutsQueue,
 }
 
-async fn venmo_or_paypal_payout(
-    PayoutContext {
-        body,
-        user,
-        payout_id,
-        transfer,
-        fee,
-        payouts_queue,
-    }: PayoutContext<'_>,
-) -> Result<DBPayout, ApiError> {
-    let (wallet, wallet_type, address, display_address) =
-        if matches!(body.method, PayoutMethodRequest::Venmo) {
-            if let Some(venmo) = &user.venmo_handle {
-                ("Venmo", "user_handle", venmo.clone(), venmo)
-            } else {
-                return Err(ApiError::InvalidInput(
-                    "Venmo address has not been set for account!".to_string(),
-                ));
-            }
-        } else if let Some(paypal_id) = &user.paypal_id {
-            if let Some(paypal_country) = &user.paypal_country {
-                if paypal_country == "US" && &*body.method_id != "paypal_us" {
-                    return Err(ApiError::InvalidInput(
-                        "Please use the US PayPal transfer option!".to_string(),
-                    ));
-                } else if paypal_country != "US"
-                    && &*body.method_id == "paypal_us"
-                {
-                    return Err(ApiError::InvalidInput(
-                        "Please use the International PayPal transfer option!"
-                            .to_string(),
-                    ));
-                }
-
-                (
-                    "PayPal",
-                    "paypal_id",
-                    paypal_id.clone(),
-                    user.paypal_email.as_ref().unwrap_or(paypal_id),
-                )
-            } else {
-                return Err(ApiError::InvalidInput(
-                    "Please re-link your PayPal account!".to_string(),
-                ));
-            }
-        } else {
-            return Err(ApiError::InvalidInput(
-                "You have not linked a PayPal account!".to_string(),
-            ));
-        };
-
-    #[derive(Deserialize)]
-    struct PayPalLink {
-        href: String,
-    }
-
-    #[derive(Deserialize)]
-    struct PayoutsResponse {
-        pub links: Vec<PayPalLink>,
-    }
-
-    let mut payout_item = crate::database::models::payout_item::DBPayout {
-        id: payout_id,
-        user_id: user.id,
-        created: Utc::now(),
-        status: PayoutStatus::InTransit,
-        amount: transfer,
-        fee: Some(fee),
-        method: Some(body.method.method_type()),
-        method_address: Some(display_address.clone()),
-        platform_id: None,
-    };
-
-    let res: PayoutsResponse = payouts_queue.make_paypal_request(
-        Method::POST,
-        "payments/payouts",
-        Some(
-            json! ({
-                "sender_batch_header": {
-                    "sender_batch_id": format!("{}-payouts", Utc::now().to_rfc3339()),
-                    "email_subject": "You have received a payment from Modrinth!",
-                    "email_message": "Thank you for creating projects on Modrinth. Please claim this payment within 30 days.",
-                },
-                "items": [{
-                    "amount": {
-                        "currency": "USD",
-                        "value": transfer.to_string()
-                    },
-                    "receiver": address,
-                    "note": "Payment from Modrinth creator monetization program",
-                    "recipient_type": wallet_type,
-                    "recipient_wallet": wallet,
-                    "sender_item_id": crate::models::ids::PayoutId::from(payout_id),
-                }]
-            })
-        ),
-        None,
-        None
-    ).await?;
-
-    if let Some(link) = res.links.first() {
-        #[derive(Deserialize)]
-        struct PayoutItem {
-            pub payout_item_id: String,
-        }
-
-        #[derive(Deserialize)]
-        struct PayoutData {
-            pub items: Vec<PayoutItem>,
-        }
-
-        if let Ok(res) = payouts_queue
-            .make_paypal_request::<(), PayoutData>(
-                Method::GET,
-                &link.href,
-                None,
-                None,
-                Some(true),
-            )
-            .await
-            && let Some(data) = res.items.first()
-        {
-            payout_item.platform_id = Some(data.payout_item_id.clone());
-        }
-    }
-
-    Ok(payout_item)
-}
-
 fn get_verified_email(user: &DBUser) -> Result<&str, ApiError> {
     let email = user.email.as_ref().wrap_request_err(
         "you must add an email to your account to withdraw",
@@ -930,8 +769,9 @@ async fn tremendous_payout(
         fee,
         payouts_queue,
     }: PayoutContext<'_>,
+    TremendousDetails { delivery_email }: &TremendousDetails,
 ) -> Result<DBPayout, ApiError> {
-    let email = get_verified_email(user)?;
+    let user_email = get_verified_email(user)?;
 
     let mut payout_item = DBPayout {
         id: payout_id,
@@ -941,7 +781,7 @@ async fn tremendous_payout(
         amount: transfer,
         fee: Some(fee),
         method: Some(PayoutMethodType::Tremendous),
-        method_address: Some(email.to_string()),
+        method_address: Some(user_email.to_string()),
         platform_id: None,
     };
 
@@ -977,7 +817,7 @@ async fn tremendous_payout(
                     },
                     "recipient": {
                         "name": user.username,
-                        "email": email
+                        "email": delivery_email
                     },
                     "products": [
                         &body.method_id,
@@ -1006,7 +846,7 @@ async fn mural_pay_payout(
     }: PayoutContext<'_>,
     details: &MuralPayDetails,
 ) -> Result<DBPayout, ApiError> {
-    let email = get_verified_email(user)?;
+    let user_email = get_verified_email(user)?;
 
     let payout_request = payouts_queue
         .create_muralpay_payout_request(
@@ -1028,7 +868,7 @@ async fn mural_pay_payout(
         amount: transfer,
         fee: Some(fee),
         method: Some(PayoutMethodType::MuralPay),
-        method_address: Some(email.to_string()),
+        method_address: Some(user_email.to_string()),
         platform_id: Some(payout_request.id.to_string()),
     })
 }
@@ -1581,47 +1421,4 @@ pub async fn platform_revenue(
     };
 
     Ok(HttpResponse::Ok().json(res))
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{
-        models::payouts::PayoutMethodRequest, routes::v3::payouts::Withdrawal,
-    };
-    use rust_decimal::Decimal;
-    use serde_json::json;
-
-    // Before the Mural Pay payment rail, we followed a different payout withdraw
-    // request format. We use these tests to ensure the serde representation is the same,
-    // for backwards compat.
-    #[test]
-    fn serde_payout_methods_backwards_compat() {
-        assert_eq!(
-            json!({
-                "amount": 1.00,
-                "method": "paypal",
-                "method_id": ""
-            }),
-            serde_json::to_value(Withdrawal {
-                amount: Decimal::new(100, 2),
-                method: PayoutMethodRequest::PayPal,
-                method_id: String::new(),
-            })
-            .unwrap()
-        );
-
-        assert_eq!(
-            json!({
-                "amount": 1.00,
-                "method": "tremendous",
-                "method_id": ""
-            }),
-            serde_json::to_value(Withdrawal {
-                amount: Decimal::new(100, 2),
-                method: PayoutMethodRequest::PayPal,
-                method_id: String::new(),
-            })
-            .unwrap()
-        );
-    }
 }

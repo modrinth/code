@@ -35,9 +35,6 @@ use tracing::{debug, error, info, warn};
 
 /// Updates charges which need to have their tax amount updated. This is done within a timer to avoid reaching
 /// Anrok API limits.
-///
-/// The global rate limit for Anrok API operations is 10 RPS, so we run ~8 requests every second up
-/// to the specified limit of processed charges.
 async fn update_tax_amounts(
     pg: &PgPool,
     redis: &RedisPool,
@@ -45,17 +42,12 @@ async fn update_tax_amounts(
     stripe_client: &stripe::Client,
     limit: i64,
 ) -> Result<(), ApiError> {
-    let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
-    interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
-
     let mut processed_charges = 0;
 
     loop {
-        interval.tick().await;
-
         let mut txn = pg.begin().await?;
 
-        let charges = DBCharge::get_updateable_lock(&mut *txn, 8).await?;
+        let charges = DBCharge::get_updateable_lock(&mut *txn, 5).await?;
 
         if charges.is_empty() {
             info!("No more charges to process");
@@ -1023,14 +1015,14 @@ pub async fn index_subscriptions(
             &redis,
             &anrok_client,
             &stripe_client,
-            1000,
+            500,
         ),
     )
     .await;
 
     run_and_time(
         "update_tax_amounts",
-        update_tax_amounts(&pool, &redis, &anrok_client, &stripe_client, 50),
+        update_tax_amounts(&pool, &redis, &anrok_client, &stripe_client, 500),
     )
     .await;
 
