@@ -50,13 +50,13 @@ export async function transformFriends(
 	friends: UserFriend[],
 	credentials: ModrinthCredentials | null,
 ): Promise<FriendWithUserData[]> {
-	if (friends.length === 0) {
+	if (friends.length === 0 || !credentials) {
 		return []
 	}
 
 	const friendStatuses = await friend_statuses()
 	const users = await get_user_many(
-		friends.map((x) => (x.id === credentials?.user_id ? x.friend_id : x.id)),
+		friends.map((x) => (x.id === credentials.user_id ? x.friend_id : x.id)),
 	)
 
 	return friends.map((friend) => {
