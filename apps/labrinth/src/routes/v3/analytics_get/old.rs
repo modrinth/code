@@ -51,25 +51,6 @@ pub struct GetData {
     pub resolution_minutes: Option<NonZeroU32>, // defaults to 1 day. Ignored in routes that do not aggregate over a resolution (eg: /countries)
 }
 
-/// Get playtime data for a set of projects or versions.
-///
-/// Data is returned as a hashmap of project/version ids to a hashmap of days to playtime data
-/// eg:
-/// {
-///     "4N1tEhnO": {
-///         "20230824": 23
-///    }
-///}
-/// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
-#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
-pub struct FetchedPlaytime {
-    pub time: u64,
-    pub total_seconds: u64,
-    pub loader_seconds: HashMap<String, u64>,
-    pub game_version_seconds: HashMap<String, u64>,
-    pub parent_seconds: HashMap<VersionId, u64>,
-}
-
 #[utoipa::path]
 #[get("/playtime")]
 pub async fn playtimes_get(
