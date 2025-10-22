@@ -77,12 +77,8 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
             }.boxed_local()
         })
     );
-    cfg.service(
-        web::scope("")
-            .wrap(default_cors())
-            .service(index::index_get)
-            .service(Files::new("/", "assets/")),
-    );
+    cfg.service(index::index_get);
+    cfg.service(Files::new("/", "assets/"));
 }
 
 #[derive(thiserror::Error, Debug)]

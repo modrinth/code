@@ -7,9 +7,11 @@
 //!   requests, you have to zip together M arrays of N elements
 //!   - this makes it inconvenient to have separate endpoints
 
+mod old;
+
 use std::num::NonZeroU64;
 
-use actix_web::{HttpRequest, web};
+use actix_web::{HttpRequest, post, web};
 use chrono::{DateTime, TimeDelta, Utc};
 use futures::StreamExt;
 use rust_decimal::Decimal;
@@ -32,10 +34,9 @@ use crate::{
     routes::ApiError,
 };
 
-// TODO: this service `analytics` is shadowed by `analytics_get_old`'s
-// see the TODO in `analytics_get_old.rs`
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("analytics").route("", web::post().to(get)));
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+    cfg.service(fetch_analytics);
+    cfg.configure(old::config);
 }
 
 // request
@@ -43,7 +44,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 /// Requests analytics data, aggregating over all possible analytics sources
 /// like projects and affiliate codes, returning the data in a list of time
 /// slices.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct GetRequest {
     /// What time range to return statistics for.
     pub time_range: TimeRange,
@@ -52,7 +53,7 @@ pub struct GetRequest {
 }
 
 /// Time range for fetching analytics.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct TimeRange {
     /// When to start including data.
     pub start: DateTime<Utc>,
@@ -68,20 +69,22 @@ pub struct TimeRange {
 
 /// Determines how many time slices between the start and end will be
 /// included, and how fine-grained those time slices will be.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum TimeRangeResolution {
     /// Use a set number of time slices, with the resolution being determined
     /// automatically.
+    #[schema(value_type = u64)]
     Slices(NonZeroU64),
     /// Each time slice will be a set number of minutes long, and the number of
     /// slices is determined automatically.
+    #[schema(value_type = u64)]
     Minutes(NonZeroU64),
 }
 
 /// What metrics the caller would like to receive from this analytics get
 /// request.
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ReturnMetrics {
     /// How many times a project page has been viewed.
     pub project_views: Option<Metrics<ProjectViewsField>>,
@@ -90,11 +93,15 @@ pub struct ReturnMetrics {
     /// How long users have been playing a project.
     pub project_playtime: Option<Metrics<ProjectPlaytimeField>>,
     /// How much payout revenue a project has generated.
-    pub project_revenue: Option<Metrics<()>>,
+    pub project_revenue: Option<Metrics<Unit>>,
 }
 
+/// Replacement for `()` because of a `utoipa` limitation.
+#[derive(Debug, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct Unit {}
+
 /// See [`ReturnMetrics`].
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Metrics<F> {
     /// When collecting metrics, what fields do we want to group the results by?
     ///
@@ -114,7 +121,9 @@ pub struct Metrics<F> {
 }
 
 /// Fields for [`ReturnMetrics::project_views`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum ProjectViewsField {
     /// Project ID.
@@ -132,7 +141,9 @@ pub enum ProjectViewsField {
 }
 
 /// Fields for [`ReturnMetrics::project_downloads`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum ProjectDownloadsField {
     /// Project ID.
@@ -150,7 +161,9 @@ pub enum ProjectDownloadsField {
 }
 
 /// Fields for [`ReturnMetrics::project_playtime`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum ProjectPlaytimeField {
     /// Project ID.
@@ -177,15 +190,15 @@ pub const MAX_TIME_SLICES: usize = 1024;
 /// This is a list of N [`TimeSlice`]s, where each slice represents an equal
 /// time interval of metrics collection. The number of slices is determined
 /// by [`GetRequest::time_range`].
-#[derive(Debug, Default, Serialize, Deserialize)]
-pub struct GetResponse(pub Vec<TimeSlice>);
+#[derive(Debug, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct FetchResponse(pub Vec<TimeSlice>);
 
 /// Single time interval of metrics collection.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct TimeSlice(pub Vec<AnalyticsData>);
 
 /// Metrics collected in a single [`TimeSlice`].
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(untagged)] // the presence of `source_project`, `source_affiliate_code` determines the kind
 pub enum AnalyticsData {
     /// Project metrics.
@@ -194,7 +207,7 @@ pub enum AnalyticsData {
 }
 
 /// Project metrics.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectAnalytics {
     /// What project these metrics are for.
     source_project: ProjectId,
@@ -213,7 +226,7 @@ impl ProjectAnalytics {
 /// Project metrics of a specific kind.
 ///
 /// If a field is not included in [`Metrics::bucket_by`], it will be [`None`].
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case", tag = "metric_kind")]
 pub enum ProjectMetrics {
     /// [`ReturnMetrics::project_views`].
@@ -227,7 +240,7 @@ pub enum ProjectMetrics {
 }
 
 /// [`ReturnMetrics::project_views`].
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectViews {
     /// [`ProjectViewsField::Domain`].
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -246,7 +259,7 @@ pub struct ProjectViews {
 }
 
 /// [`ReturnMetrics::project_downloads`].
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectDownloads {
     /// [`ProjectDownloadsField::Domain`].
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -265,7 +278,7 @@ pub struct ProjectDownloads {
 }
 
 /// [`ReturnMetrics::project_playtime`].
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectPlaytime {
     /// [`ProjectPlaytimeField::VersionId`].
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -281,7 +294,7 @@ pub struct ProjectPlaytime {
 }
 
 /// [`ReturnMetrics::project_revenue`].
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectRevenue {
     /// Total revenue for this bucket.
     revenue: Decimal,
@@ -414,14 +427,19 @@ mod query {
     };
 }
 
-pub async fn get(
+/// Fetches analytics data for the authorized user's projects.
+#[utoipa::path(
+    responses((status = OK, body = inline(FetchResponse))),
+)]
+#[post("/")]
+pub async fn fetch_analytics(
     http_req: HttpRequest,
     req: web::Json<GetRequest>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     clickhouse: web::Data<clickhouse::Client>,
-) -> Result<web::Json<GetResponse>, ApiError> {
+) -> Result<web::Json<FetchResponse>, ApiError> {
     let (scopes, user) = get_user_from_headers(
         &http_req,
         &**pool,
@@ -655,7 +673,7 @@ pub async fn get(
         }
     }
 
-    Ok(web::Json(GetResponse(time_slices)))
+    Ok(web::Json(FetchResponse(time_slices)))
 }
 
 fn none_if_empty(s: String) -> Option<String> {
@@ -824,7 +842,7 @@ mod tests {
         let test_project_2 = ProjectId(456);
         let test_project_3 = ProjectId(789);
 
-        let src = GetResponse(vec![
+        let src = FetchResponse(vec![
             TimeSlice(vec![
                 AnalyticsData::Project(ProjectAnalytics {
                     source_project: test_project_1,
