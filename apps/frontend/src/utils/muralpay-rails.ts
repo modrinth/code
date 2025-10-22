@@ -18,6 +18,7 @@ export interface RailConfig {
 	id: string
 	name: MessageDescriptor
 	currency: string
+	fee: string
 	type: 'fiat' | 'crypto'
 	railCode?: string // For fiat: 'usd', 'eur', 'cop', etc.
 	blockchain?: string // For crypto: 'POLYGON', 'BASE', 'ETHEREUM', 'CELO'
@@ -75,6 +76,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'USD',
 		type: 'fiat',
+		fee: '≈ 0.50% + $0.50',
 		railCode: 'usd',
 		requiresBankName: true,
 		fields: [
@@ -124,6 +126,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'EUR',
 		type: 'fiat',
+		fee: '≈ 0.60% + €1.00',
 		railCode: 'eur',
 		requiresBankName: true,
 		fields: [
@@ -246,6 +249,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'MXN',
 		type: 'fiat',
+		fee: '≈ 0.90% + $0.50',
 		railCode: 'mxn',
 		requiresBankName: true,
 		fields: [
@@ -276,6 +280,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'BRL',
 		type: 'fiat',
+		fee: '≈ 1.30% + $0.25',
 		railCode: 'brl',
 		requiresBankName: true,
 		fields: [
@@ -361,6 +366,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'COP',
 		type: 'fiat',
+		fee: '≈ 0.95% + $0.35',
 		railCode: 'cop',
 		requiresBankName: true,
 		fields: [
@@ -415,6 +421,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'ARS',
 		type: 'fiat',
+		fee: '≈ 0.50% + $0.00',
 		railCode: 'ars',
 		requiresBankName: true,
 		fields: [
@@ -473,6 +480,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'CLP',
 		type: 'fiat',
+		fee: '≈ 0.95% + $1.20',
 		railCode: 'clp',
 		requiresBankName: true,
 		fields: [
@@ -517,6 +525,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'CRC',
 		type: 'fiat',
+		fee: '≈ 1.05% + $0.80',
 		railCode: 'crc',
 		requiresBankName: true,
 		fields: [
@@ -551,6 +560,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'PEN',
 		type: 'fiat',
+		fee: '≈ 1.15% + $1.00',
 		railCode: 'pen',
 		requiresBankName: true,
 		fields: [
@@ -599,6 +609,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'BOB',
 		type: 'fiat',
+		fee: 'TBD',
 		railCode: 'bob',
 		requiresBankName: true,
 		fields: [
@@ -636,6 +647,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'ZAR',
 		type: 'fiat',
+		fee: '≈ 1.40% + $1.50',
 		railCode: 'zar',
 		requiresBankName: true,
 		fields: [
@@ -670,6 +682,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'USD',
 		type: 'fiat',
+		fee: '≈ 0.50% + $5.00',
 		railCode: 'usd-peru',
 		requiresBankName: true,
 		fields: [
@@ -714,6 +727,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'USD',
 		type: 'fiat',
+		fee: 'TBD',
 		railCode: 'usd-china',
 		requiresBankName: false,
 		fields: [
@@ -798,6 +812,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'USDC',
 		type: 'crypto',
+		fee: '≈ 0% + network',
 		blockchain: 'POLYGON',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
@@ -829,6 +844,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		name: defineMessage({ id: 'muralpay.rail.usdc-base.name', defaultMessage: 'USDC (Base)' }),
 		currency: 'USDC',
 		type: 'crypto',
+		fee: '≈ 0% + network',
 		blockchain: 'BASE',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
@@ -863,6 +879,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'USDC',
 		type: 'crypto',
+		fee: '≈ 0% + network',
 		blockchain: 'ETHEREUM',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
@@ -894,6 +911,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		name: defineMessage({ id: 'muralpay.rail.usdc-celo.name', defaultMessage: 'USDC (Celo)' }),
 		currency: 'USDC',
 		type: 'crypto',
+		fee: '≈ 0% + network',
 		blockchain: 'CELO',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',

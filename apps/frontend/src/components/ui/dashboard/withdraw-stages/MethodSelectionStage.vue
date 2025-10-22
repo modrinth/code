@@ -56,6 +56,7 @@
 				<button class="!h-10 !justify-start !gap-2" @click="handleMethodSelection(method)">
 					<component :is="method.icon" />
 					{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
+					<span class="ml-auto text-secondary">{{ method.fee }}</span>
 				</button>
 			</ButtonStyled>
 		</div>
@@ -71,7 +72,6 @@ import {
 	PolygonIcon,
 	UnknownIcon,
 	VenmoIcon,
-	VisaIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
@@ -223,6 +223,7 @@ const paymentOptions = computed(() => {
 			label: paymentMethodMessages.paypal,
 			icon: PayPalIcon,
 			methodId: paypalMethods[0].id,
+			fee: '≈ 6%, max $25',
 			type: 'tremendous',
 		})
 	}
@@ -234,17 +235,7 @@ const paymentOptions = computed(() => {
 			label: paymentMethodMessages.venmo,
 			icon: VenmoIcon,
 			methodId: venmoMethods[0].id,
-			type: 'tremendous',
-		})
-	}
-
-	const visaMethods = tremendousMethods.filter((m) => m.category === 'visa_card')
-	if (visaMethods.length > 0) {
-		options.push({
-			value: 'visa_card',
-			label: paymentMethodMessages.virtualVisa,
-			icon: VisaIcon,
-			methodId: visaMethods[0].id,
+			fee: '≈ 6%, max $25',
 			type: 'tremendous',
 		})
 	}
@@ -258,6 +249,7 @@ const paymentOptions = computed(() => {
 			label: paymentMethodMessages.giftCard,
 			icon: GiftIcon,
 			methodId: undefined,
+			fee: '≈ 0%',
 			type: 'tremendous',
 		})
 	}
@@ -269,6 +261,7 @@ const paymentOptions = computed(() => {
 			label: paymentMethodMessages.charity,
 			icon: HeartIcon,
 			methodId: undefined,
+			fee: '≈ 0%',
 			type: 'tremendous',
 		})
 	}
@@ -281,19 +274,21 @@ const paymentOptions = computed(() => {
 			const railCode = methodId.replace('fiat_', '')
 			const rail = getRailConfig(methodId)
 
+			if (!rail) {
+				debug('Warning: No rail config found for', methodId)
+				continue
+			}
+
 			options.push({
 				value: methodId,
 				label:
-					rail?.name ||
+					rail.name ||
 					formatMessage(messages.bankTransferFallback, { code: railCode.toUpperCase() }),
 				icon: LandmarkIcon,
 				methodId: method.id,
+				fee: rail.fee,
 				type: 'fiat',
 			})
-
-			if (!rail) {
-				debug('Warning: No rail config found for', methodId)
-			}
 		} else if (methodId.startsWith('blockchain_')) {
 			const rail = getRailConfig(methodId)
 
@@ -304,9 +299,10 @@ const paymentOptions = computed(() => {
 
 			options.push({
 				value: methodId,
-				label: rail?.name || method.name,
-				icon: getBlockchainIcon(rail?.blockchain || 'POLYGON') || PolygonIcon,
+				label: rail.name || method.name,
+				icon: getBlockchainIcon(rail.blockchain || 'POLYGON') || PolygonIcon,
 				methodId: method.id,
+				fee: rail.fee,
 				type: 'crypto',
 			})
 		}
