@@ -7,10 +7,7 @@ use crate::models::teams::ProjectPermissions;
 use crate::{
     auth::get_user_from_headers,
     database::models::user_item,
-    models::{
-        ids::{ProjectId, VersionId},
-        pats::Scopes,
-    },
+    models::{ids::ProjectId, pats::Scopes},
     queue::session::AuthQueue,
 };
 use actix_web::{HttpRequest, HttpResponse, get, web};
