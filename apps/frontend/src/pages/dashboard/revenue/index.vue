@@ -164,25 +164,11 @@
 			<span v-if="hasTinMismatch" class="text-sm font-semibold text-red">
 				{{ formatMessage(messages.withdrawBlockedTinMismatch) }}
 			</span>
-			<span class="text-sm text-secondary">
-				<IntlFormatted :message-id="messages.tosLabel">
-					<template #terms-link="{ children }">
-						<nuxt-link class="text-link" to="/legal/cmp">
-							<component :is="() => normalizeChildren(children)" />
-						</nuxt-link>
-					</template>
-					<template #info-link="{ children }">
-						<nuxt-link class="text-link" to="/legal/cmp-info">
-							<component :is="() => normalizeChildren(children)" />
-						</nuxt-link>
-					</template>
-				</IntlFormatted>
-			</span>
 		</div>
 
 		<div class="flex flex-col gap-4">
 			<div class="flex flex-row justify-between">
-				<span class="text-3xl font-semibold text-contrast">{{
+				<span class="text-2xl font-semibold text-contrast">{{
 					formatMessage(messages.transactionsHeader)
 				}}</span>
 				<nuxt-link
@@ -213,11 +199,9 @@
 import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
 import { formatMoney, type PayoutList } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 
-import { normalizeChildren } from '@/utils/vue-children.ts'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
 

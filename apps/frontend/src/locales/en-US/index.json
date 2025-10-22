@@ -647,9 +647,6 @@
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Private individual"
   },
-  "dashboard.creator-withdraw-modal.method-selection.bank-transfer-fallback": {
-    "message": "Bank transfer ({code})"
-  },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Select your country"
   },
@@ -745,6 +742,9 @@
   },
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Tax form required"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Payment method"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward": {
     "message": "Reward"

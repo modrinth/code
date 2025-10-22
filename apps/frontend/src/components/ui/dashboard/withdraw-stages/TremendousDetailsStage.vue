@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-6">
+	<div class="flex flex-col gap-5">
 		<Transition
 			enter-active-class="transition-all duration-300 ease-out"
 			enter-from-class="opacity-0 max-h-0"
@@ -15,6 +15,22 @@
 			</div>
 		</Transition>
 
+		<div v-if="!showGiftCardSelector && selectedMethodDisplay" class="flex flex-col gap-2.5">
+			<label>
+				<span class="text-md font-semibold text-contrast">
+					{{ formatMessage(messages.paymentMethod) }}
+				</span>
+			</label>
+			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
+				<component :is="selectedMethodDisplay.icon" class="size-5" />
+				<span class="font-semibold text-contrast">{{
+					typeof selectedMethodDisplay.label === 'string'
+						? selectedMethodDisplay.label
+						: formatMessage(selectedMethodDisplay.label)
+				}}</span>
+			</div>
+		</div>
+
 		<div class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast"
@@ -27,6 +43,20 @@
 				:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
 				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 			/>
+
+			<Transition
+				enter-active-class="transition-all duration-300 ease-out"
+				enter-from-class="opacity-0 max-h-0"
+				enter-to-class="opacity-100 max-h-40"
+				leave-active-class="transition-all duration-200 ease-in"
+				leave-from-class="opacity-100 max-h-40"
+				leave-to-class="opacity-0 max-h-0"
+			>
+				<span v-if="deliveryEmail.includes('@')" class="text-sm text-secondary"
+					>Our partner, Tremendous, will send an email to <b>{{ deliveryEmail }}</b> with
+					instructions on how to redeem your withdrawal.</span
+				>
+			</Transition>
 		</div>
 
 		<div v-if="showGiftCardSelector" class="flex flex-col gap-2.5">
@@ -124,7 +154,7 @@
 			/>
 
 			<Checkbox v-model="agreedTerms" class="rewards-checkbox">
-				<p>
+				<span>
 					<IntlFormatted :message-id="financialMessages.rewardsProgramTermsAgreement">
 						<template #terms-link="{ children }">
 							<nuxt-link to="/legal/cmp" class="text-link">
@@ -132,7 +162,7 @@
 							</nuxt-link>
 						</template>
 					</IntlFormatted>
-				</p>
+				</span>
 			</Checkbox>
 		</div>
 	</div>
@@ -179,6 +209,12 @@ const deliveryEmail = ref<string>(
 const showGiftCardSelector = computed(() => {
 	const method = withdrawContext.withdrawData.value.selectedMethod
 	return method === 'merchant_card' || method === 'charity'
+})
+
+const selectedMethodDisplay = computed(() => {
+	const method = withdrawContext.withdrawData.value.selectedMethod
+	if (!method) return null
+	return withdrawContext.paymentOptions.value.find((m) => m.value === method) || null
 })
 
 const categoryLabel = computed(() => {
@@ -429,6 +465,10 @@ const messages = defineMessages({
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message',
 		defaultMessage:
 			'The delivery email you have entered is not associated with your Modrinth account. Modrinth cannot recover rewards sent to an incorrect email address.',
+	},
+	paymentMethod: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.payment-method',
+		defaultMessage: 'Payment method',
 	},
 	reward: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.reward',

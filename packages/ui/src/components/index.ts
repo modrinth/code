@@ -5,6 +5,7 @@ export { default as AppearingProgressBar } from './base/AppearingProgressBar.vue
 export { default as AutoLink } from './base/AutoLink.vue'
 export { default as Avatar } from './base/Avatar.vue'
 export { default as Badge } from './base/Badge.vue'
+export { default as BulletDivider } from './base/BulletDivider.vue'
 export { default as Button } from './base/Button.vue'
 export { default as ButtonStyled } from './base/ButtonStyled.vue'
 export { default as Card } from './base/Card.vue'

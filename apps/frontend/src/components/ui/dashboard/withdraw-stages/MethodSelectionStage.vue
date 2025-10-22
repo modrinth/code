@@ -64,21 +64,12 @@
 </template>
 
 <script setup lang="ts">
-import {
-	GiftIcon,
-	HeartIcon,
-	LandmarkIcon,
-	PayPalIcon,
-	PolygonIcon,
-	UnknownIcon,
-	VenmoIcon,
-} from '@modrinth/assets'
+import { UnknownIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	ButtonStyled,
 	Combobox,
 	injectNotificationManager,
-	paymentMethodMessages,
 	useDebugLogger,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
@@ -89,8 +80,6 @@ import { all } from 'iso-3166-1'
 
 import { useUserCountry } from '@/composables/country.ts'
 import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import { getBlockchainIcon } from '@/utils/finance-icons'
-import { getRailConfig } from '@/utils/muralpay-rails'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const debug = useDebugLogger('MethodSelectionStage')
@@ -133,10 +122,6 @@ const messages = defineMessages({
 	errorText: {
 		id: 'dashboard.creator-withdraw-modal.method-selection.error-text',
 		defaultMessage: 'Unable to fetch available payment methods. Please try again later.',
-	},
-	bankTransferFallback: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.bank-transfer-fallback',
-		defaultMessage: 'Bank transfer ({code})',
 	},
 })
 
@@ -203,129 +188,7 @@ watch(
 	{ immediate: true },
 )
 
-const paymentOptions = computed(() => {
-	const methods = withdrawContext.availableMethods.value
-	if (!methods || methods.length === 0) {
-		debug('No payment methods available')
-		return []
-	}
-
-	debug('Available methods:', methods)
-
-	const options = []
-
-	const tremendousMethods = methods.filter((m) => m.type === 'tremendous')
-
-	const paypalMethods = tremendousMethods.filter((m) => m.category === 'paypal')
-	if (paypalMethods.length > 0) {
-		options.push({
-			value: 'paypal',
-			label: paymentMethodMessages.paypal,
-			icon: PayPalIcon,
-			methodId: paypalMethods[0].id,
-			fee: '≈ 6%, max $25',
-			type: 'tremendous',
-		})
-	}
-
-	const venmoMethods = tremendousMethods.filter((m) => m.category === 'venmo')
-	if (venmoMethods.length > 0) {
-		options.push({
-			value: 'venmo',
-			label: paymentMethodMessages.venmo,
-			icon: VenmoIcon,
-			methodId: venmoMethods[0].id,
-			fee: '≈ 6%, max $25',
-			type: 'tremendous',
-		})
-	}
-
-	const merchantMethods = tremendousMethods.filter(
-		(m) => m.category === 'merchant_card' || m.category === 'merchant_cards',
-	)
-	if (merchantMethods.length > 0) {
-		options.push({
-			value: 'merchant_card',
-			label: paymentMethodMessages.giftCard,
-			icon: GiftIcon,
-			methodId: undefined,
-			fee: '≈ 0%',
-			type: 'tremendous',
-		})
-	}
-
-	const charityMethods = tremendousMethods.filter((m) => m.category === 'charity')
-	if (charityMethods.length > 0) {
-		options.push({
-			value: 'charity',
-			label: paymentMethodMessages.charity,
-			icon: HeartIcon,
-			methodId: undefined,
-			fee: '≈ 0%',
-			type: 'tremendous',
-		})
-	}
-
-	const muralPayMethods = methods.filter((m) => m.type === 'muralpay')
-	for (const method of muralPayMethods) {
-		const methodId = method.id
-
-		if (methodId.startsWith('fiat_')) {
-			const railCode = methodId.replace('fiat_', '')
-			const rail = getRailConfig(methodId)
-
-			if (!rail) {
-				debug('Warning: No rail config found for', methodId)
-				continue
-			}
-
-			options.push({
-				value: methodId,
-				label:
-					rail.name ||
-					formatMessage(messages.bankTransferFallback, { code: railCode.toUpperCase() }),
-				icon: LandmarkIcon,
-				methodId: method.id,
-				fee: rail.fee,
-				type: 'fiat',
-			})
-		} else if (methodId.startsWith('blockchain_')) {
-			const rail = getRailConfig(methodId)
-
-			if (!rail) {
-				debug('Warning: No rail config found for', methodId)
-				continue
-			}
-
-			options.push({
-				value: methodId,
-				label: rail.name || method.name,
-				icon: getBlockchainIcon(rail.blockchain || 'POLYGON') || PolygonIcon,
-				methodId: method.id,
-				fee: rail.fee,
-				type: 'crypto',
-			})
-		}
-	}
-
-	const sortOrder: Record<string, number> = {
-		fiat: 1,
-		paypal: 2,
-		venmo: 3,
-		visa_card: 4,
-		merchant_card: 5,
-		charity: 6,
-		crypto: 7,
-	}
-	options.sort((a, b) => {
-		const aOrder = sortOrder[a.type] ?? sortOrder[a.value] ?? 999
-		const bOrder = sortOrder[b.type] ?? sortOrder[b.value] ?? 999
-		return aOrder - bOrder
-	})
-
-	debug('Payment options computed:', options)
-	return options
-})
+const paymentOptions = withdrawContext.paymentOptions
 
 function handleMethodSelection(option: {
 	value: string

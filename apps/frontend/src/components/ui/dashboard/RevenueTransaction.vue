@@ -11,11 +11,15 @@
 					formatMethodName(transaction.method)
 				}}</span>
 				<span class="text-secondary">
-					{{ formatTransactionStatus(transaction.status) }} |
+					{{ formatTransactionStatus(transaction.status) }} <BulletDivider />
 					{{ $dayjs(transaction.created).format('MMM DD YYYY') }}
-					<template v-if="transaction.fee"> | Fee {{ $formatMoney(transaction.fee) }} </template>
+					<template v-if="transaction.fee">
+						<BulletDivider /> Fee {{ $formatMoney(transaction.fee) }}
+					</template>
 					<template v-if="transaction.method_address">
-						| {{ formatWallet(transaction.method) }} ({{ transaction.method_address }})
+						<BulletDivider /> {{ formatWallet(transaction.method) }} ({{
+							transaction.method_address
+						}})
 					</template>
 				</span>
 			</div>
@@ -25,7 +29,7 @@
 				}}</span>
 				<template v-if="transaction.status === 'in-transit'">
 					<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
-						<ButtonStyled color="red" circular size="small">
+						<ButtonStyled circular size="small">
 							<button @click="cancelPayout">
 								<XIcon />
 							</button>
@@ -42,7 +46,7 @@
 
 <script setup>
 import { ArrowUpIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import { BulletDivider, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import { capitalizeString, formatWallet } from '@modrinth/utils'
 import { Tooltip } from 'floating-vue'
 

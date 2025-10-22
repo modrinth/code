@@ -1,38 +1,47 @@
 <template>
-	<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
-		<div class="flex items-center justify-between">
-			<span class="text-primary">{{ formatMessage(messages.feeBreakdownAmount) }}</span>
-			<span class="font-semibold text-contrast">{{ formatMoney(amount || 0) }}</span>
-		</div>
-		<div class="flex items-center justify-between">
-			<span class="text-primary">{{ formatMessage(messages.feeBreakdownFee) }}</span>
-			<span class="h-4 font-semibold text-contrast">
-				<template v-if="feeLoading">
-					<LoaderCircleIcon class="size-5 animate-spin !text-secondary" />
-				</template>
-				<template v-else>-{{ formatMoney(fee || 0) }}</template>
-			</span>
-		</div>
-		<div class="h-px bg-surface-5" />
-		<div class="flex items-center justify-between">
-			<span class="text-primary">{{ formatMessage(messages.feeBreakdownNetAmount) }}</span>
-			<span class="font-semibold text-contrast">
-				{{ formatMoney(netAmount) }}
-				<template v-if="shouldShowExchangeRate">
-					<span class="text-secondary"> ({{ formattedLocalCurrency }})</span>
-				</template>
-			</span>
-		</div>
-		<template v-if="shouldShowExchangeRate">
+	<Transition
+		enter-active-class="transition-all duration-300 ease-out"
+		enter-from-class="opacity-0 max-h-0"
+		enter-to-class="opacity-100 max-h-40"
+		leave-active-class="transition-all duration-200 ease-in"
+		leave-from-class="opacity-100 max-h-40"
+		leave-to-class="opacity-0 max-h-0"
+	>
+		<div v-if="amount > 0" class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
+			<div class="flex items-center justify-between">
+				<span class="text-primary">{{ formatMessage(messages.feeBreakdownAmount) }}</span>
+				<span class="font-semibold text-contrast">{{ formatMoney(amount || 0) }}</span>
+			</div>
+			<div class="flex items-center justify-between">
+				<span class="text-primary">{{ formatMessage(messages.feeBreakdownFee) }}</span>
+				<span class="h-4 font-semibold text-contrast">
+					<template v-if="feeLoading">
+						<LoaderCircleIcon class="size-5 animate-spin !text-secondary" />
+					</template>
+					<template v-else>-{{ formatMoney(fee || 0) }}</template>
+				</span>
+			</div>
 			<div class="h-px bg-surface-5" />
 			<div class="flex items-center justify-between">
-				<span class="text-primary">{{ formatMessage(messages.feeBreakdownExchangeRate) }}</span>
-				<span class="text-secondary"
-					>1 USD = {{ exchangeRate?.toFixed(4) }} {{ localCurrency }}</span
-				>
+				<span class="text-primary">{{ formatMessage(messages.feeBreakdownNetAmount) }}</span>
+				<span class="font-semibold text-contrast">
+					{{ formatMoney(netAmount) }}
+					<template v-if="shouldShowExchangeRate">
+						<span class="text-secondary"> ({{ formattedLocalCurrency }})</span>
+					</template>
+				</span>
 			</div>
-		</template>
-	</div>
+			<template v-if="shouldShowExchangeRate">
+				<div class="h-px bg-surface-5" />
+				<div class="flex items-center justify-between">
+					<span class="text-primary">{{ formatMessage(messages.feeBreakdownExchangeRate) }}</span>
+					<span class="text-secondary"
+						>1 USD = {{ exchangeRate?.toFixed(4) }} {{ localCurrency }}</span
+					>
+				</div>
+			</template>
+		</div>
+	</Transition>
 </template>
 
 <script setup lang="ts">
