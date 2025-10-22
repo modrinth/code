@@ -1,5 +1,6 @@
 use labrinth::queue::email::EmailQueue;
 use labrinth::util::anrok;
+use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::{LabrinthConfig, file_hosting};
 use labrinth::{check_env_vars, clickhouse};
 use modrinth_maxmind::MaxMind;
@@ -46,6 +47,8 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     let anrok_client = anrok::Client::from_env().unwrap();
     let email_queue =
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
+    let gotenberg_client =
+        GotenbergClient::from_env().expect("Failed to create Gotenberg client");
 
     labrinth::app_setup(
         pool.clone(),
@@ -58,6 +61,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         stripe_client,
         anrok_client,
         email_queue,
+        gotenberg_client,
         false,
     )
 }

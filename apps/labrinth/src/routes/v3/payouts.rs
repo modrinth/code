@@ -86,7 +86,18 @@ pub async fn post_compliance_form(
             .await?;
 
     let mut compliance = match maybe_compliance {
-        Some(c) => c,
+        Some(c) => {
+            if c.signed.is_some()
+                && c.form_type.is_some_and(|f| f.requires_domestic_tin_match())
+                && !c.tin_matched
+            {
+                return Err(ApiError::InvalidInput(
+                    "Your TIN/SSN did not match the IRS records. Please contact support https://support.modrinth.com".to_owned(),
+                ));
+            }
+
+            c
+        }
         None => users_compliance::UserCompliance {
             id: 0,
             user_id,
@@ -1110,7 +1121,11 @@ pub async fn get_balance(
                     if compliance.compliance_api_check_failed {
                         FormCompletionStatus::Unknown
                     } else if compliance.model.signed.is_some() {
-                        if compliance.model.tin_matched {
+                        if compliance.model.tin_matched
+                            || compliance.model.form_type.is_some_and(|x| {
+                                !x.requires_domestic_tin_match()
+                            })
+                        {
                             FormCompletionStatus::Complete
                         } else {
                             FormCompletionStatus::TinMismatch

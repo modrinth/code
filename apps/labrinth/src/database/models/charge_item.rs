@@ -233,7 +233,10 @@ impl DBCharge {
     ) -> Result<Option<DBCharge>, DatabaseError> {
         let user_subscription_id = user_subscription_id.0;
         let res = select_charges_with_predicate!(
-            "WHERE subscription_id = $1 AND (status = 'open' OR status = 'expiring' OR status = 'cancelled' OR status = 'failed')",
+            "WHERE
+			  subscription_id = $1
+			  AND (status = 'open' OR status = 'expiring' OR status = 'cancelled' OR status = 'failed')
+			ORDER BY due ASC LIMIT 1",
             user_subscription_id
         )
         .fetch_optional(exec)
@@ -335,7 +338,7 @@ impl DBCharge {
 			  AND COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) < NOW() - INTERVAL '1 day'
 			  AND u.email IS NOT NULL
 			  AND due - INTERVAL '7 days' > NOW()
-              AND due - INTERVAL '14 days' < NOW() -- Due between 7 and 14 days from now
+              AND due - INTERVAL '30 days' < NOW() -- Due between 7 and 30 days from now
 			ORDER BY COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) ASC
 			FOR NO KEY UPDATE SKIP LOCKED
 			LIMIT $1

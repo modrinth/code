@@ -6,7 +6,7 @@ export interface ServersFetchOptions {
 	method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 	contentType?: string
 	body?: Record<string, any>
-	version?: number
+	version?: number | 'internal'
 	override?: {
 		url?: string
 		token?: string
@@ -82,7 +82,9 @@ export async function useServersFetch<T>(
 		? `https://${newOverrideUrl}/${path.replace(/^\//, '')}`
 		: version === 0
 			? `${base}/modrinth/v${version}/${path.replace(/^\//, '')}`
-			: `${base}/v${version}/${path.replace(/^\//, '')}`
+			: version === 'internal'
+				? `${base}/_internal/${path.replace(/^\//, '')}`
+				: `${base}/v${version}/${path.replace(/^\//, '')}`
 
 	const headers: Record<string, string> = {
 		'User-Agent': 'Modrinth/1.0 (https://modrinth.com)',

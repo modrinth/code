@@ -39,12 +39,12 @@ function updateAdPosition() {
 			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit]"
 		>
 			<img
-				src="https://cdn-raw.modrinth.com/medal-modrinth-servers-light.webp"
+				src="https://cdn-raw.modrinth.com/medal-modrinth-servers-light-new.webp"
 				alt="Host your next server with Modrinth Servers"
 				class="hidden light-image rounded-[inherit]"
 			/>
 			<img
-				src="https://cdn-raw.modrinth.com/medal-modrinth-servers-dark.webp"
+				src="https://cdn-raw.modrinth.com/medal-modrinth-servers-dark-new.webp"
 				alt="Host your next server with Modrinth Servers"
 				class="dark-image rounded-[inherit]"
 			/>

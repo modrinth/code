@@ -2,6 +2,7 @@
 
 use std::{
     io::{Cursor, Read},
+    net::IpAddr,
     path::Path,
     sync::Arc,
 };
@@ -48,6 +49,19 @@ impl MaxMind {
                 .map(Arc::new)
                 .ok(),
         }
+    }
+
+    /// Queries the MaxMind database for the ISO country code of an IP address.
+    ///
+    /// If MaxMind is not configured or the database could not be read, returns
+    /// [`None`].
+    pub async fn query_country(&self, ip: impl Into<IpAddr>) -> Option<String> {
+        let reader = self.reader.as_ref()?;
+        reader
+            .lookup::<geoip2::Country>(ip.into())
+            .ok()?
+            .and_then(|c| c.country)
+            .and_then(|c| c.iso_code.map(|s| s.to_string()))
     }
 }
 

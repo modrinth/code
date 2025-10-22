@@ -9,6 +9,7 @@ pub mod date;
 pub mod env;
 pub mod error;
 pub mod ext;
+pub mod gotenberg;
 pub mod guards;
 pub mod img;
 pub mod ip;

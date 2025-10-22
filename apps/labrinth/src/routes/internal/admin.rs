@@ -6,7 +6,6 @@ use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::models::threads::MessageBody;
 use crate::queue::analytics::AnalyticsQueue;
-use crate::queue::maxmind::MaxMindIndexer;
 use crate::queue::moderation::AUTOMOD_ID;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -14,6 +13,7 @@ use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::guards::admin_key_guard;
 use actix_web::{HttpRequest, HttpResponse, patch, post, web};
+use modrinth_maxmind::MaxMind;
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -48,7 +48,7 @@ pub async fn count_download(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    maxmind: web::Data<Arc<MaxMindIndexer>>,
+    maxmind: web::Data<MaxMind>,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
     download_body: web::Json<DownloadBody>,
@@ -132,7 +132,7 @@ pub async fn count_download(
         project_id: project_id as u64,
         version_id: version_id as u64,
         ip,
-        country: maxmind.query(ip).await.unwrap_or_default(),
+        country: maxmind.query_country(ip).await.unwrap_or_default(),
         user_agent: download_body
             .headers
             .get("user-agent")

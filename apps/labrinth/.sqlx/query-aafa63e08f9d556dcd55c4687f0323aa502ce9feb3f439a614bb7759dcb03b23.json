@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT us.id, us.user_id, us.price_id, us.interval, us.created, us.status, us.metadata\n            FROM users_subscriptions us\n            WHERE us.metadata->>'type' = 'pyro' AND us.metadata->>'id' = ANY($1::text[])\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "price_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "interval",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "aafa63e08f9d556dcd55c4687f0323aa502ce9feb3f439a614bb7759dcb03b23"
+}
