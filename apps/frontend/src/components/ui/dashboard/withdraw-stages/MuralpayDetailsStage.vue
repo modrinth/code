@@ -99,20 +99,29 @@
 			</span>
 		</div>
 
-		<Transition name="fade">
-			<div v-if="dynamicDocumentNumberField" class="flex flex-col gap-2.5">
-				<label>
-					<span class="text-md font-semibold text-contrast">
-						{{ dynamicDocumentNumberField.label }}
-						<span v-if="dynamicDocumentNumberField.required" class="text-red">*</span>
-					</span>
-				</label>
-				<input
-					v-model="formData.documentNumber"
-					:type="dynamicDocumentNumberField.type"
-					:placeholder="dynamicDocumentNumberField.placeholder"
-					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
-				/>
+		<Transition
+			enter-active-class="transition-all duration-300 ease-out"
+			enter-from-class="opacity-0 max-h-0"
+			enter-to-class="opacity-100 max-h-40"
+			leave-active-class="transition-all duration-200 ease-in"
+			leave-from-class="opacity-100 max-h-40"
+			leave-to-class="opacity-0 max-h-0"
+		>
+			<div v-if="dynamicDocumentNumberField" class="overflow-hidden">
+				<div class="flex flex-col gap-2.5">
+					<label>
+						<span class="text-md font-semibold text-contrast">
+							{{ dynamicDocumentNumberField.label }}
+							<span v-if="dynamicDocumentNumberField.required" class="text-red">*</span>
+						</span>
+					</label>
+					<input
+						v-model="formData.documentNumber"
+						:type="dynamicDocumentNumberField.type"
+						:placeholder="dynamicDocumentNumberField.placeholder"
+						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+					/>
+				</div>
 			</div>
 		</Transition>
 
@@ -526,22 +535,3 @@ const messages = defineMessages({
 	},
 })
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-	transition:
-		opacity 0.3s ease,
-		transform 0.3s ease;
-}
-
-.fade-enter-from {
-	opacity: 0;
-	transform: translateY(-10px);
-}
-
-.fade-leave-to {
-	opacity: 0;
-	transform: translateY(-10px);
-}
-</style>

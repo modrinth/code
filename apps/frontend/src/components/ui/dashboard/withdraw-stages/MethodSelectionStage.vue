@@ -48,11 +48,13 @@
 <script setup lang="ts">
 import {
 	GiftIcon,
+	HeartIcon,
 	LandmarkIcon,
 	PayPalIcon,
 	PolygonIcon,
 	UnknownIcon,
 	VenmoIcon,
+	VisaIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
@@ -89,6 +91,7 @@ interface PayoutMethod {
 	id: string
 	type: string // Backend sends "type", not "type_"
 	name: string
+	category?: string
 	supported_countries: string[]
 	image_url: string | null
 	image_logo_url: string | null
@@ -178,7 +181,7 @@ const paymentOptions = computed(() => {
 
 	const tremendousMethods = methods.filter((m) => m.type === 'tremendous')
 
-	const paypalMethods = tremendousMethods.filter((m) => m.name.toLowerCase().includes('paypal'))
+	const paypalMethods = tremendousMethods.filter((m) => m.category === 'paypal')
 	if (paypalMethods.length > 0) {
 		options.push({
 			value: 'paypal',
@@ -189,7 +192,7 @@ const paymentOptions = computed(() => {
 		})
 	}
 
-	const venmoMethods = tremendousMethods.filter((m) => m.name.toLowerCase().includes('venmo'))
+	const venmoMethods = tremendousMethods.filter((m) => m.category === 'venmo')
 	if (venmoMethods.length > 0) {
 		options.push({
 			value: 'venmo',
@@ -200,14 +203,36 @@ const paymentOptions = computed(() => {
 		})
 	}
 
-	const giftCardMethods = tremendousMethods.filter(
-		(m) => !m.name.toLowerCase().includes('paypal') && !m.name.toLowerCase().includes('venmo'),
-	)
-	if (giftCardMethods.length > 0) {
+	const visaMethods = tremendousMethods.filter((m) => m.category === 'visa_card')
+	if (visaMethods.length > 0) {
 		options.push({
-			value: 'gift_cards',
+			value: 'visa_card',
+			label: 'Virtual Visa',
+			icon: VisaIcon,
+			methodId: visaMethods[0].id,
+			type: 'tremendous',
+		})
+	}
+
+	const merchantMethods = tremendousMethods.filter(
+		(m) => m.category === 'merchant_card' || m.category === 'merchant_cards',
+	)
+	if (merchantMethods.length > 0) {
+		options.push({
+			value: 'merchant_card',
 			label: 'Gift card',
 			icon: GiftIcon,
+			methodId: undefined,
+			type: 'tremendous',
+		})
+	}
+
+	const charityMethods = tremendousMethods.filter((m) => m.category === 'charity')
+	if (charityMethods.length > 0) {
+		options.push({
+			value: 'charity',
+			label: 'Charity',
+			icon: HeartIcon,
 			methodId: undefined,
 			type: 'tremendous',
 		})
@@ -254,8 +279,10 @@ const paymentOptions = computed(() => {
 		fiat: 1,
 		paypal: 2,
 		venmo: 3,
-		crypto: 4,
-		gift_cards: 5,
+		visa_card: 4,
+		merchant_card: 5,
+		charity: 6,
+		crypto: 7,
 	}
 	options.sort((a, b) => {
 		const aOrder = sortOrder[a.type] ?? sortOrder[a.value] ?? 999
@@ -285,11 +312,13 @@ function handleMethodSelection(option: {
 }
 
 watch(paymentOptions, (newOptions) => {
-	const currentMethod = withdrawContext.withdrawData.value.selectedMethod
-	if (currentMethod && !newOptions.find((o) => o.value === currentMethod)) {
-		withdrawContext.withdrawData.value.selectedMethod = null
-		withdrawContext.withdrawData.value.selectedMethodId = null
-		withdrawContext.withdrawData.value.selectedProvider = null
+	withdrawContext.withdrawData.value.selectedMethod = null
+	withdrawContext.withdrawData.value.selectedMethodId = null
+	withdrawContext.withdrawData.value.selectedProvider = null
+
+	if (newOptions.length === 1) {
+		const option = newOptions[0]
+		handleMethodSelection(option)
 	}
 })
 

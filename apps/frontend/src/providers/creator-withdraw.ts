@@ -25,6 +25,7 @@ export interface WithdrawData {
 	selectedMethodId: string | null
 	amount: number
 	skippedTaxForm: boolean
+	deliveryEmail?: string | null
 	giftCardDetails?: any
 	kycData?: any
 	accountDetails?: any
@@ -165,14 +166,22 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 					withdrawData.value.selectedCountry &&
 					withdrawData.value.selectedProvider &&
 					withdrawData.value.selectedMethod &&
-					(withdrawData.value.selectedMethod === 'gift_cards' ||
+					(withdrawData.value.selectedMethod === 'merchant_card' ||
+						withdrawData.value.selectedMethod === 'charity' ||
 						withdrawData.value.selectedMethodId)
 				)
 			case 'tremendous-details':
-				if (withdrawData.value.selectedMethod === 'gift_cards') {
-					return !!(withdrawData.value.selectedMethodId && withdrawData.value.amount > 0)
+				const method = withdrawData.value.selectedMethod
+				// For gift card categories (merchant, charity), we need a specific method ID
+				if (method === 'merchant_card' || method === 'charity') {
+					return !!(
+						withdrawData.value.selectedMethodId &&
+						withdrawData.value.amount > 0 &&
+						withdrawData.value.deliveryEmail
+					)
 				}
-				return !!(withdrawData.value.amount > 0) // for paypal/venmo, only need amount
+				// For paypal/venmo/visa, we just need amount and email
+				return !!(withdrawData.value.amount > 0 && withdrawData.value.deliveryEmail)
 			case 'muralpay-kyc': {
 				if (!withdrawData.value.kycData) return false
 

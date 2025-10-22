@@ -1,30 +1,60 @@
 <template>
 	<div class="flex flex-col gap-6">
+		<Transition
+			enter-active-class="transition-all duration-300 ease-out"
+			enter-from-class="opacity-0 max-h-0"
+			enter-to-class="opacity-100 max-h-40"
+			leave-active-class="transition-all duration-200 ease-in"
+			leave-from-class="opacity-100 max-h-40"
+			leave-to-class="opacity-0 max-h-0"
+		>
+			<div v-if="isUnverifiedEmail" class="overflow-hidden">
+				<Admonition type="warning" :header="formatMessage(messages.unverifiedEmailHeader)">
+					{{ formatMessage(messages.unverifiedEmailMessage) }}
+				</Admonition>
+			</div>
+		</Transition>
+
 		<div class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast"
 					>{{ formatMessage(messages.email) }} <span class="text-red">*</span></span
 				>
 			</label>
-			<div class="rounded-[14px] bg-surface-2 px-4 py-2.5">
-				<span class="text-primary">{{ userEmail }}</span>
-			</div>
+			<input
+				v-model="deliveryEmail"
+				type="email"
+				:placeholder="formatMessage(messages.emailPlaceholder)"
+				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+			/>
 		</div>
 
 		<div v-if="showGiftCardSelector" class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast"
-					>{{ formatMessage(messages.reward) }} <span class="text-red">*</span></span
+					>{{ categoryLabel }} <span class="text-red">*</span></span
 				>
 			</label>
 			<Combobox
 				v-model="selectedGiftCardId"
 				:options="rewardOptions"
-				:placeholder="formatMessage(messages.rewardPlaceholder)"
+				:placeholder="`Select ${categoryLabel.toLowerCase()}`"
 				searchable
-				search-placeholder="Search rewards..."
+				:search-placeholder="`Search ${categoryLabelPlural.toLowerCase()}...`"
 				class="h-10"
 			>
+				<template #selected>
+					<div v-if="selectedRewardOption" class="flex items-center gap-2">
+						<img
+							v-if="selectedRewardOption.imageUrl"
+							:src="selectedRewardOption.imageUrl"
+							:alt="selectedRewardOption.label"
+							class="size-5 rounded-full object-cover"
+							loading="lazy"
+						/>
+						<span class="font-semibold leading-tight">{{ selectedRewardOption.label }}</span>
+					</div>
+				</template>
 				<template v-for="option in rewardOptions" :key="option.value" #[`option-${option.value}`]>
 					<div class="flex items-center gap-2">
 						<img
@@ -102,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, Checkbox, Chips, Combobox, useDebugLogger } from '@modrinth/ui'
+import { Admonition, ButtonStyled, Checkbox, Chips, Combobox, useDebugLogger } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useDebounceFn } from '@vueuse/core'
@@ -121,8 +151,46 @@ const userEmail = computed(() => {
 	return (auth.value.user as any)?.email || ''
 })
 
+const deliveryEmail = ref<string>(
+	withdrawContext.withdrawData.value.deliveryEmail || userEmail.value || '',
+)
+
 const showGiftCardSelector = computed(() => {
-	return withdrawContext.withdrawData.value.selectedMethod === 'gift_cards'
+	const method = withdrawContext.withdrawData.value.selectedMethod
+	return method === 'merchant_card' || method === 'charity'
+})
+
+const categoryLabel = computed(() => {
+	const method = withdrawContext.withdrawData.value.selectedMethod
+	switch (method) {
+		case 'visa_card':
+			return 'Virtual Visa'
+		case 'merchant_card':
+			return 'Gift card'
+		case 'charity':
+			return 'Charity'
+		default:
+			return 'Reward'
+	}
+})
+
+const categoryLabelPlural = computed(() => {
+	const method = withdrawContext.withdrawData.value.selectedMethod
+	switch (method) {
+		case 'visa_card':
+			return 'Virtual Visas'
+		case 'merchant_card':
+			return 'Gift cards'
+		case 'charity':
+			return 'Charities'
+		default:
+			return 'Rewards'
+	}
+})
+
+const isUnverifiedEmail = computed(() => {
+	if (!deliveryEmail.value || !userEmail.value) return false
+	return deliveryEmail.value.toLowerCase() !== userEmail.value.toLowerCase()
 })
 
 const maxAmount = computed(() => withdrawContext.maxWithdrawAmount.value)
@@ -156,6 +224,11 @@ const rewardOptions = ref<
 		}
 	}>
 >([])
+
+const selectedRewardOption = computed(() => {
+	if (!selectedGiftCardId.value) return null
+	return rewardOptions.value.find((opt) => opt.value === selectedGiftCardId.value) || null
+})
 
 const selectedMethodDetails = computed(() => {
 	if (!selectedGiftCardId.value) return null
@@ -267,6 +340,10 @@ watch(
 	},
 )
 
+watch(deliveryEmail, (newEmail) => {
+	withdrawContext.withdrawData.value.deliveryEmail = newEmail
+})
+
 watch(
 	[() => formData.value.amount, selectedGiftCardId],
 	() => {
@@ -298,6 +375,7 @@ onMounted(async () => {
 			id: string
 			type: string
 			name: string
+			category?: string
 			image_url: string | null
 			image_logo_url: string | null
 			interval?: {
@@ -311,11 +389,11 @@ onMounted(async () => {
 			}
 		}>
 
+		const selectedMethod = withdrawContext.withdrawData.value.selectedMethod
+
 		rewardOptions.value = methods
 			.filter((m) => m.type === 'tremendous')
-			.filter(
-				(m) => !m.name.toLowerCase().includes('paypal') && !m.name.toLowerCase().includes('venmo'),
-			)
+			.filter((m) => m.category === selectedMethod)
 			.map((m) => ({
 				value: m.id,
 				label: m.name,
@@ -355,6 +433,19 @@ const messages = defineMessages({
 	email: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.email',
 		defaultMessage: 'Email',
+	},
+	emailPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.email-placeholder',
+		defaultMessage: 'Enter email address',
+	},
+	unverifiedEmailHeader: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header',
+		defaultMessage: 'Unverified email',
+	},
+	unverifiedEmailMessage: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message',
+		defaultMessage:
+			'The delivery email you have entered is not associated with your Modrinth account. Modrinth cannot recover rewards sent to an incorrect email address.',
 	},
 	reward: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.reward',

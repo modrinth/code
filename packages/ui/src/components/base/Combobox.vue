@@ -30,8 +30,8 @@
 				<slot name="suffix"></slot>
 				<ChevronLeftIcon
 					v-if="showChevron"
-					class="size-5 shrink-0 transition-transform duration-200"
-					:class="isOpen ? (openDirection === 'down' ? '-rotate-90' : 'rotate-90') : 'rotate-90'"
+					class="size-5 shrink-0 transition-transform duration-300"
+					:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
 				/>
 			</div>
 		</span>
@@ -40,7 +40,7 @@
 			<div
 				v-if="isOpen"
 				ref="dropdownRef"
-				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 !border-solid border-0"
+				class="fixed z-[9999] flex flex-col overflow-hidden rounded-[14px] bg-surface-4 !border-solid border-0 shadow-2xl"
 				:class="[
 					shouldRoundBottomCorners
 						? 'rounded-t-none !border-t-[1px] !border-t-surface-5'
