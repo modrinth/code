@@ -431,7 +431,7 @@ mod query {
 #[utoipa::path(
     responses((status = OK, body = inline(FetchResponse))),
 )]
-#[post("/")]
+#[post("")]
 pub async fn fetch_analytics(
     http_req: HttpRequest,
     req: web::Json<GetRequest>,
