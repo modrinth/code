@@ -251,7 +251,9 @@ pub struct FiatPayoutDetails {
     pub fiat_payout_status: FiatPayoutStatus,
     pub fiat_amount: FiatAmount,
     pub transaction_fee: TokenAmount,
+    #[serde(with = "rust_decimal::serde::float")]
     pub exchange_fee_percentage: Decimal,
+    #[serde(with = "rust_decimal::serde::float")]
     pub exchange_rate: Decimal,
     pub fee_total: TokenAmount,
     pub developer_fee: Option<DeveloperFee>,
@@ -297,6 +299,7 @@ pub enum FiatPayoutErrorCode {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeveloperFee {
+    #[serde(with = "rust_decimal::serde::float_option")]
     pub developer_fee_percentage: Option<Decimal>,
 }
 
@@ -679,7 +682,9 @@ pub struct TokenFeeRequest {
 pub enum TokenPayoutFee {
     #[serde(rename_all = "camelCase")]
     Success {
+        #[serde(with = "rust_decimal::serde::float")]
         exchange_rate: Decimal,
+        #[serde(with = "rust_decimal::serde::float")]
         exchange_fee_percentage: Decimal,
         fiat_and_rail_code: FiatAndRailCode,
         transaction_fee: TokenAmount,
@@ -699,6 +704,7 @@ pub enum TokenPayoutFee {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FiatFeeRequest {
+    #[serde(with = "rust_decimal::serde::float")]
     pub fiat_amount: Decimal,
     pub token_symbol: String,
     pub fiat_and_rail_code: FiatAndRailCode,
@@ -711,7 +717,9 @@ pub enum FiatPayoutFee {
     Success {
         token_symbol: String,
         fiat_amount: FiatAmount,
+        #[serde(with = "rust_decimal::serde::float")]
         exchange_rate: Decimal,
+        #[serde(with = "rust_decimal::serde::float")]
         exchange_fee_percentage: Decimal,
         fiat_and_rail_code: FiatAndRailCode,
         transaction_fee: TokenAmount,

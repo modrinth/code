@@ -19,7 +19,7 @@ derive_more = { workspace = true, features = [
 ] }
 foldhash = { workspace = true }
 reqwest = { workspace = true, features = ["default-tls", "http2", "json"] }
-rust_decimal = { workspace = true, features = ["macros", "serde-float"] }
+rust_decimal = { workspace = true, features = ["macros"] }
 rust_iso3166 = { workspace = true }
 secrecy = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

@@ -117,6 +117,7 @@ pub struct WalletDetails {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TokenAmount {
+    #[serde(with = "rust_decimal::serde::float")]
     pub token_amount: Decimal,
     pub token_symbol: String,
 }
@@ -124,6 +125,7 @@ pub struct TokenAmount {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FiatAmount {
+    #[serde(with = "rust_decimal::serde::float")]
     pub fiat_amount: Decimal,
     pub fiat_currency_code: CurrencyCode,
 }

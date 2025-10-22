@@ -131,8 +131,10 @@ pub struct DestinationToken {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Fees {
+    #[serde(with = "rust_decimal::serde::float")]
     pub variable_fee_percentage: Decimal,
     pub fixed_transaction_fee: Option<FiatAmount>,
+    #[serde(with = "rust_decimal::serde::float_option")]
     pub developer_fee_percentage: Option<Decimal>,
 }
 
