@@ -635,47 +635,8 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Net amount"
   },
-  "dashboard.creator-withdraw-modal.kyc.address-2-placeholder": {
-    "message": "Apartment, suite, etc."
-  },
-  "dashboard.creator-withdraw-modal.kyc.address-line": {
-    "message": "Address line"
-  },
-  "dashboard.creator-withdraw-modal.kyc.address-line-2": {
-    "message": "Address line 2 (optional)"
-  },
-  "dashboard.creator-withdraw-modal.kyc.address-placeholder": {
-    "message": "Enter address"
-  },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Business entity"
-  },
-  "dashboard.creator-withdraw-modal.kyc.business-name": {
-    "message": "Business name"
-  },
-  "dashboard.creator-withdraw-modal.kyc.business-name-placeholder": {
-    "message": "Enter business name"
-  },
-  "dashboard.creator-withdraw-modal.kyc.city": {
-    "message": "City"
-  },
-  "dashboard.creator-withdraw-modal.kyc.city-placeholder": {
-    "message": "Enter city"
-  },
-  "dashboard.creator-withdraw-modal.kyc.country": {
-    "message": "Country"
-  },
-  "dashboard.creator-withdraw-modal.kyc.country-placeholder": {
-    "message": "Select country"
-  },
-  "dashboard.creator-withdraw-modal.kyc.date-of-birth": {
-    "message": "Date of birth"
-  },
-  "dashboard.creator-withdraw-modal.kyc.email": {
-    "message": "Email"
-  },
-  "dashboard.creator-withdraw-modal.kyc.email-placeholder": {
-    "message": "Enter email address"
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "A business entity refers to a registered organization such as a corporation, partnership, or LLC."
@@ -683,38 +644,11 @@
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
     "message": "Are you a withdrawing as an individual or business?"
   },
-  "dashboard.creator-withdraw-modal.kyc.first-name": {
-    "message": "First name"
-  },
-  "dashboard.creator-withdraw-modal.kyc.first-name-placeholder": {
-    "message": "Enter first name"
-  },
-  "dashboard.creator-withdraw-modal.kyc.last-name": {
-    "message": "Last name"
-  },
-  "dashboard.creator-withdraw-modal.kyc.last-name-placeholder": {
-    "message": "Enter last name"
-  },
-  "dashboard.creator-withdraw-modal.kyc.postal-code": {
-    "message": "Postal code"
-  },
-  "dashboard.creator-withdraw-modal.kyc.postal-code-placeholder": {
-    "message": "Enter postal code"
-  },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Private individual"
   },
-  "dashboard.creator-withdraw-modal.kyc.state-placeholder": {
-    "message": "Enter state/province"
-  },
-  "dashboard.creator-withdraw-modal.kyc.state-province": {
-    "message": "State/province"
-  },
   "dashboard.creator-withdraw-modal.method-selection.bank-transfer-fallback": {
     "message": "Bank transfer ({code})"
-  },
-  "dashboard.creator-withdraw-modal.method-selection.charity": {
-    "message": "Charity"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Select your country"
@@ -728,12 +662,6 @@
   "dashboard.creator-withdraw-modal.method-selection.error-title": {
     "message": "Failed to load payment methods"
   },
-  "dashboard.creator-withdraw-modal.method-selection.gift-card": {
-    "message": "Gift card"
-  },
-  "dashboard.creator-withdraw-modal.method-selection.paypal": {
-    "message": "PayPal"
-  },
   "dashboard.creator-withdraw-modal.method-selection.region": {
     "message": "Region"
   },
@@ -746,29 +674,8 @@
   "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
     "message": "Your withdraw limit is <b>{amount}</b>, <tax-link>complete a tax form</tax-link> to withdraw more."
   },
-  "dashboard.creator-withdraw-modal.method-selection.venmo": {
-    "message": "Venmo"
-  },
-  "dashboard.creator-withdraw-modal.method-selection.virtual-visa": {
-    "message": "Virtual Visa"
-  },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Account owner"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.amount": {
-    "message": "Amount"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.amount-placeholder": {
-    "message": "Enter amount"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.available": {
-    "message": "available."
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.bank-name": {
-    "message": "Bank name"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.bank-name-placeholder": {
-    "message": "Enter bank name"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Coin"
@@ -806,14 +713,8 @@
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
     "message": "Enter tax ID number"
   },
-  "dashboard.creator-withdraw-modal.muralpay-details.max-button": {
-    "message": "Max"
-  },
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "Network"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.terms-agreement": {
-    "message": "I agree to the <terms-link>Rewards Program Terms</terms-link>"
   },
   "dashboard.creator-withdraw-modal.nearing-threshold": {
     "message": "You're nearing the withdraw threshold. You can withdraw <b>{amountRemaining}</b> now, but a tax form is required for more."
@@ -845,36 +746,6 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Tax form required"
   },
-  "dashboard.creator-withdraw-modal.tremendous-details.amount": {
-    "message": "Amount"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.amount-placeholder": {
-    "message": "Enter amount"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.available": {
-    "message": "available."
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.charity": {
-    "message": "Charity"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.charity-plural": {
-    "message": "Charities"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.email": {
-    "message": "Email"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.email-placeholder": {
-    "message": "Enter email address"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.gift-card": {
-    "message": "Gift card"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.gift-card-plural": {
-    "message": "Gift cards"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.max-button": {
-    "message": "Max"
-  },
   "dashboard.creator-withdraw-modal.tremendous-details.reward": {
     "message": "Reward"
   },
@@ -884,20 +755,11 @@
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Rewards"
   },
-  "dashboard.creator-withdraw-modal.tremendous-details.terms-agreement": {
-    "message": "I agree to the <terms-link>Rewards Program Terms</terms-link>"
-  },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Unverified email"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
     "message": "The delivery email you have entered is not associated with your Modrinth account. Modrinth cannot recover rewards sent to an incorrect email address."
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.virtual-visa": {
-    "message": "Virtual Visa"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.virtual-visa-plural": {
-    "message": "Virtual Visas"
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Withdraw"

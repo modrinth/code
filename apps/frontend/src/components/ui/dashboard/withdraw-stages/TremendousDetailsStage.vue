@@ -111,7 +111,9 @@
 					</ButtonStyled>
 				</div>
 				<span class="text-secondary">
-					{{ formatMessage(financialMessages.available, { amount: formatMoney(roundedMaxAmount) }) }}
+					{{
+						formatMessage(financialMessages.available, { amount: formatMoney(roundedMaxAmount) })
+					}}
 				</span>
 			</div>
 

@@ -196,7 +196,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 						withdrawData.value.selectedMethod === 'charity' ||
 						withdrawData.value.selectedMethodId)
 				)
-			case 'tremendous-details':
+			case 'tremendous-details': {
 				const method = withdrawData.value.selectedMethod
 				// For gift card categories (merchant, charity), we need a specific method ID
 				if (method === 'merchant_card' || method === 'charity') {
@@ -208,6 +208,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				}
 				// For paypal/venmo/visa, we just need amount and email
 				return !!(withdrawData.value.amount > 0 && withdrawData.value.deliveryEmail)
+			}
 			case 'muralpay-kyc': {
 				if (!withdrawData.value.kycData) return false
 
