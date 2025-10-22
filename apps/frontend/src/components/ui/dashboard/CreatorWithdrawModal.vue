@@ -8,12 +8,12 @@
 			<div v-if="shouldShowTitle" class="flex items-center gap-1 text-secondary">
 				<template v-if="withdrawContext.currentStage.value === 'tax-form'">
 					<span class="text-xl font-bold text-contrast">{{
-						formatMessage(stageLabels['tax-form'])
+						formatMessage(messages.taxFormStage)
 					}}</span>
 				</template>
 				<template v-else-if="withdrawContext.currentStage.value === 'method-selection'">
 					<span class="text-xl font-bold text-contrast">{{
-						formatMessage(stageLabels['method-selection'])
+						formatMessage(messages.methodSelectionStage)
 					}}</span>
 					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
 					<span class="text-xl text-secondary">{{ formatMessage(messages.detailsLabel) }}</span>
@@ -23,7 +23,7 @@
 						class="active:scale-9 bg-transparent p-0 text-xl text-secondary transition-colors duration-200 hover:text-primary"
 						@click="goToBreadcrumbStage('method-selection')"
 					>
-						{{ formatMessage(stageLabels['method-selection']) }}
+						{{ formatMessage(messages.methodSelectionStage) }}
 					</button>
 					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
 					<span class="text-xl font-bold text-contrast">{{
@@ -153,7 +153,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, NewModal, useScrollIndicator } from '@modrinth/ui'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
 import {
@@ -216,15 +216,6 @@ function continueWithLimit() {
 	withdrawContext.withdrawData.value.skippedTaxForm = true
 	withdrawContext.setStage(withdrawContext.nextStep.value)
 }
-
-const stageLabels = computed<Record<WithdrawStage, MessageDescriptor>>(() => ({
-	'tax-form': messages.taxFormStage,
-	'method-selection': messages.methodSelectionStage,
-	'tremendous-details': messages.tremendousDetailsStage,
-	'muralpay-kyc': messages.muralpayKycStage,
-	'muralpay-details': messages.muralpayDetailsStage,
-	completion: messages.completionStage,
-}))
 
 const shouldShowTitle = computed(() => {
 	return withdrawContext.currentStage.value !== 'completion'

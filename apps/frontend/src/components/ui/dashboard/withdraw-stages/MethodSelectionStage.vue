@@ -83,7 +83,7 @@ import { useGeolocation } from '@vueuse/core'
 import { all } from 'iso-3166-1'
 
 import { useUserCountry } from '@/composables/country.ts'
-import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { getBlockchainIcon } from '@/utils/finance-icons'
 import { getRailConfig } from '@/utils/muralpay-rails'
 import { normalizeChildren } from '@/utils/vue-children.ts'
@@ -102,31 +102,6 @@ defineProps<{
 const emit = defineEmits<{
 	(e: 'close-modal'): void
 }>()
-
-interface PayoutMethod {
-	id: string
-	type: string // Backend sends "type", not "type_"
-	name: string
-	category?: string
-	supported_countries: string[]
-	image_url: string | null
-	image_logo_url: string | null
-	fee: {
-		percentage: number
-		min: number
-		max: number | null
-	}
-	interval: {
-		standard: {
-			min: number
-			max: number
-		}
-	}
-	config?: {
-		fiat?: string | null
-		blockchain?: string[]
-	}
-}
 
 const countries = computed(() =>
 	all().map((x) => ({
@@ -147,7 +122,6 @@ const shouldShowTaxLimitWarning = computed(() => {
 	return formIncomplete && wouldHitLimit
 })
 
-const availableMethods = ref<PayoutMethod[]>([])
 const loading = ref(false)
 
 watch(
@@ -155,7 +129,7 @@ watch(
 	async (country) => {
 		console.debug('[MethodSelectionStage] Watch triggered, country:', country)
 		if (!country) {
-			availableMethods.value = []
+			withdrawContext.availableMethods.value = []
 			return
 		}
 
@@ -168,7 +142,7 @@ watch(
 				query: { country: country.id },
 			})) as PayoutMethod[]
 			console.debug('[MethodSelectionStage] Received payout methods:', methods)
-			availableMethods.value = methods
+			withdrawContext.availableMethods.value = methods
 		} catch (e) {
 			console.error('[MethodSelectionStage] Failed to fetch payout methods:', e)
 			addNotification({
@@ -185,7 +159,7 @@ watch(
 )
 
 const paymentOptions = computed(() => {
-	const methods = availableMethods.value
+	const methods = withdrawContext.availableMethods.value
 	if (!methods || methods.length === 0) {
 		debug('No payment methods available')
 		return []

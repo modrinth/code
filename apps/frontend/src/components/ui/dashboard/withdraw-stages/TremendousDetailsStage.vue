@@ -169,13 +169,13 @@ const categoryLabel = computed(() => {
 	const method = withdrawContext.withdrawData.value.selectedMethod
 	switch (method) {
 		case 'visa_card':
-			return 'Virtual Visa'
+			return formatMessage(messages.virtualVisa)
 		case 'merchant_card':
-			return 'Gift card'
+			return formatMessage(messages.giftCard)
 		case 'charity':
-			return 'Charity'
+			return formatMessage(messages.charity)
 		default:
-			return 'Reward'
+			return formatMessage(messages.reward)
 	}
 })
 
@@ -183,13 +183,13 @@ const categoryLabelPlural = computed(() => {
 	const method = withdrawContext.withdrawData.value.selectedMethod
 	switch (method) {
 		case 'visa_card':
-			return 'Virtual Visas'
+			return formatMessage(messages.virtualVisaPlural)
 		case 'merchant_card':
-			return 'Gift cards'
+			return formatMessage(messages.giftCardPlural)
 		case 'charity':
-			return 'Charities'
+			return formatMessage(messages.charityPlural)
 		default:
-			return 'Rewards'
+			return formatMessage(messages.rewardPlural)
 	}
 })
 
@@ -366,55 +366,25 @@ watch(
 )
 
 onMounted(async () => {
-	const country = withdrawContext.withdrawData.value.selectedCountry
-	if (!country) return
+	const methods = withdrawContext.availableMethods.value
+	const selectedMethod = withdrawContext.withdrawData.value.selectedMethod
 
-	debug('Fetching payout methods for country:', country.id)
+	rewardOptions.value = methods
+		.filter((m) => m.type === 'tremendous')
+		.filter((m) => m.category === selectedMethod)
+		.map((m) => ({
+			value: m.id,
+			label: m.name,
+			imageUrl: m.image_url || m.image_logo_url || undefined,
+			methodDetails: {
+				id: m.id,
+				name: m.name,
+				interval: m.interval,
+			},
+		}))
 
-	try {
-		// todo: when we do @modrinth/api deduplicate types across all these stages.
-		const methods = (await useBaseFetch('payout/methods', {
-			apiVersion: 3,
-			query: { country: country.id },
-		})) as Array<{
-			id: string
-			type: string
-			name: string
-			category?: string
-			image_url: string | null
-			image_logo_url: string | null
-			interval?: {
-				fixed?: {
-					values: number[]
-				}
-				standard?: {
-					min: number
-					max: number
-				}
-			}
-		}>
-
-		const selectedMethod = withdrawContext.withdrawData.value.selectedMethod
-
-		rewardOptions.value = methods
-			.filter((m) => m.type === 'tremendous')
-			.filter((m) => m.category === selectedMethod)
-			.map((m) => ({
-				value: m.id,
-				label: m.name,
-				imageUrl: m.image_url || m.image_logo_url || undefined,
-				methodDetails: {
-					id: m.id,
-					name: m.name,
-					interval: m.interval,
-				},
-			}))
-
-		debug('Loaded reward options:', rewardOptions.value.length, 'methods')
-		debug('Sample method with interval:', rewardOptions.value[0]?.methodDetails)
-	} catch (error) {
-		console.error('Failed to fetch gift card options:', error)
-	}
+	debug('Loaded reward options:', rewardOptions.value.length, 'methods')
+	debug('Sample method with interval:', rewardOptions.value[0]?.methodDetails)
 
 	if (formData.value.amount) {
 		calculateFees()
@@ -479,6 +449,34 @@ const messages = defineMessages({
 	termsAgreement: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.terms-agreement',
 		defaultMessage: 'I agree to the <terms-link>Rewards Program Terms</terms-link>',
+	},
+	virtualVisa: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.virtual-visa',
+		defaultMessage: 'Virtual Visa',
+	},
+	virtualVisaPlural: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.virtual-visa-plural',
+		defaultMessage: 'Virtual Visas',
+	},
+	giftCard: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.gift-card',
+		defaultMessage: 'Gift card',
+	},
+	giftCardPlural: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.gift-card-plural',
+		defaultMessage: 'Gift cards',
+	},
+	charity: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.charity',
+		defaultMessage: 'Charity',
+	},
+	charityPlural: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.charity-plural',
+		defaultMessage: 'Charities',
+	},
+	rewardPlural: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.reward-plural',
+		defaultMessage: 'Rewards',
 	},
 })
 </script>

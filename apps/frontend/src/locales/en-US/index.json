@@ -854,11 +854,23 @@
   "dashboard.creator-withdraw-modal.tremendous-details.available": {
     "message": "available."
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.charity": {
+    "message": "Charity"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.charity-plural": {
+    "message": "Charities"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.email": {
     "message": "Email"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.email-placeholder": {
     "message": "Enter email address"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.gift-card": {
+    "message": "Gift card"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.gift-card-plural": {
+    "message": "Gift cards"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.max-button": {
     "message": "Max"
@@ -869,6 +881,9 @@
   "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
     "message": "Select reward"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Rewards"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.terms-agreement": {
     "message": "I agree to the <terms-link>Rewards Program Terms</terms-link>"
   },
@@ -877,6 +892,12 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
     "message": "The delivery email you have entered is not associated with your Modrinth account. Modrinth cannot recover rewards sent to an incorrect email address."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.virtual-visa": {
+    "message": "Virtual Visa"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.virtual-visa-plural": {
+    "message": "Virtual Visas"
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Withdraw"

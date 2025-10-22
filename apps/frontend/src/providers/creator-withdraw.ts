@@ -18,6 +18,30 @@ export type PaymentProvider = 'tremendous' | 'muralpay'
  **/
 export type PaymentMethod = 'gift_card' | 'paypal' | 'venmo' | 'bank' | 'crypto'
 
+export interface PayoutMethod {
+	id: string
+	type: string
+	name: string
+	category?: string
+	image_url: string | null
+	image_logo_url: string | null
+	fee: {
+		percentage: number
+		min: number
+		max: number | null
+	}
+	interval: {
+		standard: {
+			min: number
+			max: number
+		}
+	}
+	config?: {
+		fiat?: string | null
+		blockchain?: string[]
+	}
+}
+
 export interface WithdrawData {
 	selectedCountry: { id: string; name: string } | null
 	selectedProvider: PaymentProvider | null
@@ -43,6 +67,7 @@ export interface WithdrawContextValue {
 	withdrawData: Ref<WithdrawData>
 	balance: Ref<any>
 	maxWithdrawAmount: ComputedRef<number>
+	availableMethods: Ref<PayoutMethod[]>
 
 	setStage: (stage: WithdrawStage | undefined, skipValidation?: boolean) => Promise<void>
 	validateCurrentStage: () => boolean
@@ -70,6 +95,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 	})
 
 	const balanceRef = ref(balance)
+	const availableMethods = ref<PayoutMethod[]>([])
 
 	const stages = computed<WithdrawStage[]>(() => {
 		const dynamicStages: WithdrawStage[] = []
@@ -271,6 +297,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 		withdrawData,
 		balance: balanceRef,
 		maxWithdrawAmount,
+		availableMethods,
 		setStage,
 		validateCurrentStage,
 		resetData,

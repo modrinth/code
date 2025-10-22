@@ -225,10 +225,10 @@ const { formatMessage } = useVIntl()
 
 await useAuth()
 
-// TODO: Deduplicate in @modrinth/api-client PR.
+// TODO: Deduplicate these types & interfaces in @modrinth/api-client PR.
 type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'
 
-interface UserBalanceResponse {
+type UserBalanceResponse = {
 	available: number
 	withdrawn_lifetime: number
 	withdrawn_ytd: number
