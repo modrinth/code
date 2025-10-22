@@ -45,14 +45,14 @@
 		<div v-if="selectedRail?.requiresBankName" class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
-					{{ formatMessage(messages.bankName) }}
+					{{ formatMessage(formFieldLabels.bankName) }}
 					<span class="text-red">*</span>
 				</span>
 			</label>
 			<input
 				v-model="formData.bankName"
 				type="text"
-				:placeholder="formatMessage(messages.bankNamePlaceholder)"
+				:placeholder="formatMessage(formFieldPlaceholders.bankNamePlaceholder)"
 				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
 			/>
 		</div>
@@ -144,7 +144,7 @@
 		<div class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
-					{{ formatMessage(messages.amount) }}
+					{{ formatMessage(formFieldLabels.amount) }}
 					<span class="text-red">*</span>
 				</span>
 			</label>
@@ -156,19 +156,19 @@
 						step="0.01"
 						min="0.01"
 						:max="roundedMaxAmount"
-						:placeholder="formatMessage(messages.amountPlaceholder)"
+						:placeholder="formatMessage(formFieldPlaceholders.amountPlaceholder)"
 						class="bg-raised w-full rounded-[14px] py-2.5 pl-8 pr-4 text-contrast placeholder:text-secondary"
 						@input="enforceDecimalPlaces"
 					/>
 				</div>
 				<ButtonStyled>
 					<button class="px-4 py-2" @click="setMaxAmount">
-						{{ formatMessage(messages.maxButton) }}
+						{{ formatMessage(commonMessages.maxButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
 			<span class="text-secondary">
-				{{ formatMoney(roundedMaxAmount) }} {{ formatMessage(messages.available) }}
+				{{ formatMessage(financialMessages.available, { amount: formatMoney(roundedMaxAmount) }) }}
 			</span>
 
 			<WithdrawFeeBreakdown
@@ -180,7 +180,7 @@
 			/>
 
 			<Checkbox v-model="agreedTerms" class="rewards-checkbox">
-				<IntlFormatted :message-id="messages.termsAgreement">
+				<IntlFormatted :message-id="financialMessages.rewardsProgramTermsAgreement">
 					<template #terms-link="{ children }">
 						<nuxt-link to="/legal/cmp" class="text-link">
 							<component :is="() => normalizeChildren(children)" />
@@ -193,7 +193,16 @@
 </template>
 
 <script setup lang="ts">
-import { Admonition, ButtonStyled, Checkbox, Combobox } from '@modrinth/ui'
+import {
+	Admonition,
+	ButtonStyled,
+	Checkbox,
+	Combobox,
+	commonMessages,
+	financialMessages,
+	formFieldLabels,
+	formFieldPlaceholders,
+} from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
@@ -462,30 +471,6 @@ const messages = defineMessages({
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.account-owner',
 		defaultMessage: 'Account owner',
 	},
-	bankName: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.bank-name',
-		defaultMessage: 'Bank name',
-	},
-	bankNamePlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.bank-name-placeholder',
-		defaultMessage: 'Enter bank name',
-	},
-	amount: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.amount',
-		defaultMessage: 'Amount',
-	},
-	amountPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.amount-placeholder',
-		defaultMessage: 'Enter amount',
-	},
-	maxButton: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.max-button',
-		defaultMessage: 'Max',
-	},
-	available: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.available',
-		defaultMessage: 'available.',
-	},
 	cryptoWarningHeader: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header',
 		defaultMessage: 'Confirm your wallet address',
@@ -537,10 +522,6 @@ const messages = defineMessages({
 	documentNumberTaxIdPlaceholder: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder',
 		defaultMessage: 'Enter tax ID number',
-	},
-	termsAgreement: {
-		id: 'dashboard.creator-withdraw-modal.muralpay-details.terms-agreement',
-		defaultMessage: 'I agree to the <terms-link>Rewards Program Terms</terms-link>',
 	},
 })
 </script>

@@ -18,13 +18,13 @@
 		<div class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast"
-					>{{ formatMessage(messages.email) }} <span class="text-red">*</span></span
+					>{{ formatMessage(formFieldLabels.email) }} <span class="text-red">*</span></span
 				>
 			</label>
 			<input
 				v-model="deliveryEmail"
 				type="email"
-				:placeholder="formatMessage(messages.emailPlaceholder)"
+				:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
 				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 			/>
 		</div>
@@ -73,7 +73,7 @@
 		<div class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast"
-					>{{ formatMessage(messages.amount) }} <span class="text-red">*</span></span
+					>{{ formatMessage(formFieldLabels.amount) }} <span class="text-red">*</span></span
 				>
 			</label>
 
@@ -99,19 +99,19 @@
 							step="0.01"
 							:min="selectedMethodDetails?.interval?.standard?.min || 0.01"
 							:max="roundedMaxAmount"
-							:placeholder="formatMessage(messages.amountPlaceholder)"
+							:placeholder="formatMessage(formFieldPlaceholders.amountPlaceholder)"
 							class="w-full rounded-[14px] bg-surface-4 py-2.5 pl-4 pr-4 text-contrast placeholder:text-secondary"
 							@input="enforceDecimalPlaces"
 						/>
 					</div>
 					<ButtonStyled>
 						<button class="px-4 py-2" @click="setMaxAmount">
-							{{ formatMessage(messages.maxButton) }}
+							{{ formatMessage(commonMessages.maxButton) }}
 						</button>
 					</ButtonStyled>
 				</div>
 				<span class="text-secondary">
-					{{ formatMoney(roundedMaxAmount) }} {{ formatMessage(messages.available) }}
+					{{ formatMessage(financialMessages.available, { amount: formatMoney(roundedMaxAmount) }) }}
 				</span>
 			</div>
 
@@ -122,20 +122,34 @@
 			/>
 
 			<Checkbox v-model="agreedTerms" class="rewards-checkbox">
-				<IntlFormatted :message-id="messages.termsAgreement">
-					<template #terms-link="{ children }">
-						<nuxt-link to="/legal/cmp" class="text-link">
-							<component :is="() => normalizeChildren(children)" />
-						</nuxt-link>
-					</template>
-				</IntlFormatted>
+				<p>
+					<IntlFormatted :message-id="financialMessages.rewardsProgramTermsAgreement">
+						<template #terms-link="{ children }">
+							<nuxt-link to="/legal/cmp" class="text-link">
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template>
+					</IntlFormatted>
+				</p>
 			</Checkbox>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Admonition, ButtonStyled, Checkbox, Chips, Combobox, useDebugLogger } from '@modrinth/ui'
+import {
+	Admonition,
+	ButtonStyled,
+	Checkbox,
+	Chips,
+	Combobox,
+	commonMessages,
+	financialMessages,
+	formFieldLabels,
+	formFieldPlaceholders,
+	paymentMethodMessages,
+	useDebugLogger,
+} from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
@@ -169,11 +183,11 @@ const categoryLabel = computed(() => {
 	const method = withdrawContext.withdrawData.value.selectedMethod
 	switch (method) {
 		case 'visa_card':
-			return formatMessage(messages.virtualVisa)
+			return formatMessage(paymentMethodMessages.virtualVisa)
 		case 'merchant_card':
-			return formatMessage(messages.giftCard)
+			return formatMessage(paymentMethodMessages.giftCard)
 		case 'charity':
-			return formatMessage(messages.charity)
+			return formatMessage(paymentMethodMessages.charity)
 		default:
 			return formatMessage(messages.reward)
 	}
@@ -183,11 +197,11 @@ const categoryLabelPlural = computed(() => {
 	const method = withdrawContext.withdrawData.value.selectedMethod
 	switch (method) {
 		case 'visa_card':
-			return formatMessage(messages.virtualVisaPlural)
+			return formatMessage(paymentMethodMessages.virtualVisaPlural)
 		case 'merchant_card':
-			return formatMessage(messages.giftCardPlural)
+			return formatMessage(paymentMethodMessages.giftCardPlural)
 		case 'charity':
-			return formatMessage(messages.charityPlural)
+			return formatMessage(paymentMethodMessages.charityPlural)
 		default:
 			return formatMessage(messages.rewardPlural)
 	}
@@ -405,14 +419,6 @@ watch(
 )
 
 const messages = defineMessages({
-	email: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.email',
-		defaultMessage: 'Email',
-	},
-	emailPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.email-placeholder',
-		defaultMessage: 'Enter email address',
-	},
 	unverifiedEmailHeader: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header',
 		defaultMessage: 'Unverified email',
@@ -429,50 +435,6 @@ const messages = defineMessages({
 	rewardPlaceholder: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder',
 		defaultMessage: 'Select reward',
-	},
-	amount: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.amount',
-		defaultMessage: 'Amount',
-	},
-	amountPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.amount-placeholder',
-		defaultMessage: 'Enter amount',
-	},
-	maxButton: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.max-button',
-		defaultMessage: 'Max',
-	},
-	available: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.available',
-		defaultMessage: 'available.',
-	},
-	termsAgreement: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.terms-agreement',
-		defaultMessage: 'I agree to the <terms-link>Rewards Program Terms</terms-link>',
-	},
-	virtualVisa: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.virtual-visa',
-		defaultMessage: 'Virtual Visa',
-	},
-	virtualVisaPlural: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.virtual-visa-plural',
-		defaultMessage: 'Virtual Visas',
-	},
-	giftCard: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.gift-card',
-		defaultMessage: 'Gift card',
-	},
-	giftCardPlural: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.gift-card-plural',
-		defaultMessage: 'Gift cards',
-	},
-	charity: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.charity',
-		defaultMessage: 'Charity',
-	},
-	charityPlural: {
-		id: 'dashboard.creator-withdraw-modal.tremendous-details.charity-plural',
-		defaultMessage: 'Charities',
 	},
 	rewardPlural: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.reward-plural',

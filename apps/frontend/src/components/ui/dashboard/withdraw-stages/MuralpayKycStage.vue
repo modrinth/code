@@ -28,14 +28,14 @@
 			<div v-if="entityType === 'business'" class="flex flex-col gap-2.5">
 				<label>
 					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.businessName) }}
+						{{ formatMessage(formFieldLabels.businessName) }}
 						<span class="text-red">*</span>
 					</span>
 				</label>
 				<input
 					v-model="formData.businessName"
 					type="text"
-					:placeholder="formatMessage(messages.businessNamePlaceholder)"
+					:placeholder="formatMessage(formFieldPlaceholders.businessNamePlaceholder)"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
 				/>
 			</div>
@@ -43,14 +43,14 @@
 			<div class="flex flex-col gap-2.5">
 				<label>
 					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.email) }}
+						{{ formatMessage(formFieldLabels.email) }}
 						<span class="text-red">*</span>
 					</span>
 				</label>
 				<input
 					v-model="formData.email"
 					type="email"
-					:placeholder="formatMessage(messages.emailPlaceholder)"
+					:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
 				/>
 			</div>
@@ -60,28 +60,28 @@
 					<div class="flex flex-1 flex-col gap-2.5">
 						<label>
 							<span class="text-md font-semibold text-contrast">
-								{{ formatMessage(messages.firstName) }}
+								{{ formatMessage(formFieldLabels.firstName) }}
 								<span class="text-red">*</span>
 							</span>
 						</label>
 						<input
 							v-model="formData.firstName"
 							type="text"
-							:placeholder="formatMessage(messages.firstNamePlaceholder)"
+							:placeholder="formatMessage(formFieldPlaceholders.firstNamePlaceholder)"
 							class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
 						/>
 					</div>
 					<div class="flex flex-1 flex-col gap-2.5">
 						<label>
 							<span class="text-md font-semibold text-contrast">
-								{{ formatMessage(messages.lastName) }}
+								{{ formatMessage(formFieldLabels.lastName) }}
 								<span class="text-red">*</span>
 							</span>
 						</label>
 						<input
 							v-model="formData.lastName"
 							type="text"
-							:placeholder="formatMessage(messages.lastNamePlaceholder)"
+							:placeholder="formatMessage(formFieldPlaceholders.lastNamePlaceholder)"
 							class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
 						/>
 					</div>
@@ -90,7 +90,7 @@
 				<div class="flex flex-col gap-2.5">
 					<label>
 						<span class="text-md font-semibold text-contrast">
-							{{ formatMessage(messages.dateOfBirth) }}
+							{{ formatMessage(formFieldLabels.dateOfBirth) }}
 							<span class="text-red">*</span>
 						</span>
 					</label>
@@ -106,14 +106,14 @@
 			<div class="flex flex-col gap-2.5">
 				<label>
 					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.addressLine) }}
+						{{ formatMessage(formFieldLabels.addressLine) }}
 						<span class="text-red">*</span>
 					</span>
 				</label>
 				<input
 					v-model="formData.physicalAddress.address1"
 					type="text"
-					:placeholder="formatMessage(messages.addressPlaceholder)"
+					:placeholder="formatMessage(formFieldPlaceholders.addressPlaceholder)"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
 				/>
 			</div>
@@ -121,13 +121,13 @@
 			<div class="flex flex-col gap-2.5">
 				<label>
 					<span class="text-md font-semibold text-contrast">
-						{{ formatMessage(messages.addressLine2) }}
+						{{ formatMessage(formFieldLabels.addressLine2) }}
 					</span>
 				</label>
 				<input
 					v-model="formData.physicalAddress.address2"
 					type="text"
-					:placeholder="formatMessage(messages.address2Placeholder)"
+					:placeholder="formatMessage(formFieldPlaceholders.address2Placeholder)"
 					class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
 				/>
 			</div>
@@ -136,28 +136,28 @@
 				<div class="flex flex-1 flex-col gap-2.5">
 					<label>
 						<span class="text-md font-semibold text-contrast">
-							{{ formatMessage(messages.city) }}
+							{{ formatMessage(formFieldLabels.city) }}
 							<span class="text-red">*</span>
 						</span>
 					</label>
 					<input
 						v-model="formData.physicalAddress.city"
 						type="text"
-						:placeholder="formatMessage(messages.cityPlaceholder)"
+						:placeholder="formatMessage(formFieldPlaceholders.cityPlaceholder)"
 						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
 					/>
 				</div>
 				<div class="flex flex-1 flex-col gap-2.5">
 					<label>
 						<span class="text-md font-semibold text-contrast">
-							{{ formatMessage(messages.stateProvince) }}
+							{{ formatMessage(formFieldLabels.stateProvince) }}
 							<span class="text-red">*</span>
 						</span>
 					</label>
 					<input
 						v-model="formData.physicalAddress.state"
 						type="text"
-						:placeholder="formatMessage(messages.statePlaceholder)"
+						:placeholder="formatMessage(formFieldPlaceholders.statePlaceholder)"
 						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
 					/>
 				</div>
@@ -167,28 +167,28 @@
 				<div class="flex flex-1 flex-col gap-2.5">
 					<label>
 						<span class="text-md font-semibold text-contrast">
-							{{ formatMessage(messages.postalCode) }}
+							{{ formatMessage(formFieldLabels.postalCode) }}
 							<span class="text-red">*</span>
 						</span>
 					</label>
 					<input
 						v-model="formData.physicalAddress.zip"
 						type="text"
-						:placeholder="formatMessage(messages.postalCodePlaceholder)"
+						:placeholder="formatMessage(formFieldPlaceholders.postalCodePlaceholder)"
 						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
 					/>
 				</div>
 				<div class="flex flex-1 flex-col gap-2.5">
 					<label>
 						<span class="text-md font-semibold text-contrast">
-							{{ formatMessage(messages.country) }}
+							{{ formatMessage(formFieldLabels.country) }}
 							<span class="text-red">*</span>
 						</span>
 					</label>
 					<Combobox
 						v-model="formData.physicalAddress.country"
 						:options="countryOptions"
-						:placeholder="formatMessage(messages.countryPlaceholder)"
+						:placeholder="formatMessage(formFieldPlaceholders.countryPlaceholder)"
 						searchable
 						search-placeholder="Search countries..."
 					/>
@@ -199,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { Chips, Combobox } from '@modrinth/ui'
+import { Chips, Combobox, formFieldLabels, formFieldPlaceholders } from '@modrinth/ui'
 import { useVIntl } from '@vintl/vintl'
 import { all } from 'iso-3166-1'
 
@@ -328,90 +328,6 @@ const messages = defineMessages({
 	businessEntity: {
 		id: 'dashboard.creator-withdraw-modal.kyc.business-entity',
 		defaultMessage: 'Business entity',
-	},
-	email: {
-		id: 'dashboard.creator-withdraw-modal.kyc.email',
-		defaultMessage: 'Email',
-	},
-	emailPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.kyc.email-placeholder',
-		defaultMessage: 'Enter email address',
-	},
-	firstName: {
-		id: 'dashboard.creator-withdraw-modal.kyc.first-name',
-		defaultMessage: 'First name',
-	},
-	firstNamePlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.kyc.first-name-placeholder',
-		defaultMessage: 'Enter first name',
-	},
-	lastName: {
-		id: 'dashboard.creator-withdraw-modal.kyc.last-name',
-		defaultMessage: 'Last name',
-	},
-	lastNamePlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.kyc.last-name-placeholder',
-		defaultMessage: 'Enter last name',
-	},
-	dateOfBirth: {
-		id: 'dashboard.creator-withdraw-modal.kyc.date-of-birth',
-		defaultMessage: 'Date of birth',
-	},
-	businessName: {
-		id: 'dashboard.creator-withdraw-modal.kyc.business-name',
-		defaultMessage: 'Business name',
-	},
-	businessNamePlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.kyc.business-name-placeholder',
-		defaultMessage: 'Enter business name',
-	},
-	addressLine: {
-		id: 'dashboard.creator-withdraw-modal.kyc.address-line',
-		defaultMessage: 'Address line',
-	},
-	addressPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.kyc.address-placeholder',
-		defaultMessage: 'Enter address',
-	},
-	addressLine2: {
-		id: 'dashboard.creator-withdraw-modal.kyc.address-line-2',
-		defaultMessage: 'Address line 2 (optional)',
-	},
-	address2Placeholder: {
-		id: 'dashboard.creator-withdraw-modal.kyc.address-2-placeholder',
-		defaultMessage: 'Apartment, suite, etc.',
-	},
-	city: {
-		id: 'dashboard.creator-withdraw-modal.kyc.city',
-		defaultMessage: 'City',
-	},
-	cityPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.kyc.city-placeholder',
-		defaultMessage: 'Enter city',
-	},
-	stateProvince: {
-		id: 'dashboard.creator-withdraw-modal.kyc.state-province',
-		defaultMessage: 'State/province',
-	},
-	statePlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.kyc.state-placeholder',
-		defaultMessage: 'Enter state/province',
-	},
-	postalCode: {
-		id: 'dashboard.creator-withdraw-modal.kyc.postal-code',
-		defaultMessage: 'Postal code',
-	},
-	postalCodePlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.kyc.postal-code-placeholder',
-		defaultMessage: 'Enter postal code',
-	},
-	country: {
-		id: 'dashboard.creator-withdraw-modal.kyc.country',
-		defaultMessage: 'Country',
-	},
-	countryPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.kyc.country-placeholder',
-		defaultMessage: 'Select country',
 	},
 })
 </script>

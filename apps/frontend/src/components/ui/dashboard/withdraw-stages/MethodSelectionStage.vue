@@ -21,7 +21,9 @@
 		</Admonition>
 		<div class="flex flex-col gap-2.5">
 			<div class="flex flex-row gap-1 align-middle">
-				<span class="align-middle font-semibold text-contrast">{{ formatMessage(messages.region) }}</span>
+				<span class="align-middle font-semibold text-contrast">{{
+					formatMessage(messages.region)
+				}}</span>
 				<UnknownIcon
 					v-tooltip="formatMessage(messages.regionTooltip)"
 					class="mt-auto size-5 text-secondary"
@@ -39,7 +41,9 @@
 			/>
 		</div>
 		<div class="flex flex-col gap-2.5">
-			<span class="align-middle font-semibold text-contrast">{{ formatMessage(messages.selectMethod) }}</span>
+			<span class="align-middle font-semibold text-contrast">{{
+				formatMessage(messages.selectMethod)
+			}}</span>
 			<ButtonStyled
 				v-for="method in paymentOptions"
 				:key="method.value"
@@ -74,6 +78,7 @@ import {
 	ButtonStyled,
 	Combobox,
 	injectNotificationManager,
+	paymentMethodMessages,
 	useDebugLogger,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
@@ -94,6 +99,46 @@ const userCountry = useUserCountry()
 const { coords } = useGeolocation()
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+
+const messages = defineMessages({
+	taxLimitWarning: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.tax-limit-warning',
+		defaultMessage:
+			'Your withdraw limit is <b>{amount}</b>, <tax-link>complete a tax form</tax-link> to withdraw more.',
+	},
+	region: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.region',
+		defaultMessage: 'Region',
+	},
+	regionTooltip: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.region-tooltip',
+		defaultMessage: 'Some payout methods are not available in certain regions.',
+	},
+	countryPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.country-placeholder',
+		defaultMessage: 'Select your country',
+	},
+	countrySearchPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.country-search-placeholder',
+		defaultMessage: 'Search countries...',
+	},
+	selectMethod: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.select-method',
+		defaultMessage: 'Select withdraw method',
+	},
+	errorTitle: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.error-title',
+		defaultMessage: 'Failed to load payment methods',
+	},
+	errorText: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.error-text',
+		defaultMessage: 'Unable to fetch available payment methods. Please try again later.',
+	},
+	bankTransferFallback: {
+		id: 'dashboard.creator-withdraw-modal.method-selection.bank-transfer-fallback',
+		defaultMessage: 'Bank transfer ({code})',
+	},
+})
 
 defineProps<{
 	onShowTaxForm: () => void
@@ -175,7 +220,7 @@ const paymentOptions = computed(() => {
 	if (paypalMethods.length > 0) {
 		options.push({
 			value: 'paypal',
-			label: messages.paypal,
+			label: paymentMethodMessages.paypal,
 			icon: PayPalIcon,
 			methodId: paypalMethods[0].id,
 			type: 'tremendous',
@@ -186,7 +231,7 @@ const paymentOptions = computed(() => {
 	if (venmoMethods.length > 0) {
 		options.push({
 			value: 'venmo',
-			label: messages.venmo,
+			label: paymentMethodMessages.venmo,
 			icon: VenmoIcon,
 			methodId: venmoMethods[0].id,
 			type: 'tremendous',
@@ -197,7 +242,7 @@ const paymentOptions = computed(() => {
 	if (visaMethods.length > 0) {
 		options.push({
 			value: 'visa_card',
-			label: messages.virtualVisa,
+			label: paymentMethodMessages.virtualVisa,
 			icon: VisaIcon,
 			methodId: visaMethods[0].id,
 			type: 'tremendous',
@@ -210,7 +255,7 @@ const paymentOptions = computed(() => {
 	if (merchantMethods.length > 0) {
 		options.push({
 			value: 'merchant_card',
-			label: messages.giftCard,
+			label: paymentMethodMessages.giftCard,
 			icon: GiftIcon,
 			methodId: undefined,
 			type: 'tremendous',
@@ -221,7 +266,7 @@ const paymentOptions = computed(() => {
 	if (charityMethods.length > 0) {
 		options.push({
 			value: 'charity',
-			label: messages.charity,
+			label: paymentMethodMessages.charity,
 			icon: HeartIcon,
 			methodId: undefined,
 			type: 'tremendous',
@@ -363,65 +408,5 @@ onMounted(async () => {
 			}
 		}
 	}
-})
-
-const messages = defineMessages({
-	taxLimitWarning: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.tax-limit-warning',
-		defaultMessage:
-			'Your withdraw limit is <b>{amount}</b>, <tax-link>complete a tax form</tax-link> to withdraw more.',
-	},
-	region: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.region',
-		defaultMessage: 'Region',
-	},
-	regionTooltip: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.region-tooltip',
-		defaultMessage: 'Some payout methods are not available in certain regions.',
-	},
-	countryPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.country-placeholder',
-		defaultMessage: 'Select your country',
-	},
-	countrySearchPlaceholder: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.country-search-placeholder',
-		defaultMessage: 'Search countries...',
-	},
-	selectMethod: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.select-method',
-		defaultMessage: 'Select withdraw method',
-	},
-	errorTitle: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.error-title',
-		defaultMessage: 'Failed to load payment methods',
-	},
-	errorText: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.error-text',
-		defaultMessage: 'Unable to fetch available payment methods. Please try again later.',
-	},
-	paypal: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.paypal',
-		defaultMessage: 'PayPal',
-	},
-	venmo: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.venmo',
-		defaultMessage: 'Venmo',
-	},
-	virtualVisa: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.virtual-visa',
-		defaultMessage: 'Virtual Visa',
-	},
-	giftCard: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.gift-card',
-		defaultMessage: 'Gift card',
-	},
-	charity: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.charity',
-		defaultMessage: 'Charity',
-	},
-	bankTransferFallback: {
-		id: 'dashboard.creator-withdraw-modal.method-selection.bank-transfer-fallback',
-		defaultMessage: 'Bank transfer ({code})',
-	},
 })
 </script>
