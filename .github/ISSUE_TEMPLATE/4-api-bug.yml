@@ -1,6 +1,6 @@
 name: 🛠 Bug with Modrinth API
 description: For issues with the Modrinth API for developers.
-labels: [backend]
+labels: [api, backend]
 type: 'bug'
 body:
   - type: checkboxes

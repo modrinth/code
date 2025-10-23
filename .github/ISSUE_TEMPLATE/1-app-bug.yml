@@ -1,5 +1,5 @@
 name: 🎮 Bug with Modrinth App
-description: For issues with the Modrinth App launcher.
+description: For issues with Modrinth App.
 labels: [app]
 type: 'bug'
 body:
