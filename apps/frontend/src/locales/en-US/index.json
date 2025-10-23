@@ -818,6 +818,36 @@
   "dashboard.revenue.withdraw.header": {
     "message": "Withdraw"
   },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Amount"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Close"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Date"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "You will receive an email at <b>{email}</b> from our partner, Tremendous, with instructions to redeem your withdrawal."
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Fee"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Method"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Net amount"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Recipient"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Withdraw complete"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Transactions"
+  },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
   },
@@ -2167,18 +2197,6 @@
   },
   "report.submit": {
     "message": "Submit report"
-  },
-  "revenue.transfers.total": {
-    "message": "You have withdrawn {amount} in total."
-  },
-  "revenue.transfers.total.method": {
-    "message": "You have withdrawn {amount} through {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "You have withdrawn {amount} in {year}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "You have withdrawn {amount} in {year} through {method}."
   },
   "scopes.analytics.description": {
     "message": "Access your analytics data"
