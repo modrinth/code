@@ -1,3 +1,5 @@
+use std::cmp;
+
 use crate::{
     models::ids::PayoutId, queue::payouts::muralpay_payout::MuralPayoutRequest,
 };
@@ -174,13 +176,10 @@ pub struct PayoutMethodFee {
 
 impl PayoutMethodFee {
     pub fn compute_fee(&self, value: Decimal) -> Decimal {
-        let fee = value * self.percentage;
-        let fee = fee.max(self.min);
-        if let Some(max) = self.max {
-            fee.min(max)
-        } else {
-            fee
-        }
+        cmp::min(
+            cmp::max(self.min, self.percentage * value),
+            self.max.unwrap_or(Decimal::MAX),
+        )
     }
 }
 

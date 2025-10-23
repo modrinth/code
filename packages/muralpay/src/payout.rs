@@ -226,15 +226,8 @@ pub struct Payout {
     pub id: PayoutId,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-    pub amount: PayoutAmount,
+    pub amount: TokenAmount,
     pub details: PayoutDetails,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PayoutAmount {
-    pub token_amount: u64,
-    pub token_symbol: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

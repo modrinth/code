@@ -11,7 +11,6 @@ use crate::models::payouts::{
     TremendousDetails,
 };
 use crate::queue::payouts::PayoutsQueue;
-use crate::queue::payouts::muralpay_payout::MuralPayoutRequest;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::avalara1099;
@@ -22,7 +21,7 @@ use eyre::eyre;
 use hex::ToHex;
 use hmac::{Hmac, Mac};
 use reqwest::Method;
-use rust_decimal::{Decimal, dec};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Sha256;
@@ -488,7 +487,7 @@ pub struct Withdrawal {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WithdrawalFees {
-    pub fee: Option<Decimal>,
+    pub fee: Decimal,
     pub exchange_rate: Option<Decimal>,
 }
 
@@ -514,66 +513,14 @@ pub async fn calculate_fees(
         ApiError::Authentication(AuthenticationError::InvalidCredentials)
     })?;
 
-    let fee = match &body.method {
-        PayoutMethodRequest::MuralPay {
-            method_details:
-                MuralPayDetails {
-                    payout_details: MuralPayoutRequest::Blockchain { .. },
-                    ..
-                },
-        } => WithdrawalFees {
-            fee: Some(dec!(0)),
-            exchange_rate: None,
-        },
-        PayoutMethodRequest::MuralPay {
-            method_details:
-                MuralPayDetails {
-                    payout_details:
-                        MuralPayoutRequest::Fiat {
-                            fiat_and_rail_details,
-                            ..
-                        },
-                    ..
-                },
-        } => {
-            let fiat_and_rail_code = fiat_and_rail_details.code();
-            let fee = payouts_queue
-                .compute_muralpay_fees(body.amount, fiat_and_rail_code)
-                .await?;
+    let fees = payouts_queue
+        .calculate_fees(&body.method, &body.method_id, body.amount)
+        .await?;
 
-            match fee {
-                muralpay::TokenPayoutFee::Success {
-                    exchange_rate,
-                    fee_total,
-                    ..
-                } => WithdrawalFees {
-                    fee: Some(fee_total.token_amount),
-                    exchange_rate: Some(exchange_rate),
-                },
-                muralpay::TokenPayoutFee::Error { message, .. } => {
-                    return Err(ApiError::Internal(eyre!(
-                        "failed to compute fee: {message}"
-                    )));
-                }
-            }
-        }
-        PayoutMethodRequest::Tremendous { .. } => {
-            let method = payouts_queue
-                .get_payout_methods()
-                .await
-                .wrap_internal_err("failed to fetch payout methods")?
-                .into_iter()
-                .find(|method| method.id == body.method_id)
-                .wrap_request_err("invalid payout method ID")?;
-            let fee = method.fee.compute_fee(body.amount);
-            WithdrawalFees {
-                fee: Some(fee),
-                exchange_rate: None,
-            }
-        }
-    };
-
-    Ok(web::Json(fee))
+    Ok(web::Json(WithdrawalFees {
+        fee: fees.total_fee(),
+        exchange_rate: fees.exchange_rate,
+    }))
 }
 
 #[post("")]
@@ -686,28 +633,27 @@ pub async fn create_payout(
         ));
     }
 
-    let payout_method = payouts_queue
-        .get_payout_methods()
-        .await
-        .wrap_internal_err("failed to fetch payout methods")?
-        .into_iter()
-        .find(|x| x.id == body.method_id)
-        .wrap_request_err("invalid payment method")?;
+    let fees = payouts_queue
+        .calculate_fees(&body.method, &body.method_id, body.amount)
+        .await?;
 
-    let fee = std::cmp::min(
-        std::cmp::max(
-            payout_method.fee.min,
-            payout_method.fee.percentage * body.amount,
-        ),
-        payout_method.fee.max.unwrap_or(Decimal::MAX),
-    );
+    // fees are a bit complicated here, since we have 2 types:
+    // - method fees - this is what Tremendous, Mural, etc. will take from us
+    //   without us having a say in it
+    // - platform fees - this is what we deliberately keep for ourselves
+    // - total fees - method fees + platform fees
+    //
+    // we first make sure that `amount - total fees` is greater than zero,
+    // then we issue a payout request with `amount - platform fees`
 
-    let transfer = (body.amount - fee).round_dp(2);
-    if transfer <= Decimal::ZERO {
+    if (body.amount - fees.total_fee()).round_dp(2) <= Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You need to withdraw more to cover the fee!".to_string(),
         ));
     }
+
+    let sent_to_method = (body.amount - fees.platform_fee).round_dp(2);
+    assert!(sent_to_method > Decimal::ZERO);
 
     let payout_id = generate_payout_id(&mut transaction)
         .await
@@ -717,8 +663,9 @@ pub async fn create_payout(
         body: &body,
         user: &user,
         payout_id,
-        transfer,
-        fee,
+        raw_amount: body.amount,
+        total_fee: fees.total_fee(),
+        sent_to_method,
         payouts_queue: &payouts_queue,
     };
 
@@ -752,8 +699,9 @@ struct PayoutContext<'a> {
     body: &'a Withdrawal,
     user: &'a DBUser,
     payout_id: DBPayoutId,
-    transfer: Decimal,
-    fee: Decimal,
+    raw_amount: Decimal,
+    total_fee: Decimal,
+    sent_to_method: Decimal,
     payouts_queue: &'a PayoutsQueue,
 }
 
@@ -775,8 +723,9 @@ async fn tremendous_payout(
         body,
         user,
         payout_id,
-        transfer,
-        fee,
+        raw_amount,
+        total_fee,
+        sent_to_method,
         payouts_queue,
     }: PayoutContext<'_>,
     TremendousDetails { delivery_email }: &TremendousDetails,
@@ -788,8 +737,8 @@ async fn tremendous_payout(
         user_id: user.id,
         created: Utc::now(),
         status: PayoutStatus::InTransit,
-        amount: transfer,
-        fee: Some(fee),
+        amount: raw_amount,
+        fee: Some(total_fee),
         method: Some(PayoutMethodType::Tremendous),
         method_address: Some(user_email.to_string()),
         platform_id: None,
@@ -820,7 +769,7 @@ async fn tremendous_payout(
                 },
                 "rewards": [{
                     "value": {
-                        "denomination": transfer
+                        "denomination": sent_to_method
                     },
                     "delivery": {
                         "method": "EMAIL"
@@ -850,8 +799,9 @@ async fn mural_pay_payout(
         body: _body,
         user,
         payout_id,
-        transfer,
-        fee,
+        raw_amount,
+        total_fee,
+        sent_to_method,
         payouts_queue,
     }: PayoutContext<'_>,
     details: &MuralPayDetails,
@@ -863,7 +813,7 @@ async fn mural_pay_payout(
             user.id.into(),
             muralpay::TokenAmount {
                 token_symbol: "USDC".into(),
-                token_amount: transfer,
+                token_amount: sent_to_method,
             },
             details.payout_details.clone(),
             details.recipient_info.clone(),
@@ -875,8 +825,8 @@ async fn mural_pay_payout(
         user_id: user.id,
         created: Utc::now(),
         status: PayoutStatus::InTransit,
-        amount: transfer,
-        fee: Some(fee),
+        amount: raw_amount,
+        fee: Some(total_fee),
         method: Some(PayoutMethodType::MuralPay),
         method_address: Some(user_email.to_string()),
         platform_id: Some(payout_request.id.to_string()),
