@@ -121,30 +121,11 @@
 			</div>
 
 			<div v-else class="flex flex-col gap-2">
-				<div class="flex items-center gap-2">
-					<div class="relative flex-1">
-						<input
-							v-model.number="formData.amount"
-							type="number"
-							step="0.01"
-							:min="selectedMethodDetails?.interval?.standard?.min || 0.01"
-							:max="roundedMaxAmount"
-							:placeholder="formatMessage(formFieldPlaceholders.amountPlaceholder)"
-							class="w-full rounded-[14px] bg-surface-4 py-2.5 pl-4 pr-4 text-contrast placeholder:text-secondary"
-							@input="enforceDecimalPlaces"
-						/>
-					</div>
-					<ButtonStyled>
-						<button class="px-4 py-2" @click="setMaxAmount">
-							{{ formatMessage(commonMessages.maxButton) }}
-						</button>
-					</ButtonStyled>
-				</div>
-				<span class="text-secondary">
-					{{
-						formatMessage(financialMessages.available, { amount: formatMoney(roundedMaxAmount) })
-					}}
-				</span>
+				<RevenueInputField
+					v-model="formData.amount"
+					:max-amount="roundedMaxAmount"
+					:min-amount="selectedMethodDetails?.interval?.standard?.min || 0.01"
+				/>
 			</div>
 
 			<WithdrawFeeBreakdown
@@ -171,11 +152,9 @@
 <script setup lang="ts">
 import {
 	Admonition,
-	ButtonStyled,
 	Checkbox,
 	Chips,
 	Combobox,
-	commonMessages,
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
@@ -188,6 +167,7 @@ import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 
+import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { useAuth } from '@/composables/auth.js'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
@@ -332,24 +312,6 @@ const selectedDenomination = computed({
 	},
 })
 
-function setMaxAmount() {
-	formData.value.amount = roundedMaxAmount.value
-}
-
-function enforceDecimalPlaces(event: Event) {
-	const input = event.target as HTMLInputElement
-	const value = input.value
-
-	if (value && value.includes('.')) {
-		const parts = value.split('.')
-		if (parts[1] && parts[1].length > 2) {
-			const rounded = Math.floor(parseFloat(value) * 100) / 100
-			formData.value.amount = rounded
-			input.value = rounded.toString()
-		}
-	}
-}
-
 const calculateFeesDebounced = useDebounceFn(async () => {
 	const amount = formData.value.amount
 	if (!amount || amount <= 0) {
@@ -378,22 +340,6 @@ const calculateFeesDebounced = useDebounceFn(async () => {
 	}
 }, 500)
 
-watch(
-	() => formData.value.amount,
-	(newAmount) => {
-		if (newAmount !== undefined && newAmount !== null) {
-			if (newAmount > roundedMaxAmount.value) {
-				formData.value.amount = roundedMaxAmount.value
-				return
-			}
-			if (newAmount < 0) {
-				formData.value.amount = 0
-				return
-			}
-		}
-	},
-)
-
 watch(deliveryEmail, (newEmail) => {
 	if (withdrawData.value.providerData.type === 'tremendous') {
 		withdrawData.value.providerData.deliveryEmail = newEmail
@@ -410,7 +356,11 @@ watch(
 		}
 
 		if (formData.value.amount) {
+			feeLoading.value = true
 			calculateFeesDebounced()
+		} else {
+			calculatedFee.value = 0
+			feeLoading.value = false
 		}
 	},
 	{ deep: true },
@@ -438,6 +388,7 @@ onMounted(async () => {
 	debug('Sample method with interval:', rewardOptions.value[0]?.methodDetails)
 
 	if (formData.value.amount) {
+		feeLoading.value = true
 		calculateFeesDebounced()
 	}
 })

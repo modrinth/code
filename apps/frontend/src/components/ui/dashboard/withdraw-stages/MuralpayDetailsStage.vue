@@ -53,7 +53,7 @@
 				v-model="formData.bankName"
 				type="text"
 				:placeholder="formatMessage(formFieldPlaceholders.bankNamePlaceholder)"
-				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 			/>
 		</div>
 
@@ -71,7 +71,7 @@
 				:type="field.type"
 				:placeholder="field.placeholder ? formatMessage(field.placeholder) : undefined"
 				:pattern="field.pattern"
-				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 			/>
 
 			<Combobox
@@ -91,7 +91,7 @@
 				v-else-if="field.type === 'date'"
 				v-model="formData[field.name]"
 				type="date"
-				class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 			/>
 
 			<span v-if="field.helpText" class="text-sm text-secondary">
@@ -119,7 +119,7 @@
 						v-model="formData.documentNumber"
 						:type="dynamicDocumentNumberField.type"
 						:placeholder="dynamicDocumentNumberField.placeholder"
-						class="bg-raised w-full rounded-[14px] px-4 py-2.5 text-contrast placeholder:text-secondary"
+						class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 					/>
 				</div>
 			</div>
@@ -148,28 +148,7 @@
 					<span class="text-red">*</span>
 				</span>
 			</label>
-			<div class="flex items-center gap-2">
-				<div class="relative flex-1">
-					<input
-						v-model.number="formData.amount"
-						type="number"
-						step="0.01"
-						min="0.01"
-						:max="roundedMaxAmount"
-						:placeholder="formatMessage(formFieldPlaceholders.amountPlaceholder)"
-						class="bg-raised w-full rounded-[14px] py-2.5 pl-8 pr-4 text-contrast placeholder:text-secondary"
-						@input="enforceDecimalPlaces"
-					/>
-				</div>
-				<ButtonStyled>
-					<button class="px-4 py-2" @click="setMaxAmount">
-						{{ formatMessage(commonMessages.maxButton) }}
-					</button>
-				</ButtonStyled>
-			</div>
-			<span class="text-secondary">
-				{{ formatMessage(financialMessages.available, { amount: formatMoney(roundedMaxAmount) }) }}
-			</span>
+			<RevenueInputField v-model="formData.amount" :max-amount="roundedMaxAmount" />
 
 			<WithdrawFeeBreakdown
 				:amount="formData.amount || 0"
@@ -196,20 +175,18 @@
 <script setup lang="ts">
 import {
 	Admonition,
-	ButtonStyled,
 	Checkbox,
 	Combobox,
-	commonMessages,
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
 } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
+import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import {
@@ -322,24 +299,6 @@ const accountOwnerAddress = computed(() => {
 	return parts.join(', ')
 })
 
-function setMaxAmount() {
-	formData.value.amount = roundedMaxAmount.value
-}
-
-function enforceDecimalPlaces(event: Event) {
-	const input = event.target as HTMLInputElement
-	const value = input.value
-
-	if (value && value.includes('.')) {
-		const parts = value.split('.')
-		if (parts[1] && parts[1].length > 2) {
-			const rounded = Math.floor(parseFloat(value) * 100) / 100
-			formData.value.amount = rounded
-			input.value = rounded.toString()
-		}
-	}
-}
-
 const calculateFeesDebounced = useDebounceFn(async () => {
 	const amount = formData.value.amount
 	const rail = selectedRail.value
@@ -367,22 +326,6 @@ const calculateFeesDebounced = useDebounceFn(async () => {
 }, 500)
 
 watch(
-	() => formData.value.amount,
-	(newAmount) => {
-		if (newAmount !== undefined && newAmount !== null) {
-			if (newAmount > roundedMaxAmount.value) {
-				formData.value.amount = roundedMaxAmount.value
-				return
-			}
-			if (newAmount < 0) {
-				formData.value.amount = 0
-				return
-			}
-		}
-	},
-)
-
-watch(
 	formData,
 	() => {
 		withdrawData.value.calculation.amount = formData.value.amount ?? 0
@@ -391,13 +334,19 @@ watch(
 		}
 
 		if (formData.value.amount) {
+			feeLoading.value = true
 			calculateFeesDebounced()
+		} else {
+			calculatedFee.value = null
+			exchangeRate.value = null
+			feeLoading.value = false
 		}
 	},
 	{ deep: true },
 )
 
 if (formData.value.amount) {
+	feeLoading.value = true
 	calculateFeesDebounced()
 }
 

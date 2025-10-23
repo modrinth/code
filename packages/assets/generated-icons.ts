@@ -11,6 +11,7 @@ import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
 import _AsteriskIcon from './icons/asterisk.svg?component'
 import _BadgeCheckIcon from './icons/badge-check.svg?component'
+import _BadgeDollarSignIcon from './icons/badge-dollar-sign.svg?component'
 import _BanIcon from './icons/ban.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BellRingIcon from './icons/bell-ring.svg?component'
@@ -81,6 +82,7 @@ import _GlobeIcon from './icons/globe.svg?component'
 import _GridIcon from './icons/grid.svg?component'
 import _HamburgerIcon from './icons/hamburger.svg?component'
 import _HammerIcon from './icons/hammer.svg?component'
+import _HandHelpingIcon from './icons/hand-helping.svg?component'
 import _HashIcon from './icons/hash.svg?component'
 import _Heading1Icon from './icons/heading-1.svg?component'
 import _Heading2Icon from './icons/heading-2.svg?component'
@@ -219,6 +221,7 @@ export const ArrowUpRightIcon = _ArrowUpRightIcon
 export const ArrowUpIcon = _ArrowUpIcon
 export const AsteriskIcon = _AsteriskIcon
 export const BadgeCheckIcon = _BadgeCheckIcon
+export const BadgeDollarSignIcon = _BadgeDollarSignIcon
 export const BanIcon = _BanIcon
 export const BellRingIcon = _BellRingIcon
 export const BellIcon = _BellIcon
@@ -289,6 +292,7 @@ export const GlobeIcon = _GlobeIcon
 export const GridIcon = _GridIcon
 export const HamburgerIcon = _HamburgerIcon
 export const HammerIcon = _HammerIcon
+export const HandHelpingIcon = _HandHelpingIcon
 export const HashIcon = _HashIcon
 export const Heading1Icon = _Heading1Icon
 export const Heading2Icon = _Heading2Icon

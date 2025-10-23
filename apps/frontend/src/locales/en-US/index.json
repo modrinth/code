@@ -1647,7 +1647,7 @@
     "message": "USDC (Ethereum)"
   },
   "muralpay.rail.usdc-polygon.name": {
-    "message": "Crypto (USDC via Polygon)"
+    "message": "Crypto (USDC)"
   },
   "muralpay.warning.wallet-address": {
     "message": "Double-check your wallet address. Funds sent to an incorrect address cannot be recovered."

@@ -1,16 +1,15 @@
 import {
+	BadgeDollarSignIcon,
 	GiftIcon,
-	HeartIcon,
+	HandHelpingIcon,
 	LandmarkIcon,
-	PayPalIcon,
-	PolygonIcon,
-	VenmoIcon,
+	SSOPayPalIcon,
+	SSOVenmoIcon,
 } from '@modrinth/assets'
 import { createContext, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
 import type { MessageDescriptor } from '@vintl/vintl'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
-import { getBlockchainIcon } from '@/utils/finance-icons'
 import { getRailConfig } from '@/utils/muralpay-rails'
 
 export type WithdrawStage =
@@ -424,7 +423,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			options.push({
 				value: 'paypal',
 				label: paymentMethodMessages.paypal,
-				icon: PayPalIcon,
+				icon: SSOPayPalIcon,
 				methodId: paypalMethods[0].id,
 				fee: '≈ 6%, max $25',
 				type: 'tremendous',
@@ -436,7 +435,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			options.push({
 				value: 'venmo',
 				label: paymentMethodMessages.venmo,
-				icon: VenmoIcon,
+				icon: SSOVenmoIcon,
 				methodId: venmoMethods[0].id,
 				fee: '≈ 6%, max $25',
 				type: 'tremendous',
@@ -462,7 +461,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			options.push({
 				value: 'charity',
 				label: paymentMethodMessages.charity,
-				icon: HeartIcon,
+				icon: HandHelpingIcon,
 				methodId: undefined,
 				fee: '≈ 0%',
 				type: 'tremendous',
@@ -500,7 +499,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				options.push({
 					value: methodId,
 					label: rail.name,
-					icon: getBlockchainIcon(rail.blockchain || 'POLYGON') || PolygonIcon,
+					icon: getCurrencyIcon(rail.currency) || BadgeDollarSignIcon,
 					methodId: method.id,
 					fee: rail.fee,
 					type: 'crypto',
@@ -508,7 +507,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			}
 		}
 
-		const sortOrder = ['fiat', 'paypal', 'venmo', 'crypto', 'merchant_card', 'charity']
+		const sortOrder = ['paypal', 'venmo', 'crypto', 'fiat', 'merchant_card', 'charity']
 		options.sort((a, b) => {
 			const getOrder = (item: PaymentOption) => {
 				let order = sortOrder.indexOf(item.type)
