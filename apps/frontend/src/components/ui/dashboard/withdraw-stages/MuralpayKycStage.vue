@@ -286,16 +286,11 @@ const countryOptions = computed(() =>
 	all().map((x) => {
 		let label = x.country
 
-		// Apply custom short name if available
 		if (shortCountryNames[x.alpha2]) {
 			label = `${shortCountryNames[x.alpha2]} (${x.alpha2})`
-		}
-		// Special case for Taiwan
-		else if (x.alpha2 === 'TW') {
+		} else if (x.alpha2 === 'TW') {
 			label = 'Taiwan'
-		}
-		// For other long names (>30 chars), append country code
-		else if (x.country.length > 30) {
+		} else if (x.country.length > 30) {
 			label = `${x.country} (${x.alpha2})`
 		}
 

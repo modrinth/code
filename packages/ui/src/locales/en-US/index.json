@@ -156,7 +156,7 @@
     "defaultMessage": "Last name"
   },
   "form.label.postal-code": {
-    "defaultMessage": "Postal code"
+    "defaultMessage": "Postal code/ZIP code"
   },
   "form.label.state-province": {
     "defaultMessage": "State/province"

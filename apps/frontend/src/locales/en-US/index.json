@@ -830,6 +830,9 @@
   "dashboard.withdraw.completion.email-confirmation": {
     "message": "You will receive an email at <b>{email}</b> from our partner, Tremendous, with instructions to redeem your withdrawal."
   },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Exchange rate"
+  },
   "dashboard.withdraw.completion.fee": {
     "message": "Fee"
   },
