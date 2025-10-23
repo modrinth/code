@@ -1,6 +1,7 @@
 name: 🛠️ API issue (api.modrinth.com)
 description: Report an issue regarding the Modrinth API.
-labels: [bug, backend]
+labels: [backend]
+type: 'bug'
 body:
   - type: checkboxes
     attributes:
