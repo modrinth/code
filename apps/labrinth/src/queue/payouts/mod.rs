@@ -364,6 +364,7 @@ impl PayoutsQueue {
                 #[derive(Deserialize)]
                 struct TremendousError {
                     message: String,
+                    payload: Option<serde_json::Value>,
                 }
 
                 let err =
@@ -376,8 +377,8 @@ impl PayoutsQueue {
                         })?;
 
                 return Err(ApiError::Payments(format!(
-                    "Tremendous error: {}",
-                    err.message
+                    "Tremendous error: {} ({:?})",
+                    err.message, err.payload
                 )));
             }
 
