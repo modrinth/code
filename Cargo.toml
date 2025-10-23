@@ -27,6 +27,7 @@ actix-rt = "2.11.0"
 actix-web = "4.11.0"
 actix-web-prom = "0.10.0"
 actix-ws = "0.3.0"
+arc-swap = "1.7.1"
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
 async-compression = { version = "0.4.32", default-features = false }
@@ -163,6 +164,7 @@ sha1_smol = { version = "1.0.1", features = ["std"] }
 sha2 = "0.10.9"
 spdx = "0.12.0"
 sqlx = { version = "0.8.6", default-features = false }
+strum = "0.27.2"
 sysinfo = { version = "0.37.2", default-features = false }
 tar = "0.4.44"
 tauri = "2.8.5"

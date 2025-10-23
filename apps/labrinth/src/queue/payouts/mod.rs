@@ -13,6 +13,7 @@ use crate::util::error::Context;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
 };
+use arc_swap::ArcSwapOption;
 use base64::Engine;
 use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
 use dashmap::DashMap;
@@ -36,12 +37,12 @@ pub mod muralpay_payout;
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
     payout_options: RwLock<Option<PayoutMethods>>,
-    muralpay: RwLock<Option<MuralPayConfig>>,
+    pub muralpay: ArcSwapOption<MuralPayConfig>,
 }
 
-struct MuralPayConfig {
-    client: MuralPay,
-    source_account_id: muralpay::AccountId,
+pub struct MuralPayConfig {
+    pub client: MuralPay,
+    pub source_account_id: muralpay::AccountId,
 }
 
 #[derive(Clone, Debug)]
@@ -153,7 +154,7 @@ impl PayoutsQueue {
         PayoutsQueue {
             credential: RwLock::new(None),
             payout_options: RwLock::new(None),
-            muralpay: RwLock::new(muralpay),
+            muralpay: ArcSwapOption::from_pointee(muralpay),
         }
     }
 

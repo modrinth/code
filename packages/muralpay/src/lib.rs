@@ -78,7 +78,7 @@ pub enum FiatAccountType {
     Savings,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, strum::EnumIter)]
 #[serde(rename_all = "kebab-case")]
 pub enum FiatAndRailCode {
     Usd,

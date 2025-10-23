@@ -30,6 +30,8 @@ use std::collections::HashMap;
 use tokio_stream::StreamExt;
 use tracing::error;
 
+mod mural;
+
 const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
     chrono::Duration::seconds(15);
 
@@ -38,18 +40,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("payout")
             .service(paypal_webhook)
             .service(tremendous_webhook)
-            // we use `route` instead of `service` because `user_payouts` uses the logic of `transaction_history`
-            .route(
-                "",
-                web::get().to(
-                    #[expect(
-                        deprecated,
-                        reason = "v3 backwards compatibility"
-                    )]
-                    user_payouts,
-                ),
-            )
-            .route("history", web::get().to(transaction_history))
+            .service(transaction_history)
             .service(calculate_fees)
             .service(create_payout)
             .service(cancel_payout)
@@ -58,6 +49,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(platform_revenue)
             .service(post_compliance_form),
     );
+    mural::config(cfg);
 }
 
 #[derive(Deserialize)]
@@ -428,52 +420,6 @@ pub async fn tremendous_webhook(
     }
 
     Ok(HttpResponse::NoContent().finish())
-}
-
-#[deprecated = "use `transaction_history` instead"]
-pub async fn user_payouts(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Vec<crate::models::payouts::Payout>>, ApiError> {
-    let (_, user) = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PAYOUTS_READ,
-    )
-    .await?;
-
-    let items = transaction_history(req, pool, redis, session_queue)
-        .await?
-        .0
-        .into_iter()
-        .filter_map(|txn_item| match txn_item {
-            TransactionItem::Withdrawal {
-                id,
-                status,
-                created,
-                amount,
-                fee,
-                method_type,
-                method_address,
-            } => Some(crate::models::payouts::Payout {
-                id,
-                user_id: user.id,
-                status,
-                created,
-                amount,
-                fee,
-                method: method_type,
-                method_address,
-                platform_id: None,
-            }),
-            TransactionItem::PayoutAvailable { .. } => None,
-        })
-        .collect::<Vec<_>>();
-    Ok(web::Json(items))
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -869,6 +815,7 @@ pub enum PayoutSource {
     Affilites,
 }
 
+#[get("/history")]
 pub async fn transaction_history(
     req: HttpRequest,
     pool: web::Data<PgPool>,
