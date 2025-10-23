@@ -172,6 +172,18 @@ pub struct PayoutMethodFee {
     pub max: Option<Decimal>,
 }
 
+impl PayoutMethodFee {
+    pub fn compute_fee(&self, value: Decimal) -> Decimal {
+        let fee = value * self.percentage;
+        let fee = fee.max(self.min);
+        if let Some(max) = self.max {
+            fee.min(max)
+        } else {
+            fee
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct PayoutDecimal(pub Decimal);
 
