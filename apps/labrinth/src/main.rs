@@ -12,8 +12,9 @@ use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::anrok;
 use labrinth::util::env::parse_var;
+use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
-use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
+use labrinth::{check_env_vars, clickhouse, database, file_hosting};
 use std::ffi::CStr;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -113,6 +114,10 @@ async fn main() -> std::io::Result<()> {
         std::process::exit(1);
     }
 
+    rustls::crypto::aws_lc_rs::default_provider()
+        .install_default()
+        .unwrap();
+
     // DSN is from SENTRY_DSN env variable.
     // Has no effect if not set.
     let sentry = sentry::init(sentry::ClientOptions {
@@ -196,6 +201,9 @@ async fn main() -> std::io::Result<()> {
     let email_queue =
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
 
+    let gotenberg_client =
+        GotenbergClient::from_env().expect("Failed to create Gotenberg client");
+
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
         task.run(
@@ -211,8 +219,7 @@ async fn main() -> std::io::Result<()> {
         return Ok(());
     }
 
-    let maxmind_reader =
-        Arc::new(queue::maxmind::MaxMindIndexer::new().await.unwrap());
+    let maxmind_reader = modrinth_maxmind::MaxMind::new().await;
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
         .endpoint("/metrics")
@@ -246,6 +253,7 @@ async fn main() -> std::io::Result<()> {
         stripe_client,
         anrok_client.clone(),
         email_queue,
+        gotenberg_client,
         !args.no_background_tasks,
     );
 

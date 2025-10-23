@@ -35,9 +35,6 @@ use tracing::{debug, error, info, warn};
 
 /// Updates charges which need to have their tax amount updated. This is done within a timer to avoid reaching
 /// Anrok API limits.
-///
-/// The global rate limit for Anrok API operations is 10 RPS, so we run ~8 requests every second up
-/// to the specified limit of processed charges.
 async fn update_tax_amounts(
     pg: &PgPool,
     redis: &RedisPool,
@@ -45,17 +42,12 @@ async fn update_tax_amounts(
     stripe_client: &stripe::Client,
     limit: i64,
 ) -> Result<(), ApiError> {
-    let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
-    interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
-
     let mut processed_charges = 0;
 
     loop {
-        interval.tick().await;
-
         let mut txn = pg.begin().await?;
 
-        let charges = DBCharge::get_updateable_lock(&mut *txn, 8).await?;
+        let charges = DBCharge::get_updateable_lock(&mut *txn, 5).await?;
 
         if charges.is_empty() {
             info!("No more charges to process");
@@ -384,11 +376,19 @@ async fn update_anrok_transactions(
                 stripe::Customer::retrieve(stripe_client, &customer_id, &[])
                     .await?;
 
-            let address = customer.address.ok_or_else(|| {
-                ApiError::InvalidInput(
-                    format!("Could not find any address for Stripe customer of user '{}'", to_base62(c.user_id.0 as u64))
-                )
-            })?;
+            let Some(address) = customer.address else {
+                // We won't really be able to do anything about this.
+
+                warn!(
+                    "Could not find any address for Stripe customer of user '{}', marking as unresolved",
+                    to_base62(c.user_id.0 as u64)
+                );
+
+                c.tax_platform_id = Some("unresolved".to_owned());
+                c.upsert(txn).await?;
+
+                return Ok(());
+            };
 
             (address, tax_platform_id, customer_id)
         };
@@ -424,12 +424,17 @@ async fn update_anrok_transactions(
 
         match result {
             Ok(response) => {
-                let should_have_collected = response.tax_amount_to_collect;
+                let version = response.version.ok_or_else(|| {
+                    ApiError::InvalidInput(
+                        "Anrok response is missing tax transaction version"
+                            .to_owned(),
+                    )
+                })?;
 
-                let drift = should_have_collected - c.tax_amount;
-
-                c.tax_drift_loss = Some(drift);
+                c.tax_drift_loss = Some(response.tax_amount_to_collect);
                 c.tax_platform_id = Some(tax_platform_id);
+                c.tax_transaction_version = Some(version);
+                c.tax_platform_accounting_time = Some(c.due);
                 c.upsert(txn).await?;
 
                 Ok(())
@@ -494,7 +499,7 @@ async fn update_anrok_transactions(
 
 /// Attempts to process a user redeemal.
 ///
-/// Returns `Ok` if the entry has been succesfully processed, or will not be processed.
+/// Returns `Ok` if the entry has been successfully processed, or will not be processed.
 pub async fn try_process_user_redeemal(
     pool: &PgPool,
     redis: &RedisPool,
@@ -639,6 +644,8 @@ pub async fn try_process_user_redeemal(
         net: None,
         tax_last_updated: Some(Utc::now()),
         tax_drift_loss: Some(0),
+        tax_transaction_version: None,
+        tax_platform_accounting_time: None,
     }
     .upsert(&mut txn)
     .await?;
@@ -1008,14 +1015,14 @@ pub async fn index_subscriptions(
             &redis,
             &anrok_client,
             &stripe_client,
-            750,
+            500,
         ),
     )
     .await;
 
     run_and_time(
         "update_tax_amounts",
-        update_tax_amounts(&pool, &redis, &anrok_client, &stripe_client, 50),
+        update_tax_amounts(&pool, &redis, &anrok_client, &stripe_client, 500),
     )
     .await;
 

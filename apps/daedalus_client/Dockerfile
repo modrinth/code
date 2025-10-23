@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM rust:1.89.0 AS build
+FROM rust:1.90.0 AS build
 
 WORKDIR /usr/src/daedalus
 COPY . .
@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/usr/src/daedalus/target \
 	mkdir /daedalus \
 	&& cp /usr/src/daedalus/target/release/daedalus_client /daedalus/daedalus_client
 
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 LABEL org.opencontainers.image.source=https://github.com/modrinth/code
 LABEL org.opencontainers.image.title=daedalus

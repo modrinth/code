@@ -2,13 +2,52 @@
 	<div v-if="user" class="experimental-styles-within">
 		<ModalCreation ref="modal_creation" />
 		<CollectionCreateModal ref="modal_collection_creation" />
+		<NewModal ref="editRoleModal" header="Edit role">
+			<div class="flex w-80 flex-col gap-4">
+				<div class="flex flex-col gap-2">
+					<TeleportDropdownMenu
+						v-model="selectedRole"
+						:options="roleOptions"
+						name="edit-role"
+						placeholder="Select a role"
+					/>
+				</div>
+				<div class="flex justify-end gap-2">
+					<ButtonStyled>
+						<button @click="cancelRoleEdit">
+							<XIcon />
+							{{ formatMessage(commonMessages.cancelButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button
+							:disabled="!selectedRole || selectedRole === user.role || isSavingRole"
+							@click="saveRoleEdit"
+						>
+							<template v-if="isSavingRole">
+								<SpinnerIcon class="animate-spin" /> {{ formatMessage(messages.savingLabel) }}
+							</template>
+							<template v-else>
+								<SaveIcon /> {{ formatMessage(commonMessages.saveChangesButton) }}
+							</template>
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+		</NewModal>
 		<NewModal v-if="auth.user && isStaff(auth.user)" ref="userDetailsModal" header="User details">
 			<div class="flex flex-col gap-3">
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary">Email</span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.emailLabel)
+					}}</span>
 					<div>
 						<span
-							v-tooltip="user.email_verified ? 'Email verified' : 'Email not verified'"
+							v-tooltip="
+								user.email_verified
+									? formatMessage(messages.emailVerifiedTooltip)
+									: formatMessage(messages.emailNotVerifiedTooltip)
+							"
 							class="flex w-fit items-center gap-1"
 						>
 							<span>{{ user.email }}</span>
@@ -19,12 +58,16 @@
 				</div>
 
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary"> Auth providers </span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.authProvidersLabel)
+					}}</span>
 					<span>{{ user.auth_providers.join(', ') }}</span>
 				</div>
 
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary"> Payment methods</span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.paymentMethodsLabel)
+					}}</span>
 					<span>
 						<template v-if="user.payout_data?.paypal_address">
 							Paypal ({{ user.payout_data.paypal_address }} - {{ user.payout_data.paypal_country }})
@@ -39,16 +82,22 @@
 				</div>
 
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary"> Has password </span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.hasPasswordLabel)
+					}}</span>
 					<span>
-						{{ user.has_password ? 'Yes' : 'No' }}
+						{{
+							user.has_password ? formatMessage(messages.yesLabel) : formatMessage(messages.noLabel)
+						}}
 					</span>
 				</div>
 
 				<div class="flex flex-col gap-1">
-					<span class="text-lg font-bold text-primary"> Has TOTP </span>
+					<span class="text-lg font-bold text-primary">{{
+						formatMessage(messages.hasTotpLabel)
+					}}</span>
 					<span>
-						{{ user.has_totp ? 'Yes' : 'No' }}
+						{{ user.has_totp ? formatMessage(messages.yesLabel) : formatMessage(messages.noLabel) }}
 					</span>
 				</div>
 			</div>
@@ -78,8 +127,8 @@
 							user.bio
 								? user.bio
 								: projects.length === 0
-									? 'A Modrinth user.'
-									: 'A Modrinth creator.'
+									? formatMessage(messages.bioFallbackUser)
+									: formatMessage(messages.bioFallbackCreator)
 						}}
 					</template>
 					<template #stats>
@@ -87,16 +136,22 @@
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
 							<BoxIcon class="h-6 w-6 text-secondary" />
-							{{ formatCompactNumber(projects?.length || 0) }}
-							projects
+							{{
+								formatMessage(messages.profileProjectsLabel, {
+									count: formatCompactNumber(projects?.length || 0),
+								})
+							}}
 						</div>
 						<div
 							v-tooltip="sumDownloads.toLocaleString()"
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
 							<DownloadIcon class="h-6 w-6 text-secondary" />
-							{{ formatCompactNumber(sumDownloads) }}
-							downloads
+							{{
+								formatMessage(messages.profileDownloadsLabel, {
+									count: formatCompactNumber(sumDownloads),
+								})
+							}}
 						</div>
 						<div
 							v-tooltip="
@@ -108,7 +163,7 @@
 							class="flex items-center gap-2 font-semibold"
 						>
 							<CalendarIcon class="h-6 w-6 text-secondary" />
-							Joined
+							{{ formatMessage(messages.profileJoinedLabel) }}
 							{{ formatRelativeTime(user.created) }}
 						</div>
 					</template>
@@ -139,6 +194,10 @@
 									{ id: 'copy-id', action: () => copyId() },
 									{ id: 'copy-permalink', action: () => copyPermalink() },
 									{
+										divider: true,
+										shown: auth.user && isAdmin(auth.user),
+									},
+									{
 										id: 'open-billing',
 										action: () => navigateTo(`/admin/billing/${user.id}`),
 										shown: auth.user && isStaff(auth.user),
@@ -154,6 +213,11 @@
 										id: 'open-info',
 										action: () => $refs.userDetailsModal.show(),
 										shown: auth.user && isStaff(auth.user),
+									},
+									{
+										id: 'edit-role',
+										action: () => openRoleEditModal(),
+										shown: auth.user && isAdmin(auth.user),
 									},
 								]"
 								aria-label="More options"
@@ -191,6 +255,10 @@
 											isAffiliate ? messages.removeAffiliateButton : messages.setAffiliateButton,
 										)
 									}}
+								</template>
+								<template #edit-role>
+									<EditIcon aria-hidden="true" />
+									{{ formatMessage(messages.editRoleButton) }}
 								</template>
 							</OverflowMenu>
 						</ButtonStyled>
@@ -270,7 +338,7 @@
 								<h2 class="title">{{ collection.name }}</h2>
 								<div class="stats">
 									<LibraryIcon aria-hidden="true" />
-									Collection
+									{{ formatMessage(messages.collectionLabel) }}
 								</div>
 							</div>
 						</div>
@@ -281,25 +349,27 @@
 							<div class="stats">
 								<BoxIcon />
 								{{
-									`${$formatNumber(collection.projects?.length || 0, false)} project${(collection.projects?.length || 0) !== 1 ? 's' : ''}`
+									`${$formatNumber(collection.projects?.length || 0, false)} project${
+										(collection.projects?.length || 0) !== 1 ? 's' : ''
+									}`
 								}}
 							</div>
 							<div class="stats">
 								<template v-if="collection.status === 'listed'">
 									<GlobeIcon />
-									<span> Public </span>
+									<span> {{ formatMessage(commonMessages.publicLabel) }} </span>
 								</template>
 								<template v-else-if="collection.status === 'unlisted'">
 									<LinkIcon />
-									<span> Unlisted </span>
+									<span> {{ formatMessage(commonMessages.unlistedLabel) }} </span>
 								</template>
 								<template v-else-if="collection.status === 'private'">
 									<LockIcon />
-									<span> Private </span>
+									<span> {{ formatMessage(commonMessages.privateLabel) }} </span>
 								</template>
 								<template v-else-if="collection.status === 'rejected'">
 									<XIcon />
-									<span> Rejected </span>
+									<span> {{ formatMessage(commonMessages.rejectedLabel) }} </span>
 								</template>
 							</div>
 						</div>
@@ -383,6 +453,8 @@ import {
 	LockIcon,
 	MoreVerticalIcon,
 	ReportIcon,
+	SaveIcon,
+	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -390,8 +462,10 @@ import {
 	ButtonStyled,
 	commonMessages,
 	ContentPageHeader,
+	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
+	TeleportDropdownMenu,
 	TagItem,
 	useRelativeTime,
 } from '@modrinth/ui'
@@ -428,27 +502,79 @@ const formatCompactNumber = useCompactNumber(true)
 
 const formatRelativeTime = useRelativeTime()
 
+const { addNotification } = injectNotificationManager()
+
 const baseId = useId()
 
 const messages = defineMessages({
-	profileProjectsStats: {
-		id: 'profile.stats.projects',
-		defaultMessage:
-			'{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}',
+	profileProjectsLabel: {
+		id: 'profile.label.projects',
+		defaultMessage: '{count} {count, plural, one {project} other {projects}}',
 	},
-	profileDownloadsStats: {
-		id: 'profile.stats.downloads',
-		defaultMessage:
-			'{count, plural, one {<stat>{count}</stat> project download} other {<stat>{count}</stat> project downloads}}',
+	profileDownloadsLabel: {
+		id: 'profile.label.downloads',
+		defaultMessage: '{count} {count, plural, one {download} other {downloads}}',
+	},
+	profileJoinedLabel: {
+		id: 'profile.label.joined',
+		defaultMessage: 'Joined',
+	},
+	savingLabel: {
+		id: 'profile.label.saving',
+		defaultMessage: 'Saving...',
+	},
+	emailLabel: {
+		id: 'profile.details.label.email',
+		defaultMessage: 'Email',
+	},
+	emailVerifiedTooltip: {
+		id: 'profile.details.tooltip.email-verified',
+		defaultMessage: 'Email verified',
+	},
+	emailNotVerifiedTooltip: {
+		id: 'profile.details.tooltip.email-not-verified',
+		defaultMessage: 'Email not verified',
+	},
+	authProvidersLabel: {
+		id: 'profile.details.label.auth-providers',
+		defaultMessage: 'Auth providers',
+	},
+	paymentMethodsLabel: {
+		id: 'profile.details.label.payment-methods',
+		defaultMessage: 'Payment methods',
+	},
+	hasPasswordLabel: {
+		id: 'profile.details.label.has-password',
+		defaultMessage: 'Has password',
+	},
+	hasTotpLabel: {
+		id: 'profile.details.label.has-totp',
+		defaultMessage: 'Has TOTP',
+	},
+	yesLabel: {
+		id: 'profile.label.yes',
+		defaultMessage: 'Yes',
+	},
+	noLabel: {
+		id: 'profile.label.no',
+		defaultMessage: 'No',
+	},
+	bioFallbackUser: {
+		id: 'profile.bio.fallback.user',
+		defaultMessage: 'A Modrinth user.',
+	},
+	bioFallbackCreator: {
+		id: 'profile.bio.fallback.creator',
+		defaultMessage: 'A Modrinth creator.',
+	},
+	collectionLabel: {
+		id: 'profile.label.collection',
+		defaultMessage: 'Collection',
 	},
 	profileProjectsFollowersStats: {
 		id: 'profile.stats.projects-followers',
 		defaultMessage:
 			'{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}',
-	},
-	profileJoinedAt: {
-		id: 'profile.joined-at',
-		defaultMessage: 'Joined <date>{ago}</date>',
 	},
 	profileUserId: {
 		id: 'profile.user-id',
@@ -515,6 +641,10 @@ const messages = defineMessages({
 	affiliateLabel: {
 		id: 'profile.label.affiliate',
 		defaultMessage: 'Affiliate',
+	},
+	editRoleButton: {
+		id: 'profile.button.edit-role',
+		defaultMessage: 'Edit role',
 	},
 	userNotFoundError: {
 		id: 'profile.error.not-found',
@@ -707,6 +837,55 @@ const navLinks = computed(() => [
 		.slice()
 		.sort((a, b) => a.label.localeCompare(b.label)),
 ])
+
+const selectedRole = ref(user.value.role)
+const isSavingRole = ref(false)
+
+const roleOptions = ['developer', 'moderator', 'admin']
+
+const editRoleModal = useTemplateRef('editRoleModal')
+
+const openRoleEditModal = () => {
+	selectedRole.value = user.value.role
+	editRoleModal.value?.show()
+}
+
+const cancelRoleEdit = () => {
+	selectedRole.value = user.value.role
+	editRoleModal.value?.hide()
+}
+
+function saveRoleEdit() {
+	if (!selectedRole.value || selectedRole.value === user.value.role) {
+		return
+	}
+
+	isSavingRole.value = true
+
+	useBaseFetch(`user/${user.value.id}`, {
+		method: 'PATCH',
+		body: {
+			role: selectedRole.value,
+		},
+	})
+		.then(() => {
+			user.value.role = selectedRole.value
+
+			editRoleModal.value?.hide()
+		})
+		.catch(() => {
+			console.error('Failed to update user role:', error)
+
+			addNotification({
+				type: 'error',
+				title: 'Failed to update role',
+				message: 'An error occurred while updating the user role. Please try again.',
+			})
+		})
+		.finally(() => {
+			isSavingRole.value = false
+		})
+}
 </script>
 <script>
 export default defineNuxtComponent({

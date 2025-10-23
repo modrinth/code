@@ -17,13 +17,13 @@ import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from '@modrin
 import type { Backup } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 const flags = useFeatureFlags()
 const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
-	(e: 'prepare' | 'download' | 'rename' | 'restore' | 'lock' | 'retry'): void
+	(e: 'download' | 'rename' | 'restore' | 'lock' | 'retry'): void
 	(e: 'delete', skipConfirmation?: boolean): void
 }>()
 
@@ -49,13 +49,7 @@ const backupQueued = computed(
 const automated = computed(() => props.backup.automated)
 const failedToCreate = computed(() => props.backup.interrupted)
 
-const preparedDownloadStates = ['ready', 'done']
 const inactiveStates = ['failed', 'cancelled']
-
-const hasPreparedDownload = computed(() => {
-	const fileState = props.backup.task?.file?.state ?? ''
-	return preparedDownloadStates.includes(fileState)
-})
 
 const creating = computed(() => {
 	const task = props.backup.task?.create
@@ -79,22 +73,7 @@ const restoring = computed(() => {
 	return undefined
 })
 
-const initiatedPrepare = ref(false)
-
-const preparingFile = computed(() => {
-	if (hasPreparedDownload.value) {
-		return false
-	}
-
-	const task = props.backup.task?.file
-	return (
-		(!task && initiatedPrepare.value) ||
-		(task && task.progress < 1 && !inactiveStates.includes(task.state))
-	)
-})
-
 const failedToRestore = computed(() => props.backup.task?.restore?.state === 'failed')
-const failedToPrepareFile = computed(() => props.backup.task?.file?.state === 'failed')
 
 const messages = defineMessages({
 	locked: {
@@ -121,22 +100,6 @@ const messages = defineMessages({
 		id: 'servers.backups.item.queued-for-backup',
 		defaultMessage: 'Queued for backup',
 	},
-	preparingDownload: {
-		id: 'servers.backups.item.preparing-download',
-		defaultMessage: 'Preparing download...',
-	},
-	prepareDownload: {
-		id: 'servers.backups.item.prepare-download',
-		defaultMessage: 'Prepare download',
-	},
-	prepareDownloadAgain: {
-		id: 'servers.backups.item.prepare-download-again',
-		defaultMessage: 'Try preparing again',
-	},
-	alreadyPreparing: {
-		id: 'servers.backups.item.already-preparing',
-		defaultMessage: 'Already preparing backup for download',
-	},
 	creatingBackup: {
 		id: 'servers.backups.item.creating-backup',
 		defaultMessage: 'Creating backup...',
@@ -152,10 +115,6 @@ const messages = defineMessages({
 	failedToRestoreBackup: {
 		id: 'servers.backups.item.failed-to-restore-backup',
 		defaultMessage: 'Failed to restore from backup',
-	},
-	failedToPrepareFile: {
-		id: 'servers.backups.item.failed-to-prepare-backup',
-		defaultMessage: 'Failed to prepare download',
 	},
 	automated: {
 		id: 'servers.backups.item.automated',
@@ -200,17 +159,13 @@ const messages = defineMessages({
 				</span>
 				<span v-if="(failedToCreate || failedToRestore) && (automated || backup.locked)">•</span>
 				<span
-					v-if="failedToCreate || failedToRestore || failedToPrepareFile"
+					v-if="failedToCreate || failedToRestore"
 					class="flex items-center gap-1 text-sm text-red"
 				>
 					<XIcon />
 					{{
 						formatMessage(
-							failedToCreate
-								? messages.failedToCreateBackup
-								: failedToRestore
-									? messages.failedToRestoreBackup
-									: messages.failedToPrepareFile,
+							failedToCreate ? messages.failedToCreateBackup : messages.failedToRestoreBackup,
 						)
 					}}
 				</span>
@@ -270,7 +225,6 @@ const messages = defineMessages({
 			<template v-else>
 				<ButtonStyled>
 					<a
-						v-if="hasPreparedDownload"
 						:class="{
 							disabled: !kyrosUrl || !jwt,
 						}"
@@ -280,28 +234,6 @@ const messages = defineMessages({
 						<DownloadIcon />
 						{{ formatMessage(commonMessages.downloadButton) }}
 					</a>
-					<button
-						v-else
-						:disabled="!!preparingFile"
-						@click="
-							() => {
-								initiatedPrepare = true
-								emit('prepare')
-							}
-						"
-					>
-						<SpinnerIcon v-if="preparingFile" class="animate-spin" />
-						<DownloadIcon v-else />
-						{{
-							formatMessage(
-								preparingFile
-									? messages.preparingDownload
-									: failedToPrepareFile
-										? messages.prepareDownloadAgain
-										: messages.prepareDownload,
-							)
-						}}
-					</button>
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
@@ -310,7 +242,7 @@ const messages = defineMessages({
 							{
 								id: 'restore',
 								action: () => emit('restore'),
-								disabled: !!restoring || !!preparingFile,
+								disabled: !!restoring,
 							},
 							{ id: 'lock', action: () => emit('lock') },
 							{ divider: true },
@@ -318,7 +250,7 @@ const messages = defineMessages({
 								id: 'delete',
 								color: 'red',
 								action: () => emit('delete'),
-								disabled: !!restoring || !!preparingFile,
+								disabled: !!restoring,
 							},
 						]"
 					>

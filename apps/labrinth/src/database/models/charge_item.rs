@@ -30,6 +30,8 @@ pub struct DBCharge {
     pub tax_amount: i64,
     pub tax_platform_id: Option<String>,
     pub tax_last_updated: Option<DateTime<Utc>>,
+    pub tax_transaction_version: Option<i32>,
+    pub tax_platform_accounting_time: Option<DateTime<Utc>>,
 
     // Net is always in USD
     pub net: Option<i64>,
@@ -56,6 +58,8 @@ struct ChargeQueryResult {
     tax_last_updated: Option<DateTime<Utc>>,
     net: Option<i64>,
     tax_drift_loss: Option<i64>,
+    tax_transaction_version: Option<i32>,
+    tax_platform_accounting_time: Option<DateTime<Utc>>,
 }
 
 impl TryFrom<ChargeQueryResult> for DBCharge {
@@ -84,6 +88,8 @@ impl TryFrom<ChargeQueryResult> for DBCharge {
             net: r.net,
             tax_last_updated: r.tax_last_updated,
             tax_drift_loss: r.tax_drift_loss,
+            tax_transaction_version: r.tax_transaction_version,
+            tax_platform_accounting_time: r.tax_platform_accounting_time,
         })
     }
 }
@@ -103,7 +109,9 @@ macro_rules! select_charges_with_predicate {
                 charges.parent_charge_id AS "parent_charge_id?",
                 charges.net AS "net?",
 				charges.tax_last_updated AS "tax_last_updated?",
-				charges.tax_drift_loss AS "tax_drift_loss?"
+				charges.tax_drift_loss AS "tax_drift_loss?",
+                charges.tax_transaction_version AS "tax_transaction_version?",
+                charges.tax_platform_accounting_time AS "tax_platform_accounting_time?"
             FROM charges
             "#
                 + $predicate,
@@ -119,8 +127,8 @@ impl DBCharge {
     ) -> Result<DBChargeId, DatabaseError> {
         sqlx::query!(
             r#"
-            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net, tax_amount, tax_platform_id, tax_last_updated, tax_drift_loss)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+            INSERT INTO charges (id, user_id, price_id, amount, currency_code, charge_type, status, due, last_attempt, subscription_id, subscription_interval, payment_platform, payment_platform_id, parent_charge_id, net, tax_amount, tax_platform_id, tax_last_updated, tax_drift_loss, tax_transaction_version, tax_platform_accounting_time)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
             ON CONFLICT (id)
             DO UPDATE
                 SET status = EXCLUDED.status,
@@ -139,7 +147,9 @@ impl DBCharge {
                     amount = EXCLUDED.amount,
                     currency_code = EXCLUDED.currency_code,
                     charge_type = EXCLUDED.charge_type,
-					tax_drift_loss = EXCLUDED.tax_drift_loss
+					tax_drift_loss = EXCLUDED.tax_drift_loss,
+					tax_transaction_version = EXCLUDED.tax_transaction_version,
+					tax_platform_accounting_time = EXCLUDED.tax_platform_accounting_time
             "#,
             self.id.0,
             self.user_id.0,
@@ -160,6 +170,8 @@ impl DBCharge {
             self.tax_platform_id.as_deref(),
             self.tax_last_updated,
             self.tax_drift_loss,
+            self.tax_transaction_version,
+            self.tax_platform_accounting_time,
         )
             .execute(&mut **transaction)
         .await?;
@@ -221,7 +233,10 @@ impl DBCharge {
     ) -> Result<Option<DBCharge>, DatabaseError> {
         let user_subscription_id = user_subscription_id.0;
         let res = select_charges_with_predicate!(
-            "WHERE subscription_id = $1 AND (status = 'open' OR status = 'expiring' OR status = 'cancelled' OR status = 'failed')",
+            "WHERE
+			  subscription_id = $1
+			  AND (status = 'open' OR status = 'expiring' OR status = 'cancelled' OR status = 'failed')
+			ORDER BY due ASC LIMIT 1",
             user_subscription_id
         )
         .fetch_optional(exec)
@@ -323,7 +338,7 @@ impl DBCharge {
 			  AND COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) < NOW() - INTERVAL '1 day'
 			  AND u.email IS NOT NULL
 			  AND due - INTERVAL '7 days' > NOW()
-              AND due - INTERVAL '14 days' < NOW() -- Due between 7 and 14 days from now
+              AND due - INTERVAL '30 days' < NOW() -- Due between 7 and 30 days from now
 			ORDER BY COALESCE(tax_last_updated, '-infinity' :: TIMESTAMPTZ) ASC
 			FOR NO KEY UPDATE SKIP LOCKED
 			LIMIT $1

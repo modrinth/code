@@ -90,10 +90,10 @@ import StyledDoc from '../shared/StyledDoc.vue'
 				Purpose of Payment
 			</Text>
 			<Text class="m-0 text-sm leading-relaxed text-secondary">
-				This payout reflects revenue earned by the creator through their activity on the Modrinth
-				platform. Earnings are based on advertising revenue, subscriptions, and/or affiliate
-				commissions tied to the creator's published projects, in accordance with the Rewards Program
-				Terms.
+				This payout reflects the creator's earnings from their activity on the Modrinth platform.
+				Such earnings are based on advertising revenue derived from user engagement with the
+				creator's published projects and/or affiliate commissions in accordance with the Rewards
+				Program Terms.
 			</Text>
 		</Section>
 

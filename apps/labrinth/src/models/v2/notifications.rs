@@ -109,6 +109,13 @@ pub enum LegacyNotificationBody {
         amount: String,
         service: String,
     },
+    SubscriptionCredited {
+        subscription_id: UserSubscriptionId,
+        days: i32,
+        previous_due: DateTime<Utc>,
+        next_due: DateTime<Utc>,
+        header_message: Option<String>,
+    },
     PatCreated {
         token_name: String,
     },
@@ -138,6 +145,11 @@ pub enum LegacyNotificationBody {
     PayoutAvailable {
         amount: u64,
         date_available: DateTime<Utc>,
+    },
+    Custom {
+        key: String,
+        title: String,
+        body_md: String,
     },
     Unknown,
 }
@@ -214,9 +226,13 @@ impl LegacyNotification {
             NotificationBody::TaxNotification { .. } => {
                 Some("tax_notification".to_string())
             }
+            NotificationBody::SubscriptionCredited { .. } => {
+                Some("subscription_credited".to_string())
+            }
             NotificationBody::PayoutAvailable { .. } => {
                 Some("payout_available".to_string())
             }
+            NotificationBody::Custom { .. } => Some("custom".to_string()),
             NotificationBody::LegacyMarkdown {
                 notification_type, ..
             } => notification_type.clone(),
@@ -378,9 +394,31 @@ impl LegacyNotification {
                 service,
                 currency,
             },
+            NotificationBody::Custom {
+                title,
+                body_md,
+                key,
+            } => LegacyNotificationBody::Custom {
+                title,
+                body_md,
+                key,
+            },
             NotificationBody::PaymentFailed { amount, service } => {
                 LegacyNotificationBody::PaymentFailed { amount, service }
             }
+            NotificationBody::SubscriptionCredited {
+                subscription_id,
+                days,
+                previous_due,
+                next_due,
+                header_message,
+            } => LegacyNotificationBody::SubscriptionCredited {
+                subscription_id,
+                days,
+                previous_due,
+                next_due,
+                header_message,
+            },
             NotificationBody::Unknown => LegacyNotificationBody::Unknown,
         };
 

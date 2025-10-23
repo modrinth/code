@@ -1,0 +1,15 @@
+[package]
+name = "modrinth-util"
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+actix-web = { workspace = true }
+derive_more = { workspace = true, features = ["display", "error", "from"] }
+dotenvy = { workspace = true }
+eyre = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+
+[lints]
+workspace = true

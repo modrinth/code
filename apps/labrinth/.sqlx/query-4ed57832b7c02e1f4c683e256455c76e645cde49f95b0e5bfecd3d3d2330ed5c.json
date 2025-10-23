@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                charges.id, charges.user_id, charges.price_id, charges.amount, charges.currency_code, charges.status, charges.due, charges.last_attempt,\n                charges.charge_type, charges.subscription_id, charges.tax_amount, charges.tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                charges.subscription_interval AS \"subscription_interval?\",\n                charges.payment_platform,\n                charges.payment_platform_id AS \"payment_platform_id?\",\n                charges.parent_charge_id AS \"parent_charge_id?\",\n                charges.net AS \"net?\",\n\t\t\t\tcharges.tax_last_updated AS \"tax_last_updated?\",\n\t\t\t\tcharges.tax_drift_loss AS \"tax_drift_loss?\"\n            FROM charges\n            \n\t\t\tWHERE\n\t\t\t  status = 'succeeded'\n\t\t\t  AND tax_platform_id IS NULL\n              AND payment_platform_id IS NOT NULL\n\t\t\tORDER BY due ASC\n\t\t\tFOR NO KEY UPDATE SKIP LOCKED\n            OFFSET $1\n\t\t\tLIMIT $2\n\t\t\t",
+  "query": "\n            SELECT\n                charges.id, charges.user_id, charges.price_id, charges.amount, charges.currency_code, charges.status, charges.due, charges.last_attempt,\n                charges.charge_type, charges.subscription_id, charges.tax_amount, charges.tax_platform_id,\n                -- Workaround for https://github.com/launchbadge/sqlx/issues/3336\n                charges.subscription_interval AS \"subscription_interval?\",\n                charges.payment_platform,\n                charges.payment_platform_id AS \"payment_platform_id?\",\n                charges.parent_charge_id AS \"parent_charge_id?\",\n                charges.net AS \"net?\",\n\t\t\t\tcharges.tax_last_updated AS \"tax_last_updated?\",\n\t\t\t\tcharges.tax_drift_loss AS \"tax_drift_loss?\",\n                charges.tax_transaction_version AS \"tax_transaction_version?\",\n                charges.tax_platform_accounting_time AS \"tax_platform_accounting_time?\"\n            FROM charges\n            \n            WHERE\n                charge_type = $1 AND\n                (\n                    (status = 'open' AND due < NOW()) OR\n                    (status = 'failed' AND last_attempt < NOW() - INTERVAL '2 days')\n                )\n            ",
   "describe": {
     "columns": [
       {
@@ -97,12 +97,21 @@
         "ordinal": 18,
         "name": "tax_drift_loss?",
         "type_info": "Int8"
+      },
+      {
+        "ordinal": 19,
+        "name": "tax_transaction_version?",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 20,
+        "name": "tax_platform_accounting_time?",
+        "type_info": "Timestamptz"
       }
     ],
     "parameters": {
       "Left": [
-        "Int8",
-        "Int8"
+        "Text"
       ]
     },
     "nullable": [
@@ -124,8 +133,10 @@
       true,
       true,
       true,
+      true,
+      true,
       true
     ]
   },
-  "hash": "050e755134f6d1f09de805ae2cd0f7ca8f6efb96be9f070c43db7fd2049af2d2"
+  "hash": "4ed57832b7c02e1f4c683e256455c76e645cde49f95b0e5bfecd3d3d2330ed5c"
 }

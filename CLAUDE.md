@@ -1,5 +1,7 @@
 # Architecture
 
+Use TAB instead of spaces.
+
 ## Frontend
 
 There are two similar frontends in the Modrinth monorepo, the website (apps/frontend) and the app frontend (apps/app-frontend).
@@ -43,6 +45,7 @@ To prepare the sqlx cache, cd into `apps/labrinth` and run `cargo sqlx prepare`.
 Read the root `docker-compose.yml` to see what running services are available while developing. Use `docker exec` to access these services.
 
 When the user refers to "performing pre-PR checks", do the following:
+
 - Run clippy as described above
 - DO NOT run tests unless explicitly requested (they take a long time)
 - Prepare the sqlx cache

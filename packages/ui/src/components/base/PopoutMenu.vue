@@ -3,7 +3,7 @@
 		ref="dropdown"
 		no-auto-focus
 		:aria-id="dropdownId || null"
-		placement="bottom-end"
+		:placement="placement"
 		:class="dropdownClass"
 		@apply-hide="focusTrigger"
 		@apply-show="focusMenuChild"
@@ -43,6 +43,11 @@ defineProps({
 	tooltip: {
 		type: String,
 		default: null,
+		required: false,
+	},
+	placement: {
+		type: String,
+		default: 'bottom-end',
 		required: false,
 	},
 })

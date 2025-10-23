@@ -80,11 +80,12 @@ impl CacheValueType {
         }
     }
 
+    /// Returns the expiry time for entries of this type of cache item, in seconds.
     pub fn expiry(&self) -> i64 {
         match self {
-            CacheValueType::File => 60 * 60 * 24 * 30, // 30 days
-            CacheValueType::FileHash => 60 * 60 * 24 * 30, // 30 days
-            _ => 60 * 60 * 30,                         // 30 minutes
+            CacheValueType::File => 30 * 24 * 60 * 60, // 30 days
+            CacheValueType::FileHash => 30 * 24 * 60 * 60, // 30 days
+            _ => 30 * 60,                              // 30 minutes
         }
     }
 

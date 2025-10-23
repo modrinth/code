@@ -1,23 +1,20 @@
 [package]
 name = "daedalus"
 version = "0.2.3"
-authors = ["Jai A <jai@modrinth.com>"]
 edition.workspace = true
-license = "MIT"
 description = "Utilities for querying and parsing Minecraft metadata"
-repository = "https://github.com/modrinth/daedalus/"
-include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
-keywords = ["minecraft", "launcher"]
-categories = ["game-development", "api-bindings"]
 readme = "README.md"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+repository = "https://github.com/modrinth/daedalus/"
+license = "MIT"
+keywords = ["launcher", "minecraft"]
+categories = ["api-bindings", "game-development"]
+include = ["Cargo.toml", "LICENSE", "README.md", "src/**/*.rs"]
 
 [dependencies]
-serde = { workspace = true, features = ["derive"] }
-serde_json.workspace = true
 chrono = { workspace = true, features = ["serde"] }
-thiserror.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
 
 [lints]
 workspace = true

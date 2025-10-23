@@ -1,8 +1,10 @@
 use self::payments::*;
 use crate::auth::get_user_from_headers;
 use crate::database::models::charge_item::DBCharge;
+use crate::database::models::ids::DBUserSubscriptionId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::products_tax_identifier_item::product_info_by_product_price_id;
+use crate::database::models::users_subscriptions_credits::DBUserSubscriptionCredit;
 use crate::database::models::{
     charge_item, generate_charge_id, product_item, user_subscription_item,
 };
@@ -48,6 +50,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(edit_payment_method)
             .service(remove_payment_method)
             .service(charges)
+            .service(credit)
             .service(active_servers)
             .service(initiate_payment)
             .service(stripe_webhook)
@@ -267,6 +270,24 @@ pub async fn refund_charge(
                         .tax_identifier
                         .tax_processor_id;
 
+                        let Some((
+                            (
+                                original_tax_platform_id,
+                                original_tax_transaction_version,
+                            ),
+                            original_tax_platform_accounting_time,
+                        )) = charge
+                            .tax_platform_id
+                            .clone()
+                            .zip(charge.tax_transaction_version)
+                            .zip(charge.tax_platform_accounting_time)
+                        else {
+                            return Err(ApiError::InvalidInput(
+                                "Charge is missing full tax information. Please wait for the original charge to be synchronized with the tax processor."
+                                    .to_owned(),
+                            ));
+                        };
+
                         let refund = stripe::Refund::create(
                             &stripe_client,
                             CreateRefund {
@@ -281,13 +302,16 @@ pub async fn refund_charge(
                         )
                         .await?;
 
-                        let anrok_txn_result = anrok_client.create_or_update_txn(
+                        let anrok_txn_result = anrok_client.negate_or_create_partial_negation(
+                            original_tax_platform_id,
+                            original_tax_transaction_version,
+                            charge.amount + charge.tax_amount,
                             &anrok::Transaction {
                                 id: anrok::transaction_id_stripe_pyr(&refund.id),
                                 fields: anrok::TransactionFields {
                                     customer_address: anrok::Address::from_stripe_address(&billing_address),
                                     currency_code: charge.currency_code.clone(),
-                                    accounting_time: Utc::now(),
+                                    accounting_time: original_tax_platform_accounting_time,
                                     accounting_time_zone: anrok::AccountingTimeZone::Utc,
                                     line_items: vec![anrok::LineItem::new_including_tax_amount(tax_id, -refund_amount)],
                                     customer_id: Some(format!("stripe:cust:{}", user.stripe_customer_id.unwrap_or_else(|| "unknown".to_owned()))),
@@ -347,6 +371,8 @@ pub async fn refund_charge(
             currency_code: charge.currency_code,
             tax_last_updated: Some(Utc::now()),
             tax_drift_loss: Some(0),
+            tax_transaction_version: None,
+            tax_platform_accounting_time: None,
         }
         .upsert(&mut transaction)
         .await?;
@@ -688,6 +714,14 @@ pub async fn edit_subscription(
                     }));
                 }
 
+                let payment_request_type =
+                    PaymentRequestType::from_stripe_id(payment_method)
+                        .ok_or_else(|| {
+                            ApiError::InvalidInput(
+                                "Invalid payment method ID".to_owned(),
+                            )
+                        })?;
+
                 if req == PaymentRequirement::RequiresPayment {
                     let results = create_or_update_payment_intent(
                         &pool,
@@ -698,10 +732,7 @@ pub async fn edit_subscription(
                             user: &user,
                             payment_intent: None,
                             payment_session: PaymentSession::Interactive {
-                                payment_request_type:
-                                    PaymentRequestType::PaymentMethod {
-                                        id: payment_method,
-                                    },
+                                payment_request_type,
                             },
                             attached_charge: AttachedCharge::Promotion {
                                 product_id: new_product_price.product_id.into(),
@@ -1270,6 +1301,19 @@ pub enum PaymentRequestType {
     ConfirmationToken { token: String },
 }
 
+impl PaymentRequestType {
+    pub fn from_stripe_id(id: String) -> Option<Self> {
+        let prefix = id.split_at(id.split_once('_')?.0.len() + 1).0;
+        if stripe::PaymentMethodId::is_valid_prefix(prefix) {
+            Some(Self::PaymentMethod { id })
+        } else if prefix == "ctoken_" {
+            Some(Self::ConfirmationToken { token: id })
+        } else {
+            None
+        }
+    }
+}
+
 #[derive(Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ChargeRequestType {
@@ -1641,6 +1685,8 @@ pub async fn stripe_webhook(
                             net: None,
                             tax_last_updated: Some(Utc::now()),
                             tax_drift_loss: Some(0),
+                            tax_transaction_version: None,
+                            tax_platform_accounting_time: None,
                         };
 
                         if charge_status != ChargeStatus::Failed {
@@ -2004,6 +2050,8 @@ pub async fn stripe_webhook(
                                 tax_platform_id: None,
                                 tax_last_updated: Some(Utc::now()),
                                 tax_drift_loss: Some(0),
+                                tax_transaction_version: None,
+                                tax_platform_accounting_time: None,
                             }
                             .upsert(&mut transaction)
                             .await?;
@@ -2140,6 +2188,247 @@ pub async fn stripe_webhook(
     }
 
     Ok(HttpResponse::Ok().finish())
+}
+
+#[allow(clippy::too_many_arguments)]
+async fn apply_credit_many(
+    transaction: &mut Transaction<'_, Postgres>,
+    redis: &RedisPool,
+    current_user_id: crate::database::models::ids::DBUserId,
+    subscription_ids: Vec<crate::models::ids::UserSubscriptionId>,
+    days: i32,
+    send_email: bool,
+    message: String,
+) -> Result<(), ApiError> {
+    let subs_ids: Vec<DBUserSubscriptionId> = subscription_ids
+        .iter()
+        .map(|id| DBUserSubscriptionId(id.0 as i64))
+        .collect();
+    let subs = user_subscription_item::DBUserSubscription::get_many(
+        &subs_ids,
+        &mut **transaction,
+    )
+    .await?;
+
+    let provisioned_count = subs
+        .iter()
+        .filter(|s| s.status == SubscriptionStatus::Provisioned)
+        .count();
+
+    let mut credit_sub_ids: Vec<DBUserSubscriptionId> =
+        Vec::with_capacity(provisioned_count);
+    let mut credit_user_ids: Vec<crate::database::models::ids::DBUserId> =
+        Vec::with_capacity(provisioned_count);
+    let mut credit_creditor_ids: Vec<crate::database::models::ids::DBUserId> =
+        Vec::with_capacity(provisioned_count);
+    let mut credit_days: Vec<i32> = Vec::with_capacity(provisioned_count);
+    let mut credit_prev_dues: Vec<chrono::DateTime<chrono::Utc>> =
+        Vec::with_capacity(provisioned_count);
+    let mut credit_next_dues: Vec<chrono::DateTime<chrono::Utc>> =
+        Vec::with_capacity(provisioned_count);
+
+    for subscription in subs {
+        if subscription.status != SubscriptionStatus::Provisioned {
+            continue;
+        }
+
+        let mut open_charge = charge_item::DBCharge::get_open_subscription(
+            subscription.id,
+            &mut **transaction,
+        )
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput(format!(
+                "Could not find open charge for subscription {}",
+                to_base62(subscription.id.0 as u64)
+            ))
+        })?;
+
+        let previous_due = open_charge.due;
+        open_charge.due = previous_due + Duration::days(days as i64);
+        let next_due = open_charge.due;
+        open_charge.upsert(&mut *transaction).await?;
+
+        credit_sub_ids.push(subscription.id);
+        credit_user_ids.push(subscription.user_id);
+        credit_creditor_ids.push(current_user_id);
+        credit_days.push(days);
+        credit_prev_dues.push(previous_due);
+        credit_next_dues.push(next_due);
+
+        if send_email {
+            NotificationBuilder {
+                body: NotificationBody::SubscriptionCredited {
+                    subscription_id: subscription.id.into(),
+                    days,
+                    previous_due,
+                    next_due,
+                    header_message: Some(message.clone()),
+                },
+            }
+            .insert(subscription.user_id, &mut *transaction, redis)
+            .await?;
+        }
+    }
+
+    DBUserSubscriptionCredit::insert_many(
+        &mut *transaction,
+        &credit_sub_ids,
+        &credit_user_ids,
+        &credit_creditor_ids,
+        &credit_days,
+        &credit_prev_dues,
+        &credit_next_dues,
+    )
+    .await
+    .map_err(|e| ApiError::Internal(eyre::eyre!(e)))?;
+
+    Ok(())
+}
+
+#[derive(Deserialize)]
+pub struct CreditRequest {
+    #[serde(flatten)]
+    pub target: CreditTarget,
+    pub days: i32,
+    pub send_email: bool,
+    pub message: String,
+}
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+pub enum CreditTarget {
+    Subscriptions {
+        subscription_ids: Vec<crate::models::ids::UserSubscriptionId>,
+    },
+    Nodes {
+        nodes: Vec<String>,
+    },
+    Region {
+        region: String,
+    },
+}
+
+#[post("credit")]
+pub async fn credit(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    archon_client: web::Data<crate::util::archon::ArchonClient>,
+    body: web::Json<CreditRequest>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await?
+    .1;
+
+    if !user.role.is_admin() {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to credit subscriptions!".to_string(),
+        ));
+    }
+
+    let CreditRequest {
+        target,
+        days,
+        send_email,
+        message,
+    } = body.into_inner();
+
+    if days <= 0 {
+        return Err(ApiError::InvalidInput(
+            "Days must be greater than zero".to_string(),
+        ));
+    }
+    let mut transaction = pool.begin().await?;
+
+    match target {
+        CreditTarget::Subscriptions { subscription_ids } => {
+            if subscription_ids.is_empty() {
+                return Err(ApiError::InvalidInput(
+                    "You must specify at least one subscription id".to_string(),
+                ));
+            }
+            apply_credit_many(
+                &mut transaction,
+                &redis,
+                crate::database::models::ids::DBUserId(user.id.0 as i64),
+                subscription_ids,
+                days,
+                send_email,
+                message,
+            )
+            .await?;
+        }
+        CreditTarget::Nodes { nodes } => {
+            if nodes.is_empty() {
+                return Err(ApiError::InvalidInput(
+                    "You must specify at least one node hostname".to_string(),
+                ));
+            }
+            let mut server_ids: Vec<String> = Vec::new();
+            for hostname in nodes {
+                let ids =
+                    archon_client.get_servers_by_hostname(&hostname).await?;
+                server_ids.extend(ids.into_iter().map(|id| id.to_string()));
+            }
+            server_ids.dedup();
+            let subs = user_subscription_item::DBUserSubscription::get_many_by_server_ids(
+                &server_ids,
+                &mut *transaction,
+            )
+            .await?;
+            if subs.is_empty() {
+                return Err(ApiError::InvalidInput(
+                    "No subscriptions found for provided nodes".to_string(),
+                ));
+            }
+            apply_credit_many(
+                &mut transaction,
+                &redis,
+                crate::database::models::ids::DBUserId(user.id.0 as i64),
+                subs.into_iter().map(|s| s.id.into()).collect(),
+                days,
+                send_email,
+                message,
+            )
+            .await?;
+        }
+        CreditTarget::Region { region } => {
+            let servers =
+                archon_client.get_active_servers_by_region(&region).await?;
+            let subs = user_subscription_item::DBUserSubscription::get_many_by_server_ids(
+                &servers.into_iter().map(|id| id.to_string()).collect::<Vec<String>>(),
+                &mut *transaction,
+            )
+            .await?;
+            if subs.is_empty() {
+                return Err(ApiError::InvalidInput(
+                    "No subscriptions found for provided region".to_string(),
+                ));
+            }
+            apply_credit_many(
+                &mut transaction,
+                &redis,
+                crate::database::models::ids::DBUserId(user.id.0 as i64),
+                subs.into_iter().map(|s| s.id.into()).collect(),
+                days,
+                send_email,
+                message,
+            )
+            .await?;
+        }
+    }
+
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().finish())
 }
 
 pub mod payments;

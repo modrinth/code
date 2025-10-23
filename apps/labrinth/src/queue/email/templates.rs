@@ -1,12 +1,15 @@
 use super::MailError;
 use crate::database::models::ids::*;
-use crate::database::models::notifications_template_item::NotificationTemplate;
+use crate::database::models::notifications_template_item::{
+    NotificationTemplate, get_or_set_cached_dynamic_html,
+};
 use crate::database::models::{
     DBOrganization, DBProject, DBUser, DatabaseError,
 };
 use crate::database::redis::RedisPool;
 use crate::models::v3::notifications::NotificationBody;
 use crate::routes::ApiError;
+use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
 use futures::TryFutureExt;
 use lettre::Message;
@@ -38,6 +41,12 @@ const TAXNOTIFICATION_BILLING_INTERVAL: &str =
     "taxnotification.billing_interval";
 const TAXNOTIFICATION_DUE: &str = "taxnotification.due";
 const TAXNOTIFICATION_SERVICE: &str = "taxnotification.service";
+
+const CREDIT_DAYS: &str = "credit.days_formatted";
+const CREDIT_PREVIOUS_DUE: &str = "credit.previous_due";
+const CREDIT_NEXT_DUE: &str = "credit.next_due";
+const CREDIT_HEADER_MESSAGE: &str = "credit.header_message";
+const CREDIT_SUBSCRIPTION_TYPE: &str = "credit.subscription.type";
 
 const PAYMENTFAILED_AMOUNT: &str = "paymentfailed.amount";
 const PAYMENTFAILED_SERVICE: &str = "paymentfailed.service";
@@ -138,12 +147,21 @@ pub async fn build_email(
         reply_address,
     } = from;
 
-    let (html_body_result, mut variables) = futures::try_join!(
-        get_html_body,
-        collect_template_variables(exec, redis, user_id, body)
-    )?;
+    let db_user = DBUser::get_id(user_id, &mut **exec, redis)
+        .await?
+        .ok_or(DatabaseError::Database(sqlx::Error::RowNotFound))?;
 
-    variables.insert(USER_EMAIL, to.email.to_string());
+    let map = [
+        (USER_NAME, db_user.username),
+        (USER_EMAIL, to.email.to_string()),
+    ]
+    .into_iter()
+    .collect();
+
+    let (html_body_result, either) = futures::try_join!(
+        get_html_body,
+        collect_template_variables(exec, redis, user_id, body, map)
+    )?;
 
     let mut message_builder = Message::builder().from(Mailbox::new(
         Some(from_name),
@@ -157,28 +175,79 @@ pub async fn build_email(
         ));
     }
 
-    let subject = fill_template(&template.subject_line, &variables);
-    message_builder = message_builder.to(to).subject(subject);
+    struct Body {
+        plaintext: Option<String>,
+        html: Option<String>,
+    }
 
-    let plaintext_filled_body =
-        fill_template(&template.plaintext_fallback, &variables);
+    let (body, subject) = match either {
+        EmailTemplate::Static(variables) => {
+            let plaintext_filled_body =
+                fill_template(&template.plaintext_fallback, &variables);
 
-    let email_message = match html_body_result {
-        Ok(html_body) => {
-            let html_filled_body = fill_template(&html_body, &variables);
-            message_builder
-                .multipart(MultiPart::alternative_plain_html(
-                    plaintext_filled_body,
-                    html_filled_body,
-                ))
-                .map_err(MailError::from)?
+            let email_body = Body {
+                plaintext: Some(plaintext_filled_body),
+                html: match html_body_result {
+                    Ok(html_body) => {
+                        Some(fill_template(&html_body, &variables))
+                    }
+                    Err(error) => {
+                        error!(%error, "Failed to fetch template body");
+                        None
+                    }
+                },
+            };
+
+            let subject = fill_template(&template.subject_line, &variables);
+
+            (email_body, subject)
         }
 
-        Err(error) => {
-            error!(%error, "Failed to fetch template body");
-            message_builder
-                .singlepart(SinglePart::plain(plaintext_filled_body))
-                .map_err(MailError::from)?
+        EmailTemplate::Dynamic {
+            variables,
+            body,
+            title,
+        } => {
+            let body = Body {
+                plaintext: None,
+                html: Some(fill_template(&body, &variables)),
+            };
+
+            (body, fill_template(&title, &variables))
+        }
+    };
+
+    message_builder = message_builder.to(to).subject(subject);
+
+    let email_message = match body {
+        Body {
+            plaintext: Some(plaintext),
+            html: Some(html),
+        } => message_builder
+            .multipart(MultiPart::alternative_plain_html(plaintext, html))
+            .map_err(MailError::from)?,
+
+        Body {
+            plaintext: Some(plaintext),
+            html: None,
+        } => message_builder
+            .singlepart(SinglePart::plain(plaintext))
+            .map_err(MailError::from)?,
+
+        Body {
+            plaintext: None,
+            html: Some(html),
+        } => message_builder
+            .singlepart(SinglePart::html(html))
+            .map_err(MailError::from)?,
+
+        Body {
+            plaintext: None,
+            html: None,
+        } => {
+            return Err(ApiError::Internal(eyre::eyre!(
+                "Neither HTML or plaintext could be generated"
+            )));
         }
     };
 
@@ -218,23 +287,26 @@ fn fill_template(
     buffer
 }
 
+enum EmailTemplate {
+    Static(HashMap<&'static str, String>),
+    Dynamic {
+        variables: HashMap<&'static str, String>,
+        body: String,
+        title: String,
+    },
+}
+
 async fn collect_template_variables(
     exec: &mut sqlx::PgTransaction<'_>,
     redis: &RedisPool,
     user_id: DBUserId,
     n: &NotificationBody,
-) -> Result<HashMap<&'static str, String>, ApiError> {
-    let db_user = DBUser::get_id(user_id, &mut **exec, redis)
-        .await?
-        .ok_or_else(|| DatabaseError::Database(sqlx::Error::RowNotFound))?;
-
-    let mut map = HashMap::new();
-    map.insert(USER_NAME, db_user.username);
-
+    mut map: HashMap<&'static str, String>,
+) -> Result<EmailTemplate, ApiError> {
     match &n {
         NotificationBody::PatCreated { token_name } => {
             map.insert(NEWPAT_TOKEN_NAME, token_name.clone());
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::ModerationMessageReceived { project_id, .. } => {
@@ -250,7 +322,7 @@ async fn collect_template_variables(
             map.insert(PROJECT_ID, to_base62(project_id.0));
             map.insert(PROJECT_NAME, result.name);
             map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::ReportStatusUpdated { report_id } => {
@@ -273,7 +345,7 @@ async fn collect_template_variables(
             map.insert(REPORT_ID, to_base62(report_id.0));
             map.insert(REPORT_TITLE, result.title);
             map.insert(REPORT_DATE, date_human_readable(result.created));
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::ReportSubmitted { report_id } => {
@@ -294,7 +366,7 @@ async fn collect_template_variables(
 
             map.insert(REPORT_TITLE, result.title);
             map.insert(NEWREPORT_ID, to_base62(report_id.0));
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::ProjectStatusApproved { project_id } => {
@@ -310,7 +382,7 @@ async fn collect_template_variables(
             map.insert(PROJECT_ID, to_base62(project_id.0));
             map.insert(PROJECT_NAME, result.name);
             map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::ProjectStatusNeutral {
@@ -332,7 +404,7 @@ async fn collect_template_variables(
             map.insert(PROJECT_ICON_URL, result.icon_url.unwrap_or_default());
             map.insert(PROJECT_OLD_STATUS, old_status.as_str().to_string());
             map.insert(PROJECT_NEW_STATUS, new_status.as_str().to_string());
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::ProjectTransferred {
@@ -388,7 +460,7 @@ async fn collect_template_variables(
                 map.insert(NEWOWNER_NAME, org.name);
             }
 
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
         NotificationBody::TeamInvite {
             team_id: _,
@@ -419,7 +491,7 @@ async fn collect_template_variables(
             map.insert(TEAMINVITE_PROJECT_NAME, result.project_name);
             map.insert(TEAMINVITE_ROLE_NAME, role.clone());
 
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::OrganizationInvite {
@@ -451,7 +523,7 @@ async fn collect_template_variables(
             map.insert(ORGINVITE_ORG_NAME, result.organization_name);
             map.insert(ORGINVITE_ROLE_NAME, role.clone());
 
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::StatusChange {
@@ -479,7 +551,7 @@ async fn collect_template_variables(
             map.insert(STATUSCHANGE_OLD_STATUS, old_status.as_str().to_owned());
             map.insert(STATUSCHANGE_NEW_STATUS, new_status.as_str().to_owned());
 
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::ResetPassword { flow } => {
@@ -492,7 +564,7 @@ async fn collect_template_variables(
 
             map.insert(RESETPASSWORD_URL, url);
 
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::VerifyEmail { flow } => {
@@ -505,20 +577,20 @@ async fn collect_template_variables(
 
             map.insert(VERIFYEMAIL_URL, url);
 
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::AuthProviderAdded { provider }
         | NotificationBody::AuthProviderRemoved { provider } => {
             map.insert(AUTHPROVIDER_NAME, provider.clone());
 
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::TwoFactorEnabled
         | NotificationBody::TwoFactorRemoved
         | NotificationBody::PasswordChanged
-        | NotificationBody::PasswordRemoved => Ok(map),
+        | NotificationBody::PasswordRemoved => Ok(EmailTemplate::Static(map)),
 
         NotificationBody::EmailChanged {
             new_email,
@@ -526,7 +598,7 @@ async fn collect_template_variables(
         } => {
             map.insert(EMAILCHANGED_NEW_EMAIL, new_email.clone());
 
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::PaymentFailed { amount, service } => {
@@ -541,7 +613,7 @@ async fn collect_template_variables(
             map.insert(PAYMENTFAILED_SERVICE, service.clone());
             map.insert(BILLING_URL, url);
 
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::PayoutAvailable {
@@ -562,7 +634,7 @@ async fn collect_template_variables(
                 format!("USD${:.2}", *amount as f64 / 100.0),
             );
 
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
 
         NotificationBody::TaxNotification {
@@ -607,14 +679,98 @@ async fn collect_template_variables(
             map.insert(TAXNOTIFICATION_DUE, date_human_readable(*due));
             map.insert(TAXNOTIFICATION_SERVICE, service.clone());
             map.insert(SUBSCRIPTION_ID, to_base62(subscription_id.0));
-            Ok(map)
+            Ok(EmailTemplate::Static(map))
         }
+
+        NotificationBody::SubscriptionCredited {
+            subscription_id,
+            days,
+            previous_due,
+            next_due,
+            header_message,
+        } => {
+            map.insert(
+                CREDIT_DAYS,
+                format!("{days} day{}", if *days == 1 { "" } else { "s" }),
+            );
+            map.insert(CREDIT_PREVIOUS_DUE, date_human_readable(*previous_due));
+            map.insert(CREDIT_NEXT_DUE, date_human_readable(*next_due));
+            map.insert(SUBSCRIPTION_ID, to_base62(subscription_id.0));
+
+            // Only insert header message if provided; frontend sets default fallback
+            if let Some(h) = header_message.clone() {
+                map.insert(CREDIT_HEADER_MESSAGE, h);
+            }
+
+            // Derive subscription type label for templates
+            // Resolve product metadata via price_id join
+            if let Some(info) = crate::database::models::user_subscription_item::DBUserSubscription::get(
+                (*subscription_id).into(),
+                &mut **exec,
+            )
+            .await
+            .ok()
+            .flatten()
+                && let Ok(Some(pinfo)) = crate::database::models::products_tax_identifier_item::product_info_by_product_price_id(info.price_id, &mut **exec).await {
+                    let label = match pinfo.product_metadata {
+                        crate::models::billing::ProductMetadata::Pyro { .. } => "server".to_string(),
+                        crate::models::billing::ProductMetadata::Medal { .. } => "server".to_string(),
+                        crate::models::billing::ProductMetadata::Midas => "Modrinth+".to_string(),
+                    };
+                    map.insert(CREDIT_SUBSCRIPTION_TYPE, label);
+                }
+
+            Ok(EmailTemplate::Static(map))
+        }
+
+        NotificationBody::Custom {
+            title,
+            body_md,
+            key,
+        } => Ok(EmailTemplate::Dynamic {
+            variables: map,
+            body: dynamic_email_body(redis, title, body_md, key).await?,
+            title: title.to_string(),
+        }),
 
         NotificationBody::ProjectUpdate { .. }
         | NotificationBody::ModeratorMessage { .. }
         | NotificationBody::LegacyMarkdown { .. }
-        | NotificationBody::Unknown => Ok(map),
+        | NotificationBody::Unknown => Ok(EmailTemplate::Static(map)),
     }
+}
+
+async fn dynamic_email_body(
+    redis: &RedisPool,
+    title: &str,
+    body_md: &str,
+    key: &str,
+) -> Result<String, ApiError> {
+    get_or_set_cached_dynamic_html(redis, key, || async {
+        let site_url = dotenvy::var("SITE_URL")
+            .wrap_internal_err("SITE_URL is not set")?;
+        let site_url = site_url.trim_end_matches('/');
+
+        let url = format!("{site_url}/_internal/templates/email/dynamic");
+
+        std::str::from_utf8(
+            reqwest::Client::new()
+                .post(url)
+                .json(&serde_json::json!({
+                    "title": title,
+                    "body": body_md,
+                }))
+                .send()
+                .await
+                .and_then(|res| res.error_for_status())?
+                .bytes()
+                .await?
+                .as_ref(),
+        )
+        .wrap_internal_err("email body is not valid UTF-8")
+        .map(ToOwned::to_owned)
+    })
+    .await
 }
 
 fn date_human_readable(date: chrono::DateTime<chrono::Utc>) -> String {
