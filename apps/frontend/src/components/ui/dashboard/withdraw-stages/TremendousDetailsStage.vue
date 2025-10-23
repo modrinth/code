@@ -41,6 +41,7 @@
 				v-model="deliveryEmail"
 				type="email"
 				:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
+				autocomplete="email"
 				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 			/>
 

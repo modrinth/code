@@ -685,12 +685,20 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			apiVersion: 3,
 			method: 'POST',
 			body: payload,
-		})) as { fee: number | null; exchange_rate: number | null }
+		})) as { fee: number | string | null; exchange_rate: number | string | null }
 
-		withdrawData.value.calculation.fee = response.fee || 0
-		withdrawData.value.calculation.exchangeRate = response.exchange_rate || null
+		const parsedFee = response.fee ? Number.parseFloat(String(response.fee)) : 0
+		const parsedExchangeRate = response.exchange_rate
+			? Number.parseFloat(String(response.exchange_rate))
+			: null
 
-		return response
+		withdrawData.value.calculation.fee = parsedFee
+		withdrawData.value.calculation.exchangeRate = parsedExchangeRate
+
+		return {
+			fee: parsedFee,
+			exchange_rate: parsedExchangeRate,
+		}
 	}
 
 	async function submitWithdrawal(): Promise<void> {

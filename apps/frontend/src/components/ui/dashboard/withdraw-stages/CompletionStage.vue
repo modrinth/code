@@ -36,7 +36,7 @@
 						{{ formatMessage(messages.amount) }}
 					</span>
 					<span class="text-nowrap text-base font-semibold text-contrast">
-						{{ formatCurrency(result?.amount || 0) }}
+						{{ formatMoney(result?.amount || 0) }}
 					</span>
 				</div>
 				<div class="flex w-full items-center justify-between">
@@ -44,7 +44,7 @@
 						{{ formatMessage(messages.fee) }}
 					</span>
 					<span class="text-nowrap text-base font-semibold text-contrast">
-						{{ formatCurrency(result?.fee || 0) }}
+						{{ formatMoney(result?.fee || 0) }}
 					</span>
 				</div>
 				<div class="border-b-1 h-0 w-full rounded-full border-b border-solid border-divider" />
@@ -53,9 +53,24 @@
 						{{ formatMessage(messages.netAmount) }}
 					</span>
 					<span class="text-nowrap text-base font-semibold text-contrast">
-						{{ formatCurrency(result?.netAmount || 0) }}
+						{{ formatMoney(result?.netAmount || 0) }}
+						<template v-if="shouldShowExchangeRate">
+							<span class="text-secondary"> ({{ formattedLocalCurrency }})</span>
+						</template>
 					</span>
 				</div>
+				<template v-if="shouldShowExchangeRate">
+					<div class="border-b-1 h-0 w-full rounded-full border-b border-solid border-divider" />
+					<div class="flex w-full items-center justify-between">
+						<span class="text-nowrap text-base font-normal text-primary">
+							{{ formatMessage(messages.exchangeRate) }}
+						</span>
+						<span class="text-nowrap text-base font-normal text-secondary">
+							1 USD = {{ withdrawData.calculation.exchangeRate?.toFixed(4) }}
+							{{ localCurrency }}
+						</span>
+					</div>
+				</template>
 			</div>
 		</div>
 		<span
@@ -98,6 +113,7 @@
 
 <script setup lang="ts">
 import { ButtonStyled } from '@modrinth/ui'
+import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 import dayjs from 'dayjs'
@@ -105,6 +121,7 @@ import { computed, onMounted, ref } from 'vue'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { getRailConfig } from '@/utils/muralpay-rails'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const { withdrawData } = useWithdrawContext()
@@ -130,14 +147,44 @@ const formattedDate = computed(() => {
 	return dayjs(result.value.created).format('MMMM D, YYYY')
 })
 
-function formatCurrency(amount: number): string {
-	return new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: 'USD',
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2,
-	}).format(amount)
-}
+const selectedRail = computed(() => {
+	const railId = withdrawData.value.selection.method
+	return railId ? getRailConfig(railId) : null
+})
+
+const localCurrency = computed(() => {
+	return selectedRail.value?.currency
+})
+
+const shouldShowExchangeRate = computed(() => {
+	if (!localCurrency.value) return false
+	if (localCurrency.value === 'USD') return false
+	const exchangeRate = withdrawData.value.calculation.exchangeRate
+	return exchangeRate !== null && exchangeRate !== undefined && exchangeRate > 0
+})
+
+const netAmountInLocalCurrency = computed(() => {
+	if (!shouldShowExchangeRate.value) return null
+	const netAmount = result.value?.netAmount || 0
+	const exchangeRate = withdrawData.value.calculation.exchangeRate || 0
+	return netAmount * exchangeRate
+})
+
+const formattedLocalCurrency = computed(() => {
+	if (!shouldShowExchangeRate.value || !netAmountInLocalCurrency.value || !localCurrency.value)
+		return ''
+
+	try {
+		return new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: localCurrency.value,
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		}).format(netAmountInLocalCurrency.value)
+	} catch {
+		return `${localCurrency.value} ${netAmountInLocalCurrency.value.toFixed(2)}`
+	}
+})
 
 function handleClose() {
 	emit('close')
@@ -175,6 +222,10 @@ const messages = defineMessages({
 	netAmount: {
 		id: 'dashboard.withdraw.completion.net-amount',
 		defaultMessage: 'Net amount',
+	},
+	exchangeRate: {
+		id: 'dashboard.withdraw.completion.exchange-rate',
+		defaultMessage: 'Exchange rate',
 	},
 	emailConfirmation: {
 		id: 'dashboard.withdraw.completion.email-confirmation',

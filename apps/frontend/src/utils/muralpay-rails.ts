@@ -12,6 +12,7 @@ export interface FieldConfig {
 	options?: Array<{ value: string; label: MessageDescriptor }>
 	pattern?: string
 	validate?: (value: string) => string | null
+	autocomplete?: string
 }
 
 export interface RailConfig {
@@ -86,6 +87,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 			{
 				name: 'bankAccountNumber',
@@ -99,6 +101,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.enter-account-number',
 					defaultMessage: 'Enter account number',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'bankRoutingNumber',
@@ -114,6 +117,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				}),
 				pattern: '^[0-9]{9}$',
 				validate: (val) => (/^\d{9}$/.test(val) ? null : 'Must be exactly 9 digits'),
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -143,6 +147,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.help.iban',
 					defaultMessage: 'International Bank Account Number',
 				}),
+				autocomplete: 'iban',
 			},
 			{
 				name: 'swiftBic',
@@ -157,12 +162,14 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.help.swift-bic',
 					defaultMessage: 'Bank Identifier Code',
 				}),
+				autocomplete: 'swift',
 			},
 			{
 				name: 'country',
 				type: 'select',
 				label: defineMessage({ id: 'muralpay.field.country', defaultMessage: 'Country' }),
 				required: true,
+				autocomplete: 'off',
 				options: [
 					{
 						value: 'AT',
@@ -268,6 +275,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				}),
 				pattern: '^[0-9]{18}$',
 				validate: (val) => (/^\d{18}$/.test(val) ? null : 'CLABE must be exactly 18 digits'),
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -289,6 +297,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'select',
 				label: defineMessage({ id: 'muralpay.field.pix-key-type', defaultMessage: 'PIX Key Type' }),
 				required: true,
+				autocomplete: 'off',
 				options: [
 					{
 						value: 'PHONE',
@@ -320,6 +329,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.enter-pix-email',
 					defaultMessage: 'Enter PIX email',
 				}),
+				autocomplete: 'email',
 			},
 			{
 				name: 'pixPhone',
@@ -330,6 +340,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.pix-phone',
 					defaultMessage: '+55...',
 				}),
+				autocomplete: 'tel',
 			},
 			{
 				name: 'branchCode',
@@ -340,6 +351,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.enter-branch-code',
 					defaultMessage: 'Enter branch code',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'documentNumber',
@@ -354,6 +366,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.help.cpf-cnpj',
 					defaultMessage: 'Brazilian tax identification number',
 				}),
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -379,6 +392,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.phone-cop',
 					defaultMessage: '+57...',
 				}),
+				autocomplete: 'tel',
 			},
 			{
 				name: 'accountType',
@@ -386,6 +400,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 			{
 				name: 'bankAccountNumber',
@@ -399,6 +414,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.enter-account-number',
 					defaultMessage: 'Enter account number',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'documentType',
@@ -409,6 +425,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -441,6 +458,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.help.cbu-cvu',
 					defaultMessage: 'Clave Bancaria Uniforme or Clave Virtual Uniforme',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'documentNumber',
@@ -455,6 +473,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.help.cuit-cuil',
 					defaultMessage: 'Argentine tax ID',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'bankAccountNumberType',
@@ -468,6 +487,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.cbu-cvu-type',
 					defaultMessage: 'CBU or CVU',
 				}),
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -490,6 +510,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 			{
 				name: 'bankAccountNumber',
@@ -503,6 +524,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.account-number',
 					defaultMessage: 'Enter account number',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'documentType',
@@ -513,6 +535,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -538,6 +561,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.iban-crc',
 					defaultMessage: 'Enter Costa Rican IBAN',
 				}),
+				autocomplete: 'iban',
 			},
 			{
 				name: 'documentType',
@@ -548,6 +572,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -573,6 +598,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 			{
 				name: 'bankAccountNumber',
@@ -590,6 +616,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.help.cci',
 					defaultMessage: 'Código de Cuenta Interbancaria',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'accountType',
@@ -597,6 +624,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -625,6 +653,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.account-number',
 					defaultMessage: 'Enter account number',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'documentType',
@@ -635,6 +664,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -657,6 +687,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 			{
 				name: 'bankAccountNumber',
@@ -670,6 +701,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.account-number',
 					defaultMessage: 'Enter account number',
 				}),
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -692,6 +724,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 			{
 				name: 'bankAccountNumber',
@@ -705,6 +738,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.account-number',
 					defaultMessage: 'Enter account number',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'documentType',
@@ -715,6 +749,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -740,6 +775,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.bank-name',
 					defaultMessage: 'Enter bank name',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'accountType',
@@ -747,6 +783,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 			{
 				name: 'bankAccountNumber',
@@ -760,6 +797,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.account-number',
 					defaultMessage: 'Enter account number',
 				}),
+				autocomplete: 'off',
 			},
 			{
 				name: 'documentType',
@@ -770,6 +808,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
+				autocomplete: 'off',
 			},
 			{
 				name: 'phoneNumber',
@@ -780,6 +819,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.phone-china',
 					defaultMessage: '+86...',
 				}),
+				autocomplete: 'tel',
 			},
 			{
 				name: 'address',
@@ -790,6 +830,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.address',
 					defaultMessage: 'Enter address',
 				}),
+				autocomplete: 'street-address',
 			},
 			{
 				name: 'swiftBic',
@@ -800,6 +841,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					id: 'muralpay.placeholder.swift-bic',
 					defaultMessage: 'Enter SWIFT/BIC code',
 				}),
+				autocomplete: 'swift',
 			},
 		],
 	},
@@ -835,6 +877,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				pattern: '^0x[a-fA-F0-9]{40}$',
 				validate: (val) =>
 					/^0x[a-fA-F0-9]{40}$/.test(val) ? null : 'Must be a valid Ethereum address (0x...)',
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -867,6 +910,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				pattern: '^0x[a-fA-F0-9]{40}$',
 				validate: (val) =>
 					/^0x[a-fA-F0-9]{40}$/.test(val) ? null : 'Must be a valid Ethereum address (0x...)',
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -902,6 +946,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				pattern: '^0x[a-fA-F0-9]{40}$',
 				validate: (val) =>
 					/^0x[a-fA-F0-9]{40}$/.test(val) ? null : 'Must be a valid Ethereum address (0x...)',
+				autocomplete: 'off',
 			},
 		],
 	},
@@ -934,6 +979,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				pattern: '^0x[a-fA-F0-9]{40}$',
 				validate: (val) =>
 					/^0x[a-fA-F0-9]{40}$/.test(val) ? null : 'Must be a valid Ethereum address (0x...)',
+				autocomplete: 'off',
 			},
 		],
 	},

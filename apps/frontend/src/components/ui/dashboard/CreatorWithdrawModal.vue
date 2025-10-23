@@ -133,7 +133,13 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, NewModal, useScrollIndicator } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	commonMessages,
+	injectNotificationManager,
+	NewModal,
+	useScrollIndicator,
+} from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
@@ -172,6 +178,7 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 
 const withdrawContext = createWithdrawContext(props.balance)
 provideWithdrawContext(withdrawContext)
@@ -220,7 +227,11 @@ async function handleWithdraw() {
 		setStage('completion')
 	} catch (error) {
 		console.error('Withdrawal failed:', error)
-		// TODO: add notif or error stage for modal
+		addNotification({
+			title: 'Unable to withdraw',
+			text: 'We were unable to submit your withdrawal request, please check your details or contact support.',
+			type: 'error',
+		})
 	} finally {
 		isSubmitting.value = false
 	}

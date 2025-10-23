@@ -53,6 +53,7 @@
 				v-model="formData.bankName"
 				type="text"
 				:placeholder="formatMessage(formFieldPlaceholders.bankNamePlaceholder)"
+				autocomplete="off"
 				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 			/>
 		</div>
@@ -71,6 +72,7 @@
 				:type="field.type"
 				:placeholder="field.placeholder ? formatMessage(field.placeholder) : undefined"
 				:pattern="field.pattern"
+				:autocomplete="field.autocomplete || 'off'"
 				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 			/>
 
@@ -119,6 +121,7 @@
 						v-model="formData.documentNumber"
 						:type="dynamicDocumentNumberField.type"
 						:placeholder="dynamicDocumentNumberField.placeholder"
+						autocomplete="off"
 						class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 					/>
 				</div>
@@ -151,6 +154,7 @@
 			<RevenueInputField v-model="formData.amount" :max-amount="roundedMaxAmount" />
 
 			<WithdrawFeeBreakdown
+				v-if="allRequiredFieldsFilled"
 				:amount="formData.amount || 0"
 				:fee="calculatedFee"
 				:fee-loading="feeLoading"
@@ -299,6 +303,28 @@ const accountOwnerAddress = computed(() => {
 	return parts.join(', ')
 })
 
+const allRequiredFieldsFilled = computed(() => {
+	const rail = selectedRail.value
+	if (!rail) return false
+
+	const amount = formData.value.amount
+	if (!amount || amount <= 0) return false
+
+	if (rail.requiresBankName && !formData.value.bankName) return false
+
+	const requiredFields = rail.fields.filter((f) => f.required)
+	const allRequiredPresent = requiredFields.every((f) => {
+		const value = formData.value[f.name]
+		return value !== undefined && value !== null && value !== ''
+	})
+
+	if (!allRequiredPresent) return false
+
+	if (dynamicDocumentNumberField.value?.required && !formData.value.documentNumber) return false
+
+	return true
+})
+
 const calculateFeesDebounced = useDebounceFn(async () => {
 	const amount = formData.value.amount
 	const rail = selectedRail.value
@@ -333,7 +359,7 @@ watch(
 			withdrawData.value.providerData.accountDetails = { ...formData.value }
 		}
 
-		if (formData.value.amount) {
+		if (allRequiredFieldsFilled.value) {
 			feeLoading.value = true
 			calculateFeesDebounced()
 		} else {
@@ -345,7 +371,7 @@ watch(
 	{ deep: true },
 )
 
-if (formData.value.amount) {
+if (allRequiredFieldsFilled.value) {
 	feeLoading.value = true
 	calculateFeesDebounced()
 }

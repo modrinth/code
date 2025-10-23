@@ -36,6 +36,7 @@
 					v-model="formData.businessName"
 					type="text"
 					:placeholder="formatMessage(formFieldPlaceholders.businessNamePlaceholder)"
+					autocomplete="organization"
 					class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 				/>
 			</div>
@@ -51,6 +52,7 @@
 					v-model="formData.email"
 					type="email"
 					:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
+					autocomplete="email"
 					class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 				/>
 			</div>
@@ -68,6 +70,7 @@
 							v-model="formData.firstName"
 							type="text"
 							:placeholder="formatMessage(formFieldPlaceholders.firstNamePlaceholder)"
+							autocomplete="given-name"
 							class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 						/>
 					</div>
@@ -82,6 +85,7 @@
 							v-model="formData.lastName"
 							type="text"
 							:placeholder="formatMessage(formFieldPlaceholders.lastNamePlaceholder)"
+							autocomplete="family-name"
 							class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 						/>
 					</div>
@@ -98,6 +102,7 @@
 						v-model="formData.dateOfBirth"
 						type="date"
 						:max="maxDate"
+						autocomplete="bday"
 						class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 					/>
 				</div>
@@ -114,6 +119,7 @@
 					v-model="formData.physicalAddress.address1"
 					type="text"
 					:placeholder="formatMessage(formFieldPlaceholders.addressPlaceholder)"
+					autocomplete="address-line1"
 					class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 				/>
 			</div>
@@ -128,6 +134,7 @@
 					v-model="formData.physicalAddress.address2"
 					type="text"
 					:placeholder="formatMessage(formFieldPlaceholders.address2Placeholder)"
+					autocomplete="address-line2"
 					class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 				/>
 			</div>
@@ -144,6 +151,7 @@
 						v-model="formData.physicalAddress.city"
 						type="text"
 						:placeholder="formatMessage(formFieldPlaceholders.cityPlaceholder)"
+						autocomplete="address-level2"
 						class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 					/>
 				</div>
@@ -158,6 +166,7 @@
 						v-model="formData.physicalAddress.state"
 						type="text"
 						:placeholder="formatMessage(formFieldPlaceholders.statePlaceholder)"
+						autocomplete="address-level1"
 						class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 					/>
 				</div>
@@ -175,6 +184,7 @@
 						v-model="formData.physicalAddress.zip"
 						type="text"
 						:placeholder="formatMessage(formFieldPlaceholders.postalCodePlaceholder)"
+						autocomplete="postal-code"
 						class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
 					/>
 				</div>
