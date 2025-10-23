@@ -8,6 +8,9 @@
 				<button @click="openBatchModal"><PlusIcon /> Batch credit</button>
 			</ButtonStyled>
 		</div>
+		<div>
+			don't worry there's not supposed to be anything here
+		</div>
 
 		<NewModal ref="batchModal">
 			<template #title>
