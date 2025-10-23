@@ -12,7 +12,7 @@ body:
         - label: I have tried resolving the issue using the [support portal](https://support.modrinth.com)
           required: true
   - type: dropdown
-    id: browsers
+    id: issue-location
     attributes:
       label: Is this an issue in the control panel or with the Minecraft server itself?
       options:
