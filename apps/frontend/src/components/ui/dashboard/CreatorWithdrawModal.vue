@@ -1,5 +1,11 @@
 <template>
-	<NewModal ref="withdrawModal" :closable="currentStage !== 'completion'" @on-hide="onModalHide">
+	<NewModal
+		ref="withdrawModal"
+		:closable="currentStage !== 'completion'"
+		:hide-header="currentStage === 'completion'"
+		:merge-header="currentStage === 'completion'"
+		@on-hide="onModalHide"
+	>
 		<template #title>
 			<div v-if="shouldShowTitle" class="flex items-center gap-1 text-secondary">
 				<template v-if="currentStage === 'tax-form'">
@@ -52,7 +58,11 @@
 				<TremendousDetailsStage v-else-if="currentStage === 'tremendous-details'" />
 				<MuralpayKycStage v-else-if="currentStage === 'muralpay-kyc'" />
 				<MuralpayDetailsStage v-else-if="currentStage === 'muralpay-details'" />
-				<CompletionStage v-else-if="currentStage === 'completion'" />
+				<CompletionStage
+					v-else-if="currentStage === 'completion'"
+					@close="withdrawModal?.hide()"
+					@view-transactions="handleViewTransactions"
+				/>
 				<div v-else>Something went wrong</div>
 			</div>
 
@@ -61,13 +71,9 @@
 				class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-10 bg-gradient-to-t from-bg-raised to-transparent transition-all duration-300"
 			/>
 		</div>
-		<div class="mt-4 flex justify-end gap-2">
+		<div v-if="currentStage !== 'completion'" class="mt-4 flex justify-end gap-2">
 			<ButtonStyled type="outlined">
-				<button
-					v-if="previousStep && currentStage !== 'completion'"
-					class="!border-surface-5"
-					@click="setStage(previousStep, true)"
-				>
+				<button v-if="previousStep" class="!border-surface-5" @click="setStage(previousStep, true)">
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
 				</button>
 				<button v-else class="!border-surface-5" @click="withdrawModal?.hide()">
@@ -104,11 +110,8 @@
 					{{ formatMessage(messages.withdrawButton) }}
 				</button>
 				<button v-else :disabled="!canProceed" @click="setStage(nextStep)">
-					<template v-if="currentStage === 'completion'"> <CheckCircleIcon /> Complete </template>
-					<template v-else>
-						{{ formatMessage(commonMessages.nextButton) }}
-						<RightArrowIcon />
-					</template>
+					{{ formatMessage(commonMessages.nextButton) }}
+					<RightArrowIcon />
 				</button>
 			</ButtonStyled>
 		</div>
@@ -124,7 +127,6 @@
 <script setup lang="ts">
 import {
 	ArrowLeftRightIcon,
-	CheckCircleIcon,
 	ChevronRightIcon,
 	FileTextIcon,
 	LeftArrowIcon,
@@ -263,6 +265,11 @@ function onModalHide() {
 
 function goToBreadcrumbStage(stage: WithdrawStage) {
 	setStage(stage, true)
+}
+
+function handleViewTransactions() {
+	withdrawModal.value?.hide()
+	navigateTo('/dashboard/revenue/transfers')
 }
 
 function show(preferred?: WithdrawStage) {
