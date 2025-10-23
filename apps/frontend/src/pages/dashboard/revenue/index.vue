@@ -197,7 +197,7 @@
 
 <script setup lang="ts">
 import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
-import { formatMoney, type PayoutList } from '@modrinth/utils'
+import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
@@ -306,15 +306,13 @@ const { data: userBalance, refresh: refreshUserBalance } = await useAsyncData(
 	},
 )
 
-const { data: payouts, refresh: refreshPayouts } = await useAsyncData<PayoutList>(
-	`payout`,
-	() =>
-		useBaseFetch(`payout`, {
-			apiVersion: 3,
-		}) as Promise<PayoutList>,
+const { data: payouts, refresh: refreshPayouts } = await useAsyncData(`payout/history`, () =>
+	useBaseFetch(`payout/history`, {
+		apiVersion: 3,
+	}),
 )
 
-const sortedPayouts = computed<PayoutList>(() => {
+const sortedPayouts = computed(() => {
 	if (!payouts.value) return []
 
 	return [...payouts.value].sort((a, b) => {

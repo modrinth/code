@@ -5,6 +5,7 @@ import _AlignLeftIcon from './icons/align-left.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
 import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
+import _ArrowDownIcon from './icons/arrow-down.svg?component'
 import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
@@ -212,6 +213,7 @@ export const AlignLeftIcon = _AlignLeftIcon
 export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
+export const ArrowDownIcon = _ArrowDownIcon
 export const ArrowLeftRightIcon = _ArrowLeftRightIcon
 export const ArrowUpRightIcon = _ArrowUpRightIcon
 export const ArrowUpIcon = _ArrowUpIcon

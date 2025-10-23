@@ -101,7 +101,7 @@ import { ButtonStyled } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 import dayjs from 'dayjs'
-import { computed, onMounted, ref, Teleport } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
@@ -111,8 +111,7 @@ const { withdrawData } = useWithdrawContext()
 const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
-	(e: 'close'): void
-	(e: 'view-transactions'): void
+	(e: 'close' | 'view-transactions'): void
 }>()
 
 const result = computed(() => withdrawData.value.result)

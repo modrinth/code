@@ -3,37 +3,38 @@
 		<div
 			class="flex h-12 min-h-12 w-12 min-w-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md"
 		>
-			<ArrowUpIcon class="my-auto size-8 text-secondary" />
+			<ArrowDownIcon v-if="isIncome" class="my-auto size-8 text-secondary" />
+			<ArrowUpIcon v-else class="my-auto size-8 text-secondary" />
 		</div>
 		<div class="flex w-full flex-row justify-between">
 			<div class="flex flex-col">
 				<span class="text-lg font-semibold text-contrast">{{
-					formatMethodName(transaction.method)
+					isIncome
+						? formatPayoutSource(transaction.payout_source)
+						: formatMethodName(transaction.method_type || transaction.method)
 				}}</span>
 				<span class="text-secondary">
-					{{ formatTransactionStatus(transaction.status) }} <BulletDivider />
-					{{ $dayjs(transaction.created).format('MMM DD YYYY') }}
-					<template v-if="transaction.fee">
-						<BulletDivider /> Fee {{ $formatMoney(transaction.fee) }}
+					<template v-if="!isIncome">
+						{{ formatTransactionStatus(transaction.status) }} <BulletDivider />
 					</template>
-					<template v-if="transaction.method_address">
-						<BulletDivider /> {{ formatWallet(transaction.method) }} ({{
-							transaction.method_address
-						}})
+					{{ $dayjs(transaction.created).format('MMM DD YYYY') }}
+					<template v-if="!isIncome && transaction.fee">
+						<BulletDivider /> Fee {{ $formatMoney(transaction.fee) }}
 					</template>
 				</span>
 			</div>
-			<div class="my-auto flex flex-row items-end gap-4">
-				<span class="text-lg font-semibold text-contrast">{{
-					$formatMoney(transaction.amount)
+			<div class="my-auto flex flex-row items-center gap-4">
+				<span class="text-lg font-semibold" :class="isIncome ? 'text-green' : 'text-contrast'">{{
+					formatMoney(transaction.amount)
 				}}</span>
-				<template v-if="transaction.status === 'in-transit'">
+				<template v-if="!isIncome && transaction.status === 'in-transit'">
 					<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
-						<ButtonStyled circular size="small">
-							<button @click="cancelPayout">
-								<XIcon />
-							</button>
-						</ButtonStyled>
+						<span class="my-auto align-middle"
+							><ButtonStyled circular size="small">
+								<button class="align-middle" @click="cancelPayout">
+									<XIcon />
+								</button> </ButtonStyled
+						></span>
 						<template #popper>
 							<div class="font-semibold text-contrast">Cancel transaction</div>
 						</template>
@@ -45,9 +46,9 @@
 </template>
 
 <script setup>
-import { ArrowUpIcon, XIcon } from '@modrinth/assets'
+import { ArrowDownIcon, ArrowUpIcon, XIcon } from '@modrinth/assets'
 import { BulletDivider, ButtonStyled, injectNotificationManager } from '@modrinth/ui'
-import { capitalizeString, formatWallet } from '@modrinth/utils'
+import { capitalizeString, formatMoney } from '@modrinth/utils'
 import { Tooltip } from 'floating-vue'
 
 const props = defineProps({
@@ -61,6 +62,8 @@ const emit = defineEmits(['cancelled'])
 
 const { addNotification } = injectNotificationManager()
 const auth = await useAuth()
+
+const isIncome = computed(() => props.transaction.type === 'payout_available')
 
 function formatTransactionStatus(status) {
 	if (status === 'in-transit') return 'In Transit'
@@ -76,9 +79,19 @@ function formatMethodName(method) {
 			return 'Venmo'
 		case 'tremendous':
 			return 'Tremendous'
+		case 'muralpay':
+			return 'Muralpay'
 		default:
 			return capitalizeString(method)
 	}
+}
+
+function formatPayoutSource(source) {
+	if (!source) return 'Income'
+	return source
+		.split('_')
+		.map((word) => capitalizeString(word))
+		.join(' ')
 }
 
 async function cancelPayout() {
@@ -92,7 +105,7 @@ async function cancelPayout() {
 		emit('cancelled')
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: 'Failed to cancel transaction',
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
