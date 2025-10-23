@@ -241,7 +241,12 @@ const formData = ref<Record<string, any>>({
 	...existingAccountDetails,
 })
 
-const agreedTerms = ref<boolean>(false)
+const agreedTerms = computed({
+	get: () => withdrawData.value.agreedTerms,
+	set: (value) => {
+		withdrawData.value.agreedTerms = value
+	},
+})
 
 const calculatedFee = ref<number | null>(null)
 const exchangeRate = ref<number | null>(null)

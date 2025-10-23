@@ -54,7 +54,7 @@
 				<button class="!h-10 !justify-start !gap-2" @click="handleMethodSelection(method)">
 					<component :is="method.icon" />
 					{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
-					<span class="ml-auto text-secondary">{{ method.fee }}</span>
+					<span class="ml-auto font-normal text-secondary">{{ method.fee }}</span>
 				</button>
 			</ButtonStyled>
 		</div>

@@ -322,7 +322,7 @@ export const formFieldLabels = defineMessages({
 	},
 	postalCode: {
 		id: 'form.label.postal-code',
-		defaultMessage: 'Postal code',
+		defaultMessage: 'Postal code/ZIP code',
 	},
 	country: {
 		id: 'form.label.country',

@@ -263,7 +263,12 @@ const formData = ref<Record<string, any>>({
 
 const selectedGiftCardId = ref<string | null>(withdrawData.value.selection.methodId || null)
 
-const agreedTerms = ref<boolean>(false)
+const agreedTerms = computed({
+	get: () => withdrawData.value.agreedTerms,
+	set: (value) => {
+		withdrawData.value.agreedTerms = value
+	},
+})
 
 const calculatedFee = ref<number>(0)
 const feeLoading = ref(false)

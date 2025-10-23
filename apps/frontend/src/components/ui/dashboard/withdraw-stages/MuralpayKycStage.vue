@@ -256,11 +256,44 @@ const maxDate = computed(() => {
 	return `${year}-${month}-${day}`
 })
 
+// Map for countries with excessively long names to prevent overflow
+const shortCountryNames: Record<string, string> = {
+	GB: 'United Kingdom',
+	US: 'United States',
+	SH: 'Saint Helena',
+	GS: 'South Georgia',
+	KP: "Dem. People's Rep. of Korea",
+	UM: 'US Minor Outlying Islands',
+	VI: 'US Virgin Islands',
+	VE: 'Venezuela',
+	HM: 'Heard & McDonald Islands',
+	BQ: 'Bonaire, Sint Eustatius & Saba',
+	LA: "Lao People's Dem. Rep.",
+	VC: 'St. Vincent & Grenadines',
+}
+
 const countryOptions = computed(() =>
-	all().map((x) => ({
-		value: x.alpha2,
-		label: x.alpha2 === 'TW' ? 'Taiwan' : x.country,
-	})),
+	all().map((x) => {
+		let label = x.country
+
+		// Apply custom short name if available
+		if (shortCountryNames[x.alpha2]) {
+			label = `${shortCountryNames[x.alpha2]} (${x.alpha2})`
+		}
+		// Special case for Taiwan
+		else if (x.alpha2 === 'TW') {
+			label = 'Taiwan'
+		}
+		// For other long names (>30 chars), append country code
+		else if (x.country.length > 30) {
+			label = `${x.country} (${x.alpha2})`
+		}
+
+		return {
+			value: x.alpha2,
+			label,
+		}
+	}),
 )
 
 watch(

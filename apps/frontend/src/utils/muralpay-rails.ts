@@ -808,7 +808,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		id: 'blockchain_usdc_polygon',
 		name: defineMessage({
 			id: 'muralpay.rail.usdc-polygon.name',
-			defaultMessage: 'USDC (Polygon)',
+			defaultMessage: 'Crypto (USDC via Polygon)',
 		}),
 		currency: 'USDC',
 		type: 'crypto',

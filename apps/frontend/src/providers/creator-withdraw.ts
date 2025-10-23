@@ -144,6 +144,7 @@ export interface WithdrawData {
 	calculation: CalculationData
 	providerData: ProviderData
 	result: WithdrawalResult | null
+	agreedTerms: boolean
 }
 
 export interface WithdrawContextValue {
@@ -346,6 +347,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			type: null,
 		},
 		result: null,
+		agreedTerms: false,
 	})
 
 	const balanceRef = ref(balance)
@@ -506,19 +508,14 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			}
 		}
 
-		const sortOrder: Record<string, number> = {
-			fiat: 1,
-			paypal: 2,
-			venmo: 3,
-			visa_card: 4,
-			merchant_card: 5,
-			charity: 6,
-			crypto: 7,
-		}
+		const sortOrder = ['fiat', 'paypal', 'venmo', 'crypto', 'merchant_card', 'charity']
 		options.sort((a, b) => {
-			const aOrder = sortOrder[a.type] ?? sortOrder[a.value] ?? 999
-			const bOrder = sortOrder[b.type] ?? sortOrder[b.value] ?? 999
-			return aOrder - bOrder
+			const getOrder = (item: PaymentOption) => {
+				let order = sortOrder.indexOf(item.type)
+				if (order === -1) order = sortOrder.indexOf(item.value)
+				return order !== -1 ? order : 999
+			}
+			return getOrder(a) - getOrder(b)
 		})
 
 		debug('Payment options computed:', options)
@@ -574,12 +571,15 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 					return !!(
 						withdrawData.value.selection.methodId &&
 						withdrawData.value.calculation.amount > 0 &&
-						withdrawData.value.providerData.deliveryEmail
+						withdrawData.value.providerData.deliveryEmail &&
+						withdrawData.value.agreedTerms
 					)
 				}
 				if (!isTremendousProvider(withdrawData.value.providerData)) return false
 				return !!(
-					withdrawData.value.calculation.amount > 0 && withdrawData.value.providerData.deliveryEmail
+					withdrawData.value.calculation.amount > 0 &&
+					withdrawData.value.providerData.deliveryEmail &&
+					withdrawData.value.agreedTerms
 				)
 			}
 			case 'muralpay-kyc': {
@@ -631,7 +631,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 					return value !== undefined && value !== null && value !== ''
 				})
 
-				return allRequiredPresent
+				return allRequiredPresent && withdrawData.value.agreedTerms
 			}
 			case 'completion':
 				return true
@@ -674,6 +674,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				type: null,
 			},
 			result: null,
+			agreedTerms: false,
 		}
 		currentStage.value = undefined
 	}
