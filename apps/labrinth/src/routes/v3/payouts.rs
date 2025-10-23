@@ -557,10 +557,20 @@ pub async fn calculate_fees(
                 }
             }
         }
-        PayoutMethodRequest::Tremendous { .. } => WithdrawalFees {
-            fee: Some(dec!(0)),
-            exchange_rate: None,
-        },
+        PayoutMethodRequest::Tremendous { .. } => {
+            let method = payouts_queue
+                .get_payout_methods()
+                .await
+                .wrap_internal_err("failed to fetch payout methods")?
+                .into_iter()
+                .find(|method| method.id == body.method_id)
+                .wrap_request_err("invalid payout method ID")?;
+            let fee = method.fee.compute_fee(body.amount);
+            WithdrawalFees {
+                fee: Some(fee),
+                exchange_rate: None,
+            }
+        }
     };
 
     Ok(web::Json(fee))

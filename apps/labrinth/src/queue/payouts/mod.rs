@@ -716,9 +716,7 @@ async fn get_tremendous_payout_methods(
         const SUPPORTED_METHODS: &[&str] = &[
             "merchant_cards",
             "merchant_card",
-            "visa",
             "bank",
-            "visa_card",
             "charity",
             "paypal",
             "venmo",
