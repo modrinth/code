@@ -1,6 +1,6 @@
-name: 🎮 Bug with Modrinth App
-description: For issues with the Modrinth App launcher.
-labels: [app]
+name: 🛠 Bug with Modrinth API
+description: For issues with the Modrinth API for developers.
+labels: [backend]
 type: 'bug'
 body:
   - type: checkboxes
@@ -11,30 +11,12 @@ body:
           required: true
         - label: I have tried resolving the issue using the [support portal](https://support.modrinth.com)
           required: true
-        - label: I have ensured my Modrinth App installation is up to date
-          required: true
-  - type: input
-    id: version
-    attributes:
-      label: What version of the Modrinth App are you using?
-      description: Find this in ⚙️ Settings (bottom right) -> After Modrinth App (bottom left)
-    validations:
-      required: true
-  - type: dropdown
-    id: oses
-    attributes:
-      label: What operating systems are you seeing the problem on?
-      multiple: true
-      options:
-        - Windows
-        - MacOS
-        - Linux
   - type: textarea
     attributes:
       label: Describe the bug
       description: A clear and concise description of what the bug is. Include screenshots if applicable.
     validations:
-      required: true
+      required: false
   - type: textarea
     attributes:
       label: Steps to reproduce

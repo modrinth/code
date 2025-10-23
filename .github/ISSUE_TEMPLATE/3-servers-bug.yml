@@ -1,6 +1,6 @@
-name: 🛠️ API issue (api.modrinth.com)
-description: Report an issue regarding the Modrinth API.
-labels: [backend]
+name: 🌐 Bug with Modrinth Servers
+description: For issues with a Modrinth Servers product.
+labels: [servers]
 type: 'bug'
 body:
   - type: checkboxes
@@ -11,6 +11,27 @@ body:
           required: true
         - label: I have tried resolving the issue using the [support portal](https://support.modrinth.com)
           required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: Is this an issue in the control panel or with the Minecraft server itself?
+      options:
+        - Control panel (on Modrinth.com)
+        - Minecraft server
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers are you seeing the problem on? (if a panel issue)
+      multiple: true
+      options:
+        - N/A
+        - Chrome (including Arc, Brave, Opera, Vivaldi)
+        - Microsoft Edge
+        - Firefox
+        - Safari
+        - Other (please specify)
   - type: textarea
     attributes:
       label: Describe the bug
