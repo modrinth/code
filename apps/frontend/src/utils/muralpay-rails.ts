@@ -11,7 +11,7 @@ export interface FieldConfig {
 	helpText?: MessageDescriptor
 	options?: Array<{ value: string; label: MessageDescriptor }>
 	pattern?: string
-	validate?: (value: string) => string | null // Returns error message or null if valid
+	validate?: (value: string) => string | null
 }
 
 export interface RailConfig {
@@ -20,11 +20,11 @@ export interface RailConfig {
 	currency: string
 	fee: string
 	type: 'fiat' | 'crypto'
-	railCode?: string // For fiat: 'usd', 'eur', 'cop', etc.
-	blockchain?: string // For crypto: 'POLYGON', 'BASE', 'ETHEREUM', 'CELO'
+	railCode?: string
+	blockchain?: string
 	fields: FieldConfig[]
 	warningMessage?: MessageDescriptor
-	requiresBankName?: boolean // Whether to show bank name field (most fiat rails need this)
+	requiresBankName?: boolean
 }
 
 const DOCUMENT_TYPE_OPTIONS = [

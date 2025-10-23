@@ -179,14 +179,15 @@
 				:local-currency="selectedRail?.currency"
 			/>
 
-			<Checkbox v-model="agreedTerms" class="rewards-checkbox">
-				<IntlFormatted :message-id="financialMessages.rewardsProgramTermsAgreement">
-					<template #terms-link="{ children }">
-						<nuxt-link to="/legal/cmp" class="text-link">
-							<component :is="() => normalizeChildren(children)" />
-						</nuxt-link>
-					</template>
-				</IntlFormatted>
+			<Checkbox v-model="agreedTerms">
+				<span
+					><IntlFormatted :message-id="financialMessages.rewardsProgramTermsAgreement">
+						<template #terms-link="{ children }">
+							<nuxt-link to="/legal/cmp" class="text-link">
+								<component :is="() => normalizeChildren(children)" />
+							</nuxt-link>
+						</template> </IntlFormatted
+				></span>
 			</Checkbox>
 		</div>
 	</div>
@@ -220,20 +221,20 @@ import {
 import { getRailConfig } from '@/utils/muralpay-rails'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
-const withdrawContext = useWithdrawContext()
+const { withdrawData, maxWithdrawAmount, calculateFees } = useWithdrawContext()
 const { formatMessage } = useVIntl()
 
 const selectedRail = computed(() => {
-	const railId = withdrawContext.withdrawData.value.selectedMethod
+	const railId = withdrawData.value.selection.method
 	return railId ? getRailConfig(railId) : null
 })
 
-const maxAmount = computed(() => withdrawContext.maxWithdrawAmount.value)
+const maxAmount = computed(() => maxWithdrawAmount.value)
 const roundedMaxAmount = computed(() => Math.floor(maxAmount.value * 100) / 100)
 
-// if user has switched stages use what was in withdraw context
-const existingAccountDetails = withdrawContext.withdrawData.value.accountDetails
-const existingAmount = withdrawContext.withdrawData.value.amount
+const providerData = withdrawData.value.providerData
+const existingAccountDetails = providerData.type === 'muralpay' ? providerData.accountDetails : {}
+const existingAmount = withdrawData.value.calculation.amount
 const formData = ref<Record<string, any>>({
 	amount: existingAmount || undefined,
 	bankName: existingAccountDetails?.bankName ?? '',
@@ -284,7 +285,9 @@ const dynamicDocumentNumberField = computed(() => {
 })
 
 const accountOwnerName = computed(() => {
-	const kycData = withdrawContext.withdrawData.value.kycData
+	const providerDataValue = withdrawData.value.providerData
+	if (providerDataValue.type !== 'muralpay') return ''
+	const kycData = providerDataValue.kycData
 	if (!kycData) return ''
 
 	if (kycData.type === 'individual') {
@@ -296,7 +299,9 @@ const accountOwnerName = computed(() => {
 })
 
 const accountOwnerAddress = computed(() => {
-	const kycData = withdrawContext.withdrawData.value.kycData
+	const providerDataValue = withdrawData.value.providerData
+	if (providerDataValue.type !== 'muralpay') return ''
+	const kycData = providerDataValue.kycData
 	if (!kycData || !kycData.physicalAddress) return ''
 
 	const addr = kycData.physicalAddress
@@ -330,10 +335,11 @@ function enforceDecimalPlaces(event: Event) {
 	}
 }
 
-const calculateFees = useDebounceFn(async () => {
+const calculateFeesDebounced = useDebounceFn(async () => {
 	const amount = formData.value.amount
 	const rail = selectedRail.value
-	const kycData = withdrawContext.withdrawData.value.kycData
+	const providerDataValue = withdrawData.value.providerData
+	const kycData = providerDataValue.type === 'muralpay' ? providerDataValue.kycData : null
 
 	if (!amount || amount <= 0 || !rail || !kycData) {
 		calculatedFee.value = null
@@ -343,70 +349,9 @@ const calculateFees = useDebounceFn(async () => {
 
 	feeLoading.value = true
 	try {
-		let payout_details
-
-		if (rail.type === 'crypto') {
-			payout_details = {
-				type: 'blockchain',
-				wallet_address: formData.value.walletAddress || null,
-			}
-		} else {
-			const fiatAndRailDetails: Record<string, any> = {
-				type: rail.railCode || '',
-				symbol: rail.currency || '',
-			}
-
-			for (const field of rail.fields) {
-				const value = formData.value[field.name]
-				if (value !== undefined && value !== null && value !== '') {
-					fiatAndRailDetails[field.name] = value
-				}
-			}
-
-			payout_details = {
-				type: 'fiat',
-				bank_name: formData.value.bankName || '',
-				bank_account_owner:
-					kycData.type === 'individual'
-						? `${kycData.firstName} ${kycData.lastName}`
-						: kycData.name || '',
-				fiat_and_rail_details: fiatAndRailDetails,
-			}
-		}
-
-		const recipient_info = {
-			type: kycData.type,
-			...(kycData.type === 'individual'
-				? {
-						firstName: kycData.firstName,
-						lastName: kycData.lastName,
-						dateOfBirth: kycData.dateOfBirth,
-					}
-				: {
-						name: kycData.name,
-					}),
-			email: kycData.email,
-			physicalAddress: kycData.physicalAddress,
-		}
-
-		const payload = {
-			amount,
-			method: 'muralpay',
-			method_details: {
-				payout_details,
-				recipient_info,
-			},
-			method_id: 'muralpay',
-		}
-
-		const response = (await useBaseFetch('payout/fees', {
-			apiVersion: 3,
-			method: 'POST',
-			body: payload,
-		})) as { fee: number | null; exchange_rate: number | null }
-
-		calculatedFee.value = response.fee || 0
-		exchangeRate.value = response.exchange_rate || null
+		await calculateFees()
+		calculatedFee.value = withdrawData.value.calculation.fee
+		exchangeRate.value = withdrawData.value.calculation.exchangeRate
 	} catch (error) {
 		console.error('Failed to calculate fees:', error)
 		calculatedFee.value = 0
@@ -435,31 +380,34 @@ watch(
 watch(
 	formData,
 	() => {
-		withdrawContext.withdrawData.value.amount = formData.value.amount ?? 0
-		withdrawContext.withdrawData.value.accountDetails = { ...formData.value }
+		withdrawData.value.calculation.amount = formData.value.amount ?? 0
+		if (withdrawData.value.providerData.type === 'muralpay') {
+			withdrawData.value.providerData.accountDetails = { ...formData.value }
+		}
 
 		if (formData.value.amount) {
-			calculateFees()
+			calculateFeesDebounced()
 		}
 	},
 	{ deep: true },
 )
 
 if (formData.value.amount) {
-	calculateFees()
+	calculateFeesDebounced()
 }
 
-// reset all the values if the selected method changes
 watch(
-	() => withdrawContext.withdrawData.value.selectedMethod,
+	() => withdrawData.value.selection.method,
 	(newMethod, oldMethod) => {
 		if (oldMethod && newMethod !== oldMethod) {
 			formData.value = {
 				amount: undefined,
 				bankName: '',
 			}
-			withdrawContext.withdrawData.value.accountDetails = {}
-			withdrawContext.withdrawData.value.amount = 0
+			if (withdrawData.value.providerData.type === 'muralpay') {
+				withdrawData.value.providerData.accountDetails = {}
+			}
+			withdrawData.value.calculation.amount = 0
 			calculatedFee.value = null
 			exchangeRate.value = null
 		}

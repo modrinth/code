@@ -4,7 +4,7 @@
 			<IntlFormatted
 				:message-id="messages.taxLimitWarning"
 				:values="{
-					amount: formatMoney(withdrawContext.maxWithdrawAmount.value),
+					amount: formatMoney(maxWithdrawAmount),
 				}"
 			>
 				<template #b="{ children }">
@@ -47,10 +47,8 @@
 			<ButtonStyled
 				v-for="method in paymentOptions"
 				:key="method.value"
-				:color="
-					withdrawContext.withdrawData.value.selectedMethod === method.value ? 'green' : 'standard'
-				"
-				:highlighted="withdrawContext.withdrawData.value.selectedMethod === method.value"
+				:color="withdrawData.selection.method === method.value ? 'green' : 'standard'"
+				:highlighted="withdrawData.selection.method === method.value"
 				type="chip"
 			>
 				<button class="!h-10 !justify-start !gap-2" @click="handleMethodSelection(method)">
@@ -83,11 +81,13 @@ import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withd
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const debug = useDebugLogger('MethodSelectionStage')
-const withdrawContext = useWithdrawContext()
+const { withdrawData, availableMethods, paymentOptions, balance, maxWithdrawAmount } =
+	useWithdrawContext()
 const userCountry = useUserCountry()
 const { coords } = useGeolocation()
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+const auth = await useAuth()
 
 const messages = defineMessages({
 	taxLimitWarning: {
@@ -140,14 +140,14 @@ const countries = computed(() =>
 	})),
 )
 
-const selectedCountryCode = computed(() => withdrawContext.withdrawData.value.selectedCountry?.id)
+const selectedCountryCode = computed(() => withdrawData.value.selection.country?.id)
 
 const shouldShowTaxLimitWarning = computed(() => {
-	const balance = withdrawContext.balance.value
-	if (!balance) return false
+	const balanceValue = balance.value
+	if (!balanceValue) return false
 
-	const formIncomplete = balance.form_completion_status !== 'complete'
-	const wouldHitLimit = (balance.withdrawn_ytd ?? 0) + (balance.available ?? 0) >= 600
+	const formIncomplete = balanceValue.form_completion_status !== 'complete'
+	const wouldHitLimit = (balanceValue.withdrawn_ytd ?? 0) + (balanceValue.available ?? 0) >= 600
 
 	return formIncomplete && wouldHitLimit
 })
@@ -155,11 +155,11 @@ const shouldShowTaxLimitWarning = computed(() => {
 const loading = ref(false)
 
 watch(
-	() => withdrawContext.withdrawData.value.selectedCountry,
+	() => withdrawData.value.selection.country,
 	async (country) => {
 		console.debug('[MethodSelectionStage] Watch triggered, country:', country)
 		if (!country) {
-			withdrawContext.availableMethods.value = []
+			availableMethods.value = []
 			return
 		}
 
@@ -172,7 +172,7 @@ watch(
 				query: { country: country.id },
 			})) as PayoutMethod[]
 			console.debug('[MethodSelectionStage] Received payout methods:', methods)
-			withdrawContext.availableMethods.value = methods
+			availableMethods.value = methods
 		} catch (e) {
 			console.error('[MethodSelectionStage] Failed to fetch payout methods:', e)
 			addNotification({
@@ -188,35 +188,53 @@ watch(
 	{ immediate: true },
 )
 
-const paymentOptions = withdrawContext.paymentOptions
-
 function handleMethodSelection(option: {
 	value: string
 	methodId: string | undefined
 	type: string
 }) {
-	withdrawContext.withdrawData.value.selectedMethod = option.value
-	withdrawContext.withdrawData.value.selectedMethodId = option.methodId ?? null
+	withdrawData.value.selection.method = option.value
+	withdrawData.value.selection.methodId = option.methodId ?? null
 
 	if (option.type === 'tremendous') {
-		withdrawContext.withdrawData.value.selectedProvider = 'tremendous'
+		withdrawData.value.selection.provider = 'tremendous'
 	} else if (option.type === 'fiat' || option.type === 'crypto') {
-		withdrawContext.withdrawData.value.selectedProvider = 'muralpay'
+		withdrawData.value.selection.provider = 'muralpay'
 	} else {
-		withdrawContext.withdrawData.value.selectedProvider = 'muralpay'
+		withdrawData.value.selection.provider = 'muralpay'
 	}
 }
 
 watch(paymentOptions, (newOptions) => {
-	withdrawContext.withdrawData.value.selectedMethod = null
-	withdrawContext.withdrawData.value.selectedMethodId = null
-	withdrawContext.withdrawData.value.selectedProvider = null
+	withdrawData.value.selection.method = null
+	withdrawData.value.selection.methodId = null
+	withdrawData.value.selection.provider = null
 
 	if (newOptions.length === 1) {
 		const option = newOptions[0]
 		handleMethodSelection(option)
 	}
 })
+
+watch(
+	() => withdrawData.value.selection.provider,
+	(newProvider) => {
+		if (newProvider === 'tremendous') {
+			const userEmail = (auth.value.user as any)?.email || ''
+			withdrawData.value.providerData = {
+				type: 'tremendous',
+				deliveryEmail: userEmail,
+				giftCardDetails: null,
+			}
+		} else if (newProvider === 'muralpay') {
+			withdrawData.value.providerData = {
+				type: 'muralpay',
+				kycData: {} as any,
+				accountDetails: {},
+			}
+		}
+	},
+)
 
 function handleCountryChange(countryCode: string | null) {
 	debug('handleCountryChange called with:', countryCode)
@@ -225,21 +243,21 @@ function handleCountryChange(countryCode: string | null) {
 		const country = all().find((c) => c.alpha2 === normalizedCode)
 		debug('Found country:', country)
 		if (country) {
-			withdrawContext.withdrawData.value.selectedCountry = {
+			withdrawData.value.selection.country = {
 				id: country.alpha2,
 				name: country.alpha2 === 'TW' ? 'Taiwan' : country.country,
 			}
-			debug('Set selectedCountry to:', withdrawContext.withdrawData.value.selectedCountry)
+			debug('Set selectedCountry to:', withdrawData.value.selection.country)
 		}
 	} else {
-		withdrawContext.withdrawData.value.selectedCountry = null
+		withdrawData.value.selection.country = null
 	}
 }
 
 debug('Setup: userCountry.value =', userCountry.value)
-debug('Setup: current selectedCountry =', withdrawContext.withdrawData.value.selectedCountry)
+debug('Setup: current selectedCountry =', withdrawData.value.selection.country)
 
-if (!withdrawContext.withdrawData.value.selectedCountry) {
+if (!withdrawData.value.selection.country) {
 	const defaultCountryCode = userCountry.value || 'US'
 	debug('Setup: calling handleCountryChange with', defaultCountryCode)
 	handleCountryChange(defaultCountryCode)
@@ -259,7 +277,7 @@ async function getCountryFromGeoIP(lat: number, lon: number): Promise<string | n
 }
 
 onMounted(async () => {
-	if (withdrawContext.withdrawData.value.selectedCountry?.id === 'US' && !userCountry.value) {
+	if (withdrawData.value.selection.country?.id === 'US' && !userCountry.value) {
 		if (coords.value.latitude && coords.value.longitude) {
 			const geoCountry = await getCountryFromGeoIP(coords.value.latitude, coords.value.longitude)
 			if (geoCountry) {

@@ -1,17 +1,13 @@
 <template>
-	<NewModal
-		ref="withdrawModal"
-		:closable="withdrawContext.currentStage.value !== 'completion'"
-		@on-hide="onModalHide"
-	>
+	<NewModal ref="withdrawModal" :closable="currentStage !== 'completion'" @on-hide="onModalHide">
 		<template #title>
 			<div v-if="shouldShowTitle" class="flex items-center gap-1 text-secondary">
-				<template v-if="withdrawContext.currentStage.value === 'tax-form'">
+				<template v-if="currentStage === 'tax-form'">
 					<span class="text-xl font-bold text-contrast">{{
 						formatMessage(messages.taxFormStage)
 					}}</span>
 				</template>
-				<template v-else-if="withdrawContext.currentStage.value === 'method-selection'">
+				<template v-else-if="currentStage === 'method-selection'">
 					<span class="text-xl font-bold text-contrast">{{
 						formatMessage(messages.methodSelectionStage)
 					}}</span>
@@ -44,23 +40,19 @@
 				@scroll="checkScrollState"
 			>
 				<TaxFormStage
-					v-if="withdrawContext.currentStage.value === 'tax-form'"
+					v-if="currentStage === 'tax-form'"
 					:balance="balance"
 					:on-show-tax-form="showTaxFormModal"
 				/>
 				<MethodSelectionStage
-					v-else-if="withdrawContext.currentStage.value === 'method-selection'"
+					v-else-if="currentStage === 'method-selection'"
 					:on-show-tax-form="showTaxFormModal"
 					@close-modal="withdrawModal?.hide()"
 				/>
-				<TremendousDetailsStage
-					v-else-if="withdrawContext.currentStage.value === 'tremendous-details'"
-				/>
-				<MuralpayKycStage v-else-if="withdrawContext.currentStage.value === 'muralpay-kyc'" />
-				<MuralpayDetailsStage
-					v-else-if="withdrawContext.currentStage.value === 'muralpay-details'"
-				/>
-				<CompletionStage v-else-if="withdrawContext.currentStage.value === 'completion'" />
+				<TremendousDetailsStage v-else-if="currentStage === 'tremendous-details'" />
+				<MuralpayKycStage v-else-if="currentStage === 'muralpay-kyc'" />
+				<MuralpayDetailsStage v-else-if="currentStage === 'muralpay-details'" />
+				<CompletionStage v-else-if="currentStage === 'completion'" />
 				<div v-else>Something went wrong</div>
 			</div>
 
@@ -72,9 +64,9 @@
 		<div class="mt-4 flex justify-end gap-2">
 			<ButtonStyled type="outlined">
 				<button
-					v-if="withdrawContext.previousStep.value"
+					v-if="previousStep && currentStage !== 'completion'"
 					class="!border-surface-5"
-					@click="withdrawContext.setStage(withdrawContext.previousStep.value, true)"
+					@click="setStage(previousStep, true)"
 				>
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
 				</button>
@@ -85,47 +77,34 @@
 			</ButtonStyled>
 			<ButtonStyled
 				:color="
-					withdrawContext.currentStage.value === 'tax-form' && needsTaxForm && remainingLimit <= 0
+					currentStage === 'tax-form' && needsTaxForm && remainingLimit <= 0
 						? 'orange'
-						: withdrawContext.currentStage.value === 'muralpay-details' ||
-							  withdrawContext.currentStage.value === 'tremendous-details'
+						: currentStage === 'muralpay-details' || currentStage === 'tremendous-details'
 							? 'brand'
 							: 'standard'
 				"
 			>
 				<button
-					v-if="
-						withdrawContext.currentStage.value === 'tax-form' && needsTaxForm && remainingLimit > 0
-					"
+					v-if="currentStage === 'tax-form' && needsTaxForm && remainingLimit > 0"
 					@click="continueWithLimit"
 				>
 					{{ formatMessage(messages.continueWithLimit) }}
 					<RightArrowIcon />
 				</button>
-				<button
-					v-else-if="withdrawContext.currentStage.value === 'tax-form' && needsTaxForm"
-					@click="showTaxFormModal"
-				>
+				<button v-else-if="currentStage === 'tax-form' && needsTaxForm" @click="showTaxFormModal">
 					<FileTextIcon />
 					{{ formatMessage(messages.completeTaxForm) }}
 				</button>
 				<button
-					v-else
-					:disabled="!withdrawContext.canProceed.value"
-					@click="withdrawContext.setStage(withdrawContext.nextStep.value)"
+					v-else-if="currentStage === 'muralpay-details' || currentStage === 'tremendous-details'"
+					:disabled="!canProceed || isSubmitting"
+					@click="handleWithdraw"
 				>
-					<template v-if="withdrawContext.currentStage.value === 'completion'">
-						<CheckCircleIcon /> Complete
-					</template>
-					<template
-						v-else-if="
-							withdrawContext.currentStage.value === 'muralpay-details' ||
-							withdrawContext.currentStage.value === 'tremendous-details'
-						"
-					>
-						<ArrowLeftRightIcon />
-						{{ formatMessage(messages.withdrawButton) }}
-					</template>
+					<ArrowLeftRightIcon />
+					{{ formatMessage(messages.withdrawButton) }}
+				</button>
+				<button v-else :disabled="!canProceed" @click="setStage(nextStep)">
+					<template v-if="currentStage === 'completion'"> <CheckCircleIcon /> Complete </template>
 					<template v-else>
 						{{ formatMessage(commonMessages.nextButton) }}
 						<RightArrowIcon />
@@ -195,8 +174,20 @@ const { formatMessage } = useVIntl()
 const withdrawContext = createWithdrawContext(props.balance)
 provideWithdrawContext(withdrawContext)
 
+const {
+	currentStage,
+	previousStep,
+	nextStep,
+	canProceed,
+	setStage,
+	withdrawData,
+	resetData,
+	stages,
+	submitWithdrawal,
+} = withdrawContext
+
 const needsTaxForm = computed(() => {
-	if (!props.balance || withdrawContext.currentStage.value !== 'tax-form') return false
+	if (!props.balance || currentStage.value !== 'tax-form') return false
 	const ytd = props.balance.withdrawn_ytd ?? 0
 	const available = props.balance.available ?? 0
 	const status = props.balance.form_completion_status
@@ -213,18 +204,34 @@ const remainingLimit = computed(() => {
 })
 
 function continueWithLimit() {
-	withdrawContext.withdrawData.value.skippedTaxForm = true
-	withdrawContext.setStage(withdrawContext.nextStep.value)
+	withdrawData.value.tax.skipped = true
+	setStage(nextStep.value)
+}
+
+const isSubmitting = ref(false)
+async function handleWithdraw() {
+	if (isSubmitting.value) return
+
+	try {
+		isSubmitting.value = true
+		await submitWithdrawal()
+		setStage('completion')
+	} catch (error) {
+		console.error('Withdrawal failed:', error)
+		// TODO: add notif or error stage for modal
+	} finally {
+		isSubmitting.value = false
+	}
 }
 
 const shouldShowTitle = computed(() => {
-	return withdrawContext.currentStage.value !== 'completion'
+	return currentStage.value !== 'completion'
 })
 
 const isDetailsStage = computed(() => {
 	const detailsStages: WithdrawStage[] = ['tremendous-details', 'muralpay-kyc', 'muralpay-details']
-	const currentStage = withdrawContext.currentStage.value
-	return currentStage ? detailsStages.includes(currentStage) : false
+	const current = currentStage.value
+	return current ? detailsStages.includes(current) : false
 })
 
 const withdrawModal = useTemplateRef<InstanceType<typeof NewModal>>('withdrawModal')
@@ -250,25 +257,25 @@ function onTaxFormCancelled() {
 }
 
 function onModalHide() {
-	withdrawContext.resetData()
+	resetData()
 	emit('hide')
 }
 
 function goToBreadcrumbStage(stage: WithdrawStage) {
-	withdrawContext.setStage(stage, true)
+	setStage(stage, true)
 }
 
 function show(preferred?: WithdrawStage) {
 	if (preferred) {
-		withdrawContext.setStage(preferred, true)
+		setStage(preferred, true)
 		withdrawModal.value?.show()
 		checkScrollState()
 		return
 	}
 
-	const firstStage = withdrawContext.stages.value[0]
+	const firstStage = stages.value[0]
 	if (firstStage) {
-		withdrawContext.setStage(firstStage, true)
+		setStage(firstStage, true)
 	}
 
 	withdrawModal.value?.show()

@@ -7,6 +7,7 @@ import {
 	VenmoIcon,
 } from '@modrinth/assets'
 import { createContext, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
+import type { MessageDescriptor } from '@vintl/vintl'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
 import { getBlockchainIcon } from '@/utils/finance-icons'
@@ -23,7 +24,7 @@ export type WithdrawStage =
 export type PaymentProvider = 'tremendous' | 'muralpay'
 
 /**
- * only used for the withdraw modal stage logic - not actually for API requests
+ * only used for the method selection stage logic - not actually for API requests
  **/
 export type PaymentMethod = 'gift_card' | 'paypal' | 'venmo' | 'bank' | 'crypto'
 
@@ -53,24 +54,96 @@ export interface PayoutMethod {
 
 export interface PaymentOption {
 	value: string
-	label: string | { id: string; defaultMessage: string }
+	label: string | MessageDescriptor
 	icon: Component
 	methodId: string | undefined
 	fee: string
 	type: string
 }
 
-export interface WithdrawData {
-	selectedCountry: { id: string; name: string } | null
-	selectedProvider: PaymentProvider | null
-	selectedMethod: string | null
-	selectedMethodId: string | null
+export interface Country {
+	id: string
+	name: string
+}
+
+export interface WithdrawalResult {
+	created: Date
 	amount: number
-	skippedTaxForm: boolean
-	deliveryEmail?: string | null
-	giftCardDetails?: any
-	kycData?: any
-	accountDetails?: any
+	fee: number
+	netAmount: number
+	methodType: string
+	recipientDisplay: string
+}
+
+export interface KycData {
+	type: 'individual' | 'business'
+	email: string
+	firstName?: string
+	lastName?: string
+	dateOfBirth?: string
+	name?: string
+	physicalAddress: {
+		address1: string
+		address2?: string
+		city: string
+		state: string
+		country: string
+		zip: string
+	}
+}
+
+export interface AccountDetails {
+	bankName?: string
+	walletAddress?: string
+	documentNumber?: string
+	[key: string]: any // for dynamic rail fields
+}
+
+export interface GiftCardDetails {
+	[key: string]: any
+}
+
+export interface SelectionData {
+	country: Country | null
+	provider: PaymentProvider | null
+	method: string | null
+	methodId: string | null
+}
+
+export interface TaxData {
+	skipped: boolean
+}
+
+export interface CalculationData {
+	amount: number
+	fee: number | null
+	exchangeRate: number | null
+}
+
+export interface TremendousProviderData {
+	type: 'tremendous'
+	deliveryEmail: string
+	giftCardDetails: GiftCardDetails | null
+}
+
+export interface MuralPayProviderData {
+	type: 'muralpay'
+	kycData: KycData
+	accountDetails: AccountDetails
+}
+
+export interface NoProviderData {
+	type: null
+}
+
+export type ProviderData = TremendousProviderData | MuralPayProviderData | NoProviderData
+
+export interface WithdrawData {
+	selection: SelectionData
+	tax: TaxData
+	calculation: CalculationData
+	providerData: ProviderData
+	result: WithdrawalResult | null
 }
 
 export interface WithdrawContextValue {
@@ -91,6 +164,8 @@ export interface WithdrawContextValue {
 	setStage: (stage: WithdrawStage | undefined, skipValidation?: boolean) => Promise<void>
 	validateCurrentStage: () => boolean
 	resetData: () => void
+	calculateFees: () => Promise<{ fee: number | null; exchange_rate: number | null }>
+	submitWithdrawal: () => Promise<void>
 }
 
 export const [injectWithdrawContext, provideWithdrawContext] =
@@ -100,17 +175,177 @@ export function useWithdrawContext() {
 	return injectWithdrawContext()
 }
 
+function isTremendousProvider(data: ProviderData): data is TremendousProviderData {
+	return data.type === 'tremendous'
+}
+
+function isMuralPayProvider(data: ProviderData): data is MuralPayProviderData {
+	return data.type === 'muralpay'
+}
+
+function buildRecipientInfo(kycData: KycData) {
+	return {
+		type: kycData.type,
+		...(kycData.type === 'individual'
+			? {
+					firstName: kycData.firstName,
+					lastName: kycData.lastName,
+					dateOfBirth: kycData.dateOfBirth,
+				}
+			: {
+					name: kycData.name,
+				}),
+		email: kycData.email,
+		physicalAddress: kycData.physicalAddress,
+	}
+}
+
+function getAccountOwnerName(kycData: KycData): string {
+	if (kycData.type === 'individual') {
+		return `${kycData.firstName} ${kycData.lastName}`
+	}
+	return kycData.name || ''
+}
+
+function getMethodDisplayName(method: string | null): string {
+	if (!method) return ''
+	const methodMap: Record<string, string> = {
+		paypal: 'PayPal',
+		venmo: 'Venmo',
+		merchant_card: 'Gift Card',
+		charity: 'Charity',
+		visa_card: 'Virtual Visa',
+	}
+	if (methodMap[method]) return methodMap[method]
+	if (method.startsWith('fiat_')) {
+		return 'Bank Transfer'
+	}
+	if (method.startsWith('blockchain_')) {
+		return 'Crypto'
+	}
+	return method
+}
+
+function getRecipientDisplay(data: WithdrawData): string {
+	if (isTremendousProvider(data.providerData)) {
+		return data.providerData.deliveryEmail
+	}
+	if (isMuralPayProvider(data.providerData)) {
+		const kycData = data.providerData.kycData
+		if (kycData.type === 'individual') {
+			return `${kycData.firstName} ${kycData.lastName}`
+		}
+		return kycData.name || ''
+	}
+	return ''
+}
+
+interface PayoutPayload {
+	amount: number
+	method: 'tremendous' | 'muralpay'
+	method_id: string
+	method_details?: {
+		delivery_email?: string
+		payout_details?: any
+		recipient_info?: any
+	}
+}
+
+function buildPayoutPayload(data: WithdrawData): PayoutPayload {
+	if (data.selection.provider === 'tremendous') {
+		if (!isTremendousProvider(data.providerData)) {
+			throw new Error('Invalid provider data for Tremendous')
+		}
+		return {
+			amount: data.calculation.amount,
+			method: 'tremendous',
+			method_id: data.selection.methodId!,
+			method_details: {
+				delivery_email: data.providerData.deliveryEmail,
+			},
+		}
+	} else if (data.selection.provider === 'muralpay') {
+		if (!isMuralPayProvider(data.providerData)) {
+			throw new Error('Invalid provider data for MuralPay')
+		}
+		const railId = data.selection.method!
+		const rail = getRailConfig(railId)
+
+		if (!rail) throw new Error('Invalid payment method')
+
+		if (rail.type === 'crypto') {
+			return {
+				amount: data.calculation.amount,
+				method: 'muralpay',
+				method_id: data.selection.methodId!,
+				method_details: {
+					payout_details: {
+						type: 'blockchain',
+						wallet_address: data.providerData.accountDetails.walletAddress || null,
+					},
+					recipient_info: buildRecipientInfo(data.providerData.kycData),
+				},
+			}
+		} else if (rail.type === 'fiat') {
+			const fiatAndRailDetails: Record<string, any> = {
+				type: rail.railCode || '',
+				symbol: rail.currency || '',
+			}
+
+			for (const field of rail.fields) {
+				const value = data.providerData.accountDetails[field.name]
+				if (value !== undefined && value !== null && value !== '') {
+					fiatAndRailDetails[field.name] = value
+				}
+			}
+
+			if (data.providerData.accountDetails.documentNumber) {
+				fiatAndRailDetails.documentNumber = data.providerData.accountDetails.documentNumber
+			}
+
+			return {
+				amount: data.calculation.amount,
+				method: 'muralpay',
+				method_id: data.selection.methodId!,
+				method_details: {
+					payout_details: {
+						type: 'fiat',
+						bank_name: data.providerData.accountDetails.bankName || '',
+						bank_account_owner: getAccountOwnerName(data.providerData.kycData),
+						fiat_and_rail_details: fiatAndRailDetails,
+					},
+					recipient_info: buildRecipientInfo(data.providerData.kycData),
+				},
+			}
+		}
+	}
+
+	throw new Error('Invalid provider')
+}
+
 export function createWithdrawContext(balance: any): WithdrawContextValue {
 	const debug = useDebugLogger('CreatorWithdraw')
 	const currentStage = ref<WithdrawStage | undefined>()
 
 	const withdrawData = ref<WithdrawData>({
-		selectedCountry: null,
-		selectedProvider: null,
-		selectedMethod: null,
-		selectedMethodId: null,
-		amount: 0,
-		skippedTaxForm: false,
+		selection: {
+			country: null,
+			provider: null,
+			method: null,
+			methodId: null,
+		},
+		tax: {
+			skipped: false,
+		},
+		calculation: {
+			amount: 0,
+			fee: null,
+			exchangeRate: null,
+		},
+		providerData: {
+			type: null,
+		},
+		result: null,
 	})
 
 	const balanceRef = ref(balance)
@@ -139,7 +374,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 
 		dynamicStages.push('method-selection')
 
-		const selectedProvider = withdrawData.value.selectedProvider
+		const selectedProvider = withdrawData.value.selection.provider
 		if (selectedProvider === 'tremendous') {
 			dynamicStages.push('tremendous-details')
 		} else if (selectedProvider === 'muralpay') {
@@ -160,7 +395,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			return availableBalance
 		}
 
-		if (!withdrawData.value.skippedTaxForm) {
+		if (!withdrawData.value.tax.skipped) {
 			return availableBalance
 		}
 
@@ -237,7 +472,6 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			const methodId = method.id
 
 			if (methodId.startsWith('fiat_')) {
-				const railCode = methodId.replace('fiat_', '')
 				const rail = getRailConfig(methodId)
 
 				if (!rail) {
@@ -247,7 +481,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 
 				options.push({
 					value: methodId,
-					label: rail.name || `Bank transfer (${railCode.toUpperCase()})`,
+					label: rail.name,
 					icon: LandmarkIcon,
 					methodId: method.id,
 					fee: rail.fee,
@@ -263,7 +497,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 
 				options.push({
 					value: methodId,
-					label: rail.name || method.name,
+					label: rail.name,
 					icon: getBlockchainIcon(rail.blockchain || 'POLYGON') || PolygonIcon,
 					methodId: method.id,
 					fee: rail.fee,
@@ -316,44 +550,44 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 	function validateCurrentStage(): boolean {
 		switch (currentStage.value) {
 			case 'tax-form': {
-				// If no balance data, allow proceeding
 				if (!balanceRef.value) return true
 				const ytd = balanceRef.value.withdrawn_ytd ?? 0
 				const remainingLimit = Math.max(0, 600 - ytd)
 				const form_completion_status = balanceRef.value.form_completion_status
-				// If they haven't hit $600 yet, they can proceed without completing the form
 				if (ytd < 600) return true
-				// If user skipped tax form to proceed with limited withdrawal
-				if (withdrawData.value.skippedTaxForm && remainingLimit > 0) return true
-				// If they hit $600, they must complete the form to proceed
+				if (withdrawData.value.tax.skipped && remainingLimit > 0) return true
 				return form_completion_status === 'complete'
 			}
 			case 'method-selection':
 				return !!(
-					withdrawData.value.selectedCountry &&
-					withdrawData.value.selectedProvider &&
-					withdrawData.value.selectedMethod &&
-					(withdrawData.value.selectedMethod === 'merchant_card' ||
-						withdrawData.value.selectedMethod === 'charity' ||
-						withdrawData.value.selectedMethodId)
+					withdrawData.value.selection.country &&
+					withdrawData.value.selection.provider &&
+					withdrawData.value.selection.method &&
+					(withdrawData.value.selection.method === 'merchant_card' ||
+						withdrawData.value.selection.method === 'charity' ||
+						withdrawData.value.selection.methodId)
 				)
 			case 'tremendous-details': {
-				const method = withdrawData.value.selectedMethod
-				// For gift card categories (merchant, charity), we need a specific method ID
+				const method = withdrawData.value.selection.method
 				if (method === 'merchant_card' || method === 'charity') {
+					if (!isTremendousProvider(withdrawData.value.providerData)) return false
 					return !!(
-						withdrawData.value.selectedMethodId &&
-						withdrawData.value.amount > 0 &&
-						withdrawData.value.deliveryEmail
+						withdrawData.value.selection.methodId &&
+						withdrawData.value.calculation.amount > 0 &&
+						withdrawData.value.providerData.deliveryEmail
 					)
 				}
-				// For paypal/venmo/visa, we just need amount and email
-				return !!(withdrawData.value.amount > 0 && withdrawData.value.deliveryEmail)
+				if (!isTremendousProvider(withdrawData.value.providerData)) return false
+				return !!(
+					withdrawData.value.calculation.amount > 0 && withdrawData.value.providerData.deliveryEmail
+				)
 			}
 			case 'muralpay-kyc': {
-				if (!withdrawData.value.kycData) return false
+				if (!isMuralPayProvider(withdrawData.value.providerData)) return false
 
-				const kycData = withdrawData.value.kycData
+				const kycData = withdrawData.value.providerData.kycData
+				if (!kycData) return false
+
 				const hasValidAddress = !!(
 					kycData.physicalAddress?.address1 &&
 					kycData.physicalAddress?.city &&
@@ -377,13 +611,16 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				return false
 			}
 			case 'muralpay-details': {
-				const railId = withdrawData.value.selectedMethod
+				if (!isMuralPayProvider(withdrawData.value.providerData)) return false
+
+				const railId = withdrawData.value.selection.method
 				const rail = getRailConfig(railId as string)
 				if (!rail) return false
 
-				if (!withdrawData.value.amount || withdrawData.value.amount <= 0) return false
+				if (!withdrawData.value.calculation.amount || withdrawData.value.calculation.amount <= 0)
+					return false
 
-				const accountDetails = withdrawData.value.accountDetails
+				const accountDetails = withdrawData.value.providerData.accountDetails
 				if (!accountDetails) return false
 
 				if (rail.requiresBankName && !accountDetails.bankName) return false
@@ -419,14 +656,64 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 
 	function resetData() {
 		withdrawData.value = {
-			selectedCountry: null,
-			selectedProvider: null,
-			selectedMethod: null,
-			selectedMethodId: null,
-			amount: 0,
-			skippedTaxForm: false,
+			selection: {
+				country: null,
+				provider: null,
+				method: null,
+				methodId: null,
+			},
+			tax: {
+				skipped: false,
+			},
+			calculation: {
+				amount: 0,
+				fee: null,
+				exchangeRate: null,
+			},
+			providerData: {
+				type: null,
+			},
+			result: null,
 		}
 		currentStage.value = undefined
+	}
+
+	async function calculateFees(): Promise<{ fee: number | null; exchange_rate: number | null }> {
+		const payload = buildPayoutPayload(withdrawData.value)
+
+		const response = (await useBaseFetch('payout/fees', {
+			apiVersion: 3,
+			method: 'POST',
+			body: payload,
+		})) as { fee: number | null; exchange_rate: number | null }
+
+		withdrawData.value.calculation.fee = response.fee || 0
+		withdrawData.value.calculation.exchangeRate = response.exchange_rate || null
+
+		return response
+	}
+
+	async function submitWithdrawal(): Promise<void> {
+		const payload = buildPayoutPayload(withdrawData.value)
+
+		debug('Withdrawal payload:', payload)
+
+		await useBaseFetch('payout', {
+			apiVersion: 3,
+			method: 'POST',
+			body: payload,
+		})
+
+		withdrawData.value.result = {
+			created: new Date(),
+			amount: withdrawData.value.calculation.amount,
+			fee: withdrawData.value.calculation.fee || 0,
+			netAmount: withdrawData.value.calculation.amount - (withdrawData.value.calculation.fee || 0),
+			methodType: getMethodDisplayName(withdrawData.value.selection.method),
+			recipientDisplay: getRecipientDisplay(withdrawData.value),
+		}
+
+		debug('Withdrawal submitted successfully', withdrawData.value.result)
 	}
 
 	return {
@@ -444,5 +731,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 		setStage,
 		validateCurrentStage,
 		resetData,
+		calculateFees,
+		submitWithdrawal,
 	}
 }

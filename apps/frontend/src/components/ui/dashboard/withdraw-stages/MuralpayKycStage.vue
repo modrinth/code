@@ -205,12 +205,13 @@ import { all } from 'iso-3166-1'
 
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
-const withdrawContext = useWithdrawContext()
+const { withdrawData } = useWithdrawContext()
 const { formatMessage } = useVIntl()
 
-const entityType = ref<'individual' | 'business' | null>(
-	withdrawContext.withdrawData.value.kycData?.type ?? null,
-)
+const providerData = withdrawData.value.providerData
+const existingKycData = providerData.type === 'muralpay' ? providerData.kycData : null
+
+const entityType = ref<'individual' | 'business' | null>(existingKycData?.type ?? null)
 
 interface PayoutRecipientInfoMerged {
 	email: string
@@ -230,8 +231,6 @@ interface PayoutRecipientInfoMerged {
 
 const auth = await useAuth()
 
-// if user has switched stages use what was in withdraw context
-const existingKycData = withdrawContext.withdrawData.value.kycData
 const formData = ref<PayoutRecipientInfoMerged>({
 	email: existingKycData?.email ?? `${(auth.value.user as any)?.email}`,
 	firstName: existingKycData?.type === 'individual' ? existingKycData.firstName : '',
@@ -242,9 +241,7 @@ const formData = ref<PayoutRecipientInfoMerged>({
 		address1: existingKycData?.physicalAddress?.address1 ?? '',
 		address2: existingKycData?.physicalAddress?.address2 ?? null,
 		country:
-			existingKycData?.physicalAddress?.country ??
-			withdrawContext.withdrawData.value.selectedCountry?.id ??
-			'',
+			existingKycData?.physicalAddress?.country ?? withdrawData.value.selection.country?.id ?? '',
 		state: existingKycData?.physicalAddress?.state ?? '',
 		city: existingKycData?.physicalAddress?.city ?? '',
 		zip: existingKycData?.physicalAddress?.zip ?? '',
@@ -270,13 +267,17 @@ watch(
 	[entityType, formData],
 	() => {
 		if (!entityType.value) {
-			withdrawContext.withdrawData.value.kycData = null
+			if (withdrawData.value.providerData.type === 'muralpay') {
+				withdrawData.value.providerData.kycData = null as any
+			}
 			return
 		}
 
+		if (withdrawData.value.providerData.type !== 'muralpay') return
+
 		if (entityType.value === 'individual') {
 			if (formData.value.dateOfBirth) {
-				withdrawContext.withdrawData.value.kycData = {
+				withdrawData.value.providerData.kycData = {
 					type: 'individual',
 					firstName: formData.value.firstName || '',
 					lastName: formData.value.lastName || '',
@@ -293,7 +294,7 @@ watch(
 				}
 			}
 		} else {
-			withdrawContext.withdrawData.value.kycData = {
+			withdrawData.value.providerData.kycData = {
 				type: 'business',
 				name: formData.value.businessName || '',
 				email: formData.value.email,

@@ -153,7 +153,7 @@
 				:fee-loading="feeLoading"
 			/>
 
-			<Checkbox v-model="agreedTerms" class="rewards-checkbox">
+			<Checkbox v-model="agreedTerms">
 				<span>
 					<IntlFormatted :message-id="financialMessages.rewardsProgramTermsAgreement">
 						<template #terms-link="{ children }">
@@ -194,7 +194,8 @@ import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const debug = useDebugLogger('TremendousDetailsStage')
-const withdrawContext = useWithdrawContext()
+const { withdrawData, maxWithdrawAmount, availableMethods, paymentOptions, calculateFees } =
+	useWithdrawContext()
 const { formatMessage } = useVIntl()
 const auth = await useAuth()
 
@@ -202,23 +203,26 @@ const userEmail = computed(() => {
 	return (auth.value.user as any)?.email || ''
 })
 
-const deliveryEmail = ref<string>(
-	withdrawContext.withdrawData.value.deliveryEmail || userEmail.value || '',
-)
+const providerData = withdrawData.value.providerData
+const initialDeliveryEmail =
+	providerData.type === 'tremendous'
+		? providerData.deliveryEmail || userEmail.value || ''
+		: userEmail.value || ''
+const deliveryEmail = ref<string>(initialDeliveryEmail)
 
 const showGiftCardSelector = computed(() => {
-	const method = withdrawContext.withdrawData.value.selectedMethod
+	const method = withdrawData.value.selection.method
 	return method === 'merchant_card' || method === 'charity'
 })
 
 const selectedMethodDisplay = computed(() => {
-	const method = withdrawContext.withdrawData.value.selectedMethod
+	const method = withdrawData.value.selection.method
 	if (!method) return null
-	return withdrawContext.paymentOptions.value.find((m) => m.value === method) || null
+	return paymentOptions.value.find((m) => m.value === method) || null
 })
 
 const categoryLabel = computed(() => {
-	const method = withdrawContext.withdrawData.value.selectedMethod
+	const method = withdrawData.value.selection.method
 	switch (method) {
 		case 'visa_card':
 			return formatMessage(paymentMethodMessages.virtualVisa)
@@ -232,7 +236,7 @@ const categoryLabel = computed(() => {
 })
 
 const categoryLabelPlural = computed(() => {
-	const method = withdrawContext.withdrawData.value.selectedMethod
+	const method = withdrawData.value.selection.method
 	switch (method) {
 		case 'visa_card':
 			return formatMessage(paymentMethodMessages.virtualVisaPlural)
@@ -250,16 +254,14 @@ const isUnverifiedEmail = computed(() => {
 	return deliveryEmail.value.toLowerCase() !== userEmail.value.toLowerCase()
 })
 
-const maxAmount = computed(() => withdrawContext.maxWithdrawAmount.value)
+const maxAmount = computed(() => maxWithdrawAmount.value)
 const roundedMaxAmount = computed(() => Math.floor(maxAmount.value * 100) / 100)
 
 const formData = ref<Record<string, any>>({
-	amount: withdrawContext.withdrawData.value.amount || undefined,
+	amount: withdrawData.value.calculation.amount || undefined,
 })
 
-const selectedGiftCardId = ref<string | null>(
-	withdrawContext.withdrawData.value.selectedMethodId || null,
-)
+const selectedGiftCardId = ref<string | null>(withdrawData.value.selection.methodId || null)
 
 const agreedTerms = ref<boolean>(false)
 
@@ -343,7 +345,7 @@ function enforceDecimalPlaces(event: Event) {
 	}
 }
 
-const calculateFees = useDebounceFn(async () => {
+const calculateFeesDebounced = useDebounceFn(async () => {
 	const amount = formData.value.amount
 	if (!amount || amount <= 0) {
 		calculatedFee.value = 0
@@ -352,7 +354,7 @@ const calculateFees = useDebounceFn(async () => {
 
 	const methodId = showGiftCardSelector.value
 		? selectedGiftCardId.value
-		: withdrawContext.withdrawData.value.selectedMethodId
+		: withdrawData.value.selection.methodId
 
 	if (!methodId) {
 		calculatedFee.value = 0
@@ -361,18 +363,8 @@ const calculateFees = useDebounceFn(async () => {
 
 	feeLoading.value = true
 	try {
-		// mostly useless apart from PayPal/Venmo
-		const response = (await useBaseFetch('payout/fees', {
-			apiVersion: 3,
-			method: 'POST',
-			body: {
-				amount,
-				method: 'tremendous',
-				method_id: methodId,
-			},
-		})) as { fee: number | null; exchange_rate: number | null }
-
-		calculatedFee.value = response.fee || 0
+		await calculateFees()
+		calculatedFee.value = withdrawData.value.calculation.fee ?? 0
 	} catch (error) {
 		console.error('Failed to calculate fees:', error)
 		calculatedFee.value = 0
@@ -398,28 +390,30 @@ watch(
 )
 
 watch(deliveryEmail, (newEmail) => {
-	withdrawContext.withdrawData.value.deliveryEmail = newEmail
+	if (withdrawData.value.providerData.type === 'tremendous') {
+		withdrawData.value.providerData.deliveryEmail = newEmail
+	}
 })
 
 watch(
 	[() => formData.value.amount, selectedGiftCardId],
 	() => {
-		withdrawContext.withdrawData.value.amount = formData.value.amount ?? 0
+		withdrawData.value.calculation.amount = formData.value.amount ?? 0
 
 		if (showGiftCardSelector.value && selectedGiftCardId.value) {
-			withdrawContext.withdrawData.value.selectedMethodId = selectedGiftCardId.value
+			withdrawData.value.selection.methodId = selectedGiftCardId.value
 		}
 
 		if (formData.value.amount) {
-			calculateFees()
+			calculateFeesDebounced()
 		}
 	},
 	{ deep: true },
 )
 
 onMounted(async () => {
-	const methods = withdrawContext.availableMethods.value
-	const selectedMethod = withdrawContext.withdrawData.value.selectedMethod
+	const methods = availableMethods.value
+	const selectedMethod = withdrawData.value.selection.method
 
 	rewardOptions.value = methods
 		.filter((m) => m.type === 'tremendous')
@@ -439,12 +433,12 @@ onMounted(async () => {
 	debug('Sample method with interval:', rewardOptions.value[0]?.methodDetails)
 
 	if (formData.value.amount) {
-		calculateFees()
+		calculateFeesDebounced()
 	}
 })
 
 watch(
-	() => withdrawContext.withdrawData.value.selectedMethod,
+	() => withdrawData.value.selection.method,
 	(newMethod, oldMethod) => {
 		if (oldMethod && newMethod !== oldMethod) {
 			formData.value = {
