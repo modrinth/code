@@ -77,7 +77,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'USD',
 		type: 'fiat',
-		fee: '≈ 0.50% + $0.50',
+		fee: '≈ 1.50% + $0.50',
 		railCode: 'usd',
 		requiresBankName: true,
 		fields: [
@@ -130,7 +130,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'EUR',
 		type: 'fiat',
-		fee: '≈ 0.60% + €1.00',
+		fee: '≈ 1.60% + €1.00',
 		railCode: 'eur',
 		requiresBankName: true,
 		fields: [
@@ -256,7 +256,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'MXN',
 		type: 'fiat',
-		fee: '≈ 0.90% + $0.50',
+		fee: '≈ 1.90% + $0.50',
 		railCode: 'mxn',
 		requiresBankName: true,
 		fields: [
@@ -288,7 +288,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'BRL',
 		type: 'fiat',
-		fee: '≈ 1.30% + $0.25',
+		fee: '≈ 2.30% + $0.25',
 		railCode: 'brl',
 		requiresBankName: true,
 		fields: [
@@ -379,7 +379,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'COP',
 		type: 'fiat',
-		fee: '≈ 0.95% + $0.35',
+		fee: '≈ 1.95% + $0.35',
 		railCode: 'cop',
 		requiresBankName: true,
 		fields: [
@@ -438,7 +438,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'ARS',
 		type: 'fiat',
-		fee: '≈ 0.50% + $0.00',
+		fee: '≈ 1.50% + $0.00',
 		railCode: 'ars',
 		requiresBankName: true,
 		fields: [
@@ -500,7 +500,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'CLP',
 		type: 'fiat',
-		fee: '≈ 0.95% + $1.20',
+		fee: '≈ 1.95% + $1.20',
 		railCode: 'clp',
 		requiresBankName: true,
 		fields: [
@@ -548,7 +548,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'CRC',
 		type: 'fiat',
-		fee: '≈ 1.05% + $0.80',
+		fee: '≈ 2.05% + $0.80',
 		railCode: 'crc',
 		requiresBankName: true,
 		fields: [
@@ -585,7 +585,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'PEN',
 		type: 'fiat',
-		fee: '≈ 1.15% + $1.00',
+		fee: '≈ 2.15% + $1.00',
 		railCode: 'pen',
 		requiresBankName: true,
 		fields: [
@@ -629,45 +629,45 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		],
 	},
 
-	fiat_bob: {
-		id: 'fiat_bob',
-		name: defineMessage({
-			id: 'muralpay.rail.fiat-bob.name',
-			defaultMessage: 'Bank Transfer (BOB)',
-		}),
-		currency: 'BOB',
-		type: 'fiat',
-		fee: 'TBD',
-		railCode: 'bob',
-		requiresBankName: true,
-		fields: [
-			{
-				name: 'bankAccountNumber',
-				type: 'text',
-				label: defineMessage({
-					id: 'muralpay.field.account-number',
-					defaultMessage: 'Account Number',
-				}),
-				required: true,
-				placeholder: defineMessage({
-					id: 'muralpay.placeholder.account-number',
-					defaultMessage: 'Enter account number',
-				}),
-				autocomplete: 'off',
-			},
-			{
-				name: 'documentType',
-				type: 'select',
-				label: defineMessage({
-					id: 'muralpay.field.document-type',
-					defaultMessage: 'Document Type',
-				}),
-				required: true,
-				options: DOCUMENT_TYPE_OPTIONS,
-				autocomplete: 'off',
-			},
-		],
-	},
+	// fiat_bob: {
+	// 	id: 'fiat_bob',
+	// 	name: defineMessage({
+	// 		id: 'muralpay.rail.fiat-bob.name',
+	// 		defaultMessage: 'Bank Transfer (BOB)',
+	// 	}),
+	// 	currency: 'BOB',
+	// 	type: 'fiat',
+	// 	fee: 'TBD',
+	// 	railCode: 'bob',
+	// 	requiresBankName: true,
+	// 	fields: [
+	// 		{
+	// 			name: 'bankAccountNumber',
+	// 			type: 'text',
+	// 			label: defineMessage({
+	// 				id: 'muralpay.field.account-number',
+	// 				defaultMessage: 'Account Number',
+	// 			}),
+	// 			required: true,
+	// 			placeholder: defineMessage({
+	// 				id: 'muralpay.placeholder.account-number',
+	// 				defaultMessage: 'Enter account number',
+	// 			}),
+	// 			autocomplete: 'off',
+	// 		},
+	// 		{
+	// 			name: 'documentType',
+	// 			type: 'select',
+	// 			label: defineMessage({
+	// 				id: 'muralpay.field.document-type',
+	// 				defaultMessage: 'Document Type',
+	// 			}),
+	// 			required: true,
+	// 			options: DOCUMENT_TYPE_OPTIONS,
+	// 			autocomplete: 'off',
+	// 		},
+	// 	],
+	// },
 
 	fiat_zar: {
 		id: 'fiat_zar',
@@ -677,7 +677,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'ZAR',
 		type: 'fiat',
-		fee: '≈ 1.40% + $1.50',
+		fee: '≈ 2.40% + $1.50',
 		railCode: 'zar',
 		requiresBankName: true,
 		fields: [
@@ -714,7 +714,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'USD',
 		type: 'fiat',
-		fee: '≈ 0.50% + $5.00',
+		fee: '≈ 1.50% + $5.00',
 		railCode: 'usd-peru',
 		requiresBankName: true,
 		fields: [
@@ -754,97 +754,97 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		],
 	},
 
-	'fiat_usd-china': {
-		id: 'fiat_usd-china',
-		name: defineMessage({
-			id: 'muralpay.rail.fiat-usd-china.name',
-			defaultMessage: 'Bank Transfer (USD - China)',
-		}),
-		currency: 'USD',
-		type: 'fiat',
-		fee: 'TBD',
-		railCode: 'usd-china',
-		requiresBankName: false,
-		fields: [
-			{
-				name: 'bankName',
-				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.bank-name', defaultMessage: 'Bank Name' }),
-				required: true,
-				placeholder: defineMessage({
-					id: 'muralpay.placeholder.bank-name',
-					defaultMessage: 'Enter bank name',
-				}),
-				autocomplete: 'off',
-			},
-			{
-				name: 'accountType',
-				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
-				required: true,
-				options: ACCOUNT_TYPE_OPTIONS,
-				autocomplete: 'off',
-			},
-			{
-				name: 'bankAccountNumber',
-				type: 'text',
-				label: defineMessage({
-					id: 'muralpay.field.account-number',
-					defaultMessage: 'Account Number',
-				}),
-				required: true,
-				placeholder: defineMessage({
-					id: 'muralpay.placeholder.account-number',
-					defaultMessage: 'Enter account number',
-				}),
-				autocomplete: 'off',
-			},
-			{
-				name: 'documentType',
-				type: 'select',
-				label: defineMessage({
-					id: 'muralpay.field.document-type',
-					defaultMessage: 'Document Type',
-				}),
-				required: true,
-				options: DOCUMENT_TYPE_OPTIONS,
-				autocomplete: 'off',
-			},
-			{
-				name: 'phoneNumber',
-				type: 'tel',
-				label: defineMessage({ id: 'muralpay.field.phone-number', defaultMessage: 'Phone Number' }),
-				required: true,
-				placeholder: defineMessage({
-					id: 'muralpay.placeholder.phone-china',
-					defaultMessage: '+86...',
-				}),
-				autocomplete: 'tel',
-			},
-			{
-				name: 'address',
-				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.address', defaultMessage: 'Address' }),
-				required: true,
-				placeholder: defineMessage({
-					id: 'muralpay.placeholder.address',
-					defaultMessage: 'Enter address',
-				}),
-				autocomplete: 'street-address',
-			},
-			{
-				name: 'swiftBic',
-				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.swift-bic', defaultMessage: 'SWIFT/BIC' }),
-				required: true,
-				placeholder: defineMessage({
-					id: 'muralpay.placeholder.swift-bic',
-					defaultMessage: 'Enter SWIFT/BIC code',
-				}),
-				autocomplete: 'swift',
-			},
-		],
-	},
+	// 'fiat_usd-china': {
+	// 	id: 'fiat_usd-china',
+	// 	name: defineMessage({
+	// 		id: 'muralpay.rail.fiat-usd-china.name',
+	// 		defaultMessage: 'Bank Transfer (USD - China)',
+	// 	}),
+	// 	currency: 'USD',
+	// 	type: 'fiat',
+	// 	fee: 'TBD',
+	// 	railCode: 'usd-china',
+	// 	requiresBankName: false,
+	// 	fields: [
+	// 		{
+	// 			name: 'bankName',
+	// 			type: 'text',
+	// 			label: defineMessage({ id: 'muralpay.field.bank-name', defaultMessage: 'Bank Name' }),
+	// 			required: true,
+	// 			placeholder: defineMessage({
+	// 				id: 'muralpay.placeholder.bank-name',
+	// 				defaultMessage: 'Enter bank name',
+	// 			}),
+	// 			autocomplete: 'off',
+	// 		},
+	// 		{
+	// 			name: 'accountType',
+	// 			type: 'select',
+	// 			label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
+	// 			required: true,
+	// 			options: ACCOUNT_TYPE_OPTIONS,
+	// 			autocomplete: 'off',
+	// 		},
+	// 		{
+	// 			name: 'bankAccountNumber',
+	// 			type: 'text',
+	// 			label: defineMessage({
+	// 				id: 'muralpay.field.account-number',
+	// 				defaultMessage: 'Account Number',
+	// 			}),
+	// 			required: true,
+	// 			placeholder: defineMessage({
+	// 				id: 'muralpay.placeholder.account-number',
+	// 				defaultMessage: 'Enter account number',
+	// 			}),
+	// 			autocomplete: 'off',
+	// 		},
+	// 		{
+	// 			name: 'documentType',
+	// 			type: 'select',
+	// 			label: defineMessage({
+	// 				id: 'muralpay.field.document-type',
+	// 				defaultMessage: 'Document Type',
+	// 			}),
+	// 			required: true,
+	// 			options: DOCUMENT_TYPE_OPTIONS,
+	// 			autocomplete: 'off',
+	// 		},
+	// 		{
+	// 			name: 'phoneNumber',
+	// 			type: 'tel',
+	// 			label: defineMessage({ id: 'muralpay.field.phone-number', defaultMessage: 'Phone Number' }),
+	// 			required: true,
+	// 			placeholder: defineMessage({
+	// 				id: 'muralpay.placeholder.phone-china',
+	// 				defaultMessage: '+86...',
+	// 			}),
+	// 			autocomplete: 'tel',
+	// 		},
+	// 		{
+	// 			name: 'address',
+	// 			type: 'text',
+	// 			label: defineMessage({ id: 'muralpay.field.address', defaultMessage: 'Address' }),
+	// 			required: true,
+	// 			placeholder: defineMessage({
+	// 				id: 'muralpay.placeholder.address',
+	// 				defaultMessage: 'Enter address',
+	// 			}),
+	// 			autocomplete: 'street-address',
+	// 		},
+	// 		{
+	// 			name: 'swiftBic',
+	// 			type: 'text',
+	// 			label: defineMessage({ id: 'muralpay.field.swift-bic', defaultMessage: 'SWIFT/BIC' }),
+	// 			required: true,
+	// 			placeholder: defineMessage({
+	// 				id: 'muralpay.placeholder.swift-bic',
+	// 				defaultMessage: 'Enter SWIFT/BIC code',
+	// 			}),
+	// 			autocomplete: 'swift',
+	// 		},
+	// 	],
+	// },
 
 	blockchain_usdc_polygon: {
 		id: 'blockchain_usdc_polygon',
