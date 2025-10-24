@@ -4,6 +4,8 @@
 		:closable="currentStage !== 'completion'"
 		:hide-header="currentStage === 'completion'"
 		:merge-header="currentStage === 'completion'"
+		:scrollable="true"
+		max-content-height="70vh"
 		@on-hide="onModalHide"
 	>
 		<template #title>
@@ -34,44 +36,29 @@
 				</template>
 			</div>
 		</template>
-		<div class="relative min-w-[496px] max-w-[496px]">
-			<div
-				v-show="showTopFade"
-				class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-10 bg-gradient-to-b from-bg-raised to-transparent transition-all duration-300"
+		<div class="min-w-[496px] max-w-[496px] px-1 pb-1">
+			<TaxFormStage
+				v-if="currentStage === 'tax-form'"
+				:balance="balance"
+				:on-show-tax-form="showTaxFormModal"
 			/>
-
-			<div
-				ref="scrollContainer"
-				class="max-h-[70vh] overflow-y-auto px-1 pb-1"
-				@scroll="checkScrollState"
-			>
-				<TaxFormStage
-					v-if="currentStage === 'tax-form'"
-					:balance="balance"
-					:on-show-tax-form="showTaxFormModal"
-				/>
-				<MethodSelectionStage
-					v-else-if="currentStage === 'method-selection'"
-					:on-show-tax-form="showTaxFormModal"
-					@close-modal="withdrawModal?.hide()"
-				/>
-				<TremendousDetailsStage v-else-if="currentStage === 'tremendous-details'" />
-				<MuralpayKycStage v-else-if="currentStage === 'muralpay-kyc'" />
-				<MuralpayDetailsStage v-else-if="currentStage === 'muralpay-details'" />
-				<CompletionStage
-					v-else-if="currentStage === 'completion'"
-					@close="withdrawModal?.hide()"
-					@view-transactions="handleViewTransactions"
-				/>
-				<div v-else>Something went wrong</div>
-			</div>
-
-			<div
-				v-show="showBottomFade"
-				class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-10 bg-gradient-to-t from-bg-raised to-transparent transition-all duration-300"
+			<MethodSelectionStage
+				v-else-if="currentStage === 'method-selection'"
+				:on-show-tax-form="showTaxFormModal"
+				@close-modal="withdrawModal?.hide()"
 			/>
+			<TremendousDetailsStage v-else-if="currentStage === 'tremendous-details'" />
+			<MuralpayKycStage v-else-if="currentStage === 'muralpay-kyc'" />
+			<MuralpayDetailsStage v-else-if="currentStage === 'muralpay-details'" />
+			<CompletionStage
+				v-else-if="currentStage === 'completion'"
+				@close="withdrawModal?.hide()"
+				@view-transactions="handleViewTransactions"
+			/>
+			<div v-else>Something went wrong</div>
 		</div>
-		<div v-if="currentStage !== 'completion'" class="mt-4 flex justify-end gap-2">
+		<template v-if="currentStage !== 'completion'" #actions>
+			<div class="mt-4 flex justify-end gap-2">
 			<ButtonStyled type="outlined">
 				<button v-if="previousStep" class="!border-surface-5" @click="setStage(previousStep, true)">
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
@@ -114,7 +101,8 @@
 					<RightArrowIcon />
 				</button>
 			</ButtonStyled>
-		</div>
+			</div>
+		</template>
 	</NewModal>
 	<CreatorTaxFormModal
 		ref="taxFormModal"
@@ -138,7 +126,6 @@ import {
 	commonMessages,
 	injectNotificationManager,
 	NewModal,
-	useScrollIndicator,
 } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
@@ -249,9 +236,6 @@ const isDetailsStage = computed(() => {
 
 const withdrawModal = useTemplateRef<InstanceType<typeof NewModal>>('withdrawModal')
 const taxFormModal = ref<InstanceType<typeof CreatorTaxFormModal> | null>(null)
-const scrollContainer = ref<HTMLElement | null>(null)
-
-const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
 
 function showTaxFormModal(e?: MouseEvent) {
 	withdrawModal.value?.hide()
@@ -287,7 +271,6 @@ function show(preferred?: WithdrawStage) {
 	if (preferred) {
 		setStage(preferred, true)
 		withdrawModal.value?.show()
-		checkScrollState()
 		return
 	}
 
@@ -297,7 +280,6 @@ function show(preferred?: WithdrawStage) {
 	}
 
 	withdrawModal.value?.show()
-	checkScrollState()
 }
 
 defineExpose({

@@ -48,8 +48,52 @@
 						<XIcon aria-hidden="true" />
 					</button>
 				</ButtonStyled>
-				<div :class="['overflow-y-auto p-6', { 'pt-12': props.mergeHeader && closable }]">
+
+				<div v-if="scrollable" class="relative">
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-24"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-24"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showTopFade"
+							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-24 bg-gradient-to-b from-bg-raised to-transparent"
+						/>
+					</Transition>
+
+					<div
+						ref="scrollContainer"
+						:class="['overflow-y-auto p-6', { 'pt-12': props.mergeHeader && closable }]"
+						:style="{ maxHeight: maxContentHeight }"
+						@scroll="checkScrollState"
+					>
+						<slot> You just lost the game.</slot>
+					</div>
+
+					<Transition
+						enter-active-class="transition-all duration-200 ease-out"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-24"
+						leave-active-class="transition-all duration-200 ease-in"
+						leave-from-class="opacity-100 max-h-24"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<div
+							v-if="showBottomFade"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-t from-bg-raised to-transparent"
+						/>
+					</Transition>
+				</div>
+
+				<div v-else :class="['overflow-y-auto p-6', { 'pt-12': props.mergeHeader && closable }]">
 					<slot> You just lost the game.</slot>
+				</div>
+
+				<div v-if="$slots.actions" class="p-6 pt-0">
+					<slot name="actions" />
 				</div>
 			</div>
 		</div>
@@ -61,6 +105,7 @@
 import { XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
+import { useScrollIndicator } from '../../composables/scroll-indicator'
 import ButtonStyled from '../base/ButtonStyled.vue'
 
 const props = withDefaults(
@@ -76,6 +121,8 @@ const props = withDefaults(
 		onHide?: () => void
 		onShow?: () => void
 		mergeHeader?: boolean
+		scrollable?: boolean
+		maxContentHeight?: string
 	}>(),
 	{
 		type: true,
@@ -89,11 +136,17 @@ const props = withDefaults(
 		onHide: () => {},
 		onShow: () => {},
 		mergeHeader: false,
+		// TODO: migrate all modals to use scrollable and remove this prop
+		scrollable: false,
+		maxContentHeight: '70vh',
 	},
 )
 
 const open = ref(false)
 const visible = ref(false)
+
+const scrollContainer = ref<HTMLElement | null>(null)
+const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
 
 // make modal opening not shift page when there's a vertical scrollbar
 function addBodyPadding() {
@@ -139,6 +192,7 @@ function hide() {
 defineExpose({
 	show,
 	hide,
+	checkScrollState,
 })
 
 const mouseX = ref(-1)
