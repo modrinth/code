@@ -41,7 +41,7 @@ impl Payout {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(tag = "method", rename_all = "lowercase")]
 #[expect(
     clippy::large_enum_variant,
@@ -54,7 +54,17 @@ pub enum PayoutMethodRequest {
     MuralPay { method_details: MuralPayDetails },
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum PayoutMethodType {
     Venmo,
@@ -80,12 +90,12 @@ impl std::fmt::Display for PayoutMethodType {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct TremendousDetails {
     pub delivery_email: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct MuralPayDetails {
     pub payout_details: MuralPayoutRequest,
     pub recipient_info: muralpay::PayoutRecipientInfo,
@@ -112,7 +122,9 @@ impl PayoutMethodType {
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug, utoipa::ToSchema,
+)]
 #[serde(rename_all = "kebab-case")]
 pub enum PayoutStatus {
     Success,

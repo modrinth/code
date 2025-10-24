@@ -14,12 +14,6 @@ use crate::{
     TransferError, WalletDetails, util::RequestExt,
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
-pub enum PayoutStatusFilter {
-    PayoutStatus { statuses: Vec<String> },
-}
-
 impl MuralPay {
     pub async fn search_payout_requests(
         &self,
@@ -163,6 +157,7 @@ impl MuralPay {
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct PayoutRequestId(pub Uuid);
 
@@ -186,6 +181,7 @@ impl FromStr for PayoutRequestId {
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct PayoutId(pub Uuid);
 
@@ -198,6 +194,14 @@ impl FromStr for PayoutId {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum PayoutStatusFilter {
+    PayoutStatus { statuses: Vec<String> },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct PayoutRequest {
     pub id: PayoutRequestId,
@@ -211,6 +215,7 @@ pub struct PayoutRequest {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum PayoutStatus {
     AwaitingExecution,
@@ -221,6 +226,7 @@ pub enum PayoutStatus {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct Payout {
     pub id: PayoutId,
@@ -231,6 +237,7 @@ pub struct Payout {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum PayoutDetails {
     Fiat(FiatPayoutDetails),
@@ -238,6 +245,7 @@ pub enum PayoutDetails {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct FiatPayoutDetails {
     pub fiat_and_rail_code: FiatAndRailCode,
@@ -253,6 +261,7 @@ pub struct FiatPayoutDetails {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum FiatPayoutStatus {
     Created,
@@ -279,6 +288,7 @@ pub enum FiatPayoutStatus {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum FiatPayoutErrorCode {
     Unknown,
@@ -290,6 +300,7 @@ pub enum FiatPayoutErrorCode {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct DeveloperFee {
     #[serde(with = "rust_decimal::serde::float_option", default)]
@@ -297,6 +308,7 @@ pub struct DeveloperFee {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct BlockchainPayoutDetails {
     pub wallet_address: String,
@@ -305,6 +317,7 @@ pub struct BlockchainPayoutDetails {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum BlockchainPayoutStatus {
     AwaitingExecution,
@@ -315,6 +328,7 @@ pub enum BlockchainPayoutStatus {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct CreatePayout {
     pub amount: TokenAmount,
@@ -324,6 +338,7 @@ pub struct CreatePayout {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum CreatePayoutDetails {
     #[serde(rename_all = "camelCase")]
@@ -338,6 +353,7 @@ pub enum CreatePayoutDetails {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum FiatAndRailDetails {
     #[serde(rename_all = "camelCase")]
@@ -369,6 +385,7 @@ pub enum FiatAndRailDetails {
         iban: String,
         swift_bic: String,
         #[serde(with = "crate::serde_iso3166")]
+        #[cfg_attr(feature = "utoipa", schema(value_type = String))]
         country: CountryCode,
     },
     #[serde(rename_all = "camelCase")]
@@ -464,72 +481,84 @@ impl FiatAndRailDetails {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum UsdSymbol {
     Usd,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum CopSymbol {
     Cop,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum ArsSymbol {
     Ars,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum EurSymbol {
     Eur,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum MxnSymbol {
     Mxn,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum BrlSymbol {
     Brl,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum ClpSymbol {
     Clp,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum PenSymbol {
     Pen,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum BobSymbol {
     Bob,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum CrcSymbol {
     Crc,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum ZarSymbol {
     Zar,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum DocumentType {
     NationalId,
@@ -540,6 +569,7 @@ pub enum DocumentType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum PixAccountType {
     Phone,
@@ -549,6 +579,7 @@ pub enum PixAccountType {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, From)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum PayoutRecipientInfo {
     #[serde(rename_all = "camelCase")]
@@ -568,6 +599,7 @@ pub enum PayoutRecipientInfo {
 }
 
 #[derive(Debug, Display, Clone, Copy, SerializeDisplay, DeserializeFromStr)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{year:04}-{month:02}-{day:02}")]
 pub struct Dob {
     year: u16,
@@ -625,11 +657,13 @@ impl FromStr for Dob {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct PhysicalAddress {
     pub address1: String,
     pub address2: Option<String>,
     #[serde(with = "crate::serde_iso3166")]
+    #[cfg_attr(feature = "utoipa", schema(value_type = String))]
     pub country: CountryCode,
     pub state: String,
     pub city: String,
@@ -637,6 +671,7 @@ pub struct PhysicalAddress {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct SupportingDetails {
     pub supporting_document: Option<String>, // data:image/jpeg;base64,...
@@ -644,6 +679,7 @@ pub struct SupportingDetails {
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum PayoutPurpose {
     VendorPayment,
@@ -664,6 +700,7 @@ pub enum PayoutPurpose {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TokenFeeRequest {
     pub amount: TokenAmount,
@@ -671,6 +708,7 @@ pub struct TokenFeeRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum TokenPayoutFee {
     #[serde(rename_all = "camelCase")]
@@ -695,6 +733,7 @@ pub enum TokenPayoutFee {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct FiatFeeRequest {
     #[serde(with = "rust_decimal::serde::float")]
@@ -704,6 +743,7 @@ pub struct FiatFeeRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum FiatPayoutFee {
     #[serde(rename_all = "camelCase")]
@@ -729,12 +769,14 @@ pub enum FiatPayoutFee {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct BankDetailsResponse {
     pub bank_details: CurrenciesBankDetails,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "kebab-case")]
 pub struct CurrenciesBankDetails {
     #[serde(default)]
@@ -768,6 +810,7 @@ pub struct CurrenciesBankDetails {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct CurrencyBankDetails {
     pub bank_names: Vec<String>,

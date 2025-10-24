@@ -47,7 +47,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(threads::config)
             .configure(users::config)
             .configure(version_file::config)
-            .configure(payouts::config)
             .configure(versions::config)
             .configure(friends::config),
     );
@@ -59,6 +58,9 @@ pub fn utoipa_config(
     cfg.service(
         utoipa_actix_web::scope("/v3/analytics")
             .configure(analytics_get::config),
+    );
+    cfg.service(
+        utoipa_actix_web::scope("/v3/payout").configure(payouts::config),
     );
 }
 

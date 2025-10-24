@@ -47,6 +47,7 @@ impl MuralPay {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Blockchain {
     Ethereum,
@@ -56,6 +57,7 @@ pub enum Blockchain {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum CurrencyCode {
     Usd,
@@ -72,6 +74,7 @@ pub enum CurrencyCode {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
 pub enum FiatAccountType {
     Checking,
@@ -79,6 +82,7 @@ pub enum FiatAccountType {
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, strum::EnumIter)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "kebab-case")]
 pub enum FiatAndRailCode {
     Usd,
@@ -108,6 +112,7 @@ impl FromStr for FiatAndRailCode {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct WalletDetails {
     pub blockchain: Blockchain,
@@ -115,6 +120,7 @@ pub struct WalletDetails {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TokenAmount {
     #[serde(with = "rust_decimal::serde::float")]
@@ -123,6 +129,7 @@ pub struct TokenAmount {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct FiatAmount {
     #[serde(with = "rust_decimal::serde::float")]
@@ -151,6 +158,7 @@ impl<Id: Deref<Target = Uuid> + Clone> SearchParams<Id> {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct SearchResponse<Id, T> {
     pub total: u64,

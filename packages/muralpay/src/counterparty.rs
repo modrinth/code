@@ -83,6 +83,7 @@ impl MuralPay {
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct CounterpartyId(pub Uuid);
 
@@ -95,6 +96,7 @@ impl FromStr for CounterpartyId {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct Counterparty {
     pub id: CounterpartyId,
@@ -106,6 +108,7 @@ pub struct Counterparty {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum CounterpartyKind {
     #[serde(rename_all = "camelCase")]
@@ -124,6 +127,7 @@ pub enum CounterpartyKind {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum CreateCounterparty {
     #[serde(rename_all = "camelCase")]
@@ -144,6 +148,7 @@ pub enum CreateCounterparty {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum UpdateCounterparty {
     #[serde(rename_all = "camelCase")]
