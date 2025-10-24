@@ -26,6 +26,7 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
 strum = { workspace = true, features = ["derive"] }
+utoipa = { workspace = true, features = ["uuid"], optional = true }
 uuid = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]
@@ -35,6 +36,9 @@ dotenvy = { workspace = true }
 eyre = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tracing-subscriber = { workspace = true }
+
+[features]
+utoipa = ["dep:utoipa"]
 
 [lints]
 workspace = true

@@ -71,7 +71,7 @@ json-patch = { workspace = true }
 lettre = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 modrinth-maxmind = { workspace = true }
-muralpay = { workspace = true }
+muralpay = { workspace = true, features = ["utoipa"] }
 murmur2 = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
@@ -123,6 +123,9 @@ tracing-ecs = { workspace = true }
 tracing-subscriber = { workspace = true }
 url = { workspace = true }
 urlencoding = { workspace = true }
+utoipa = { workspace = true }
+utoipa-actix-web = { workspace = true }
+utoipa-swagger-ui = { workspace = true }
 uuid = { workspace = true, features = ["fast-rng", "serde", "v4"] }
 validator = { workspace = true, features = ["derive"] }
 webp = { workspace = true }

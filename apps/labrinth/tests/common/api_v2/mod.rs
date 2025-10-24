@@ -6,6 +6,7 @@ use actix_web::{App, dev::ServiceResponse, test};
 use async_trait::async_trait;
 use labrinth::LabrinthConfig;
 use std::rc::Rc;
+use utoipa_actix_web::AppExt;
 
 pub mod project;
 pub mod request_data;
@@ -22,9 +23,15 @@ pub struct ApiV2 {
 #[async_trait(?Send)]
 impl ApiBuildable for ApiV2 {
     async fn build(labrinth_config: LabrinthConfig) -> Self {
-        let app = App::new().configure(|cfg| {
-            labrinth::app_config(cfg, labrinth_config.clone())
-        });
+        let app = App::new()
+            .into_utoipa_app()
+            .configure(|cfg| {
+                labrinth::utoipa_app_config(cfg, labrinth_config.clone())
+            })
+            .into_app()
+            .configure(|cfg| {
+                labrinth::app_config(cfg, labrinth_config.clone())
+            });
         let test_app: Rc<dyn LocalService> =
             Rc::new(test::init_service(app).await);
 

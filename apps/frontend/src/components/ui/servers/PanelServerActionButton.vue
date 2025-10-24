@@ -68,7 +68,11 @@
 				</ButtonStyled>
 
 				<ButtonStyled type="standard" color="brand">
-					<button :disabled="!canTakeAction" @click="handlePrimaryAction">
+					<button
+						v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
+						:disabled="!canTakeAction"
+						@click="handlePrimaryAction"
+					>
 						<div v-if="isTransitionState" class="grid place-content-center">
 							<LoadingIcon />
 						</div>
@@ -122,12 +126,15 @@ import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+
 import LoadingIcon from './icons/LoadingIcon.vue'
 import PanelSpinner from './PanelSpinner.vue'
 import ServerInfoLabels from './ServerInfoLabels.vue'
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 const flags = useFeatureFlags()
+const { formatMessage } = useVIntl()
 
 interface PowerAction {
 	action: ServerPowerAction
@@ -142,6 +149,7 @@ const props = defineProps<{
 	serverName?: string
 	serverData: object
 	uptimeSeconds: number
+	backupInProgress?: BackupInProgressReason
 }>()
 
 const emit = defineEmits<{
@@ -163,7 +171,11 @@ const dontAskAgain = ref(false)
 const startingDelay = ref(false)
 
 const canTakeAction = computed(
-	() => !props.isActioning && !startingDelay.value && !isTransitionState.value,
+	() =>
+		!props.isActioning &&
+		!startingDelay.value &&
+		!isTransitionState.value &&
+		!props.backupInProgress,
 )
 const isRunning = computed(() => serverState.value === 'running')
 const isTransitionState = computed(() =>

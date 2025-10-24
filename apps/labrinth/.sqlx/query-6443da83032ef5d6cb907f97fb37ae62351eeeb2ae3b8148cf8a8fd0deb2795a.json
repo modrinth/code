@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE affiliate_codes\n                SET created_by = $1\n                WHERE created_by = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6443da83032ef5d6cb907f97fb37ae62351eeeb2ae3b8148cf8a8fd0deb2795a"
+}

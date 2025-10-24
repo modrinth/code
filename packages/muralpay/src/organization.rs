@@ -82,6 +82,7 @@ impl MuralPay {
     Serialize,
     Deserialize,
 )]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct OrganizationId(pub Uuid);
 
@@ -94,6 +95,7 @@ impl FromStr for OrganizationId {
 }
 
 #[derive(Debug, Clone, Default)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct SearchRequest {
     pub limit: Option<u64>,
     pub next_id: Option<Uuid>,
@@ -101,6 +103,7 @@ pub struct SearchRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Organization {
     Individual(Individual),
@@ -110,6 +113,7 @@ pub enum Organization {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct Individual {
     pub id: OrganizationId,
@@ -123,6 +127,7 @@ pub struct Individual {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct Business {
     pub id: OrganizationId,
@@ -135,6 +140,7 @@ pub struct Business {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct EndUserCustodialIndividual {
     pub id: OrganizationId,
@@ -149,6 +155,7 @@ pub struct EndUserCustodialIndividual {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct EndUserCustodialBusiness {
     pub id: OrganizationId,
@@ -162,6 +169,7 @@ pub struct EndUserCustodialBusiness {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct Approver {
     pub id: Uuid,
@@ -172,6 +180,7 @@ pub struct Approver {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TosStatus {
     NotAccepted,
@@ -180,6 +189,7 @@ pub enum TosStatus {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum KycStatus {
     Inactive,
@@ -206,6 +216,7 @@ pub enum KycStatus {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum FailedValidationReason {
     DocumentPrevalidationFailed {
@@ -219,6 +230,7 @@ pub enum FailedValidationReason {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct CurrencyCapability {
     pub fiat_and_rail_code: String,
@@ -228,6 +240,7 @@ pub struct CurrencyCapability {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum TransactionCapabilityStatus {
     TermsOfService {
@@ -249,12 +262,14 @@ pub enum TransactionCapabilityStatus {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum RejectedReason {
     KycFailed,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum DisabledReason {
     CapabilityUnavailable,

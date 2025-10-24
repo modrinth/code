@@ -33,28 +33,26 @@ use tracing::error;
 const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
     chrono::Duration::seconds(15);
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("payout")
-            .service(paypal_webhook)
-            .service(tremendous_webhook)
-            .service(transaction_history)
-            .service(calculate_fees)
-            .service(create_payout)
-            .service(cancel_payout)
-            .service(payment_methods)
-            .service(get_balance)
-            .service(platform_revenue)
-            .service(post_compliance_form),
-    );
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+    cfg.service(paypal_webhook)
+        .service(tremendous_webhook)
+        .service(transaction_history)
+        .service(calculate_fees)
+        .service(create_payout)
+        .service(cancel_payout)
+        .service(payment_methods)
+        .service(get_balance)
+        .service(platform_revenue)
+        .service(post_compliance_form);
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct RequestForm {
     form_type: users_compliance::FormType,
 }
 
-#[post("compliance")]
+#[utoipa::path]
+#[post("/compliance")]
 pub async fn post_compliance_form(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -152,7 +150,8 @@ pub async fn post_compliance_form(
     }
 }
 
-#[post("_paypal")]
+#[utoipa::path]
+#[post("/_paypal")]
 pub async fn paypal_webhook(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -309,7 +308,8 @@ pub async fn paypal_webhook(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[post("_tremendous")]
+#[utoipa::path]
+#[post("/_tremendous")]
 pub async fn tremendous_webhook(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -419,7 +419,7 @@ pub async fn tremendous_webhook(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Withdrawal {
     #[serde(with = "rust_decimal::serde::float")]
     amount: Decimal,
@@ -434,6 +434,7 @@ pub struct WithdrawalFees {
     pub exchange_rate: Option<Decimal>,
 }
 
+#[utoipa::path]
 #[post("/fees")]
 pub async fn calculate_fees(
     req: HttpRequest,
@@ -466,6 +467,7 @@ pub async fn calculate_fees(
     }))
 }
 
+#[utoipa::path]
 #[post("")]
 pub async fn create_payout(
     req: HttpRequest,
@@ -909,9 +911,11 @@ async fn paypal_payout(
     Ok(payout_item)
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// User performing a payout-related action.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum TransactionItem {
+    /// User withdrew some of their available payout.
     Withdrawal {
         id: PayoutId,
         status: PayoutStatus,
@@ -921,6 +925,7 @@ pub enum TransactionItem {
         method_type: Option<PayoutMethodType>,
         method_address: Option<String>,
     },
+    /// User got a payout available for them to withdraw.
     PayoutAvailable {
         created: DateTime<Utc>,
         payout_source: PayoutSource,
@@ -937,7 +942,17 @@ impl TransactionItem {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum PayoutSource {
@@ -945,6 +960,9 @@ pub enum PayoutSource {
     Affilites,
 }
 
+/// Get the history of when the authorized user got payouts available, and when
+/// the user withdrew their payouts.
+#[utoipa::path(responses((status = OK, body = Vec<TransactionItem>)))]
 #[get("/history")]
 pub async fn transaction_history(
     req: HttpRequest,
@@ -1014,7 +1032,8 @@ pub async fn transaction_history(
     Ok(web::Json(txn_items))
 }
 
-#[delete("{id}")]
+#[utoipa::path]
+#[delete("/{id}")]
 pub async fn cancel_payout(
     info: web::Path<(PayoutId,)>,
     req: HttpRequest,
@@ -1132,7 +1151,8 @@ pub enum FormCompletionStatus {
     Complete,
 }
 
-#[get("methods")]
+#[utoipa::path]
+#[get("/methods")]
 pub async fn payment_methods(
     payouts_queue: web::Data<PayoutsQueue>,
     filter: web::Query<MethodFilter>,
@@ -1164,7 +1184,8 @@ pub struct UserBalance {
     pub dates: HashMap<DateTime<Utc>, Decimal>,
 }
 
-#[get("balance")]
+#[utoipa::path]
+#[get("/balance")]
 pub async fn get_balance(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -1400,7 +1421,8 @@ pub struct RevenueData {
     pub creator_revenue: Decimal,
 }
 
-#[get("platform_revenue")]
+#[utoipa::path]
+#[get("/platform_revenue")]
 pub async fn platform_revenue(
     query: web::Query<RevenueQuery>,
     pool: web::Data<PgPool>,
