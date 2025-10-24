@@ -9,6 +9,7 @@ import { defineNuxtConfig } from 'nuxt/config'
 import { $fetch } from 'ofetch'
 import { basename, relative, resolve } from 'pathe'
 import svgLoader from 'vite-svg-loader'
+import type { GeneratedState } from './src/composables/generated'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
 
@@ -133,20 +134,7 @@ export default defineNuxtConfig({
 			// 30 minutes
 			const TTL = 30 * 60 * 1000
 
-			let state: {
-				lastGenerated?: string
-				apiUrl?: string
-				categories?: any[]
-				loaders?: any[]
-				gameVersions?: any[]
-				donationPlatforms?: any[]
-				reportTypes?: any[]
-				homePageProjects?: any[]
-				homePageSearch?: any[]
-				homePageNotifs?: any[]
-				products?: any[]
-				errors?: number[]
-			} = {}
+			let state: GeneratedState = {}
 
 			try {
 				state = JSON.parse(await fs.readFile('./src/generated/state.json', 'utf8'))
@@ -200,6 +188,7 @@ export default defineNuxtConfig({
 				homePageSearch,
 				homePageNotifs,
 				products,
+				muralBankDetails,
 			] = await Promise.all([
 				$fetch(`${API_URL}tag/category`, headers).catch((err) => handleFetchError(err, [])),
 				$fetch(`${API_URL}tag/loader`, headers).catch((err) => handleFetchError(err, [])),
@@ -220,6 +209,9 @@ export default defineNuxtConfig({
 				$fetch(`${API_URL.replace('/v2/', '/_internal/')}billing/products`, headers).catch((err) =>
 					handleFetchError(err, []),
 				),
+				$fetch(`${API_URL.replace('/v2/', '/_internal/')}mural/bank-details`, headers).catch(
+					(err) => handleFetchError(err, null),
+				),
 			])
 
 			state.categories = categories
@@ -231,6 +223,7 @@ export default defineNuxtConfig({
 			state.homePageSearch = homePageSearch
 			state.homePageNotifs = homePageNotifs
 			state.products = products
+			state.muralBankDetails = muralBankDetails.bankDetails
 			state.errors = [...caughtErrorCodes]
 
 			await fs.writeFile('./src/generated/state.json', JSON.stringify(state))

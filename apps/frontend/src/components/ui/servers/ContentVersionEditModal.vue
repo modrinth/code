@@ -283,7 +283,7 @@ const versionsError = ref('')
 const showBetaAlphaReleases = ref(false)
 const unlockFilterAccordion = ref()
 const versionFilter = ref(true)
-const tags = useTags()
+const tags = useGeneratedState()
 const noCompatibleVersions = ref(false)
 
 const { pluginLoaders, modLoaders } = tags.value.loaders.reduce(

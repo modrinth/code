@@ -1,7 +1,7 @@
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 
 export default defineNuxtPlugin((nuxtApp) => {
-	const tagStore = useTags()
+	const tagStore = useGeneratedState()
 
 	nuxtApp.provide('formatNumber', formatNumber)
 	nuxtApp.provide('capitalizeString', capitalizeString)

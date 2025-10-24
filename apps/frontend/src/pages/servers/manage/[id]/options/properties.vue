@@ -171,7 +171,7 @@ const props = defineProps<{
 	server: ModrinthServer
 }>()
 
-const tags = useTags()
+const tags = useGeneratedState()
 
 const isUpdating = ref(false)
 

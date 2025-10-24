@@ -383,6 +383,10 @@ export const formFieldPlaceholders = defineMessages({
 		id: 'form.placeholder.bank-name',
 		defaultMessage: 'Enter bank name',
 	},
+	bankNamePlaceholderDropdown: {
+		id: 'form.placeholder.bank-name-dropdown',
+		defaultMessage: 'Select bank name',
+	},
 	amountPlaceholder: {
 		id: 'form.placeholder.amount',
 		defaultMessage: 'Enter amount',

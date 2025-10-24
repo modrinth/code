@@ -53,7 +53,18 @@
 					<span class="text-red">*</span>
 				</span>
 			</label>
+
+			<Combobox
+				v-if="shouldShowBankNameDropdown"
+				v-model="formData.bankName"
+				:options="bankNameOptions"
+				:searchable="true"
+				:placeholder="formatMessage(formFieldPlaceholders.bankNamePlaceholderDropdown)"
+				class="h-10"
+			/>
+
 			<input
+				v-else
 				v-model="formData.bankName"
 				type="text"
 				:placeholder="formatMessage(formFieldPlaceholders.bankNamePlaceholder)"
@@ -200,6 +211,7 @@ import { computed, ref, watch } from 'vue'
 
 import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
+import { useGeneratedState } from '@/composables/generated'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import {
 	getBlockchainColor,
@@ -212,6 +224,7 @@ import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const { withdrawData, maxWithdrawAmount, calculateFees } = useWithdrawContext()
 const { formatMessage } = useVIntl()
+const generatedState = useGeneratedState()
 
 const selectedRail = computed(() => {
 	const railId = withdrawData.value.selection.method
@@ -220,6 +233,25 @@ const selectedRail = computed(() => {
 
 const maxAmount = computed(() => maxWithdrawAmount.value)
 const roundedMaxAmount = computed(() => Math.floor(maxAmount.value * 100) / 100)
+
+const availableBankNames = computed(() => {
+	const rail = selectedRail.value
+	if (!rail || !rail.railCode) return []
+
+	const bankDetails = generatedState.value.muralBankDetails?.[rail.railCode]
+	return bankDetails?.bankNames || []
+})
+
+const shouldShowBankNameDropdown = computed(() => {
+	return availableBankNames.value.length > 0
+})
+
+const bankNameOptions = computed(() => {
+	return availableBankNames.value.map((name) => ({
+		value: name,
+		label: name,
+	}))
+})
 
 const providerData = withdrawData.value.providerData
 const existingAccountDetails = providerData.type === 'muralpay' ? providerData.accountDetails : {}

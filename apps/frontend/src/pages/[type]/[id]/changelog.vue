@@ -112,7 +112,7 @@ useSeoMeta({
 
 const router = useNativeRouter()
 const route = useNativeRoute()
-const tags = useTags()
+const tags = useGeneratedState()
 
 const currentPage = ref(Number(route.query.page ?? 1))
 const filteredVersions = computed(() => {

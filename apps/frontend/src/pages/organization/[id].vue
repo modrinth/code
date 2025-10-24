@@ -288,7 +288,7 @@ const user = await useUser()
 const cosmetics = useCosmetics()
 const route = useNativeRoute()
 const router = useRouter()
-const tags = useTags()
+const tags = useGeneratedState()
 const config = useRuntimeConfig()
 
 const orgId = useRouteId()

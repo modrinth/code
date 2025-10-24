@@ -441,7 +441,7 @@ onMounted(() => {
 	fetchLoaderVersions()
 })
 
-const tags = useTags()
+const tags = useGeneratedState()
 const mcVersions = computed(() =>
 	tags.value.gameVersions
 		.filter((x) =>

@@ -458,7 +458,7 @@ const data = useNuxtApp()
 const route = useNativeRoute()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
-const tags = useTags()
+const tags = useGeneratedState()
 const config = useRuntimeConfig()
 
 const vintl = useVIntl()

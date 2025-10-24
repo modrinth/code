@@ -38,7 +38,7 @@
 				</template>
 			</div>
 		</template>
-		<div class="w-full max-w-[496px]">
+		<div class="w-full max-w-[496px] lg:min-w-[496px]">
 			<TaxFormStage
 				v-if="currentStage === 'tax-form'"
 				:balance="balance"
