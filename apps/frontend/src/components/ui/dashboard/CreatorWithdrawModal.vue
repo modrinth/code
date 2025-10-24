@@ -262,7 +262,7 @@ async function handleWithdraw() {
 	} catch (error) {
 		console.error('Withdrawal failed:', error)
 
-		if ((error as any)?.data?.description?.toLower()?.includes('tax')) {
+		if ((error as any)?.data?.description?.toLower()?.includes('Tax form')) {
 			addNotification({
 				title: 'Please complete tax form',
 				text: 'You must complete a tax form to submit your withdrawal request.',
