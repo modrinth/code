@@ -2,20 +2,22 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
 use crate::database::redis::RedisPool;
 use crate::models::payouts::{
-    PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodFee,
-    PayoutMethodType,
+    MuralPayDetails, PayoutDecimal, PayoutInterval, PayoutMethod,
+    PayoutMethodFee, PayoutMethodRequest, PayoutMethodType,
 };
 use crate::models::projects::MonetizationStatus;
+use crate::queue::payouts::muralpay_payout::MuralPayoutRequest;
 use crate::routes::ApiError;
 use crate::util::env::env_var;
 use crate::util::error::Context;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
 };
+use arc_swap::ArcSwapOption;
 use base64::Engine;
 use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
 use dashmap::DashMap;
-use eyre::Result;
+use eyre::{Result, eyre};
 use futures::TryStreamExt;
 use muralpay::MuralPay;
 use reqwest::Method;
@@ -35,12 +37,12 @@ pub mod muralpay_payout;
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
     payout_options: RwLock<Option<PayoutMethods>>,
-    muralpay: RwLock<Option<MuralPayConfig>>,
+    pub muralpay: ArcSwapOption<MuralPayConfig>,
 }
 
-struct MuralPayConfig {
-    client: MuralPay,
-    source_account_id: muralpay::AccountId,
+pub struct MuralPayConfig {
+    pub client: MuralPay,
+    pub source_account_id: muralpay::AccountId,
 }
 
 #[derive(Clone, Debug)]
@@ -152,7 +154,7 @@ impl PayoutsQueue {
         PayoutsQueue {
             credential: RwLock::new(None),
             payout_options: RwLock::new(None),
-            muralpay: RwLock::new(muralpay),
+            muralpay: ArcSwapOption::from_pointee(muralpay),
         }
     }
 
@@ -411,58 +413,34 @@ impl PayoutsQueue {
                 }
             }
 
-            // {
-            //     let paypal_us = PayoutMethod {
-            //         id: "paypal_us".to_string(),
-            //         type_: PayoutMethodType::PayPal,
-            //         name: "PayPal".to_string(),
-            //         supported_countries: vec!["US".to_string()],
-            //         image_url: None,
-            //         image_logo_url: None,
-            //         interval: PayoutInterval::Standard {
-            //             min: Decimal::from(1) / Decimal::from(4),
-            //             max: Decimal::from(100_000),
-            //         },
-            //         fee: PayoutMethodFee {
-            //             percentage: Decimal::from(2) / Decimal::from(100),
-            //             min: Decimal::from(1) / Decimal::from(4),
-            //             max: Some(Decimal::from(1)),
-            //         },
-            //     };
+            {
+                let paypal_us = PayoutMethod {
+                    id: "paypal_us".to_string(),
+                    type_: PayoutMethodType::PayPal,
+                    name: "PayPal".to_string(),
+                    category: None,
+                    supported_countries: vec!["US".to_string()],
+                    image_url: None,
+                    image_logo_url: None,
+                    interval: PayoutInterval::Standard {
+                        min: Decimal::from(1) / Decimal::from(4),
+                        max: Decimal::from(100_000),
+                    },
+                    fee: PayoutMethodFee {
+                        percentage: Decimal::from(2) / Decimal::from(100),
+                        min: Decimal::from(1) / Decimal::from(4),
+                        max: Some(Decimal::from(1)),
+                    },
+                };
 
-            //     let mut venmo = paypal_us.clone();
-            //     venmo.id = "venmo".to_string();
-            //     venmo.name = "Venmo".to_string();
-            //     venmo.type_ = PayoutMethodType::Venmo;
+                let mut venmo = paypal_us.clone();
+                venmo.id = "venmo".to_string();
+                venmo.name = "Venmo".to_string();
+                venmo.type_ = PayoutMethodType::Venmo;
 
-            //     methods.insert(0, paypal_us);
-            //     methods.insert(1, venmo)
-            // }
-
-            // methods.insert(
-            //     2,
-            //     PayoutMethod {
-            //         id: "paypal_in".to_string(),
-            //         type_: PayoutMethodType::PayPal,
-            //         name: "PayPal".to_string(),
-            //         supported_countries: rust_iso3166::ALL
-            //             .iter()
-            //             .filter(|x| x.alpha2 != "US")
-            //             .map(|x| x.alpha2.to_string())
-            //             .collect(),
-            //         image_url: None,
-            //         image_logo_url: None,
-            //         interval: PayoutInterval::Standard {
-            //             min: Decimal::from(1) / Decimal::from(4),
-            //             max: Decimal::from(100_000),
-            //         },
-            //         fee: PayoutMethodFee {
-            //             percentage: Decimal::from(2) / Decimal::from(100),
-            //             min: Decimal::ZERO,
-            //             max: Some(Decimal::from(20)),
-            //         },
-            //     },
-            // );
+                methods.insert(0, paypal_us);
+                methods.insert(1, venmo)
+            }
 
             methods.extend(create_muralpay_methods());
 
@@ -620,6 +598,105 @@ impl PayoutsQueue {
                 pending: Decimal::from(x.meta.pending_cents.unwrap_or(0))
                     / Decimal::from(100),
             }))
+    }
+
+    pub async fn calculate_fees(
+        &self,
+        request: &PayoutMethodRequest,
+        method_id: &str,
+        amount: Decimal,
+    ) -> Result<PayoutFees, ApiError> {
+        const MURAL_FEE: Decimal = dec!(0.01);
+
+        let fees = match request {
+            PayoutMethodRequest::MuralPay {
+                method_details:
+                    MuralPayDetails {
+                        payout_details: MuralPayoutRequest::Blockchain { .. },
+                        ..
+                    },
+            } => PayoutFees {
+                method_fee: dec!(0),
+                platform_fee: amount * MURAL_FEE,
+                exchange_rate: None,
+            },
+            PayoutMethodRequest::MuralPay {
+                method_details:
+                    MuralPayDetails {
+                        payout_details:
+                            MuralPayoutRequest::Fiat {
+                                fiat_and_rail_details,
+                                ..
+                            },
+                        ..
+                    },
+            } => {
+                let fiat_and_rail_code = fiat_and_rail_details.code();
+                let fee = self
+                    .compute_muralpay_fees(amount, fiat_and_rail_code)
+                    .await?;
+
+                match fee {
+                    muralpay::TokenPayoutFee::Success {
+                        exchange_rate,
+                        fee_total,
+                        ..
+                    } => PayoutFees {
+                        method_fee: fee_total.token_amount,
+                        platform_fee: amount * MURAL_FEE,
+                        exchange_rate: Some(exchange_rate),
+                    },
+                    muralpay::TokenPayoutFee::Error { message, .. } => {
+                        return Err(ApiError::Internal(eyre!(
+                            "failed to compute fee: {message}"
+                        )));
+                    }
+                }
+            }
+            PayoutMethodRequest::PayPal
+            | PayoutMethodRequest::Venmo
+            | PayoutMethodRequest::Tremendous { .. } => {
+                let method = self
+                    .get_payout_methods()
+                    .await
+                    .wrap_internal_err("failed to fetch payout methods")?
+                    .into_iter()
+                    .find(|method| method.id == method_id)
+                    .wrap_request_err("invalid payout method ID")?;
+                let fee = method.fee.compute_fee(amount);
+                PayoutFees {
+                    method_fee: fee,
+                    platform_fee: dec!(0),
+                    exchange_rate: None,
+                }
+            }
+        };
+
+        Ok(fees)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PayoutFees {
+    /// Fee which is taken by the underlying method we're using.
+    ///
+    /// For example, if a user withdraws $10.00 and the method takes a
+    /// 10% cut, then we submit a payout request of $10.00 to the method,
+    /// and only $9.00 will be sent to the recipient.
+    pub method_fee: Decimal,
+    /// Fee which we keep and don't pass to the underlying method.
+    ///
+    /// For example, if a user withdraws $10.00 and the method takes a
+    /// 10% cut, then we submit a payout request of $9.00, and the $1.00 stays
+    /// in our account.
+    pub platform_fee: Decimal,
+    /// How much is 1 USD worth in the target currency?
+    pub exchange_rate: Option<Decimal>,
+}
+
+impl PayoutFees {
+    pub fn total_fee(&self) -> Decimal {
+        self.method_fee + self.platform_fee
     }
 }
 

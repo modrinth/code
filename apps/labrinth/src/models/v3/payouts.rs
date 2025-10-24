@@ -1,3 +1,5 @@
+use std::cmp;
+
 use crate::{
     models::ids::PayoutId, queue::payouts::muralpay_payout::MuralPayoutRequest,
 };
@@ -46,6 +48,8 @@ impl Payout {
     reason = "acceptable since values of this type are not moved much"
 )]
 pub enum PayoutMethodRequest {
+    Venmo,
+    PayPal,
     Tremendous { method_details: TremendousDetails },
     MuralPay { method_details: MuralPayDetails },
 }
@@ -62,6 +66,8 @@ pub enum PayoutMethodType {
 impl PayoutMethodRequest {
     pub fn method_type(&self) -> PayoutMethodType {
         match self {
+            Self::Venmo => PayoutMethodType::Venmo,
+            Self::PayPal => PayoutMethodType::PayPal,
             Self::Tremendous { .. } => PayoutMethodType::Tremendous,
             Self::MuralPay { .. } => PayoutMethodType::MuralPay,
         }
@@ -174,13 +180,10 @@ pub struct PayoutMethodFee {
 
 impl PayoutMethodFee {
     pub fn compute_fee(&self, value: Decimal) -> Decimal {
-        let fee = value * self.percentage;
-        let fee = fee.max(self.min);
-        if let Some(max) = self.max {
-            fee.min(max)
-        } else {
-            fee
-        }
+        cmp::min(
+            cmp::max(self.min, self.percentage * value),
+            self.max.unwrap_or(Decimal::MAX),
+        )
     }
 }
 

@@ -27,7 +27,7 @@ impl PayoutsQueue {
         amount: Decimal,
         fiat_and_rail_code: muralpay::FiatAndRailCode,
     ) -> Result<muralpay::TokenPayoutFee, ApiError> {
-        let muralpay = self.muralpay.read().await;
+        let muralpay = self.muralpay.load();
         let muralpay = muralpay
             .as_ref()
             .wrap_internal_err("Mural Pay client not available")?;
@@ -57,7 +57,7 @@ impl PayoutsQueue {
         payout_details: MuralPayoutRequest,
         recipient_info: muralpay::PayoutRecipientInfo,
     ) -> Result<muralpay::PayoutRequest, ApiError> {
-        let muralpay = self.muralpay.read().await;
+        let muralpay = self.muralpay.load();
         let muralpay = muralpay
             .as_ref()
             .wrap_internal_err("Mural Pay client not available")?;
@@ -115,7 +115,7 @@ impl PayoutsQueue {
         &self,
         id: muralpay::PayoutRequestId,
     ) -> Result<()> {
-        let muralpay = self.muralpay.read().await;
+        let muralpay = self.muralpay.load();
         let muralpay = muralpay
             .as_ref()
             .wrap_err("Mural Pay client not available")?;

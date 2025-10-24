@@ -134,7 +134,7 @@ pub struct Fees {
     #[serde(with = "rust_decimal::serde::float")]
     pub variable_fee_percentage: Decimal,
     pub fixed_transaction_fee: Option<FiatAmount>,
-    #[serde(with = "rust_decimal::serde::float_option")]
+    #[serde(with = "rust_decimal::serde::float_option", default)]
     pub developer_fee_percentage: Option<Decimal>,
 }
 
