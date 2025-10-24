@@ -100,7 +100,7 @@ const messages = defineMessages({
 		:open-by-default="openByDefault"
 		:force-open="isSearching"
 		:button-class="
-			'px-4 flex w-full items-center bg-transparent border-0 p-0' +
+			'pl-4 pr-3 flex w-full items-center bg-transparent border-0 p-0' +
 			(isSearching
 				? ''
 				: ' cursor-pointer hover:brightness-[--hover-brightness] active:scale-[0.98] transition-all')
@@ -116,7 +116,7 @@ const messages = defineMessages({
 				<div
 					v-for="friend in friends"
 					:key="friend.username"
-					class="group grid items-center grid-cols-[auto_1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full ml-4 mr-2"
+					class="group grid items-center grid-cols-[auto_1fr_auto] gap-2 hover:bg-button-bg transition-colors rounded-full ml-4 mr-1"
 					@contextmenu.prevent.stop="
 						(event) => friendOptions?.showMenu(event, friend, createContextMenuOptions(friend))
 					"

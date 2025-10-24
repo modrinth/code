@@ -8,6 +8,7 @@ import {
 	useRelativeTime,
 } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import { IntlFormatted } from '@vintl/vintl/components'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
 import FriendsSection from '@/components/ui/friends/FriendsSection.vue'
@@ -127,6 +128,7 @@ watch(
 	() => {
 		if (userCredentials.value === undefined) {
 			userFriends.value = []
+			loading.value = false
 		} else if (userCredentials.value === null) {
 			userFriends.value = []
 			loading.value = false
@@ -199,6 +201,15 @@ const messages = defineMessages({
 		id: 'friends.no-friends-match',
 		defaultMessage: `No friends matching ''{query}''`,
 	},
+	signInToAddFriends: {
+		id: 'friends.sign-in-to-add-friends',
+		defaultMessage:
+			"<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!",
+	},
+	addFriendsToShare: {
+		id: 'friends.add-friends-to-share',
+		defaultMessage: "<link>Add friends</link> to see what they're playing!",
+	},
 })
 </script>
 
@@ -211,7 +222,7 @@ const messages = defineMessages({
 				<div class="grid grid-cols-[1fr_auto] w-full gap-4">
 					<div>
 						<p class="m-0">
-							<template v-if="friend.id === userCredentials.user_id">
+							<template v-if="friend.id === userCredentials?.user_id">
 								<span class="text-contrast">{{ friend.username }}</span> sent you a friend request
 							</template>
 							<template v-else>
@@ -223,7 +234,7 @@ const messages = defineMessages({
 						</p>
 					</div>
 					<div class="flex gap-2">
-						<template v-if="friend.id === userCredentials.user_id">
+						<template v-if="friend.id === userCredentials?.user_id">
 							<ButtonStyled color="brand">
 								<button @click="addFriend(friend)">
 									<UserPlusIcon />
@@ -277,33 +288,38 @@ const messages = defineMessages({
 			</div>
 		</div>
 	</ModalWrapper>
-	<div v-if="userCredentials && !loading" class="flex gap-1 items-center mb-3 ml-2 mr-2">
-		<ButtonStyled circular type="transparent">
-			<button
-				v-tooltip="formatMessage(messages.addFriend)"
-				:aria-label="formatMessage(messages.addFriend)"
-				@click="addFriendModal.show"
-			>
-				<UserPlusIcon />
-			</button>
-		</ButtonStyled>
-		<div class="iconified-input flex-1">
-			<input
-				v-model="search"
-				type="text"
-				class="friends-search-bar flex w-full"
-				:placeholder="formatMessage(messages.searchFriends)"
-				@keyup.esc="search = ''"
-			/>
-			<button
-				v-if="search"
-				v-tooltip="formatMessage(commonMessages.clearButton)"
-				class="r-btn flex items-center justify-center bg-transparent button-animation p-2 cursor-pointer appearance-none border-none"
-				@click="search = ''"
-			>
-				<XIcon />
-			</button>
-		</div>
+	<div v-if="userCredentials && !loading" class="flex gap-1 items-center mb-3 ml-2 mr-1">
+		<template v-if="sortedFriends.length > 0">
+			<ButtonStyled circular type="transparent">
+				<button
+					v-tooltip="formatMessage(messages.addFriend)"
+					:aria-label="formatMessage(messages.addFriend)"
+					@click="addFriendModal.show"
+				>
+					<UserPlusIcon />
+				</button>
+			</ButtonStyled>
+			<div class="iconified-input flex-1">
+				<input
+					v-model="search"
+					type="text"
+					class="friends-search-bar flex w-full"
+					:placeholder="formatMessage(messages.searchFriends)"
+					@keyup.esc="search = ''"
+				/>
+				<button
+					v-if="search"
+					v-tooltip="formatMessage(commonMessages.clearButton)"
+					class="r-btn flex items-center justify-center bg-transparent button-animation p-2 cursor-pointer appearance-none border-none"
+					@click="search = ''"
+				>
+					<XIcon />
+				</button>
+			</div>
+		</template>
+		<h3 v-else class="ml-2 w-full text-base text-primary font-medium m-0">
+			{{ formatMessage(messages.friends) }}
+		</h3>
 		<ButtonStyled v-if="incomingRequests.length > 0" circular type="transparent">
 			<button
 				v-tooltip="formatMessage(messages.viewFriendRequests, { count: incomingRequests.length })"
@@ -323,9 +339,14 @@ const messages = defineMessages({
 		</ButtonStyled>
 	</div>
 	<div class="flex flex-col gap-3">
+		<h3
+			v-if="sortedFriends.length === 0 || loading"
+			class="ml-4 mr-1 text-base text-primary font-medium m-0"
+		>
+			{{ formatMessage(messages.friends) }}
+		</h3>
 		<template v-if="loading">
-			<h3 class="text-base text-primary font-medium m-0">{{ formatMessage(messages.friends) }}</h3>
-			<div v-for="n in 5" :key="n" class="flex gap-2 items-center animate-pulse">
+			<div v-for="n in 5" :key="n" class="flex gap-2 items-center animate-pulse ml-4 mr-1">
 				<div class="min-w-9 min-h-9 bg-button-bg rounded-full"></div>
 				<div class="flex flex-col w-full">
 					<div class="h-3 bg-button-bg rounded-full w-1/2 mb-1"></div>
@@ -334,16 +355,24 @@ const messages = defineMessages({
 			</div>
 		</template>
 		<template v-else-if="sortedFriends.length === 0">
-			<div class="text-sm mx-4">
+			<div class="text-sm ml-4 mr-1">
 				<div v-if="!userCredentials">
-					<span class="font-semibold text-brand cursor-pointer" @click="signIn"
-						>Sign in to a Modrinth account</span
-					>
-					to add friends and see what they're playing!
+					<IntlFormatted :message-id="messages.signInToAddFriends">
+						<template #link="{ children }">
+							<span class="font-semibold text-brand cursor-pointer" @click="signIn">
+								<component :is="() => children" />
+							</span>
+						</template>
+					</IntlFormatted>
 				</div>
 				<div v-else>
-					<span class="text-link cursor-pointer" @click="addFriendModal.show()">Add friends</span>
-					to share what you're playing!
+					<IntlFormatted :message-id="messages.addFriendsToShare">
+						<template #link="{ children }">
+							<span class="font-semibold text-brand cursor-pointer" @click="signIn">
+								<component :is="() => children" />
+							</span>
+						</template>
+					</IntlFormatted>
 				</div>
 			</div>
 		</template>
