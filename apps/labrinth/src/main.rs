@@ -14,6 +14,7 @@ use labrinth::util::anrok;
 use labrinth::util::env::parse_var;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
+use labrinth::utoipa_app_config;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting};
 use std::ffi::CStr;
 use std::str::FromStr;
@@ -25,6 +26,9 @@ use tracing_ecs::ECSLayerBuilder;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
+use utoipa::OpenApi;
+use utoipa_actix_web::AppExt;
+use utoipa_swagger_ui::SwaggerUi;
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -293,12 +297,22 @@ async fn main() -> std::io::Result<()> {
             .wrap(from_fn(rate_limit_middleware))
             .wrap(actix_web::middleware::Compress::default())
             .wrap(sentry_actix::Sentry::new())
+            .into_utoipa_app()
+            .configure(|cfg| utoipa_app_config(cfg, labrinth_config.clone()))
+            .openapi_service(|api| SwaggerUi::new("/docs/swagger-ui/{_:.*}")
+                .config(utoipa_swagger_ui::Config::default().try_it_out_enabled(true))
+                .url("/docs/openapi.json", ApiDoc::openapi().merge_from(api)))
+            .into_app()
             .configure(|cfg| app_config(cfg, labrinth_config.clone()))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
     .run()
     .await
 }
+
+#[derive(utoipa::OpenApi)]
+#[openapi(info(title = "Labrinth"))]
+struct ApiDoc;
 
 fn log_error(err: &actix_web::Error) {
     if err.as_response_error().status_code().is_client_error() {
