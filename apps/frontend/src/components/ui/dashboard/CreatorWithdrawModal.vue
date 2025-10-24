@@ -57,50 +57,39 @@
 			/>
 			<div v-else>Something went wrong</div>
 		</div>
-		<template v-if="currentStage !== 'completion'" #actions>
-			<div class="mt-4 flex justify-end gap-2">
-			<ButtonStyled type="outlined">
-				<button v-if="previousStep" class="!border-surface-5" @click="setStage(previousStep, true)">
-					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
-				</button>
-				<button v-else class="!border-surface-5" @click="withdrawModal?.hide()">
-					<XIcon />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled
-				:color="
-					currentStage === 'tax-form' && needsTaxForm && remainingLimit <= 0
-						? 'orange'
-						: currentStage === 'muralpay-details' || currentStage === 'tremendous-details'
-							? 'brand'
-							: 'standard'
-				"
-			>
-				<button
-					v-if="currentStage === 'tax-form' && needsTaxForm && remainingLimit > 0"
-					@click="continueWithLimit"
-				>
-					{{ formatMessage(messages.continueWithLimit) }}
-					<RightArrowIcon />
-				</button>
-				<button v-else-if="currentStage === 'tax-form' && needsTaxForm" @click="showTaxFormModal">
-					<FileTextIcon />
-					{{ formatMessage(messages.completeTaxForm) }}
-				</button>
-				<button
-					v-else-if="currentStage === 'muralpay-details' || currentStage === 'tremendous-details'"
-					:disabled="!canProceed || isSubmitting"
-					@click="handleWithdraw"
-				>
-					<ArrowLeftRightIcon />
-					{{ formatMessage(messages.withdrawButton) }}
-				</button>
-				<button v-else :disabled="!canProceed" @click="setStage(nextStep)">
-					{{ formatMessage(commonMessages.nextButton) }}
-					<RightArrowIcon />
-				</button>
-			</ButtonStyled>
+		<template #actions>
+			<div v-if="currentStage === 'completion'" class="mt-4 flex w-full gap-3">
+				<ButtonStyled class="flex-1">
+					<button class="w-full text-contrast" @click="withdrawModal?.hide()">
+						{{ formatMessage(messages.closeButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled class="flex-1">
+					<button class="w-full text-contrast" @click="handleViewTransactions">
+						{{ formatMessage(messages.transactionsButton) }}
+					</button>
+				</ButtonStyled>
+			</div>
+			<div v-else class="mt-4 flex justify-end gap-2">
+				<ButtonStyled type="outlined">
+					<button class="!border-surface-5" @click="leftButtonConfig.handler">
+						<component :is="leftButtonConfig.icon" />
+						{{ leftButtonConfig.label }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled :color="rightButtonConfig.color">
+					<button :disabled="rightButtonConfig.disabled" @click="rightButtonConfig.handler">
+						<component
+							:is="rightButtonConfig.icon"
+							v-if="rightButtonConfig.iconPosition === 'before'"
+						/>
+						{{ rightButtonConfig.label }}
+						<component
+							:is="rightButtonConfig.icon"
+							v-if="rightButtonConfig.iconPosition === 'after'"
+						/>
+					</button>
+				</ButtonStyled>
 			</div>
 		</template>
 	</NewModal>
@@ -121,12 +110,7 @@ import {
 	RightArrowIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	commonMessages,
-	injectNotificationManager,
-	NewModal,
-} from '@modrinth/ui'
+import { ButtonStyled, commonMessages, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
@@ -199,6 +183,69 @@ const remainingLimit = computed(() => {
 	return cents / 100
 })
 
+const leftButtonConfig = computed(() => {
+	if (previousStep.value) {
+		return {
+			icon: LeftArrowIcon,
+			label: formatMessage(commonMessages.backButton),
+			handler: () => setStage(previousStep.value, true),
+		}
+	}
+	return {
+		icon: XIcon,
+		label: formatMessage(commonMessages.cancelButton),
+		handler: () => withdrawModal.value?.hide(),
+	}
+})
+
+const rightButtonConfig = computed(() => {
+	const stage = currentStage.value
+	const isTaxFormStage = stage === 'tax-form'
+	const isDetailsStage = stage === 'muralpay-details' || stage === 'tremendous-details'
+
+	if (isTaxFormStage && needsTaxForm.value && remainingLimit.value > 0) {
+		return {
+			icon: RightArrowIcon,
+			label: formatMessage(messages.continueWithLimit),
+			handler: continueWithLimit,
+			disabled: false,
+			color: 'standard' as const,
+			iconPosition: 'after' as const,
+		}
+	}
+
+	if (isTaxFormStage && needsTaxForm.value) {
+		return {
+			icon: FileTextIcon,
+			label: formatMessage(messages.completeTaxForm),
+			handler: showTaxFormModal,
+			disabled: false,
+			color: 'orange' as const,
+			iconPosition: 'before' as const,
+		}
+	}
+
+	if (isDetailsStage) {
+		return {
+			icon: ArrowLeftRightIcon,
+			label: formatMessage(messages.withdrawButton),
+			handler: handleWithdraw,
+			disabled: !canProceed.value || isSubmitting.value,
+			color: 'brand' as const,
+			iconPosition: 'before' as const,
+		}
+	}
+
+	return {
+		icon: RightArrowIcon,
+		label: formatMessage(commonMessages.nextButton),
+		handler: () => setStage(nextStep.value),
+		disabled: !canProceed.value,
+		color: 'standard' as const,
+		iconPosition: 'after' as const,
+	}
+})
+
 function continueWithLimit() {
 	withdrawData.value.tax.skipped = true
 	setStage(nextStep.value)
@@ -214,11 +261,20 @@ async function handleWithdraw() {
 		setStage('completion')
 	} catch (error) {
 		console.error('Withdrawal failed:', error)
-		addNotification({
-			title: 'Unable to withdraw',
-			text: 'We were unable to submit your withdrawal request, please check your details or contact support.',
-			type: 'error',
-		})
+
+		if ((error as any)?.data?.description?.toLower()?.includes('tax')) {
+			addNotification({
+				title: 'Please complete tax form',
+				text: 'You must complete a tax form to submit your withdrawal request.',
+				type: 'error',
+			})
+		} else {
+			addNotification({
+				title: 'Unable to withdraw',
+				text: 'We were unable to submit your withdrawal request, please check your details or contact support.',
+				type: 'error',
+			})
+		}
 	} finally {
 		isSubmitting.value = false
 	}
@@ -326,6 +382,14 @@ const messages = defineMessages({
 	withdrawButton: {
 		id: 'dashboard.creator-withdraw-modal.withdraw-button',
 		defaultMessage: 'Withdraw',
+	},
+	closeButton: {
+		id: 'dashboard.withdraw.completion.close-button',
+		defaultMessage: 'Close',
+	},
+	transactionsButton: {
+		id: 'dashboard.withdraw.completion.transactions-button',
+		defaultMessage: 'Transactions',
 	},
 })
 </script>

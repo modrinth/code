@@ -644,12 +644,6 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			return
 		}
 
-		if (!stage) {
-			// TBD: Handle final withdraw submission
-			debug('Withdraw process completed!', withdrawData.value)
-			return
-		}
-
 		currentStage.value = stage
 	}
 

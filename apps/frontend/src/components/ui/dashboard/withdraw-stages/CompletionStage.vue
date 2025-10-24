@@ -88,18 +88,6 @@
 				</template>
 			</IntlFormatted>
 		</span>
-		<div class="flex w-full gap-3">
-			<ButtonStyled class="flex-1">
-				<button class="w-full text-contrast" @click="handleClose">
-					{{ formatMessage(messages.closeButton) }}
-				</button>
-			</ButtonStyled>
-			<ButtonStyled class="flex-1">
-				<button class="w-full text-contrast" @click="handleViewTransactions">
-					{{ formatMessage(messages.transactionsButton) }}
-				</button>
-			</ButtonStyled>
-		</div>
 		<Teleport to="body">
 			<div
 				v-if="showConfetti"
