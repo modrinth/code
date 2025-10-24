@@ -753,6 +753,46 @@ impl DBUser {
             .execute(&mut **transaction)
             .await?;
 
+            sqlx::query!(
+                "
+                UPDATE affiliate_codes
+                SET created_by = $1
+                WHERE created_by = $2",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM affiliate_codes
+                WHERE affiliate = $1",
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                UPDATE payouts_values
+                SET user_id = $1
+                WHERE user_id = $2",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM payouts_values_notifications
+                WHERE user_id = $1",
+                id as DBUserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
+
             let open_subscriptions =
                 DBUserSubscription::get_all_user(id, &mut **transaction)
                     .await?;

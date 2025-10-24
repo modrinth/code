@@ -94,6 +94,7 @@ macro_rules! base62_id {
             serde::Deserialize,
             Debug,
             Hash,
+            utoipa::ToSchema,
         )]
         #[serde(from = "ariadne::ids::Base62Id")]
         #[serde(into = "ariadne::ids::Base62Id")]
