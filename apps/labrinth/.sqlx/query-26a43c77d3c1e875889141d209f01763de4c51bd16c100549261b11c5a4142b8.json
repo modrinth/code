@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO delphi_reports (file_id, delphi_version, artifact_url, severity)\n            VALUES ($1, $2, $3, $4)\n            ON CONFLICT (file_id, delphi_version) DO UPDATE SET\n                delphi_version = $2, artifact_url = $3, created = CURRENT_TIMESTAMP, severity = $4\n            RETURNING id\n            ",
+  "query": "\n            INSERT INTO delphi_report_issue_details (issue_id, internal_class_name, decompiled_source, data, severity)\n            VALUES ($1, $2, $3, $4, $5)\n            RETURNING id\n            ",
   "describe": {
     "columns": [
       {
@@ -12,8 +12,9 @@
     "parameters": {
       "Left": [
         "Int8",
-        "Int4",
-        "Varchar",
+        "Text",
+        "Text",
+        "Jsonb",
         {
           "Custom": {
             "name": "delphi_severity",
@@ -33,5 +34,5 @@
       false
     ]
   },
-  "hash": "f2054ae7dcc89b21ed6b2f04526de1e7cddd68ac956143bef994104280a8dc07"
+  "hash": "26a43c77d3c1e875889141d209f01763de4c51bd16c100549261b11c5a4142b8"
 }
