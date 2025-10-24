@@ -413,58 +413,34 @@ impl PayoutsQueue {
                 }
             }
 
-            // {
-            //     let paypal_us = PayoutMethod {
-            //         id: "paypal_us".to_string(),
-            //         type_: PayoutMethodType::PayPal,
-            //         name: "PayPal".to_string(),
-            //         supported_countries: vec!["US".to_string()],
-            //         image_url: None,
-            //         image_logo_url: None,
-            //         interval: PayoutInterval::Standard {
-            //             min: Decimal::from(1) / Decimal::from(4),
-            //             max: Decimal::from(100_000),
-            //         },
-            //         fee: PayoutMethodFee {
-            //             percentage: Decimal::from(2) / Decimal::from(100),
-            //             min: Decimal::from(1) / Decimal::from(4),
-            //             max: Some(Decimal::from(1)),
-            //         },
-            //     };
+            {
+                let paypal_us = PayoutMethod {
+                    id: "paypal_us".to_string(),
+                    type_: PayoutMethodType::PayPal,
+                    name: "PayPal".to_string(),
+                    category: None,
+                    supported_countries: vec!["US".to_string()],
+                    image_url: None,
+                    image_logo_url: None,
+                    interval: PayoutInterval::Standard {
+                        min: Decimal::from(1) / Decimal::from(4),
+                        max: Decimal::from(100_000),
+                    },
+                    fee: PayoutMethodFee {
+                        percentage: Decimal::from(2) / Decimal::from(100),
+                        min: Decimal::from(1) / Decimal::from(4),
+                        max: Some(Decimal::from(1)),
+                    },
+                };
 
-            //     let mut venmo = paypal_us.clone();
-            //     venmo.id = "venmo".to_string();
-            //     venmo.name = "Venmo".to_string();
-            //     venmo.type_ = PayoutMethodType::Venmo;
+                let mut venmo = paypal_us.clone();
+                venmo.id = "venmo".to_string();
+                venmo.name = "Venmo".to_string();
+                venmo.type_ = PayoutMethodType::Venmo;
 
-            //     methods.insert(0, paypal_us);
-            //     methods.insert(1, venmo)
-            // }
-
-            // methods.insert(
-            //     2,
-            //     PayoutMethod {
-            //         id: "paypal_in".to_string(),
-            //         type_: PayoutMethodType::PayPal,
-            //         name: "PayPal".to_string(),
-            //         supported_countries: rust_iso3166::ALL
-            //             .iter()
-            //             .filter(|x| x.alpha2 != "US")
-            //             .map(|x| x.alpha2.to_string())
-            //             .collect(),
-            //         image_url: None,
-            //         image_logo_url: None,
-            //         interval: PayoutInterval::Standard {
-            //             min: Decimal::from(1) / Decimal::from(4),
-            //             max: Decimal::from(100_000),
-            //         },
-            //         fee: PayoutMethodFee {
-            //             percentage: Decimal::from(2) / Decimal::from(100),
-            //             min: Decimal::ZERO,
-            //             max: Some(Decimal::from(20)),
-            //         },
-            //     },
-            // );
+                methods.insert(0, paypal_us);
+                methods.insert(1, venmo)
+            }
 
             methods.extend(create_muralpay_methods());
 
@@ -677,7 +653,9 @@ impl PayoutsQueue {
                     }
                 }
             }
-            PayoutMethodRequest::Tremendous { .. } => {
+            PayoutMethodRequest::PayPal
+            | PayoutMethodRequest::Venmo
+            | PayoutMethodRequest::Tremendous { .. } => {
                 let method = self
                     .get_payout_methods()
                     .await

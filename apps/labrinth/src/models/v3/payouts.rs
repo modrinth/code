@@ -48,6 +48,8 @@ impl Payout {
     reason = "acceptable since values of this type are not moved much"
 )]
 pub enum PayoutMethodRequest {
+    Venmo,
+    PayPal,
     Tremendous { method_details: TremendousDetails },
     MuralPay { method_details: MuralPayDetails },
 }
@@ -64,6 +66,8 @@ pub enum PayoutMethodType {
 impl PayoutMethodRequest {
     pub fn method_type(&self) -> PayoutMethodType {
         match self {
+            Self::Venmo => PayoutMethodType::Venmo,
+            Self::PayPal => PayoutMethodType::PayPal,
             Self::Tremendous { .. } => PayoutMethodType::Tremendous,
             Self::MuralPay { .. } => PayoutMethodType::MuralPay,
         }

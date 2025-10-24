@@ -292,7 +292,7 @@ pub enum FiatPayoutErrorCode {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DeveloperFee {
-    #[serde(with = "rust_decimal::serde::float_option")]
+    #[serde(with = "rust_decimal::serde::float_option", default)]
     pub developer_fee_percentage: Option<Decimal>,
 }
 

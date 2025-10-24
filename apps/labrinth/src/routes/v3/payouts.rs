@@ -616,6 +616,9 @@ pub async fn create_payout(
     };
 
     let payout_item = match &body.method {
+        PayoutMethodRequest::PayPal | PayoutMethodRequest::Venmo => {
+            paypal_payout(payout_cx).await?
+        }
         PayoutMethodRequest::Tremendous { method_details } => {
             tremendous_payout(payout_cx, method_details).await?
         }
@@ -777,6 +780,136 @@ async fn mural_pay_payout(
         method_address: Some(user_email.to_string()),
         platform_id: Some(payout_request.id.to_string()),
     })
+}
+
+async fn paypal_payout(
+    PayoutContext {
+        body,
+        user,
+        payout_id,
+        raw_amount,
+        total_fee,
+        sent_to_method,
+        payouts_queue,
+    }: PayoutContext<'_>,
+) -> Result<DBPayout, ApiError> {
+    let (wallet, wallet_type, address, display_address) =
+        if matches!(body.method, PayoutMethodRequest::Venmo) {
+            if let Some(venmo) = &user.venmo_handle {
+                ("Venmo", "user_handle", venmo.clone(), venmo)
+            } else {
+                return Err(ApiError::InvalidInput(
+                    "Venmo address has not been set for account!".to_string(),
+                ));
+            }
+        } else if let Some(paypal_id) = &user.paypal_id {
+            if let Some(paypal_country) = &user.paypal_country {
+                if paypal_country == "US" && &*body.method_id != "paypal_us" {
+                    return Err(ApiError::InvalidInput(
+                        "Please use the US PayPal transfer option!".to_string(),
+                    ));
+                } else if paypal_country != "US"
+                    && &*body.method_id == "paypal_us"
+                {
+                    return Err(ApiError::InvalidInput(
+                        "Please use the International PayPal transfer option!"
+                            .to_string(),
+                    ));
+                }
+
+                (
+                    "PayPal",
+                    "paypal_id",
+                    paypal_id.clone(),
+                    user.paypal_email.as_ref().unwrap_or(paypal_id),
+                )
+            } else {
+                return Err(ApiError::InvalidInput(
+                    "Please re-link your PayPal account!".to_string(),
+                ));
+            }
+        } else {
+            return Err(ApiError::InvalidInput(
+                "You have not linked a PayPal account!".to_string(),
+            ));
+        };
+
+    #[derive(Deserialize)]
+    struct PayPalLink {
+        href: String,
+    }
+
+    #[derive(Deserialize)]
+    struct PayoutsResponse {
+        pub links: Vec<PayPalLink>,
+    }
+
+    let mut payout_item = crate::database::models::payout_item::DBPayout {
+        id: payout_id,
+        user_id: user.id,
+        created: Utc::now(),
+        status: PayoutStatus::InTransit,
+        amount: raw_amount,
+        fee: Some(total_fee),
+        method: Some(body.method.method_type()),
+        method_address: Some(display_address.clone()),
+        platform_id: None,
+    };
+
+    let res: PayoutsResponse = payouts_queue.make_paypal_request(
+        Method::POST,
+        "payments/payouts",
+        Some(
+            json!({
+                "sender_batch_header": {
+                    "sender_batch_id": format!("{}-payouts", Utc::now().to_rfc3339()),
+                    "email_subject": "You have received a payment from Modrinth!",
+                    "email_message": "Thank you for creating projects on Modrinth. Please claim this payment within 30 days.",
+                },
+                "items": [{
+                    "amount": {
+                        "currency": "USD",
+                        "value": sent_to_method.to_string()
+                    },
+                    "receiver": address,
+                    "note": "Payment from Modrinth creator monetization program",
+                    "recipient_type": wallet_type,
+                    "recipient_wallet": wallet,
+                    "sender_item_id": crate::models::ids::PayoutId::from(payout_id),
+                }]
+            })
+        ),
+        None,
+        None
+    ).await?;
+
+    if let Some(link) = res.links.first() {
+        #[derive(Deserialize)]
+        struct PayoutItem {
+            pub payout_item_id: String,
+        }
+
+        #[derive(Deserialize)]
+        struct PayoutData {
+            pub items: Vec<PayoutItem>,
+        }
+
+        if let Ok(res) = payouts_queue
+            .make_paypal_request::<(), PayoutData>(
+                Method::GET,
+                &link.href,
+                None,
+                None,
+                Some(true),
+            )
+            .await
+            && let Some(data) = res.items.first()
+        {
+            payout_item.platform_id = Some(data.payout_item_id.clone());
+        }
+    }
+
+    Ok(payout_item)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
