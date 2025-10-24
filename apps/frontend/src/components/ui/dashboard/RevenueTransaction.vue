@@ -1,32 +1,34 @@
 <template>
-	<div class="flex flex-row gap-3">
+	<div class="flex flex-row gap-2 md:gap-3">
 		<div
-			class="flex h-12 min-h-12 w-12 min-w-12 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md"
+			class="flex h-10 min-h-10 w-10 min-w-10 justify-center rounded-full border-[1px] border-solid border-button-bg bg-bg-raised !p-0 shadow-md md:h-12 md:min-h-12 md:w-12 md:min-w-12"
 		>
-			<ArrowDownIcon v-if="isIncome" class="my-auto size-8 text-secondary" />
-			<ArrowUpIcon v-else class="my-auto size-8 text-secondary" />
+			<ArrowDownIcon v-if="isIncome" class="my-auto size-6 text-secondary md:size-8" />
+			<ArrowUpIcon v-else class="my-auto size-6 text-secondary md:size-8" />
 		</div>
 		<div class="flex w-full flex-row justify-between">
 			<div class="flex flex-col">
-				<span class="text-lg font-semibold text-contrast">{{
+				<span class="text-base font-semibold text-contrast md:text-lg">{{
 					isIncome
 						? formatPayoutSource(transaction.payout_source)
 						: formatMethodName(transaction.method_type || transaction.method)
 				}}</span>
-				<span class="text-secondary">
+				<span class="text-xs text-secondary md:text-sm">
 					<template v-if="!isIncome">
 						{{ formatTransactionStatus(transaction.status) }} <BulletDivider />
 					</template>
 					{{ $dayjs(transaction.created).format('MMM DD YYYY') }}
 					<template v-if="!isIncome && transaction.fee">
-						<BulletDivider /> Fee {{ $formatMoney(transaction.fee) }}
+						<BulletDivider /> Fee {{ formatMoney(transaction.fee) }}
 					</template>
 				</span>
 			</div>
-			<div class="my-auto flex flex-row items-center gap-4">
-				<span class="text-lg font-semibold" :class="isIncome ? 'text-green' : 'text-contrast'">{{
-					formatMoney(transaction.amount)
-				}}</span>
+			<div class="my-auto flex flex-row items-center gap-3 md:gap-4">
+				<span
+					class="text-base font-semibold md:text-lg"
+					:class="isIncome ? 'text-green' : 'text-contrast'"
+					>{{ formatMoney(transaction.amount) }}</span
+				>
 				<template v-if="!isIncome && transaction.status === 'in-transit'">
 					<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
 						<span class="my-auto align-middle"

@@ -1,10 +1,12 @@
 <template>
-	<div class="mb-6 flex flex-col gap-4 p-12 py-0">
-		<div class="flex flex-row items-center justify-between">
-			<span class="text-2xl font-semibold text-contrast">{{
+	<div class="mb-6 flex flex-col gap-4 p-4 py-0 !pt-4 md:p-8 lg:p-12">
+		<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+			<span class="text-xl font-semibold text-contrast md:text-2xl">{{
 				formatMessage(messages.transactionsHeader)
 			}}</span>
-			<div class="flex w-[400px] flex-row items-center gap-2">
+			<div
+				class="flex w-full flex-col gap-2 min-[480px]:flex-row min-[480px]:items-center sm:max-w-[400px]"
+			>
 				<Combobox
 					v-model="selectedYear"
 					:options="yearOptions"
@@ -20,14 +22,14 @@
 			</div>
 		</div>
 
-		<div v-if="Object.keys(groupedTransactions).length > 0" class="flex flex-col gap-6">
+		<div v-if="Object.keys(groupedTransactions).length > 0" class="flex flex-col gap-5 md:gap-6">
 			<div
 				v-for="(transactions, period) in groupedTransactions"
 				:key="period"
 				class="flex flex-col gap-4"
 			>
-				<h3 class="text-base font-medium leading-6 text-primary">{{ period }}</h3>
-				<div class="flex flex-col gap-4">
+				<h3 class="text-sm font-medium leading-6 text-primary md:text-base">{{ period }}</h3>
+				<div class="flex flex-col gap-3 md:gap-4">
 					<RevenueTransaction
 						v-for="transaction in transactions"
 						:key="transaction.id || transaction.created"
@@ -38,8 +40,10 @@
 			</div>
 		</div>
 		<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
-			<span class="text-xl text-contrast">{{ formatMessage(messages.noTransactions) }}</span>
-			<span class="max-w-[256px] text-lg text-secondary">{{
+			<span class="text-lg text-contrast md:text-xl">{{
+				formatMessage(messages.noTransactions)
+			}}</span>
+			<span class="max-w-[256px] text-base text-secondary md:text-lg">{{
 				formatMessage(messages.noTransactionsDesc)
 			}}</span>
 		</div>

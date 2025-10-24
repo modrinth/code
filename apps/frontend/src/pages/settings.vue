@@ -77,7 +77,7 @@
 					"
 				/>
 			</div>
-			<div class="normal-page__content">
+			<div class="normal-page__content mt-3 lg:mt-0">
 				<NuxtPage :route="route" />
 			</div>
 		</div>

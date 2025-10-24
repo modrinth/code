@@ -1,18 +1,18 @@
 <template>
 	<CreatorWithdrawModal ref="withdrawModal" :balance="userBalance" @refresh-data="refreshData" />
-	<div class="mb-16 flex flex-col gap-8 p-12 py-0">
-		<div class="flex flex-col gap-5">
+	<div class="mb-8 flex flex-col gap-6 p-4 py-0 md:mb-16 md:gap-8 md:p-8 lg:p-12">
+		<div class="flex flex-col gap-4 md:gap-5">
 			<div class="flex flex-col gap-1">
-				<span class="text-2xl font-semibold text-contrast">{{
+				<span class="text-xl font-semibold text-contrast md:text-2xl">{{
 					formatMessage(messages.balanceLabel)
 				}}</span>
 				<span
-					class="bg-gradient-to-r from-brand-purple via-brand-orange via-20% to-brand-orange bg-clip-text text-4xl font-extrabold text-transparent"
+					class="bg-gradient-to-r from-brand-purple via-brand-orange via-20% to-brand-orange bg-clip-text text-3xl font-extrabold text-transparent md:text-4xl"
 					>{{ formatMoney(grandTotal) }}</span
 				>
 			</div>
 
-			<div class="flex h-4 w-full gap-2 overflow-hidden rounded-full bg-bg-raised">
+			<div class="flex h-3 w-full gap-2 overflow-hidden rounded-full bg-bg-raised md:h-4">
 				<div
 					v-for="(seg, index) in segments"
 					:key="seg.key"
@@ -35,14 +35,16 @@
 
 			<div class="flex flex-col">
 				<div
-					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
+					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-1.5 md:p-2"
 				>
-					<span class="text-md my-auto flex flex-row items-center gap-2 leading-none"
-						><span class="gradient-border my-auto block size-4 rounded-full bg-brand-green"></span>
+					<span class="my-auto flex flex-row items-center gap-2 text-sm leading-none md:text-base"
+						><span
+							class="gradient-border my-auto block size-4 rounded-full bg-brand-green md:size-5"
+						></span>
 						{{ formatMessage(messages.availableNow) }}</span
 					>
 					<span
-						class="text-lg font-semibold text-contrast"
+						class="text-base font-semibold text-contrast md:text-lg"
 						:class="{ '!text-green': hoveredSeg === 'available' }"
 						>{{ formatMoney(totalAvailable) }}</span
 					>
@@ -51,11 +53,11 @@
 				<div
 					v-for="(date, i) in dateSegments"
 					:key="date.date"
-					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-2"
+					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-1.5 md:p-2"
 				>
-					<span class="text-md my-auto flex flex-row items-center gap-2 leading-none">
+					<span class="my-auto flex flex-row items-center gap-2 text-sm leading-none md:text-base">
 						<span
-							class="zone--striped-small my-auto block size-4 rounded-full"
+							class="zone--striped-small my-auto block size-4 rounded-full md:size-5"
 							:class="[date.stripeClass, date.highlightClass]"
 						></span>
 						{{
@@ -68,7 +70,7 @@
 								class="inline-flex items-center justify-center text-link"
 								to="/legal/cmp-info#pending"
 							>
-								<UnknownIcon class="inline-block size-5 align-middle" />
+								<UnknownIcon class="inline-block size-4 align-middle md:size-5" />
 							</nuxt-link>
 							<template #popper>
 								<div class="w-[250px] font-semibold text-contrast">
@@ -80,20 +82,20 @@
 						</Tooltip>
 					</span>
 					<span
-						class="text-lg font-semibold text-contrast"
+						class="text-base font-semibold text-contrast md:text-lg"
 						:class="{ [date.textClass]: hoveredSeg === `upcoming-${date.date}-${i}` }"
 						>{{ formatMoney(date?.amount ?? 0) }}</span
 					>
 				</div>
 
-				<div class="flex flex-row justify-between p-2">
-					<span class="text-md my-auto flex flex-row items-center gap-2 leading-none">
+				<div class="flex flex-row justify-between p-1.5 md:p-2">
+					<span class="my-auto flex flex-row items-center gap-2 text-sm leading-none md:text-base">
 						<span
-							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg opacity-90"
+							class="zone--striped-small zone--striped--gray my-auto block size-4 rounded-full bg-button-bg opacity-90 md:size-5"
 						></span>
 						{{ formatMessage(messages.processing) }}
 						<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
-							<InProgressIcon class="inline-block size-5 align-middle" />
+							<InProgressIcon class="inline-block size-4 align-middle md:size-5" />
 							<template #popper>
 								<div class="w-[250px] font-semibold text-contrast">
 									{{ formatMessage(messages.processingTooltip) }}
@@ -102,7 +104,7 @@
 						</Tooltip>
 					</span>
 					<span
-						class="text-lg font-semibold text-contrast"
+						class="text-base font-semibold text-contrast md:text-lg"
 						:class="{ '!text-gray': hoveredSeg === 'processing' }"
 						>{{ formatMoney(processingDate?.amount ?? 0) }}</span
 					>
@@ -110,21 +112,21 @@
 			</div>
 		</div>
 
-		<div class="flex flex-col gap-4">
-			<span class="text-2xl font-semibold text-contrast">{{
+		<div class="flex flex-col gap-3 md:gap-4">
+			<span class="text-xl font-semibold text-contrast md:text-2xl">{{
 				formatMessage(messages.withdrawHeader)
 			}}</span>
-			<div class="grid grid-cols-3 gap-x-4 gap-y-2">
+			<div class="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-2 lg:grid-cols-3">
 				<button
-					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-700 p-5 text-inverted shadow-md transition-all duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100"
+					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-700 p-4 text-inverted shadow-md transition-all duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 md:p-5"
 					:disabled="hasTinMismatch"
 					@click="openWithdrawModal"
 				>
 					<div class="relative z-10 flex flex-row justify-between">
-						<span class="text-md font-semibold">{{
+						<span class="text-base font-semibold md:text-lg">{{
 							formatMessage(messages.withdrawCardTitle)
 						}}</span>
-						<ArrowUpRightIcon class="my-auto size-6" />
+						<ArrowUpRightIcon class="my-auto size-5 md:size-6" />
 					</div>
 					<div class="relative z-10 text-left text-sm font-medium">
 						{{ formatMessage(messages.withdrawCardDescription) }}
@@ -167,17 +169,17 @@
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<div class="flex flex-row justify-between">
-				<span class="text-2xl font-semibold text-contrast">{{
+			<div class="flex flex-col gap-2 sm:flex-row sm:justify-between">
+				<span class="text-xl font-semibold text-contrast md:text-2xl">{{
 					formatMessage(messages.transactionsHeader)
 				}}</span>
 				<nuxt-link
-					class="my-auto font-semibold text-contrast underline underline-offset-2"
+					class="mt-0 font-semibold text-contrast underline underline-offset-2 sm:my-auto"
 					to="/dashboard/revenue/transfers"
 					>{{ formatMessage(messages.seeAll) }}</nuxt-link
 				>
 			</div>
-			<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-4">
+			<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-3 md:gap-4">
 				<RevenueTransaction
 					v-for="transaction in sortedPayouts.slice(0, 3)"
 					:key="transaction.id || transaction.created"
@@ -186,7 +188,9 @@
 				/>
 			</div>
 			<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
-				<span class="text-xl text-contrast">{{ formatMessage(messages.noTransactions) }}</span>
+				<span class="text-lg text-contrast md:text-xl">{{
+					formatMessage(messages.noTransactions)
+				}}</span>
 				<span class="max-w-[256px] text-lg text-secondary">{{
 					formatMessage(messages.noTransactionsDesc)
 				}}</span>
