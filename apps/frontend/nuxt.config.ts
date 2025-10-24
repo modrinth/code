@@ -9,6 +9,7 @@ import { defineNuxtConfig } from 'nuxt/config'
 import { $fetch } from 'ofetch'
 import { basename, relative, resolve } from 'pathe'
 import svgLoader from 'vite-svg-loader'
+
 import type { GeneratedState } from './src/composables/generated'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'

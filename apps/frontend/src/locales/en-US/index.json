@@ -1454,14 +1454,8 @@
   "muralpay.field.account-type": {
     "message": "Account Type"
   },
-  "muralpay.field.address": {
-    "message": "Address"
-  },
   "muralpay.field.bank-account-number": {
     "message": "Account Number"
-  },
-  "muralpay.field.bank-name": {
-    "message": "Bank Name"
   },
   "muralpay.field.branch-code": {
     "message": "Branch Code"
@@ -1541,12 +1535,6 @@
   "muralpay.placeholder.account-number": {
     "message": "Enter account number"
   },
-  "muralpay.placeholder.address": {
-    "message": "Enter address"
-  },
-  "muralpay.placeholder.bank-name": {
-    "message": "Enter bank name"
-  },
   "muralpay.placeholder.cbu-cvu": {
     "message": "Enter CBU or CVU"
   },
@@ -1586,26 +1574,17 @@
   "muralpay.placeholder.iban-crc": {
     "message": "Enter Costa Rican IBAN"
   },
-  "muralpay.placeholder.phone-china": {
-    "message": "+86..."
-  },
   "muralpay.placeholder.phone-cop": {
     "message": "+57..."
   },
   "muralpay.placeholder.pix-phone": {
     "message": "+55..."
   },
-  "muralpay.placeholder.swift-bic": {
-    "message": "Enter SWIFT/BIC code"
-  },
   "muralpay.placeholder.wallet-address-eth": {
     "message": "0x..."
   },
   "muralpay.rail.fiat-ars.name": {
     "message": "Bank Transfer (ARS)"
-  },
-  "muralpay.rail.fiat-bob.name": {
-    "message": "Bank Transfer (BOB)"
   },
   "muralpay.rail.fiat-brl.name": {
     "message": "PIX Transfer (BRL)"
@@ -1627,9 +1606,6 @@
   },
   "muralpay.rail.fiat-pen.name": {
     "message": "Bank Transfer (PEN)"
-  },
-  "muralpay.rail.fiat-usd-china.name": {
-    "message": "Bank Transfer (USD - China)"
   },
   "muralpay.rail.fiat-usd-peru.name": {
     "message": "Bank Transfer (USD - Peru)"

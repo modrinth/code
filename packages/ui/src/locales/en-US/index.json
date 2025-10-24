@@ -173,6 +173,9 @@
   "form.placeholder.bank-name": {
     "defaultMessage": "Enter bank name"
   },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Select bank name"
+  },
   "form.placeholder.business-name": {
     "defaultMessage": "Enter business name"
   },
