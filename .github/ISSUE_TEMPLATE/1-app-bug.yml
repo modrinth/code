@@ -1,6 +1,7 @@
-name: 🎮 Modrinth App bug
-description: Report an issue in the Modrinth Launcher.
-labels: [bug, app]
+name: 🎮 Bug with Modrinth App
+description: For issues with Modrinth App.
+labels: [app]
+type: 'bug'
 body:
   - type: checkboxes
     attributes:

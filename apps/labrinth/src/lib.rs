@@ -345,6 +345,13 @@ pub fn app_config(
     .default_service(web::get().wrap(default_cors()).to(routes::not_found));
 }
 
+pub fn utoipa_app_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+    _labrinth_config: LabrinthConfig,
+) {
+    cfg.configure(routes::v3::utoipa_config);
+}
+
 // This is so that env vars not used immediately don't panic at runtime
 pub fn check_env_vars() -> bool {
     let mut failed = false;

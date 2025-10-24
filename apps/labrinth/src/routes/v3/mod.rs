@@ -4,7 +4,6 @@ use actix_web::{HttpResponse, web};
 use serde_json::json;
 
 pub mod analytics_get;
-pub mod analytics_get_old;
 pub mod collections;
 pub mod friends;
 pub mod images;
@@ -33,8 +32,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("v3")
             .wrap(default_cors())
             .configure(limits::config)
-            // .configure(analytics_get::config) // TODO: see `analytics_get`
-            .configure(analytics_get_old::config)
             .configure(collections::config)
             .configure(images::config)
             .configure(notifications::config)
@@ -53,6 +50,15 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .configure(payouts::config)
             .configure(versions::config)
             .configure(friends::config),
+    );
+}
+
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("/v3/analytics")
+            .configure(analytics_get::config),
     );
 }
 

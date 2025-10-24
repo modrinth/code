@@ -7,13 +7,10 @@ use crate::models::teams::ProjectPermissions;
 use crate::{
     auth::get_user_from_headers,
     database::models::user_item,
-    models::{
-        ids::{ProjectId, VersionId},
-        pats::Scopes,
-    },
+    models::{ids::ProjectId, pats::Scopes},
     queue::session::AuthQueue,
 };
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, get, web};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Duration, Utc};
 use eyre::eyre;
@@ -24,28 +21,21 @@ use std::collections::HashMap;
 use std::convert::TryInto;
 use std::num::NonZeroU32;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("analytics")
-            // TODO: since our service shadows analytics v2, we have to redirect here
-            .route("", web::post().to(super::analytics_get::get))
-            .route("playtime", web::get().to(playtimes_get))
-            .route("views", web::get().to(views_get))
-            .route("downloads", web::get().to(downloads_get))
-            .route("revenue", web::get().to(revenue_get))
-            .route(
-                "countries/downloads",
-                web::get().to(countries_downloads_get),
-            )
-            .route("countries/views", web::get().to(countries_views_get)),
-    );
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+    cfg.service(playtimes_get)
+        .service(views_get)
+        .service(downloads_get)
+        .service(revenue_get)
+        .service(countries_downloads_get)
+        .service(countries_views_get);
 }
 
-/// The json data to be passed to fetch analytic data
+/// The json data to be passed to fetch analytic data.
+///
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 /// start_date and end_date are optional, and default to two weeks ago, and the maximum date respectively.
 /// resolution_minutes is optional. This refers to the window by which we are looking (every day, every minute, etc) and defaults to 1440 (1 day)
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, utoipa::ToSchema)]
 pub struct GetData {
     // only one of project_ids or version_ids should be used
     // if neither are provided, all projects the user has access to will be used
@@ -54,26 +44,12 @@ pub struct GetData {
     pub start_date: Option<DateTime<Utc>>, // defaults to 2 weeks ago
     pub end_date: Option<DateTime<Utc>>,   // defaults to now
 
+    #[schema(value_type = Option<u32>, minimum = 1)]
     pub resolution_minutes: Option<NonZeroU32>, // defaults to 1 day. Ignored in routes that do not aggregate over a resolution (eg: /countries)
 }
 
-/// Get playtime data for a set of projects or versions
-/// Data is returned as a hashmap of project/version ids to a hashmap of days to playtime data
-/// eg:
-/// {
-///     "4N1tEhnO": {
-///         "20230824": 23
-///    }
-///}
-/// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
-#[derive(Serialize, Deserialize, Clone)]
-pub struct FetchedPlaytime {
-    pub time: u64,
-    pub total_seconds: u64,
-    pub loader_seconds: HashMap<String, u64>,
-    pub game_version_seconds: HashMap<String, u64>,
-    pub parent_seconds: HashMap<VersionId, u64>,
-}
+#[utoipa::path]
+#[get("/playtime")]
 pub async fn playtimes_get(
     req: HttpRequest,
     clickhouse: web::Data<clickhouse::Client>,
@@ -134,7 +110,8 @@ pub async fn playtimes_get(
     Ok(HttpResponse::Ok().json(hm))
 }
 
-/// Get view data for a set of projects or versions
+/// Get view data for a set of projects or versions.
+///
 /// Data is returned as a hashmap of project/version ids to a hashmap of days to views
 /// eg:
 /// {
@@ -143,6 +120,8 @@ pub async fn playtimes_get(
 ///    }
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
+#[utoipa::path]
+#[get("/views")]
 pub async fn views_get(
     req: HttpRequest,
     clickhouse: web::Data<clickhouse::Client>,
@@ -203,7 +182,8 @@ pub async fn views_get(
     Ok(HttpResponse::Ok().json(hm))
 }
 
-/// Get download data for a set of projects or versions
+/// Get download data for a set of projects or versions.
+///
 /// Data is returned as a hashmap of project/version ids to a hashmap of days to downloads
 /// eg:
 /// {
@@ -212,6 +192,8 @@ pub async fn views_get(
 ///    }
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
+#[utoipa::path]
+#[get("/downloads")]
 pub async fn downloads_get(
     req: HttpRequest,
     clickhouse: web::Data<clickhouse::Client>,
@@ -273,7 +255,8 @@ pub async fn downloads_get(
     Ok(HttpResponse::Ok().json(hm))
 }
 
-/// Get payout data for a set of projects
+/// Get payout data for a set of projects.
+///
 /// Data is returned as a hashmap of project ids to a hashmap of days to amount earned per day
 /// eg:
 /// {
@@ -282,6 +265,8 @@ pub async fn downloads_get(
 ///    }
 ///}
 /// ONLY project IDs can be used. Unauthorized projects will be filtered out.
+#[utoipa::path]
+#[get("/revenue")]
 pub async fn revenue_get(
     req: HttpRequest,
     data: web::Query<GetData>,
@@ -409,7 +394,8 @@ pub async fn revenue_get(
     Ok(HttpResponse::Ok().json(hm))
 }
 
-/// Get country data for a set of projects or versions
+/// Get country data for a set of projects or versions.
+///
 /// Data is returned as a hashmap of project/version ids to a hashmap of coutnry to downloads.
 /// Unknown countries are labeled "".
 /// This is usable to see significant performing countries per project
@@ -421,6 +407,8 @@ pub async fn revenue_get(
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
+#[utoipa::path]
+#[get("/countries/downloads")]
 pub async fn countries_downloads_get(
     req: HttpRequest,
     clickhouse: web::Data<clickhouse::Client>,
@@ -482,7 +470,8 @@ pub async fn countries_downloads_get(
     Ok(HttpResponse::Ok().json(hm))
 }
 
-/// Get country data for a set of projects or versions
+/// Get country data for a set of projects or versions.
+///
 /// Data is returned as a hashmap of project/version ids to a hashmap of coutnry to views.
 /// Unknown countries are labeled "".
 /// This is usable to see significant performing countries per project
@@ -494,6 +483,8 @@ pub async fn countries_downloads_get(
 ///}
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
 /// For this endpoint, provided dates are a range to aggregate over, not specific days to fetch
+#[utoipa::path]
+#[get("/countries/views")]
 pub async fn countries_views_get(
     req: HttpRequest,
     clickhouse: web::Data<clickhouse::Client>,
