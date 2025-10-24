@@ -58,6 +58,7 @@ pub fn utoipa_config(
 ) {
     cfg.service(
         utoipa_actix_web::scope("/v3/analytics")
+            .wrap(default_cors())
             .configure(analytics_get::config),
     );
 }
