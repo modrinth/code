@@ -1,7 +1,6 @@
 export const useAffiliates = () => {
 	const affiliateCookie = useCookie('mrs_afl', {
-		// maxAge: 60 * 60 * 24 * 7, // 7 days
-		maxAge: 60 * 60, // an hour
+		maxAge: 60 * 60 * 24 * 7, // 7 days
 		sameSite: 'lax',
 		secure: true,
 		httpOnly: false,
