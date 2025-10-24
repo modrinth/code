@@ -35,7 +35,7 @@
 				show-actions-underneath
 				:header="formatMessage(messages.taxFormRequiredHeader)"
 			>
-				<span class="font-normal sm:text-sm">
+				<span class="text-sm font-normal md:text-base">
 					{{
 						formatMessage(messages.taxFormRequiredBodyWithLimit, {
 							limit: formatMoney(remainingLimit),
