@@ -2,10 +2,8 @@
 	<div class="flex flex-col gap-2.5 sm:gap-3">
 		<div class="flex flex-col gap-3">
 			<div class="flex w-full flex-col gap-1 sm:flex-row sm:justify-between sm:gap-0">
-				<span class="text-sm font-semibold text-contrast sm:text-[1rem]">{{
-					formatMessage(messages.withdrawLimit)
-				}}</span>
-				<div class="text-sm sm:text-[1rem]">
+				<span class="font-semibold text-contrast">{{ formatMessage(messages.withdrawLimit) }}</span>
+				<div>
 					<span class="text-orange">{{ formatMoney(usedLimit) }}</span> /
 					<span class="text-contrast">{{ formatMoney(600) }}</span>
 				</div>
@@ -37,7 +35,7 @@
 				show-actions-underneath
 				:header="formatMessage(messages.taxFormRequiredHeader)"
 			>
-				<span class="font-normal">
+				<span class="font-normal sm:text-sm">
 					{{
 						formatMessage(messages.taxFormRequiredBodyWithLimit, {
 							limit: formatMoney(remainingLimit),

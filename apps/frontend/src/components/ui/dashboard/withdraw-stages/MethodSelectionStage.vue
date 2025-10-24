@@ -52,7 +52,7 @@
 				type="chip"
 			>
 				<button
-					class="!h-12 !justify-start !gap-2 !text-left sm:!h-10"
+					class="!justify-start !gap-2 !text-left sm:!h-10"
 					@click="handleMethodSelection(method)"
 				>
 					<component :is="method.icon" class="shrink-0" />

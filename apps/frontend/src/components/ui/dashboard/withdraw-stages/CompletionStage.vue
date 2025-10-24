@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col items-center gap-6">
+	<div class="flex flex-col items-center gap-4">
 		<div class="flex w-full items-center justify-center gap-2.5">
 			<span class="text-xl font-semibold text-contrast sm:text-2xl">
 				{{ formatMessage(messages.title) }}

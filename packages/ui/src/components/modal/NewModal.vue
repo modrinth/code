@@ -66,7 +66,10 @@
 
 					<div
 						ref="scrollContainer"
-						:class="['overflow-y-auto p-6', { 'pt-12': props.mergeHeader && closable }]"
+						:class="[
+							'overflow-y-auto p-6 pb-0 sm:pb-6',
+							{ 'pt-12': props.mergeHeader && closable },
+						]"
 						:style="{ maxHeight: maxContentHeight }"
 						@scroll="checkScrollState"
 					>
