@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-4">
+	<div class="flex flex-col gap-3 sm:gap-4">
 		<Admonition
 			v-if="selectedRail?.warningMessage"
 			type="warning"
@@ -14,13 +14,17 @@
 					{{ formatMessage(messages.coin) }}
 				</span>
 			</label>
-			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
+			<div
+				class="flex min-h-[44px] items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5 sm:min-h-0"
+			>
 				<component
 					:is="getCurrencyIcon(selectedRail.currency)"
-					class="size-5"
+					class="size-5 shrink-0"
 					:class="getCurrencyColor(selectedRail.currency)"
 				/>
-				<span class="font-semibold text-contrast">{{ selectedRail.currency }}</span>
+				<span class="text-sm font-semibold text-contrast sm:text-[1rem]">{{
+					selectedRail.currency
+				}}</span>
 			</div>
 		</div>
 
@@ -30,12 +34,12 @@
 					{{ formatMessage(messages.accountOwner) }}
 				</span>
 			</label>
-			<div class="w-full rounded-[14px] bg-surface-2 p-4">
+			<div class="w-full rounded-[14px] bg-surface-2 p-3 sm:p-4">
 				<div class="flex flex-col gap-1">
-					<span class="font-semibold text-contrast">
+					<span class="break-words text-sm font-semibold text-contrast sm:text-[1rem]">
 						{{ accountOwnerName }}
 					</span>
-					<span class="text-primary">
+					<span class="break-words text-xs text-primary sm:text-sm">
 						{{ accountOwnerAddress }}
 					</span>
 				</div>
@@ -54,7 +58,7 @@
 				type="text"
 				:placeholder="formatMessage(formFieldPlaceholders.bankNamePlaceholder)"
 				autocomplete="off"
-				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+				class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 			/>
 		</div>
 
@@ -73,7 +77,7 @@
 				:placeholder="field.placeholder ? formatMessage(field.placeholder) : undefined"
 				:pattern="field.pattern"
 				:autocomplete="field.autocomplete || 'off'"
-				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+				class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 			/>
 
 			<Combobox
@@ -122,7 +126,7 @@
 						:type="dynamicDocumentNumberField.type"
 						:placeholder="dynamicDocumentNumberField.placeholder"
 						autocomplete="off"
-						class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 					/>
 				</div>
 			</div>
@@ -134,13 +138,17 @@
 					{{ formatMessage(messages.network) }}
 				</span>
 			</label>
-			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
+			<div
+				class="flex min-h-[44px] items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5 sm:min-h-0"
+			>
 				<component
 					:is="getBlockchainIcon(selectedRail.blockchain)"
-					class="size-5"
+					class="size-5 shrink-0"
 					:class="getBlockchainColor(selectedRail.blockchain)"
 				/>
-				<span class="font-semibold text-contrast">{{ selectedRail.blockchain }}</span>
+				<span class="text-sm font-semibold text-contrast sm:text-[1rem]">{{
+					selectedRail.blockchain
+				}}</span>
 			</div>
 		</div>
 

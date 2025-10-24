@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-4">
+	<div class="flex flex-col gap-3 sm:gap-4">
 		<div class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
@@ -58,7 +58,7 @@
 			</div>
 
 			<div v-if="entityType === 'individual'" class="flex flex-col gap-6">
-				<div class="flex gap-4">
+				<div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
 					<div class="flex flex-1 flex-col gap-2.5">
 						<label>
 							<span class="text-md font-semibold text-contrast">
@@ -71,7 +71,7 @@
 							type="text"
 							:placeholder="formatMessage(formFieldPlaceholders.firstNamePlaceholder)"
 							autocomplete="given-name"
-							class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+							class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 						/>
 					</div>
 					<div class="flex flex-1 flex-col gap-2.5">
@@ -86,7 +86,7 @@
 							type="text"
 							:placeholder="formatMessage(formFieldPlaceholders.lastNamePlaceholder)"
 							autocomplete="family-name"
-							class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+							class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 						/>
 					</div>
 				</div>
@@ -139,7 +139,7 @@
 				/>
 			</div>
 
-			<div class="flex gap-4">
+			<div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
 				<div class="flex flex-1 flex-col gap-2.5">
 					<label>
 						<span class="text-md font-semibold text-contrast">
@@ -152,7 +152,7 @@
 						type="text"
 						:placeholder="formatMessage(formFieldPlaceholders.cityPlaceholder)"
 						autocomplete="address-level2"
-						class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 					/>
 				</div>
 				<div class="flex flex-1 flex-col gap-2.5">
@@ -167,12 +167,12 @@
 						type="text"
 						:placeholder="formatMessage(formFieldPlaceholders.statePlaceholder)"
 						autocomplete="address-level1"
-						class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 					/>
 				</div>
 			</div>
 
-			<div class="flex gap-4">
+			<div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
 				<div class="flex flex-1 flex-col gap-2.5">
 					<label>
 						<span class="text-md font-semibold text-contrast">
@@ -185,7 +185,7 @@
 						type="text"
 						:placeholder="formatMessage(formFieldPlaceholders.postalCodePlaceholder)"
 						autocomplete="postal-code"
-						class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 					/>
 				</div>
 				<div class="flex flex-1 flex-col gap-2.5">
@@ -211,8 +211,8 @@
 <script setup lang="ts">
 import { Chips, Combobox, formFieldLabels, formFieldPlaceholders } from '@modrinth/ui'
 import { useVIntl } from '@vintl/vintl'
-import { all } from 'iso-3166-1'
 
+import { useFormattedCountries } from '@/composables/country.ts'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
 const { withdrawData } = useWithdrawContext()
@@ -266,40 +266,7 @@ const maxDate = computed(() => {
 	return `${year}-${month}-${day}`
 })
 
-// Map for countries with excessively long names to prevent overflow
-const shortCountryNames: Record<string, string> = {
-	GB: 'United Kingdom',
-	US: 'United States',
-	SH: 'Saint Helena',
-	GS: 'South Georgia',
-	KP: "Dem. People's Rep. of Korea",
-	UM: 'US Minor Outlying Islands',
-	VI: 'US Virgin Islands',
-	VE: 'Venezuela',
-	HM: 'Heard & McDonald Islands',
-	BQ: 'Bonaire, Sint Eustatius & Saba',
-	LA: "Lao People's Dem. Rep.",
-	VC: 'St. Vincent & Grenadines',
-}
-
-const countryOptions = computed(() =>
-	all().map((x) => {
-		let label = x.country
-
-		if (shortCountryNames[x.alpha2]) {
-			label = `${shortCountryNames[x.alpha2]} (${x.alpha2})`
-		} else if (x.alpha2 === 'TW') {
-			label = 'Taiwan'
-		} else if (x.country.length > 30) {
-			label = `${x.country} (${x.alpha2})`
-		}
-
-		return {
-			value: x.alpha2,
-			label,
-		}
-	}),
-)
+const countryOptions = useFormattedCountries()
 
 watch(
 	[entityType, formData],

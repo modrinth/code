@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-6">
+	<div class="flex flex-col gap-4 sm:gap-6">
 		<Admonition v-if="shouldShowTaxLimitWarning" type="warning">
 			<IntlFormatted
 				:message-id="messages.taxLimitWarning"
@@ -36,7 +36,7 @@
 				searchable
 				:search-placeholder="formatMessage(messages.countrySearchPlaceholder)"
 				:max-height="240"
-				class="h-10"
+				class="h-12"
 				@update:model-value="handleCountryChange"
 			/>
 		</div>
@@ -51,10 +51,17 @@
 				:highlighted="withdrawData.selection.method === method.value"
 				type="chip"
 			>
-				<button class="!h-10 !justify-start !gap-2" @click="handleMethodSelection(method)">
-					<component :is="method.icon" />
-					{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
-					<span class="ml-auto font-normal text-secondary">{{ method.fee }}</span>
+				<button
+					class="!h-12 !justify-start !gap-2 !text-left sm:!h-10"
+					@click="handleMethodSelection(method)"
+				>
+					<component :is="method.icon" class="shrink-0" />
+					<span class="flex-1 truncate text-sm sm:text-[1rem]">
+						{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
+					</span>
+					<span class="ml-auto shrink-0 text-xs font-normal text-secondary sm:text-sm">{{
+						method.fee
+					}}</span>
 				</button>
 			</ButtonStyled>
 		</div>
@@ -76,7 +83,7 @@ import { IntlFormatted } from '@vintl/vintl/components'
 import { useGeolocation } from '@vueuse/core'
 import { all } from 'iso-3166-1'
 
-import { useUserCountry } from '@/composables/country.ts'
+import { useFormattedCountries, useUserCountry } from '@/composables/country.ts'
 import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
@@ -133,12 +140,7 @@ const emit = defineEmits<{
 	(e: 'close-modal'): void
 }>()
 
-const countries = computed(() =>
-	all().map((x) => ({
-		value: x.alpha2,
-		label: x.alpha2 === 'TW' ? 'Taiwan' : x.country,
-	})),
-)
+const countries = useFormattedCountries()
 
 const selectedCountryCode = computed(() => withdrawData.value.selection.country?.id)
 

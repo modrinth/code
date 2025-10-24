@@ -9,34 +9,36 @@
 		@on-hide="onModalHide"
 	>
 		<template #title>
-			<div v-if="shouldShowTitle" class="flex items-center gap-1 text-secondary">
+			<div v-if="shouldShowTitle" class="flex flex-wrap items-center gap-1 text-secondary">
 				<template v-if="currentStage === 'tax-form'">
-					<span class="text-xl font-bold text-contrast">{{
+					<span class="text-lg font-bold text-contrast sm:text-xl">{{
 						formatMessage(messages.taxFormStage)
 					}}</span>
 				</template>
 				<template v-else-if="currentStage === 'method-selection'">
-					<span class="text-xl font-bold text-contrast">{{
+					<span class="text-lg font-bold text-contrast sm:text-xl">{{
 						formatMessage(messages.methodSelectionStage)
 					}}</span>
 					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
-					<span class="text-xl text-secondary">{{ formatMessage(messages.detailsLabel) }}</span>
+					<span class="text-lg text-secondary sm:text-xl">{{
+						formatMessage(messages.detailsLabel)
+					}}</span>
 				</template>
 				<template v-else-if="isDetailsStage">
 					<button
-						class="active:scale-9 bg-transparent p-0 text-xl text-secondary transition-colors duration-200 hover:text-primary"
+						class="active:scale-9 bg-transparent p-0 text-lg text-secondary transition-colors duration-200 hover:text-primary sm:text-xl"
 						@click="goToBreadcrumbStage('method-selection')"
 					>
 						{{ formatMessage(messages.methodSelectionStage) }}
 					</button>
 					<ChevronRightIcon class="size-5 text-secondary" stroke-width="3" />
-					<span class="text-xl font-bold text-contrast">{{
+					<span class="text-lg font-bold text-contrast sm:text-xl">{{
 						formatMessage(messages.detailsLabel)
 					}}</span>
 				</template>
 			</div>
 		</template>
-		<div class="min-w-[496px] max-w-[496px] px-1 pb-1">
+		<div class="w-full max-w-[496px]">
 			<TaxFormStage
 				v-if="currentStage === 'tax-form'"
 				:balance="balance"
@@ -50,11 +52,7 @@
 			<TremendousDetailsStage v-else-if="currentStage === 'tremendous-details'" />
 			<MuralpayKycStage v-else-if="currentStage === 'muralpay-kyc'" />
 			<MuralpayDetailsStage v-else-if="currentStage === 'muralpay-details'" />
-			<CompletionStage
-				v-else-if="currentStage === 'completion'"
-				@close="withdrawModal?.hide()"
-				@view-transactions="handleViewTransactions"
-			/>
+			<CompletionStage v-else-if="currentStage === 'completion'" />
 			<div v-else>Something went wrong</div>
 		</div>
 		<template #actions>
@@ -70,7 +68,7 @@
 					</button>
 				</ButtonStyled>
 			</div>
-			<div v-else class="mt-4 flex justify-end gap-2">
+			<div v-else class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
 				<ButtonStyled type="outlined">
 					<button class="!border-surface-5" @click="leftButtonConfig.handler">
 						<component :is="leftButtonConfig.icon" />

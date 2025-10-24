@@ -1,58 +1,70 @@
 <template>
 	<div class="flex flex-col items-center gap-6">
 		<div class="flex w-full items-center justify-center gap-2.5">
-			<span class="text-nowrap text-2xl font-semibold text-contrast">
+			<span class="text-xl font-semibold text-contrast sm:text-2xl">
 				{{ formatMessage(messages.title) }}
 			</span>
 		</div>
 		<div class="flex w-full flex-col gap-3">
 			<div class="span-4 flex w-full flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
-				<div class="flex w-full items-center justify-between">
-					<span class="text-nowrap text-base font-normal text-primary">
+				<div
+					class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+				>
+					<span class="text-sm font-normal text-primary sm:text-[1rem]">
 						{{ formatMessage(messages.method) }}
 					</span>
-					<span class="text-nowrap text-base font-semibold text-contrast">
+					<span class="break-words text-sm font-semibold text-contrast sm:text-[1rem]">
 						{{ result?.methodType || 'N/A' }}
 					</span>
 				</div>
-				<div class="flex w-full items-center justify-between">
-					<span class="text-nowrap text-base font-normal text-primary">
+				<div
+					class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+				>
+					<span class="text-sm font-normal text-primary sm:text-[1rem]">
 						{{ formatMessage(messages.recipient) }}
 					</span>
-					<span class="text-nowrap text-base font-semibold text-contrast">
+					<span class="break-words text-sm font-semibold text-contrast sm:text-[1rem]">
 						{{ result?.recipientDisplay || 'N/A' }}
 					</span>
 				</div>
-				<div class="flex w-full items-center justify-between">
-					<span class="text-nowrap text-base font-normal text-primary">
+				<div
+					class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+				>
+					<span class="text-sm font-normal text-primary sm:text-[1rem]">
 						{{ formatMessage(messages.date) }}
 					</span>
-					<span class="text-nowrap text-base font-semibold text-contrast">
+					<span class="break-words text-sm font-semibold text-contrast sm:text-[1rem]">
 						{{ formattedDate }}
 					</span>
 				</div>
-				<div class="flex w-full items-center justify-between">
-					<span class="text-nowrap text-base font-normal text-primary">
+				<div
+					class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+				>
+					<span class="text-sm font-normal text-primary sm:text-[1rem]">
 						{{ formatMessage(messages.amount) }}
 					</span>
-					<span class="text-nowrap text-base font-semibold text-contrast">
+					<span class="break-words text-sm font-semibold text-contrast sm:text-[1rem]">
 						{{ formatMoney(result?.amount || 0) }}
 					</span>
 				</div>
-				<div class="flex w-full items-center justify-between">
-					<span class="text-nowrap text-base font-normal text-primary">
+				<div
+					class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+				>
+					<span class="text-sm font-normal text-primary sm:text-[1rem]">
 						{{ formatMessage(messages.fee) }}
 					</span>
-					<span class="text-nowrap text-base font-semibold text-contrast">
+					<span class="break-words text-sm font-semibold text-contrast sm:text-[1rem]">
 						{{ formatMoney(result?.fee || 0) }}
 					</span>
 				</div>
 				<div class="border-b-1 h-0 w-full rounded-full border-b border-solid border-divider" />
-				<div class="flex w-full items-center justify-between">
-					<span class="text-nowrap text-base font-normal text-primary">
+				<div
+					class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+				>
+					<span class="text-sm font-normal text-primary sm:text-[1rem]">
 						{{ formatMessage(messages.netAmount) }}
 					</span>
-					<span class="text-nowrap text-base font-semibold text-contrast">
+					<span class="break-words text-sm font-semibold text-contrast sm:text-[1rem]">
 						{{ formatMoney(result?.netAmount || 0) }}
 						<template v-if="shouldShowExchangeRate">
 							<span class="text-secondary"> ({{ formattedLocalCurrency }})</span>
@@ -61,11 +73,13 @@
 				</div>
 				<template v-if="shouldShowExchangeRate">
 					<div class="border-b-1 h-0 w-full rounded-full border-b border-solid border-divider" />
-					<div class="flex w-full items-center justify-between">
-						<span class="text-nowrap text-base font-normal text-primary">
+					<div
+						class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+					>
+						<span class="text-sm font-normal text-primary sm:text-[1rem]">
 							{{ formatMessage(messages.exchangeRate) }}
 						</span>
-						<span class="text-nowrap text-base font-normal text-secondary">
+						<span class="break-words text-sm font-normal text-secondary sm:text-[1rem]">
 							1 USD = {{ withdrawData.calculation.exchangeRate?.toFixed(4) }}
 							{{ localCurrency }}
 						</span>
@@ -75,7 +89,7 @@
 		</div>
 		<span
 			v-if="withdrawData.providerData.type === 'tremendous'"
-			class="w-full text-center text-base font-normal text-primary"
+			class="w-full break-words text-center text-sm font-normal text-primary sm:text-[1rem]"
 		>
 			<IntlFormatted
 				:message-id="messages.emailConfirmation"
@@ -100,7 +114,6 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
@@ -114,10 +127,6 @@ import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const { withdrawData } = useWithdrawContext()
 const { formatMessage } = useVIntl()
-
-const emit = defineEmits<{
-	(e: 'close' | 'view-transactions'): void
-}>()
 
 const result = computed(() => withdrawData.value.result)
 
@@ -173,14 +182,6 @@ const formattedLocalCurrency = computed(() => {
 		return `${localCurrency.value} ${netAmountInLocalCurrency.value.toFixed(2)}`
 	}
 })
-
-function handleClose() {
-	emit('close')
-}
-
-function handleViewTransactions() {
-	emit('view-transactions')
-}
 
 const messages = defineMessages({
 	title: {

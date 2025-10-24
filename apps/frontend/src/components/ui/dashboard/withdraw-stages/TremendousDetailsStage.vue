@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-5">
+	<div class="flex flex-col gap-4 sm:gap-5">
 		<Transition
 			enter-active-class="transition-all duration-300 ease-out"
 			enter-from-class="opacity-0 max-h-0"
@@ -21,9 +21,11 @@
 					{{ formatMessage(messages.paymentMethod) }}
 				</span>
 			</label>
-			<div class="flex items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5">
-				<component :is="selectedMethodDisplay.icon" class="size-5" />
-				<span class="font-semibold text-contrast">{{
+			<div
+				class="flex min-h-[44px] items-center gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5 sm:min-h-0"
+			>
+				<component :is="selectedMethodDisplay.icon" class="size-5 shrink-0" />
+				<span class="break-words text-sm font-semibold text-contrast sm:text-[1rem]">{{
 					typeof selectedMethodDisplay.label === 'string'
 						? selectedMethodDisplay.label
 						: formatMessage(selectedMethodDisplay.label)
@@ -42,7 +44,7 @@
 				type="email"
 				:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
 				autocomplete="email"
-				class="w-full rounded-[14px] bg-surface-4 px-4 py-2.5 text-contrast placeholder:text-secondary"
+				class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 			/>
 
 			<Transition
