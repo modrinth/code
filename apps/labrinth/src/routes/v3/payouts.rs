@@ -30,8 +30,6 @@ use std::collections::HashMap;
 use tokio_stream::StreamExt;
 use tracing::error;
 
-mod mural;
-
 const COMPLIANCE_CHECK_DEBOUNCE: chrono::Duration =
     chrono::Duration::seconds(15);
 
@@ -49,7 +47,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(platform_revenue)
             .service(post_compliance_form),
     );
-    mural::config(cfg);
 }
 
 #[derive(Deserialize)]
