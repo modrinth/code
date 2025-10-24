@@ -12,13 +12,13 @@ use crate::{
     auth::check_is_moderator_from_headers,
     database::{
         models::{
-            DBFileId, DelphiReportId, DelphiReportIssueId,
-            DelphiReportIssueJavaClassId,
+            DBFileId, DelphiReportId, DelphiReportIssueDetailsId,
+            DelphiReportIssueId,
             delphi_report_item::{
                 DBDelphiReport, DBDelphiReportIssue,
-                DBDelphiReportIssueJavaClass, DecompiledJavaClassSource,
-                DelphiReportIssueStatus, DelphiReportListOrder,
-                DelphiReportSeverity, InternalJavaClassName,
+                DBDelphiReportIssueDetails, DecompiledJavaClassSource,
+                DelphiReportIssueStatus, DelphiReportListOrder, DelphiSeverity,
+                InternalJavaClassName,
             },
         },
         redis::RedisPool,
@@ -60,6 +60,14 @@ static DELPHI_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
 });
 
 #[derive(Deserialize)]
+struct DelphiReportIssueDetails {
+    pub internal_class_name: InternalJavaClassName,
+    pub decompiled_source: Option<DecompiledJavaClassSource>,
+    pub data: HashMap<String, serde_json::Value>,
+    pub severity: DelphiSeverity,
+}
+
+#[derive(Deserialize)]
 struct DelphiReport {
     pub url: String,
     pub project_id: crate::models::ids::ProjectId,
@@ -69,11 +77,8 @@ struct DelphiReport {
     /// A sequential, monotonically increasing version number for the
     /// Delphi version that generated this report.
     pub delphi_version: i32,
-    pub issues: HashMap<
-        String,
-        HashMap<InternalJavaClassName, Option<DecompiledJavaClassSource>>,
-    >,
-    pub severity: DelphiReportSeverity,
+    pub issues: HashMap<String, Vec<DelphiReportIssueDetails>>,
+    pub severity: DelphiSeverity,
 }
 
 impl DelphiReport {
@@ -88,12 +93,19 @@ impl DelphiReport {
             format!("⚠️ Suspicious traces found at {}", self.url);
 
         for (issue, trace) in &self.issues {
-            for (class, code) in trace {
-                let code = code.as_deref().map(|code| &**code);
+            for DelphiReportIssueDetails {
+                internal_class_name,
+                decompiled_source,
+                ..
+            } in trace
+            {
                 write!(
                     &mut message_header,
-                    "\n issue {issue} found at class `{class}`:\n```\n{}\n```",
-                    code.unwrap_or("No decompiled source available")
+                    "\n issue {issue} found at class `{internal_class_name}`:\n```\n{}\n```",
+                    decompiled_source.as_ref().map_or(
+                        "No decompiled source available",
+                        |decompiled_source| &**decompiled_source
+                    )
                 )
                 .ok();
             }
@@ -141,7 +153,7 @@ async fn ingest_report(
     .upsert(&mut transaction)
     .await?;
 
-    for (issue_type, issue_java_classes) in report.issues {
+    for (issue_type, issue_details) in report.issues {
         let issue_id = DBDelphiReportIssue {
             id: DelphiReportIssueId(0), // This will be set by the database
             report_id,
@@ -151,14 +163,23 @@ async fn ingest_report(
         .upsert(&mut transaction)
         .await?;
 
-        for (internal_class_name, decompiled_source) in issue_java_classes {
-            DBDelphiReportIssueJavaClass {
-                id: DelphiReportIssueJavaClassId(0), // This will be set by the database
+        // This is required to handle the case where the same Delphi version is re-run on the same file
+        DBDelphiReportIssueDetails::remove_all_by_issue_id(
+            issue_id,
+            &mut transaction,
+        )
+        .await?;
+
+        for issue_detail in issue_details {
+            DBDelphiReportIssueDetails {
+                id: DelphiReportIssueDetailsId(0), // This will be set by the database
                 issue_id,
-                internal_class_name,
-                decompiled_source,
+                internal_class_name: issue_detail.internal_class_name,
+                decompiled_source: issue_detail.decompiled_source,
+                data: issue_detail.data.into(),
+                severity: issue_detail.severity,
             }
-            .upsert(&mut transaction)
+            .insert(&mut transaction)
             .await?;
         }
     }

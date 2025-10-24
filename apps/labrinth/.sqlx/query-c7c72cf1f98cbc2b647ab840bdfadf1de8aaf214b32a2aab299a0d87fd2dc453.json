@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM delphi_report_issue_details WHERE issue_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c7c72cf1f98cbc2b647ab840bdfadf1de8aaf214b32a2aab299a0d87fd2dc453"
+}
