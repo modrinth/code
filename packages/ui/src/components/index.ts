@@ -99,6 +99,10 @@ export { default as SearchFilterControl } from './search/SearchFilterControl.vue
 export { default as SearchFilterOption } from './search/SearchFilterOption.vue'
 export { default as SearchSidebarFilter } from './search/SearchSidebarFilter.vue'
 
+// Affiliate
+export { default as AffiliateLinkCard } from './affiliate/AffiliateLinkCard.vue'
+export { default as AffiliateLinkCreateModal } from './affiliate/AffiliateLinkCreateModal.vue'
+
 // Billing
 export { default as AddPaymentMethodModal } from './billing/AddPaymentMethodModal.vue'
 export { default as ModrinthServersPurchaseModal } from './billing/ModrinthServersPurchaseModal.vue'

@@ -495,7 +495,9 @@
 						<template #affiliates>
 							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
 						</template>
-						<template #servers-nodes> <ServerIcon aria-hidden="true" /> Credit server nodes </template>
+						<template #servers-nodes>
+							<ServerIcon aria-hidden="true" /> Credit server nodes
+						</template>
 					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled type="transparent">

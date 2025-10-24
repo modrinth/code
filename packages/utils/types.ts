@@ -598,3 +598,11 @@ export interface DelphiReport {
 	status: 'pending' | 'approved' | 'rejected'
 	content?: string
 }
+
+export type AffiliateLink = {
+	id: string
+	created_at: string
+	created_by: string
+	affiliate: string
+	source_name: string
+}

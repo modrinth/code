@@ -566,6 +566,27 @@
   "create.project.visibility-unlisted": {
     "message": "Unlisted"
   },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Create affiliate link"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Error loading affiliate links"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Your affiliate links"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "This will permanently revoke the affiliate code `{id}` and any existing links with this code that have been shared will no longer be valid."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Revoke"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Are you sure you want to revoke your ''{title}'' affiliate link?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Search affiliate links..."
+  },
   "dashboard.collections.button.create-new": {
     "message": "Create new"
   },
@@ -870,7 +891,7 @@
     "message": "Lookup by email"
   },
   "layout.action.manage-affiliates": {
-    "message": "Manage affiliates"
+    "message": "Manage affiliate links"
   },
   "layout.action.manage-server-notices": {
     "message": "Manage server notices"
@@ -1133,6 +1154,12 @@
   "profile.button.manage-projects": {
     "message": "Manage projects"
   },
+  "profile.button.remove-affiliate": {
+    "message": "Remove as affiliate"
+  },
+  "profile.button.set-affiliate": {
+    "message": "Set as affiliate"
+  },
   "profile.details.label.auth-providers": {
     "message": "Auth providers"
   },
@@ -1156,6 +1183,9 @@
   },
   "profile.error.not-found": {
     "message": "User not found"
+  },
+  "profile.label.affiliate": {
+    "message": "Affiliate"
   },
   "profile.label.badges": {
     "message": "Badges"

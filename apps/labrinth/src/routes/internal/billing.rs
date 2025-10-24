@@ -1332,6 +1332,7 @@ pub enum PaymentRequestMetadata {
     Pyro {
         server_name: Option<String>,
         server_region: Option<String>,
+        affiliate_code: Option<String>,
         source: serde_json::Value,
     },
 }
@@ -1864,12 +1865,13 @@ pub async fn stripe_webhook(
                                     subscription.metadata = Some(SubscriptionMetadata::Pyro { id: id.to_string(), region });
 
                                 } else {
-                                    let (server_name, server_region, source) =
+                                    let (server_name, server_region, source, affiliate_code) =
                                         if let Some(
                                             PaymentRequestMetadata::Pyro {
                                                 ref server_name,
                                                 ref server_region,
                                                 ref source,
+                                                ref affiliate_code,
                                             },
                                         ) = metadata.payment_metadata
                                         {
@@ -1877,6 +1879,7 @@ pub async fn stripe_webhook(
                                                 server_name.clone(),
                                                 server_region.clone(),
                                                 source.clone(),
+                                                affiliate_code.clone(),
                                             )
                                         } else {
                                             // Create a server with the latest version of Minecraft
@@ -1895,6 +1898,7 @@ pub async fn stripe_webhook(
                                                     "game_version": minecraft_versions.first().map(|x| x.version.clone()),
                                                     "loader_version": ""
                                                 }),
+                                                None,
                                             )
                                         };
 

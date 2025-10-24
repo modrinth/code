@@ -10,7 +10,8 @@ import {
 	InstagramIcon,
 	KoFiIcon,
 	MastodonIcon,
-ModrinthIcon,	OpenCollectiveIcon,
+	ModrinthIcon,
+	OpenCollectiveIcon,
 	PatreonIcon,
 	PayPalIcon,
 	RedditIcon,
@@ -24,7 +25,8 @@ ModrinthIcon,	OpenCollectiveIcon,
 	WindowsIcon,
 	YouTubeGaming,
 	YouTubeIcon,
-	YouTubeShortsIcon} from '@modrinth/assets'
+	YouTubeShortsIcon,
+} from '@modrinth/assets'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -34,111 +36,115 @@ const props = defineProps<{
 const services = [
 	{
 		icon: AppleIcon,
-		keywords: ["apple"]
+		keywords: ['apple'],
 	},
 	{
 		icon: BlueskyIcon,
-		keywords: ["bluesky", "bsky", "blue sky"]
+		keywords: ['bluesky', 'bsky', 'blue sky'],
 	},
 	{
 		icon: BuyMeACoffeeIcon,
-		keywords: ["buymeacoffee", "bmac", "buy me a coffee"]
+		keywords: ['buymeacoffee', 'bmac', 'buy me a coffee'],
 	},
 	{
 		icon: DiscordIcon,
-		keywords: ["discord"]
+		keywords: ['discord'],
 	},
 	{
 		icon: FacebookIcon,
-		keywords: ["facebook", "fb", "face book"]
+		keywords: ['facebook', 'fb', 'face book'],
 	},
 	{
 		icon: GithubIcon,
-		keywords: ["github", "gh", "git hub"]
+		keywords: ['github', 'gh', 'git hub'],
 	},
 	{
 		icon: ThreadsIcon,
-		keywords: ["threads"]
+		keywords: ['threads'],
 	},
 	{
 		icon: InstagramIcon,
-		keywords: ["instagram", "ig", "insta"]
+		keywords: ['instagram', 'ig', 'insta'],
 	},
 	{
 		icon: KoFiIcon,
-		keywords: ["ko-fi", "kofi", "ko fi"]
+		keywords: ['ko-fi', 'kofi', 'ko fi'],
 	},
 	{
 		icon: MastodonIcon,
-		keywords: ["mastodon"]
+		keywords: ['mastodon'],
 	},
 	{
 		icon: OpenCollectiveIcon,
-		keywords: ["opencollective", "open collective"]
+		keywords: ['opencollective', 'open collective'],
 	},
 	{
 		icon: PatreonIcon,
-		keywords: ["patreon"]
+		keywords: ['patreon'],
 	},
 	{
 		icon: PayPalIcon,
-		keywords: ["paypal", "pay pal"]
+		keywords: ['paypal', 'pay pal'],
 	},
 	{
 		icon: RedditIcon,
-		keywords: ["reddit"]
+		keywords: ['reddit'],
 	},
 	{
 		icon: ReelsIcon,
-		keywords: ["reels", "instagram reels", "facebook reels"]
+		keywords: ['reels', 'instagram reels', 'facebook reels'],
 	},
 	{
 		icon: SnapchatIcon,
-		keywords: ["snapchat"]
+		keywords: ['snapchat'],
 	},
 	{
 		icon: TikTokIcon,
-		keywords: ["tiktok", "tik", "tok"]
+		keywords: ['tiktok', 'tik', 'tok'],
 	},
 	{
 		icon: TumblrIcon,
-		keywords: ["tumblr"]
+		keywords: ['tumblr'],
 	},
 	{
 		icon: TwitchIcon,
-		keywords: ["twitch", "twitch.tv"]
+		keywords: ['twitch', 'twitch.tv'],
 	},
 	{
 		icon: WindowsIcon,
-		keywords: ["windows", "microsoft"]
+		keywords: ['windows', 'microsoft'],
 	},
 	{
 		icon: YouTubeIcon,
-		keywords: ["youtube", "yt"]
+		keywords: ['youtube', 'yt'],
 	},
 	{
 		icon: YouTubeShortsIcon,
-		keywords: ["shorts", "youtube shorts"]
+		keywords: ['shorts', 'youtube shorts'],
 	},
 	{
 		icon: YouTubeGaming,
-		keywords: ["youtube gaming"]
+		keywords: ['youtube gaming'],
 	},
 	{
 		icon: CurseForgeIcon,
-		keywords: ["curseforge", "cf", "curse", "curse forge"]
+		keywords: ['curseforge', 'cf', 'curse', 'curse forge'],
 	},
 	{
 		icon: ModrinthIcon,
-		keywords: ["modrinth", "mod rinth", "modrith", "mr"]
+		keywords: ['modrinth', 'mod rinth', 'modrith', 'mr'],
 	},
 	{
 		icon: TwitterIcon,
-		keywords: ["twitter", "x.com", "x"]
+		keywords: ['twitter', 'x.com', 'x'],
 	},
 ]
 
-const selectedService = computed(() => services.find(service => service.keywords.some(keyword => props.keyword.toLowerCase().includes(keyword))))
+const selectedService = computed(() =>
+	services.find((service) =>
+		service.keywords.some((keyword) => props.keyword.toLowerCase().includes(keyword)),
+	),
+)
 </script>
 
 <template>

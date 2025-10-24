@@ -117,7 +117,7 @@
 									'--_color': 'var(--color-brand)',
 									'--_bg-color': 'var(--color-brand-highlight)',
 								}"
-								>
+							>
 								<AffiliateIcon /> Affiliate
 							</TagItem>
 						</span>
@@ -465,8 +465,8 @@ import {
 	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
-	TeleportDropdownMenu,
 	TagItem,
+	TeleportDropdownMenu,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { isAdmin, UserBadge } from '@modrinth/utils'

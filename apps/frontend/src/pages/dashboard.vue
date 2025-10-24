@@ -61,7 +61,7 @@ import {
 	ReportIcon,
 } from '@modrinth/assets'
 import { commonMessages } from '@modrinth/ui'
-import { type User,UserBadge } from '@modrinth/utils'
+import { type User, UserBadge } from '@modrinth/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
@@ -69,7 +69,7 @@ import NavStackItem from '~/components/ui/NavStackItem.vue'
 const auth = (await useAuth()) as Ref<{ user: User | null }>
 
 const isAffiliate = computed(() => {
-	return auth.value.user && (auth.value.user.badges & UserBadge.AFFILIATE)
+	return auth.value.user && auth.value.user.badges & UserBadge.AFFILIATE
 })
 
 const { formatMessage } = useVIntl()

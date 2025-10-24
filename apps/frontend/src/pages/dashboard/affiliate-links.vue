@@ -1,40 +1,9 @@
 <template>
-	<NewModal ref="createModal" :header="formatMessage(messages.createHeader)">
-		<div class="flex flex-col gap-4">
-			<label class="contents" for="create-affiliate-title-input">
-				<span class="text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.createTitleLabel) }}
-				</span>
-				<span class="text-secondary">{{ formatMessage(messages.createTitleDescription) }}</span>
-			</label>
-			<div class="flex items-center gap-2">
-				<div class="iconified-input">
-					<AutoBrandIcon :keyword="affiliateLinkTitle" aria-hidden="true">
-						<AffiliateIcon />
-					</AutoBrandIcon>
-					<input
-						id="create-affiliate-title-input"
-						v-model="affiliateLinkTitle"
-						class="card-shadow"
-						autocomplete="off"
-						spellcheck="false"
-						type="text"
-						:placeholder="formatMessage(messages.createTitlePlaceholder)"
-					/>
-					<Button v-if="affiliateLinkTitle" class="r-btn" @click="() => (affiliateLinkTitle = '')">
-						<XIcon />
-					</Button>
-				</div>
-				<ButtonStyled color="brand">
-					<button :disabled="creatingLink" @click="createAffiliateLink">
-						<SpinnerIcon v-if="creatingLink" class="animate-spin" />
-						<PlusIcon v-else />
-						{{ formatMessage(creatingLink ? messages.creatingButton : messages.createButton) }}
-					</button>
-				</ButtonStyled>
-			</div>
-		</div>
-	</NewModal>
+	<AffiliateLinkCreateModal
+		ref="createModal"
+		:creating-link="creatingLink"
+		@create="createAffiliateCode"
+	/>
 	<ConfirmModal
 		ref="revokeModal"
 		:title="formatMessage(messages.revokeConfirmTitle, { title: revokingTitle })"
@@ -80,70 +49,43 @@
 			{{ error }}
 		</Admonition>
 		<div
-			v-for="affiliate in filteredAffiliates"
-			v-else
-			:key="`affiliate-${affiliate.id}`"
-			class="card-shadow mb-3 flex flex-col gap-4 rounded-2xl bg-bg-raised p-4"
+			v-else-if="!filteredAffiliates || filteredAffiliates.length === 0"
+			class="py-8 text-center"
 		>
-			<div class="flex items-center gap-4">
-				<div
-					class="flex items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg p-2"
-				>
-					<AutoBrandIcon :keyword="affiliate.source_name" class="h-6 w-6">
-						<AffiliateIcon />
-					</AutoBrandIcon>
-				</div>
-				<div class="flex flex-col gap-1">
-					<span class="w-fit text-lg font-bold text-contrast">
-						{{ affiliate.source_name }}
-					</span>
-				</div>
-				<div class="ml-auto flex items-center gap-2">
-					<ButtonStyled color="red" color-fill="text">
-						<button @click="revokeAffiliateLink(affiliate)">
-							<XCircleIcon /> {{ formatMessage(messages.revokeAffiliateLink) }}
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-			<CopyCode :text="`https://modrinth.gg?afl=${affiliate.id}`" />
+			<p class="text-secondary">No affiliate codes found.</p>
+		</div>
+		<div v-else class="space-y-3">
+			<AffiliateLinkCard
+				v-for="affiliate in filteredAffiliates"
+				:key="`affiliate-${affiliate.id}`"
+				:affiliate="affiliate"
+				@revoke="revokeAffiliateLink"
+			/>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
-import {
-	AffiliateIcon,
-	PlusIcon,
-	SearchIcon,
-	SpinnerIcon,
-	XCircleIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { PlusIcon, SearchIcon, XCircleIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
-	AutoBrandIcon,
+	AffiliateLinkCard,
+	AffiliateLinkCreateModal,
 	Button,
 	ButtonStyled,
 	ConfirmModal,
-	CopyCode,
-	NewModal,
+	injectNotificationManager,
 } from '@modrinth/ui'
+import type { AffiliateLink } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
 
-const createModal = useTemplateRef<typeof NewModal>('createModal')
+const createModal = useTemplateRef<typeof AffiliateLinkCreateModal>('createModal')
 const revokeModal = useTemplateRef<typeof ConfirmModal>('revokeModal')
 
-const auth: { user: any } & any = await useAuth()
+const auth = await useAuth()
+
+const { handleError } = injectNotificationManager()
 
 const { formatMessage } = useVIntl()
-
-type AffiliateLink = {
-	id: string
-	created_at: string
-	created_by: string
-	affiliate: string
-	source_name: string
-}
 
 const {
 	data: affiliateLinks,
@@ -155,36 +97,39 @@ const {
 )
 
 const filterQuery = ref('')
+const creatingLink = ref(false)
 
 const filteredAffiliates = computed(() =>
 	affiliateLinks
-		? affiliateLinks.value?.filter((link: AffiliateLink) =>
-				link.affiliate === auth.user?.id && filterQuery.value.trim()
-					? link.source_name.trim().toLowerCase().includes(filterQuery.value.trim().toLowerCase())
-					: true,
+		? affiliateLinks.value?.filter(
+				(link: AffiliateLink) =>
+					link.affiliate === auth.value?.user?.id &&
+					(filterQuery.value.trim()
+						? link.source_name.trim().toLowerCase().includes(filterQuery.value.trim().toLowerCase())
+						: true),
 			)
 		: [],
 )
 
-const affiliateLinkTitle = ref<string>('')
-
-const creatingLink = ref(false)
-
-function createAffiliateLink() {
+async function createAffiliateCode(data: { sourceName: string }) {
 	creatingLink.value = true
 
-	useBaseFetch('affiliate', {
-		method: 'PUT',
-		body: {
-			source_name: affiliateLinkTitle.value,
-		},
-		internal: true,
-	}).then(() => {
-		refresh()
-		createModal.value?.hide()
+	try {
+		await useBaseFetch('affiliate', {
+			method: 'PUT',
+			body: {
+				source_name: data.sourceName,
+			},
+			internal: true,
+		})
+
+		await refresh()
+		createModal.value?.close()
+	} catch (err) {
+		handleError(err)
+	} finally {
 		creatingLink.value = false
-		affiliateLinkTitle.value = ''
-	})
+	}
 }
 
 const revokingTitle = ref<string | null>(null)
@@ -196,50 +141,34 @@ function revokeAffiliateLink(affiliate: AffiliateLink) {
 	revokeModal.value?.show()
 }
 
-function confirmRevokeAffiliateLink() {
-	useBaseFetch(`affiliate/${revokingId.value}`, {
-		method: 'DELETE',
-		internal: true,
-	}).then(() => {
-		refresh()
+async function confirmRevokeAffiliateLink() {
+	if (!revokingId.value) {
+		return
+	}
+
+	try {
+		await useBaseFetch(`affiliate/${revokingId.value}`, {
+			method: 'DELETE',
+			internal: true,
+		})
+
+		await refresh()
 		revokeModal.value?.hide()
 		revokingTitle.value = null
 		revokingId.value = null
-	})
+	} catch (err) {
+		console.error('Failed to revoke affiliate code:', err)
+	}
 }
 
 const messages = defineMessages({
-	createHeader: {
-		id: 'dashboard.affiliate-links.create.header',
-		defaultMessage: 'Creating new affiliate code',
-	},
-	createTitleLabel: {
-		id: 'dashboard.affiliate-links.create.title.label',
-		defaultMessage: 'Title of affiliate link',
-	},
-	createTitleDescription: {
-		id: 'dashboard.affiliate-links.create.title.description',
-		defaultMessage: 'Give your affiliate link a name so you know where people are coming from!',
-	},
-	createTitlePlaceholder: {
-		id: 'dashboard.affiliate-links.create.title.placeholder',
-		defaultMessage: 'e.g. YouTube',
-	},
 	createButton: {
 		id: 'dashboard.affiliate-links.create.button',
 		defaultMessage: 'Create affiliate link',
 	},
-	creatingButton: {
-		id: 'dashboard.affiliate-links.creating.button',
-		defaultMessage: 'Creating affiliate link...',
-	},
 	yourAffiliateLinks: {
 		id: 'dashboard.affiliate-links.header',
 		defaultMessage: 'Your affiliate links',
-	},
-	revokeAffiliateLink: {
-		id: 'dashboard.affiliate-links.revoke',
-		defaultMessage: 'Revoke affiliate link',
 	},
 	searchAffiliateLinks: {
 		id: 'dashboard.affiliate-links.search',

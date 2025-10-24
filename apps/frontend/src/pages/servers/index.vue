@@ -1,8 +1,4 @@
 <template>
-	<div v-if="affiliateCode" class="text-center text-2xl font-bold text-red">
-		Affiliate code: '{{ affiliateCode }}'
-	</div>
-	<div v-else class="text-center text-2xl font-bold text-red">No affiliate code saved</div>
 	<div
 		ref="scrollListener"
 		data-pyro
@@ -30,6 +26,7 @@
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
+			:affiliate-code="affiliateCode"
 		/>
 
 		<section
