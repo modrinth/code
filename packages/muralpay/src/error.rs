@@ -1,8 +1,7 @@
-use std::fmt;
+use std::{collections::HashMap, fmt};
 
 use bytes::Bytes;
 use derive_more::{Display, Error, From};
-use foldhash::HashMap;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

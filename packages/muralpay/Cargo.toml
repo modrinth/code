@@ -17,7 +17,6 @@ derive_more = { workspace = true, features = [
   "error",
   "from",
 ] }
-foldhash = { workspace = true }
 reqwest = { workspace = true, features = ["default-tls", "http2", "json"] }
 rust_decimal = { workspace = true, features = ["macros"] }
 rust_iso3166 = { workspace = true }

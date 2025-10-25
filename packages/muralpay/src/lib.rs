@@ -56,6 +56,8 @@ pub enum Blockchain {
     Celo,
 }
 
+crate::util::display_as_serialize!(Blockchain);
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
@@ -73,6 +75,8 @@ pub enum CurrencyCode {
     Zar,
 }
 
+crate::util::display_as_serialize!(CurrencyCode);
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "SCREAMING-KEBAB-CASE")]
@@ -80,6 +84,8 @@ pub enum FiatAccountType {
     Checking,
     Savings,
 }
+
+crate::util::display_as_serialize!(FiatAccountType);
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, strum::EnumIter)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
