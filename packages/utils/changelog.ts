@@ -11,6 +11,21 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-24T21:05:00-07:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed the colors of OLED mode being brighter than intended.`,
+	},
+	{
+		date: `2025-10-24T21:05:00-07:00`,
+		product: 'app',
+		version: '0.10.14',
+		body: `## Improvements
+- Fixed window maximized state not being saved properly.
+- Fixed padding issue when Friends are loading.
+- Fixed the colors of OLED mode being brighter than intended.`,
+	},
+	{
 		date: `2025-10-19T17:45:00-07:00`,
 		product: 'app',
 		version: '0.10.13',
