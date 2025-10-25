@@ -44,32 +44,37 @@
 			<span class="align-middle font-semibold text-contrast">{{
 				formatMessage(messages.selectMethod)
 			}}</span>
-			<ButtonStyled
-				v-for="method in paymentOptions"
-				:key="method.value"
-				:color="withdrawData.selection.method === method.value ? 'green' : 'standard'"
-				:highlighted="withdrawData.selection.method === method.value"
-				type="chip"
-			>
-				<button
-					class="!justify-start !gap-2 !text-left sm:!h-10"
-					@click="handleMethodSelection(method)"
+			<div v-if="loading" class="flex min-h-[120px] items-center justify-center">
+				<SpinnerIcon class="size-8 animate-spin text-contrast" />
+			</div>
+			<template v-else>
+				<ButtonStyled
+					v-for="method in paymentOptions"
+					:key="method.value"
+					:color="withdrawData.selection.method === method.value ? 'green' : 'standard'"
+					:highlighted="withdrawData.selection.method === method.value"
+					type="chip"
 				>
-					<component :is="method.icon" class="shrink-0" />
-					<span class="flex-1 truncate text-sm sm:text-[1rem]">
-						{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
-					</span>
-					<span class="ml-auto shrink-0 text-xs font-normal text-secondary sm:text-sm">{{
-						method.fee
-					}}</span>
-				</button>
-			</ButtonStyled>
+					<button
+						class="!justify-start !gap-2 !text-left sm:!h-10"
+						@click="handleMethodSelection(method)"
+					>
+						<component :is="method.icon" class="shrink-0" />
+						<span class="flex-1 truncate text-sm sm:text-[1rem]">
+							{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
+						</span>
+						<span class="ml-auto shrink-0 text-xs font-normal text-secondary sm:text-sm">{{
+							method.fee
+						}}</span>
+					</button>
+				</ButtonStyled>
+			</template>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { UnknownIcon } from '@modrinth/assets'
+import { SpinnerIcon, UnknownIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	ButtonStyled,
