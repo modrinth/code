@@ -1,3 +1,11 @@
+#![cfg_attr(
+    feature = "utoipa",
+    expect(
+        clippy::large_stack_arrays,
+        reason = "due to `utoipa::ToSchema` derive"
+    )
+)]
+
 use std::str::FromStr;
 
 use chrono::{DateTime, Utc};
