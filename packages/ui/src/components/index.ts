@@ -2,6 +2,7 @@
 export { default as Accordion } from './base/Accordion.vue'
 export { default as Admonition } from './base/Admonition.vue'
 export { default as AppearingProgressBar } from './base/AppearingProgressBar.vue'
+export { default as AutoBrandIcon } from './base/AutoBrandIcon.vue'
 export { default as AutoLink } from './base/AutoLink.vue'
 export { default as Avatar } from './base/Avatar.vue'
 export { default as Badge } from './base/Badge.vue'
@@ -97,6 +98,10 @@ export { default as SearchFilter } from './search/SearchFilter.vue'
 export { default as SearchFilterControl } from './search/SearchFilterControl.vue'
 export { default as SearchFilterOption } from './search/SearchFilterOption.vue'
 export { default as SearchSidebarFilter } from './search/SearchSidebarFilter.vue'
+
+// Affiliate
+export { default as AffiliateLinkCard } from './affiliate/AffiliateLinkCard.vue'
+export { default as AffiliateLinkCreateModal } from './affiliate/AffiliateLinkCreateModal.vue'
 
 // Billing
 export { default as AddPaymentMethodModal } from './billing/AddPaymentMethodModal.vue'
