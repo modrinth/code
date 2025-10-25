@@ -376,7 +376,7 @@ const props = defineProps({
 })
 
 const flags = useFeatureFlags()
-const tags = useTags()
+const tags = useGeneratedState()
 
 const type = computed(() =>
 	!props.notification.body || props.notification.body.type === 'legacy_markdown'

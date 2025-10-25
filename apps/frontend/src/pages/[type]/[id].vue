@@ -1032,7 +1032,7 @@ const { addNotification } = notifications
 const auth = await useAuth()
 const user = await useUser()
 
-const tags = useTags()
+const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 

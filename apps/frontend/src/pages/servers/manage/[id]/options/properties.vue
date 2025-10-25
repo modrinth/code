@@ -77,13 +77,13 @@
 							v-if="overrides[index] && overrides[index].type === 'dropdown'"
 							class="mt-2 flex w-full sm:w-[320px] sm:justify-end"
 						>
-							<TeleportDropdownMenu
+							<Combobox
 								:id="`server-property-${index}`"
 								v-model="liveProperties[index]"
 								:name="formatPropertyName(index)"
-								:options="overrides[index].options || []"
+								:options="(overrides[index].options || []).map((v) => ({ value: v, label: v }))"
 								:aria-labelledby="`property-label-${index}`"
-								placeholder="Select..."
+								:display-value="String(liveProperties[index] ?? 'Select...')"
 							/>
 						</div>
 						<div v-else-if="typeof property === 'boolean'" class="flex justify-end">
@@ -159,7 +159,7 @@
 
 <script setup lang="ts">
 import { EyeIcon, IssuesIcon, SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, TeleportDropdownMenu } from '@modrinth/ui'
+import { ButtonStyled, Combobox, injectNotificationManager } from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import { computed, inject, ref, watch } from 'vue'
 
@@ -171,7 +171,7 @@ const props = defineProps<{
 	server: ModrinthServer
 }>()
 
-const tags = useTags()
+const tags = useGeneratedState()
 
 const isUpdating = ref(false)
 

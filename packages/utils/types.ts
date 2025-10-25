@@ -597,3 +597,78 @@ export interface DelphiReport {
 	status: 'pending' | 'approved' | 'rejected'
 	content?: string
 }
+
+export type PayoutId = string
+export type UserId = string
+export type PayoutStatus =
+	| 'success'
+	| 'in-transit'
+	| 'cancelled'
+	| 'cancelling'
+	| 'failed'
+	| 'unknown'
+export type PayoutMethodType = 'venmo' | 'paypal' | 'tremendous' | 'muralpay' | 'unknown'
+
+export interface Payout {
+	id: PayoutId
+	user_id: UserId
+	status: PayoutStatus
+	created: string // ISO 8601
+	amount: number
+	fee: number | null
+	method: PayoutMethodType | null
+	method_address: string | null
+	platform_id: string | null
+}
+
+export type PayoutList = Payout[]
+
+// Revenue event types for transaction history
+export interface IncomeEvent {
+	type: 'payout_available'
+	created: string // ISO 8601
+	payout_source: string
+	amount: number
+}
+
+export interface WithdrawalEvent {
+	type: 'withdrawal'
+	id: string
+	status: PayoutStatus
+	created: string // ISO 8601
+	amount: number
+	fee: number | null
+	method_type: PayoutMethodType | null
+	method_address: string | null
+}
+
+export type RevenueEvent = IncomeEvent | WithdrawalEvent
+
+export type RevenueEventList = RevenueEvent[]
+
+export interface PayoutMethodFee {
+	percentage: number
+	min: number
+	max: number | null
+}
+
+export type PayoutInterval =
+	| {
+			type: 'standard'
+			min: number
+			max: number
+	  }
+	| {
+			type: 'fixed'
+			values: number[]
+	  }
+
+export interface PayoutMethod {
+	id: string
+	type: PayoutMethodType
+	name: string
+	supported_countries: string[]
+	image_url: string | null
+	interval: PayoutInterval
+	fee: PayoutMethodFee
+}

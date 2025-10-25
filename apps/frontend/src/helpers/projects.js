@@ -3,7 +3,7 @@ export const getProjectTypeForUrl = (type, categories) => {
 }
 
 export const getProjectTypeForUrlShorthand = (type, categories, overrideTags) => {
-	const tags = overrideTags ?? useTags().value
+	const tags = overrideTags ?? useGeneratedState().value
 
 	if (type === 'mod') {
 		const isMod = categories.some((category) => {
@@ -87,7 +87,7 @@ export function getVersionsToDisplay(project) {
 }
 
 export function formatVersionsForDisplay(gameVersions, overrideTags) {
-	const tags = overrideTags ?? useTags().value
+	const tags = overrideTags ?? useGeneratedState().value
 
 	const inputVersions = gameVersions.slice()
 	const allVersions = tags.gameVersions.slice()

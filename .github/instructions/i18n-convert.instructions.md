@@ -9,6 +9,7 @@ Please follow these rules precisely:
 1. Identify translatable strings
 
 - Scan the <template> for all user-visible strings (inner text, alt attributes, placeholders, button labels, etc.). Do not extract dynamic expressions (like {{ user.name }}) or HTML tags. Only extract static human-readable text.
+- There may be strings within the <script> block, e.g dropdown option labels, notifications etc.
 
 2. Create message definitions
 

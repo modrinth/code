@@ -26,7 +26,7 @@ export default {
 		},
 	},
 	setup() {
-		const tags = useTags()
+		const tags = useGeneratedState()
 
 		return { tags }
 	},

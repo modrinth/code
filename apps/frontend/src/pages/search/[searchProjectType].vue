@@ -353,7 +353,7 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 
 const cosmetics = useCosmetics()
-const tags = useTags()
+const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 

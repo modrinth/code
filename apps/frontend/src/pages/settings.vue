@@ -5,75 +5,79 @@
 		</div>
 		<div class="normal-page">
 			<div class="normal-page__sidebar">
-				<aside class="universal-card">
-					<NavStack>
-						<h3>Display</h3>
-						<NavStackItem
-							link="/settings"
-							:label="formatMessage(commonSettingsMessages.appearance)"
-						>
-							<PaintbrushIcon />
-						</NavStackItem>
-						<NavStackItem
-							v-if="isStaging"
-							:badge="`${formatMessage(commonMessages.beta)}`"
-							link="/settings/language"
-							:label="formatMessage(commonSettingsMessages.language)"
-						>
-							<LanguagesIcon />
-						</NavStackItem>
-						<template v-if="auth.user">
-							<h3>Account</h3>
-							<NavStackItem
-								link="/settings/profile"
-								:label="formatMessage(commonSettingsMessages.profile)"
-							>
-								<UserIcon />
-							</NavStackItem>
-							<NavStackItem
-								link="/settings/account"
-								:label="formatMessage(commonSettingsMessages.account)"
-							>
-								<ShieldIcon />
-							</NavStackItem>
-							<NavStackItem
-								link="/settings/authorizations"
-								:label="formatMessage(commonSettingsMessages.authorizedApps)"
-							>
-								<GridIcon />
-							</NavStackItem>
-							<NavStackItem
-								link="/settings/sessions"
-								:label="formatMessage(commonSettingsMessages.sessions)"
-							>
-								<MonitorSmartphoneIcon />
-							</NavStackItem>
-							<NavStackItem
-								link="/settings/billing"
-								:label="formatMessage(commonSettingsMessages.billing)"
-							>
-								<CardIcon />
-							</NavStackItem>
-						</template>
-						<template v-if="auth.user">
-							<h3>Developer</h3>
-							<NavStackItem
-								link="/settings/pats"
-								:label="formatMessage(commonSettingsMessages.pats)"
-							>
-								<KeyIcon />
-							</NavStackItem>
-							<NavStackItem
-								link="/settings/applications"
-								:label="formatMessage(commonSettingsMessages.applications)"
-							>
-								<ServerIcon />
-							</NavStackItem>
-						</template>
-					</NavStack>
-				</aside>
+				<NavStack
+					:items="
+						[
+							{ type: 'heading', label: 'Display' },
+							{
+								link: '/settings',
+								label: formatMessage(commonSettingsMessages.appearance),
+								icon: PaintbrushIcon,
+							},
+							isStaging
+								? {
+										link: '/settings/language',
+										label: formatMessage(commonSettingsMessages.language),
+										icon: LanguagesIcon,
+										badge: `${formatMessage(commonMessages.beta)}`,
+									}
+								: null,
+							auth.user ? { type: 'heading', label: 'Account' } : null,
+							auth.user
+								? {
+										link: '/settings/profile',
+										label: formatMessage(commonSettingsMessages.profile),
+										icon: UserIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/account',
+										label: formatMessage(commonSettingsMessages.account),
+										icon: ShieldIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/authorizations',
+										label: formatMessage(commonSettingsMessages.authorizedApps),
+										icon: GridIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/sessions',
+										label: formatMessage(commonSettingsMessages.sessions),
+										icon: MonitorSmartphoneIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/billing',
+										label: formatMessage(commonSettingsMessages.billing),
+										icon: CardIcon,
+									}
+								: null,
+							auth.user ? { type: 'heading', label: 'Developer' } : null,
+							auth.user
+								? {
+										link: '/settings/pats',
+										label: formatMessage(commonSettingsMessages.pats),
+										icon: KeyIcon,
+									}
+								: null,
+							auth.user
+								? {
+										link: '/settings/applications',
+										label: formatMessage(commonSettingsMessages.applications),
+										icon: ServerIcon,
+									}
+								: null,
+						].filter(Boolean)
+					"
+				/>
 			</div>
-			<div class="normal-page__content">
+			<div class="normal-page__content mt-3 lg:mt-0">
 				<NuxtPage :route="route" />
 			</div>
 		</div>
@@ -94,7 +98,6 @@ import {
 import { commonMessages, commonSettingsMessages } from '@modrinth/ui'
 
 import NavStack from '~/components/ui/NavStack.vue'
-import NavStackItem from '~/components/ui/NavStackItem.vue'
 
 const { formatMessage } = useVIntl()
 
