@@ -61,7 +61,9 @@ pub fn utoipa_config(
             .configure(analytics_get::config),
     );
     cfg.service(
-        utoipa_actix_web::scope("/v3/payout").configure(payouts::config),
+        utoipa_actix_web::scope("/v3/payout")
+            .wrap(default_cors())
+            .configure(payouts::config),
     );
 }
 
