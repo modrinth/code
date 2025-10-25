@@ -734,6 +734,9 @@
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
     "message": "Venmo handle saved successfully!"
   },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Saved"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Sign in with PayPal"
   },

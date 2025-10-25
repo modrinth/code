@@ -353,7 +353,7 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 const STORAGE_KEY = 'modrinth_withdraw_state'
 const STATE_EXPIRY_MS = 15 * 60 * 1000 // 15 minutes
 
-export function createWithdrawContext(balance: any, auth: any): WithdrawContextValue {
+export function createWithdrawContext(balance: any): WithdrawContextValue {
 	const debug = useDebugLogger('CreatorWithdraw')
 	const currentStage = ref<WithdrawStage | undefined>()
 
