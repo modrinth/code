@@ -1,96 +1,71 @@
 <template>
 	<nav :aria-label="ariaLabel" class="w-full">
-		<div class="rounded-2xl bg-surface-3">
-			<button
-				class="flex w-full items-center justify-between bg-surface-3 px-4 py-3 text-base font-semibold text-contrast transition-colors hover:bg-surface-4 lg:hidden"
-				:class="{ 'rounded-t-2xl': true, 'rounded-b-2xl': isCollapsed }"
-				@click="toggleCollapsed"
-			>
-				<span>Navigation</span>
-				<ChevronDownIcon v-if="isCollapsed" class="h-5 w-5" />
-				<ChevronUpIcon v-else class="h-5 w-5" />
-			</button>
-			<div
-				class="overflow-hidden transition-all duration-300 ease-in-out lg:!max-h-none"
-				:class="isCollapsed ? 'max-h-0' : 'max-h-[2000px]'"
-			>
-				<ul class="m-0 flex list-none flex-col items-start gap-1.5 p-2 lg:rounded-2xl lg:p-4">
-					<slot v-if="hasSlotContent" />
+		<ul class="m-0 flex list-none flex-col items-start gap-1.5 rounded-2xl bg-bg-raised p-4">
+			<slot v-if="hasSlotContent" />
 
-					<template v-else>
-						<li v-for="(item, idx) in items" :key="getKey(item, idx)" class="contents">
-							<hr v-if="isSeparator(item)" class="my-1 w-full border-t border-solid" />
+			<template v-else>
+				<li v-for="(item, idx) in items" :key="getKey(item, idx)" class="contents">
+					<hr v-if="isSeparator(item)" class="my-1 w-full border-t border-solid" />
 
-							<div
-								v-else-if="isHeading(item)"
-								class="px-4 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary"
-							>
-								{{ item.label }}
-							</div>
+					<div
+						v-else-if="isHeading(item)"
+						class="px-4 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary"
+					>
+						{{ item.label }}
+					</div>
 
-							<NuxtLink
-								v-else-if="item.link ?? item.to"
-								:to="(item.link ?? item.to) as string"
-								class="nav-item inline-flex w-full cursor-pointer items-center gap-2 text-nowrap rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
-								@click="() => (isCollapsed = true)"
-							>
-								<component
-									:is="item.icon"
-									v-if="item.icon"
-									aria-hidden="true"
-									class="h-5 w-5 shrink-0"
-								/>
-								<span class="text-contrast">{{ item.label }}</span>
-								<span
-									v-if="item.badge != null"
-									class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
-								>
-									{{ String(item.badge) }}
-								</span>
-								<span v-if="item.chevron" class="ml-auto"><ChevronRightIcon /></span>
-							</NuxtLink>
+					<NuxtLink
+						v-else-if="item.link ?? item.to"
+						:to="(item.link ?? item.to) as string"
+						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 text-nowrap rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
+					>
+						<component
+							:is="item.icon"
+							v-if="item.icon"
+							aria-hidden="true"
+							class="h-5 w-5 shrink-0"
+						/>
+						<span class="text-contrast">{{ item.label }}</span>
+						<span
+							v-if="item.badge != null"
+							class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
+						>
+							{{ String(item.badge) }}
+						</span>
+						<span v-if="item.chevron" class="ml-auto"><ChevronRightIcon /></span>
+					</NuxtLink>
 
-							<button
-								v-else-if="item.action"
-								class="nav-item inline-flex w-full cursor-pointer items-center gap-2 text-nowrap rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
-								:class="{ 'danger-button': item.danger }"
-								@click="
-									() => {
-										item.action?.()
-										isCollapsed = true
-									}
-								"
-							>
-								<component
-									:is="item.icon"
-									v-if="item.icon"
-									aria-hidden="true"
-									class="h-5 w-5 shrink-0"
-								/>
-								<span class="text-contrast">{{ item.label }}</span>
-								<span
-									v-if="item.badge != null"
-									class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
-								>
-									{{ String(item.badge) }}
-								</span>
-							</button>
+					<button
+						v-else-if="item.action"
+						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 text-nowrap rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
+						:class="{ 'danger-button': item.danger }"
+						@click="item.action"
+					>
+						<component
+							:is="item.icon"
+							v-if="item.icon"
+							aria-hidden="true"
+							class="h-5 w-5 shrink-0"
+						/>
+						<span class="text-contrast">{{ item.label }}</span>
+						<span
+							v-if="item.badge != null"
+							class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
+						>
+							{{ String(item.badge) }}
+						</span>
+					</button>
 
-							<span v-else>You frog. 🐸</span>
-						</li>
-					</template>
-				</ul>
-			</div>
-		</div>
+					<span v-else>You frog. 🐸</span>
+				</li>
+			</template>
+		</ul>
 	</nav>
 </template>
 
 <script setup lang="ts">
 import { ChevronRightIcon } from '@modrinth/assets'
-import { type Component, computed, ref, useSlots } from 'vue'
-
-import ChevronDownIcon from './servers/icons/ChevronDownIcon.vue'
-import ChevronUpIcon from './servers/icons/ChevronUpIcon.vue'
+import { type Component, computed, useSlots } from 'vue'
 
 type NavStackBaseItem = {
 	label: string
@@ -112,16 +87,10 @@ type NavStackHeading = { type: 'heading'; label: string }
 
 export type NavStackEntry = NavStackLinkItem | NavStackSeparator | NavStackHeading
 
-const props = withDefaults(
-	defineProps<{
-		items?: NavStackEntry[]
-		ariaLabel?: string
-		initiallyCollapsed?: boolean
-	}>(),
-	{
-		initiallyCollapsed: true,
-	},
-)
+const props = defineProps<{
+	items?: NavStackEntry[]
+	ariaLabel?: string
+}>()
 
 const ariaLabel = computed(() => props.ariaLabel ?? 'Section navigation')
 
@@ -130,12 +99,6 @@ const hasSlotContent = computed(() => {
 	const content = slots.default?.()
 	return !!(content && content.length)
 })
-
-const isCollapsed = ref(props.initiallyCollapsed)
-
-function toggleCollapsed() {
-	isCollapsed.value = !isCollapsed.value
-}
 
 function isSeparator(item: NavStackEntry): item is NavStackSeparator {
 	return (item as any).type === 'separator'
