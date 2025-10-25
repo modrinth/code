@@ -73,6 +73,7 @@ serde_json = { workspace = true }
 serde_with = { workspace = true }
 sha1_smol = { workspace = true }
 sha2 = { workspace = true }
+shlex = { workspace = true }
 sqlx = { workspace = true, features = [
   "json",
   "macros",

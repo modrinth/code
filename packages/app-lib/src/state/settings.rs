@@ -42,6 +42,8 @@ pub struct Settings {
     pub skipped_update: Option<String>,
     pub pending_update_toast_for_version: Option<String>,
     pub auto_download_updates: Option<bool>,
+
+    pub version: usize,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
@@ -68,7 +70,8 @@ impl Settings {
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
                 hook_pre_launch, hook_wrapper, hook_post_exit,
                 custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,
-                skipped_update, pending_update_toast_for_version, auto_download_updates
+                skipped_update, pending_update_toast_for_version, auto_download_updates,
+                version
             FROM settings
             "
         )
@@ -126,6 +129,7 @@ impl Settings {
             pending_update_toast_for_version: res
                 .pending_update_toast_for_version,
             auto_download_updates: res.auto_download_updates.map(|x| x == 1),
+            version: res.version as usize,
         })
     }
 
@@ -140,6 +144,7 @@ impl Settings {
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
         let feature_flags = serde_json::to_string(&self.feature_flags)?;
+        let version = self.version as i64;
 
         sqlx::query!(
             "
@@ -183,7 +188,9 @@ impl Settings {
 
                 skipped_update = $29,
                 pending_update_toast_for_version = $30,
-                auto_download_updates = $31
+                auto_download_updates = $31,
+
+                version = $32
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -216,6 +223,7 @@ impl Settings {
             self.skipped_update,
             self.pending_update_toast_for_version,
             self.auto_download_updates,
+            version,
         )
         .execute(exec)
         .await?;

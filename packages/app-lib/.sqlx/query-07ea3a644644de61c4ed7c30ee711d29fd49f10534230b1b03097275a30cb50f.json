@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,\n                skipped_update, pending_update_toast_for_version, auto_download_updates\n            FROM settings\n            ",
+  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,\n                skipped_update, pending_update_toast_for_version, auto_download_updates,\n                version\n            FROM settings\n            ",
   "describe": {
     "columns": [
       {
@@ -157,6 +157,11 @@
         "name": "auto_download_updates",
         "ordinal": 30,
         "type_info": "Integer"
+      },
+      {
+        "name": "version",
+        "ordinal": 31,
+        "type_info": "Integer"
       }
     ],
     "parameters": {
@@ -193,8 +198,9 @@
       false,
       true,
       true,
-      true
+      true,
+      false
     ]
   },
-  "hash": "7dc83d7ffa3d583fc5ffaf13811a8dab4d0b9ded6200f827b9de7ac32e5318d5"
+  "hash": "07ea3a644644de61c4ed7c30ee711d29fd49f10534230b1b03097275a30cb50f"
 }
