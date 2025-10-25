@@ -202,6 +202,10 @@ function handleMethodSelection(option: {
 		withdrawData.value.selection.provider = 'tremendous'
 	} else if (option.type === 'fiat' || option.type === 'crypto') {
 		withdrawData.value.selection.provider = 'muralpay'
+	} else if (option.type === 'paypal') {
+		withdrawData.value.selection.provider = 'paypal'
+	} else if (option.type === 'venmo') {
+		withdrawData.value.selection.provider = 'venmo'
 	} else {
 		withdrawData.value.selection.provider = 'muralpay'
 	}
@@ -233,6 +237,10 @@ watch(
 				type: 'muralpay',
 				kycData: {} as any,
 				accountDetails: {},
+			}
+		} else if (newProvider === 'paypal' || newProvider === 'venmo') {
+			withdrawData.value.providerData = {
+				type: newProvider,
 			}
 		}
 	},

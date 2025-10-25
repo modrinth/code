@@ -18,9 +18,10 @@ export type WithdrawStage =
 	| 'tremendous-details'
 	| 'muralpay-kyc'
 	| 'muralpay-details'
+	| 'paypal-details'
 	| 'completion'
 
-export type PaymentProvider = 'tremendous' | 'muralpay'
+export type PaymentProvider = 'tremendous' | 'muralpay' | 'paypal' | 'venmo'
 
 /**
  * only used for the method selection stage logic - not actually for API requests
@@ -131,11 +132,19 @@ export interface MuralPayProviderData {
 	accountDetails: AccountDetails
 }
 
+export interface PayPalVenmoProviderData {
+	type: 'paypal' | 'venmo'
+}
+
 export interface NoProviderData {
 	type: null
 }
 
-export type ProviderData = TremendousProviderData | MuralPayProviderData | NoProviderData
+export type ProviderData =
+	| TremendousProviderData
+	| MuralPayProviderData
+	| PayPalVenmoProviderData
+	| NoProviderData
 
 export interface WithdrawData {
 	selection: SelectionData
@@ -144,6 +153,9 @@ export interface WithdrawData {
 	providerData: ProviderData
 	result: WithdrawalResult | null
 	agreedTerms: boolean
+	stageValidation: {
+		paypalDetails?: boolean
+	}
 }
 
 export interface WithdrawContextValue {
@@ -242,7 +254,7 @@ function getRecipientDisplay(data: WithdrawData): string {
 
 interface PayoutPayload {
 	amount: number
-	method: 'tremendous' | 'muralpay'
+	method: 'tremendous' | 'muralpay' | 'paypal' | 'venmo'
 	method_id: string
 	method_details?: {
 		delivery_email?: string
@@ -252,7 +264,13 @@ interface PayoutPayload {
 }
 
 function buildPayoutPayload(data: WithdrawData): PayoutPayload {
-	if (data.selection.provider === 'tremendous') {
+	if (data.selection.provider === 'paypal' || data.selection.provider === 'venmo') {
+		return {
+			amount: data.calculation.amount,
+			method: data.selection.provider,
+			method_id: data.selection.methodId!,
+		}
+	} else if (data.selection.provider === 'tremendous') {
 		if (!isTremendousProvider(data.providerData)) {
 			throw new Error('Invalid provider data for Tremendous')
 		}
@@ -323,7 +341,7 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 	throw new Error('Invalid provider')
 }
 
-export function createWithdrawContext(balance: any): WithdrawContextValue {
+export function createWithdrawContext(balance: any, auth: any): WithdrawContextValue {
 	const debug = useDebugLogger('CreatorWithdraw')
 	const currentStage = ref<WithdrawStage | undefined>()
 
@@ -347,6 +365,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 		},
 		result: null,
 		agreedTerms: false,
+		stageValidation: {},
 	})
 
 	const balanceRef = ref(balance)
@@ -381,6 +400,8 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 		} else if (selectedProvider === 'muralpay') {
 			dynamicStages.push('muralpay-kyc')
 			dynamicStages.push('muralpay-details')
+		} else if (selectedProvider === 'paypal' || selectedProvider === 'venmo') {
+			dynamicStages.push('paypal-details')
 		}
 
 		dynamicStages.push('completion')
@@ -422,21 +443,9 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 		if (paypalMethods.length > 0) {
 			options.push({
 				value: 'paypal',
-				label: paymentMethodMessages.paypal,
+				label: paymentMethodMessages.paypalInternational,
 				icon: SSOPayPalIcon,
 				methodId: paypalMethods[0].id,
-				fee: '≈ 6%, max $25',
-				type: 'tremendous',
-			})
-		}
-
-		const venmoMethods = tremendousMethods.filter((m) => m.category === 'venmo')
-		if (venmoMethods.length > 0) {
-			options.push({
-				value: 'venmo',
-				label: paymentMethodMessages.venmo,
-				icon: SSOVenmoIcon,
-				methodId: venmoMethods[0].id,
 				fee: '≈ 6%, max $25',
 				type: 'tremendous',
 			})
@@ -505,6 +514,30 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 					type: 'crypto',
 				})
 			}
+		}
+
+		const directPaypal = methods.find((m) => m.type === 'paypal')
+		if (directPaypal) {
+			options.push({
+				value: directPaypal.id,
+				label: paymentMethodMessages.paypal,
+				icon: SSOPayPalIcon,
+				methodId: directPaypal.id,
+				fee: `≈ 2%, min 25¢, max $1`,
+				type: 'paypal',
+			})
+		}
+
+		const directVenmo = methods.find((m) => m.type === 'venmo')
+		if (directVenmo) {
+			options.push({
+				value: directVenmo.id,
+				label: paymentMethodMessages.venmo,
+				icon: SSOVenmoIcon,
+				methodId: directVenmo.id,
+				fee: `≈ 2%, min 25¢, max $1`,
+				type: 'venmo',
+			})
 		}
 
 		const sortOrder = ['paypal', 'venmo', 'crypto', 'fiat', 'merchant_card', 'charity']
@@ -632,6 +665,8 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 
 				return allRequiredPresent && withdrawData.value.agreedTerms
 			}
+			case 'paypal-details':
+				return !!withdrawData.value.stageValidation?.paypalDetails
 			case 'completion':
 				return true
 			default:
@@ -668,6 +703,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			},
 			result: null,
 			agreedTerms: false,
+			stageValidation: {},
 		}
 		currentStage.value = undefined
 	}

@@ -52,6 +52,7 @@
 			<TremendousDetailsStage v-else-if="currentStage === 'tremendous-details'" />
 			<MuralpayKycStage v-else-if="currentStage === 'muralpay-kyc'" />
 			<MuralpayDetailsStage v-else-if="currentStage === 'muralpay-details'" />
+			<LegacyPaypalDetailsStage v-else-if="currentStage === 'paypal-details'" />
 			<CompletionStage v-else-if="currentStage === 'completion'" />
 			<div v-else>Something went wrong</div>
 		</div>
@@ -120,6 +121,7 @@ import {
 
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
 import CompletionStage from './withdraw-stages/CompletionStage.vue'
+import LegacyPaypalDetailsStage from './withdraw-stages/LegacyPaypalDetailsStage.vue'
 import MethodSelectionStage from './withdraw-stages/MethodSelectionStage.vue'
 import MuralpayDetailsStage from './withdraw-stages/MuralpayDetailsStage.vue'
 import MuralpayKycStage from './withdraw-stages/MuralpayKycStage.vue'
@@ -146,10 +148,35 @@ const emit = defineEmits<{
 	(e: 'refresh-data' | 'hide'): void
 }>()
 
+// Must be defined before await to support defineExpose
+const withdrawModal = useTemplateRef<InstanceType<typeof NewModal>>('withdrawModal')
+const taxFormModal = ref<InstanceType<typeof CreatorTaxFormModal> | null>(null)
+const isSubmitting = ref(false)
+
+function show(preferred?: WithdrawStage) {
+	if (preferred) {
+		setStage(preferred, true)
+		withdrawModal.value?.show()
+		return
+	}
+
+	const firstStage = stages.value[0]
+	if (firstStage) {
+		setStage(firstStage, true)
+	}
+
+	withdrawModal.value?.show()
+}
+
+defineExpose({
+	show,
+})
+
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+const auth = await useAuth()
 
-const withdrawContext = createWithdrawContext(props.balance)
+const withdrawContext = createWithdrawContext(props.balance, auth)
 provideWithdrawContext(withdrawContext)
 
 const {
@@ -199,7 +226,8 @@ const leftButtonConfig = computed(() => {
 const rightButtonConfig = computed(() => {
 	const stage = currentStage.value
 	const isTaxFormStage = stage === 'tax-form'
-	const isDetailsStage = stage === 'muralpay-details' || stage === 'tremendous-details'
+	const isDetailsStage =
+		stage === 'muralpay-details' || stage === 'tremendous-details' || stage === 'paypal-details'
 
 	if (isTaxFormStage && needsTaxForm.value && remainingLimit.value > 0) {
 		return {
@@ -249,7 +277,6 @@ function continueWithLimit() {
 	setStage(nextStep.value)
 }
 
-const isSubmitting = ref(false)
 async function handleWithdraw() {
 	if (isSubmitting.value) return
 
@@ -260,7 +287,7 @@ async function handleWithdraw() {
 	} catch (error) {
 		console.error('Withdrawal failed:', error)
 
-		if ((error as any)?.data?.description?.toLower()?.includes('Tax form')) {
+		if ((error as any)?.data?.description?.toLower?.()?.includes('Tax form')) {
 			addNotification({
 				title: 'Please complete tax form',
 				text: 'You must complete a tax form to submit your withdrawal request.',
@@ -283,13 +310,15 @@ const shouldShowTitle = computed(() => {
 })
 
 const isDetailsStage = computed(() => {
-	const detailsStages: WithdrawStage[] = ['tremendous-details', 'muralpay-kyc', 'muralpay-details']
+	const detailsStages: WithdrawStage[] = [
+		'tremendous-details',
+		'muralpay-kyc',
+		'muralpay-details',
+		'paypal-details',
+	]
 	const current = currentStage.value
 	return current ? detailsStages.includes(current) : false
 })
-
-const withdrawModal = useTemplateRef<InstanceType<typeof NewModal>>('withdrawModal')
-const taxFormModal = ref<InstanceType<typeof CreatorTaxFormModal> | null>(null)
 
 function showTaxFormModal(e?: MouseEvent) {
 	withdrawModal.value?.hide()
@@ -320,25 +349,6 @@ function handleViewTransactions() {
 	withdrawModal.value?.hide()
 	navigateTo('/dashboard/revenue/transfers')
 }
-
-function show(preferred?: WithdrawStage) {
-	if (preferred) {
-		setStage(preferred, true)
-		withdrawModal.value?.show()
-		return
-	}
-
-	const firstStage = stages.value[0]
-	if (firstStage) {
-		setStage(firstStage, true)
-	}
-
-	withdrawModal.value?.show()
-}
-
-defineExpose({
-	show,
-})
 
 const messages = defineMessages({
 	taxFormStage: {

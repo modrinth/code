@@ -620,6 +620,14 @@ export const paymentMethodMessages = defineMessages({
 		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
 		defaultMessage: 'PayPal',
 	},
+	paypalInternational: {
+		id: 'omorphia.component.purchase_modal.payment_method_type.paypal_international',
+		defaultMessage: 'PayPal International',
+	},
+	paypalUS: {
+		id: 'omorphia.component.purchase_modal.payment_method_type.paypal_international',
+		defaultMessage: 'PayPal',
+	},
 	unionpay: {
 		id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
 		defaultMessage: 'UnionPay',

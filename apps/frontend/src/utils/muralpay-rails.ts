@@ -854,7 +854,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'USDC',
 		type: 'crypto',
-		fee: '≈ 0% + network',
+		fee: '≈ 1% + network',
 		blockchain: 'POLYGON',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
@@ -887,7 +887,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		name: defineMessage({ id: 'muralpay.rail.usdc-base.name', defaultMessage: 'USDC (Base)' }),
 		currency: 'USDC',
 		type: 'crypto',
-		fee: '≈ 0% + network',
+		fee: '≈ 1% + network',
 		blockchain: 'BASE',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
@@ -923,7 +923,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		}),
 		currency: 'USDC',
 		type: 'crypto',
-		fee: '≈ 0% + network',
+		fee: '≈ 1% + network',
 		blockchain: 'ETHEREUM',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',
@@ -956,7 +956,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 		name: defineMessage({ id: 'muralpay.rail.usdc-celo.name', defaultMessage: 'USDC (Celo)' }),
 		currency: 'USDC',
 		type: 'crypto',
-		fee: '≈ 0% + network',
+		fee: '≈ 1% + network',
 		blockchain: 'CELO',
 		warningMessage: defineMessage({
 			id: 'muralpay.warning.wallet-address',

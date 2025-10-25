@@ -716,6 +716,36 @@
   "dashboard.creator-withdraw-modal.nearing-threshold": {
     "message": "You're nearing the withdraw threshold. You can withdraw <b>{amountRemaining}</b> now, but a tax form is required for more."
   },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Disconnect account"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Payment method"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal account"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Connect your PayPal account to receive payments directly."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Save"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Venmo handle saved successfully!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Sign in with PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Enter your Venmo handle to receive payments."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Venmo handle"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@username"
+  },
   "dashboard.creator-withdraw-modal.stage.completion": {
     "message": "Complete"
   },
