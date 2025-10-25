@@ -134,7 +134,7 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
                 max: Decimal::from(100_000),
             },
             fee: PayoutMethodFee {
-                percentage: Decimal::ZERO,
+                percentage: Decimal::from(1) / Decimal::from(100),
                 min: Decimal::ZERO,
                 max: Some(Decimal::ZERO),
             },
