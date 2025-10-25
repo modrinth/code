@@ -679,6 +679,22 @@ export function createWithdrawContext(balance: any, auth: any): WithdrawContextV
 			return
 		}
 
+		const detailsStages: WithdrawStage[] = [
+			'tremendous-details',
+			'muralpay-details',
+			'paypal-details',
+		]
+		const isLeavingDetails = currentStage.value && detailsStages.includes(currentStage.value)
+		const isGoingToMethodSelection = stage === 'method-selection'
+
+		if (isLeavingDetails && isGoingToMethodSelection) {
+			withdrawData.value.calculation.amount = 0
+			withdrawData.value.calculation.fee = null
+			withdrawData.value.calculation.exchangeRate = null
+			withdrawData.value.agreedTerms = false
+			withdrawData.value.stageValidation = {}
+		}
+
 		currentStage.value = stage
 	}
 
