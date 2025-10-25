@@ -26,9 +26,9 @@
 			<div
 				v-for="(transactions, period) in groupedTransactions"
 				:key="period"
-				class="flex flex-col gap-4"
+				class="flex flex-col"
 			>
-				<h3 class="text-sm font-medium leading-6 text-primary md:text-base">{{ period }}</h3>
+				<h3 class="text-sm font-medium text-primary md:text-base">{{ period }}</h3>
 				<div class="flex flex-col gap-3 md:gap-4">
 					<RevenueTransaction
 						v-for="transaction in transactions"
