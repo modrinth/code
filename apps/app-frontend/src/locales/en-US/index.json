@@ -86,6 +86,9 @@
   "friends.add-friend.username.title": {
     "message": "What's your friend's Modrinth username?"
   },
+  "friends.add-friends-to-share": {
+    "message": "<link>Add friends</link> to see what they're playing!"
+  },
   "friends.friend.cancel-request": {
     "message": "Cancel request"
   },
@@ -121,6 +124,9 @@
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Sign in to a Modrinth account</link> to add friends and see what they're playing!"
   },
   "instance.add-server.add-and-play": {
     "message": "Add and play"
