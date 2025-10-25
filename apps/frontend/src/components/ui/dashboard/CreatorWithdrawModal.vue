@@ -5,7 +5,7 @@
 		:hide-header="currentStage === 'completion'"
 		:merge-header="currentStage === 'completion'"
 		:scrollable="true"
-		max-content-height="70vh"
+		max-content-height="72vh"
 		@on-hide="onModalHide"
 	>
 		<template #title>

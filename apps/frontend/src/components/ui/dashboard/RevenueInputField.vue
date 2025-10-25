@@ -20,7 +20,7 @@
 				</button>
 			</ButtonStyled>
 		</div>
-		<span class="text-secondary">
+		<span class="my-1 mt-2 text-secondary">
 			{{ formatMessage(financialMessages.available, { amount: formatMoney(maxAmount) }) }}
 		</span>
 	</div>

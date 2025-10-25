@@ -7,32 +7,30 @@
 				>
 			</label>
 
-			<div v-if="!isPayPalAuthenticated" class="flex flex-col gap-2">
-				<ButtonStyled color="standard">
+			<div class="flex flex-col gap-2">
+				<ButtonStyled color="standard" v-if="!isPayPalAuthenticated">
 					<a :href="paypalAuthUrl" class="w-min" @click="handlePayPalAuth">
 						<SSOPayPalIcon class="size-5" />
 						{{ formatMessage(messages.signInWithPaypal) }}
 					</a>
 				</ButtonStyled>
-				<span class="text-sm text-secondary">{{
-					formatMessage(messages.paypalAuthDescription)
-				}}</span>
+				<ButtonStyled v-else>
+					<button class="w-min" @click="handleDisconnectPaypal">
+						<XIcon /> {{ formatMessage(messages.disconnectButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
+		</div>
 
-			<div v-else class="flex flex-col gap-2">
-				<div
-					class="flex min-h-[44px] items-center justify-between gap-2 rounded-[14px] bg-surface-2 px-4 py-2.5 sm:min-h-0"
-				>
-					<div class="flex items-center gap-2">
-						<SSOPayPalIcon class="size-5 shrink-0" />
-						<span class="text-sm text-contrast sm:text-[1rem]">{{ paypalEmail }}</span>
-					</div>
-					<ButtonStyled type="outlined">
-						<button class="px-3 py-1 text-sm" @click="handleDisconnectPaypal">
-							{{ formatMessage(messages.disconnectButton) }}
-						</button>
-					</ButtonStyled>
-				</div>
+		<div v-if="isPayPal && isPayPalAuthenticated" class="flex flex-col gap-2.5">
+			<label>
+				<span class="text-md font-semibold text-contrast">{{
+					formatMessage(messages.account)
+				}}</span>
+			</label>
+
+			<div class="flex flex-col gap-2 rounded-2xl bg-surface-2 px-4 py-2.5">
+				<span>{{ paypalEmail }}</span>
 			</div>
 		</div>
 
@@ -105,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, SaveIcon, SSOPayPalIcon } from '@modrinth/assets'
+import { CheckIcon, SaveIcon, SSOPayPalIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, Checkbox, financialMessages, formFieldLabels } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
@@ -133,11 +131,11 @@ const selectedMethodDetails = computed(() => {
 })
 
 const isPayPalAuthenticated = computed(() => {
-	return !!(auth.value.user as any)?.paypal_id
+	return (auth.value.user as any)?.auth_providers?.includes('paypal') || false
 })
 
 const paypalEmail = computed(() => {
-	return (auth.value.user as any)?.paypal_email || ''
+	return (auth.value.user as any)?.payout_data?.paypal_address || ''
 })
 
 const paypalAuthUrl = computed(() => {
@@ -300,6 +298,10 @@ const messages = defineMessages({
 	paypalAccount: {
 		id: 'dashboard.creator-withdraw-modal.paypal-details.paypal-account',
 		defaultMessage: 'PayPal account',
+	},
+	account: {
+		id: 'dashboard.creator-withdraw-modal.paypal-details.account',
+		defaultMessage: 'Account',
 	},
 	signInWithPaypal: {
 		id: 'dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal',
