@@ -9,7 +9,7 @@
 
 			<div v-if="!isPayPalAuthenticated" class="flex flex-col gap-2">
 				<ButtonStyled color="standard">
-					<a :href="paypalAuthUrl" class="w-min">
+					<a :href="paypalAuthUrl" class="w-min" @click="handlePayPalAuth">
 						<SSOPayPalIcon class="size-5" />
 						{{ formatMessage(messages.signInWithPaypal) }}
 					</a>
@@ -118,7 +118,8 @@ import { getAuthUrl, removeAuthProvider, useAuth } from '@/composables/auth.js'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
-const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees } = useWithdrawContext()
+const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees, saveStateToStorage } =
+	useWithdrawContext()
 const { formatMessage } = useVIntl()
 const auth = await useAuth()
 
@@ -141,8 +142,14 @@ const paypalEmail = computed(() => {
 
 const paypalAuthUrl = computed(() => {
 	const route = useRoute()
-	return getAuthUrl('paypal', route.fullPath)
+	const separator = route.fullPath.includes('?') ? '&' : '?'
+	const returnUrl = `${route.fullPath}${separator}paypal_auth_return=true`
+	return getAuthUrl('paypal', returnUrl)
 })
+
+function handlePayPalAuth() {
+	saveStateToStorage()
+}
 
 async function handleDisconnectPaypal() {
 	try {

@@ -111,7 +111,7 @@ import {
 } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 
 import {
 	createWithdrawContext,
@@ -189,7 +189,32 @@ const {
 	resetData,
 	stages,
 	submitWithdrawal,
+	restoreStateFromStorage,
+	clearSavedState,
 } = withdrawContext
+
+onMounted(() => {
+	const route = useRoute()
+	const router = useRouter()
+
+	if (route.query.paypal_auth_return === 'true') {
+		const savedState = restoreStateFromStorage()
+
+		if (savedState?.data) {
+			withdrawData.value = { ...savedState.data }
+
+			nextTick(() => {
+				show(savedState.stage)
+			})
+
+			clearSavedState()
+		}
+
+		const query = { ...route.query }
+		delete query.paypal_auth_return
+		router.replace({ query })
+	}
+})
 
 const needsTaxForm = computed(() => {
 	if (!props.balance || currentStage.value !== 'tax-form') return false

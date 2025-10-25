@@ -158,6 +158,12 @@ export interface WithdrawData {
 	}
 }
 
+export interface SavedWithdrawState {
+	timestamp: number
+	stage: WithdrawStage
+	data: WithdrawData
+}
+
 export interface WithdrawContextValue {
 	currentStage: Ref<WithdrawStage | undefined>
 	stages: ComputedRef<WithdrawStage[]>
@@ -178,6 +184,9 @@ export interface WithdrawContextValue {
 	resetData: () => void
 	calculateFees: () => Promise<{ fee: number | null; exchange_rate: number | null }>
 	submitWithdrawal: () => Promise<void>
+	saveStateToStorage: () => void
+	restoreStateFromStorage: () => SavedWithdrawState | null
+	clearSavedState: () => void
 }
 
 export const [injectWithdrawContext, provideWithdrawContext] =
@@ -340,6 +349,9 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 
 	throw new Error('Invalid provider')
 }
+
+const STORAGE_KEY = 'modrinth_withdraw_state'
+const STATE_EXPIRY_MS = 15 * 60 * 1000 // 15 minutes
 
 export function createWithdrawContext(balance: any, auth: any): WithdrawContextValue {
 	const debug = useDebugLogger('CreatorWithdraw')
@@ -722,6 +734,7 @@ export function createWithdrawContext(balance: any, auth: any): WithdrawContextV
 			stageValidation: {},
 		}
 		currentStage.value = undefined
+		clearSavedState()
 	}
 
 	async function calculateFees(): Promise<{ fee: number | null; exchange_rate: number | null }> {
@@ -770,6 +783,54 @@ export function createWithdrawContext(balance: any, auth: any): WithdrawContextV
 		debug('Withdrawal submitted successfully', withdrawData.value.result)
 	}
 
+	function saveStateToStorage(): void {
+		const state: SavedWithdrawState = {
+			timestamp: Date.now(),
+			stage: currentStage.value || 'method-selection',
+			data: withdrawData.value,
+		}
+		try {
+			if (typeof localStorage !== 'undefined') {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+			}
+		} catch (e) {
+			console.warn('Failed to save withdraw state:', e)
+		}
+	}
+
+	function restoreStateFromStorage(): SavedWithdrawState | null {
+		try {
+			if (typeof localStorage === 'undefined') return null
+
+			const saved = localStorage.getItem(STORAGE_KEY)
+			if (!saved) return null
+
+			const state: SavedWithdrawState = JSON.parse(saved)
+			const age = Date.now() - state.timestamp
+
+			if (age > STATE_EXPIRY_MS) {
+				clearSavedState()
+				return null
+			}
+
+			return state
+		} catch (e) {
+			console.warn('Failed to restore withdraw state:', e)
+			clearSavedState()
+			return null
+		}
+	}
+
+	function clearSavedState(): void {
+		try {
+			if (typeof localStorage !== 'undefined') {
+				localStorage.removeItem(STORAGE_KEY)
+			}
+		} catch (e) {
+			console.warn('Failed to clear withdraw state:', e)
+		}
+	}
+
 	return {
 		currentStage,
 		stages,
@@ -787,5 +848,8 @@ export function createWithdrawContext(balance: any, auth: any): WithdrawContextV
 		resetData,
 		calculateFees,
 		submitWithdrawal,
+		saveStateToStorage,
+		restoreStateFromStorage,
+		clearSavedState,
 	}
 }
