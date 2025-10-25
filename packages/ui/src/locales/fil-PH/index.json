@@ -5,6 +5,9 @@
   "button.cancel": {
     "defaultMessage": "Kanselahin"
   },
+  "button.close": {
+    "defaultMessage": "Isara"
+  },
   "button.continue": {
     "defaultMessage": "Magpatuloy"
   },
@@ -281,6 +284,9 @@
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Edisyong Java"
   },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Mga plataproma"
+  },
   "project.about.creators.title": {
     "defaultMessage": "Mga tagagawa"
   },
@@ -298,6 +304,9 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Environment"
+  },
+  "project.settings.general.title": {
+    "defaultMessage": "General"
   },
   "project.settings.upload.title": {
     "defaultMessage": "Upload"
@@ -340,6 +349,9 @@
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Open source"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Plataporma"
   },
   "settings.display.theme.description": {
     "defaultMessage": "Pumili ng iyong gugustohing paksang-kulay para sa Modrinth ng nitong device."

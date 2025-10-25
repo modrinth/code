@@ -108,7 +108,7 @@
     "message": "% ЦП"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
+    "message": "Modrinth App работает лучше многих популярных Launchers, используя лишь 150 МБ ОЗУ!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -258,7 +258,7 @@
     "message": "Введите код двухфакторной аутентификации."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Введите код двухфакторной аутентификации"
+    "message": "Введите код двухкратной  аутентификации"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Введите код..."
@@ -459,7 +459,7 @@
     "message": "Почти исчерпан лимит {type} ({current}/{max})"
   },
   "create.limit-alert.approaching-limit-description": {
-    "message": "Почти достигнут лимит в {max} {type}. Увеличьте его, обратившись в поддержку."
+    "message": "Почти достигнут лимит в {max} {type}. Увеличьте его обратившись в поддержку."
   },
   "create.limit-alert.contact-support": {
     "message": "Связаться с поддержкой"
@@ -577,6 +577,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Ваши коллекции"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Скачать {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Налоговая декларация {formType} успешно отправлена!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Средства можно выводить. По вопросам и для обновления данных <support-link>обращайтесь в поддержку</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Готово! 🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Иностранная организация означает коммерческую организацию, созданную за пределами Соединённых Штатов (например, иностранную компанию, партнёрство или ООО)."
@@ -711,7 +723,7 @@
     "message": "Перейти в панель управления"
   },
   "landing.creator.feature.constantly-evolving.description": {
-    "message": "Получайте лучший опыт моддинга с постоянными обновлениями от команды Modrinth"
+    "message": "Получайте лучший опыт Modrinth с постоянными обновлениями от команды Modrinth"
   },
   "landing.creator.feature.constantly-evolving.title": {
     "message": "Постоянное развитие"
@@ -756,10 +768,10 @@
     "message": "Следите за тем, что нравится"
   },
   "landing.feature.launcher.description": {
-    "message": "Наш открытый API позволяет глубже интегрироваться с Modrinth — используйте <link>наше приложение</link> или сторонние лаунчеры наподобие ATLauncher, MultiMC и Prism Launcher."
+    "message": "Наш открытый API позволяет глубже интегрироваться с Modrinth — используйте <link>наше приложение</link> или сторонние Launchers наподобие ATLauncher, MultiMC и Prism Launcher."
   },
   "landing.feature.launcher.heading": {
-    "message": "Играйте с вашим любимым лаунчером"
+    "message": "Играйте с вашим любимым launcher"
   },
   "landing.feature.search.description": {
     "message": "Мгновенный поиск и мощные фильтры Modrinth позволяют находить контент уже во время ввода."
@@ -768,10 +780,10 @@
     "message": "Ищите нужное быстро и легко"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "Место для Minecraft {content}"
+    "message": "Место Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "датапаков"
+    "message": "Дата паков"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
     "message": "сборок"
@@ -783,7 +795,7 @@
     "message": "плагинов"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "наборов ресурсов"
+    "message": "Наборов ресурсов"
   },
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "серверов"
@@ -804,7 +816,7 @@
     "message": "Prism Launcher"
   },
   "landing.notifications.has-been-updated": {
-    "message": "{title} обновлён!"
+    "message": "{title} Обновлён!"
   },
   "landing.notifications.heading": {
     "message": "Уведомления"
@@ -813,7 +825,7 @@
     "message": "Получено {time}"
   },
   "landing.notifications.version-released": {
-    "message": "Выпущена версия {version} для {gameVersion}"
+    "message": "Выпущена версия {version} была выпущена  {gameVersion}"
   },
   "landing.search.label": {
     "message": "Поиск"
@@ -888,13 +900,13 @@
     "message": "В целях безопасности Modrinth просит вас привязать электронный адрес к учётной записи."
   },
   "layout.banner.build-fail.description": {
-    "message": "При развёртывании фронтенда Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Повторите сборку, когда API будет доступен. Коды ошибок: {errors}; Текущий URL-адрес API: {url}"
+    "message": "При развёртывании фронтона Modrinth не удалось сгенерировать состояние от API. Причиной может быть временный сбой или неверная настройка. Повторите сборку, когда API будет доступен. Коды ошибок: {errors}; Текущий URL-адрес API: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "Ошибка генерации состояния от API во время сборки."
   },
   "layout.banner.staging.description": {
-    "message": "Тестовая среда полностью отделена от основной базы данных Modrinth и нужна для тестирования и отладки. Фронтенд и бэкенд здесь могут быть новее, чем на основном сайте."
+    "message": "Тестовая среда полностью отделена от основной базы данных Modrinth и нужна для тестирования и отладки. Протеид и бекхенд здесь могут быть новее, чем на основном сайте."
   },
   "layout.banner.staging.title": {
     "message": "Вы находитесь в тестовой среде Modrinth"
@@ -1014,7 +1026,7 @@
     "message": "Меню"
   },
   "layout.meta.description": {
-    "message": "Скачивайте моды, плагины, датапаки, шейдеры, ресурс-паки и сборки для Minecraft на Modrinth. Ищите и публикуйте проекты на Modrinth, используя удобный современный интерфейс и API."
+    "message": "Скачивайте моды, плагины, дата паки, шейдер, ресурс-банки и сборки для Minecraft на Modrinth. Ищите и публикуйте проекты на Modrinth, используя удобный современный интерфейс и API."
   },
   "layout.meta.og-description": {
     "message": "Ищите и публикуйте проекты для Minecraft!"
@@ -1974,7 +1986,7 @@
     "message": "Удалить этот способ оплаты"
   },
   "settings.billing.modal.delete.description": {
-    "message": "Этот способ оплаты будет удалён навсегда. Совсем."
+    "message": "Этот способ оплаты будет удалён навсегда (буквально навсегда)."
   },
   "settings.billing.modal.delete.title": {
     "message": "Вы действительно хотите удалить этот способ оплаты?"
@@ -2175,10 +2187,10 @@
     "message": "Изменение языка сайта может привести к отображению части контента на английском, если перевод недоступен или пока невозможен. Мы всё ещё работаем над системой локализации, поэтому иногда что-то может отображаться неправильно."
   },
   "settings.pats.action.create": {
-    "message": "Создать PAT"
+    "message": "Создать токен доступа"
   },
   "settings.pats.description": {
-    "message": "PAT можно использовать для обращения к API Modrinth. Ознакомьтесь с <doc-link>документацией к Modrinth's API </doc-link>. Их можно создавать и удалять в любое время."
+    "message": "Токены доступа можно использовать для обращения к API Modrinth — ознакомьтесь с <doc-link>документацией по API</doc-link>. Их можно создавать и удалять в любое время."
   },
   "settings.pats.modal.create.action": {
     "message": "Создать токен доступа"
@@ -2193,19 +2205,19 @@
     "message": "Введите название токена..."
   },
   "settings.pats.modal.create.title": {
-    "message": "Создать персональный токен доступа"
+    "message": "Создание персонального токена доступа"
   },
   "settings.pats.modal.delete.action": {
-    "message": "Удалить токен"
+    "message": "Удалить этот токен"
   },
   "settings.pats.modal.delete.description": {
-    "message": "Данное действие навсегда удалит этот токен (ну буквально навсегда)."
+    "message": "Этот токен будет удалён навсегда (буквально навсегда)."
   },
   "settings.pats.modal.delete.title": {
-    "message": "Вы уверены, что хотите удалить данный токен?"
+    "message": "Вы действительно хотите удалить этот токен?"
   },
   "settings.pats.modal.edit.title": {
-    "message": "Редактировать персональный токен доступа"
+    "message": "Изменение персонального токена доступа"
   },
   "settings.pats.token.action.edit": {
     "message": "Изменить токен"
@@ -2214,28 +2226,28 @@
     "message": "Отозвать токен"
   },
   "settings.pats.token.expired-ago": {
-    "message": "Устарел {ago}"
+    "message": "Истёк {ago}"
   },
   "settings.pats.token.expires-in": {
-    "message": "Устареет {inTime}"
+    "message": "Истечёт {inTime}"
   },
   "settings.pats.token.last-used": {
-    "message": "Последнее использование {ago}"
+    "message": "Активность: {ago}"
   },
   "settings.pats.token.never-used": {
-    "message": "Никогда не использовался"
+    "message": "Не использовался"
   },
   "settings.profile.bio.description": {
-    "message": "Небольшое описание, чтобы рассказать всем немного о себе."
+    "message": "Возможность кратко рассказать всем о себе."
   },
   "settings.profile.bio.title": {
-    "message": "Описание"
+    "message": "О себе"
   },
   "settings.profile.description": {
-    "message": "Информация о вашем профиле доступна публично на Modrinth и через <docs-link>Modrinth API</docs-link>."
+    "message": "Информация в вашем профиле доступна публично на Modrinth и через <docs-link>API Modrinth</docs-link>."
   },
   "settings.profile.profile-info": {
-    "message": "Информация профиля"
+    "message": "Информация в профиле"
   },
   "settings.profile.profile-picture.reset": {
     "message": "Сбросить"
@@ -2244,25 +2256,25 @@
     "message": "Изображение профиля"
   },
   "settings.profile.username.description": {
-    "message": "Уникальное имя, не зависящее от регистра, для идентификации вашего профиля."
+    "message": "Уникальное имя для идентификации профиля (регистр не имеет значения)."
   },
   "settings.profile.username.title": {
     "message": "Имя пользователя"
   },
   "settings.sessions.action.revoke-session": {
-    "message": "Удалить сессию"
+    "message": "Завершить сеанс"
   },
   "settings.sessions.created-ago": {
-    "message": "Создан {ago}"
+    "message": "Запущен {ago}"
   },
   "settings.sessions.current-session": {
-    "message": "Текущая сессия"
+    "message": "Текущий сеанс"
   },
   "settings.sessions.description": {
-    "message": "Здесь перечислены все устройства, которые в настоящее время вошли в систему с помощью вашей учетной записи Modrinth. Вы можете выйти из каждого устройства по отдельности.\n\nЕсли вы видите запись, которую не узнаете, выйдите из этого устройства и немедленно измените пароль учетной записи Modrinth."
+    "message": "Ниже представлены все устройства, с которых осуществлён вход в вашу учётную запись Modrinth. Вы можете управлять сеансом каждого из них по отдельности.\n\nЕсли среди них присутствует незнакомое устройство, незамедлительно завершите его сеанс и смените пароль своей учётной записи."
   },
   "settings.sessions.last-accessed-ago": {
-    "message": "Последняя активность {ago}"
+    "message": "Активность: {ago}"
   },
   "settings.sessions.unknown-os": {
     "message": "Неизвестная ОС"
@@ -2274,6 +2286,6 @@
     "message": "Последние новости от Modrinth"
   },
   "ui.latest-news-row.view-all": {
-    "message": "Все новости"
+    "message": "Посмотреть все новости"
   }
 }

@@ -428,6 +428,9 @@
   "create.collection.cancel": {
     "message": "取消"
   },
+  "create.collection.collection-info": {
+    "message": ""
+  },
   "create.collection.create-collection": {
     "message": "新建收藏夹"
   },
@@ -440,11 +443,32 @@
   "create.collection.name-placeholder": {
     "message": "输入收藏夹名称……"
   },
+  "create.collection.summary-description": {
+    "message": "一两句话描述你的收藏夹。"
+  },
   "create.collection.summary-label": {
     "message": "收藏夹概述"
   },
+  "create.collection.summary-placeholder": {
+    "message": "一个收藏夹……"
+  },
   "create.collection.title": {
     "message": "新建收藏夹"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "接近 {type} 限制 ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "你即将达到{type}限制，如需超过{max} {typePlural}，请联系客服。"
+  },
+  "create.limit-alert.contact-support": {
+    "message": "联系客服"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "已达到 {type} 限制"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "你已达到你的 {type} 限制 {max}。请联系客服增加你的限额。"
   },
   "create.limit-alert.type-collection": {
     "message": "收藏夹"
@@ -479,8 +503,20 @@
   "create.organization.name-placeholder": {
     "message": "输入组织名称……"
   },
+  "create.organization.ownership-info": {
+    "message": "你将成为这个组织的所有者，但你可以随时邀请其他成员并转让所有权。"
+  },
+  "create.organization.summary-description": {
+    "message": "一两句话描述你的组织。"
+  },
   "create.organization.summary-label": {
     "message": "组织概述"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "一个组织……"
+  },
+  "create.organization.title": {
+    "message": "创建组织"
   },
   "create.organization.url-label": {
     "message": "URL"
@@ -500,14 +536,23 @@
   "create.project.name-placeholder": {
     "message": "输入项目名称"
   },
+  "create.project.summary-description": {
+    "message": "一两句话描述你的项目。"
+  },
   "create.project.summary-label": {
     "message": "项目概述"
+  },
+  "create.project.summary-placeholder": {
+    "message": "这个项目增加了……"
   },
   "create.project.title": {
     "message": "创建项目"
   },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "你的项目在获得批准后的可见性。"
   },
   "create.project.visibility-label": {
     "message": "可见性"
@@ -532,6 +577,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "你的收藏夹"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "下载{formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "您的{formType}税务表格已成功提交！"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "你现在可以随时自由提现。如有疑问或需要更新账户信息，请<support-link>联系客服</support-link>。"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "搞定啦！🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "外国实体指的是在美国以外组织的企业实体（例如非美国公司、合伙企业或有限责任公司）。"
@@ -577,6 +634,12 @@
   },
   "error.generic.404.title": {
     "message": "页面不存在"
+  },
+  "error.generic.451.subtitle": {
+    "message": "由于法律原因，例如政府审查或正在进行的法律诉讼，本页面已被屏蔽。"
+  },
+  "error.generic.451.title": {
+    "message": "因法律原因无法提供内容"
   },
   "error.generic.default.list_item.1": {
     "message": "在我们的<status-link>状态页面</status-link>上查看 Modrinth 服务是否中断。"

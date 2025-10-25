@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Le tue raccolte"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Scarica {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Il tuo modulo fiscale {formType} è stato inviato con successo!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Ora puoi nuovamente ritirare denaro. Se hai altre domande o devi aggiornare le tue informazioni <support-link>contatta l'assistenza</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Tutto fatto! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Entità estera fa riferimento a un'entità commerciale stabilita fuori dagli Stati Uniti (per esempio società, partenariati, o LLC non statunitensi)."
   },

@@ -154,6 +154,63 @@
   },
   "nags.settings.tags.title": {
     "defaultMessage": "בקר בהגדרות התגיות"
+  },
+  "nags.settings.title": {
+    "defaultMessage": "בקר בהגדרות כלליות"
+  },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "התקציר שלך לא יכול להיות זהה לשם הפרוייקט שלך. זה חשוב ליצור תקציר אינפורמטיבי ומעניין."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "עשה את התקציר שלך ייחודי"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "התקציר שלך לא יכול לכלול פרמוט, הפסקות שורה, תווים מיוחדים או קישורים, מכיוון שהוא יוצג בטקסט פשוט."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "נקה את התקציר"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "התקציר שלך באורך {length} תווים. מומלץ לרשום לפחות {minChars} תווים על מנת ליצור תקציר אינפורמטיבי ומעניין."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "הארך את התקציר"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "שמירת שם הפרוייקט שלך נקי הופך אותו לקל יותר לזכירה ולמציאה. פרטים אודות גרסה וטוען המודים מופיעים באופן אוטומטי לצד שם הפרוייקט."
+  },
+  "nags.title-contains-technical-info.title": {
+    "defaultMessage": "נקה את השם"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "בחרת {tagCount} תגים. שקול להפחית את כמות התגים ל {maxTagCount} או פחות על מנת שהפרוייקט שלך יופיע בחיפושים הרלוונטיים."
+  },
+  "nags.too-many-tags.title": {
+    "defaultMessage": "בחר תגים מדוייקים"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "לפחות תמונת גלריה אחת נדרשת בכדי להציג את התוכן של {type}{resourcepackMessage}."
+  },
+  "nags.upload-gallery-image.title": {
+    "defaultMessage": "העלה תמונת גלריה"
+  },
+  "nags.upload-version.description": {
+    "defaultMessage": "לפחות גרסה אחת נדרשת כדי להגיש פרוייקט לבדיקה."
+  },
+  "nags.upload-version.title": {
+    "defaultMessage": "העלה גרסה"
+  },
+  "nags.verify-external-links.description": {
+    "defaultMessage": "חלק מהקישורים החיצוניים שלך עלולים לכלול דומיינים לא ראויים לסוג הקישור הזה."
+  },
+  "nags.verify-external-links.title": {
+    "defaultMessage": "אשר קישורים חיצוניים"
+  },
+  "nags.versions.title": {
+    "defaultMessage": "בקר בדף הגרסאות"
+  },
+  "nags.visit-links-settings.title": {
+    "defaultMessage": "בקר בהגדרות הקישורים"
   }
 }
 

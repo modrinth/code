@@ -3,7 +3,7 @@
     "defaultMessage": "Beta"
   },
   "badge.beta-release": {
-    "defaultMessage": "Em beta"
+    "defaultMessage": "Versão Beta"
   },
   "badge.new": {
     "defaultMessage": "Novo"
@@ -81,10 +81,10 @@
     "defaultMessage": "Salvando"
   },
   "button.sign-in": {
-    "defaultMessage": "Iniciar sessão"
+    "defaultMessage": "Entrar"
   },
   "button.sign-out": {
-    "defaultMessage": "Desconectar-se"
+    "defaultMessage": "Sair"
   },
   "button.sign-up": {
     "defaultMessage": "Entrar"

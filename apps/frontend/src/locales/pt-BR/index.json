@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Suas coleções"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Baixar {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Seu formulário de imposto {formType} foi enviado com sucesso!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Você já pode sacar livremente. Se tiver dúvidas ou precisar atualizar suas informações, <support-link>entre em contato com o suporte</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Tudo pronto! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Uma entidade estrangeira significa uma entidade comercial organizada fora dos Estados Unidos (como uma corporação, parceria ou LLC não americana)."
   },
@@ -723,7 +735,7 @@
     "message": "Dados e estatísticas"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Faça com que seu projeto seja descoberto por milhares de usuários nas buscas, em nossa página inicial, no servidor de Discord e muitas outras formas que virão no futuro!"
+    "message": "Faça com que seu projeto seja descoberto por milhares de usuários nas buscas, em nossa página inicial, no servidor de Discord e muitas outras formas que chegarão no futuro!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Descoberta"

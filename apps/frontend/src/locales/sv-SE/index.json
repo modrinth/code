@@ -407,6 +407,9 @@
   "collection.title": {
     "message": "{name} - samling"
   },
+  "create.organization.summary-label": {
+    "message": "Sammanfattning"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Skapa ny"
   },

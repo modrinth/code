@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Twoje kolekcje"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Pobierz {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Twój formularz podatkowy {formType} został pomyślnie przesłany!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Możesz teraz wypłacać bez ograniczeń. Jeżeli masz pytania lub chcesz zaktualizować swoje dane, <support-link>skontaktuj się z obsługą</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Gotowe! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Podmiot zagraniczny oznacza podmiot gospodarczy zorganizowany poza Stanami Zjednoczonymi (na przykład korporacja spoza Stanów Zjednoczonych, spółka osobowa bądź sp. z o.o.)."
   },
@@ -722,8 +734,14 @@
   "landing.creator.feature.data-statistics.title": {
     "message": "Dane i statystyki"
   },
+  "landing.creator.feature.discovery.description": {
+    "message": "Spraw, by tysiące użytkowników mogło znaleźć Twój projekt przez wyszukiwarkę, naszą stronę główną, serwer Discord, i nie tylko!"
+  },
   "landing.creator.feature.discovery.title": {
     "message": "Odkrycie"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Integruj swoje narzędzia budowania poprzez Minotaur, by automatycznie aktualizować swoje projekty gdy tylko wydasz nową wersję"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Zróżnicowany ekosystem"
@@ -836,6 +854,9 @@
   "landing.section.for-players.tagline": {
     "message": "Odkryj ponad {count} kreacji"
   },
+  "landing.subheading": {
+    "message": "Odkrywaj, graj i udostępniaj treści Minecraft poprzez naszą otwartoźródłową platformę, stworzoną dla społeczności."
+  },
   "layout.action.change-theme": {
     "message": "Zmień motyw"
   },
@@ -898,6 +919,12 @@
   },
   "layout.banner.subscription-payment-failed.title": {
     "message": "Wymagana akcja w sprawie płatności."
+  },
+  "layout.banner.tax.action": {
+    "message": "Wypełnij formularz podatkowy"
+  },
+  "layout.banner.tax.description": {
+    "message": "Wypłaciłeś/aś ponad 600$ z Modrinth w tym roku. Aby spełnić wymogi podatkowe, musisz wypełnić formularz podatkowy. Twoje wypłaty są spauzowane, aż nie wypełnisz formularza podatkowego."
   },
   "layout.banner.tax.title": {
     "message": "Wymagany jest formularz podatkowy"

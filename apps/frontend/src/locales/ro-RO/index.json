@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Colecțiile tale"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Descarcă {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Formularul tău fiscal {formType} a fost trimis cu succes!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Poți retrage liber acum. Dacă ai întrebări sau trebuie să îți actualizezi detaliile, <support-link>contactează suportul</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Totul este pregătit! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "O entitate străină înseamnă o entitate de afaceri organizată în afara Statelor Unite (cum ar fi o corporație, un parteneriat sau un SRL non-SUA)."
   },

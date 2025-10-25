@@ -174,13 +174,13 @@
     "message": "Название"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Настройки запуска"
+    "message": "Команды запуска"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
     "message": "Изменение команд запуска"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Позволяют опытным пользователям задать системные команды, выполняемые перед запуском и после закрытия игры."
+    "message": "Позволяет опытным пользователям задать системные команды, выполняемые до и после запуска игры."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "После выхода"
@@ -201,7 +201,7 @@
     "message": "Введите команду перед запуском..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Настройки запуска игры"
+    "message": "Команды запуска игры"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Обёртка"
@@ -303,7 +303,7 @@
     "message": "Восстановить сборку?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Выполняется исправление..."
+    "message": "Выполняется исправление"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Сбросить выбор"

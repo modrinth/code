@@ -35,6 +35,15 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.mod-management.description": {
+    "message": "Pinapadali ng Modrinth na ma-manage ang lahat ng iyong mod sa iisang lugar. Makaka-install, uninstall, at update ng mga mod sa iisang pindot lang."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Mga na-install na mod"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Pangalan"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
   },
@@ -59,6 +68,9 @@
   "auth.verify-email.action.account-settings": {
     "message": "Mga setting sa account"
   },
+  "auth.verify-email.post-verification.description": {
+    "message": "Tagumpay na napatunayan ang adres ng iyong email!"
+  },
   "auth.welcome.description": {
     "message": "Ikaw ay parte na ngayon ng kahanga-hangang komunidad na ito ng mga tagagawa at manlalalakbay na nagtataguyod, nagda-download, at nananatiling napapanahon sa mga nakamamanghang na mga mod."
   },
@@ -71,6 +83,18 @@
   "collection.delete-modal.description": {
     "message": "Habambuhay na matatanggal ang koleksiyong ito. Hindi mababawi ang pagkilos na ito."
   },
+  "collection.error.not-found": {
+    "message": "Hindi mahanap ang koleksiyon"
+  },
+  "create.collection.name-label": {
+    "message": "Pangalan"
+  },
+  "create.organization.name-label": {
+    "message": "Pangalan"
+  },
+  "create.project.name-label": {
+    "message": "Pangalan"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Ang banyagang entidad ay isang kalakalang entidad na nakaayos sa labas ng Estados Unidos (tulod ng di-US na korporasyon, partnership, o LLC)."
   },
@@ -80,6 +104,9 @@
   "dashboard.creator-tax-form-modal.entity.question": {
     "message": "Isa ka bang pribadong indibidwal o parte ng isang banyagang entidad?"
   },
+  "error.collection.404.list_title": {
+    "message": "Bakit?"
+  },
   "landing.creator.feature.data-statistics.description": {
     "message": "Makatanggap ng detalyadong reporta ng mga pagtingin ng pahina, bilang ng pagdownload, at revenue"
   },
@@ -88,6 +115,9 @@
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
     "message": "mga resource pack"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "Na-update ang {title}!"
   },
   "landing.subheading": {
     "message": "Magtuklas, maglaro, at magbahagi ng mga Minecraft content sa aming open-source na platapormang ginawa para sa komunidad."
@@ -101,11 +131,17 @@
   "layout.banner.add-email.button": {
     "message": "Mga setting sa account"
   },
+  "layout.banner.add-email.description": {
+    "message": "Dahil sa mga kadahilang pangseguridad, kailangan ng Modrinth na makapag-register ka ng email address sa iyong akawnt."
+  },
   "layout.banner.build-fail.description": {
     "message": "Itong pinakalat na frontend ng Modrinth ay bigong makabuo ng estato galing sa API. Maaaring dahil ito sa isang outage o error sa konpigurasyon. Muling itayo kapag magagamit na ang API. Error codes: {errors}; Kasalukuyang URL ng API ay: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "May error sa pagbuo ng estado galing sa API habang nagpapatayo."
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Dahil sa mga kadahilang pangseguridad, kailangan ng Modrinth na mapatunayan ang email address sa iyong akawnt."
   },
   "layout.footer.about": {
     "message": "Tungkol"
@@ -224,8 +260,14 @@
   "project-type.resourcepack.singular": {
     "message": "Resource Pack"
   },
+  "project.about.details.updated": {
+    "message": "In-update {date}"
+  },
   "project.download.game-version": {
     "message": "Bersiyon ng laro: {version}"
+  },
+  "project.download.install-with-app": {
+    "message": "I-install gamit ang Modrinth App"
   },
   "project.download.no-app": {
     "message": "Wala kang Modrinth App?"
@@ -238,6 +280,9 @@
   },
   "project.download.select-game-version": {
     "message": "Piliin ang lahat ng bersiyon ng laro"
+  },
+  "project.download.select-platform": {
+    "message": "Pumili ng plataporma"
   },
   "project.download.show-all-versions": {
     "message": "Ipakita ang lahat ng bersiyon"
@@ -305,7 +350,13 @@
   "settings.display.theme.description": {
     "message": "Pumili ng iyong gugustohing paksang-kulay para sa Modrinth ng nitong device."
   },
+  "settings.pats.modal.create.name.label": {
+    "message": "Pangalan"
+  },
   "settings.sessions.description": {
     "message": "Narito ang lahat ng mga device na kasalukuyang nakalog-in sa iyong Modrinth account. Maaari mong maisaisang malog-out ang bawat isa.\n\nKung makakita ka ng isang hindi mo nakikilala, maglog-out sa device na iyon at agarang palitan ang password ng iyong Modrinth account."
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Hindi kilalang plataforma"
   }
 }
