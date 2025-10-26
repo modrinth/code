@@ -11,7 +11,7 @@
 
 Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth web interface and app. It contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=black&label=) contributors!
 
-If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com) and download the latest release of the app [here](https://modrinth.com/app).
+If you're not a developer and you've stumbled upon this repository, the website is here: [Modrinth website](https://modrinth.com) and download the latest release of the app here: [download](https://modrinth.com/app).
 
 ## Development
 
