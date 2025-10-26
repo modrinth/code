@@ -59,7 +59,7 @@
 		<template #actions>
 			<div v-if="currentStage === 'completion'" class="mt-4 flex w-full gap-3">
 				<ButtonStyled class="flex-1">
-					<button class="w-full text-contrast" @click="withdrawModal?.hide()">
+					<button class="w-full text-contrast" @click="handleClose">
 						{{ formatMessage(messages.closeButton) }}
 					</button>
 				</ButtonStyled>
@@ -71,7 +71,11 @@
 			</div>
 			<div v-else class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
 				<ButtonStyled type="outlined">
-					<button class="!border-surface-5" :disabled="leftButtonConfig.disabled" @click="leftButtonConfig.handler">
+					<button
+						class="!border-surface-5"
+						:disabled="leftButtonConfig.disabled"
+						@click="leftButtonConfig.handler"
+					>
 						<component :is="leftButtonConfig.icon" />
 						{{ leftButtonConfig.label }}
 					</button>
@@ -80,14 +84,14 @@
 					<button :disabled="rightButtonConfig.disabled" @click="rightButtonConfig.handler">
 						<component
 							:is="rightButtonConfig.icon"
-							:class="rightButtonConfig.iconClass"
 							v-if="rightButtonConfig.iconPosition === 'before'"
+							:class="rightButtonConfig.iconClass"
 						/>
 						{{ rightButtonConfig.label }}
 						<component
 							:is="rightButtonConfig.icon"
-							:class="rightButtonConfig.iconClass"
 							v-if="rightButtonConfig.iconPosition === 'after'"
+							:class="rightButtonConfig.iconClass"
 						/>
 					</button>
 				</ButtonStyled>
@@ -178,9 +182,8 @@ defineExpose({
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
-const auth = await useAuth()
 
-const withdrawContext = createWithdrawContext(props.balance, auth)
+const withdrawContext = createWithdrawContext(props.balance)
 provideWithdrawContext(withdrawContext)
 
 const {
@@ -375,6 +378,11 @@ function onModalHide() {
 
 function goToBreadcrumbStage(stage: WithdrawStage) {
 	setStage(stage, true)
+}
+
+function handleClose() {
+	withdrawModal.value?.hide()
+	emit('refresh-data')
 }
 
 function handleViewTransactions() {

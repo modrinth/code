@@ -716,6 +716,9 @@
   "dashboard.creator-withdraw-modal.nearing-threshold": {
     "message": "You're nearing the withdraw threshold. You can withdraw <b>{amountRemaining}</b> now, but a tax form is required for more."
   },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Account"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
     "message": "Disconnect account"
   },
@@ -851,6 +854,9 @@
   "dashboard.revenue.withdraw.header": {
     "message": "Withdraw"
   },
+  "dashboard.withdraw.completion.account": {
+    "message": "Account"
+  },
   "dashboard.withdraw.completion.amount": {
     "message": "Amount"
   },
@@ -861,7 +867,7 @@
     "message": "Date"
   },
   "dashboard.withdraw.completion.email-confirmation": {
-    "message": "You will receive an email at <b>{email}</b> from our partner, Tremendous, with instructions to redeem your withdrawal."
+    "message": "You'll receive an email at <b>{email}</b> with instructions to redeem your withdrawal."
   },
   "dashboard.withdraw.completion.exchange-rate": {
     "message": "Exchange rate"
@@ -883,6 +889,9 @@
   },
   "dashboard.withdraw.completion.transactions-button": {
     "message": "Transactions"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Wallet"
   },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."

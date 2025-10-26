@@ -79,8 +79,8 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 import { computed } from 'vue'
 
-import { normalizeChildren } from '@/utils/vue-children.ts'
 import { TAX_THRESHOLD_ACTUAL } from '@/providers/creator-withdraw.ts'
+import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const props = defineProps<{
 	balance: any

@@ -341,7 +341,25 @@ const processingDate = computed<{ date: string; amount: number }>(() => {
 	const nextDates = nextDate.value
 	if (!nextDates.length) return { date: '', amount: 0 }
 
-	return nextDates[nextDates.length - 1]
+	const now = dayjs()
+	const currentMonth = now.format('YYYY-MM')
+
+	// Find revenue from the current month (still "processing")
+	// Revenue earned in month X becomes available at end_of_month(X) + 60 days
+	// So we calculate: source_month = (date_available - 60 days).startOf('month')
+	for (const { date, amount } of nextDates) {
+		const availableDate = dayjs(date)
+		const sourceMonthEnd = availableDate.subtract(60, 'days')
+		const sourceMonth = sourceMonthEnd.startOf('month').format('YYYY-MM')
+
+		// If this revenue is from the current month, it's still "processing"
+		if (sourceMonth === currentMonth) {
+			return { date, amount: Number(amount) }
+		}
+	}
+
+	// No revenue from current month found
+	return { date: '', amount: 0 }
 })
 
 const grandTotal = computed(() =>
@@ -390,7 +408,13 @@ const dateSegments = computed(() => {
 			textClass: string
 		}>
 
-	return dates.slice(0, -1).map((d, i) => ({
+	const processing = processingDate.value
+
+	// Filter out the processing date (current month's revenue)
+	// Show only finalized pending dates as "Estimated"
+	const estimatedDates = processing.date ? dates.filter((d) => d.date !== processing.date) : dates
+
+	return estimatedDates.map((d, i) => ({
 		...d,
 		stripeClass: dateStripeClasses[i % dateStripeClasses.length],
 		highlightClass: dateHighlightClasses[i % dateHighlightClasses.length],
@@ -403,8 +427,10 @@ const segments = computed<RevenueBarSegment[]>(() => {
 	const dates = nextDate.value || []
 	const processing = processingDate.value
 
-	const upcoming = dates.slice(0, Math.max(0, dates.length - 1))
-	const totalPending = dates.reduce((sum, d) => sum + (Number(d.amount) || 0), 0)
+	// Filter out processing date from upcoming dates (same logic as dateSegments)
+	const upcoming = processing.date ? dates.filter((d) => d.date !== processing.date) : dates
+
+	const totalPending = userBalance.value?.pending ?? 0
 	const total = available + totalPending
 
 	if (total <= 0) return [] as RevenueBarSegment[]
@@ -433,14 +459,14 @@ const segments = computed<RevenueBarSegment[]>(() => {
 		})
 	})
 
-	if (processing?.amount) {
-		segs.push({
-			key: 'processing',
-			class: 'zone--striped--gray bg-button-bg',
-			width: (Number(processing.amount) || 0) / total,
-			amount: Number(processing.amount) || 0,
-		})
-	}
+	// Always show processing section (even if $0)
+	const processingAmt = Number(processing.amount) || 0
+	segs.push({
+		key: 'processing',
+		class: 'zone--striped--gray bg-button-bg',
+		width: processingAmt / total,
+		amount: processingAmt,
+	})
 
 	let acc = 0
 	const normalized = segs.map((s, idx) => {

@@ -8,7 +8,7 @@
 			</label>
 
 			<div class="flex flex-col gap-2">
-				<ButtonStyled color="standard" v-if="!isPayPalAuthenticated">
+				<ButtonStyled v-if="!isPayPalAuthenticated" color="standard">
 					<a :href="paypalAuthUrl" class="w-min" @click="handlePayPalAuth">
 						<SSOPayPalIcon class="size-5" />
 						{{ formatMessage(messages.signInWithPaypal) }}
