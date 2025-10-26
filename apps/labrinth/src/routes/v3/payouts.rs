@@ -676,7 +676,10 @@ async fn tremendous_payout(
         sent_to_method,
         payouts_queue,
     }: PayoutContext<'_>,
-    TremendousDetails { delivery_email }: &TremendousDetails,
+    TremendousDetails {
+        delivery_email,
+        currency,
+    }: &TremendousDetails,
 ) -> Result<DBPayout, ApiError> {
     let user_email = get_verified_email(user)?;
 
@@ -717,7 +720,8 @@ async fn tremendous_payout(
                 },
                 "rewards": [{
                     "value": {
-                        "denomination": sent_to_method
+                        "denomination": sent_to_method,
+                        "currency_code": currency.map(|s| s.to_string()),
                     },
                     "delivery": {
                         "method": "EMAIL"
