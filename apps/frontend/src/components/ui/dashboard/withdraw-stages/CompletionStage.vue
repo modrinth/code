@@ -28,6 +28,17 @@
 					</span>
 				</div>
 				<div
+					v-if="destinationLabel && destinationValue"
+					class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
+				>
+					<span class="text-sm font-normal text-primary sm:text-[1rem]">
+						{{ destinationLabel }}
+					</span>
+					<span class="break-words font-mono text-sm font-semibold text-contrast sm:text-[1rem]">
+						{{ destinationValue }}
+					</span>
+				</div>
+				<div
 					class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
 				>
 					<span class="text-sm font-normal text-primary sm:text-[1rem]">
@@ -183,6 +194,53 @@ const formattedLocalCurrency = computed(() => {
 	}
 })
 
+const isMuralPayWithdrawal = computed(() => {
+	return withdrawData.value.providerData.type === 'muralpay'
+})
+
+const destinationLabel = computed(() => {
+	if (!isMuralPayWithdrawal.value) return null
+
+	const rail = selectedRail.value
+	if (!rail) return null
+
+	if (rail.type === 'crypto') {
+		return formatMessage(messages.wallet)
+	} else if (rail.type === 'fiat') {
+		return formatMessage(messages.account)
+	}
+	return null
+})
+
+const destinationValue = computed(() => {
+	if (!isMuralPayWithdrawal.value || withdrawData.value.providerData.type !== 'muralpay') {
+		return null
+	}
+
+	const accountDetails = withdrawData.value.providerData.accountDetails
+	const rail = selectedRail.value
+
+	if (rail?.type === 'crypto' && accountDetails.walletAddress) {
+		// Show first 6 and last 4 characters: 0xb135A...f3c2
+		const addr = accountDetails.walletAddress
+		if (addr.length > 10) {
+			return `${addr.slice(0, 6)}...${addr.slice(-4)}`
+		}
+		return addr
+	} else if (rail?.type === 'fiat' && accountDetails.bankAccountNumber) {
+		// Show account type and last 4 digits: Chequing (9972)
+		const accountType = accountDetails.accountType || 'Account'
+		const last4 = accountDetails.bankAccountNumber.slice(-4)
+
+		// Format account type: CHECKING -> Chequing, SAVINGS -> Savings
+		const formattedType = accountType.charAt(0) + accountType.slice(1).toLowerCase()
+
+		return `${formattedType} (${last4})`
+	}
+
+	return null
+})
+
 const messages = defineMessages({
 	title: {
 		id: 'dashboard.withdraw.completion.title',
@@ -195,6 +253,14 @@ const messages = defineMessages({
 	recipient: {
 		id: 'dashboard.withdraw.completion.recipient',
 		defaultMessage: 'Recipient',
+	},
+	wallet: {
+		id: 'dashboard.withdraw.completion.wallet',
+		defaultMessage: 'Wallet',
+	},
+	account: {
+		id: 'dashboard.withdraw.completion.account',
+		defaultMessage: 'Account',
 	},
 	date: {
 		id: 'dashboard.withdraw.completion.date',
@@ -219,7 +285,7 @@ const messages = defineMessages({
 	emailConfirmation: {
 		id: 'dashboard.withdraw.completion.email-confirmation',
 		defaultMessage:
-			'You will receive an email at <b>{email}</b> from our partner, Tremendous, with instructions to redeem your withdrawal.',
+			"You'll receive an email at <b>{email}</b> with instructions to redeem your withdrawal.",
 	},
 	closeButton: {
 		id: 'dashboard.withdraw.completion.close-button',

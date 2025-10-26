@@ -80,6 +80,7 @@ import { IntlFormatted } from '@vintl/vintl/components'
 import { computed } from 'vue'
 
 import { normalizeChildren } from '@/utils/vue-children.ts'
+import { TAX_THRESHOLD_ACTUAL } from '@/providers/creator-withdraw.ts'
 
 const props = defineProps<{
 	balance: any
@@ -90,7 +91,7 @@ const { formatMessage } = useVIntl()
 
 const usedLimit = computed(() => props.balance?.withdrawn_ytd ?? 0)
 const remainingLimit = computed(() => {
-	const raw = 600 - usedLimit.value
+	const raw = TAX_THRESHOLD_ACTUAL - usedLimit.value
 	if (raw <= 0) return 0
 	const cents = Math.floor(raw * 100)
 	return cents / 100

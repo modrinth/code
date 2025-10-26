@@ -12,6 +12,11 @@ import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
 import { getRailConfig } from '@/utils/muralpay-rails'
 
+// Tax form is required when withdrawn_ytd >= $600
+// Therefore, the maximum withdrawal without a tax form is $599.99
+export const TAX_THRESHOLD_REQUIREMENT = 600
+export const TAX_THRESHOLD_ACTUAL = 599.99
+
 export type WithdrawStage =
 	| 'tax-form'
 	| 'method-selection'
@@ -44,6 +49,9 @@ export interface PayoutMethod {
 		standard: {
 			min: number
 			max: number
+		}
+		fixed?: {
+			values: number[]
 		}
 	}
 	config?: {
@@ -434,7 +442,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 		}
 
 		const usedLimit = balance?.withdrawn_ytd ?? 0
-		const remainingLimit = Math.max(0, 600 - usedLimit)
+		const remainingLimit = Math.max(0, TAX_THRESHOLD_ACTUAL - usedLimit)
 		return Math.min(remainingLimit, availableBalance)
 	})
 
@@ -451,13 +459,16 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 
 		const tremendousMethods = methods.filter((m) => m.type === 'tremendous')
 
-		const paypalMethods = tremendousMethods.filter((m) => m.category === 'paypal')
-		if (paypalMethods.length > 0) {
+		const internationalPaypalMethod = tremendousMethods.find(
+			(m) => m.type === 'tremendous' && m.category === 'paypal',
+		)
+		// TODO: remove this US check when boris removes it from backend
+		if (internationalPaypalMethod && withdrawData.value.selection.country?.id != 'US') {
 			options.push({
 				value: 'paypal',
 				label: paymentMethodMessages.paypalInternational,
 				icon: SSOPayPalIcon,
-				methodId: paypalMethods[0].id,
+				methodId: internationalPaypalMethod.id,
 				fee: '≈ 6%, max $25',
 				type: 'tremendous',
 			})
@@ -535,7 +546,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				label: paymentMethodMessages.paypal,
 				icon: SSOPayPalIcon,
 				methodId: directPaypal.id,
-				fee: `≈ 2%, min 25¢, max $1`,
+				fee: `≈ 2% + 0.25, max $1`,
 				type: 'paypal',
 			})
 		}
@@ -547,7 +558,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				label: paymentMethodMessages.venmo,
 				icon: SSOVenmoIcon,
 				methodId: directVenmo.id,
-				fee: `≈ 2%, min 25¢, max $1`,
+				fee: `≈ 2% + 0.25, max $1`,
 				type: 'venmo',
 			})
 		}
@@ -593,7 +604,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			case 'tax-form': {
 				if (!balanceRef.value) return true
 				const ytd = balanceRef.value.withdrawn_ytd ?? 0
-				const remainingLimit = Math.max(0, 600 - ytd)
+				const remainingLimit = Math.max(0, TAX_THRESHOLD_ACTUAL - ytd)
 				const form_completion_status = balanceRef.value.form_completion_status
 				if (ytd < 600) return true
 				if (withdrawData.value.tax.skipped && remainingLimit > 0) return true
@@ -610,18 +621,36 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				)
 			case 'tremendous-details': {
 				const method = withdrawData.value.selection.method
+				const amount = withdrawData.value.calculation.amount
+
+				// Find the selected method to get min/max constraints
+				const selectedMethod = availableMethods.value.find(
+					(m) => m.id === withdrawData.value.selection.methodId,
+				)
+
+				// Validate amount against method's interval constraints
+				if (selectedMethod?.interval) {
+					if (selectedMethod.interval.standard) {
+						const { min, max } = selectedMethod.interval.standard
+						if (amount < min || amount > max) return false
+					}
+					if (selectedMethod.interval.fixed) {
+						if (!selectedMethod.interval.fixed.values.includes(amount)) return false
+					}
+				}
+
 				if (method === 'merchant_card' || method === 'charity') {
 					if (!isTremendousProvider(withdrawData.value.providerData)) return false
 					return !!(
 						withdrawData.value.selection.methodId &&
-						withdrawData.value.calculation.amount > 0 &&
+						amount > 0 &&
 						withdrawData.value.providerData.deliveryEmail &&
 						withdrawData.value.agreedTerms
 					)
 				}
 				if (!isTremendousProvider(withdrawData.value.providerData)) return false
 				return !!(
-					withdrawData.value.calculation.amount > 0 &&
+					amount > 0 &&
 					withdrawData.value.providerData.deliveryEmail &&
 					withdrawData.value.agreedTerms
 				)

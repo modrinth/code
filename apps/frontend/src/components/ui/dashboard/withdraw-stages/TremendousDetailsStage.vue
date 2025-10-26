@@ -46,61 +46,54 @@
 				autocomplete="email"
 				class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 			/>
-
-			<Transition
-				enter-active-class="transition-all duration-300 ease-out"
-				enter-from-class="opacity-0 max-h-0"
-				enter-to-class="opacity-100 max-h-40"
-				leave-active-class="transition-all duration-200 ease-in"
-				leave-from-class="opacity-100 max-h-40"
-				leave-to-class="opacity-0 max-h-0"
-			>
-				<span v-if="deliveryEmail.includes('@')" class="text-sm text-secondary"
-					>Our partner, Tremendous, will send an email to <b>{{ deliveryEmail }}</b> with
-					instructions on how to redeem your withdrawal.</span
-				>
-			</Transition>
 		</div>
 
-		<div v-if="showGiftCardSelector" class="flex flex-col gap-2.5">
-			<label>
-				<span class="text-md font-semibold text-contrast"
-					>{{ categoryLabel }} <span class="text-red">*</span></span
+		<div v-if="showGiftCardSelector" class="flex flex-col gap-1">
+			<div class="flex flex-col gap-2.5">
+				<label>
+					<span class="text-md font-semibold text-contrast"
+						>{{ categoryLabel }} <span class="text-red">*</span></span
+					>
+				</label>
+				<Combobox
+					v-model="selectedGiftCardId"
+					:options="rewardOptions"
+					:placeholder="`Select ${categoryLabel.toLowerCase()}`"
+					searchable
+					:search-placeholder="`Search ${categoryLabelPlural.toLowerCase()}...`"
+					class="h-10"
 				>
-			</label>
-			<Combobox
-				v-model="selectedGiftCardId"
-				:options="rewardOptions"
-				:placeholder="`Select ${categoryLabel.toLowerCase()}`"
-				searchable
-				:search-placeholder="`Search ${categoryLabelPlural.toLowerCase()}...`"
-				class="h-10"
-			>
-				<template #selected>
-					<div v-if="selectedRewardOption" class="flex items-center gap-2">
-						<img
-							v-if="selectedRewardOption.imageUrl"
-							:src="selectedRewardOption.imageUrl"
-							:alt="selectedRewardOption.label"
-							class="size-5 rounded-full object-cover"
-							loading="lazy"
-						/>
-						<span class="font-semibold leading-tight">{{ selectedRewardOption.label }}</span>
-					</div>
-				</template>
-				<template v-for="option in rewardOptions" :key="option.value" #[`option-${option.value}`]>
-					<div class="flex items-center gap-2">
-						<img
-							v-if="option.imageUrl"
-							:src="option.imageUrl"
-							:alt="option.label"
-							class="size-5 rounded-full object-cover"
-							loading="lazy"
-						/>
-						<span class="font-semibold leading-tight">{{ option.label }}</span>
-					</div>
-				</template>
-			</Combobox>
+					<template #selected>
+						<div v-if="selectedRewardOption" class="flex items-center gap-2">
+							<img
+								v-if="selectedRewardOption.imageUrl"
+								:src="selectedRewardOption.imageUrl"
+								:alt="selectedRewardOption.label"
+								class="size-5 rounded-full object-cover"
+								loading="lazy"
+							/>
+							<span class="font-semibold leading-tight">{{ selectedRewardOption.label }}</span>
+						</div>
+					</template>
+					<template v-for="option in rewardOptions" :key="option.value" #[`option-${option.value}`]>
+						<div class="flex items-center gap-2">
+							<img
+								v-if="option.imageUrl"
+								:src="option.imageUrl"
+								:alt="option.label"
+								class="size-5 rounded-full object-cover"
+								loading="lazy"
+							/>
+							<span class="font-semibold leading-tight">{{ option.label }}</span>
+						</div>
+					</template>
+				</Combobox>
+			</div>
+			<span v-if="selectedMethodDetails" class="text-sm text-secondary">
+				{{ formatMoney(effectiveMinAmount) }} min,
+				{{ formatMoney(selectedMethodDetails.interval?.standard?.max ?? effectiveMaxAmount) }}
+				max withdrawal amount.
+			</span>
 		</div>
 
 		<div class="flex flex-col gap-2.5">
@@ -126,8 +119,8 @@
 			<div v-else class="flex flex-col gap-2">
 				<RevenueInputField
 					v-model="formData.amount"
-					:max-amount="roundedMaxAmount"
-					:min-amount="selectedMethodDetails?.interval?.standard?.min || 0.01"
+					:max-amount="effectiveMaxAmount"
+					:min-amount="effectiveMinAmount"
 				/>
 			</div>
 
@@ -278,6 +271,7 @@ const selectedRewardOption = computed(() => {
 })
 
 const selectedMethodDetails = computed(() => {
+	console.log(rewardOptions.value, selectedGiftCardId.value)
 	if (!selectedGiftCardId.value) return null
 	const option = rewardOptions.value.find((opt) => opt.value === selectedGiftCardId.value)
 	debug('Selected method details:', option?.methodDetails)
@@ -306,6 +300,18 @@ const denominationOptions = computed(() => {
 		roundedMaxAmount.value,
 	)
 	return filtered
+})
+
+const effectiveMinAmount = computed(() => {
+	return selectedMethodDetails.value?.interval?.standard?.min || 0.01
+})
+
+const effectiveMaxAmount = computed(() => {
+	const methodMax = selectedMethodDetails.value?.interval?.standard?.max
+	if (methodMax !== undefined && methodMax !== null) {
+		return Math.min(roundedMaxAmount.value, methodMax)
+	}
+	return roundedMaxAmount.value
 })
 
 const selectedDenomination = computed({

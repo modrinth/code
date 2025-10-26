@@ -20,22 +20,27 @@
 				</button>
 			</ButtonStyled>
 		</div>
-		<span class="my-1 mt-2 text-secondary">
-			{{ formatMessage(financialMessages.available, { amount: formatMoney(maxAmount) }) }}
-		</span>
+		<div>
+			<span class="my-1 mt-0 text-sm text-secondary">{{ formatMoney(maxAmount) }} available.</span>
+			<Transition name="fade">
+				<span v-if="isBelowMinimum" class="text-sm text-red">
+					Amount must be at least {{ formatMoney(minAmount) }}.
+				</span>
+			</Transition>
+			<Transition name="fade">
+				<span v-if="isAboveMaximum" class="text-sm text-red">
+					Amount cannot exceed {{ formatMoney(maxAmount) }}.
+				</span>
+			</Transition>
+		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import {
-	ButtonStyled,
-	commonMessages,
-	financialMessages,
-	formFieldPlaceholders,
-} from '@modrinth/ui'
+import { ButtonStyled, commonMessages, formFieldPlaceholders } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
-import { nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -54,6 +59,16 @@ const emit = defineEmits<{
 
 const { formatMessage } = useVIntl()
 const amountInput = ref<HTMLInputElement | null>(null)
+
+const isBelowMinimum = computed(() => {
+	return (
+		props.modelValue !== undefined && props.modelValue > 0 && props.modelValue < props.minAmount
+	)
+})
+
+const isAboveMaximum = computed(() => {
+	return props.modelValue !== undefined && props.modelValue > props.maxAmount
+})
 
 async function setMaxAmount() {
 	const maxValue = props.maxAmount
@@ -100,3 +115,18 @@ watch(
 	},
 )
 </script>
+
+<style scoped>
+.fade-enter-active {
+	transition: opacity 200ms ease-out;
+}
+
+.fade-leave-active {
+	transition: opacity 150ms ease-in;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}
+</style>

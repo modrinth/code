@@ -71,7 +71,7 @@
 			</div>
 			<div v-else class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
 				<ButtonStyled type="outlined">
-					<button class="!border-surface-5" @click="leftButtonConfig.handler">
+					<button class="!border-surface-5" :disabled="leftButtonConfig.disabled" @click="leftButtonConfig.handler">
 						<component :is="leftButtonConfig.icon" />
 						{{ leftButtonConfig.label }}
 					</button>
@@ -80,11 +80,13 @@
 					<button :disabled="rightButtonConfig.disabled" @click="rightButtonConfig.handler">
 						<component
 							:is="rightButtonConfig.icon"
+							:class="rightButtonConfig.iconClass"
 							v-if="rightButtonConfig.iconPosition === 'before'"
 						/>
 						{{ rightButtonConfig.label }}
 						<component
 							:is="rightButtonConfig.icon"
+							:class="rightButtonConfig.iconClass"
 							v-if="rightButtonConfig.iconPosition === 'after'"
 						/>
 					</button>
@@ -107,6 +109,7 @@ import {
 	FileTextIcon,
 	LeftArrowIcon,
 	RightArrowIcon,
+	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, injectNotificationManager, NewModal } from '@modrinth/ui'
@@ -116,6 +119,7 @@ import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import {
 	createWithdrawContext,
 	provideWithdrawContext,
+	TAX_THRESHOLD_ACTUAL,
 	type WithdrawStage,
 } from '@/providers/creator-withdraw.ts'
 
@@ -227,7 +231,7 @@ const needsTaxForm = computed(() => {
 const remainingLimit = computed(() => {
 	if (!props.balance) return 0
 	const ytd = props.balance.withdrawn_ytd ?? 0
-	const raw = 600 - ytd
+	const raw = TAX_THRESHOLD_ACTUAL - ytd
 	if (raw <= 0) return 0
 	const cents = Math.floor(raw * 100)
 	return cents / 100
@@ -239,12 +243,14 @@ const leftButtonConfig = computed(() => {
 			icon: LeftArrowIcon,
 			label: formatMessage(commonMessages.backButton),
 			handler: () => setStage(previousStep.value, true),
+			disabled: isSubmitting.value,
 		}
 	}
 	return {
 		icon: XIcon,
 		label: formatMessage(commonMessages.cancelButton),
 		handler: () => withdrawModal.value?.hide(),
+		disabled: isSubmitting.value,
 	}
 })
 
@@ -278,7 +284,8 @@ const rightButtonConfig = computed(() => {
 
 	if (isDetailsStage) {
 		return {
-			icon: ArrowLeftRightIcon,
+			icon: isSubmitting.value ? SpinnerIcon : ArrowLeftRightIcon,
+			iconClass: isSubmitting.value ? 'animate-spin' : undefined,
 			label: formatMessage(messages.withdrawButton),
 			handler: handleWithdraw,
 			disabled: !canProceed.value || isSubmitting.value,
