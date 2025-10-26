@@ -8,7 +8,7 @@ use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{
     MuralPayDetails, PayoutMethodRequest, PayoutMethodType, PayoutStatus,
-    TremendousDetails,
+    TremendousDetails, TremendousForexResponse,
 };
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
@@ -708,11 +708,6 @@ async fn tremendous_payout(
     #[derive(Deserialize)]
     struct TremendousResponse {
         pub order: Order,
-    }
-
-    #[derive(Deserialize)]
-    struct TremendousForexResponse {
-        forex: HashMap<String, Decimal>,
     }
 
     let forex: TremendousForexResponse = payouts_queue

@@ -4,6 +4,7 @@ use crate::database::redis::RedisPool;
 use crate::models::payouts::{
     MuralPayDetails, PayoutDecimal, PayoutInterval, PayoutMethod,
     PayoutMethodFee, PayoutMethodRequest, PayoutMethodType,
+    TremendousForexResponse,
 };
 use crate::models::projects::MonetizationStatus;
 use crate::queue::payouts::muralpay_payout::MuralPayoutRequest;
@@ -608,6 +609,17 @@ impl PayoutsQueue {
     ) -> Result<PayoutFees, ApiError> {
         const MURAL_FEE: Decimal = dec!(0.01);
 
+        let get_method = async {
+            let method = self
+                .get_payout_methods()
+                .await
+                .wrap_internal_err("failed to fetch payout methods")?
+                .into_iter()
+                .find(|method| method.id == method_id)
+                .wrap_request_err("invalid payout method ID")?;
+            Ok::<_, ApiError>(method)
+        };
+
         let fees = match request {
             PayoutMethodRequest::MuralPay {
                 method_details:
@@ -653,21 +665,41 @@ impl PayoutsQueue {
                     }
                 }
             }
-            PayoutMethodRequest::PayPal
-            | PayoutMethodRequest::Venmo
-            | PayoutMethodRequest::Tremendous { .. } => {
-                let method = self
-                    .get_payout_methods()
-                    .await
-                    .wrap_internal_err("failed to fetch payout methods")?
-                    .into_iter()
-                    .find(|method| method.id == method_id)
-                    .wrap_request_err("invalid payout method ID")?;
+            PayoutMethodRequest::PayPal | PayoutMethodRequest::Venmo => {
+                let method = get_method.await?;
                 let fee = method.fee.compute_fee(amount);
                 PayoutFees {
                     method_fee: fee,
                     platform_fee: dec!(0),
                     exchange_rate: None,
+                }
+            }
+            PayoutMethodRequest::Tremendous { method_details } => {
+                let method = get_method.await?;
+                let fee = method.fee.compute_fee(amount);
+
+                let forex: TremendousForexResponse = self
+                    .make_tremendous_request(Method::GET, "forex", None::<()>)
+                    .await
+                    .wrap_internal_err("failed to fetch Tremendous forex")?;
+
+                let exchange_rate = if let Some(currency) =
+                    &method_details.currency
+                {
+                    let currency_code = currency.to_string();
+                    let exchange_rate =
+                        forex.forex.get(&currency_code).wrap_request_err_with(
+                            || eyre!("no Tremendous forex data for {currency}"),
+                        )?;
+                    Some(*exchange_rate)
+                } else {
+                    None
+                };
+
+                PayoutFees {
+                    method_fee: fee,
+                    platform_fee: dec!(0),
+                    exchange_rate,
                 }
             }
         };

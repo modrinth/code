@@ -1,4 +1,4 @@
-use std::{cmp, fmt};
+use std::{cmp, collections::HashMap, fmt};
 
 use crate::{
     models::ids::PayoutId, queue::payouts::muralpay_payout::MuralPayoutRequest,
@@ -122,6 +122,11 @@ impl fmt::Display for TremendousCurrency {
         let s = s.as_str().ok_or(fmt::Error)?;
         write!(f, "{s}")
     }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TremendousForexResponse {
+    pub forex: HashMap<String, Decimal>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
