@@ -559,7 +559,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			})
 		}
 
-		const sortOrder = ['paypal', 'venmo', 'crypto', 'fiat', 'merchant_card', 'charity']
+		const sortOrder = ['fiat', 'paypal', 'venmo', 'crypto', 'merchant_card', 'charity']
 		options.sort((a, b) => {
 			const getOrder = (item: PaymentOption) => {
 				let order = sortOrder.indexOf(item.type)
@@ -619,12 +619,10 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 				const method = withdrawData.value.selection.method
 				const amount = withdrawData.value.calculation.amount
 
-				// Find the selected method to get min/max constraints
 				const selectedMethod = availableMethods.value.find(
 					(m) => m.id === withdrawData.value.selection.methodId,
 				)
 
-				// Validate amount against method's interval constraints
 				if (selectedMethod?.interval) {
 					if (selectedMethod.interval.standard) {
 						const { min, max } = selectedMethod.interval.standard

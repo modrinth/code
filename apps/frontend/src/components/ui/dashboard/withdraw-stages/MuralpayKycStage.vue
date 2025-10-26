@@ -162,7 +162,16 @@
 							<span class="text-red">*</span>
 						</span>
 					</label>
+					<Combobox
+						v-if="subdivisionOptions.length > 0"
+						v-model="formData.physicalAddress.state"
+						:options="subdivisionOptions"
+						:placeholder="formatMessage(formFieldPlaceholders.statePlaceholder)"
+						searchable
+						search-placeholder="Search subdivisions..."
+					/>
 					<input
+						v-else
 						v-model="formData.physicalAddress.state"
 						type="text"
 						:placeholder="formatMessage(formFieldPlaceholders.statePlaceholder)"
@@ -213,10 +222,12 @@ import { Chips, Combobox, formFieldLabels, formFieldPlaceholders } from '@modrin
 import { useVIntl } from '@vintl/vintl'
 
 import { useFormattedCountries } from '@/composables/country.ts'
+import { useGeneratedState } from '@/composables/generated.ts'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
 const { withdrawData } = useWithdrawContext()
 const { formatMessage } = useVIntl()
+const generatedState = useGeneratedState()
 
 const providerData = withdrawData.value.providerData
 const existingKycData = providerData.type === 'muralpay' ? providerData.kycData : null
@@ -267,6 +278,18 @@ const maxDate = computed(() => {
 })
 
 const countryOptions = useFormattedCountries()
+
+const subdivisionOptions = computed(() => {
+	const selectedCountry = formData.value.physicalAddress.country
+	if (!selectedCountry) return []
+
+	const subdivisions = generatedState.value.subdivisions?.[selectedCountry] ?? []
+
+	return subdivisions.map((sub) => ({
+		value: sub.code.includes('-') ? sub.code.split('-')[1] : sub.code,
+		label: sub.localVariant || sub.name,
+	}))
+})
 
 watch(
 	[entityType, formData],

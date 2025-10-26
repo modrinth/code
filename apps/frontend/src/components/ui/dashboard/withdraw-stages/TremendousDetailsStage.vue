@@ -125,6 +125,7 @@
 			</div>
 
 			<WithdrawFeeBreakdown
+				v-if="allRequiredFieldsFilled"
 				:amount="formData.amount || 0"
 				:fee="calculatedFee"
 				:fee-loading="feeLoading"
@@ -321,6 +322,17 @@ const selectedDenomination = computed({
 	},
 })
 
+const allRequiredFieldsFilled = computed(() => {
+	const amount = formData.value.amount
+	if (!amount || amount <= 0) return false
+
+	if (!deliveryEmail.value) return false
+
+	if (showGiftCardSelector.value && !selectedGiftCardId.value) return false
+
+	return true
+})
+
 const calculateFeesDebounced = useDebounceFn(async () => {
 	const amount = formData.value.amount
 	if (!amount || amount <= 0) {
@@ -356,7 +368,7 @@ watch(deliveryEmail, (newEmail) => {
 })
 
 watch(
-	[() => formData.value.amount, selectedGiftCardId],
+	[() => formData.value.amount, selectedGiftCardId, deliveryEmail],
 	() => {
 		withdrawData.value.calculation.amount = formData.value.amount ?? 0
 
@@ -364,7 +376,7 @@ watch(
 			withdrawData.value.selection.methodId = selectedGiftCardId.value
 		}
 
-		if (formData.value.amount) {
+		if (allRequiredFieldsFilled.value) {
 			feeLoading.value = true
 			calculateFeesDebounced()
 		} else {
@@ -396,7 +408,7 @@ onMounted(async () => {
 	debug('Loaded reward options:', rewardOptions.value.length, 'methods')
 	debug('Sample method with interval:', rewardOptions.value[0]?.methodDetails)
 
-	if (formData.value.amount) {
+	if (allRequiredFieldsFilled.value) {
 		feeLoading.value = true
 		calculateFeesDebounced()
 	}

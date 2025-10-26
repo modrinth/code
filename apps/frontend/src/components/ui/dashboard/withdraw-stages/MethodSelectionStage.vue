@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-4 pb-1">
+	<div class="flex flex-col gap-4">
 		<Admonition v-if="shouldShowTaxLimitWarning" type="warning">
 			<IntlFormatted
 				:message-id="messages.taxLimitWarning"
@@ -90,9 +90,8 @@ import { formatMoney } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 import { useGeolocation } from '@vueuse/core'
-import { all } from 'iso-3166-1'
 
-import { useFormattedCountries, useUserCountry } from '@/composables/country.ts'
+import { useCountries, useFormattedCountries, useUserCountry } from '@/composables/country.ts'
 import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
@@ -100,6 +99,7 @@ const debug = useDebugLogger('MethodSelectionStage')
 const { withdrawData, availableMethods, paymentOptions, balance, maxWithdrawAmount } =
 	useWithdrawContext()
 const userCountry = useUserCountry()
+const allCountries = useCountries()
 const { coords } = useGeolocation()
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -259,12 +259,12 @@ function handleCountryChange(countryCode: string | null) {
 	debug('handleCountryChange called with:', countryCode)
 	if (countryCode) {
 		const normalizedCode = countryCode.toUpperCase()
-		const country = all().find((c) => c.alpha2 === normalizedCode)
+		const country = allCountries.value.find((c) => c.alpha2 === normalizedCode)
 		debug('Found country:', country)
 		if (country) {
 			withdrawData.value.selection.country = {
 				id: country.alpha2,
-				name: country.alpha2 === 'TW' ? 'Taiwan' : country.country,
+				name: country.alpha2 === 'TW' ? 'Taiwan' : country.nameShort,
 			}
 			debug('Set selectedCountry to:', withdrawData.value.selection.country)
 		}

@@ -625,7 +625,7 @@ export const paymentMethodMessages = defineMessages({
 		defaultMessage: 'PayPal International',
 	},
 	paypalUS: {
-		id: 'omorphia.component.purchase_modal.payment_method_type.paypal_international',
+		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
 		defaultMessage: 'PayPal',
 	},
 	unionpay: {

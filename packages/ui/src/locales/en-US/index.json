@@ -441,7 +441,7 @@
     "defaultMessage": "PayPal"
   },
   "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal"
+    "defaultMessage": "PayPal International"
   },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
