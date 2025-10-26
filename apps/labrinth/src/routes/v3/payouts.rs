@@ -772,7 +772,7 @@ async fn mural_pay_payout(
         id: payout_id,
         user_id: user.id,
         created: Utc::now(),
-        status: PayoutStatus::InTransit,
+        status: PayoutStatus::Success,
         amount: raw_amount,
         fee: Some(total_fee),
         method: Some(PayoutMethodType::MuralPay),
