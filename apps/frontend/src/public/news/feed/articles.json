@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Creator Revenue Dashboard & Withdrawal Overhaul",
+			"summary": "A new and improved revenue dashboard and withdrawal process, with brand new payout methods.",
+			"thumbnail": "https://modrinth.com/news/default.webp",
+			"date": "2025-10-26T18:17:46.000Z",
+			"link": "https://modrinth.com/news/article/creator-withdrawals-overhaul"
+		},
+		{
 			"title": "Standing By Our Values",
 			"summary": "Keeping LGBTQIA+ content visible despite demands from Russia.",
 			"thumbnail": "https://modrinth.com/news/default.webp",
