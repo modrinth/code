@@ -1004,7 +1004,7 @@ pub async fn transaction_history(
             });
 
     let mut payouts_available = sqlx::query!(
-        "SELECT created, amount
+        "SELECT date_available, amount
         FROM payouts_values
         WHERE user_id = $1
         AND NOW() >= date_available",
@@ -1015,7 +1015,7 @@ pub async fn transaction_history(
         let record = record
             .wrap_internal_err("failed to fetch available payout record")?;
         Ok(TransactionItem::PayoutAvailable {
-            created: record.created,
+            created: record.date_available,
             payout_source: PayoutSource::CreatorRewards,
             amount: record.amount,
         })
