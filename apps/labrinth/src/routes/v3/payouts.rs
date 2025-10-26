@@ -710,6 +710,27 @@ async fn tremendous_payout(
         pub order: Order,
     }
 
+    #[derive(Deserialize)]
+    struct TremendousForexResponse {
+        forex: HashMap<String, Decimal>,
+    }
+
+    let forex: TremendousForexResponse = payouts_queue
+        .make_tremendous_request(Method::GET, "forex", None::<()>)
+        .await
+        .wrap_internal_err("failed to fetch Tremendous forex data")?;
+
+    let (denomination, currency_code) = if let Some(currency) = currency {
+        let currency_code = currency.to_string();
+        let exchange_rate =
+            forex.forex.get(&currency_code).wrap_internal_err_with(|| {
+                eyre!("no Tremendous forex data for {currency}")
+            })?;
+        (sent_to_method * *exchange_rate, Some(currency_code))
+    } else {
+        (sent_to_method, None)
+    };
+
     let res: TremendousResponse = payouts_queue
         .make_tremendous_request(
             Method::POST,
@@ -720,8 +741,8 @@ async fn tremendous_payout(
                 },
                 "rewards": [{
                     "value": {
-                        "denomination": sent_to_method,
-                        "currency_code": currency.map(|s| s.to_string()),
+                        "denomination": denomination,
+                        "currency_code": currency_code,
                     },
                     "delivery": {
                         "method": "EMAIL"
