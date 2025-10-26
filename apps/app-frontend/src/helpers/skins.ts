@@ -22,6 +22,11 @@ export interface Skin {
 	is_equipped: boolean
 }
 
+export interface SkinTextureUrl {
+	original: string
+	normalized: string
+}
+
 export const DEFAULT_MODEL_SORTING = ['Steve', 'Alex'] as string[]
 
 export const DEFAULT_MODELS: Record<string, SkinModel> = {
