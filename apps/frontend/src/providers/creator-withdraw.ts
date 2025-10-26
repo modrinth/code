@@ -437,10 +437,6 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			return availableBalance
 		}
 
-		if (!withdrawData.value.tax.skipped) {
-			return availableBalance
-		}
-
 		const usedLimit = balance?.withdrawn_ytd ?? 0
 		const remainingLimit = Math.max(0, TAX_THRESHOLD_ACTUAL - usedLimit)
 		return Math.min(remainingLimit, availableBalance)
@@ -763,6 +759,7 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 			stageValidation: {},
 		}
 		currentStage.value = undefined
+		availableMethods.value = []
 		clearSavedState()
 	}
 

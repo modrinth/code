@@ -6,7 +6,7 @@
 		:merge-header="currentStage === 'completion'"
 		:scrollable="true"
 		max-content-height="72vh"
-		@on-hide="onModalHide"
+		:on-hide="onModalHide"
 	>
 		<template #title>
 			<div v-if="shouldShowTitle" class="flex flex-wrap items-center gap-1 text-secondary">
@@ -156,7 +156,6 @@ const emit = defineEmits<{
 	(e: 'refresh-data' | 'hide'): void
 }>()
 
-// Must be defined before await to support defineExpose
 const withdrawModal = useTemplateRef<InstanceType<typeof NewModal>>('withdrawModal')
 const taxFormModal = ref<InstanceType<typeof CreatorTaxFormModal> | null>(null)
 const isSubmitting = ref(false)

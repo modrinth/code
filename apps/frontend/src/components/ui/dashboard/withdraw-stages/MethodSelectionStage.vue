@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-4 sm:gap-6">
+	<div class="flex flex-col gap-4 pb-1">
 		<Admonition v-if="shouldShowTaxLimitWarning" type="warning">
 			<IntlFormatted
 				:message-id="messages.taxLimitWarning"
@@ -8,7 +8,7 @@
 				}"
 			>
 				<template #b="{ children }">
-					<span class="font-bold">
+					<span class="font-semibold">
 						<component :is="() => normalizeChildren(children)" />
 					</span>
 				</template>
@@ -19,56 +19,60 @@
 				</template>
 			</IntlFormatted>
 		</Admonition>
-		<div class="flex flex-col gap-2.5">
-			<div class="flex flex-row gap-1 align-middle">
-				<span class="align-middle font-semibold text-contrast">{{
-					formatMessage(messages.region)
-				}}</span>
-				<UnknownIcon
-					v-tooltip="formatMessage(messages.regionTooltip)"
-					class="mt-auto size-5 text-secondary"
+		<div class="flex flex-col">
+			<div class="flex flex-col gap-2.5">
+				<div class="flex flex-row gap-1 align-middle">
+					<span class="align-middle font-semibold text-contrast">{{
+						formatMessage(messages.region)
+					}}</span>
+					<UnknownIcon
+						v-tooltip="formatMessage(messages.regionTooltip)"
+						class="mt-auto size-5 text-secondary"
+					/>
+				</div>
+				<Combobox
+					:model-value="selectedCountryCode"
+					:options="countries"
+					:placeholder="formatMessage(messages.countryPlaceholder)"
+					searchable
+					:search-placeholder="formatMessage(messages.countrySearchPlaceholder)"
+					:max-height="240"
+					class="h-12"
+					@update:model-value="handleCountryChange"
 				/>
 			</div>
-			<Combobox
-				:model-value="selectedCountryCode"
-				:options="countries"
-				:placeholder="formatMessage(messages.countryPlaceholder)"
-				searchable
-				:search-placeholder="formatMessage(messages.countrySearchPlaceholder)"
-				:max-height="240"
-				class="h-12"
-				@update:model-value="handleCountryChange"
-			/>
-		</div>
-		<div class="flex flex-col gap-2.5">
-			<span class="align-middle font-semibold text-contrast">{{
-				formatMessage(messages.selectMethod)
-			}}</span>
-			<div v-if="loading" class="flex min-h-[120px] items-center justify-center">
-				<SpinnerIcon class="size-8 animate-spin text-contrast" />
-			</div>
-			<template v-else>
-				<ButtonStyled
-					v-for="method in paymentOptions"
-					:key="method.value"
-					:color="withdrawData.selection.method === method.value ? 'green' : 'standard'"
-					:highlighted="withdrawData.selection.method === method.value"
-					type="chip"
-				>
-					<button
-						class="!justify-start !gap-2 !text-left sm:!h-10"
-						@click="handleMethodSelection(method)"
+			<div class="flex flex-col gap-2.5">
+				<div class="flex flex-row gap-1 align-middle">
+					<span class="align-middle font-semibold text-contrast">{{
+						formatMessage(messages.selectMethod)
+					}}</span>
+				</div>
+				<div v-if="loading" class="flex min-h-[120px] items-center justify-center">
+					<SpinnerIcon class="size-8 animate-spin text-contrast" />
+				</div>
+				<template v-else>
+					<ButtonStyled
+						v-for="method in paymentOptions"
+						:key="method.value"
+						:color="withdrawData.selection.method === method.value ? 'green' : 'standard'"
+						:highlighted="withdrawData.selection.method === method.value"
+						type="chip"
 					>
-						<component :is="method.icon" class="shrink-0" />
-						<span class="flex-1 truncate text-sm sm:text-[1rem]">
-							{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
-						</span>
-						<span class="ml-auto shrink-0 text-xs font-normal text-secondary sm:text-sm">{{
-							method.fee
-						}}</span>
-					</button>
-				</ButtonStyled>
-			</template>
+						<button
+							class="!justify-start !gap-2 !text-left sm:!h-10"
+							@click="handleMethodSelection(method)"
+						>
+							<component :is="method.icon" class="shrink-0" />
+							<span class="flex-1 truncate text-sm sm:text-[1rem]">
+								{{ typeof method.label === 'string' ? method.label : formatMessage(method.label) }}
+							</span>
+							<span class="ml-auto shrink-0 text-xs font-normal text-secondary sm:text-sm">{{
+								method.fee
+							}}</span>
+						</button>
+					</ButtonStyled>
+				</template>
+			</div>
 		</div>
 	</div>
 </template>

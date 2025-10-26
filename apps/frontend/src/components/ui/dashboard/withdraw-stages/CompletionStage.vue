@@ -97,22 +97,22 @@
 					</div>
 				</template>
 			</div>
-		</div>
-		<span
-			v-if="withdrawData.providerData.type === 'tremendous'"
-			class="w-full break-words text-center text-sm font-normal text-primary sm:text-[1rem]"
-		>
-			<IntlFormatted
-				:message-id="messages.emailConfirmation"
-				:values="{ email: withdrawData.result?.recipientDisplay }"
+			<span
+				v-if="withdrawData.providerData.type === 'tremendous'"
+				class="w-full break-words text-center text-sm font-normal text-primary sm:text-[1rem]"
 			>
-				<template #b="{ children }">
-					<strong>
-						<component :is="() => normalizeChildren(children)" />
-					</strong>
-				</template>
-			</IntlFormatted>
-		</span>
+				<IntlFormatted
+					:message-id="messages.emailConfirmation"
+					:values="{ email: withdrawData.result?.recipientDisplay }"
+				>
+					<template #b="{ children }">
+						<strong>
+							<component :is="() => normalizeChildren(children)" />
+						</strong>
+					</template>
+				</IntlFormatted>
+			</span>
+		</div>
 		<Teleport to="body">
 			<div
 				v-if="showConfetti"
@@ -221,18 +221,15 @@ const destinationValue = computed(() => {
 	const rail = selectedRail.value
 
 	if (rail?.type === 'crypto' && accountDetails.walletAddress) {
-		// Show first 6 and last 4 characters: 0xb135A...f3c2
 		const addr = accountDetails.walletAddress
 		if (addr.length > 10) {
 			return `${addr.slice(0, 6)}...${addr.slice(-4)}`
 		}
 		return addr
 	} else if (rail?.type === 'fiat' && accountDetails.bankAccountNumber) {
-		// Show account type and last 4 digits: Chequing (9972)
 		const accountType = accountDetails.accountType || 'Account'
 		const last4 = accountDetails.bankAccountNumber.slice(-4)
 
-		// Format account type: CHECKING -> Chequing, SAVINGS -> Savings
 		const formattedType = accountType.charAt(0) + accountType.slice(1).toLowerCase()
 
 		return `${formattedType} (${last4})`
