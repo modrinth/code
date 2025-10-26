@@ -67,4 +67,4 @@ app-playground-data/*
 .claude
 
 # labrinth demo fixtures
-fixtures/demo
+apps/labrinth/fixtures/demo
