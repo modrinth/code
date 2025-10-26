@@ -89,6 +89,7 @@ impl State {
             let res = tokio::try_join!(
                 state.discord_rpc.clear_to_default(true),
                 Profile::refresh_all(),
+                Settings::migrate(&state.pool),
                 ModrinthCredentials::refresh_all(),
             );
 

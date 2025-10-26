@@ -1,6 +1,7 @@
 //! Theseus settings file
 
 use serde::{Deserialize, Serialize};
+use sqlx::{Pool, Sqlite};
 use std::collections::HashMap;
 
 // Types
@@ -56,6 +57,8 @@ pub enum FeatureFlag {
 }
 
 impl Settings {
+    const CURRENT_VERSION: usize = 2;
+
     pub async fn get(
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<Self> {
@@ -227,6 +230,68 @@ impl Settings {
         )
         .execute(exec)
         .await?;
+
+        Ok(())
+    }
+
+    pub async fn migrate(exec: &Pool<Sqlite>) -> crate::Result<()> {
+        let mut settings = Self::get(exec).await?;
+
+        if settings.version < Settings::CURRENT_VERSION {
+            tracing::info!(
+                "Migrating settings version {} to {:?}",
+                settings.version,
+                Settings::CURRENT_VERSION
+            );
+        }
+        while settings.version < Settings::CURRENT_VERSION {
+            if let Err(err) = settings.perform_migration() {
+                tracing::error!(
+                    "Failed to migrate settings from version {}: {}",
+                    settings.version,
+                    err
+                );
+                return Err(err);
+            }
+        }
+
+        settings.update(exec).await?;
+
+        Ok(())
+    }
+
+    pub fn perform_migration(&mut self) -> crate::Result<()> {
+        match self.version {
+            1 => {
+                let quoter = shlex::Quoter::new().allow_nul(true);
+
+                // Previously split by spaces
+                if let Some(pre_launch) = self.hooks.pre_launch.as_ref() {
+                    self.hooks.pre_launch =
+                        Some(quoter.join(pre_launch.split(' ')).unwrap())
+                }
+
+                // Previously treated as complete path to command
+                if let Some(wrapper) = self.hooks.wrapper.as_ref() {
+                    self.hooks.wrapper =
+                        Some(quoter.quote(wrapper).unwrap().to_string())
+                }
+
+                // Previously split by spaces
+                if let Some(post_exit) = self.hooks.post_exit.as_ref() {
+                    self.hooks.post_exit =
+                        Some(quoter.join(post_exit.split(' ')).unwrap())
+                }
+
+                self.version = 2;
+            }
+            version => {
+                return Err(crate::ErrorKind::OtherError(format!(
+                    "Invalid settings version: {version}"
+                ))
+                .into());
+            }
+        }
 
         Ok(())
     }
