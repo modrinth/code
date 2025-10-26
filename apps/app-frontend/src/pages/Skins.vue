@@ -246,19 +246,17 @@ function openUploadSkinModal(e: MouseEvent) {
 function onSkinFileUploaded(buffer: ArrayBuffer) {
 	const fakeEvent = new MouseEvent('click')
 	const originalSkinTexUrl = `data:image/png;base64,` + arrayBufferToBase64(buffer)
-	normalize_skin_texture(originalSkinTexUrl).then(
-		(skinTextureNormalized: Uint8Array) => {
-			const skinTexUrl: SkinTextureUrl = {
-				original: originalSkinTexUrl,
-				normalized: `data:image/png;base64,` + arrayBufferToBase64(skinTextureNormalized)
-			}
-			if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
-				editSkinModal.value.restoreWithNewTexture(skinTexUrl)
-			} else {
-				editSkinModal.value?.showNew(fakeEvent, skinTexUrl)
-			}
-		},
-	)
+	normalize_skin_texture(originalSkinTexUrl).then((skinTextureNormalized: Uint8Array) => {
+		const skinTexUrl: SkinTextureUrl = {
+			original: originalSkinTexUrl,
+			normalized: `data:image/png;base64,` + arrayBufferToBase64(skinTextureNormalized),
+		}
+		if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
+			editSkinModal.value.restoreWithNewTexture(skinTexUrl)
+		} else {
+			editSkinModal.value?.showNew(fakeEvent, skinTexUrl)
+		}
+	})
 }
 
 function onUploadCanceled() {

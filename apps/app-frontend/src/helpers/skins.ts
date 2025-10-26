@@ -23,8 +23,8 @@ export interface Skin {
 }
 
 export interface SkinTextureUrl {
-	original: string,
-	normalized: string,
+	original: string
+	normalized: string
 }
 
 export const DEFAULT_MODEL_SORTING = ['Steve', 'Alex'] as string[]
