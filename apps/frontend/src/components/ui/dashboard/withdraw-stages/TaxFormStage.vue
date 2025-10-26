@@ -10,6 +10,7 @@
 			</div>
 			<div class="flex h-2.5 w-full overflow-hidden rounded-full bg-surface-2">
 				<div
+					v-if="usedLimit > 0"
 					class="gradient-border bg-orange"
 					:style="{ width: `${(usedLimit / 600) * 100}%` }"
 				></div>
