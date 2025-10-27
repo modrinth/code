@@ -4,7 +4,7 @@ import { articles as rawArticles } from '@modrinth/blog'
 import { Avatar, ButtonStyled } from '@modrinth/ui'
 import type { User } from '@modrinth/utils'
 import dayjs from 'dayjs'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 import NewsletterButton from '~/components/ui/NewsletterButton.vue'
 import ShareArticleButtons from '~/components/ui/ShareArticleButtons.vue'
@@ -73,6 +73,36 @@ useSeoMeta({
 	articlePublishedTime: () => dayjsDate.value.toISOString(),
 	twitterCard: 'summary_large_image',
 	twitterImage: () => thumbnailPath.value,
+})
+
+onMounted(() => {
+	const videos = document.querySelectorAll('.markdown-body video')
+
+	if ('IntersectionObserver' in window) {
+		const videoObserver = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					const video = entry.target as HTMLVideoElement
+					if (entry.isIntersecting) {
+						video.play().catch(() => {})
+					} else {
+						video.pause()
+					}
+				})
+			},
+			{
+				threshold: 0.5,
+			},
+		)
+
+		videos.forEach((video) => {
+			videoObserver.observe(video)
+		})
+	} else {
+		videos.forEach((video) => {
+			;(video as HTMLVideoElement).setAttribute('autoplay', '')
+		})
+	}
 })
 </script>
 

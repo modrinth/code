@@ -48,7 +48,7 @@ Withdrawing from your balance now uses a new modal flow. Click the green Withdra
 
 <div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
-		<source src="./withdraw-example.webm" type="video/webm" />
+		<source src="./withdraw-example.mp4" type="video/mp4" />
 	</video>
 </div>
 
