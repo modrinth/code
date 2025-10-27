@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Annuleren"
+  },
+  "action.continue": {
+    "message": "Doorgaan"
+  },
   "admin.billing.error.not-found": {
     "message": "Gebruiker niet gevonden"
   },
@@ -169,6 +175,9 @@
   },
   "app-marketing.features.youve-used-before": {
     "message": "je hebt het al gezien"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Screenshot van de Modrinth App met een Cobblemon installatie geopend op de 'Content' pagina."
   },
   "app-marketing.hero.description": {
     "message": "De Modrinth App is een unieke, openbare launcher waarmee je je favoriete mods kunt spelen en up-to-date houden, allemaal in één handig app."
@@ -410,6 +419,153 @@
   "collection.title": {
     "message": "{name} - Collectie"
   },
+  "common.no": {
+    "message": "Nee"
+  },
+  "common.yes": {
+    "message": "Ja"
+  },
+  "create.collection.cancel": {
+    "message": "Annuleren"
+  },
+  "create.collection.collection-info": {
+    "message": "Je nieuwe collectie wordt gemaakt als een publieke collectie met {{count, plural,=0 {geen projecten}one {# project}other {# projecten}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Collectie aanmaken"
+  },
+  "create.collection.error-title": {
+    "message": "Er is een fout opgetreden"
+  },
+  "create.collection.name-label": {
+    "message": "Naam"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Vul collectienaam in"
+  },
+  "create.collection.summary-description": {
+    "message": "Eén of twee zinnen die je collectie beschrijven."
+  },
+  "create.collection.summary-label": {
+    "message": "Samenvatting"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Dit is een collectie van..."
+  },
+  "create.collection.title": {
+    "message": "Een collectie aanmaken"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "{type} limiet is naderend ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Je staat op het punt het {type} limiet te bereiken, neem contact op met support als je meer dan {max} {typePlural} nodig hebt."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Neem contact op met support"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type} limiet bereikt"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Je hebt het {type} limiet bereikt. Neem contact op met support om je limiet te verhogen."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "Collectie"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "Organisatie"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "Collecties"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "Organisaties"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "Projecten"
+  },
+  "create.limit-alert.type-project": {
+    "message": "Project"
+  },
+  "create.organization.cancel": {
+    "message": "Annuleren"
+  },
+  "create.organization.create-organization": {
+    "message": "Organisatie aanmaken"
+  },
+  "create.organization.error-title": {
+    "message": "Er is een fout opgetreden"
+  },
+  "create.organization.name-label": {
+    "message": "Naam"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Vul organisatienaam in"
+  },
+  "create.organization.ownership-info": {
+    "message": "Jij wordt de eigenaar van deze organisatie, maar je kan andere leden uitnodigen en het beheer altijd overdragen."
+  },
+  "create.organization.summary-description": {
+    "message": "Eén of twee zinnen die je organisatie beschrijven."
+  },
+  "create.organization.summary-label": {
+    "message": "Samenvatting"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Een organisatie voor..."
+  },
+  "create.organization.title": {
+    "message": "Een organisatie aanmaken"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Annuleren"
+  },
+  "create.project.create-project": {
+    "message": "Project aanmaken"
+  },
+  "create.project.error-title": {
+    "message": "Er is een fout opgetreden"
+  },
+  "create.project.name-label": {
+    "message": "Naam"
+  },
+  "create.project.name-placeholder": {
+    "message": "Voer projectnaam in..."
+  },
+  "create.project.summary-description": {
+    "message": "Eén of twee zinnen die je project beschrijven."
+  },
+  "create.project.summary-label": {
+    "message": "Samenvatting"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Dit project..."
+  },
+  "create.project.title": {
+    "message": "Een project aanmaken"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "De zichtbaarheid van je project nadat het is goedgekeurd."
+  },
+  "create.project.visibility-label": {
+    "message": "Zichtbaarheid"
+  },
+  "create.project.visibility-private": {
+    "message": "Privé"
+  },
+  "create.project.visibility-public": {
+    "message": "Publiek"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Niet vermeld"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Maak nieuwe"
   },
@@ -421,6 +577,42 @@
   },
   "dashboard.collections.long-title": {
     "message": "Je collecties"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Download {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Je {formType} belastingformulier is succesvol verstuurd!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Je bent nu vrij om je geld over te boeken. Als je vragen hebt of je details wilt updaten, neem dan <support-link>contact op met support</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Je bent helemaal klaar! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Een buitenlandse entiteit is een bedrijf dat opgericht is buiten de Verenigde Staten (zoals een niet-Amerikaanse onderneming, partnerschap of LLC)"
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Buitenlandse entiteit"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Particulier"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Ben je een particulier of maak je deel uit van een buitenlandse entiteit?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Belastingformulier"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth maakt gebruik van de externe leverancier Track1099 om je belastingformulieren veilig te verzamelen en op te slaan. <security-link>Leer hier meer.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Veiligheidsmaatregelen"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "Ben je een inwoner van de VS?"
   },
   "error.collection.404.list_item.1": {
     "message": "U heeft mogelijk de URL van de collectie fout ingetypt."
@@ -442,6 +634,12 @@
   },
   "error.generic.404.title": {
     "message": "Pagina niet gevonden"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Deze pagina is geblokkeerd om juridische redenen, zoals censuur door de overheid of lopende juridische procedures."
+  },
+  "error.generic.451.title": {
+    "message": "Content niet beschikbaar om juridische redenen"
   },
   "error.generic.default.list_item.1": {
     "message": "Controleer of Modrinth een storing heeft op onze <status-link>Status pagina</status-link>."
@@ -536,8 +734,14 @@
   "landing.creator.feature.data-statistics.title": {
     "message": "Cijfers en Statistieken "
   },
+  "landing.creator.feature.discovery.description": {
+    "message": "Word ontdekt door duizenden gebruikers door middel van zoekresultaten, onze startpagina, Discord server, en nog veel meer mogelijkheden in de toekomst!"
+  },
   "landing.creator.feature.discovery.title": {
     "message": "Ontdekken"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Integreer je build-tools met behulp van Minotaur voor automatische uploads meteen wanneer je een nieuwe versie releaset. "
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Een Diverse Ecosysteem "
@@ -548,14 +752,95 @@
   "landing.creator.feature.monetization.title": {
     "message": "Maak jouw projecten te gelden"
   },
+  "landing.creator.feature.team-management.description": {
+    "message": "Nodig je teamleden uit en beheer rollen en machtigingen eenvoudig"
+  },
   "landing.creator.feature.team-management.title": {
     "message": "Team Beheer"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "Het is niet gelukt om willekeurige projecten te laden :("
+  },
+  "landing.feature.follow.description": {
+    "message": "Krijg een melding wanneer je favoriete projecten worden bijgewerkt en blijf op de hoogte."
+  },
+  "landing.feature.follow.heading": {
+    "message": "Volg je favoriete projecten"
+  },
+  "landing.feature.launcher.description": {
+    "message": "Modrinth's open-source API biedt launchers diepe integratie met Modrinth. Je kan Modrinth gebruikern via onze <link>eigen app</link> en populaire launchers als ATLauncher, MultiMC, en Prism Launcher."
+  },
+  "landing.feature.launcher.heading": {
+    "message": "Speel via je favoriete launcher"
+  },
+  "landing.feature.search.description": {
+    "message": "Dankzij Modrinth's razendsnelle zoekfunctie en filters vindt je wat je zoekt terwijl je typt."
+  },
+  "landing.feature.search.heading": {
+    "message": "Vind wat je zoekt, snel en eenvoudig"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Dé plek voor Minecraft {content}"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "data packs"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "modpacks"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "mods"
   },
   "landing.heading.the-place-for-minecraft.plugins": {
     "message": "plugins"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
     "message": "bronpakketten"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "servers"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "shaders"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "Een vereenvoudigde weergave van een Minecraft venster, met het Mojang Studios logo in Modrinth groen."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.heading": {
+    "message": "Meldingen"
+  },
+  "landing.notifications.received-time": {
+    "message": "Ontvangen {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "Versie {version} is gereleased voor {gameVersion}"
+  },
+  "landing.search.label": {
+    "message": "Zoeken"
+  },
+  "landing.search.placeholder": {
+    "message": "Zoeken..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "Sorteer op"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Geef je creaties een online thuis en bereik een groot publiek met toegewijde spelers."
+  },
+  "landing.section.for-creators.label": {
+    "message": "Voor Creators"
+  },
+  "landing.section.for-creators.tagline": {
+    "message": "Deel je content met de wereld"
   },
   "layout.action.change-theme": {
     "message": "Thema aanpassen"
@@ -854,9 +1139,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup creatie in de werken"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Al aan het voorbereiden van backup voor het downloaden"
-  },
   "servers.backups.item.automated": {
     "message": "Geautomatiseerd"
   },
@@ -866,20 +1148,8 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Maken van back-up mislukt"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Voorbereiden van download mislukt"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Terugzetten van back-up mislukt"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Download voorbereiden"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Voorbereiden opnieuw proberen"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Download voorbereiden..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Backup in de wachtrij"

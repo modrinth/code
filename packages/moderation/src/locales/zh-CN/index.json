@@ -24,7 +24,7 @@
     "defaultMessage": "选择准确的标签"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "你的描述包含{length}个可读字符。建议描述至少包含{minChars}个字符，以便撰写清晰且信息充实的描述文案。"
+    "defaultMessage": "Your description is {length} readable characters. At least {minChars} characters is recommended to create a clear and informative description。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "扩展描述"

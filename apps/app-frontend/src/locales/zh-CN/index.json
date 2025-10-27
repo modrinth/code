@@ -65,6 +65,33 @@
   "app.update.reload-to-update": {
     "message": "重新启动以安装更新"
   },
+  "friends.action.add-friend": {
+    "message": "加一好友"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count}好友请求"
+  },
+  "friends.add-friend.submit": {
+    "message": "发送好友请求"
+  },
+  "friends.add-friend.title": {
+    "message": ""
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "输入Modrinth用户名……"
+  },
+  "friends.heading.offline": {
+    "message": "离线"
+  },
+  "friends.heading.online": {
+    "message": "在线"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "搜索好友……"
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
   "instance.add-server.add-and-play": {
     "message": "添加并游玩"
   },

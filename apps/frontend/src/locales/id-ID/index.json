@@ -1,4 +1,76 @@
 {
+  "action.cancel": {
+    "message": "Batal"
+  },
+  "action.continue": {
+    "message": "Lanjutkan"
+  },
+  "admin.billing.error.not-found": {
+    "message": "Pengguna tidak ditemukan"
+  },
+  "app-marketing.download.description": {
+    "message": "Aplikasi destop kami tersedia pada semua platform, pilih versi yang Anda inginkan."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Unduh Applmage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Unduh versi beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Unduh DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Unduh RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Modrinth App untuk Linux <issues-link>memiliki isu</issues-link> pada sistem dan konfigurasi tertentu. Bila Modrinth App tidak stabil pada sistem Anda, kami menyarankan Anda untuk mencoba aplikasi lain seperti <prism-link>Prism Launcher</prism-link> untuk mengunduh konten Modrinth dengan mudah."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Pilihan pengunduhan"
+  },
+  "app-marketing.download.terms": {
+    "message": "Dengan mengunduh Modrinth App, Anda menyetujui <terms-link>Syarat</terms-link> dan <privacy-link>Kebijakan Privasi</privacy-link> kami."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Paket pihak ketiga"
+  },
+  "app-marketing.download.title": {
+    "message": "Unduh Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Simpan konten yang Anda suka dan dapatkan pembaruan dengan satu klik saja."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Ikuti proyek"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Impor semua profil favorit Anda dari peluncur yang telah Anda gunakan sebelumnya, dan mulai penggunaan Modrinth App dalam beberapa saat!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Pengimporan profil"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Tindakan"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "oleh {author}"
+  },
   "frog": {
     "message": "Anda terkodok-kodok!🐸"
   }

@@ -17,6 +17,12 @@
   "button.cancel": {
     "defaultMessage": "Mégsem"
   },
+  "button.clear": {
+    "defaultMessage": "Törlés"
+  },
+  "button.close": {
+    "defaultMessage": "Bezárt"
+  },
   "button.continue": {
     "defaultMessage": "Tovább"
   },
@@ -275,17 +281,26 @@
   "omorphia.component.badge.label.private": {
     "defaultMessage": "Privát"
   },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Feldolgozva"
+  },
   "omorphia.component.badge.label.rejected": {
     "defaultMessage": "Elutasítva"
   },
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Visszatérve"
   },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Ütemezve"
+  },
   "omorphia.component.badge.label.under-review": {
     "defaultMessage": "Felülvizsgálat alatt"
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Nem listázott"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Vissztartva"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kód másolása a vágólapra"
@@ -497,6 +512,15 @@
   "project.settings.description.title": {
     "defaultMessage": "Leírás"
   },
+  "project.settings.environment.client_and_server.description": {
+    "defaultMessage": "Van néhány funkciója mind a kliensen, mind a szerveren, még ha csak részlegesen is."
+  },
+  "project.settings.environment.client_and_server.optional_both.title": {
+    "defaultMessage": "Mindkettőn opcionális, mindkét oldalon történő felszerelés esetén működik a legjobban"
+  },
+  "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
+    "defaultMessage": "Mindkettőn opciónális, mindkét oldalon legjobb ha mindkét oldalon telepítve van"
+  },
   "project.settings.environment.client_and_server.optional_client.title": {
     "defaultMessage": "Opcionális kliensen"
   },
@@ -509,14 +533,26 @@
   "project.settings.environment.client_and_server.title": {
     "defaultMessage": "Kliens és szerver"
   },
+  "project.settings.environment.client_only.description": {
+    "defaultMessage": "Minden funkció kliens oldalon történik, és kompatibilis a vanilla szerverekkel."
+  },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Csak kliens-oldal"
+  },
+  "project.settings.environment.server_only.dedicated_only.title": {
+    "defaultMessage": "Szerverkhez dedikálva"
+  },
+  "project.settings.environment.server_only.description": {
+    "defaultMessage": "Minden funkció szerver oldalon történik, és kompatibilis a vanilla klinesekkel."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
     "defaultMessage": "Mükszik Egyjátékos módban is"
   },
   "project.settings.environment.server_only.title": {
     "defaultMessage": "Csak Szerver-oldal"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Csak egyjátékos módban vagy többjátékos szerverhez való csatlakozás nélkül működik."
   },
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Csak egyjátékos mód"
@@ -587,6 +623,9 @@
   "project.visibility.rejected": {
     "defaultMessage": "Elutasítva"
   },
+  "project.visibility.scheduled": {
+    "defaultMessage": "Ütemezve"
+  },
   "project.visibility.under-review": {
     "defaultMessage": "Felülvizsgálat alatt"
   },
@@ -601,6 +640,9 @@
   },
   "search.filter.locked.default": {
     "defaultMessage": "Szűrő zárolva"
+  },
+  "search.filter.locked.default.description": {
+    "defaultMessage": "E szűrő feloldásával le tudsz tölteni nem támogatott tartalmat."
   },
   "search.filter.locked.default.sync": {
     "defaultMessage": "Szűrő szinkronizálása"
@@ -650,6 +692,12 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Betöltő"
   },
+  "servers.notice.dismiss": {
+    "defaultMessage": "Elutasítás"
+  },
+  "servers.notice.dismissable": {
+    "defaultMessage": "Elutasítható"
+  },
   "servers.notice.heading.attention": {
     "defaultMessage": "Figyelem"
   },
@@ -668,17 +716,47 @@
   "servers.notice.level.warn.name": {
     "defaultMessage": "Figyelmeztetés"
   },
+  "servers.notice.undismissable": {
+    "defaultMessage": "Elutasíthatatlan"
+  },
+  "servers.purchase.step.payment.description": {
+    "defaultMessage": "Nem lesz terhelve még."
+  },
   "servers.purchase.step.payment.prompt": {
     "defaultMessage": "Válasz fizetési módot"
   },
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Fizetési mód"
   },
+  "servers.purchase.step.plan.billed": {
+    "defaultMessage": "számlázva {interval}"
+  },
+  "servers.purchase.step.plan.custom.desc": {
+    "defaultMessage": "Válasszon egy személyre szabott csomagot, amely pontosan az Ön igényeinek megfelelő specifikációkkal rendelkezik."
+  },
+  "servers.purchase.step.plan.get-started": {
+    "defaultMessage": "Itt kezdj"
+  },
+  "servers.purchase.step.plan.large.desc": {
+    "defaultMessage": "Ideális 15–25 játékos számára, modpackekhez vagy intenzív moddinghoz."
+  },
+  "servers.purchase.step.plan.medium.desc": {
+    "defaultMessage": "6–15 játékos és többféle mod számára ideális."
+  },
+  "servers.purchase.step.plan.most-popular": {
+    "defaultMessage": "Legnépszerűbb"
+  },
   "servers.purchase.step.plan.prompt": {
     "defaultMessage": "Válasz előfizetést"
   },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Válasz előfizetést"
+  },
+  "servers.purchase.step.plan.small.desc": {
+    "defaultMessage": "Tökéletes 1–5 barát számára, néhány kisebb módosítással."
+  },
+  "servers.purchase.step.plan.subtitle": {
+    "defaultMessage": "Válassza ki az Ön igényeinek megfelelő RAM-mennyiséget és specifikációkat."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Előfizetés"
@@ -692,8 +770,23 @@
   "servers.region.central-europe": {
     "defaultMessage": "Közép Európa"
   },
+  "servers.region.custom.prompt": {
+    "defaultMessage": "Mennyi RAM-ot szeretne szerveréhez?"
+  },
   "servers.region.north-america": {
     "defaultMessage": "Észak Amerika"
+  },
+  "servers.region.prompt": {
+    "defaultMessage": "Hol szeretné elhelyezni a szerverét?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Régió nincs listázva? <link> Tudassa velünk mit szeretne látni következőnek a Modrinth Szervereknél!</link>"
+  },
+  "servers.region.southeast-asia": {
+    "defaultMessage": "Délkelet-Ázsia"
+  },
+  "servers.region.western-europe": {
+    "defaultMessage": "Nyugat-Európa"
   },
   "settings.account.title": {
     "defaultMessage": "Fiók és biztonság"
@@ -713,11 +806,20 @@
   "settings.display.theme.dark": {
     "defaultMessage": "Sötét"
   },
+  "settings.display.theme.description": {
+    "defaultMessage": "Válassza ki a Modrinth számára a kívánt színsémát ezen az eszközön."
+  },
   "settings.display.theme.light": {
     "defaultMessage": "Világos"
   },
   "settings.display.theme.oled": {
     "defaultMessage": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Sötét témát szeretnék"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Világos témát szeretnék"
   },
   "settings.display.theme.retro": {
     "defaultMessage": "Retro"
@@ -731,8 +833,14 @@
   "settings.language.title": {
     "defaultMessage": "Nyelv"
   },
+  "settings.pats.title": {
+    "defaultMessage": "Személyes hozzáférsi tokenek"
+  },
   "settings.profile.title": {
     "defaultMessage": "Publikus profil"
+  },
+  "settings.sessions.title": {
+    "defaultMessage": "Munkamenetek"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} kor {time, time, short}"

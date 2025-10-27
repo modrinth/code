@@ -27,7 +27,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "На версії Modrinth для Linux <issues-link>проблеми</issues-link> на певних системах та налаштуваннях. Якщо Modrinth робить нестабільно на вашому пристрої, ми рекомендуємо спробувати інші додатки, такі як <prism-link>Prism Launcher</prism-link>, щоб легко встановлювати контент Modrinth."
+    "message": "На версії Modrinth App для Linux є <issues-link>відомі проблеми</issues-link> на деяких системах та конфігураціях. Якщо Modrinth App нестабільно працює на вашій системі, ми радимо вам спробувати інші програми, як наприклад <prism-link>Prism Launcher</prism-link> щоб легко встановлювати контент від Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -36,7 +36,7 @@
     "message": "Налаштування завантаження"
   },
   "app-marketing.download.terms": {
-    "message": "Завантажуючи Modrinth, ви погоджуєтеся з <terms-link>Умовами користування</terms-link> та <privacy-link>Політикою конфіденційности</privacy-link>."
+    "message": "Встановлюючи Modrinth, ви погоджуєтесь з <terms-link>Умовами користування</terms-link> та <privacy-link>Політикою конфіденційності</privacy-link>."
   },
   "app-marketing.download.third-party-packages": {
     "message": "Сторонні пакети"
@@ -48,7 +48,7 @@
     "message": "Windows"
   },
   "app-marketing.features.follow.description": {
-    "message": "Зберігайте контент, який вам до вподоби та отримуйте оновлення лише за один клік."
+    "message": "Зберігайте вміст, який вам подобається, та отримуйте оновлення за одне натискання."
   },
   "app-marketing.features.follow.title": {
     "message": "Відстежувати проєкти"
@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Ваші добірки"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Завантажити {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Ваша податкова форма {formType} була успішно надіслана!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Ви можете вивести кошти вже зараз. Якщо у вас залишилися питання або вам треба оновити свої дані, <support-link>зв'яжіться з підтримкою</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Все готово! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Закордонна організація означає ділову організацію, організовану за межами США (наприклад, неамериканську корпорацію, партнерство, або ТОВ)."
   },
@@ -912,10 +924,19 @@
     "message": "Заповніть податкову форму"
   },
   "layout.banner.tax.description": {
-    "message": "Ви вже вивели більше ніж $600 з Modrinth цього року. Щоб дотримуватися податкових форм, ви маєте заповнити податкову форму. Ваші виведення затримані до поки ця форма не буде заповнена."
+    "message": "Ви вже вивели більше ніж $600 з Modrinth цього року. Щоб дотримуватися податкових зобов’язань, ви маєте заповнити податкову форму. Ваші виведення затримані, доки ця форма не буде заповнена."
   },
   "layout.banner.tax.title": {
     "message": "Вимагано податкову форму"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Звернутися до підтримки"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Виведення коштів тимчасово заблоковано, оскільки вказаний TIN або SSN не збігається з IRS. Зверніться до служби підтримки для повторного подання форми."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Податкову форму відхилено"
   },
   "layout.banner.verify-email.action": {
     "message": "Повторно надіслати електронний лист для підтвердження"
@@ -1091,8 +1112,17 @@
   "moderation.technical.search.placeholder": {
     "message": "Пошук технічних оглядів…"
   },
+  "profile.bio.fallback.creator": {
+    "message": "Творець Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Користувач Modrinth."
+  },
   "profile.button.billing": {
     "message": "Керувати розрахунками користувача"
+  },
+  "profile.button.edit-role": {
+    "message": "Редагувати роль"
   },
   "profile.button.info": {
     "message": "Переглянути дані користувача"
@@ -1100,17 +1130,47 @@
   "profile.button.manage-projects": {
     "message": "Керувати проєктами"
   },
+  "profile.details.label.auth-providers": {
+    "message": "Провайдери автентифікації"
+  },
+  "profile.details.label.email": {
+    "message": "Електронна пошта"
+  },
+  "profile.details.label.has-password": {
+    "message": "Має пароль"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Має TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Способи оплати"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "Електронна пошта не перевірена"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "Електронна пошта перевірена"
+  },
   "profile.error.not-found": {
     "message": "Користувача не знайдено"
-  },
-  "profile.joined-at": {
-    "message": "Приєднався <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Значки"
   },
+  "profile.label.collection": {
+    "message": "Добірка"
+  },
   "profile.label.details": {
     "message": "Деталі"
+  },
+  "profile.label.downloads": {
+    "message": "{count} завантажен{count, plural, one {ня} few {ня} many {ь} other {ня}}"
+  },
+  "profile.label.joined": {
+    "message": "Приєднався"
+  },
+  "profile.label.no": {
+    "message": "Ні"
   },
   "profile.label.no-collections": {
     "message": "У цього користувача немає добірок!"
@@ -1127,17 +1187,20 @@
   "profile.label.organizations": {
     "message": "Організації"
   },
+  "profile.label.projects": {
+    "message": "{count} проєкт{count, plural, one {} few {и} many {ів} other {у}}"
+  },
+  "profile.label.saving": {
+    "message": "Збереження…"
+  },
+  "profile.label.yes": {
+    "message": "Так"
+  },
   "profile.meta.description": {
     "message": "Завантажте проєкти {username} на Modrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} — Завантажуйте проєкти {username} на Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> завантаження} few {<stat>{count}</stat> завантаження} other {<stat>{count}</stat> завантажень}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural,one {<stat>{count}</stat> проєкт}other {<stat>{count}</stat> проєкти(-ів)}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> підписника} other\n {<stat>{count}</stat> підписника (-ів)}}"
@@ -1473,7 +1536,7 @@
     "message": "Підсумуйте свій проєкт одним реченням."
   },
   "project.settings.general.tagline.placeholder.1": {
-    "message": "наприклад, Змінено ігровий процес щоб він був зациклений навколо Нижнього світу."
+    "message": "наприклад, Змінено ігровий процес, щоб він був зациклений навколо Незеру."
   },
   "project.settings.general.tagline.placeholder.2": {
     "message": "наприклад, Додає будівельне спорядження, що можна носити."
@@ -1860,13 +1923,10 @@
     "message": "Синхронізувати з сервером"
   },
   "servers.backup.create.in-progress.tooltip": {
-    "message": "Створення резервної копії в процесі"
+    "message": "Створення резервної копії триває"
   },
   "servers.backup.restore.in-progress.tooltip": {
-    "message": "Відновлення резервної копії в процесі"
-  },
-  "servers.backups.item.already-preparing": {
-    "message": "Вже іде підготовка до завантаження резервної копії"
+    "message": "Відновлення резервної копії триває"
   },
   "servers.backups.item.automated": {
     "message": "Автоматично"
@@ -1877,9 +1937,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Помилка в створенні резервної копії"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Помилка в підготовці до завантаження"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Помилка в відновленні з резервної копії"
   },
@@ -1888,15 +1945,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Замкнено"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Підготувати завантаження"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Спробувати підготувати знову"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Підготовка завантаження…"
   },
   "servers.backups.item.queued-for-backup": {
     "message": "В черзі на створення резервної копії"

@@ -273,7 +273,7 @@
     "message": "Senha"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Entrar com"
+    "message": "Iniciar sessão com"
   },
   "auth.sign-in.title": {
     "message": "Iniciar sessão"
@@ -354,13 +354,13 @@
     "message": "Inscreva-se para receber atualizações sobre o Modrinth"
   },
   "auth.welcome.description": {
-    "message": "Agora você faz parte de uma comunidade incrível de criadores e exploradores que já criam, baixam e se mantêm atualizados com mods incríveis."
+    "message": "Agora você faz parte da incrível comunidade de criadores e exploradores que já estão criando, baixando e acompanhando mods incríveis."
   },
   "auth.welcome.label.tos": {
     "message": "Ao criar uma conta, você concorda com os <terms-link>Termos</terms-link> e a <privacy-policy-link>Política de Privacidade</privacy-policy-link> do Modrinth."
   },
   "auth.welcome.long-title": {
-    "message": "Bem-vindo ao Modrinth!"
+    "message": "Bem-vindo(a) ao Modrinth!"
   },
   "auth.welcome.title": {
     "message": "Bem-vindo"
@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Suas coleções"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Baixar {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Seu formulário de imposto {formType} foi enviado com sucesso!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Você já pode sacar livremente. Se tiver dúvidas ou precisar atualizar suas informações, <support-link>entre em contato com o suporte</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Tudo pronto! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Uma entidade estrangeira significa uma entidade comercial organizada fora dos Estados Unidos (como uma corporação, parceria ou LLC não americana)."
   },
@@ -723,7 +735,7 @@
     "message": "Dados e estatísticas"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Faça com que seu projeto seja descoberto por milhares de usuários nas buscas, em nossa página inicial, no servidor de Discord e muitas outras formas que virão no futuro!"
+    "message": "Faça com que seu projeto seja descoberto por milhares de usuários nas buscas, em nossa página inicial, no servidor de Discord e muitas outras formas que chegarão no futuro!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Descoberta"
@@ -912,10 +924,19 @@
     "message": "Preencha o formulário fiscal"
   },
   "layout.banner.tax.description": {
-    "message": "Você já retirou mais de US$ 600 do Modrinth este ano. Para cumprir as normas fiscais, você precisa preencher um formulário fiscal. Suas retiradas ficarão suspensas até que esse formulário seja enviado."
+    "message": "Você já retirou mais de $600 do Modrinth neste ano. Para cumprir as regras fiscais, é preciso preencher um formulário de impostos. Seus saques ficarão pausados até que o formulário seja enviado."
   },
   "layout.banner.tax.title": {
     "message": "Formulário fiscal necessário"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Contatar suporte"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Seus saques estão temporariamente bloqueados porque seu TIN ou SSN não corresponde aos registros do IRS. Por favor, entre em contato com o suporte para redefinir e reenviar seu formulário de impostos."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Falha ao enviar formulário de impostos"
   },
   "layout.banner.verify-email.action": {
     "message": "Reenviar verificação de e-mail"
@@ -1065,7 +1086,7 @@
     "message": "Buscar"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Atualize para o Modrinth+"
+    "message": "Assinar o Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Filtrar por"
@@ -1091,8 +1112,17 @@
   "moderation.technical.search.placeholder": {
     "message": "Buscar revisões técnicas..."
   },
+  "profile.bio.fallback.creator": {
+    "message": "Um criador Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Usuário comum."
+  },
   "profile.button.billing": {
     "message": "Gerenciar cobrança do usuário"
+  },
+  "profile.button.edit-role": {
+    "message": "Editar cargo"
   },
   "profile.button.info": {
     "message": "Ver detalhes do usuário"
@@ -1100,17 +1130,47 @@
   "profile.button.manage-projects": {
     "message": "Gerenciar projetos"
   },
+  "profile.details.label.auth-providers": {
+    "message": "Provedores de autenticação"
+  },
+  "profile.details.label.email": {
+    "message": "E-mail"
+  },
+  "profile.details.label.has-password": {
+    "message": "Possui senha"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Possui TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Métodos de pagamento"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "E-mail não verificado"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "E-mail verificado"
+  },
   "profile.error.not-found": {
     "message": "Usuário não encontrado"
-  },
-  "profile.joined-at": {
-    "message": "Entrou há <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Emblemas"
   },
+  "profile.label.collection": {
+    "message": "Coleção"
+  },
   "profile.label.details": {
     "message": "Detalhes"
+  },
+  "profile.label.downloads": {
+    "message": "{count, plural, =0 {Nenhum download} one {{count} download} other {{count} downloads}}\n"
+  },
+  "profile.label.joined": {
+    "message": "Entrou"
+  },
+  "profile.label.no": {
+    "message": "Não"
   },
   "profile.label.no-collections": {
     "message": "Este usuário não possui coleções!"
@@ -1127,17 +1187,20 @@
   "profile.label.organizations": {
     "message": "Organizações"
   },
+  "profile.label.projects": {
+    "message": "{count, plural, =0 {Nenhum projeto} one {{count} projeto} other {{count} projetos}}"
+  },
+  "profile.label.saving": {
+    "message": "Salvando..."
+  },
+  "profile.label.yes": {
+    "message": "Sim"
+  },
   "profile.meta.description": {
     "message": "Baixe os projetos de {username} no Modrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} — Baixe os projetos de {username} no Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "“{count, plural, one {<stat>{count}</stat> projeto baixado} other {<stat>{count}</stat> projetos baixados}}”"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> projeto} other {<stat>{count}</stat> projetos}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> seguidor} other {<stat>{count}</stat> seguidores}} do projeto"
@@ -1865,9 +1928,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauração de backup em andamento"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "O download de um backup já está sendo preparado"
-  },
   "servers.backups.item.automated": {
     "message": "Automatizado"
   },
@@ -1877,9 +1937,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Falha ao criar um backup"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Falha ao preparar o download"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Falha ao restaurar um backup"
   },
@@ -1888,15 +1945,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Trancado"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Preparar download"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Tente preparar novamente"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Preparando download..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Na fila para backup"
@@ -2127,7 +2175,7 @@
     "message": "Selecione seu tema de cor preferido para o Modrinth neste dispositivo."
   },
   "settings.display.theme.title": {
-    "message": "Cor do tema"
+    "message": "Tema"
   },
   "settings.language.categories.auto": {
     "message": "Automático"

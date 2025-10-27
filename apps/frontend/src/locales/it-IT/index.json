@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Le tue raccolte"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Scarica {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Il tuo modulo fiscale {formType} è stato inviato con successo!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Ora puoi nuovamente ritirare denaro. Se hai altre domande o devi aggiornare le tue informazioni <support-link>contatta l'assistenza</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Tutto fatto! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Entità estera fa riferimento a un'entità commerciale stabilita fuori dagli Stati Uniti (per esempio società, partenariati, o LLC non statunitensi)."
   },
@@ -911,9 +923,6 @@
   "layout.banner.tax.action": {
     "message": "Completa il modulo fiscale"
   },
-  "layout.banner.tax.description": {
-    "message": "Hai già ritirato oltre $600 da Modrinth quest'ano. Per essere in regola con le norme fiscali devi completare un modulo fiscale. I tuoi prelievi saranno sospesi finché questo modulo sarà inviato."
-  },
   "layout.banner.tax.title": {
     "message": "Modulo fiscale obbligatorio"
   },
@@ -1103,9 +1112,6 @@
   "profile.error.not-found": {
     "message": "Utente non trovato"
   },
-  "profile.joined-at": {
-    "message": "Registrato <date>{ago}</date>"
-  },
   "profile.label.badges": {
     "message": "Badge"
   },
@@ -1132,12 +1138,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Scarica i progetti di {username} su Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> download del progetto} other {<stat>{count}</stat> download del progetto}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> progetto} other {<stat>{count}</stat> progetti}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> follower del progetto} other {<stat>{count}</stat> follower del progetto}}"
@@ -1865,9 +1865,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Ripristino backup in corso"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Preparando backup per il download"
-  },
   "servers.backups.item.automated": {
     "message": "Automatizzato"
   },
@@ -1877,9 +1874,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Errore nella creazione del backup"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Errore nella preparazione download"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Errore nel ripristino da backup"
   },
@@ -1888,15 +1882,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Bloccato"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Prepara download"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Prova a preparare di nuovo"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Preparando download..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "In coda per backup"

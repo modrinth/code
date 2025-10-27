@@ -36,7 +36,7 @@
     "message": "變更紀錄"
   },
   "app.update-toast.download": {
-    "message": "下載（{size}）"
+    "message": "下載 ({size})"
   },
   "app.update-toast.downloading": {
     "message": "下載中..."
@@ -60,10 +60,73 @@
     "message": "下載更新"
   },
   "app.update.downloading-update": {
-    "message": "正在下載更新（{percent}%）"
+    "message": "正在下載更新 ({percent}%)"
   },
   "app.update.reload-to-update": {
     "message": "重新載入即可安裝更新"
+  },
+  "friends.action.add-friend": {
+    "message": "新增好友"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} 個好友請求"
+  },
+  "friends.add-friend.submit": {
+    "message": "傳送好友請求"
+  },
+  "friends.add-friend.title": {
+    "message": "新增好友"
+  },
+  "friends.add-friend.username.description": {
+    "message": "這可能與對方的 Minecraft 使用者名稱不同！"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "輸入 Modrinth 使用者名稱..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "你好友的 Modrinth 使用者名稱是什麼？"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>新增好友</link>即可查看對方正在玩什麼！"
+  },
+  "friends.friend.cancel-request": {
+    "message": "取消請求"
+  },
+  "friends.friend.remove-friend": {
+    "message": "移除好友"
+  },
+  "friends.friend.request-sent": {
+    "message": "好友請求已送出"
+  },
+  "friends.friend.view-profile": {
+    "message": "查看個人檔案"
+  },
+  "friends.heading": {
+    "message": "好友"
+  },
+  "friends.heading.active": {
+    "message": "活躍中"
+  },
+  "friends.heading.offline": {
+    "message": "離線"
+  },
+  "friends.heading.online": {
+    "message": "線上"
+  },
+  "friends.heading.pending": {
+    "message": "待處理"
+  },
+  "friends.no-friends-match": {
+    "message": "沒有符合「{query}」的好友"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "搜尋好友..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>登入 Modrinth 帳號</link>即可新增好友並查看對方正在玩什麼！"
   },
   "instance.add-server.add-and-play": {
     "message": "新增並遊玩"

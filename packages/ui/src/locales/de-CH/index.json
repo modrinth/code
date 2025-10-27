@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Abbrechen"
   },
+  "button.clear": {
+    "defaultMessage": "Löschen"
+  },
   "button.close": {
     "defaultMessage": "Schliessen"
   },
@@ -594,7 +597,7 @@
     "defaultMessage": "Versionen"
   },
   "project.settings.view.title": {
-    "defaultMessage": "Anzeigen"
+    "defaultMessage": "Ansehen"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"

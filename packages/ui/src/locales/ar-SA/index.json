@@ -370,6 +370,9 @@
   },
   "project-type.modpack.category": {
     "defaultMessage": "حزم المودات"
+  },
+  "project.about.compatibility.environments.client-and-server": {
+    "defaultMessage": ""
   }
 }
 

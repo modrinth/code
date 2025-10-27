@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Colecțiile tale"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Descarcă {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Formularul tău fiscal {formType} a fost trimis cu succes!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Poți retrage liber acum. Dacă ai întrebări sau trebuie să îți actualizezi detaliile, <support-link>contactează suportul</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Totul este pregătit! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "O entitate străină înseamnă o entitate de afaceri organizată în afara Statelor Unite (cum ar fi o corporație, un parteneriat sau un SRL non-SUA)."
   },
@@ -911,9 +923,6 @@
   "layout.banner.tax.action": {
     "message": "Completează formularul fiscal"
   },
-  "layout.banner.tax.description": {
-    "message": "Ai retras deja peste $600 de la Modrinth anul acesta. Pentru a respecta reglementările fiscale, trebuie să completezi un formular fiscal. Retragerile tale sunt puse pe pauză până când acest formular este trimis."
-  },
   "layout.banner.tax.title": {
     "message": "Formular fiscal necesar"
   },
@@ -1094,6 +1103,9 @@
   "profile.button.billing": {
     "message": "Administrează facturarea utilizatorului"
   },
+  "profile.button.edit-role": {
+    "message": "Editează rolul"
+  },
   "profile.button.info": {
     "message": "Vizualizează detaliile utilizatorului"
   },
@@ -1102,9 +1114,6 @@
   },
   "profile.error.not-found": {
     "message": "Utilizatorul nu a fost găsit"
-  },
-  "profile.joined-at": {
-    "message": "S-a alăturat în urmă cu <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Insigne"
@@ -1132,12 +1141,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Descarcă proiectele lui {username} pe Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> descărcare} few {<stat>{count}</stat> descărcări} other {<stat>{count}</stat> de descărcări}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> proiect} few {<stat>{count}</stat> proiecte} other {<stat>{count}</stat> de proiecte}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> urmăritor} other {<stat>{count}</stat> urmăritori}}"
@@ -1865,9 +1868,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restaurare copie de rezervă în curs"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Se pregătește deja copia de rezervă pentru descărcare"
-  },
   "servers.backups.item.automated": {
     "message": "Automat"
   },
@@ -1877,9 +1877,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Eșec la crearea copiei de rezervă"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Eșec la pregătirea descărcării"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Eșec la restaurarea din copie de rezervă"
   },
@@ -1888,15 +1885,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Blocat"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Pregătește descărcarea"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Încearcă să pregătești din nou"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Se pregătește descărcarea..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Programat pentru copiere de rezervă"
@@ -2061,34 +2049,34 @@
     "message": "Activați sau dezactivați anumite caracteristici pe acest dispozitiv."
   },
   "settings.display.flags.title": {
-    "message": "Comută funcțiile"
+    "message": "Funcții avansate"
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Pagina Pachetelor de Date"
+    "message": "Pagina cu pachete de date"
   },
   "settings.display.project-list-layouts.description": {
     "message": "Selectează aspectul preferat pentru fiecare pagină care afișează liste de proiecte pe acest dispozitiv."
   },
   "settings.display.project-list-layouts.mod": {
-    "message": "Pagina Modurilor"
+    "message": "Pagina cu moduri"
   },
   "settings.display.project-list-layouts.modpack": {
-    "message": "Pagina Pachetelor de Moduri"
+    "message": "Pagina cu pachete de moduri"
   },
   "settings.display.project-list-layouts.plugin": {
-    "message": "Pagina Pluginurilor"
+    "message": "Pagina cu pluginuri"
   },
   "settings.display.project-list-layouts.resourcepack": {
-    "message": "Pagina Pachetelor de Resurse"
+    "message": "Pagina cu pachete de resurse"
   },
   "settings.display.project-list-layouts.shader": {
-    "message": "Pagina Shaderurilor"
+    "message": "Pagina cu shadere"
   },
   "settings.display.project-list-layouts.title": {
     "message": "Aspectul listelor de proiecte"
   },
   "settings.display.project-list-layouts.user": {
-    "message": "Pagini de profil ale utilizatorilor"
+    "message": "Paginile de profil ale utilizatorului"
   },
   "settings.display.project-list.layouts.collection": {
     "message": "Colecție"
@@ -2100,10 +2088,10 @@
     "message": "Redare avansată"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Deschide linkurile externe de pe Modrinth într-un tab nou. Indiferent de această setare, linkurile de pe același domeniu și din descrierile Markdown se vor deschide în același tab, iar linkurile din reclame și paginile de editare se vor deschide într-un tab nou."
+    "message": "Deschide linkurile externe de pe Modrinth într-o pagină nouă. Indiferent de această setare, linkurile de pe același domeniu și din descrierile Markdown se vor deschide în aceeași pagină, iar linkurile din reclame și paginile de editare se vor deschide într-o pagină nouă."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Deschide linkurile externe într-un tab nou"
+    "message": "Deschide linkurile externe într-o pagină nouă"
   },
   "settings.display.sidebar.hide-app-promos.description": {
     "message": "Ascunde butoanele \"Descarcă Modrinth App\" din navigarea principală. Pagina aplicației Modrinth poate fi găsită în continuare pe pagina de destinație sau în subsol."
