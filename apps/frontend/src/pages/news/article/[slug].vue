@@ -188,7 +188,12 @@ useSeoMeta({
 
 	ul,
 	ol {
-		p {
+		> li > p {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+
+		> li > p:not(:last-child) {
 			margin-bottom: 0.5rem;
 		}
 	}
@@ -275,8 +280,32 @@ useSeoMeta({
 		}
 	}
 
+	hr {
+		border-color: var(--color-divider);
+	}
+
+	.video-wrapper {
+		display: inline-block;
+		max-width: 100%;
+		border-radius: var(--radius-md);
+		overflow: hidden;
+		border: 1px solid var(--color-button-border);
+		@media (min-width: 640px) {
+			border-radius: var(--radius-lg);
+		}
+
+		video {
+			display: block;
+			max-width: 100%;
+			object-fit: cover;
+			height: auto;
+		}
+	}
+
 	> img,
-	> :has(img:first-child:last-child) {
+	> .video-wrapper,
+	> :has(img:first-child:last-child),
+	> :has(video:first-child:last-child) {
 		display: flex;
 		justify-content: center;
 	}
