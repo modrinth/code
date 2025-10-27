@@ -255,20 +255,22 @@ onMounted(() => {
 
 	h2 {
 		font-size: 1.25rem;
+		margin-top: 1.5rem;
 		@media (min-width: 640px) {
 			font-size: 1.5rem;
 		}
 	}
 
 	h3 {
-		font-size: 1.125rem;
+		font-size: 1rem;
+		margin-top: 1.25rem;
 		@media (min-width: 640px) {
-			font-size: 1.25rem;
+			font-size: 1.125rem;
 		}
 	}
 
 	p {
-		margin-bottom: 1.25rem;
+		margin-bottom: 0.75rem;
 		font-size: 0.875rem;
 		@media (min-width: 640px) {
 			font-size: 1rem;
@@ -311,7 +313,9 @@ onMounted(() => {
 	}
 
 	hr {
-		border-color: var(--color-divider);
+		border: none;
+		height: 1px;
+		background-color: var(--color-divider);
 	}
 
 	.video-wrapper {
