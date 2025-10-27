@@ -627,7 +627,7 @@
     "message": "Amount"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
-    "message": "Exchange rate"
+    "message": "FX rate"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Fee"

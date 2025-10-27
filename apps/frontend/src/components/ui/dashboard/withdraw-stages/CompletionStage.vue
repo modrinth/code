@@ -135,10 +135,7 @@ import dayjs from 'dayjs'
 import { computed, onMounted, ref } from 'vue'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
-import {
-	type TremendousProviderData,
-	useWithdrawContext,
-} from '@/providers/creator-withdraw.ts'
+import { type TremendousProviderData, useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 

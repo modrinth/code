@@ -23,7 +23,7 @@
 					</template>
 				</span>
 			</div>
-			<div class="my-auto flex flex-row items-center gap-3 md:gap-4">
+			<div class="my-auto flex flex-row items-center gap-2">
 				<span
 					class="text-base font-semibold md:text-lg"
 					:class="isIncome ? 'text-green' : 'text-contrast'"

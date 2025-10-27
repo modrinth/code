@@ -1,6 +1,6 @@
 <template>
 	<CreatorWithdrawModal ref="withdrawModal" :balance="userBalance" @refresh-data="refreshData" />
-	<div class="mb-8 flex flex-col gap-6 pl-4">
+	<div class="mb-20 flex flex-col gap-6 pl-4">
 		<div class="flex flex-col gap-4 md:gap-5">
 			<div class="flex flex-col gap-1">
 				<span class="text-xl font-semibold text-contrast md:text-2xl">{{

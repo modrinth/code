@@ -118,7 +118,7 @@ import {
 } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import {
 	createWithdrawContext,
@@ -198,6 +198,16 @@ const {
 	restoreStateFromStorage,
 	clearSavedState,
 } = withdrawContext
+
+watch(
+	() => props.balance,
+	(newBalance) => {
+		if (newBalance) {
+			withdrawContext.balance.value = newBalance
+		}
+	},
+	{ deep: true },
+)
 
 onMounted(() => {
 	const route = useRoute()
