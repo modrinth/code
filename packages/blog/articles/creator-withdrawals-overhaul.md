@@ -1,8 +1,7 @@
 ---
-title: Creator Withdrawals Overhaul
-summary: A new and improved revenue dashboard and withdrawal process, with brand new payout methods.
-date: 2025-10-27T21:38:54+00:00
-authors: ['AJfd8YH6', 'bOHH0P9Z']
+title: Expanding Withdrawal Options for Creators
+summary: 'Coming soon: New withdrawal options for creators around the world and a revamped withdrawal dashboard.'
+authors: ['AJfd8YH6', 'bOHH0P9Z', 'xSQqYYIN']
 ---
 
 Hey everyone! We've heard your feedback on creator withdrawal options, and we're excited to share that more are finally coming to Modrinth! Over the past month, we've been working on overhauling the withdrawal experience and supporting more withdraw methods.
