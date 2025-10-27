@@ -20,19 +20,19 @@
 				]"
 			/>
 		</div>
-		<div class="normal-page__content mt-4 lg:!mt-0 lg:pl-4">
+		<div class="normal-page__content mt-4 lg:!mt-0">
 			<NuxtPage :route="route" />
 		</div>
 	</div>
 </template>
 <script setup>
 import {
-	BellIcon as NotificationsIcon,
 	ChartIcon,
 	CurrencyIcon,
 	DashboardIcon,
 	LibraryIcon,
 	ListIcon,
+	BellIcon as NotificationsIcon,
 	OrganizationIcon,
 	ReportIcon,
 } from '@modrinth/assets'
