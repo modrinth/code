@@ -48,24 +48,6 @@
 			/>
 		</div>
 
-		<div v-if="showPayPalCurrencySelector" class="flex flex-col gap-2.5">
-			<label>
-				<span class="text-md font-semibold text-contrast"
-					>Currency <span class="text-red">*</span></span
-				>
-			</label>
-			<Combobox
-				v-model="selectedCurrency"
-				:options="currencyOptions"
-				placeholder="Select currency"
-				class="h-10"
-			>
-				<template v-for="option in currencyOptions" :key="option.value" #[`option-${option.value}`]>
-					<span class="font-semibold leading-tight">{{ option.label }}</span>
-				</template>
-			</Combobox>
-		</div>
-
 		<div v-if="showGiftCardSelector" class="flex flex-col gap-1">
 			<div class="flex flex-col gap-2.5">
 				<label>
@@ -137,8 +119,11 @@
 			<div v-else class="flex flex-col gap-2">
 				<RevenueInputField
 					v-model="formData.amount"
+					v-model:selected-currency="selectedCurrency"
 					:max-amount="effectiveMaxAmount"
 					:min-amount="effectiveMinAmount"
+					:show-currency-selector="showPayPalCurrencySelector"
+					:currency-options="currencyOptions"
 				/>
 			</div>
 
@@ -266,10 +251,10 @@ const formData = ref<Record<string, any>>({
 const selectedGiftCardId = ref<string | null>(withdrawData.value.selection.methodId || null)
 
 const currencyOptions = [
-	{ value: 'USD', label: 'USD - US Dollar' },
-	{ value: 'GBP', label: 'GBP - British Pound' },
-	{ value: 'CAD', label: 'CAD - Canadian Dollar' },
-	{ value: 'EUR', label: 'EUR - Euro' },
+	{ value: 'USD', label: 'USD' },
+	{ value: 'GBP', label: 'GBP' },
+	{ value: 'CAD', label: 'CAD' },
+	{ value: 'EUR', label: 'EUR' },
 ]
 
 function getCurrencyFromCountryCode(countryCode: string | undefined): string {
@@ -442,11 +427,15 @@ watch(deliveryEmail, (newEmail) => {
 	}
 })
 
-watch(selectedCurrency, (newCurrency) => {
-	if (withdrawData.value.providerData.type === 'tremendous') {
-		;(withdrawData.value.providerData as any).currency = newCurrency
-	}
-})
+watch(
+	selectedCurrency,
+	(newCurrency) => {
+		if (withdrawData.value.providerData.type === 'tremendous') {
+			;(withdrawData.value.providerData as any).currency = newCurrency
+		}
+	},
+	{ immediate: true },
+)
 
 watch(
 	() => withdrawData.value.selection.country?.id,

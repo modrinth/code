@@ -14,6 +14,17 @@
 					@input="handleInput"
 				/>
 			</div>
+			<Combobox
+				v-if="showCurrencySelector"
+				:model-value="selectedCurrency"
+				:options="currencyOptions"
+				class="w-min"
+				@update:model-value="$emit('update:selectedCurrency', $event)"
+			>
+				<template v-for="option in currencyOptions" :key="option.value" #[`option-${option.value}`]>
+					<span class="font-semibold leading-tight">{{ option.label }}</span>
+				</template>
+			</Combobox>
 			<ButtonStyled>
 				<button class="px-4 py-2" @click="setMaxAmount">
 					{{ formatMessage(commonMessages.maxButton) }}
@@ -21,14 +32,14 @@
 			</ButtonStyled>
 		</div>
 		<div>
-			<span class="my-1 mt-0 text-sm text-secondary">{{ formatMoney(maxAmount) }} available.</span>
+			<span class="my-1 mt-0 text-secondary">{{ formatMoney(maxAmount) }} available.</span>
 			<Transition name="fade">
-				<span v-if="isBelowMinimum" class="text-sm text-red">
+				<span v-if="isBelowMinimum" class="text-red">
 					Amount must be at least {{ formatMoney(minAmount) }}.
 				</span>
 			</Transition>
 			<Transition name="fade">
-				<span v-if="isAboveMaximum" class="text-sm text-red">
+				<span v-if="isAboveMaximum" class="text-red">
 					Amount cannot exceed {{ formatMoney(maxAmount) }}.
 				</span>
 			</Transition>
@@ -37,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, commonMessages, formFieldPlaceholders } from '@modrinth/ui'
+import { ButtonStyled, Combobox, commonMessages, formFieldPlaceholders } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
 import { computed, nextTick, ref, watch } from 'vue'
@@ -47,14 +58,20 @@ const props = withDefaults(
 		modelValue: number | undefined
 		maxAmount: number
 		minAmount?: number
+		showCurrencySelector?: boolean
+		selectedCurrency?: string
+		currencyOptions?: Array<{ value: string; label: string }>
 	}>(),
 	{
 		minAmount: 0.01,
+		showCurrencySelector: false,
+		currencyOptions: () => [],
 	},
 )
 
 const emit = defineEmits<{
 	'update:modelValue': [value: number | undefined]
+	'update:selectedCurrency': [value: string]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -73,7 +90,7 @@ const isAboveMaximum = computed(() => {
 async function setMaxAmount() {
 	const maxValue = props.maxAmount
 	emit('update:modelValue', maxValue)
-	// Force display of 2 decimal places after Vue updates the DOM
+
 	await nextTick()
 	if (amountInput.value) {
 		amountInput.value.value = maxValue.toFixed(2)

@@ -1,5 +1,10 @@
 <template>
-	<CreatorWithdrawModal ref="withdrawModal" :balance="userBalance" @refresh-data="refreshData" />
+	<CreatorWithdrawModal
+		ref="withdrawModal"
+		:balance="userBalance"
+		:preloaded-payment-data="preloadedPaymentMethods"
+		@refresh-data="refreshData"
+	/>
 	<div class="mb-20 flex flex-col gap-6 pl-4">
 		<div class="flex flex-col gap-4 md:gap-5">
 			<div class="flex flex-col gap-1">
@@ -206,6 +211,8 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 
+import { useUserCountry } from '@/composables/country.ts'
+import type { PayoutMethod } from '@/providers/creator-withdraw.ts'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
 
@@ -315,6 +322,22 @@ const { data: payouts, refresh: refreshPayouts } = await useAsyncData(`payout/hi
 		apiVersion: 3,
 	}),
 )
+
+const userCountry = useUserCountry()
+const { data: preloadedPaymentMethods } = await useAsyncData(`payout/methods-preload`, async () => {
+	const defaultCountry = userCountry.value || 'US'
+	try {
+		return {
+			country: defaultCountry,
+			methods: (await useBaseFetch('payout/methods', {
+				apiVersion: 3,
+				query: { country: defaultCountry },
+			})) as PayoutMethod[],
+		}
+	} catch {
+		return null
+	}
+})
 
 const sortedPayouts = computed(() => {
 	if (!payouts.value) return []

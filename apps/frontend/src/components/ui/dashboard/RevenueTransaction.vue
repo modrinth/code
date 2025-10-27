@@ -15,7 +15,14 @@
 				}}</span>
 				<span class="text-xs text-secondary md:text-sm">
 					<template v-if="!isIncome">
-						{{ formatTransactionStatus(transaction.status) }} <BulletDivider />
+						<span
+							:class="[
+								transaction.status === 'cancelling' || transaction.status === 'cancelled'
+									? 'text-red'
+									: '',
+							]"
+							>{{ formatTransactionStatus(transaction.status) }} <BulletDivider
+						/></span>
 					</template>
 					{{ $dayjs(transaction.created).format('MMM DD YYYY') }}
 					<template v-if="!isIncome && transaction.fee">

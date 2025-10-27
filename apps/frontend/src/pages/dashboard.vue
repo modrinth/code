@@ -20,7 +20,7 @@
 				]"
 			/>
 		</div>
-		<div class="normal-page__content mt-4 md:!mt-0">
+		<div class="normal-page__content mt-4 lg:!mt-0 lg:pl-4">
 			<NuxtPage :route="route" />
 		</div>
 	</div>

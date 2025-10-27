@@ -76,17 +76,13 @@
 						{{ formatMessage(messages.netAmount) }}
 					</span>
 					<span class="break-words text-sm font-semibold text-contrast sm:text-[1rem]">
+						{{ formatMoney(result?.netAmount || 0) }}
 						<template v-if="shouldShowExchangeRate">
-							{{ formattedLocalCurrency }}
-							<span class="text-secondary"> ({{ formatMoney(result?.netAmount || 0) }})</span>
-						</template>
-						<template v-else>
-							{{ formatMoney(result?.netAmount || 0) }}
+							<span> ({{ formattedLocalCurrency }})</span>
 						</template>
 					</span>
 				</div>
 				<template v-if="shouldShowExchangeRate">
-					<div class="border-b-1 h-0 w-full rounded-full border-b border-solid border-divider" />
 					<div
 						class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
 					>

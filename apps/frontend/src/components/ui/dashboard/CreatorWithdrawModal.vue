@@ -122,6 +122,7 @@ import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import {
 	createWithdrawContext,
+	type PayoutMethod,
 	provideWithdrawContext,
 	TAX_THRESHOLD_ACTUAL,
 	type WithdrawStage,
@@ -150,6 +151,7 @@ interface UserBalanceResponse {
 
 const props = defineProps<{
 	balance: UserBalanceResponse | null
+	preloadedPaymentData?: { country: string; methods: PayoutMethod[] } | null
 }>()
 
 const emit = defineEmits<{
@@ -182,7 +184,10 @@ defineExpose({
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 
-const withdrawContext = createWithdrawContext(props.balance)
+const withdrawContext = createWithdrawContext(
+	props.balance,
+	props.preloadedPaymentData || undefined,
+)
 provideWithdrawContext(withdrawContext)
 
 const {

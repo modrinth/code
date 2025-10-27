@@ -96,8 +96,14 @@ import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withd
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const debug = useDebugLogger('MethodSelectionStage')
-const { withdrawData, availableMethods, paymentOptions, balance, maxWithdrawAmount } =
-	useWithdrawContext()
+const {
+	withdrawData,
+	availableMethods,
+	paymentOptions,
+	balance,
+	maxWithdrawAmount,
+	paymentMethodsCache,
+} = useWithdrawContext()
 const userCountry = useUserCountry()
 const allCountries = useCountries()
 const { coords } = useGeolocation()
@@ -168,21 +174,29 @@ const loading = ref(false)
 watch(
 	() => withdrawData.value.selection.country,
 	async (country) => {
-		console.debug('[MethodSelectionStage] Watch triggered, country:', country)
+		debug('Watch triggered, country:', country)
 		if (!country) {
 			availableMethods.value = []
 			return
 		}
 
+		if (paymentMethodsCache.value[country.id]) {
+			debug('Using cached methods for', country.id)
+			availableMethods.value = paymentMethodsCache.value[country.id]
+			return
+		}
+
 		loading.value = true
-		console.debug('[MethodSelectionStage] Fetching payout methods for country:', country.id)
+		debug('Fetching payout methods for country:', country.id)
 
 		try {
 			const methods = (await useBaseFetch('payout/methods', {
 				apiVersion: 3,
 				query: { country: country.id },
 			})) as PayoutMethod[]
-			console.debug('[MethodSelectionStage] Received payout methods:', methods)
+			debug('Received payout methods:', methods)
+
+			paymentMethodsCache.value[country.id] = methods
 			availableMethods.value = methods
 		} catch (e) {
 			console.error('[MethodSelectionStage] Failed to fetch payout methods:', e)

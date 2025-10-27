@@ -187,6 +187,8 @@ export interface WithdrawContextValue {
 	maxWithdrawAmount: ComputedRef<number>
 	availableMethods: Ref<PayoutMethod[]>
 	paymentOptions: ComputedRef<PaymentOption[]>
+	preloadedCountry: Ref<string | undefined>
+	paymentMethodsCache: Ref<Record<string, PayoutMethod[]>>
 
 	setStage: (stage: WithdrawStage | undefined, skipValidation?: boolean) => Promise<void>
 	validateCurrentStage: () => boolean
@@ -366,7 +368,10 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 const STORAGE_KEY = 'modrinth_withdraw_state'
 const STATE_EXPIRY_MS = 15 * 60 * 1000 // 15 minutes
 
-export function createWithdrawContext(balance: any): WithdrawContextValue {
+export function createWithdrawContext(
+	balance: any,
+	preloadedPaymentData?: { country: string; methods: PayoutMethod[] },
+): WithdrawContextValue {
 	const debug = useDebugLogger('CreatorWithdraw')
 	const currentStage = ref<WithdrawStage | undefined>()
 
@@ -394,7 +399,12 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 	})
 
 	const balanceRef = ref(balance)
-	const availableMethods = ref<PayoutMethod[]>([])
+	const availableMethods = ref<PayoutMethod[]>(preloadedPaymentData?.methods || [])
+	const preloadedCountry = ref(preloadedPaymentData?.country)
+
+	const paymentMethodsCache = ref<Record<string, PayoutMethod[]>>(
+		preloadedPaymentData ? { [preloadedPaymentData.country]: preloadedPaymentData.methods } : {},
+	)
 
 	const stages = computed<WithdrawStage[]>(() => {
 		const dynamicStages: WithdrawStage[] = []
@@ -872,6 +882,8 @@ export function createWithdrawContext(balance: any): WithdrawContextValue {
 		maxWithdrawAmount,
 		availableMethods,
 		paymentOptions,
+		preloadedCountry,
+		paymentMethodsCache,
 		setStage,
 		validateCurrentStage,
 		resetData,
