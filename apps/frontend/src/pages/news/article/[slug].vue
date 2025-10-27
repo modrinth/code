@@ -211,7 +211,7 @@ onMounted(() => {
 		padding: 0;
 	}
 
-	ul,
+	ul > li:not(:last-child),
 	ol > li:not(:last-child) {
 		margin-bottom: 0.5rem;
 	}

@@ -26,15 +26,11 @@ Hey everyone! We've heard your feedback on creator withdrawal options, and we're
 
 ---
 
-# Withdrawal Flow
+## Streamlined Withdrawal Experience
 
 A big goal for this release was to make payouts as clear as possible for creators. The revenue screen and withdrawal process has been completely overhauled.
 
-## Revenue at a Glance
-
-Your revenue is now displayed as a balance, with a detailed breakdown below.
-
-Green shows available revenue, blue and purple show estimated revenue from the last two completed months, and grey shows the current month revenue that's still being processed.
+**Your revenue is now displayed as a balance, with a detailed breakdown below.**
 
 <div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
@@ -42,9 +38,13 @@ Green shows available revenue, blue and purple show estimated revenue from the l
 	</video>
 </div>
 
-## Simplified Withdrawals
+Green shows available revenue, blue and purple show estimated revenue from the last two completed months, and grey shows the current month revenue that's still being processed.
 
-Withdrawing from your balance now uses a new modal flow. Click the green Withdraw button to start, and you'll immediately see all available methods and fees for your country.
+We've also cleaned up the transaction history. You'll now see your most recent transactions directly on the revenue page, along with any deposits from Modrinth into your account.
+
+## New Withdraw Methods
+
+The second big goal of this release was to bring more options, better fees, and new ways to withdraw from countries that were previously hard to reach.
 
 <div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
@@ -52,17 +52,9 @@ Withdrawing from your balance now uses a new modal flow. Click the green Withdra
 	</video>
 </div>
 
-## Transaction History
+Withdrawing with ease from your balance using our new modal flow. Click the green Withdraw button to get started, and you'll immediately see all available methods and fees for your country, including a few new ones:
 
-We've also cleaned up the transaction history. You'll now see your most recent transactions directly on the revenue page, along with any deposits from Modrinth into your account.
-
----
-
-# New Withdraw Methods
-
-The second big goal of this release was to bring more options, better fees, and new ways to withdraw from countries that were previously hard to reach.
-
-## Bank Transfers (29 Countries)
+### Bank Transfers (29 Countries)
 
 You can now withdraw directly to your bank account via wire or ACH, depending on your country. Supported countries and their fees are listed below.
 
@@ -84,30 +76,21 @@ We're working to expand this list, most notably to Canada, the UK, and countries
 
 _Total Fee includes both transaction and FX fees._
 
-### Supported EU countries
+> **Supported EU countries**
+> Austria, Belgium, Cyprus, Estonia, Finland, France, Germany, Greece, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Portugal, Slovakia, Spain
 
-Austria, Belgium, Cyprus, Estonia, Finland, France, Germany, Greece, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Portugal, Slovakia, Spain
-
-## Crypto Withdrawals (USDC)
+### Crypto Withdrawals (USDC)
 
 We've also added USDC withdrawals on the Polygon network. This option is available worldwide, so everyone can now withdraw funds. Fees are a flat 1% + network fees, making it a great low-cost option.
 
-## PayPal & Venmo
+### PayPal & Venmo
 
 We've moved PayPal and Venmo to two different methods depending on your country:
 
-<ul style="margin-top: -1rem">
-	<li>
-		<strong>United States</strong>
-		<p>PayPal and Venmo will remain on the existing system with the same fees: $0.25 + 2%, capped at $1.00.</p>
-	</li>
-	<li>
-		<strong>International</strong>
-		<p>PayPal and Venmo have been moved to Tremendous, which has zero FX fees and charges a flat 6%, capped at $25.00. This should be an improvement over the old method for larger creators.</p>
-	</li>
-</ul>
+- **United States:** PayPal and Venmo will remain on the existing system with the same low fees: $0.25 + 2%, capped at $1.00.
+- **Outside of the United States:** PayPal and Venmo have been moved to Tremendous, which has zero FX fees and charges a flat 6%, capped at $25.00. This should be an improvement over the old method for larger creators, where PayPal charged high uncapped fees for currency conversion.
 
-## New Emails
+## New Email Notifications
 
 Earlier this month, we quietly rolled out a new email system that lets us give both creators and users better feedback about what's going on.
 
@@ -117,11 +100,11 @@ This includes emails for things like project status changes, payouts available, 
 
 Last but not least, we're also rolling out our new tax compliance system. We partially rolled this out earlier this month, but the full version is now live.
 
-Creator withdrawals will now be limited to $600.00 USD per calendar year for 2025, with this limit set to increase in 2026 (up to the US government). When a creator approaches that threshold, they'll be prompted to fill out a W-8 or W-9 tax form, depending on their country.
+Creator withdrawals will now be limited to $600.00 USD per calendar year as of 2025, per U.S. regulations. As a creator approaches that threshold, they'll be prompted to fill out a W-8 or W-9 tax form, depending on their country.
 
 ![A snippet of the tax form stage of the new withdraw modal.](./tax-compliance.png)
 
-Completing this form helps Modrinth stay compliant and will automatically unlock withdrawals again once submitted.
+Completing this form helps Modrinth stay compliant and will automatically unlock withdrawals again once submitted. For non-US users, these details are not automatically sent to the US government! They are for our own records in the case of an audit and we need to prove where we're sending money to.
 
 ---
 
