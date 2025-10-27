@@ -76,9 +76,12 @@
 						{{ formatMessage(messages.netAmount) }}
 					</span>
 					<span class="break-words text-sm font-semibold text-contrast sm:text-[1rem]">
-						{{ formatMoney(result?.netAmount || 0) }}
 						<template v-if="shouldShowExchangeRate">
-							<span class="text-secondary"> ({{ formattedLocalCurrency }})</span>
+							{{ formattedLocalCurrency }}
+							<span class="text-secondary"> ({{ formatMoney(result?.netAmount || 0) }})</span>
+						</template>
+						<template v-else>
+							{{ formatMoney(result?.netAmount || 0) }}
 						</template>
 					</span>
 				</div>
@@ -132,7 +135,10 @@ import dayjs from 'dayjs'
 import { computed, onMounted, ref } from 'vue'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
-import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import {
+	type TremendousProviderData,
+	useWithdrawContext,
+} from '@/providers/creator-withdraw.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
@@ -161,6 +167,12 @@ const selectedRail = computed(() => {
 })
 
 const localCurrency = computed(() => {
+	// Check if it's Tremendous withdrawal with currency
+	if (withdrawData.value.providerData.type === 'tremendous') {
+		return (withdrawData.value.providerData as TremendousProviderData).currency
+	}
+
+	// Fall back to MuralPay rail currency
 	return selectedRail.value?.currency
 })
 

@@ -27,13 +27,12 @@
 				<span class="font-semibold text-contrast">
 					{{ formatMoney(netAmount) }}
 					<template v-if="shouldShowExchangeRate">
-						<span class="text-secondary"> ({{ formattedLocalCurrency }})</span>
+						<span> ({{ formattedLocalCurrency }})</span>
 					</template>
 				</span>
 			</div>
 			<template v-if="shouldShowExchangeRate">
-				<div class="h-px bg-surface-5" />
-				<div class="flex items-center justify-between">
+				<div class="flex items-center justify-between text-sm">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownExchangeRate) }}</span>
 					<span class="text-secondary"
 						>1 USD = {{ exchangeRate?.toFixed(4) }} {{ localCurrency }}</span
@@ -114,7 +113,7 @@ const messages = defineMessages({
 	},
 	feeBreakdownExchangeRate: {
 		id: 'dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate',
-		defaultMessage: 'Exchange rate',
+		defaultMessage: 'FX rate',
 	},
 })
 </script>

@@ -33,6 +33,21 @@
 			</div>
 		</div>
 
+		<div class="flex flex-col gap-2.5">
+			<label>
+				<span class="text-md font-semibold text-contrast"
+					>{{ formatMessage(formFieldLabels.email) }} <span class="text-red">*</span></span
+				>
+			</label>
+			<input
+				v-model="deliveryEmail"
+				type="email"
+				:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
+				autocomplete="email"
+				class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+			/>
+		</div>
+
 		<div v-if="showPayPalCurrencySelector" class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast"
@@ -49,21 +64,6 @@
 					<span class="font-semibold leading-tight">{{ option.label }}</span>
 				</template>
 			</Combobox>
-		</div>
-
-		<div class="flex flex-col gap-2.5">
-			<label>
-				<span class="text-md font-semibold text-contrast"
-					>{{ formatMessage(formFieldLabels.email) }} <span class="text-red">*</span></span
-				>
-			</label>
-			<input
-				v-model="deliveryEmail"
-				type="email"
-				:placeholder="formatMessage(formFieldPlaceholders.emailPlaceholder)"
-				autocomplete="email"
-				class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
-			/>
 		</div>
 
 		<div v-if="showGiftCardSelector" class="flex flex-col gap-1">
