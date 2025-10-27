@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "More Ways to Withdraw",
+			"summary": "Coming soon: new withdraw options and a redesigned revenue dashboard",
+			"thumbnail": "https://modrinth.com/news/article/creator-withdrawals-overhaul/thumbnail.webp",
+			"date": "2025-10-27T23:30:00.000Z",
+			"link": "https://modrinth.com/news/article/creator-withdrawals-overhaul"
+		},
+		{
 			"title": "Standing By Our Values",
 			"summary": "Keeping LGBTQIA+ content visible despite demands from Russia.",
 			"thumbnail": "https://modrinth.com/news/default.webp",
