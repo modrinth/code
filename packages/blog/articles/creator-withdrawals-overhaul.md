@@ -1,6 +1,6 @@
 ---
-title: Expanding Withdrawal Options for Creators
-summary: 'Coming soon: New withdrawal options for creators around the world and a revamped withdrawal dashboard.'
+title: More Ways to Withdraw
+summary: 'Coming soon: new withdraw options and a redesigned revenue dashboard'
 authors: ['AJfd8YH6', 'bOHH0P9Z', 'xSQqYYIN']
 ---
 
