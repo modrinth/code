@@ -4,12 +4,12 @@
         <description><![CDATA[Keep up-to-date on the latest news from Modrinth.]]></description>
         <link>https://modrinth.com/news/</link>
         <generator>@modrinth/blog</generator>
-        <lastBuildDate>Mon, 27 Oct 2025 22:06:50 GMT</lastBuildDate>
+        <lastBuildDate>Mon, 27 Oct 2025 22:20:09 GMT</lastBuildDate>
         <atom:link href="https://modrinth.com/news/feed/rss.xml" rel="self" type="application/rss+xml"/>
         <language><![CDATA[en]]></language>
         <item>
-            <title><![CDATA[Creator Withdrawals Overhaul]]></title>
-            <description><![CDATA[A new and improved revenue dashboard and withdrawal process, with brand new payout methods.]]></description>
+            <title><![CDATA[More Ways to Withdraw]]></title>
+            <description><![CDATA[Coming soon: new withdraw options and a redesigned revenue dashboard]]></description>
             <link>https://modrinth.com/news/article/creator-withdrawals-overhaul/</link>
             <guid isPermaLink="false">https://modrinth.com/news/article/creator-withdrawals-overhaul/</guid>
             <pubDate>Mon, 27 Oct 2025 21:38:54 GMT</pubDate>
