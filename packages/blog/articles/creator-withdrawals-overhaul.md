@@ -96,13 +96,16 @@ We've also added USDC withdrawals on the Polygon network. This option is availab
 
 We've moved PayPal and Venmo to two different methods depending on your country:
 
-- **United States:**
-
-  PayPal and Venmo will remain on the existing system with the same fees: $0.25 + 2%, capped at $1.00.
-
-- **International:**
-
-  PayPal and Venmo have been moved to Tremendous, which has zero FX fees and charges a flat 6%, capped at $25.00. This should be an improvement over the old method for larger creators.
+<ul style="margin-top: -1rem">
+	<li>
+		<strong>United States</strong>
+		<p>PayPal and Venmo will remain on the existing system with the same fees: $0.25 + 2%, capped at $1.00.</p>
+	</li>
+	<li>
+		<strong>International</strong>
+		<p>PayPal and Venmo have been moved to Tremendous, which has zero FX fees and charges a flat 6%, capped at $25.00. This should be an improvement over the old method for larger creators.</p>
+	</li>
+</ul>
 
 ## New Emails
 
