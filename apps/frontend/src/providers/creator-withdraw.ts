@@ -132,6 +132,7 @@ export interface TremendousProviderData {
 	type: 'tremendous'
 	deliveryEmail: string
 	giftCardDetails: GiftCardDetails | null
+	currency?: string
 }
 
 export interface MuralPayProviderData {
@@ -291,13 +292,17 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 		if (!isTremendousProvider(data.providerData)) {
 			throw new Error('Invalid provider data for Tremendous')
 		}
+		const methodDetails: any = {
+			delivery_email: data.providerData.deliveryEmail,
+		}
+		if (data.providerData.currency) {
+			methodDetails.currency = data.providerData.currency
+		}
 		return {
 			amount: data.calculation.amount,
 			method: 'tremendous',
 			method_id: data.selection.methodId!,
-			method_details: {
-				delivery_email: data.providerData.deliveryEmail,
-			},
+			method_details: methodDetails,
 		}
 	} else if (data.selection.provider === 'muralpay') {
 		if (!isMuralPayProvider(data.providerData)) {

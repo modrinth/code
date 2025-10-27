@@ -240,6 +240,7 @@ watch(
 				type: 'tremendous',
 				deliveryEmail: userEmail,
 				giftCardDetails: null,
+				currency: undefined,
 			}
 		} else if (newProvider === 'muralpay') {
 			withdrawData.value.providerData = {

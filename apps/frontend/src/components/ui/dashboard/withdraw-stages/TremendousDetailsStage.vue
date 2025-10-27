@@ -33,6 +33,24 @@
 			</div>
 		</div>
 
+		<div v-if="showPayPalCurrencySelector" class="flex flex-col gap-2.5">
+			<label>
+				<span class="text-md font-semibold text-contrast"
+					>Currency <span class="text-red">*</span></span
+				>
+			</label>
+			<Combobox
+				v-model="selectedCurrency"
+				:options="currencyOptions"
+				placeholder="Select currency"
+				class="h-10"
+			>
+				<template v-for="option in currencyOptions" :key="option.value" #[`option-${option.value}`]>
+					<span class="font-semibold leading-tight">{{ option.label }}</span>
+				</template>
+			</Combobox>
+		</div>
+
 		<div class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast"
@@ -129,6 +147,8 @@
 				:amount="formData.amount || 0"
 				:fee="calculatedFee"
 				:fee-loading="feeLoading"
+				:exchange-rate="exchangeRate"
+				:local-currency="showPayPalCurrencySelector ? selectedCurrency : undefined"
 			/>
 
 			<Checkbox v-model="agreedTerms">
@@ -192,6 +212,11 @@ const showGiftCardSelector = computed(() => {
 	return method === 'merchant_card' || method === 'charity'
 })
 
+const showPayPalCurrencySelector = computed(() => {
+	const method = withdrawData.value.selection.method
+	return method === 'paypal'
+})
+
 const selectedMethodDisplay = computed(() => {
 	const method = withdrawData.value.selection.method
 	if (!method) return null
@@ -240,6 +265,51 @@ const formData = ref<Record<string, any>>({
 
 const selectedGiftCardId = ref<string | null>(withdrawData.value.selection.methodId || null)
 
+const currencyOptions = [
+	{ value: 'USD', label: 'USD - US Dollar' },
+	{ value: 'GBP', label: 'GBP - British Pound' },
+	{ value: 'CAD', label: 'CAD - Canadian Dollar' },
+	{ value: 'EUR', label: 'EUR - Euro' },
+]
+
+function getCurrencyFromCountryCode(countryCode: string | undefined): string {
+	if (!countryCode) return 'USD'
+
+	const code = countryCode.toUpperCase()
+
+	const countryToCurrency: Record<string, string> = {
+		US: 'USD', // United States
+		GB: 'GBP', // UK
+		CA: 'CAD', // Canada
+
+		// Eurozone countries
+		AT: 'EUR', // Austria
+		BE: 'EUR', // Belgium
+		CY: 'EUR', // Cyprus
+		EE: 'EUR', // Estonia
+		FI: 'EUR', // Finland
+		FR: 'EUR', // France
+		DE: 'EUR', // Germany
+		GR: 'EUR', // Greece
+		IE: 'EUR', // Ireland
+		IT: 'EUR', // Italy
+		LV: 'EUR', // Latvia
+		LT: 'EUR', // Lithuania
+		LU: 'EUR', // Luxembourg
+		MT: 'EUR', // Malta
+		NL: 'EUR', // Netherlands
+		PT: 'EUR', // Portugal
+		SK: 'EUR', // Slovakia
+		SI: 'EUR', // Slovenia
+		ES: 'EUR', // Spain
+	}
+
+	return countryToCurrency[code] || 'USD'
+}
+
+const initialCurrency = getCurrencyFromCountryCode(withdrawData.value.selection.country?.id)
+const selectedCurrency = ref<string>(initialCurrency)
+
 const agreedTerms = computed({
 	get: () => withdrawData.value.agreedTerms,
 	set: (value) => {
@@ -248,6 +318,7 @@ const agreedTerms = computed({
 })
 
 const calculatedFee = ref<number>(0)
+const exchangeRate = ref<number | null>(null)
 const feeLoading = ref(false)
 
 const rewardOptions = ref<
@@ -337,6 +408,7 @@ const calculateFeesDebounced = useDebounceFn(async () => {
 	const amount = formData.value.amount
 	if (!amount || amount <= 0) {
 		calculatedFee.value = 0
+		exchangeRate.value = null
 		return
 	}
 
@@ -346,6 +418,7 @@ const calculateFeesDebounced = useDebounceFn(async () => {
 
 	if (!methodId) {
 		calculatedFee.value = 0
+		exchangeRate.value = null
 		return
 	}
 
@@ -353,9 +426,11 @@ const calculateFeesDebounced = useDebounceFn(async () => {
 	try {
 		await calculateFees()
 		calculatedFee.value = withdrawData.value.calculation.fee ?? 0
+		exchangeRate.value = withdrawData.value.calculation.exchangeRate
 	} catch (error) {
 		console.error('Failed to calculate fees:', error)
 		calculatedFee.value = 0
+		exchangeRate.value = null
 	} finally {
 		feeLoading.value = false
 	}
@@ -367,8 +442,24 @@ watch(deliveryEmail, (newEmail) => {
 	}
 })
 
+watch(selectedCurrency, (newCurrency) => {
+	if (withdrawData.value.providerData.type === 'tremendous') {
+		;(withdrawData.value.providerData as any).currency = newCurrency
+	}
+})
+
 watch(
-	[() => formData.value.amount, selectedGiftCardId, deliveryEmail],
+	() => withdrawData.value.selection.country?.id,
+	(newCountryId) => {
+		if (showPayPalCurrencySelector.value && newCountryId) {
+			const detectedCurrency = getCurrencyFromCountryCode(newCountryId)
+			selectedCurrency.value = detectedCurrency
+		}
+	},
+)
+
+watch(
+	[() => formData.value.amount, selectedGiftCardId, deliveryEmail, selectedCurrency],
 	() => {
 		withdrawData.value.calculation.amount = formData.value.amount ?? 0
 
@@ -381,6 +472,7 @@ watch(
 			calculateFeesDebounced()
 		} else {
 			calculatedFee.value = 0
+			exchangeRate.value = null
 			feeLoading.value = false
 		}
 	},
@@ -423,6 +515,7 @@ watch(
 			}
 			selectedGiftCardId.value = null
 			calculatedFee.value = 0
+			exchangeRate.value = null
 		}
 	},
 )
