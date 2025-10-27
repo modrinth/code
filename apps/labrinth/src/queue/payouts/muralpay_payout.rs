@@ -108,6 +108,31 @@ impl PayoutsQueue {
                 MuralError::Api(err) => ApiError::Request(err.into()),
                 err => ApiError::Internal(err.into()),
             })?;
+
+        // try to immediately execute the payout request...
+        let result = async move {
+            muralpay
+                .client
+                .execute_payout_request(payout_request.id)
+                .await
+                .wrap_internal_err("failed to execute payout request")?;
+            eyre::Ok(())
+        }
+        .await;
+
+        // and if it fails, make sure to immediately cancel it -
+        // we don't want floating payout requests
+        if let Err(err) = result {
+            muralpay
+                .client
+                .cancel_payout_request(payout_request.id)
+                .await
+                .wrap_internal_err(
+                    "failed to cancel unexecuted payout request",
+                )?;
+            return Err(ApiError::Internal(err));
+        }
+
         Ok(payout_request)
     }
 

@@ -8,7 +8,7 @@ use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{
     MuralPayDetails, PayoutMethodRequest, PayoutMethodType, PayoutStatus,
-    TremendousDetails,
+    TremendousDetails, TremendousForexResponse,
 };
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
@@ -676,7 +676,10 @@ async fn tremendous_payout(
         sent_to_method,
         payouts_queue,
     }: PayoutContext<'_>,
-    TremendousDetails { delivery_email }: &TremendousDetails,
+    TremendousDetails {
+        delivery_email,
+        currency,
+    }: &TremendousDetails,
 ) -> Result<DBPayout, ApiError> {
     let user_email = get_verified_email(user)?;
 
@@ -707,6 +710,22 @@ async fn tremendous_payout(
         pub order: Order,
     }
 
+    let forex: TremendousForexResponse = payouts_queue
+        .make_tremendous_request(Method::GET, "forex", None::<()>)
+        .await
+        .wrap_internal_err("failed to fetch Tremendous forex data")?;
+
+    let (denomination, currency_code) = if let Some(currency) = currency {
+        let currency_code = currency.to_string();
+        let exchange_rate =
+            forex.forex.get(&currency_code).wrap_internal_err_with(|| {
+                eyre!("no Tremendous forex data for {currency}")
+            })?;
+        (sent_to_method * *exchange_rate, Some(currency_code))
+    } else {
+        (sent_to_method, None)
+    };
+
     let res: TremendousResponse = payouts_queue
         .make_tremendous_request(
             Method::POST,
@@ -717,7 +736,8 @@ async fn tremendous_payout(
                 },
                 "rewards": [{
                     "value": {
-                        "denomination": sent_to_method
+                        "denomination": denomination,
+                        "currency_code": currency_code,
                     },
                     "delivery": {
                         "method": "EMAIL"
@@ -772,7 +792,7 @@ async fn mural_pay_payout(
         id: payout_id,
         user_id: user.id,
         created: Utc::now(),
-        status: PayoutStatus::InTransit,
+        status: PayoutStatus::Success,
         amount: raw_amount,
         fee: Some(total_fee),
         method: Some(PayoutMethodType::MuralPay),

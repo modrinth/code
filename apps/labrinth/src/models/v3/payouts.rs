@@ -1,4 +1,4 @@
-use std::cmp;
+use std::{cmp, collections::HashMap, fmt};
 
 use crate::{
     models::ids::PayoutId, queue::payouts::muralpay_payout::MuralPayoutRequest,
@@ -93,6 +93,40 @@ impl std::fmt::Display for PayoutMethodType {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct TremendousDetails {
     pub delivery_email: String,
+    #[schema(inline)]
+    pub currency: Option<TremendousCurrency>,
+}
+
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum TremendousCurrency {
+    Usd,
+    Cad,
+    Eur,
+    Gbp,
+}
+
+impl fmt::Display for TremendousCurrency {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = serde_json::to_value(self).map_err(|_| fmt::Error)?;
+        let s = s.as_str().ok_or(fmt::Error)?;
+        write!(f, "{s}")
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TremendousForexResponse {
+    pub forex: HashMap<String, Decimal>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
