@@ -1,5 +1,5 @@
 ---
-title: Creator Revenue Dashboard & Withdrawal Overhaul
+title: Creator Withdrawals Overhaul
 summary: A new and improved revenue dashboard and withdrawal process, with brand new payout methods.
 date: 2025-10-27T21:38:54+00:00
 authors: ['AJfd8YH6', 'bOHH0P9Z']
