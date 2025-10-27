@@ -1,7 +1,7 @@
 ---
 title: More Ways to Withdraw
 summary: 'Coming soon: new withdraw options and a redesigned revenue dashboard'
-date: 2025-10-27T21:38:54+00:00
+date: 2025-10-27T16:30:00-07:00
 authors: ['AJfd8YH6', 'bOHH0P9Z', 'xSQqYYIN']
 ---
 
