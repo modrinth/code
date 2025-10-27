@@ -38,7 +38,7 @@ A big goal for this release was to make payouts as clear as possible for creator
 	</video>
 </div>
 
-Green shows available revenue, blue and purple show estimated revenue from the last two completed months, and grey shows the current month revenue that's still being processed.
+> Green shows available revenue, blue and purple show estimated revenue from the last two completed months, and grey shows the current month revenue that's still being processed.
 
 We've also cleaned up the transaction history. You'll now see your most recent transactions directly on the revenue page, along with any deposits from Modrinth into your account.
 
@@ -76,8 +76,7 @@ We're working to expand this list, most notably to Canada, the UK, and countries
 
 _Total Fee includes both transaction and FX fees._
 
-> **Supported EU countries**
-> Austria, Belgium, Cyprus, Estonia, Finland, France, Germany, Greece, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Portugal, Slovakia, Spain
+> **Supported EU countries:** Austria, Belgium, Cyprus, Estonia, Finland, France, Germany, Greece, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Portugal, Slovakia, Spain
 
 ### Crypto Withdrawals (USDC)
 
