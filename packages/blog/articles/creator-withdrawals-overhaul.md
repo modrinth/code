@@ -36,7 +36,7 @@ Your revenue is now displayed as a balance, with a detailed breakdown below.
 
 Green shows available revenue, blue and purple show estimated revenue from the last two completed months, and grey shows the current month revenue that's still being processed.
 
-<div class="video-wrapper mb-8 rounded-xl relative">
+<div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
 		<source src="./balance-progress-bar.mp4" type="video/mp4" />
 	</video>
