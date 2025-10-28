@@ -340,7 +340,7 @@ const messages = defineMessages({
 	</div>
 	<div class="flex flex-col gap-3">
 		<h3
-			v-if="sortedFriends.length === 0 || loading"
+			v-if="loading"
 			class="ml-4 mr-1 text-base text-primary font-medium m-0"
 		>
 			{{ formatMessage(messages.friends) }}
