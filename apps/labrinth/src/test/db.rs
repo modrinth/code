@@ -1,14 +1,39 @@
 use eyre::{Context, Result};
 use sqlx::PgPool;
 
+/// Static personal access token for use in [`AppendPat`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Pat(pub &'static str);
+
+/// Dummy [`Pat`]s.
+#[allow(missing_docs, reason = "self-explanatory")]
 pub mod pat {
-    pub const ADMIN: &str = "mrp_patadmin";
-    pub const MODERATOR: &str = "mrp_patmoderator";
-    pub const USER: &str = "mrp_patuser";
-    pub const FRIEND: &str = "mrp_patfriend";
-    pub const ENEMY: &str = "mrp_patenemy";
+    use super::Pat;
+
+    pub const ADMIN: Pat = Pat("mrp_patadmin");
+    pub const MODERATOR: Pat = Pat("mrp_patmoderator");
+    pub const USER: Pat = Pat("mrp_patuser");
+    pub const FRIEND: Pat = Pat("mrp_patfriend");
+    pub const ENEMY: Pat = Pat("mrp_patenemy");
 }
 
+/// See [`AppendPat::append_pat`].
+pub trait AppendPat {
+    /// Appends a [`Pat`] authorization token to an
+    /// [`actix_web::test::TestRequest`].
+    #[must_use]
+    fn append_pat(self, pat: Pat) -> Self;
+}
+
+impl AppendPat for actix_web::test::TestRequest {
+    fn append_pat(self, pat: Pat) -> Self {
+        self.append_header(("Authorization", pat.0))
+    }
+}
+
+/// Dummy [`DBUserId`]s.
+///
+/// [`DBUserId`]: crate::database::models::DBUserId
 pub mod user_id {
     use crate::database::models::DBUserId;
 
@@ -19,6 +44,11 @@ pub mod user_id {
     pub const ENEMY: DBUserId = DBUserId(5);
 }
 
+/// Initialize a database with dummy fixture data.
+///
+/// # Errors
+///
+/// Errors if the fixture could not be applied.
 pub async fn add_dummy_data(db: &PgPool) -> Result<()> {
     sqlx::query(
         include_str!("../../fixtures/dummy_data.sql")
