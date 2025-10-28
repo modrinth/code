@@ -1,6 +1,6 @@
 use eyre::Context;
 use prometheus::{IntGauge, Registry};
-use sqlx::migrate::MigrateDatabase;
+use sqlx::migrate::{MigrateDatabase, Migrator};
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use sqlx::{Connection, PgConnection, Postgres};
 use std::ops::{Deref, DerefMut};
@@ -96,13 +96,15 @@ pub async fn check_for_migrations() -> eyre::Result<()> {
     let mut conn: PgConnection = PgConnection::connect(uri)
         .await
         .wrap_err("failed to connect to database")?;
-    sqlx::migrate!()
+    MIGRATOR
         .run(&mut conn)
         .await
         .wrap_err("failed to run database migrations")?;
 
     Ok(())
 }
+
+pub static MIGRATOR: Migrator = sqlx::migrate!();
 
 pub static DUMMY_SEED_FIXTURE: &str =
     include_str!("../../fixtures/labrinth-seed-data-202508052143.sql");
