@@ -289,7 +289,7 @@ pub async fn add_dummy_data(api: &ApiV3, db: TemporaryDatabase) -> DummyData {
     // Adds basic dummy data to the database directly with sql (user, pats)
     let pool = &db.pool.clone();
 
-    labrinth::test::db::add_dummy_data(&pool).await.unwrap();
+    labrinth::test::db::add_dummy_data(pool).await.unwrap();
 
     let (alpha_project, alpha_version) = add_project_alpha(api).await;
     let (beta_project, beta_version) = add_project_beta(api).await;
