@@ -339,10 +339,7 @@ const messages = defineMessages({
 		</ButtonStyled>
 	</div>
 	<div class="flex flex-col gap-3">
-		<h3
-			v-if="loading"
-			class="ml-4 mr-1 text-base text-primary font-medium m-0"
-		>
+		<h3 v-if="loading" class="ml-4 mr-1 text-base text-primary font-medium m-0">
 			{{ formatMessage(messages.friends) }}
 		</h3>
 		<template v-if="loading">
