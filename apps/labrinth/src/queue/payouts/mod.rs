@@ -36,6 +36,9 @@ use tracing::{error, info, warn};
 
 pub mod mural;
 
+mod affiliate;
+pub use affiliate::process_affiliate_payouts;
+
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
     payout_options: RwLock<Option<PayoutMethods>>,
