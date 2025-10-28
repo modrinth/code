@@ -1,3 +1,4 @@
+use eyre::Context;
 use prometheus::{IntGauge, Registry};
 use sqlx::migrate::MigrateDatabase;
 use sqlx::postgres::{PgPool, PgPoolOptions};
@@ -75,24 +76,36 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
         Ok((pool, ro))
     }
 }
-pub async fn check_for_migrations() -> Result<(), sqlx::Error> {
-    let uri = dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+
+pub async fn check_for_migrations() -> eyre::Result<()> {
+    let uri =
+        dotenvy::var("DATABASE_URL").wrap_err("`DATABASE_URL` not in .env")?;
     let uri = uri.as_str();
-    if !Postgres::database_exists(uri).await? {
+    if !Postgres::database_exists(uri)
+        .await
+        .wrap_err("failed to check if database exists")?
+    {
         info!("Creating database...");
-        Postgres::create_database(uri).await?;
+        Postgres::create_database(uri)
+            .await
+            .wrap_err("failed to create database")?;
     }
 
     info!("Applying migrations...");
 
-    let mut conn: PgConnection = PgConnection::connect(uri).await?;
+    let mut conn: PgConnection = PgConnection::connect(uri)
+        .await
+        .wrap_err("failed to connect to database")?;
     sqlx::migrate!()
         .run(&mut conn)
         .await
-        .expect("Error while running database migrations!");
+        .wrap_err("failed to run database migrations")?;
 
     Ok(())
 }
+
+pub static DUMMY_SEED_FIXTURE: &str =
+    include_str!("../../fixtures/labrinth-seed-data-202508052143.sql");
 
 pub async fn register_and_set_metrics(
     pool: &PgPool,
