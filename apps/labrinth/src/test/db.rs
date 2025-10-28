@@ -1,5 +1,5 @@
 use eyre::{Context, Result};
-use sqlx::PgPool;
+use sqlx::{Executor, PgPool};
 
 /// Static personal access token for use in [`AppendPat`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -50,7 +50,7 @@ pub mod user_id {
 ///
 /// Errors if the fixture could not be applied.
 pub async fn add_dummy_data(db: &PgPool) -> Result<()> {
-    sqlx::query(
+    db.execute(
         include_str!("../../fixtures/dummy_data.sql")
             //
             .replace("{{user_id::ADMIN}}", &user_id::ADMIN.0.to_string())
@@ -74,7 +74,6 @@ pub async fn add_dummy_data(db: &PgPool) -> Result<()> {
             )
             .as_str(),
     )
-    .execute(db)
     .await
     .wrap_err("failed to add dummy data")?;
 
