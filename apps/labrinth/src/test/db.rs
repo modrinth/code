@@ -62,11 +62,11 @@ pub async fn add_dummy_data(db: &PgPool) -> Result<()> {
             .replace("{{user_id::FRIEND}}", &user_id::FRIEND.0.to_string())
             .replace("{{user_id::ENEMY}}", &user_id::ENEMY.0.to_string())
             //
-            .replace("{{pat::ADMIN}}", pat::ADMIN)
-            .replace("{{pat::MODERATOR}}", pat::MODERATOR)
-            .replace("{{pat::USER}}", pat::USER)
-            .replace("{{pat::FRIEND}}", pat::FRIEND)
-            .replace("{{pat::ENEMY}}", pat::ENEMY)
+            .replace("{{pat::ADMIN}}", pat::ADMIN.0)
+            .replace("{{pat::MODERATOR}}", pat::MODERATOR.0)
+            .replace("{{pat::USER}}", pat::USER.0)
+            .replace("{{pat::FRIEND}}", pat::FRIEND.0)
+            .replace("{{pat::ENEMY}}", pat::ENEMY.0)
             //
             .replace(
                 "{{all_scopes}}",
