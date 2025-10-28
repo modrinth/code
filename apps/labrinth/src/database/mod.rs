@@ -5,6 +5,5 @@ pub use models::DBImage;
 pub use models::DBProject;
 pub use models::DBVersion;
 pub use postgres_database::{
-    DUMMY_SEED_FIXTURE, ReadOnlyPgPool, check_for_migrations, connect_all,
-    register_and_set_metrics,
+    ReadOnlyPgPool, check_for_migrations, connect_all, register_and_set_metrics,
 };

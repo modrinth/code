@@ -106,9 +106,6 @@ pub async fn check_for_migrations() -> eyre::Result<()> {
 
 pub static MIGRATOR: Migrator = sqlx::migrate!();
 
-pub static DUMMY_SEED_FIXTURE: &str =
-    include_str!("../../fixtures/labrinth-seed-data-202508052143.sql");
-
 pub async fn register_and_set_metrics(
     pool: &PgPool,
     registry: &Registry,
