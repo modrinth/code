@@ -365,7 +365,7 @@ const messages = defineMessages({
 				<div v-else>
 					<IntlFormatted :message-id="messages.addFriendsToShare">
 						<template #link="{ children }">
-							<span class="font-semibold text-brand cursor-pointer" @click="signIn">
+							<span class="font-semibold text-brand cursor-pointer" @click="addFriendModal.show">
 								<component :is="() => children" />
 							</span>
 						</template>
