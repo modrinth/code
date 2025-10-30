@@ -744,7 +744,7 @@ export default defineNuxtComponent({
 		const route = useNativeRoute()
 
 		const auth = await useAuth()
-		const tags = useTags()
+		const tags = useGeneratedState()
 		const flags = useFeatureFlags()
 
 		const path = route.name.split('-')

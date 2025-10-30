@@ -26,6 +26,16 @@ import _WavingRinthbot from './branding/rinthbot/waving.webp'
 import _AppleIcon from './external/apple.svg?component'
 import _BlueskyIcon from './external/bluesky.svg?component'
 import _BuyMeACoffeeIcon from './external/bmac.svg?component'
+// External Icons
+import _SSODiscordIcon from './external/color/discord.svg?component'
+import _SSOGitHubIcon from './external/color/github.svg?component'
+import _SSOGitLabIcon from './external/color/gitlab.svg?component'
+import _SSOGoogleIcon from './external/color/google.svg?component'
+import _SSOMicrosoftIcon from './external/color/microsoft.svg?component'
+import _SSOPayPalIcon from './external/color/paypal.svg?component'
+import _SSOSteamIcon from './external/color/steam.svg?component'
+import _SSOUSDCIcon from './external/color/usdc.svg?component'
+import _SSOVenmoIcon from './external/color/venmo.svg?component'
 import _CurseForgeIcon from './external/curseforge.svg?component'
 import _DiscordIcon from './external/discord.svg?component'
 import _GithubIcon from './external/github.svg?component'
@@ -34,16 +44,12 @@ import _MastodonIcon from './external/mastodon.svg?component'
 import _OpenCollectiveIcon from './external/opencollective.svg?component'
 import _PatreonIcon from './external/patreon.svg?component'
 import _PayPalIcon from './external/paypal.svg?component'
+import _PolygonIcon from './external/polygon.svg?component'
 import _RedditIcon from './external/reddit.svg?component'
-// External Icons
-import _SSODiscordIcon from './external/sso/discord.svg?component'
-import _SSOGitHubIcon from './external/sso/github.svg?component'
-import _SSOGitLabIcon from './external/sso/gitlab.svg?component'
-import _SSOGoogleIcon from './external/sso/google.svg?component'
-import _SSOMicrosoftIcon from './external/sso/microsoft.svg?component'
-import _SSOSteamIcon from './external/sso/steam.svg?component'
 import _TumblrIcon from './external/tumblr.svg?component'
 import _TwitterIcon from './external/twitter.svg?component'
+import _VenmoIcon from './external/venmo.svg?component'
+import _VisaIcon from './external/visa.svg?component'
 import _WindowsIcon from './external/windows.svg?component'
 import _YouTubeIcon from './external/youtube.svg?component'
 
@@ -61,6 +67,8 @@ export const SleepingRinthbot = _SleepingRinthbot
 export const SobbingRinthbot = _SobbingRinthbot
 export const ThinkingRinthbot = _ThinkingRinthbot
 export const WavingRinthbot = _WavingRinthbot
+export const SSOPayPalIcon = _SSOPayPalIcon
+export const SSOVenmoIcon = _SSOVenmoIcon
 export const SSODiscordIcon = _SSODiscordIcon
 export const SSOGitHubIcon = _SSOGitHubIcon
 export const SSOGitLabIcon = _SSOGitLabIcon
@@ -83,6 +91,10 @@ export const TumblrIcon = _TumblrIcon
 export const TwitterIcon = _TwitterIcon
 export const WindowsIcon = _WindowsIcon
 export const YouTubeIcon = _YouTubeIcon
+export const VenmoIcon = _VenmoIcon
+export const PolygonIcon = _PolygonIcon
+export const SSOUSDCIcon = _SSOUSDCIcon
+export const VisaIcon = _VisaIcon
 
 export * from './generated-icons'
 export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'

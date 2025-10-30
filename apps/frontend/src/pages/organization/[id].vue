@@ -7,22 +7,13 @@
 		<ModalCreation ref="modal_creation" :organization-id="organization.id" />
 		<template v-if="routeHasSettings">
 			<div class="normal-page__sidebar">
-				<div class="universal-card">
-					<Breadcrumbs
-						current-title="Settings"
-						:link-stack="[
-							{ href: `/dashboard/organizations`, label: 'Organizations' },
-							{
-								href: `/organization/${organization.slug}`,
-								label: organization.name,
-								allowTrimming: true,
-							},
-						]"
-					/>
-					<div class="page-header__settings">
+				<div
+					class="bg-surface mb-4 flex flex-col rounded-xl border border-solid border-surface-4 p-4"
+				>
+					<div class="flex items-center gap-4">
 						<Avatar size="sm" :src="organization.icon_url" />
-						<div class="title-section">
-							<h2 class="settings-title">
+						<div class="flex flex-col justify-center gap-1">
+							<h2 class="m-0 text-base">
 								<nuxt-link :to="`/organization/${organization.slug}/settings`">
 									{{ organization.name }}
 								</nuxt-link>
@@ -33,33 +24,32 @@
 							</span>
 						</div>
 					</div>
-
-					<h2>Organization settings</h2>
-
-					<NavStack>
-						<NavStackItem :link="`/organization/${organization.slug}/settings`" label="Overview">
-							<SettingsIcon />
-						</NavStackItem>
-						<NavStackItem
-							:link="`/organization/${organization.slug}/settings/members`"
-							label="Members"
-						>
-							<UsersIcon />
-						</NavStackItem>
-						<NavStackItem
-							:link="`/organization/${organization.slug}/settings/projects`"
-							label="Projects"
-						>
-							<BoxIcon />
-						</NavStackItem>
-						<NavStackItem
-							:link="`/organization/${organization.slug}/settings/analytics`"
-							label="Analytics"
-						>
-							<ChartIcon />
-						</NavStackItem>
-					</NavStack>
 				</div>
+
+				<NavStack
+					:items="[
+						{
+							link: `/organization/${organization.slug}/settings`,
+							label: 'Overview',
+							icon: SettingsIcon,
+						},
+						{
+							link: `/organization/${organization.slug}/settings/members`,
+							label: 'Members',
+							icon: UsersIcon,
+						},
+						{
+							link: `/organization/${organization.slug}/settings/projects`,
+							label: 'Projects',
+							icon: BoxIcon,
+						},
+						{
+							link: `/organization/${organization.slug}/settings/analytics`,
+							label: 'Analytics',
+							icon: ChartIcon,
+						},
+					]"
+				/>
 			</div>
 			<div class="normal-page__content">
 				<NuxtPage />
@@ -271,14 +261,7 @@ import {
 	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	Avatar,
-	Breadcrumbs,
-	ButtonStyled,
-	commonMessages,
-	ContentPageHeader,
-	OverflowMenu,
-} from '@modrinth/ui'
+import { Avatar, ButtonStyled, commonMessages, ContentPageHeader, OverflowMenu } from '@modrinth/ui'
 import type { Organization, ProjectStatus, ProjectType, ProjectV3 } from '@modrinth/utils'
 import { formatNumber } from '@modrinth/utils'
 
@@ -286,7 +269,6 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
-import NavStackItem from '~/components/ui/NavStackItem.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
@@ -306,7 +288,7 @@ const user = await useUser()
 const cosmetics = useCosmetics()
 const route = useNativeRoute()
 const router = useRouter()
-const tags = useTags()
+const tags = useGeneratedState()
 const config = useRuntimeConfig()
 
 const orgId = useRouteId()

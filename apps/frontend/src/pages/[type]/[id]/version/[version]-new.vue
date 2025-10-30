@@ -130,7 +130,7 @@ const version = computed(() => {
 const route = useNativeRoute()
 
 // const auth = await useAuth();
-// const tags = useTags();
+// const tags = useGeneratedState();
 
 const versionsListLink = computed(() => {
 	if (router.options.history.state.back) {

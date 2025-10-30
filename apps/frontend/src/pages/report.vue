@@ -298,7 +298,7 @@ import { useImageUpload } from '~/composables/image-upload.ts'
 
 const { addNotification } = injectNotificationManager()
 
-const tags = useTags()
+const tags = useGeneratedState()
 const route = useNativeRoute()
 const router = useRouter()
 

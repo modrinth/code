@@ -90,7 +90,7 @@ defineProps({
 	},
 })
 
-const tags = useTags()
+const tags = useGeneratedState()
 </script>
 <style lang="scss" scoped>
 .environment {
