@@ -179,12 +179,13 @@
 					formatMessage(messages.transactionsHeader)
 				}}</span>
 				<nuxt-link
+					v-if="sortedPayouts.length > 0"
 					class="mt-0 font-semibold text-contrast underline underline-offset-2 sm:my-auto"
 					to="/dashboard/revenue/transfers"
 					>{{ formatMessage(messages.seeAll) }}</nuxt-link
 				>
 			</div>
-			<div v-if="false" class="flex flex-col gap-3 md:gap-4">
+			<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-3 md:gap-4">
 				<RevenueTransaction
 					v-for="transaction in sortedPayouts.slice(0, 3)"
 					:key="transaction.id || transaction.created"
