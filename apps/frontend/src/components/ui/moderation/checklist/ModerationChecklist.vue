@@ -631,6 +631,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+	window.removeEventListener('keydown', handleKeybinds)
 	notifications.setNotificationLocation('right')
 })
 
