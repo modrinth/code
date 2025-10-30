@@ -666,7 +666,14 @@ async fn run_credentials(
         .filter(|hook_command| !hook_command.is_empty());
     if let Some(hook) = pre_launch_hooks {
         // TODO: hook parameters
-        let mut cmd = hook.split(' ');
+        let mut cmd = shlex::split(hook)
+            .ok_or_else(|| {
+                crate::ErrorKind::LauncherError(format!(
+                    "Invalid pre-launch command: {hook}",
+                ))
+            })?
+            .into_iter();
+
         if let Some(command) = cmd.next() {
             let full_path = get_full_path(&profile.path).await?;
             let result = Command::new(command)
