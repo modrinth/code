@@ -139,6 +139,10 @@ const messages = defineMessages({
 		id: 'servers.backups.item.downloading-backup',
 		defaultMessage: 'Downloading backup...',
 	},
+	downloading: {
+		id: 'servers.backups.item.downloading',
+		defaultMessage: 'Downloading',
+	},
 })
 
 const downloadingState = ref<{ progress: number; state: string } | undefined>(undefined)
@@ -282,9 +286,14 @@ const handleDownload = async () => {
 			<template v-else>
 				<ButtonStyled>
 					<button :disabled="!server?.backups || !!downloading" @click="handleDownload">
-						<SpinnerIcon v-if="downloading" class="animate-spin" />
-						<DownloadIcon v-else />
-						{{ formatMessage(commonMessages.downloadButton) }}
+						<template v-if="downloading">
+							<SpinnerIcon class="animate-spin" />
+							{{ formatMessage(messages.downloading) }}
+						</template>
+						<template v-else>
+							<DownloadIcon />
+							{{ formatMessage(commonMessages.downloadButton) }}
+						</template>
 					</button>
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
