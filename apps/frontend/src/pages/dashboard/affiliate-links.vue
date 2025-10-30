@@ -14,7 +14,7 @@
 	/>
 	<div class="page">
 		<div
-			class="mb-6 flex items-center gap-6 border-0 border-b-[1px] border-solid border-divider pb-6"
+			class="mb-6 flex items-center gap-6"
 		>
 			<h1 class="m-0 grow text-2xl font-extrabold">
 				{{ formatMessage(messages.yourAffiliateLinks) }}
