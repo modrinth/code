@@ -11,7 +11,15 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2025-10-24T21:05:00-07:00`,
+		date: `2025-10-26T18:30:00-07:00`,
+		product: 'app',
+		version: '0.10.15',
+		body: `## Improvements
+- Fixed skins page uploading modified 'normalized' versions of the skin texture instead of the original.
+- Improved skins page lighting to have the player model be lit more from the front.`,
+	},
+	{
+		date: `2025-10-26T18:05:00-07:00`,
 		product: 'web',
 		body: `## Improvements
 - Fixed the colors of OLED mode being brighter than intended.`,
