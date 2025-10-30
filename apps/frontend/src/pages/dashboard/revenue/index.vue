@@ -123,7 +123,7 @@
 			}}</span>
 			<div class="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-2 lg:grid-cols-3">
 				<button
-					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-700 p-4 text-inverted shadow-md transition-all duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 md:p-5"
+					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-700 p-4 text-inverted shadow-md transition-all duration-200 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 md:p-5"
 					:disabled="hasTinMismatch"
 					@click="openWithdrawModal"
 				>
@@ -405,10 +405,10 @@ async function refreshData() {
 }
 
 const dateStripeClasses = [
-	'zone--striped--blue bg-gradient-to-r from-blue-400 to-blue-600',
-	'zone--striped--purple bg-gradient-to-r from-purple-400 to-purple-600',
-	'zone--striped--orange bg-gradient-to-r from-orange-400 to-orange-600',
-	'zone--striped--red bg-gradient-to-r from-red-400 to-red-600',
+	'zone--striped--blue bg-gradient-to-b from-[#4E9CFF] to-[#4181D3]',
+	'zone--striped--purple bg-gradient-to-b from-[#c084fc] to-[#a855f7]',
+	'zone--striped--orange bg-gradient-to-b from-[#fb923c] to-[#f97316]',
+	'zone--striped--red bg-gradient-to-b from-[#f87171] to-[#ef4444]',
 ] as const
 
 const dateHighlightClasses = [
@@ -463,7 +463,7 @@ const segments = computed<RevenueBarSegment[]>(() => {
 	if (available > 0) {
 		segs.push({
 			key: 'available',
-			class: 'bg-gradient-to-r from-green-500 to-green-800',
+			class: 'bg-gradient-to-b from-[#1CD96A] to-[#17B257]',
 			width: available / total,
 			amount: available,
 		})

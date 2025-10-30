@@ -557,7 +557,7 @@ export function createWithdrawContext(
 				label: paymentMethodMessages.paypal,
 				icon: SSOPayPalIcon,
 				methodId: directPaypal.id,
-				fee: `≈ 2% + 0.25, max $1`,
+				fee: `≈ 2% + $0.25, max $1`,
 				type: 'paypal',
 			})
 		}
@@ -569,7 +569,7 @@ export function createWithdrawContext(
 				label: paymentMethodMessages.venmo,
 				icon: SSOVenmoIcon,
 				methodId: directVenmo.id,
-				fee: `≈ 2% + 0.25, max $1`,
+				fee: `≈ 2% + $0.25, max $1`,
 				type: 'venmo',
 			})
 		}
