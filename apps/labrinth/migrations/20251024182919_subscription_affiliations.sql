@@ -1,9 +1,9 @@
 CREATE TABLE users_subscriptions_affiliations (
-	id              BIGSERIAL   NOT NULL PRIMARY KEY,
 	subscription_id BIGINT      NOT NULL REFERENCES users_subscriptions(id),
 	affiliate_code  BIGINT      NOT NULL REFERENCES affiliate_codes(id),
 	created_at      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	deactivated_at  TIMESTAMPTZ
+	deactivated_at  TIMESTAMPTZ,
+	UNIQUE (subscription_id)
 );
 
 CREATE TABLE users_subscriptions_affiliations_payouts(

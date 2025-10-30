@@ -48,10 +48,10 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
         INNER JOIN users_subscriptions_affiliations usa
             ON c.subscription_id = usa.subscription_id
             AND c.subscription_id IS NOT NULL
+            AND usa.deactivated_at IS NULL
         -- ...which have an affiliate code...
         INNER JOIN affiliate_codes ac
             ON usa.affiliate_code = ac.id
-            AND usa.deactivated_at IS NULL
         -- ...and where no payout to an affiliate has been made for this charge yet
         LEFT JOIN users_subscriptions_affiliations_payouts usap
             ON c.id = usap.charge_id
