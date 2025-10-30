@@ -334,7 +334,7 @@ const loading = ref(false)
 const { data: pats, refresh } = await useAsyncData('pat', () => useBaseFetch('pat'))
 const displayPats = computed(() => {
 	return pats.value.toSorted((a, b) => new Date(b.created) - new Date(a.created))
-});
+})
 
 async function createPat() {
 	startLoading()
