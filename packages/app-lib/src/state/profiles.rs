@@ -225,10 +225,14 @@ impl ProjectType {
         }
     }
 
-    pub fn get_from_parent_folder(path: &Path) -> Option<Self> {
-        // Get parent folder
-        let path = path.parent()?.file_name()?;
-        match path.to_str()? {
+    pub fn get_from_parent_folder(path: impl AsRef<Path>) -> Option<Self> {
+        match path
+            .as_ref()
+            .parent()?
+            .file_name()?
+            .to_str()
+            .unwrap_or_default()
+        {
             "mods" => Some(ProjectType::Mod),
             "datapacks" => Some(ProjectType::DataPack),
             "resourcepacks" => Some(ProjectType::ResourcePack),

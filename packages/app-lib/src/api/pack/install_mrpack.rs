@@ -12,6 +12,8 @@ use crate::util::fetch::{fetch_mirrors, write};
 use crate::util::io;
 use crate::{State, profile};
 use async_zip::base::read::seek::ZipFileReader;
+use futures::StreamExt;
+use path_util::SafeRelativeUtf8UnixPathBuf;
 
 use super::install_from::{
     CreatePack, CreatePackLocation, PackFormat, generate_pack_from_file,
@@ -19,7 +21,6 @@ use super::install_from::{
 };
 use crate::data::ProjectType;
 use std::io::{Cursor, ErrorKind};
-use std::path::PathBuf;
 
 /// Install a pack
 /// Wrapper around install_pack_files that generates a pack creation description, and
@@ -93,197 +94,194 @@ pub async fn install_zipped_mrpack_files(
         })?;
 
     // Extract index of modrinth.index.json
-    let zip_index_option = zip_reader.file().entries().iter().position(|f| {
-        f.filename().as_str().unwrap_or_default() == "modrinth.index.json"
-    });
-    if let Some(zip_index) = zip_index_option {
-        let mut manifest = String::new();
-        let mut reader = zip_reader.reader_with_entry(zip_index).await?;
-        reader.read_to_string_checked(&mut manifest).await?;
-
-        let pack: PackFormat = serde_json::from_str(&manifest)?;
-
-        if &*pack.game != "minecraft" {
-            return Err(crate::ErrorKind::InputError(
-                "Pack does not support Minecraft".to_string(),
-            )
-            .into());
-        }
-
-        // Sets generated profile attributes to the pack ones (using profile::edit)
-        set_profile_information(
-            profile_path.clone(),
-            &description,
-            &pack.name,
-            &pack.dependencies,
-            ignore_lock,
-        )
-        .await?;
-
-        let profile_path = profile_path.clone();
-        let loading_bar = init_or_edit_loading(
-            existing_loading_bar,
-            LoadingBarType::PackDownload {
-                profile_path: profile_path.clone(),
-                pack_name: pack.name.clone(),
-                icon,
-                pack_id: project_id,
-                pack_version: version_id,
-            },
-            100.0,
-            "Downloading modpack",
-        )
-        .await?;
-
-        let num_files = pack.files.len();
-        use futures::StreamExt;
-        loading_try_for_each_concurrent(
-            futures::stream::iter(pack.files.into_iter())
-                .map(Ok::<PackFile, crate::Error>),
-            None,
-            Some(&loading_bar),
-            70.0,
-            num_files,
-            None,
-            |project| {
-                let profile_path = profile_path.clone();
-                async move {
-                    //TODO: Future update: prompt user for optional files in a modpack
-                    if let Some(env) = project.env
-                        && env
-                            .get(&EnvType::Client)
-                            .is_some_and(|x| x == &SideType::Unsupported)
-                    {
-                        return Ok(());
-                    }
-
-                    let file = fetch_mirrors(
-                        &project
-                            .downloads
-                            .iter()
-                            .map(|x| &**x)
-                            .collect::<Vec<&str>>(),
-                        project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
-                        &state.fetch_semaphore,
-                        &state.pool,
-                    )
-                    .await?;
-
-                    let path = profile::get_full_path(&profile_path)
-                        .await?
-                        .join(project.path.as_str());
-
-                    cache_file_hash(
-                        file.clone(),
-                        &profile_path,
-                        project.path.as_str(),
-                        project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
-                        ProjectType::get_from_parent_folder(&path),
-                        &state.pool,
-                    )
-                    .await?;
-
-                    write(&path, &file, &state.io_semaphore).await?;
-
-                    Ok(())
-                }
-            },
-        )
-        .await?;
-
-        emit_loading(&loading_bar, 0.0, Some("Extracting overrides"))?;
-
-        let mut total_len = 0;
-
-        for index in 0..zip_reader.file().entries().len() {
-            let file = zip_reader.file().entries().get(index).unwrap();
-            let filename = file.filename().as_str().unwrap_or_default();
-
-            if (filename.starts_with("overrides")
-                || filename.starts_with("client-overrides"))
-                && !filename.ends_with('/')
-            {
-                total_len += 1;
-            }
-        }
-
-        for index in 0..zip_reader.file().entries().len() {
-            let file = zip_reader.file().entries().get(index).unwrap();
-
-            let filename = file.filename().as_str().unwrap_or_default();
-
-            let file_path = PathBuf::from(filename);
-            if (filename.starts_with("overrides")
-                || filename.starts_with("client-overrides"))
-                && !filename.ends_with('/')
-            {
-                // Reads the file into the 'content' variable
-                let mut content = Vec::new();
-                let mut reader = zip_reader.reader_with_entry(index).await?;
-                reader.read_to_end_checked(&mut content).await?;
-
-                let mut new_path = PathBuf::new();
-                let components = file_path.components().skip(1);
-
-                for component in components {
-                    new_path.push(component);
-                }
-
-                if new_path.file_name().is_some() {
-                    let bytes = bytes::Bytes::from(content);
-
-                    cache_file_hash(
-                        bytes.clone(),
-                        &profile_path,
-                        &new_path.to_string_lossy(),
-                        None,
-                        ProjectType::get_from_parent_folder(&new_path),
-                        &state.pool,
-                    )
-                    .await?;
-
-                    write(
-                        &profile::get_full_path(&profile_path)
-                            .await?
-                            .join(new_path),
-                        &bytes,
-                        &state.io_semaphore,
-                    )
-                    .await?;
-                }
-
-                emit_loading(
-                    &loading_bar,
-                    30.0 / total_len as f64,
-                    Some(&format!("Extracting override {index}/{total_len}")),
-                )?;
-            }
-        }
-
-        // If the icon doesn't exist, we expect icon.png to be a potential icon.
-        // If it doesn't exist, and an override to icon.png exists, cache and use that
-        let potential_icon = profile::get_full_path(&profile_path)
-            .await?
-            .join("icon.png");
-        if !icon_exists && potential_icon.exists() {
-            profile::edit_icon(&profile_path, Some(&potential_icon)).await?;
-        }
-
-        if let Some(profile_val) = profile::get(&profile_path).await? {
-            crate::launcher::install_minecraft(
-                &profile_val,
-                Some(loading_bar),
-                false,
-            )
-            .await?;
-        }
-
-        Ok::<String, crate::Error>(profile_path.clone())
-    } else {
-        Err(crate::Error::from(crate::ErrorKind::InputError(
+    let Some(manifest_idx) = zip_reader.file().entries().iter().position(|f| {
+        matches!(f.filename().as_str(), Ok("modrinth.index.json"))
+    }) else {
+        return Err(crate::Error::from(crate::ErrorKind::InputError(
             "No pack manifest found in mrpack".to_string(),
-        )))
+        )));
+    };
+
+    let mut manifest = String::new();
+    let mut reader = zip_reader.reader_with_entry(manifest_idx).await?;
+    reader.read_to_string_checked(&mut manifest).await?;
+
+    let pack: PackFormat = serde_json::from_str(&manifest)?;
+
+    if &*pack.game != "minecraft" {
+        return Err(crate::ErrorKind::InputError(
+            "Pack does not support Minecraft".to_string(),
+        )
+        .into());
     }
+
+    // Sets generated profile attributes to the pack ones (using profile::edit)
+    set_profile_information(
+        profile_path.clone(),
+        &description,
+        &pack.name,
+        &pack.dependencies,
+        ignore_lock,
+    )
+    .await?;
+
+    let profile_path = profile_path.clone();
+    let loading_bar = init_or_edit_loading(
+        existing_loading_bar,
+        LoadingBarType::PackDownload {
+            profile_path: profile_path.clone(),
+            pack_name: pack.name.clone(),
+            icon,
+            pack_id: project_id,
+            pack_version: version_id,
+        },
+        100.0,
+        "Downloading modpack",
+    )
+    .await?;
+
+    let num_files = pack.files.len();
+    loading_try_for_each_concurrent(
+        futures::stream::iter(pack.files.into_iter())
+            .map(Ok::<PackFile, crate::Error>),
+        None,
+        Some(&loading_bar),
+        70.0,
+        num_files,
+        None,
+        |project| {
+            let profile_path = profile_path.clone();
+            async move {
+                //TODO: Future update: prompt user for optional files in a modpack
+                if let Some(env) = project.env
+                    && env
+                        .get(&EnvType::Client)
+                        .is_some_and(|x| x == &SideType::Unsupported)
+                {
+                    return Ok(());
+                }
+
+                let file = fetch_mirrors(
+                    &project
+                        .downloads
+                        .iter()
+                        .map(|x| &**x)
+                        .collect::<Vec<&str>>(),
+                    project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
+                    &state.fetch_semaphore,
+                    &state.pool,
+                )
+                .await?;
+
+                let path = profile::get_full_path(&profile_path)
+                    .await?
+                    .join(project.path.as_str());
+
+                cache_file_hash(
+                    file.clone(),
+                    &profile_path,
+                    project.path.as_str(),
+                    project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
+                    ProjectType::get_from_parent_folder(&path),
+                    &state.pool,
+                )
+                .await?;
+
+                write(&path, &file, &state.io_semaphore).await?;
+
+                Ok(())
+            }
+        },
+    )
+    .await?;
+
+    emit_loading(&loading_bar, 0.0, Some("Extracting overrides"))?;
+
+    let override_file_entries = zip_reader
+        .file()
+        .entries()
+        .iter()
+        .enumerate()
+        .filter_map(|(index, file)| {
+            let filename = file.filename().as_str().unwrap_or_default();
+            ((filename.starts_with("overrides/")
+                || filename.starts_with("client-overrides/"))
+                && !filename.ends_with('/'))
+            .then(|| (index, file.clone()))
+        })
+        .collect::<Vec<_>>();
+    let override_file_entries_count = override_file_entries.len();
+
+    for (i, (index, file)) in override_file_entries.into_iter().enumerate() {
+        let relative_override_file_path =
+            SafeRelativeUtf8UnixPathBuf::try_from(
+                file.filename().as_str().unwrap().to_string(),
+            )?;
+        let relative_override_file_path = relative_override_file_path
+            .strip_prefix("overrides")
+            .or_else(|_| relative_override_file_path.strip_prefix("client-overrides"))
+            .map_err(|_| {
+                crate::Error::from(crate::ErrorKind::OtherError(
+                    format!("Failed to strip override prefix from override file path: {relative_override_file_path}")
+                ))
+            })?;
+
+        let mut file_bytes = vec![];
+        let mut reader = zip_reader.reader_with_entry(index).await?;
+        reader.read_to_end_checked(&mut file_bytes).await?;
+
+        let file_bytes = bytes::Bytes::from(file_bytes);
+
+        cache_file_hash(
+            file_bytes.clone(),
+            &profile_path,
+            relative_override_file_path.as_str(),
+            None,
+            ProjectType::get_from_parent_folder(
+                relative_override_file_path.as_str(),
+            ),
+            &state.pool,
+        )
+        .await?;
+
+        write(
+            &profile::get_full_path(&profile_path)
+                .await?
+                .join(relative_override_file_path.as_str()),
+            &file_bytes,
+            &state.io_semaphore,
+        )
+        .await?;
+
+        emit_loading(
+            &loading_bar,
+            30.0 / override_file_entries_count as f64,
+            Some(&format!(
+                "Extracting override {}/{override_file_entries_count}",
+                i + 1
+            )),
+        )?;
+    }
+
+    // If the icon doesn't exist, we expect icon.png to be a potential icon.
+    // If it doesn't exist, and an override to icon.png exists, cache and use that
+    let potential_icon = profile::get_full_path(&profile_path)
+        .await?
+        .join("icon.png");
+    if !icon_exists && potential_icon.exists() {
+        profile::edit_icon(&profile_path, Some(&potential_icon)).await?;
+    }
+
+    if let Some(profile_val) = profile::get(&profile_path).await? {
+        crate::launcher::install_minecraft(
+            &profile_val,
+            Some(loading_bar),
+            false,
+        )
+        .await?;
+    }
+
+    Ok::<String, crate::Error>(profile_path.clone())
 }
 
 #[tracing::instrument(skip(mrpack_file))]
@@ -303,127 +301,130 @@ pub async fn remove_all_related_files(
         })?;
 
     // Extract index of modrinth.index.json
-    let zip_index_option = zip_reader.file().entries().iter().position(|f| {
-        f.filename().as_str().unwrap_or_default() == "modrinth.index.json"
-    });
-    if let Some(zip_index) = zip_index_option {
-        let mut manifest = String::new();
+    let Some(manifest_idx) = zip_reader.file().entries().iter().position(|f| {
+        matches!(f.filename().as_str(), Ok("modrinth.index.json"))
+    }) else {
+        return Err(crate::Error::from(crate::ErrorKind::InputError(
+            "No pack manifest found in mrpack".to_string(),
+        )));
+    };
 
-        let mut reader = zip_reader.reader_with_entry(zip_index).await?;
-        reader.read_to_string_checked(&mut manifest).await?;
+    let mut manifest = String::new();
 
-        let pack: PackFormat = serde_json::from_str(&manifest)?;
+    let mut reader = zip_reader.reader_with_entry(manifest_idx).await?;
+    reader.read_to_string_checked(&mut manifest).await?;
 
-        if &*pack.game != "minecraft" {
-            return Err(crate::ErrorKind::InputError(
-                "Pack does not support Minecraft".to_string(),
-            )
-            .into());
-        }
+    let pack: PackFormat = serde_json::from_str(&manifest)?;
 
-        // Set install stage to installing, and do not change it back (as files are being removed and are not being reinstalled here)
-        crate::api::profile::edit(&profile_path, |prof| {
-            prof.install_stage = ProfileInstallStage::PackInstalling;
-            async { Ok(()) }
-        })
-        .await?;
+    if &*pack.game != "minecraft" {
+        return Err(crate::ErrorKind::InputError(
+            "Pack does not support Minecraft".to_string(),
+        )
+        .into());
+    }
 
-        // First, remove all modrinth projects by their version hashes
-        // Remove all modrinth projects by their version hashes
-        // We need to do a fetch to get the project ids from Modrinth
-        let state = State::get().await?;
-        let all_hashes = pack
-            .files
-            .iter()
-            .filter_map(|f| Some(f.hashes.get(&PackFileHash::Sha1)?.clone()))
-            .collect::<Vec<_>>();
+    // Set install stage to installing, and do not change it back (as files are being removed and are not being reinstalled here)
+    crate::api::profile::edit(&profile_path, |prof| {
+        prof.install_stage = ProfileInstallStage::PackInstalling;
+        async { Ok(()) }
+    })
+    .await?;
 
-        // First, get project info by hash
-        let file_infos = CachedEntry::get_file_many(
-            &all_hashes.iter().map(|x| &**x).collect::<Vec<_>>(),
-            None,
+    // First, remove all modrinth projects by their version hashes
+    // Remove all modrinth projects by their version hashes
+    // We need to do a fetch to get the project ids from Modrinth
+    let state = State::get().await?;
+    let all_hashes = pack
+        .files
+        .iter()
+        .filter_map(|f| Some(f.hashes.get(&PackFileHash::Sha1)?.clone()))
+        .collect::<Vec<_>>();
+
+    // First, get project info by hash
+    let file_infos = CachedEntry::get_file_many(
+        &all_hashes.iter().map(|x| &**x).collect::<Vec<_>>(),
+        None,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?;
+
+    let to_remove = file_infos
+        .into_iter()
+        .map(|p| p.project_id)
+        .collect::<Vec<_>>();
+
+    let profile = profile::get(&profile_path).await?.ok_or_else(|| {
+        crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+    })?;
+    let profile_full_path = profile::get_full_path(&profile_path).await?;
+
+    for (file_path, project) in profile
+        .get_projects(
+            Some(CacheBehaviour::MustRevalidate),
             &state.pool,
             &state.api_semaphore,
         )
-        .await?;
-
-        let to_remove = file_infos
-            .into_iter()
-            .map(|p| p.project_id)
-            .collect::<Vec<_>>();
-
-        let profile = profile::get(&profile_path).await?.ok_or_else(|| {
-            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
-        })?;
-        let profile_full_path = profile::get_full_path(&profile_path).await?;
-
-        for (file_path, project) in profile
-            .get_projects(
-                Some(CacheBehaviour::MustRevalidate),
-                &state.pool,
-                &state.api_semaphore,
-            )
-            .await?
+        .await?
+    {
+        if let Some(metadata) = &project.metadata
+            && to_remove.contains(&metadata.project_id)
         {
-            if let Some(metadata) = &project.metadata
-                && to_remove.contains(&metadata.project_id)
-            {
-                match io::remove_file(profile_full_path.join(file_path)).await {
-                    Ok(_) => (),
-                    Err(err) if err.kind() == ErrorKind::NotFound => (),
-                    Err(err) => return Err(err.into()),
-                }
-            }
-        }
-
-        // Iterate over all Modrinth project file paths in the json, and remove them
-        // (There should be few, but this removes any files the .mrpack intended as Modrinth projects but were unrecognized)
-        for file in pack.files {
-            match io::remove_file(profile_full_path.join(file.path.as_str()))
-                .await
-            {
+            match io::remove_file(profile_full_path.join(file_path)).await {
                 Ok(_) => (),
                 Err(err) if err.kind() == ErrorKind::NotFound => (),
                 Err(err) => return Err(err.into()),
             }
         }
-
-        // Iterate over each 'overrides' file and remove it
-        for index in 0..zip_reader.file().entries().len() {
-            let file = zip_reader.file().entries().get(index).unwrap();
-
-            let filename = file.filename().as_str().unwrap_or_default();
-
-            let file_path = PathBuf::from(filename);
-            if (filename.starts_with("overrides")
-                || filename.starts_with("client-overrides"))
-                && !filename.ends_with('/')
-            {
-                let mut new_path = PathBuf::new();
-                let components = file_path.components().skip(1);
-
-                for component in components {
-                    new_path.push(component);
-                }
-
-                // Remove this file if a corresponding one exists in the filesystem
-                match io::remove_file(
-                    profile::get_full_path(&profile_path)
-                        .await?
-                        .join(&new_path),
-                )
-                .await
-                {
-                    Ok(_) => (),
-                    Err(err) if err.kind() == ErrorKind::NotFound => (),
-                    Err(err) => return Err(err.into()),
-                }
-            }
-        }
-        Ok(())
-    } else {
-        Err(crate::Error::from(crate::ErrorKind::InputError(
-            "No pack manifest found in mrpack".to_string(),
-        )))
     }
+
+    // Iterate over all Modrinth project file paths in the json, and remove them
+    // (There should be few, but this removes any files the .mrpack intended as Modrinth projects but were unrecognized)
+    for file in pack.files {
+        match io::remove_file(profile_full_path.join(file.path.as_str())).await
+        {
+            Ok(_) => (),
+            Err(err) if err.kind() == ErrorKind::NotFound => (),
+            Err(err) => return Err(err.into()),
+        }
+    }
+
+    // Iterate over each 'overrides' file and remove it
+    let override_file_entries =
+        zip_reader.file().entries().iter().filter(|file| {
+            let filename = file.filename().as_str().unwrap_or_default();
+            (filename.starts_with("overrides/")
+                || filename.starts_with("client-overrides/"))
+                && !filename.ends_with('/')
+        });
+
+    for file in override_file_entries {
+        let relative_override_file_path =
+            SafeRelativeUtf8UnixPathBuf::try_from(
+                file.filename().as_str().unwrap().to_string(),
+            )?;
+        let relative_override_file_path = relative_override_file_path
+            .strip_prefix("overrides")
+            .or_else(|_| relative_override_file_path.strip_prefix("client-overrides"))
+            .map_err(|_| {
+                crate::Error::from(crate::ErrorKind::OtherError(
+                    format!("Failed to strip override prefix from override file path: {relative_override_file_path}")
+                ))
+            })?;
+
+        // Remove this file if a corresponding one exists in the filesystem
+        match io::remove_file(
+            profile::get_full_path(&profile_path)
+                .await?
+                .join(relative_override_file_path.as_str()),
+        )
+        .await
+        {
+            Ok(_) => (),
+            Err(err) if err.kind() == ErrorKind::NotFound => (),
+            Err(err) => return Err(err.into()),
+        }
+    }
+
+    Ok(())
 }
