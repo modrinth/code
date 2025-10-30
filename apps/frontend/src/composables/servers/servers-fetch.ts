@@ -30,7 +30,7 @@ export async function useServersFetch<T>(
 			'[Modrinth Servers] Cannot fetch without auth',
 			10000,
 		)
-		throw new ModrinthServerError('Missing auth token', 401, error, module)
+		throw new ModrinthServerError('Missing auth token', 401, error, module, undefined, undefined)
 	}
 
 	const {
@@ -52,7 +52,7 @@ export async function useServersFetch<T>(
 			'[Modrinth Servers] Circuit breaker open - too many recent failures',
 			503,
 		)
-		throw new ModrinthServerError('Service temporarily unavailable', 503, error, module)
+		throw new ModrinthServerError('Service temporarily unavailable', 503, error, module, undefined, undefined)
 	}
 
 	if (now - lastFailureTime.value > 30000) {
@@ -69,7 +69,7 @@ export async function useServersFetch<T>(
 			'[Modrinth Servers] Cannot fetch without base url. Make sure to set a PYRO_BASE_URL in environment variables',
 			10001,
 		)
-		throw new ModrinthServerError('Configuration error: Missing PYRO_BASE_URL', 500, error, module)
+		throw new ModrinthServerError('Configuration error: Missing PYRO_BASE_URL', 500, error, module, undefined, undefined)
 	}
 
 	const versionString = `v${version}`
@@ -179,6 +179,7 @@ export async function useServersFetch<T>(
 						fetchError,
 						module,
 						v1Error,
+						error.data,
 					)
 				}
 
@@ -200,6 +201,8 @@ export async function useServersFetch<T>(
 				undefined,
 				fetchError,
 				module,
+				undefined,
+				undefined,
 			)
 		}
 	}
@@ -212,7 +215,7 @@ export async function useServersFetch<T>(
 			statusCode,
 			lastError,
 		)
-		throw new ModrinthServerError('Maximum retry attempts reached', statusCode, pyroError, module)
+		throw new ModrinthServerError('Maximum retry attempts reached', statusCode, pyroError, module, undefined, lastError.data)
 	}
 
 	const fetchError = new ModrinthServersFetchError(
@@ -220,5 +223,5 @@ export async function useServersFetch<T>(
 		undefined,
 		lastError || undefined,
 	)
-	throw new ModrinthServerError('Maximum retry attempts reached', undefined, fetchError, module)
+	throw new ModrinthServerError('Maximum retry attempts reached', undefined, fetchError, module, undefined, undefined)
 }

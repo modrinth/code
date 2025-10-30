@@ -1043,7 +1043,7 @@ const nodeUnavailableDetails = computed(() => [
 	},
 	{
 		label: 'Node',
-		value: server.general?.datacenter ?? 'Unknown',
+		value: server.moduleErrors?.general?.error.responseData?.hostname ?? server.general?.datacenter ?? 'Unknown',
 		type: 'inline' as const,
 	},
 	{
