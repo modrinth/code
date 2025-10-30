@@ -5,7 +5,9 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    queue::payouts::PayoutsQueue, routes::ApiError, util::error::Context,
+    queue::payouts::{AccountBalance, PayoutsQueue},
+    routes::ApiError,
+    util::error::Context,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
@@ -147,5 +149,35 @@ impl PayoutsQueue {
 
         muralpay.client.cancel_payout_request(id).await?;
         Ok(())
+    }
+
+    pub async fn get_mural_balance(&self) -> Result<Option<AccountBalance>> {
+        let muralpay = self.muralpay.load();
+        let muralpay = muralpay
+            .as_ref()
+            .wrap_err("Mural Pay client not available")?;
+
+        let account = muralpay
+            .client
+            .get_account(muralpay.source_account_id)
+            .await?;
+        let details = account
+            .account_details
+            .wrap_err("source account does not have details")?;
+        let available = details
+            .balances
+            .iter()
+            .map(|balance| {
+                if balance.token_symbol == "USDC" {
+                    balance.token_amount
+                } else {
+                    Decimal::ZERO
+                }
+            })
+            .sum::<Decimal>();
+        Ok(Some(AccountBalance {
+            available,
+            pending: Decimal::ZERO,
+        }))
     }
 }

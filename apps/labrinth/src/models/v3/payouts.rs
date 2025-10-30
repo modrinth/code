@@ -1,8 +1,6 @@
 use std::{cmp, collections::HashMap, fmt};
 
-use crate::{
-    models::ids::PayoutId, queue::payouts::muralpay_payout::MuralPayoutRequest,
-};
+use crate::{models::ids::PayoutId, queue::payouts::mural::MuralPayoutRequest};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;

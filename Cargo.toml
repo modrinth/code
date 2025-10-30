@@ -73,7 +73,6 @@ encoding_rs = "0.8.35"
 enumset = "1.1.10"
 eyre = "0.6.12"
 flate2 = "1.1.4"
-foldhash = "0.2.0"
 fs4 = { version = "0.13.1", default-features = false }
 futures = "0.3.31"
 futures-util = "0.3.31"
