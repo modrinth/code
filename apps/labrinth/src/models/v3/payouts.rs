@@ -109,9 +109,19 @@ pub struct TremendousDetails {
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TremendousCurrency {
     Usd,
+    Gbp,
     Cad,
     Eur,
-    Gbp,
+    Aud,
+    Chf,
+    Czk,
+    Dkk,
+    Mxn,
+    Nok,
+    Nzd,
+    Pln,
+    Sek,
+    Sgd,
 }
 
 impl fmt::Display for TremendousCurrency {
