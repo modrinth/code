@@ -3,24 +3,22 @@
 
 -- Inserts 5 dummy users for testing, with slight differences
 -- 'Friend' and 'enemy' function like 'user', but we can use them to simulate 'other' users that may or may not be able to access certain things
--- IDs 1-5, 1-5
-INSERT INTO users (id, username, email, role) VALUES (1, 'Admin', 'admin@modrinth.com', 'admin');
 INSERT INTO users (id, username, email, role)
-VALUES (2, 'Moderator', 'moderator@modrinth.com', 'moderator');
-INSERT INTO users (id, username, email, role) VALUES (3, 'User', 'user@modrinth.com', 'developer');
-INSERT INTO users (id, username, email, role)
-VALUES (4, 'Friend', 'friend@modrinth.com', 'developer');
-INSERT INTO users (id, username, email, role)
-VALUES (5, 'Enemy', 'enemy@modrinth.com', 'developer');
+VALUES ({{user_id::ADMIN}},     'Admin',     'admin@modrinth.com',     'admin'),
+       ({{user_id::MODERATOR}}, 'Moderator', 'moderator@modrinth.com', 'moderator'),
+       ({{user_id::USER}},      'User',      'user@modrinth.com',      'developer'),
+       ({{user_id::FRIEND}},    'Friend',    'friend@modrinth.com',    'developer'),
+       ({{user_id::ENEMY}},     'Enemy',     'enemy@modrinth.com',     'developer');
 
 -- Full PATs for each user, with different scopes
 -- These are not legal PATs, as they contain all scopes- they mimic permissions of a logged in user
 -- IDs: 50-54, o p q r s
-INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (50, 1, 'admin-pat', 'mrp_patadmin', $1, '2030-08-18 15:48:58.435729+00');
-INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (51, 2, 'moderator-pat', 'mrp_patmoderator', $1, '2030-08-18 15:48:58.435729+00');
-INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (52, 3, 'user-pat', 'mrp_patuser', $1, '2030-08-18 15:48:58.435729+00');
-INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (53, 4, 'friend-pat', 'mrp_patfriend', $1, '2030-08-18 15:48:58.435729+00');
-INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (54, 5, 'enemy-pat', 'mrp_patenemy', $1, '2030-08-18 15:48:58.435729+00');
+INSERT INTO pats (id, user_id, name, access_token, scopes, expires)
+VALUES (50, {{user_id::ADMIN}},     'admin-pat',     '{{pat::ADMIN}}',     {{all_scopes}}, '2030-08-18 15:48:58.435729+00'),
+       (51, {{user_id::MODERATOR}}, 'moderator-pat', '{{pat::MODERATOR}}', {{all_scopes}}, '2030-08-18 15:48:58.435729+00'),
+       (52, {{user_id::USER}},      'user-pat',      '{{pat::USER}}',      {{all_scopes}}, '2030-08-18 15:48:58.435729+00'),
+       (53, {{user_id::FRIEND}},    'friend-pat',    '{{pat::FRIEND}}',    {{all_scopes}}, '2030-08-18 15:48:58.435729+00'),
+       (54, {{user_id::ENEMY}},     'enemy-pat',     '{{pat::ENEMY}}',     {{all_scopes}}, '2030-08-18 15:48:58.435729+00');
 
 INSERT INTO loaders (id, loader) VALUES (5, 'fabric');
 INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id) VALUES (5, 1);
@@ -119,7 +117,7 @@ VALUES (
         1,
         'oauth_client_alpha',
         NULL,
-        $1,
+        {{all_scopes}},
         '4dbff86cc2ca1bae1e16468a05cb9881c97f1753bce3619034898faa1aabe429955a1bf8ec483d7421fe3c1646613a59ed5441fb0f321389f77f48a879c7b1f1',
         3
     );

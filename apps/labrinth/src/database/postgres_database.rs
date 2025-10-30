@@ -1,5 +1,6 @@
+use eyre::Context;
 use prometheus::{IntGauge, Registry};
-use sqlx::migrate::MigrateDatabase;
+use sqlx::migrate::{MigrateDatabase, Migrator};
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use sqlx::{Connection, PgConnection, Postgres};
 use std::ops::{Deref, DerefMut};
@@ -75,24 +76,35 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
         Ok((pool, ro))
     }
 }
-pub async fn check_for_migrations() -> Result<(), sqlx::Error> {
-    let uri = dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+
+pub async fn check_for_migrations() -> eyre::Result<()> {
+    let uri =
+        dotenvy::var("DATABASE_URL").wrap_err("`DATABASE_URL` not in .env")?;
     let uri = uri.as_str();
-    if !Postgres::database_exists(uri).await? {
+    if !Postgres::database_exists(uri)
+        .await
+        .wrap_err("failed to check if database exists")?
+    {
         info!("Creating database...");
-        Postgres::create_database(uri).await?;
+        Postgres::create_database(uri)
+            .await
+            .wrap_err("failed to create database")?;
     }
 
     info!("Applying migrations...");
 
-    let mut conn: PgConnection = PgConnection::connect(uri).await?;
-    sqlx::migrate!()
+    let mut conn: PgConnection = PgConnection::connect(uri)
+        .await
+        .wrap_err("failed to connect to database")?;
+    MIGRATOR
         .run(&mut conn)
         .await
-        .expect("Error while running database migrations!");
+        .wrap_err("failed to run database migrations")?;
 
     Ok(())
 }
+
+pub static MIGRATOR: Migrator = sqlx::migrate!();
 
 pub async fn register_and_set_metrics(
     pool: &PgPool,
