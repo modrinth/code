@@ -37,6 +37,7 @@ pub mod routes;
 pub mod scheduler;
 pub mod search;
 pub mod sync;
+pub mod test;
 pub mod util;
 pub mod validate;
 

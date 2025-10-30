@@ -7,6 +7,7 @@ import { article as carbon_ads } from "./carbon_ads";
 import { article as creator_monetization } from "./creator_monetization";
 import { article as creator_update } from "./creator_update";
 import { article as creator_updates_july_2025 } from "./creator_updates_july_2025";
+import { article as creator_withdrawals_overhaul } from "./creator_withdrawals_overhaul";
 import { article as design_refresh } from "./design_refresh";
 import { article as download_adjustment } from "./download_adjustment";
 import { article as free_server_medal } from "./free_server_medal";
@@ -57,6 +58,7 @@ export const articles = [
   free_server_medal,
   download_adjustment,
   design_refresh,
+  creator_withdrawals_overhaul,
   creator_updates_july_2025,
   creator_update,
   creator_monetization,
