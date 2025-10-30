@@ -797,6 +797,12 @@
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
     "message": "The delivery email you have entered is not associated with your Modrinth account. Modrinth cannot recover rewards sent to an incorrect email address."
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Lower fees available"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "You selected USD for PayPal International. <direct-paypal-link>Switch to direct PayPal</direct-paypal-link> for better fees (≈2% instead of ≈6%)."
+  },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Withdraw"
   },
