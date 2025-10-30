@@ -45,8 +45,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		</Button>
 
 		<Text class="text-base">
-			If you have questions or believe something isn't correct, you can reply to this email or reach
-			out via the
+			If you have questions or believe something isn't correct, you can reach out via the
 			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink
 			>.
 		</Text>

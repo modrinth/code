@@ -32,7 +32,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 
 		<Text class="text-muted text-base">
 			Thank you for choosing Modrinth! If you have any questions or need help with your
-			subscription, reply to this email or visit our
+			subscription, visit our
 			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink
 			>.
 		</Text>

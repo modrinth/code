@@ -70,9 +70,8 @@ import StyledEmail from '../shared/StyledEmail.vue'
 
 		<Text class="text-muted text-base">
 			If this wasn't you, please update your password and review your account security settings. If
-			you cannot do this, contact us immediately by replying to this email or
-			<VLink href="https://support.modrinth.com" class="text-green underline"
-				>through our Support Portal</VLink
+			you cannot do this, contact us immediately through our
+			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink
 			>.
 		</Text>
 	</StyledEmail>
