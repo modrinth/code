@@ -307,6 +307,7 @@ export const useFetchAllAnalytics = (
 	startDate = ref(dayjs().subtract(30, 'days')),
 	endDate = ref(dayjs()),
 	timeResolution = ref(1440),
+	isInitialized = ref(false),
 ) => {
 	const downloadData = ref(null)
 	const viewData = ref(null)
@@ -388,8 +389,18 @@ export const useFetchAllAnalytics = (
 	}
 
 	watch(
-		[() => startDate.value, () => endDate.value, () => timeResolution.value, () => projects.value],
+		[
+			() => startDate.value,
+			() => endDate.value,
+			() => timeResolution.value,
+			() => projects.value,
+			() => isInitialized.value,
+		],
 		async () => {
+			if (!isInitialized.value) {
+				return
+			}
+
 			const q = {
 				start_date: startDate.value.toISOString(),
 				end_date: endDate.value.toISOString(),
@@ -456,5 +467,6 @@ export const useFetchAllAnalytics = (
 		totalData,
 		loading,
 		error,
+		isInitialized,
 	}
 }
