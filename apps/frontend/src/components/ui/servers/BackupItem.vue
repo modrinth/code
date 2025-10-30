@@ -284,34 +284,32 @@ const handleDownload = async () => {
 				</button>
 			</ButtonStyled>
 			<template v-else>
-				<ButtonStyled>
-					<button :disabled="!server?.backups || !!downloading" @click="handleDownload">
-						<template v-if="downloading">
-							<SpinnerIcon class="animate-spin" />
-							{{ formatMessage(messages.downloading) }}
-						</template>
-						<template v-else>
-							<DownloadIcon />
-							{{ formatMessage(commonMessages.downloadButton) }}
-						</template>
+				<ButtonStyled v-show="!downloading">
+					<button :disabled="!server?.backups" @click="handleDownload">
+						<DownloadIcon />
+						{{ formatMessage(commonMessages.downloadButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
 						:options="[
-							{ id: 'rename', action: () => emit('rename') },
+							{
+								id: 'rename',
+								action: () => emit('rename'),
+								disabled: !!restoring || !!downloading,
+							},
 							{
 								id: 'restore',
 								action: () => emit('restore'),
-								disabled: !!restoring,
+								disabled: !!restoring || !!downloading,
 							},
-							{ id: 'lock', action: () => emit('lock') },
+							{ id: 'lock', action: () => emit('lock'), disabled: !!restoring || !!downloading },
 							{ divider: true },
 							{
 								id: 'delete',
 								color: 'red',
 								action: () => emit('delete'),
-								disabled: !!restoring,
+								disabled: !!restoring || !!downloading,
 							},
 						]"
 					>
