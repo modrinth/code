@@ -1380,6 +1380,10 @@ async fn test_thread_deleted_with_project() {
                 .await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
 
+            // Check that the thread exists before project deletion
+            let resp = api.get_thread(alpha_thread_id, ADMIN_USER_PAT).await;
+            assert_status!(&resp, StatusCode::OK);
+
             // Delete the project
             let resp =
                 api.remove_project(alpha_project_id, USER_USER_PAT).await;
