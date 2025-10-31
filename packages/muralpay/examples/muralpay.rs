@@ -226,7 +226,7 @@ async fn create_payout_request(
             &[CreatePayout {
                 amount: TokenAmount {
                     token_amount: dec!(2.00),
-                    token_symbol: "USDC".into(),
+                    token_symbol: muralpay::USDC.into(),
                 },
                 payout_details: CreatePayoutDetails::Fiat {
                     bank_name: "Foo Bank".into(),
@@ -270,7 +270,7 @@ async fn get_fees_for_token_amount(
         .get_fees_for_token_amount(&[TokenFeeRequest {
             amount: TokenAmount {
                 token_amount: amount,
-                token_symbol: "USDC".into(),
+                token_symbol: muralpay::USDC.into(),
             },
             fiat_and_rail_code,
         }])
@@ -290,7 +290,7 @@ async fn get_fees_for_fiat_amount(
     let fees = muralpay
         .get_fees_for_fiat_amount(&[FiatFeeRequest {
             fiat_amount: amount,
-            token_symbol: "USDC".into(),
+            token_symbol: muralpay::USDC.into(),
             fiat_and_rail_code,
         }])
         .await?;

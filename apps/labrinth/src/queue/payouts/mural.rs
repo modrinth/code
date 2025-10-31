@@ -38,7 +38,7 @@ impl PayoutsQueue {
             .client
             .get_fees_for_token_amount(&[TokenFeeRequest {
                 amount: muralpay::TokenAmount {
-                    token_symbol: "USDC".into(),
+                    token_symbol: muralpay::USDC.into(),
                     token_amount: amount,
                 },
                 fiat_and_rail_code,
@@ -91,11 +91,6 @@ impl PayoutsQueue {
             payout_details,
             recipient_info,
             supporting_details: None,
-            // TODO
-            // Some(muralpay::SupportingDetails {
-            //     supporting_document: Some(todo!()),
-            //     payout_purpose: Some(muralpay::PayoutPurpose::VendorPayment),
-            // }),
         };
 
         let payout_request = muralpay
@@ -112,6 +107,8 @@ impl PayoutsQueue {
             })?;
 
         // try to immediately execute the payout request...
+        // use a poor man's try/catch block using this `async move {}`
+        // to catch any errors within this block
         let result = async move {
             muralpay
                 .client
@@ -168,7 +165,7 @@ impl PayoutsQueue {
             .balances
             .iter()
             .map(|balance| {
-                if balance.token_symbol == "USDC" {
+                if balance.token_symbol == muralpay::USDC {
                     balance.token_amount
                 } else {
                     Decimal::ZERO

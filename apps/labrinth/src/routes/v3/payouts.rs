@@ -780,7 +780,7 @@ async fn mural_pay_payout(
         .create_muralpay_payout_request(
             user.id.into(),
             muralpay::TokenAmount {
-                token_symbol: "USDC".into(),
+                token_symbol: muralpay::USDC.into(),
                 token_amount: sent_to_method,
             },
             details.payout_details.clone(),
