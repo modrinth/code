@@ -1381,7 +1381,8 @@ async fn test_thread_deleted_with_project() {
             assert_status!(&resp, StatusCode::NO_CONTENT);
 
             // Check that the thread exists before project deletion
-            let resp = api.get_thread(alpha_thread_id, ADMIN_USER_PAT).await;
+            // Use a moderator PAT since moderation threads are not visible to users
+            let resp = api.get_thread(alpha_thread_id, MOD_USER_PAT).await;
             assert_status!(&resp, StatusCode::OK);
 
             // Delete the project
@@ -1390,7 +1391,8 @@ async fn test_thread_deleted_with_project() {
             assert_status!(&resp, StatusCode::NO_CONTENT);
 
             // Check that the thread still exists after project deletion
-            let resp = api.get_thread(alpha_thread_id, USER_USER_PAT).await;
+            // Also use mod PAT here
+            let resp = api.get_thread(alpha_thread_id, MOD_USER_PAT).await;
             assert_status!(&resp, StatusCode::OK);
         },
     )
