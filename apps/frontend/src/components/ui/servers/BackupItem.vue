@@ -13,23 +13,14 @@ import {
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	commonMessages,
-	injectNotificationManager,
-	OverflowMenu,
-	ProgressBar,
-} from '@modrinth/ui'
+import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from '@modrinth/ui'
 import type { Backup } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
-import { computed, ref } from 'vue'
-
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { computed } from 'vue'
 
 const flags = useFeatureFlags()
 const { formatMessage } = useVIntl()
-const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
 	(e: 'download' | 'rename' | 'restore' | 'lock' | 'retry'): void
@@ -42,13 +33,11 @@ const props = withDefaults(
 		preview?: boolean
 		kyrosUrl?: string
 		jwt?: string
-		server?: ModrinthServer
 	}>(),
 	{
 		preview: false,
 		kyrosUrl: undefined,
 		jwt: undefined,
-		server: undefined,
 	},
 )
 
@@ -135,48 +124,7 @@ const messages = defineMessages({
 		id: 'servers.backups.item.retry',
 		defaultMessage: 'Retry',
 	},
-	downloadingBackup: {
-		id: 'servers.backups.item.downloading-backup',
-		defaultMessage: 'Downloading backup...',
-	},
-	downloading: {
-		id: 'servers.backups.item.downloading',
-		defaultMessage: 'Downloading',
-	},
 })
-
-const downloadingState = ref<{ progress: number; state: string } | undefined>(undefined)
-
-const downloading = computed(() => downloadingState.value)
-
-const handleDownload = async () => {
-	if (!props.server?.backups || downloading.value) {
-		return
-	}
-
-	downloadingState.value = { progress: 0, state: 'ongoing' }
-
-	try {
-		const download = props.server.backups.downloadBackup(props.backup.id, props.backup.name)
-
-		download.onProgress((p) => {
-			downloadingState.value = { progress: p.progress, state: 'ongoing' }
-		})
-
-		await download.promise
-
-		emit('download')
-	} catch (error) {
-		console.error('Failed to download backup:', error)
-		addNotification({
-			type: 'error',
-			title: 'Download failed',
-			text: error instanceof Error ? error.message : 'Failed to download backup',
-		})
-	} finally {
-		downloadingState.value = undefined
-	}
-}
 </script>
 <template>
 	<div
@@ -244,15 +192,6 @@ const handleDownload = async () => {
 				class="max-w-full"
 			/>
 		</div>
-		<div v-else-if="downloading" class="col-span-2 flex flex-col gap-3 text-blue">
-			{{ formatMessage(messages.downloadingBackup) }}
-			<ProgressBar
-				:progress="downloading.progress >= 0 ? downloading.progress : 0"
-				color="blue"
-				:waiting="downloading.progress <= 0"
-				class="max-w-full"
-			/>
-		</div>
 		<template v-else>
 			<div class="col-span-2">
 				{{ dayjs(backup.created_at).format('MMMM D, YYYY [at] h:mm A') }}
@@ -284,32 +223,34 @@ const handleDownload = async () => {
 				</button>
 			</ButtonStyled>
 			<template v-else>
-				<ButtonStyled v-show="!downloading">
-					<button :disabled="!server?.backups" @click="handleDownload">
+				<ButtonStyled>
+					<a
+						:class="{
+							disabled: !kyrosUrl || !jwt,
+						}"
+						:href="`https://${kyrosUrl}/modrinth/v0/backups/${backup.id}/download?auth=${jwt}`"
+						@click="() => emit('download')"
+					>
 						<DownloadIcon />
 						{{ formatMessage(commonMessages.downloadButton) }}
-					</button>
+					</a>
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
 						:options="[
-							{
-								id: 'rename',
-								action: () => emit('rename'),
-								disabled: !!restoring || !!downloading,
-							},
+							{ id: 'rename', action: () => emit('rename') },
 							{
 								id: 'restore',
 								action: () => emit('restore'),
-								disabled: !!restoring || !!downloading,
+								disabled: !!restoring,
 							},
-							{ id: 'lock', action: () => emit('lock'), disabled: !!restoring || !!downloading },
+							{ id: 'lock', action: () => emit('lock') },
 							{ divider: true },
 							{
 								id: 'delete',
 								color: 'red',
 								action: () => emit('delete'),
-								disabled: !!restoring || !!downloading,
+								disabled: !!restoring,
 							},
 						]"
 					>

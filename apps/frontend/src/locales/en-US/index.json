@@ -1934,12 +1934,6 @@
   "servers.backups.item.creating-backup": {
     "message": "Creating backup..."
   },
-  "servers.backups.item.downloading": {
-    "message": "Downloading"
-  },
-  "servers.backups.item.downloading-backup": {
-    "message": "Downloading backup..."
-  },
   "servers.backups.item.failed-to-create-backup": {
     "message": "Failed to create backup"
   },
