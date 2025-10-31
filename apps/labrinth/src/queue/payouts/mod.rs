@@ -132,7 +132,7 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
             image_logo_url: None,
             interval: PayoutInterval::Standard {
                 min: Decimal::from(1),
-                max: Decimal::from(100_000),
+                max: Decimal::from(3000),
             },
             fee: PayoutMethodFee {
                 percentage: Decimal::from(1) / Decimal::from(100),
