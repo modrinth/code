@@ -34,8 +34,8 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		<Text class="text-base">
 			If you have any questions about the creator rewards program, please contact support through
 			the
-			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink>
-			or by replying to this email.
+			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink
+			>.
 		</Text>
 
 		<Text class="text-base">Thank you for being a creator on Modrinth!</Text>

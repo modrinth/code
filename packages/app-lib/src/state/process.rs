@@ -743,7 +743,14 @@ impl Process {
             // We do not wait on the post exist command to finish running! We let it spawn + run on its own.
             // This behaviour may be changed in the future
             if let Some(hook) = post_exit_command {
-                let mut cmd = hook.split(' ');
+                let mut cmd = shlex::split(&hook)
+                    .ok_or_else(|| {
+                        crate::ErrorKind::LauncherError(format!(
+                            "Invalid post-exit command: {hook}",
+                        ))
+                    })?
+                    .into_iter();
+
                 if let Some(command) = cmd.next() {
                     let mut command = Command::new(command);
                     command.args(cmd).current_dir(
