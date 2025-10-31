@@ -26,6 +26,9 @@ use std::collections::HashMap;
 use tokio::sync::RwLock;
 use tracing::{error, info};
 
+mod affiliate;
+pub use affiliate::process_affiliate_payouts;
+
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
     payout_options: RwLock<Option<PayoutMethods>>,

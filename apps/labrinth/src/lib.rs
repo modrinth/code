@@ -527,5 +527,7 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("ARCHON_URL");
 
+    failed |= check_var::<String>("DEFAULT_AFFILIATE_REVENUE_SPLIT");
+
     failed
 }
