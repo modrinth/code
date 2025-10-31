@@ -527,5 +527,10 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("ARCHON_URL");
 
+    failed |= check_var::<String>("MURALPAY_API_URL");
+    failed |= check_var::<String>("MURALPAY_API_KEY");
+    failed |= check_var::<String>("MURALPAY_TRANSFER_API_KEY");
+    failed |= check_var::<String>("MURALPAY_SOURCE_ACCOUNT_ID");
+
     failed
 }

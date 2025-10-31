@@ -1,4 +1,6 @@
-use crate::models::ids::PayoutId;
+use std::{cmp, collections::HashMap, fmt};
+
+use crate::{models::ids::PayoutId, queue::payouts::mural::MuralPayoutRequest};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
@@ -37,13 +39,47 @@ impl Payout {
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "method", rename_all = "lowercase")]
+#[expect(
+    clippy::large_enum_variant,
+    reason = "acceptable since values of this type are not moved much"
+)]
+pub enum PayoutMethodRequest {
+    Venmo,
+    PayPal,
+    Tremendous { method_details: TremendousDetails },
+    MuralPay { method_details: MuralPayDetails },
+}
+
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum PayoutMethodType {
     Venmo,
     PayPal,
     Tremendous,
-    Unknown,
+    MuralPay,
+}
+
+impl PayoutMethodRequest {
+    pub fn method_type(&self) -> PayoutMethodType {
+        match self {
+            Self::Venmo => PayoutMethodType::Venmo,
+            Self::PayPal => PayoutMethodType::PayPal,
+            Self::Tremendous { .. } => PayoutMethodType::Tremendous,
+            Self::MuralPay { .. } => PayoutMethodType::MuralPay,
+        }
+    }
 }
 
 impl std::fmt::Display for PayoutMethodType {
@@ -52,27 +88,85 @@ impl std::fmt::Display for PayoutMethodType {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct TremendousDetails {
+    pub delivery_email: String,
+    #[schema(inline)]
+    pub currency: Option<TremendousCurrency>,
+}
+
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum TremendousCurrency {
+    Usd,
+    Gbp,
+    Cad,
+    Eur,
+    Aud,
+    Chf,
+    Czk,
+    Dkk,
+    Mxn,
+    Nok,
+    Nzd,
+    Pln,
+    Sek,
+    Sgd,
+}
+
+impl fmt::Display for TremendousCurrency {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = serde_json::to_value(self).map_err(|_| fmt::Error)?;
+        let s = s.as_str().ok_or(fmt::Error)?;
+        write!(f, "{s}")
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TremendousForexResponse {
+    pub forex: HashMap<String, Decimal>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct MuralPayDetails {
+    pub payout_details: MuralPayoutRequest,
+    pub recipient_info: muralpay::PayoutRecipientInfo,
+}
+
 impl PayoutMethodType {
     pub fn as_str(&self) -> &'static str {
         match self {
             PayoutMethodType::Venmo => "venmo",
             PayoutMethodType::PayPal => "paypal",
             PayoutMethodType::Tremendous => "tremendous",
-            PayoutMethodType::Unknown => "unknown",
+            PayoutMethodType::MuralPay => "muralpay",
         }
     }
 
-    pub fn from_string(string: &str) -> PayoutMethodType {
+    pub fn from_string(string: &str) -> Option<PayoutMethodType> {
         match string {
-            "venmo" => PayoutMethodType::Venmo,
-            "paypal" => PayoutMethodType::PayPal,
-            "tremendous" => PayoutMethodType::Tremendous,
-            _ => PayoutMethodType::Unknown,
+            "venmo" => Some(PayoutMethodType::Venmo),
+            "paypal" => Some(PayoutMethodType::PayPal),
+            "tremendous" => Some(PayoutMethodType::Tremendous),
+            "muralpay" => Some(PayoutMethodType::MuralPay),
+            _ => None,
         }
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug, utoipa::ToSchema,
+)]
 #[serde(rename_all = "kebab-case")]
 pub enum PayoutStatus {
     Success,
@@ -119,6 +213,8 @@ pub struct PayoutMethod {
     #[serde(rename = "type")]
     pub type_: PayoutMethodType,
     pub name: String,
+    pub category: Option<String>,
+    #[serde(skip_serializing)]
     pub supported_countries: Vec<String>,
     pub image_url: Option<String>,
     pub image_logo_url: Option<String>,
@@ -134,6 +230,15 @@ pub struct PayoutMethodFee {
     pub min: Decimal,
     #[serde(with = "rust_decimal::serde::float_option")]
     pub max: Option<Decimal>,
+}
+
+impl PayoutMethodFee {
+    pub fn compute_fee(&self, value: Decimal) -> Decimal {
+        cmp::min(
+            cmp::max(self.min, self.percentage * value),
+            self.max.unwrap_or(Decimal::MAX),
+        )
+    }
 }
 
 #[derive(Clone)]

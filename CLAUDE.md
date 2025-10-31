@@ -57,3 +57,7 @@ Use `docker exec labrinth-clickhouse clickhouse-client` to access the Clickhouse
 ### Postgres
 
 Use `docker exec labrinth-postgres psql -U postgres` to access the PostgreSQL instance.
+
+# Guidelines
+
+- Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to.
