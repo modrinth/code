@@ -105,7 +105,6 @@
 				v-for="backup in backups"
 				:key="`backup-${backup.id}`"
 				:backup="backup"
-				:server="props.server"
 				:kyros-url="props.server.general?.node.instance"
 				:jwt="props.server.general?.node.token"
 				@download="() => triggerDownloadAnimation()"
