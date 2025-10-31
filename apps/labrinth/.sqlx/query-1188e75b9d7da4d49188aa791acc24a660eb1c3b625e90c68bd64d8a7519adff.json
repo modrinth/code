@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            c.id as charge_id,\n            c.subscription_id AS \"subscription_id!\",\n            c.net as charge_net,\n            c.currency_code,\n            usa.affiliate_code,\n            ac.affiliate as affiliate_user_id,\n            ac.revenue_split\n        -- get any charges...\n        FROM charges c\n        -- ...which have a subscription...\n        INNER JOIN users_subscriptions_affiliations usa\n            ON c.subscription_id = usa.subscription_id\n            AND c.subscription_id IS NOT NULL\n            AND usa.deactivated_at IS NULL\n        -- ...which have an affiliate code...\n        INNER JOIN affiliate_codes ac\n            ON usa.affiliate_code = ac.id\n        -- ...and where no payout to an affiliate has been made for this charge yet\n        LEFT JOIN users_subscriptions_affiliations_payouts usap\n            ON c.id = usap.charge_id\n        WHERE\n            c.status = 'succeeded'\n            AND c.net > 0\n            AND usap.id IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "charge_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "subscription_id!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "charge_net",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "currency_code",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "affiliate_code",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "affiliate_user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "revenue_split",
+        "type_info": "Float8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "1188e75b9d7da4d49188aa791acc24a660eb1c3b625e90c68bd64d8a7519adff"
+}
