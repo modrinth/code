@@ -384,9 +384,6 @@ impl DBProject {
             .execute(&mut **transaction)
             .await?;
 
-            models::DBThread::remove_full(project.thread_id, transaction)
-                .await?;
-
             sqlx::query!(
                 "
                 UPDATE reports
