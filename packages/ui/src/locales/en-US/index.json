@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Create affiliate link"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Creating new affiliate code"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Give your affiliate link a name so you know where people are coming from!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Title of affiliate link"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "e.g. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "The username of the user to create the affiliate code for"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Username"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Enter username..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Created by {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Creating affiliate link..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Revoke affiliate link"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "View analytics"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -7,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "New"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Affiliate links"
   },
   "button.analytics": {
     "defaultMessage": "Analytics"

@@ -334,6 +334,7 @@ export enum UserBadge {
 	ALPHA_TESTER = 1 << 4,
 	CONTRIBUTOR = 1 << 5,
 	TRANSLATOR = 1 << 6,
+	AFFILIATE = 1 << 7,
 }
 
 export type UserBadges = number
@@ -596,4 +597,12 @@ export interface DelphiReport {
 	// rejected = not approved as malicious, remains on modrinth?
 	status: 'pending' | 'approved' | 'rejected'
 	content?: string
+}
+
+export type AffiliateLink = {
+	id: string
+	created_at: string
+	created_by: string
+	affiliate: string
+	source_name: string
 }
