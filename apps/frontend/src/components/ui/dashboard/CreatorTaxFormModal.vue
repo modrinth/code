@@ -15,7 +15,7 @@
 					<IntlFormatted :message-id="messages.securityDescription">
 						<template #security-link="{ children }">
 							<a
-								href="https://www.track1099.com/info/security"
+								href="https://web.archive.org/web/20250929023030/https://www.avalara.com/blog/en/north-america/2023/02/avalara-achieves-soc-2-compliance-offering-unparalleled-data-security.html"
 								class="flex w-fit flex-row gap-1 align-middle text-link"
 								target="_blank"
 								rel="noopener noreferrer"
@@ -215,7 +215,7 @@ const messages = defineMessages({
 	securityDescription: {
 		id: 'dashboard.creator-tax-form-modal.security.description',
 		defaultMessage:
-			'Modrinth uses third-party provider Track1099 to securely collect and store your tax forms. <security-link>Learn more here.</security-link>',
+			'Modrinth uses third-party provider Avalara, a SOC2 certified service, to securely collect and store your tax forms. <security-link>Learn more here.</security-link>',
 	},
 	usCitizenQuestion: {
 		id: 'dashboard.creator-tax-form-modal.us-citizen.question',

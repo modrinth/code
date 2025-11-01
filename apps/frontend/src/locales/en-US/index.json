@@ -606,7 +606,7 @@
     "message": "Tax form"
   },
   "dashboard.creator-tax-form-modal.security.description": {
-    "message": "Modrinth uses third-party provider Track1099 to securely collect and store your tax forms. <security-link>Learn more here.</security-link>"
+    "message": "Modrinth uses third-party provider Avalara, a SOC2 certified service, to securely collect and store your tax forms. <security-link>Learn more here.</security-link>"
   },
   "dashboard.creator-tax-form-modal.security.header": {
     "message": "Security practices"
