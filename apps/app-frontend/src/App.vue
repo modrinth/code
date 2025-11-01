@@ -1221,9 +1221,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	right: calc(-1 * var(--left-bar-width));
 	bottom: calc(-1 * var(--left-bar-width));
 	border-radius: var(--radius-xl);
-	box-shadow:
-		1px 1px 15px rgba(0, 0, 0, 0.2) inset,
-		inset 1px 1px 1px rgba(255, 255, 255, 0.23);
 	pointer-events: none;
 }
 
