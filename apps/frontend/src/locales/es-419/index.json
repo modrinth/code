@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Tus colecciones"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Descarga {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "¡Tu {formType} formulario de impuestos se ha subido exitosamente!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Puedes retirarte por ahora. Si tiene preguntas o necesita actualizar tus datos <support-link>contacte con soporte</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "¡Está todo listo! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Una entidad extranjera es una entidad comercial constituida fuera de Estados Unidos (como una corporación, sociedad o LLC no estadounidense)."
   },
@@ -912,10 +924,19 @@
     "message": "Completar formulario fiscal"
   },
   "layout.banner.tax.description": {
-    "message": "Ya retiraste más de \\$600 de Modrinth este año. Para cumplir con las regulaciones fiscales, necesitas completar un formulario fiscal. Tus retiros estarán en pausa hasta que envíes este formulario."
+    "message": "Ya ha retirado más de 600 dólares de Modrinth este año. Para cumplir con la normativa fiscal, debes rellenar un formulario de impuestos. Tus retiradas quedarán en suspenso hasta que envíes el formulario."
   },
   "layout.banner.tax.title": {
     "message": "Formulario fiscal requerido"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Contacta con soporte"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Tus retiradas están bloqueadas temporalmente porque tu TIN o SSN no coinciden con los registros del IRS. Ponte en contacto con el servicio de asistencia para restablecer y volver a enviar tu formulario fiscal."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Error en el formulario fiscal"
   },
   "layout.banner.verify-email.action": {
     "message": "Reenviar correo de verificación"
@@ -1091,8 +1112,17 @@
   "moderation.technical.search.placeholder": {
     "message": "Buscar revisiones técnicas..."
   },
+  "profile.bio.fallback.creator": {
+    "message": "Creador en Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Usuario de Modrinth."
+  },
   "profile.button.billing": {
     "message": "Gestionar la facturación de usuario"
+  },
+  "profile.button.edit-role": {
+    "message": "Editar rol"
   },
   "profile.button.info": {
     "message": "Ver detalles de usuario"
@@ -1100,17 +1130,47 @@
   "profile.button.manage-projects": {
     "message": "Gestionar proyectos"
   },
+  "profile.details.label.auth-providers": {
+    "message": "Autentificar proveedores"
+  },
+  "profile.details.label.email": {
+    "message": "Correo electrónico"
+  },
+  "profile.details.label.has-password": {
+    "message": "Tiene contraseña"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Tiene autentificación de doble factor"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Métodos de pago"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "Correo electrónico no verificado"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "Correo electrónico verificado"
+  },
   "profile.error.not-found": {
     "message": "Usuario no encontrado"
-  },
-  "profile.joined-at": {
-    "message": "Se unió el <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Insignias"
   },
+  "profile.label.collection": {
+    "message": "Colección"
+  },
   "profile.label.details": {
     "message": "Detalles"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, one {descarga} other {descargas}}"
+  },
+  "profile.label.joined": {
+    "message": "Se unió hace"
+  },
+  "profile.label.no": {
+    "message": "No"
   },
   "profile.label.no-collections": {
     "message": "¡Este usuario no tiene colecciones!"
@@ -1127,17 +1187,20 @@
   "profile.label.organizations": {
     "message": "Organizaciones"
   },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, one {proyecto} other {proyectos}}"
+  },
+  "profile.label.saving": {
+    "message": "Guardando..."
+  },
+  "profile.label.yes": {
+    "message": "Sí"
+  },
   "profile.meta.description": {
     "message": "Descarga proyectos de {username} en Modrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Descarga proyectos de {username} en Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> descarga del proyecto} other {<stat>{count}</stat> descargas del proyecto}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> proyecto} other {<stat>{count}</stat> proyectos}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> seguidor del proyecto} other {<stat>{count}</stat> seguidores del proyecto}}"
@@ -1865,9 +1928,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauración del respaldo en curso"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Ya se está preparando el respaldo para su descarga"
-  },
   "servers.backups.item.automated": {
     "message": "Automatizado"
   },
@@ -1877,9 +1937,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "No se pudo crear el respaldo"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Error al preparar la descarga"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Error al restaurar desde el respaldo"
   },
@@ -1888,15 +1945,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Bloqueado"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Preparar descarga"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Intenta prepararlo de nuevo"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Preparando descarga..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "En cola para respaldo"

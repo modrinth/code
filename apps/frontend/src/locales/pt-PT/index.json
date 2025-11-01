@@ -893,9 +893,6 @@
   "profile.error.not-found": {
     "message": "Utilizador não encontrado"
   },
-  "profile.joined-at": {
-    "message": "Juntou-se <date>{ago}</date>"
-  },
   "profile.label.badges": {
     "message": "Emblemas"
   },
@@ -922,12 +919,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Transfere os projetos de {username} no Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> transferência do projeto} other {<stat>{count}</stat> transferências do projeto}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> projeto} other {<stat>{count}</stat> projetos}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> seguidor do projeto} other {<stat>{count}</stat> seguidores do projeto}}"
@@ -1646,9 +1637,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauro de backup em curso"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Preparação do backup para transferência já em curso"
-  },
   "servers.backups.item.automated": {
     "message": "Automático"
   },
@@ -1658,9 +1646,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Falha a criar backup"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Falha a preparar transferência"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Falha a restaurar do backup"
   },
@@ -1669,15 +1654,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Trancado"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Preparar transferência"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Tenta preparar novamente"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Preparando transferência..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Na fila para backup"

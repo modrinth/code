@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Скасувати"
   },
+  "button.clear": {
+    "defaultMessage": "Очистити"
+  },
   "button.close": {
     "defaultMessage": "Замкнути"
   },

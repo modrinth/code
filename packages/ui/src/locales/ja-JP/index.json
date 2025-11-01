@@ -17,6 +17,12 @@
   "button.cancel": {
     "defaultMessage": "キャンセル"
   },
+  "button.clear": {
+    "defaultMessage": "クリア"
+  },
+  "button.close": {
+    "defaultMessage": "閉じる"
+  },
   "button.continue": {
     "defaultMessage": "続行"
   },

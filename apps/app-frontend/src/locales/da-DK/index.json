@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Udvikler-tilstand aktiveret."
   },
+  "app.settings.downloading": {
+    "message": "Downloader v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Udseende"
   },
@@ -19,6 +22,15 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Ressourcestyring"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} er allerede installeret! Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} er færdig med at download. Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} er nu tilgængelig! Siden du er på et begrænset netværk, vi downloadede den ikke automatisk."
   },
   "instance.add-server.add-and-play": {
     "message": "Tilføj og spil"

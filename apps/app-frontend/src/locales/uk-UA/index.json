@@ -24,16 +24,16 @@
     "message": "Керування ресурсами"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} готова до встановлення. Перезапустіть програму, щоб встановити зараз, чи вона оновиться автоматично після закриття."
+    "message": "Modrinth App v{version} готова до встановлення! Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте Modrinth App."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Завантаження Modrinth App v{version} завершене. Перезапустіть програму щоб оновити зараз, чи вона оновиться автоматично після закриття."
+    "message": "Modrinth App v{version} уже завантажилась. Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте Modrinth App."
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} вже доступна до завантаження! Оскільки ви на лімітному підключенні, ми не завантажили його автоматично."
+    "message": "Modrinth App v{version} доступна зараз! Оскільки ви на лімітному з’єднанні, ми не завантажили її автоматично."
   },
   "app.update-toast.changelog": {
-    "message": "Список змін"
+    "message": "Журнал змін"
   },
   "app.update-toast.download": {
     "message": "Завантажити ({size})"
@@ -64,6 +64,69 @@
   },
   "app.update.reload-to-update": {
     "message": "Перезавантажте, щоб установити оновлення"
+  },
+  "friends.action.add-friend": {
+    "message": "Додати друга"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} запит{count, plural, one { у} few {и в} many {ів у} other {у в}} друзі"
+  },
+  "friends.add-friend.submit": {
+    "message": "Надіслати запит у друзі"
+  },
+  "friends.add-friend.title": {
+    "message": "Додавання друга"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Може відрізнятися від його або її імені користувача Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Уведіть ім’я користувача Modrinth…"
+  },
+  "friends.add-friend.username.title": {
+    "message": "Яке ім’я користувача Modrinth у вашого друга?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Додайте друзів</link>, щоб бачити, у що вони грають!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Скасувати запит"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Видалити друга"
+  },
+  "friends.friend.request-sent": {
+    "message": "Запит у друзі надіслано"
+  },
+  "friends.friend.view-profile": {
+    "message": "Переглянути профіль"
+  },
+  "friends.heading": {
+    "message": "Друзі"
+  },
+  "friends.heading.active": {
+    "message": "Активний"
+  },
+  "friends.heading.offline": {
+    "message": "Поза мережею"
+  },
+  "friends.heading.online": {
+    "message": "У мережі"
+  },
+  "friends.heading.pending": {
+    "message": "Очікується"
+  },
+  "friends.no-friends-match": {
+    "message": "Немає друзів, котрі збігаються з «{query}»"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Шукати друзів…"
+  },
+  "friends.section.heading": {
+    "message": "{title} — {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Увійдіть в обліковий запис Modrinth</link>, щоб додати друзів і бачити, у що вони грають!"
   },
   "instance.add-server.add-and-play": {
     "message": "Додати та грати"
@@ -123,7 +186,7 @@
     "message": "Загальні"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Видалити інсталяцію"
+    "message": "Видалити примірник"
   },
   "instance.settings.tabs.general.delete.button": {
     "message": "Видалити профіль"
@@ -279,7 +342,7 @@
     "message": "Перевстановлення збірки"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Перевстановлення скине увесь доданий або модифікований вміст до наданого збіркою, прибираючи будь-які, додатково встановлені вами модифікації чи вміст.\nЯкщо ви змінювали профіль, це може виправити непередбачувану поведінку, однак, якщо ваші світи залежать від додаткового вмісту, це може зламати ці світи."
+    "message": "Перевстановлення скине увесь доданий або модифікований вміст до наданого збіркою, прибираючи будь-які, додатково встановлені вами модифікації чи вміст.\nЯкщо ви змінювали інсталяцію, це може виправити непередбачувану поведінку, однак, якщо ваші світи залежать від додаткового вмісту, це може зламати ці світи."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Ви впевнені, що хочете перевстановити цей профіль?"
@@ -303,7 +366,7 @@
     "message": "Відновити профіль?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Відновлення в процессі"
+    "message": "Лагодження в процесі"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Скинути до поточного"
@@ -321,7 +384,7 @@
     "message": "перевстановити"
   },
   "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "виправити"
+    "message": "полагодити"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
     "message": "Неможливо {action} під час встановлення"

@@ -1,2 +1,6 @@
-{}
+{
+  "nags.add-description.description": {
+    "defaultMessage": "يجب تقديم وصف يوضح غرض المشروع ووظيفته بشكل واضح."
+  }
+}
 

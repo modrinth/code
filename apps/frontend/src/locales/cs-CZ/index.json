@@ -461,6 +461,12 @@
   "create.organization.name-label": {
     "message": "Název"
   },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
   "create.project.visibility-public": {
     "message": "Veřejné"
   },
@@ -782,9 +788,6 @@
   "profile.error.not-found": {
     "message": "Uživatel nenalezen"
   },
-  "profile.joined-at": {
-    "message": "Připojil/a se <date>{ago}</date>"
-  },
   "profile.label.badges": {
     "message": "Odznaky"
   },
@@ -811,12 +814,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Stáhněte si projekty od {username} na Modrinthu"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural,  other {<stat>{count}</stat> stažení}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> projekt} few {<stat>{count}</stat> projekty} other {<stat>{count}</stat> projektů}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> sledující projektu} few {<stat>{count}</stat> sledující projektu} other {<stat>{count}</stat> sledujících projektu}}"
@@ -958,6 +955,9 @@
   },
   "project.settings.general.name.title": {
     "message": "Název"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
   },
   "project.stats.downloads-label": {
     "message": "stažení{count, plural, one {} few {} many {} other {}}"

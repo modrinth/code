@@ -16,6 +16,21 @@
   },
   "nags.add-links.title": {
     "defaultMessage": "Agy hozzá külső linkeket"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "Leírás szerkesztése"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "Licenc szerkesztése"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "Összefoglalás szerkesztése"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "Címkék szerkesztése"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "Cím szerkesztése"
   }
 }
 

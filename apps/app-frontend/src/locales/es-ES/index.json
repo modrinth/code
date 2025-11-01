@@ -24,13 +24,13 @@
     "message": "Gestión de recursos"
   },
   "app.update-toast.body": {
-    "message": "¡La aplicación Modrinth v{version} está lista para instalarse! Actualiza ahora o automáticamente al cerrar la aplicación Modrinth."
+    "message": "¡La versión v{version} de Modrinth está lista para instalarse! Actualiza ahora o automáticamente al cerrar la aplicación."
   },
   "app.update-toast.body.download-complete": {
-    "message": "La descarga de la aplicación Modrinth v{version} ha finalizado. Actualice ahora o automáticamente al cerrar la aplicación Modrinth."
+    "message": "La descarga de la versión v{version} de Modrinth ha finalizado. Actualice ahora o automáticamente al cerrar la aplicación."
   },
   "app.update-toast.body.metered": {
-    "message": "¡La aplicación Modrinth v{version} ya está disponible! Como estás conectado a una red con límite de datos, no la hemos descargado automáticamente."
+    "message": "¡La versión v{version} de Modrinth ya está disponible! Como estás conectado a una red con límite de datos, no la hemos descargado automáticamente."
   },
   "app.update-toast.changelog": {
     "message": "Registro de cambios"
@@ -64,6 +64,63 @@
   },
   "app.update.reload-to-update": {
     "message": "Recarga para instalar la actualización"
+  },
+  "friends.action.add-friend": {
+    "message": "Agrega a un amigo"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {petición} other {peticiones}} de amistad"
+  },
+  "friends.add-friend.submit": {
+    "message": "Envía una petición de amistad"
+  },
+  "friends.add-friend.title": {
+    "message": "Agrega a un amigo"
+  },
+  "friends.add-friend.username.description": {
+    "message": "¡Puede ser diferente de su apodo en Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Escribe su apodo en Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "¿Cuál es el apodo de tu amigo en Modrinth?"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Cancelar petición"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Eliminar amigo"
+  },
+  "friends.friend.request-sent": {
+    "message": "Petición de amistad enviada"
+  },
+  "friends.friend.view-profile": {
+    "message": "Ver perfil"
+  },
+  "friends.heading": {
+    "message": "Amigos"
+  },
+  "friends.heading.active": {
+    "message": "Activos"
+  },
+  "friends.heading.offline": {
+    "message": "Desconectados"
+  },
+  "friends.heading.online": {
+    "message": "Conectados"
+  },
+  "friends.heading.pending": {
+    "message": "Pendientes"
+  },
+  "friends.no-friends-match": {
+    "message": "Ningún apodo concuerda con ''{query}''"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Buscando amigos..."
+  },
+  "friends.section.heading": {
+    "message": "{title}: {count}"
   },
   "instance.add-server.add-and-play": {
     "message": "Añadir y jugar"

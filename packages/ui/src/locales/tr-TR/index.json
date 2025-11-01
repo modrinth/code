@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "İptal"
   },
+  "button.clear": {
+    "defaultMessage": "Temizle"
+  },
   "button.close": {
     "defaultMessage": "Kapat"
   },

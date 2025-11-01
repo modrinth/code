@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "ביטול"
   },
+  "button.close": {
+    "defaultMessage": "סגור"
+  },
   "button.continue": {
     "defaultMessage": "המשך"
   },
