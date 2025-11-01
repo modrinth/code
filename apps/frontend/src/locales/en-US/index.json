@@ -1251,7 +1251,7 @@
     "message": "Resubmit for review"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Your project has been {status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message."
+    "message": "Your project has been {status, select, rejected {rejected} withheld {withheld} other {{status}}} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "You must complete the required steps in the publishing checklist!"
