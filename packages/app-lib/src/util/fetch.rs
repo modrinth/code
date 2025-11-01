@@ -10,9 +10,9 @@ use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
-use std::time::{self};
+use std::time::{self, Duration};
 use tokio::sync::Semaphore;
-use tokio::{fs::File, io::AsyncWriteExt};
+use tokio::{fs::File, io::AsyncWriteExt, time::sleep};
 
 #[derive(Debug)]
 pub struct IoSemaphore(pub Semaphore);
@@ -116,6 +116,16 @@ pub async fn fetch_advanced(
                     || resp.status().is_server_error()
                 {
                     let backup_error = resp.error_for_status_ref().unwrap_err();
+                    if resp.status() == 429
+                        && let Some(reset_header) =
+                            resp.headers().get("X-Ratelimit-Reset")
+                        && let Ok(seconds) = reset_header.to_str()
+                        && let Ok(seconds) = seconds.parse::<u64>()
+                        && attempt <= FETCH_ATTEMPTS
+                    {
+                        sleep(Duration::from_secs(seconds)).await;
+                        continue;
+                    }
                     if let Ok(error) = resp.json().await {
                         return Err(ErrorKind::LabrinthError(error).into());
                     }
