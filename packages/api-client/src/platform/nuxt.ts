@@ -14,8 +14,6 @@ import type { RequestOptions } from '../types/request'
  */
 export class NuxtCircuitBreakerStorage implements CircuitBreakerStorage {
 	private getState(): Map<string, CircuitBreakerState> {
-		// Use useState to persist circuit breaker state across SSR requests
-		// This is a Nuxt composable that works in both server and client
 		// @ts-expect-error - useState is provided by Nuxt runtime
 		const state = useState<Map<string, CircuitBreakerState>>(
 			'circuit-breaker-state',
@@ -41,6 +39,7 @@ export class NuxtCircuitBreakerStorage implements CircuitBreakerStorage {
  * Nuxt-specific configuration
  */
 export interface NuxtClientConfig extends ClientConfig {
+	// TODO: do we want to provide this for tauri+base as well? its not used on app
 	/**
 	 * Rate limit key for server-side requests
 	 * This is injected as x-ratelimit-key header on server-side
@@ -75,7 +74,6 @@ export class NuxtModrinthClient extends AbstractModrinthClient {
 
 	protected async executeRequest<T>(url: string, options: RequestOptions): Promise<T> {
 		try {
-			// Use Nuxt's $fetch which handles SSR/CSR automatically
 			// @ts-expect-error - $fetch is provided by Nuxt runtime
 			const response = await $fetch<T>(url, {
 				method: options.method ?? 'GET',
@@ -88,7 +86,6 @@ export class NuxtModrinthClient extends AbstractModrinthClient {
 
 			return response
 		} catch (error) {
-			// Nuxt's $fetch throws FetchError (same as ofetch)
 			throw this.normalizeError(error)
 		}
 	}
@@ -110,7 +107,6 @@ export class NuxtModrinthClient extends AbstractModrinthClient {
 			...super.buildDefaultHeaders(),
 		}
 
-		// Add rate limit key for server-side requests
 		// @ts-expect-error - import.meta is provided by Nuxt
 		if (import.meta.server && this.config.rateLimitKey) {
 			headers['x-ratelimit-key'] = this.config.rateLimitKey
