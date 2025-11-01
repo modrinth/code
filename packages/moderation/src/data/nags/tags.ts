@@ -39,7 +39,7 @@ export const tagsNags: Nag[] = [
 				defineMessage({
 					id: 'nags.too-many-tags.description',
 					defaultMessage:
-						"You've selected {tagCount} tags. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results.",
+						"You've selected {tagCount, plural, one {# tag} other {# tags}}. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results.",
 				}),
 				{
 					tagCount,
@@ -82,7 +82,7 @@ export const tagsNags: Nag[] = [
 				defineMessage({
 					id: 'nags.multiple-resolution-tags.description',
 					defaultMessage:
-						"You've selected {count} resolution tags ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution.",
+						"You've selected {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Resource packs should typically only have one resolution tag that matches their primary resolution.",
 				}),
 				{
 					count: resolutionTags.length,
@@ -129,7 +129,7 @@ export const tagsNags: Nag[] = [
 				defineMessage({
 					id: 'nags.all-tags-selected.description',
 					defaultMessage:
-						"You've selected all {totalAvailableTags} available tags. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project.",
+						"You've selected all {totalAvailableTags, plural, one {# available tag} other {# available tags}}. This defeats the purpose of tags, which are meant to help users find relevant projects. Please select only the tags that are relevant to your project.",
 				}),
 				{
 					totalAvailableTags,

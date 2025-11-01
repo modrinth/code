@@ -1,4 +1,3 @@
-import { formatProjectType } from '@modrinth/utils'
 import { defineMessage, useVIntl } from '@vintl/vintl'
 
 import type { Nag, NagContext } from '../../types/nags'
@@ -218,10 +217,10 @@ export const linksNags: Nag[] = [
 				defineMessage({
 					id: 'nags.gpl-license-source-required.description',
 					defaultMessage:
-						'Your {projectType} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license.',
+						'Your {type, select, mod {mod} plugin {plugin} other {project}} uses a license which requires source code to be available. Please provide a source code link or sources file for each additional version, or consider using a different license.',
 				}),
 				{
-					projectType: formatProjectType(context.project.project_type).toLowerCase(),
+					type: context.project.project_type,
 				},
 			)
 		},
