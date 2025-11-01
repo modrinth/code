@@ -384,6 +384,19 @@ importers:
 
   apps/labrinth: {}
 
+  packages/api-client:
+    dependencies:
+      '@tauri-apps/plugin-http':
+        specifier: ^2.0.0
+        version: 2.5.0
+      ofetch:
+        specifier: ^1.4.1
+        version: 1.4.1
+    devDependencies:
+      '@modrinth/tooling-config':
+        specifier: workspace:*
+        version: link:../tooling-config
+
   packages/app-lib: {}
 
   packages/assets:
