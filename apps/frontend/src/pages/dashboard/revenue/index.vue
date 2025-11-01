@@ -251,7 +251,7 @@
 				<span class="text-lg text-contrast md:text-xl">{{
 					formatMessage(messages.noTransactions)
 				}}</span>
-				<span class="max-w-[256px] text-lg text-secondary">{{
+				<span class="max-w-[256px] text-lg leading-none text-secondary">{{
 					formatMessage(messages.noTransactionsDesc)
 				}}</span>
 			</div>

@@ -297,7 +297,7 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 		const methodDetails: any = {
 			delivery_email: data.providerData.deliveryEmail,
 		}
-		if (data.providerData.currency) {
+		if (data.providerData.currency && data.selection.method === 'paypal') {
 			methodDetails.currency = data.providerData.currency
 		}
 		return {

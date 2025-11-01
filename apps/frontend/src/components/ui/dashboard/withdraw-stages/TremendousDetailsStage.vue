@@ -110,7 +110,7 @@
 					</template>
 				</Combobox>
 			</div>
-			<span v-if="selectedMethodDetails" class="text-sm text-secondary">
+			<span v-if="selectedMethodDetails" class="text-secondary">
 				{{ formatMoney(effectiveMinAmount) }} min,
 				{{ formatMoney(selectedMethodDetails.interval?.standard?.max ?? effectiveMaxAmount) }}
 				max withdrawal amount.
@@ -560,6 +560,11 @@ watch(
 			selectedGiftCardId.value = null
 			calculatedFee.value = 0
 			exchangeRate.value = null
+
+			// Clear currency when switching away from PayPal International
+			if (newMethod !== 'paypal' && withdrawData.value.providerData.type === 'tremendous') {
+				;(withdrawData.value.providerData as any).currency = undefined
+			}
 		}
 	},
 )
