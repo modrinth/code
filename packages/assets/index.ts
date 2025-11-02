@@ -23,29 +23,38 @@ import _SleepingRinthbot from './branding/rinthbot/sleeping.webp'
 import _SobbingRinthbot from './branding/rinthbot/sobbing.webp'
 import _ThinkingRinthbot from './branding/rinthbot/thinking.webp'
 import _WavingRinthbot from './branding/rinthbot/waving.webp'
+// External Icons
 import _AppleIcon from './external/apple.svg?component'
 import _BlueskyIcon from './external/bluesky.svg?component'
 import _BuyMeACoffeeIcon from './external/bmac.svg?component'
 import _CurseForgeIcon from './external/curseforge.svg?component'
 import _DiscordIcon from './external/discord.svg?component'
+import _FacebookIcon from './external/facebook.svg?component'
 import _GithubIcon from './external/github.svg?component'
+import _InstagramIcon from './external/instagram.svg?component'
 import _KoFiIcon from './external/kofi.svg?component'
 import _MastodonIcon from './external/mastodon.svg?component'
 import _OpenCollectiveIcon from './external/opencollective.svg?component'
 import _PatreonIcon from './external/patreon.svg?component'
 import _PayPalIcon from './external/paypal.svg?component'
 import _RedditIcon from './external/reddit.svg?component'
-// External Icons
+import _ReelsIcon from './external/reels.svg?component'
+import _SnapchatIcon from './external/snapchat.svg?component'
 import _SSODiscordIcon from './external/sso/discord.svg?component'
 import _SSOGitHubIcon from './external/sso/github.svg?component'
 import _SSOGitLabIcon from './external/sso/gitlab.svg?component'
 import _SSOGoogleIcon from './external/sso/google.svg?component'
 import _SSOMicrosoftIcon from './external/sso/microsoft.svg?component'
 import _SSOSteamIcon from './external/sso/steam.svg?component'
+import _ThreadsIcon from './external/threads.svg?component'
+import _TikTokIcon from './external/tiktok.svg?component'
 import _TumblrIcon from './external/tumblr.svg?component'
+import _TwitchIcon from './external/twitch.svg?component'
 import _TwitterIcon from './external/twitter.svg?component'
 import _WindowsIcon from './external/windows.svg?component'
 import _YouTubeIcon from './external/youtube.svg?component'
+import _YouTubeGaming from './external/youtubegaming.svg?component'
+import _YouTubeShortsIcon from './external/youtubeshorts.svg?component'
 
 export const ModrinthIcon = _ModrinthIcon
 export const BrowserWindowSuccessIllustration = _BrowserWindowSuccessIllustration
@@ -73,6 +82,13 @@ export const BuyMeACoffeeIcon = _BuyMeACoffeeIcon
 export const GithubIcon = _GithubIcon
 export const CurseForgeIcon = _CurseForgeIcon
 export const DiscordIcon = _DiscordIcon
+export const FacebookIcon = _FacebookIcon
+export const InstagramIcon = _InstagramIcon
+export const SnapchatIcon = _SnapchatIcon
+export const ReelsIcon = _ReelsIcon
+export const TikTokIcon = _TikTokIcon
+export const TwitchIcon = _TwitchIcon
+export const ThreadsIcon = _ThreadsIcon
 export const KoFiIcon = _KoFiIcon
 export const MastodonIcon = _MastodonIcon
 export const OpenCollectiveIcon = _OpenCollectiveIcon
@@ -83,6 +99,8 @@ export const TumblrIcon = _TumblrIcon
 export const TwitterIcon = _TwitterIcon
 export const WindowsIcon = _WindowsIcon
 export const YouTubeIcon = _YouTubeIcon
+export const YouTubeGaming = _YouTubeGaming
+export const YouTubeShortsIcon = _YouTubeShortsIcon
 
 export * from './generated-icons'
 export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'

@@ -37,6 +37,7 @@ export const useStripe = (
 		body: CreatePaymentIntentRequest | UpdatePaymentIntentRequest,
 	) => Promise<CreatePaymentIntentResponse | UpdatePaymentIntentResponse | null>,
 	onError: (err: Error) => void,
+	affiliateCode?: Ref<string | null>,
 ) => {
 	const stripe = ref<StripeJs | null>(null)
 
@@ -229,6 +230,13 @@ export const useStripe = (
 
 			let result: BasePaymentIntentResponse | null = null
 
+			const affiliateMetadata =
+				affiliateCode && affiliateCode.value
+					? {
+							affiliate_code: affiliateCode.value,
+						}
+					: {}
+
 			const metadata: CreatePaymentIntentRequest['metadata'] = {
 				type: 'pyro',
 				server_region: region.value,
@@ -237,6 +245,7 @@ export const useStripe = (
 							project_id: project.value,
 						}
 					: {},
+				...affiliateMetadata,
 			}
 
 			if (paymentIntentId.value) {
