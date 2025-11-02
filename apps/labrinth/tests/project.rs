@@ -1355,6 +1355,50 @@ async fn projects_various_visibility() {
     .await;
 }
 
+#[actix_rt::test]
+async fn test_thread_deleted_with_project() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+
+            let alpha_project_id = &test_env.dummy.project_alpha.project_id;
+            let alpha_thread_id = &test_env.dummy.project_alpha.thread_id;
+
+            // Verify the thread exists initially
+            let resp = api.get_thread(alpha_thread_id, USER_USER_PAT).await;
+            assert_status!(&resp, StatusCode::OK);
+
+            // Write a message to the thread to confirm it's working
+            let resp = api
+                .write_to_thread(
+                    alpha_thread_id,
+                    "text",
+                    "Test message before project deletion",
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
+
+            // Check that the thread exists before project deletion
+            // Use a moderator PAT since moderation threads are not visible to users
+            let resp = api.get_thread(alpha_thread_id, MOD_USER_PAT).await;
+            assert_status!(&resp, StatusCode::OK);
+
+            // Delete the project
+            let resp =
+                api.remove_project(alpha_project_id, USER_USER_PAT).await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
+
+            // Check that the thread still exists after project deletion
+            // Also use mod PAT here
+            let resp = api.get_thread(alpha_thread_id, MOD_USER_PAT).await;
+            assert_status!(&resp, StatusCode::OK);
+        },
+    )
+    .await;
+}
+
 // Route tests:
 // TODO: Missing routes on projects
 // TODO: using permissions/scopes, can we SEE projects existence that we are not allowed to? (ie 401 instead of 404)
