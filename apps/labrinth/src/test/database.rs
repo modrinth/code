@@ -1,5 +1,5 @@
-use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
+use crate::database::{MIGRATOR, ReadOnlyPgPool};
 use crate::search;
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::time::Duration;
@@ -82,8 +82,7 @@ impl TemporaryDatabase {
         println!("Running migrations on temporary database");
 
         // Performs migrations
-        let migrations = sqlx::migrate!("./migrations");
-        migrations.run(&pool).await.expect("Migrations failed");
+        MIGRATOR.run(&pool).await.expect("Migrations failed");
 
         println!("Migrations complete");
 
@@ -182,8 +181,7 @@ impl TemporaryDatabase {
                 }
 
                 // Run migrations on the template
-                let migrations = sqlx::migrate!("./migrations");
-                migrations.run(&pool).await.expect("Migrations failed");
+                MIGRATOR.run(&pool).await.expect("Migrations failed");
 
                 if !dummy_data_exists {
                     // Add dummy data
