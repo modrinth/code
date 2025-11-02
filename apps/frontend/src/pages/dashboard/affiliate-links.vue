@@ -13,9 +13,7 @@
 		@proceed="confirmRevokeAffiliateLink"
 	/>
 	<div class="page">
-		<div
-			class="mb-6 flex items-center gap-6"
-		>
+		<div class="mb-6 flex items-center gap-6">
 			<h1 class="m-0 grow text-2xl font-extrabold">
 				{{ formatMessage(messages.yourAffiliateLinks) }}
 			</h1>
