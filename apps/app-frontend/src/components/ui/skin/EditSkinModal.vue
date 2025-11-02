@@ -130,6 +130,7 @@ import {
 	remove_custom_skin,
 	type Skin,
 	type SkinModel,
+	type SkinTextureUrl,
 	unequip_skin,
 } from '@/helpers/skins.ts'
 
@@ -142,7 +143,7 @@ const currentSkin = ref<Skin | null>(null)
 const shouldRestoreModal = ref(false)
 const isSaving = ref(false)
 
-const uploadedTextureUrl = ref<string | null>(null)
+const uploadedTextureUrl = ref<SkinTextureUrl | null>(null)
 const previewSkin = ref<string>('')
 
 const variant = ref<SkinModel>('CLASSIC')
@@ -188,7 +189,7 @@ function getSortedCapeExcluding(excludeId: string): Cape | undefined {
 
 async function loadPreviewSkin() {
 	if (uploadedTextureUrl.value) {
-		previewSkin.value = uploadedTextureUrl.value
+		previewSkin.value = uploadedTextureUrl.value.normalized
 	} else if (currentSkin.value) {
 		try {
 			previewSkin.value = await get_normalized_skin_texture(currentSkin.value)
@@ -253,11 +254,11 @@ async function show(e: MouseEvent, skin?: Skin) {
 	modal.value?.show(e)
 }
 
-async function showNew(e: MouseEvent, skinTextureUrl: string) {
+async function showNew(e: MouseEvent, skinTextureUrl: SkinTextureUrl) {
 	mode.value = 'new'
 	currentSkin.value = null
 	uploadedTextureUrl.value = skinTextureUrl
-	variant.value = await determineModelType(skinTextureUrl)
+	variant.value = await determineModelType(skinTextureUrl.original)
 	selectedCape.value = undefined
 	visibleCapeList.value = []
 	initVisibleCapeList()
@@ -267,7 +268,7 @@ async function showNew(e: MouseEvent, skinTextureUrl: string) {
 	modal.value?.show(e)
 }
 
-async function restoreWithNewTexture(skinTextureUrl: string) {
+async function restoreWithNewTexture(skinTextureUrl: SkinTextureUrl) {
 	uploadedTextureUrl.value = skinTextureUrl
 	await loadPreviewSkin()
 
@@ -361,7 +362,7 @@ async function save() {
 		let textureUrl: string
 
 		if (uploadedTextureUrl.value) {
-			textureUrl = uploadedTextureUrl.value
+			textureUrl = uploadedTextureUrl.value.original
 		} else {
 			textureUrl = currentSkin.value!.texture
 		}

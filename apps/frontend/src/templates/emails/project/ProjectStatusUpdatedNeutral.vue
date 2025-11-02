@@ -53,8 +53,8 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		<Text class="text-base">
 			If you believe this status was applied in error, you can reply in the moderation thread or
 			contact support through our
-			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink>
-			or by replying to this email.
+			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink
+			>.
 		</Text>
 
 		<Text class="text-base">Thank you for publishing on Modrinth!</Text>

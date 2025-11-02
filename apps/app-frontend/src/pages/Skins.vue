@@ -31,7 +31,7 @@ import { get_default_user, login as login_flow, users } from '@/helpers/auth'
 import type { RenderResult } from '@/helpers/rendering/batch-skin-renderer.ts'
 import { generateSkinPreviews, skinBlobUrlMap } from '@/helpers/rendering/batch-skin-renderer.ts'
 import { get as getSettings } from '@/helpers/settings.ts'
-import type { Cape, Skin } from '@/helpers/skins.ts'
+import type { Cape, Skin, SkinTextureUrl } from '@/helpers/skins.ts'
 import {
 	equip_skin,
 	filterDefaultSkins,
@@ -245,16 +245,18 @@ function openUploadSkinModal(e: MouseEvent) {
 
 function onSkinFileUploaded(buffer: ArrayBuffer) {
 	const fakeEvent = new MouseEvent('click')
-	normalize_skin_texture(`data:image/png;base64,` + arrayBufferToBase64(buffer)).then(
-		(skinTextureNormalized: Uint8Array) => {
-			const skinTexUrl = `data:image/png;base64,` + arrayBufferToBase64(skinTextureNormalized)
-			if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
-				editSkinModal.value.restoreWithNewTexture(skinTexUrl)
-			} else {
-				editSkinModal.value?.showNew(fakeEvent, skinTexUrl)
-			}
-		},
-	)
+	const originalSkinTexUrl = `data:image/png;base64,` + arrayBufferToBase64(buffer)
+	normalize_skin_texture(originalSkinTexUrl).then((skinTextureNormalized: Uint8Array) => {
+		const skinTexUrl: SkinTextureUrl = {
+			original: originalSkinTexUrl,
+			normalized: `data:image/png;base64,` + arrayBufferToBase64(skinTextureNormalized),
+		}
+		if (editSkinModal.value && editSkinModal.value.shouldRestoreModal) {
+			editSkinModal.value.restoreWithNewTexture(skinTexUrl)
+		} else {
+			editSkinModal.value?.showNew(fakeEvent, skinTexUrl)
+		}
+	})
 }
 
 function onUploadCanceled() {

@@ -8,6 +8,11 @@
 				{{ analytics.error.value }}
 			</div>
 		</div>
+		<div v-else-if="!isInitialized || analytics.loading.value" class="universal-card">
+			<h2>
+				<span class="label__title">Loading analytics...</span>
+			</h2>
+		</div>
 		<div v-else class="graphs">
 			<div class="graphs__vertical-bar">
 				<client-only>
@@ -419,6 +424,7 @@ const isUsingProjectColors = computed({
 const startDate = ref(dayjs().startOf('day'))
 const endDate = ref(dayjs().endOf('day'))
 const timeResolution = ref(30)
+const isInitialized = ref(false)
 
 onBeforeMount(() => {
 	// Load cached data and range from localStorage - cache.
@@ -449,6 +455,8 @@ onMounted(() => {
 	startDate.value = ranges.startDate
 	endDate.value = ranges.endDate
 	timeResolution.value = selectedRange.value.timeResolution
+
+	isInitialized.value = true
 })
 
 const internalRange: Ref<RangeObject> = ref(null as unknown as RangeObject)
@@ -482,6 +490,7 @@ const analytics = useFetchAllAnalytics(
 	startDate,
 	endDate,
 	timeResolution,
+	isInitialized,
 )
 
 const formattedCategorySubtitle = computed(() => {

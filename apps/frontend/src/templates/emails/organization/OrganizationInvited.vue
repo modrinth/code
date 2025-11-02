@@ -68,8 +68,7 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			in error or is abusive, please contact support
 			<VLink href="https://support.modrinth.com" class="text-green underline">
 				through the Support Portal</VLink
-			>
-			or by replying to this email.
+			>.
 		</Text>
 	</StyledEmail>
 </template>

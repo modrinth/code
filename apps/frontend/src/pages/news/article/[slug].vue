@@ -4,7 +4,7 @@ import { articles as rawArticles } from '@modrinth/blog'
 import { Avatar, ButtonStyled } from '@modrinth/ui'
 import type { User } from '@modrinth/utils'
 import dayjs from 'dayjs'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 
 import NewsletterButton from '~/components/ui/NewsletterButton.vue'
 import ShareArticleButtons from '~/components/ui/ShareArticleButtons.vue'
@@ -73,6 +73,36 @@ useSeoMeta({
 	articlePublishedTime: () => dayjsDate.value.toISOString(),
 	twitterCard: 'summary_large_image',
 	twitterImage: () => thumbnailPath.value,
+})
+
+onMounted(() => {
+	const videos = document.querySelectorAll('.markdown-body video')
+
+	if ('IntersectionObserver' in window) {
+		const videoObserver = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					const video = entry.target as HTMLVideoElement
+					if (entry.isIntersecting) {
+						video.play().catch(() => {})
+					} else {
+						video.pause()
+					}
+				})
+			},
+			{
+				threshold: 0.5,
+			},
+		)
+
+		videos.forEach((video) => {
+			videoObserver.observe(video)
+		})
+	} else {
+		videos.forEach((video) => {
+			;(video as HTMLVideoElement).setAttribute('autoplay', '')
+		})
+	}
 })
 </script>
 
@@ -181,14 +211,19 @@ useSeoMeta({
 		padding: 0;
 	}
 
-	ul,
+	ul > li:not(:last-child),
 	ol > li:not(:last-child) {
 		margin-bottom: 0.5rem;
 	}
 
 	ul,
 	ol {
-		p {
+		> li > p {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+
+		> li > p:not(:last-child) {
 			margin-bottom: 0.5rem;
 		}
 	}
@@ -220,20 +255,22 @@ useSeoMeta({
 
 	h2 {
 		font-size: 1.25rem;
+		margin-top: 1.5rem;
 		@media (min-width: 640px) {
 			font-size: 1.5rem;
 		}
 	}
 
 	h3 {
-		font-size: 1.125rem;
+		font-size: 1rem;
+		margin-top: 1.25rem;
 		@media (min-width: 640px) {
-			font-size: 1.25rem;
+			font-size: 1.125rem;
 		}
 	}
 
 	p {
-		margin-bottom: 1.25rem;
+		margin-bottom: 0.75rem;
 		font-size: 0.875rem;
 		@media (min-width: 640px) {
 			font-size: 1rem;
@@ -275,8 +312,34 @@ useSeoMeta({
 		}
 	}
 
+	hr {
+		border: none;
+		height: 1px;
+		background-color: var(--color-divider);
+	}
+
+	.video-wrapper {
+		display: inline-block;
+		max-width: 100%;
+		border-radius: var(--radius-md);
+		overflow: hidden;
+		border: 1px solid var(--color-button-border);
+		@media (min-width: 640px) {
+			border-radius: var(--radius-lg);
+		}
+
+		video {
+			display: block;
+			max-width: 100%;
+			object-fit: cover;
+			height: auto;
+		}
+	}
+
 	> img,
-	> :has(img:first-child:last-child) {
+	> .video-wrapper,
+	> :has(img:first-child:last-child),
+	> :has(video:first-child:last-child) {
 		display: flex;
 		justify-content: center;
 	}

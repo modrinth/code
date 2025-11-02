@@ -303,7 +303,7 @@ html {
 
 	--color-text-primary: #ffffff;
 	--color-text-default: #b0bac5;
-	--color-text-tertiary: #80878f;
+	--color-text-tertiary: #96a2b0;
 
 	// ===
 
@@ -389,10 +389,10 @@ html {
 .oled-mode {
 	@extend .dark-mode;
 	--surface-1: #000000;
-	--surface-2: #101013;
-	--surface-3: #1b1b20;
-	--surface-4: #25262b;
-	--surface-5: #2e2f34;
+	--surface-2: #09090a;
+	--surface-3: #101013;
+	--surface-4: #1b1b20;
+	--surface-5: #25262b;
 
 	--color-ad: #0d1828;
 

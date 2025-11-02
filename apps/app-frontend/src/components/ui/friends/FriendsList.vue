@@ -339,10 +339,7 @@ const messages = defineMessages({
 		</ButtonStyled>
 	</div>
 	<div class="flex flex-col gap-3">
-		<h3
-			v-if="sortedFriends.length === 0 || loading"
-			class="ml-4 mr-1 text-base text-primary font-medium m-0"
-		>
+		<h3 v-if="loading" class="ml-4 mr-1 text-base text-primary font-medium m-0">
 			{{ formatMessage(messages.friends) }}
 		</h3>
 		<template v-if="loading">
@@ -368,7 +365,7 @@ const messages = defineMessages({
 				<div v-else>
 					<IntlFormatted :message-id="messages.addFriendsToShare">
 						<template #link="{ children }">
-							<span class="font-semibold text-brand cursor-pointer" @click="signIn">
+							<span class="font-semibold text-brand cursor-pointer" @click="addFriendModal.show">
 								<component :is="() => children" />
 							</span>
 						</template>

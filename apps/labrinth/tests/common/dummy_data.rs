@@ -10,11 +10,9 @@ use labrinth::models::ids::ProjectId;
 use labrinth::models::{
     oauth_clients::OAuthClient,
     organizations::Organization,
-    pats::Scopes,
     projects::{Project, Version},
 };
 use serde_json::json;
-use sqlx::Executor;
 use zip::{CompressionMethod, ZipWriter, write::FileOptions};
 
 use super::{
@@ -291,13 +289,7 @@ pub async fn add_dummy_data(api: &ApiV3, db: TemporaryDatabase) -> DummyData {
     // Adds basic dummy data to the database directly with sql (user, pats)
     let pool = &db.pool.clone();
 
-    pool.execute(
-        include_str!("../fixtures/dummy_data.sql")
-            .replace("$1", &Scopes::all().bits().to_string())
-            .as_str(),
-    )
-    .await
-    .unwrap();
+    labrinth::test::db::add_dummy_data(pool).await.unwrap();
 
     let (alpha_project, alpha_version) = add_project_alpha(api).await;
     let (beta_project, beta_version) = add_project_beta(api).await;

@@ -53,8 +53,8 @@ import StyledEmail from '../shared/StyledEmail.vue'
 
 		<Text class="text-base">
 			If you did not initiate this transfer, please contact support immediately through the
-			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink>
-			or by replying to this email.
+			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink
+			>.
 		</Text>
 	</StyledEmail>
 </template>

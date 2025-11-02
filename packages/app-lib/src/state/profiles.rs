@@ -103,10 +103,11 @@ impl ProfileInstallStage {
 pub enum LauncherFeatureVersion {
     None,
     MigratedServerLastPlayTime,
+    MigratedLaunchHooks,
 }
 
 impl LauncherFeatureVersion {
-    pub const MOST_RECENT: Self = Self::MigratedServerLastPlayTime;
+    pub const MOST_RECENT: Self = Self::MigratedLaunchHooks;
 
     pub fn as_str(&self) -> &'static str {
         match *self {
@@ -114,6 +115,7 @@ impl LauncherFeatureVersion {
             Self::MigratedServerLastPlayTime => {
                 "migrated_server_last_play_time"
             }
+            Self::MigratedLaunchHooks => "migrated_launch_hooks",
         }
     }
 
@@ -123,6 +125,7 @@ impl LauncherFeatureVersion {
             "migrated_server_last_play_time" => {
                 Self::MigratedServerLastPlayTime
             }
+            "migrated_launch_hooks" => Self::MigratedLaunchHooks,
             _ => Self::None,
         }
     }
@@ -225,10 +228,14 @@ impl ProjectType {
         }
     }
 
-    pub fn get_from_parent_folder(path: &Path) -> Option<Self> {
-        // Get parent folder
-        let path = path.parent()?.file_name()?;
-        match path.to_str()? {
+    pub fn get_from_parent_folder(path: impl AsRef<Path>) -> Option<Self> {
+        match path
+            .as_ref()
+            .parent()?
+            .file_name()?
+            .to_str()
+            .unwrap_or_default()
+        {
             "mods" => Some(ProjectType::Mod),
             "datapacks" => Some(ProjectType::DataPack),
             "resourcepacks" => Some(ProjectType::ResourcePack),
@@ -780,6 +787,30 @@ impl Profile {
                 }
                 self.launcher_feature_version =
                     LauncherFeatureVersion::MigratedServerLastPlayTime;
+            }
+            LauncherFeatureVersion::MigratedServerLastPlayTime => {
+                let quoter = shlex::Quoter::new().allow_nul(true);
+
+                // Previously split by spaces
+                if let Some(pre_launch) = self.hooks.pre_launch.as_ref() {
+                    self.hooks.pre_launch =
+                        Some(quoter.join(pre_launch.split(' ')).unwrap())
+                }
+
+                // Previously treated as complete path to command
+                if let Some(wrapper) = self.hooks.wrapper.as_ref() {
+                    self.hooks.wrapper =
+                        Some(quoter.quote(wrapper).unwrap().to_string())
+                }
+
+                // Previously split by spaces
+                if let Some(post_exit) = self.hooks.post_exit.as_ref() {
+                    self.hooks.post_exit =
+                        Some(quoter.join(post_exit.split(' ')).unwrap())
+                }
+
+                self.launcher_feature_version =
+                    LauncherFeatureVersion::MigratedLaunchHooks;
             }
             LauncherFeatureVersion::MOST_RECENT => unreachable!(
                 "LauncherFeatureVersion::MOST_RECENT was not updated"

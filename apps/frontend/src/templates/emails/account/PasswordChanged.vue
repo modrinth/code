@@ -14,9 +14,8 @@ import StyledEmail from '../shared/StyledEmail.vue'
 		<Text class="text-muted text-base">Hi {user.name},</Text>
 		<Text class="text-muted text-base"> Your password has been changed on your account. </Text>
 		<Text class="text-muted text-base">
-			If you did not make this change, please contact us immediately by replying to this email or
-			<VLink href="https://support.modrinth.com" class="text-green underline"
-				>through our Support Portal</VLink
+			If you did not make this change, please contact us immediately through our
+			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink
 			>.
 		</Text>
 	</StyledEmail>

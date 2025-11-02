@@ -100,7 +100,7 @@
 				</template>
 			</IntlFormatted>
 		</p>
-		<div v-for="(pat, index) in pats" :key="pat.id" class="universal-card recessed token">
+		<div v-for="(pat, index) in displayPats" :key="pat.id" class="universal-card recessed token">
 			<div>
 				<div>
 					<strong>{{ pat.name }}</strong>
@@ -332,6 +332,9 @@ const deletePatIndex = ref(null)
 const loading = ref(false)
 
 const { data: pats, refresh } = await useAsyncData('pat', () => useBaseFetch('pat'))
+const displayPats = computed(() => {
+	return pats.value.toSorted((a, b) => new Date(b.created) - new Date(a.created))
+})
 
 async function createPat() {
 	startLoading()

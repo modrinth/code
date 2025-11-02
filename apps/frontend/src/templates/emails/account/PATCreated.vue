@@ -18,9 +18,8 @@ import StyledEmail from '../shared/StyledEmail.vue'
 			A new personal access token, <b>{newpat.token_name}</b>, has been added to your account.
 		</Text>
 		<Text class="text-muted text-base">
-			If you did not create this token, please contact us immediately by replying to this email or
-			<VLink href="https://support.modrinth.com" class="text-green underline"
-				>through our Support Portal</VLink
+			If you did not create this token, please contact us immediately through our
+			<VLink href="https://support.modrinth.com" class="text-green underline">Support Portal</VLink
 			>.
 		</Text>
 	</StyledEmail>
