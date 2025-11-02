@@ -4679,6 +4679,7 @@ dependencies = [
  "itertools 0.14.0",
  "jemalloc_pprof",
  "json-patch 4.1.0",
+ "labrinth",
  "lettre",
  "meilisearch-sdk",
  "modrinth-maxmind",

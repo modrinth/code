@@ -12,6 +12,7 @@ path = "src/main.rs"
 [dependencies]
 actix-cors = { workspace = true }
 actix-files = { workspace = true }
+actix-http = { workspace = true, optional = true }
 actix-multipart = { workspace = true }
 actix-rt = { workspace = true }
 actix-web = { workspace = true }
@@ -135,7 +136,7 @@ zip = { workspace = true }
 zxcvbn = { workspace = true }
 
 [dev-dependencies]
-actix-http = { workspace = true }
+labrinth = { path = ".", features = ["test"] }
 
 [build-dependencies]
 chrono = { workspace = true }
@@ -149,6 +150,9 @@ tikv-jemallocator = { workspace = true, features = [
   "profiling",
   "unprefixed_malloc_on_supported_platforms",
 ] }
+
+[features]
+test = ["dep:actix-http"]
 
 [lints]
 workspace = true
