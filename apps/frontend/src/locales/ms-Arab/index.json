@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "کوليکسي اندا"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "موات تورون {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "بورڠ چوکاي {formType} اندا تله برجاي دهانتر!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "اندا بوليه مڠلوارکن واڠ دڠن بيبس سکارڠ. جک اندا ممڤوڽاءي سوءالن اتاو ڤرلو مڠمس کيني بوتيرن اندا <support-link>هوبوڠي سوکوڠن</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "سلساي! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "اينتيتي اسيڠ برمقصود اينتيتي ڤرنياݢاءن يڠ دأنجورکن دلوار اميريکا شريکت (سڤرتي ڤربادنن⹁ ڤرکوڠسين اتاو LLC بوکن ا.س.)."
   },
@@ -917,6 +929,15 @@
   "layout.banner.tax.title": {
     "message": "بورڠ چوکاي دڤرلوکن"
   },
+  "layout.banner.tin-mismatch.action": {
+    "message": "هوبوڠي سوکوڠن"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "ڤڠلوارن اندا تله دکونچي بوات سمنتارا وقتو کران TIN اتاو SSN اندا تيدق سڤادن دڠن ريکود IRS. سيلا هوبوڠي سوکوڠن اونتوق منتڤکن سمولا دان مڠهانتر سمولا بورڠ چوکاي اندا."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "بورڠ چوکاي ݢاݢل"
+  },
   "layout.banner.verify-email.action": {
     "message": "هانتر سمولا إي-ميل ڤڠصحن"
   },
@@ -1091,8 +1112,17 @@
   "moderation.technical.search.placeholder": {
     "message": "چاري ڤنيلاين تيکنيکل..."
   },
+  "profile.bio.fallback.creator": {
+    "message": "سأورڠ ڤنچيڤتا Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "سأورڠ ڤڠݢونا Modrinth."
+  },
   "profile.button.billing": {
     "message": "اوروس ڤڠبيلن ڤڠݢونا"
+  },
+  "profile.button.edit-role": {
+    "message": "سونتيڠ ڤرانن"
   },
   "profile.button.info": {
     "message": "ليهت بوتيرن ڤڠݢونا"
@@ -1100,17 +1130,47 @@
   "profile.button.manage-projects": {
     "message": "اوروس ڤروجيک"
   },
+  "profile.details.label.auth-providers": {
+    "message": "ڤڽديا ڤڠصحن"
+  },
+  "profile.details.label.email": {
+    "message": "إي-ميل"
+  },
+  "profile.details.label.has-password": {
+    "message": "ممڤوڽاءي کات لالوان"
+  },
+  "profile.details.label.has-totp": {
+    "message": "ممڤوڽاءي TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "قاعده ڤمبايرن"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "إي-ميل تيدق دصحکن"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "إي-ميل دصحکن"
+  },
   "profile.error.not-found": {
     "message": "ڤڠݢونا تيدق دجومڤاءي"
-  },
-  "profile.joined-at": {
-    "message": "تله مڽرتاءي <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "لنچان"
   },
+  "profile.label.collection": {
+    "message": "کوليکسي"
+  },
   "profile.label.details": {
     "message": "بوتيرن"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, other {موات تورون}}"
+  },
+  "profile.label.joined": {
+    "message": "تله مڽرتاءي ڤد"
+  },
+  "profile.label.no": {
+    "message": "تيدق"
   },
   "profile.label.no-collections": {
     "message": "ڤڠݢونا اين تيدق مميليقي سبارڠ کوليکسي!"
@@ -1127,17 +1187,20 @@
   "profile.label.organizations": {
     "message": "اورݢانيساسي"
   },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, other {ڤروجيک}}"
+  },
+  "profile.label.saving": {
+    "message": "سدڠ مڽيمڤن..."
+  },
+  "profile.label.yes": {
+    "message": "يا"
+  },
   "profile.meta.description": {
     "message": "موات تورون ڤروجيک ميليق {username} دModrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - موات تورون ڤروجيک ميليق {username} دModrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, other {<stat>{count}</stat> موات تورون}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, other {<stat>{count}</stat> ڤروجيک}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, other {<stat>{count}</stat> ڤڠيکوت ڤروجيک}}"
@@ -1865,9 +1928,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "ڤموليهن ساندرن سدڠ دجالنکن"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "سوده مڽدياکن ساندرن اونتوق موات تورون"
-  },
   "servers.backups.item.automated": {
     "message": "داءوتوماتيککن"
   },
@@ -1877,9 +1937,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "ݢاݢل منچيڤتا ساندرن"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "ݢاݢل مڽدياکن موات تورون"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "ݢاݢل مموليهکن درڤد ساندرن"
   },
@@ -1888,15 +1945,6 @@
   },
   "servers.backups.item.locked": {
     "message": "دکونچي"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "سدياکن موات تورون"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "چوبا سدياکن لاݢي"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "سدڠ مڽدياکن موات تورون..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "دالم باريسن اونتوق دساندر"

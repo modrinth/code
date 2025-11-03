@@ -1,4 +1,244 @@
 {
+  "action.cancel": {
+    "message": "Batal"
+  },
+  "action.continue": {
+    "message": "Lanjutkan"
+  },
+  "admin.billing.error.not-found": {
+    "message": "Pengguna tidak ditemukan"
+  },
+  "app-marketing.download.description": {
+    "message": "Aplikasi destop kami tersedia pada semua platform, pilih versi yang Anda inginkan."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Unduh Applmage"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Unduh versi beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Unduh DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Unduh RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Modrinth App untuk Linux <issues-link>memiliki isu</issues-link> pada sistem dan konfigurasi tertentu. Bila Modrinth App tidak stabil pada sistem Anda, kami menyarankan Anda untuk mencoba aplikasi lain seperti <prism-link>Prism Launcher</prism-link> untuk mengunduh konten Modrinth dengan mudah."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Pilihan pengunduhan"
+  },
+  "app-marketing.download.terms": {
+    "message": "Dengan mengunduh Modrinth App, Anda menyetujui <terms-link>Syarat</terms-link> dan <privacy-link>Kebijakan Privasi</privacy-link> kami."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Paket pihak ketiga"
+  },
+  "app-marketing.download.title": {
+    "message": "Unduh Modrinth App (Beta)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.description": {
+    "message": "Simpan konten yang Anda suka dan dapatkan pembaruan dengan satu klik saja."
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Ikuti proyek"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "Impor semua profil favorit Anda dari peluncur yang telah Anda gunakan sebelumnya, dan mulai penggunaan Modrinth App dalam beberapa saat!"
+  },
+  "app-marketing.features.importing.gdlauncher-alt": {
+    "message": "GDLauncher"
+  },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Pengimporan profil"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Tindakan"
+  },
+  "app-marketing.features.mod-management.byAuthor": {
+    "message": "oleh {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth mempermudah pengurusan seluruh mod Anda dalam satu tempat. Anda dapat memasang, menghapus, dan memperbarui mod dalam satu klik."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Mod terpasang"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Nama"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Cari mod"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Pengelolaan mod"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Versi"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Mainkan mod Anda, baik saat daring maupun luring."
+  },
+  "app-marketing.features.offline.title": {
+    "message": "Mode luring"
+  },
+  "app-marketing.features.open-source.description": {
+    "message": "Peluncur Modrinth sepenuhnya bersumber terbuka. Anda dapat melihat kode sumber pada <github-link>GitHub</github-link> kami!"
+  },
+  "app-marketing.features.open-source.title": {
+    "message": "Sumber terbuka"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "Pemantauan aktivitas"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App bekerja lebih baik daripada pengurus mod ternama lainnya, dengan menggunakan hanya 150 MB RAM!"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.good-performance": {
+    "message": "Kinerja baik"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.infinite-times-infinite-mb": {
+    "message": "∞ * ∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
+  },
+  "app-marketing.features.performance.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 miliar %"
+  },
+  "app-marketing.features.performance.process-name": {
+    "message": "Nama proses"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Kecil"
+  },
+  "app-marketing.features.performance.title": {
+    "message": "Berkinerja"
+  },
+  "app-marketing.features.play.description": {
+    "message": "Gunakan Modrinth App untuk mengunduh dan memainkan mod dan paket mod favorit Anda."
+  },
+  "app-marketing.features.play.title": {
+    "message": "Mainkan mod favorit Anda"
+  },
+  "app-marketing.features.sharing.description": {
+    "message": "Buat, bagikan, dan mainkan paket mod dengan berbagai pilihan mod dan paket mod yang dibagikan di Modrinth."
+  },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Paket Mod"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Bagikan"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Bagikan paket mod"
+  },
+  "app-marketing.features.unlike-any-launcher": {
+    "message": "Tidak seperti peluncur lain"
+  },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth App berintegrasi penuh dengan situs web, sehingga Anda dapat mengakses semua proyek favorit Anda dari aplikasi!"
+  },
+  "app-marketing.features.website.title": {
+    "message": "Integrasi situs web"
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "yang pernah Anda gunakan"
+  },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Tangkapan layar dari Modrinth App dengan pemasangan Cobblemon dibuka pada halaman 'Konten'."
+  },
+  "app-marketing.hero.description": {
+    "message": "Modrinth App adalah peluncur unik dan bersumber terbuka yang memperbolehkan Anda untuk memainkan mod-mod favorit Anda dan memastikannya diperbarui, semuanya dalam satu kemasan ringkas."
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Unduh Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app": {
+    "message": "Unduh Modrinth App"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "Unduh Modrinth App untuk {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Tangkapan layar menu utama pemasangan Cobblemon."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "Pilihan Pengunduhan Lainnya"
+  },
+  "auth.authorize.action.authorize": {
+    "message": "Sahkan"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Tolak"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> oleh <creator-link>{creator}</creator-link> akan dapat:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Mengesahkan {appName}"
+  },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Sur-el"
+  },
+  "auth.reset-password.notification.email-sent.title": {
+    "message": "Sur-el terkirim"
+  },
+  "auth.reset-password.post-challenge.action": {
+    "message": "Atur ulang kata sandi"
+  },
+  "auth.reset-password.post-challenge.confirm-password.label": {
+    "message": "Konfirmasi kata sandi"
+  },
+  "auth.reset-password.title": {
+    "message": "Atur Ulang Kata Sandi"
+  },
+  "auth.reset-password.title.long": {
+    "message": "Atur ulang kata sandi Anda"
+  },
+  "auth.sign-in.email-username.label": {
+    "message": "Sur-el atau nama pengguna"
+  },
+  "auth.sign-in.password.label": {
+    "message": "Kata sandi"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Sur-el"
+  },
+  "auth.sign-up.label.username": {
+    "message": "Nama pengguna"
+  },
   "frog": {
     "message": "Anda terkodok-kodok!🐸"
   }

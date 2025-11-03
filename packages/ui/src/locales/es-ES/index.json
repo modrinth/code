@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Cancelar"
   },
+  "button.clear": {
+    "defaultMessage": "Borrar"
+  },
   "button.close": {
     "defaultMessage": "Cerrar"
   },
@@ -380,17 +383,41 @@
   "project-type.mod.lowercase": {
     "defaultMessage": "{count, plural, one {modificación} other {modificaciones}}"
   },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
+  },
   "project-type.modpack.category": {
     "defaultMessage": "Paquetes de mods"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpack} other {modpacks}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
   },
   "project-type.plugin.category": {
     "defaultMessage": "Complementos"
   },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Pequete de recursos} other {Paquetes de recursos}}"
+  },
   "project-type.resourcepack.category": {
     "defaultMessage": "Paquetes de Recursos"
   },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {paquete de recursos} other {paquetes de recursos}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
+  },
   "project-type.shader.category": {
     "defaultMessage": "Sombreadores"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shaders}}"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Entornos soportados"

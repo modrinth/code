@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "取消"
   },
+  "button.clear": {
+    "defaultMessage": "清除"
+  },
   "button.close": {
     "defaultMessage": "关闭"
   },

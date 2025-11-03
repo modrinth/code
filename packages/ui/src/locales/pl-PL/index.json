@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Anuluj"
   },
+  "button.clear": {
+    "defaultMessage": "Wyczyść"
+  },
   "button.close": {
     "defaultMessage": "Zamknij"
   },
@@ -336,7 +339,7 @@
     "defaultMessage": "Diners Club"
   },
   "omorphia.component.purchase_modal.payment_method_type.discover": {
-    "defaultMessage": "Discover"
+    "defaultMessage": "Odkryj"
   },
   "omorphia.component.purchase_modal.payment_method_type.eftpos": {
     "defaultMessage": "EFTPOS"
@@ -375,7 +378,7 @@
     "defaultMessage": "{count, plural, one {Mod} few {Mody} other {Modów}}"
   },
   "project-type.mod.category": {
-    "defaultMessage": "Mody"
+    "defaultMessage": "Modyfikacje"
   },
   "project-type.mod.lowercase": {
     "defaultMessage": "{count, plural, one {mod} few {mody} other {modów}}"

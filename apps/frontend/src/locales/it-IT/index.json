@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Le tue raccolte"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Scarica {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Il tuo modulo fiscale {formType} è stato inviato con successo!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Ora puoi nuovamente ritirare denaro. Se hai altre domande o devi aggiornare le tue informazioni <support-link>contatta l'assistenza</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Tutto fatto! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Entità estera fa riferimento a un'entità commerciale stabilita fuori dagli Stati Uniti (per esempio società, partenariati, o LLC non statunitensi)."
   },
@@ -912,10 +924,19 @@
     "message": "Completa il modulo fiscale"
   },
   "layout.banner.tax.description": {
-    "message": "Hai già ritirato oltre $600 da Modrinth quest'ano. Per essere in regola con le norme fiscali devi completare un modulo fiscale. I tuoi prelievi saranno sospesi finché questo modulo sarà inviato."
+    "message": "Hai già ritirato oltre $600 da Modrinth quest'anno. Per essere in regola con le norme fiscali devi completare un modulo fiscale. I tuoi prelievi saranno sospesi finché questo modulo sarà inviato."
   },
   "layout.banner.tax.title": {
     "message": "Modulo fiscale obbligatorio"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Contatta assistenza"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "I tuoi prelievi sono temporaneamente bloccati perché il tuo TIN o SSN non corrispondono ai registri dell'IRS. Si prega di contattare l'assistenza per resettare e reinviare il tuo modulo fiscale."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Modulo fiscale fallito"
   },
   "layout.banner.verify-email.action": {
     "message": "Reinvia email di verifica"
@@ -1091,8 +1112,17 @@
   "moderation.technical.search.placeholder": {
     "message": "Cerca revisioni tecniche..."
   },
+  "profile.bio.fallback.creator": {
+    "message": "Un creatore su Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Un utente di Modrinth."
+  },
   "profile.button.billing": {
     "message": "Gestisci pagamento utente"
+  },
+  "profile.button.edit-role": {
+    "message": "Modifica ruolo"
   },
   "profile.button.info": {
     "message": "Mostra dettagli utente"
@@ -1100,17 +1130,47 @@
   "profile.button.manage-projects": {
     "message": "Gestisci progetti"
   },
+  "profile.details.label.auth-providers": {
+    "message": "Fornitori autenticazione"
+  },
+  "profile.details.label.email": {
+    "message": "Email"
+  },
+  "profile.details.label.has-password": {
+    "message": "Usa una password"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Usa TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Metodi di pagamento"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "Email non verificata"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "Email verificata"
+  },
   "profile.error.not-found": {
     "message": "Utente non trovato"
-  },
-  "profile.joined-at": {
-    "message": "Registrato <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Badge"
   },
+  "profile.label.collection": {
+    "message": "Raccolta"
+  },
   "profile.label.details": {
     "message": "Dettagli"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, one {download} other {download}}"
+  },
+  "profile.label.joined": {
+    "message": "Registrazione"
+  },
+  "profile.label.no": {
+    "message": "No"
   },
   "profile.label.no-collections": {
     "message": "Questo utente non ha raccolte!"
@@ -1127,17 +1187,20 @@
   "profile.label.organizations": {
     "message": "Organizzazioni"
   },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, one {progetto} other {progetti}}"
+  },
+  "profile.label.saving": {
+    "message": "Salvando..."
+  },
+  "profile.label.yes": {
+    "message": "Sì"
+  },
   "profile.meta.description": {
     "message": "Scarica i progetti di {username} su Modrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Scarica i progetti di {username} su Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> download del progetto} other {<stat>{count}</stat> download del progetto}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> progetto} other {<stat>{count}</stat> progetti}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> follower del progetto} other {<stat>{count}</stat> follower del progetto}}"
@@ -1865,9 +1928,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Ripristino backup in corso"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Preparando backup per il download"
-  },
   "servers.backups.item.automated": {
     "message": "Automatizzato"
   },
@@ -1877,9 +1937,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Errore nella creazione del backup"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Errore nella preparazione download"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Errore nel ripristino da backup"
   },
@@ -1888,15 +1945,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Bloccato"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Prepara download"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Prova a preparare di nuovo"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Preparando download..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "In coda per backup"

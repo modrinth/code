@@ -1,6 +1,9 @@
 {
   "app.settings.developer-mode-enabled": {
-    "message": "وضع المطوّر مُفعَّل."
+    "message": "تم تفعيل وضع المطوّر."
+  },
+  "app.settings.downloading": {
+    "message": "جار تنزيل الإصدار {version}"
   },
   "app.settings.tabs.appearance": {
     "message": "المظهر"
@@ -9,7 +12,7 @@
     "message": "خيارات النسخة الافتراضية"
   },
   "app.settings.tabs.feature-flags": {
-    "message": "إعدادات المميزات"
+    "message": "أعلام الميزات"
   },
   "app.settings.tabs.java-installations": {
     "message": "تثبيتات جافا"
@@ -19,6 +22,111 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "إدارة الموارد"
+  },
+  "app.update-toast.body": {
+    "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت!\nأعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت!\nأعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."
+  },
+  "app.update-toast.body.metered": {
+    "message": "تطبيق Modrinth الإصدار {version} متاح الآن!\nنظرًا لأنك تستخدم شبكة محدودة البيانات، لم نقم بتنزيل التحديث تلقائيًا.\n"
+  },
+  "app.update-toast.changelog": {
+    "message": "سجلّ التغييرات"
+  },
+  "app.update-toast.download": {
+    "message": "تنزيل ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "جار التنزيل..."
+  },
+  "app.update-toast.reload": {
+    "message": "إعادة تحميل"
+  },
+  "app.update-toast.title": {
+    "message": "تحديث متاح"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "اكتمل التنزيل"
+  },
+  "app.update.complete-toast.text": {
+    "message": "انقر هنا لعرض سجلّ التغييرات."
+  },
+  "app.update.complete-toast.title": {
+    "message": "تم تثبيت الإصدار {version} بنجاح!"
+  },
+  "app.update.download-update": {
+    "message": "تنزيل التحديث"
+  },
+  "app.update.downloading-update": {
+    "message": "جار تنزيل التحديث ({percent}٪)"
+  },
+  "app.update.reload-to-update": {
+    "message": "أعد التحميل لتثبيت التحديث"
+  },
+  "friends.action.add-friend": {
+    "message": "إضافة صديق"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {طلب صداقة} other {طلبات صداقة}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "إرسال طلب صداقة"
+  },
+  "friends.add-friend.title": {
+    "message": "جار إضافة صديق"
+  },
+  "friends.add-friend.username.description": {
+    "message": "قد يختلف عن اسم المستخدم الخاص بهم في Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "أدخل اسم مستخدم Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "ما اسم مستخدم صديقك في Modrinth؟"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>أضف أصدقاء</link> لمعرفة ما الذي يلعبونه!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "إلغاء الطلب"
+  },
+  "friends.friend.remove-friend": {
+    "message": "إزالة صديق"
+  },
+  "friends.friend.request-sent": {
+    "message": "إرسال طلب الصداقة"
+  },
+  "friends.friend.view-profile": {
+    "message": "عرض الملف الشخصي"
+  },
+  "friends.heading": {
+    "message": "أصدقاء"
+  },
+  "friends.heading.active": {
+    "message": "نشط"
+  },
+  "friends.heading.offline": {
+    "message": "غير متصل"
+  },
+  "friends.heading.online": {
+    "message": "متصل"
+  },
+  "friends.heading.pending": {
+    "message": "قيد الانتظار"
+  },
+  "friends.no-friends-match": {
+    "message": "لا يوجد أصدقاء يطابقون ‎''{query}''‎"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "ابحث عن الأصدقاء..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>سجّل الدخول إلى حساب Modrinth</link> لإضافة الأصدقاء ومعرفة ما الذي يلعبونه!"
   },
   "instance.add-server.add-and-play": {
     "message": "إضافة واللعب"

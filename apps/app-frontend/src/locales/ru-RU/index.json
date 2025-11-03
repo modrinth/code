@@ -12,7 +12,7 @@
     "message": "Предустановки"
   },
   "app.settings.tabs.feature-flags": {
-    "message": "Экспериментальные функции"
+    "message": "Флаги функций"
   },
   "app.settings.tabs.java-installations": {
     "message": "Установки Java"
@@ -30,7 +30,7 @@
     "message": "Скачивание Modrinth App v{version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически при закрытии."
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} доступно к скачиванию! Используется лимитное подключение, поэтому скачивание не началось автоматически."
+    "message": "Modrinth App v{version} доступно для скачивания! Используется лимитное подключение, поэтому скачивание не началось автоматически."
   },
   "app.update-toast.changelog": {
     "message": "Список изменений"
@@ -63,7 +63,70 @@
     "message": "Скачивание обновления ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "Перезапустить для обновления"
+    "message": "Перезапустить и обновить"
+  },
+  "friends.action.add-friend": {
+    "message": "Добавить в друзья"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {запрос} few {запроса} many {запросов} other {запроса}} дружбы"
+  },
+  "friends.add-friend.submit": {
+    "message": "Отправить запрос дружбы"
+  },
+  "friends.add-friend.title": {
+    "message": "Добавление в друзья"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Оно может быть не таким, как в Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Введите имя на Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Какое имя у друга на Modrinth?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Добавьте друзей</link>, чтобы знать, во что они играют!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Отменить запрос"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Удалить из друзей"
+  },
+  "friends.friend.request-sent": {
+    "message": "Отправлен запрос дружбы"
+  },
+  "friends.friend.view-profile": {
+    "message": "Открыть профиль"
+  },
+  "friends.heading": {
+    "message": "Друзья"
+  },
+  "friends.heading.active": {
+    "message": "В игре"
+  },
+  "friends.heading.offline": {
+    "message": "Не в сети"
+  },
+  "friends.heading.online": {
+    "message": "В сети"
+  },
+  "friends.heading.pending": {
+    "message": "В ожидании"
+  },
+  "friends.no-friends-match": {
+    "message": "Нет друзей по запросу «{query}»"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Поиск по друзьям..."
+  },
+  "friends.section.heading": {
+    "message": "{title} — {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Войдите в Modrinth</link>, чтобы добавлять друзей и знать, во что они играют!"
   },
   "instance.add-server.add-and-play": {
     "message": "Добавить и играть"
@@ -84,7 +147,7 @@
     "message": "Добавление сервера"
   },
   "instance.edit-server.title": {
-    "message": "Изменение сервера"
+    "message": "Настройка сервера"
   },
   "instance.edit-world.hide-from-home": {
     "message": "Не показывать на главной"
@@ -99,7 +162,7 @@
     "message": "Сбросить иконку"
   },
   "instance.edit-world.title": {
-    "message": "Изменение информации о мире"
+    "message": "Изменение мира"
   },
   "instance.filter.disabled": {
     "message": "Отключённые"
@@ -174,13 +237,13 @@
     "message": "Название"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Настройки запуска"
+    "message": "Команды запуска"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
     "message": "Изменение команд запуска"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Позволяют опытным пользователям задать системные команды, выполняемые перед запуском и после закрытия игры."
+    "message": "Позволяет опытным пользователям задать системные команды, выполняемые до и после запуска игры."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "После выхода"
@@ -201,13 +264,13 @@
     "message": "Введите команду перед запуском..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Настройки запуска игры"
+    "message": "Команды запуска игры"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Обёртка"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Команда обёртки для запуска Minecraft."
+    "message": "Команда-обёртка для запуска Minecraft."
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "Команда обёртки..."
@@ -252,7 +315,7 @@
     "message": "Установить"
   },
   "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Выполняется установка..."
+    "message": "Выполняется установка"
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Версия {loader}"
@@ -303,7 +366,7 @@
     "message": "Восстановить сборку?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Выполняется исправление..."
+    "message": "Выполняется исправление"
   },
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Сбросить выбор"
@@ -357,7 +420,7 @@
     "message": "Переменные среды"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Настройки запуска"
+    "message": "Команды запуска"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Аргументы Java"

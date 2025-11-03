@@ -11,6 +11,9 @@
   "nags.add-icon.title": {
     "defaultMessage": "Pagbutang og amoy"
   },
+  "nags.add-links.title": {
+    "defaultMessage": "Pagdugang og mga panggawas nga katayan"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "Usba ang paghulagway"
   },
@@ -26,26 +29,32 @@
   "nags.edit-title.title": {
     "defaultMessage": "Usba ang titulo"
   },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Pagpasundayag og galeriyang hulagway"
+  },
   "nags.select-environments.title": {
     "defaultMessage": "Pagpili ug mga kalikopan"
   },
+  "nags.select-tags.title": {
+    "defaultMessage": "Pagpili og mga timailhan"
+  },
   "nags.settings.description.title": {
-    "defaultMessage": "Bisitahon ang mga gusto sa paghulagway"
+    "defaultMessage": "Duawi ang mga himutangan sa paghulagway"
   },
   "nags.settings.environments.title": {
-    "defaultMessage": "Bisitahin ang mga gusto sa kalikopan"
+    "defaultMessage": "Duawi ang mga himutangan sa kalikopan"
   },
   "nags.settings.license.title": {
-    "defaultMessage": "Bisitahon ang mga gusto sa lisensiya"
+    "defaultMessage": "Duawi ang mga himutangan sa lisensiya"
   },
   "nags.settings.links.title": {
-    "defaultMessage": "Bisitahon ang mga gusto sa mga katayan"
+    "defaultMessage": "Duawi ang mga himutangan sa mga katayan"
   },
   "nags.settings.tags.title": {
-    "defaultMessage": "Bisitahon ang mga gusto sa timailhan"
+    "defaultMessage": "Duawi ang mga himutangan sa timailhan"
   },
   "nags.settings.title": {
-    "defaultMessage": "Bisitahon ang tinanan nga mga gusto"
+    "defaultMessage": "Duawi ang tinanan nga mga himutangan"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Dili mahimong mopareho ang imong kalangkoban sa Ngalan sa imong proyekto. Hinungdanon ang pagbuhat sa mapahibaloon ug madanihon nga Kalangkoban."
@@ -60,7 +69,7 @@
     "defaultMessage": "Pamatud-i ang mga panggawas nga katayan"
   },
   "nags.visit-links-settings.title": {
-    "defaultMessage": "Bisitahon ang mga gusto sa mga katayan"
+    "defaultMessage": "Duawi ang mga himutangan sa mga katayan"
   }
 }
 

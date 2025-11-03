@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Batal"
   },
+  "button.clear": {
+    "defaultMessage": "Kosongkan"
+  },
   "button.close": {
     "defaultMessage": "Tutup"
   },

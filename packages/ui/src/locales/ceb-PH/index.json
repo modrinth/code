@@ -1,18 +1,30 @@
 {
+  "badge.beta": {
+    "defaultMessage": "Beta"
+  },
+  "badge.new": {
+    "defaultMessage": "Bag-o"
+  },
   "button.back": {
     "defaultMessage": "Pagbalik"
   },
   "button.cancel": {
     "defaultMessage": "Paphai"
   },
+  "button.clear": {
+    "defaultMessage": "Limpyohi"
+  },
+  "button.close": {
+    "defaultMessage": "Tak-opi"
+  },
   "button.continue": {
     "defaultMessage": "Magpadayon"
   },
   "button.copy-id": {
-    "defaultMessage": "Kuhai ang bili sa tigpaila"
+    "defaultMessage": "Awata ang tigpaila"
   },
   "button.copy-permalink": {
-    "defaultMessage": "Kuhai ang bili sa kununay nga katayan"
+    "defaultMessage": "Awata ang kununay nga katayan"
   },
   "button.create-a-project": {
     "defaultMessage": "Pagbuhat og proyekto"
@@ -26,11 +38,14 @@
   "button.edit": {
     "defaultMessage": "Usba"
   },
+  "button.follow": {
+    "defaultMessage": "Sundi"
+  },
   "button.next": {
     "defaultMessage": "Sunod"
   },
   "button.open-folder": {
-    "defaultMessage": "Buksi ang tigpilo"
+    "defaultMessage": "Buksi ang limbasan"
   },
   "button.play": {
     "defaultMessage": "Pagdula"
@@ -47,11 +62,17 @@
   "button.report": {
     "defaultMessage": "Isumbong"
   },
+  "button.reset": {
+    "defaultMessage": "Pag-usab"
+  },
   "button.save": {
-    "defaultMessage": "Hinumdumi"
+    "defaultMessage": "Pagtipig"
   },
   "button.save-changes": {
-    "defaultMessage": "Hinumdumi ang mga pagbag-o"
+    "defaultMessage": "Tipigi ang mga pagbag-o"
+  },
+  "button.saving": {
+    "defaultMessage": "Nagtipig"
   },
   "button.sign-in": {
     "defaultMessage": "Magsignin"
@@ -75,7 +96,7 @@
     "defaultMessage": "App"
   },
   "changelog.product.servers": {
-    "defaultMessage": "Mga serber"
+    "defaultMessage": "Mga magsisilbi"
   },
   "changelog.product.web": {
     "defaultMessage": "Balayan"
@@ -88,6 +109,9 @@
   },
   "icon-select.remove": {
     "defaultMessage": "Tangtangi ang amoy"
+  },
+  "input.search.placeholder": {
+    "defaultMessage": "Mangita..."
   },
   "input.view.gallery": {
     "defaultMessage": "Galeriya nga talan-awon"
@@ -111,7 +135,7 @@
     "defaultMessage": "Pagkabuhi nga Paagi"
   },
   "instance.worlds.game_mode.unknown": {
-    "defaultMessage": "Wala mailhi nga paagi sa dula"
+    "defaultMessage": "Diinilang paagi sa dula"
   },
   "label.collections": {
     "defaultMessage": "Mga gitigom"
@@ -123,10 +147,13 @@
     "defaultMessage": "Talad sa Pagsubay"
   },
   "label.delete": {
-    "defaultMessage": "Tangtangi"
+    "defaultMessage": "Panas-i"
   },
   "label.description": {
     "defaultMessage": "Paghulagway"
+  },
+  "label.error": {
+    "defaultMessage": "Kasaypanan"
   },
   "label.followed-projects": {
     "defaultMessage": "Mga gisundan nga proyekto"
@@ -140,6 +167,9 @@
   "label.notifications": {
     "defaultMessage": "Mga pahibalo"
   },
+  "label.or": {
+    "defaultMessage": "o"
+  },
   "label.password": {
     "defaultMessage": "Tinago nga pulong"
   },
@@ -152,11 +182,17 @@
   "label.rejected": {
     "defaultMessage": "Gisalikway"
   },
+  "label.saved": {
+    "defaultMessage": "Pagtipig"
+  },
+  "label.scopes": {
+    "defaultMessage": "Mga Katungod"
+  },
   "label.server": {
-    "defaultMessage": "Serber"
+    "defaultMessage": "Magsisilbi"
   },
   "label.servers": {
-    "defaultMessage": "Mga serber"
+    "defaultMessage": "Mga magsisilbi"
   },
   "label.settings": {
     "defaultMessage": "Mga gusto"
@@ -174,7 +210,7 @@
     "defaultMessage": "Pagkamakit-an"
   },
   "label.visit-your-profile": {
-    "defaultMessage": "Bisitahon ang imong profile"
+    "defaultMessage": "Duawi ang imong profile"
   },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Gidawat"
@@ -186,7 +222,7 @@
     "defaultMessage": "Inarkibo"
   },
   "omorphia.component.badge.label.closed": {
-    "defaultMessage": "Sirado"
+    "defaultMessage": "Gitak-op"
   },
   "omorphia.component.badge.label.creator": {
     "defaultMessage": "Magbubuhat"
@@ -234,19 +270,19 @@
     "defaultMessage": "Gipugngan"
   },
   "omorphia.component.copy.action.copy": {
-    "defaultMessage": "Kopyaha ang kalagdaan sa clipboard"
+    "defaultMessage": "Awata ang kalagdaan sa clipboard"
   },
   "omorphia.component.environment-indicator.label.client": {
     "defaultMessage": "Kliyente"
   },
   "omorphia.component.environment-indicator.label.client-and-server": {
-    "defaultMessage": "Kliyente ug serber"
+    "defaultMessage": "Kliyente ug magsisilbi"
   },
   "omorphia.component.environment-indicator.label.client-or-server": {
-    "defaultMessage": "Kliyente o serber"
+    "defaultMessage": "Kliyente o magsisilbi"
   },
   "omorphia.component.environment-indicator.label.server": {
-    "defaultMessage": "Serber"
+    "defaultMessage": "Magsisilbi"
   },
   "omorphia.component.environment-indicator.label.type": {
     "defaultMessage": "Usa ka {type}"
@@ -269,17 +305,47 @@
   "omorphia.component.purchase_modal.payment_method_type.discover": {
     "defaultMessage": "Discover"
   },
+  "omorphia.component.purchase_modal.payment_method_type.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.unknown": {
+    "defaultMessage": "Diiniliang pamaagi sa pagbayad"
+  },
+  "omorphia.component.purchase_modal.payment_method_type.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-type.all": {
+    "defaultMessage": "Lahat"
+  },
   "project-type.datapack.capital": {
-    "defaultMessage": "{count, plural, one {Putos sa Datos} other {Putos sa Datos}}"
+    "defaultMessage": "{count, plural, one {Putos sa Lawsayod} other {Mga Putos sa Lawsayod}}"
   },
   "project-type.datapack.category": {
-    "defaultMessage": "Mga Putos sa Datos"
+    "defaultMessage": "Mga Putos sa Lawsayod"
   },
   "project-type.datapack.lowercase": {
-    "defaultMessage": "{count, plural, one {putos sa datos} other {putos sa datos}}"
+    "defaultMessage": "{count, plural, one {putos sa lawsayod} other {mga putos sa lawsayod}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mga Kausaban"
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Inusara nga dula"
+  },
+  "project.about.compatibility.environments.singleplayer-only": {
+    "defaultMessage": "Inusara nga dula lamang"
   },
   "project.about.compatibility.game.minecraftJava": {
-    "defaultMessage": "Minecraft: Java nga Edisyon"
+    "defaultMessage": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "defaultMessage": "Mga pantawan"
   },
   "project.about.creators.title": {
     "defaultMessage": "Mga magbubuhat"
@@ -291,16 +357,43 @@
     "defaultMessage": "Gimantala {date}"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Nagbag-o {date}"
+    "defaultMessage": "Nasibo {date}"
+  },
+  "project.about.links.donate.generic": {
+    "defaultMessage": "Pag-amot"
   },
   "project.about.links.issues": {
     "defaultMessage": "Pagtaho og mga isyu"
   },
+  "project.about.links.title": {
+    "defaultMessage": "Mga Katayan"
+  },
+  "project.settings.environment.server_only.supports_singleplayer.title": {
+    "defaultMessage": "Mugana sad sa inusara nga dula"
+  },
+  "project.settings.environment.singleplayer.description": {
+    "defaultMessage": "Mogana lamang sa Insura nga dula o kun wala mokonekta sa usa ka magsisilbi nga Katalingbanon nga dula."
+  },
+  "project.settings.environment.singleplayer.title": {
+    "defaultMessage": "Inusara nga dula lamang"
+  },
   "project.settings.environment.title": {
     "defaultMessage": "Kalikopan"
   },
+  "project.settings.general.title": {
+    "defaultMessage": "Tinanan"
+  },
+  "project.settings.links.title": {
+    "defaultMessage": "Mga Katayan"
+  },
+  "project.settings.tags.title": {
+    "defaultMessage": "Mga Timailhan"
+  },
   "project.settings.upload.title": {
     "defaultMessage": "Sakarga"
+  },
+  "project.settings.view.title": {
+    "defaultMessage": "Lantawa"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "ᜀ"
@@ -333,16 +426,70 @@
     "defaultMessage": "Ginasusi"
   },
   "project.visibility.unknown": {
-    "defaultMessage": "Wala mahibal-an"
+    "defaultMessage": "Dili maila"
+  },
+  "project.visibility.unlisted": {
+    "defaultMessage": "Wala malista"
+  },
+  "project.visibility.unlisted-by-staff": {
+    "defaultMessage": "Gipawala malista sa kawani"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Kalikopan"
   },
+  "search.filter_type.environment.server": {
+    "defaultMessage": "Magsisilbi"
+  },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Bukas nga tinubdan"
   },
+  "search.filter_type.mod_loader": {
+    "defaultMessage": "Tigkarga"
+  },
+  "search.filter_type.modpack_loader": {
+    "defaultMessage": "Tigkarga"
+  },
+  "search.filter_type.plugin_loader": {
+    "defaultMessage": "Tigkarga"
+  },
+  "search.filter_type.plugin_platform": {
+    "defaultMessage": "Pantawan"
+  },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Tigkarga"
+  },
+  "servers.notice.heading.info": {
+    "defaultMessage": "Kasayoran"
+  },
+  "servers.notice.level.info.name": {
+    "defaultMessage": "Kasayoran"
+  },
+  "servers.notice.level.survey.name": {
+    "defaultMessage": "Pagpaniid"
+  },
+  "servers.purchase.step.plan.title": {
+    "defaultMessage": "Plano"
+  },
+  "servers.purchase.step.region.title": {
+    "defaultMessage": "Bungto"
+  },
+  "servers.purchase.step.review.title": {
+    "defaultMessage": "Susiha"
+  },
+  "settings.display.theme.dark": {
+    "defaultMessage": "ngitngit"
+  },
   "settings.display.theme.description": {
     "defaultMessage": "Pamili og imong gigusto nga hiligotanong kulay alang sa Modrinth sa kini nga himan."
+  },
+  "settings.display.theme.light": {
+    "defaultMessage": "Hayag"
+  },
+  "settings.display.theme.oled": {
+    "defaultMessage": "OLED"
+  },
+  "settings.display.theme.retro": {
+    "defaultMessage": "Retro"
   },
   "settings.profile.title": {
     "defaultMessage": "Publiko"

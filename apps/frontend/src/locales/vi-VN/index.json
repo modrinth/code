@@ -758,12 +758,6 @@
   "profile.meta.description-with-bio": {
     "message": "{bio} - Tải xuống các dự án của {username} trên Modrinth"
   },
-  "profile.stats.downloads": {
-    "message": "{count, plural, other {<stat>{count}</stat> lượt tải dự án về}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, other {<stat>{count}</stat> dự án}}"
-  },
   "profile.stats.projects-followers": {
     "message": "{count, plural, other {<stat>{count}</stat> người theo dõi dự án}}"
   },

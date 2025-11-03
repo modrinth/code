@@ -15,7 +15,7 @@
     "message": "AppImage'i indir"
   },
   "app-marketing.download.download-beta": {
-    "message": "Betayı indir"
+    "message": "Beta'yı indir"
   },
   "app-marketing.download.download-deb": {
     "message": "DEB'i indir"
@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Koleksiyonların"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "{formType} İndirin"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "{formType} vergi formunuz başarıyla gönderildi!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Artık özgürce çekim yapabilirsiniz. Sorunuz varsa veya bilgilerinizi güncellemeniz gerekiyorsa <support-link>desteğe başvurun</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Hazırsın! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Yabancı kuruluş, Amerika Birleşik Devletleri dışında kurulmuş bir ticari kuruluş (örneğin, ABD dışı şirket, ortaklık veya LLC) anlamına gelir."
   },
@@ -912,10 +924,19 @@
     "message": "Vergi formunu doldurun"
   },
   "layout.banner.tax.description": {
-    "message": "Bu yıl Modrinth'ten 600 doların üzerinde para çektiniz. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekiyor. Bu form gönderilene kadar para çekme işlemleriniz askıya alınacaktır."
+    "message": "Bu yıl Modrinth'ten 600 dolardan fazla para çektiniz. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekiyor. Bu form gönderilene kadar para çekme işlemleriniz durdurulmuştur."
   },
   "layout.banner.tax.title": {
     "message": "Vergi formu gereklidir"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Destekle iletişime geçin"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Vergi kimlik numaranız (TIN) veya sosyal güvenlik numaranız (SSN) IRS kayıtlarıyla eşleşmediği için para çekme işlemleriniz geçici olarak kilitlenmiştir. Vergi formunuzu sıfırlamak ve yeniden göndermek için lütfen destek ekibiyle iletişime geçin."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Vergi formu başarısız oldu"
   },
   "layout.banner.verify-email.action": {
     "message": "Doğrulama e-postasını yeniden gönder"
@@ -1091,8 +1112,17 @@
   "moderation.technical.search.placeholder": {
     "message": "Teknik incelemeleri ara..."
   },
+  "profile.bio.fallback.creator": {
+    "message": "Bir Modrinth içerik üreticisi."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Bir Modrinth kullanıcısı."
+  },
   "profile.button.billing": {
     "message": "Kullanıcı faturasını yönet"
+  },
+  "profile.button.edit-role": {
+    "message": "Rolü düzenle"
   },
   "profile.button.info": {
     "message": "Kullanıcı ayrıntılarını görüntüle"
@@ -1100,17 +1130,47 @@
   "profile.button.manage-projects": {
     "message": "Projeleri yönet"
   },
+  "profile.details.label.auth-providers": {
+    "message": "Kimlik doğrulama sağlayıcıları"
+  },
+  "profile.details.label.email": {
+    "message": "Eposta"
+  },
+  "profile.details.label.has-password": {
+    "message": "Parolayı sıfırla"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Zaman bazlı Tek Seferlik Şifre"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Ödeme yöntemi"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "Eposta doğrulanmadı"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "Eposta doğrulandı"
+  },
   "profile.error.not-found": {
     "message": "Kullanıcı bulunamadı"
-  },
-  "profile.joined-at": {
-    "message": "<date>{ago}</date> katıldı"
   },
   "profile.label.badges": {
     "message": "Rozetler"
   },
+  "profile.label.collection": {
+    "message": "Koleksiyon"
+  },
   "profile.label.details": {
     "message": "Ayrıntılar"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, one {indirme} other {indirme}}"
+  },
+  "profile.label.joined": {
+    "message": "Katıldı"
+  },
+  "profile.label.no": {
+    "message": "Hayır"
   },
   "profile.label.no-collections": {
     "message": "Bu kullanıcının hiç koleksiyonu yok!"
@@ -1127,17 +1187,20 @@
   "profile.label.organizations": {
     "message": "Organizasyonlar"
   },
+  "profile.label.projects": {
+    "message": "{count}{count, plural, one {proje} other {proje}}"
+  },
+  "profile.label.saving": {
+    "message": "Kaydediliyor..."
+  },
+  "profile.label.yes": {
+    "message": "Evet"
+  },
   "profile.meta.description": {
     "message": "{username} kullanıcısının Modrinth'teki projelerini indir"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - {username} kullanıcısının Modrinth'teki projelerini indir"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> proje indirmesi} other {<stat>{count}</stat> proje indirmesi}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> proje} other {<stat>{count}</stat> proje}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> proje takipçisi} other {<stat>{count}</stat> proje takipçisi}}"
@@ -1865,9 +1928,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Yedek geri yükleme devam ediyor"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Zaten indirmek için yedek hazırlanıyor"
-  },
   "servers.backups.item.automated": {
     "message": "Otomatikleştirilmiş"
   },
@@ -1877,9 +1937,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Yedek oluşturma başarısız"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "İndirmeye hazırlanılamadı"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Yedekten geri yükleme başarısız"
   },
@@ -1888,15 +1945,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Kilitli"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "İndirmeye hazırla"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Tekrar hazırlanmayı dene"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "İndirmeye hazırlanıyor..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Yedek için sırada"

@@ -407,6 +407,9 @@
   "collection.title": {
     "message": "{name} - samling"
   },
+  "create.organization.summary-label": {
+    "message": "Sammanfattning"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Skapa ny"
   },
@@ -896,9 +899,6 @@
   "profile.error.not-found": {
     "message": "Användare hittades inte"
   },
-  "profile.joined-at": {
-    "message": "Gick med <date>{ago}</date>"
-  },
   "profile.label.badges": {
     "message": "Märken"
   },
@@ -925,12 +925,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Ladda ned {username}s projekt på Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> nedladdning} other {<stat>{count}</stat> nedladdningar}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> projekt}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> följare} other {<stat>{count}</stat> följare}}"
@@ -1457,23 +1451,11 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Misslyckades med att skapa säkerhetskopia"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Misslyckades med att förbereda nerladdning"
-  },
   "servers.backups.item.lock": {
     "message": "Lås"
   },
   "servers.backups.item.locked": {
     "message": "Låst"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Förbered nedladdning"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Försök förbereda igen"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Förbereder nedladdning..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Köad för säkerhetskopiering"

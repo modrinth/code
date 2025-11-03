@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Annulla"
   },
+  "button.clear": {
+    "defaultMessage": "Cancella"
+  },
   "button.close": {
     "defaultMessage": "Chiudi"
   },

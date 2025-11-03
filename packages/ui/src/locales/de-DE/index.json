@@ -17,6 +17,9 @@
   "button.cancel": {
     "defaultMessage": "Abbrechen"
   },
+  "button.clear": {
+    "defaultMessage": "Eingabe löschen"
+  },
   "button.close": {
     "defaultMessage": "Schließen"
   },

@@ -24,7 +24,10 @@
     "message": "Zarządzanie zasobami"
   },
   "app.update-toast.body": {
-    "message": "Nowa wersja Modrinth v{version} jest gotowa do pobrania! Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz aplikację Modrinth."
+    "message": "Wersja Modrinth App v{version} jest gotowa do pobrania! Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Wersja Modrinth App v{version} została pobrana. Odśwież, żeby zaktualizować teraz, albo automatycznie, gdy zamkniesz Modrinth App."
   },
   "app.update-toast.body.metered": {
     "message": "Wersja v{version} Modrinth App jest dostępna! Skoro korzystasz z sieci taryfowej, nie pobraliśmy jej automatycznie."
@@ -61,6 +64,69 @@
   },
   "app.update.reload-to-update": {
     "message": "Załaduj ponownie, aby zainstalować aktualizację"
+  },
+  "friends.action.add-friend": {
+    "message": "Dodaj znajomego"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {zaproszenie} few {zaproszenia} other {zaproszeń}} do znajomych"
+  },
+  "friends.add-friend.submit": {
+    "message": "Wyślij zaproszenie"
+  },
+  "friends.add-friend.title": {
+    "message": "Dodawanie znajomego"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Może różnić się od nazwy użytkownika Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Wpisz nazwę użytkownika Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Jaka jest nazwa użytkownika Twojego znajomego?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Dodaj znajomych</link> by widzieć, w co grają!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Anuluj zaproszenie"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Usuń z znajomych"
+  },
+  "friends.friend.request-sent": {
+    "message": "Wysłano zaproszenie"
+  },
+  "friends.friend.view-profile": {
+    "message": "Pokaż profil"
+  },
+  "friends.heading": {
+    "message": "Znajomi"
+  },
+  "friends.heading.active": {
+    "message": "Aktywny"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Oczekujące"
+  },
+  "friends.no-friends-match": {
+    "message": "Nie znaleziono znajomych pasujących do zapytania \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Szukaj znajomych..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Zaloguj się na konto Modrinth</link> by dodać znajomych i widzieć, w co grają!"
   },
   "instance.add-server.add-and-play": {
     "message": "Dodaj i graj"
