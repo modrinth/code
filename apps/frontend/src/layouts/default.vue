@@ -1393,17 +1393,13 @@ const userMenuOptions = computed(() => {
 			link: '/dashboard/organizations',
 		},
 		{
+			id: 'analytics',
+			link: '/dashboard/analytics',
+		},
+		{
 			id: 'affiliate-links',
 			link: '/dashboard/affiliate-links',
 			shown: auth.value.user.badges & UserBadge.AFFILIATE,
-		},
-		{
-			id: 'revenue',
-			link: '/dashboard/revenue',
-		},
-		{
-			id: 'analytics',
-			link: '/dashboard/analytics',
 		},
 		{
 			id: 'revenue',
