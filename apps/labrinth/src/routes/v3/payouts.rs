@@ -726,6 +726,17 @@ async fn tremendous_payout(
         (sent_to_method, None)
     };
 
+    let reward_value = if let Some(currency_code) = currency_code {
+        json!({
+            "denomination": denomination,
+            "currency_code": currency_code,
+        })
+    } else {
+        json!({
+            "denomination": denomination,
+        })
+    };
+
     let res: TremendousResponse = payouts_queue
         .make_tremendous_request(
             Method::POST,
@@ -735,10 +746,7 @@ async fn tremendous_payout(
                     "funding_source_id": "BALANCE",
                 },
                 "rewards": [{
-                    "value": {
-                        "denomination": denomination,
-                        "currency_code": currency_code,
-                    },
+                    "value": reward_value,
                     "delivery": {
                         "method": "EMAIL"
                     },
