@@ -170,7 +170,11 @@
 					<span class="text-red">*</span>
 				</span>
 			</label>
-			<RevenueInputField v-model="formData.amount" :max-amount="roundedMaxAmount" />
+			<RevenueInputField
+				v-model="formData.amount"
+				:min-amount="effectiveMinAmount"
+				:max-amount="effectiveMaxAmount"
+			/>
 
 			<WithdrawFeeBreakdown
 				v-if="allRequiredFieldsFilled"
@@ -222,7 +226,7 @@ import {
 import { getRailConfig } from '@/utils/muralpay-rails'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
-const { withdrawData, maxWithdrawAmount, calculateFees } = useWithdrawContext()
+const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees } = useWithdrawContext()
 const { formatMessage } = useVIntl()
 const generatedState = useGeneratedState()
 
@@ -231,8 +235,23 @@ const selectedRail = computed(() => {
 	return railId ? getRailConfig(railId) : null
 })
 
+const selectedMethodDetails = computed(() => {
+	const methodId = withdrawData.value.selection.methodId
+	if (!methodId) return null
+	return availableMethods.value.find((m) => m.id === methodId) || null
+})
+
 const maxAmount = computed(() => maxWithdrawAmount.value)
 const roundedMaxAmount = computed(() => Math.floor(maxAmount.value * 100) / 100)
+
+const effectiveMinAmount = computed(() => selectedMethodDetails.value?.interval?.standard?.min || 0.01)
+const effectiveMaxAmount = computed(() => {
+	const apiMax = selectedMethodDetails.value?.interval?.standard?.max
+	if (apiMax) {
+		return Math.min(roundedMaxAmount.value, apiMax)
+	}
+	return roundedMaxAmount.value
+})
 
 const availableBankNames = computed(() => {
 	const rail = selectedRail.value
