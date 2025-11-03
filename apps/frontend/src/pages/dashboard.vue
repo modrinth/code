@@ -16,6 +16,7 @@
 					{ link: '/dashboard/projects', label: 'Projects', icon: ListIcon },
 					{ link: '/dashboard/organizations', label: 'Organizations', icon: OrganizationIcon },
 					{ link: '/dashboard/analytics', label: 'Analytics', icon: ChartIcon },
+					{ link: '/dashboard/affiliates', label: formatMessage(commonMessages.affiliateLinksButton), icon: AffiliateIcon, shown: isAffiliate },
 					{ link: '/dashboard/revenue', label: 'Revenue', icon: CurrencyIcon },
 				]"
 			/>
@@ -25,8 +26,9 @@
 		</div>
 	</div>
 </template>
-<script setup>
+<script setup lang="ts">
 import {
+	AffiliateIcon,
 	BellIcon as NotificationsIcon,
 	ChartIcon,
 	CurrencyIcon,
@@ -37,8 +39,15 @@ import {
 	ReportIcon,
 } from '@modrinth/assets'
 import { commonMessages } from '@modrinth/ui'
+import { type User, UserBadge } from '@modrinth/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'
+
+const auth = (await useAuth()) as Ref<{ user: User | null }>
+
+const isAffiliate = computed(() => {
+	return auth.value.user && auth.value.user.badges & UserBadge.AFFILIATE
+})
 
 const { formatMessage } = useVIntl()
 

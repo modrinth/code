@@ -106,4 +106,87 @@ export class BackupsModule extends ServerModule {
 	async getAutoBackup(): Promise<AutoBackupSettings> {
 		return await useServersFetch(`servers/${this.serverId}/autobackup`)
 	}
+
+	downloadBackup(
+		backupId: string,
+		backupName: string,
+	): {
+		promise: Promise<void>
+		onProgress: (cb: (p: { loaded: number; total: number; progress: number }) => void) => void
+		cancel: () => void
+	} {
+		const progressSubject = new EventTarget()
+		const abortController = new AbortController()
+
+		const downloadPromise = new Promise<void>((resolve, reject) => {
+			const auth = this.server.general?.node
+			if (!auth?.instance || !auth?.token) {
+				reject(new Error('Missing authentication credentials'))
+				return
+			}
+
+			const xhr = new XMLHttpRequest()
+
+			xhr.addEventListener('progress', (e) => {
+				if (e.lengthComputable) {
+					const progress = e.loaded / e.total
+					progressSubject.dispatchEvent(
+						new CustomEvent('progress', {
+							detail: { loaded: e.loaded, total: e.total, progress },
+						}),
+					)
+				} else {
+					// progress = -1 to indicate indeterminate size
+					progressSubject.dispatchEvent(
+						new CustomEvent('progress', {
+							detail: { loaded: e.loaded, total: 0, progress: -1 },
+						}),
+					)
+				}
+			})
+
+			xhr.onload = () => {
+				if (xhr.status >= 200 && xhr.status < 300) {
+					try {
+						const blob = xhr.response
+						const url = window.URL.createObjectURL(blob)
+						const a = document.createElement('a')
+						a.href = url
+						a.download = `${backupName}.zip`
+						document.body.appendChild(a)
+						a.click()
+						document.body.removeChild(a)
+						window.URL.revokeObjectURL(url)
+						resolve()
+					} catch (error) {
+						reject(error)
+					}
+				} else {
+					reject(new Error(`Download failed with status ${xhr.status}`))
+				}
+			}
+
+			xhr.onerror = () => reject(new Error('Download failed'))
+			xhr.onabort = () => reject(new Error('Download cancelled'))
+
+			xhr.open(
+				'GET',
+				`https://${auth.instance}/modrinth/v0/backups/${backupId}/download?auth=${auth.token}`,
+			)
+			xhr.responseType = 'blob'
+			xhr.send()
+
+			abortController.signal.addEventListener('abort', () => xhr.abort())
+		})
+
+		return {
+			promise: downloadPromise,
+			onProgress: (cb: (p: { loaded: number; total: number; progress: number }) => void) => {
+				progressSubject.addEventListener('progress', ((e: CustomEvent) => {
+					cb(e.detail)
+				}) as EventListener)
+			},
+			cancel: () => abortController.abort(),
+		}
+	}
 }
