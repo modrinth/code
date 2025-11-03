@@ -1,5 +1,12 @@
 use std::str::FromStr;
 
+use eyre::{Context, eyre};
+
+pub fn env_var(key: &str) -> eyre::Result<String> {
+    dotenvy::var(key)
+        .wrap_err_with(|| eyre!("missing environment variable `{key}`"))
+}
+
 pub fn parse_var<T: FromStr>(var: &str) -> Option<T> {
     dotenvy::var(var).ok().and_then(|i| i.parse().ok())
 }

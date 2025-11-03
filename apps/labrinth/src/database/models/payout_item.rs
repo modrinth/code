@@ -38,7 +38,7 @@ impl DBPayout {
             self.fee,
             self.user_id.0,
             self.status.as_str(),
-            self.method.map(|x| x.as_str()),
+            self.method.as_ref().map(|x| x.as_str()),
             self.method_address,
             self.platform_id,
         )
@@ -84,7 +84,7 @@ impl DBPayout {
             created: r.created,
             status: PayoutStatus::from_string(&r.status),
             amount: r.amount,
-            method: r.method.map(|x| PayoutMethodType::from_string(&x)),
+            method: r.method.and_then(|x| PayoutMethodType::from_string(&x)),
             method_address: r.method_address,
             platform_id: r.platform_id,
             fee: r.fee,

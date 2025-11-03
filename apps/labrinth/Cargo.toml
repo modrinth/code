@@ -17,6 +17,7 @@ actix-rt = { workspace = true }
 actix-web = { workspace = true }
 actix-web-prom = { workspace = true, features = ["process"] }
 actix-ws = { workspace = true }
+arc-swap = { workspace = true }
 argon2 = { workspace = true }
 ariadne = { workspace = true }
 async-stripe = { workspace = true, features = [
@@ -70,6 +71,7 @@ json-patch = { workspace = true }
 lettre = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 modrinth-maxmind = { workspace = true }
+muralpay = { workspace = true, features = ["utoipa"] }
 murmur2 = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }
@@ -110,6 +112,7 @@ sqlx = { workspace = true, features = [
   "rust_decimal",
   "tls-rustls-aws-lc-rs",
 ] }
+strum = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tokio-stream = { workspace = true }

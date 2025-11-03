@@ -2,21 +2,28 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
 use crate::database::redis::RedisPool;
 use crate::models::payouts::{
-    PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodFee,
-    PayoutMethodType,
+    MuralPayDetails, PayoutDecimal, PayoutInterval, PayoutMethod,
+    PayoutMethodFee, PayoutMethodRequest, PayoutMethodType,
+    TremendousForexResponse,
 };
 use crate::models::projects::MonetizationStatus;
+use crate::queue::payouts::mural::MuralPayoutRequest;
 use crate::routes::ApiError;
+use crate::util::env::env_var;
+use crate::util::error::Context;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
 };
+use arc_swap::ArcSwapOption;
 use base64::Engine;
 use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
 use dashmap::DashMap;
+use eyre::{Result, eyre};
 use futures::TryStreamExt;
+use muralpay::MuralPay;
 use reqwest::Method;
-use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
+use rust_decimal::{Decimal, dec};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -24,11 +31,19 @@ use sqlx::PgPool;
 use sqlx::postgres::PgQueryResult;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
-use tracing::{error, info};
+use tracing::{error, info, warn};
+
+pub mod mural;
 
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
     payout_options: RwLock<Option<PayoutMethods>>,
+    pub muralpay: ArcSwapOption<MuralPayConfig>,
+}
+
+pub struct MuralPayConfig {
+    pub client: MuralPay,
+    pub source_account_id: muralpay::AccountId,
 }
 
 #[derive(Clone, Debug)]
@@ -55,12 +70,102 @@ impl Default for PayoutsQueue {
         Self::new()
     }
 }
+
+fn create_muralpay() -> Result<MuralPayConfig> {
+    let api_url = env_var("MURALPAY_API_URL")?;
+    let api_key = env_var("MURALPAY_API_KEY")?;
+    let transfer_api_key = env_var("MURALPAY_TRANSFER_API_KEY")?;
+    let source_account_id = env_var("MURALPAY_SOURCE_ACCOUNT_ID")?
+        .parse::<muralpay::AccountId>()
+        .wrap_err("failed to parse source account ID")?;
+
+    let client = MuralPay::new(api_url, api_key, Some(transfer_api_key));
+
+    Ok(MuralPayConfig {
+        client,
+        source_account_id,
+    })
+}
+
+fn create_muralpay_methods() -> Vec<PayoutMethod> {
+    let all_countries = rust_iso3166::ALL
+        .iter()
+        .map(|x| x.alpha2)
+        .collect::<Vec<_>>();
+
+    let currencies = vec![
+        ("blockchain_usdc_polygon", "USDC on Polygon", all_countries),
+        ("fiat_mxn", "MXN", vec!["MX"]),
+        ("fiat_brl", "BRL", vec!["BR"]),
+        ("fiat_clp", "CLP", vec!["CL"]),
+        ("fiat_crc", "CRC", vec!["CR"]),
+        ("fiat_pen", "PEN", vec!["PE"]),
+        // ("fiat_dop", "DOP"), // unsupported in API
+        // ("fiat_uyu", "UYU"), // unsupported in API
+        ("fiat_ars", "ARS", vec!["AR"]),
+        ("fiat_cop", "COP", vec!["CO"]),
+        ("fiat_usd", "USD", vec!["US"]),
+        ("fiat_usd-peru", "USD Peru", vec!["PE"]),
+        // ("fiat_usd-panama", "USD Panama"), // by request
+        (
+            "fiat_eur",
+            "EUR",
+            vec![
+                "DE", "FR", "IT", "ES", "NL", "BE", "AT", "PT", "FI", "IE",
+                "GR", "LU", "CY", "MT", "SK", "SI", "EE", "LV", "LT",
+            ],
+        ),
+    ];
+
+    currencies
+        .into_iter()
+        .map(|(id, currency, countries)| PayoutMethod {
+            id: id.to_string(),
+            type_: PayoutMethodType::MuralPay,
+            name: format!("Mural Pay - {currency}"),
+            category: None,
+            supported_countries: countries
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
+            image_url: None,
+            image_logo_url: None,
+            interval: PayoutInterval::Standard {
+                // Different countries and currencies supported by Mural have different fees.
+                min: match id {
+                    // Due to relatively low volume of Peru withdrawals, fees are higher,
+                    // so we need to raise the minimum to cover these fees.
+                    "fiat_usd-peru" => Decimal::from(10),
+                    // USDC has much lower fees.
+                    "blockchain_usdc_polygon" => {
+                        Decimal::from(10) / Decimal::from(100)
+                    }
+                    _ => Decimal::from(5),
+                },
+                max: Decimal::from(10_000),
+            },
+            fee: PayoutMethodFee {
+                percentage: Decimal::from(1) / Decimal::from(100),
+                min: Decimal::ZERO,
+                max: Some(Decimal::ZERO),
+            },
+        })
+        .collect()
+}
+
 // Batches payouts and handles token refresh
 impl PayoutsQueue {
     pub fn new() -> Self {
+        let muralpay = create_muralpay()
+            .inspect_err(|err| {
+                warn!("Failed to create Mural Pay client: {err:#?}")
+            })
+            .ok();
+
         PayoutsQueue {
             credential: RwLock::new(None),
             payout_options: RwLock::new(None),
+            muralpay: ArcSwapOption::from_pointee(muralpay),
         }
     }
 
@@ -272,6 +377,7 @@ impl PayoutsQueue {
                 #[derive(Deserialize)]
                 struct TremendousError {
                     message: String,
+                    payload: Option<serde_json::Value>,
                 }
 
                 let err =
@@ -283,7 +389,10 @@ impl PayoutsQueue {
                             )
                         })?;
 
-                return Err(ApiError::Payments(err.message));
+                return Err(ApiError::Payments(format!(
+                    "Tremendous error: {} ({:?})",
+                    err.message, err.payload
+                )));
             }
 
             return Err(ApiError::Payments(
@@ -304,198 +413,23 @@ impl PayoutsQueue {
 
             let mut methods = Vec::new();
 
-            #[derive(Deserialize)]
-            pub struct Sku {
-                pub min: Decimal,
-                pub max: Decimal,
-            }
-
-            #[derive(Deserialize, Eq, PartialEq)]
-            #[serde(rename_all = "snake_case")]
-            pub enum ProductImageType {
-                Card,
-                Logo,
-            }
-
-            #[derive(Deserialize)]
-            pub struct ProductImage {
-                pub src: String,
-                #[serde(rename = "type")]
-                pub type_: ProductImageType,
-            }
-
-            #[derive(Deserialize)]
-            pub struct ProductCountry {
-                pub abbr: String,
-            }
-
-            #[derive(Deserialize)]
-            pub struct Product {
-                pub id: String,
-                pub category: String,
-                pub name: String,
-                // pub description: String,
-                // pub disclosure: String,
-                pub skus: Vec<Sku>,
-                pub currency_codes: Vec<String>,
-                pub countries: Vec<ProductCountry>,
-                pub images: Vec<ProductImage>,
-            }
-
-            #[derive(Deserialize)]
-            pub struct TremendousResponse {
-                pub products: Vec<Product>,
-            }
-
-            let response = queue
-                .make_tremendous_request::<(), TremendousResponse>(
-                    Method::GET,
-                    "products",
-                    None,
-                )
-                .await?;
-
-            for product in response.products {
-                const BLACKLISTED_IDS: &[&str] = &[
-                    // physical visa
-                    "A2J05SWPI2QG",
-                    // crypto
-                    "1UOOSHUUYTAM",
-                    "5EVJN47HPDFT",
-                    "NI9M4EVAVGFJ",
-                    "VLY29QHTMNGT",
-                    "7XU98H109Y3A",
-                    "0CGEDFP2UIKV",
-                    "PDYLQU0K073Y",
-                    "HCS5Z7O2NV5G",
-                    "IY1VMST1MOXS",
-                    "VRPZLJ7HCA8X",
-                    // bitcard (crypto)
-                    "GWQQS5RM8IZS",
-                    "896MYD4SGOGZ",
-                    "PWLEN1VZGMZA",
-                    "A2VRM96J5K5W",
-                    "HV9ICIM3JT7P",
-                    "K2KLSPVWC2Q4",
-                    "HRBRQLLTDF95",
-                    "UUBYLZVK7QAB",
-                    "BH8W3XEDEOJN",
-                    "7WGE043X1RYQ",
-                    "2B13MHUZZVTF",
-                    "JN6R44P86EYX",
-                    "DA8H43GU84SO",
-                    "QK2XAQHSDEH4",
-                    "J7K1IQFS76DK",
-                    "NL4JQ2G7UPRZ",
-                    "OEFTMSBA5ELH",
-                    "A3CQK6UHNV27",
-                ];
-                const SUPPORTED_METHODS: &[&str] = &[
-                    "merchant_cards",
-                    "merchant_card",
-                    "visa",
-                    "bank",
-                    "ach",
-                    "visa_card",
-                    "charity",
-                ];
-
-                if !SUPPORTED_METHODS.contains(&&*product.category)
-                    || BLACKLISTED_IDS.contains(&&*product.id)
-                {
-                    continue;
-                };
-
-                let method = PayoutMethod {
-                    id: product.id,
-                    type_: PayoutMethodType::Tremendous,
-                    name: product.name.clone(),
-                    supported_countries: product
-                        .countries
-                        .into_iter()
-                        .map(|x| x.abbr)
-                        .collect(),
-                    image_logo_url: product
-                        .images
-                        .iter()
-                        .find(|x| x.type_ == ProductImageType::Logo)
-                        .map(|x| x.src.clone()),
-                    image_url: product
-                        .images
-                        .into_iter()
-                        .find(|x| x.type_ == ProductImageType::Card)
-                        .map(|x| x.src),
-                    interval: if product.skus.len() > 1 {
-                        let mut values = product
-                            .skus
-                            .into_iter()
-                            .map(|x| PayoutDecimal(x.min))
-                            .collect::<Vec<_>>();
-                        values.sort_by(|a, b| a.0.cmp(&b.0));
-
-                        PayoutInterval::Fixed { values }
-                    } else if let Some(first) = product.skus.first() {
-                        PayoutInterval::Standard {
-                            min: first.min,
-                            max: first.max,
-                        }
-                    } else {
-                        PayoutInterval::Standard {
-                            min: Decimal::ZERO,
-                            max: Decimal::from(5_000),
-                        }
-                    },
-                    fee: if product.category == "ach" {
-                        PayoutMethodFee {
-                            percentage: Decimal::from(4) / Decimal::from(100),
-                            min: Decimal::from(1) / Decimal::from(4),
-                            max: None,
-                        }
-                    } else {
-                        PayoutMethodFee {
-                            percentage: Decimal::default(),
-                            min: Decimal::default(),
-                            max: None,
-                        }
-                    },
-                };
-
-                // we do not support interval gift cards with non US based currencies since we cannot do currency conversions properly
-                if let PayoutInterval::Fixed { .. } = method.interval
-                    && !product.currency_codes.contains(&"USD".to_string())
-                {
-                    continue;
+            match get_tremendous_payout_methods(queue).await {
+                Ok(mut tremendous_methods) => {
+                    methods.append(&mut tremendous_methods);
                 }
-
-                methods.push(method);
-            }
-
-            const UPRANK_IDS: &[&str] =
-                &["ET0ZVETV5ILN", "Q24BD9EZ332JT", "UIL1ZYJU5MKN"];
-            const DOWNRANK_IDS: &[&str] = &["EIPF8Q00EMM1", "OU2MWXYWPNWQ"];
-
-            methods.sort_by(|a, b| {
-                let a_top = UPRANK_IDS.contains(&&*a.id);
-                let a_bottom = DOWNRANK_IDS.contains(&&*a.id);
-                let b_top = UPRANK_IDS.contains(&&*b.id);
-                let b_bottom = DOWNRANK_IDS.contains(&&*b.id);
-
-                match (a_top, a_bottom, b_top, b_bottom) {
-                    (true, _, true, _) => a.name.cmp(&b.name), // Both in top_priority: sort alphabetically
-                    (_, true, _, true) => a.name.cmp(&b.name), // Both in bottom_priority: sort alphabetically
-                    (true, _, _, _) => std::cmp::Ordering::Less, // a in top_priority: a comes first
-                    (_, _, true, _) => std::cmp::Ordering::Greater, // b in top_priority: b comes first
-                    (_, true, _, _) => std::cmp::Ordering::Greater, // a in bottom_priority: b comes first
-                    (_, _, _, true) => std::cmp::Ordering::Less, // b in bottom_priority: a comes first
-                    (_, _, _, _) => a.name.cmp(&b.name), // Neither in priority: sort alphabetically
+                Err(err) => {
+                    warn!(
+                        "Failed to fetch Tremendous payout methods: {err:#?}"
+                    );
                 }
-            });
+            }
 
             {
                 let paypal_us = PayoutMethod {
                     id: "paypal_us".to_string(),
                     type_: PayoutMethodType::PayPal,
                     name: "PayPal".to_string(),
+                    category: None,
                     supported_countries: vec!["US".to_string()],
                     image_url: None,
                     image_logo_url: None,
@@ -519,30 +453,7 @@ impl PayoutsQueue {
                 methods.insert(1, venmo)
             }
 
-            methods.insert(
-                2,
-                PayoutMethod {
-                    id: "paypal_in".to_string(),
-                    type_: PayoutMethodType::PayPal,
-                    name: "PayPal".to_string(),
-                    supported_countries: rust_iso3166::ALL
-                        .iter()
-                        .filter(|x| x.alpha2 != "US")
-                        .map(|x| x.alpha2.to_string())
-                        .collect(),
-                    image_url: None,
-                    image_logo_url: None,
-                    interval: PayoutInterval::Standard {
-                        min: Decimal::from(1) / Decimal::from(4),
-                        max: Decimal::from(100_000),
-                    },
-                    fee: PayoutMethodFee {
-                        percentage: Decimal::from(2) / Decimal::from(100),
-                        min: Decimal::ZERO,
-                        max: Some(Decimal::from(20)),
-                    },
-                },
-            );
+            methods.extend(create_muralpay_methods());
 
             let new_options = PayoutMethods {
                 options: methods,
@@ -699,6 +610,333 @@ impl PayoutsQueue {
                     / Decimal::from(100),
             }))
     }
+
+    pub async fn calculate_fees(
+        &self,
+        request: &PayoutMethodRequest,
+        method_id: &str,
+        amount: Decimal,
+    ) -> Result<PayoutFees, ApiError> {
+        const MURAL_FEE: Decimal = dec!(0.01);
+
+        let get_method = async {
+            let method = self
+                .get_payout_methods()
+                .await
+                .wrap_internal_err("failed to fetch payout methods")?
+                .into_iter()
+                .find(|method| method.id == method_id)
+                .wrap_request_err("invalid payout method ID")?;
+            Ok::<_, ApiError>(method)
+        };
+
+        let fees = match request {
+            PayoutMethodRequest::MuralPay {
+                method_details:
+                    MuralPayDetails {
+                        payout_details: MuralPayoutRequest::Blockchain { .. },
+                        ..
+                    },
+            } => PayoutFees {
+                method_fee: dec!(0),
+                platform_fee: amount * MURAL_FEE,
+                exchange_rate: None,
+            },
+            PayoutMethodRequest::MuralPay {
+                method_details:
+                    MuralPayDetails {
+                        payout_details:
+                            MuralPayoutRequest::Fiat {
+                                fiat_and_rail_details,
+                                ..
+                            },
+                        ..
+                    },
+            } => {
+                let fiat_and_rail_code = fiat_and_rail_details.code();
+                let fee = self
+                    .compute_muralpay_fees(amount, fiat_and_rail_code)
+                    .await?;
+
+                match fee {
+                    muralpay::TokenPayoutFee::Success {
+                        exchange_rate,
+                        fee_total,
+                        ..
+                    } => PayoutFees {
+                        method_fee: fee_total.token_amount,
+                        platform_fee: amount * MURAL_FEE,
+                        exchange_rate: Some(exchange_rate),
+                    },
+                    muralpay::TokenPayoutFee::Error { message, .. } => {
+                        return Err(ApiError::Internal(eyre!(
+                            "failed to compute fee: {message}"
+                        )));
+                    }
+                }
+            }
+            PayoutMethodRequest::PayPal | PayoutMethodRequest::Venmo => {
+                let method = get_method.await?;
+                let fee = method.fee.compute_fee(amount);
+                PayoutFees {
+                    method_fee: fee,
+                    platform_fee: dec!(0),
+                    exchange_rate: None,
+                }
+            }
+            PayoutMethodRequest::Tremendous { method_details } => {
+                let method = get_method.await?;
+                let fee = method.fee.compute_fee(amount);
+
+                let forex: TremendousForexResponse = self
+                    .make_tremendous_request(Method::GET, "forex", None::<()>)
+                    .await
+                    .wrap_internal_err("failed to fetch Tremendous forex")?;
+
+                let exchange_rate = if let Some(currency) =
+                    &method_details.currency
+                {
+                    let currency_code = currency.to_string();
+                    let exchange_rate =
+                        forex.forex.get(&currency_code).wrap_request_err_with(
+                            || eyre!("no Tremendous forex data for {currency}"),
+                        )?;
+                    Some(*exchange_rate)
+                } else {
+                    None
+                };
+
+                PayoutFees {
+                    method_fee: fee,
+                    platform_fee: dec!(0),
+                    exchange_rate,
+                }
+            }
+        };
+
+        Ok(fees)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PayoutFees {
+    /// Fee which is taken by the underlying method we're using.
+    ///
+    /// For example, if a user withdraws $10.00 and the method takes a
+    /// 10% cut, then we submit a payout request of $10.00 to the method,
+    /// and only $9.00 will be sent to the recipient.
+    pub method_fee: Decimal,
+    /// Fee which we keep and don't pass to the underlying method.
+    ///
+    /// For example, if a user withdraws $10.00 and the method takes a
+    /// 10% cut, then we submit a payout request of $9.00, and the $1.00 stays
+    /// in our account.
+    pub platform_fee: Decimal,
+    /// How much is 1 USD worth in the target currency?
+    pub exchange_rate: Option<Decimal>,
+}
+
+impl PayoutFees {
+    pub fn total_fee(&self) -> Decimal {
+        self.method_fee + self.platform_fee
+    }
+}
+
+async fn get_tremendous_payout_methods(
+    queue: &PayoutsQueue,
+) -> Result<Vec<PayoutMethod>> {
+    #[derive(Debug, Deserialize)]
+    struct Sku {
+        min: Decimal,
+        max: Decimal,
+    }
+
+    #[derive(Deserialize, Eq, PartialEq)]
+    #[serde(rename_all = "snake_case")]
+    enum ProductImageType {
+        Card,
+        Logo,
+    }
+
+    #[derive(Deserialize)]
+    struct ProductImage {
+        src: String,
+        #[serde(rename = "type")]
+        type_: ProductImageType,
+    }
+
+    #[derive(Deserialize)]
+    struct ProductCountry {
+        abbr: String,
+    }
+
+    #[derive(Deserialize)]
+    struct Product {
+        id: String,
+        category: String,
+        name: String,
+        // description: String,
+        // disclosure: String,
+        skus: Vec<Sku>,
+        currency_codes: Vec<String>,
+        countries: Vec<ProductCountry>,
+        images: Vec<ProductImage>,
+    }
+
+    #[derive(Deserialize)]
+    struct TremendousResponse {
+        products: Vec<Product>,
+    }
+
+    let response = queue
+        .make_tremendous_request::<(), TremendousResponse>(
+            Method::GET,
+            "products",
+            None,
+        )
+        .await?;
+
+    let mut methods = Vec::new();
+
+    for product in response.products {
+        const BLACKLISTED_IDS: &[&str] = &[
+            // physical visa
+            "A2J05SWPI2QG",
+            // crypto
+            "1UOOSHUUYTAM",
+            "5EVJN47HPDFT",
+            "NI9M4EVAVGFJ",
+            "VLY29QHTMNGT",
+            "7XU98H109Y3A",
+            "0CGEDFP2UIKV",
+            "PDYLQU0K073Y",
+            "HCS5Z7O2NV5G",
+            "IY1VMST1MOXS",
+            "VRPZLJ7HCA8X",
+            // bitcard (crypto)
+            "GWQQS5RM8IZS",
+            "896MYD4SGOGZ",
+            "PWLEN1VZGMZA",
+            "A2VRM96J5K5W",
+            "HV9ICIM3JT7P",
+            "K2KLSPVWC2Q4",
+            "HRBRQLLTDF95",
+            "UUBYLZVK7QAB",
+            "BH8W3XEDEOJN",
+            "7WGE043X1RYQ",
+            "2B13MHUZZVTF",
+            "JN6R44P86EYX",
+            "DA8H43GU84SO",
+            "QK2XAQHSDEH4",
+            "J7K1IQFS76DK",
+            "NL4JQ2G7UPRZ",
+            "OEFTMSBA5ELH",
+            "A3CQK6UHNV27",
+        ];
+        const SUPPORTED_METHODS: &[&str] = &[
+            "merchant_cards",
+            "merchant_card",
+            "bank",
+            "charity",
+            "paypal",
+            "venmo",
+        ];
+
+        if !SUPPORTED_METHODS.contains(&&*product.category)
+            || BLACKLISTED_IDS.contains(&&*product.id)
+        {
+            continue;
+        };
+
+        // https://help.tremendous.com/hc/en-us/articles/41472317536787-Premium-reward-options
+        let fee = match product.category.as_str() {
+            "paypal" | "venmo" => PayoutMethodFee {
+                percentage: dec!(0.06),
+                min: dec!(1.00),
+                max: Some(dec!(25.00)),
+            },
+            _ => PayoutMethodFee {
+                percentage: dec!(0),
+                min: dec!(0),
+                max: None,
+            },
+        };
+
+        let method = PayoutMethod {
+            id: product.id,
+            type_: PayoutMethodType::Tremendous,
+            name: product.name.clone(),
+            category: Some(product.category.clone()),
+            supported_countries: product
+                .countries
+                .into_iter()
+                .map(|x| x.abbr)
+                .collect(),
+            image_logo_url: product
+                .images
+                .iter()
+                .find(|x| x.type_ == ProductImageType::Logo)
+                .map(|x| x.src.clone()),
+            image_url: product
+                .images
+                .into_iter()
+                .find(|x| x.type_ == ProductImageType::Card)
+                .map(|x| x.src),
+            interval: if product.skus.len() > 1 {
+                let mut values = product
+                    .skus
+                    .into_iter()
+                    .map(|x| PayoutDecimal(x.min))
+                    .collect::<Vec<_>>();
+                values.sort_by(|a, b| a.0.cmp(&b.0));
+
+                PayoutInterval::Fixed { values }
+            } else if let Some(first) = product.skus.first() {
+                PayoutInterval::Standard {
+                    min: first.min,
+                    max: first.max,
+                }
+            } else {
+                PayoutInterval::Standard {
+                    min: Decimal::ZERO,
+                    max: Decimal::from(5_000),
+                }
+            },
+            fee,
+        };
+
+        // we do not support interval gift cards with non US based currencies since we cannot do currency conversions properly
+        if let PayoutInterval::Fixed { .. } = method.interval
+            && !product.currency_codes.contains(&"USD".to_string())
+        {
+            continue;
+        }
+
+        methods.push(method);
+    }
+
+    const UPRANK_IDS: &[&str] =
+        &["ET0ZVETV5ILN", "Q24BD9EZ332JT", "UIL1ZYJU5MKN"];
+    const DOWNRANK_IDS: &[&str] = &["EIPF8Q00EMM1", "OU2MWXYWPNWQ"];
+
+    methods.sort_by(|a, b| {
+        let a_top = UPRANK_IDS.contains(&&*a.id);
+        let a_bottom = DOWNRANK_IDS.contains(&&*a.id);
+        let b_top = UPRANK_IDS.contains(&&*b.id);
+        let b_bottom = DOWNRANK_IDS.contains(&&*b.id);
+
+        match (a_top, a_bottom, b_top, b_bottom) {
+            (true, _, true, _) => a.name.cmp(&b.name), // Both in top_priority: sort alphabetically
+            (_, true, _, true) => a.name.cmp(&b.name), // Both in bottom_priority: sort alphabetically
+            (true, _, _, _) => std::cmp::Ordering::Less, // a in top_priority: a comes first
+            (_, _, true, _) => std::cmp::Ordering::Greater, // b in top_priority: b comes first
+            (_, true, _, _) => std::cmp::Ordering::Greater, // a in bottom_priority: b comes first
+            (_, _, _, true) => std::cmp::Ordering::Less, // b in bottom_priority: a comes first
+            (_, _, _, _) => a.name.cmp(&b.name), // Neither in priority: sort alphabetically
+        }
+    });
+
+    Ok(methods)
 }
 
 #[derive(Deserialize)]
@@ -1133,6 +1371,7 @@ pub async fn insert_bank_balances_and_webhook(
     let paypal_result = PayoutsQueue::get_paypal_balance().await;
     let brex_result = PayoutsQueue::get_brex_balance().await;
     let tremendous_result = payouts.get_tremendous_balance().await;
+    let mural_result = payouts.get_mural_balance().await;
 
     let mut insert_account_types = Vec::new();
     let mut insert_amounts = Vec::new();
@@ -1162,6 +1401,9 @@ pub async fn insert_bank_balances_and_webhook(
     }
     if let Ok(Some(ref tremendous)) = tremendous_result {
         add_balance("tremendous", tremendous);
+    }
+    if let Ok(Some(ref mural)) = mural_result {
+        add_balance("mural", mural);
     }
 
     let inserted = sqlx::query_scalar!(
