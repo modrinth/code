@@ -16,7 +16,12 @@
 					{ link: '/dashboard/projects', label: 'Projects', icon: ListIcon },
 					{ link: '/dashboard/organizations', label: 'Organizations', icon: OrganizationIcon },
 					{ link: '/dashboard/analytics', label: 'Analytics', icon: ChartIcon },
-					{ link: '/dashboard/affiliates', label: formatMessage(commonMessages.affiliateLinksButton), icon: AffiliateIcon, shown: isAffiliate },
+					{
+						link: '/dashboard/affiliates',
+						label: formatMessage(commonMessages.affiliateLinksButton),
+						icon: AffiliateIcon,
+						shown: isAffiliate,
+					},
 					{ link: '/dashboard/revenue', label: 'Revenue', icon: CurrencyIcon },
 				]"
 			/>

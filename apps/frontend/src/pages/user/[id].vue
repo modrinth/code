@@ -462,7 +462,6 @@ import {
 	NewModal,
 	OverflowMenu,
 	TagItem,
-	TeleportDropdownMenu,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { isAdmin, UserBadge } from '@modrinth/utils'

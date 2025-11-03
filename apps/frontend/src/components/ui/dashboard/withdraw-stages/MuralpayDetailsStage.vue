@@ -244,7 +244,9 @@ const selectedMethodDetails = computed(() => {
 const maxAmount = computed(() => maxWithdrawAmount.value)
 const roundedMaxAmount = computed(() => Math.floor(maxAmount.value * 100) / 100)
 
-const effectiveMinAmount = computed(() => selectedMethodDetails.value?.interval?.standard?.min || 0.01)
+const effectiveMinAmount = computed(
+	() => selectedMethodDetails.value?.interval?.standard?.min || 0.01,
+)
 const effectiveMaxAmount = computed(() => {
 	const apiMax = selectedMethodDetails.value?.interval?.standard?.max
 	if (apiMax) {

@@ -822,7 +822,7 @@
     "message": "Lower fees available"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
-    "message": "You selected PayPal International (USD). <direct-paypal-link>Switch to PayPal United States</direct-paypal-link> to skip currency conversion and save up to 4% in fees (works with international accounts)."
+    "message": "You selected USD for PayPal International. <direct-paypal-link>Switch to direct PayPal</direct-paypal-link> for better fees (≈2% instead of ≈6%)."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Withdraw"

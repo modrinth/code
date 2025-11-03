@@ -4,7 +4,7 @@
 			<slot v-if="hasSlotContent" />
 
 			<template v-else>
-				<li v-for="(item, idx) in items" :key="getKey(item, idx)" class="contents">
+				<li v-for="(item, idx) in filteredItems" :key="getKey(item, idx)" class="contents">
 					<hr v-if="isSeparator(item)" class="my-1 w-full border-t border-solid" />
 
 					<div
@@ -85,7 +85,9 @@ type NavStackLinkItem = NavStackBaseItem & {
 type NavStackSeparator = { type: 'separator' }
 type NavStackHeading = { type: 'heading'; label: string }
 
-export type NavStackEntry = NavStackLinkItem | NavStackSeparator | NavStackHeading
+export type NavStackEntry = (NavStackLinkItem | NavStackSeparator | NavStackHeading) & {
+	shown?: boolean
+}
 
 const props = defineProps<{
 	items?: NavStackEntry[]
@@ -114,6 +116,8 @@ function getKey(item: NavStackEntry, idx: number) {
 	const link = (item as NavStackLinkItem).link ?? (item as NavStackLinkItem).to
 	return link ? `link-${link}` : `action-${(item as NavStackLinkItem).label}-${idx}`
 }
+
+const filteredItems = computed(() => props.items?.filter((x) => x.shown === undefined || x.shown))
 </script>
 
 <style lang="scss" scoped>
