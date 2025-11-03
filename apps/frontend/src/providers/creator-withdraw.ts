@@ -702,6 +702,15 @@ export function createWithdrawContext(
 				if (!withdrawData.value.calculation.amount || withdrawData.value.calculation.amount <= 0)
 					return false
 
+				const amount = withdrawData.value.calculation.amount
+				const selectedMethod = availableMethods.value.find(
+					(m) => m.id === withdrawData.value.selection.methodId,
+				)
+				if (selectedMethod?.interval?.standard) {
+					const { min, max } = selectedMethod.interval.standard
+					if (amount < min || amount > max) return false
+				}
+
 				const accountDetails = withdrawData.value.providerData.accountDetails
 				if (!accountDetails) return false
 
@@ -715,8 +724,20 @@ export function createWithdrawContext(
 
 				return allRequiredPresent && withdrawData.value.agreedTerms
 			}
-			case 'paypal-details':
+			case 'paypal-details': {
+				const amount = withdrawData.value.calculation.amount
+				if (!amount || amount <= 0) return false
+
+				const selectedMethod = availableMethods.value.find(
+					(m) => m.id === withdrawData.value.selection.methodId,
+				)
+				if (selectedMethod?.interval?.standard) {
+					const { min, max } = selectedMethod.interval.standard
+					if (amount < min || amount > max) return false
+				}
+
 				return !!withdrawData.value.stageValidation?.paypalDetails
+			}
 			case 'completion':
 				return true
 			default:

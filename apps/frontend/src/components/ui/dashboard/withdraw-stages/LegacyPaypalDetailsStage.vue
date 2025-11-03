@@ -77,7 +77,7 @@
 
 			<RevenueInputField
 				v-model="formData.amount"
-				:max-amount="roundedMaxAmount"
+				:max-amount="effectiveMaxAmount"
 				:min-amount="selectedMethodDetails?.interval?.standard?.min || 0.01"
 			/>
 
@@ -204,6 +204,14 @@ async function saveVenmoHandle() {
 
 const maxAmount = computed(() => maxWithdrawAmount.value)
 const roundedMaxAmount = computed(() => Math.floor(maxAmount.value * 100) / 100)
+
+const effectiveMaxAmount = computed(() => {
+	const apiMax = selectedMethodDetails.value?.interval?.standard?.max
+	if (apiMax) {
+		return Math.min(roundedMaxAmount.value, apiMax)
+	}
+	return roundedMaxAmount.value
+})
 
 const formData = ref<Record<string, any>>({
 	amount: withdrawData.value.calculation.amount || undefined,
