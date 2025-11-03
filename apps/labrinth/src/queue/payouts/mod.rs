@@ -7,7 +7,7 @@ use crate::models::payouts::{
     TremendousForexResponse,
 };
 use crate::models::projects::MonetizationStatus;
-use crate::queue::payouts::muralpay_payout::MuralPayoutRequest;
+use crate::queue::payouts::mural::MuralPayoutRequest;
 use crate::routes::ApiError;
 use crate::util::env::env_var;
 use crate::util::error::Context;
@@ -33,7 +33,7 @@ use std::collections::HashMap;
 use tokio::sync::RwLock;
 use tracing::{error, info, warn};
 
-pub mod muralpay_payout;
+pub mod mural;
 
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
@@ -132,7 +132,7 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
             image_logo_url: None,
             interval: PayoutInterval::Standard {
                 min: Decimal::from(1),
-                max: Decimal::from(100_000),
+                max: Decimal::from(3000),
             },
             fee: PayoutMethodFee {
                 percentage: Decimal::from(1) / Decimal::from(100),
@@ -1361,6 +1361,7 @@ pub async fn insert_bank_balances_and_webhook(
     let paypal_result = PayoutsQueue::get_paypal_balance().await;
     let brex_result = PayoutsQueue::get_brex_balance().await;
     let tremendous_result = payouts.get_tremendous_balance().await;
+    let mural_result = payouts.get_mural_balance().await;
 
     let mut insert_account_types = Vec::new();
     let mut insert_amounts = Vec::new();
@@ -1390,6 +1391,9 @@ pub async fn insert_bank_balances_and_webhook(
     }
     if let Ok(Some(ref tremendous)) = tremendous_result {
         add_balance("tremendous", tremendous);
+    }
+    if let Ok(Some(ref mural)) = mural_result {
+        add_balance("mural", mural);
     }
 
     let inserted = sqlx::query_scalar!(

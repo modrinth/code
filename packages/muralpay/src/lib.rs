@@ -23,6 +23,9 @@ use uuid::Uuid;
 pub const API_URL: &str = "https://api.muralpay.com";
 pub const SANDBOX_API_URL: &str = "https://api-staging.muralpay.com";
 
+/// Default token symbol for [`TokenAmount::token_symbol`] values.
+pub const USDC: &str = "USDC";
+
 #[derive(Debug)]
 pub struct MuralPay {
     pub http: reqwest::Client,

@@ -18,7 +18,9 @@
 			{{ selectedItem.formatted_name ?? selectedItem.option }}
 		</TagItem>
 		<TagItem
-			v-for="providedItem in items.filter((x) => x.provided)"
+			v-for="providedItem in items.filter(
+				(x) => x.provided && !overriddenProvidedFilterTypes.includes(x.type),
+			)"
 			:key="`provided-filter-${providedItem.type}-${providedItem.option}`"
 			v-tooltip="formatMessage(providedMessage ?? defaultProvidedMessage)"
 			:style="{ '--_bg-color': `var(--color-raised-bg)` }"

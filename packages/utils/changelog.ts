@@ -11,6 +11,19 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-10-30T16:30:00-07:00`,
+		product: 'app',
+		version: '0.10.16',
+		body: `## Security fixes
+- Fixed a security vulnerability with .mrpack import zip parsing.
+
+## Improvements
+- Fixed stacking multiple instance wrapper commands.
+- Fixed instance-provided filters still showing as locked in the filters bar even when the filter is unlocked.
+- Fixed "Friends" title showing up in the sidebar twice when you have no friends.
+- Fixed the "Add friends" button not working properly.`,
+	},
+	{
 		date: `2025-10-26T18:30:00-07:00`,
 		product: 'app',
 		version: '0.10.15',

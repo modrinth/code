@@ -1,8 +1,6 @@
 use std::{cmp, collections::HashMap, fmt};
 
-use crate::{
-    models::ids::PayoutId, queue::payouts::muralpay_payout::MuralPayoutRequest,
-};
+use crate::{models::ids::PayoutId, queue::payouts::mural::MuralPayoutRequest};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
@@ -111,9 +109,19 @@ pub struct TremendousDetails {
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TremendousCurrency {
     Usd,
+    Gbp,
     Cad,
     Eur,
-    Gbp,
+    Aud,
+    Chf,
+    Czk,
+    Dkk,
+    Mxn,
+    Nok,
+    Nzd,
+    Pln,
+    Sek,
+    Sgd,
 }
 
 impl fmt::Display for TremendousCurrency {
