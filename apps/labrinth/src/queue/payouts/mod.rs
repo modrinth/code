@@ -131,7 +131,13 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
             image_url: None,
             image_logo_url: None,
             interval: PayoutInterval::Standard {
-                min: Decimal::from(1),
+                // Different countries and currencies supported by Mural have different fees.
+                // Due to relatively low volume of Peru withdrawals, fees are higher,
+                // so we need to raise the minimum to cover these fees.
+                min: match currency {
+                    "USD Peru" => Decimal::from(10),
+                    _ => Decimal::from(5),
+                },
                 max: Decimal::from(3000),
             },
             fee: PayoutMethodFee {
@@ -735,7 +741,7 @@ impl PayoutFees {
 async fn get_tremendous_payout_methods(
     queue: &PayoutsQueue,
 ) -> Result<Vec<PayoutMethod>> {
-    #[derive(Deserialize)]
+    #[derive(Debug, Deserialize)]
     struct Sku {
         min: Decimal,
         max: Decimal,
