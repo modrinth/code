@@ -176,7 +176,7 @@ import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@modrinth/moderation'
 import { DropdownSelect } from '@modrinth/ui'
 
-const tags = useTags()
+const tags = useGeneratedState()
 
 const props = defineProps({
 	project: {

@@ -300,7 +300,7 @@ const props = defineProps({
 	},
 })
 
-const tags = useTags()
+const tags = useGeneratedState()
 const router = useNativeRouter()
 
 const name = ref(props.project.title)

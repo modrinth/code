@@ -5,12 +5,7 @@
 		<NewModal ref="editRoleModal" header="Edit role">
 			<div class="flex w-80 flex-col gap-4">
 				<div class="flex flex-col gap-2">
-					<TeleportDropdownMenu
-						v-model="selectedRole"
-						:options="roleOptions"
-						name="edit-role"
-						placeholder="Select a role"
-					/>
+					<Combobox v-model="selectedRole" :options="roleOptions" placeholder="Select a role" />
 				</div>
 				<div class="flex justify-end gap-2">
 					<ButtonStyled>
@@ -460,13 +455,13 @@ import {
 import {
 	Avatar,
 	ButtonStyled,
+	Combobox,
 	commonMessages,
 	ContentPageHeader,
 	injectNotificationManager,
 	NewModal,
 	OverflowMenu,
 	TagItem,
-	TeleportDropdownMenu,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { isAdmin, UserBadge } from '@modrinth/utils'
@@ -492,7 +487,7 @@ const data = useNuxtApp()
 const route = useNativeRoute()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
-const tags = useTags()
+const tags = useGeneratedState()
 const config = useRuntimeConfig()
 
 const vintl = useVIntl()
@@ -841,7 +836,11 @@ const navLinks = computed(() => [
 const selectedRole = ref(user.value.role)
 const isSavingRole = ref(false)
 
-const roleOptions = ['developer', 'moderator', 'admin']
+const roleOptions = [
+	{ value: 'developer', label: 'Developer' },
+	{ value: 'moderator', label: 'Moderator' },
+	{ value: 'admin', label: 'Admin' },
+]
 
 const editRoleModal = useTemplateRef('editRoleModal')
 

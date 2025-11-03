@@ -161,7 +161,7 @@ interface Props {
 	patchProject?: (data: any) => void
 }
 
-const tags = useTags()
+const tags = useGeneratedState()
 
 const props = withDefaults(defineProps<Props>(), {
 	allMembers: () => [],
