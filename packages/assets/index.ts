@@ -27,16 +27,15 @@ import _WavingRinthbot from './branding/rinthbot/waving.webp'
 import _AppleIcon from './external/apple.svg?component'
 import _BlueskyIcon from './external/bluesky.svg?component'
 import _BuyMeACoffeeIcon from './external/bmac.svg?component'
-// External Icons
-import _SSODiscordIcon from './external/color/discord.svg?component'
-import _SSOGitHubIcon from './external/color/github.svg?component'
-import _SSOGitLabIcon from './external/color/gitlab.svg?component'
-import _SSOGoogleIcon from './external/color/google.svg?component'
-import _SSOMicrosoftIcon from './external/color/microsoft.svg?component'
-import _SSOPayPalIcon from './external/color/paypal.svg?component'
-import _SSOSteamIcon from './external/color/steam.svg?component'
-import _SSOUSDCIcon from './external/color/usdc.svg?component'
-import _SSOVenmoIcon from './external/color/venmo.svg?component'
+import _DiscordColorIcon from './external/color/discord.svg?component'
+import _GitHubColorIcon from './external/color/github.svg?component'
+import _GitLabColorIcon from './external/color/gitlab.svg?component'
+import _GoogleColorIcon from './external/color/google.svg?component'
+import _MicrosoftColorIcon from './external/color/microsoft.svg?component'
+import _PayPalColorIcon from './external/color/paypal.svg?component'
+import _SteamColorIcon from './external/color/steam.svg?component'
+import _USDCColorIcon from './external/color/usdc.svg?component'
+import _VenmoColorIcon from './external/color/venmo.svg?component'
 import _CurseForgeIcon from './external/curseforge.svg?component'
 import _DiscordIcon from './external/discord.svg?component'
 import _FacebookIcon from './external/facebook.svg?component'
@@ -51,12 +50,6 @@ import _PolygonIcon from './external/polygon.svg?component'
 import _RedditIcon from './external/reddit.svg?component'
 import _ReelsIcon from './external/reels.svg?component'
 import _SnapchatIcon from './external/snapchat.svg?component'
-import _SSODiscordIcon from './external/sso/discord.svg?component'
-import _SSOGitHubIcon from './external/sso/github.svg?component'
-import _SSOGitLabIcon from './external/sso/gitlab.svg?component'
-import _SSOGoogleIcon from './external/sso/google.svg?component'
-import _SSOMicrosoftIcon from './external/sso/microsoft.svg?component'
-import _SSOSteamIcon from './external/sso/steam.svg?component'
 import _ThreadsIcon from './external/threads.svg?component'
 import _TikTokIcon from './external/tiktok.svg?component'
 import _TumblrIcon from './external/tumblr.svg?component'
@@ -83,14 +76,14 @@ export const SleepingRinthbot = _SleepingRinthbot
 export const SobbingRinthbot = _SobbingRinthbot
 export const ThinkingRinthbot = _ThinkingRinthbot
 export const WavingRinthbot = _WavingRinthbot
-export const SSOPayPalIcon = _SSOPayPalIcon
-export const SSOVenmoIcon = _SSOVenmoIcon
-export const SSODiscordIcon = _SSODiscordIcon
-export const SSOGitHubIcon = _SSOGitHubIcon
-export const SSOGitLabIcon = _SSOGitLabIcon
-export const SSOGoogleIcon = _SSOGoogleIcon
-export const SSOMicrosoftIcon = _SSOMicrosoftIcon
-export const SSOSteamIcon = _SSOSteamIcon
+export const PayPalColorIcon = _PayPalColorIcon
+export const VenmoColorIcon = _VenmoColorIcon
+export const DiscordColorIcon = _DiscordColorIcon
+export const GitHubColorIcon = _GitHubColorIcon
+export const GitLabColorIcon = _GitLabColorIcon
+export const GoogleColorIcon = _GoogleColorIcon
+export const MicrosoftColorIcon = _MicrosoftColorIcon
+export const SteamColorIcon = _SteamColorIcon
 export const AppleIcon = _AppleIcon
 export const BlueskyIcon = _BlueskyIcon
 export const BuyMeACoffeeIcon = _BuyMeACoffeeIcon
@@ -118,7 +111,7 @@ export const YouTubeGaming = _YouTubeGaming
 export const YouTubeShortsIcon = _YouTubeShortsIcon
 export const VenmoIcon = _VenmoIcon
 export const PolygonIcon = _PolygonIcon
-export const SSOUSDCIcon = _SSOUSDCIcon
+export const USDCColorIcon = _USDCColorIcon
 export const VisaIcon = _VisaIcon
 
 export * from './generated-icons'

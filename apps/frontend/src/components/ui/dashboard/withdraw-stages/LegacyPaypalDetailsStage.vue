@@ -10,7 +10,7 @@
 			<div class="flex flex-col gap-2">
 				<ButtonStyled v-if="!isPayPalAuthenticated" color="standard">
 					<a :href="paypalAuthUrl" class="w-min" @click="handlePayPalAuth">
-						<SSOPayPalIcon class="size-5" />
+						<PayPalColorIcon class="size-5" />
 						{{ formatMessage(messages.signInWithPaypal) }}
 					</a>
 				</ButtonStyled>
@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, SaveIcon, SSOPayPalIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, PayPalColorIcon, SaveIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, Checkbox, financialMessages, formFieldLabels } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'

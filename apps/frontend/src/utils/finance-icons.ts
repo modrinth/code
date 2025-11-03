@@ -1,10 +1,10 @@
-import { PolygonIcon, SSOUSDCIcon } from '@modrinth/assets'
+import { PolygonIcon, USDCColorIcon } from '@modrinth/assets'
 import type { Component } from 'vue'
 
 export function getCurrencyIcon(currency: string): Component | null {
 	const lower = currency.toLocaleLowerCase()
 
-	if (lower.includes('usdc')) return SSOUSDCIcon
+	if (lower.includes('usdc')) return USDCColorIcon
 
 	return null
 }

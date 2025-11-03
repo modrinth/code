@@ -3,8 +3,8 @@ import {
 	GiftIcon,
 	HandHelpingIcon,
 	LandmarkIcon,
-	SSOPayPalIcon,
-	SSOVenmoIcon,
+	PayPalColorIcon,
+	VenmoColorIcon,
 } from '@modrinth/assets'
 import { createContext, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
 import type { MessageDescriptor } from '@vintl/vintl'
@@ -478,7 +478,7 @@ export function createWithdrawContext(
 			options.push({
 				value: 'paypal',
 				label: paymentMethodMessages.paypalInternational,
-				icon: SSOPayPalIcon,
+				icon: PayPalColorIcon,
 				methodId: internationalPaypalMethod.id,
 				fee: '≈ 6%, max $25',
 				type: 'tremendous',
@@ -555,7 +555,7 @@ export function createWithdrawContext(
 			options.push({
 				value: directPaypal.id,
 				label: paymentMethodMessages.paypal,
-				icon: SSOPayPalIcon,
+				icon: PayPalColorIcon,
 				methodId: directPaypal.id,
 				fee: `≈ 2% + $0.25, max $1`,
 				type: 'paypal',
@@ -567,7 +567,7 @@ export function createWithdrawContext(
 			options.push({
 				value: directVenmo.id,
 				label: paymentMethodMessages.venmo,
-				icon: SSOVenmoIcon,
+				icon: VenmoColorIcon,
 				methodId: directVenmo.id,
 				fee: `≈ 2% + $0.25, max $1`,
 				type: 'venmo',
