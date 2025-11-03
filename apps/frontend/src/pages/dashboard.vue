@@ -17,7 +17,7 @@
 					{ link: '/dashboard/organizations', label: 'Organizations', icon: OrganizationIcon },
 					{ link: '/dashboard/analytics', label: 'Analytics', icon: ChartIcon },
 					{
-						link: '/dashboard/affiliates',
+						link: '/dashboard/affiliate-links',
 						label: formatMessage(commonMessages.affiliateLinksButton),
 						icon: AffiliateIcon,
 						shown: isAffiliate,
