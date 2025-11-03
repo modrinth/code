@@ -21,7 +21,7 @@
 				<div
 					v-for="(seg, index) in segments"
 					:key="seg.key"
-					class="h-full hover:brightness-150"
+					class="h-full hover:brightness-105"
 					:style="{ width: seg.widthPct }"
 					@mouseenter="hoveredSeg = seg.key"
 					@mouseleave="hoveredSeg = null"
