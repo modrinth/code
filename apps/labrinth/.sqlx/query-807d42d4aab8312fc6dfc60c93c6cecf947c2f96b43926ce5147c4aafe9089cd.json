@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH\n              period_payouts AS (\n                SELECT\n                  ids.notification_id,\n                  ids.user_id,\n                  ids.date_available,\n                  FLOOR(COALESCE(SUM(pv.amount), 0.0) * 100) :: BIGINT sum -- Convert to cents\n                  FROM UNNEST($1::bigint[], $2::bigint[], $3::timestamptz[]) AS ids(notification_id, user_id, date_available)\n                LEFT JOIN payouts_values pv ON pv.user_id = ids.user_id AND pv.date_available = ids.date_available\n                GROUP BY ids.user_id, ids.notification_id, ids.date_available\n              )\n            INSERT INTO notifications (\n                id, user_id, body\n            )\n            SELECT\n              notification_id id,\n              user_id,\n              JSONB_BUILD_OBJECT(\n                'type', 'payout_available',\n                'date_available', to_jsonb(date_available),\n                'amount', to_jsonb(sum)\n              ) body\n            FROM period_payouts\n            WHERE sum >= 100\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int8Array",
+        "TimestamptzArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "807d42d4aab8312fc6dfc60c93c6cecf947c2f96b43926ce5147c4aafe9089cd"
+}
