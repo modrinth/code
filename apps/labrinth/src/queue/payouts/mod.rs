@@ -132,13 +132,17 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
             image_logo_url: None,
             interval: PayoutInterval::Standard {
                 // Different countries and currencies supported by Mural have different fees.
-                // Due to relatively low volume of Peru withdrawals, fees are higher,
-                // so we need to raise the minimum to cover these fees.
-                min: match currency {
-                    "USD Peru" => Decimal::from(10),
+                min: match id {
+                    // Due to relatively low volume of Peru withdrawals, fees are higher,
+                    // so we need to raise the minimum to cover these fees.
+                    "fiat_usd-peru" => Decimal::from(10),
+                    // USDC has much lower fees.
+                    "blockchain_usdc_polygon" => {
+                        Decimal::from(10) / Decimal::from(100)
+                    }
                     _ => Decimal::from(5),
                 },
-                max: Decimal::from(3000),
+                max: Decimal::from(10_000),
             },
             fee: PayoutMethodFee {
                 percentage: Decimal::from(1) / Decimal::from(100),
