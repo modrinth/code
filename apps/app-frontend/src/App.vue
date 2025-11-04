@@ -1221,6 +1221,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	right: calc(-1 * var(--left-bar-width));
 	bottom: calc(-1 * var(--left-bar-width));
 	border-radius: var(--radius-xl);
+	border-color: rgba(255, 255, 255, 0.23);
+	border-width: 1px;
+	border-style: solid;
 	pointer-events: none;
 }
 
