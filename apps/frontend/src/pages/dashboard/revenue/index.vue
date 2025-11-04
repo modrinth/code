@@ -185,7 +185,7 @@
 					>{{ formatMessage(messages.seeAll) }}</nuxt-link
 				>
 			</div>
-			<div v-if="sortedPayouts.length > 0 && false" class="flex flex-col gap-3 md:gap-4">
+			<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-3 md:gap-4">
 				<RevenueTransaction
 					v-for="transaction in sortedPayouts.slice(0, 3)"
 					:key="transaction.id || transaction.created"
@@ -555,7 +555,7 @@ const segments = computed<RevenueBarSegment[]>(() => {
 		return { key: s.key, class: s.class, pct, amount: s.amount }
 	})
 
-	const filtered = normalized.filter((s) => s.pct > 0)
+	const filtered = normalized.filter((s) => s.pct >= 1)
 	if (!filtered.length) return [] as RevenueBarSegment[]
 
 	const sumExceptLast = filtered.slice(0, -1).reduce((sum, s) => sum + s.pct, 0)
