@@ -591,7 +591,8 @@ pub async fn create_payout(
     // we first make sure that `amount - total fees` is greater than zero,
     // then we issue a payout request with `amount - platform fees`
 
-    if (body.amount - fees.total_fee()).round_dp(2) <= Decimal::ZERO {
+    let amount_minus_fee = body.amount - fees.total_fee();
+    if amount_minus_fee.round_dp(2) <= Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You need to withdraw more to cover the fee!".to_string(),
         ));
@@ -608,7 +609,7 @@ pub async fn create_payout(
         body: &body,
         user: &user,
         payout_id,
-        raw_amount: body.amount,
+        amount_minus_fee,
         total_fee: fees.total_fee(),
         sent_to_method,
         payouts_queue: &payouts_queue,
@@ -647,7 +648,9 @@ struct PayoutContext<'a> {
     body: &'a Withdrawal,
     user: &'a DBUser,
     payout_id: DBPayoutId,
-    raw_amount: Decimal,
+    /// Set as the [`DBPayout::amount`] field.
+    amount_minus_fee: Decimal,
+    /// Set as the [`DBPayout::fee`] field.
     total_fee: Decimal,
     sent_to_method: Decimal,
     payouts_queue: &'a PayoutsQueue,
@@ -671,7 +674,7 @@ async fn tremendous_payout(
         body,
         user,
         payout_id,
-        raw_amount,
+        amount_minus_fee,
         total_fee,
         sent_to_method,
         payouts_queue,
@@ -688,7 +691,7 @@ async fn tremendous_payout(
         user_id: user.id,
         created: Utc::now(),
         status: PayoutStatus::InTransit,
-        amount: raw_amount,
+        amount: amount_minus_fee,
         fee: Some(total_fee),
         method: Some(PayoutMethodType::Tremendous),
         method_address: Some(user_email.to_string()),
@@ -775,7 +778,7 @@ async fn mural_pay_payout(
         body: _body,
         user,
         payout_id,
-        raw_amount,
+        amount_minus_fee,
         total_fee,
         sent_to_method,
         payouts_queue,
@@ -801,7 +804,7 @@ async fn mural_pay_payout(
         user_id: user.id,
         created: Utc::now(),
         status: PayoutStatus::Success,
-        amount: raw_amount,
+        amount: amount_minus_fee,
         fee: Some(total_fee),
         method: Some(PayoutMethodType::MuralPay),
         method_address: Some(user_email.to_string()),
@@ -814,7 +817,7 @@ async fn paypal_payout(
         body,
         user,
         payout_id,
-        raw_amount,
+        amount_minus_fee,
         total_fee,
         sent_to_method,
         payouts_queue,
@@ -876,7 +879,7 @@ async fn paypal_payout(
         user_id: user.id,
         created: Utc::now(),
         status: PayoutStatus::InTransit,
-        amount: raw_amount,
+        amount: amount_minus_fee,
         fee: Some(total_fee),
         method: Some(body.method.method_type()),
         method_address: Some(display_address.clone()),
@@ -1032,25 +1035,36 @@ pub async fn transaction_history(
             });
 
     let mut payouts_available = sqlx::query!(
-        "SELECT date_available, amount
+        "
+        SELECT date_available, SUM(amount) AS amount
         FROM payouts_values
         WHERE user_id = $1
-        AND NOW() >= date_available",
+        AND NOW() >= date_available
+        GROUP BY date_available
+        ",
         DBUserId::from(user.id) as DBUserId
     )
     .fetch(&**pool)
     .map(|record| {
         let record = record
             .wrap_internal_err("failed to fetch available payout record")?;
-        Ok(TransactionItem::PayoutAvailable {
-            created: record.date_available,
-            payout_source: PayoutSource::CreatorRewards,
-            amount: record.amount,
-        })
+        let amount = record.amount.unwrap_or_default();
+        if amount > Decimal::ZERO {
+            Ok(Some(TransactionItem::PayoutAvailable {
+                created: record.date_available,
+                payout_source: PayoutSource::CreatorRewards,
+                amount,
+            }))
+        } else {
+            Ok(None)
+        }
     })
     .collect::<Result<Vec<_>, ApiError>>()
     .await
-    .wrap_internal_err("failed to fetch available payouts")?;
+    .wrap_internal_err("failed to fetch available payouts")?
+    .into_iter()
+    .flatten()
+    .collect::<Vec<_>>();
 
     let mut txn_items = Vec::new();
     txn_items.extend(withdrawals);
