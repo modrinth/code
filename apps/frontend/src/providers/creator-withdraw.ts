@@ -449,12 +449,12 @@ export function createWithdrawContext(
 		const formCompleted = balance?.form_completion_status === 'complete'
 
 		if (formCompleted) {
-			return availableBalance
+			return Math.max(0, availableBalance)
 		}
 
 		const usedLimit = balance?.withdrawn_ytd ?? 0
 		const remainingLimit = Math.max(0, TAX_THRESHOLD_ACTUAL - usedLimit)
-		return Math.min(remainingLimit, availableBalance)
+		return Math.max(0, Math.min(remainingLimit, availableBalance))
 	})
 
 	const paymentOptions = computed<PaymentOption[]>(() => {
