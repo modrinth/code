@@ -486,7 +486,10 @@ export function createWithdrawContext(
 		}
 
 		const merchantMethods = tremendousMethods.filter(
-			(m) => m.category === 'merchant_card' || m.category === 'merchant_cards',
+			(m) =>
+				m.category === 'merchant_card' ||
+				m.category === 'merchant_cards' ||
+				m.category === 'visa_card',
 		)
 		if (merchantMethods.length > 0) {
 			options.push({
