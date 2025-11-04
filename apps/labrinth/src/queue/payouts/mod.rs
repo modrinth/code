@@ -838,6 +838,8 @@ async fn get_tremendous_payout_methods(
             "merchant_card",
             "bank",
             "charity",
+            "visa",
+            "visa_card",
             "paypal",
             "venmo",
         ];
@@ -1439,6 +1441,12 @@ pub async fn insert_bank_balances_and_webhook(
             "tremendous",
             "TREMENDOUS_BALANCE_ALERT_THRESHOLD",
             tremendous_result,
+        )
+        .await?;
+        check_balance_with_webhook(
+            "mural",
+            "MURAL_BALANCE_ALERT_THRESHOLD",
+            mural_result,
         )
         .await?;
     }
