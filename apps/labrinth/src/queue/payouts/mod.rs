@@ -1441,6 +1441,12 @@ pub async fn insert_bank_balances_and_webhook(
             tremendous_result,
         )
         .await?;
+        check_balance_with_webhook(
+            "mural",
+            "MURAL_BALANCE_ALERT_THRESHOLD",
+            mural_result,
+        )
+        .await?;
     }
 
     transaction.commit().await?;
