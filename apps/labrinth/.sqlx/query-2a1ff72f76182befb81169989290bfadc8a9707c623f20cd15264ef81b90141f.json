@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT date_available, amount\n        FROM payouts_values\n        WHERE user_id = $1\n        AND NOW() >= date_available",
+  "query": "\n        SELECT date_available, SUM(amount) AS amount\n        FROM payouts_values\n        WHERE user_id = $1\n        AND NOW() >= date_available\n        GROUP BY date_available\n        ",
   "describe": {
     "columns": [
       {
@@ -21,8 +21,8 @@
     },
     "nullable": [
       false,
-      false
+      null
     ]
   },
-  "hash": "0a01edcb023f6fd1bdfb3a6b77ad4fd183fd439ddcbbac76471a9771d4f29b61"
+  "hash": "2a1ff72f76182befb81169989290bfadc8a9707c623f20cd15264ef81b90141f"
 }
