@@ -38,7 +38,7 @@
 				</template>
 			</div>
 		</template>
-		<div class="w-full max-w-[496px] lg:min-w-[496px]">
+		<div class="mx-auto w-full max-w-[496px] sm:mx-0 sm:min-w-[496px]">
 			<TaxFormStage
 				v-if="currentStage === 'tax-form'"
 				:balance="balance"
@@ -326,6 +326,73 @@ function continueWithLimit() {
 	setStage(nextStep.value)
 }
 
+// TODO: God we need better errors from the backend (e.g error ids), this shit is insane
+function getWithdrawalError(error: any): { title: string; text: string } {
+	const description = error?.data?.description?.toLowerCase() || ''
+
+	// Tax form error
+	if (description.includes('tax form')) {
+		return {
+			title: formatMessage(messages.errorTaxFormTitle),
+			text: formatMessage(messages.errorTaxFormText),
+		}
+	}
+
+	// Invalid crypto wallet address
+	if (
+		(description.includes('wallet') && description.includes('invalid')) ||
+		description.includes('wallet_address') ||
+		(description.includes('blockchain') && description.includes('invalid'))
+	) {
+		return {
+			title: formatMessage(messages.errorInvalidWalletTitle),
+			text: formatMessage(messages.errorInvalidWalletText),
+		}
+	}
+
+	// Invalid bank details
+	if (
+		(description.includes('bank') || description.includes('account')) &&
+		(description.includes('invalid') || description.includes('failed'))
+	) {
+		return {
+			title: formatMessage(messages.errorInvalidBankTitle),
+			text: formatMessage(messages.errorInvalidBankText),
+		}
+	}
+
+	// Invalid/fraudulent address
+	if (
+		description.includes('address') &&
+		(description.includes('invalid') ||
+			description.includes('verification') ||
+			description.includes('fraudulent'))
+	) {
+		return {
+			title: formatMessage(messages.errorInvalidAddressTitle),
+			text: formatMessage(messages.errorInvalidAddressText),
+		}
+	}
+
+	// Minimum amount not met
+	if (
+		description.includes('payoutminimumnotmeterror') ||
+		description.includes('minimum') ||
+		(description.includes('amount') && description.includes('less'))
+	) {
+		return {
+			title: formatMessage(messages.errorMinimumNotMetTitle),
+			text: formatMessage(messages.errorMinimumNotMetText),
+		}
+	}
+
+	// Generic fallback
+	return {
+		title: formatMessage(messages.errorGenericTitle),
+		text: formatMessage(messages.errorGenericText),
+	}
+}
+
 async function handleWithdraw() {
 	if (isSubmitting.value) return
 
@@ -336,19 +403,12 @@ async function handleWithdraw() {
 	} catch (error) {
 		console.error('Withdrawal failed:', error)
 
-		if ((error as any)?.data?.description?.toLower?.()?.includes('Tax form')) {
-			addNotification({
-				title: 'Please complete tax form',
-				text: 'You must complete a tax form to submit your withdrawal request.',
-				type: 'error',
-			})
-		} else {
-			addNotification({
-				title: 'Unable to withdraw',
-				text: 'We were unable to submit your withdrawal request, please check your details or contact support.',
-				type: 'error',
-			})
-		}
+		const { title, text } = getWithdrawalError(error)
+		addNotification({
+			title,
+			text,
+			type: 'error',
+		})
 	} finally {
 		isSubmitting.value = false
 	}
@@ -452,6 +512,59 @@ const messages = defineMessages({
 	transactionsButton: {
 		id: 'dashboard.withdraw.completion.transactions-button',
 		defaultMessage: 'Transactions',
+	},
+	errorTaxFormTitle: {
+		id: 'dashboard.withdraw.error.tax-form.title',
+		defaultMessage: 'Please complete tax form',
+	},
+	errorTaxFormText: {
+		id: 'dashboard.withdraw.error.tax-form.text',
+		defaultMessage: 'You must complete a tax form to submit your withdrawal request.',
+	},
+	errorInvalidWalletTitle: {
+		id: 'dashboard.withdraw.error.invalid-wallet.title',
+		defaultMessage: 'Invalid wallet address',
+	},
+	errorInvalidWalletText: {
+		id: 'dashboard.withdraw.error.invalid-wallet.text',
+		defaultMessage:
+			'The crypto wallet address you provided is invalid. Please double-check and try again.',
+	},
+	errorInvalidBankTitle: {
+		id: 'dashboard.withdraw.error.invalid-bank.title',
+		defaultMessage: 'Invalid bank details',
+	},
+	errorInvalidBankText: {
+		id: 'dashboard.withdraw.error.invalid-bank.text',
+		defaultMessage:
+			'The bank account details you provided are invalid. Please verify your information.',
+	},
+	errorInvalidAddressTitle: {
+		id: 'dashboard.withdraw.error.invalid-address.title',
+		defaultMessage: 'Address verification failed',
+	},
+	errorInvalidAddressText: {
+		id: 'dashboard.withdraw.error.invalid-address.text',
+		defaultMessage:
+			'The address you provided could not be verified. Please check your address details.',
+	},
+	errorMinimumNotMetTitle: {
+		id: 'dashboard.withdraw.error.minimum-not-met.title',
+		defaultMessage: 'Amount too low',
+	},
+	errorMinimumNotMetText: {
+		id: 'dashboard.withdraw.error.minimum-not-met.text',
+		defaultMessage:
+			"The withdrawal amount (after fees) doesn't meet the minimum requirement. Please increase your withdrawal amount.",
+	},
+	errorGenericTitle: {
+		id: 'dashboard.withdraw.error.generic.title',
+		defaultMessage: 'Unable to withdraw',
+	},
+	errorGenericText: {
+		id: 'dashboard.withdraw.error.generic.text',
+		defaultMessage:
+			'We were unable to submit your withdrawal request, please check your details or contact support.',
 	},
 })
 </script>
