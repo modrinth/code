@@ -838,6 +838,8 @@ async fn get_tremendous_payout_methods(
             "merchant_card",
             "bank",
             "charity",
+            "visa",
+            "visa_card",
             "paypal",
             "venmo",
         ];
