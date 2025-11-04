@@ -325,7 +325,7 @@ const dynamicDocumentNumberField = computed(() => {
 	return {
 		name: 'documentNumber',
 		type: 'text' as const,
-		label: labelMap[documentType] || 'Document Number',
+		label: labelMap[documentType] || 'Document number',
 		placeholder: placeholderMap[documentType] || 'Enter document number',
 		required: true,
 	}
@@ -474,23 +474,23 @@ const messages = defineMessages({
 	},
 	documentNumberNationalId: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id',
-		defaultMessage: 'National ID Number',
+		defaultMessage: 'National ID number',
 	},
 	documentNumberPassport: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-passport',
-		defaultMessage: 'Passport Number',
+		defaultMessage: 'Passport number',
 	},
 	documentNumberResidentId: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id',
-		defaultMessage: 'Resident ID Number',
+		defaultMessage: 'Resident ID number',
 	},
 	documentNumberRuc: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc',
-		defaultMessage: 'RUC Number',
+		defaultMessage: 'RUC number',
 	},
 	documentNumberTaxId: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id',
-		defaultMessage: 'Tax ID Number',
+		defaultMessage: 'Tax ID number',
 	},
 	documentNumberNationalIdPlaceholder: {
 		id: 'dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder',
