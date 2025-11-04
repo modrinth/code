@@ -920,6 +920,42 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Wallet"
   },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "We were unable to submit your withdrawal request, please check your details or contact support."
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Unable to withdraw"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "The address you provided could not be verified. Please check your address details."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Address verification failed"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "The bank account details you provided are invalid. Please verify your information."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Invalid bank details"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "The crypto wallet address you provided is invalid. Please double-check and try again."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Invalid wallet address"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "The withdrawal amount (after fees) doesn't meet the minimum requirement. Please increase your withdrawal amount."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Amount too low"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "You must complete a tax form to submit your withdrawal request."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Please complete tax form"
+  },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
   },
