@@ -314,7 +314,7 @@ function handleKeyDown(event: KeyboardEvent) {
 			transition: none !important;
 		}
 
-		@media screen and (max-width: 650px) {
+		@media screen and (max-width: 640px) {
 			width: calc(100% - 2 * var(--gap-lg));
 		}
 	}
