@@ -5,6 +5,7 @@ use crate::routes::{ApiError, internal::gotenberg::GotenbergQueue};
 use crate::util::env::env_var;
 use crate::util::error::Context;
 use actix_web::{http::header::HeaderName, web};
+use chrono::{DateTime, Datelike, Utc};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use std::time::Duration;
@@ -24,7 +25,7 @@ pub struct PaymentStatement {
     pub recipient_address_line_2: Option<String>,
     pub recipient_address_line_3: Option<String>,
     pub recipient_email: String,
-    pub payment_date: String,
+    pub payment_date: DateTime<Utc>,
     pub gross_amount_cents: i64,
     pub net_amount_cents: i64,
     pub fees_cents: i64,
@@ -189,14 +190,14 @@ impl GotenbergClient {
 
         self.generate_payment_statement(statement).await?;
 
-        let timeout_secs = env_var("GOTENBERG_TIMEOUT")
+        let timeout_ms = env_var("GOTENBERG_TIMEOUT")
             .map_err(ApiError::Internal)?
             .parse::<u64>()
             .wrap_internal_err(
-                "`GOTENBERG_TIMEOUT` is not a valid number of seconds",
+                "`GOTENBERG_TIMEOUT` is not a valid number of milliseconds",
             )?;
 
-        let document = timeout(Duration::from_secs(timeout_secs), rx_result)
+        let document = timeout(Duration::from_millis(timeout_ms), rx_result)
             .await
             .wrap_internal_err("Gotenberg generation timed out")?
             .wrap_internal_err("Gotenberg document sender dropped")?
@@ -221,7 +222,15 @@ fn fill_statement_template(html: &str, s: &PaymentStatement) -> String {
             s.recipient_address_line_3.clone().unwrap_or_default(),
         ),
         ("statement.recipient_email", s.recipient_email.clone()),
-        ("statement.payment_date", s.payment_date.clone()),
+        (
+            "statement.payment_date",
+            format!(
+                "{:04}-{:02}-{:02}",
+                s.payment_date.year(),
+                s.payment_date.month(),
+                s.payment_date.day()
+            ),
+        ),
         (
             "statement.gross_amount",
             format_money(s.gross_amount_cents, &s.currency_code),

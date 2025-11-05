@@ -10,7 +10,7 @@ use crate::models::payouts::{
     MuralPayDetails, PayoutMethodRequest, PayoutMethodType, PayoutStatus,
     TremendousDetails, TremendousForexResponse,
 };
-use crate::queue::payouts::PayoutsQueue;
+use crate::queue::payouts::{PayoutFees, PayoutsQueue};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::avalara1099;
@@ -611,6 +611,8 @@ pub async fn create_payout(
         body: &body,
         user: &user,
         payout_id,
+        gross_amount: body.amount,
+        fees,
         amount_minus_fee,
         total_fee: fees.total_fee(),
         sent_to_method,
@@ -650,6 +652,8 @@ struct PayoutContext<'a> {
     body: &'a Withdrawal,
     user: &'a DBUser,
     payout_id: DBPayoutId,
+    gross_amount: Decimal,
+    fees: PayoutFees,
     /// Set as the [`DBPayout::amount`] field.
     amount_minus_fee: Decimal,
     /// Set as the [`DBPayout::fee`] field.
@@ -676,6 +680,8 @@ async fn tremendous_payout(
         body,
         user,
         payout_id,
+        gross_amount: _,
+        fees: _,
         amount_minus_fee,
         total_fee,
         sent_to_method,
@@ -780,9 +786,11 @@ async fn mural_pay_payout(
         body: _body,
         user,
         payout_id,
+        gross_amount,
+        fees,
         amount_minus_fee,
         total_fee,
-        sent_to_method,
+        sent_to_method: _,
         payouts_queue,
     }: PayoutContext<'_>,
     details: &MuralPayDetails,
@@ -792,11 +800,10 @@ async fn mural_pay_payout(
 
     let payout_request = payouts_queue
         .create_muralpay_payout_request(
+            payout_id,
             user.id.into(),
-            muralpay::TokenAmount {
-                token_symbol: muralpay::USDC.into(),
-                token_amount: sent_to_method,
-            },
+            gross_amount,
+            fees,
             details.payout_details.clone(),
             details.recipient_info.clone(),
             gotenberg,
@@ -821,6 +828,8 @@ async fn paypal_payout(
         body,
         user,
         payout_id,
+        gross_amount: _,
+        fees: _,
         amount_minus_fee,
         total_fee,
         sent_to_method,

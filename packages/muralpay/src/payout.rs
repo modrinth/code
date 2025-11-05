@@ -32,6 +32,8 @@ impl MuralPay {
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body {
+            // if we submit `null`, Mural errors; we have to explicitly exclude this field
+            #[serde(skip_serializing_if = "Option::is_none")]
             filter: Option<PayoutStatusFilter>,
         }
 
@@ -48,7 +50,7 @@ impl MuralPay {
         &self,
         id: PayoutRequestId,
     ) -> Result<PayoutRequest, MuralError> {
-        self.http_get(|base| format!("{base}/api/payouts/{id}"))
+        self.http_get(|base| format!("{base}/api/payouts/payout/{id}"))
             .send_mural()
             .await
     }

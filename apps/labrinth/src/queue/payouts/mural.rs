@@ -3,11 +3,13 @@ use base64::Engine;
 use chrono::Utc;
 use eyre::{Result, eyre};
 use muralpay::{MuralError, TokenFeeRequest};
-use rust_decimal::Decimal;
+use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    queue::payouts::{AccountBalance, PayoutsQueue},
+    database::models::DBPayoutId,
+    models::ids::PayoutId,
+    queue::payouts::{AccountBalance, PayoutFees, PayoutsQueue},
     routes::ApiError,
     util::{
         error::Context,
@@ -59,8 +61,10 @@ impl PayoutsQueue {
 
     pub async fn create_muralpay_payout_request(
         &self,
+        payout_id: DBPayoutId,
         user_id: UserId,
-        amount: muralpay::TokenAmount,
+        gross_amount: Decimal,
+        fees: PayoutFees,
         payout_details: MuralPayoutRequest,
         recipient_info: muralpay::PayoutRecipientInfo,
         gotenberg: &GotenbergClient,
@@ -92,19 +96,40 @@ impl PayoutsQueue {
             }
         };
 
+        // Mural takes `fees.method_fee` off the top of the amount we tell them to send
+        let sent_to_method = gross_amount - fees.platform_fee;
+        // ..so the net is `gross - platform_fee - method_fee`
+        let net_amount = gross_amount - fees.total_fee();
+
         let recipient_address = recipient_info.physical_address();
         let recipient_email = recipient_info.email().to_string();
+        let gross_amount_cents = gross_amount * Decimal::from(100);
+        let net_amount_cents = net_amount * Decimal::from(100);
+        let fees_cents = fees.total_fee() * Decimal::from(100);
+        let address_line_3 = format!(
+            "{}, {}, {}",
+            recipient_address.city,
+            recipient_address.state,
+            recipient_address.zip
+        );
+
         let payment_statement = PaymentStatement {
-            payment_id: "todo".into(),
+            payment_id: PayoutId::from(payout_id).to_string(),
             recipient_address_line_1: Some(recipient_address.address1.clone()),
             recipient_address_line_2: recipient_address.address2.clone(),
-            recipient_address_line_3: None,
+            recipient_address_line_3: Some(address_line_3),
             recipient_email,
-            payment_date: "TO/DO/TODO".into(),
-            gross_amount_cents: 123,
-            net_amount_cents: 123,
-            fees_cents: 456,
-            currency_code: "TODO".into(),
+            payment_date: Utc::now(),
+            gross_amount_cents: gross_amount_cents
+                .to_i64()
+                .wrap_internal_err_with(|| eyre!("gross amount of cents `{gross_amount_cents}` cannot be expressed as an `i64`"))?,
+            net_amount_cents: net_amount_cents
+                .to_i64()
+                .wrap_internal_err_with(|| eyre!("net amount of cents `{net_amount_cents}` cannot be expressed as an `i64`"))?,
+            fees_cents: fees_cents
+                .to_i64()
+                .wrap_internal_err_with(|| eyre!("fees amount of cents `{fees_cents}` cannot be expressed as an `i64`"))?,
+            currency_code: "USD".into(),
         };
         let payment_statement_doc = gotenberg
             .wait_for_payment_statement(&payment_statement)
@@ -112,17 +137,20 @@ impl PayoutsQueue {
             .wrap_internal_err("failed to generate payment statement")?;
 
         // TODO
-        std::fs::write(
-            "/tmp/modrinth-payout-statement.pdf",
-            &payment_statement_doc.body,
-        )
-        .unwrap();
+        // std::fs::write(
+        //     "/tmp/modrinth-payout-statement.pdf",
+        //     &payment_statement_doc.body,
+        // )
+        // .unwrap();
 
         let payment_statement_doc = base64::engine::general_purpose::STANDARD
             .encode(&payment_statement_doc.body);
 
         let payout = muralpay::CreatePayout {
-            amount,
+            amount: muralpay::TokenAmount {
+                token_amount: sent_to_method,
+                token_symbol: muralpay::USDC.into(),
+            },
             payout_details,
             recipient_info,
             supporting_details: Some(muralpay::SupportingDetails {
@@ -143,7 +171,9 @@ impl PayoutsQueue {
             .await
             .map_err(|err| match err {
                 MuralError::Api(err) => ApiError::Request(err.into()),
-                err => ApiError::Internal(err.into()),
+                err => ApiError::Internal(
+                    eyre!(err).wrap_err("failed to create payout request"),
+                ),
             })?;
 
         // try to immediately execute the payout request...

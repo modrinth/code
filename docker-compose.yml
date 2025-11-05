@@ -83,6 +83,10 @@ services:
     container_name: labrinth-gotenberg
     ports:
       - '13000:3000'
+    extra_hosts:
+      # Gotenberg must send a message on a webhook to our backend,
+      # so it must have access to our local network
+      - 'host.docker.internal:host-gateway'
   labrinth:
     profiles:
       - with-labrinth

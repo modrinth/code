@@ -5,7 +5,8 @@ use muralpay::{
     AccountId, CounterpartyId, CreatePayout, CreatePayoutDetails, Dob,
     FiatAccountType, FiatAndRailCode, FiatAndRailDetails, FiatFeeRequest,
     FiatPayoutFee, MuralPay, PayoutMethodId, PayoutRecipientInfo,
-    PhysicalAddress, TokenAmount, TokenFeeRequest, TokenPayoutFee, UsdSymbol,
+    PayoutRequestId, PhysicalAddress, TokenAmount, TokenFeeRequest,
+    TokenPayoutFee, UsdSymbol,
 };
 use rust_decimal::{Decimal, dec};
 use serde::Serialize;
@@ -54,6 +55,11 @@ enum PayoutCommand {
     /// List all payout requests
     #[clap(alias = "ls")]
     List,
+    /// Get details for a single payout request
+    Get {
+        /// ID of the payout request
+        payout_request_id: PayoutRequestId,
+    },
     /// Create a payout request
     Create {
         /// ID of the Mural account to send from
@@ -140,6 +146,9 @@ async fn main() -> Result<()> {
         Command::Payout {
             command: PayoutCommand::List,
         } => run(of, muralpay.search_payout_requests(None, None).await?),
+        Command::Payout {
+            command: PayoutCommand::Get { payout_request_id },
+        } => run(of, muralpay.get_payout_request(payout_request_id).await?),
         Command::Payout {
             command:
                 PayoutCommand::Create {
