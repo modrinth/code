@@ -285,6 +285,7 @@ import type { Organization, Project, TeamMember, Version } from '@modrinth/utils
 import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -313,7 +314,6 @@ import {
 } from '@/helpers/profile.js'
 import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
-import { useStorage } from '@vueuse/core'
 
 const { handleError } = injectNotificationManager()
 

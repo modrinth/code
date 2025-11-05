@@ -12,6 +12,7 @@ import {
 } from '@modrinth/assets'
 import { Button, DropdownSelect, injectNotificationManager } from '@modrinth/ui'
 import { formatCategoryHeader } from '@modrinth/utils'
+import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
@@ -19,7 +20,6 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/Instance.vue'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { duplicate, remove } from '@/helpers/profile.js'
-import { useStorage } from '@vueuse/core'
 
 const { handleError } = injectNotificationManager()
 
