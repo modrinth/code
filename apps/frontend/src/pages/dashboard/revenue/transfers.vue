@@ -12,7 +12,7 @@
 					listbox
 				/>
 				<ButtonStyled circular type="outlined">
-					<button @click="onDownloadCSV" :disabled="buildingCsv">
+					<button :disabled="buildingCsv" @click="onDownloadCSV">
 						<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
 						<DownloadIcon v-else />
 					</button>
