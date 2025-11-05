@@ -5,7 +5,16 @@ use sqlx::{query, query_scalar};
 use std::fmt;
 
 #[derive(
-    Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize,
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
 )]
 pub enum FormType {
     #[serde(rename = "W-8BEN")]

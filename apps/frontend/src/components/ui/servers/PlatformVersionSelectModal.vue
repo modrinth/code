@@ -54,11 +54,12 @@
 
 				<div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
 					<div class="text-lg font-bold text-contrast">Minecraft version</div>
-					<TeleportDropdownMenu
+					<Combobox
 						v-model="selectedMCVersion"
 						name="mcVersion"
-						:options="mcVersions"
-						class="w-full max-w-[100%]"
+						:options="mcVersions.map((v) => ({ value: v, label: v }))"
+						:display-value="selectedMCVersion || 'Select Minecraft version...'"
+						class="!w-full"
 						placeholder="Select Minecraft version..."
 					/>
 					<div class="mt-2 flex items-center justify-between gap-2">
@@ -108,10 +109,17 @@
 							</div>
 						</template>
 						<template v-else-if="selectedLoaderVersions.length > 0">
-							<TeleportDropdownMenu
+							<Combobox
 								v-model="selectedLoaderVersion"
 								name="loaderVersion"
-								:options="selectedLoaderVersions"
+								:options="selectedLoaderVersions.map((v) => ({ value: v, label: v }))"
+								:display-value="
+									selectedLoaderVersion ||
+									(selectedLoader.toLowerCase() === 'paper' ||
+									selectedLoader.toLowerCase() === 'purpur'
+										? 'Select build number...'
+										: 'Select loader version...')
+								"
 								class="w-full max-w-[100%]"
 								:placeholder="
 									selectedLoader.toLowerCase() === 'paper' ||
@@ -201,9 +209,9 @@ import { DropdownIcon, RightArrowIcon, ServerIcon, XIcon } from '@modrinth/asset
 import {
 	BackupWarning,
 	ButtonStyled,
+	Combobox,
 	injectNotificationManager,
 	NewModal,
-	TeleportDropdownMenu,
 	Toggle,
 } from '@modrinth/ui'
 import { type Loaders, ModrinthServersFetchError } from '@modrinth/utils'
@@ -433,7 +441,7 @@ onMounted(() => {
 	fetchLoaderVersions()
 })
 
-const tags = useTags()
+const tags = useGeneratedState()
 const mcVersions = computed(() =>
 	tags.value.gameVersions
 		.filter((x) =>

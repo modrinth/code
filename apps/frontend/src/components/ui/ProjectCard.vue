@@ -212,7 +212,7 @@ export default {
 		},
 	},
 	setup() {
-		const tags = useTags()
+		const tags = useGeneratedState()
 		const formatRelativeTime = useRelativeTime()
 
 		return { tags, formatRelativeTime }

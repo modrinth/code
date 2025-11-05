@@ -226,7 +226,7 @@ const props = defineProps({
 	},
 })
 
-const tags = useTags()
+const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 

@@ -33,27 +33,27 @@
 
 			<section class="third-party">
 				<a class="btn" :href="getAuthUrl('discord', redirectTarget)">
-					<SSODiscordIcon />
+					<DiscordColorIcon />
 					<span>Discord</span>
 				</a>
 				<a class="btn" :href="getAuthUrl('github', redirectTarget)">
-					<SSOGitHubIcon />
+					<GitHubColorIcon />
 					<span>GitHub</span>
 				</a>
 				<a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-					<SSOMicrosoftIcon />
+					<MicrosoftColorIcon />
 					<span>Microsoft</span>
 				</a>
 				<a class="btn" :href="getAuthUrl('google', redirectTarget)">
-					<SSOGoogleIcon />
+					<GoogleColorIcon />
 					<span>Google</span>
 				</a>
 				<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-					<SSOSteamIcon />
+					<SteamColorIcon />
 					<span>Steam</span>
 				</a>
 				<a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-					<SSOGitLabIcon />
+					<GitLabColorIcon />
 					<span>GitLab</span>
 				</a>
 			</section>
@@ -130,15 +130,15 @@
 
 <script setup>
 import {
+	DiscordColorIcon,
+	GitHubColorIcon,
+	GitLabColorIcon,
+	GoogleColorIcon,
 	KeyIcon,
 	MailIcon,
+	MicrosoftColorIcon,
 	RightArrowIcon,
-	SSODiscordIcon,
-	SSOGitHubIcon,
-	SSOGitLabIcon,
-	SSOGoogleIcon,
-	SSOMicrosoftIcon,
-	SSOSteamIcon,
+	SteamColorIcon,
 } from '@modrinth/assets'
 import { commonMessages, injectNotificationManager } from '@modrinth/ui'
 import { IntlFormatted } from '@vintl/vintl/components'

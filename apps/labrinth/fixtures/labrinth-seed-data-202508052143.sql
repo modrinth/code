@@ -1105,6 +1105,9 @@ COPY public.users (id, github_id, username, email, avatar_url, bio, created, rol
 \.
 
 INSERT INTO sessions (id, session, user_id, created, last_login, expires, refresh_expires, city, country, ip, os, platform, user_agent)
-VALUES (93083445641246, 'mra_admin', 103587649610509, '2025-10-20 14:58:53.128901+00', '2025-10-20 14:58:53.128901+00', '2025-11-03 14:58:53.128901+00', '2025-12-19 14:58:53.128901+00', '', '', '127.0.0.1', 'Linux', 'Chrome', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36');
+VALUES (93083445641246, 'mra_admin', 103587649610509, '2025-10-20 14:58:53.128901+00', '2025-10-20 14:58:53.128901+00', '2030-11-03 14:58:53.128901+00', '2030-12-19 14:58:53.128901+00', '', '', '127.0.0.1', 'Linux', 'Chrome', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36');
+
+INSERT INTO payouts_values (user_id, amount, created, date_available)
+VALUES (103587649610509, 1000.00000000000000000000, '2025-10-23 00:00:00+00', '2025-10-23 00:00:00+00');
 
 COMMIT;

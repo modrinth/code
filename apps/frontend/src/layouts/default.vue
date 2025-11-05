@@ -456,6 +456,12 @@
 								shown: isAdmin(auth.user),
 							},
 							{
+								id: 'affiliates',
+								color: 'primary',
+								link: '/admin/affiliates',
+								shown: isAdmin(auth.user),
+							},
+							{
 								id: 'servers-notices',
 								color: 'primary',
 								link: '/admin/servers/notices',
@@ -478,7 +484,7 @@
 							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
 						</template>
 						<template #user-lookup>
-							<UserIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
+							<UserSearchIcon aria-hidden="true" /> {{ formatMessage(messages.lookupByEmail) }}
 						</template>
 						<template #file-lookup>
 							<FileIcon aria-hidden="true" /> {{ formatMessage(messages.fileLookup) }}
@@ -486,7 +492,12 @@
 						<template #servers-notices>
 							<IssuesIcon aria-hidden="true" /> {{ formatMessage(messages.manageServerNotices) }}
 						</template>
-						<template #servers-nodes> <ServerIcon aria-hidden="true" /> Server Nodes </template>
+						<template #affiliates>
+							<AffiliateIcon aria-hidden="true" /> {{ formatMessage(messages.manageAffiliates) }}
+						</template>
+						<template #servers-nodes>
+							<ServerIcon aria-hidden="true" /> Credit server nodes
+						</template>
 					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled type="transparent">
@@ -541,11 +552,14 @@
 					<template #notifications>
 						<BellIcon aria-hidden="true" /> {{ formatMessage(commonMessages.notificationsLabel) }}
 					</template>
+					<template #reports>
+						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.activeReports) }}
+					</template>
 					<template #saved>
-						<BookmarkIcon aria-hidden="true" /> {{ formatMessage(messages.savedProjects) }}
+						<LibraryIcon aria-hidden="true" /> {{ formatMessage(commonMessages.collectionsLabel) }}
 					</template>
 					<template #servers>
-						<ServerIcon aria-hidden="true" /> {{ formatMessage(commonMessages.serversLabel) }}
+						<ServerIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
 					</template>
 					<template #plus>
 						<ArrowBigUpDashIcon aria-hidden="true" />
@@ -562,6 +576,10 @@
 					</template>
 					<template #organizations>
 						<OrganizationIcon aria-hidden="true" /> {{ formatMessage(messages.organizations) }}
+					</template>
+					<template #affiliate-links>
+						<AffiliateIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.affiliateLinksButton) }}
 					</template>
 					<template #revenue>
 						<CurrencyIcon aria-hidden="true" /> {{ formatMessage(messages.revenue) }}
@@ -735,7 +753,9 @@
 				<button
 					class="tab button-animation"
 					:title="formatMessage(messages.toggleMenu)"
-					:aria-label="isMobileMenuOpen ? 'Close menu' : 'Open menu'"
+					:aria-label="
+						isMobileMenuOpen ? formatMessage(messages.closeMenu) : formatMessage(messages.openMenu)
+					"
 					@click="toggleMobileMenu()"
 				>
 					<template v-if="!auth.user">
@@ -810,7 +830,9 @@
 									</template>
 								</IntlFormatted>
 							</p>
-							<p class="m-0">© 2025 Rinth, Inc.</p>
+							<p class="m-0">
+								{{ formatMessage(footerMessages.copyright, { year: currentYear }) }}
+							</p>
 						</div>
 					</div>
 					<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
@@ -850,10 +872,10 @@
 </template>
 <script setup>
 import {
+	AffiliateIcon,
 	ArrowBigUpDashIcon,
 	BellIcon,
 	BlueskyIcon,
-	BookmarkIcon,
 	BookTextIcon,
 	BoxIcon,
 	BracesIcon,
@@ -891,6 +913,7 @@ import {
 	SunIcon,
 	TwitterIcon,
 	UserIcon,
+	UserSearchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -903,7 +926,7 @@ import {
 	OverflowMenu,
 	PagewideBanner,
 } from '@modrinth/ui'
-import { isAdmin, isStaff } from '@modrinth/utils'
+import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import TextLogo from '~/components/brand/TextLogo.vue'
@@ -1159,6 +1182,10 @@ const messages = defineMessages({
 		id: 'layout.action.manage-server-notices',
 		defaultMessage: 'Manage server notices',
 	},
+	manageAffiliates: {
+		id: 'layout.action.manage-affiliates',
+		defaultMessage: 'Manage affiliate links',
+	},
 	newProject: {
 		id: 'layout.action.new-project',
 		defaultMessage: 'New project',
@@ -1203,6 +1230,22 @@ const messages = defineMessages({
 		id: 'layout.nav.analytics',
 		defaultMessage: 'Analytics',
 	},
+	activeReports: {
+		id: 'layout.nav.active-reports',
+		defaultMessage: 'Active reports',
+	},
+	myServers: {
+		id: 'layout.nav.my-servers',
+		defaultMessage: 'My servers',
+	},
+	openMenu: {
+		id: 'layout.mobile.open-menu',
+		defaultMessage: 'Open menu',
+	},
+	closeMenu: {
+		id: 'layout.mobile.close-menu',
+		defaultMessage: 'Close menu',
+	},
 })
 
 const footerMessages = defineMessages({
@@ -1214,6 +1257,10 @@ const footerMessages = defineMessages({
 		id: 'layout.footer.legal-disclaimer',
 		defaultMessage:
 			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
+	},
+	copyright: {
+		id: 'layout.footer.copyright',
+		defaultMessage: '© {year} Rinth, Inc.',
 	},
 })
 
@@ -1256,6 +1303,8 @@ useSeoMeta({
 })
 
 const developerModeCounter = ref(0)
+
+const currentYear = new Date().getFullYear()
 
 const isMobileMenuOpen = ref(false)
 const isBrowseMenuOpen = ref(false)
@@ -1300,14 +1349,6 @@ const userMenuOptions = computed(() => {
 			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(auth.value.user.badges, 1 << 0),
 		},
 		{
-			id: 'notifications',
-			link: '/dashboard/notifications',
-		},
-		{
-			id: 'saved',
-			link: '/dashboard/collections',
-		},
-		{
 			id: 'servers',
 			link: '/servers/manage',
 		},
@@ -1329,6 +1370,21 @@ const userMenuOptions = computed(() => {
 			divider: true,
 		},
 		{
+			id: 'notifications',
+			link: '/dashboard/notifications',
+		},
+		{
+			id: 'reports',
+			link: '/dashboard/reports',
+		},
+		{
+			id: 'saved',
+			link: '/dashboard/collections',
+		},
+		{
+			divider: true,
+		},
+		{
 			id: 'projects',
 			link: '/dashboard/projects',
 		},
@@ -1337,12 +1393,17 @@ const userMenuOptions = computed(() => {
 			link: '/dashboard/organizations',
 		},
 		{
-			id: 'revenue',
-			link: '/dashboard/revenue',
-		},
-		{
 			id: 'analytics',
 			link: '/dashboard/analytics',
+		},
+		{
+			id: 'affiliate-links',
+			link: '/dashboard/affiliate-links',
+			shown: auth.value.user.badges & UserBadge.AFFILIATE,
+		},
+		{
+			id: 'revenue',
+			link: '/dashboard/revenue',
 		},
 	]
 

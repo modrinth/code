@@ -345,7 +345,7 @@ const toggleFeatures = defineMessages({
 
 const cosmetics = useCosmetics()
 const flags = useFeatureFlags()
-const tags = useTags()
+const tags = useGeneratedState()
 
 const theme = useTheme()
 
