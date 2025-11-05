@@ -123,7 +123,7 @@ const handleOptionsClick = async (args) => {
 }
 
 const state = useStorage(
-	'instance-library-state',
+	`${props.label}-grid-display-state`,
 	{
 		group: 'Group',
 		sortBy: 'Name',
