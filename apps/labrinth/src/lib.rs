@@ -20,6 +20,7 @@ use crate::background_task::update_versions;
 use crate::database::ReadOnlyPgPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
+use crate::routes::internal::gotenberg::GotenbergQueue;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::env::{parse_strings_from_var, parse_var};
@@ -69,6 +70,7 @@ pub struct LabrinthConfig {
     pub anrok_client: anrok::Client,
     pub email_queue: web::Data<EmailQueue>,
     pub archon_client: web::Data<ArchonClient>,
+    pub gotenberg_queue: web::Data<GotenbergQueue>,
     pub gotenberg_client: GotenbergClient,
 }
 
@@ -84,6 +86,7 @@ pub fn app_setup(
     stripe_client: stripe::Client,
     anrok_client: anrok::Client,
     email_queue: EmailQueue,
+    gotenberg_queue: web::Data<GotenbergQueue>,
     gotenberg_client: GotenbergClient,
     enable_background_tasks: bool,
 ) -> LabrinthConfig {
@@ -287,6 +290,7 @@ pub fn app_setup(
         rate_limiter: limiter,
         stripe_client,
         anrok_client,
+        gotenberg_queue,
         gotenberg_client,
         archon_client: web::Data::new(
             ArchonClient::from_env()
@@ -317,6 +321,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
     .app_data(web::Data::new(labrinth_config.search_config.clone()))
+    .app_data(labrinth_config.gotenberg_queue.clone())
     .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
@@ -503,6 +508,7 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("GOTENBERG_URL");
     failed |= check_var::<String>("GOTENBERG_CALLBACK_BASE");
+    failed |= check_var::<String>("GOTENBERG_TIMEOUT");
 
     failed |= check_var::<String>("STRIPE_API_KEY");
     failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");

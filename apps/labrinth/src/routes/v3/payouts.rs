@@ -15,6 +15,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::avalara1099;
 use crate::util::error::Context;
+use crate::util::gotenberg::GotenbergClient;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use chrono::{DateTime, Duration, Utc};
 use eyre::eyre;
@@ -476,6 +477,7 @@ pub async fn create_payout(
     body: web::Json<Withdrawal>,
     session_queue: web::Data<AuthQueue>,
     payouts_queue: web::Data<PayoutsQueue>,
+    gotenberg: web::Data<GotenbergClient>,
 ) -> Result<(), ApiError> {
     let (scopes, user) = get_user_record_from_bearer_token(
         &req,
@@ -623,7 +625,7 @@ pub async fn create_payout(
             tremendous_payout(payout_cx, method_details).await?
         }
         PayoutMethodRequest::MuralPay { method_details } => {
-            mural_pay_payout(payout_cx, method_details).await?
+            mural_pay_payout(payout_cx, method_details, &gotenberg).await?
         }
     };
 
@@ -784,6 +786,7 @@ async fn mural_pay_payout(
         payouts_queue,
     }: PayoutContext<'_>,
     details: &MuralPayDetails,
+    gotenberg: &GotenbergClient,
 ) -> Result<DBPayout, ApiError> {
     let user_email = get_verified_email(user)?;
 
@@ -796,6 +799,7 @@ async fn mural_pay_payout(
             },
             details.payout_details.clone(),
             details.recipient_info.clone(),
+            gotenberg,
         )
         .await?;
 

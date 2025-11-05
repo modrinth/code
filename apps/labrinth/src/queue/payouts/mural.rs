@@ -1,4 +1,6 @@
 use ariadne::ids::UserId;
+use base64::Engine;
+use chrono::Utc;
 use eyre::{Result, eyre};
 use muralpay::{MuralError, TokenFeeRequest};
 use rust_decimal::Decimal;
@@ -7,7 +9,10 @@ use serde::{Deserialize, Serialize};
 use crate::{
     queue::payouts::{AccountBalance, PayoutsQueue},
     routes::ApiError,
-    util::error::Context,
+    util::{
+        error::Context,
+        gotenberg::{GotenbergClient, PaymentStatement},
+    },
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
@@ -58,6 +63,7 @@ impl PayoutsQueue {
         amount: muralpay::TokenAmount,
         payout_details: MuralPayoutRequest,
         recipient_info: muralpay::PayoutRecipientInfo,
+        gotenberg: &GotenbergClient,
     ) -> Result<muralpay::PayoutRequest, ApiError> {
         let muralpay = self.muralpay.load();
         let muralpay = muralpay
@@ -86,11 +92,45 @@ impl PayoutsQueue {
             }
         };
 
+        let recipient_address = recipient_info.physical_address();
+        let recipient_email = recipient_info.email().to_string();
+        let payment_statement = PaymentStatement {
+            payment_id: "todo".into(),
+            recipient_address_line_1: Some(recipient_address.address1.clone()),
+            recipient_address_line_2: recipient_address.address2.clone(),
+            recipient_address_line_3: None,
+            recipient_email,
+            payment_date: "TO/DO/TODO".into(),
+            gross_amount_cents: 123,
+            net_amount_cents: 123,
+            fees_cents: 456,
+            currency_code: "TODO".into(),
+        };
+        let payment_statement_doc = gotenberg
+            .wait_for_payment_statement(&payment_statement)
+            .await
+            .wrap_internal_err("failed to generate payment statement")?;
+
+        // TODO
+        std::fs::write(
+            "/tmp/modrinth-payout-statement.pdf",
+            &payment_statement_doc.body,
+        )
+        .unwrap();
+
+        let payment_statement_doc = base64::engine::general_purpose::STANDARD
+            .encode(&payment_statement_doc.body);
+
         let payout = muralpay::CreatePayout {
             amount,
             payout_details,
             recipient_info,
-            supporting_details: None,
+            supporting_details: Some(muralpay::SupportingDetails {
+                supporting_document: Some(format!(
+                    "data:application/pdf;base64,{payment_statement_doc}"
+                )),
+                payout_purpose: Some(muralpay::PayoutPurpose::VendorPayment),
+            }),
         };
 
         let payout_request = muralpay

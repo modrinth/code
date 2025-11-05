@@ -606,6 +606,26 @@ pub enum PayoutRecipientInfo {
     },
 }
 
+impl PayoutRecipientInfo {
+    pub fn email(&self) -> &str {
+        match self {
+            PayoutRecipientInfo::Individual { email, .. } => email,
+            PayoutRecipientInfo::Business { email, .. } => email,
+        }
+    }
+
+    pub fn physical_address(&self) -> &PhysicalAddress {
+        match self {
+            PayoutRecipientInfo::Individual {
+                physical_address, ..
+            } => physical_address,
+            PayoutRecipientInfo::Business {
+                physical_address, ..
+            } => physical_address,
+        }
+    }
+}
+
 #[derive(Debug, Display, Clone, Copy, SerializeDisplay, DeserializeFromStr)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{year:04}-{month:02}-{day:02}")]

@@ -1,8 +1,16 @@
-use crate::routes::ApiError;
+use crate::routes::internal::gotenberg::{
+    GotenbergDocument, ModrinthPaymentId,
+};
+use crate::routes::{ApiError, internal::gotenberg::GotenbergQueue};
+use crate::util::env::env_var;
 use crate::util::error::Context;
-use actix_web::http::header::HeaderName;
+use actix_web::{http::header::HeaderName, web};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
+use std::time::Duration;
+use tokio::sync::oneshot;
+use tokio::time::timeout;
+use tracing::warn;
 
 pub const MODRINTH_GENERATED_PDF_TYPE: HeaderName =
     HeaderName::from_static("modrinth-generated-pdf-type");
@@ -53,28 +61,27 @@ pub struct GotenbergClient {
     gotenberg_url: String,
     site_url: String,
     callback_base: String,
+    queue: web::Data<GotenbergQueue>,
 }
 
 impl GotenbergClient {
     /// Initialize the client from environment variables.
-    pub fn from_env() -> Result<Self, ApiError> {
+    pub fn from_env(queue: web::Data<GotenbergQueue>) -> eyre::Result<Self> {
         let client = reqwest::Client::builder()
             .user_agent("Modrinth")
             .build()
-            .wrap_internal_err("failed to build reqwest client")?;
+            .wrap_err("failed to build reqwest client")?;
 
-        let gotenberg_url = dotenvy::var("GOTENBERG_URL")
-            .wrap_internal_err("GOTENBERG_URL is not set")?;
-        let site_url = dotenvy::var("SITE_URL")
-            .wrap_internal_err("SITE_URL is not set")?;
-        let callback_base = dotenvy::var("GOTENBERG_CALLBACK_BASE")
-            .wrap_internal_err("GOTENBERG_CALLBACK_BASE is not set")?;
+        let gotenberg_url = env_var("GOTENBERG_URL")?;
+        let site_url = env_var("SITE_URL")?;
+        let callback_base = env_var("GOTENBERG_CALLBACK_BASE")?;
 
         Ok(Self {
             client,
             gotenberg_url: gotenberg_url.trim_end_matches('/').to_owned(),
             site_url: site_url.trim_end_matches('/').to_owned(),
             callback_base: callback_base.trim_end_matches('/').to_owned(),
+            queue,
         })
     }
 
@@ -154,6 +161,47 @@ impl GotenbergClient {
             .wrap_internal_err("Gotenberg returned an error status")?;
 
         Ok(())
+    }
+
+    /// Tells Gotenberg to generate a payment statement PDF, and waits until we
+    /// get a response for that PDF.
+    ///
+    /// This submits the PDF via [`GotenbergClient::generate_payment_statement`]
+    /// then waits until we receive a response on the Gotenberg webhook, and
+    /// returns that from this function.
+    ///
+    /// If Gotenberg does not return a response to us within `GOTENBERG_TIMEOUT`
+    /// number of seconds, this will fail.
+    pub async fn wait_for_payment_statement(
+        &self,
+        statement: &PaymentStatement,
+    ) -> Result<GotenbergDocument, ApiError> {
+        let (tx_result, rx_result) = oneshot::channel();
+        let payment_id = ModrinthPaymentId(statement.payment_id.clone());
+
+        let old = self.queue.pending.insert(payment_id.clone(), tx_result);
+        if old.is_some() {
+            warn!(
+                "Overwrote pending document generation {payment_id:?}; \
+                a previous payment statement generation operation will have its sender dropped!"
+            );
+        }
+
+        self.generate_payment_statement(statement).await?;
+
+        let timeout_secs = env_var("GOTENBERG_TIMEOUT")
+            .map_err(ApiError::Internal)?
+            .parse::<u64>()
+            .wrap_internal_err(
+                "`GOTENBERG_TIMEOUT` is not a valid number of seconds",
+            )?;
+
+        let document = timeout(Duration::from_secs(timeout_secs), rx_result)
+            .await
+            .wrap_internal_err("Gotenberg generation timed out")?
+            .wrap_internal_err("Gotenberg document sender dropped")?
+            .wrap_internal_err("Gotenberg document generation failed")?;
+        Ok(document)
     }
 }
 
