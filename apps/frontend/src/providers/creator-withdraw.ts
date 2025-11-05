@@ -480,7 +480,7 @@ export function createWithdrawContext(
 				label: paymentMethodMessages.paypalInternational,
 				icon: PayPalColorIcon,
 				methodId: internationalPaypalMethod.id,
-				fee: '≈ 6%, max $25',
+				fee: '≈ 3.84%',
 				type: 'tremendous',
 			})
 		}
