@@ -8,7 +8,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     database::models::DBPayoutId,
-    models::ids::PayoutId,
     queue::payouts::{AccountBalance, PayoutFees, PayoutsQueue},
     routes::ApiError,
     util::{
@@ -114,7 +113,7 @@ impl PayoutsQueue {
         );
 
         let payment_statement = PaymentStatement {
-            payment_id: PayoutId::from(payout_id).to_string(),
+            payment_id: payout_id.into(),
             recipient_address_line_1: Some(recipient_address.address1.clone()),
             recipient_address_line_2: recipient_address.address2.clone(),
             recipient_address_line_3: Some(address_line_3),
@@ -139,12 +138,11 @@ impl PayoutsQueue {
         // TODO
         // std::fs::write(
         //     "/tmp/modrinth-payout-statement.pdf",
-        //     &payment_statement_doc.body,
+        //     base64::engine::general_purpose::STANDARD
+        //         .decode(&payment_statement_doc.body)
+        //         .unwrap(),
         // )
         // .unwrap();
-
-        let payment_statement_doc = base64::engine::general_purpose::STANDARD
-            .encode(&payment_statement_doc.body);
 
         let payout = muralpay::CreatePayout {
             amount: muralpay::TokenAmount {
@@ -155,7 +153,8 @@ impl PayoutsQueue {
             recipient_info,
             supporting_details: Some(muralpay::SupportingDetails {
                 supporting_document: Some(format!(
-                    "data:application/pdf;base64,{payment_statement_doc}"
+                    "data:application/pdf;base64,{}",
+                    payment_statement_doc.body
                 )),
                 payout_purpose: Some(muralpay::PayoutPurpose::VendorPayment),
             }),

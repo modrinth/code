@@ -1,26 +1,28 @@
-use crate::routes::internal::gotenberg::{
-    GotenbergDocument, ModrinthPaymentId,
-};
-use crate::routes::{ApiError, internal::gotenberg::GotenbergQueue};
+use crate::database::redis::RedisPool;
+use crate::models::ids::PayoutId;
+use crate::routes::ApiError;
+use crate::routes::internal::gotenberg::{GotenbergDocument, GotenbergError};
 use crate::util::env::env_var;
 use crate::util::error::Context;
-use actix_web::{http::header::HeaderName, web};
+use actix_web::http::header::HeaderName;
 use chrono::{DateTime, Datelike, Utc};
+use redis::AsyncTypedCommands;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
-use std::time::Duration;
-use tokio::sync::oneshot;
-use tokio::time::timeout;
-use tracing::warn;
 
 pub const MODRINTH_GENERATED_PDF_TYPE: HeaderName =
     HeaderName::from_static("modrinth-generated-pdf-type");
 pub const MODRINTH_PAYMENT_ID: HeaderName =
     HeaderName::from_static("modrinth-payment-id");
+const DOCUMENT_REDIS_CHANNEL: &str = "payment-statement";
+
+pub fn payment_statement_redis_channel(payout_id: PayoutId) -> String {
+    format!("{DOCUMENT_REDIS_CHANNEL}:{}", payout_id.0)
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PaymentStatement {
-    pub payment_id: String,
+    pub payment_id: PayoutId,
     pub recipient_address_line_1: Option<String>,
     pub recipient_address_line_2: Option<String>,
     pub recipient_address_line_3: Option<String>,
@@ -62,12 +64,12 @@ pub struct GotenbergClient {
     gotenberg_url: String,
     site_url: String,
     callback_base: String,
-    queue: web::Data<GotenbergQueue>,
+    redis: RedisPool,
 }
 
 impl GotenbergClient {
     /// Initialize the client from environment variables.
-    pub fn from_env(queue: web::Data<GotenbergQueue>) -> eyre::Result<Self> {
+    pub fn from_env(redis: RedisPool) -> eyre::Result<Self> {
         let client = reqwest::Client::builder()
             .user_agent("Modrinth")
             .build()
@@ -82,7 +84,7 @@ impl GotenbergClient {
             gotenberg_url: gotenberg_url.trim_end_matches('/').to_owned(),
             site_url: site_url.trim_end_matches('/').to_owned(),
             callback_base: callback_base.trim_end_matches('/').to_owned(),
-            queue,
+            redis,
         })
     }
 
@@ -148,7 +150,7 @@ impl GotenbergClient {
             )
             .header(
                 "Modrinth-Payment-Id",
-                &statement.payment_id,
+                statement.payment_id.to_string(),
             )
             .header(
                 "Gotenberg-Output-Filename",
@@ -168,8 +170,14 @@ impl GotenbergClient {
     /// get a response for that PDF.
     ///
     /// This submits the PDF via [`GotenbergClient::generate_payment_statement`]
-    /// then waits until we receive a response on the Gotenberg webhook, and
+    /// then waits until some Labrinth instance receives a response on the
+    /// Gotenberg webhook, sends the response over Redis to our instance, and
     /// returns that from this function.
+    ///
+    /// In a local environment, the Labrinth instance that receives the webhook
+    /// response will be the same one that is waiting on the response, so the
+    /// Redis step is unnecessary, but in a real deployment, we have multiple
+    /// Labrinth instances so we need Redis in between.
     ///
     /// If Gotenberg does not return a response to us within `GOTENBERG_TIMEOUT`
     /// number of milliseconds, this will fail.
@@ -177,16 +185,11 @@ impl GotenbergClient {
         &self,
         statement: &PaymentStatement,
     ) -> Result<GotenbergDocument, ApiError> {
-        let (tx_result, rx_result) = oneshot::channel();
-        let payment_id = ModrinthPaymentId(statement.payment_id.clone());
-
-        let old = self.queue.pending.insert(payment_id.clone(), tx_result);
-        if old.is_some() {
-            warn!(
-                "Overwrote pending document generation {payment_id:?}; \
-                a previous payment statement generation operation will have its sender dropped!"
-            );
-        }
+        let mut redis = self
+            .redis
+            .connect()
+            .await
+            .wrap_internal_err("failed to get Redis connection")?;
 
         self.generate_payment_statement(statement).await?;
 
@@ -197,18 +200,28 @@ impl GotenbergClient {
                 "`GOTENBERG_TIMEOUT` is not a valid number of milliseconds",
             )?;
 
-        let document = timeout(Duration::from_millis(timeout_ms), rx_result)
+        let redis_channel =
+            payment_statement_redis_channel(statement.payment_id);
+
+        let [_key, document] = redis
+            .connection
+            .brpop(redis_channel, timeout_ms as f64 / 1000f64)
             .await
-            .wrap_internal_err("Gotenberg generation timed out")?
-            .wrap_internal_err("Gotenberg document sender dropped")?
-            .wrap_internal_err("Gotenberg document generation failed")?;
+            .wrap_internal_err("failed to get document over Redis")?
+            .wrap_internal_err("no document was returned from Redis")?;
+        let document = serde_json::from_str::<
+            Result<GotenbergDocument, GotenbergError>,
+        >(&document)
+        .wrap_internal_err("failed to deserialize Redis document response")?
+        .wrap_internal_err("Gotenberg document generation failed")?;
+
         Ok(document)
     }
 }
 
 fn fill_statement_template(html: &str, s: &PaymentStatement) -> String {
     let variables: Vec<(&str, String)> = vec![
-        ("statement.payment_id", s.payment_id.clone()),
+        ("statement.payment_id", s.payment_id.to_string()),
         (
             "statement.recipient_address_line_1",
             s.recipient_address_line_1.clone().unwrap_or_default(),
