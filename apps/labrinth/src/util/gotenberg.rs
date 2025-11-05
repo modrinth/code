@@ -172,7 +172,7 @@ impl GotenbergClient {
     /// returns that from this function.
     ///
     /// If Gotenberg does not return a response to us within `GOTENBERG_TIMEOUT`
-    /// number of seconds, this will fail.
+    /// number of milliseconds, this will fail.
     pub async fn wait_for_payment_statement(
         &self,
         statement: &PaymentStatement,
