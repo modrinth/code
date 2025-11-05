@@ -706,9 +706,17 @@ impl PayoutsQueue {
                     None
                 };
 
+                // In the Tremendous dashboard, we have configured it so that,
+                // if we make a $10 request for a premium method, *we* get
+                // charged an extra 4% - the user gets the full $10, and we get
+                // $10.40 subtracted from our Tremendous balance.
+                //
+                // To offset this, we (the platform) take the fees off before
+                // we send the request to Tremendous. Afterwards, the method
+                // (Tremendous) will take 0% off the top of our $10.
                 PayoutFees {
-                    method_fee: fee,
-                    platform_fee: dec!(0),
+                    method_fee: dec!(0),
+                    platform_fee: fee,
                     exchange_rate,
                 }
             }
@@ -853,9 +861,19 @@ async fn get_tremendous_payout_methods(
         // https://help.tremendous.com/hc/en-us/articles/41472317536787-Premium-reward-options
         let fee = match product.category.as_str() {
             "paypal" | "venmo" => PayoutMethodFee {
-                percentage: dec!(0.06),
-                min: dec!(1.00),
-                max: Some(dec!(25.00)),
+                // If a user withdraws $10:
+                //
+                //   amount charged by Tremendous = X * 1.04 = $10.00
+                //
+                // We have to solve for X here:
+                //
+                //   X = $10.00 / 1.04
+                //
+                // So the percentage fee is `1 - (1 / 1.04)`
+                // Roughly 0.03846, not 0.04
+                percentage: dec!(1) - (dec!(1) / dec!(1.04)),
+                min: dec!(0.25),
+                max: None,
             },
             _ => PayoutMethodFee {
                 percentage: dec!(0),
