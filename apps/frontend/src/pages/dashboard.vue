@@ -22,7 +22,7 @@
 						icon: AffiliateIcon,
 						shown: isAffiliate,
 					},
-					{ link: '/dashboard/revenue', label: 'Revenue', icon: CurrencyIcon },
+					{ link: '/dashboard/revenue', label: 'Revenue', icon: CurrencyIcon, matchNested: true },
 				]"
 			/>
 		</div>

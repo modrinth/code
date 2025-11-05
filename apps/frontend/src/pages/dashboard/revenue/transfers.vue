@@ -12,8 +12,9 @@
 					listbox
 				/>
 				<ButtonStyled circular type="outlined">
-					<button>
-						<DownloadIcon />
+					<button @click="onDownloadCSV" :disabled="buildingCsv">
+						<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
+						<DownloadIcon v-else />
 					</button>
 				</ButtonStyled>
 			</div>
@@ -43,7 +44,7 @@
 					<GenericListIcon class="size-6" />
 				</div>
 				<span class="text-2xl font-semibold text-contrast md:text-4xl">{{
-					transactions.length
+					filteredTransactions.length
 				}}</span>
 			</div>
 		</div>
@@ -83,6 +84,7 @@ import {
 	ArrowUpRightIcon,
 	DownloadIcon,
 	GenericListIcon,
+	SpinnerIcon,
 } from '@modrinth/assets'
 import { ButtonStyled, Combobox } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
@@ -127,6 +129,7 @@ const yearOptions = computed(() => {
 })
 
 const selectedYear = ref('all')
+const buildingCsv = ref(false)
 
 const filteredTransactions = computed(() =>
 	sortedTransactions.value.filter(
@@ -164,16 +167,122 @@ const groupedTransactions = computed(() => {
 })
 
 const totalReceived = computed(() => {
-	return allTransactions.value
+	return filteredTransactions.value
 		.filter((txn) => txn.type === 'payout_available')
 		.reduce((sum, txn) => sum + Number(txn.amount), 0)
 })
 
 const totalWithdrawn = computed(() => {
-	return allTransactions.value
+	return filteredTransactions.value
 		.filter((txn) => txn.type === 'withdrawal')
 		.reduce((sum, txn) => sum + Number(txn.amount), 0)
 })
+
+function escapeCSVField(field) {
+	if (field === null || field === undefined) return ''
+	const stringField = String(field)
+	if (stringField.includes(',') || stringField.includes('"') || stringField.includes('\n')) {
+		return `"${stringField.replace(/"/g, '""')}"`
+	}
+	return stringField
+}
+
+function transactionsToCSV() {
+	if (!filteredTransactions.value || filteredTransactions.value.length === 0) {
+		return ''
+	}
+
+	const newline = '\n'
+	const header = ['Date', 'Type', 'Source', 'Status', 'Amount', 'Fee'].join(',')
+
+	const rows = filteredTransactions.value.map((txn) => {
+		const date = dayjs(txn.created).format('YYYY-MM-DD HH:mm:ss')
+		const type = txn.type === 'withdrawal' ? 'Withdrawal' : 'Payout'
+
+		let methodOrSource = ''
+		let status = ''
+		let fee = ''
+
+		if (txn.type === 'withdrawal') {
+			const method = txn.method_type || txn.method || 'Unknown'
+			switch (method) {
+				case 'paypal':
+					methodOrSource = 'PayPal'
+					break
+				case 'venmo':
+					methodOrSource = 'Venmo'
+					break
+				case 'tremendous':
+					methodOrSource = 'Tremendous'
+					break
+				case 'muralpay':
+					methodOrSource = 'Muralpay'
+					break
+				default:
+					methodOrSource = method.charAt(0).toUpperCase() + method.slice(1)
+			}
+
+			status = txn.status
+				? txn.status.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+				: 'Unknown'
+
+			fee = txn.fee ? Number(txn.fee).toFixed(2) : '0.00'
+		} else {
+			methodOrSource = txn.payout_source
+				? txn.payout_source
+						.split('_')
+						.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+						.join(' ')
+				: 'Unknown'
+			status = 'N/A'
+			fee = 'N/A'
+		}
+
+		const amount = Number(txn.amount).toFixed(2)
+
+		return [
+			escapeCSVField(date),
+			escapeCSVField(type),
+			escapeCSVField(methodOrSource),
+			escapeCSVField(status),
+			escapeCSVField(amount),
+			escapeCSVField(fee),
+		].join(',')
+	})
+
+	return [header, ...rows].join(newline)
+}
+
+const downloadTransactionsCSV = () => {
+	buildingCsv.value = true
+
+	try {
+		const csv = transactionsToCSV()
+
+		if (!csv) {
+			return
+		}
+
+		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+
+		const link = document.createElement('a')
+		const url = URL.createObjectURL(blob)
+		const yearSuffix = selectedYear.value === 'all' ? 'all' : selectedYear.value
+		const filename = `modrinth-transactions-${yearSuffix}.csv`
+
+		link.setAttribute('href', url)
+		link.setAttribute('download', filename)
+		link.style.visibility = 'hidden'
+		document.body.appendChild(link)
+
+		link.click()
+		document.body.removeChild(link)
+	} finally {
+		buildingCsv.value = false
+	}
+}
+
+const onDownloadCSV = useClientTry(async () => await downloadTransactionsCSV())
 
 const messages = defineMessages({
 	transactionsHeader: {
