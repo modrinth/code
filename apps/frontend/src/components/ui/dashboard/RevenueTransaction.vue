@@ -39,7 +39,7 @@
 				<template v-if="transaction.type === 'withdrawal' && transaction.status === 'in-transit'">
 					<Tooltip theme="dismissable-prompt" :triggers="['hover', 'focus']" no-auto-focus>
 						<span class="my-auto align-middle"
-							><ButtonStyled circular size="small">
+							><ButtonStyled circular type="outlined" size="small">
 								<button class="align-middle" @click="cancelPayout">
 									<XIcon />
 								</button> </ButtonStyled
