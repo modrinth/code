@@ -193,7 +193,7 @@
 					@cancelled="refreshPayouts"
 				/>
 			</div>
-			<div v-else class="mx-auto flex flex-col justify-center gap-4 p-6 text-center">
+			<div v-else class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
 				<div data-svg-wrapper>
 					<svg
 						viewBox="0 0 154 94"
