@@ -1,13 +1,13 @@
 ---
 title: More Ways to Withdraw
-summary: 'Coming soon: new withdraw options and a redesigned revenue dashboard'
+summary: 'New withdraw options and a redesigned revenue dashboard'
 date: 2025-10-27T16:30:00-07:00
 authors: ['AJfd8YH6', 'bOHH0P9Z', 'xSQqYYIN']
 ---
 
 Hey everyone! We've heard your feedback on creator withdrawal options, and we're excited to share that more are finally coming to Modrinth! Over the past month, we've been working on overhauling the withdrawal experience and supporting more withdraw methods.
 
-**This update will roll out later this week**, but we wanted to give everyone an early heads-up so you can hold off on withdrawing when payouts go out in a couple days in case one of the new options interests you. There's a lot packed into this release, so let's dive in!
+There's a lot packed into this release, so let's dive in!
 
 <div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
