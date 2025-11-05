@@ -40,7 +40,6 @@ color-thief = { workspace = true }
 const_format = { workspace = true }
 dashmap = { workspace = true }
 deadpool-redis.workspace = true
-derive_more = { workspace = true, features = ["display", "error"] }
 dotenvy = { workspace = true }
 either = { workspace = true }
 eyre = { workspace = true }
