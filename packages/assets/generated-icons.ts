@@ -7,6 +7,7 @@ import _ArchiveIcon from './icons/archive.svg?component'
 import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
 import _ArrowDownIcon from './icons/arrow-down.svg?component'
+import _ArrowDownLeftIcon from './icons/arrow-down-left.svg?component'
 import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
@@ -77,6 +78,7 @@ import _FolderSearchIcon from './icons/folder-search.svg?component'
 import _GameIcon from './icons/game.svg?component'
 import _GapIcon from './icons/gap.svg?component'
 import _GaugeIcon from './icons/gauge.svg?component'
+import _GenericListIcon from './icons/generic-list.svg?component'
 import _GiftIcon from './icons/gift.svg?component'
 import _GitGraphIcon from './icons/git-graph.svg?component'
 import _GlassesIcon from './icons/glasses.svg?component'
@@ -219,6 +221,7 @@ export const AlignLeftIcon = _AlignLeftIcon
 export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
+export const ArrowDownLeftIcon = _ArrowDownLeftIcon
 export const ArrowDownIcon = _ArrowDownIcon
 export const ArrowLeftRightIcon = _ArrowLeftRightIcon
 export const ArrowUpRightIcon = _ArrowUpRightIcon
@@ -290,6 +293,7 @@ export const FolderSearchIcon = _FolderSearchIcon
 export const GameIcon = _GameIcon
 export const GapIcon = _GapIcon
 export const GaugeIcon = _GaugeIcon
+export const GenericListIcon = _GenericListIcon
 export const GiftIcon = _GiftIcon
 export const GitGraphIcon = _GitGraphIcon
 export const GlassesIcon = _GlassesIcon
