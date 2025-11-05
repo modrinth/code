@@ -1355,6 +1355,7 @@ pub async fn index_payouts_notifications(
 
     payouts_values_notifications::synchronize_future_payout_values(
         &mut *transaction,
+        200,
     )
     .await?;
     let items = payouts_values_notifications::PayoutsValuesNotification::unnotified_users_with_available_payouts_with_limit(&mut *transaction, 200).await?;
