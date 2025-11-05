@@ -313,6 +313,7 @@ import {
 } from '@/helpers/profile.js'
 import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
+import { useStorage } from '@vueuse/core'
 
 const { handleError } = injectNotificationManager()
 
@@ -531,7 +532,13 @@ const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
 	return options
 })
 
-const selectedFilters = ref<string[]>([])
+const selectedFilters = useStorage<string[]>(
+	`${props.instance.name}-mod-selected-filters`,
+	[],
+	sessionStorage,
+	{ mergeDefaults: true },
+)
+
 const filteredProjects = computed(() => {
 	const updatesFilter = selectedFilters.value.includes('updates')
 	const disabledFilter = selectedFilters.value.includes('disabled')
