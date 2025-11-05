@@ -11,6 +11,24 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-11-04T18:20:00-07:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed an issue with PayPal International fees.`,
+	},
+	{
+		date: `2025-11-04T16:20:00-07:00`,
+		product: 'web',
+		body: `## Improvements
+- Some bugfixes to the new withdrawal experience.`,
+	},
+	{
+		date: `2025-11-03T15:30:00-07:00`,
+		product: 'web',
+		body: `## Improvements
+- Revamped creator revenue page and withdrawal experience.`,
+	},
+	{
 		date: `2025-10-30T16:30:00-07:00`,
 		product: 'app',
 		version: '0.10.16',

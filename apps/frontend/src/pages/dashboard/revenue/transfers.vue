@@ -1,228 +1,204 @@
 <template>
-	<div>
-		<section class="universal-card payout-history">
-			<Breadcrumbs
-				current-title="Transfer history"
-				:link-stack="[{ href: '/dashboard/revenue', label: 'Revenue' }]"
-			/>
-			<h2>Transfer history</h2>
-			<p>All of your withdrawals from your Modrinth balance will be listed here:</p>
-			<div class="input-group">
-				<DropdownSelect
-					v-model="selectedYear"
-					:options="years"
-					:display-name="(x) => (x === 'all' ? 'All years' : x)"
-					name="Year filter"
-				/>
-				<DropdownSelect
-					v-model="selectedMethod"
-					:options="methods"
-					:display-name="
-						(x) => (x === 'all' ? 'Any method' : x === 'paypal' ? 'PayPal' : capitalizeString(x))
-					"
-					name="Method filter"
-				/>
-			</div>
-			<p>
-				{{
-					selectedYear !== 'all'
-						? selectedMethod !== 'all'
-							? formatMessage(messages.transfersTotalYearMethod, {
-									amount: $formatMoney(totalAmount),
-									year: selectedYear,
-									method: selectedMethod,
-								})
-							: formatMessage(messages.transfersTotalYear, {
-									amount: $formatMoney(totalAmount),
-									year: selectedYear,
-								})
-						: selectedMethod !== 'all'
-							? formatMessage(messages.transfersTotalMethod, {
-									amount: $formatMoney(totalAmount),
-									method: selectedMethod,
-								})
-							: formatMessage(messages.transfersTotal, {
-									amount: $formatMoney(totalAmount),
-								})
-				}}
-			</p>
+	<div class="mb-6 flex flex-col gap-4 p-4 py-0 !pt-4 md:p-8 lg:p-12">
+		<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+			<span class="text-xl font-semibold text-contrast md:text-2xl">{{
+				formatMessage(messages.transactionsHeader)
+			}}</span>
 			<div
-				v-for="payout in filteredPayouts"
-				:key="payout.id"
-				class="universal-card recessed payout"
+				class="flex w-full flex-col gap-2 min-[480px]:flex-row min-[480px]:items-center sm:max-w-[400px]"
 			>
-				<div class="platform">
-					<PayPalIcon v-if="payout.method === 'paypal'" />
-					<TremendousIcon v-else-if="payout.method === 'tremendous'" />
-					<VenmoIcon v-else-if="payout.method === 'venmo'" />
-					<UnknownIcon v-else />
-				</div>
-				<div class="payout-info">
-					<div>
-						<strong>
-							{{ $dayjs(payout.created).format('MMMM D, YYYY [at] h:mm A') }}
-						</strong>
-					</div>
-					<div>
-						<span class="amount">{{ $formatMoney(payout.amount) }}</span>
-						<template v-if="payout.fee">⋅ Fee {{ $formatMoney(payout.fee) }}</template>
-					</div>
-					<div class="payout-status">
-						<span>
-							<Badge v-if="payout.status === 'success'" color="green" type="Success" />
-							<Badge v-else-if="payout.status === 'cancelling'" color="yellow" type="Cancelling" />
-							<Badge v-else-if="payout.status === 'cancelled'" color="red" type="Cancelled" />
-							<Badge v-else-if="payout.status === 'failed'" color="red" type="Failed" />
-							<Badge v-else-if="payout.status === 'in-transit'" color="yellow" type="In transit" />
-							<Badge v-else :type="payout.status" />
-						</span>
-						<template v-if="payout.method">
-							<span>⋅</span>
-							<span>{{ formatWallet(payout.method) }} ({{ payout.method_address }})</span>
-						</template>
-					</div>
-				</div>
-				<div class="input-group">
-					<button
-						v-if="payout.status === 'in-transit'"
-						class="iconified-button raised-button"
-						@click="cancelPayout(payout.id)"
-					>
-						<XIcon /> Cancel payment
-					</button>
+				<Combobox
+					v-model="selectedYear"
+					:options="yearOptions"
+					:display-value="selectedYear === 'all' ? 'All years' : String(selectedYear)"
+					listbox
+				/>
+				<Combobox
+					v-model="selectedMethod"
+					:options="methodOptions"
+					:display-value="selectedMethod === 'all' ? 'All types' : formatTypeLabel(selectedMethod)"
+					listbox
+				/>
+			</div>
+		</div>
+
+		<div v-if="Object.keys(groupedTransactions).length > 0" class="flex flex-col gap-5 md:gap-6">
+			<div
+				v-for="(transactions, period) in groupedTransactions"
+				:key="period"
+				class="flex flex-col"
+			>
+				<h3 class="text-sm font-medium text-primary md:text-base">{{ period }}</h3>
+				<div class="flex flex-col gap-3 md:gap-4">
+					<RevenueTransaction
+						v-for="transaction in transactions"
+						:key="transaction.id || transaction.created"
+						:transaction="transaction"
+						@cancelled="refresh"
+					/>
 				</div>
 			</div>
-		</section>
+		</div>
+		<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
+			<span class="text-lg text-contrast md:text-xl">{{
+				formatMessage(messages.noTransactions)
+			}}</span>
+			<span class="max-w-[256px] text-base text-secondary md:text-lg">{{
+				formatMessage(messages.noTransactionsDesc)
+			}}</span>
+		</div>
 	</div>
 </template>
 <script setup>
-import { PayPalIcon, UnknownIcon, XIcon } from '@modrinth/assets'
-import { Badge, Breadcrumbs, DropdownSelect, injectNotificationManager } from '@modrinth/ui'
-import { capitalizeString, formatWallet } from '@modrinth/utils'
+import { Combobox } from '@modrinth/ui'
+import { capitalizeString } from '@modrinth/utils'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 
-import TremendousIcon from '~/assets/images/external/tremendous.svg?component'
-import VenmoIcon from '~/assets/images/external/venmo-small.svg?component'
+import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
 
-const { addNotification } = injectNotificationManager()
-const vintl = useVIntl()
-const { formatMessage } = vintl
+const { formatMessage } = useVIntl()
 
 useHead({
-	title: 'Transfer history - Modrinth',
+	title: 'Transaction history - Modrinth',
 })
 
-const auth = await useAuth()
-
-const { data: payouts, refresh } = await useAsyncData(`payout`, () =>
-	useBaseFetch(`payout`, {
+const { data: transactions, refresh } = await useAsyncData(`payout-history`, () =>
+	useBaseFetch(`payout/history`, {
 		apiVersion: 3,
 	}),
 )
 
-const sortedPayouts = computed(() =>
-	(payouts.value ? [...payouts.value] : []).sort((a, b) => dayjs(b.created) - dayjs(a.created)),
+const allTransactions = computed(() => {
+	if (!transactions.value) return []
+
+	return transactions.value.map((txn) => ({
+		...txn,
+		type: txn.type || (txn.method_type || txn.method ? 'withdrawal' : 'payout_available'),
+	}))
+})
+
+const sortedTransactions = computed(() =>
+	[...allTransactions.value].sort((a, b) => dayjs(b.created).diff(dayjs(a.created))),
 )
 
-const years = computed(() => {
-	const values = sortedPayouts.value.map((x) => dayjs(x.created).year())
-	return ['all', ...new Set(values)]
+const yearOptions = computed(() => {
+	const yearSet = new Set(sortedTransactions.value.map((x) => dayjs(x.created).year()))
+	const yearValues = ['all', ...Array.from(yearSet).sort((a, b) => b - a)]
+
+	return yearValues.map((year) => ({
+		value: year,
+		label: year === 'all' ? 'All years' : String(year),
+	}))
 })
 
 const selectedYear = ref('all')
 
-const methods = computed(() => {
-	const values = sortedPayouts.value.filter((x) => x.method).map((x) => x.method)
-	return ['all', ...new Set(values)]
+const methodOptions = computed(() => {
+	const types = new Set()
+
+	sortedTransactions.value.forEach((x) => {
+		if (x.type === 'payout_available' && x.payout_source) {
+			types.add(x.payout_source)
+		} else if (x.type === 'withdrawal' && (x.method_type || x.method)) {
+			types.add(x.method_type || x.method)
+		}
+	})
+
+	const typeValues = ['all', ...Array.from(types)]
+
+	return typeValues.map((type) => ({
+		value: type,
+		label: type === 'all' ? 'All types' : formatTypeLabel(type),
+	}))
 })
 
 const selectedMethod = ref('all')
 
-const filteredPayouts = computed(() =>
-	sortedPayouts.value
-		.filter((x) => selectedYear.value === 'all' || dayjs(x.created).year() === selectedYear.value)
-		.filter((x) => selectedMethod.value === 'all' || x.method === selectedMethod.value),
-)
-
-const totalAmount = computed(() =>
-	filteredPayouts.value.reduce((sum, payout) => sum + payout.amount, 0),
-)
-
-async function cancelPayout(id) {
-	startLoading()
-	try {
-		await useBaseFetch(`payout/${id}`, {
-			method: 'DELETE',
-			apiVersion: 3,
-		})
-		await refresh()
-		await useAuth(auth.value.token)
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
+function formatMethodLabel(method) {
+	switch (method) {
+		case 'paypal':
+			return 'PayPal'
+		case 'venmo':
+			return 'Venmo'
+		case 'tremendous':
+			return 'Tremendous'
+		case 'muralpay':
+			return 'Muralpay'
+		default:
+			return capitalizeString(method)
 	}
-	stopLoading()
 }
 
+function formatTypeLabel(type) {
+	// Check if it's a payout method (withdrawal)
+	const payoutMethods = ['paypal', 'venmo', 'tremendous', 'muralpay']
+	if (payoutMethods.includes(type)) {
+		return formatMethodLabel(type)
+	}
+	// Otherwise it's a payout_source (income), convert snake_case to Title Case
+	return type
+		.split('_')
+		.map((word) => capitalizeString(word))
+		.join(' ')
+}
+
+const filteredTransactions = computed(() =>
+	sortedTransactions.value
+		.filter((x) => selectedYear.value === 'all' || dayjs(x.created).year() === selectedYear.value)
+		.filter((x) => {
+			if (selectedMethod.value === 'all') return true
+			// Check if it's an income source
+			if (x.type === 'payout_available') {
+				return x.payout_source === selectedMethod.value
+			}
+			// Check if it's a withdrawal method
+			return x.type === 'withdrawal' && (x.method_type || x.method) === selectedMethod.value
+		}),
+)
+
+function getPeriodLabel(date) {
+	const txnDate = dayjs(date)
+	const now = dayjs()
+
+	if (txnDate.isSame(now, 'month')) {
+		return 'This month'
+	} else if (txnDate.isSame(now.subtract(1, 'month'), 'month')) {
+		return 'Last month'
+	} else {
+		return txnDate.format('MMMM YYYY')
+	}
+}
+
+const groupedTransactions = computed(() => {
+	const groups = {}
+
+	filteredTransactions.value.forEach((transaction) => {
+		const period = getPeriodLabel(transaction.created)
+
+		if (!groups[period]) {
+			groups[period] = []
+		}
+
+		groups[period].push(transaction)
+	})
+
+	return groups
+})
+
 const messages = defineMessages({
-	transfersTotal: {
-		id: 'revenue.transfers.total',
-		defaultMessage: 'You have withdrawn {amount} in total.',
+	transactionsHeader: {
+		id: 'dashboard.revenue.transactions.header',
+		defaultMessage: 'Transactions',
 	},
-	transfersTotalYear: {
-		id: 'revenue.transfers.total.year',
-		defaultMessage: 'You have withdrawn {amount} in {year}.',
+	noTransactions: {
+		id: 'dashboard.revenue.transactions.none',
+		defaultMessage: 'No transactions',
 	},
-	transfersTotalMethod: {
-		id: 'revenue.transfers.total.method',
-		defaultMessage: 'You have withdrawn {amount} through {method}.',
-	},
-	transfersTotalYearMethod: {
-		id: 'revenue.transfers.total.year_method',
-		defaultMessage: 'You have withdrawn {amount} in {year} through {method}.',
+	noTransactionsDesc: {
+		id: 'dashboard.revenue.transactions.none.desc',
+		defaultMessage: 'Your payouts and withdrawals will appear here.',
 	},
 })
 </script>
-<style lang="scss" scoped>
-.payout {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-
-	.platform {
-		display: flex;
-		padding: 0.75rem;
-		background-color: var(--color-raised-bg);
-		width: fit-content;
-		height: fit-content;
-		border-radius: 20rem;
-
-		svg {
-			width: 2rem;
-			height: 2rem;
-		}
-	}
-
-	.payout-status {
-		display: flex;
-		gap: 0.5ch;
-	}
-
-	.amount {
-		color: var(--color-heading);
-		font-weight: 500;
-	}
-
-	@media screen and (min-width: 800px) {
-		flex-direction: row;
-		align-items: center;
-
-		.input-group {
-			margin-left: auto;
-		}
-	}
-}
-</style>
+<style scoped></style>

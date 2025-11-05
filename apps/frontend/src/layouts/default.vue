@@ -552,11 +552,14 @@
 					<template #notifications>
 						<BellIcon aria-hidden="true" /> {{ formatMessage(commonMessages.notificationsLabel) }}
 					</template>
+					<template #reports>
+						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.activeReports) }}
+					</template>
 					<template #saved>
-						<BookmarkIcon aria-hidden="true" /> {{ formatMessage(messages.savedProjects) }}
+						<LibraryIcon aria-hidden="true" /> {{ formatMessage(commonMessages.collectionsLabel) }}
 					</template>
 					<template #servers>
-						<ServerIcon aria-hidden="true" /> {{ formatMessage(commonMessages.serversLabel) }}
+						<ServerIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
 					</template>
 					<template #plus>
 						<ArrowBigUpDashIcon aria-hidden="true" />
@@ -750,7 +753,9 @@
 				<button
 					class="tab button-animation"
 					:title="formatMessage(messages.toggleMenu)"
-					:aria-label="isMobileMenuOpen ? 'Close menu' : 'Open menu'"
+					:aria-label="
+						isMobileMenuOpen ? formatMessage(messages.closeMenu) : formatMessage(messages.openMenu)
+					"
 					@click="toggleMobileMenu()"
 				>
 					<template v-if="!auth.user">
@@ -825,7 +830,9 @@
 									</template>
 								</IntlFormatted>
 							</p>
-							<p class="m-0">© 2025 Rinth, Inc.</p>
+							<p class="m-0">
+								{{ formatMessage(footerMessages.copyright, { year: currentYear }) }}
+							</p>
 						</div>
 					</div>
 					<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
@@ -869,7 +876,6 @@ import {
 	ArrowBigUpDashIcon,
 	BellIcon,
 	BlueskyIcon,
-	BookmarkIcon,
 	BookTextIcon,
 	BoxIcon,
 	BracesIcon,
@@ -1224,6 +1230,22 @@ const messages = defineMessages({
 		id: 'layout.nav.analytics',
 		defaultMessage: 'Analytics',
 	},
+	activeReports: {
+		id: 'layout.nav.active-reports',
+		defaultMessage: 'Active reports',
+	},
+	myServers: {
+		id: 'layout.nav.my-servers',
+		defaultMessage: 'My servers',
+	},
+	openMenu: {
+		id: 'layout.mobile.open-menu',
+		defaultMessage: 'Open menu',
+	},
+	closeMenu: {
+		id: 'layout.mobile.close-menu',
+		defaultMessage: 'Close menu',
+	},
 })
 
 const footerMessages = defineMessages({
@@ -1235,6 +1257,10 @@ const footerMessages = defineMessages({
 		id: 'layout.footer.legal-disclaimer',
 		defaultMessage:
 			'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
+	},
+	copyright: {
+		id: 'layout.footer.copyright',
+		defaultMessage: '© {year} Rinth, Inc.',
 	},
 })
 
@@ -1277,6 +1303,8 @@ useSeoMeta({
 })
 
 const developerModeCounter = ref(0)
+
+const currentYear = new Date().getFullYear()
 
 const isMobileMenuOpen = ref(false)
 const isBrowseMenuOpen = ref(false)
@@ -1321,14 +1349,6 @@ const userMenuOptions = computed(() => {
 			shown: !flags.value.hidePlusPromoInUserMenu && !isPermission(auth.value.user.badges, 1 << 0),
 		},
 		{
-			id: 'notifications',
-			link: '/dashboard/notifications',
-		},
-		{
-			id: 'saved',
-			link: '/dashboard/collections',
-		},
-		{
 			id: 'servers',
 			link: '/servers/manage',
 		},
@@ -1350,12 +1370,31 @@ const userMenuOptions = computed(() => {
 			divider: true,
 		},
 		{
+			id: 'notifications',
+			link: '/dashboard/notifications',
+		},
+		{
+			id: 'reports',
+			link: '/dashboard/reports',
+		},
+		{
+			id: 'saved',
+			link: '/dashboard/collections',
+		},
+		{
+			divider: true,
+		},
+		{
 			id: 'projects',
 			link: '/dashboard/projects',
 		},
 		{
 			id: 'organizations',
 			link: '/dashboard/organizations',
+		},
+		{
+			id: 'analytics',
+			link: '/dashboard/analytics',
 		},
 		{
 			id: 'affiliate-links',
@@ -1365,10 +1404,6 @@ const userMenuOptions = computed(() => {
 		{
 			id: 'revenue',
 			link: '/dashboard/revenue',
-		},
-		{
-			id: 'analytics',
-			link: '/dashboard/analytics',
 		},
 	]
 

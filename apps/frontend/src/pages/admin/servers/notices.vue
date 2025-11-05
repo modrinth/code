@@ -11,12 +11,12 @@
 					<span class="text-lg font-semibold text-contrast"> Level </span>
 					<span>Determines how the notice should be styled.</span>
 				</label>
-				<TeleportDropdownMenu
+				<Combobox
 					id="level-selector"
 					v-model="newNoticeLevel"
 					class="max-w-[10rem]"
-					:options="levelOptions"
-					:display-name="(x) => formatMessage(x.name)"
+					:options="levelOptions.map((x) => ({ value: x, label: formatMessage(x.name) }))"
+					:display-value="newNoticeLevel ? formatMessage(newNoticeLevel.name) : 'Select level'"
 					name="Level"
 				/>
 			</div>
@@ -264,13 +264,13 @@
 import { EditIcon, PlusIcon, SaveIcon, SettingsIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	Combobox,
 	commonMessages,
 	CopyCode,
 	injectNotificationManager,
 	NewModal,
 	ServerNotice,
 	TagItem,
-	TeleportDropdownMenu,
 	Toggle,
 	useRelativeTime,
 } from '@modrinth/ui'
