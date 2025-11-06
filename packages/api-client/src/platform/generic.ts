@@ -1,7 +1,7 @@
 import { $fetch, FetchError } from 'ofetch'
 
 import { AbstractModrinthClient } from '../core/abstract-client'
-import { ModrinthApiError } from '../core/errors'
+import type { ModrinthApiError } from '../core/errors'
 import type { RequestOptions } from '../types/request'
 
 /**

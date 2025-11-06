@@ -1,7 +1,7 @@
 import { FetchError } from 'ofetch'
 
 import { AbstractModrinthClient } from '../core/abstract-client'
-import { ModrinthApiError } from '../core/errors'
+import type { ModrinthApiError } from '../core/errors'
 import type { CircuitBreakerState, CircuitBreakerStorage } from '../features/circuit-breaker'
 import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'

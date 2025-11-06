@@ -1,5 +1,5 @@
 import { AbstractModrinthClient } from '../core/abstract-client'
-import { ModrinthApiError } from '../core/errors'
+import type { ModrinthApiError } from '../core/errors'
 import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'
 
@@ -8,6 +8,14 @@ import type { RequestOptions } from '../types/request'
  * TODO: extend into interface if needed.
  */
 export type TauriClientConfig = ClientConfig
+
+/**
+ * Extended error type with HTTP response metadata
+ */
+interface HttpError extends Error {
+	statusCode?: number
+	responseData?: unknown
+}
 
 /**
  * Tauri platform client using Tauri v2 HTTP plugin
@@ -65,10 +73,11 @@ export class TauriModrinthClient extends AbstractModrinthClient {
 					responseData = undefined
 				}
 
-				const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
+				const error = new Error(`HTTP ${response.status}: ${response.statusText}`) as HttpError
 
-				;(error as any).statusCode = response.status
-				;(error as any).responseData = responseData
+				error.statusCode = response.status
+				error.responseData = responseData
+
 				throw error
 			}
 
@@ -81,8 +90,9 @@ export class TauriModrinthClient extends AbstractModrinthClient {
 
 	protected normalizeError(error: unknown): ModrinthApiError {
 		if (error instanceof Error) {
-			const statusCode = (error as any).statusCode as number | undefined
-			const responseData = (error as any).responseData
+			const httpError = error as HttpError
+			const statusCode = httpError.statusCode
+			const responseData = httpError.responseData
 
 			return this.createNormalizedError(error, statusCode, responseData)
 		}

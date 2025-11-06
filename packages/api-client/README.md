@@ -165,6 +165,16 @@ This package is **self-documenting** through TypeScript types and JSDoc comments
 
 For Modrinth API endpoints and routes, refer to the [Modrinth API Documentation](https://docs.modrinth.com).
 
+## Contributing
+
+- Modules are available in the `modules/<api>/...` folders.
+  - When a module has different versions available, you should do it like so: `modules/labrinth/projects/v2.ts` etc.
+  - Types for a module's requests should be made available in `modules/<api>/module/types.ts` or `.../types/v2.ts`.
+  - You should expose these types in the `modules/types.ts` file.
+- When creating a new module, add it to the `modules/index.ts`'s `MODULE_REGISTRY` for it to become available in the api client class.
+
+Dont forget to run `pnpm fix` before commiting.
+
 ## License
 
 Licensed under GPL-3.0 - see the [LICENSE](LICENSE) file for details.
