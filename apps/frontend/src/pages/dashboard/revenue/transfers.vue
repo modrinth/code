@@ -11,8 +11,8 @@
 					:display-value="selectedYear === 'all' ? 'All years' : String(selectedYear)"
 					listbox
 				/>
-				<ButtonStyled circular type="outlined">
-					<button :disabled="buildingCsv" @click="onDownloadCSV">
+				<ButtonStyled circular>
+					<button :disabled="buildingCsv" @click="onDownloadCSV" v-tooltip="formatMessage(messages.downloadCsv)">
 						<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
 						<DownloadIcon v-else />
 					</button>
@@ -308,6 +308,10 @@ const messages = defineMessages({
 	noTransactionsDesc: {
 		id: 'dashboard.revenue.transactions.none.desc',
 		defaultMessage: 'Your payouts and withdrawals will appear here.',
+	},
+	downloadCsv: {
+		id: 'dashboard.revenue.transactions.btn.download-csv',
+		defaultMessage: 'Download as CSV',
 	},
 })
 </script>
