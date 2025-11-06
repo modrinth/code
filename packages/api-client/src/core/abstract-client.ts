@@ -1,3 +1,4 @@
+import { LabrinthProjectsV2Module } from '../modules/labrinth'
 import type { ClientConfig } from '../types/client'
 import type { RequestContext, RequestOptions } from '../types/request'
 import type { AbstractFeature } from './abstract-feature'
@@ -14,7 +15,10 @@ export abstract class AbstractModrinthClient {
 	protected config: ClientConfig
 	protected features: AbstractFeature[]
 
-	constructor(config: ClientConfig = {}) {
+	// Modules
+	public readonly projects_v2: LabrinthProjectsV2Module
+
+	constructor(config: ClientConfig) {
 		this.config = {
 			timeout: 10000,
 			labrinthBaseUrl: 'https://api.modrinth.com',
@@ -22,6 +26,8 @@ export abstract class AbstractModrinthClient {
 			...config,
 		}
 		this.features = config.features ?? []
+
+		this.projects_v2 = new LabrinthProjectsV2Module(this)
 	}
 
 	/**
