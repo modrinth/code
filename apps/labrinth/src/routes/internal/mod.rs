@@ -40,7 +40,7 @@ pub fn utoipa_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
 ) {
     cfg.service(
-        utoipa_actix_web::scope("/v3/moderation")
+        utoipa_actix_web::scope("/_internal/moderation")
             .wrap(default_cors())
             .configure(moderation::config),
     );

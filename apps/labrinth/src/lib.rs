@@ -350,7 +350,8 @@ pub fn utoipa_app_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
     _labrinth_config: LabrinthConfig,
 ) {
-    cfg.configure(routes::v3::utoipa_config);
+    cfg.configure(routes::v3::utoipa_config)
+        .configure(routes::internal::utoipa_config);
 }
 
 // This is so that env vars not used immediately don't panic at runtime
