@@ -1,12 +1,3 @@
-/**
- * @modrinth/api-client
- *
- * A flexible, type-safe API client for Modrinth's APIs (Labrinth, Kyros, Archon).
- * Works across multiple platforms: Node.js, Browser, Nuxt, and Tauri.
- *
- * @packageDocumentation
- */
-
 export { AbstractModrinthClient } from './core/abstract-client'
 export { AbstractFeature, type FeatureConfig } from './core/abstract-feature'
 export { ModrinthApiError, ModrinthServerError } from './core/errors'
@@ -19,6 +10,8 @@ export {
 	type CircuitBreakerStorage,
 } from './features/circuit-breaker'
 export { RetryFeature, type BackoffStrategy, type RetryConfig } from './features/retry'
+export type { InferredClientModules } from './modules'
+export * from './modules/types'
 export { GenericModrinthClient } from './platform/generic'
 export { NuxtCircuitBreakerStorage, NuxtModrinthClient } from './platform/nuxt'
 export type { NuxtClientConfig } from './platform/nuxt'

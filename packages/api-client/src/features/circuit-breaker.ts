@@ -5,7 +5,7 @@ import type { RequestContext } from '../types/request'
 /**
  * Circuit breaker state
  */
-export interface CircuitBreakerState {
+export type CircuitBreakerState = {
 	/**
 	 * Number of consecutive failures
 	 */

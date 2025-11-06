@@ -5,17 +5,13 @@ import type { RequestOptions } from '../types/request'
 
 /**
  * Tauri-specific configuration
+ * TODO: extend into interface if needed.
  */
-export interface TauriClientConfig extends ClientConfig {
-	// No additional Tauri-specific config currently
-}
+export type TauriClientConfig = ClientConfig
 
 /**
  * Tauri platform client using Tauri v2 HTTP plugin
- *
- * This client is optimized for Tauri applications and uses the Tauri HTTP plugin
- * which provides native HTTP requests with proper CORS handling and system integration.
- *
+
  * @example
  * ```typescript
  * import { getVersion } from '@tauri-apps/api/app'
@@ -62,7 +58,18 @@ export class TauriModrinthClient extends AbstractModrinthClient {
 			})
 
 			if (!response.ok) {
-				throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+				let responseData: unknown
+				try {
+					responseData = await response.json()
+				} catch {
+					responseData = undefined
+				}
+
+				const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
+
+				;(error as any).statusCode = response.status
+				;(error as any).responseData = responseData
+				throw error
 			}
 
 			const data = await response.json()
@@ -74,14 +81,10 @@ export class TauriModrinthClient extends AbstractModrinthClient {
 
 	protected normalizeError(error: unknown): ModrinthApiError {
 		if (error instanceof Error) {
-			// Try to extract status code from error message
-			const statusMatch = error.message.match(/HTTP (\d+)/)
-			const statusCode = statusMatch ? parseInt(statusMatch[1]) : undefined
+			const statusCode = (error as any).statusCode as number | undefined
+			const responseData = (error as any).responseData
 
-			return new ModrinthApiError(error.message, {
-				statusCode,
-				originalError: error,
-			})
+			return this.createNormalizedError(error, statusCode, responseData)
 		}
 
 		return super.normalizeError(error)

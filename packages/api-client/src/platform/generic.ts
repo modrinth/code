@@ -43,11 +43,7 @@ export class GenericModrinthClient extends AbstractModrinthClient {
 
 	protected normalizeError(error: unknown): ModrinthApiError {
 		if (error instanceof FetchError) {
-			return new ModrinthApiError(error.message, {
-				statusCode: error.response?.status,
-				originalError: error,
-				responseData: error.data,
-			})
+			return this.createNormalizedError(error, error.response?.status, error.data)
 		}
 
 		return super.normalizeError(error)

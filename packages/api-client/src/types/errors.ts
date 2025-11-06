@@ -1,7 +1,7 @@
 /**
  * Data for API errors
  */
-export interface ApiErrorData {
+export type ApiErrorData = {
 	/**
 	 * HTTP status code (if available)
 	 */
@@ -27,7 +27,7 @@ export interface ApiErrorData {
  * Modrinth V1 error response format
  * Used by kyros + archon APIs
  */
-export interface ModrinthErrorResponse {
+export type ModrinthErrorResponse = {
 	/**
 	 * Error code/identifier
 	 */
@@ -48,10 +48,9 @@ export interface ModrinthErrorResponse {
  * Type guard to check if an object is a ModrinthErrorResponse
  */
 export function isModrinthErrorResponse(obj: unknown): obj is ModrinthErrorResponse {
-	return (
-		typeof obj === 'object' &&
-		obj !== null &&
-		typeof obj.error === 'string' &&
-		typeof obj.description === 'string'
-	)
+	if (typeof obj !== 'object' || obj === null) {
+		return false
+	}
+	const record = obj as Record<string, unknown>
+	return typeof record.error === 'string' && typeof record.description === 'string'
 }

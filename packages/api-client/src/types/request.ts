@@ -6,7 +6,7 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 /**
  * Options for making a request
  */
-export interface RequestOptions {
+export type RequestOptions = {
 	/**
 	 * API to use for this request
 	 * - 'labrinth': Main Modrinth API (resolves to labrinthBaseUrl)
@@ -78,7 +78,7 @@ export interface RequestOptions {
 /**
  * Full context passed to features during request execution
  */
-export interface RequestContext {
+export type RequestContext = {
 	/**
 	 * Full URL being requested (with base URL and versioning applied)
 	 */
@@ -113,7 +113,7 @@ export interface RequestContext {
 /**
  * Generic response wrapper
  */
-export interface ResponseData<T = unknown> {
+export type ResponseData<T = unknown> = {
 	/**
 	 * Response data
 	 */

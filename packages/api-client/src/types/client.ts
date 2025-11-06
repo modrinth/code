@@ -4,7 +4,7 @@ import type { RequestContext } from './request'
 /**
  * Request lifecycle hooks
  */
-export interface RequestHooks {
+export type RequestHooks = {
 	/**
 	 * Called before request is sent (after all features have processed)
 	 */

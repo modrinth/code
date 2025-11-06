@@ -1,22 +1,30 @@
-import { LabrinthProjectsV2Module } from '../modules/labrinth'
+import type { InferredClientModules } from '../modules'
+import { buildModuleStructure } from '../modules'
 import type { ClientConfig } from '../types/client'
 import type { RequestContext, RequestOptions } from '../types/request'
 import type { AbstractFeature } from './abstract-feature'
-import { ModrinthApiError } from './errors'
+import type { AbstractModule } from './abstract-module'
+import { ModrinthApiError, ModrinthServerError } from './errors'
 
 /**
  * Abstract base client for Modrinth APIs
- *
- * This class provides the core functionality for making API requests with features.
- * Platform-specific implementations (Nuxt, Tauri, generic) should extend this class
- * and implement the executeRequest method.
  */
 export abstract class AbstractModrinthClient {
 	protected config: ClientConfig
 	protected features: AbstractFeature[]
 
-	// Modules
-	public readonly projects_v2: LabrinthProjectsV2Module
+	/**
+	 * Maps full module ID (e.g., 'labrinth_projects_v2') to instantiated module
+	 */
+	private _moduleInstances: Map<string, AbstractModule> = new Map()
+
+	/**
+	 * Maps API name (e.g., 'labrinth') to namespace object
+	 */
+	private _moduleNamespaces: Map<string, Record<string, AbstractModule>> = new Map()
+
+	// TODO: When adding kyros/archon add readonly fields for those too.
+	public readonly labrinth!: InferredClientModules['labrinth']
 
 	constructor(config: ClientConfig) {
 		this.config = {
@@ -26,15 +34,64 @@ export abstract class AbstractModrinthClient {
 			...config,
 		}
 		this.features = config.features ?? []
+		this.initializeModules()
+	}
 
-		this.projects_v2 = new LabrinthProjectsV2Module(this)
+	/**
+	 * This creates the nested API structure (e.g., client.labrinth.projects_v2)
+	 * but doesn't instantiate modules until first access
+	 *
+	 * Module IDs in the registry are validated at runtime to ensure they match
+	 * what the module declares via getModuleID().
+	 */
+	private initializeModules(): void {
+		const structure = buildModuleStructure()
+
+		for (const [api, modules] of Object.entries(structure)) {
+			const namespaceObj: Record<string, AbstractModule> = {}
+
+			// Define lazy getters for each module
+			for (const [moduleName, ModuleConstructor] of Object.entries(modules)) {
+				const fullModuleId = `${api}_${moduleName}`
+
+				Object.defineProperty(namespaceObj, moduleName, {
+					get: () => {
+						// Lazy instantiation
+						if (!this._moduleInstances.has(fullModuleId)) {
+							const instance = new ModuleConstructor(this)
+
+							// Validate the module ID matches what we expect
+							const declaredId = instance.getModuleID()
+							if (declaredId !== fullModuleId) {
+								throw new Error(
+									`Module ID mismatch: registry expects "${fullModuleId}" but module declares "${declaredId}"`,
+								)
+							}
+
+							this._moduleInstances.set(fullModuleId, instance)
+						}
+						return this._moduleInstances.get(fullModuleId)!
+					},
+					enumerable: true,
+					configurable: false,
+				})
+			}
+
+			// Assign namespace to client (e.g., this.labrinth = namespaceObj)
+			// defineProperty bypasses readonly restriction
+			Object.defineProperty(this, api, {
+				value: namespaceObj,
+				writable: false,
+				enumerable: true,
+				configurable: false,
+			})
+
+			this._moduleNamespaces.set(api, namespaceObj)
+		}
 	}
 
 	/**
 	 * Make a request to the API
-	 *
-	 * This is the main public method that applications use to make requests.
-	 * It handles URL building, feature execution, and error normalization.
 	 *
 	 * @param path - API path (e.g., '/project/sodium')
 	 * @param options - Request options
@@ -113,11 +170,6 @@ export abstract class AbstractModrinthClient {
 
 	/**
 	 * Build the full URL for a request
-	 *
-	 * This handles:
-	 * - Base URL
-	 * - API versioning (v2, v3, internal)
-	 * - Path normalization
 	 */
 	protected buildUrl(path: string, baseUrl: string, version: number | 'internal'): string {
 		// Remove trailing slash from base URL
@@ -131,7 +183,6 @@ export abstract class AbstractModrinthClient {
 			versionPath = `/v${version}`
 		}
 
-		// Ensure path starts with /
 		const cleanPath = path.startsWith('/') ? path : `/${path}`
 
 		return `${base}${versionPath}${cleanPath}`
@@ -168,10 +219,6 @@ export abstract class AbstractModrinthClient {
 	 * Execute the actual HTTP request
 	 *
 	 * This must be implemented by platform-specific clients.
-	 * Platform implementations should use their native fetch mechanism:
-	 * - Generic: ofetch
-	 * - Nuxt: $fetch
-	 * - Tauri: @tauri-apps/plugin-http
 	 *
 	 * @param url - Full URL to request
 	 * @param options - Request options
@@ -192,6 +239,25 @@ export abstract class AbstractModrinthClient {
 		}
 
 		return ModrinthApiError.fromUnknown(error, context?.path)
+	}
+
+	/**
+	 * Helper to create a normalized error from extracted status code and response data
+	 */
+	protected createNormalizedError(
+		error: Error,
+		statusCode: number | undefined,
+		responseData: unknown,
+	): ModrinthApiError {
+		if (statusCode && responseData) {
+			return ModrinthServerError.fromResponse(statusCode, responseData)
+		}
+
+		return new ModrinthApiError(error.message, {
+			statusCode,
+			originalError: error,
+			responseData,
+		})
 	}
 
 	/**

@@ -1,4 +1,4 @@
-import { AbstractModrinthClient } from './abstract-client'
+import type { AbstractModrinthClient } from './abstract-client'
 
 export abstract class AbstractModule {
 	protected client: AbstractModrinthClient
@@ -8,7 +8,7 @@ export abstract class AbstractModule {
 	}
 
 	/**
-	 * Get the module's name, used for error reporting.
+	 * Get the module's name, used for error reporting & for module field generation.
 	 * @returns Module name
 	 */
 	public abstract getModuleID(): string
