@@ -694,18 +694,6 @@ async fn tremendous_payout(
 ) -> Result<DBPayout, ApiError> {
     let user_email = get_verified_email(user)?;
 
-    let mut payout_item = DBPayout {
-        id: payout_id,
-        user_id: user.id,
-        created: Utc::now(),
-        status: PayoutStatus::InTransit,
-        amount: amount_minus_fee,
-        fee: Some(total_fee),
-        method: Some(PayoutMethodType::Tremendous),
-        method_address: Some(user_email.to_string()),
-        platform_id: None,
-    };
-
     #[derive(Deserialize)]
     struct Reward {
         pub id: String,
@@ -774,16 +762,24 @@ async fn tremendous_payout(
         )
         .await?;
 
-    if let Some(reward) = res.order.rewards.first() {
-        payout_item.platform_id = Some(reward.id.clone())
-    }
+    let platform_id = res.order.rewards.first().map(|reward| reward.id.clone());
 
-    Ok(payout_item)
+    Ok(DBPayout {
+        id: payout_id,
+        user_id: user.id,
+        created: Utc::now(),
+        status: PayoutStatus::InTransit,
+        amount: amount_minus_fee,
+        fee: Some(total_fee),
+        method: Some(PayoutMethodType::Tremendous),
+        method_address: Some(user_email.to_string()),
+        platform_id,
+    })
 }
 
 async fn mural_pay_payout(
     PayoutContext {
-        body: _body,
+        body,
         user,
         payout_id,
         gross_amount,
@@ -798,7 +794,7 @@ async fn mural_pay_payout(
 ) -> Result<DBPayout, ApiError> {
     let user_email = get_verified_email(user)?;
 
-    let payout_request = payouts_queue
+    payouts_queue
         .create_muralpay_payout_request(
             payout_id,
             user.id.into(),
@@ -819,7 +815,7 @@ async fn mural_pay_payout(
         fee: Some(total_fee),
         method: Some(PayoutMethodType::MuralPay),
         method_address: Some(user_email.to_string()),
-        platform_id: Some(payout_request.id.to_string()),
+        platform_id: Some(body.method_id.clone()),
     })
 }
 
@@ -961,18 +957,34 @@ async fn paypal_payout(
 pub enum TransactionItem {
     /// User withdrew some of their available payout.
     Withdrawal {
+        /// ID of the payout.
         id: PayoutId,
+        /// Status of this payout.
         status: PayoutStatus,
+        /// When the payout was created.
         created: DateTime<Utc>,
+        /// How much the user got from this payout, excluding fees.
         amount: Decimal,
+        /// How much the user paid in fees for this payout, on top of `amount`.
         fee: Option<Decimal>,
+        /// What payout method type was used for this.
         method_type: Option<PayoutMethodType>,
+        /// Payout-method-specific ID for the type of reward the user got.
+        ///
+        /// - Tremendous: the reward ID
+        /// - Mural: the payment rail used, i.e. crypto USDC or fiat USD.
+        method_id: Option<String>,
+        /// Payout-method-specific address which the payout was sent to, like
+        /// an email address.
         method_address: Option<String>,
     },
     /// User got a payout available for them to withdraw.
     PayoutAvailable {
+        /// When this payout was made available for the user to withdraw.
         created: DateTime<Utc>,
+        /// Where this payout came from.
         payout_source: PayoutSource,
+        /// How much the payout was worth.
         amount: Decimal,
     },
 }
@@ -1044,6 +1056,7 @@ pub async fn transaction_history(
                 amount: payout.amount,
                 fee: payout.fee,
                 method_type: payout.method,
+                method_id: payout.platform_id,
                 method_address: payout.method_address,
             });
 

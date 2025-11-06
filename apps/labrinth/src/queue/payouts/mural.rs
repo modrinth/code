@@ -1,5 +1,4 @@
 use ariadne::ids::UserId;
-use base64::Engine;
 use chrono::Utc;
 use eyre::{Result, eyre};
 use muralpay::{MuralError, TokenFeeRequest};
