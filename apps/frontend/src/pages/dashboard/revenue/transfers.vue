@@ -12,7 +12,11 @@
 					listbox
 				/>
 				<ButtonStyled circular>
-					<button :disabled="buildingCsv" @click="onDownloadCSV" v-tooltip="formatMessage(messages.downloadCsv)">
+					<button
+						v-tooltip="formatMessage(messages.downloadCsv)"
+						:disabled="buildingCsv"
+						@click="onDownloadCSV"
+					>
 						<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
 						<DownloadIcon v-else />
 					</button>
