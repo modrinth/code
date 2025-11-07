@@ -4,6 +4,7 @@ import * as Pages from '@/pages'
 import * as Instance from '@/pages/instance'
 import * as Library from '@/pages/library'
 import * as Project from '@/pages/project'
+import { sharedRoutes } from '@modrinth/ui/pages'
 
 /**
  * Configures application routing. Add page to pages/index and then add to route table here.
@@ -170,6 +171,8 @@ export default new createRouter({
 				},
 			],
 		},
+		// Shared routes from @modrinth/ui
+		...sharedRoutes,
 	],
 	linkActiveClass: 'router-link-active',
 	linkExactActiveClass: 'router-link-exact-active',
