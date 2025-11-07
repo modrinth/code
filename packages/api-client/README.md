@@ -172,7 +172,7 @@ For Modrinth API endpoints and routes, refer to the [Modrinth API Documentation]
   - You should expose these types in the `modules/types.ts` file.
 - When creating a new module, add it to the `modules/index.ts`'s `MODULE_REGISTRY` for it to become available in the api client class.
 
-Dont forget to run `pnpm fix` before commiting.
+Dont forget to run `pnpm fix` before committing.
 
 ## License
 
