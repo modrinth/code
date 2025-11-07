@@ -1,5 +1,5 @@
 use ariadne::ids::UserId;
-use eyre::Result;
+use eyre::{Result, eyre};
 use muralpay::{MuralError, TokenFeeRequest};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -126,9 +126,9 @@ impl PayoutsQueue {
                 .client
                 .cancel_payout_request(payout_request.id)
                 .await
-                .wrap_internal_err(
-                    "failed to cancel unexecuted payout request",
-                )?;
+                .wrap_internal_err_with(|| {
+                    eyre!("failed to cancel unexecuted payout request\noriginal error: {err:#?}")
+                })?;
             return Err(ApiError::Internal(err));
         }
 
