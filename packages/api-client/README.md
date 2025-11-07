@@ -1,8 +1,7 @@
-# ![Modrinth Monorepo Cover](/.github/assets/monorepo_cover.png)
+![Modrinth Monorepo Cover](/.github/assets/monorepo_cover.png)
 
 # @modrinth/api-client
 
-[![npm version](https://img.shields.io/npm/v/@modrinth/api-client?color=c78aff&style=for-the-badge)](https://www.npmjs.com/package/@modrinth/api-client)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-c78aff?style=for-the-badge)](https://www.typescriptlang.org/)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-c78aff?style=for-the-badge)](LICENSE)
 
@@ -53,7 +52,7 @@ export const useModrinthClient = () => {
 	const auth = await useAuth()
 
 	return new NuxtModrinthClient({
-		userAgent: 'my-nuxt-app/1.0.0',
+		userAgent: 'my-nuxt-app/1.0.0', // leave blank to use default user agent from fetch function
 		rateLimitKey: import.meta.server ? config.rateLimitKey : undefined,
 		features: [
 			new AuthFeature({
@@ -89,16 +88,16 @@ const project = await client.request('/project/sodium', { api: 'labrinth', versi
 
 By default, the client uses the production base URLs:
 
-- `labrinthBaseUrl`: `https://api.modrinth.com` (Labrinth API)
-- `archonBaseUrl`: `https://archon.modrinth.com` (Archon/Servers API)
+- `labrinthBaseUrl`: `https://api.modrinth.com/` (Labrinth API)
+- `archonBaseUrl`: `https://archon.modrinth.com/` (Archon/Servers API)
 
 You can override these for staging environments or custom instances:
 
 ```typescript
 const client = new GenericModrinthClient({
 	userAgent: 'my-app/1.0.0',
-	labrinthBaseUrl: 'https://staging-api.modrinth.com',
-	archonBaseUrl: 'https://staging-archon.modrinth.com',
+	labrinthBaseUrl: 'https://staging-api.modrinth.com/',
+	archonBaseUrl: 'https://staging-archon.modrinth.com/',
 	features: [new AuthFeature({ token: 'mrp_...' })],
 })
 
@@ -112,7 +111,7 @@ You can also use custom URLs directly in requests:
 ```typescript
 // One-off custom URL (useful for Kyros nodes or dynamic endpoints)
 await client.request('/some-endpoint', {
-	api: 'https://eu-lim16.nodes.modrinth.com',
+	api: 'https://eu-lim16.nodes.modrinth.com/',
 	version: 0,
 })
 ```
