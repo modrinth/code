@@ -11,6 +11,9 @@
   "nags.add-icon.title": {
     "defaultMessage": "Maglagay ng lambana"
   },
+  "nags.add-links.title": {
+    "defaultMessage": "Magdagdag ng mga panlabas na kawingan"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "Baguhin ang paglalarawan"
   },
@@ -26,8 +29,14 @@
   "nags.edit-title.title": {
     "defaultMessage": "Baguhin ang pamagat"
   },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Magtampok ng tanghalang laragway"
+  },
   "nags.select-environments.title": {
     "defaultMessage": "Pumili ng mga kapaligiran"
+  },
+  "nags.select-tags.title": {
+    "defaultMessage": "Pumili ng mga pananda"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Bisitahin ang mga kagustuhan sa paglalarawan"

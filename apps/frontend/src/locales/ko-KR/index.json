@@ -29,6 +29,9 @@
   "app-marketing.download.options-title": {
     "message": "다운로드 옵션"
   },
+  "app-marketing.download.terms": {
+    "message": "Modrinth App을 다운로드하면 <terms-link> 이용 약관</terms-link>과 <privacy-link>개인정보 처리방침</privacy-link>에 동의하는 것으로 간주합니다."
+  },
   "app-marketing.download.third-party-packages": {
     "message": "제3자 패키지"
   },
@@ -37,6 +40,9 @@
   },
   "app-marketing.download.windows": {
     "message": "Windows"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "이전에 사용하던 런처의 즐겨찾기 프로필을 불러와, Modrinth App에서 바로 시작해보세요!"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
@@ -89,6 +95,9 @@
   "app-marketing.features.performance.small": {
     "message": "적음"
   },
+  "app-marketing.features.play.description": {
+    "message": "Modrinth App을 통해 여러분이 좋아하는 모드와 모드팩을 다운로드하고 바로 플레이하세요."
+  },
   "app-marketing.features.sharing.modpack": {
     "message": "모드팩"
   },
@@ -97,6 +106,12 @@
   },
   "app-marketing.features.sharing.title": {
     "message": "모드팩 공유"
+  },
+  "app-marketing.features.website.title": {
+    "message": ""
+  },
+  "app-marketing.features.youve-used-before": {
+    "message": "이전에 사용"
   },
   "auth.authorize.action.authorize": {
     "message": "승인"
@@ -317,6 +332,18 @@
   "collection.title": {
     "message": "{name} - 컬렉션"
   },
+  "create.collection.error-title": {
+    "message": "오류 발생"
+  },
+  "create.collection.summary-description": {
+    "message": "당신의 collection을 문장으로 설명해주세요."
+  },
+  "create.limit-alert.limit-reached": {
+    "message": ""
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "{type} 한도 {max}에 도달했습니다. 한도를 늘리려면 고객 지원팀에 문의하세요."
+  },
   "create.limit-alert.type-collection": {
     "message": "컬렉션"
   },
@@ -341,8 +368,14 @@
   "create.organization.create-organization": {
     "message": "조직 만들기"
   },
+  "create.organization.error-title": {
+    "message": "오류 발생"
+  },
   "create.organization.name-label": {
     "message": "이름"
+  },
+  "create.organization.ownership-info": {
+    "message": "당신은 이 Organization의 관리자이며, 필요시 다른 멤버를 초대하거나 권한을 이전할 수 있습니다."
   },
   "create.organization.summary-label": {
     "message": "개요"
@@ -362,8 +395,17 @@
   "create.project.summary-label": {
     "message": "개요"
   },
+  "create.project.summary-placeholder": {
+    "message": "이 프로젝트는 ...을 추가합니다"
+  },
+  "create.project.title": {
+    "message": "프로젝트 생성"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": ""
   },
   "dashboard.collections.button.create-new": {
     "message": "새로 만들기"
@@ -505,6 +547,9 @@
   },
   "landing.search.placeholder": {
     "message": "검색..."
+  },
+  "landing.section.for-creators.description": {
+    "message": ""
   },
   "layout.action.change-theme": {
     "message": "테마 변경"
@@ -683,9 +728,6 @@
   "profile.error.not-found": {
     "message": "사용자를 찾을 수 없습니다"
   },
-  "profile.joined-at": {
-    "message": "<date>{ago}</date> 전에 가입함"
-  },
   "profile.label.badges": {
     "message": "배지"
   },
@@ -712,12 +754,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Modrinth에서 {username}의 프로젝트 다운로드"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, other {<stat>{count}</stat> 프로젝트 다운로드}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, other {<stat>{count}</stat> 프로젝트}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, other {<stat>{count}</stat> 프로젝트 팔로워}}"
@@ -1208,9 +1244,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "백업 생성에 실패했습니다"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "다운로드 준비를 실패했습니다"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "백업을 복구하는데 실패했습니다"
   },
@@ -1219,15 +1252,6 @@
   },
   "servers.backups.item.locked": {
     "message": "잠김"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "다운로드 준비중"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "다시 시도하기"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "다운로드를 준비하는 중..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "백업 대기열에 추가됨"

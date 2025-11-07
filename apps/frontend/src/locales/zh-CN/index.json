@@ -428,6 +428,9 @@
   "create.collection.cancel": {
     "message": "取消"
   },
+  "create.collection.collection-info": {
+    "message": ""
+  },
   "create.collection.create-collection": {
     "message": "新建收藏夹"
   },
@@ -440,11 +443,32 @@
   "create.collection.name-placeholder": {
     "message": "输入收藏夹名称……"
   },
+  "create.collection.summary-description": {
+    "message": "一两句话描述你的收藏夹。"
+  },
   "create.collection.summary-label": {
     "message": "收藏夹概述"
   },
+  "create.collection.summary-placeholder": {
+    "message": "一个收藏夹……"
+  },
   "create.collection.title": {
     "message": "新建收藏夹"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "接近 {type} 限制 ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "你即将达到{type}限制，如需超过{max} {typePlural}，请联系客服。"
+  },
+  "create.limit-alert.contact-support": {
+    "message": "联系客服"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "已达到 {type} 限制"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "你已达到你的 {type} 限制 {max}。请联系客服增加你的限额。"
   },
   "create.limit-alert.type-collection": {
     "message": "收藏夹"
@@ -479,8 +503,20 @@
   "create.organization.name-placeholder": {
     "message": "输入组织名称……"
   },
+  "create.organization.ownership-info": {
+    "message": "你将成为这个组织的所有者，但你可以随时邀请其他成员并转让所有权。"
+  },
+  "create.organization.summary-description": {
+    "message": "一两句话描述你的组织。"
+  },
   "create.organization.summary-label": {
     "message": "组织概述"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "一个组织……"
+  },
+  "create.organization.title": {
+    "message": "创建组织"
   },
   "create.organization.url-label": {
     "message": "URL"
@@ -500,14 +536,23 @@
   "create.project.name-placeholder": {
     "message": "输入项目名称"
   },
+  "create.project.summary-description": {
+    "message": "一两句话描述你的项目。"
+  },
   "create.project.summary-label": {
     "message": "项目概述"
+  },
+  "create.project.summary-placeholder": {
+    "message": "这个项目增加了……"
   },
   "create.project.title": {
     "message": "创建项目"
   },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "你的项目在获得批准后的可见性。"
   },
   "create.project.visibility-label": {
     "message": "可见性"
@@ -532,6 +577,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "你的收藏夹"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "下载{formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "您的{formType}税务表格已成功提交！"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "你现在可以随时自由提现。如有疑问或需要更新账户信息，请<support-link>联系客服</support-link>。"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "搞定啦！🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "外国实体指的是在美国以外组织的企业实体（例如非美国公司、合伙企业或有限责任公司）。"
@@ -577,6 +634,12 @@
   },
   "error.generic.404.title": {
     "message": "页面不存在"
+  },
+  "error.generic.451.subtitle": {
+    "message": "由于法律原因，例如政府审查或正在进行的法律诉讼，本页面已被屏蔽。"
+  },
+  "error.generic.451.title": {
+    "message": "因法律原因无法提供内容"
   },
   "error.generic.default.list_item.1": {
     "message": "在我们的<status-link>状态页面</status-link>上查看 Modrinth 服务是否中断。"
@@ -866,6 +929,15 @@
   "layout.banner.tax.title": {
     "message": "需要填写税务表格"
   },
+  "layout.banner.tin-mismatch.action": {
+    "message": "联系客服"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "由于你的纳税人识别号或社会安全号码与美国国税局记录不符，你的提款被暂时锁定。请联系客服重置并重新提交你的税表。"
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "税务表格上报失败"
+  },
   "layout.banner.verify-email.action": {
     "message": "重新发送验证邮件"
   },
@@ -1040,8 +1112,17 @@
   "moderation.technical.search.placeholder": {
     "message": "搜索技术评价……"
   },
+  "profile.bio.fallback.creator": {
+    "message": "一位 Modrinth 创作者。"
+  },
+  "profile.bio.fallback.user": {
+    "message": "一位 Modrinth 用户。"
+  },
   "profile.button.billing": {
     "message": "管理用户财务"
+  },
+  "profile.button.edit-role": {
+    "message": "编辑角色"
   },
   "profile.button.info": {
     "message": "查看用户详情"
@@ -1049,17 +1130,47 @@
   "profile.button.manage-projects": {
     "message": "管理项目"
   },
+  "profile.details.label.auth-providers": {
+    "message": "身份验证提供者"
+  },
+  "profile.details.label.email": {
+    "message": "电子邮箱"
+  },
+  "profile.details.label.has-password": {
+    "message": "已设置密码"
+  },
+  "profile.details.label.has-totp": {
+    "message": "已设置动态令牌"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "支付方式"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "电子邮箱未验证"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "电子邮箱验证成功"
+  },
   "profile.error.not-found": {
     "message": "未找到用户"
-  },
-  "profile.joined-at": {
-    "message": "<date>{ago}</date>加入"
   },
   "profile.label.badges": {
     "message": "徽章"
   },
+  "profile.label.collection": {
+    "message": "收藏夹"
+  },
   "profile.label.details": {
     "message": "详情"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, other {次下载}}"
+  },
+  "profile.label.joined": {
+    "message": "加入"
+  },
+  "profile.label.no": {
+    "message": "否"
   },
   "profile.label.no-collections": {
     "message": "该用户没有收藏夹！"
@@ -1076,17 +1187,20 @@
   "profile.label.organizations": {
     "message": "组织"
   },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, other {个项目}}"
+  },
+  "profile.label.saving": {
+    "message": "正在保存……"
+  },
+  "profile.label.yes": {
+    "message": "是"
+  },
   "profile.meta.description": {
     "message": "前往 Modrinth 下载 {username} 的项目"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - 前往 Modrinth 下载 {username} 的项目"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, other {<stat>{count}</stat>次项目下载}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, other {<stat>{count}</stat>个项目}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, other {<stat>{count}</stat>项目关注者}}"
@@ -1814,9 +1928,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "正在恢复备份"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "已在准备下载备份了"
-  },
   "servers.backups.item.automated": {
     "message": "自动"
   },
@@ -1826,9 +1937,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "创建备份时失败"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "准备下载时失败"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "恢复备份时失败"
   },
@@ -1837,15 +1945,6 @@
   },
   "servers.backups.item.locked": {
     "message": "已锁定"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "准备下载"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "请尝试再准备一次"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "正在准备下载……"
   },
   "servers.backups.item.queued-for-backup": {
     "message": "排队等待备份"

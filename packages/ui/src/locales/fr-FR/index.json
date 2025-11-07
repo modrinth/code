@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Créer un lien affilié"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Création d'un nouveau code d'affiliation"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Donnez un nom au lien d'affiliation pour s'avoir d'où les gens viennent !"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Titre du lien affilié"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "par exemple, YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Pseudo de l'utilisateur à qui est destiné le code d'affiliation"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Pseudo"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Entrez un pseudo..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Créé par {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Création d'un lien affilié..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Révoquer un lien affilié"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Voir les statistiques"
+  },
   "badge.beta": {
     "defaultMessage": "Bêta"
   },
@@ -8,6 +44,9 @@
   "badge.new": {
     "defaultMessage": "Nouveau"
   },
+  "button.affiliate-links": {
+    "defaultMessage": "Liens affiliés"
+  },
   "button.analytics": {
     "defaultMessage": "Analyses"
   },
@@ -16,6 +55,12 @@
   },
   "button.cancel": {
     "defaultMessage": "Annuler"
+  },
+  "button.clear": {
+    "defaultMessage": "Effacer"
+  },
+  "button.close": {
+    "defaultMessage": "Fermer"
   },
   "button.continue": {
     "defaultMessage": "Continuer"

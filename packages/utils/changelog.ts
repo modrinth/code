@@ -11,6 +11,29 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-11-07T09:30:00-07:00`,
+		product: 'app',
+		version: '0.10.17',
+		body: `## Improvements
+- Sorting and grouping options in the Library page are now persistent.
+- Instance content filters are now remembered until you close the app.
+- Improved performance when 'Advanced rendering' is disabled, especially on Linux.
+- Fixed account list not being scrollable.
+- Fixed glitchy text selection in Logs page.`,
+	},
+	{
+		date: `2025-11-07T09:30:00-07:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed 'Advanced rendering' toggle not working properly on many popups.`,
+	},
+	{
+		date: `2025-11-07T08:05:00-07:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed some further issues with the new withdrawal experience.`,
+	},
+	{
 		date: `2025-11-04T18:20:00-07:00`,
 		product: 'web',
 		body: `## Improvements

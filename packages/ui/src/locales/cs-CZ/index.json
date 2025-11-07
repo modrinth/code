@@ -6,7 +6,7 @@
     "defaultMessage": "Beta verze"
   },
   "badge.new": {
-    "defaultMessage": "Nový"
+    "defaultMessage": "Nové"
   },
   "button.analytics": {
     "defaultMessage": "Analytika"
@@ -585,7 +585,7 @@
     "defaultMessage": "Žádná práva"
   },
   "project.settings.tags.title": {
-    "defaultMessage": "Štítky"
+    "defaultMessage": "Značky"
   },
   "project.settings.upload.title": {
     "defaultMessage": "Nahrát"

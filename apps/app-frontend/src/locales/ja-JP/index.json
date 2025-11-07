@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "開発者モードがオンになっています。"
   },
+  "app.settings.downloading": {
+    "message": "v{version}をダウンロード中"
+  },
   "app.settings.tabs.appearance": {
     "message": "表示設定"
   },
@@ -19,6 +22,108 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "リソース管理"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version}は今すぐインストールできます！再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version}のダウンロードが完了しました。再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version}は今すぐダウンロードできます！従量課金制ネットワークを使用しているため自動でダウンロードはされていません。"
+  },
+  "app.update-toast.changelog": {
+    "message": "更新履歴"
+  },
+  "app.update-toast.download": {
+    "message": "ダウンロード ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "ダウンロード中..."
+  },
+  "app.update-toast.reload": {
+    "message": "再起動"
+  },
+  "app.update-toast.title": {
+    "message": "アップデートが可能"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "ダウンロード完了"
+  },
+  "app.update.complete-toast.text": {
+    "message": "クリックすると更新履歴を表示できます。"
+  },
+  "app.update.complete-toast.title": {
+    "message": "バージョン {version} のインストールが正常に完了しました！"
+  },
+  "app.update.download-update": {
+    "message": "アップデートをダウンロード"
+  },
+  "app.update.downloading-update": {
+    "message": "アップデートをダウンロード中 ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "再起動して今すぐ更新"
+  },
+  "friends.action.add-friend": {
+    "message": "フレンドを追加"
+  },
+  "friends.add-friend.submit": {
+    "message": "フレンド申請を送信"
+  },
+  "friends.add-friend.title": {
+    "message": "フレンドを追加中"
+  },
+  "friends.add-friend.username.description": {
+    "message": "これはMinecraftユーザーネームと違う可能性があります！"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Modrinthユーザーネームを入力..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "あなたのフレンドのModrinthユーザーネームは何ですか？"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>友達を追加</link>して、彼らが何をしているか見てみよう！"
+  },
+  "friends.friend.cancel-request": {
+    "message": "申請をキャンセル"
+  },
+  "friends.friend.remove-friend": {
+    "message": "フレンドを削除"
+  },
+  "friends.friend.request-sent": {
+    "message": "フレンド申請が送信されました"
+  },
+  "friends.friend.view-profile": {
+    "message": "プロフィールを表示"
+  },
+  "friends.heading": {
+    "message": "フレンド"
+  },
+  "friends.heading.active": {
+    "message": "活動中"
+  },
+  "friends.heading.offline": {
+    "message": "オフライン"
+  },
+  "friends.heading.online": {
+    "message": "オンライン"
+  },
+  "friends.heading.pending": {
+    "message": "保留中"
+  },
+  "friends.no-friends-match": {
+    "message": "フレンド\"{query}\"は見つかりませんでした"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "フレンドを検索…"
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Modrinthアカウントにサインイン</link>して友達を追加し、彼らがプレイしているゲームをチェックしよう！"
   },
   "instance.add-server.add-and-play": {
     "message": "追加してプレイ"

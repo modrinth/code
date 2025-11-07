@@ -686,7 +686,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 <template>
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
-	<div v-if="stateInitialized" class="app-grid-layout experimental-styles-within relative">
+	<div
+		v-if="stateInitialized"
+		class="app-grid-layout experimental-styles-within relative"
+		:class="{ 'disable-advanced-rendering': !themeStore.advancedRendering }"
+	>
 		<Suspense>
 			<Transition name="toast">
 				<UpdateToast
@@ -914,7 +918,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<div
 		v-if="stateInitialized"
 		class="app-contents experimental-styles-within"
-		:class="{ 'sidebar-enabled': sidebarVisible }"
+		:class="{
+			'sidebar-enabled': sidebarVisible,
+			'disable-advanced-rendering': !themeStore.advancedRendering,
+		}"
 	>
 		<div class="app-viewport flex-grow router-view">
 			<transition name="popup-survey">
@@ -1194,9 +1201,19 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	display: none;
 }
 
+.disable-advanced-rendering {
+	.app-sidebar::before {
+		box-shadow: none;
+	}
+
+	&.app-contents::before {
+		box-shadow: none;
+	}
+}
+
 .app-sidebar::before {
 	content: '';
-	box-shadow: -15px 0 15px -15px rgba(0, 0, 0, 0.2) inset;
+	box-shadow: -15px 0 15px -15px rgba(0, 0, 0, 0.1) inset;
 	top: 0;
 	bottom: 0;
 	left: -2rem;
@@ -1221,9 +1238,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	right: calc(-1 * var(--left-bar-width));
 	bottom: calc(-1 * var(--left-bar-width));
 	border-radius: var(--radius-xl);
-	box-shadow:
-		1px 1px 15px rgba(0, 0, 0, 0.2) inset,
-		inset 1px 1px 1px rgba(255, 255, 255, 0.23);
+	box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.1) inset;
+	border-color: var(--surface-5);
+	border-width: 1px;
+	border-style: solid;
 	pointer-events: none;
 }
 

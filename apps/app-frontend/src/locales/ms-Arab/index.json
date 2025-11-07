@@ -65,6 +65,69 @@
   "app.update.reload-to-update": {
     "message": "موات سمولا اونتوق مماسڠ کمس کيني"
   },
+  "friends.action.add-friend": {
+    "message": "تمبه راکن"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, other {ڤرمينتاٴن}} راکن"
+  },
+  "friends.add-friend.submit": {
+    "message": "هانتر ڤرمينتاٴن راکن"
+  },
+  "friends.add-friend.title": {
+    "message": "منمبه راکن"
+  },
+  "friends.add-friend.username.description": {
+    "message": "اي موڠکين بربيذا درڤد نام ڤڠݢونا ماٴينکرف‌ت مريک!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "ماسوقکن نام ڤڠݢونا Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "اڤاکه نام ڤڠݢونا Modrinth راکن اندا؟"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>تمبه راکن</link> اونتوق مليهت اڤ يڠ مريک ماءينکن!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "بطلکن ڤرمينتاٴن"
+  },
+  "friends.friend.remove-friend": {
+    "message": "اليه کلوار راکن"
+  },
+  "friends.friend.request-sent": {
+    "message": "ڤرمينتاٴن راکن تله دهانتر"
+  },
+  "friends.friend.view-profile": {
+    "message": "ليهت ڤروفيل"
+  },
+  "friends.heading": {
+    "message": "راکن"
+  },
+  "friends.heading.active": {
+    "message": "اکتيف"
+  },
+  "friends.heading.offline": {
+    "message": "لوار تالين"
+  },
+  "friends.heading.online": {
+    "message": "دالم تالين"
+  },
+  "friends.heading.pending": {
+    "message": "منوڠݢو"
+  },
+  "friends.no-friends-match": {
+    "message": "تياد راکن يڠ سڤادن دڠن ''{query}''"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "چاري راکن..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>لوݢ ماسوق کأکاٴون Modrinth</link> اونتوق منمبه راکن دان مليهت اڤ يڠ مريک ماءينکن!"
+  },
   "instance.add-server.add-and-play": {
     "message": "تمبه دان ماءين"
   },

@@ -2,8 +2,17 @@
   "app.settings.developer-mode-enabled": {
     "message": "กำลังอยู่ในโหมดผู้พัฒนา"
   },
+  "app.settings.downloading": {
+    "message": "ดาวน์โหลด เวอร์ชั่น{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "รูปลักษณ์"
+  },
+  "app.settings.tabs.default-instance-options": {
+    "message": "ตัวเลือกอินสแตนซ์เริ่มต้น"
+  },
+  "app.settings.tabs.feature-flags": {
+    "message": "ระบบควบคุมการเปิดใช้งานฟีเจอร์"
   },
   "app.settings.tabs.java-installations": {
     "message": "การจัดการ Java ที่ติดตั้ง"
@@ -13,6 +22,48 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "การจัดการทรัพยากร"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} พร้อมติดตั้งแล้ว! รีโหลดเพื่ออัปเดตทันที หรือจะอัปเดตอัตโนมัติเมื่อคุณปิดแอป"
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} ดาวน์โหลดเสร็จแล้ว! รีโหลดเพื่ออัปเดตทันที หรือจะอัปเดตอัตโนมัติเมื่อคุณปิดแอป"
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} พร้อมให้ดาวน์โหลดแล้ว! เนื่องจากคุณกำลังใช้งานเครือข่ายที่มีการคิดค่าใช้จ่ายตามปริมาณข้อมูล ระบบจึงไม่ได้ดาวน์โหลดอัตโนมัติ"
+  },
+  "app.update-toast.changelog": {
+    "message": "บันทึกการเปลี่ยนแปลง"
+  },
+  "app.update-toast.download": {
+    "message": "ดาวน์โหลด ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "กำลังดาวน์โหลด...."
+  },
+  "app.update-toast.reload": {
+    "message": "รีโหลด"
+  },
+  "app.update-toast.title": {
+    "message": "อัพเดตพร้อมแล้ว"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "ดาวน์โหลดเรียบร้อยแล้ว"
+  },
+  "app.update.complete-toast.text": {
+    "message": "คลิกที่นี่เพื่อดูบันทึกการเปลี่ยนแปลง"
+  },
+  "app.update.complete-toast.title": {
+    "message": "เวอร์ชั่น {version} ถูกติดตั้งแล้ว"
+  },
+  "app.update.download-update": {
+    "message": "ดาวน์โหลดอัพเดต"
+  },
+  "app.update.downloading-update": {
+    "message": "ดาวน์โหลดอัพเดตไปแล้ว ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "รีโหลดเพื่อติดตั้งอัพเดต"
   },
   "instance.add-server.add-and-play": {
     "message": "เพิ่มและเล่นทันที"
@@ -50,6 +101,9 @@
   "instance.edit-world.title": {
     "message": "แก้ไขโลก"
   },
+  "instance.filter.disabled": {
+    "message": "ปิดโปรเจ็ค"
+  },
   "instance.filter.updates-available": {
     "message": "พบอัพเดท"
   },
@@ -68,6 +122,15 @@
   "instance.settings.tabs.general": {
     "message": "ทั่วไป"
   },
+  "instance.settings.tabs.general.delete": {
+    "message": "ลบอินสแตนซ์"
+  },
+  "instance.settings.tabs.general.delete.button": {
+    "message": "ลบอินสแตนซ์"
+  },
+  "instance.settings.tabs.general.delete.description": {
+    "message": "ลบอินสแตนซ์ออกจากอุปกรณ์ของคุณอย่างถาวร รวมถึงโลก การตั้งค่า และเนื้อหาทั้งหมดที่ติดตั้งไว้ โปรดระมัดระวัง เนื่องจากเมื่อถูกลบแล้วจะไม่สามารถกู้คืนได้อีก"
+  },
   "instance.settings.tabs.general.deleting.button": {
     "message": "กำลังลบ..."
   },
@@ -76,6 +139,12 @@
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
     "message": "ไม่สามารถทำซ้ำได้ขณะติดตั้ง"
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "สร้างสำเนาอินสแตนซ์"
+  },
+  "instance.settings.tabs.general.duplicate-instance.description": {
+    "message": "สร้างสำเนาของอินสแตนซ์นี้ รวมถึงโลก การตั้งค่า ม็อด และอื่นๆ"
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "แก้ไขไอคอน"
@@ -94,6 +163,9 @@
   },
   "instance.settings.tabs.general.library-groups.create": {
     "message": "สร้างกลุ่มใหม่"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "กลุ่มไลบรารีช่วยให้คุณจัดระเบียบอินสแตนซ์ของคุณเป็นหมวดหมู่ต่างๆ ภายในไลบรารี"
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "ใส่ชื่อกลุ่ม"

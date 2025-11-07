@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Mode pengembang dihidupkan."
   },
+  "app.settings.downloading": {
+    "message": "Mengunduh v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Tampilan"
   },
@@ -19,6 +22,111 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Manajemen sumber"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} siap dipasang! Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} sudah tersedia! Karena Anda saat ini sedang berada dalam jaringan terukur, kami tidak mengunduhnya secara otomatis."
+  },
+  "app.update-toast.changelog": {
+    "message": "Log perubahan"
+  },
+  "app.update-toast.download": {
+    "message": "Unduh ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Mengunduh..."
+  },
+  "app.update-toast.reload": {
+    "message": "Muat ulang"
+  },
+  "app.update-toast.title": {
+    "message": "Pembaruan tersedia"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Selesai mengunduh"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Klik di sini untuk melihat log perubahan."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versi {version} berhasil dipasang!"
+  },
+  "app.update.download-update": {
+    "message": "Unduh pembaruan"
+  },
+  "app.update.downloading-update": {
+    "message": "Mengunduh pembaruan ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Muat ulang untuk memasang pembaruan"
+  },
+  "friends.action.add-friend": {
+    "message": "Tambah teman"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, other {permintaan}} teman"
+  },
+  "friends.add-friend.submit": {
+    "message": "Kirim permintaan teman"
+  },
+  "friends.add-friend.title": {
+    "message": "Menambah teman"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Ia mungkin memiliki nama yang berbeda dari nama pengguna Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Masukkan nama pengguna Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Apakah nama pengguna Modrinth teman Anda?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Tambah teman</link> untuk melihat apa yang mereka mainkan!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Batalkan permintaan"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Hapus teman"
+  },
+  "friends.friend.request-sent": {
+    "message": "Permintaan teman dikirim"
+  },
+  "friends.friend.view-profile": {
+    "message": "Lihat profil"
+  },
+  "friends.heading": {
+    "message": "Teman"
+  },
+  "friends.heading.active": {
+    "message": "Aktif"
+  },
+  "friends.heading.offline": {
+    "message": "Luring"
+  },
+  "friends.heading.online": {
+    "message": "Daring"
+  },
+  "friends.heading.pending": {
+    "message": "Menunggu"
+  },
+  "friends.no-friends-match": {
+    "message": "Tidak ada teman dengan nama \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Cari teman..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Masuk ke akun Modrinth</link> untuk menambah teman dan melihat apa yang mereka mainkan!"
   },
   "instance.add-server.add-and-play": {
     "message": "Tambah dan mainkan"
