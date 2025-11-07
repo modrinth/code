@@ -9,8 +9,9 @@ import {
 	UnsavedChangesPopup,
 	useSavable,
 } from '@modrinth/ui'
-import { injectModrinthClient } from '~/providers/api-client.ts'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+
+import { injectModrinthClient } from '~/providers/api-client.ts'
 
 const { formatMessage } = useVIntl()
 

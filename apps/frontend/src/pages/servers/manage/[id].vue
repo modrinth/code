@@ -1044,7 +1044,7 @@ const nodeUnavailableDetails = computed(() => [
 	{
 		label: 'Node',
 		value:
-			server.moduleErrors?.general?.error.responseData?.hostname ??
+			(server.moduleErrors?.general?.error.responseData as any)?.hostname ??
 			server.general?.datacenter ??
 			'Unknown',
 		type: 'inline' as const,

@@ -10,8 +10,8 @@ import { NotificationPanel, provideNotificationManager } from '@modrinth/ui'
 
 import ModrinthLoadingIndicator from '~/components/ui/modrinth-loading-indicator.ts'
 
-import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
 import { createModrinthClient, provideModrinthClient } from './providers/api-client.ts'
+import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
 
 const auth = await useAuth()
 const config = useRuntimeConfig()
