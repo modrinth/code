@@ -81,7 +81,7 @@ impl NotificationBuilder {
                 'amount', to_jsonb(sum)
               ) body
             FROM period_payouts
-            WHERE sum > 0
+            WHERE sum >= 100
             ",
             &notification_ids[..],
             &users_raw_ids[..],

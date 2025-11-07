@@ -631,7 +631,7 @@ async fn collect_template_variables(
 
             map.insert(
                 PAYOUTAVAILABLE_AMOUNT,
-                format!("USD${:.2}", *amount as f64 / 100.0),
+                format!("${:.2} USD", *amount as f64 / 100.0),
             );
 
             Ok(EmailTemplate::Static(map))

@@ -7,6 +7,7 @@ pub mod gdpr;
 pub mod gotenberg;
 pub mod medal;
 pub mod moderation;
+pub mod mural;
 pub mod pats;
 pub mod session;
 pub mod statuses;
@@ -31,6 +32,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(statuses::config)
             .configure(medal::config)
             .configure(external_notifications::config)
-            .configure(affiliate::config),
+            .configure(affiliate::config)
+            .configure(mural::config),
     );
 }

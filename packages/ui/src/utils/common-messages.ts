@@ -1,6 +1,10 @@
 import { defineMessages } from '@vintl/vintl'
 
 export const commonMessages = defineMessages({
+	affiliateLinksButton: {
+		id: 'button.affiliate-links',
+		defaultMessage: 'Affiliate links',
+	},
 	analyticsButton: {
 		id: 'button.analytics',
 		defaultMessage: 'Analytics',
@@ -277,6 +281,131 @@ export const commonMessages = defineMessages({
 		id: 'label.visit-your-profile',
 		defaultMessage: 'Visit your profile',
 	},
+	maxButton: {
+		id: 'button.max',
+		defaultMessage: 'Max',
+	},
+})
+
+export const formFieldLabels = defineMessages({
+	email: {
+		id: 'form.label.email',
+		defaultMessage: 'Email',
+	},
+	firstName: {
+		id: 'form.label.first-name',
+		defaultMessage: 'First name',
+	},
+	lastName: {
+		id: 'form.label.last-name',
+		defaultMessage: 'Last name',
+	},
+	dateOfBirth: {
+		id: 'form.label.date-of-birth',
+		defaultMessage: 'Date of birth',
+	},
+	businessName: {
+		id: 'form.label.business-name',
+		defaultMessage: 'Business name',
+	},
+	addressLine: {
+		id: 'form.label.address-line',
+		defaultMessage: 'Address line',
+	},
+	addressLine2: {
+		id: 'form.label.address-line-2',
+		defaultMessage: 'Address line 2 (optional)',
+	},
+	city: {
+		id: 'form.label.city',
+		defaultMessage: 'City',
+	},
+	stateProvince: {
+		id: 'form.label.state-province',
+		defaultMessage: 'State/province',
+	},
+	postalCode: {
+		id: 'form.label.postal-code',
+		defaultMessage: 'Postal code/ZIP code',
+	},
+	country: {
+		id: 'form.label.country',
+		defaultMessage: 'Country',
+	},
+	bankName: {
+		id: 'form.label.bank-name',
+		defaultMessage: 'Bank name',
+	},
+	amount: {
+		id: 'form.label.amount',
+		defaultMessage: 'Amount',
+	},
+})
+
+export const formFieldPlaceholders = defineMessages({
+	emailPlaceholder: {
+		id: 'form.placeholder.email',
+		defaultMessage: 'Enter email address',
+	},
+	firstNamePlaceholder: {
+		id: 'form.placeholder.first-name',
+		defaultMessage: 'Enter first name',
+	},
+	lastNamePlaceholder: {
+		id: 'form.placeholder.last-name',
+		defaultMessage: 'Enter last name',
+	},
+	businessNamePlaceholder: {
+		id: 'form.placeholder.business-name',
+		defaultMessage: 'Enter business name',
+	},
+	addressPlaceholder: {
+		id: 'form.placeholder.address',
+		defaultMessage: 'Enter address',
+	},
+	address2Placeholder: {
+		id: 'form.placeholder.address-2',
+		defaultMessage: 'Apartment, suite, etc.',
+	},
+	cityPlaceholder: {
+		id: 'form.placeholder.city',
+		defaultMessage: 'Enter city',
+	},
+	statePlaceholder: {
+		id: 'form.placeholder.state',
+		defaultMessage: 'Enter state/province',
+	},
+	postalCodePlaceholder: {
+		id: 'form.placeholder.postal-code',
+		defaultMessage: 'Enter postal code',
+	},
+	countryPlaceholder: {
+		id: 'form.placeholder.country',
+		defaultMessage: 'Select country',
+	},
+	bankNamePlaceholder: {
+		id: 'form.placeholder.bank-name',
+		defaultMessage: 'Enter bank name',
+	},
+	bankNamePlaceholderDropdown: {
+		id: 'form.placeholder.bank-name-dropdown',
+		defaultMessage: 'Select bank name',
+	},
+	amountPlaceholder: {
+		id: 'form.placeholder.amount',
+		defaultMessage: 'Enter amount',
+	},
+})
+
+export const financialMessages = defineMessages({
+	available: {
+		id: 'label.available',
+		defaultMessage: '{amount} available.',
+	},
+	rewardsProgramTermsAgreement: {
+		id: 'label.rewards-program-terms-agreement',
+		defaultMessage: 'I agree to the <terms-link>Rewards Program Terms</terms-link>',
+	},
 })
 
 export const commonProjectTypeCategoryMessages = defineMessages({
@@ -495,6 +624,14 @@ export const paymentMethodMessages = defineMessages({
 		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
 		defaultMessage: 'PayPal',
 	},
+	paypalInternational: {
+		id: 'omorphia.component.purchase_modal.payment_method_type.paypal_international',
+		defaultMessage: 'PayPal International',
+	},
+	paypalUS: {
+		id: 'omorphia.component.purchase_modal.payment_method_type.paypal',
+		defaultMessage: 'PayPal',
+	},
 	unionpay: {
 		id: 'omorphia.component.purchase_modal.payment_method_type.unionpay',
 		defaultMessage: 'UnionPay',
@@ -506,5 +643,33 @@ export const paymentMethodMessages = defineMessages({
 	visa: {
 		id: 'omorphia.component.purchase_modal.payment_method_type.visa',
 		defaultMessage: 'Visa',
+	},
+	venmo: {
+		id: 'payment-method.venmo',
+		defaultMessage: 'Venmo',
+	},
+	virtualVisa: {
+		id: 'payment-method.virtual-visa',
+		defaultMessage: 'Virtual Visa',
+	},
+	virtualVisaPlural: {
+		id: 'payment-method.virtual-visa-plural',
+		defaultMessage: 'Virtual Visas',
+	},
+	giftCard: {
+		id: 'payment-method.gift-card',
+		defaultMessage: 'Gift card',
+	},
+	giftCardPlural: {
+		id: 'payment-method.gift-card-plural',
+		defaultMessage: 'Gift cards',
+	},
+	charity: {
+		id: 'payment-method.charity',
+		defaultMessage: 'Charity',
+	},
+	charityPlural: {
+		id: 'payment-method.charity-plural',
+		defaultMessage: 'Charities',
 	},
 })

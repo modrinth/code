@@ -8,6 +8,7 @@
 				<button @click="openBatchModal"><PlusIcon /> Batch credit</button>
 			</ButtonStyled>
 		</div>
+		<div>don't worry there's not supposed to be anything here</div>
 
 		<NewModal ref="batchModal">
 			<template #title>
@@ -19,11 +20,10 @@
 						<span class="text-lg font-semibold text-contrast"> Type </span>
 						<span>Select target to credit.</span>
 					</label>
-					<TeleportDropdownMenu
+					<Combobox
 						v-model="mode"
 						:options="modeOptions"
-						:display-name="(x) => x.name"
-						name="Type"
+						placeholder="Select type"
 						class="max-w-[8rem]"
 					/>
 				</div>
@@ -41,7 +41,7 @@
 					/>
 				</div>
 
-				<div v-if="mode.id === 'nodes'" class="flex flex-col gap-3">
+				<div v-if="mode === 'nodes'" class="flex flex-col gap-3">
 					<div class="flex flex-col gap-2">
 						<label for="node-input" class="flex flex-col gap-1">
 							<span class="text-lg font-semibold text-contrast"> Node hostnames </span>
@@ -76,12 +76,10 @@
 							<span class="text-lg font-semibold text-contrast"> Region </span>
 							<span>This will credit all active servers in the region.</span>
 						</label>
-						<TeleportDropdownMenu
-							id="region-select"
+						<Combobox
 							v-model="selectedRegion"
 							:options="regions"
-							:display-name="(x) => x.display"
-							name="Region"
+							placeholder="Select region"
 							class="max-w-[24rem]"
 						/>
 					</div>
@@ -146,10 +144,10 @@
 import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	Combobox,
 	injectNotificationManager,
 	NewModal,
 	TagItem,
-	TeleportDropdownMenu,
 	Toggle,
 } from '@modrinth/ui'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
@@ -167,17 +165,17 @@ const sendEmail = ref(true)
 const message = ref('')
 
 const modeOptions = [
-	{ id: 'nodes', name: 'Nodes' },
-	{ id: 'region', name: 'Region' },
+	{ value: 'nodes', label: 'Nodes' },
+	{ value: 'region', label: 'Region' },
 ]
-const mode = ref(modeOptions[0])
+const mode = ref<string>('nodes')
 
 const nodeInput = ref('')
 const selectedNodes = ref<string[]>([])
 
-type RegionOpt = { key: string; display: string }
+type RegionOpt = { value: string; label: string }
 const regions = ref<RegionOpt[]>([])
-const selectedRegion = ref<RegionOpt | null>(null)
+const selectedRegion = ref<string | null>(null)
 const nodeHostnames = ref<string[]>([])
 
 function openBatchModal() {
@@ -208,7 +206,7 @@ function removeNode(v: string) {
 
 const applyDisabled = computed(() => {
 	if (days.value < 1) return true
-	if (mode.value.id === 'nodes') return selectedNodes.value.length === 0
+	if (mode.value === 'nodes') return selectedNodes.value.length === 0
 	return !selectedRegion.value
 })
 
@@ -217,11 +215,11 @@ async function ensureOverview() {
 	try {
 		const data = await useServersFetch<any>('/nodes/overview', { version: 'internal' })
 		regions.value = (data.regions || []).map((r: any) => ({
-			key: r.key,
-			display: `${r.display_name} (${r.key})`,
+			value: r.key,
+			label: `${r.display_name} (${r.key})`,
 		}))
 		nodeHostnames.value = data.node_hostnames || []
-		if (!selectedRegion.value && regions.value.length) selectedRegion.value = regions.value[0]
+		if (!selectedRegion.value && regions.value.length) selectedRegion.value = regions.value[0].value
 	} catch (err) {
 		addNotification({ title: 'Failed to load nodes overview', text: String(err), type: 'error' })
 	}
@@ -230,7 +228,7 @@ async function ensureOverview() {
 async function apply() {
 	try {
 		const body =
-			mode.value.id === 'nodes'
+			mode.value === 'nodes'
 				? {
 						nodes: selectedNodes.value.slice(),
 						days: Math.max(1, Math.floor(days.value)),
@@ -238,7 +236,7 @@ async function apply() {
 						message: message.value?.trim() || DEFAULT_CREDIT_EMAIL_MESSAGE,
 					}
 				: {
-						region: selectedRegion.value!.key,
+						region: selectedRegion.value!,
 						days: Math.max(1, Math.floor(days.value)),
 						send_email: sendEmail.value,
 						message: message.value?.trim() || DEFAULT_CREDIT_EMAIL_MESSAGE,

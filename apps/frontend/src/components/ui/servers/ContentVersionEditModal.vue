@@ -60,16 +60,24 @@
 							</NuxtLink>
 						</div>
 					</div>
-					<TeleportDropdownMenu
+					<Combobox
 						v-model="selectedVersion"
 						name="Project"
-						:options="filteredVersions"
-						placeholder="No valid versions found"
+						:options="
+							filteredVersions.map((v) => ({
+								value: v,
+								label: typeof v === 'object' ? v.version_number : String(v),
+							}))
+						"
+						:display-value="
+							selectedVersion
+								? typeof selectedVersion === 'object'
+									? selectedVersion.version_number
+									: String(selectedVersion)
+								: 'No valid versions found'
+						"
 						class="!min-w-full"
 						:disabled="filteredVersions.length === 0"
-						:display-name="
-							(version) => (typeof version === 'object' ? version?.version_number : version)
-						"
 					/>
 					<Checkbox v-model="showBetaAlphaReleases"> Show any beta and alpha releases </Checkbox>
 				</template>
@@ -237,14 +245,7 @@ import {
 	LockOpenIcon,
 	XIcon,
 } from '@modrinth/assets'
-import {
-	Admonition,
-	Avatar,
-	ButtonStyled,
-	CopyCode,
-	NewModal,
-	TeleportDropdownMenu,
-} from '@modrinth/ui'
+import { Admonition, Avatar, ButtonStyled, Combobox, CopyCode, NewModal } from '@modrinth/ui'
 import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
 import { formatCategory, formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'
@@ -282,7 +283,7 @@ const versionsError = ref('')
 const showBetaAlphaReleases = ref(false)
 const unlockFilterAccordion = ref()
 const versionFilter = ref(true)
-const tags = useTags()
+const tags = useGeneratedState()
 const noCompatibleVersions = ref(false)
 
 const { pluginLoaders, modLoaders } = tags.value.loaders.reduce(

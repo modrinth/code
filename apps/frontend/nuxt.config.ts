@@ -7,10 +7,16 @@ import { promises as fs } from 'fs'
 import { globIterate } from 'glob'
 import { defineNuxtConfig } from 'nuxt/config'
 import { $fetch } from 'ofetch'
+import Papa from 'papaparse'
 import { basename, relative, resolve } from 'pathe'
 import svgLoader from 'vite-svg-loader'
 
+import type { GeneratedState } from './src/composables/generated'
+
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
+// ISO 3166 data from https://github.com/ipregistry/iso3166
+// Licensed under CC BY-SA 4.0
+const ISO3166_REPO = 'https://raw.githubusercontent.com/ipregistry/iso3166/master'
 
 const preloadedFonts = [
 	'inter/Inter-Regular.woff2',
@@ -133,20 +139,7 @@ export default defineNuxtConfig({
 			// 30 minutes
 			const TTL = 30 * 60 * 1000
 
-			let state: {
-				lastGenerated?: string
-				apiUrl?: string
-				categories?: any[]
-				loaders?: any[]
-				gameVersions?: any[]
-				donationPlatforms?: any[]
-				reportTypes?: any[]
-				homePageProjects?: any[]
-				homePageSearch?: any[]
-				homePageNotifs?: any[]
-				products?: any[]
-				errors?: number[]
-			} = {}
+			let state: Partial<GeneratedState> = {}
 
 			try {
 				state = JSON.parse(await fs.readFile('./src/generated/state.json', 'utf8'))
@@ -200,6 +193,9 @@ export default defineNuxtConfig({
 				homePageSearch,
 				homePageNotifs,
 				products,
+				muralBankDetails,
+				countriesCSV,
+				subdivisionsCSV,
 			] = await Promise.all([
 				$fetch(`${API_URL}tag/category`, headers).catch((err) => handleFetchError(err, [])),
 				$fetch(`${API_URL}tag/loader`, headers).catch((err) => handleFetchError(err, [])),
@@ -220,7 +216,52 @@ export default defineNuxtConfig({
 				$fetch(`${API_URL.replace('/v2/', '/_internal/')}billing/products`, headers).catch((err) =>
 					handleFetchError(err, []),
 				),
+				$fetch(`${API_URL.replace('/v2/', '/_internal/')}mural/bank-details`, headers).catch(
+					(err) => handleFetchError(err, null),
+				),
+				$fetch<string>(`${ISO3166_REPO}/countries.csv`, {
+					...headers,
+					responseType: 'text',
+				}).catch((err) => handleFetchError(err, '')),
+				$fetch<string>(`${ISO3166_REPO}/subdivisions.csv`, {
+					...headers,
+					responseType: 'text',
+				}).catch((err) => handleFetchError(err, '')),
 			])
+
+			const countriesData = Papa.parse(countriesCSV, {
+				header: true,
+				skipEmptyLines: true,
+				transformHeader: (header) => (header.startsWith('#') ? header.slice(1) : header),
+			}).data
+			const subdivisionsData = Papa.parse(subdivisionsCSV, {
+				header: true,
+				skipEmptyLines: true,
+				transformHeader: (header) => (header.startsWith('#') ? header.slice(1) : header),
+			}).data
+
+			const subdivisionsByCountry = (subdivisionsData as any[]).reduce(
+				(acc, sub) => {
+					const countryCode = sub.country_code_alpha2
+
+					if (!countryCode || typeof countryCode !== 'string' || countryCode.trim() === '') {
+						return acc
+					}
+
+					if (!acc[countryCode]) acc[countryCode] = []
+
+					acc[countryCode].push({
+						code: sub['subdivision_code_iso3166-2'],
+						name: sub.subdivision_name,
+						localVariant: sub.localVariant || null,
+						category: sub.category,
+						parent: sub.parent_subdivision || null,
+						language: sub.language_code,
+					})
+					return acc
+				},
+				{} as Record<string, any[]>,
+			)
 
 			state.categories = categories
 			state.loaders = loaders
@@ -231,6 +272,15 @@ export default defineNuxtConfig({
 			state.homePageSearch = homePageSearch
 			state.homePageNotifs = homePageNotifs
 			state.products = products
+			state.muralBankDetails = muralBankDetails.bankDetails
+			state.countries = (countriesData as any[]).map((c) => ({
+				alpha2: c.country_code_alpha2,
+				alpha3: c.country_code_alpha3,
+				numeric: c.numeric_code,
+				nameShort: c.name_short,
+				nameLong: c.name_long,
+			}))
+			state.subdivisions = subdivisionsByCountry
 			state.errors = [...caughtErrorCodes]
 
 			await fs.writeFile('./src/generated/state.json', JSON.stringify(state))
@@ -473,6 +523,12 @@ export default defineNuxtConfig({
 			headers: {
 				'Accept-CH': 'Sec-CH-Prefers-Color-Scheme',
 				'Critical-CH': 'Sec-CH-Prefers-Color-Scheme',
+			},
+		},
+		'/dashboard/revenue/withdraw': {
+			redirect: {
+				to: '/dashboard/revenue',
+				statusCode: 410,
 			},
 		},
 		'/email/**': {

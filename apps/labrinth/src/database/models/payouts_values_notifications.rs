@@ -56,6 +56,7 @@ impl PayoutsValuesNotification {
 
 pub async fn synchronize_future_payout_values(
     exec: impl sqlx::PgExecutor<'_>,
+    limit: i64,
 ) -> Result<(), DatabaseError> {
     sqlx::query!(
         "
@@ -63,8 +64,10 @@ pub async fn synchronize_future_payout_values(
 		SELECT DISTINCT date_available, user_id, false notified
 		FROM payouts_values
 		WHERE date_available > NOW()
+		LIMIT $1
 		ON CONFLICT (date_available, user_id) DO NOTHING
 		",
+        limit,
     )
     .execute(exec)
     .await?;

@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Create affiliate link"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Creating new affiliate code"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Give your affiliate link a name so you know where people are coming from!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Title of affiliate link"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "e.g. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "The username of the user to create the affiliate code for"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Username"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Enter username..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Created by {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Creating affiliate link..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Revoke affiliate link"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "View analytics"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -7,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "New"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Affiliate links"
   },
   "button.analytics": {
     "defaultMessage": "Analytics"
@@ -46,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Follow"
+  },
+  "button.max": {
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "More options"
@@ -119,6 +161,84 @@
   "collection.label.private": {
     "defaultMessage": "Private"
   },
+  "form.label.address-line": {
+    "defaultMessage": "Address line"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Address line 2 (optional)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Amount"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Bank name"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Business name"
+  },
+  "form.label.city": {
+    "defaultMessage": "City"
+  },
+  "form.label.country": {
+    "defaultMessage": "Country"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Date of birth"
+  },
+  "form.label.email": {
+    "defaultMessage": "Email"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "First name"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Last name"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Postal code/ZIP code"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "State/province"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Enter address"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Apartment, suite, etc."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Enter amount"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Enter bank name"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Select bank name"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Enter business name"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Enter city"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Select country"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Enter email address"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Enter first name"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Enter last name"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Enter postal code"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Enter state/province"
+  },
   "icon-select.edit": {
     "defaultMessage": "Edit icon"
   },
@@ -157,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unknown game mode"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} available."
   },
   "label.changes-saved": {
     "defaultMessage": "Changes saved"
@@ -205,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Rejected"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "I agree to the <terms-link>Rewards Program Terms</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "Saved"
@@ -353,6 +479,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -361,6 +490,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Charity"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Charities"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Gift card"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Gift cards"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Virtual Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Virtual Visas"
   },
   "project-type.all": {
     "defaultMessage": "All"
