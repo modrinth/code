@@ -3,6 +3,7 @@ import { CheckIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	commonProjectSettingsMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	ProjectSettingsEnvSelector,
@@ -10,8 +11,6 @@ import {
 	useSavable,
 } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-
-import { injectModrinthClient } from '~/providers/api-client.ts'
 
 const { formatMessage } = useVIntl()
 

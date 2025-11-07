@@ -544,6 +544,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.22.1
         version: 6.28.4
+      '@modrinth/api-client':
+        specifier: workspace:*
+        version: link:../api-client
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../assets

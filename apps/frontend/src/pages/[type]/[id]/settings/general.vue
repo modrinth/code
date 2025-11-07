@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
 	IconSelect,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	SettingsLabel,
@@ -8,8 +9,6 @@ import {
 	useSavable,
 } from '@modrinth/ui'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
-
-import { injectModrinthClient } from '~/providers/api-client.ts'
 
 const { formatMessage } = useVIntl()
 

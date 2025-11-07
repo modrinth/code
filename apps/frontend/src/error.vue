@@ -58,8 +58,9 @@ import { IntlFormatted } from '@vintl/vintl/components'
 
 import Logo404 from '~/assets/images/404.svg'
 
+import { provideModrinthClient } from '@modrinth/ui'
 import ModrinthLoadingIndicator from './components/ui/modrinth-loading-indicator.ts'
-import { createModrinthClient, provideModrinthClient } from './providers/api-client.ts'
+import { createModrinthClient } from './helpers/api.ts'
 import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
 
 const auth = await useAuth()
