@@ -1,13 +1,17 @@
 ---
 title: More Ways to Withdraw
-summary: 'Coming soon: new withdraw options and a redesigned revenue dashboard'
+summary: 'New withdraw options and a redesigned revenue dashboard'
 date: 2025-10-27T16:30:00-07:00
 authors: ['AJfd8YH6', 'bOHH0P9Z', 'xSQqYYIN']
 ---
 
+**Edited November 4, 2025** to correct information about international PayPal withdrawal fees
+
+---
+
 Hey everyone! We've heard your feedback on creator withdrawal options, and we're excited to share that more are finally coming to Modrinth! Over the past month, we've been working on overhauling the withdrawal experience and supporting more withdraw methods.
 
-**This update will roll out later this week**, but we wanted to give everyone an early heads-up so you can hold off on withdrawing when payouts go out in a couple days in case one of the new options interests you. There's a lot packed into this release, so let's dive in!
+There's a lot packed into this release, so let's dive in!
 
 <div class="video-wrapper mb-8">
 	<video autoplay loop muted playsinline>
@@ -87,7 +91,7 @@ We've also added USDC withdrawals on the Polygon network. This option is availab
 We've moved PayPal and Venmo to two different methods depending on your country:
 
 - **United States:** PayPal and Venmo will remain on the existing system with the same low fees: $0.25 + 2%, capped at $1.00.
-- **Outside of the United States:** PayPal and Venmo have been moved to Tremendous, which has zero FX fees and charges a flat 6%, capped at $25.00. This should be an improvement over the old method for larger creators, where PayPal charged high uncapped fees for currency conversion.
+- **Outside of the United States:** PayPal and Venmo have been moved to Tremendous, which has zero FX fees and charges approximately 3.84% on the total amount. This should be an improvement over the old method, which had hidden FX fees that could end up much higher.
 
 ## New Email Notifications
 

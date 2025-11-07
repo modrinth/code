@@ -8,7 +8,8 @@
 					type="number"
 					step="0.01"
 					:min="minAmount"
-					:max="maxAmount"
+					:max="safeMaxAmount"
+					:disabled="isDisabled"
 					:placeholder="formatMessage(formFieldPlaceholders.amountPlaceholder)"
 					class="w-full rounded-[14px] bg-surface-4 py-2.5 pl-4 pr-4 text-contrast placeholder:text-secondary"
 					@input="handleInput"
@@ -26,13 +27,13 @@
 				</template>
 			</Combobox>
 			<ButtonStyled>
-				<button class="px-4 py-2" @click="setMaxAmount">
+				<button class="px-4 py-2" :disabled="isDisabled" @click="setMaxAmount">
 					{{ formatMessage(commonMessages.maxButton) }}
 				</button>
 			</ButtonStyled>
 		</div>
 		<div>
-			<span class="my-1 mt-0 text-secondary">{{ formatMoney(maxAmount) }} available.</span>
+			<span class="my-1 mt-0 text-secondary">{{ formatMoney(safeMaxAmount) }} available.</span>
 			<Transition name="fade">
 				<span v-if="isBelowMinimum" class="text-red">
 					Amount must be at least {{ formatMoney(minAmount) }}.
@@ -40,7 +41,7 @@
 			</Transition>
 			<Transition name="fade">
 				<span v-if="isAboveMaximum" class="text-red">
-					Amount cannot exceed {{ formatMoney(maxAmount) }}.
+					Amount cannot exceed {{ formatMoney(safeMaxAmount) }}.
 				</span>
 			</Transition>
 		</div>
@@ -77,6 +78,14 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const amountInput = ref<HTMLInputElement | null>(null)
 
+const safeMaxAmount = computed(() => {
+	return Math.max(0, props.maxAmount)
+})
+
+const isDisabled = computed(() => {
+	return safeMaxAmount.value < 0.01
+})
+
 const isBelowMinimum = computed(() => {
 	return (
 		props.modelValue !== undefined && props.modelValue > 0 && props.modelValue < props.minAmount
@@ -84,11 +93,11 @@ const isBelowMinimum = computed(() => {
 })
 
 const isAboveMaximum = computed(() => {
-	return props.modelValue !== undefined && props.modelValue > props.maxAmount
+	return props.modelValue !== undefined && props.modelValue > safeMaxAmount.value
 })
 
 async function setMaxAmount() {
-	const maxValue = props.maxAmount
+	const maxValue = safeMaxAmount.value
 	emit('update:modelValue', maxValue)
 
 	await nextTick()
@@ -119,11 +128,11 @@ watch(
 	() => props.modelValue,
 	async (newAmount) => {
 		if (newAmount !== undefined && newAmount !== null) {
-			if (newAmount > props.maxAmount) {
-				emit('update:modelValue', props.maxAmount)
+			if (newAmount > safeMaxAmount.value) {
+				emit('update:modelValue', safeMaxAmount.value)
 				await nextTick()
 				if (amountInput.value) {
-					amountInput.value.value = props.maxAmount.toFixed(2)
+					amountInput.value.value = safeMaxAmount.value.toFixed(2)
 				}
 			} else if (newAmount < 0) {
 				emit('update:modelValue', 0)

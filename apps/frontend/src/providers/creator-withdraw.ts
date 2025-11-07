@@ -449,12 +449,12 @@ export function createWithdrawContext(
 		const formCompleted = balance?.form_completion_status === 'complete'
 
 		if (formCompleted) {
-			return availableBalance
+			return Math.max(0, availableBalance)
 		}
 
 		const usedLimit = balance?.withdrawn_ytd ?? 0
 		const remainingLimit = Math.max(0, TAX_THRESHOLD_ACTUAL - usedLimit)
-		return Math.min(remainingLimit, availableBalance)
+		return Math.max(0, Math.min(remainingLimit, availableBalance))
 	})
 
 	const paymentOptions = computed<PaymentOption[]>(() => {
@@ -480,13 +480,16 @@ export function createWithdrawContext(
 				label: paymentMethodMessages.paypalInternational,
 				icon: PayPalColorIcon,
 				methodId: internationalPaypalMethod.id,
-				fee: '≈ 6%, max $25',
+				fee: '≈ 3.84%',
 				type: 'tremendous',
 			})
 		}
 
 		const merchantMethods = tremendousMethods.filter(
-			(m) => m.category === 'merchant_card' || m.category === 'merchant_cards',
+			(m) =>
+				m.category === 'merchant_card' ||
+				m.category === 'merchant_cards' ||
+				m.category === 'visa_card',
 		)
 		if (merchantMethods.length > 0) {
 			options.push({

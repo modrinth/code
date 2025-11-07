@@ -84,7 +84,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'accountType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
+				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
 				autocomplete: 'off',
@@ -94,7 +94,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.bank-account-number',
-					defaultMessage: 'Account Number',
+					defaultMessage: 'Account number',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -108,7 +108,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.routing-number',
-					defaultMessage: 'Routing Number',
+					defaultMessage: 'Routing number',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -295,13 +295,13 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'pixAccountType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.pix-key-type', defaultMessage: 'PIX Key Type' }),
+				label: defineMessage({ id: 'muralpay.field.pix-key-type', defaultMessage: 'PIX key type' }),
 				required: true,
 				autocomplete: 'off',
 				options: [
 					{
 						value: 'PHONE',
-						label: defineMessage({ id: 'muralpay.pix-type.phone', defaultMessage: 'Phone Number' }),
+						label: defineMessage({ id: 'muralpay.pix-type.phone', defaultMessage: 'Phone number' }),
 					},
 					{
 						value: 'EMAIL',
@@ -315,7 +315,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 						value: 'BANK_ACCOUNT',
 						label: defineMessage({
 							id: 'muralpay.pix-type.bank-account',
-							defaultMessage: 'Bank Account',
+							defaultMessage: 'Bank account',
 						}),
 					},
 				],
@@ -323,7 +323,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'pixEmail',
 				type: 'email',
-				label: defineMessage({ id: 'muralpay.field.pix-email', defaultMessage: 'PIX Email' }),
+				label: defineMessage({ id: 'muralpay.field.pix-email', defaultMessage: 'PIX email' }),
 				required: true,
 				placeholder: defineMessage({
 					id: 'muralpay.placeholder.enter-pix-email',
@@ -334,7 +334,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'pixPhone',
 				type: 'tel',
-				label: defineMessage({ id: 'muralpay.field.pix-phone', defaultMessage: 'PIX Phone' }),
+				label: defineMessage({ id: 'muralpay.field.pix-phone', defaultMessage: 'PIX phone' }),
 				required: true,
 				placeholder: defineMessage({
 					id: 'muralpay.placeholder.pix-phone',
@@ -345,7 +345,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'branchCode',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.branch-code', defaultMessage: 'Branch Code' }),
+				label: defineMessage({ id: 'muralpay.field.branch-code', defaultMessage: 'Branch code' }),
 				required: true,
 				placeholder: defineMessage({
 					id: 'muralpay.placeholder.enter-branch-code',
@@ -386,7 +386,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'phoneNumber',
 				type: 'tel',
-				label: defineMessage({ id: 'muralpay.field.phone-number', defaultMessage: 'Phone Number' }),
+				label: defineMessage({ id: 'muralpay.field.phone-number', defaultMessage: 'Phone number' }),
 				required: true,
 				placeholder: defineMessage({
 					id: 'muralpay.placeholder.phone-cop',
@@ -397,7 +397,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'accountType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
+				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
 				autocomplete: 'off',
@@ -407,7 +407,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.bank-account-number',
-					defaultMessage: 'Account Number',
+					defaultMessage: 'Account number',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -421,7 +421,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'select',
 				label: defineMessage({
 					id: 'muralpay.field.document-type',
-					defaultMessage: 'Document Type',
+					defaultMessage: 'Document type',
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
@@ -447,7 +447,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.account-number-cbu-cvu',
-					defaultMessage: 'Account Number (CBU/CVU)',
+					defaultMessage: 'Account number (CBU/CVU)',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -480,7 +480,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.account-number-type',
-					defaultMessage: 'Account Number Type',
+					defaultMessage: 'Account number type',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -507,7 +507,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'accountType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
+				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
 				autocomplete: 'off',
@@ -517,7 +517,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.account-number',
-					defaultMessage: 'Account Number',
+					defaultMessage: 'Account number',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -531,7 +531,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'select',
 				label: defineMessage({
 					id: 'muralpay.field.document-type',
-					defaultMessage: 'Document Type',
+					defaultMessage: 'Document type',
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
@@ -568,7 +568,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'select',
 				label: defineMessage({
 					id: 'muralpay.field.document-type',
-					defaultMessage: 'Document Type',
+					defaultMessage: 'Document type',
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
@@ -594,7 +594,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'select',
 				label: defineMessage({
 					id: 'muralpay.field.document-type',
-					defaultMessage: 'Document Type',
+					defaultMessage: 'Document type',
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
@@ -605,7 +605,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.account-number-cci',
-					defaultMessage: 'Account Number (CCI)',
+					defaultMessage: 'Account number (CCI)',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -621,7 +621,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'accountType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
+				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
 				autocomplete: 'off',
@@ -646,7 +646,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	// 			type: 'text',
 	// 			label: defineMessage({
 	// 				id: 'muralpay.field.account-number',
-	// 				defaultMessage: 'Account Number',
+	// 				defaultMessage: 'Account number',
 	// 			}),
 	// 			required: true,
 	// 			placeholder: defineMessage({
@@ -660,7 +660,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	// 			type: 'select',
 	// 			label: defineMessage({
 	// 				id: 'muralpay.field.document-type',
-	// 				defaultMessage: 'Document Type',
+	// 				defaultMessage: 'Document type',
 	// 			}),
 	// 			required: true,
 	// 			options: DOCUMENT_TYPE_OPTIONS,
@@ -684,7 +684,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'accountType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
+				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
 				autocomplete: 'off',
@@ -694,7 +694,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.account-number',
-					defaultMessage: 'Account Number',
+					defaultMessage: 'Account number',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -721,7 +721,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'accountType',
 				type: 'select',
-				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
+				label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account type' }),
 				required: true,
 				options: ACCOUNT_TYPE_OPTIONS,
 				autocomplete: 'off',
@@ -731,7 +731,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.account-number',
-					defaultMessage: 'Account Number',
+					defaultMessage: 'Account number',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -745,7 +745,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'select',
 				label: defineMessage({
 					id: 'muralpay.field.document-type',
-					defaultMessage: 'Document Type',
+					defaultMessage: 'Document type',
 				}),
 				required: true,
 				options: DOCUMENT_TYPE_OPTIONS,
@@ -780,7 +780,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	// 		{
 	// 			name: 'accountType',
 	// 			type: 'select',
-	// 			label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account Type' }),
+	// 			label: defineMessage({ id: 'muralpay.field.account-type', defaultMessage: 'Account type' }),
 	// 			required: true,
 	// 			options: ACCOUNT_TYPE_OPTIONS,
 	// 			autocomplete: 'off',
@@ -790,7 +790,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	// 			type: 'text',
 	// 			label: defineMessage({
 	// 				id: 'muralpay.field.account-number',
-	// 				defaultMessage: 'Account Number',
+	// 				defaultMessage: 'Account number',
 	// 			}),
 	// 			required: true,
 	// 			placeholder: defineMessage({
@@ -804,7 +804,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	// 			type: 'select',
 	// 			label: defineMessage({
 	// 				id: 'muralpay.field.document-type',
-	// 				defaultMessage: 'Document Type',
+	// 				defaultMessage: 'Document type',
 	// 			}),
 	// 			required: true,
 	// 			options: DOCUMENT_TYPE_OPTIONS,
@@ -813,7 +813,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 	// 		{
 	// 			name: 'phoneNumber',
 	// 			type: 'tel',
-	// 			label: defineMessage({ id: 'muralpay.field.phone-number', defaultMessage: 'Phone Number' }),
+	// 			label: defineMessage({ id: 'muralpay.field.phone-number', defaultMessage: 'Phone number' }),
 	// 			required: true,
 	// 			placeholder: defineMessage({
 	// 				id: 'muralpay.placeholder.phone-china',
@@ -867,7 +867,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.wallet-address',
-					defaultMessage: 'Wallet Address',
+					defaultMessage: 'Wallet address',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -900,7 +900,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.wallet-address',
-					defaultMessage: 'Wallet Address',
+					defaultMessage: 'Wallet address',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -936,7 +936,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.wallet-address',
-					defaultMessage: 'Wallet Address',
+					defaultMessage: 'Wallet address',
 				}),
 				required: true,
 				placeholder: defineMessage({
@@ -969,7 +969,7 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 				type: 'text',
 				label: defineMessage({
 					id: 'muralpay.field.wallet-address',
-					defaultMessage: 'Wallet Address',
+					defaultMessage: 'Wallet address',
 				}),
 				required: true,
 				placeholder: defineMessage({

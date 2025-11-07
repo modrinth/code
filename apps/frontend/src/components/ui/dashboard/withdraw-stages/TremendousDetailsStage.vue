@@ -529,7 +529,11 @@ onMounted(async () => {
 
 	rewardOptions.value = methods
 		.filter((m) => m.type === 'tremendous')
-		.filter((m) => m.category === selectedMethod)
+		.filter(
+			(m) =>
+				m.category === selectedMethod ||
+				(selectedMethod === 'merchant_card' && m.category === 'visa_card'),
+		)
 		.map((m) => ({
 			value: m.id,
 			label: m.name,

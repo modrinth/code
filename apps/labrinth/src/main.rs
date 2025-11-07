@@ -317,11 +317,11 @@ struct ApiDoc;
 fn log_error(err: &actix_web::Error) {
     if err.as_response_error().status_code().is_client_error() {
         tracing::debug!(
-            "Error encountered while processing the incoming HTTP request: {err}"
+            "Error encountered while processing the incoming HTTP request: {err:#?}"
         );
     } else {
         tracing::error!(
-            "Error encountered while processing the incoming HTTP request: {err}"
+            "Error encountered while processing the incoming HTTP request: {err:#?}"
         );
     }
 }
