@@ -68,7 +68,8 @@ const config = useRuntimeConfig()
 provideNotificationManager(new FrontendNotificationManager())
 
 const client = createModrinthClient(auth.value, {
-	apiBaseUrl: config.apiBaseUrl,
+	apiBaseUrl: config.public.apiBaseUrl.replace('/v2/', '/'),
+	archonBaseUrl: config.public.pyroBaseUrl.replace('/v2/', '/'),
 	rateLimitKey: config.rateLimitKey,
 })
 provideModrinthClient(client)
