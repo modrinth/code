@@ -218,6 +218,9 @@ importers:
       '@ltd/j-toml':
         specifier: ^1.38.0
         version: 1.38.0
+      '@modrinth/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../../packages/assets

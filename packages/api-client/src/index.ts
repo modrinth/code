@@ -10,6 +10,7 @@ export {
 	InMemoryCircuitBreakerStorage,
 } from './features/circuit-breaker'
 export { type BackoffStrategy, type RetryConfig, RetryFeature } from './features/retry'
+export { type VerboseLoggingConfig, VerboseLoggingFeature } from './features/verbose-logging'
 export type { InferredClientModules } from './modules'
 export * from './modules/types'
 export { GenericModrinthClient } from './platform/generic'

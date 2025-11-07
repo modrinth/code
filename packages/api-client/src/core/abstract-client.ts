@@ -208,11 +208,16 @@ export abstract class AbstractModrinthClient {
 	 * (e.g., Nuxt rate limit key)
 	 */
 	protected buildDefaultHeaders(): Record<string, string> {
-		return {
+		const headers: Record<string, string> = {
 			'Content-Type': 'application/json',
-			'User-Agent': this.config.userAgent,
 			...this.config.headers,
 		}
+
+		if (this.config.userAgent) {
+			headers['User-Agent'] = this.config.userAgent
+		}
+
+		return headers
 	}
 
 	/**
