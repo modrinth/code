@@ -10,15 +10,20 @@ export class VerboseLoggingFeature extends AbstractFeature {
 		const version = context.options.version
 		const prefix = `[${method}] [${api}_v${version}]`
 
-		console.log(`${prefix} ${context.url} SENT`)
+		console.debug(`${prefix} ${context.url} SENT`)
 
 		try {
 			const result = await next()
-			const size = JSON.stringify(result).length
-			console.log(`${prefix} ${context.url} RECEIVED ${size} bytes`)
+			try {
+				const size = result ? JSON.stringify(result) : 0
+				console.debug(`${prefix} ${context.url} RECEIVED ${size} bytes`)
+			} catch {
+				// ignore size calc fail
+				console.debug(`${prefix} ${context.url} RECEIVED`)
+			}
 			return result
 		} catch (error) {
-			console.log(`${prefix} ${context.url} FAILED`)
+			console.debug(`${prefix} ${context.url} FAILED`)
 			throw error
 		}
 	}

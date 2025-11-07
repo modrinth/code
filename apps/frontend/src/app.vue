@@ -20,7 +20,8 @@ provideNotificationManager(new FrontendNotificationManager())
 
 // Provide NuxtModrinthClient with auth and circuit breaker features
 const client = createModrinthClient(auth.value, {
-	apiBaseUrl: config.apiBaseUrl,
+	apiBaseUrl: config.public.apiBaseUrl.replace('/v2/', '/'),
+	archonBaseUrl: config.public.pyroBaseUrl.replace('/v2/', '/'),
 	rateLimitKey: config.rateLimitKey,
 })
 provideModrinthClient(client)
