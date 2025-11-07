@@ -25,7 +25,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(session::config)
             .configure(flows::config)
             .configure(pats::config)
-            .configure(moderation::config)
             .configure(billing::config)
             .configure(gdpr::config)
             .configure(gotenberg::config)
@@ -34,5 +33,15 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(external_notifications::config)
             .configure(affiliate::config)
             .configure(mural::config),
+    );
+}
+
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("/_internal/moderation")
+            .wrap(default_cors())
+            .configure(moderation::config),
     );
 }

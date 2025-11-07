@@ -1,26 +1,32 @@
 use super::ApiError;
 use crate::database;
+use crate::database::models::{DBOrganization, DBTeamId, DBTeamMember, DBUser};
 use crate::database::redis::RedisPool;
-use crate::models::projects::ProjectStatus;
+use crate::models::ids::{OrganizationId, TeamId};
+use crate::models::projects::{Project, ProjectStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
+use crate::util::error::Context;
 use crate::{auth::check_is_moderator_from_headers, models::pats::Scopes};
-use actix_web::{HttpRequest, HttpResponse, web};
-use ariadne::ids::random_base62;
-use serde::Deserialize;
+use actix_web::{HttpRequest, get, post, web};
+use ariadne::ids::{UserId, random_base62};
+use eyre::eyre;
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.route("moderation/projects", web::get().to(get_projects));
-    cfg.route("moderation/project/{id}", web::get().to(get_project_meta));
-    cfg.route("moderation/project", web::post().to(set_project_meta));
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+    cfg.service(get_projects)
+        .service(get_project_meta)
+        .service(set_project_meta);
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ProjectsRequestOptions {
+    /// How many projects to fetch.
     #[serde(default = "default_count")]
     pub count: u16,
+    /// How many projects to skip.
     #[serde(default)]
     pub offset: u32,
 }
@@ -29,13 +35,63 @@ fn default_count() -> u16 {
     100
 }
 
-pub async fn get_projects(
+/// Project with extra information fetched from the database, to avoid having
+/// clients make more round trips.
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct FetchedProject {
+    /// Project info.
+    #[serde(flatten)]
+    pub project: Project,
+    /// Who owns the project.
+    pub ownership: Ownership,
+}
+
+/// Fetched information on who owns a project.
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum Ownership {
+    /// Project is owned by a team, and this is the team owner.
+    User {
+        /// ID of the team owner.
+        id: UserId,
+        /// Name of the team owner.
+        name: String,
+        /// URL of the team owner's icon.
+        icon_url: Option<String>,
+    },
+    /// Project is owned by an organization.
+    Organization {
+        /// ID of the organization.
+        id: OrganizationId,
+        /// Name of the organization.
+        name: String,
+        /// URL of the organization's icon.
+        icon_url: Option<String>,
+    },
+}
+
+/// Fetch all projects which are in the moderation queue.
+#[utoipa::path(
+    responses((status = OK, body = inline(Vec<FetchedProject>)))
+)]
+#[get("/projects")]
+async fn get_projects(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     request_opts: web::Query<ProjectsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<Vec<FetchedProject>>, ApiError> {
+    get_projects_internal(req, pool, redis, request_opts, session_queue).await
+}
+
+pub async fn get_projects_internal(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    request_opts: web::Query<ProjectsRequestOptions>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<FetchedProject>>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -62,25 +118,100 @@ pub async fn get_projects(
     .fetch(&**pool)
     .map_ok(|m| database::models::DBProjectId(m.id))
     .try_collect::<Vec<database::models::DBProjectId>>()
-    .await?;
+    .await
+    .wrap_internal_err("failed to fetch projects awaiting review")?;
 
-    let projects: Vec<_> =
+    let projects =
         database::DBProject::get_many_ids(&project_ids, &**pool, &redis)
-            .await?
+            .await
+            .wrap_internal_err("failed to fetch projects")?
             .into_iter()
             .map(crate::models::projects::Project::from)
-            .collect();
+            .collect::<Vec<_>>();
 
-    Ok(HttpResponse::Ok().json(projects))
+    let team_ids = projects
+        .iter()
+        .map(|project| project.team_id)
+        .map(DBTeamId::from)
+        .collect::<Vec<_>>();
+    let org_ids = projects
+        .iter()
+        .filter_map(|project| project.organization)
+        .collect::<Vec<_>>();
+
+    let team_members =
+        DBTeamMember::get_from_team_full_many(&team_ids, &**pool, &redis)
+            .await
+            .wrap_internal_err("failed to fetch team members")?;
+    let users = DBUser::get_many_ids(
+        &team_members
+            .iter()
+            .map(|member| member.user_id)
+            .collect::<Vec<_>>(),
+        &**pool,
+        &redis,
+    )
+    .await
+    .wrap_internal_err("failed to fetch user data of team members")?;
+    let orgs = DBOrganization::get_many(&org_ids, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to fetch organizations")?;
+
+    let map_project = |project: Project| -> Result<FetchedProject, ApiError> {
+        let project_id = project.id;
+        let ownership = if let Some(org_id) = project.organization {
+            let org = orgs
+                    .iter()
+                    .find(|org| OrganizationId::from(org.id) == org_id)
+                    .wrap_internal_err_with(|| {
+                        eyre!(
+                            "project {project_id} is owned by an invalid organization {org_id}"
+                        )
+                    })?;
+
+            Ownership::Organization {
+                id: OrganizationId::from(org.id),
+                name: org.name.clone(),
+                icon_url: org.icon_url.clone(),
+            }
+        } else {
+            let team_id = project.team_id;
+            let team_owner = team_members.iter().find(|member| TeamId::from(member.team_id) == team_id && member.is_owner)
+                .wrap_internal_err_with(|| eyre!("project {project_id} is owned by a team {team_id} which has no valid owner"))?;
+            let team_owner_id = team_owner.user_id;
+            let user = users.iter().find(|user| user.id == team_owner_id)
+                .wrap_internal_err_with(|| eyre!("project {project_id} is owned by a team {team_id} which has owner {} which does not exist", UserId::from(team_owner_id)))?;
+
+            Ownership::User {
+                id: UserId::from(user.id),
+                name: user.username.clone(),
+                icon_url: user.avatar_url.clone(),
+            }
+        };
+
+        Ok(FetchedProject { ownership, project })
+    };
+
+    let projects = projects
+        .into_iter()
+        .map(map_project)
+        .collect::<Result<Vec<_>, _>>()?;
+
+    Ok(web::Json(projects))
 }
 
-pub async fn get_project_meta(
+/// Fetch moderation metadata for a specific project.
+#[utoipa::path(
+    responses((status = OK, body = inline(Vec<Project>)))
+)]
+#[get("/project/{id}")]
+async fn get_project_meta(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     info: web::Path<(String,)>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<MissingMetadata>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -202,13 +333,13 @@ pub async fn get_project_meta(
             }
         }
 
-        Ok(HttpResponse::Ok().json(merged))
+        Ok(web::Json(merged))
     } else {
         Err(ApiError::NotFound)
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Judgement {
     Flame {
@@ -225,13 +356,16 @@ pub enum Judgement {
     },
 }
 
-pub async fn set_project_meta(
+/// Update moderation judgements for projects in the review queue.
+#[utoipa::path]
+#[post("/project")]
+async fn set_project_meta(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     judgements: web::Json<HashMap<String, Judgement>>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<(), ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -302,11 +436,11 @@ pub async fn set_project_meta(
 
     sqlx::query(
         "
-            INSERT INTO moderation_external_files (sha1, external_license_id)
-            SELECT * FROM UNNEST ($1::bytea[], $2::bigint[])
-            ON CONFLICT (sha1)
-            DO NOTHING
-            ",
+        INSERT INTO moderation_external_files (sha1, external_license_id)
+        SELECT * FROM UNNEST ($1::bytea[], $2::bigint[])
+        ON CONFLICT (sha1)
+        DO NOTHING
+        ",
     )
     .bind(&file_hashes[..])
     .bind(&ids[..])
@@ -315,5 +449,5 @@ pub async fn set_project_meta(
 
     transaction.commit().await?;
 
-    Ok(HttpResponse::NoContent().finish())
+    Ok(())
 }

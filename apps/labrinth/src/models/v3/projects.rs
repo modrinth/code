@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 /// A project returned from the API
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Project {
     /// The ID of the project, encoded as a base62 string.
     pub id: ProjectId,
@@ -370,7 +370,7 @@ impl Project {
     //     })
     // }
 }
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, utoipa::ToSchema)]
 pub struct GalleryItem {
     pub url: String,
     pub raw_url: String,
@@ -381,7 +381,7 @@ pub struct GalleryItem {
     pub ordering: i64,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, utoipa::ToSchema)]
 pub struct ModeratorMessage {
     pub message: String,
     pub body: Option<String>,
@@ -389,14 +389,23 @@ pub struct ModeratorMessage {
 
 pub const DEFAULT_LICENSE_ID: &str = "LicenseRef-All-Rights-Reserved";
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct License {
     pub id: String,
     pub name: String,
     pub url: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Validate, Clone, Eq, PartialEq)]
+#[derive(
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    Validate,
+    Eq,
+    PartialEq,
+    utoipa::ToSchema,
+)]
 pub struct Link {
     pub platform: String,
     pub donation: bool,
@@ -425,7 +434,9 @@ impl From<LinkUrl> for Link {
 /// Processing - Project is not displayed on search, and not accessible by URL (Temporary state, project under review)
 /// Scheduled - Project is scheduled to be released in the future
 /// Private - Project is approved, but is not viewable to the public
-#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug, utoipa::ToSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectStatus {
     Approved,
@@ -564,7 +575,9 @@ impl ProjectStatus {
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Debug, Eq, PartialEq, utoipa::ToSchema,
+)]
 #[serde(rename_all = "kebab-case")]
 pub enum MonetizationStatus {
     ForceDemonetized,
@@ -599,7 +612,9 @@ impl MonetizationStatus {
 
 /// Represents the status of the manual review of the migration of side types of this
 /// project to the new environment field.
-#[derive(Serialize, Deserialize, Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Debug, Eq, PartialEq, utoipa::ToSchema,
+)]
 #[serde(rename_all = "kebab-case")]
 pub enum SideTypesMigrationReviewStatus {
     /// The project has been reviewed to use the new environment side types appropriately.
