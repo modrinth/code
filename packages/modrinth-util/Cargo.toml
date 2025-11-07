@@ -6,7 +6,6 @@ repository.workspace = true
 
 [dependencies]
 actix-web = { workspace = true }
-console-subscriber = { workspace = true }
 derive_more = { workspace = true, features = ["display", "error", "from"] }
 dotenvy = { workspace = true }
 eyre = { workspace = true }

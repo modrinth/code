@@ -54,19 +54,16 @@ pub fn init() -> Result<()> {
         Err(_) => OutputFormat::Human,
     };
 
-    let console_layer = console_subscriber::spawn();
     let env_filter = EnvFilter::builder()
         .with_default_directive(LevelFilter::INFO.into())
         .from_env_lossy();
 
     let result = match output_format {
         OutputFormat::Human => tracing_subscriber::registry()
-            .with(console_layer)
             .with(env_filter)
             .with(tracing_subscriber::fmt::layer())
             .try_init(),
         OutputFormat::Json => tracing_subscriber::registry()
-            .with(console_layer)
             .with(env_filter)
             .with(ECSLayerBuilder::default().stdout())
             .try_init(),

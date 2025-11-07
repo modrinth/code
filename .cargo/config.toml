@@ -1,9 +1,6 @@
-[build]
-rustflags = ["--cfg", "tokio_unstable"]
-
 # Windows has stack overflows when calling from Tauri, so we increase the default stack size used by the compiler
 [target.'cfg(windows)']
-rustflags = ["--cfg", "tokio_unstable", "-C", "link-args=/STACK:16777220"]
+rustflags = ["-C", "link-args=/STACK:16777220"]
 
 [target.x86_64-pc-windows-msvc]
 linker = "rust-lld"
