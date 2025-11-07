@@ -191,6 +191,8 @@ export const formatCategory = (name) => {
 		return 'Resource Pack'
 	} else if (name === 'vanilla') {
 		return 'Vanilla Shader'
+	} else if (name === 'geyser') {
+		return 'Geyser Extension'
 	}
 	return capitalizeString(name)
 }

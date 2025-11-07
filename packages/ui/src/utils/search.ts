@@ -93,6 +93,8 @@ export interface SortType {
 	name: string
 }
 
+const PLUGIN_PLATFORMS = ['bungeecord', 'waterfall', 'velocity', 'geyser']
+
 export function useSearch(
 	projectTypes: Ref<ProjectType[]>,
 	tags: Ref<Tags>,
@@ -298,7 +300,7 @@ export function useSearch(
 					.filter(
 						(loader) =>
 							loader.supported_project_types.includes('plugin') &&
-							!['bungeecord', 'waterfall', 'velocity'].includes(loader.name),
+							!PLUGIN_PLATFORMS.includes(loader.name),
 					)
 					.map((loader) => {
 						return {
@@ -324,7 +326,7 @@ export function useSearch(
 				supports_negative_filter: true,
 				searchable: false,
 				options: tags.value.loaders
-					.filter((loader) => ['bungeecord', 'waterfall', 'velocity'].includes(loader.name))
+					.filter((loader) => PLUGIN_PLATFORMS.includes(loader.name))
 					.map((loader) => {
 						return {
 							id: loader.name,
