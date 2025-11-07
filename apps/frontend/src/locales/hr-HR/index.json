@@ -2,6 +2,12 @@
   "admin.billing.error.not-found": {
     "message": "Korisnik nije pronađen"
   },
+  "app-marketing.features.follow.title": {
+    "message": "Zasljedi projekte"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "!"
+  },
   "auth.authorize.action.authorize": {
     "message": "Ovlasti"
   },

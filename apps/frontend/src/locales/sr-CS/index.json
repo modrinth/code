@@ -506,9 +506,6 @@
   "profile.error.not-found": {
     "message": "Korisnik nije pronađen"
   },
-  "profile.joined-at": {
-    "message": "Pridružio/la se <date>{ago}</date>"
-  },
   "profile.label.badges": {
     "message": "Bedževi"
   },
@@ -535,12 +532,6 @@
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Preuzmite projekte korisnika {username} na Modrinthu"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> preuzimanje projekta} few {<stat>{count}</stat> preuzimanja projekta} other {<stat>{count}</stat> preuzimanja projekata}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> projekat} few {<stat>{count}</stat> projekta} other {<stat>{count}</stat> projekata}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> pratilac projekta} few {<stat>{count}</stat> pratioca projekta} other {<stat>{count}</stat> pratilaca projekta}}"
@@ -1016,9 +1007,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Vraćanje iz backupa u toku"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Već se priprema backup za preuzimanje"
-  },
   "servers.backups.item.automated": {
     "message": "Automatski"
   },
@@ -1028,9 +1016,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Neuspešno kreiranje backupa"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Neuspešno pripremanje za preuzimanje"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Neuspešno vraćanje iz backupa"
   },
@@ -1039,15 +1024,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Zaključano"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Pripremi preuzimanje"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Pokušajte ponovo da pripremite"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Pripremanje preuzimanja..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "U redu za backup"

@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Mode développeur activé."
   },
+  "app.settings.downloading": {
+    "message": "Téléchargement de la version {version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Apparence"
   },
@@ -20,6 +23,21 @@
   "app.settings.tabs.resource-management": {
     "message": "Gestion des ressources"
   },
+  "app.update-toast.body": {
+    "message": "L'application Modrinth v{version} est prêtes à être installé ! Relancez l'application pour faire la mise à jour maintenant ou la mise à jour se fera automatiquement lorsque vous fermerez l'application Modrinth."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "L'application Modrinth v{version} a finis d'être téléchargé ! Relancez l'application pour faire la mise à jour maintenant ou la mise à jour se fera automatiquement lorsque vous fermerez l'application Modrinth."
+  },
+  "app.update-toast.body.metered": {
+    "message": "L'application Modrinth v{version} est disponible dès maintenant ! Lorsque vous êtes sur un réseau limité ou en donnée mobile, nous ne téléchargerons pas les mises à jour automatiquement."
+  },
+  "app.update-toast.changelog": {
+    "message": "Notes de changement"
+  },
+  "app.update-toast.download": {
+    "message": "Télécharger ({size})"
+  },
   "app.update-toast.downloading": {
     "message": "Téléchargement..."
   },
@@ -32,8 +50,83 @@
   "app.update-toast.title.download-complete": {
     "message": "Téléchargement terminé"
   },
+  "app.update.complete-toast.text": {
+    "message": "Cliquez ici pour voir les changements récents."
+  },
+  "app.update.complete-toast.title": {
+    "message": "La version {version} a été téléchargée avec succès !"
+  },
   "app.update.download-update": {
     "message": "Télécharger la mise à jour"
+  },
+  "app.update.downloading-update": {
+    "message": "Téléchargement de la mise à jour ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Relancez l'application pour installer la mise à jour"
+  },
+  "friends.action.add-friend": {
+    "message": "Ajouter un ami"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural,one {demande}other {demandes}} d'ami"
+  },
+  "friends.add-friend.submit": {
+    "message": "Envoyer une demande d'ami"
+  },
+  "friends.add-friend.title": {
+    "message": "Ajouter un ami"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Ça peut être différent de son pseudo Minecraft !"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Entrez un pseudo Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Quel est le pseudo Modrinth de votre ami ?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Ajouter des amis</link> pour voir à quoi ils jouent !"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Annuler la demande"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Supprimer l'ami"
+  },
+  "friends.friend.request-sent": {
+    "message": "La demande d'ami a été envoyé"
+  },
+  "friends.friend.view-profile": {
+    "message": "Voir le profile"
+  },
+  "friends.heading": {
+    "message": "Amis"
+  },
+  "friends.heading.active": {
+    "message": "Actif"
+  },
+  "friends.heading.offline": {
+    "message": "Hors ligne"
+  },
+  "friends.heading.online": {
+    "message": "En ligne"
+  },
+  "friends.heading.pending": {
+    "message": "En attente"
+  },
+  "friends.no-friends-match": {
+    "message": "Aucuns amis ne correspondent à \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Chercher des amis..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Créer un compte Modrinth</link> pour ajouter des amis et voir à quoi ils jouent !"
   },
   "instance.add-server.add-and-play": {
     "message": "Ajouter et jouer"

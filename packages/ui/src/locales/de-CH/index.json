@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Partnerlink erstellen"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Neuen Partnercode erstellen"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Gib deinem Partnerlink einen Namen, damit du weist, von wo Leute kommen!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Titel des Partnerlinks"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "z.B. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Der Benutzername des Benutzers, für den der Affiliate-Code erstellt werden soll"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Benutzername"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Benutzername eingeben..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Erstellt von {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Erstelle Partnerlink..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Partnerlink widerrufen"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Analytiken ansehen"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -8,6 +44,9 @@
   "badge.new": {
     "defaultMessage": "Neu"
   },
+  "button.affiliate-links": {
+    "defaultMessage": "Partnerlinks"
+  },
   "button.analytics": {
     "defaultMessage": "Analytik"
   },
@@ -16,6 +55,9 @@
   },
   "button.cancel": {
     "defaultMessage": "Abbrechen"
+  },
+  "button.clear": {
+    "defaultMessage": "Löschen"
   },
   "button.close": {
     "defaultMessage": "Schliessen"
@@ -594,7 +636,7 @@
     "defaultMessage": "Versionen"
   },
   "project.settings.view.title": {
-    "defaultMessage": "Anzeigen"
+    "defaultMessage": "Ansehen"
   },
   "project.versions.channel.alpha.symbol": {
     "defaultMessage": "A"

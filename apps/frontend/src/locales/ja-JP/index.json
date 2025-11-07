@@ -167,11 +167,23 @@
   "app-marketing.features.unlike-any-launcher": {
     "message": "他のランチャーと異なる点"
   },
+  "app-marketing.features.website.description": {
+    "message": "Modrinth Appはウェブサイトと完全に統合されているため、あなたはお気に入りのプロジェクトにアプリからアクセスできます！"
+  },
+  "app-marketing.features.website.title": {
+    "message": "ウェブサイトとの統合"
+  },
   "app-marketing.hero.download-button": {
     "message": "Modrinth アプリをダウンロードする"
   },
   "app-marketing.hero.download-modrinth-app": {
     "message": "Modrinth アプリをダウンロードする"
+  },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "{os}向けのModrinth Appをダウンロード"
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "詳細なダウンロード設定"
   },
   "auth.authorize.action.authorize": {
     "message": "認証"
@@ -398,6 +410,111 @@
   "common.yes": {
     "message": "はい"
   },
+  "create.collection.cancel": {
+    "message": "キャンセル"
+  },
+  "create.collection.create-collection": {
+    "message": "コレクションを作成"
+  },
+  "create.collection.error-title": {
+    "message": "エラーが発生しました"
+  },
+  "create.collection.name-label": {
+    "message": "名前"
+  },
+  "create.collection.name-placeholder": {
+    "message": "コレクション名を入力…"
+  },
+  "create.collection.summary-description": {
+    "message": "1~2文程度のコレクションの説明。"
+  },
+  "create.collection.summary-label": {
+    "message": "概要"
+  },
+  "create.collection.title": {
+    "message": "コレクションを作成中"
+  },
+  "create.limit-alert.contact-support": {
+    "message": "サポートに連絡"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "組織"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "コレクション"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "組織"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "プロジェクト"
+  },
+  "create.limit-alert.type-project": {
+    "message": "プロジェクト"
+  },
+  "create.organization.cancel": {
+    "message": "キャンセル"
+  },
+  "create.organization.create-organization": {
+    "message": "組織を作成"
+  },
+  "create.organization.error-title": {
+    "message": "エラーが発生しました"
+  },
+  "create.organization.name-label": {
+    "message": "名前"
+  },
+  "create.organization.name-placeholder": {
+    "message": "組織名を入力…"
+  },
+  "create.organization.summary-label": {
+    "message": "概要"
+  },
+  "create.organization.title": {
+    "message": "組織を作成"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "キャンセル"
+  },
+  "create.project.create-project": {
+    "message": "プロジェクトを作成"
+  },
+  "create.project.error-title": {
+    "message": "エラーが発生しました"
+  },
+  "create.project.name-label": {
+    "message": "名前"
+  },
+  "create.project.name-placeholder": {
+    "message": "プロジェクト名を入力…"
+  },
+  "create.project.summary-description": {
+    "message": "1~2文程度のプロジェクトの説明。"
+  },
+  "create.project.summary-label": {
+    "message": "概要"
+  },
+  "create.project.title": {
+    "message": "プロジェクトを作成中"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-label": {
+    "message": "公開範囲"
+  },
+  "create.project.visibility-private": {
+    "message": "非公開"
+  },
+  "create.project.visibility-public": {
+    "message": "公開"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "限定公開"
+  },
   "dashboard.collections.button.create-new": {
     "message": "新規作成"
   },
@@ -409,6 +526,12 @@
   },
   "dashboard.collections.long-title": {
     "message": "コレクション"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "ダウンロード {formType}"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "あなたはアメリカ国民ですか？"
   },
   "error.collection.404.list_item.1": {
     "message": "コレクションの URL を誤って入力した可能性があります。"
@@ -482,6 +605,9 @@
   "landing.creator.feature.monetization.title": {
     "message": "収益化"
   },
+  "landing.creator.feature.team-management.description": {
+    "message": "チームメンバーを招待し、役割と権限を簡単に管理しましょう"
+  },
   "landing.creator.feature.team-management.title": {
     "message": "チーム管理"
   },
@@ -521,17 +647,26 @@
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
   },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
   },
   "landing.notifications.heading": {
     "message": "通知"
   },
+  "landing.search.label": {
+    "message": "検索"
+  },
   "landing.search.placeholder": {
     "message": "検索…"
   },
   "landing.search.sort-by.label": {
     "message": "並び替え"
+  },
+  "landing.section.for-creators.label": {
+    "message": "クリエーター"
   },
   "landing.section.for-players.label": {
     "message": "プレイヤー向け"
@@ -553,6 +688,15 @@
   },
   "layout.action.lookup-by-email": {
     "message": "メールで探す"
+  },
+  "layout.action.new-collection": {
+    "message": "新規コレクション"
+  },
+  "layout.action.new-organization": {
+    "message": "新規組織"
+  },
+  "layout.action.new-project": {
+    "message": "新規プロジェクト"
   },
   "layout.avatar.alt": {
     "message": "あなたのアバター"
@@ -640,6 +784,9 @@
   },
   "layout.meta.description": {
     "message": "ModrinthでMinecraftのMOD、プラグイン、データパック、シェーダー、リソースパック、そしてModパックをダウンロードしましょう。Modrinthでは、モダンで使いやすいインターフェースとAPIを使って、プロジェクトを発見したり公開したりできます。"
+  },
+  "layout.nav.analytics": {
+    "message": "統計"
   },
   "layout.nav.home": {
     "message": "ホーム"

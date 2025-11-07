@@ -5,6 +5,6 @@
 	},
 	"searchTerms": {
 		"description": "Please provide additional search terms associated with the language, if needed, to enhance the search functionality (e.g., American English, Deutschland). Each search term should be entered on a separate line. Translate as a hyphen (-) if no additional terms are needed.",
-		"message": "Taiwan\nChinese\nTraditional Chinese\nChinese Traditional\nTC\n正體\n繁體\n繁中\n中文\n臺灣\n台灣"
+		"message": "Taiwan\nChinese\nTraditional Chinese\nChinese Traditional\nTC\n正體\n繁體\n繁中\n中文\n漢語\n華語\n臺灣\n台灣"
 	}
 }

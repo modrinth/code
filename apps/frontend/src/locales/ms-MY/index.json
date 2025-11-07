@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Koleksi anda"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Muat turun {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Borang cukai {formType} anda telah berjaya dihantar!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Anda boleh mengeluarkan wang dengan bebas sekarang. Jika anda mempunyai soalan atau perlu mengemas kini butiran anda <support-link>hubungi sokongan</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Selesai! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Entiti asing bermaksud entiti perniagaan yang dianjurkan di luar Amerika Syarikat (seperti perbadanan, perkongsian atau LLC bukan AS)."
   },
@@ -917,6 +929,15 @@
   "layout.banner.tax.title": {
     "message": "Borang cukai diperlukan"
   },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Hubungi sokongan"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Pengeluaran anda telah dikunci buat sementara waktu kerana TIN atau SSN anda tidak sepadan dengan rekod IRS. Sila hubungi sokongan untuk menetapkan semula dan menghantar semula borang cukai anda."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Borang cukai gagal"
+  },
   "layout.banner.verify-email.action": {
     "message": "Hantar semula e-mel pengesahan"
   },
@@ -1091,8 +1112,17 @@
   "moderation.technical.search.placeholder": {
     "message": "Cari penilaian teknikal..."
   },
+  "profile.bio.fallback.creator": {
+    "message": "Seorang pencipta Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Seorang pengguna Modrinth."
+  },
   "profile.button.billing": {
     "message": "Urus pengebilan pengguna"
+  },
+  "profile.button.edit-role": {
+    "message": "Sunting peranan"
   },
   "profile.button.info": {
     "message": "Lihat butiran pengguna"
@@ -1100,17 +1130,47 @@
   "profile.button.manage-projects": {
     "message": "Urus projek"
   },
+  "profile.details.label.auth-providers": {
+    "message": "Penyedia pengesahan"
+  },
+  "profile.details.label.email": {
+    "message": "E-mel"
+  },
+  "profile.details.label.has-password": {
+    "message": "Mempunyai kata laluan"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Mempunyai TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Kaedah pembayaran"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "E-mel tidak disahkan"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "E-mel disahkan"
+  },
   "profile.error.not-found": {
     "message": "Pengguna tidak dijumpai"
-  },
-  "profile.joined-at": {
-    "message": "Telah menyertai <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Lencana"
   },
+  "profile.label.collection": {
+    "message": "Koleksi"
+  },
   "profile.label.details": {
     "message": "Butiran"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, other {muat turun}}"
+  },
+  "profile.label.joined": {
+    "message": "Telah menyertai pada"
+  },
+  "profile.label.no": {
+    "message": "Tidak"
   },
   "profile.label.no-collections": {
     "message": "Pengguna ini tidak memiliki sebarang koleksi!"
@@ -1127,17 +1187,20 @@
   "profile.label.organizations": {
     "message": "Organisasi"
   },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, other {projek}}"
+  },
+  "profile.label.saving": {
+    "message": "Sedang menyimpan..."
+  },
+  "profile.label.yes": {
+    "message": "Ya"
+  },
   "profile.meta.description": {
     "message": "Muat turun projek milik {username} di Modrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Muat turun projek milik {username} di Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, other {<stat>{count}</stat> muat turun}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, other {<stat>{count}</stat> projek}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, other {<stat>{count}</stat> pengikut projek}}"
@@ -1865,9 +1928,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Pemulihan sandaran sedang dijalankan"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Sudah menyediakan sandaran untuk muat turun"
-  },
   "servers.backups.item.automated": {
     "message": "Diautomatikkan"
   },
@@ -1877,9 +1937,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Gagal mencipta sandaran"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Gagal menyediakan muat turun"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Gagal memulihkan daripada sandaran"
   },
@@ -1888,15 +1945,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Dikunci"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Sediakan muat turun"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Cuba sediakan lagi"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Sedang menyediakan muat turun..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Dalam barisan untuk disandar"

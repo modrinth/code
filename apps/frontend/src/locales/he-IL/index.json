@@ -24,28 +24,28 @@
     "message": "הורד את קובץ ה-RPM"
   },
   "app-marketing.download.linux": {
-    "message": "Linux"
+    "message": "לינוקס"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "ידוע שלגרסאות Linux של Modrinth App יש <issues-link>בעיות</issues-link> במערכות ובתצורות מסוימות. אם Modrinth App אינו יציב במערכת שלך, אנו ממליצים לך לנסות יישומים אחרים כמו <prism-link>Prism Launcher</prism-link> כדי להתקין בקלות תוכן מ-Modrinth."
+    "message": "ידוע שלגרסאות לינוקס של אפליקציית מודרינת' יש <issues-link>בעיות</issues-link> במערכות ובתצורות מסוימות. אם אפליקציית מודרינת' אינה יציבה במערכת שלך, אנו ממליצים לך לנסות יישומים אחרים כמו <prism-link>Prism Launcher</prism-link> כדי להתקין בקלות תוכן ממודרינת'."
   },
   "app-marketing.download.mac": {
-    "message": "Mac"
+    "message": "מאק"
   },
   "app-marketing.download.options-title": {
     "message": "אפשרויות הורדה"
   },
   "app-marketing.download.terms": {
-    "message": "בהורדת Modrinth App אתה מסכים ל<terms-link>תנאים</terms-link> ול<privacy-link>מדיניות הפרטיות</privacy-link> שלנו."
+    "message": "בהורדת אפליקציית מודרינת' אתה מסכים ל<terms-link>תנאים</terms-link> ול<privacy-link>מדיניות הפרטיות</privacy-link> שלנו."
   },
   "app-marketing.download.third-party-packages": {
     "message": "חבילות צד שלישי"
   },
   "app-marketing.download.title": {
-    "message": "הורד את Modrinth App (בטא)"
+    "message": "הורד את אפליקציית מודרינת' (בטא)"
   },
   "app-marketing.download.windows": {
-    "message": "Windows"
+    "message": "ווינדוס"
   },
   "app-marketing.features.follow.description": {
     "message": "שמור תוכן שאתה אוהב וקבל עדכונים בלחיצה אחת."
@@ -54,7 +54,7 @@
     "message": "עקוב אחר פרויקטים"
   },
   "app-marketing.features.importing.description": {
-    "message": "ייבא את כל הפרופילים המועדפים עליך מהמפעיל שבו השתמשת לפני כן, והתחל להשתמש ב-Modrinth App תוך שניות!"
+    "message": "ייבא את כל הפרופילים המועדפים עליך מהמפעיל שבו השתמשת לפני כן, והתחל להשתמש באפליקציית מודרינת' תוך שניות!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -72,7 +72,7 @@
     "message": "מאת {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth הופך את ניהול כל המודים שלך לפשוט ונוח במקום אחד. באפשרותך להתקין, להסיר ולעדכן מודים בלחיצה אחת."
+    "message": "מודרינת' הופך את ניהול כל המודים שלך לפשוט ונוח במקום אחד. באפשרותך להתקין, להסיר ולעדכן מודים בלחיצה אחת."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "מודים מותקנים"
@@ -96,7 +96,7 @@
     "message": "מצב לא מקוון"
   },
   "app-marketing.features.open-source.description": {
-    "message": "המפעיל של Modrinth הוא קוד פתוח לחלוטין. באפשרותך לצפות בקוד המקור ב<github-link>GitHub</github-link>!"
+    "message": "המפעיל של מודרינת' הוא קוד פתוח לחלוטין. באפשרותך לצפות בקוד המקור ב<github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "קוד פתוח"
@@ -108,7 +108,7 @@
     "message": "% מעבד"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App פועל עם ביצועים טובים יותר ממנהלי מודים מובילים רבים, תוך שימוש ב-150 מגה-בייט RAM בלבד!"
+    "message": "אפליקציית מודרינת' פועל עם ביצועים טובים יותר ממנהלי מודים מובילים רבים, תוך שימוש בכ-150 מגה בייט זיכרון (RAM) בלבד!"
   },
   "app-marketing.features.performance.discord": {
     "message": "דיסקורד"
@@ -129,7 +129,7 @@
     "message": "פחות מ-150 מגה-בייט"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "אפליקציית Modrinth"
+    "message": "Modrinth App"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "1 מיליארד %"
@@ -153,7 +153,7 @@
     "message": "שחק עם המודים האהובים עליך"
   },
   "app-marketing.features.sharing.description": {
-    "message": "בנה, שתף ושחק בחבילות מודים עם כל אחד מאלפי המודים וחבילות המודים שיש כאן ב-Modrinth."
+    "message": "בנה, שתף ושחק בחבילות מודים עם כל אחד מאלפי המודים וחבילות המודים שיש כאן במודרינת'."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "מודפק"
@@ -168,7 +168,7 @@
     "message": "לא כמו שום מפעיל"
   },
   "app-marketing.features.website.description": {
-    "message": "יישומון מודרינף נתמך במלואו עם האתר, כך שניתן לגשת לכל הפרויקטים האהובים עליכם מהיישומון!"
+    "message": "אפליקציית מודרינת' נתמכת במלואה עם האתר, כך שניתן לגשת לכל הפרויקטים האהובים עליכם מהאפליקציה!"
   },
   "app-marketing.features.website.title": {
     "message": "אינטגרציה עם האתר"
@@ -177,19 +177,25 @@
     "message": "השתמשת בעבר"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "תמונה של יישומון מודרינף עם התקנה של קובלמון שנפתחת בעמוד \"התוכן\"."
+    "message": "תמונה של אפליקציית מודרינת' עם התקנה של Cobblemon שנפתחת בעמוד ה\"תוכן\"."
   },
   "app-marketing.hero.description": {
-    "message": "יישומון מודרינף הוא launcher מיוחד, בקוד פתוח, שמאפשר לכם לשחק עם המודים שאתם אוהבים, ושומר עליהם מעודכנים. הכל בחבילה אחת, קומפקטית ומסודרת."
+    "message": "אפליקציית מודרינת' היא משגר (launcher) מיוחד, קוד פתוח, שמאפשר לכם לשחק עם המודים שאתם אוהבים, ושומר עליהם מעודכנים. הכל בחבילה אחת, קומפקטית ומסודרת."
   },
   "app-marketing.hero.download-button": {
-    "message": "יישומון מודרינף - לחץ להורדה"
+    "message": "הורד את Modrinth App"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "הורד את יישומון מודרינף"
+    "message": "הורד את אפליקציית מודרינת'"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "הורד את יישומון מודרינף עבור {os}"
+    "message": "הורד את Modrinth App עבור {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "תמונה ראשית מהפנורמה של המודפק cobblemon."
+  },
+  "app-marketing.hero.more-download-options": {
+    "message": "אפשרויות הורדה נוספות"
   },
   "auth.authorize.action.authorize": {
     "message": "אימות"
@@ -347,6 +353,12 @@
   "auth.welcome.checkbox.subscribe": {
     "message": "הירשם לעדכונים על Modrinth"
   },
+  "auth.welcome.description": {
+    "message": "אתה עכשיו חלק מהקהילה המדהימה של יוצרים ומשתמשים שכבר בונים, מורידים ומתעדכנים עם מודים מגניבים."
+  },
+  "auth.welcome.label.tos": {
+    "message": "ע\"י יצירת חשבון, אתה הסכמת ל<terms-link>תנאים</terms-link> של מודרינפ ו<privacy-policy-link>מדיניות הפרטיות</privacy-policy-link>."
+  },
   "auth.welcome.long-title": {
     "message": "ברוכים הבאים ל-Modrinth!"
   },
@@ -365,6 +377,18 @@
   "collection.button.unfollow-project": {
     "message": "הסר מעקב מפרוייקט"
   },
+  "collection.delete-modal.description": {
+    "message": "זה יגרום להסרה של הקולנוע הזאת לתמיד. אין אפשרות לבטל."
+  },
+  "collection.delete-modal.title": {
+    "message": "אתה בטוח שאתה רוצה למחוק את הקולקציה?"
+  },
+  "collection.description": {
+    "message": "{description} צפה באוסף {name} מ{username} במודרינת'"
+  },
+  "collection.description.following": {
+    "message": "אוסף שנוצר אוטומטית של כל הפרויקטים שאתה עוקב אחריו."
+  },
   "collection.error.not-found": {
     "message": "אוסף לא נמצא"
   },
@@ -373,6 +397,9 @@
   },
   "collection.label.created-at": {
     "message": "נוצר {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "נוצר על ידי"
   },
   "collection.label.no-projects": {
     "message": "אין לאוסף זה פרוייקטים!"
@@ -392,6 +419,153 @@
   "collection.title": {
     "message": "{name} - אוסף"
   },
+  "common.no": {
+    "message": "לא"
+  },
+  "common.yes": {
+    "message": "כן"
+  },
+  "create.collection.cancel": {
+    "message": "בטל"
+  },
+  "create.collection.collection-info": {
+    "message": "האוסף החדש שלך יווצר עכשיו כאוסף ציבורי עם {count, plural, =0 {no projects} one {# project} other {# projects}}."
+  },
+  "create.collection.create-collection": {
+    "message": "צור אוסף"
+  },
+  "create.collection.error-title": {
+    "message": "אירעה שגיאה"
+  },
+  "create.collection.name-label": {
+    "message": "שם"
+  },
+  "create.collection.name-placeholder": {
+    "message": "הכנס שם לאוסף..."
+  },
+  "create.collection.summary-description": {
+    "message": "משפט או שניים שמתאים בקצרה את האוסף שלך."
+  },
+  "create.collection.summary-label": {
+    "message": "תקציר"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "זה האוסף של..."
+  },
+  "create.collection.title": {
+    "message": "צור אוסף"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "מתקרב למגבלה של {type} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "הינך עומד/ת להגיע למגבלת ה{type}, אנה צרו קשר עם שירות לקוחות במידה וצריך יותר מ{max}{typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "צור קשר עם תמיכה"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "הגעת לגבול של {type}"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "הגעת להגבלת ה{type} מתוך {max}. אנה צרו קשר עם שרות לקוחות על מנת להעלות את ההגבלה."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "אוסף"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "ארגון"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "אוספים"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "ארגונים"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "פרויקטים"
+  },
+  "create.limit-alert.type-project": {
+    "message": "פרויקט"
+  },
+  "create.organization.cancel": {
+    "message": "בטל"
+  },
+  "create.organization.create-organization": {
+    "message": "צור ארגון"
+  },
+  "create.organization.error-title": {
+    "message": "התרחשה תקלה"
+  },
+  "create.organization.name-label": {
+    "message": "שם"
+  },
+  "create.organization.name-placeholder": {
+    "message": "הכנס שם ארגון..."
+  },
+  "create.organization.ownership-info": {
+    "message": "אתה תהיה הבעלים של ארגון זה, אבל אתה יכול להזמין חברים אחרים ולהעביר את הבעלות אליהם בכל זמן."
+  },
+  "create.organization.summary-description": {
+    "message": "משפט או שניים שמפרטים על הארגון שלך."
+  },
+  "create.organization.summary-label": {
+    "message": "סיכום"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "ארגון ל..."
+  },
+  "create.organization.title": {
+    "message": "יוצר ארגון"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "בטל"
+  },
+  "create.project.create-project": {
+    "message": "צור פרויקט"
+  },
+  "create.project.error-title": {
+    "message": "התרחשה תקלה"
+  },
+  "create.project.name-label": {
+    "message": "שם"
+  },
+  "create.project.name-placeholder": {
+    "message": "הכנס שם פרויקט..."
+  },
+  "create.project.summary-description": {
+    "message": "משפט או שניים שמפרטים על הפרויקט שלך."
+  },
+  "create.project.summary-label": {
+    "message": "סיכום"
+  },
+  "create.project.summary-placeholder": {
+    "message": "הפרויקט מוסיף..."
+  },
+  "create.project.title": {
+    "message": "יוצר פרויקט"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "מצב נראות הפרויקט שלך אחרי שאושר."
+  },
+  "create.project.visibility-label": {
+    "message": "מצב נראות"
+  },
+  "create.project.visibility-private": {
+    "message": "פרויקט פרטי"
+  },
+  "create.project.visibility-public": {
+    "message": "פרויקט פומבי"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "לא מוגדר"
+  },
   "dashboard.collections.button.create-new": {
     "message": "צור חדש"
   },
@@ -404,17 +578,77 @@
   "dashboard.collections.long-title": {
     "message": "האוספים שלך"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "הורדת {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "מס {formType} שלך נשלח בהצלחה!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "ברשותך לצאת עכשיו. אם יש שאלות או צורך לעדכן את פרטיך <support-link>צרו קשר עם שירות לקוחות</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "הכל מוכן!🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "ארגון חיצוני הוא עסק ממוסד מחוץ לארצות הברית (כמו חברה לא-ארה״בית, שותפות, או LLC)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "ארגון חיצוני"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "אדם פרטי"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "הינך גוף פרטי או חלק מארגון חיצוני?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "קובץ מס"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth משתמשים בגוף החיצוני Track1099 על מנת לאסוף ולשמור בבטיחות את קבצי המס שלך.\n<security-link>עוד מידע כאן.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "הליכים בטחונים"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "הינך אזרח מארה״ב?"
+  },
   "error.collection.404.list_item.1": {
     "message": "ייתכן שהקלדת כתובת URL שגויה של האוסף."
   },
   "error.collection.404.list_item.2": {
     "message": "ייתכן שהאוסף פרטי."
   },
+  "error.collection.404.list_item.3": {
+    "message": "יכול להיות שהקובץ שלך נסתר על ידי צוות Modrinth משום שפגע ב<tou-link>תנאי השימוש</tou-link>."
+  },
+  "error.collection.404.list_title": {
+    "message": "למה?"
+  },
+  "error.collection.404.title": {
+    "message": "קובץ לא נמצא"
+  },
+  "error.generic.404.subtitle": {
+    "message": "העמוד שחיפשת לא קיים."
+  },
   "error.generic.404.title": {
     "message": "עמוד לא קיים"
   },
+  "error.generic.451.subtitle": {
+    "message": "עמוד זה נחסם מסיבות משפטיות, כגון צנזורה ממשלתית או הליכים משפטיים מתמשכים."
+  },
+  "error.generic.451.title": {
+    "message": "תוכן לא נגיש מסיבות משפטיות"
+  },
   "error.generic.default.list_item.1": {
     "message": "בדוק אם Modrinth אינו זמין ב<status-link>דף הסטטוס</status-link> שלנו."
+  },
+  "error.generic.default.list_item.2": {
+    "message": "אם זה ממשיך לקרות, אנא ידע/י את צוות Modrinth דרך <discord-server>שרת הדיסקורד</discord-link>."
+  },
+  "error.generic.default.list_title": {
+    "message": "נסו שוב בעוד מספר דקות."
   },
   "error.generic.default.subtitle": {
     "message": "משהו השתבש."
@@ -527,14 +761,80 @@
   "landing.error.failedToLoadRandomProjects": {
     "message": "נכשל בניסיון טעינת פרויקטים אקראיים :("
   },
+  "landing.feature.follow.description": {
+    "message": "התעדכן/י כל פעם הפקרויקטים האהובים עליך מתעדכנים."
+  },
   "landing.feature.follow.heading": {
     "message": "עקבו אחר פרויקטים שאתם אוהבים"
   },
   "landing.feature.launcher.description": {
-    "message": "ה-API הפתוח של Modrinth מאפשר למשגרים (Launchers) להוסיף אינטגרציה עמוקה עם הפלטפורמה. אתם יכולים להשתמש ב-Modrinth דרך האפליקציה שלנו, וגם דרך כמה מהמשגרים הפופולריים ביותר כמו ATLauncher, MultiMC ו-Prism Launcher."
+    "message": "ה-API הפתוח של Modrinth מאפשר למפעילים לשלב אינטגרציה עמוקה עם Modrinth. ניתן להשתמש ב-Modrinth דרך <link>האפליקציה שלנו</link>, וגם באמצעות כמה מהמפעילים הפופולריים ביותר, כמו ATLauncher, MultiMC ו-Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "שחק עם המפעיל האהוב עליך"
+  },
+  "landing.feature.search.description": {
+    "message": "מערכת החיפוש הזריזה והפילטרים העוצמתיים של Modrinth מאפשרים למצוא את מה שמחפשים בזמן כתיבה."
+  },
+  "landing.feature.search.heading": {
+    "message": "מצא/י מה שתרצה/י, במהירות וקלות"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "המקום ל{content} מיינקראפט"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "חבילות תוכן / Data Packs"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "חבילות מודים / Modpacks"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "מודים"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "פלאגינים"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "טקסטורות"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "שרתים"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "הצללות / שיידרים"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
+  "landing.launcher.graphic-alt": {
+    "message": "הצגה של חלון מיינקראפט מופשט, עם לוגו Mojang בצבע ירוק Modrinth."
+  },
+  "landing.launcher.modrinth-app-label": {
+    "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "{title} עודכן!"
+  },
+  "landing.notifications.heading": {
+    "message": "עדכונים"
+  },
+  "landing.notifications.received-time": {
+    "message": "זמן קבלה: {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "גרסא {version} יצאה לגרסאת המשחק {gameVersion}"
+  },
+  "landing.search.label": {
+    "message": "חיפוש"
+  },
+  "landing.search.placeholder": {
+    "message": "חיפוש..."
+  },
+  "landing.search.sort-by.label": {
+    "message": "מיון לפי"
   },
   "landing.section.for-players.label": {
     "message": "בשביל שחקנים"
@@ -621,7 +921,7 @@
     "message": "מוצרים"
   },
   "layout.footer.products.app": {
-    "message": "אפליקציית Modrinth"
+    "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
@@ -646,5 +946,68 @@
   },
   "layout.footer.social.bluesky": {
     "message": "Bluesky"
+  },
+  "layout.footer.social.discord": {
+    "message": "דיסקורד"
+  },
+  "layout.footer.social.github": {
+    "message": "GitHub"
+  },
+  "layout.footer.social.mastodon": {
+    "message": "מסטודון"
+  },
+  "layout.footer.social.x": {
+    "message": "X"
+  },
+  "layout.nav.modrinth-app": {
+    "message": "Modrinth App"
+  },
+  "moderation.page.projects": {
+    "message": "פרויקטים"
+  },
+  "profile.label.no": {
+    "message": "לא"
+  },
+  "profile.label.yes": {
+    "message": "כן"
+  },
+  "project-member-header.error": {
+    "message": "שגיאה"
+  },
+  "project-type.datapack.plural": {
+    "message": "חבילות נתונים"
+  },
+  "project-type.datapack.singular": {
+    "message": "חבילת נתונים"
+  },
+  "project-type.mod.plural": {
+    "message": "מודים"
+  },
+  "project-type.mod.singular": {
+    "message": "מוד"
+  },
+  "project.actions.dont-show-again": {
+    "message": "אל תציג שוב"
+  },
+  "project.description.title": {
+    "message": "תיאור"
+  },
+  "project.download.install-with-app": {
+    "message": "התקן באמצעות Modrinth App"
+  },
+  "project.settings.general.name.title": {
+    "message": "שם"
+  },
+  "project.settings.title": {
+    "message": "הגדרות"
+  },
+  "settings.language.languages.language-label-error": {
+    "message": "{label}. שגיאה"
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "שם"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "תמונת פרופיל"
   }
 }

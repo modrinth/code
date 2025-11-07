@@ -566,6 +566,27 @@
   "create.project.visibility-unlisted": {
     "message": "Nicht gelistet"
   },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Partnerlink erstellen"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Fehler beim laden von Partnerlinks"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Deine Partnerlinks"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Dies wird permanent den Partbercode `{id}` widerrufen und alle existierenden Links, welche es nutzen, werden nicht mehr gültig sein."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Widerrufen"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Bist du sicher dass du deinen \"{title}\" Partnerlink widerrufen willst?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Partnerlinks durchsuchen..."
+  },
   "dashboard.collections.button.create-new": {
     "message": "Erstellen"
   },
@@ -577,6 +598,18 @@
   },
   "dashboard.collections.long-title": {
     "message": "Deine Kollektionen"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "{formType} herunterladen"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Dein {formType} Steuerformular wurde erfolgreich eingereicht!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Du kannst nun frei abheben. Falls du fragen hast oder deine Daten aktualisieren musst <support-link>kontaktiere den Support</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Alles ist bereit! 🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Eine ausländische Einheit bezeichnet eine ausserhalb der Vereinigten Staaten gegründete Geschäftseinheit (z.B. eine nicht US-amerikanische Kapitalgesellschaft, Personengesellschaft oder LLC)."
@@ -857,6 +890,9 @@
   "layout.action.lookup-by-email": {
     "message": "Über E-Mail ansehen"
   },
+  "layout.action.manage-affiliates": {
+    "message": "Partnerlinks verwalten"
+  },
   "layout.action.manage-server-notices": {
     "message": "Servermitteilungen verwalten"
   },
@@ -912,10 +948,19 @@
     "message": "Steuerformular abschliessen"
   },
   "layout.banner.tax.description": {
-    "message": "Du hast dieses Jahr bereits mehr als $600 von Modrinth abgehoben. Um die Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Abhebungen werden ausgesetzt, bis dieses Formular eingereicht wurde."
+    "message": "Du hast bereits mehr als $600 von Modrinth für dieses Jahr abgehoben. Um geltende Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Abhebungen werden ausgesetzt, bis dieses Formular eingereicht wurde."
   },
   "layout.banner.tax.title": {
     "message": "Steuerformular benötigt"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Support kontaktieren"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Deine Abbuchungen sind vorrübergehend blockiert, da deine TIN oder SSN nicht mit IRS-Aufzeichnungen übereinstimmt. Bitte kontakitiere den Support umd dein Steuerformular zurückzusetzen und erneut zu übermitteln."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Steuerformular fehlgeschlagen"
   },
   "layout.banner.verify-email.action": {
     "message": "Verifizierungs-E-Mail erneut senden"
@@ -1091,8 +1136,17 @@
   "moderation.technical.search.placeholder": {
     "message": "Technische Rezensionen durchsuchen..."
   },
+  "profile.bio.fallback.creator": {
+    "message": "Ein Modrinth Ersteller."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Ein Modrinth Benutzer."
+  },
   "profile.button.billing": {
     "message": "Nutzer Zahlungen verwalten"
+  },
+  "profile.button.edit-role": {
+    "message": "Rolle bearbeiten"
   },
   "profile.button.info": {
     "message": "Nutzerdetails ansehen"
@@ -1100,17 +1154,56 @@
   "profile.button.manage-projects": {
     "message": "Projekte verwalten"
   },
+  "profile.button.remove-affiliate": {
+    "message": "Als Partner entfernen"
+  },
+  "profile.button.set-affiliate": {
+    "message": "Als Partner setzen"
+  },
+  "profile.details.label.auth-providers": {
+    "message": "Authentifizierungsanbieter"
+  },
+  "profile.details.label.email": {
+    "message": "E-Mail"
+  },
+  "profile.details.label.has-password": {
+    "message": "Hat Passwort"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Hat TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Zahlungsmethoden"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "E-Mail nicht verifiziert"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "E-Mail verifiziert"
+  },
   "profile.error.not-found": {
     "message": "Benutzer nicht gefunden"
   },
-  "profile.joined-at": {
-    "message": "<date>{ago}</date> beigetreten"
+  "profile.label.affiliate": {
+    "message": "Partner"
   },
   "profile.label.badges": {
     "message": "Abzeichen"
   },
+  "profile.label.collection": {
+    "message": "Kollektion"
+  },
   "profile.label.details": {
     "message": "Details"
+  },
+  "profile.label.downloads": {
+    "message": "{count} Download{count, plural, one {} other {s}}"
+  },
+  "profile.label.joined": {
+    "message": "Beigetreten"
+  },
+  "profile.label.no": {
+    "message": "Nein"
   },
   "profile.label.no-collections": {
     "message": "Dieser Nutzer hat keine Kollektionen!"
@@ -1127,17 +1220,20 @@
   "profile.label.organizations": {
     "message": "Organisationen"
   },
+  "profile.label.projects": {
+    "message": "{count} Projekt{count, plural, one {} other {e}}"
+  },
+  "profile.label.saving": {
+    "message": "Speichert..."
+  },
+  "profile.label.yes": {
+    "message": "Ja"
+  },
   "profile.meta.description": {
     "message": "Lade {username}'s Projekte auf Modrinth herunter"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Lade {username}'s Projekte auf Modrinth herunter"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> Projekt download} other {<stat>{count}</stat> Projekt downloads}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> Projek} other {<stat>{count}</stat> Projekte}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat>} other {<stat>{count}</stat>}} Projekt-Follower"
@@ -1865,20 +1961,20 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup-Wiederherstellung im gange"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Bereite bereits Backup zum download vor"
-  },
   "servers.backups.item.automated": {
     "message": "Automatisiert"
   },
   "servers.backups.item.creating-backup": {
     "message": "Erstelle Backup..."
   },
+  "servers.backups.item.downloading": {
+    "message": "Wird Heruntergeladen"
+  },
+  "servers.backups.item.downloading-backup": {
+    "message": "Lade Backup herunter..."
+  },
   "servers.backups.item.failed-to-create-backup": {
     "message": "Erstellung eines Backup fehlgeschlagen"
-  },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Vorbereitung von download fehlgeschlagen"
   },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Wiederherstellung von Backup fehlgeschlagen"
@@ -1888,15 +1984,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Gesperrt"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Download vorbereiten"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Versuche vorbereitung erneut"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Download vorbereiten..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Zur sicherung in warteschlange gestellt"

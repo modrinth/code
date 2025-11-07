@@ -437,6 +437,9 @@
   "create.collection.name-label": {
     "message": "Nom"
   },
+  "create.collection.name-placeholder": {
+    "message": "Entrez le nom de la collection..."
+  },
   "create.collection.summary-description": {
     "message": "Une ou deux phrases qui décrivent vôtre collection."
   },
@@ -445,6 +448,9 @@
   },
   "create.collection.summary-placeholder": {
     "message": "C'est une collection de..."
+  },
+  "create.collection.title": {
+    "message": "Création de la collection"
   },
   "create.limit-alert.contact-support": {
     "message": "Contacter le support"
@@ -479,6 +485,63 @@
   "create.organization.name-label": {
     "message": "Nom"
   },
+  "create.organization.name-placeholder": {
+    "message": "Entrez le nom de l'organisation..."
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Annuler"
+  },
+  "create.project.create-project": {
+    "message": "Créer un projet"
+  },
+  "create.project.error-title": {
+    "message": "Une erreur est survenue"
+  },
+  "create.project.name-label": {
+    "message": "Nom"
+  },
+  "create.project.name-placeholder": {
+    "message": "Entrez le nom du projet..."
+  },
+  "create.project.summary-description": {
+    "message": "Une phrase ou deux qui décrivent votre projet."
+  },
+  "create.project.summary-label": {
+    "message": "Sommaire"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Ce projet ajoute..."
+  },
+  "create.project.title": {
+    "message": "Création d'un projet"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-label": {
+    "message": "Visibilité"
+  },
+  "create.project.visibility-private": {
+    "message": "Privé"
+  },
+  "create.project.visibility-public": {
+    "message": "Publique"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Non répertorié"
+  },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Créer un lien affilié"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Vos liens affiliés"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Révoquer"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Créer un nouveau"
   },
@@ -490,6 +553,12 @@
   },
   "dashboard.collections.long-title": {
     "message": "Vos collections"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Télécharger {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Tout est prêt ! 🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Une entité étrangère correspond à toute entreprise située en dehors des États-Unis d'Amérique (par exemple, une entreprise non américaine, une entreprise partenaire ou LLC)."
@@ -535,6 +604,9 @@
   },
   "error.generic.404.title": {
     "message": "Page introuvable"
+  },
+  "error.generic.451.title": {
+    "message": "Contenu indisponible pour des raisons légal"
   },
   "error.generic.default.list_item.1": {
     "message": "Vérifiez si Modrinth est hors ligne sur notre <status-link>page de statut</status-link>."
@@ -764,6 +836,9 @@
   "layout.action.lookup-by-email": {
     "message": "Recherche par email"
   },
+  "layout.action.manage-affiliates": {
+    "message": "Gérer les liens affiliés"
+  },
   "layout.action.manage-server-notices": {
     "message": "Gérer les notifications du serveur"
   },
@@ -818,11 +893,11 @@
   "layout.banner.tax.action": {
     "message": "Remplir la déclaration de revenus"
   },
-  "layout.banner.tax.description": {
-    "message": "Vous avez désormais retiré plus de 600 $ depuis Modrinth cette année. Pour être en règle avec la législation, vous devez remplir une déclaration de revenus. Vos demandes de retrait sont en attente tant que le formulaire n'a pas été rempli."
-  },
   "layout.banner.tax.title": {
     "message": "Déclaration de revenus nécessaire"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Contacter le support"
   },
   "layout.banner.verify-email.action": {
     "message": "Renvoyer un e-mail de vérification"
@@ -998,8 +1073,17 @@
   "moderation.technical.search.placeholder": {
     "message": "Rechercher des revues techniques…"
   },
+  "profile.bio.fallback.creator": {
+    "message": "Un créateur Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Un utilisateur Modrinth."
+  },
   "profile.button.billing": {
     "message": "Gérer la facturation de l’utilisateur"
+  },
+  "profile.button.edit-role": {
+    "message": "Modifier le rôle"
   },
   "profile.button.info": {
     "message": "Afficher les détails de l’utilisateur"
@@ -1007,17 +1091,29 @@
   "profile.button.manage-projects": {
     "message": "Gérer les projets"
   },
+  "profile.details.tooltip.email-verified": {
+    "message": "Email vérifié"
+  },
   "profile.error.not-found": {
     "message": "Utilisateur introuvable"
   },
-  "profile.joined-at": {
-    "message": "Inscrit le <date>{ago}</date>"
+  "profile.label.affiliate": {
+    "message": "Affilié"
   },
   "profile.label.badges": {
     "message": "Badges"
   },
+  "profile.label.collection": {
+    "message": "Collection"
+  },
   "profile.label.details": {
     "message": "Détails"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, one {téléchargement} other {téléchargements}}"
+  },
+  "profile.label.no": {
+    "message": "Non"
   },
   "profile.label.no-collections": {
     "message": "Cet utilisateur n'a aucune collection !"
@@ -1034,17 +1130,20 @@
   "profile.label.organizations": {
     "message": "Organisations"
   },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, one {projet} other {projets}}"
+  },
+  "profile.label.saving": {
+    "message": "Sauvegarde en cours..."
+  },
+  "profile.label.yes": {
+    "message": "Oui"
+  },
   "profile.meta.description": {
     "message": "Téléchargez les projets de {username} sur Modrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Téléchargez les projets de {username} sur Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> téléchargement} other {<stat>{count}</stat> téléchargements}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> projet} other {<stat>{count}</stat> projets}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> abonné} other {<stat>{count}</stat> abonnés}} aux projets"
@@ -1073,6 +1172,9 @@
   "project-member-header.invitation-title": {
     "message": "Invitation à rejoindre un projet"
   },
+  "project-member-header.invitation-with-role": {
+    "message": "Vous avez été invité à être membre de ce projet sous le rôle de '{role}''."
+  },
   "project-member-header.success": {
     "message": "Succès"
   },
@@ -1098,6 +1200,9 @@
     "message": "Vous devez compléter les étapes obligatoires dans la liste de contrôle de publication !"
   },
   "project-moderation-nags.submit-for-review": {
+    "message": "Soumettre pour examen"
+  },
+  "project-moderation-nags.submit-for-review-button": {
     "message": "Soumettre pour examen"
   },
   "project-moderation-nags.submit-for-review-desc": {
@@ -1766,20 +1871,20 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauration de sauvegarde en cours"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Préparation de la sauvegarde pour le téléchargement déjà en cours "
-  },
   "servers.backups.item.automated": {
     "message": "Automatisé"
   },
   "servers.backups.item.creating-backup": {
     "message": "Création de sauvegarde..."
   },
+  "servers.backups.item.downloading": {
+    "message": "Téléchargement"
+  },
+  "servers.backups.item.downloading-backup": {
+    "message": "Téléchargement de la backup..."
+  },
   "servers.backups.item.failed-to-create-backup": {
     "message": "Échec de la création de la sauvegarde"
-  },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Échec de la préparation du téléchargement"
   },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Échec de la restauration à partir de la sauvegarde"
@@ -1789,15 +1894,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Verrouillé"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Préparer le téléchargement"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Réessayer la préparation"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Préparation du téléchargement…"
   },
   "servers.backups.item.queued-for-backup": {
     "message": "En file pour sauvegarde"

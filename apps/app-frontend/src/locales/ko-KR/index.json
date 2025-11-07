@@ -23,6 +23,18 @@
   "app.settings.tabs.resource-management": {
     "message": "리소스 관리"
   },
+  "app.update-toast.changelog": {
+    "message": "변경사항"
+  },
+  "app.update-toast.download": {
+    "message": "다운로드 ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "다운로드 중..."
+  },
+  "app.update-toast.reload": {
+    "message": "리로드"
+  },
   "instance.add-server.add-and-play": {
     "message": "추가하고 플레이"
   },

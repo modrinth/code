@@ -1,4 +1,10 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Створити партнерське посилання"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Створити новий код партнера"
+  },
   "badge.beta": {
     "defaultMessage": "Бета"
   },
@@ -16,6 +22,9 @@
   },
   "button.cancel": {
     "defaultMessage": "Скасувати"
+  },
+  "button.clear": {
+    "defaultMessage": "Очистити"
   },
   "button.close": {
     "defaultMessage": "Замкнути"

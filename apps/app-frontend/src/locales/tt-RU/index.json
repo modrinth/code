@@ -92,6 +92,9 @@
   "instance.settings.tabs.installation.change-version.button.installing": {
     "message": "Утырту"
   },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Төзәтү мәгълүматы:"
+  },
   "instance.settings.tabs.installation.game-version": {
     "message": "Уен версиясе"
   },
