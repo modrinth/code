@@ -70,7 +70,7 @@ pub enum Ownership {
     },
 }
 
-/// Fetches all projects which are in the moderation queue.
+/// Fetch all projects which are in the moderation queue.
 #[utoipa::path(
     responses((status = OK, body = inline(Vec<FetchedProject>)))
 )]
@@ -200,6 +200,7 @@ pub async fn get_projects_internal(
     Ok(web::Json(projects))
 }
 
+/// Fetch moderation metadata for a specific project.
 #[utoipa::path(
     responses((status = OK, body = inline(Vec<Project>)))
 )]
@@ -355,6 +356,7 @@ pub enum Judgement {
     },
 }
 
+/// Update moderation judgements for projects in the review queue.
 #[utoipa::path]
 #[post("/project")]
 async fn set_project_meta(
