@@ -15,10 +15,16 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;
 
+mod tech_review;
+
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(get_projects)
         .service(get_project_meta)
-        .service(set_project_meta);
+        .service(set_project_meta)
+        .service(
+            utoipa_actix_web::scope("/tech-review")
+                .configure(tech_review::config),
+        );
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
