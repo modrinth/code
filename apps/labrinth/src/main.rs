@@ -17,7 +17,6 @@ use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::utoipa_app_config;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting};
 use std::ffi::CStr;
-use std::str::FromStr;
 use std::sync::Arc;
 use tracing::{Instrument, error, info, info_span};
 use tracing_actix_web::TracingLogger;
