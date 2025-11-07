@@ -26,7 +26,14 @@
 			</div>
 		</div>
 	</div>
-	<div ref="main_page" class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
+	<div
+		ref="main_page"
+		class="layout"
+		:class="{
+			'expanded-mobile-nav': isBrowseMenuOpen,
+			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
+		}"
+	>
 		<PagewideBanner v-if="isRussia && !flags.hideRussiaCensorshipBanner" variant="error">
 			<template #title>
 				<div class="flex flex-col gap-1 text-contrast">
