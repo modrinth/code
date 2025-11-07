@@ -4660,7 +4660,6 @@ dependencies = [
  "clickhouse",
  "color-eyre",
  "color-thief",
- "console-subscriber",
  "const_format",
  "dashmap",
  "deadpool-redis",
@@ -4683,6 +4682,7 @@ dependencies = [
  "lettre",
  "meilisearch-sdk",
  "modrinth-maxmind",
+ "modrinth-util",
  "muralpay",
  "murmur2",
  "paste",
@@ -4716,8 +4716,6 @@ dependencies = [
  "totp-rs",
  "tracing",
  "tracing-actix-web",
- "tracing-ecs",
- "tracing-subscriber",
  "url",
  "urlencoding",
  "utoipa",
@@ -5227,10 +5225,14 @@ name = "modrinth-util"
 version = "0.0.0"
 dependencies = [
  "actix-web",
+ "console-subscriber",
  "derive_more 2.0.1",
  "dotenvy",
  "eyre",
  "serde",
+ "tracing",
+ "tracing-ecs",
+ "tracing-subscriber",
 ]
 
 [[package]]
