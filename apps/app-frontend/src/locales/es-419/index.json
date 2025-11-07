@@ -65,6 +65,63 @@
   "app.update.reload-to-update": {
     "message": "Recarga para instalar la actualización"
   },
+  "friends.action.add-friend": {
+    "message": "Agrega a un amigo"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {petición} other {peticiones}} de amistad"
+  },
+  "friends.add-friend.submit": {
+    "message": "Envía una petición de amistad"
+  },
+  "friends.add-friend.title": {
+    "message": "Agrega a un amigo"
+  },
+  "friends.add-friend.username.description": {
+    "message": "¡Puede ser diferente de su apodo en Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Escribe su apodo en Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "¿Cuál es el apodo de tu amigo en Modrinth?"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Cancelar petición"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Eliminar amigo"
+  },
+  "friends.friend.request-sent": {
+    "message": "Petición de amistad enviada"
+  },
+  "friends.friend.view-profile": {
+    "message": "Ver perfil"
+  },
+  "friends.heading": {
+    "message": "Amigos"
+  },
+  "friends.heading.active": {
+    "message": "Activos"
+  },
+  "friends.heading.offline": {
+    "message": "Desconectados"
+  },
+  "friends.heading.online": {
+    "message": "Conectados"
+  },
+  "friends.heading.pending": {
+    "message": "Pendientes"
+  },
+  "friends.no-friends-match": {
+    "message": "Ningún apodo concuerda con ''{query}''"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Buscando amigos..."
+  },
+  "friends.section.heading": {
+    "message": "{title}: {count}"
+  },
   "instance.add-server.add-and-play": {
     "message": "Añadir y jugar"
   },

@@ -65,6 +65,69 @@
   "app.update.reload-to-update": {
     "message": "Lade neu um Aktualisierung zu installieren"
   },
+  "friends.action.add-friend": {
+    "message": "Freund hinzufügen"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} Freundschaftsanfrage{count, plural, one {} other {n}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Freundschaftsanfrage senden"
+  },
+  "friends.add-friend.title": {
+    "message": "Einen Freund hinzufügen"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Es könnte anders als ihr Minecraft Nutzername sein!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Modrinth Nutzernamen eingeben..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Was ist der Modrinth Nutzername deines Freundes?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Füge Freunde hinzu</link> um zu sehen, was sie spielen!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Anfrage abbrechen"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Freund entfernen"
+  },
+  "friends.friend.request-sent": {
+    "message": "Freundschaftsanfrage gesendet"
+  },
+  "friends.friend.view-profile": {
+    "message": "Profil anzeigen"
+  },
+  "friends.heading": {
+    "message": "Freunde"
+  },
+  "friends.heading.active": {
+    "message": "Aktiv"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Ausstehend"
+  },
+  "friends.no-friends-match": {
+    "message": "Keine Freunde, die mit \"{query}\" übereinstimmen"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Freunde suchen..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Logge dich in ein Modrinth Konto ein</link> um Freunde hinzuzufügen und zu sehen, was sie spielen!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Ersteue u starte"
   },

@@ -3,7 +3,7 @@
     "message": "Fejlesztői mód bekapcsolva."
   },
   "app.settings.downloading": {
-    "message": "Letöltés v{version}"
+    "message": "v{version} letöltése"
   },
   "app.settings.tabs.appearance": {
     "message": "Megjelenés"
@@ -60,10 +60,73 @@
     "message": "Frissítés letöltése"
   },
   "app.update.downloading-update": {
-    "message": "Frissítés folyamatban ({percent}%)"
+    "message": "Frissítés letöltése ({percent}%)"
   },
   "app.update.reload-to-update": {
     "message": "A telepítéshez újraindítás szükséges"
+  },
+  "friends.action.add-friend": {
+    "message": "Barát hozzáadása"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} barát {count, plural, other {kérelem}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Barátkérelem elküldése"
+  },
+  "friends.add-friend.title": {
+    "message": "Barát hozzáadása"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Más is lehet, mint a Minecraft felhasználóneve!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Barát Modrinth felhasználóneve..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Mi a barátod Modrinth felhasználóneve?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Vegyél fel barátokat</link>, hogy lásd mivel játszanak!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Barátkérelem visszavonása"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Barát eltávolítása"
+  },
+  "friends.friend.request-sent": {
+    "message": "Barátkérelem elküldve"
+  },
+  "friends.friend.view-profile": {
+    "message": "Profil megtekintése"
+  },
+  "friends.heading": {
+    "message": "Barátok"
+  },
+  "friends.heading.active": {
+    "message": "Aktív"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Jóváhagyásra vár"
+  },
+  "friends.no-friends-match": {
+    "message": "Nincsen \"{query}\" nevű barátod"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Keresés a barátaid között..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Lépj be Modrinth fiókba</link>, hogy felvehess barátokat és lásd mivel játszanak!"
   },
   "instance.add-server.add-and-play": {
     "message": "Hozzáadás és játék"

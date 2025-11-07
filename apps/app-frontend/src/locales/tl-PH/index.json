@@ -9,7 +9,7 @@
     "message": "Kiyas"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Mga pagpipilian sa batayang pangyayari"
+    "message": "Mga pagpipilian sa batayang tularan"
   },
   "app.settings.tabs.feature-flags": {
     "message": "Watawat ng mga tampok"
@@ -23,11 +23,17 @@
   "app.settings.tabs.resource-management": {
     "message": "Pamamahala ng mapagkukunan"
   },
+  "app.update-toast.body": {
+    "message": "Handa nang maikabit ang Modrinth App v{version}. Muling dalhin upang maisapanahon, o pagkusaan pagpinid ng Modrinth App."
+  },
   "app.update-toast.body.download-complete": {
-    "message": "Tapos nang maidalamba ang Modrinth App v{version}. Muling dalhin upang matakda ang pagbabago ngayon, o mamaya nalang sa pagpinid ng Modrinth App."
+    "message": "Tapos nang maidalamba ang Modrinth App v{version}. Muling dalhin upang maisapanahon, o pagkusaan pagpinid ng Modrinth App."
   },
   "app.update-toast.body.metered": {
     "message": "Magagamit na ngayon ang Modrinth App v{version}! Hindi namin dinalamba kaagad dahil bilang ang inyong kabalagan."
+  },
+  "app.update-toast.changelog": {
+    "message": "Tala ng Pagbabago"
   },
   "app.update-toast.download": {
     "message": "Idalamba ({size})"
@@ -35,14 +41,89 @@
   "app.update-toast.downloading": {
     "message": "Nagdadalamba..."
   },
+  "app.update-toast.reload": {
+    "message": "Magmulindala"
+  },
+  "app.update-toast.title": {
+    "message": "May kamakailang pagsasapanahon"
+  },
   "app.update-toast.title.download-complete": {
     "message": "Natapos ang pagdalamba"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Magpindot rito upang matingnan ang talaan ng pagbabago."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Tagumpay na nakabit ang bersiyong {version}!"
   },
   "app.update.download-update": {
     "message": "Idalamba ang pagbabago"
   },
   "app.update.downloading-update": {
-    "message": "Nagdadalamba ng pagbabago ({percent}%)"
+    "message": "Nagdadalamba ng pagsasapanahon ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Handang makabit ang pagsasapanahon"
+  },
+  "friends.action.add-friend": {
+    "message": "Magdagdag ng kaibigan"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count, plural, one {{count}} other {{count} na}} hiling na makipagkaibigan"
+  },
+  "friends.add-friend.submit": {
+    "message": "Magpadala ng hiling na makipagkaibigan"
+  },
+  "friends.add-friend.title": {
+    "message": "Pagdaragdag ng kaibigan"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Maaaraing hindi katulad sa kanilang pangalan sa Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Ilagay ang pangalan ng gagamit sa Modrinth... "
+  },
+  "friends.add-friend.username.title": {
+    "message": "Ano ang pangalan ng iyong kaibigan sa Modrinth?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Magdagdag ng mga kaibigan</link> upang makita ang kanilang nilalaro!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Bawiin ang hiling"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Tanggalin ang kaibing"
+  },
+  "friends.friend.request-sent": {
+    "message": "Ipinadala na ang hiling na makipagkaibigan"
+  },
+  "friends.friend.view-profile": {
+    "message": "Tingnan ang propayl"
+  },
+  "friends.heading": {
+    "message": "Mga kaibigan"
+  },
+  "friends.heading.active": {
+    "message": "Masigla"
+  },
+  "friends.heading.offline": {
+    "message": "Pinid"
+  },
+  "friends.heading.online": {
+    "message": "Bukas"
+  },
+  "friends.heading.pending": {
+    "message": "Nakabinbin"
+  },
+  "friends.no-friends-match": {
+    "message": "Walang kaibigang tumugma sa \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Hanapin ang mga kaibigan..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
   },
   "instance.add-server.add-and-play": {
     "message": "Idagdag at laruin"
@@ -86,6 +167,9 @@
   "instance.filter.updates-available": {
     "message": "May mga bagong pagbabago"
   },
+  "instance.server-modal.address": {
+    "message": "Tinitirhan"
+  },
   "instance.server-modal.name": {
     "message": "Pangalan"
   },
@@ -95,14 +179,29 @@
   "instance.server-modal.resource-pack": {
     "message": "Balot ng mapagkukunan"
   },
+  "instance.settings.tabs.general": {
+    "message": "Pangkalahatan"
+  },
   "instance.settings.tabs.general.delete": {
-    "message": "Tanggalin ang pangyayari"
+    "message": "Tanggalin ang tularan"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Tanggalin ang pangyayari"
+    "message": "Tanggalin ang tularan"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Lagiang matatanggal ang pangyayari sa iyong pakasam, kasali na ang iyong mga daigdig, pagsasaayos, at lahat ng kinabitang nilalaman. Mag-ingat, hindi na mababawi kapag magtanggal ka ng pangyayari."
+    "message": "Habam buhay na matatanggal ang tularan sa iyong pakasam, kasali na ang iyong mga daigdig, pagsasaayos, at lahat ng kinabitang nilalaman. Mag-ingat, hindi na mababawi kapag nagtanggal ka na ng tularan."
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Binubura..."
+  },
+  "instance.settings.tabs.general.duplicate-button": {
+    "message": "Isaduhasipi"
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
+    "message": "Hindi makakasaduhasipi habang nagkakabit."
+  },
+  "instance.settings.tabs.general.duplicate-instance": {
+    "message": "Isaduhasipi ang tularan"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
     "message": "Gagawan ng sipi ang pangyayaring ito, kasali na ang mga daigdig, pagsasaaayos, pagbabago, at iba pa."
@@ -113,19 +212,199 @@
   "instance.settings.tabs.general.edit-icon.remove": {
     "message": "Tanggalin ang lambana"
   },
+  "instance.settings.tabs.general.edit-icon.replace": {
+    "message": "Palitan ang lambana"
+  },
+  "instance.settings.tabs.general.edit-icon.select": {
+    "message": "Pumili ng lambana"
+  },
+  "instance.settings.tabs.general.library-groups": {
+    "message": "Mga pangkat ng aklatan"
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Gumawa ng bagong pangkat"
+  },
+  "instance.settings.tabs.general.library-groups.description": {
+    "message": "Binibigyang-daan ng mga pangkat ng aklatan na iyong maayos ang iyong mga tularan sa iba't-ibang tapyas ng iyong aklatan."
+  },
+  "instance.settings.tabs.general.library-groups.enter-name": {
+    "message": "Ilagay ang pangalan ng pangkat"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Pangalan"
+  },
+  "instance.settings.tabs.hooks": {
+    "message": "Mga kawit sa paglunsad"
+  },
+  "instance.settings.tabs.hooks.custom-hooks": {
+    "message": "Mga pasadyang kawit sa paglunsad"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "Binibigyan-daan ng mga kawit ang mga madalubhasang gumagamit na makapagtakbo ng mga utos sa kaayusan bago at pagkatapos malunsad ang laro."
+  },
+  "instance.settings.tabs.hooks.post-exit": {
+    "message": "Tapos-mapinid"
+  },
+  "instance.settings.tabs.hooks.post-exit.description": {
+    "message": "Ipapatakbo pagkatapos mapinid ang laro."
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "Ilagay ang tapos-mapinid na utos..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "Bago-malunsad"
+  },
+  "instance.settings.tabs.hooks.pre-launch.description": {
+    "message": "Ipapatakbo bago mailunsad ang tularan."
+  },
+  "instance.settings.tabs.hooks.pre-launch.enter": {
+    "message": "Ilagay ang bago-malunsad na utos..."
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "Mga kawit sa paglunsad ng laro"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "Pambalot"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "Pambalot na utos sa paglunsad ng Minecraft."
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "Ilagay ang pambalot na utos..."
+  },
+  "instance.settings.tabs.installation": {
+    "message": "Pagkakabit"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.modded": {
+    "message": "Naka-install naman ang {platform} {version} para sa Minecraft {game_version}"
+  },
+  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
+    "message": "Nakakabit naman ang Baynilyang {game_version}"
+  },
+  "instance.settings.tabs.installation.change-version.button": {
+    "message": "Palitan ang bersiyon"
+  },
+  "instance.settings.tabs.installation.change-version.button.install": {
+    "message": "Ikabit"
+  },
+  "instance.settings.tabs.installation.change-version.button.installing": {
+    "message": "Kinakabit"
+  },
+  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
+    "message": "Naghahanap ng mga bersiyon ng mga balot ng pambago"
+  },
+  "instance.settings.tabs.installation.change-version.in-progress": {
+    "message": "Kinakabit ang bagong bersiyon"
+  },
+  "instance.settings.tabs.installation.currently-installed": {
+    "message": "Kasalukuyang nakakabit"
+  },
+  "instance.settings.tabs.installation.debug-information": {
+    "message": "Kaalaman sa pagdalisay:"
+  },
+  "instance.settings.tabs.installation.game-version": {
+    "message": "Bersiyon ng laro"
+  },
+  "instance.settings.tabs.installation.install": {
+    "message": "Ikabit"
+  },
+  "instance.settings.tabs.installation.loader-version": {
+    "message": "Bersiyon ng {loader}"
+  },
+  "instance.settings.tabs.installation.minecraft-version": {
+    "message": "Minecraft {version}"
+  },
+  "instance.settings.tabs.installation.no-loader-versions": {
+    "message": "Hindi magagamit ang {loader} sa Minecraft {version}. Sumubok ng ibang tagapagtala ng pambago."
+  },
+  "instance.settings.tabs.installation.platform": {
+    "message": "Batyawan"
+  },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Maaaring mababalik sa dati ang lahat ng kinabit o binago na nilalaman sa kung anong ibibigay ng balot ng pambago, tatanggalin ang mga pambago o nilalamang idinagdag mo lalo na ang nangunang balot ng pambago. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa pangyayari, ngunit kung nakabatay na ang iyong daigdig sa karagdagang nilalaman, maaari nitong masira ang mga umiiral na daigdig."
+    "message": "Maaaring mababalik sa dati ang lahat ng kinabit o binago na nilalaman sa kung anong ibibigay ng balot ng pambago, tatanggalin ang mga pambago o nilalamang idinagdag mo lalo na ang nangunang balot ng pambago. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa tularan, ngunit kung nakabatay na ang iyong daigdig sa karagdagang nilalaman, maaari nitong masira ang mga umiiral na daigdig."
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Ibalik ang mga nilalaman ng pangyayari sa pangunahing kalagayan, tatanggalin ang mga pambago o nilalamang idinagdag mo lalo na ang nangunang balot ng pambago."
+    "message": "Ibalik ang mga nilalaman ng tularan sa pangunahing kalagayan, tatanggalin ang mga pambago o nilalamang idinagdag mo lalo na ang nangunang balot ng pambago."
+  },
+  "instance.settings.tabs.installation.repair.button": {
+    "message": "Kumpunihin"
+  },
+  "instance.settings.tabs.installation.repair.button.repairing": {
+    "message": "Kinukumpuni"
+  },
+  "instance.settings.tabs.installation.repair.confirm.description": {
+    "message": "Sa pag-aayos, magkakabit muli ng mga sandalan ng Minecraft at maghahanap ng mga katiwalian. Maaaring malutas nito ang mga isyu kung hindi malulunsad ang laro dahil sa mga kamalian sa tagapaglunsad, ngunit hindi nito malulutas ang mga isyu o pagbagsak na dulot nga mga pambagong nakakabit."
+  },
+  "instance.settings.tabs.installation.repair.confirm.title": {
+    "message": "Kumpunihin ang tularan?"
+  },
+  "instance.settings.tabs.installation.show-all-versions": {
+    "message": "Ipakita ang lahat ng bersiyon"
+  },
+  "instance.settings.tabs.installation.tooltip.action.change-version": {
+    "message": "palitan ang bersiyon"
+  },
+  "instance.settings.tabs.installation.tooltip.action.install": {
+    "message": "ikabit"
+  },
+  "instance.settings.tabs.installation.tooltip.action.reinstall": {
+    "message": "ikabit muli"
+  },
+  "instance.settings.tabs.installation.tooltip.action.repair": {
+    "message": "kumpunihin"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
+    "message": "Hindi makaka-{action} habang nagkakabit"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
+    "message": "Hindi makaka-{action} habang di-nakakabit"
+  },
+  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
+    "message": "Hindi makaka-{action} habang nagkukumpuni"
+  },
+  "instance.settings.tabs.installation.unknown-version": {
+    "message": "(hindi kilalang bersiyon)"
+  },
+  "instance.settings.tabs.installation.unlink.confirm.description": {
+    "message": "Kung ipapatuloy mo, hindi mo na itong maaaring maikawing muli ng hindi lilikha ng panibagong tularan. Hindi ka makatatanggap ng mga pagsasapanahon ng pambalot ng pambago at magiging pangkaraniwan na itong."
+  },
+  "instance.settings.tabs.installation.unlink.description": {
+    "message": "Nakakawing ang tularang ito sa isang pambalot ng pambago, ibig sabihin hindi maisapanahon ang mga pambago at hindi mo mapapalitan ang tagapagdala ng pambago o ang bersiyon ng Minecraft."
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "Mga kawit"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "Kabit ng Java"
+  },
+  "instance.settings.tabs.window": {
+    "message": "Durungawan"
   },
   "instance.settings.tabs.window.custom-window-settings": {
     "message": "Mga kagustuhan sa pasadyang durungawan"
   },
+  "instance.settings.tabs.window.height": {
+    "message": "Tayog"
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "Lapad"
+  },
   "instance.settings.title": {
     "message": "Mga Kagustuhan"
   },
+  "instance.worlds.a_minecraft_server": {
+    "message": "Isang Minecraft na Tagapagsilbi"
+  },
+  "instance.worlds.copy_address": {
+    "message": "Sipiin ang tinitirhan"
+  },
+  "instance.worlds.type.server": {
+    "message": "Tagapagsilbi"
+  },
+  "instance.worlds.type.singleplayer": {
+    "message": "Pang-isahang laro"
+  },
   "instance.worlds.view_instance": {
-    "message": "Tingnan ang pangyayari"
+    "message": "Tingnan ang tularan"
   }
 }

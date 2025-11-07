@@ -1,6 +1,9 @@
 {
+  "action.cancel": {
+    "message": "Bawiin"
+  },
   "app-marketing.download.description": {
-    "message": "Magagamit ang aming desktop na aplikasyon sa samot-saring plataporma, piliin ang iyong ninanais na bersiyon."
+    "message": "Magagamit ang aming desktop na aplikasyon sa samot-saring batyawan, piliin ang iyong ninanais na bersiyon."
   },
   "app-marketing.download.download-appimage": {
     "message": "Idalamba ang AppImage"
@@ -35,14 +38,53 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.importing.multimc-alt": {
+    "message": "MultiMC"
+  },
+  "app-marketing.features.mod-management.actions": {
+    "message": "Mga Kilos"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Pinapadali ng Modrinth na pamahalaan ang lahat ng iyong pambago sa iisang pook. Makakakabit, makakaalis, at makakapagsapanahon ng mga pambago sa iisang pindot lang."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Mga pambagong kinabit"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Pangalan"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Maghanap ng mga pambago"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Bukas na pinagmulan"
+  },
+  "app-marketing.features.performance.cpu-percent": {
+    "message": "% CPU"
+  },
+  "app-marketing.features.performance.infinite-mb": {
+    "message": "∞ MB"
+  },
+  "app-marketing.features.performance.less-than-150mb": {
+    "message": "< 150 MB"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
   },
+  "app-marketing.features.performance.one-billion-percent": {
+    "message": "1 gatos na %"
+  },
+  "app-marketing.features.performance.ram": {
+    "message": "RAM"
+  },
+  "app-marketing.features.performance.small": {
+    "message": "Maliit"
+  },
   "app-marketing.features.play.description": {
     "message": "Gamitin ang Modrinth App sa pagdalamba at paglaro ng iyong mga paboritong pambago at balot ng pambago."
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Ibahagi"
   },
   "app-marketing.hero.download-button": {
     "message": "Idalamba ang Modrinth App"
@@ -56,8 +98,20 @@
   "app-marketing.hero.more-download-options": {
     "message": "Higit na Pagpipilian sa Pagdalamba"
   },
+  "auth.reset-password.method-choice.email-username.placeholder": {
+    "message": "Dagisulat"
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Nalimutan ang lihim na salita?</forgot-password-link> • <create-account-link>Lumikha ng akawnt</create-account-link>"
+  },
+  "auth.sign-up.email.label": {
+    "message": "Dagisulat"
+  },
   "auth.verify-email.action.account-settings": {
     "message": "Mga kagustuhan sa akawnt"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Tagumpay na napatunayan ang tinitirhan ng iyong dagisulat!"
   },
   "auth.welcome.description": {
     "message": "Bahagi ka na ngayon ng nitong kahanga-hangang pamayanan kabilang sa mga tagalikha at manlalakbay na nagtataguyod, nagdadalamba, at nananatiling napapanahon sa mga nakamamanghang mga pambago."
@@ -71,6 +125,51 @@
   "collection.delete-modal.description": {
     "message": "Habambuhay na matatanggal ang pagtitipong ito. Hindi mababawi ang pagkilos na ito."
   },
+  "collection.error.not-found": {
+    "message": "Hindi mahanap ang pagtitipon"
+  },
+  "collection.label.owner": {
+    "message": "May-ari"
+  },
+  "common.no": {
+    "message": "Hindi"
+  },
+  "common.yes": {
+    "message": "Oo"
+  },
+  "create.collection.cancel": {
+    "message": "Bawiin"
+  },
+  "create.collection.name-label": {
+    "message": "Pangalan"
+  },
+  "create.organization.cancel": {
+    "message": "Bawiin"
+  },
+  "create.organization.name-label": {
+    "message": "Pangalan"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Bawiin"
+  },
+  "create.project.name-label": {
+    "message": "Pangalan"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-public": {
+    "message": "Publiko"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Hindi nakatala"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Maghanap sa iyong mga pagtitipon"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Isang kalakalang entidad ang banyagang entidad na nakaayos sa labas ng Nangagkakaisang Banwa (tulod ng di-US na korporasyon, partnership, o LLC)."
   },
@@ -80,17 +179,62 @@
   "dashboard.creator-tax-form-modal.entity.question": {
     "message": "Isa ka bang pribadong indibidwal o parte ng isang banyagang entidad?"
   },
+  "error.collection.404.list_title": {
+    "message": "Bakit?"
+  },
+  "error.generic.default.title": {
+    "message": "Naku!"
+  },
+  "error.organization.404.list_title": {
+    "message": "Bakit?"
+  },
+  "error.project.404.list_title": {
+    "message": "Bakit?"
+  },
+  "error.user.404.list_title": {
+    "message": "Bakit?"
+  },
+  "frog.altText": {
+    "message": "Isang malakatotohanang pagpipinta ng laberintong palaka"
+  },
+  "frog.title": {
+    "message": "Palaka"
+  },
+  "landing.button.discover-mods": {
+    "message": "Magtuklas ng mga pambago"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "Pumunta sa hapag ng pagsubaybay"
+  },
   "landing.creator.feature.data-statistics.description": {
     "message": "Makatanggap ng detalyadong ulat ng mga pagtingin ng pahina, bilang ng pagdownload, at kinikita"
   },
   "landing.feature.launcher.description": {
     "message": "Binibigyang-daan ng bukas na pinagmulang API ng Modrinth ang mga tagapaglunsad na makadagdag ng malalimang pagsasama sa Modrinth. Maaari mong gamitin ang Modrinth sa <link>aming aplikasyon</link> at sa iilang pinakasikat na mga tagapaglunsad gaya ng ATLauncher, MultiMC, at Prism Launcher."
   },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "Ang pook para sa Minecraft na {content}"
+  },
+  "landing.heading.the-place-for-minecraft.mods": {
+    "message": "mga pambago"
+  },
   "landing.heading.the-place-for-minecraft.resource-packs": {
     "message": "mga balot ng mapagkukunan"
   },
+  "landing.notifications.has-been-updated": {
+    "message": "Naisapanahon ang {title}!"
+  },
+  "landing.search.label": {
+    "message": "Maghanap"
+  },
+  "landing.search.placeholder": {
+    "message": "Maghanap..."
+  },
+  "landing.section.for-players.label": {
+    "message": "Para sa mga Manlalaro"
+  },
   "landing.subheading": {
-    "message": "Magtuklas, maglaro, at magbahagi ng mga kontentong Minecraft sa aming bukas na pinagmulang platapormang ginawa para sa pamayanan."
+    "message": "Magtuklas, maglaro, at magbahagi ng mga kontentong Minecraft sa aming bukas na pinagmulang batyawang ginawa para sa pamayanan."
   },
   "layout.action.create-new": {
     "message": "Gumawa ng bago..."
@@ -98,14 +242,23 @@
   "layout.action.reports": {
     "message": "Mga pag-ulat"
   },
+  "layout.banner.account-action": {
+    "message": "Nangangailangan ng akawnt"
+  },
   "layout.banner.add-email.button": {
-    "message": "Mga kagustuhan sa akawnt"
+    "message": "Bisitahin ang mga kagustuhan sa akawnt"
+  },
+  "layout.banner.add-email.description": {
+    "message": "Dahil sa mga kadahilang pangkaligtasan, kailangan ng Modrinth na makapagrehistro ka ng tinitirhan ng dagisulat sa iyong akawnt."
   },
   "layout.banner.build-fail.description": {
     "message": "Bigong makabuo ng kalagayan galing sa API ang nitong pinakalat na frontend ng Modrinth. Marahil dahil ito sa isang pagkawalan o kamalian sa pagsasaaayos. Muling itayo kapag magagamit na ang API. Mga palahudyatan ng kamalian: {errors}; Ang kasalukuyang URL ng API: {url}"
   },
   "layout.banner.build-fail.title": {
     "message": "May kamalian sa pagbuo ng katayuan galing sa API habang nagpapatayo."
+  },
+  "layout.banner.verify-email.description": {
+    "message": "Dahil sa mga kadahilang pangkaligtasan, kailangan ng Modrinth na mapatunayan ang tinitirhan ng dagisulat sa iyong akawnt."
   },
   "layout.footer.about": {
     "message": "Tungkol"
@@ -194,6 +347,12 @@
   "layout.meta.description": {
     "message": "Magpasayong sipi ng mga pambago, pansaksak, balot ng malak, tagalilom, balot ng mapagkukunan, at balot ng pambago ng Minecraft sa Modrinth. Tumuklas at maglathala ng mga panukala sa Modrinth na may makabagong, madaling magamit na daungan at API."
   },
+  "layout.nav.home": {
+    "message": "Tirahan"
+  },
+  "layout.nav.search": {
+    "message": "Maghanap"
+  },
   "moderation.page.projects": {
     "message": "Mga Panukala"
   },
@@ -203,14 +362,41 @@
   "moderation.page.technicalReview": {
     "message": "Aghimuing Pagsusuri"
   },
+  "moderation.search.placeholder": {
+    "message": "Maghanap..."
+  },
+  "profile.bio.fallback.creator": {
+    "message": "Isang tagalikha sa Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Isang tagagamit sa Modrinth."
+  },
+  "profile.details.label.email": {
+    "message": "Dagisulat"
+  },
+  "profile.label.badges": {
+    "message": "Tsapa"
+  },
+  "profile.label.joined": {
+    "message": "Sumali"
+  },
+  "profile.label.no": {
+    "message": "Hindi"
+  },
+  "profile.label.yes": {
+    "message": "Oo"
+  },
   "profile.meta.description": {
     "message": "Magdalamba ng mga panukala ni {username} sa Modrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Magdalamba ng mga panukala ni {username} sa Modrinth"
   },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> dalamba ng panukala} other {<stat>{count}</stat> na dalamba ng panukala}}"
+  "project-member-header.accept": {
+    "message": "Tanggapin"
+  },
+  "project-member-header.error": {
+    "message": "Kamalian"
   },
   "project-type.datapack.plural": {
     "message": "Mga Balot ng Malak"
@@ -218,26 +404,47 @@
   "project-type.datapack.singular": {
     "message": "Balot ng Malak"
   },
+  "project-type.mod.plural": {
+    "message": "Mga Pambago"
+  },
+  "project-type.mod.singular": {
+    "message": "Pambago"
+  },
+  "project-type.plugin.singular": {
+    "message": "Pansaksak"
+  },
   "project-type.resourcepack.plural": {
     "message": "Mga Balot ng Mapagkukunan"
   },
   "project-type.resourcepack.singular": {
     "message": "Balot ng Mapagkukunan"
   },
+  "project-type.shader.singular": {
+    "message": "Tagalilom"
+  },
+  "project.about.details.updated": {
+    "message": "Naisapanahon {date}"
+  },
   "project.download.game-version": {
     "message": "Bersiyon ng laro: {version}"
+  },
+  "project.download.install-with-app": {
+    "message": "Ikabit gamit ang Modrinth App"
   },
   "project.download.no-app": {
     "message": "Wala kang Modrinth App?"
   },
   "project.download.platform": {
-    "message": "Plataporma: {platform}"
+    "message": "Batyawan: {platform}"
   },
   "project.download.search-game-versions": {
     "message": "Maghanap ng mga bersiyon ng laro..."
   },
   "project.download.select-game-version": {
     "message": "Piliin ang lahat ng bersiyon ng laro"
+  },
+  "project.download.select-platform": {
+    "message": "Pumili ng batyawan"
   },
   "project.download.show-all-versions": {
     "message": "Ipakita ang lahat ng bersiyon"
@@ -272,40 +479,112 @@
   "project.settings.environment.notice.review-options.description": {
     "message": "Kakaunlad lang ng aming kaayusan sa Mga Kapaligiran sa Modrinth at magagamit na ngayon ang mga bagong pagpipilian. Mangyaring suriin na tama ang napili sa ibaba at pindutin ang 'Patunayan' kapag tapos ka na!"
   },
+  "project.settings.environment.verification.verify-button": {
+    "message": "Patunayan"
+  },
+  "project.settings.general.name.title": {
+    "message": "Pangalan"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
+  },
   "project.settings.title": {
     "message": "Mga Kagustuhan"
   },
   "project.stats.downloads-label": {
     "message": "dalamba {count, plural, one {} other {}}"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Bigong maihanda ang dalamba"
+  "scopes.performAnalytics.description": {
+    "message": "Buhata ang mga kalihokan sa analitika"
   },
-  "servers.backups.item.prepare-download": {
-    "message": "Ihanda ang dalamba"
+  "servers.backups.item.lock": {
+    "message": "Ikandado"
   },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Muling subukan ang paghahanda"
+  "servers.backups.item.locked": {
+    "message": "Kinandado"
   },
-  "servers.backups.item.preparing-download": {
-    "message": "Hinahanda ang dalamba..."
+  "servers.backups.item.rename": {
+    "message": "Palitan ang pangalan"
+  },
+  "servers.backups.item.retry": {
+    "message": "Subukan muli"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Buksan"
+  },
+  "servers.notice.actions": {
+    "message": "Mga Kilos"
+  },
+  "servers.notice.begins": {
+    "message": "Magsisimula"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "servers.notice.level": {
+    "message": "Antas"
+  },
+  "servers.plan.large.name": {
+    "message": "Malaki"
+  },
+  "servers.plan.medium.name": {
+    "message": "Katamtaman"
+  },
+  "servers.plan.small.name": {
+    "message": "Maliit"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "Hindi kilalang paraan ng pagbabayad"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
   },
   "settings.display.flags.description": {
     "message": "Magpagana o huwag magpagana ng mga tiyak na tampok sa iyong pakasam."
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Pahina ng mga Balot ng Malak"
+    "message": "Pahina ng Mga Balot ng Malak"
   },
   "settings.display.project-list-layouts.description": {
-    "message": "Pumili ng iyong ninanais na pag-aayos ng bawat pahinang magpapakita sa mga tala ng panukala sa iyong pakasam."
+    "message": "Pumili ng iyong ninanais na ayos ng bawat pahinang magpapakita sa mga tala ng panukala sa iyong pakasam."
   },
   "settings.display.project-list-layouts.resourcepack": {
-    "message": "Pahina ng mga Balot ng Mapagkukunan"
+    "message": "Pahina ng Mga Balot ng Mapagkukunan"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Mga ayos ng talaan ng panukala"
   },
   "settings.display.theme.description": {
     "message": "Pumili ng iyong gugustohing paksang-kulay para sa Modrinth ng nitong pakasam."
   },
+  "settings.language.languages.search-field.placeholder": {
+    "message": "Maghanap ng wika..."
+  },
+  "settings.pats.modal.create.name.label": {
+    "message": "Pangalan"
+  },
+  "settings.profile.bio.title": {
+    "message": "Talambuhay"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Isauli"
+  },
   "settings.sessions.description": {
     "message": "Narito ang lahat ng mga pakasam na kasalukuyang nakalog-in sa iyong Modrinth account. Maaari mong maisaisang ma-logout ang bawat isa.\n\nKung makakita ka ng isang hindi mo nakikilala, maglog-out sa pakasam na iyon at agarang palitan ang lihim na salita ng iyong akawnt sa Modrinth."
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Hindi kilalang OS"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Hindi kilalang batyawan"
   }
 }

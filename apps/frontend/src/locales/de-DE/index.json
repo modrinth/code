@@ -51,7 +51,7 @@
     "message": "Speichere deine Lieblingsinhalte und erhalte Updates mit nur einem Klick."
   },
   "app-marketing.features.follow.title": {
-    "message": "Projekt folgen"
+    "message": "Projekten folgen"
   },
   "app-marketing.features.importing.description": {
     "message": "Importiere alle deine Lieblingsprofile aus dem Launcher, den du bisher verwendet hast, und starte in Sekundenschnelle mit der Modrinth App!"
@@ -63,10 +63,10 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Profil Importierung"
+    "message": "Profile importieren"
   },
   "app-marketing.features.mod-management.actions": {
-    "message": "Maßnahmen"
+    "message": "Aktionen"
   },
   "app-marketing.features.mod-management.byAuthor": {
     "message": "von {author}"
@@ -84,25 +84,25 @@
     "message": "Mods suchen"
   },
   "app-marketing.features.mod-management.title": {
-    "message": "Mod Verwaltung"
+    "message": "Mod-Verwaltung"
   },
   "app-marketing.features.mod-management.version": {
     "message": "Version"
   },
   "app-marketing.features.offline.description": {
-    "message": "Spiele deine Mods, ganz egal, ob du mit dem Internet verbunden bist oder nicht."
+    "message": "Spiele mit deinen Mods, egal, ob du mit dem Internet verbunden bist oder nicht."
   },
   "app-marketing.features.offline.title": {
-    "message": "Offline Modus"
+    "message": "Offline-Modus"
   },
   "app-marketing.features.open-source.description": {
     "message": "Der Modrinth-Launcher ist vollständig quelloffen. Den Quellcode kannst du auf unserem <github-link>GitHub</github-link> einsehen!"
   },
   "app-marketing.features.open-source.title": {
-    "message": "Quelloffen"
+    "message": "Open Source"
   },
   "app-marketing.features.performance.activity-monitor": {
-    "message": "Aktivitätenmonitor"
+    "message": "Aktivitätsmonitoring"
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Deine Kollektionen"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Lade {formType} herunter"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Dein {formType} Steuerformular wurde erfolgreich eingereicht!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Sie können sich jetzt jederzeit abmelden. Wenn Sie Fragen haben oder Ihre Daten aktualisieren möchten, wenden Sie sich an den <support-link>Support</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Sie sind startklar! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Ein ausländisches Unternehmen bezeichnet eine Geschäftseinheit, die außerhalb der Vereinigten Staaten gegründet wurde (z. B. eine nicht-US-amerikanische Kapitalgesellschaft, Personengesellschaft oder LLC)."
   },
@@ -917,6 +929,9 @@
   "layout.banner.tax.title": {
     "message": "Steuerformular erforderlich"
   },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Support Kontaktieren"
+  },
   "layout.banner.verify-email.action": {
     "message": "Bestätigungs-E-Mail erneut senden"
   },
@@ -1091,8 +1106,17 @@
   "moderation.technical.search.placeholder": {
     "message": "Durchsuche Technische Rezensionen..."
   },
+  "profile.bio.fallback.creator": {
+    "message": "Ein Modrinth Ersteller."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Ein Modrinth Nutzer."
+  },
   "profile.button.billing": {
     "message": "Verwalte Nutzer Zahlungen"
+  },
+  "profile.button.edit-role": {
+    "message": "Rolle ändern"
   },
   "profile.button.info": {
     "message": "Schaue Nutzerdetails an"
@@ -1100,17 +1124,26 @@
   "profile.button.manage-projects": {
     "message": "Projekte verwalten"
   },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "E-Mail nicht verifiziert"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "E-Mail verifiziert"
+  },
   "profile.error.not-found": {
     "message": "Benutzer nicht gefunden"
-  },
-  "profile.joined-at": {
-    "message": "Am </date>{ago}</date> beigetreten"
   },
   "profile.label.badges": {
     "message": "Abzeichen"
   },
   "profile.label.details": {
     "message": "Details"
+  },
+  "profile.label.joined": {
+    "message": "Beigetreten"
+  },
+  "profile.label.no": {
+    "message": "Nein"
   },
   "profile.label.no-collections": {
     "message": "Dieser Nutzer hat keine Kollektionen!"
@@ -1127,17 +1160,17 @@
   "profile.label.organizations": {
     "message": "Organisationen"
   },
+  "profile.label.saving": {
+    "message": "Speichern..."
+  },
+  "profile.label.yes": {
+    "message": "Ja"
+  },
   "profile.meta.description": {
     "message": "Lade {username}'s Projekte auf Modrinth herunter"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Lade {username}'s Projekte auf Modrinth herunter"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> Projektdownload} other {<stat>{count}</stat> Projektdownloads}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> Projekt} other {<stat>{count}</stat> Projekte}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {{count}} other {{count}}} Projekt Follower"
@@ -1865,9 +1898,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Sicherung wird wiederhergestellt"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Backup wird bereits für den Download vorbereitet"
-  },
   "servers.backups.item.automated": {
     "message": "Automatisiert"
   },
@@ -1877,9 +1907,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Erstellung der Sicherung ist fehlgeschlagen"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Vorbereitung des Downloads ist fehlgeschlagen"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Wiederherstellung aus der Sicherung fehlgeschlagen"
   },
@@ -1888,15 +1915,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Gesperrt"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Download wird vorbereitet"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Versuche es noch einmal"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Download vorbereiten..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "Zur Sicherung vorgemerkt"

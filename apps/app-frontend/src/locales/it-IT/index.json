@@ -65,6 +65,69 @@
   "app.update.reload-to-update": {
     "message": "Ricarica per installare aggiornamento"
   },
+  "friends.action.add-friend": {
+    "message": "Stringi un'amicizia"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {richiesta} other {richieste}} d'amicizia"
+  },
+  "friends.add-friend.submit": {
+    "message": "Invia richiesta d'amicizia"
+  },
+  "friends.add-friend.title": {
+    "message": "Stringendo l'amicizia"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Potrebbe essere diverso dal nome utente di Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Inserisci il nome utente Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Con quale utente Modrinth vuoi stringere l'amicizia?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Stringi un'amicizia</link> per sapere a cosa stanno giocando!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Annulla richiesta"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Annulla amicizia"
+  },
+  "friends.friend.request-sent": {
+    "message": "Richiesta d'amicizia inviata"
+  },
+  "friends.friend.view-profile": {
+    "message": "Visita profilo"
+  },
+  "friends.heading": {
+    "message": "Amicizie"
+  },
+  "friends.heading.active": {
+    "message": "Attivo"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "In sospeso"
+  },
+  "friends.no-friends-match": {
+    "message": "Nessuna amicizia pertinente a ''{query}''"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Cerca amicizie..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Accedi all'account Modrinth</link> per stringere amicizie e sapere a cosa stanno giocando!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Aggiungi e gioca"
   },

@@ -578,6 +578,18 @@
   "dashboard.collections.long-title": {
     "message": "Twoje kolekcje"
   },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Pobierz {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "Twój formularz podatkowy {formType} został pomyślnie przesłany!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Możesz teraz wypłacać bez ograniczeń. Jeżeli masz pytania lub chcesz zaktualizować swoje dane, <support-link>skontaktuj się z obsługą</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Gotowe! 🎉"
+  },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Podmiot zagraniczny oznacza podmiot gospodarczy zorganizowany poza Stanami Zjednoczonymi (na przykład korporacja spoza Stanów Zjednoczonych, spółka osobowa bądź sp. z o.o.)."
   },
@@ -722,8 +734,14 @@
   "landing.creator.feature.data-statistics.title": {
     "message": "Dane i statystyki"
   },
+  "landing.creator.feature.discovery.description": {
+    "message": "Spraw, by tysiące użytkowników mogło znaleźć Twój projekt przez wyszukiwarkę, naszą stronę główną, serwer Discord, i nie tylko!"
+  },
   "landing.creator.feature.discovery.title": {
     "message": "Odkrycie"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "Integruj swoje narzędzia budowania poprzez Minotaur, by automatycznie aktualizować swoje projekty gdy tylko wydasz nową wersję"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Zróżnicowany ekosystem"
@@ -836,6 +854,9 @@
   "landing.section.for-players.tagline": {
     "message": "Odkryj ponad {count} kreacji"
   },
+  "landing.subheading": {
+    "message": "Odkrywaj, graj i udostępniaj treści Minecraft poprzez naszą otwartoźródłową platformę, stworzoną dla społeczności."
+  },
   "layout.action.change-theme": {
     "message": "Zmień motyw"
   },
@@ -899,8 +920,23 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "Wymagana akcja w sprawie płatności."
   },
+  "layout.banner.tax.action": {
+    "message": "Wypełnij formularz podatkowy"
+  },
+  "layout.banner.tax.description": {
+    "message": "Wypłaciłeś/aś ponad 600$ z Modrinth w tym roku. Aby spełnić wymogi podatkowe, musisz wypełnić formularz podatkowy. Twoje wypłaty są spauzowane, aż nie wypełnisz formularza podatkowego."
+  },
   "layout.banner.tax.title": {
     "message": "Wymagany jest formularz podatkowy"
+  },
+  "layout.banner.tin-mismatch.action": {
+    "message": "Skontaktuj się z obsługą"
+  },
+  "layout.banner.tin-mismatch.description": {
+    "message": "Twoje wypłaty są tymczasowo zablokowane, ponieważ Twój TIN lub SSN nie pasował do zapisów IRS. Skontaktuj się z obsługą, by resetować i ponownie wysłać Twój formularz podatkowy."
+  },
+  "layout.banner.tin-mismatch.title": {
+    "message": "Formularz podatkowy został odrzucony"
   },
   "layout.banner.verify-email.action": {
     "message": "Wyślij ponownie e-mail weryfikacyjny"
@@ -1076,8 +1112,17 @@
   "moderation.technical.search.placeholder": {
     "message": "Wyszukaj recenzje technologiczne..."
   },
+  "profile.bio.fallback.creator": {
+    "message": "Twórca Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Użytkownik Modrinth."
+  },
   "profile.button.billing": {
     "message": "Zarządzaj rozliczaniem użytkownika"
+  },
+  "profile.button.edit-role": {
+    "message": "Edytuj rolę"
   },
   "profile.button.info": {
     "message": "Otwórz szczegóły użytkownika"
@@ -1085,17 +1130,47 @@
   "profile.button.manage-projects": {
     "message": "Zarządzaj projektami"
   },
+  "profile.details.label.auth-providers": {
+    "message": "Dostawcy uwierzytelniania"
+  },
+  "profile.details.label.email": {
+    "message": "E-mail"
+  },
+  "profile.details.label.has-password": {
+    "message": "Ma hasło"
+  },
+  "profile.details.label.has-totp": {
+    "message": "Ma TOTP"
+  },
+  "profile.details.label.payment-methods": {
+    "message": "Metody płatności"
+  },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "E-mail nie jest zweryfikowany"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "E-mail jest zweryfikowany"
+  },
   "profile.error.not-found": {
     "message": "Nie znaleziono użytkownika"
-  },
-  "profile.joined-at": {
-    "message": "Dołączono <date>{ago}</date>"
   },
   "profile.label.badges": {
     "message": "Odznaki"
   },
+  "profile.label.collection": {
+    "message": "Kolekcja"
+  },
   "profile.label.details": {
     "message": "Szczegóły"
+  },
+  "profile.label.downloads": {
+    "message": "{count} {count, plural, one {pobranie} few {pobrania} other {pobrań}}"
+  },
+  "profile.label.joined": {
+    "message": "Dołączył/a"
+  },
+  "profile.label.no": {
+    "message": "Nie"
   },
   "profile.label.no-collections": {
     "message": "Ten użytkownik nie ma żadnych kolekcji!"
@@ -1112,17 +1187,20 @@
   "profile.label.organizations": {
     "message": "Organizacje"
   },
+  "profile.label.projects": {
+    "message": "{count} {count, plural, one {projekt} few {projekty} other {projektów}}"
+  },
+  "profile.label.saving": {
+    "message": "Zapisywanie..."
+  },
+  "profile.label.yes": {
+    "message": "Tak"
+  },
   "profile.meta.description": {
     "message": "Pobieraj projekty {username} na Modrinth"
   },
   "profile.meta.description-with-bio": {
     "message": "{bio} - Pobieraj projekty {username} na Modrinth"
-  },
-  "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> pobranie projektu} few {<stat>{count}</stat> pobrania projektu} other {<stat>{count}</stat> pobrań projektu}}"
-  },
-  "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> projekty}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> obserwujący projekt} other {<stat>{count}</stat> obserwujących projekt}}"
@@ -1850,9 +1928,6 @@
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Trwa przywracanie kopii zapasowej"
   },
-  "servers.backups.item.already-preparing": {
-    "message": "Już przygotowuję kopię zapasową do pobrania"
-  },
   "servers.backups.item.automated": {
     "message": "Zautomatyzowane"
   },
@@ -1862,9 +1937,6 @@
   "servers.backups.item.failed-to-create-backup": {
     "message": "Nie udało się utworzyć kopii zapasowej"
   },
-  "servers.backups.item.failed-to-prepare-backup": {
-    "message": "Nie udało się przygotować pliku do pobrania"
-  },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Nie udało się przywrócić danych z kopii zapasowej"
   },
@@ -1873,15 +1945,6 @@
   },
   "servers.backups.item.locked": {
     "message": "Zablokowane"
-  },
-  "servers.backups.item.prepare-download": {
-    "message": "Przygotuj do pobrania"
-  },
-  "servers.backups.item.prepare-download-again": {
-    "message": "Spróbuj przygotować ponownie"
-  },
-  "servers.backups.item.preparing-download": {
-    "message": "Przygotowywanie do pobrania..."
   },
   "servers.backups.item.queued-for-backup": {
     "message": "W kolejce do tworzenia kopii zapasowej"

@@ -33,7 +33,7 @@
     "message": "Die Modrinth App v{version} ist jetzt verfügbar! Da Sie sich in einem getakteten Netzwerk befinden, haben wir es nicht automatisch heruntergeladen."
   },
   "app.update-toast.changelog": {
-    "message": "Änderungen"
+    "message": "Änderungsverlauf"
   },
   "app.update-toast.download": {
     "message": "Herunterladen ({size})"
@@ -45,13 +45,13 @@
     "message": "Neu laden"
   },
   "app.update-toast.title": {
-    "message": "Aktualisierung verfügbar"
+    "message": "Update verfügbar"
   },
   "app.update-toast.title.download-complete": {
-    "message": "Herunterladen abgeschlossen"
+    "message": "Download abgeschlossen"
   },
   "app.update.complete-toast.text": {
-    "message": "Drücke hier um die Änderungen zu sehen."
+    "message": "Drücke hier, um den Änderungsverlauf zu sehen."
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} wurde erfolgreich installiert!"
@@ -64,6 +64,63 @@
   },
   "app.update.reload-to-update": {
     "message": "Neu laden um Update zu installieren"
+  },
+  "friends.action.add-friend": {
+    "message": "Freund hinzufügen"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural, one {Freundesanfrage} other {Freundesanfragen}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Sende Freundesanfrage"
+  },
+  "friends.add-friend.title": {
+    "message": "Einen Freund hinzufügen"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Es kann vom Minecraft Nutzernamen abweichen!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Gebe den Modrinth Nutzername ein..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Was ist der Modrinth Nutzername deines Freundes?"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Anfrage abbrechen"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Freund entfernen"
+  },
+  "friends.friend.request-sent": {
+    "message": "Freundesanfrage gesendet"
+  },
+  "friends.friend.view-profile": {
+    "message": "Profil anzeigen"
+  },
+  "friends.heading": {
+    "message": "Freunde"
+  },
+  "friends.heading.active": {
+    "message": "Aktiv"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Ausstehend"
+  },
+  "friends.no-friends-match": {
+    "message": "Keine Freunde die \"{query}\" entsprechen"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Suche nach Freunden..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
   },
   "instance.add-server.add-and-play": {
     "message": "Hinzufügen und spielen"
@@ -129,7 +186,7 @@
     "message": "Instanz löschen"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Löscht eine Instanz dauerhaft von deinem Gerät, einschließlich deiner Welten, Einstellungen und aller installierten Inhalte. Sei vorsichtig, eine gelöschte Installation ist nicht wiederherstellbar."
+    "message": "Löscht eine Instanz dauerhaft von deinem Gerät, einschließlich deiner Welten, Einstellungen und aller installierten Inhalte. Sei vorsichtig, eine gelöschte Instanz ist nicht wiederherstellbar."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Wird gelöscht..."
@@ -165,7 +222,7 @@
     "message": "Neue Gruppe erstellen"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Gruppen ermöglichen dir, deine Instanzen in verschiedenen Abteilen deiner Bibliothek einzuteilen."
+    "message": "Bibliotheksgruppen ermöglichen es dir, deine Instanzen in verschiedene Abteile deiner Bibliothek einzuteilen."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "Gruppenname eingeben"
@@ -189,16 +246,16 @@
     "message": "Wird ausgeführt nach dem Beenden des Spiels."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Ausgeführter Befehl nach dem Beenden des Spiels eingeben..."
+    "message": "Nach Spielbeendigung auszuführender Befehl eingeben..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Vor dem Starten des Spiels"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Wird ausgeführt nach dem Starten des Spiels."
+    "message": "Wird vor dem Starten des Spiels ausgeführt."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Ausgeführter Befehl nach dem Starten des Spiels eingeben..."
+    "message": "Vor Spielstart auszuführender Befehl eingeben..."
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Start Hooks"
@@ -237,7 +294,7 @@
     "message": "Neue Version wird installiert"
   },
   "instance.settings.tabs.installation.currently-installed": {
-    "message": "Aktuell installiert"
+    "message": "Derzeit installiert"
   },
   "instance.settings.tabs.installation.debug-information": {
     "message": "Informationen für die Fehlerbehebung:"
@@ -315,19 +372,19 @@
     "message": "Version ändern"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "installieren"
+    "message": "Installieren"
   },
   "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "neuinstallieren"
+    "message": "Neuinstallieren"
   },
   "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "reparieren"
+    "message": "Reparieren"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
     "message": "{action} während der Installation nicht möglich"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "{action} wegen fehlender Internetverbindung nicht möglich"
+    "message": "{action} offline nicht möglich"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
     "message": "{action} während der Reparation nicht möglich"
@@ -363,7 +420,7 @@
     "message": "Java-Argumente"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Java Installation"
+    "message": "Java-Installation"
   },
   "instance.settings.tabs.java.java-memory": {
     "message": "Zugewiesener Arbeitsspeicher"
@@ -375,7 +432,7 @@
     "message": "Benutzerdefinierte Spielfenstereinstellungen"
   },
   "instance.settings.tabs.window.fullscreen": {
-    "message": "Vollbildschirm"
+    "message": "Vollbild"
   },
   "instance.settings.tabs.window.fullscreen.description": {
     "message": "Lässt das Spiel im Vollbildmodus starten (mit Verwendung von options.txt)."
@@ -384,7 +441,7 @@
     "message": "Höhe"
   },
   "instance.settings.tabs.window.height.description": {
-    "message": "Die Höhe des spiel Fensters beim Starten."
+    "message": "Die Höhe des Spielfensters beim Start."
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Höhe eingeben..."
@@ -393,7 +450,7 @@
     "message": "Breite"
   },
   "instance.settings.tabs.window.width.description": {
-    "message": "Die Breite des spiel Fensters beim Starten."
+    "message": "Die Breite des Spielfensters beim Start."
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Breite eingeben..."
@@ -447,16 +504,16 @@
     "message": "Instanzen anzeigen"
   },
   "instance.worlds.world_in_use": {
-    "message": "Welt wird aktuell benutzt"
+    "message": "Welt ist aktuell in Benutzung"
   },
   "search.filter.locked.instance": {
-    "message": "Von der Instanz vorgegeben"
+    "message": "Von der Instanz bereitgestellt"
   },
   "search.filter.locked.instance-game-version.title": {
     "message": "Spielversion ist von der Instanz vorgegeben"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Der Loader ist von der Instanz vorgegeben"
+    "message": "Der Loader wird von der Instanz bereitgestellt"
   },
   "search.filter.locked.instance.sync": {
     "message": "Mit Instanz synchronisieren"

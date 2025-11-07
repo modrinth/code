@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."
   },
+  "app.settings.downloading": {
+    "message": "מוריד גרסה {version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "מראה"
   },
@@ -19,6 +22,57 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "ניהול משאבים"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App גרסה: {version} מוכנה להורדה!\nרענן כדי להוריד עכשיו, או באופן אוטומטי כאשר תסגור את האפליקציה."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App גרסה {version} סיימה את תהליך ההורדה. רענן כדי לעדכן עכשיו, או באופן אוטומטי כאשר תסגור את האפליקציה."
+  },
+  "app.update-toast.body.metered": {
+    "message": "אפליקצית מודרינת' גרסה {version} זמינה עכשיו! מכיוון שאתה על נתונים, אנחנו לא הורדנו אותה אוטומטית."
+  },
+  "app.update-toast.changelog": {
+    "message": "יומן שינויים"
+  },
+  "app.update-toast.download": {
+    "message": "הורד ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "מוריד..."
+  },
+  "app.update-toast.reload": {
+    "message": "רענן"
+  },
+  "app.update-toast.title": {
+    "message": "עדכונים זמינים"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "הורדה הושלמה"
+  },
+  "app.update.complete-toast.text": {
+    "message": "לחץ כאן כדי לראות את יומן השינויים."
+  },
+  "app.update.complete-toast.title": {
+    "message": "גרסה {version} הותקנה בהצלחה!"
+  },
+  "app.update.download-update": {
+    "message": "הורד עדכון"
+  },
+  "app.update.downloading-update": {
+    "message": "מוריד עדכון ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "רענן בכדי להתקין את העדכונים"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>הוסף חברים</link> כדי לראות במה הם משחקים!"
+  },
+  "friends.heading": {
+    "message": "חברים"
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
   },
   "instance.add-server.add-and-play": {
     "message": "הוסף ושחק"
@@ -51,7 +105,7 @@
     "message": "עולם מיינקראפט"
   },
   "instance.edit-world.reset-icon": {
-    "message": "איפוס אייקון"
+    "message": "אפס סמל"
   },
   "instance.edit-world.title": {
     "message": "ערוך עולם"
@@ -84,7 +138,7 @@
     "message": "מחק התקנה"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "מוחק לצמיתות את התקנה זו מהמכשיר שלך, כולל העולמות שלך, הגדרות, וכל התוכן המותקן. תיזהר, מכיוון שלאחר מחיקת התקנה אין דרך להחזיר אותה."
+    "message": "מוחק לצמיתות את התקנה זו מהמכשיר שלך, כולל העולמות שלך, הגדרות, וכל התוכן המותקן. שים לב, לאחר מחיקת ההתקנה אין דרך להחזיר אותה."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "מוחק..."
@@ -99,19 +153,19 @@
     "message": "שכפל התקנה"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "יוצר עותק של התקנה זו, כולל עולם, הגדרות, מודים, וכו."
+    "message": "יוצר עותק של התקנה זו, כולל עולמות, הגדרות, מודים, וכדומה."
   },
   "instance.settings.tabs.general.edit-icon": {
-    "message": "ערוך אייקון"
+    "message": "ערוך סמל"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "הסר אייקון"
+    "message": "הסר סמל"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "החלף אייקון"
+    "message": "החלף סמל"
   },
   "instance.settings.tabs.general.edit-icon.select": {
-    "message": "בחר אייקון"
+    "message": "בחר סמל"
   },
   "instance.settings.tabs.general.library-groups": {
     "message": "קבוצות ספרייה"
@@ -120,7 +174,7 @@
     "message": "צור קבוצה חדשה"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "קבוצות ספרייה מאפשרות לך לארגן את ההתקנות שלך לפי חלקים שונים."
+    "message": "קבוצות ספרייה מאפשרות לך לארגן את ההתקנות שלך לחלקים שונים בספרייה שלך."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "הכנס שם קבוצה"
@@ -132,7 +186,7 @@
     "message": "פעולות בעת הפעלה"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "מותאם אישית"
+    "message": "פעולות בעת הפעלה מותאמות אישית"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "פעולות בעת הפעלה מאפשרות למשתמשים מתקדמים להריץ פקודות מערכת מסוימות לפני ואחרי שהמשחק מופעל."
@@ -147,16 +201,16 @@
     "message": "הכנס פקודה לאחר יציאה..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
-    "message": "טרום-השקה"
+    "message": "טרום-הפעלה"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "מופעל לפני שהאינסטנס מתחיל."
+    "message": "מופעל לפני שההתקנה מופעלת."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "הכנס פקודה לפני ההפעלה..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "פקודות הפעלה מותאמות"
+    "message": "פעולות הפעלה"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "מעטפת"
@@ -174,7 +228,7 @@
     "message": "{platform} {version} בשביל מיינקראפט {game_version} כבר מותקן"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "ונילה {game_version} כבר מותקן"
+    "message": "וונילה {game_version} כבר מותקן"
   },
   "instance.settings.tabs.installation.change-version.button": {
     "message": "שנה גרסה"
@@ -186,7 +240,7 @@
     "message": "מתקין"
   },
   "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "אחזור גרסאות מודפאקים"
+    "message": "מאחזר גרסאות חבילת מודים"
   },
   "instance.settings.tabs.installation.change-version.in-progress": {
     "message": "מתקין גרסה חדשה"
@@ -198,7 +252,7 @@
     "message": "מידע ניפוי שגיאות:"
   },
   "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "אחזור פרטי מודפאקים"
+    "message": "מאחזר פרטי חבילת מודים"
   },
   "instance.settings.tabs.installation.game-version": {
     "message": "גרסת משחק"
@@ -216,13 +270,13 @@
     "message": "מיינקראפט {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "לא ניתן לאחזר את פרטי המודפאק המקושר. אנא בדוק את חיבור האינטרנט שלך."
+    "message": "לא ניתן לאחזר את פרטי חבילת המודים המקושרת. אנא בדוק את חיבור האינטרנט שלך."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader}\" אינו זמין עבור מיינקראפט {version}. נסה מעלה מודים אחר."
+    "message": "{loader} אינו זמין עבור מיינקראפט {version}. אנא נסה טוען מודים אחר."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "אינסטנס זה מקושר למודפק, אך המודפק לא נמצא ב-Modrinth."
+    "message": "התקנה זאת מקושרת לחבילת מודים, אך חבילת המודים לא נמצאה במודרינת'."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "פלטפורמה"
@@ -234,13 +288,13 @@
     "message": "מתקין מחדש את חבילת המודים"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "התקנה מחדש תאפס את כל התוכן המותקן או ששונה, ותחזיר אותו למצב שסופק על ידי חבילת המודים, תוך הסרת כל מוד או תוכן שהוספתם מעבר להתקנה המקורית. פעולה זו עשויה לתקן תקלות שנגרמו משינויים במופע, אך אם העולמות שלכם תלויים בתוכן נוסף שהותקן, היא עלולה לשבש אותם."
+    "message": "התקנה מחדש תאפס את כל התוכן המותקן או ששונה, ותחזיר אותו למצב שסופק על ידי חבילת המודים, תוך הסרת כל מוד או תוכן שהוספתם מעבר להתקנה המקורית. פעולה זו עשויה לתקן תקלות שנגרמו משינויים בהתקנה, אך אם העולמות שלכם תלויים בתוכן נוסף שהותקן, היא עלולה לשבש אותם."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "האם אתה בטוח שברצונך להתקין מחדש instance זה?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "מאפס את התוכן שנמצא ב-instance למצבו המקורי, תוך הסרת כל מוד או תוכן שהוספת מעבר למודפק המקורי."
+    "message": "מאפס את התוכן שנמצא בהתקנה למצבו המקורי, תוך הסרת כל מוד או תוכן ששונה מעבר לחבילת המודים המקורית."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "התקן מחדש חבילת מודים"
@@ -294,16 +348,16 @@
     "message": "לבטל את הקישור של ההתקנה הזו"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "אם תמשיך, לא תוכל לקשר אותו מחדש מבלי ליצור instance חדש לחלוטין. לא תקבל עוד עדכונים למודפקים, והוא יהפוך לרגיל."
+    "message": "אם תמשיך, לא תוכל לקשר אותה מחדש מבלי ליצור התקנה חדשה לחלוטין. לא תקבל עוד עדכונים לחבילת המודים, והיא תהפוך להתקנה רגילה."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "האם אתה בטוח שברצונך לנתק את הקישור ל-instance הזה?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Instance זה מקושר ל-modpack, מה שאומר שלא ניתן לעדכן מודים ולא ניתן לשנות את ה-mod loader או את גרסת מיינקראפט. הניתוק יבטל לצמיתות את הקישור של instance זה מה-modpack."
+    "message": "התקנה זאת מקושרת לחבילת מודים, מה שאומר שלא ניתן לעדכן מודים ולא ניתן לשנות את טוען המודים או את גרסת המיינקראפט. הניתוק יבטל לצמיתות את הקישור של התקנה זאת לחבילת המודים."
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "נתק קישור מ-modpack"
+    "message": "נתק קישור מחבילת מודים"
   },
   "instance.settings.tabs.java": {
     "message": "ג'אווה וזיכרון"
@@ -383,6 +437,12 @@
   "instance.worlds.no_contact": {
     "message": "לא ניתן ליצור קשר עם השרת"
   },
+  "instance.worlds.no_server_quick_play": {
+    "message": "אתה יכול רק לקפוץ ישירות לשרתים מהגרסא אלפא 1.0.5 ואלך"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "אתה יכול לקפוץ ישירות לעולמות החל מהגרסא 1.20 ומעלה"
+  },
   "instance.worlds.play_instance": {
     "message": "שחק בהתקנה"
   },
@@ -403,6 +463,9 @@
   },
   "search.filter.locked.instance-game-version.title": {
     "message": "גרסאת המשחק מסופקת על ידי ההתקנה"
+  },
+  "search.filter.locked.instance-loader.title": {
+    "message": "מטען מודים מסופק ע\"י ההתקן"
   },
   "search.filter.locked.instance.sync": {
     "message": "סנכרן עם התקנה"

@@ -65,6 +65,66 @@
   "app.update.reload-to-update": {
     "message": "重新启动以安装更新"
   },
+  "friends.action.add-friend": {
+    "message": "加一好友"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count}好友请求"
+  },
+  "friends.add-friend.submit": {
+    "message": "发送好友请求"
+  },
+  "friends.add-friend.username.description": {
+    "message": "可能和他们的 Minecraft 用户名不一样！"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "输入Modrinth用户名……"
+  },
+  "friends.add-friend.username.title": {
+    "message": "你朋友的 Modrinth 用户名是什么？"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>添加好友</link>查看他们在玩什么！"
+  },
+  "friends.friend.cancel-request": {
+    "message": "取消请求"
+  },
+  "friends.friend.remove-friend": {
+    "message": "删除好友"
+  },
+  "friends.friend.request-sent": {
+    "message": "已发送好友请求"
+  },
+  "friends.friend.view-profile": {
+    "message": "查看个人资料"
+  },
+  "friends.heading": {
+    "message": "好友"
+  },
+  "friends.heading.active": {
+    "message": "活跃的"
+  },
+  "friends.heading.offline": {
+    "message": "离线"
+  },
+  "friends.heading.online": {
+    "message": "在线"
+  },
+  "friends.heading.pending": {
+    "message": "待确认"
+  },
+  "friends.no-friends-match": {
+    "message": "没有匹配“{query}”的朋友"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "搜索好友……"
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "请登录你的 <link>Modrinth账号</link> 添加好友并查看他们在玩什么！"
+  },
   "instance.add-server.add-and-play": {
     "message": "添加并游玩"
   },

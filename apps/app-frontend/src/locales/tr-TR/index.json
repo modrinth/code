@@ -3,7 +3,7 @@
     "message": "Geliştirici modu açıldı."
   },
   "app.settings.downloading": {
-    "message": "V{version} İndiriliyor"
+    "message": "v{version} indiriliyor"
   },
   "app.settings.tabs.appearance": {
     "message": "Görünüm"
@@ -64,6 +64,69 @@
   },
   "app.update.reload-to-update": {
     "message": "Güncellemeyi yüklemek için yeniden yükleyin"
+  },
+  "friends.action.add-friend": {
+    "message": "Bir arkadaş ekle"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} Arkadaşlık {count, plural,one {isteği} other {istekleri}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Arkadaşlık isteği gönder"
+  },
+  "friends.add-friend.title": {
+    "message": "Bir arkadaş ekleme"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Minecraft kullanıcı adlarından farklı olabilir!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Modrinth kullanıcı adını girin..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Arkadaşının Modrinth kullanıcı adı nedir?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "Arkadaşlarının ne oynadığını görmek için <link>onları ekle</link>!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "İsteği iptal et"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Arkadaşı çıkar"
+  },
+  "friends.friend.request-sent": {
+    "message": "Arkadaşlık isteği gönderildi"
+  },
+  "friends.friend.view-profile": {
+    "message": "Profili gör"
+  },
+  "friends.heading": {
+    "message": "Arkadaşlar"
+  },
+  "friends.heading.active": {
+    "message": "Aktif"
+  },
+  "friends.heading.offline": {
+    "message": "Deaktif"
+  },
+  "friends.heading.online": {
+    "message": "Çevrimiçi"
+  },
+  "friends.heading.pending": {
+    "message": "Bekleniyor"
+  },
+  "friends.no-friends-match": {
+    "message": "''{query}'' ile eşleşen arkadaş yok"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Arkadaşları ara..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "Arkadaş eklemek ve ne oynadıklarını görmek için bir <link>Modrinth hesabına giriş yap</link>!"
   },
   "instance.add-server.add-and-play": {
     "message": "Ekle ve oyna"

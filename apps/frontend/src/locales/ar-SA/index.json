@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "إلغاء"
+  },
+  "action.continue": {
+    "message": "متابعة"
+  },
   "admin.billing.error.not-found": {
     "message": "المستخدم غير موجود"
   },
@@ -326,6 +332,24 @@
   "auth.verify-email.failed-verification.action": {
     "message": "إعادة إرسال بريد التحقق"
   },
+  "auth.verify-email.failed-verification.description": {
+    "message": "تعذّر علينا التحقّق من بريدك الإلكتروني. حاول إعادة إرسال رسالة التحقّق من خلال لوحة التحكم بعد تسجيل الدخول."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "تعذّر علينا التحقّق من بريدك الإلكتروني. حاول إعادة إرسال رسالة التحقّق باستخدام الزر أدناه."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "فشل التحقق من البريد الإلكتروني"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "تم التحقّق من عنوان بريدك الإلكتروني بنجاح!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "التحقّق من البريد الإلكتروني"
+  },
+  "auth.verify-email.title": {
+    "message": "تحقّق من البريد الإلكتروني"
+  },
   "auth.welcome.checkbox.subscribe": {
     "message": "اشترك في التحديثات حول مودرنث"
   },
@@ -338,6 +362,21 @@
   "auth.welcome.long-title": {
     "message": "مرحبًا بك في مودرنث!"
   },
+  "auth.welcome.title": {
+    "message": "مرحبًا"
+  },
+  "collection.button.delete-icon": {
+    "message": "حذف الأيقونة"
+  },
+  "collection.button.edit-icon": {
+    "message": "تعديل الأيقونة"
+  },
+  "collection.button.remove-project": {
+    "message": "إزالة المشروع"
+  },
+  "collection.button.unfollow-project": {
+    "message": "إلغاء متابعة المشروع"
+  },
   "collection.delete-modal.description": {
     "message": "سيتم حذف هذه المجموعة نهائيًا. لا يمكن التراجع عن هذا الإجراء."
   },
@@ -346,6 +385,117 @@
   },
   "collection.description": {
     "message": "{description} - عرض المجموعة {name} بواسطة {username} على مودرنث"
+  },
+  "collection.description.following": {
+    "message": "مجموعة تم إنشاؤها تلقائيًا تضمّ جميع المشاريع التي تتابعها."
+  },
+  "collection.error.not-found": {
+    "message": "لم يتم العثور على المجموعة"
+  },
+  "collection.label.collection": {
+    "message": "مجموعة"
+  },
+  "collection.label.created-at": {
+    "message": "تم الإنشاء منذ {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "من إعداد"
+  },
+  "collection.label.no-projects": {
+    "message": "لا تحتوي هذه المجموعة على أي مشاريع!"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "ليس لديك أي مشاريع. هل ترغب في <create-link>إضافة مشروع</create-link>؟"
+  },
+  "collection.label.owner": {
+    "message": "المالك"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural,\n  one {<stat>{count}</stat> مشروع}\n  other {<stat>{count}</stat> مشاريع}\n}"
+  },
+  "collection.label.updated-at": {
+    "message": "تم التحديث منذ {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - مجموعة"
+  },
+  "common.no": {
+    "message": "لا"
+  },
+  "common.yes": {
+    "message": "نعم"
+  },
+  "create.collection.cancel": {
+    "message": "إلغاء"
+  },
+  "create.collection.collection-info": {
+    "message": "سيتم إنشاء مجموعتك الجديدة كمجموعة عامة تحتوي على {count, plural,\n  one {# مشروع}\n  other {# مشاريع}\n}."
+  },
+  "create.collection.create-collection": {
+    "message": "إنشاء مجموعة"
+  },
+  "create.collection.error-title": {
+    "message": "حدث خطأ"
+  },
+  "create.collection.name-label": {
+    "message": "الاسم"
+  },
+  "create.collection.name-placeholder": {
+    "message": "أدخل اسم المجموعة..."
+  },
+  "create.collection.summary-description": {
+    "message": "جملة أو جملتان تصف مجموعتك."
+  },
+  "create.collection.summary-label": {
+    "message": "الملخّص"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "هذه مجموعة من..."
+  },
+  "create.collection.title": {
+    "message": "إنشاء مجموعة"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "تقترب من حدّ {type} ‏({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "أنت على وشك بلوغ حدّ {type}. يُرجى التواصل مع الدعم إذا كنت بحاجة إلى أكثر من {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "تواصل مع الدعم الفني"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "تم بلوغ حدّ {type}"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "لقد وصلت إلى حدّ {type} الخاص بك وهو {max}. يُرجى التواصل مع الدعم لزيادة الحدّ."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "مجموعة"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "مؤسسة"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "مجموعات"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "مؤسسات"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "مشاريع"
+  },
+  "create.limit-alert.type-project": {
+    "message": "مشروع"
+  },
+  "create.organization.cancel": {
+    "message": "إلغاء"
+  },
+  "create.organization.create-organization": {
+    "message": "إنشاء مؤسسة"
+  },
+  "create.organization.error-title": {
+    "message": "حدث خطأ"
   },
   "error.collection.404.list_item.3": {
     "message": "قد تكون هذه المجموعة قد أزالها فريق مراقبة مودرنث لانتهاك <tou-link>شروط الاستخدام</tou-link> الخاصة بنا."
@@ -356,14 +506,53 @@
   "error.generic.default.list_item.2": {
     "message": "إذا استمر حدوث ذلك، قد ترغب في إعلام فريق مودرنث بالانضمام إلى <discord-link>سيرفر ديسكورد</discord-link> الخاص بنا."
   },
+  "error.organization.404.list_item.1": {
+    "message": "ربما أدخلت عنوان URL الخاص بالمؤسسة بشكل غير صحيح."
+  },
+  "error.organization.404.list_item.2": {
+    "message": "قد يكون مالك المؤسسة قد غيّر عنوان الـURL أو حذفه."
+  },
   "error.organization.404.list_item.3": {
     "message": "قد تكون هذه المنظمة قد أزالها فريق مراقبة مودرنث لانتهاك <tou-link>شروط الاستخدام</tou-link> الخاصة بنا."
+  },
+  "error.organization.404.list_title": {
+    "message": "لماذا؟"
+  },
+  "error.organization.404.title": {
+    "message": "لم يتم العثور على المؤسسة"
+  },
+  "error.project.404.list_item.1": {
+    "message": "ربما أدخلت عنوان URL الخاص بالمؤسسة بشكل غير صحيح."
+  },
+  "error.project.404.list_item.2": {
+    "message": "قد يكون مالك المشروع قد غيّر عنوان الـURL، أو جعل المشروع خاصًا، أو حذفه."
   },
   "error.project.404.list_item.3": {
     "message": "قد يكون هذا المشروع قد أزاله فريق مراقبة مودرنث لانتهاك <tou-link>شروط الاستخدام</tou-link> الخاصة بنا."
   },
+  "error.project.404.list_title": {
+    "message": "لماذا؟"
+  },
+  "error.project.404.title": {
+    "message": "لم يتم العثور على المشروع"
+  },
+  "error.user.404.list_item.1": {
+    "message": "ربما أدخلت اسم مستخدم المستخدم بشكل غير صحيح."
+  },
+  "error.user.404.list_item.2": {
+    "message": "قد يكون المستخدم قد غيّر اسم المستخدم أو حذف حسابه."
+  },
   "error.user.404.list_item.3": {
     "message": "تم تعطيل حساب هذا المستخدم لانتهاكه <tou-link>شروط الاستخدام</tou-link> الخاصة بمودرنث."
+  },
+  "error.user.404.list_title": {
+    "message": "لماذا؟"
+  },
+  "error.user.404.title": {
+    "message": "لم يتم العثور على المُستخدم"
+  },
+  "frog": {
+    "message": "لقد تم ضفدعتك! 🐸"
   },
   "landing.button.discover-mods": {
     "message": "اكتشف المودات"
