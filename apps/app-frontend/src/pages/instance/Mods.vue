@@ -285,6 +285,7 @@ import type { Organization, Project, TeamMember, Version } from '@modrinth/utils
 import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { defineMessages, useVIntl } from '@vintl/vintl'
+import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import type { ComputedRef } from 'vue'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -531,7 +532,13 @@ const filterOptions: ComputedRef<FilterOption[]> = computed(() => {
 	return options
 })
 
-const selectedFilters = ref<string[]>([])
+const selectedFilters = useStorage<string[]>(
+	`${props.instance.name}-mod-selected-filters`,
+	[],
+	sessionStorage,
+	{ mergeDefaults: true },
+)
+
 const filteredProjects = computed(() => {
 	const updatesFilter = selectedFilters.value.includes('updates')
 	const disabledFilter = selectedFilters.value.includes('disabled')
