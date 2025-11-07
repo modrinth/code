@@ -18,6 +18,7 @@
 						v-else-if="item.link ?? item.to"
 						:to="(item.link ?? item.to) as string"
 						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 text-nowrap rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
+						:class="{ 'is-active': isActive(item as NavStackLinkItem) }"
 					>
 						<component
 							:is="item.icon"
@@ -80,6 +81,7 @@ type NavStackLinkItem = NavStackBaseItem & {
 	link?: string | null
 	to?: string | null
 	action?: (() => void) | null
+	matchNested?: boolean
 }
 
 type NavStackSeparator = { type: 'separator' }
@@ -95,6 +97,8 @@ const props = defineProps<{
 }>()
 
 const ariaLabel = computed(() => props.ariaLabel ?? 'Section navigation')
+
+const route = useRoute()
 
 const slots = useSlots()
 const hasSlotContent = computed(() => {
@@ -117,6 +121,19 @@ function getKey(item: NavStackEntry, idx: number) {
 	return link ? `link-${link}` : `action-${(item as NavStackLinkItem).label}-${idx}`
 }
 
+function isActive(item: NavStackLinkItem): boolean {
+	const link = item.link ?? item.to
+	if (!link) return false
+
+	const currentPath = route.path
+
+	if (item.matchNested) {
+		return currentPath.startsWith(link)
+	}
+
+	return currentPath === link
+}
+
 const filteredItems = computed(() => props.items?.filter((x) => x.shown === undefined || x.shown))
 </script>
 
@@ -124,11 +141,13 @@ const filteredItems = computed(() => props.items?.filter((x) => x.shown === unde
 li {
 	text-align: unset;
 }
-.router-link-exact-active.nav-item {
+.router-link-exact-active.nav-item,
+.nav-item.is-active {
 	background: var(--color-button-bg-selected);
 	color: var(--color-button-text-selected);
 }
-.router-link-exact-active.nav-item .text-contrast {
+.router-link-exact-active.nav-item .text-contrast,
+.nav-item.is-active .text-contrast {
 	color: var(--color-button-text-selected);
 }
 </style>

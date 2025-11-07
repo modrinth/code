@@ -12,6 +12,7 @@ import {
 } from '@modrinth/assets'
 import { Button, DropdownSelect, injectNotificationManager } from '@modrinth/ui'
 import { formatCategoryHeader } from '@modrinth/utils'
+import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
@@ -121,40 +122,50 @@ const handleOptionsClick = async (args) => {
 	}
 }
 
+const state = useStorage(
+	`${props.label}-grid-display-state`,
+	{
+		group: 'Group',
+		sortBy: 'Name',
+	},
+	localStorage,
+	{ mergeDefaults: true },
+)
+
 const search = ref('')
-const group = ref('Group')
-const sortBy = ref('Name')
 
 const filteredResults = computed(() => {
+	const { group = 'Group', sortBy = 'Name' } = state.value
+
 	const instances = props.instances.filter((instance) => {
 		return instance.name.toLowerCase().includes(search.value.toLowerCase())
 	})
 
-	if (sortBy.value === 'Name') {
+	if (sortBy === 'Name') {
 		instances.sort((a, b) => {
 			return a.name.localeCompare(b.name)
 		})
 	}
 
-	if (sortBy.value === 'Game version') {
+	if (sortBy === 'Game version') {
 		instances.sort((a, b) => {
 			return a.game_version.localeCompare(b.game_version, undefined, { numeric: true })
 		})
 	}
 
-	if (sortBy.value === 'Last played') {
+	if (sortBy === 'Last played') {
 		instances.sort((a, b) => {
 			return dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0))
 		})
 	}
 
-	if (sortBy.value === 'Date created') {
+	if (sortBy === 'Date created') {
 		instances.sort((a, b) => {
 			return dayjs(b.date_created).diff(dayjs(a.date_created))
 		})
 	}
 
-	if (sortBy.value === 'Date modified') {
+	if (sortBy === 'Date modified') {
 		instances.sort((a, b) => {
 			return dayjs(b.date_modified).diff(dayjs(a.date_modified))
 		})
@@ -162,7 +173,7 @@ const filteredResults = computed(() => {
 
 	const instanceMap = new Map()
 
-	if (group.value === 'Loader') {
+	if (group === 'Loader') {
 		instances.forEach((instance) => {
 			const loader = formatCategoryHeader(instance.loader)
 			if (!instanceMap.has(loader)) {
@@ -171,7 +182,7 @@ const filteredResults = computed(() => {
 
 			instanceMap.get(loader).push(instance)
 		})
-	} else if (group.value === 'Game version') {
+	} else if (group === 'Game version') {
 		instances.forEach((instance) => {
 			if (!instanceMap.has(instance.game_version)) {
 				instanceMap.set(instance.game_version, [])
@@ -179,7 +190,7 @@ const filteredResults = computed(() => {
 
 			instanceMap.get(instance.game_version).push(instance)
 		})
-	} else if (group.value === 'Group') {
+	} else if (group === 'Group') {
 		instances.forEach((instance) => {
 			if (instance.groups.length === 0) {
 				instance.groups.push('None')
@@ -199,7 +210,7 @@ const filteredResults = computed(() => {
 
 	// For 'name', we intuitively expect the sorting to apply to the name of the group first, not just the name of the instance
 	// ie: Category A should come before B, even if the first instance in B comes before the first instance in A
-	if (sortBy.value === 'Name') {
+	if (sortBy === 'Name') {
 		const sortedEntries = [...instanceMap.entries()].sort((a, b) => {
 			// None should always be first
 			if (a[0] === 'None' && b[0] !== 'None') {
@@ -217,7 +228,7 @@ const filteredResults = computed(() => {
 	}
 	// default sorting would do 1.20.4 < 1.8.9 because 2 < 8
 	// localeCompare with numeric=true puts 1.8.9 < 1.20.4 because 8 < 20
-	if (group.value === 'Game version') {
+	if (group === 'Game version') {
 		const sortedEntries = [...instanceMap.entries()].sort((a, b) => {
 			return a[0].localeCompare(b[0], undefined, { numeric: true })
 		})
@@ -241,7 +252,7 @@ const filteredResults = computed(() => {
 		</div>
 		<DropdownSelect
 			v-slot="{ selected }"
-			v-model="sortBy"
+			v-model="state.sortBy"
 			name="Sort Dropdown"
 			class="max-w-[16rem]"
 			:options="['Name', 'Last played', 'Date created', 'Date modified', 'Game version']"
@@ -252,7 +263,7 @@ const filteredResults = computed(() => {
 		</DropdownSelect>
 		<DropdownSelect
 			v-slot="{ selected }"
-			v-model="group"
+			v-model="state.group"
 			class="max-w-[16rem]"
 			name="Group Dropdown"
 			:options="['Group', 'Loader', 'Game version', 'None']"

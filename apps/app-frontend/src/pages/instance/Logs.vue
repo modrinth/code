@@ -67,6 +67,7 @@
 				direction="vertical"
 				:item-size="20"
 				key-field="id"
+				buffer="200"
 			>
 				<div class="user no-wrap">
 					<span :style="{ color: item.prefixColor, 'font-weight': item.weight }">{{
@@ -508,7 +509,7 @@ onUnmounted(() => {
 	background-color: var(--color-accent-contrast);
 	color: var(--color-contrast);
 	border-radius: var(--radius-lg);
-	padding: 1.5rem;
+	padding-top: 1.5rem;
 	overflow-x: auto; /* Enables horizontal scrolling */
 	overflow-y: hidden; /* Disables vertical scrolling on this wrapper */
 	white-space: nowrap; /* Keeps content on a single line */
@@ -557,9 +558,10 @@ onUnmounted(() => {
 
 .user {
 	height: 32%;
-	padding: 0 12px;
+	padding: 0 1.5rem;
 	display: flex;
 
 	align-items: center;
+	user-select: text;
 }
 </style>

@@ -139,7 +139,7 @@ const messages = defineMessages({
 	resubmitForReviewDesc: {
 		id: 'project-moderation-nags.resubmit-for-review-desc',
 		defaultMessage:
-			"Your project has been {status} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message.",
+			"Your project has been {status, select, rejected {rejected} withheld {withheld} other {{status}}} by Modrinth's staff. In most cases, you can resubmit for review after addressing the staff's message.",
 	},
 	visitModerationPage: {
 		id: 'project-moderation-nags.visit-moderation-page',

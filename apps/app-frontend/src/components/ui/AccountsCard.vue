@@ -289,7 +289,7 @@ onUnmounted(() => {
 	user-select: none;
 	-ms-user-select: none;
 	-webkit-user-select: none;
-	max-height: 98vh;
+	max-height: calc(100vh - 300px);
 	overflow-y: auto;
 
 	&::-webkit-scrollbar-track {
