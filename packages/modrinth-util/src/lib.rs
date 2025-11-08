@@ -1,6 +1,8 @@
 #![doc = include_str!("../README.md")]
 
 mod error;
+pub mod log;
+
 pub use error::*;
 
 use eyre::{Result, eyre};

@@ -37,9 +37,11 @@ pub mod routes;
 pub mod scheduler;
 pub mod search;
 pub mod sync;
-pub mod test;
 pub mod util;
 pub mod validate;
+
+#[cfg(feature = "test")]
+pub mod test;
 
 #[derive(Clone)]
 pub struct Pepper {

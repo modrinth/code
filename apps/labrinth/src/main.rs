@@ -17,15 +17,9 @@ use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::utoipa_app_config;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting};
 use std::ffi::CStr;
-use std::str::FromStr;
 use std::sync::Arc;
-use tracing::level_filters::LevelFilter;
 use tracing::{Instrument, error, info, info_span};
 use tracing_actix_web::TracingLogger;
-use tracing_ecs::ECSLayerBuilder;
-use tracing_subscriber::EnvFilter;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
 use utoipa::OpenApi;
 use utoipa_actix_web::AppExt;
 use utoipa_swagger_ui::SwaggerUi;
@@ -59,59 +53,13 @@ struct Args {
     run_background_task: Option<BackgroundTask>,
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-enum OutputFormat {
-    #[default]
-    Human,
-    Json,
-}
-
-impl FromStr for OutputFormat {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "human" => Ok(Self::Human),
-            "json" => Ok(Self::Json),
-            _ => Err(()),
-        }
-    }
-}
-
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
     color_eyre::install().expect("failed to install `color-eyre`");
     dotenvy::dotenv().ok();
-    let console_layer = console_subscriber::spawn();
-    let env_filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::INFO.into())
-        .from_env_lossy();
-
-    let output_format =
-        dotenvy::var("LABRINTH_FORMAT").map_or(OutputFormat::Human, |format| {
-            format
-                .parse::<OutputFormat>()
-                .unwrap_or_else(|_| panic!("invalid output format '{format}'"))
-        });
-
-    match output_format {
-        OutputFormat::Human => {
-            tracing_subscriber::registry()
-                .with(console_layer)
-                .with(env_filter)
-                .with(tracing_subscriber::fmt::layer())
-                .init();
-        }
-        OutputFormat::Json => {
-            tracing_subscriber::registry()
-                .with(console_layer)
-                .with(env_filter)
-                .with(ECSLayerBuilder::default().stdout())
-                .init();
-        }
-    }
+    modrinth_util::log::init().expect("failed to initialize logging");
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
