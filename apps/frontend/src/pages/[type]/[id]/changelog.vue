@@ -75,9 +75,8 @@
 <script setup>
 import { DownloadIcon } from '@modrinth/assets'
 import { Pagination } from '@modrinth/ui'
+import { renderHighlightedString } from '@modrinth/utils'
 import VersionFilterControl from '@modrinth/ui/src/components/version/VersionFilterControl.vue'
-
-import { renderHighlightedString } from '~/helpers/highlight.js'
 
 const props = defineProps({
 	project: {

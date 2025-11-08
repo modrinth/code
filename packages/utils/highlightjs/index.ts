@@ -1,6 +1,5 @@
-// Configs
-import { configuredXss, md } from '@modrinth/utils'
 import hljs from 'highlight.js/lib/core'
+// Configs
 import gradle from 'highlight.js/lib/languages/gradle'
 // Coding
 import groovy from 'highlight.js/lib/languages/groovy'
@@ -16,12 +15,18 @@ import python from 'highlight.js/lib/languages/python'
 import scala from 'highlight.js/lib/languages/scala'
 import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
+import { default as mcfunction } from 'highlightjs-mcfunction'
+import skript from './skript'
+
+import { configuredXss, md } from '../parse'
 
 /* REGISTRATION */
 // Scripting
 hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('python', python)
 hljs.registerLanguage('lua', lua)
+hljs.registerLanguage('skript', skript)
+hljs.registerLanguage('mcfunction', mcfunction)
 // Coding
 hljs.registerLanguage('java', java)
 hljs.registerLanguage('kotlin', kotlin)
@@ -39,6 +44,9 @@ hljs.registerLanguage('properties', properties)
 // Scripting
 hljs.registerAliases(['js'], { languageName: 'javascript' })
 hljs.registerAliases(['py'], { languageName: 'python' })
+hljs.registerAliases(['sk'], { languageName: 'skript' })
+hljs.registerAliases(['command'], { languageName: 'mcfunction' })
+hljs.registerAliases(['kubejs'], { languageName: 'javascript' })
 // Coding
 hljs.registerAliases(['kt'], { languageName: 'kotlin' })
 // Configs
@@ -50,7 +58,7 @@ hljs.registerAliases(['html', 'htm', 'xhtml', 'mcui', 'fxml'], { languageName: '
 export const renderHighlightedString = (string) =>
 	configuredXss.process(
 		md({
-			highlight: function (str, lang) {
+			highlight(str, lang) {
 				if (lang && hljs.getLanguage(lang)) {
 					try {
 						return hljs.highlight(str, { language: lang }).value
