@@ -652,6 +652,9 @@ importers:
       highlight.js:
         specifier: ^11.9.0
         version: 11.9.0
+      highlightjs-mcfunction:
+        specifier: github:modrinth/better-highlightjs-mcfunction
+        version: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
@@ -5022,6 +5025,10 @@ packages:
     resolution: {integrity: sha512-fJ7cW7fQGCYAkgv4CPfwFHrfd/cLS4Hau96JuJ+ZTOWhjnhoeN1ub1tFmALm/+lW5z4WCAuAV9bm05AP0mS6Gw==}
     engines: {node: '>=12.0.0'}
 
+  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166:
+    resolution: {tarball: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166}
+    version: 1.0.0
+
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
 
@@ -7106,6 +7113,7 @@ packages:
   sitemap@8.0.0:
     resolution: {integrity: sha512-+AbdxhM9kJsHtruUF39bwS/B0Fytw6Fr1o4ZAIAEqA6cke2xcoO2GleBw9Zw7nRzILVEgz7zBM5GiTJjie1G9A==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    deprecated: 'SECURITY: Multiple vulnerabilities fixed in 8.0.1 (XML injection, path traversal, command injection, protocol injection). Upgrade immediately: npm install sitemap@8.0.1'
     hasBin: true
 
   slash@5.1.0:
@@ -13706,6 +13714,8 @@ snapshots:
   he@1.2.0: {}
 
   highlight.js@11.9.0: {}
+
+  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166: {}
 
   hookable@5.5.3: {}
 

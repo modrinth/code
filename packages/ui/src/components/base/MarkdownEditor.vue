@@ -293,7 +293,7 @@ import {
 	YouTubeIcon,
 } from '@modrinth/assets'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
-import { renderHighlightedString } from '@modrinth/utils/highlight'
+import { renderHighlightedString } from '@modrinth/utils/highlightjs'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 
 import Modal from '../modal/Modal.vue'
