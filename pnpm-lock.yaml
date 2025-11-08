@@ -653,8 +653,8 @@ importers:
         specifier: ^11.9.0
         version: 11.9.0
       highlightjs-mcfunction:
-        specifier: github:modrinth/highlightjs-mcfunction
-        version: https://codeload.github.com/modrinth/highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166
+        specifier: github:modrinth/better-highlightjs-mcfunction
+        version: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
@@ -5025,8 +5025,8 @@ packages:
     resolution: {integrity: sha512-fJ7cW7fQGCYAkgv4CPfwFHrfd/cLS4Hau96JuJ+ZTOWhjnhoeN1ub1tFmALm/+lW5z4WCAuAV9bm05AP0mS6Gw==}
     engines: {node: '>=12.0.0'}
 
-  highlightjs-mcfunction@https://codeload.github.com/modrinth/highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166:
-    resolution: {tarball: https://codeload.github.com/modrinth/highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166}
+  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166:
+    resolution: {tarball: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166}
     version: 1.0.0
 
   hookable@5.5.3:
@@ -13715,7 +13715,7 @@ snapshots:
 
   highlight.js@11.9.0: {}
 
-  highlightjs-mcfunction@https://codeload.github.com/modrinth/highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166: {}
+  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166: {}
 
   hookable@5.5.3: {}
 
