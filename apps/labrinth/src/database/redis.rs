@@ -699,9 +699,11 @@ impl RedisConnection {
         &mut self,
         namespace: &str,
         key: &str,
-        timeout: f64,
+        timeout: Option<f64>,
     ) -> Result<Option<[String; 2]>, DatabaseError> {
         let key = format!("{}_{namespace}:{key}", self.meta_namespace);
+        // a timeout of 0 is infinite
+        let timeout = timeout.unwrap_or(0.0);
         let values = self.connection.brpop(key, timeout).await?;
         Ok(values)
     }

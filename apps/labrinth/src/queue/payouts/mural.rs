@@ -137,9 +137,11 @@ impl PayoutsQueue {
         // TODO
         // std::fs::write(
         //     "/tmp/modrinth-payout-statement.pdf",
-        //     base64::engine::general_purpose::STANDARD
-        //         .decode(&payment_statement_doc.body)
-        //         .unwrap(),
+        //     base64::Engine::decode(
+        //         &base64::engine::general_purpose::STANDARD,
+        //         &payment_statement_doc.body,
+        //     )
+        //     .unwrap(),
         // )
         // .unwrap();
 

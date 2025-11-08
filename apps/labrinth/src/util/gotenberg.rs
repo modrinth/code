@@ -8,6 +8,7 @@ use actix_web::http::header::HeaderName;
 use chrono::{DateTime, Datelike, Utc};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
+use std::time::Duration;
 
 pub const MODRINTH_GENERATED_PDF_TYPE: HeaderName =
     HeaderName::from_static("modrinth-generated-pdf-type");
@@ -195,15 +196,19 @@ impl GotenbergClient {
                 "`GOTENBERG_TIMEOUT` is not a valid number of milliseconds",
             )?;
 
-        let [_key, document] = redis
-            .brpop(
+        let [_key, document] = tokio::time::timeout(
+            Duration::from_millis(timeout_ms),
+            redis.brpop(
                 PAYMENT_STATEMENTS_NAMESPACE,
                 &statement.payment_id.to_string(),
-                timeout_ms as f64 / 1000f64,
-            )
-            .await
-            .wrap_internal_err("failed to get document over Redis")?
-            .wrap_internal_err("no document was returned from Redis")?;
+                None,
+            ),
+        )
+        .await
+        .wrap_internal_err("Gotenberg document generation timed out")?
+        .wrap_internal_err("failed to get document over Redis")?
+        .wrap_internal_err("no document was returned from Redis")?;
+
         let document = serde_json::from_str::<
             Result<GotenbergDocument, GotenbergError>,
         >(&document)
