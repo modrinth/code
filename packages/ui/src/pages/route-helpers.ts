@@ -1,4 +1,4 @@
-import { resolve } from 'pathe'
+import { posix } from 'path'
 import type { RouteRecordRaw } from 'vue-router'
 
 interface NuxtPage {
@@ -36,7 +36,7 @@ export function createComponentResolver(baseDir: string) {
 
 	return {
 		register(component: any, relativePath: string) {
-			componentMap.set(component, resolve(baseDir, relativePath))
+			componentMap.set(component, posix.resolve(baseDir, relativePath))
 		},
 		resolve(component: any): string {
 			const path = componentMap.get(component)
