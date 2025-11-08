@@ -128,8 +128,9 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, RocketIcon, SparklesIcon } from '@modrinth/assets'
+import type { Archon } from '@modrinth/api-client'
 import { AutoLink, Avatar, ButtonStyled, CopyCode } from '@modrinth/ui'
-import type { Project, Server } from '@modrinth/utils'
+import type { Project } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 
@@ -141,7 +142,7 @@ import ServerInfoLabels from '../ServerInfoLabels.vue'
 
 dayjs.extend(dayjsDuration)
 
-const props = defineProps<Partial<Server>>()
+const props = defineProps<Partial<Archon.Servers.v0.Server>>()
 const emit = defineEmits<{ (e: 'upgrade'): void }>()
 
 const showGameLabel = computed(() => !!props.game)

@@ -113,8 +113,9 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, LockIcon, SparklesIcon } from '@modrinth/assets'
+import type { Archon } from '@modrinth/api-client'
 import { Avatar, CopyCode, ServersSpecs } from '@modrinth/ui'
-import type { Project, Server } from '@modrinth/utils'
+import type { Project } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
@@ -136,7 +137,7 @@ type PendingChange = {
 	verb: string
 }
 
-const props = defineProps<Partial<Server> & { pendingChange?: PendingChange }>()
+const props = defineProps<Partial<Archon.Servers.v0.Server> & { pendingChange?: PendingChange }>()
 
 if (props.server_id && props.status === 'available') {
 	// Necessary only to get server icon
