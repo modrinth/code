@@ -726,7 +726,7 @@ impl PayoutsQueue {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct PayoutFees {
     /// Fee which is taken by the underlying method we're using.
     ///

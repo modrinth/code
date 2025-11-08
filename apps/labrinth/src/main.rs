@@ -153,8 +153,8 @@ async fn main() -> std::io::Result<()> {
     let email_queue =
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
 
-    let gotenberg_client =
-        GotenbergClient::from_env().expect("Failed to create Gotenberg client");
+    let gotenberg_client = GotenbergClient::from_env(redis_pool.clone())
+        .expect("Failed to create Gotenberg client");
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
