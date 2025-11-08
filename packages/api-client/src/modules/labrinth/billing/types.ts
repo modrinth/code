@@ -84,7 +84,8 @@ export namespace Labrinth {
 				unitary: boolean
 			}
 
-			export type EditSubscriptionRequest = Partial<UserSubscription> & {
+			export type EditSubscriptionRequest = {
+				interval?: PriceDuration
 				payment_method?: string
 				cancelled?: boolean
 				region?: string
