@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-11-07T21:10:00-07:00`,
+		product: 'web',
+		body: `## Improvements
+- Enhanced syntax highlighting support for skript, mcfunction, and kubejs code blocks in Markdown descriptions.`,
+	},
+	{
 		date: `2025-11-07T15:45:00-07:00`,
 		product: 'web',
 		body: `## Improvements
