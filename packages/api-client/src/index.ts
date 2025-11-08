@@ -13,6 +13,8 @@ export { type BackoffStrategy, type RetryConfig, RetryFeature } from './features
 export { type VerboseLoggingConfig, VerboseLoggingFeature } from './features/verbose-logging'
 export type { InferredClientModules } from './modules'
 export * from './modules/types'
+export type { Archon } from './modules/archon/servers/types'
+export type { Labrinth } from './modules/labrinth/billing/types'
 export { GenericModrinthClient } from './platform/generic'
 export type { NuxtClientConfig } from './platform/nuxt'
 export { NuxtCircuitBreakerStorage, NuxtModrinthClient } from './platform/nuxt'

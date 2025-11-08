@@ -23,8 +23,8 @@ export abstract class AbstractModrinthClient {
 	 */
 	private _moduleNamespaces: Map<string, Record<string, AbstractModule>> = new Map()
 
-	// TODO: When adding kyros/archon add readonly fields for those too.
 	public readonly labrinth!: InferredClientModules['labrinth']
+	public readonly archon!: InferredClientModules['archon']
 
 	constructor(config: ClientConfig) {
 		this.config = {
