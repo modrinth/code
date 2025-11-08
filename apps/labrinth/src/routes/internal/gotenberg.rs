@@ -14,7 +14,7 @@ use crate::routes::ApiError;
 use crate::util::error::Context;
 use crate::util::gotenberg::{
     GeneratedPdfType, MODRINTH_GENERATED_PDF_TYPE, MODRINTH_PAYMENT_ID,
-    payment_statement_redis_channel,
+    PAYMENT_STATEMENTS_NAMESPACE,
 };
 use crate::util::guards::internal_network_guard;
 
@@ -72,8 +72,11 @@ pub async fn success_callback(
     .wrap_internal_err("failed to serialize document to JSON")?;
 
     redis
-        .connection
-        .lpush(payment_statement_redis_channel(payout_id), &redis_msg)
+        .lpush(
+            PAYMENT_STATEMENTS_NAMESPACE,
+            &payout_id.to_string(),
+            &redis_msg,
+        )
         .await
         .wrap_internal_err("failed to send document over Redis")?;
 
@@ -133,8 +136,11 @@ pub async fn error_callback(
     .wrap_internal_err("failed to serialize error to JSON")?;
 
     redis
-        .connection
-        .lpush(payment_statement_redis_channel(payout_id), &redis_msg)
+        .lpush(
+            PAYMENT_STATEMENTS_NAMESPACE,
+            &payout_id.to_string(),
+            &redis_msg,
+        )
         .await
         .wrap_internal_err("failed to send error over Redis")?;
 

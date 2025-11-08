@@ -14,11 +14,7 @@ pub const MODRINTH_GENERATED_PDF_TYPE: HeaderName =
     HeaderName::from_static("modrinth-generated-pdf-type");
 pub const MODRINTH_PAYMENT_ID: HeaderName =
     HeaderName::from_static("modrinth-payment-id");
-const DOCUMENT_REDIS_CHANNEL: &str = "payment-statement";
-
-pub fn payment_statement_redis_channel(payout_id: PayoutId) -> String {
-    format!("{DOCUMENT_REDIS_CHANNEL}:{}", payout_id.0)
-}
+pub const PAYMENT_STATEMENTS_NAMESPACE: &str = "payment_statements";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PaymentStatement {
@@ -204,8 +200,11 @@ impl GotenbergClient {
             payment_statement_redis_channel(statement.payment_id);
 
         let [_key, document] = redis
-            .connection
-            .brpop(redis_channel, timeout_ms as f64 / 1000f64)
+            .brpop(
+                PAYMENT_STATEMENTS_NAMESPACE,
+                &statement.payment_id.to_string(),
+                timeout_ms as f64 / 1000f64,
+            )
             .await
             .wrap_internal_err("failed to get document over Redis")?
             .wrap_internal_err("no document was returned from Redis")?;

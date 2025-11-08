@@ -794,7 +794,7 @@ async fn mural_pay_payout(
 ) -> Result<DBPayout, ApiError> {
     let user_email = get_verified_email(user)?;
 
-    payouts_queue
+    let payout_request = payouts_queue
         .create_muralpay_payout_request(
             payout_id,
             user.id.into(),
@@ -815,7 +815,7 @@ async fn mural_pay_payout(
         fee: Some(total_fee),
         method: Some(PayoutMethodType::MuralPay),
         method_address: Some(user_email.to_string()),
-        platform_id: Some(body.method_id.clone()),
+        platform_id: Some(payout_request.id.to_string()),
     })
 }
 
@@ -969,10 +969,15 @@ pub enum TransactionItem {
         fee: Option<Decimal>,
         /// What payout method type was used for this.
         method_type: Option<PayoutMethodType>,
-        /// Payout-method-specific ID for the type of reward the user got.
+        /// Payout-method-specific ID for the type of payout the user got.
         ///
-        /// - Tremendous: the reward ID
+        /// - Tremendous: the rewarded gift card ID.
         /// - Mural: the payment rail used, i.e. crypto USDC or fiat USD.
+        /// - PayPal: `paypal_us`
+        /// - Venmo: `venmo`
+        ///
+        /// For legacy transactions, this may be [`None`] as we did not always
+        /// store this payout info.
         method_id: Option<String>,
         /// Payout-method-specific address which the payout was sent to, like
         /// an email address.
@@ -1056,7 +1061,9 @@ pub async fn transaction_history(
                 amount: payout.amount,
                 fee: payout.fee,
                 method_type: payout.method,
-                method_id: payout.platform_id,
+                // TODO: store the `method_id` in the database, and return it here
+                // don't use the `platform_id`, that's something else
+                method_id: None,
                 method_address: payout.method_address,
             });
 
