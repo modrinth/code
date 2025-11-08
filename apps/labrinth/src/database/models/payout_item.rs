@@ -15,7 +15,11 @@ pub struct DBPayout {
 
     pub fee: Option<Decimal>,
     pub method: Option<PayoutMethodType>,
+    /// See [`crate::models::v3::payouts::Payout::method_id`].
+    pub method_id: Option<String>,
+    /// See [`crate::models::v3::payouts::Payout::method_address`].
     pub method_address: Option<String>,
+    /// See [`crate::models::v3::payouts::Payout::platform_id`].
     pub platform_id: Option<String>,
 }
 
@@ -27,10 +31,10 @@ impl DBPayout {
         sqlx::query!(
             "
             INSERT INTO payouts (
-                id, amount, fee, user_id, status, method, method_address, platform_id
+                id, amount, fee, user_id, status, method, method_id, method_address, platform_id
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8
+                $1, $2, $3, $4, $5, $6, $7, $8, $9
             )
             ",
             self.id.0,
@@ -39,6 +43,7 @@ impl DBPayout {
             self.user_id.0,
             self.status.as_str(),
             self.method.as_ref().map(|x| x.as_str()),
+            self.method_id,
             self.method_address,
             self.platform_id,
         )
@@ -71,7 +76,7 @@ impl DBPayout {
 
         let results = sqlx::query!(
             "
-            SELECT id, user_id, created, amount, status, method, method_address, platform_id, fee
+            SELECT id, user_id, created, amount, status, method, method_id, method_address, platform_id, fee
             FROM payouts
             WHERE id = ANY($1)
             ",
@@ -85,6 +90,7 @@ impl DBPayout {
             status: PayoutStatus::from_string(&r.status),
             amount: r.amount,
             method: r.method.and_then(|x| PayoutMethodType::from_string(&x)),
+            method_id: r.method_id,
             method_address: r.method_address,
             platform_id: r.platform_id,
             fee: r.fee,
