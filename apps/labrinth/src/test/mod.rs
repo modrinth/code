@@ -48,8 +48,8 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     let anrok_client = anrok::Client::from_env().unwrap();
     let email_queue =
         EmailQueue::init(pool.clone(), redis_pool.clone()).unwrap();
-    let gotenberg_client =
-        GotenbergClient::from_env().expect("Failed to create Gotenberg client");
+    let gotenberg_client = GotenbergClient::from_env(redis_pool.clone())
+        .expect("Failed to create Gotenberg client");
 
     crate::app_setup(
         pool.clone(),
