@@ -57,7 +57,7 @@
 			</div>
 		</div>
 
-		<Transition name="fade" mode="out-in" v-else>
+		<Transition v-else name="fade" mode="out-in">
 			<div v-if="isLoading && !serverResponse" key="loading" class="flex flex-col gap-4 py-8">
 				<div class="mb-4 text-center">
 					<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />

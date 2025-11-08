@@ -1,16 +1,18 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { InfoIcon } from '@modrinth/assets'
 import { formatPrice } from '@modrinth/utils'
 import { type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { Menu } from 'floating-vue'
 import { computed, inject, type Ref } from 'vue'
 
-import { monthsInInterval, type ServerBillingInterval, type ServerPlan } from '../../utils/billing'
+import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
+import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import ServersSpecs from './ServersSpecs.vue'
 
 const props = withDefaults(
 	defineProps<{
-		plan: ServerPlan
+		plan: Labrinth.Billing.Internal.Product
 		title: MessageDescriptor
 		description: MessageDescriptor
 		buttonColor?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
@@ -25,7 +27,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-	(e: 'select', plan: ServerPlan): void
+	(e: 'select', plan: Labrinth.Billing.Internal.Product): void
 }>()
 
 const { formatMessage, locale } = useVIntl()
@@ -36,11 +38,21 @@ const currency = inject<string>('currency')
 
 const perMonth = computed(() => {
 	if (!props.plan || !currency || !selectedInterval?.value) return undefined
-	const total = props.plan.prices?.find((x) => x.currency_code === currency)?.prices?.intervals?.[
-		selectedInterval.value
-	]
+	const total = getPriceForInterval(props.plan, currency, selectedInterval.value)
 	if (!total) return undefined
 	return total / monthsInInterval[selectedInterval.value]
+})
+
+const planSpecs = computed(() => {
+	const metadata = props.plan.metadata
+	if (metadata.type === 'pyro' || metadata.type === 'medal') {
+		return {
+			ram: metadata.ram,
+			storage: metadata.storage,
+			cpu: metadata.cpu,
+		}
+	}
+	return null
 })
 
 const mostPopularStyle = computed(() => {
@@ -121,11 +133,11 @@ const mostPopularStyle = computed(() => {
 					</template>
 
 					<template #popper>
-						<div class="w-fit rounded-md border border-contrast/10 p-3 shadow-lg">
+						<div v-if="planSpecs" class="w-fit rounded-md border border-contrast/10 p-3 shadow-lg">
 							<ServersSpecs
-								:ram="plan.metadata.ram!"
-								:storage="plan.metadata.storage!"
-								:cpus="plan.metadata.cpu!"
+								:ram="planSpecs.ram"
+								:storage="planSpecs.storage"
+								:cpus="planSpecs.cpu"
 							/>
 						</div>
 					</template>

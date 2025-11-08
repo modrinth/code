@@ -127,8 +127,8 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon, LockIcon, RocketIcon, SparklesIcon } from '@modrinth/assets'
 import type { Archon } from '@modrinth/api-client'
+import { ChevronRightIcon, LockIcon, RocketIcon, SparklesIcon } from '@modrinth/assets'
 import { AutoLink, Avatar, ButtonStyled, CopyCode } from '@modrinth/ui'
 import type { Project } from '@modrinth/utils'
 import dayjs from 'dayjs'

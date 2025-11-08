@@ -96,6 +96,17 @@ export namespace Archon {
 				limit?: number
 				offset?: number
 			}
+
+			export type StockRequest = {
+				cpu?: number
+				memory_mb?: number
+				swap_mb?: number
+				storage_mb?: number
+			}
+
+			export type StockResponse = {
+				available: number
+			}
 		}
 	}
 }

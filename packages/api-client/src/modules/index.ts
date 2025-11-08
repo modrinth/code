@@ -1,6 +1,7 @@
 import type { AbstractModrinthClient } from '../core/abstract-client'
 import type { AbstractModule } from '../core/abstract-module'
 import { ArchonServersV0Module } from './archon/servers/v0'
+import { ArchonServersV1Module } from './archon/servers/v1'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
@@ -18,6 +19,7 @@ type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
  */
 export const MODULE_REGISTRY = {
 	archon_servers_v0: ArchonServersV0Module,
+	archon_servers_v1: ArchonServersV1Module,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,

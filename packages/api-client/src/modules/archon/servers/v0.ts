@@ -1,5 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
-import type { Archon } from './types'
+import type { Archon } from './types/'
 
 export class ArchonServersV0Module extends AbstractModule {
 	public getModuleID(): string {
@@ -19,9 +19,26 @@ export class ArchonServersV0Module extends AbstractModule {
 
 		const query = params.toString() ? `?${params.toString()}` : ''
 
-		return this.client.request<Archon.Servers.v0.ServerGetResponse>(`/modrinth/v0/servers${query}`, {
+		return this.client.request<Archon.Servers.v0.ServerGetResponse>(`servers${query}`, {
 			api: 'archon',
 			method: 'GET',
+			version: 'modrinth/v0',
+		})
+	}
+
+	/**
+	 * Check stock availability for a region
+	 * POST /modrinth/v0/stock
+	 */
+	public async checkStock(
+		region: string,
+		request: Archon.Servers.v0.StockRequest,
+	): Promise<Archon.Servers.v0.StockResponse> {
+		return this.client.request<Archon.Servers.v0.StockResponse>(`/stock?region=${region}`, {
+			api: 'archon',
+			version: 'modrinth/v0',
+			method: 'POST',
+			body: request,
 		})
 	}
 }

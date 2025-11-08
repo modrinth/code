@@ -147,12 +147,15 @@ export class LabrinthBillingInternalModule extends AbstractModule {
 	public async initiatePayment(
 		request: Labrinth.Billing.Internal.InitiatePaymentRequest,
 	): Promise<Labrinth.Billing.Internal.InitiatePaymentResponse> {
-		return this.client.request<Labrinth.Billing.Internal.InitiatePaymentResponse>('/billing/payment', {
-			api: 'labrinth',
-			version: 'internal',
-			method: 'POST',
-			body: request,
-		})
+		return this.client.request<Labrinth.Billing.Internal.InitiatePaymentResponse>(
+			'/billing/payment',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: request,
+			},
+		)
 	}
 
 	/**

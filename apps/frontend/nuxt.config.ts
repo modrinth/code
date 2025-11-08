@@ -11,12 +11,6 @@ import Papa from 'papaparse'
 import { basename, relative, resolve } from 'pathe'
 import svgLoader from 'vite-svg-loader'
 
-import {
-	ServersOverviewPage,
-	createComponentResolver,
-	sharedRoutes,
-	toNuxtPages,
-} from '@modrinth/ui/pages'
 import type { GeneratedState } from './src/composables/generated'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
@@ -309,17 +303,6 @@ export default defineNuxtConfig({
 					children: [],
 				}),
 			)
-
-			// Shared routes
-			const uiPackagePath = resolve(__dirname, '../../packages/ui')
-			const componentResolver = createComponentResolver(uiPackagePath)
-
-			componentResolver.register(ServersOverviewPage, 'src/pages/servers/manage.vue')
-
-			const nuxtPages = toNuxtPages(sharedRoutes, (component) =>
-				componentResolver.resolve(component),
-			)
-			routes.push(...nuxtPages)
 		},
 		async 'vintl:extendOptions'(opts) {
 			opts.locales ??= []

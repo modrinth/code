@@ -1,6 +1,6 @@
 <template>
 	<ModrinthServersPurchaseModal
-		v-if="customer"
+		v-if="customer && regionsData"
 		ref="purchaseModal"
 		:publishable-key="config.public.stripePublishableKey"
 		:initiate-payment="async (body) => await initiatePayment(body)"
@@ -11,7 +11,7 @@
 		:currency="selectedCurrency"
 		:return-url="`${config.public.siteUrl}/servers/manage`"
 		:pings="regionPings"
-		:regions="regions"
+		:regions="regionsData"
 		:refresh-payment-methods="fetchPaymentData"
 		:fetch-stock="fetchStock"
 		:plan-stage="true"
@@ -27,66 +27,80 @@
 </template>
 
 <script setup lang="ts">
-import { injectNotificationManager, ModrinthServersPurchaseModal } from '@modrinth/ui'
-import type { ServerPlan } from '@modrinth/ui/src/utils/billing'
-import type { UserSubscription } from '@modrinth/utils'
-import { computed, onMounted, ref } from 'vue'
+import type { Archon, Labrinth } from '@modrinth/api-client'
+import {
+	injectModrinthClient,
+	injectNotificationManager,
+	ModrinthServersPurchaseModal,
+} from '@modrinth/ui'
+import { useMutation, useQuery } from '@tanstack/vue-query'
+import { computed, ref, watch } from 'vue'
 
-import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 
 const { addNotification } = injectNotificationManager()
+const { labrinth, archon } = injectModrinthClient()
 
 const config = useRuntimeConfig()
 const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
 const customer = ref<any>(null)
 const paymentMethods = ref<any[]>([])
 const selectedCurrency = ref<string>('USD')
-const regions = ref<any[]>([])
 const regionPings = ref<any[]>([])
 
-const pyroProducts = (products as any[])
+const pyroProducts = (products as Labrinth.Billing.Internal.Product[])
 	.filter((p) => p?.metadata?.type === 'pyro')
-	.sort((a, b) => (a?.metadata?.ram ?? 0) - (b?.metadata?.ram ?? 0))
+	.sort((a, b) => {
+		const aRam = a?.metadata?.type === 'pyro' ? a.metadata.ram : 0
+		const bRam = b?.metadata?.type === 'pyro' ? b.metadata.ram : 0
+		return aRam - bRam
+	})
 
 function handleError(err: any) {
 	console.error('Purchase modal error:', err)
 }
 
-async function fetchPaymentData() {
-	try {
-		const [customerData, paymentMethodsData] = await Promise.all([
-			useBaseFetch('billing/customer', { internal: true }),
-			useBaseFetch('billing/payment_methods', { internal: true }),
-		])
-		customer.value = customerData as any
-		paymentMethods.value = paymentMethodsData as any[]
-	} catch (error) {
-		console.error('Error fetching payment data:', error)
-	}
-}
+const { data: customerData } = useQuery({
+	queryKey: ['billing', 'customer'],
+	queryFn: () => labrinth.billing_internal.getCustomer(),
+})
 
-function fetchStock(region: any, request: any) {
-	return useServersFetch(`stock?region=${region.shortcode}`, {
-		method: 'POST',
-		body: {
-			...request,
-		},
-		bypassAuth: true,
-	}).then((res: any) => res.available as number)
-}
+const { data: paymentMethodsData, refetch: refetchPaymentMethods } = useQuery({
+	queryKey: ['billing', 'payment-methods'],
+	queryFn: () => labrinth.billing_internal.getPaymentMethods(),
+})
 
-function pingRegions() {
-	useServersFetch('regions', {
-		method: 'GET',
-		version: 1,
-		bypassAuth: true,
-	}).then((res: any) => {
-		regions.value = res as any[]
-		;(regions.value as any[]).forEach((region: any) => {
+const { data: regionsData } = useQuery({
+	queryKey: ['servers', 'regions'],
+	queryFn: () => archon.servers_v1.getRegions(),
+})
+
+watch(customerData, (newCustomer) => {
+	if (newCustomer) customer.value = newCustomer
+})
+
+watch(paymentMethodsData, (newMethods) => {
+	if (newMethods) paymentMethods.value = newMethods
+})
+
+watch(regionsData, (newRegions) => {
+	if (newRegions) {
+		newRegions.forEach((region) => {
 			runPingTest(region)
 		})
-	})
+	}
+})
+
+async function fetchPaymentData() {
+	await refetchPaymentMethods()
+}
+
+async function fetchStock(
+	region: Archon.Servers.v1.Region,
+	request: Archon.Servers.v0.StockRequest,
+): Promise<number> {
+	const result = await archon.servers_v0.checkStock(region.shortcode, request)
+	return result.available
 }
 
 const PING_COUNT = 20
@@ -141,24 +155,22 @@ function runPingTest(region: any, index = 1) {
 	}
 }
 
-const subscription = ref<UserSubscription | null>(null)
+const subscription = ref<Labrinth.Billing.Internal.UserSubscription | null>(null)
 // Dry run state
 const dryRunResponse = ref<{
 	requires_payment: boolean
 	required_payment_is_proration: boolean
 } | null>(null)
-const pendingDowngradeBody = ref<any | null>(null)
-const currentPlanFromSubscription = computed<ServerPlan | undefined>(() => {
+const pendingDowngradeBody = ref<Labrinth.Billing.Internal.EditSubscriptionRequest | null>(null)
+const currentPlanFromSubscription = computed<Labrinth.Billing.Internal.Product | undefined>(() => {
 	return subscription.value
-		? (pyroProducts.find(
-				(p) =>
-					p.prices.filter((price: { id: string }) => price.id === subscription.value?.price_id)
-						.length > 0,
+		? (pyroProducts.find((p) =>
+				p.prices.some((price) => price.id === subscription.value?.price_id),
 			) ?? undefined)
 		: undefined
 })
 
-const currentInterval = computed(() => {
+const currentInterval = computed<'monthly' | 'quarterly'>(() => {
 	const interval = subscription.value?.interval
 
 	if (interval === 'monthly' || interval === 'quarterly') {
@@ -167,26 +179,45 @@ const currentInterval = computed(() => {
 	return 'monthly'
 })
 
-async function initiatePayment(body: any): Promise<any> {
+const editSubscriptionMutation = useMutation({
+	mutationFn: async ({
+		id,
+		body,
+		dry,
+	}: {
+		id: string
+		body: Labrinth.Billing.Internal.EditSubscriptionRequest
+		dry: boolean
+	}) => {
+		return await labrinth.billing_internal.editSubscription(id, body, dry)
+	},
+})
+
+async function initiatePayment(
+	body: Labrinth.Billing.Internal.InitiatePaymentRequest,
+): Promise<Labrinth.Billing.Internal.EditSubscriptionResponse | null> {
 	if (subscription.value) {
-		const transformedBody = {
-			interval: body.charge?.interval,
+		const transformedBody: Labrinth.Billing.Internal.EditSubscriptionRequest = {
+			interval: body.charge.type === 'new' ? body.charge.interval : undefined,
 			payment_method: body.type === 'confirmation_token' ? body.token : body.id,
-			product: body.charge?.product_id,
+			product: body.charge.type === 'new' ? body.charge.product_id : undefined,
 			region: body.metadata?.server_region,
 		}
 
 		try {
-			const dry = await useBaseFetch(`billing/subscription/${subscription.value.id}?dry=true`, {
-				internal: true,
-				method: 'PATCH',
+			const dry = await editSubscriptionMutation.mutateAsync({
+				id: subscription.value.id,
 				body: transformedBody,
+				dry: true,
 			})
 
-			if (dry && typeof dry === 'object' && 'requires_payment' in dry) {
-				dryRunResponse.value = dry as any
+			if (dry && typeof dry === 'object' && 'payment_intent_id' in dry) {
+				dryRunResponse.value = {
+					requires_payment: !!dry.payment_intent_id,
+					required_payment_is_proration: true,
+				}
 				pendingDowngradeBody.value = transformedBody
-				if (dry.requires_payment) {
+				if (dry.payment_intent_id) {
 					return await finalizeImmediate(transformedBody)
 				} else {
 					return null
@@ -209,14 +240,16 @@ async function initiatePayment(body: any): Promise<any> {
 	}
 }
 
-async function finalizeImmediate(body: any) {
-	const result = await useBaseFetch(`billing/subscription/${subscription.value?.id}`, {
-		internal: true,
-		method: 'PATCH',
+async function finalizeImmediate(body: Labrinth.Billing.Internal.EditSubscriptionRequest) {
+	if (!subscription.value) return null
+
+	const result = await editSubscriptionMutation.mutateAsync({
+		id: subscription.value.id,
 		body,
+		dry: false,
 	})
 
-	return result
+	return result ?? null
 }
 
 async function finalizeDowngrade() {
@@ -243,11 +276,9 @@ async function finalizeDowngrade() {
 
 async function open(id?: string) {
 	if (id) {
-		const subscriptions = (await useBaseFetch(`billing/subscriptions`, {
-			internal: true,
-		})) as any[]
+		const subscriptions = await labrinth.billing_internal.getSubscriptions()
 		for (const sub of subscriptions) {
-			if (sub?.metadata?.id === id) {
+			if (sub?.metadata?.type === 'pyro' && sub.metadata.id === id) {
 				subscription.value = sub
 				break
 			}
@@ -261,10 +292,5 @@ async function open(id?: string) {
 
 defineExpose({
 	open,
-})
-
-onMounted(() => {
-	fetchPaymentData()
-	pingRegions()
 })
 </script>
