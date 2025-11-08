@@ -112,12 +112,11 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, TransferIcon } from '@modrinth/assets'
+import { EditIcon, ServerIcon, TransferIcon } from '@modrinth/assets'
 import { injectNotificationManager } from '@modrinth/ui'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
-import ServerIcon from '~/components/ui/servers/ServerIcon.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()

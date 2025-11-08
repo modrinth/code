@@ -25,6 +25,7 @@ export abstract class AbstractModrinthClient {
 
 	public readonly labrinth!: InferredClientModules['labrinth']
 	public readonly archon!: InferredClientModules['archon']
+	public readonly kyros!: InferredClientModules['kyros']
 
 	constructor(config: ClientConfig) {
 		this.config = {
@@ -171,7 +172,7 @@ export abstract class AbstractModrinthClient {
 	/**
 	 * Build the full URL for a request
 	 */
-	protected buildUrl(path: string, baseUrl: string, version: number | 'internal'): string {
+	protected buildUrl(path: string, baseUrl: string, version: number | 'internal' | string): string {
 		// Remove trailing slash from base URL
 		const base = baseUrl.replace(/\/$/, '')
 
@@ -181,6 +182,9 @@ export abstract class AbstractModrinthClient {
 			versionPath = '/_internal'
 		} else if (typeof version === 'number') {
 			versionPath = `/v${version}`
+		} else if (typeof version === 'string') {
+			// Custom version string (e.g., 'v0', 'modrinth/v0')
+			versionPath = `/${version}`
 		}
 
 		const cleanPath = path.startsWith('/') ? path : `/${path}`

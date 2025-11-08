@@ -69,6 +69,12 @@ export class AuthFeature extends AbstractFeature {
 			return false
 		}
 
+		// Skip if Authorization header is already explicitly set
+		const headerName = this.config.headerName ?? 'Authorization'
+		if (context.options.headers?.[headerName]) {
+			return false
+		}
+
 		return super.shouldApply(context)
 	}
 

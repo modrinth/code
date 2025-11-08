@@ -5,7 +5,7 @@
 		class="min-w-0 flex-none flex-row items-center gap-2 first:!flex"
 	>
 		<GameIcon aria-hidden="true" class="size-5 shrink-0" />
-		<NuxtLink
+		<AutoLink
 			v-if="isLink"
 			:to="serverId ? `/servers/manage/${serverId}/options/loader` : ''"
 			class="flex min-w-0 items-center truncate text-sm font-semibold"
@@ -16,7 +16,7 @@
 				<span v-if="mcVersion">{{ mcVersion }}</span>
 				<span v-else class="inline-block h-3 w-12 animate-pulse rounded bg-button-border"></span>
 			</div>
-		</NuxtLink>
+		</AutoLink>
 		<div v-else class="flex min-w-0 flex-row items-center gap-1 truncate text-sm font-semibold">
 			{{ game[0].toUpperCase() + game.slice(1) }}
 			<span v-if="mcVersion">{{ mcVersion }}</span>
@@ -27,6 +27,8 @@
 
 <script setup lang="ts">
 import { GameIcon } from '@modrinth/assets'
+import { useRoute } from 'vue-router'
+import AutoLink from '../../base/AutoLink.vue'
 
 defineProps<{
 	game: string
@@ -34,6 +36,6 @@ defineProps<{
 	isLink?: boolean
 }>()
 
-const route = useNativeRoute()
+const route = useRoute()
 const serverId = route.params.id as string
 </script>

@@ -58,7 +58,7 @@
 			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
 			class="relative flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
 		>
-			<PanelSpinner />
+			<LoaderCircleIcon class="size-5 animate-spin" />
 			Your server's hardware is currently being upgraded and will be back online shortly.
 		</div>
 		<div
@@ -66,7 +66,7 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your server has been cancelled. Please update your
+				<TriangleAlertIcon class="!size-5" /> Your server has been cancelled. Please update your
 				billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
@@ -76,8 +76,9 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your server has been suspended: {{ suspension_reason }}.
-				Please update your billing information or contact Modrinth Support for more information.
+				<TriangleAlertIcon class="!size-5" /> Your server has been suspended:
+				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
+				for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -86,7 +87,7 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your
+				<TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your
 				billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
@@ -112,20 +113,26 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
-import { ChevronRightIcon, LockIcon, SparklesIcon } from '@modrinth/assets'
-import { Avatar, CopyCode, ServersSpecs } from '@modrinth/ui'
-import type { Project } from '@modrinth/utils'
+import type { Archon, ProjectV2 } from '@modrinth/api-client'
+import {
+	ChevronRightIcon,
+	LoaderCircleIcon,
+	LockIcon,
+	SparklesIcon,
+	TriangleAlertIcon,
+} from '@modrinth/assets'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
-import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
-
-import PanelErrorIcon from './icons/PanelErrorIcon.vue'
-import PanelSpinner from './PanelSpinner.vue'
-import ServerIcon from './ServerIcon.vue'
+import { computed } from 'vue'
+import { injectModrinthClient } from '../../providers/api-client'
+import Avatar from '../base/Avatar.vue'
+import CopyCode from '../base/CopyCode.vue'
+import ServersSpecs from '../billing/ServersSpecs.vue'
+import ServerIcon from './icons/ServerIcon.vue'
 import ServerInfoLabels from './ServerInfoLabels.vue'
 
-type PendingChange = {
+export type PendingChange = {
 	planSize: string
 	cpu: number
 	cpuBurst: number
@@ -139,30 +146,93 @@ type PendingChange = {
 
 const props = defineProps<Partial<Archon.Servers.v0.Server> & { pendingChange?: PendingChange }>()
 
-if (props.server_id && props.status === 'available') {
-	// Necessary only to get server icon
-	await useModrinthServers(props.server_id, ['general'])
-}
+const { archon, kyros, labrinth } = injectModrinthClient()
 
 const showGameLabel = computed(() => !!props.game)
 const showLoaderLabel = computed(() => !!props.loader)
 
-let projectData: Ref<Project | null>
-if (props.upstream) {
-	const { data } = await useAsyncData<Project>(
-		`server-project-${props.server_id}`,
-		async (): Promise<Project> => {
-			const result = await useBaseFetch(`project/${props.upstream?.project_id}`)
-			return result as Project
-		},
-	)
-	projectData = data
-} else {
-	projectData = ref(null)
+const { data: projectData } = useQuery({
+	queryKey: ['project', props.upstream?.project_id] as const,
+	queryFn: async (): Promise<ProjectV2 | null> => {
+		if (!props.upstream?.project_id) return null
+		return await labrinth.projects_v2.get(props.upstream.project_id)
+	},
+	enabled: computed(() => !!props.upstream?.project_id),
+})
+
+const iconUrl = computed(() => projectData.value?.icon_url)
+
+async function processImageBlob(blob: Blob, size: number): Promise<string> {
+	return new Promise((resolve) => {
+		const canvas = document.createElement('canvas')
+		const ctx = canvas.getContext('2d')!
+		const img = new Image()
+		img.onload = () => {
+			canvas.width = size
+			canvas.height = size
+			ctx.drawImage(img, 0, 0, size, size)
+			const dataURL = canvas.toDataURL('image/png')
+			URL.revokeObjectURL(img.src)
+			resolve(dataURL)
+		}
+		img.src = URL.createObjectURL(blob)
+	})
 }
 
-const image = useState<string | undefined>(`server-icon-${props.server_id}`, () => undefined)
-const iconUrl = computed(() => projectData.value?.icon_url || undefined)
+async function dataURLToBlob(dataURL: string): Promise<Blob> {
+	const res = await fetch(dataURL)
+	return res.blob()
+}
+
+const { data: image } = useQuery({
+	queryKey: ['server-icon', props.server_id] as const,
+	queryFn: async (): Promise<string | undefined> => {
+		if (!props.server_id || props.status !== 'available') return undefined
+
+		try {
+			const auth = await archon.servers_v0.getFilesystemAuth(props.server_id)
+
+			try {
+				const blob = await kyros.files_v0.downloadFile(
+					auth.url,
+					auth.token,
+					'/server-icon-original.png',
+				)
+
+				return await processImageBlob(blob, 512)
+			} catch (downloadError) {
+				const projectIcon = iconUrl.value
+				if (projectIcon) {
+					const response = await fetch(projectIcon)
+					const blob = await response.blob()
+
+					const scaledDataUrl = await processImageBlob(blob, 64)
+					const scaledBlob = await dataURLToBlob(scaledDataUrl)
+					const scaledFile = new File([scaledBlob], 'server-icon.png', { type: 'image/png' })
+
+					await kyros.files_v0.uploadFile(auth.url, auth.token, '/server-icon.png', scaledFile)
+
+					const originalFile = new File([blob], 'server-icon-original.png', {
+						type: 'image/png',
+					})
+					await kyros.files_v0.uploadFile(
+						auth.url,
+						auth.token,
+						'/server-icon-original.png',
+						originalFile,
+					)
+
+					return scaledDataUrl
+				}
+			}
+		} catch (error) {
+			console.debug('Icon processing failed:', error)
+			return undefined
+		}
+	},
+	enabled: computed(() => !!props.server_id && props.status === 'available'),
+})
+
 const isConfiguring = computed(() => props.flows?.intro)
 
 const formatDate = (d: unknown) => {

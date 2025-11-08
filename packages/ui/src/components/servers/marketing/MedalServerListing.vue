@@ -129,38 +129,39 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { ChevronRightIcon, LockIcon, RocketIcon, SparklesIcon } from '@modrinth/assets'
-import { AutoLink, Avatar, ButtonStyled, CopyCode } from '@modrinth/ui'
-import type { Project } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 
-import MedalBackgroundImage from '~/components/ui/servers/marketing/MedalBackgroundImage.vue'
-
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { injectModrinthClient } from '../../../providers/api-client'
+import AutoLink from '../../base/AutoLink.vue'
+import Avatar from '../../base/Avatar.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
+import CopyCode from '../../base/CopyCode.vue'
 import PanelErrorIcon from '../icons/PanelErrorIcon.vue'
 import PanelSpinner from '../PanelSpinner.vue'
 import ServerInfoLabels from '../ServerInfoLabels.vue'
+import MedalBackgroundImage from './MedalBackgroundImage.vue'
 
 dayjs.extend(dayjsDuration)
 
 const props = defineProps<Partial<Archon.Servers.v0.Server>>()
 const emit = defineEmits<{ (e: 'upgrade'): void }>()
 
+const client = injectModrinthClient()
+
 const showGameLabel = computed(() => !!props.game)
 const showLoaderLabel = computed(() => !!props.loader)
 
-let projectData: Ref<Project | null>
-if (props.upstream) {
-	const { data } = await useAsyncData<Project>(
-		`server-project-${props.server_id}`,
-		async (): Promise<Project> => {
-			const result = await useBaseFetch(`project/${props.upstream?.project_id}`)
-			return result as Project
-		},
-	)
-	projectData = data
-} else {
-	projectData = ref(null)
-}
+const { data: projectData } = useQuery({
+	queryKey: ['server-project', props.server_id, props.upstream?.project_id],
+	queryFn: async () => {
+		if (!props.upstream?.project_id) return null
+		return await client.labrinth.projects_v2.get(props.upstream.project_id)
+	},
+	enabled: !!props.upstream?.project_id,
+})
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined)
 const isConfiguring = computed(() => props.flows?.intro)

@@ -41,4 +41,17 @@ export class ArchonServersV0Module extends AbstractModule {
 			body: request,
 		})
 	}
+
+	/**
+	 * Get filesystem authentication credentials for a server
+	 * Returns URL and JWT token for accessing the server's filesystem via Kyros
+	 * GET /modrinth/v0/servers/:id/fs
+	 */
+	public async getFilesystemAuth(serverId: string): Promise<Archon.Servers.v0.JWTAuth> {
+		return this.client.request<Archon.Servers.v0.JWTAuth>(`/servers/${serverId}/fs`, {
+			api: 'archon',
+			version: 'modrinth/v0',
+			method: 'GET',
+		})
+	}
 }

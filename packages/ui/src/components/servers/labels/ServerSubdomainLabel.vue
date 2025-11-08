@@ -22,6 +22,8 @@
 import { LinkIcon } from '@modrinth/assets'
 import { injectNotificationManager } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 const { addNotification } = injectNotificationManager()
 
@@ -39,7 +41,7 @@ const copySubdomain = () => {
 	})
 }
 
-const route = useNativeRoute()
+const route = useRoute()
 const serverId = computed(() => route.params.id as string)
 
 const userPreferences = useStorage(`pyro-server-${serverId.value}-preferences`, {

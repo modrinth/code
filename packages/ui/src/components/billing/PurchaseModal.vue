@@ -552,7 +552,7 @@ import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import NewModal from '../modal/NewModal.vue'
-import LoaderIcon from '../servers/LoaderIcon.vue'
+import LoaderIcon from '../servers/icons/LoaderIcon.vue'
 
 const { locale, formatMessage } = useVIntl()
 
