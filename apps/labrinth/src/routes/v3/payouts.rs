@@ -779,7 +779,7 @@ async fn tremendous_payout(
 
 async fn mural_pay_payout(
     PayoutContext {
-        body,
+        body: _,
         user,
         payout_id,
         gross_amount,

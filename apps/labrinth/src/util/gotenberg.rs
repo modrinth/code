@@ -6,7 +6,6 @@ use crate::util::env::env_var;
 use crate::util::error::Context;
 use actix_web::http::header::HeaderName;
 use chrono::{DateTime, Datelike, Utc};
-use redis::AsyncTypedCommands;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
@@ -195,9 +194,6 @@ impl GotenbergClient {
             .wrap_internal_err(
                 "`GOTENBERG_TIMEOUT` is not a valid number of milliseconds",
             )?;
-
-        let redis_channel =
-            payment_statement_redis_channel(statement.payment_id);
 
         let [_key, document] = redis
             .brpop(

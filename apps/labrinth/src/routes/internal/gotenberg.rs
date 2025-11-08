@@ -3,7 +3,6 @@ use std::fmt;
 use actix_web::{HttpMessage, error::ParseError, http::header, post, web};
 use ariadne::ids::base62_impl::parse_base62;
 use base64::Engine;
-use redis::AsyncTypedCommands;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use tracing::trace;
