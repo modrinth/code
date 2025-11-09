@@ -1,12 +1,12 @@
-import type {
-	AbstractFeature,
-	type AuthConfig,
+import {
 	AuthFeature,
 	CircuitBreakerFeature,
 	NuxtCircuitBreakerStorage,
-	type NuxtClientConfig,
 	NuxtModrinthClient,
 	VerboseLoggingFeature,
+	type AbstractFeature,
+	type AuthConfig,
+	type NuxtClientConfig,
 } from '@modrinth/api-client'
 
 export function createModrinthClient(

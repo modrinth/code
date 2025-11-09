@@ -91,7 +91,7 @@
 			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
 			class="relative flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
 		>
-			<PanelSpinner />
+			<LoaderCircleIcon class="size-5 animate-spin" />
 			Your server's hardware is currently being upgraded and will be back online shortly.
 		</div>
 		<div
@@ -99,7 +99,7 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your Medal server trial has ended and your server has
+				<TriangleAlertIcon class="!size-5" /> Your Medal server trial has ended and your server has
 				been suspended. Please upgrade to continue to use your server.
 			</div>
 		</div>
@@ -108,8 +108,9 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your server has been suspended: {{ suspension_reason }}.
-				Please update your billing information or contact Modrinth Support for more information.
+				<TriangleAlertIcon class="!size-5" /> Your server has been suspended:
+				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
+				for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -118,7 +119,7 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your
+				<TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your
 				billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
@@ -128,7 +129,14 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { ChevronRightIcon, LockIcon, RocketIcon, SparklesIcon } from '@modrinth/assets'
+import {
+	ChevronRightIcon,
+	LoaderCircleIcon,
+	LockIcon,
+	RocketIcon,
+	SparklesIcon,
+	TriangleAlertIcon,
+} from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
@@ -139,9 +147,7 @@ import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import CopyCode from '../../base/CopyCode.vue'
-import PanelErrorIcon from '../icons/PanelErrorIcon.vue'
-import PanelSpinner from '../PanelSpinner.vue'
-import ServerInfoLabels from '../ServerInfoLabels.vue'
+import ServerInfoLabels from '../labels/ServerInfoLabels.vue'
 import MedalBackgroundImage from './MedalBackgroundImage.vue'
 
 dayjs.extend(dayjsDuration)

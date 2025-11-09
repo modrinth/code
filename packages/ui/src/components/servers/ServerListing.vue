@@ -130,7 +130,7 @@ import Avatar from '../base/Avatar.vue'
 import CopyCode from '../base/CopyCode.vue'
 import ServersSpecs from '../billing/ServersSpecs.vue'
 import ServerIcon from './icons/ServerIcon.vue'
-import ServerInfoLabels from './ServerInfoLabels.vue'
+import ServerInfoLabels from './labels/ServerInfoLabels.vue'
 
 export type PendingChange = {
 	planSize: string
