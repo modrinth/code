@@ -446,6 +446,8 @@ export namespace Labrinth {
 
 			countries: ISO3166.Country[]
 			subdivisions: Record<string, ISO3166.Subdivision[]>
+
+			errors: unknown[]
 		}
 	}
 }

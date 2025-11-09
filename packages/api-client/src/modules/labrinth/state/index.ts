@@ -18,8 +18,11 @@ export class LabrinthStateModule extends AbstractModule {
 	 * ```
 	 */
 	public async build(): Promise<Labrinth.State.GeneratedState> {
+		const errors: unknown[] = []
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const handleError = (err: any, defaultValue: any) => {
 			console.error('Error fetching state data:', err)
+			errors.push(err)
 			return defaultValue
 		}
 
@@ -126,6 +129,7 @@ export class LabrinthStateModule extends AbstractModule {
 			muralBankDetails: muralBankDetails?.bankDetails,
 			countries: iso3166Data.countries,
 			subdivisions: iso3166Data.subdivisions,
+			errors,
 		}
 	}
 }

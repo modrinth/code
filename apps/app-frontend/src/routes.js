@@ -1,10 +1,10 @@
+import { ServersManagePageIndex } from '@modrinth/ui'
 import { createRouter, createWebHistory } from 'vue-router'
 
 import * as Pages from '@/pages'
 import * as Instance from '@/pages/instance'
 import * as Library from '@/pages/library'
 import * as Project from '@/pages/project'
-import { ServersManagePageIndex } from '@modrinth/ui'
 
 /**
  * Configures application routing. Add page to pages/index and then add to route table here.

@@ -1,4 +1,5 @@
 <script setup>
+import { AuthFeature, TauriModrinthClient } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
@@ -92,7 +93,7 @@ import {
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
-import { AuthFeature, TauriModrinthClient } from '@modrinth/api-client'
+
 import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
@@ -108,7 +109,7 @@ const tauriApiClient = new TauriModrinthClient({
 	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
 	features: [
 		new AuthFeature({
-			token: getCreds,
+			token: async () => (await getCreds()).session,
 		}),
 	],
 })

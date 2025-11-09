@@ -10,6 +10,7 @@
 <script setup lang="ts">
 // TODO: Remove this wrapper when we figure out how to do cross platform state + stripe
 import { ServersUpgradeModalWrapper as ServersUpgradeModalWrapperBase } from '@modrinth/ui'
+
 import { useGeneratedState } from '~/composables/generated'
 
 const config = useRuntimeConfig()

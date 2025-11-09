@@ -4,7 +4,7 @@
 		class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
 	>
 		<ServersUpgradeModalWrapper
-			v-if="stripePublishableKey && siteUrl && products"
+			v-if="isNuxt"
 			ref="upgradeModal"
 			:stripe-publishable-key
 			:site-url
@@ -106,30 +106,24 @@
 				<div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
 					<h1 class="w-full text-4xl font-bold text-contrast">Servers</h1>
 					<div class="mb-4 flex w-full flex-row items-center justify-end gap-2 md:mb-0 md:gap-4">
-						<div class="relative w-full text-sm md:w-72">
+						<div class="iconified-input w-full md:w-72">
 							<label class="sr-only" for="search">Search</label>
-							<SearchIcon
-								class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
-								aria-hidden="true"
-							/>
+							<SearchIcon />
 							<input
 								id="search"
 								v-model="searchInput"
-								class="w-full border-[1px] border-solid border-button-border pl-9"
+								class="input-text-inherit"
 								type="search"
 								name="search"
 								autocomplete="off"
 								placeholder="Search servers..."
 							/>
 						</div>
-						<ButtonStyled type="standard">
-							<NuxtLink
-								class="!h-10 whitespace-pre !border-[1px] !border-solid !border-button-border text-sm !font-medium"
-								:to="{ path: '/servers', hash: '#plan' }"
-							>
-								<PlusIcon class="size-4" />
+						<ButtonStyled type="standard" v-if="isNuxt">
+							<AutoLink :to="{ path: '/servers', hash: '#plan' }">
+								<PlusIcon />
 								New server
-							</NuxtLink>
+							</AutoLink>
 						</ButtonStyled>
 					</div>
 				</div>
@@ -178,7 +172,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon, Labrinth } from '@modrinth/api-client'
+import { NuxtModrinthClient, type Archon, type Labrinth } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import { AutoLink, ButtonStyled, CopyCode, injectModrinthClient } from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
@@ -201,7 +195,10 @@ defineProps<{
 
 const router = useRouter()
 const route = useRoute()
-const { labrinth, archon } = injectModrinthClient()
+const client = injectModrinthClient()
+
+const isNuxt = computed(() => client instanceof NuxtModrinthClient)
+
 const hasError = ref(false)
 const isPollingForNewServers = ref(false)
 const pollingState = ref({
@@ -217,12 +214,12 @@ const {
 } = useQuery({
 	queryKey: ['servers'],
 	queryFn: async () => {
-		const response = await archon.servers_v0.list()
+		const response = await client.archon.servers_v0.list()
 
 		// Fetch subscriptions for medal servers
 		const hasMedalServers = response.servers.some((s) => s.is_medal)
 		if (hasMedalServers) {
-			const subscriptions = await labrinth.billing_internal.getSubscriptions()
+			const subscriptions = await client.labrinth.billing_internal.getSubscriptions()
 
 			// Inject medal_expires into servers
 			for (const server of response.servers) {

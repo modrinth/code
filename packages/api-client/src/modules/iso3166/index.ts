@@ -1,5 +1,6 @@
 import { $fetch } from 'ofetch'
 import Papa from 'papaparse'
+
 import { AbstractModule } from '../../core/abstract-module'
 import type { ISO3166 } from './types'
 
@@ -43,12 +44,14 @@ export class ISO3166Module extends AbstractModule {
 				}),
 			])
 
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const countriesData = Papa.parse<Record<string, any>>(countriesCSV, {
 				header: true,
 				skipEmptyLines: true,
 				transformHeader: (header) => (header.startsWith('#') ? header.slice(1) : header),
 			}).data
 
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const subdivisionsData = Papa.parse<Record<string, any>>(subdivisionsCSV, {
 				header: true,
 				skipEmptyLines: true,

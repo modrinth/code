@@ -626,11 +626,11 @@ import {
 	OverflowMenu,
 	PurchaseModal,
 } from '@modrinth/ui'
+import ServerListing from '@modrinth/ui/src/components/servers/ServerListing.vue'
 import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import { useBaseFetch } from '@/composables/fetch.js'
-import ServerListing from '@modrinth/ui/src/components/servers/ServerListing.vue'
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'

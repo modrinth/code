@@ -44,6 +44,7 @@ import type { UserSubscription } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 import type { ComponentPublicInstance } from 'vue'
+
 import ServersUpgradeModalWrapper from '../ServersUpgradeModalWrapper.vue'
 
 dayjs.extend(dayjsDuration)
