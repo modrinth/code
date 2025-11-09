@@ -1,3 +1,5 @@
+import type { ISO3166 } from '../iso3166/types'
+
 export namespace Labrinth {
 	export namespace Billing {
 		export namespace Internal {
@@ -356,6 +358,94 @@ export namespace Labrinth {
 				environment?: Environment
 				[key: string]: unknown
 			}
+		}
+	}
+
+	export namespace Tags {
+		export namespace v2 {
+			export interface Category {
+				icon: string
+				name: string
+				project_type: string
+				header: string
+			}
+
+			export interface Loader {
+				icon: string
+				name: string
+				supported_project_types: string[]
+			}
+
+			export interface GameVersion {
+				version: string
+				version_type: string
+				date: string // RFC 3339 DateTime
+				major: boolean
+			}
+
+			export interface DonationPlatform {
+				short: string
+				name: string
+			}
+		}
+	}
+
+	export namespace Search {
+		export namespace v2 {
+			export interface ResultSearchProject {
+				project_id: string
+				project_type: string
+				slug: string | null
+				author: string
+				title: string
+				description: string
+				categories: string[]
+				display_categories: string[]
+				versions: string[]
+				downloads: number
+				follows: number
+				icon_url: string
+				date_created: string
+				date_modified: string
+				latest_version: string
+				license: string
+				client_side: string
+				server_side: string
+				gallery: string[]
+				featured_gallery: string | null
+				color: number | null
+			}
+
+			export interface SearchResults {
+				hits: ResultSearchProject[]
+				offset: number
+				limit: number
+				total_hits: number
+			}
+		}
+	}
+
+	export namespace State {
+		export interface GeneratedState {
+			categories: Tags.v2.Category[]
+			loaders: Tags.v2.Loader[]
+			gameVersions: Tags.v2.GameVersion[]
+			donationPlatforms: Tags.v2.DonationPlatform[]
+			reportTypes: string[]
+			muralBankDetails?: Record<
+				string,
+				{
+					bankNames: string[]
+				}
+			>
+
+			homePageProjects?: Projects.v2.Project[]
+			homePageSearch?: Search.v2.SearchResults
+			homePageNotifs?: Search.v2.SearchResults
+			products?: Billing.Internal.Product[]
+
+			countries: ISO3166.Country[]
+			subdivisions: Record<string, ISO3166.Subdivision[]>
 		}
 	}
 }

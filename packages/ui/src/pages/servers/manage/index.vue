@@ -3,7 +3,12 @@
 		data-pyro-server-list-root
 		class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
 	>
-		<ServersUpgradeModalWrapper ref="upgradeModal" />
+		<ServersUpgradeModalWrapper
+			ref="upgradeModal"
+			:stripe-publishable-key="props.stripePublishableKey"
+			:site-url="props.siteUrl"
+			:products="props.products"
+		/>
 
 		<div
 			v-if="hasError || fetchError"
@@ -172,7 +177,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import { AutoLink, ButtonStyled, CopyCode, injectModrinthClient } from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
@@ -183,9 +188,15 @@ import type { ComponentPublicInstance } from 'vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import ServersUpgradeModalWrapper from '../../../components/billing/ServersUpgradeModalWrapper.vue'
+
+const props = defineProps<{
+	stripePublishableKey: string
+	siteUrl: string
+	products: Labrinth.Billing.Internal.Product[]
+}>()
 import MedalServerListing from '../../../components/servers/marketing/MedalServerListing.vue'
 import ServerListing from '../../../components/servers/ServerListing.vue'
-import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 
 const router = useRouter()
 const route = useRoute()

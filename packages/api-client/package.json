@@ -8,10 +8,12 @@
 		"fix": "eslint . --fix && prettier --write ."
 	},
 	"dependencies": {
-		"ofetch": "^1.4.1"
+		"ofetch": "^1.4.1",
+		"papaparse": "^5.4.1"
 	},
 	"devDependencies": {
-		"@modrinth/tooling-config": "workspace:*"
+		"@modrinth/tooling-config": "workspace:*",
+		"@types/papaparse": "^5.3.15"
 	},
 	"peerDependencies": {
 		"@tauri-apps/plugin-http": "^2.0.0"

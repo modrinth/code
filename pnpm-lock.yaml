@@ -47,6 +47,9 @@ importers:
 
   apps/app-frontend:
     dependencies:
+      '@modrinth/api-client':
+        specifier: workspace:^
+        version: link:../../packages/api-client
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../../packages/assets
@@ -404,10 +407,16 @@ importers:
       ofetch:
         specifier: ^1.4.1
         version: 1.4.1
+      papaparse:
+        specifier: ^5.4.1
+        version: 5.5.3
     devDependencies:
       '@modrinth/tooling-config':
         specifier: workspace:*
         version: link:../tooling-config
+      '@types/papaparse':
+        specifier: ^5.3.15
+        version: 5.3.16
 
   packages/app-lib: {}
 

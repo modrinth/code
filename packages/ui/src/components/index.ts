@@ -108,6 +108,7 @@ export { default as AffiliateLinkCreateModal } from './affiliate/AffiliateLinkCr
 export { default as AddPaymentMethodModal } from './billing/AddPaymentMethodModal.vue'
 export { default as ModrinthServersPurchaseModal } from './billing/ModrinthServersPurchaseModal.vue'
 export { default as PurchaseModal } from './billing/PurchaseModal.vue'
+export { default as ServersUpgradeModalWrapper } from './billing/ServersUpgradeModalWrapper.vue'
 
 // Skins
 export { default as CapeButton } from './skin/CapeButton.vue'

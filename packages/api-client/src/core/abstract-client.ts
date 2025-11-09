@@ -26,6 +26,7 @@ export abstract class AbstractModrinthClient {
 	public readonly labrinth!: InferredClientModules['labrinth']
 	public readonly archon!: InferredClientModules['archon']
 	public readonly kyros!: InferredClientModules['kyros']
+	public readonly iso3166!: InferredClientModules['iso3166']
 
 	constructor(config: ClientConfig) {
 		this.config = {

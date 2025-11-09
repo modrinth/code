@@ -2,10 +2,12 @@ import type { AbstractModrinthClient } from '../core/abstract-client'
 import type { AbstractModule } from '../core/abstract-module'
 import { ArchonServersV0Module } from './archon/servers/v0'
 import { ArchonServersV1Module } from './archon/servers/v1'
+import { ISO3166Module } from './iso3166'
 import { KyrosFilesV0Module } from './kyros/files/v0'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
+import { LabrinthStateModule } from './labrinth/state'
 
 type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
 
@@ -21,10 +23,12 @@ type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
 export const MODULE_REGISTRY = {
 	archon_servers_v0: ArchonServersV0Module,
 	archon_servers_v1: ArchonServersV1Module,
+	iso3166_data: ISO3166Module,
 	kyros_files_v0: KyrosFilesV0Module,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,
+	labrinth_state: LabrinthStateModule,
 } as const satisfies Record<string, ModuleConstructor>
 
 export type ModuleID = keyof typeof MODULE_REGISTRY
