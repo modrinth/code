@@ -20,6 +20,7 @@
 		:on-finalize-no-payment-change="finalizeDowngrade"
 		@hide="
 			() => {
+				debug('modal hidden, resetting subscription')
 				subscription = null
 			}
 		"
@@ -32,6 +33,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	ModrinthServersPurchaseModal,
+	useDebugLogger,
 } from '@modrinth/ui'
 import { useMutation, useQuery } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
@@ -40,6 +42,7 @@ import { products } from '~/generated/state.json'
 
 const { addNotification } = injectNotificationManager()
 const { labrinth, archon } = injectModrinthClient()
+const debug = useDebugLogger('ServersUpgradeModalWrapper')
 
 const config = useRuntimeConfig()
 const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
@@ -49,15 +52,15 @@ const selectedCurrency = ref<string>('USD')
 const regionPings = ref<any[]>([])
 
 const pyroProducts = (products as Labrinth.Billing.Internal.Product[])
-	.filter((p) => p?.metadata?.type === 'pyro')
+	.filter((p) => p?.metadata?.type === 'pyro' || p?.metadata?.type === 'medal')
 	.sort((a, b) => {
-		const aRam = a?.metadata?.type === 'pyro' ? a.metadata.ram : 0
-		const bRam = b?.metadata?.type === 'pyro' ? b.metadata.ram : 0
+		const aRam = a?.metadata?.type === 'pyro' || a?.metadata?.type === 'medal' ? a.metadata.ram : 0
+		const bRam = b?.metadata?.type === 'pyro' || b?.metadata?.type === 'medal' ? b.metadata.ram : 0
 		return aRam - bRam
 	})
 
 function handleError(err: any) {
-	console.error('Purchase modal error:', err)
+	debug('Purchase modal error:', err)
 }
 
 const { data: customerData } = useQuery({
@@ -176,6 +179,7 @@ const currentInterval = computed<'monthly' | 'quarterly'>(() => {
 	if (interval === 'monthly' || interval === 'quarterly') {
 		return interval
 	}
+
 	return 'monthly'
 })
 
@@ -196,6 +200,11 @@ const editSubscriptionMutation = useMutation({
 async function initiatePayment(
 	body: Labrinth.Billing.Internal.InitiatePaymentRequest,
 ): Promise<Labrinth.Billing.Internal.EditSubscriptionResponse | null> {
+	debug('initiatePayment called', {
+		hasSubscription: !!subscription.value,
+		subscriptionId: subscription.value?.id,
+		body,
+	})
 	if (subscription.value) {
 		const transformedBody: Labrinth.Billing.Internal.EditSubscriptionRequest = {
 			interval: body.charge.type === 'new' ? body.charge.interval : undefined,
@@ -227,10 +236,13 @@ async function initiatePayment(
 				return await finalizeImmediate(transformedBody)
 			}
 		} catch (e) {
-			console.error('Dry run failed, attempting immediate patch', e)
+			debug('Dry run failed, attempting immediate patch', e)
 			return await finalizeImmediate(transformedBody)
 		}
 	} else {
+		debug('subscription.value is null/undefined', {
+			subscriptionValue: subscription.value,
+		})
 		addNotification({
 			title: 'Unable to determine subscription ID.',
 			text: 'Please contact support.',
@@ -275,15 +287,34 @@ async function finalizeDowngrade() {
 }
 
 async function open(id?: string) {
+	debug('open called', { id })
 	if (id) {
 		const subscriptions = await labrinth.billing_internal.getSubscriptions()
+		debug('fetched subscriptions', {
+			count: subscriptions.length,
+			subscriptions: subscriptions.map((s) => ({
+				id: s.id,
+				metadataType: s.metadata?.type,
+				metadataId: s.metadata?.id,
+			})),
+		})
 		for (const sub of subscriptions) {
-			if (sub?.metadata?.type === 'pyro' && sub.metadata.id === id) {
+			if (
+				(sub?.metadata?.type === 'pyro' || sub?.metadata?.type === 'medal') &&
+				sub.metadata.id === id
+			) {
 				subscription.value = sub
+				debug('found matching subscription', {
+					subscriptionId: sub.id,
+				})
 				break
 			}
 		}
+		if (!subscription.value) {
+			debug('no matching subscription found for id', id)
+		}
 	} else {
+		debug('no id provided, resetting subscription')
 		subscription.value = null
 	}
 
