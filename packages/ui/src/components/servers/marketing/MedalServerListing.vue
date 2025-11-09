@@ -80,7 +80,7 @@
 				</div>
 			</AutoLink>
 
-			<div class="z-10 ml-auto">
+			<div class="z-10 ml-auto" v-if="isNuxt">
 				<ButtonStyled color="medal-promo" type="outlined" size="large">
 					<button class="my-auto" @click="handleUpgrade"><RocketIcon /> Upgrade</button>
 				</ButtonStyled>
@@ -128,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
+import { NuxtModrinthClient, type Archon } from '@modrinth/api-client'
 import {
 	ChevronRightIcon,
 	LoaderCircleIcon,
@@ -156,6 +156,8 @@ const props = defineProps<Partial<Archon.Servers.v0.Server>>()
 const emit = defineEmits<{ (e: 'upgrade'): void }>()
 
 const client = injectModrinthClient()
+
+const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 
 const showGameLabel = computed(() => !!props.game)
 const showLoaderLabel = computed(() => !!props.loader)

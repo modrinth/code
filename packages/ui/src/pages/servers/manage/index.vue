@@ -4,10 +4,11 @@
 		class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
 	>
 		<ServersUpgradeModalWrapper
+			v-if="stripePublishableKey && siteUrl && products"
 			ref="upgradeModal"
-			:stripe-publishable-key="props.stripePublishableKey"
-			:site-url="props.siteUrl"
-			:products="props.products"
+			:stripe-publishable-key
+			:site-url
+			:products
 		/>
 
 		<div
@@ -189,14 +190,14 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ServersUpgradeModalWrapper from '../../../components/billing/ServersUpgradeModalWrapper.vue'
-
-const props = defineProps<{
-	stripePublishableKey: string
-	siteUrl: string
-	products: Labrinth.Billing.Internal.Product[]
-}>()
 import MedalServerListing from '../../../components/servers/marketing/MedalServerListing.vue'
 import ServerListing from '../../../components/servers/ServerListing.vue'
+
+defineProps<{
+	stripePublishableKey?: string
+	siteUrl?: string
+	products?: Labrinth.Billing.Internal.Product[]
+}>()
 
 const router = useRouter()
 const route = useRoute()
