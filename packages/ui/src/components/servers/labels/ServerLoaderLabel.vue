@@ -35,6 +35,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+
 import AutoLink from '../../base/AutoLink.vue'
 import LoaderIcon from '../icons/LoaderIcon.vue'
 

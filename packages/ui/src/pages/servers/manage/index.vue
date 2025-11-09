@@ -119,7 +119,7 @@
 								placeholder="Search servers..."
 							/>
 						</div>
-						<ButtonStyled type="standard" v-if="isNuxt">
+						<ButtonStyled v-if="isNuxt" type="standard">
 							<AutoLink :to="{ path: '/servers', hash: '#plan' }">
 								<PlusIcon />
 								New server
@@ -172,7 +172,7 @@
 </template>
 
 <script setup lang="ts">
-import { NuxtModrinthClient, type Archon, type Labrinth } from '@modrinth/api-client'
+import { type Archon, type Labrinth, NuxtModrinthClient } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import { AutoLink, ButtonStyled, CopyCode, injectModrinthClient } from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'

@@ -33,6 +33,7 @@ import ServerSubdomainLabel from './ServerSubdomainLabel.vue'
 import ServerUptimeLabel from './ServerUptimeLabel.vue'
 
 interface ServerInfoLabelsProps {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	serverData: Record<string, any>
 	showGameLabel: boolean
 	showLoaderLabel: boolean

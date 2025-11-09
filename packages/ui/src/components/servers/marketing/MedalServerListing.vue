@@ -80,7 +80,7 @@
 				</div>
 			</AutoLink>
 
-			<div class="z-10 ml-auto" v-if="isNuxt">
+			<div v-if="isNuxt" class="z-10 ml-auto">
 				<ButtonStyled color="medal-promo" type="outlined" size="large">
 					<button class="my-auto" @click="handleUpgrade"><RocketIcon /> Upgrade</button>
 				</ButtonStyled>
@@ -128,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { NuxtModrinthClient, type Archon } from '@modrinth/api-client'
+import { type Archon, NuxtModrinthClient } from '@modrinth/api-client'
 import {
 	ChevronRightIcon,
 	LoaderCircleIcon,
@@ -140,8 +140,8 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
-
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+
 import { injectModrinthClient } from '../../../providers/api-client'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'

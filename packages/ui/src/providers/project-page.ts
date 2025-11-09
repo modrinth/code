@@ -1,5 +1,4 @@
 import type { Labrinth } from '@modrinth/api-client/src/modules/types'
-
 // TODO: api client this shit
 import type { TeamMember } from '@modrinth/utils'
 import type { Ref } from 'vue'

@@ -28,6 +28,7 @@
 <script setup lang="ts">
 import { GameIcon } from '@modrinth/assets'
 import { useRoute } from 'vue-router'
+
 import AutoLink from '../../base/AutoLink.vue'
 
 defineProps<{

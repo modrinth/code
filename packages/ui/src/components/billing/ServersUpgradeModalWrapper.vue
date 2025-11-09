@@ -48,10 +48,22 @@ const { addNotification } = injectNotificationManager()
 const { labrinth, archon } = injectModrinthClient()
 const debug = useDebugLogger('ServersUpgradeModalWrapper')
 const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
+
+// stripe type
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const customer = ref<any>(null)
+
+// stripe type
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const paymentMethods = ref<any[]>([])
 const selectedCurrency = ref<string>('USD')
-const regionPings = ref<any[]>([])
+
+const regionPings = ref<
+	{
+		region: string
+		ping: number
+	}[]
+>([])
 
 const pyroProducts = (props.products as Labrinth.Billing.Internal.Product[])
 	.filter((p) => p?.metadata?.type === 'pyro' || p?.metadata?.type === 'medal')
@@ -61,7 +73,7 @@ const pyroProducts = (props.products as Labrinth.Billing.Internal.Product[])
 		return aRam - bRam
 	})
 
-function handleError(err: any) {
+function handleError(err: unknown) {
 	debug('Purchase modal error:', err)
 }
 
@@ -112,7 +124,7 @@ const PING_COUNT = 20
 const PING_INTERVAL = 200
 const MAX_PING_TIME = 1000
 
-function runPingTest(region: any, index = 1) {
+function runPingTest(region: Archon.Servers.v1.Region, index = 1) {
 	if (index > 10) {
 		regionPings.value.push({
 			region: region.shortcode,
@@ -169,9 +181,9 @@ const dryRunResponse = ref<{
 const pendingDowngradeBody = ref<Labrinth.Billing.Internal.EditSubscriptionRequest | null>(null)
 const currentPlanFromSubscription = computed<Labrinth.Billing.Internal.Product | undefined>(() => {
 	return subscription.value
-		? (pyroProducts.find((p) =>
+		? pyroProducts.find((p) =>
 				p.prices.some((price) => price.id === subscription.value?.price_id),
-			) ?? undefined)
+			) ?? undefined
 		: undefined
 })
 

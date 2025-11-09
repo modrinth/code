@@ -123,8 +123,8 @@ import {
 } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
-
 import { computed } from 'vue'
+
 import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
 import CopyCode from '../base/CopyCode.vue'
@@ -200,7 +200,7 @@ const { data: image } = useQuery({
 				)
 
 				return await processImageBlob(blob, 512)
-			} catch (downloadError) {
+			} catch {
 				const projectIcon = iconUrl.value
 				if (projectIcon) {
 					const response = await fetch(projectIcon)
@@ -237,7 +237,7 @@ const isConfiguring = computed(() => props.flows?.intro)
 
 const formatDate = (d: unknown) => {
 	try {
-		return dayjs(d as any).format('MMMM D, YYYY')
+		return dayjs(d as string).format('MMMM D, YYYY')
 	} catch {
 		return ''
 	}
