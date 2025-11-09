@@ -656,7 +656,7 @@ import {
 	injectNotificationManager,
 	MarkdownEditor,
 } from '@modrinth/ui'
-import { formatBytes, formatCategory } from '@modrinth/utils'
+import { formatBytes, formatCategory, renderHighlightedString } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -666,7 +666,6 @@ import Modal from '~/components/ui/Modal.vue'
 import Categories from '~/components/ui/search/Categories.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
-import { renderHighlightedString } from '~/helpers/highlight.js'
 import { inferVersionInfo } from '~/helpers/infer.js'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'

@@ -37,9 +37,11 @@ pub mod routes;
 pub mod scheduler;
 pub mod search;
 pub mod sync;
-pub mod test;
 pub mod util;
 pub mod validate;
+
+#[cfg(feature = "test")]
+pub mod test;
 
 #[derive(Clone)]
 pub struct Pepper {
@@ -350,7 +352,8 @@ pub fn utoipa_app_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
     _labrinth_config: LabrinthConfig,
 ) {
-    cfg.configure(routes::v3::utoipa_config);
+    cfg.configure(routes::v3::utoipa_config)
+        .configure(routes::internal::utoipa_config);
 }
 
 // This is so that env vars not used immediately don't panic at runtime
@@ -500,6 +503,7 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("GOTENBERG_URL");
     failed |= check_var::<String>("GOTENBERG_CALLBACK_BASE");
+    failed |= check_var::<String>("GOTENBERG_TIMEOUT");
 
     failed |= check_var::<String>("STRIPE_API_KEY");
     failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");

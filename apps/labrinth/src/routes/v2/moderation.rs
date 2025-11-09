@@ -30,7 +30,7 @@ pub async fn get_projects(
     count: web::Query<ResultCount>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = internal::moderation::get_projects(
+    let response = internal::moderation::get_projects_internal(
         req,
         pool.clone(),
         redis.clone(),
@@ -41,6 +41,7 @@ pub async fn get_projects(
         session_queue,
     )
     .await
+    .map(|resp| HttpResponse::Ok().json(resp))
     .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert to V2 projects

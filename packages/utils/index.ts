@@ -1,6 +1,6 @@
 export * from './billing'
 export * from './changelog'
-export * from './highlight'
+export * from './highlightjs'
 export * from './licenses'
 export * from './parse'
 export * from './projects'

@@ -1411,7 +1411,7 @@ const filteredVersions = computed(() => {
 	return versions.value.filter(
 		(x) =>
 			x.game_versions.includes(currentGameVersion.value) &&
-			x.loaders.includes(currentPlatform.value),
+			(x.loaders.includes(currentPlatform.value) || project.value.project_type === 'resourcepack'),
 	)
 })
 
