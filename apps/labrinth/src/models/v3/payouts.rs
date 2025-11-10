@@ -18,8 +18,17 @@ pub struct Payout {
     #[serde(with = "rust_decimal::serde::float_option")]
     pub fee: Option<Decimal>,
     pub method: Option<PayoutMethodType>,
-    /// the address this payout was sent to: ex: email, paypal email, venmo handle
+    /// Platform-dependent identifier for the submethod.
+    ///
+    /// See [`crate::routes::v3::payouts::TransactionItem::Withdrawal::method_id`].
+    pub method_id: Option<String>,
+    /// Address this payout was sent to: ex: email, paypal email, venmo handle.
     pub method_address: Option<String>,
+    /// Platform-provided opaque identifier for the transaction linked to this payout.
+    ///
+    /// - Tremendous: reward ID
+    /// - Mural: payout request UUID
+    /// - PayPal/Venmo: transaction ID
     pub platform_id: Option<String>,
 }
 
@@ -33,6 +42,7 @@ impl Payout {
             amount: data.amount,
             fee: data.fee,
             method: data.method,
+            method_id: data.method_id,
             method_address: data.method_address,
             platform_id: data.platform_id,
         }
