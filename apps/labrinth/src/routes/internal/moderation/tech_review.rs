@@ -1,6 +1,9 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt};
 
-use actix_web::{HttpRequest, get, post, web};
+use actix_web::{HttpRequest, post, web};
+use chrono::{DateTime, Utc};
+use eyre::eyre;
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use tokio_stream::StreamExt;
@@ -8,16 +11,19 @@ use tokio_stream::StreamExt;
 use crate::{
     auth::check_is_moderator_from_headers,
     database::{
+        DBProject,
         models::{
-            DelphiReportId, DelphiReportIssueDetailsId, DelphiReportIssueId,
-            ProjectTypeId, categories::ProjectType,
-            delphi_report_item::DelphiSeverity,
+            DBProjectId, DBThread, DBThreadId, DelphiReportId,
+            DelphiReportIssueId, ProjectTypeId,
+            delphi_report_item::{
+                DBDelphiReportIssue, DBDelphiReportIssueDetails, DelphiSeverity,
+            },
         },
         redis::RedisPool,
     },
     models::{pats::Scopes, projects::Project, threads::Thread},
     queue::session::AuthQueue,
-    routes::{ApiError, internal::moderation::ProjectsRequestOptions},
+    routes::ApiError,
     util::error::Context,
 };
 
@@ -42,7 +48,7 @@ fn default_limit() -> u64 {
 }
 
 fn default_sort_by() -> SearchProjectsSort {
-    SearchProjectsSort::Oldest
+    SearchProjectsSort::CreatedAsc
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
@@ -62,15 +68,30 @@ pub struct SearchProjectsFilter {
     utoipa::ToSchema,
 )]
 pub enum SearchProjectsSort {
-    Oldest,
-    Newest,
+    CreatedAsc,
+    CreatedDesc,
+}
+
+impl fmt::Display for SearchProjectsSort {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = serde_json::to_value(*self).unwrap();
+        let s = s.as_str().unwrap();
+        write!(f, "{s}")
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectReview {
     pub project: Project,
     pub project_owner: (),
-    pub thread: Thread,
+    pub thread: DBThread,
+    pub reports: Vec<ProjectReport>,
+}
+
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectReport {
+    /// When this report was created.
+    pub created_at: DateTime<Utc>,
     /// Why this project was flagged.
     pub flag_reason: FlagReason,
     /// What files were flagged in this review.
@@ -146,6 +167,20 @@ async fn search_projects(
     session_queue: web::Data<AuthQueue>,
     search_req: web::Json<SearchProjects>,
 ) -> Result<web::Json<Vec<ProjectReview>>, ApiError> {
+    #[derive(Debug)]
+    struct ProjectRecord {
+        reports: IndexMap<DelphiReportId, ReportRecord>,
+    }
+
+    #[derive(Debug)]
+    struct ReportRecord {
+        created: DateTime<Utc>,
+        issues: IndexMap<DelphiReportIssueId, IssueRecord>,
+    }
+
+    #[derive(Debug)]
+    struct IssueRecord {}
+
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -155,10 +190,7 @@ async fn search_projects(
     )
     .await?;
 
-    let sort_by = match search_req.sort_by {
-        SearchProjectsSort::Oldest => 0,
-        SearchProjectsSort::Newest => 1,
-    };
+    let sort_by = search_req.sort_by.to_string();
     let limit = search_req.limit.max(50);
     let offset = limit * search_req.page;
 
@@ -167,27 +199,31 @@ async fn search_projects(
     let offset = i64::try_from(offset)
         .wrap_request_err("offset cannot fit into `i64`")?;
 
-    let mut reports = Vec::new();
-    let mut project_ids = Vec::new();
+    let mut project_records = IndexMap::<DBProjectId, ProjectRecord>::new();
+    let mut project_ids = Vec::<DBProjectId>::new();
+    let mut thread_ids = Vec::<DBThreadId>::new();
 
     let mut rows = sqlx::query!(
         r#"
         SELECT
-            dr.id AS report_id,
-            m.id AS project_id,
-            dr.created AS report_created,
-            dri.issue_type AS issue_type,
-            drid.internal_class_name AS issue_detail_class_name,
-            drid.decompiled_source AS issue_detail_decompiled_source,
-            drid.severity AS "issue_detail_severity: DelphiSeverity"
+            dr.id AS "report_id!: DelphiReportId",
+            m.id AS "project_id!: DBProjectId",
+            t.id AS "project_thread_id!: DBThreadId",
+            dr.created AS "report_created!",
+            dri.id AS "issue_id",
+            dri.issue_type AS "issue_type?",
+            drid.internal_class_name AS "issue_detail_class_name?",
+            drid.decompiled_source AS "issue_detail_decompiled_source?",
+            drid.severity AS "issue_detail_severity?: DelphiSeverity"
         FROM delphi_reports dr
 
-        -- fetch the project this report is for, and its type
+        -- fetch the project this report is for, its type, and thread
         INNER JOIN files f ON f.id = dr.file_id
         INNER JOIN versions v ON v.id = f.version_id
         INNER JOIN mods m ON m.id = v.mod_id
         LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
         INNER JOIN categories c ON c.id = mc.joining_category_id
+        INNER JOIN threads t ON t.mod_id = m.id
 
         -- fetch report issues and details
         LEFT JOIN delphi_report_issues dri ON dri.report_id = dr.id
@@ -200,39 +236,88 @@ async fn search_projects(
 
         -- sorting
         ORDER BY
-            CASE WHEN $2 = '
-                -- when sorting on TIMESTAMPTZ columns, we extract the int value of the time
-                -- so that we can sort by an integer, which we can negate
-                -- (we can't negate a TIMESTAMPTZ)
-
-                -- oldest
-                WHEN $2 = 0 THEN EXTRACT(EPOCH FROM created)
-                -- newest
-                WHEN $2 = 1 THEN -EXTRACT(EPOCH FROM created)
-            END
+            CASE WHEN $2 = 'created_asc' THEN created ELSE TO_TIMESTAMP(0) END ASC,
+            CASE WHEN $2 = 'created_desc' THEN created ELSE TO_TIMESTAMP(0) END DESC
 
         -- pagination
         LIMIT $3
         OFFSET $4
         "#,
-        &search_req.filter.project_type.iter().map(|ty| ty.0).collect::<Vec<_>>(),
-        sort_by,
+        &search_req
+            .filter
+            .project_type
+            .iter()
+            .map(|ty| ty.0)
+            .collect::<Vec<_>>(),
+        &sort_by,
         limit,
         offset,
     )
     .fetch(&**pool);
+
     while let Some(row) = rows
         .next()
         .await
         .transpose()
-        .wrap_internal_err("failed to fetch reports")
+        .wrap_internal_err("failed to fetch reports")?
     {
         project_ids.push(row.project_id);
-        reports.push(ProjectReview {
-            project: (),
-            project_owner: (),
-        });
+        thread_ids.push(row.project_thread_id);
+
+        let project =
+            project_records.entry(row.project_id).or_insert_with(|| {
+                ProjectRecord {
+                    reports: IndexMap::new(),
+                }
+            });
+        let report =
+            project
+                .reports
+                .entry(row.report_id)
+                .or_insert(|| ReportRecord {
+                    created: row.report_created,
+                    issues: IndexMap::new(),
+                });
+        report.issues.entry(row.issue)
+        // .push(ReportRecord {
+        //     created: row.report_created,
+        //     issues:
+        //     flag_reason: FlagReason::Delphi,
+        //     files:
+        //     created: row.report_created,
+        // });
     }
 
-    Ok(())
+    let projects = DBProject::get_many_ids(&project_ids, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to fetch projects")?
+        .into_iter()
+        .map(|project| (project.inner.id, Project::from(project)))
+        .collect::<HashMap<_, _>>();
+    let threads = DBThread::get_many(&thread_ids, &**pool)
+        .await
+        .wrap_internal_err("failed to fetch threads")?
+        .into_iter()
+        .map(|thread| (thread.id, thread))
+        .collect::<HashMap<_, _>>();
+
+    let projects = project_records.into_iter().map(|(project_id, reports)| {
+        let project =
+            projects.get(&project_id).wrap_internal_err_with(|| {
+                eyre!("no fetched project with ID {project_id:?}")
+            })?;
+        let thread = threads
+            .get(&DBThreadId::from(project.thread_id))
+            .wrap_internal_err_with(|| {
+                eyre!("no fetched thread with ID {:?}", project.thread_id)
+            })?;
+        Ok::<_, ApiError>(ProjectReview {
+            project: project.clone(),
+            project_owner: (),
+            thread: thread.clone(),
+            reports,
+        })
+    });
+
+    Ok(web::Json(projects))
 }
