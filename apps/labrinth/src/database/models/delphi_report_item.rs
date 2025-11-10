@@ -55,7 +55,16 @@ impl DBDelphiReport {
 
 /// A severity level reported by Delphi.
 #[derive(
-    Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash, sqlx::Type,
+    Deserialize,
+    Serialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    sqlx::Type,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "UPPERCASE")]
 #[sqlx(type_name = "delphi_severity", rename_all = "snake_case")]
