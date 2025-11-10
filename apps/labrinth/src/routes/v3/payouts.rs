@@ -991,8 +991,8 @@ pub enum TransactionItem {
         ///
         /// - Tremendous: the rewarded gift card ID.
         /// - Mural: the payment rail code used.
-        ///   - Blockchain: `blockchain-usdc-polygon`
-        ///   - Fiat: see [`muralpay::FiatAndRailCode`]
+        ///   - Blockchain: `blockchain-usdc-polygon`.
+        ///   - Fiat: see [`muralpay::FiatAndRailCode`].
         /// - PayPal: `paypal_us`.
         /// - Venmo: `venmo`.
         ///
