@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-11-10T11:20:00-07:00`,
+		product: 'app',
+		version: '0.10.18',
+		body: `## Improvements
+- Fixed automatic dependency resolution ignoring the selected mod loader.`,
+	},
+	{
 		date: `2025-11-07T21:10:00-07:00`,
 		product: 'web',
 		body: `## Improvements
