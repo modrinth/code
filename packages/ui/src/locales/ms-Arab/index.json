@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Cipta pautan afiliasi"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Mencipta kod afiliasi baharu"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Berikan nama kepada pautan afiliasi anda supaya anda tahu dari mana orang datang!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Tajuk pautan afiliasi"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "cth. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Nama pengguna pengguna yang akan menggunakan kod afiliasi"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Nama pengguna"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Masukkan nama pengguna..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Dicipta oleh {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Mencipta pautan afiliasi..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Batalkan pautan afiliasi"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Lihat analitik"
+  },
   "badge.beta": {
     "defaultMessage": "بيتا"
   },
@@ -7,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "بهارو"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Pautan afiliasi"
   },
   "button.analytics": {
     "defaultMessage": "اناليتيک"
@@ -46,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "ايکوت"
+  },
+  "button.max": {
+    "defaultMessage": "Maks"
   },
   "button.more-options": {
     "defaultMessage": "لبيه باڽق ڤيليهن"
@@ -119,6 +161,84 @@
   "collection.label.private": {
     "defaultMessage": "ڤريبادي"
   },
+  "form.label.address-line": {
+    "defaultMessage": "Baris alamat"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Baris alamat 2 (tidak wajib)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Amaun"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Nama bank"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Nama bisnes"
+  },
+  "form.label.city": {
+    "defaultMessage": "Bandar"
+  },
+  "form.label.country": {
+    "defaultMessage": "Negara"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Tarikh lahir"
+  },
+  "form.label.email": {
+    "defaultMessage": "E-mel"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Nama depan"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Nama akhir"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Poskod/Kod ZIP"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Negeri/wilayah"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Masukkan alamat"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Apartmen, suite, dll."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Masukkan amaun"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Masukkan nama bank"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Pilih nama bank"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Masukkan nama bisnes"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Masukkan bandar"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Pilih negara"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Masukkan alamat e-mel"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Masukkan nama depan"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Masukkan nama akhir"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Masukkan poskod"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Masukkan negeri/wilayah"
+  },
   "icon-select.edit": {
     "defaultMessage": "سونتيڠ ايکون"
   },
@@ -157,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "مود ڤرماءينن يڠ تيدق دکتاهوءي"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} tersedia."
   },
   "label.changes-saved": {
     "defaultMessage": "ڤروبهن دسيمڤن"
@@ -205,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "دتولق"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Saya bersetuju dengan <terms-link>Terma Program Ganjaran</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "دسيمڤن"
@@ -353,6 +479,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Antarabangsa"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -361,6 +490,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Amal Kebajikan"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Amal Kebajikan"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Kad hadiah"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Kad hadiah"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Visa Virtual"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Visa Virtual"
   },
   "project-type.all": {
     "defaultMessage": "سموا"

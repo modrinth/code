@@ -17,14 +17,8 @@
   "nags.add-links.title": {
     "defaultMessage": "Adiciona links externos"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Selecionaste todas as {totalAvailableTags} etiquetas disponíveis. Isto contraria o propósito das etiquetas, que visam ajudar os utilizadores a encontrar projetos relevantes. Seleciona apenas as etiquetas relevantes para o teu projeto."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Seleciona etiquetas adequadas"
-  },
-  "nags.description-too-short.description": {
-    "defaultMessage": "A tua descrição tem {length} caracteres legíveis. Pelo menos {minChars} caracteres são recomendados para criar uma descrição clara e informativa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Expande a descrição"
@@ -52,9 +46,6 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "Vê a página da galeria"
-  },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "O teu {projectType} usa uma licença que requer que o código-fonte esteja disponível. Por favor, fornece um link para o código-fonte ou um ficheiro de fonte para cada versão adicional, ou considera usar uma licença diferente."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fornece o código-fonte"
@@ -113,23 +104,11 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Revê e resolve todos os problemas apontados pela equipa de moderação antes de submeter novamente."
   },
-  "nags.moderator-feedback.title": {
-    "defaultMessage": "Rever feedback do moderador"
-  },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Selecionaste {count} etiquetas de resolução ({tags}). Pacotes de recursos devem normalmente ter apenas uma etiqueta de resolução que corresponda à sua resolução primária."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleciona a resolução correta"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "Seleciona os ambientes em que o teu {projectType} funciona."
-  },
   "nags.select-environments.title": {
     "defaultMessage": "Seleciona ambientes"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "Seleciona a licença sob a qual o teu {projectType} é distribuído."
   },
   "nags.select-license.title": {
     "defaultMessage": "Seleciona uma licença"
@@ -170,26 +149,14 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Limpa o sumário"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "O teu sumário tem {length} caracteres. Pelo menos {minChars} caracteres são recomendados para criar um sumário informativo e apelativo."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Expande o sumário"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Manter o Nome do teu projeto limpo e simples fá-lo memorável e fácil de encontrar. Informação de versão e carregador é mostrada automaticamente com o teu projeto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpa o nome"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "Selecionaste {tagCount} etiquetas. Considera reduzi-las para {maxTagCount} ou menos para garantir que o teu projeto apareça em resultados de pesquisa relevantes."
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleciona etiquetas precisas"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Pelo menos uma imagem na galeria é necessária para mostrar o conteúdo do teu {type}{resourcepackMessage}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Adiciona uma imagem à galeria"

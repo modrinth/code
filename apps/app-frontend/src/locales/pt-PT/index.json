@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Modo de desenvolvedor ativado."
   },
+  "app.settings.downloading": {
+    "message": "A transferir v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Aparência"
   },
@@ -19,6 +22,111 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestão de recursos"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} está pronta para ser instalada! Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} acabou de ser transferida. Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} está disponível! Como estás numa rede com tráfego limitado, não a transferimos automaticamente."
+  },
+  "app.update-toast.changelog": {
+    "message": "Lista de alterações"
+  },
+  "app.update-toast.download": {
+    "message": "Transferir ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "A transferir..."
+  },
+  "app.update-toast.reload": {
+    "message": "Recarregar"
+  },
+  "app.update-toast.title": {
+    "message": "Atualização disponível"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Transferência concluída"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Clica aqui para ver a lista de alterações."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Versão {version} foi instalada com sucesso!"
+  },
+  "app.update.download-update": {
+    "message": "Transferir atualização"
+  },
+  "app.update.downloading-update": {
+    "message": "A transferir atualização ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Recarrega para instalar a atualização"
+  },
+  "friends.action.add-friend": {
+    "message": "Adicionar um amigo"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} {count, plural,one {pedido} other {pedidos}} de amizade"
+  },
+  "friends.add-friend.submit": {
+    "message": "Enviar pedido de amizade"
+  },
+  "friends.add-friend.title": {
+    "message": "Adicionar um amigo"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Pode ser diferente do nome no Minecraft!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Insere o nome do utilizador no Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Qual é o nome de utilizador do teu amigo no Modrinth?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Adiciona amigos</link> para ver o que estão a jogar!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Cancelar pedido"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Remover amigo"
+  },
+  "friends.friend.request-sent": {
+    "message": "Pedido de amizade enviado"
+  },
+  "friends.friend.view-profile": {
+    "message": "Ver perfil"
+  },
+  "friends.heading": {
+    "message": "Amigos"
+  },
+  "friends.heading.active": {
+    "message": "Ativo"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Pendente"
+  },
+  "friends.no-friends-match": {
+    "message": "Nenhum amigo corresponde a \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Procurar amigos..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Inicia a sessão com uma conta Modrinth</link> para adicionar amigos e ver o que estão a jogar!"
   },
   "instance.add-server.add-and-play": {
     "message": "Adicionar e jogar"

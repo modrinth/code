@@ -18,13 +18,13 @@
     "defaultMessage": "Dodaj zewnętrzne linki"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Wybrano wszystkie z {totalAvailableTags} dostępnych tagów. To mija się z celem tagów, które mają pomagać użytkownikom znaleźć trafne projekty. Wybierz jedynie tagi, które dotyczą twojego projektu."
+    "defaultMessage": "Wybrano {totalAvailableTags, plural, one {jedyny dostępny tag} other {wszystkie z # dostępnych tagów}}. To mija się z celem tagów, które mają pomóc użytkownikom znaleźć to, czego szukają. Wybierz tylko te tagi, które opisują Twój projekt."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Twój opis ma jedynie {length, plural, one {# czytelny znak} few {# czytelne znaki} other {# czytelnych znaków}}. Zalecane jest użycie przynajmniej {minChars, plural, one {# znaku} other {# znaków}}, by stworzyć czytelny i informatywny opis."
+    "defaultMessage": "Twój opis składa się z {length, plural, one {# czytenego znaku} other {# czytelnych znaków}}. Zalecane jest użycie chociaż {minChars, plural, one {# znaku} other {# znaków}} by stworzyć przejrzysty i informatywny opis."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Rozwiń opis"
@@ -54,7 +54,7 @@
     "defaultMessage": "Odwiedź stronę galerii"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Twój {projectType} używa licencji, która wymaga dostępności kodu źródłowego. Podaj link do kodu źródłowego lub plik ze źródłami dla każdej dodatkowej wersji albo rozważ użycie innej licencji."
+    "defaultMessage": "Twój {type, select, mod {mod} plugin {plugin} other {projekt}} używa licencji, która wymaga publikacji kodu źródłowego. Podaj link do kodu źródłowego, plik z źródłami dla każdej podanej wersji lub rozważ użycie innej licencji."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Podaj kod źródłowy"
@@ -114,22 +114,22 @@
     "defaultMessage": "Przejrzyj oraz rozwiąż wszystkie obawy zespołu moderacji przed ponownym przesłaniem."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Przejrzyj informację zwrotną moderatorów"
+    "defaultMessage": "Przejrzyj informacje zwrotne"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Wybrano {count} tagów rozdzielczości ({tags}). Paczki zasobów powinny mieć tylko jeden tag rozdzielczości, który pasuje do ich głównej rozdzielczości."
+    "defaultMessage": "Wybrano {count, plural, one {# tag rozdzielczości} few {# tagi rozdzielczości} other {# tagów rozdzielczości}} ({tags}). Paczki zasobów zwykle powinny mieć tylko jeden tag rozdzielczości opisujący ich główną rozdzielczość."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Wybierz poprawną rozdzielczość"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "Wybierz środowiska, na których działa twój {projectType}."
+    "defaultMessage": "Wybierz środowisko, w którym działa {type, select, mod {Twój mod} modpack {Twoja paczka modów} other {Twój projekt}}."
   },
   "nags.select-environments.title": {
     "defaultMessage": "Wybierz środowiska"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Wybierz licencję, pod którą twój {projectType} jest dystrybuowany."
+    "defaultMessage": "Wybierz licencje, pod którą {type, select, mod {udostępniony jest Twój mod} modpack {udostępniona jest Twoja paczka modów} resourcepack {udostępniona jest Twoja paczka zasobów} shader {udostępnione są Twoje shadery} plugin {udostępniony jest Twój plugin} datapack {udostępniona jest Twoja paczka danych} other {udostępniony jest Twój projekt}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Zaznacz licencje"
@@ -171,25 +171,25 @@
     "defaultMessage": "Wyjaśnij podsumowanie"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Twoje streszczenie ma {length} znaków. Aby stworzyć streszczenie zawierające wiele informacji i zachęcającego podsumowania, zaleca się użycie co najmniej {minChars} znaków."
+    "defaultMessage": "Twoje podsumowanie składa się z {length, plural, one {# znaku} other {# znaków}}. Zalecane jest użycie chociaż {minChars, plural, one {# znaku} other {# znaków}} by stworzyć informatywne i ciekawe podsumowanie."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Poszerz podsumowanie"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Utrzymanie nazwy projektu w czystości sprawia, że łatwiej ją zapamiętać i znaleźć. Informacje o wersji i programie ładującym są automatycznie wyświetlane obok projektu."
+    "defaultMessage": "Utrzymanie nazwy projektu w czystości sprawia, że łatwiej ją zapamiętać i znaleźć. Informacje o wersji i loaderze są automatycznie wyświetlane obok projektu."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Oczyść nazwę"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Wybrałeś {tagCount} tagów. Rozważ zmniejszenie liczby tagów do {maxTagCount} lub mniej, aby mieć pewność, że twój projekt pojawi się w odpowiednich wynikach wyszukiwania."
+    "defaultMessage": "Wybrano {tagCount, plural, one {# tag} few {# tagi} other {# tagów}}. Spróbuj użyć {maxTagCount} lub mniej tagów, by Twój projekt był łatwiejszy to znalezienia."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Przynajmniej jedne z obrazów w galery musi pokazywać kontent twojego {type}{resourcepackMessage}."
+    "defaultMessage": "Przynajmniej jeden obrazek w galerii jest wymagany, by pokazać zawartość {type, select, resourcepack {Twojej paczki zasobów, z wyjątkiem paczek zawierających tylko dźwięki lub tłumaczenia. Jeżeli opisuje to Twoją paczkę, wybierz odpowiedni tag} shader {Twojego shadera} other {Twojego projektu}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Prześlij obraz do galerii"

@@ -737,18 +737,6 @@
   "report.submit": {
     "message": "Pošaljite prijavu"
   },
-  "revenue.transfers.total": {
-    "message": "Isplatili ste ukupno {amount}."
-  },
-  "revenue.transfers.total.method": {
-    "message": "Isplatili ste {amount} putem {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "Isplatili ste {amount} u {year}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "Isplatili ste {amount} u {year} putem {method}."
-  },
   "scopes.analytics.description": {
     "message": "Pristupite svojim analitičkim podacima"
   },

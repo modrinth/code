@@ -18,13 +18,13 @@
     "defaultMessage": "Dış bağlantı ekle"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Mevcut {totalAvailableTags} etiketin tamamını seçtiniz. Etiketlerin amacı, kullanıcıların ilgili projeleri bulmasına yardımcı olmaktır. Lütfen yalnızca projenizle alakalı etiketleri seçiniz."
+    "defaultMessage": "Tüm {totalAvailableTags, plural, one {# mevcut etiketi} other {# mevcut etiketi}} seçtin. Bu, etiketlerin amacını ortadan kaldırır; etiketler, kullanıcıların ilgili projeleri bulmasına yardımcı olmak için vardır. Lütfen projenle yalnızca ilgili etiketleri seç."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Uygun etiketleri seç"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Açıklamanızda {length} okunabilir karakter var. Açık ve bilgilendirici bir açıklama için en az {minChars} karakter önerilir."
+    "defaultMessage": "Açıklamanız {length, plural, one {# okunabilir karakter} other {# okunabilir karakter}} uzunluğunda. Net ve bilgilendirici bir açıklama oluşturmak için en az {minChars, plural, one {# karakter} other {# karakter}} önerilir."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Açıklamayı uzat"
@@ -54,7 +54,7 @@
     "defaultMessage": "Galeriye göz at"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Kullandığın lisans kaynak kodunun açık olmasını gerektiriyor. Lütfen kaynak kodun için bir bağlantı veya her sürüm için kaynak dosyası ekle ya da başka bir lisans kullan."
+    "defaultMessage": "Senin {type, select, mod {mod} plugin {plugin} other {project}} bir lisans kullanıyor ve bu lisans, kaynak kodun erişilebilir olmasını gerektirir. Lütfen her ek sürüm için bir kaynak kod bağlantısı veya kaynak dosyası sağla ya da farklı bir lisans kullanmayı düşün."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Kaynak kodu sun"
@@ -114,22 +114,22 @@
     "defaultMessage": "Tekrar göndermeden önce moderasyon ekibinin dediği şeyleri gözden geçir"
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Moderasyon ekibini dinle"
+    "defaultMessage": "Geri bildirimi incele"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "{count} tane boyut etiketi seçtin ({tags}). Kaynak paketleri genelde sadece bir boyut etiketine olmalı ve bu etiket birincil boyutları ile aynı olmalı."
+    "defaultMessage": "Seçtin {count, plural, one {# çözünürlük etiketi} other {# çözünürlük etiketi}} ({tags}). Kaynak paketlerin genellikle yalnızca bir çözünürlük etiketi olması ve bu etiketin ana çözünürlükle eşleşmesi gerekir."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Doğru boyutu seç"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "Projenin çalıştığı ortamları seçin."
+    "defaultMessage": "Senin {type, select, mod {mod} modpack {modpack} other {project}} hangi ortamlar da çalışıyor, seç."
   },
   "nags.select-environments.title": {
     "defaultMessage": "Ortamları seç"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Projenin altında paylaşıldığı lisansı seçin."
+    "defaultMessage": "Senin {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} hangi lisans altında dağıtılıyor, seç."
   },
   "nags.select-license.title": {
     "defaultMessage": "Bir lisans seç"
@@ -170,26 +170,14 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Özetini düzenle"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Özetin {length} karakter. Bilgilendirici ve ilgi çekici bir özet için en az {minChars} karakter önerilir."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Özeti uzat"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Projenin ismini hatırlanabilir ve kolayca bulunabilir bir şey yap. Sürüm ve yükleyici bilgisi projenin yanında otomatik olarak gözükecek."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "İsmi düzenle"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount} etiket seçtin. Projenin alakalı aramalarda çıkması için {maxTagCount} veya daha az etiket seçtiğine emin ol."
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Uygun etiketleri seç"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "İçeriğini göstermek için en az bir galeri resmi zorunlu."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriye resim yükle"

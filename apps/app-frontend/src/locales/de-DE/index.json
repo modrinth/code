@@ -86,6 +86,9 @@
   "friends.add-friend.username.title": {
     "message": "Was ist der Modrinth Nutzername deines Freundes?"
   },
+  "friends.add-friends-to-share": {
+    "message": "<link>Freunde hinzufügen</link>, um zu sehen, was sie spielen!"
+  },
   "friends.friend.cancel-request": {
     "message": "Anfrage abbrechen"
   },
@@ -121,6 +124,9 @@
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Melden Sie sich bei einem Modrinth Konto an</link>, um Freunde hinzuzufügen und zu sehen, was sie gerade spielen!"
   },
   "instance.add-server.add-and-play": {
     "message": "Hinzufügen und spielen"

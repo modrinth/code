@@ -1,4 +1,28 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Criar link de afiliado"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Criando novo código de afiliado"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Título do link de afiliado"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "ex.: YouTube"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Nome de usuário"
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Criado por {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Criando link de afiliado..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Revogar link de afiliado"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -7,6 +31,9 @@
   },
   "badge.new": {
     "defaultMessage": "Novo"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Links de afiliado"
   },
   "button.analytics": {
     "defaultMessage": "Estatísticas"
