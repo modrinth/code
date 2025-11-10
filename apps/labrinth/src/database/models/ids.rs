@@ -152,6 +152,7 @@ macro_rules! id_type {
             Eq,
             PartialEq,
             Hash,
+            utoipa::ToSchema,
         )]
         #[sqlx(transparent)]
         pub struct $name(pub $type);
