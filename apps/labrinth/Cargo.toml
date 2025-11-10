@@ -66,6 +66,7 @@ image = { workspace = true, features = [
   "tiff",
   "webp",
 ] }
+indexmap = { workspace = true }
 itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
