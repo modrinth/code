@@ -11,7 +11,7 @@ pub struct ThreadBuilder {
     pub report_id: Option<DBReportId>,
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DBThread {
     pub id: DBThreadId,
 
@@ -30,7 +30,7 @@ pub struct ThreadMessageBuilder {
     pub hide_identity: bool,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DBThreadMessage {
     pub id: DBThreadMessageId,
     pub thread_id: DBThreadId,
