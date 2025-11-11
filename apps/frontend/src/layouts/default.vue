@@ -220,8 +220,8 @@
 			class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
 			<div>
-				<NuxtLink to="/" :aria-label="formatMessage(messages.modrinthHomePage)">
-					<TextLogo aria-hidden="true" class="h-7 w-auto text-contrast" />
+				<NuxtLink to="/" :aria-label="formatMessage(messages.modrinthHomePage)" class="hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness] group">
+					<TextLogo aria-hidden="true" class="h-7 w-auto text-contrast transition-transform group-active:scale-[0.98]" />
 				</NuxtLink>
 			</div>
 			<div
