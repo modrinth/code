@@ -548,30 +548,41 @@
 							</template>
 						</Tooltip>
 						<ButtonStyled size="large" circular>
-							<button
-								v-if="auth.user"
-								v-tooltip="
-									following
-										? formatMessage(commonMessages.unfollowButton)
-										: formatMessage(commonMessages.followButton)
-								"
-								:aria-label="
-									following
-										? formatMessage(commonMessages.unfollowButton)
-										: formatMessage(commonMessages.followButton)
-								"
-								@click="userFollowProject(project)"
-							>
-								<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
-							</button>
-							<nuxt-link
-								v-else
-								v-tooltip="formatMessage(commonMessages.followButton)"
-								to="/auth/sign-in"
-								:aria-label="formatMessage(commonMessages.followButton)"
-							>
-								<HeartIcon aria-hidden="true" />
-							</nuxt-link>
+							<ClientOnly>
+								<button
+									v-if="auth.user"
+									v-tooltip="
+										following
+											? formatMessage(commonMessages.unfollowButton)
+											: formatMessage(commonMessages.followButton)
+									"
+									:aria-label="
+										following
+											? formatMessage(commonMessages.unfollowButton)
+											: formatMessage(commonMessages.followButton)
+									"
+									@click="userFollowProject(project)"
+								>
+									<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
+								</button>
+								<nuxt-link
+									v-else
+									v-tooltip="formatMessage(commonMessages.followButton)"
+									to="/auth/sign-in"
+									:aria-label="formatMessage(commonMessages.followButton)"
+								>
+									<HeartIcon aria-hidden="true" />
+								</nuxt-link>
+								<template #fallback>
+									<nuxt-link
+										v-tooltip="formatMessage(commonMessages.followButton)"
+										to="/auth/sign-in"
+										:aria-label="formatMessage(commonMessages.followButton)"
+									>
+										<HeartIcon aria-hidden="true" />
+									</nuxt-link>
+								</template>
+							</ClientOnly>
 						</ButtonStyled>
 						<ButtonStyled size="large" circular>
 							<PopoutMenu

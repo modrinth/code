@@ -1,5 +1,5 @@
 export const useUser = async (force = false) => {
-	const user = useState('user', () => null)
+	const user = useState('user', () => {})
 
 	if (!user.value || force || (user.value && Date.now() - user.value.lastUpdated > 300000)) {
 		user.value = await initUser()
