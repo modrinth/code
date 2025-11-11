@@ -17,14 +17,8 @@
   "nags.add-links.title": {
     "defaultMessage": "Aggiungi link esterni"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Hai selezionato tutti i {totalAvailableTags} tag disponibili. Questo rende i tag, che servono ad aiutare gli utenti a trovare progetti pertinenti, del tutto inutili. Si prega di selezionare solo i tag pertinenti al tuo progetto."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Seleziona tag accurati"
-  },
-  "nags.description-too-short.description": {
-    "defaultMessage": "La tua descrizione è di {length} caratteri leggibili. Si consiglia di scrivere almeno {minChars} caratteri per avere una descrizione pulita e informativa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Espandi la descrizione"
@@ -52,9 +46,6 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "Visita la galleria"
-  },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Il tuo {projectType} utilizza una licenza che necessita che sia disponibile il codice sorgente. Si prega di fornire un link al codice sorgente, o un file sorgente per ogni versione aggiuntiva, oppure potresti scegliere un'altra licenza."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fornisci codice sorgente"
@@ -113,23 +104,11 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Controlla e rispondi a tutte le richieste del team di moderazione prima di reinviare."
   },
-  "nags.moderator-feedback.title": {
-    "defaultMessage": "Controlla il feedback dei moderatori"
-  },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero avere un solo tag di risoluzione che corrisponda alla loro risoluzione primaria."
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleziona risoluzione corretta"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "Seleziona gli ambienti su cui il tuo {projectType} funziona."
-  },
   "nags.select-environments.title": {
     "defaultMessage": "Seleziona ambienti"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "Seleziona la licenza con la quale il tuo {projectType} è distribuito."
   },
   "nags.select-license.title": {
     "defaultMessage": "Scegli una licenza"
@@ -170,26 +149,14 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Rivedi il riepilogo"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "Il tuo riepilogo è di {length} caratteri. Ѐ consigliato utilizzare almeno {minChars} caratteri perché il riepilogo sia informativo e accattivante."
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Espandi il riepilogo"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Mantenere il nome del progetto semplice lo rende semplice da memorizzare e trovare. Le informazioni sulla versione e sul loader vengono mostrate automaticamente insieme al progetto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rivedi il nome"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "Hai selezionato {tagCount} tag. Considera di ridurli a {maxTagCount} o meno per assicurarti che il tuo progetto appaia solo nelle ricerche più rilevanti."
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleziona tag accurati"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "È necessaria almeno un'immagine di galleria per mostrare il contenuto del tuo {type}{resourcepackMessage}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Carica un'immagine"

@@ -66,34 +66,37 @@
     "message": "Recarga para instalar la actualización"
   },
   "friends.action.add-friend": {
-    "message": "Agrega a un amigo"
+    "message": "Añadir un amigo"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} {count, plural, one {petición} other {peticiones}} de amistad"
+    "message": "{count} {count, plural, one {solicitud} other {solicitudes}} de amistad"
   },
   "friends.add-friend.submit": {
-    "message": "Envía una petición de amistad"
+    "message": "Enviar solicitud de amistad"
   },
   "friends.add-friend.title": {
-    "message": "Agrega a un amigo"
+    "message": "Añadiendo un amigo"
   },
   "friends.add-friend.username.description": {
-    "message": "¡Puede ser diferente de su apodo en Minecraft!"
+    "message": "¡Podría ser distinto a su nombre de Minecraft!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Escribe su apodo en Modrinth..."
+    "message": "Escribe el nombre de usuario de Modrinth..."
   },
   "friends.add-friend.username.title": {
-    "message": "¿Cuál es el apodo de tu amigo en Modrinth?"
+    "message": "¿Cuál es el nombre de usuario de Modrinth de tu amigo?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>¡Añade amigos</link> para ver qué están jugando!"
   },
   "friends.friend.cancel-request": {
-    "message": "Cancelar petición"
+    "message": "Cancelar solicitud"
   },
   "friends.friend.remove-friend": {
     "message": "Eliminar amigo"
   },
   "friends.friend.request-sent": {
-    "message": "Petición de amistad enviada"
+    "message": "Solicitud de amistad enviada"
   },
   "friends.friend.view-profile": {
     "message": "Ver perfil"
@@ -111,16 +114,19 @@
     "message": "Conectados"
   },
   "friends.heading.pending": {
-    "message": "Pendientes"
+    "message": "Pendiente"
   },
   "friends.no-friends-match": {
-    "message": "Ningún apodo concuerda con ''{query}''"
+    "message": "Ningún amigo coincide con \"{query}\""
   },
   "friends.search-friends-placeholder": {
-    "message": "Buscando amigos..."
+    "message": "Buscar amigos..."
   },
   "friends.section.heading": {
-    "message": "{title}: {count}"
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>¡Inicia sesión en una cuenta de Modrinth</link> para añadir amigos y ver qué están jugando!"
   },
   "instance.add-server.add-and-play": {
     "message": "Añadir y jugar"
@@ -174,7 +180,7 @@
     "message": "Servidor de Minecraft"
   },
   "instance.server-modal.resource-pack": {
-    "message": "Paquete de recursos"
+    "message": "Resource pack"
   },
   "instance.settings.tabs.general": {
     "message": "General"

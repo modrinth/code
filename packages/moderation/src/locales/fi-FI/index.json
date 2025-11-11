@@ -38,9 +38,6 @@
   "nags.minecraft-title-clause.description": {
     "defaultMessage": "Projektit eivät saa käyttää Minecraftin brändäystä tai sisältää \"Minecraft\" sanaa suurena osana nimeä."
   },
-  "nags.moderator-feedback.title": {
-    "defaultMessage": "Tarkasta moderaattorien palaute"
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Valitse oikea resoluutio"
   },

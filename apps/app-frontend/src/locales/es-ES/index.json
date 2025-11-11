@@ -86,6 +86,9 @@
   "friends.add-friend.username.title": {
     "message": "¿Cuál es el apodo de tu amigo en Modrinth?"
   },
+  "friends.add-friends-to-share": {
+    "message": "<link>Añade amigos</link> para ver a qué están jugando."
+  },
   "friends.friend.cancel-request": {
     "message": "Cancelar petición"
   },
@@ -121,6 +124,9 @@
   },
   "friends.section.heading": {
     "message": "{title}: {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Inicia sesión en una cuenta Modrinth</link> para añadir amigos y ver a qué están jugando."
   },
   "instance.add-server.add-and-play": {
     "message": "Añadir y jugar"
@@ -198,7 +204,7 @@
     "message": "No puedes duplicar mientras se instala."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Duplicar instancia."
+    "message": "Duplicar instancia"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
     "message": "Crea una copia de esta instancia, incluyendo mundos, configuraciones, mods, etc."
@@ -273,7 +279,7 @@
     "message": "Instancia"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} para Minecraft {game_version} ya esta instalada"
+    "message": "{platform} {version} para Minecraft {game_version} ya está instalada"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "La versión vanilla {game_version} ya está instalada"

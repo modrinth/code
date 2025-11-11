@@ -5,6 +5,36 @@
   "affiliate.create.header": {
     "defaultMessage": "Створити новий код партнера"
   },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Дайте своєму партнерському посиланню назву, щоб ви знали, звідки люди приходять!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Заголовок партнерського посилання"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "напр., YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Ім’я користувача особи, для якої створити код партнера"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Ім’я користувача"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Уведіть ім’я користувача"
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Створено від {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Створення партнерського посилання…"
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Відкликати партнерське посилання"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Переглянути аналітику"
+  },
   "badge.beta": {
     "defaultMessage": "Бета"
   },
@@ -13,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "Новинка"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Партнерські посилання"
   },
   "button.analytics": {
     "defaultMessage": "Аналітика"

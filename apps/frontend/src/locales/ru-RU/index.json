@@ -108,7 +108,7 @@
     "message": "% ЦП"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App работает лучше многих популярных Launchers, используя лишь 150 МБ ОЗУ!"
+    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -635,6 +635,339 @@
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Вы гражданин США?"
   },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Заполнить налоговую форму"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Продолжить с лимитом"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Реквизиты"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Сумма"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Валютный курс"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Сбор"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Чистая сумма"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Юридическое лицо"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "Юридическое лицо — зарегистрированная организация, например: компания, партнёрство или ООО."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Вы выводите как физическое или юридическое лицо?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Физическое лицо"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Выберите страну"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Поиск стран..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Не удалось получить список доступных способов вывода. Повторите попытку позже."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Ошибка загрузки способов вывода"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Регион"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Доступность способов вывода зависит от региона."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Выберите способ вывода"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Можно вывести ещё <b>{amount}</b>. <tax-link>Заполните налоговую форму</tax-link>, чтобы вывести больше."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Владелец счёта"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Криптовалюта"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Проверьте адрес кошелька"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Номер национального удостоверения"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Введите номер национального удостоверения"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Номер паспорта"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Введите номер паспорта"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Номер вида на жительство"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Введите номер вида на жительство"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "Номер RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Введите номер RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "ИНН"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Введите ИНН"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Сеть"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Почти исчерпан лимит вывода: доступно ещё <b>{amountRemaining}</b>. Заполните налоговую форму, чтобы вывести больше."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Учётная запись"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Отвязать учётную запись"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Способ вывода"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "Учётная запись PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Подключите свой PayPal и получайте выплаты напрямую."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Сохранить"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Профиль Venmo успешно сохранён!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Сохранено"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Войти через PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Введите свой профиль Venmo и получайте выплаты."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Профиль Venmo"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@username"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Завершение"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Способ"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Реквизиты счёта"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Идентификация"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Налоговая форма"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Реквизиты"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "Чтобы вывести все <b>{available}</b> средства, пожалуйста, заполните форму ниже. Это необходимо для налоговой отчётности и нужно сделать только один раз."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "Для отчётности Modrinth и соблюдения налогового законодательства нужно заполнить форму W-9 или W-8."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Требуется налоговая форма"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Способ вывода"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Вознаграждение"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Выберите вознаграждение"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Вознаграждения"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Непроверенная почта"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "Указанная почта не связана с учётной записью Modrinth. Вознаграждения, отправленные на неверный адрес, невозможно восстановить."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Можно снизить сборы"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Выбран PayPal International с USD. <direct-paypal-link>Используйте PayPal напрямую</direct-paypal-link>, чтобы снизить сборы (≈2% вместо ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Вывести средства"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Лимит вывода"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Достигнут лимит вывода в <b>{withdrawLimit}</b>. Заполните налоговую форму, чтобы вывести больше."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Доступно"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Баланс"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Сумма может измениться, прежде чем станет доступна."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Нажмите, чтобы узнать, как Modrinth рассчитывает доход."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Ожидается {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "В обработке"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Средства остаются в обработке до конца месяца и становятся доступными через 60 дней."
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Получено"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Транзакций"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Выведено"
+  },
+  "dashboard.revenue.tos": {
+    "message": "Загружая проекты на Modrinth и выводя деньги со своего счёта, вы соглашаетесь с нашими <terms-link>Условиями программы вознаграждений</terms-link>. Узнайте больше о <info-link>программе вознаграждений</info-link>."
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Скачать в формате CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Транзакции"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Нет транзакций"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Ваши выплаты и выводы появятся здесь."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Посмотреть все"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Вывод средств временно заблокирован — указанный TIN или SSN не совпал с данными IRS. Свяжитесь с поддержкой для повторной отправки формы."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Выведите средства с баланса любым из доступных способов."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Вывести средства"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Вывод средств"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Счёт"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Сумма"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Закрыть"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Дата"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "Письмо с инструкциями по активации отправлено на <b>{email}</b>."
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Валютный курс"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Сбор"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Способ"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Чистая сумма"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Получатель"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Средства отправлены"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Транзакции"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Кошелёк"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Не удалось обработать запрос на вывод средств. Проверьте реквизиты или свяжитесь с поддержкой."
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Не удалось вывести средства"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "Не удалось подтвердить указанный адрес. Проверьте правильность данных."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Ошибка проверки адреса"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Указанные реквизиты банковского счёта недействительны. Перепроверьте их."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Неверные банковские реквизиты"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "Указанный адрес криптокошелька недействителен. Перепроверьте его и попробуйте снова."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Неверный адрес кошелька"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Сумма вывода после вычета сборов меньше минимально допустимой. Укажите более крупную сумму."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Сумма слишком мала"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "Чтобы отправить запрос на вывод средств, необходимо заполнить налоговую форму."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Заполните налоговую форму"
+  },
   "error.collection.404.list_item.1": {
     "message": "URL-адрес коллекции мог быть введён неправильно."
   },
@@ -789,7 +1122,7 @@
     "message": "Следите за тем, что нравится"
   },
   "landing.feature.launcher.description": {
-    "message": "Наш открытый API позволяет глубже интегрироваться с Modrinth — используйте <link>наше приложение</link> или сторонние Launchers наподобие ATLauncher, MultiMC и Prism Launcher."
+    "message": "Наш открытый API позволяет глубже интегрироваться с Modrinth — используйте <link>наше приложение</link> или сторонние лаунчеры наподобие ATLauncher, MultiMC и Prism Launcher."
   },
   "landing.feature.launcher.heading": {
     "message": "Играйте с вашим любимым launcher"
@@ -986,6 +1319,9 @@
   "layout.footer.about.status": {
     "message": "Статус"
   },
+  "layout.footer.copyright": {
+    "message": "© Rinth, Inc., {year}"
+  },
   "layout.footer.legal": {
     "message": "Правовой материал"
   },
@@ -1064,6 +1400,15 @@
   "layout.meta.og-description": {
     "message": "Ищите и публикуйте проекты для Minecraft!"
   },
+  "layout.mobile.close-menu": {
+    "message": "Закрыть меню"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Открыть меню"
+  },
+  "layout.nav.active-reports": {
+    "message": "Активные жалобы"
+  },
   "layout.nav.analytics": {
     "message": "Аналитика"
   },
@@ -1091,6 +1436,9 @@
   "layout.nav.modrinth-home-page": {
     "message": "Главная страница Modrinth"
   },
+  "layout.nav.my-servers": {
+    "message": "Мои серверы"
+  },
   "layout.nav.organizations": {
     "message": "Организации"
   },
@@ -1110,7 +1458,7 @@
     "message": "Поиск"
   },
   "layout.nav.upgrade-to-modrinth-plus": {
-    "message": "Обновиться до Modrinth+"
+    "message": "Перейти на Modrinth+"
   },
   "moderation.filter.by": {
     "message": "Фильтры"
@@ -1135,6 +1483,273 @@
   },
   "moderation.technical.search.placeholder": {
     "message": "Поиск техпроверок..."
+  },
+  "muralpay.account-type.checking": {
+    "message": "Расчётный"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Сберегательный"
+  },
+  "muralpay.country.at": {
+    "message": "Австрия"
+  },
+  "muralpay.country.be": {
+    "message": "Бельгия"
+  },
+  "muralpay.country.cy": {
+    "message": "Кипр"
+  },
+  "muralpay.country.de": {
+    "message": "Германия"
+  },
+  "muralpay.country.ee": {
+    "message": "Эстония"
+  },
+  "muralpay.country.es": {
+    "message": "Испания"
+  },
+  "muralpay.country.fi": {
+    "message": "Финляндия"
+  },
+  "muralpay.country.fr": {
+    "message": "Франция"
+  },
+  "muralpay.country.gr": {
+    "message": "Греция"
+  },
+  "muralpay.country.ie": {
+    "message": "Ирландия"
+  },
+  "muralpay.country.it": {
+    "message": "Италия"
+  },
+  "muralpay.country.lt": {
+    "message": "Литва"
+  },
+  "muralpay.country.lu": {
+    "message": "Люксембург"
+  },
+  "muralpay.country.lv": {
+    "message": "Латвия"
+  },
+  "muralpay.country.mt": {
+    "message": "Мальта"
+  },
+  "muralpay.country.nl": {
+    "message": "Нидерланды"
+  },
+  "muralpay.country.pt": {
+    "message": "Португалия"
+  },
+  "muralpay.country.sk": {
+    "message": "Словакия"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "Национальное удостоверение личности"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Паспорт"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Вид на жительство"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "ИНН"
+  },
+  "muralpay.field.account-number": {
+    "message": "Номер счёта"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Номер счёта (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Номер счёта (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Тип номера счёта"
+  },
+  "muralpay.field.account-type": {
+    "message": "Тип счёта"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Номер счёта"
+  },
+  "muralpay.field.branch-code": {
+    "message": "Код филиала"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "Страна"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "Тип документа"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Номер телефона"
+  },
+  "muralpay.field.pix-email": {
+    "message": "Электронная почта PIX"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "Тип ключа PIX"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "Телефон PIX"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Маршрутный номер"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Адрес кошелька"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme или Clave Virtual Uniforme"
+  },
+  "muralpay.help.cci": {
+    "message": "Código de Cuenta Interbancaria"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (номер счёта в мексиканском банке)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Бразильский идентификационный номер налогоплательщика"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Аргентинский идентификационный номер налогоплательщика"
+  },
+  "muralpay.help.iban": {
+    "message": "Международный номер банковского счёта"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Банковский идентификационный код"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Банковский счёт"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Электронная почта"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Номер телефона"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Введите номер счёта"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Введите CBU или CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU или CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Введите 20-значный CCI"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Введите CUIT или CUIL"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Введите номер счёта"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Введите код филиала"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Введите 18-значный CLABE"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Введите CPF или CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Введите IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Введите электронную почту PIX"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Введите 9-значный маршрутный номер"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Введите SWIFT/BIC-код"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Введите коста-риканский IBAN"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Банковский перевод (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "Перевод через PIX (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Банковский перевод (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Банковский перевод (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Банковский перевод (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Банковский перевод (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Банковский перевод (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Банковский перевод (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Банковский перевод (USD — Перу)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Банковский перевод (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Банковский перевод (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "Криптовалюта (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Перепроверьте адрес кошелька. Средства, отправленные на неверный адрес, невозможно вернуть."
   },
   "profile.bio.fallback.creator": {
     "message": "Автор на Modrinth."
@@ -1284,7 +1899,7 @@
     "message": "Запросите перепроверку"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Ваш проект был {status} персоналом Modrinth. В большинстве случаев Вы можете повторно отправить на рассмотрение после прочтения сообщения персонала."
+    "message": "Проект {status, select, rejected {отклонён} withheld {на удержании} other {{status}}} командой Modrinth. Обычно после решения указанных модератором проблем можно снова запросить проверку."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Необходимо выполнить обязательные действия в контрольном списке!"
@@ -1296,7 +1911,7 @@
     "message": "Отправить на проверку"
   },
   "project-moderation-nags.submit-for-review-desc": {
-    "message": "Ваш проект доступен для просмотра только участникам проекта. Для публикации он должен быть проверен модераторами."
+    "message": "Проект сейчас виден только участникам. Для публикации он должен пройти проверку модераторами."
   },
   "project-moderation-nags.suggestion": {
     "message": "Предложение"
@@ -1691,18 +2306,6 @@
   "report.submit": {
     "message": "Отправить жалобу"
   },
-  "revenue.transfers.total": {
-    "message": "Всего вы вывели {amount}."
-  },
-  "revenue.transfers.total.method": {
-    "message": "Вы вывели {amount} через {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "В {year} году вы вывели {amount}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "В {year} году вы вывели {amount} через {method}."
-  },
   "scopes.analytics.description": {
     "message": "Просматривать данные аналитики"
   },
@@ -1966,12 +2569,6 @@
   },
   "servers.backups.item.creating-backup": {
     "message": "Создание резервной копии..."
-  },
-  "servers.backups.item.downloading": {
-    "message": "Скачивание"
-  },
-  "servers.backups.item.downloading-backup": {
-    "message": "Скачивание резервной копии..."
   },
   "servers.backups.item.failed-to-create-backup": {
     "message": "Не удалось создать резервную копию"

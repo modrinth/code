@@ -68,6 +68,9 @@
   "friends.action.add-friend": {
     "message": "フレンドを追加"
   },
+  "friends.action.view-friend-requests": {
+    "message": "{count}件の友達リクエスト"
+  },
   "friends.add-friend.submit": {
     "message": "フレンド申請を送信"
   },

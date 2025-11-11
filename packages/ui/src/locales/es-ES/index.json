@@ -1,4 +1,31 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Crear enlace de afiliado"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Creando nuevo código de afiliado"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "¡Ponle un nombre a tu enlace de afiliado para saber de dónde provienen los usuarios!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Título del enlace de afiliado"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "p. ej. Youtube"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Nombre de usuario"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Introduce un nombre de usuario..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Creado por {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Creando enlace de afiliado..."
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -7,6 +34,9 @@
   },
   "badge.new": {
     "defaultMessage": "Nuevo"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Enlaces de afiliado"
   },
   "button.analytics": {
     "defaultMessage": "Analíticas"
@@ -119,6 +149,54 @@
   "collection.label.private": {
     "defaultMessage": "Privado"
   },
+  "form.label.amount": {
+    "defaultMessage": "Cantidad"
+  },
+  "form.label.city": {
+    "defaultMessage": "Ciudad"
+  },
+  "form.label.country": {
+    "defaultMessage": "País"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Fecha de nacimiento"
+  },
+  "form.label.email": {
+    "defaultMessage": "Correo electrónico"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Nombre"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Apellidos"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Código postal"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Provincia"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Introduzca ciudad"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Seleccione el país"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Introduzca el correo electrónico"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Introduzca nombre"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Introduzca apellidos"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Introduzca el código postal"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Introduzca la provincia"
+  },
   "icon-select.edit": {
     "defaultMessage": "Editar icono"
   },
@@ -205,6 +283,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Rechazado"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Acepto los <terms-link>Términos del programa de recompensas</terms-link>."
   },
   "label.saved": {
     "defaultMessage": "Guardado"
@@ -353,6 +434,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -361,6 +445,21 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Tarjeta regalo"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Tarjetas regalo"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Virtual Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Virtual Visas"
   },
   "project-type.all": {
     "defaultMessage": "Todos"

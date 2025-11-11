@@ -635,6 +635,93 @@
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Чи ви громадянин США?"
   },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Заповнити податкову форму"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Продовжити з лімітом"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Деталі"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Кількість"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Комісія"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Чиста кількість"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Юридична особа"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "Юридичною особою є зареєстрована організація, як-от корпорація, товариство або ТОВ."
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Фізична особа"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Виберіть свою країну"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Шукати країни…"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Неможливо отримати доступні способи оплати. Будь ласка, спробуйте знову пізніше."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Не вдалося завантажити способи оплати"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Регіон"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Деякі способи оплати недоступні в певних регіонах."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Власник рахунка"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Монета"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Підтвердьте адресу свого гаманця"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Рахунок"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Від’єднати рахунок"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "Рахунок PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "З’єднайте свій рахунок PayPal, щоб отримувати платежі напряму."
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Деталі рахунка"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Транзакції"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Рахунок"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Кількість"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Закрити"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Дата"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Гаманець"
+  },
   "error.collection.404.list_item.1": {
     "message": "Ви, можливо, помилилися під час написання URL добірки."
   },
@@ -986,6 +1073,9 @@
   "layout.footer.about.status": {
     "message": "Статус"
   },
+  "layout.footer.copyright": {
+    "message": "© {year} Rinth, Inc."
+  },
   "layout.footer.legal": {
     "message": "Угоди"
   },
@@ -1064,6 +1154,12 @@
   "layout.meta.og-description": {
     "message": "Досліджуйте інший та публікуйте свій уміст для Minecraft!"
   },
+  "layout.mobile.close-menu": {
+    "message": "Закрити меню"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Відкрити меню"
+  },
   "layout.nav.analytics": {
     "message": "Аналітика"
   },
@@ -1090,6 +1186,9 @@
   },
   "layout.nav.modrinth-home-page": {
     "message": "Головна сторінка Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Мої сервери"
   },
   "layout.nav.organizations": {
     "message": "Організації"
@@ -1135,6 +1234,66 @@
   },
   "moderation.technical.search.placeholder": {
     "message": "Пошук технічних оглядів…"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Заощадження"
+  },
+  "muralpay.country.at": {
+    "message": "Австрія"
+  },
+  "muralpay.country.be": {
+    "message": "Бельгія"
+  },
+  "muralpay.country.cy": {
+    "message": "Кіпр"
+  },
+  "muralpay.country.de": {
+    "message": "Німеччина"
+  },
+  "muralpay.country.ee": {
+    "message": "Естонія"
+  },
+  "muralpay.country.es": {
+    "message": "Іспанія"
+  },
+  "muralpay.country.fi": {
+    "message": "Фінляндія"
+  },
+  "muralpay.country.fr": {
+    "message": "Франція"
+  },
+  "muralpay.country.gr": {
+    "message": "Греція"
+  },
+  "muralpay.country.ie": {
+    "message": "Ірландія"
+  },
+  "muralpay.country.it": {
+    "message": "Італія"
+  },
+  "muralpay.country.lt": {
+    "message": "Литва"
+  },
+  "muralpay.country.lu": {
+    "message": "Люксембург"
+  },
+  "muralpay.country.lv": {
+    "message": "Латвія"
+  },
+  "muralpay.country.mt": {
+    "message": "Мальта"
+  },
+  "muralpay.country.nl": {
+    "message": "Нідерланди"
+  },
+  "muralpay.country.pt": {
+    "message": "Португалія"
+  },
+  "muralpay.country.sk": {
+    "message": "Словаччина"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Паспорт"
   },
   "profile.bio.fallback.creator": {
     "message": "Творець Modrinth."
@@ -1282,9 +1441,6 @@
   },
   "project-moderation-nags.resubmit-for-review": {
     "message": "Надіслати на повторний розгляд"
-  },
-  "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Ваш проєкт був {status} персоналом Modrinth. У більшості випадків ви можете повторно подати проєкт на розгляд після врахування повідомлення персоналу."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Ви повинні завершити всі обов’язкові кроки в контрольному списку для публікації!"
@@ -1691,18 +1847,6 @@
   "report.submit": {
     "message": "Відправити скаргу"
   },
-  "revenue.transfers.total": {
-    "message": "Ви вивели {amount} загалом."
-  },
-  "revenue.transfers.total.method": {
-    "message": "Ви вивели {amount} за допомогою {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "Ви вивели {amount} протягом {year}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "Ви вивели {amount} протягом {year} за допомогою {method}."
-  },
   "scopes.analytics.description": {
     "message": "Доступ до ваших даних аналітики"
   },
@@ -1967,14 +2111,8 @@
   "servers.backups.item.creating-backup": {
     "message": "Створення резервної копії…"
   },
-  "servers.backups.item.downloading": {
-    "message": "Завантаження"
-  },
-  "servers.backups.item.downloading-backup": {
-    "message": "Завантаження резервної копії…"
-  },
   "servers.backups.item.failed-to-create-backup": {
-    "message": "Помилка в створенні резервної копії"
+    "message": "Не вдалося створити резервну копію"
   },
   "servers.backups.item.failed-to-restore-backup": {
     "message": "Помилка в відновленні з резервної копії"
@@ -2340,7 +2478,7 @@
     "message": "Завершити сеанс"
   },
   "settings.sessions.created-ago": {
-    "message": "Створенно {ago}"
+    "message": "Створено {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Поточний сеанс"
