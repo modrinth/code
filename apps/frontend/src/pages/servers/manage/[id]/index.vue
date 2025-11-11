@@ -341,7 +341,7 @@ const commandTree: any = {
 			},
 		},
 	},
-	ban_ip: null,
+	'ban-ip': null,
 	banlist: {
 		ips: null,
 		players: null,
@@ -470,7 +470,7 @@ const commandTree: any = {
 	msg: null,
 	op: null,
 	pardon: null,
-	pardon_ip: null,
+	'pardon-ip': null,
 	particle: null,
 	playsound: null,
 	recipe: {
