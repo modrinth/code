@@ -547,13 +547,9 @@
 								</div>
 							</template>
 						</Tooltip>
-						<ClientOnly>
 							<ButtonStyled
 								size="large"
 								circular
-								:color="following ? 'red' : 'standard'"
-								color-fill="none"
-								hover-color-fill="background"
 							>
 								<button
 									v-if="auth.user"
@@ -637,36 +633,6 @@
 									<BookmarkIcon aria-hidden="true" />
 								</nuxt-link>
 							</ButtonStyled>
-							<template #fallback>
-								<ButtonStyled size="large" circular>
-									<button
-										v-if="auth.user"
-										:v-tooltip="formatMessage(commonMessages.followButton)"
-										:aria-label="formatMessage(commonMessages.followButton)"
-										@click="userFollowProject(project)"
-									>
-										<HeartIcon aria-hidden="true" />
-									</button>
-									<nuxt-link
-										v-else
-										v-tooltip="formatMessage(commonMessages.followButton)"
-										to="/auth/sign-in"
-										:aria-label="formatMessage(commonMessages.followButton)"
-									>
-										<HeartIcon aria-hidden="true" />
-									</nuxt-link>
-								</ButtonStyled>
-								<ButtonStyled size="large" circular>
-									<nuxt-link
-										v-tooltip="formatMessage(commonMessages.saveButton)"
-										to="/auth/sign-in"
-										:aria-label="formatMessage(commonMessages.saveButton)"
-									>
-										<BookmarkIcon aria-hidden="true" />
-									</nuxt-link>
-								</ButtonStyled>
-							</template>
-						</ClientOnly>
 						<ButtonStyled v-if="auth.user && currentMember" size="large" circular>
 							<nuxt-link
 								v-tooltip="formatMessage(commonMessages.settingsLabel)"

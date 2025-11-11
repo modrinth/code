@@ -36,7 +36,7 @@
 						v-for="(option, index) in filteredOptions"
 						:key="isDivider(option) ? `divider-${index}` : option.id"
 					>
-						<div v-if="isDivider(option)" class="h-px w-full bg-button-bg"></div>
+						<div v-if="isDivider(option)" class="h-px w-full bg-surface-5"></div>
 						<ButtonStyled v-else type="transparent" role="menuitem" :color="option.color">
 							<button
 								v-if="typeof option.action === 'function'"
@@ -288,19 +288,10 @@ const handleMouseOver = (index: number) => {
 
 // Scrolling is disabled for keyboard navigation
 const disableBodyScroll = () => {
-	// Make opening not shift page when there's a vertical scrollbar
-	const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth
-	if (scrollBarWidth > 0) {
-		document.body.style.paddingRight = `${scrollBarWidth}px`
-	} else {
-		document.body.style.paddingRight = ''
-	}
-
 	document.body.style.overflow = 'hidden'
 }
 
 const enableBodyScroll = () => {
-	document.body.style.paddingRight = ''
 	document.body.style.overflow = ''
 }
 

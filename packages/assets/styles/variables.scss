@@ -3,7 +3,7 @@
 	--surface-2: #f5f5f5;
 	--surface-3: #f8f8f8;
 	--surface-4: #ffffff;
-	--surface-5: #e6e6e6;
+	--surface-5: #dddddd;
 
 	--color-red-50: #fef2f2;
 	--color-red-100: #fee5e7;
@@ -97,8 +97,8 @@
 	--color-button-border: rgba(161, 161, 161, 0.35);
 	--color-scrollbar: #96a2b0;
 
-	--color-divider: var(--surface-2);
-	--color-divider-dark: #c8cdd3;
+	--color-divider: var(--surface-5);
+	--color-divider-dark: var(--surface-5);
 
 	--color-base: var(--color-text-default);
 	--color-secondary: var(--color-text-tertiary);
@@ -207,6 +207,8 @@ html {
 	--color-link: var(--color-blue) !important;
 	--color-link-hover: var(--color-blue) !important; // DEPRECATED, use filters in future
 	--color-link-active: var(--color-blue) !important; // DEPRECATED, use filters in future
+
+	--shadow-button: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.15);
 }
 
 .light-mode,

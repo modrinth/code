@@ -3,6 +3,10 @@
 	box-sizing: border-box;
 }
 
+:root {
+	scrollbar-gutter: stable;
+}
+
 body {
 	// Defaults
 	background-color: var(--color-bg);

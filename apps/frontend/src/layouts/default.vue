@@ -369,7 +369,7 @@
 								formatMessage(navMenuMessages.discoverContent)
 							}}</span>
 							<span class="contents md:hidden">{{ formatMessage(navMenuMessages.discover) }}</span>
-							<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+							<DropdownIcon aria-hidden="true" class="h-5 w-5" />
 
 							<template #mods>
 								<BoxIcon aria-hidden="true" />

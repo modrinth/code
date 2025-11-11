@@ -891,7 +891,7 @@ const defaultRanges: RangeObject[] = [
 	flex-direction: column;
 	background-color: var(--color-bg);
 	border-radius: var(--radius-sm);
-	border: 1px solid var(--color-button-bg);
+	border: 1px solid var(--color-divider);
 	gap: var(--gap-md);
 	padding: var(--gap-md);
 	margin-top: var(--gap-md);
@@ -920,7 +920,7 @@ const defaultRanges: RangeObject[] = [
 		width: 100%;
 		height: 1rem;
 		background-color: var(--color-raised-bg);
-		border: 1px solid var(--color-button-bg);
+		border: 1px solid var(--color-divider);
 		border-radius: var(--radius-sm);
 		overflow: hidden;
 
