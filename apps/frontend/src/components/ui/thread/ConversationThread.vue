@@ -261,7 +261,13 @@ import {
 	SendIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Checkbox,CopyCode, injectNotificationManager, MarkdownEditor, OverflowMenu } from '@modrinth/ui'
+import {
+	Checkbox,
+	CopyCode,
+	injectNotificationManager,
+	MarkdownEditor,
+	OverflowMenu,
+} from '@modrinth/ui'
 
 import Modal from '~/components/ui/Modal.vue'
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'

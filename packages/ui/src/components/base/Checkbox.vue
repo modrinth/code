@@ -2,7 +2,11 @@
 	<button
 		class="group bg-transparent border-none p-0 m-0 flex items-center gap-3 checkbox-outer outline-offset-4 text-contrast"
 		:disabled="disabled"
-		:class="disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]'"
+		:class="
+			disabled
+				? 'cursor-not-allowed opacity-50'
+				: 'cursor-pointer hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]'
+		"
 		:aria-label="description"
 		:aria-checked="modelValue"
 		role="checkbox"
@@ -13,9 +17,8 @@
 			:class="
 				(modelValue
 					? 'bg-brand border-button-border text-brand-inverted'
-					: 'bg-surface-2 border-surface-5') + (disabled
-						? ''
-						: ' checkbox-shadow group-active:scale-95')
+					: 'bg-surface-2 border-surface-5') +
+				(disabled ? '' : ' checkbox-shadow group-active:scale-95')
 			"
 		>
 			<MinusIcon v-if="indeterminate" aria-hidden="true" stroke-width="3" />

@@ -245,7 +245,15 @@ import {
 	LockOpenIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Admonition, Avatar, ButtonStyled, Checkbox,Combobox, CopyCode, NewModal } from '@modrinth/ui'
+import {
+	Admonition,
+	Avatar,
+	ButtonStyled,
+	Checkbox,
+	Combobox,
+	CopyCode,
+	NewModal,
+} from '@modrinth/ui'
 import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
 import { formatCategory, formatVersionsForDisplay, type Mod, type Version } from '@modrinth/utils'
 import { computed, ref } from 'vue'

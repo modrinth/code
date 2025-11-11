@@ -547,92 +547,89 @@
 								</div>
 							</template>
 						</Tooltip>
-							<ButtonStyled
-								size="large"
-								circular
+						<ButtonStyled size="large" circular>
+							<button
+								v-if="auth.user"
+								v-tooltip="
+									following
+										? formatMessage(commonMessages.unfollowButton)
+										: formatMessage(commonMessages.followButton)
+								"
+								:aria-label="
+									following
+										? formatMessage(commonMessages.unfollowButton)
+										: formatMessage(commonMessages.followButton)
+								"
+								@click="userFollowProject(project)"
 							>
-								<button
-									v-if="auth.user"
-									v-tooltip="
-										following
-											? formatMessage(commonMessages.unfollowButton)
-											: formatMessage(commonMessages.followButton)
-									"
-									:aria-label="
-										following
-											? formatMessage(commonMessages.unfollowButton)
-											: formatMessage(commonMessages.followButton)
-									"
-									@click="userFollowProject(project)"
-								>
-									<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
-								</button>
-								<nuxt-link
-									v-else
-									v-tooltip="formatMessage(commonMessages.followButton)"
-									to="/auth/sign-in"
-									:aria-label="formatMessage(commonMessages.followButton)"
-								>
-									<HeartIcon aria-hidden="true" />
-								</nuxt-link>
-							</ButtonStyled>
-							<ButtonStyled size="large" circular>
-								<PopoutMenu
-									v-if="auth.user"
-									:tooltip="
+								<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
+							</button>
+							<nuxt-link
+								v-else
+								v-tooltip="formatMessage(commonMessages.followButton)"
+								to="/auth/sign-in"
+								:aria-label="formatMessage(commonMessages.followButton)"
+							>
+								<HeartIcon aria-hidden="true" />
+							</nuxt-link>
+						</ButtonStyled>
+						<ButtonStyled size="large" circular>
+							<PopoutMenu
+								v-if="auth.user"
+								:tooltip="
+									collections.some((x) => x.projects.includes(project.id))
+										? formatMessage(commonMessages.savedLabel)
+										: formatMessage(commonMessages.saveButton)
+								"
+								from="top-right"
+								:aria-label="formatMessage(commonMessages.saveButton)"
+								:dropdown-id="`${baseId}-save`"
+							>
+								<BookmarkIcon
+									aria-hidden="true"
+									:fill="
 										collections.some((x) => x.projects.includes(project.id))
-											? formatMessage(commonMessages.savedLabel)
-											: formatMessage(commonMessages.saveButton)
+											? 'currentColor'
+											: 'none'
 									"
-									from="top-right"
-									:aria-label="formatMessage(commonMessages.saveButton)"
-									:dropdown-id="`${baseId}-save`"
-								>
-									<BookmarkIcon
-										aria-hidden="true"
-										:fill="
-											collections.some((x) => x.projects.includes(project.id))
-												? 'currentColor'
-												: 'none'
-										"
+								/>
+								<template #menu>
+									<input
+										v-model="displayCollectionsSearch"
+										type="text"
+										:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+										class="search-input menu-search"
 									/>
-									<template #menu>
-										<input
-											v-model="displayCollectionsSearch"
-											type="text"
-											:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-											class="search-input menu-search"
-										/>
-										<div v-if="collections.length > 0" class="collections-list text-primary">
-											<Checkbox
-												v-for="option in collections
-													.slice()
-													.sort((a, b) => a.name.localeCompare(b.name))"
-												:key="option.id"
-												:model-value="option.projects.includes(project.id)"
-												class="popout-checkbox"
-												@update:model-value="() => onUserCollectProject(option, project.id)"
-											>
-												{{ option.name }}
-											</Checkbox>
-										</div>
-
-										<div v-else class="menu-text">
-											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
-										</div>
-										<button
-											class="btn collection-button"
-											@click="(event) => $refs.modal_collection.show(event)"
+									<div v-if="collections.length > 0" class="collections-list text-primary">
+										<Checkbox
+											v-for="option in collections
+												.slice()
+												.sort((a, b) => a.name.localeCompare(b.name))"
+											:key="option.id"
+											:model-value="option.projects.includes(project.id)"
+											class="popout-checkbox"
+											@update:model-value="() => onUserCollectProject(option, project.id)"
 										>
-											<PlusIcon aria-hidden="true" />
-											{{ formatMessage(messages.createNewCollection) }}
-										</button>
-									</template>
-								</PopoutMenu>
-								<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
-									<BookmarkIcon aria-hidden="true" />
-								</nuxt-link>
-							</ButtonStyled>
+											{{ option.name }}
+										</Checkbox>
+									</div>
+
+									<div v-else class="menu-text">
+										<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
+									</div>
+									<button
+										class="btn collection-button"
+										@click="(event) => $refs.modal_collection.show(event)"
+									>
+										<PlusIcon aria-hidden="true" />
+										{{ formatMessage(messages.createNewCollection) }}
+									</button>
+								</template>
+							</PopoutMenu>
+							<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+								<BookmarkIcon aria-hidden="true" />
+							</nuxt-link>
+						</ButtonStyled>
 						<ButtonStyled v-if="auth.user && currentMember" size="large" circular>
 							<nuxt-link
 								v-tooltip="formatMessage(commonMessages.settingsLabel)"
