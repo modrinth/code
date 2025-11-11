@@ -3,7 +3,7 @@
 		<template #title>
 			<span class="text-lg font-extrabold text-contrast">Batch credit</span>
 		</template>
-		<div class="flex w-[720px] max-w-[90vw] flex-col gap-6">
+		<div class="flex w-[500px] max-w-[90vw] flex-col gap-6">
 			<div class="flex flex-col gap-2">
 				<label class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Type </span>
@@ -89,24 +89,26 @@
 						default
 					</span>
 				</label>
-				<div class="text-muted rounded-lg border border-divider bg-button-bg p-4">
-					<p>Hi {user.name},</p>
+				<div
+					class="text-muted flex flex-col gap-2 rounded-lg border border-divider bg-button-bg p-4"
+				>
+					<span>Hi {user.name},</span>
 					<div class="textarea-wrapper">
 						<textarea
 							id="message-batch"
 							v-model="message"
 							rows="3"
-							class="w-full overflow-hidden"
+							class="w-full overflow-hidden !bg-surface-3"
 						/>
 					</div>
-					<p>
+					<span>
 						To make up for it, we've added {{ days }} day{{ pluralize(days) }} to your Modrinth
 						Servers subscription.
-					</p>
-					<p>
+					</span>
+					<span>
 						Your next charge was scheduled for {credit.previous_due} and will now be on
 						{credit.next_due}.
-					</p>
+					</span>
 				</div>
 			</div>
 
