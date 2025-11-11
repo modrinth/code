@@ -1635,10 +1635,12 @@ const projectTypeDisplay = computed(() =>
 	),
 )
 
-const following = computed(
-	() =>
-		user.value && user.value.follows && user.value.follows.find((x) => x.id === project.value.id),
-)
+const following = computed(() => {
+	if (!user.value?.follows) {
+		return false
+	}
+	return !!user.value.follows.find((x) => x.id === project.value.id)
+})
 
 const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`)
 const description = computed(
