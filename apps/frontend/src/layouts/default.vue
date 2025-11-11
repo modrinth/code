@@ -1901,7 +1901,7 @@ const footerLinks = [
 		bottom: 0;
 		background-color: var(--color-raised-bg);
 		box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
-		z-index: 7;
+		z-index: 10000;
 		width: 100%;
 		align-items: center;
 		justify-content: space-between;
