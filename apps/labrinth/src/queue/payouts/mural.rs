@@ -381,8 +381,16 @@ async fn sync_pending_payouts_from_mural_with_client<M: MuralClient>(
     let mut payout_ids = Vec::<i64>::new();
     let mut payout_statuses = Vec::<String>::new();
 
-    while let Some(op) = futs.next().await.transpose()? {
-        let Some(op) = op else { continue };
+    while let Some(result) = futs.next().await {
+        let op = match result {
+            Ok(Some(op)) => op,
+            Ok(None) => continue,
+            Err(err) => {
+                warn!("Failed to update payout: {err:#?}");
+                continue;
+            }
+        };
+
         payout_ids.push(op.payout_id);
         payout_statuses.push(op.status.to_string());
     }
@@ -485,6 +493,10 @@ async fn sync_failed_mural_payouts_to_labrinth_with_client<M: MuralClient>(
         .execute(db)
         .await
         .wrap_internal_err("failed to update payout statuses")?;
+
+        if next_id.is_none() {
+            break;
+        }
     }
 
     Ok(())
@@ -600,16 +612,13 @@ mod tests {
         for (id, platform_id, status) in payouts {
             sqlx::query!(
                 "
-                INSERT INTO payouts (id, method, platform_id, status, user_id, created)
-                VALUES ($1, $2, $3, $4, $5, NOW())
-                ON CONFLICT (id) DO UPDATE SET
-                    platform_id = EXCLUDED.platform_id,
-                    status = EXCLUDED.status
+                INSERT INTO payouts (id, method, platform_id, status, user_id, amount, created)
+                VALUES ($1, $2, $3, $4, $5, 10.0, NOW())
                 ",
                 id,
                 PayoutMethodType::MuralPay.as_str(),
                 platform_id,
-                status.to_string(),
+                status.as_str(),
                 1i64, // user_id
             )
             .execute(db)
@@ -630,16 +639,35 @@ mod tests {
             let uuid4 = uuid::Uuid::new_v4().to_string();
 
             setup_test_db_with_payouts(
-                &db,
+                db,
                 vec![
-                    (1, uuid1.clone(), PayoutStatus::from_string("in_transit")),
-                    (2, uuid2.clone(), PayoutStatus::from_string("unknown")),
-                    (3, uuid3.clone(), PayoutStatus::from_string("cancelling")),
-                    (4, uuid4.clone(), PayoutStatus::from_string("in_transit")), // This one won't change
+                    (1, uuid1.clone(), PayoutStatus::InTransit),
+                    (2, uuid2.clone(), PayoutStatus::Unknown),
+                    (3, uuid3.clone(), PayoutStatus::Cancelling),
+                    (4, uuid4.clone(), PayoutStatus::InTransit), // This one won't change
                 ],
             )
             .await
             .unwrap();
+
+            // Verify setup
+            let updated_payouts = sqlx::query!(
+                r#"
+                SELECT
+                    id,
+                    status AS "status: PayoutStatus"
+                FROM payouts
+                ORDER BY id
+                "#
+            )
+            .fetch_all(db)
+            .await
+            .unwrap();
+            assert_eq!(updated_payouts.len(), 4);
+            assert_eq!(updated_payouts[0].status, PayoutStatus::InTransit);
+            assert_eq!(updated_payouts[1].status, PayoutStatus::Unknown);
+            assert_eq!(updated_payouts[2].status, PayoutStatus::Cancelling);
+            assert_eq!(updated_payouts[3].status, PayoutStatus::InTransit);
 
             // Setup mock client
             let mut mock_client = MockMuralClient::new();
@@ -674,7 +702,7 @@ mod tests {
 
             // Run the function
             let result = sync_pending_payouts_from_mural_with_client(
-                &db,
+                db,
                 &mock_client,
                 10,
             )
@@ -683,18 +711,24 @@ mod tests {
 
             // Verify results
             let updated_payouts = sqlx::query!(
-                    "SELECT id, status FROM payouts WHERE id IN (1, 2, 3, 4) ORDER BY id"
-                )
-                .fetch_all(db)
-                .await
-                .unwrap();
-
+                r#"
+                SELECT
+                    id,
+                    status AS "status: PayoutStatus"
+                FROM payouts
+                ORDER BY id
+                "#
+            )
+            .fetch_all(db)
+            .await
+            .unwrap();
             assert_eq!(updated_payouts.len(), 4);
-            assert_eq!(updated_payouts[0].status, "success"); // req_123 -> executed
-            assert_eq!(updated_payouts[1].status, "cancelled"); // req_456 -> canceled
-            assert_eq!(updated_payouts[2].status, "failed"); // req_789 -> failed
-            assert_eq!(updated_payouts[3].status, "in_transit"); // req_nochange unchanged
-        });
+            assert_eq!(updated_payouts[0].status, PayoutStatus::Success);
+            assert_eq!(updated_payouts[1].status, PayoutStatus::Cancelled);
+            assert_eq!(updated_payouts[2].status, PayoutStatus::Failed);
+            assert_eq!(updated_payouts[3].status, PayoutStatus::InTransit);
+        })
+        .await;
     }
 
     #[actix_rt::test]
@@ -706,12 +740,12 @@ mod tests {
             // Setup test data with null platform_id
             sqlx::query!(
                     "
-                    INSERT INTO payouts (id, method, platform_id, status, user_id, created)
-                    VALUES ($1, $2, NULL, $3, $4, NOW())
+                    INSERT INTO payouts (id, method, platform_id, status, user_id, amount, created)
+                    VALUES ($1, $2, NULL, $3, $4, 10.00, NOW())
                     ",
                     1,
                     PayoutMethodType::MuralPay.as_str(),
-                    "in_transit",
+                    PayoutStatus::InTransit.as_str(),
                     1i64, // user_id
                 )
                 .execute(db)
@@ -721,14 +755,13 @@ mod tests {
             let mock_client = MockMuralClient::new();
 
             // Run the function - should not fail even with null platform_id
-            let result = sync_pending_payouts_from_mural_with_client(
-                &db,
+            sync_pending_payouts_from_mural_with_client(
+                db,
                 &mock_client,
                 10,
             )
-            .await;
-            assert!(result.is_ok());
-        });
+            .await.unwrap();
+        }).await;
     }
 
     #[actix_rt::test]
@@ -742,11 +775,11 @@ mod tests {
             let uuid3 = uuid::Uuid::new_v4().to_string();
 
             setup_test_db_with_payouts(
-                &db,
+                db,
                 vec![
-                    (1, uuid1.clone(), PayoutStatus::from_string("in_transit")), // Will be updated to cancelled
-                    (2, uuid2.clone(), PayoutStatus::from_string("success")), // Will be updated to failed
-                    (3, uuid3.clone(), PayoutStatus::from_string("success")), // Will remain unchanged
+                    (1, uuid1.clone(), PayoutStatus::InTransit), // Will be updated to cancelled
+                    (2, uuid2.clone(), PayoutStatus::Success), // Will be updated to failed
+                    (3, uuid3.clone(), PayoutStatus::Success), // Will remain unchanged
                 ],
             )
             .await
@@ -771,7 +804,7 @@ mod tests {
 
             // Run the function
             let result = sync_failed_mural_payouts_to_labrinth_with_client(
-                &db,
+                db,
                 &mock_client,
                 10,
             )
@@ -780,17 +813,24 @@ mod tests {
 
             // Verify results
             let updated_payouts = sqlx::query!(
-                    "SELECT id, status FROM payouts WHERE id IN (1, 2, 3) ORDER BY id"
-                )
-                .fetch_all(db)
-                .await
-                .unwrap();
+                r#"
+                SELECT
+                    id,
+                    status AS "status: PayoutStatus"
+                FROM payouts
+                ORDER BY id
+                "#
+            )
+            .fetch_all(db)
+            .await
+            .unwrap();
 
             assert_eq!(updated_payouts.len(), 3);
-            assert_eq!(updated_payouts[0].status, "cancelled"); // search_req_1 -> canceled
-            assert_eq!(updated_payouts[1].status, "failed"); // search_req_2 -> failed
-            assert_eq!(updated_payouts[2].status, "success"); // search_req_3 unchanged
-        });
+            assert_eq!(updated_payouts[0].status, PayoutStatus::Cancelled); // search_req_1 -> canceled
+            assert_eq!(updated_payouts[1].status, PayoutStatus::Failed); // search_req_2 -> failed
+            assert_eq!(updated_payouts[2].status, PayoutStatus::Success); // search_req_3 unchanged
+        })
+        .await;
     }
 
     #[actix_rt::test]
@@ -802,12 +842,8 @@ mod tests {
             let uuid1 = uuid::Uuid::new_v4().to_string();
 
             setup_test_db_with_payouts(
-                &db,
-                vec![(
-                    1,
-                    uuid1.clone(),
-                    PayoutStatus::from_string("in_transit"),
-                )],
+                db,
+                vec![(1, uuid1.clone(), PayoutStatus::InTransit)],
             )
             .await
             .unwrap();
@@ -822,30 +858,23 @@ mod tests {
             );
 
             // Run the function - should handle this gracefully
-            let result = sync_failed_mural_payouts_to_labrinth_with_client(
-                &db,
+            sync_failed_mural_payouts_to_labrinth_with_client(
+                db,
                 &mock_client,
                 10,
             )
-            .await;
-            assert!(result.is_ok());
+            .await
+            .unwrap();
 
             // Verify status remains unchanged
             let payout =
-                sqlx::query!("SELECT status FROM payouts WHERE id = 1")
+                sqlx::query!(r#"SELECT status AS "status: PayoutStatus" FROM payouts WHERE id = 1"#)
                     .fetch_one(db)
                     .await
                     .unwrap();
 
-            assert_eq!(payout.status, "in_transit"); // Unchanged
-        });
-    }
-
-    #[actix_rt::test]
-    async fn test_foo() {
-        with_test_environment(
-            None,
-            |_env: TestEnvironment<ApiV3>| async move {},
-        );
+            assert_eq!(payout.status, PayoutStatus::InTransit); // Unchanged
+        })
+        .await;
     }
 }
