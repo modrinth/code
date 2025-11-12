@@ -13,7 +13,7 @@ use crate::{
     database::{
         DBProject,
         models::{
-            DBProjectId, DBThread, DBThreadId, DelphiReportId,
+            DBFileId, DBProjectId, DBThread, DBThreadId, DelphiReportId,
             DelphiReportIssueId, ProjectTypeId,
             delphi_report_item::{
                 DBDelphiReportIssue, DBDelphiReportIssueDetails, DelphiSeverity,
@@ -179,7 +179,10 @@ async fn search_projects(
     }
 
     #[derive(Debug)]
-    struct IssueRecord {}
+    struct IssueRecord {
+        file_name: String,
+        file_size: u64,
+    }
 
     check_is_moderator_from_headers(
         &req,
@@ -202,6 +205,7 @@ async fn search_projects(
     let mut project_records = IndexMap::<DBProjectId, ProjectRecord>::new();
     let mut project_ids = Vec::<DBProjectId>::new();
     let mut thread_ids = Vec::<DBThreadId>::new();
+    let mut file_ids = Vec::<DBFileId>::new();
 
     let mut rows = sqlx::query!(
         r#"
@@ -212,6 +216,8 @@ async fn search_projects(
             dr.created AS "report_created!",
             dri.id AS "issue_id",
             dri.issue_type AS "issue_type?",
+            f.filename AS "file_name?",
+            f.size AS "file_size?",
             drid.internal_class_name AS "issue_detail_class_name?",
             drid.decompiled_source AS "issue_detail_decompiled_source?",
             drid.severity AS "issue_detail_severity?: DelphiSeverity"
@@ -278,7 +284,7 @@ async fn search_projects(
                     created: row.report_created,
                     issues: IndexMap::new(),
                 });
-        report.issues.entry(row.issue)
+        // report.issues.entry(row.issue).or_inser
         // .push(ReportRecord {
         //     created: row.report_created,
         //     issues:
@@ -301,23 +307,41 @@ async fn search_projects(
         .map(|thread| (thread.id, thread))
         .collect::<HashMap<_, _>>();
 
-    let projects = project_records.into_iter().map(|(project_id, reports)| {
-        let project =
-            projects.get(&project_id).wrap_internal_err_with(|| {
-                eyre!("no fetched project with ID {project_id:?}")
-            })?;
-        let thread = threads
-            .get(&DBThreadId::from(project.thread_id))
-            .wrap_internal_err_with(|| {
-                eyre!("no fetched thread with ID {:?}", project.thread_id)
-            })?;
-        Ok::<_, ApiError>(ProjectReview {
-            project: project.clone(),
-            project_owner: (),
-            thread: thread.clone(),
-            reports,
+    let projects = project_records
+        .into_iter()
+        .map(|(project_id, project_record)| {
+            let project =
+                projects.get(&project_id).wrap_internal_err_with(|| {
+                    eyre!("no fetched project with ID {project_id:?}")
+                })?;
+            let thread = threads
+                .get(&DBThreadId::from(project.thread_id))
+                .wrap_internal_err_with(|| {
+                    eyre!("no fetched thread with ID {:?}", project.thread_id)
+                })?;
+            Ok::<_, ApiError>(ProjectReview {
+                project: project.clone(),
+                project_owner: (),
+                thread: thread.clone(),
+                reports: project_record
+                    .reports
+                    .into_iter()
+                    .map(|(_, report_record)| ProjectReport {
+                        created_at: report_record.created,
+                        flag_reason: FlagReason::Delphi,
+                        files: report_record
+                            .issues
+                            .into_iter()
+                            .map(|(_, issue_record)| FileReview {
+                                file_name: issue_record.file_name,
+                                file_size: issue_record.file_size,
+                            })
+                            .collect(),
+                    })
+                    .collect(),
+            })
         })
-    });
+        .collect::<Result<Vec<_>, _>>()?;
 
     Ok(web::Json(projects))
 }
