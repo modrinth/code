@@ -162,7 +162,7 @@ export class RetryFeature extends AbstractFeature {
 			/ECONNRESET/i,
 		]
 
-		const errorMessage = error?.message ?? String(error)
+		const errorMessage = error instanceof Error ? error.message : String(error)
 		return networkErrorPatterns.some((pattern) => pattern.test(errorMessage))
 	}
 
