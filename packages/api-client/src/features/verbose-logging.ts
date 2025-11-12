@@ -15,7 +15,7 @@ export class VerboseLoggingFeature extends AbstractFeature {
 		try {
 			const result = await next()
 			try {
-				const size = result ? JSON.stringify(result) : 0
+				const size = result ? JSON.stringify(result).length : 0
 				console.debug(`${prefix} ${context.url} RECEIVED ${size} bytes`)
 			} catch {
 				// ignore size calc fail
