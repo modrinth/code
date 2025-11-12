@@ -22,7 +22,7 @@ export function createModrinthClient(
 		rateLimitKey: config.rateLimitKey,
 		features: [
 			new AuthFeature({
-				token: async () => auth.token!,
+				token: async () => auth.token,
 			} as AuthConfig),
 			new CircuitBreakerFeature({
 				storage: new NuxtCircuitBreakerStorage(),
