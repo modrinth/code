@@ -566,6 +566,15 @@
   "create.project.visibility-unlisted": {
     "message": "Não listado"
   },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Criar link de afiliado"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Seus links de afiliado"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Revogar"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Criar nova"
   },
@@ -613,6 +622,30 @@
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Você é um cidadão americano?"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Preencha o formulário fiscal"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Detalhes"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Taxa"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Seu limite de saque é de <b>{amount}</b>. <tax-link>Preencha um formulário fiscal</tax-link> para sacar mais."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@usuário"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Detalhes"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Saldo"
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Transfira o saldo disponível usando o método de pagamento desejado."
   },
   "error.collection.404.list_item.1": {
     "message": "Você pode ter digitado incorretamente o URL da coleção."
@@ -868,6 +901,9 @@
   },
   "layout.action.lookup-by-email": {
     "message": "Procurar por e-mail"
+  },
+  "layout.action.manage-affiliates": {
+    "message": "Gerenciar links de afiliado"
   },
   "layout.action.manage-server-notices": {
     "message": "Gerenciar notificações do servidor"
@@ -1130,6 +1166,9 @@
   "profile.button.manage-projects": {
     "message": "Gerenciar projetos"
   },
+  "profile.button.remove-affiliate": {
+    "message": "Remover como afiliado"
+  },
   "profile.details.label.auth-providers": {
     "message": "Provedores de autenticação"
   },
@@ -1153,6 +1192,9 @@
   },
   "profile.error.not-found": {
     "message": "Usuário não encontrado"
+  },
+  "profile.label.affiliate": {
+    "message": "Afiliado"
   },
   "profile.label.badges": {
     "message": "Emblemas"
@@ -1249,9 +1291,6 @@
   },
   "project-moderation-nags.resubmit-for-review": {
     "message": "Reenviar para revisão"
-  },
-  "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Seu projeto foi {status} pela equipe do Modrinth. Na maioria dos casos, você pode enviar uma revisão após resolver a mensagem da equipe."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Você precisa completar as etapas necessárias nas tarefas de publicação!"
@@ -1658,18 +1697,6 @@
   "report.submit": {
     "message": "Enviar denúncia"
   },
-  "revenue.transfers.total": {
-    "message": "Você sacou {amount} no total."
-  },
-  "revenue.transfers.total.method": {
-    "message": "Você sacou {amount} através de {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "Você sacou {amount} em {year}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "Você sacou {amount} em {year} através de {method}."
-  },
   "scopes.analytics.description": {
     "message": "Acessas suas estatísticas"
   },
@@ -1933,12 +1960,6 @@
   },
   "servers.backups.item.creating-backup": {
     "message": "Criando backup..."
-  },
-  "servers.backups.item.downloading": {
-    "message": "Baixando"
-  },
-  "servers.backups.item.downloading-backup": {
-    "message": "Baixando backup..."
   },
   "servers.backups.item.failed-to-create-backup": {
     "message": "Falha ao criar um backup"

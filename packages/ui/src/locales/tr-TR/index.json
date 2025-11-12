@@ -1,4 +1,37 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Ortaklık bağlantısı oluştur"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Yeni ortaklık kodu oluşturuluyor"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Ortaklık bağlantına bir isim ver, böylece insanların nereden geldiğini bilirsin!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Ortaklık bağlantısının başlığı"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Ortaklık kodunu oluşturmak için kullanıcının kullanıcı adı"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Kullanıcı adı"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Kullanıcı adı giriniz..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Tarafından oluşturuldu {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Ortaklık bağlantısı oluşturuluyor..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Ortaklık bağlantısını iptal et"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Analizleri görüntüle"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -7,6 +40,9 @@
   },
   "badge.new": {
     "defaultMessage": "Yeni"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Ortaklık bağlantıları"
   },
   "button.analytics": {
     "defaultMessage": "Veriler"
@@ -46,6 +82,9 @@
   },
   "button.follow": {
     "defaultMessage": "Takip Et"
+  },
+  "button.max": {
+    "defaultMessage": "Maksimum"
   },
   "button.more-options": {
     "defaultMessage": "Diğer ayarlar"
@@ -118,6 +157,36 @@
   },
   "collection.label.private": {
     "defaultMessage": "Gizli"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Adres satırı"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adres satırı 2 (isteğe bağlı)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Miktar"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "İşletme adı"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Doğum tarihi"
+  },
+  "form.label.email": {
+    "defaultMessage": "E Posta"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "İlk adı"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Posta kodu"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Eyalet/il"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Adresi girin"
   },
   "icon-select.edit": {
     "defaultMessage": "Simgeyi düzenle"
@@ -205,6 +274,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Reddedilmiş"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "<terms-link>Ödül Programı Şartları</terms-link>'nı kabul ediyorum"
   },
   "label.saved": {
     "defaultMessage": "Kaydedildi"

@@ -18,13 +18,13 @@
     "defaultMessage": "Externe Links hinzufügen"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Sie haben alle {totalAvailableTags} verfügbaren Tags ausgewählt. Dies widerspricht dem Zweck von Tags, die den Benutzern helfen sollen, relevante Projekte zu finden. Bitte wählen Sie nur die Tags aus, die für Ihr Projekt relevant sind."
+    "defaultMessage": "Du hast alle {totalAvailableTags, plural, one {# verfügbaren Tag} other {# verfügbaren Tags}} ausgewählt. Das widerspricht dem Zweck von Tags, die dazu dienen, Nutzern zu helfen, relevante Projekte zu finden. Bitte wähle nur die Tags aus, die wirklich zu deinem Projekt passen."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Wählen Sie sinnvolle Tags aus"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Ihre Beschreibung umfasst {length} lesbare Zeichen. Es werden mindestens {minChars} Zeichen empfohlen, um eine klare und informative Beschreibung zu erstellen."
+    "defaultMessage": "Deine Beschreibung enthält {length, plural, one {# lesbares Zeichen} other {# lesbare Zeichen}}. Es wird empfohlen, mindestens {minChars, plural, one {# Zeichen} other {# Zeichen}} zu verwenden, um eine klare und informative Beschreibung zu erstellen."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Beschreibung erweitern"
@@ -54,7 +54,7 @@
     "defaultMessage": "Zur Galerie-Seite"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Dein {projectType} verwendet eine Lizenz, die die Verfügbarkeit des Quellcodes vorschreibt. Bitte stelle für jede zusätzliche Version einen Link zum Quellcode oder eine Quelldatei bereit oder verwende eine andere Lizenz."
+    "defaultMessage": "Dein {type, select, mod {Mod} plugin {Plugin} other {Projekt}} verwendet eine Lizenz, die erfordert, dass der Quellcode verfügbar ist. Bitte gib für jede zusätzliche Version einen Link zum Quellcode oder eine Quelldatei an, oder erwäge, eine andere Lizenz zu verwenden."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Quellcode bereitstellen"
@@ -114,22 +114,22 @@
     "defaultMessage": "Überprüfen Sie alle Bedenken des Moderationsteams und gehen Sie darauf ein, bevor Sie den Beitrag erneut einreichen."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Sehen sie sich das Feedback von den Moderatoren an"
+    "defaultMessage": "Feedback überprüfen"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Du hast {count} Auflösungs-Tags ausgewählt ({tags}). Ressourcenpakete sollten in der Regel nur ein Auflösungs-Tag haben, das der primären Auflösung entspricht."
+    "defaultMessage": "Du hast {count, plural, one {# Auflösungs-Tag} other {# Auflösungs-Tags}} ({tags}) ausgewählt. Ressourcenpakete sollten in der Regel nur ein Auflösungs-Tag haben, das ihrer Hauptauflösung entspricht."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Wählen Sie die richtige Auflösung aus"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "Wähle die Umgebungen aus, auf denen dein {projectType} funktioniert."
+    "defaultMessage": "Wähle die Umgebungen aus, in denen dein {type, select, mod {Mod} modpack {Modpack} other {Projekt}} funktioniert."
   },
   "nags.select-environments.title": {
     "defaultMessage": "Umgebung auswählen"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Wählen Sie die Lizenz aus, unter der Ihr {projectType} veröffentlicht wird."
+    "defaultMessage": "Wähle die Lizenz aus, unter der dein {type, select, mod {Mod} modpack {Modpack} resourcepack {Ressourcenpaket} shader {Shader} plugin {Plugin} datapack {Datenpaket} other {Projekt}} veröffentlicht wird."
   },
   "nags.select-license.title": {
     "defaultMessage": "Lizenz auswählen"
@@ -171,25 +171,25 @@
     "defaultMessage": "Zusammenfassung bereinigen"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Ihre Zusammenfassung umfasst {length} Zeichen. Es werden mindestens {minChars} Zeichen empfohlen, um eine informative und ansprechende Zusammenfassung zu erstellen."
+    "defaultMessage": "Deine Zusammenfassung enthält {length, plural, one {# Zeichen} other {# Zeichen}}. Es wird empfohlen, mindestens {minChars, plural, one {# Zeichen} other {# Zeichen}} zu verwenden, um eine informative und ansprechende Zusammenfassung zu erstellen."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Zusammenfassung erweitern"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Halten Sie den Namen Ihres Projekts übersichtlich und einprägsam, damit es leichter zu finden ist. Versions- und Loader-Informationen werden automatisch neben Ihrem Projekt angezeigt."
+    "defaultMessage": "Ein klarer, übersichtlicher Name macht dein Projekt einprägsamer und leichter auffindbar. Versions- und Loader-Informationen werden automatisch neben deinem Projekt angezeigt."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Namen bereinigen"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Sie haben {tagCount} Tags ausgewählt. Reduzieren Sie die Anzahl auf {maxTagCount} oder weniger, damit Ihr Projekt in den relevanten Suchergebnissen angezeigt wird."
+    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekt in den relevanten Suchergebnissen erscheint."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wählen Sie genaue Tags aus"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Es ist mindestens ein Galeriebild erforderlich, um den Inhalt Ihres {type}{resourcepackMessage} zu präsentieren."
+    "defaultMessage": "Mindestens ein Galeriebild ist erforderlich, um den Inhalt deines {type, select,\nresourcepack {Ressourcenpakets zu präsentieren, außer bei Audio- oder Sprachpaketen. Wenn dies auf dein Paket zutrifft, wähle bitte das entsprechende Tag aus} shader {Shaders} other {Projekts}} zu zeigen."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriebild hochladen"

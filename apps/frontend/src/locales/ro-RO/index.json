@@ -1190,9 +1190,6 @@
   "project-moderation-nags.resubmit-for-review": {
     "message": "Retrimite pentru revizuire"
   },
-  "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Proiectul tău a fost {status} de către echipa Modrinth. În cele mai multe cazuri, poți retrimite pentru revizuire după ce ai rezolvat mesajul echipei."
-  },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Trebuie să completezi pașii necesari din lista de verificare pentru publicare!"
   },
@@ -1597,18 +1594,6 @@
   },
   "report.submit": {
     "message": "Trimite raportul"
-  },
-  "revenue.transfers.total": {
-    "message": "Ați retras în total {amount}."
-  },
-  "revenue.transfers.total.method": {
-    "message": "Ați retras {amount} prin {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "Ați retras {amount} în {year}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "Ați retras suma de {amount} în anul {year} prin intermediul {method}."
   },
   "scopes.analytics.description": {
     "message": "Accesați-vă datele analitice"
