@@ -207,7 +207,7 @@ impl FromStr for PayoutId {
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum PayoutStatusFilter {
-    PayoutStatus { statuses: Vec<String> },
+    PayoutStatus { statuses: Vec<PayoutStatus> },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

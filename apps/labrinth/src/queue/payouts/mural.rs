@@ -1,12 +1,16 @@
 use ariadne::ids::UserId;
 use chrono::Utc;
 use eyre::{Result, eyre};
-use muralpay::{MuralError, TokenFeeRequest};
+use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
+use muralpay::{MuralError, MuralPay, TokenFeeRequest};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
+use tracing::warn;
 
 use crate::{
     database::models::DBPayoutId,
+    models::payouts::{PayoutMethodType, PayoutStatus},
     queue::payouts::{AccountBalance, PayoutFees, PayoutsQueue},
     routes::ApiError,
     util::{
@@ -250,4 +254,172 @@ impl PayoutsQueue {
             pending: Decimal::ZERO,
         }))
     }
+}
+
+/// Finds Labrinth payouts which are not complete, fetches their corresponding
+/// Mural state, and updates the payout status.
+pub async fn sync_pending_payouts_from_mural(
+    db: &PgPool,
+    mural: &MuralPay,
+    limit: u32,
+) -> eyre::Result<()> {
+    #[derive(Debug)]
+    struct UpdatePayoutOp {
+        payout_id: i64,
+        status: PayoutStatus,
+    }
+
+    let mut txn = db
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin transaction")?;
+
+    let rows = sqlx::query!(
+        "
+        SELECT id, platform_id FROM payouts
+        WHERE
+            method = $1
+            AND status = ANY($2::text[])
+        LIMIT $3
+        ",
+        &PayoutMethodType::MuralPay.to_string(),
+        &[
+            PayoutStatus::InTransit,
+            PayoutStatus::Unknown,
+            PayoutStatus::Cancelling
+        ]
+        .iter()
+        .map(|s| s.to_string())
+        .collect::<Vec<String>>(),
+        i64::from(limit),
+    )
+    .fetch_all(&mut *txn)
+    .await
+    .wrap_internal_err("failed to fetch incomplete Mural payouts")?;
+
+    let futs = rows.into_iter().map(|row| async move {
+        let platform_id = row.platform_id.wrap_err("no platform ID")?;
+        let payout_request_id = platform_id.parse::<muralpay::PayoutRequestId>()
+            .wrap_err_with(|| eyre!("platform ID '{platform_id:?}' is not a valid payout request ID"))?;
+        let payout_request = mural.get_payout_request(payout_request_id).await
+            .wrap_err_with(|| eyre!("failed to fetch payout request {payout_request_id}"))?;
+
+        let new_payout_status = match payout_request.status {
+            muralpay::PayoutStatus::Canceled => Some(PayoutStatus::Cancelled),
+            muralpay::PayoutStatus::Executed => Some(PayoutStatus::Success),
+            muralpay::PayoutStatus::Failed => Some(PayoutStatus::Failed),
+            _ => None,
+        };
+
+        if let Some(status) = new_payout_status {
+            eyre::Ok(Some(UpdatePayoutOp {
+                payout_id: row.id,
+                status
+            }))
+        } else {
+            eyre::Ok(None)
+        }
+    }.map_err(move |err| eyre!(err).wrap_err(eyre!("failed to update payout with ID '{}'", row.id))));
+    let mut futs = futs.collect::<FuturesUnordered<_>>();
+
+    let mut payout_ids = Vec::<i64>::new();
+    let mut payout_statuses = Vec::<String>::new();
+
+    while let Some(op) = futs.next().await.transpose()? {
+        let Some(op) = op else { continue };
+        payout_ids.push(op.payout_id);
+        payout_statuses.push(op.status.to_string());
+    }
+
+    sqlx::query!(
+        "
+        UPDATE payouts
+        SET status = u.status
+        FROM UNNEST($1::bigint[], $2::varchar[]) AS u(id, status)
+        WHERE payouts.id = u.id
+        ",
+        &payout_ids,
+        &payout_statuses,
+    )
+    .execute(&mut *txn)
+    .await
+    .wrap_internal_err("failed to update payout statuses")?;
+
+    txn.commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
+
+    Ok(())
+}
+
+/// Queries Mural for canceled or failed payouts, and updates the corresponding
+/// Labrinth payouts' statuses.
+pub async fn sync_failed_mural_payouts_to_labrinth(
+    db: &PgPool,
+    mural: &MuralPay,
+    limit: u32,
+) -> eyre::Result<()> {
+    let mut next_id = None;
+    loop {
+        let search_resp = mural
+            .search_payout_requests(
+                Some(muralpay::PayoutStatusFilter::PayoutStatus {
+                    statuses: vec![
+                        muralpay::PayoutStatus::Canceled,
+                        muralpay::PayoutStatus::Failed,
+                    ],
+                }),
+                Some(muralpay::SearchParams {
+                    limit: Some(u64::from(limit)),
+                    next_id,
+                }),
+            )
+            .await
+            .wrap_internal_err(
+                "failed to fetch failed payout requests from Mural",
+            )?;
+        next_id = search_resp.next_id;
+        if search_resp.results.is_empty() {
+            break;
+        }
+
+        let mut payout_platform_id = Vec::<String>::new();
+        let mut payout_new_status = Vec::<String>::new();
+
+        for payout_req in search_resp.results {
+            let new_payout_status = match payout_req.status {
+                muralpay::PayoutStatus::Canceled => PayoutStatus::Cancelled,
+                muralpay::PayoutStatus::Failed => PayoutStatus::Failed,
+                _ => {
+                    warn!(
+                        "Found payout {} with status {:?}, which should have been filtered out by our Mural request - Mural bug",
+                        payout_req.id, payout_req.status
+                    );
+                    continue;
+                }
+            };
+
+            payout_platform_id.push(payout_req.id.to_string());
+            payout_new_status.push(new_payout_status.to_string());
+        }
+
+        sqlx::query!(
+            "
+            UPDATE payouts
+            SET status = u.status
+            FROM UNNEST($1::text[], $2::text[]) AS u(platform_id, status)
+            WHERE
+                payouts.method = $3
+                AND payouts.platform_id = u.platform_id
+            ",
+            &payout_platform_id,
+            &payout_new_status,
+            PayoutMethodType::MuralPay.as_str(),
+        )
+        .execute(db)
+        .await
+        .wrap_internal_err("failed to update payout statuses")?;
+    }
+
+    Ok(())
 }

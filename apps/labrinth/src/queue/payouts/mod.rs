@@ -71,15 +71,18 @@ impl Default for PayoutsQueue {
     }
 }
 
-fn create_muralpay() -> Result<MuralPayConfig> {
+pub fn create_muralpay_client() -> Result<MuralPay> {
     let api_url = env_var("MURALPAY_API_URL")?;
     let api_key = env_var("MURALPAY_API_KEY")?;
     let transfer_api_key = env_var("MURALPAY_TRANSFER_API_KEY")?;
+    Ok(MuralPay::new(api_url, api_key, Some(transfer_api_key)))
+}
+
+pub fn create_muralpay() -> Result<MuralPayConfig> {
+    let client = create_muralpay_client()?;
     let source_account_id = env_var("MURALPAY_SOURCE_ACCOUNT_ID")?
         .parse::<muralpay::AccountId>()
         .wrap_err("failed to parse source account ID")?;
-
-    let client = MuralPay::new(api_url, api_key, Some(transfer_api_key));
 
     Ok(MuralPayConfig {
         client,
