@@ -2,7 +2,9 @@ use ariadne::ids::UserId;
 use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
-use muralpay::{MuralError, MuralPay, TokenFeeRequest, PayoutRequest, PayoutRequestId};
+use muralpay::{
+    MuralError, MuralPay, PayoutRequest, PayoutRequestId, TokenFeeRequest,
+};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -21,26 +23,43 @@ use crate::{
 
 #[async_trait::async_trait]
 pub trait MuralClient: Send + Sync {
-    async fn get_payout_request(&self, id: PayoutRequestId) -> Result<PayoutRequest, MuralError>;
+    async fn get_payout_request(
+        &self,
+        id: PayoutRequestId,
+    ) -> Result<PayoutRequest, MuralError>;
     async fn search_payout_requests(
         &self,
         status_filter: Option<muralpay::PayoutStatusFilter>,
-        search_params: Option<muralpay::SearchParams<muralpay::PayoutRequestId>>,
-    ) -> Result<muralpay::SearchResponse<muralpay::PayoutRequestId, PayoutRequest>, MuralError>;
+        search_params: Option<
+            muralpay::SearchParams<muralpay::PayoutRequestId>,
+        >,
+    ) -> Result<
+        muralpay::SearchResponse<muralpay::PayoutRequestId, PayoutRequest>,
+        MuralError,
+    >;
 }
 
 #[async_trait::async_trait]
 impl MuralClient for MuralPay {
-    async fn get_payout_request(&self, id: PayoutRequestId) -> Result<PayoutRequest, MuralError> {
+    async fn get_payout_request(
+        &self,
+        id: PayoutRequestId,
+    ) -> Result<PayoutRequest, MuralError> {
         self.get_payout_request(id).await
     }
 
     async fn search_payout_requests(
         &self,
         status_filter: Option<muralpay::PayoutStatusFilter>,
-        search_params: Option<muralpay::SearchParams<muralpay::PayoutRequestId>>,
-    ) -> Result<muralpay::SearchResponse<muralpay::PayoutRequestId, PayoutRequest>, MuralError> {
-        self.search_payout_requests(status_filter, search_params).await
+        search_params: Option<
+            muralpay::SearchParams<muralpay::PayoutRequestId>,
+        >,
+    ) -> Result<
+        muralpay::SearchResponse<muralpay::PayoutRequestId, PayoutRequest>,
+        MuralError,
+    > {
+        self.search_payout_requests(status_filter, search_params)
+            .await
     }
 }
 
@@ -112,7 +131,9 @@ impl PayoutsQueue {
                 developer_fee: None,
                 fiat_and_rail_details,
             },
-            crate::queue::payouts::mural::MuralPayoutRequest::Blockchain { wallet_address } => {
+            crate::queue::payouts::mural::MuralPayoutRequest::Blockchain {
+                wallet_address,
+            } => {
                 muralpay::CreatePayoutDetails::Blockchain {
                     wallet_details: muralpay::WalletDetails {
                         // only Polygon chain is currently supported
@@ -291,10 +312,11 @@ pub async fn sync_pending_payouts_from_mural(
     sync_pending_payouts_from_mural_with_client(db, mural, limit).await
 }
 
-/// Internal version that accepts any MuralClient implementation for testing.
-pub async fn sync_pending_payouts_from_mural_with_client(
+/// Internal version of [`sync_pending_payouts_from_mural`] that accepts any
+/// [`MuralClient`] implementation for testing.
+async fn sync_pending_payouts_from_mural_with_client<M: MuralClient>(
     db: &PgPool,
-    mural: &dyn MuralClient,
+    mural: &M,
     limit: u32,
 ) -> eyre::Result<()> {
     #[derive(Debug)]
@@ -396,10 +418,11 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
     sync_failed_mural_payouts_to_labrinth_with_client(db, mural, limit).await
 }
 
-/// Internal version that accepts any MuralClient implementation for testing.
-pub async fn sync_failed_mural_payouts_to_labrinth_with_client(
+/// Internal version of [`sync_failed_mural_payouts_to_labrinth`] that accepts
+/// any [`MuralClient`] implementation for testing.
+async fn sync_failed_mural_payouts_to_labrinth_with_client<M: MuralClient>(
     db: &PgPool,
-    mural: &dyn MuralClient,
+    mural: &M,
     limit: u32,
 ) -> eyre::Result<()> {
     let mut next_id = None;
@@ -469,15 +492,15 @@ pub async fn sync_failed_mural_payouts_to_labrinth_with_client(
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-        use crate::{
+    use super::*;
+    use crate::{
+        queue::payouts::mural::MuralClient,
         test::{
             api_v3::ApiV3,
             environment::{TestEnvironment, with_test_environment},
         },
-        queue::payouts::mural::MuralClient,
     };
-    use super::*;
+    use std::collections::HashMap;
 
     struct MockMuralClient {
         payout_requests: HashMap<String, PayoutRequest>,
@@ -503,7 +526,10 @@ mod tests {
 
     #[async_trait::async_trait]
     impl MuralClient for MockMuralClient {
-        async fn get_payout_request(&self, id: PayoutRequestId) -> Result<PayoutRequest, MuralError> {
+        async fn get_payout_request(
+            &self,
+            id: PayoutRequestId,
+        ) -> Result<PayoutRequest, MuralError> {
             let id_str = id.to_string();
             match self.payout_requests.get(&id_str) {
                 Some(request) => Ok(request.clone()),
@@ -520,8 +546,13 @@ mod tests {
         async fn search_payout_requests(
             &self,
             _status_filter: Option<muralpay::PayoutStatusFilter>,
-            _search_params: Option<muralpay::SearchParams<muralpay::PayoutRequestId>>,
-        ) -> Result<muralpay::SearchResponse<muralpay::PayoutRequestId, PayoutRequest>, MuralError> {
+            _search_params: Option<
+                muralpay::SearchParams<muralpay::PayoutRequestId>,
+            >,
+        ) -> Result<
+            muralpay::SearchResponse<muralpay::PayoutRequestId, PayoutRequest>,
+            MuralError,
+        > {
             Ok(muralpay::SearchResponse {
                 total: self.search_results.len() as u64,
                 results: self.search_results.clone(),
@@ -544,22 +575,21 @@ mod tests {
             transaction_hash: None,
             memo: None,
             status,
-            payouts: vec![
-                Payout {
-                    id: PayoutId(uuid::Uuid::new_v4()),
-                    created_at: chrono::Utc::now(),
-                    updated_at: chrono::Utc::now(),
-                    amount: TokenAmount {
-                        token_symbol: USDC.to_string(),
-                        token_amount: rust_decimal::Decimal::from(100),
-                    },
-                    details: PayoutDetails::Blockchain(BlockchainPayoutDetails {
-                        wallet_address: "0x1234567890123456789012345678901234567890".to_string(),
-                        blockchain: Blockchain::Polygon,
-                        status: BlockchainPayoutStatus::Pending,
-                    }),
+            payouts: vec![Payout {
+                id: PayoutId(uuid::Uuid::new_v4()),
+                created_at: chrono::Utc::now(),
+                updated_at: chrono::Utc::now(),
+                amount: TokenAmount {
+                    token_symbol: USDC.to_string(),
+                    token_amount: rust_decimal::Decimal::from(100),
                 },
-            ],
+                details: PayoutDetails::Blockchain(BlockchainPayoutDetails {
+                    wallet_address:
+                        "0x1234567890123456789012345678901234567890".to_string(),
+                    blockchain: Blockchain::Polygon,
+                    status: BlockchainPayoutStatus::Pending,
+                }),
+            }],
         }
     }
 
@@ -590,78 +620,91 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_sync_pending_payouts_from_mural_success() {
-        with_test_environment(
-            None,
-            |env: TestEnvironment<ApiV3>| async move {
-                let db = &env.db.pool;
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let db = &env.db.pool;
 
-                // Setup test data
-                let uuid1 = uuid::Uuid::new_v4().to_string();
-                let uuid2 = uuid::Uuid::new_v4().to_string();
-                let uuid3 = uuid::Uuid::new_v4().to_string();
-                let uuid4 = uuid::Uuid::new_v4().to_string();
+            // Setup test data
+            let uuid1 = uuid::Uuid::new_v4().to_string();
+            let uuid2 = uuid::Uuid::new_v4().to_string();
+            let uuid3 = uuid::Uuid::new_v4().to_string();
+            let uuid4 = uuid::Uuid::new_v4().to_string();
 
-                setup_test_db_with_payouts(
-                    &db,
-                    vec![
-                        (1, uuid1.clone(), PayoutStatus::from_string("in_transit")),
-                        (2, uuid2.clone(), PayoutStatus::from_string("unknown")),
-                        (3, uuid3.clone(), PayoutStatus::from_string("cancelling")),
-                        (4, uuid4.clone(), PayoutStatus::from_string("in_transit")), // This one won't change
-                    ],
-                )
-                .await
-                .unwrap();
+            setup_test_db_with_payouts(
+                &db,
+                vec![
+                    (1, uuid1.clone(), PayoutStatus::from_string("in_transit")),
+                    (2, uuid2.clone(), PayoutStatus::from_string("unknown")),
+                    (3, uuid3.clone(), PayoutStatus::from_string("cancelling")),
+                    (4, uuid4.clone(), PayoutStatus::from_string("in_transit")), // This one won't change
+                ],
+            )
+            .await
+            .unwrap();
 
-                // Setup mock client
-                let mut mock_client = MockMuralClient::new();
-                mock_client.add_payout_request(
+            // Setup mock client
+            let mut mock_client = MockMuralClient::new();
+            mock_client.add_payout_request(
+                &uuid1,
+                create_mock_payout_request(
                     &uuid1,
-                    create_mock_payout_request(&uuid1, muralpay::PayoutStatus::Executed),
-                );
-                mock_client.add_payout_request(
+                    muralpay::PayoutStatus::Executed,
+                ),
+            );
+            mock_client.add_payout_request(
+                &uuid2,
+                create_mock_payout_request(
                     &uuid2,
-                    create_mock_payout_request(&uuid2, muralpay::PayoutStatus::Canceled),
-                );
-                mock_client.add_payout_request(
+                    muralpay::PayoutStatus::Canceled,
+                ),
+            );
+            mock_client.add_payout_request(
+                &uuid3,
+                create_mock_payout_request(
                     &uuid3,
-                    create_mock_payout_request(&uuid3, muralpay::PayoutStatus::Failed),
-                );
-                mock_client.add_payout_request(
+                    muralpay::PayoutStatus::Failed,
+                ),
+            );
+            mock_client.add_payout_request(
+                &uuid4,
+                create_mock_payout_request(
                     &uuid4,
-                    create_mock_payout_request(&uuid4, muralpay::PayoutStatus::Pending), // Still pending
-                );
+                    muralpay::PayoutStatus::Pending,
+                ), // Still pending
+            );
 
-                // Run the function
-                let result = sync_pending_payouts_from_mural_with_client(&db, &mock_client, 10).await;
-                assert!(result.is_ok());
+            // Run the function
+            let result = sync_pending_payouts_from_mural_with_client(
+                &db,
+                &mock_client,
+                10,
+            )
+            .await;
+            assert!(result.is_ok());
 
-                // Verify results
-                let updated_payouts = sqlx::query!(
+            // Verify results
+            let updated_payouts = sqlx::query!(
                     "SELECT id, status FROM payouts WHERE id IN (1, 2, 3, 4) ORDER BY id"
                 )
                 .fetch_all(db)
                 .await
                 .unwrap();
 
-                assert_eq!(updated_payouts.len(), 4);
-                assert_eq!(updated_payouts[0].status, "success"); // req_123 -> executed
-                assert_eq!(updated_payouts[1].status, "cancelled"); // req_456 -> canceled
-                assert_eq!(updated_payouts[2].status, "failed"); // req_789 -> failed
-                assert_eq!(updated_payouts[3].status, "in_transit"); // req_nochange unchanged
-            },
-        );
+            assert_eq!(updated_payouts.len(), 4);
+            assert_eq!(updated_payouts[0].status, "success"); // req_123 -> executed
+            assert_eq!(updated_payouts[1].status, "cancelled"); // req_456 -> canceled
+            assert_eq!(updated_payouts[2].status, "failed"); // req_789 -> failed
+            assert_eq!(updated_payouts[3].status, "in_transit"); // req_nochange unchanged
+        });
     }
 
     #[actix_rt::test]
-    async fn test_sync_pending_payouts_from_mural_handles_missing_platform_id() {
-        with_test_environment(
-            None,
-            |env: TestEnvironment<ApiV3>| async move {
-                let db = &env.db.pool;
+    async fn test_sync_pending_payouts_from_mural_handles_missing_platform_id()
+    {
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let db = &env.db.pool;
 
-                // Setup test data with null platform_id
-                sqlx::query!(
+            // Setup test data with null platform_id
+            sqlx::query!(
                     "
                     INSERT INTO payouts (id, method, platform_id, status, user_id, created)
                     VALUES ($1, $2, NULL, $3, $4, NOW())
@@ -675,110 +718,127 @@ mod tests {
                 .await
                 .unwrap();
 
-                let mock_client = MockMuralClient::new();
+            let mock_client = MockMuralClient::new();
 
-                // Run the function - should not fail even with null platform_id
-                let result = sync_pending_payouts_from_mural_with_client(&db, &mock_client, 10).await;
-                assert!(result.is_ok());
-            },
-        );
+            // Run the function - should not fail even with null platform_id
+            let result = sync_pending_payouts_from_mural_with_client(
+                &db,
+                &mock_client,
+                10,
+            )
+            .await;
+            assert!(result.is_ok());
+        });
     }
 
     #[actix_rt::test]
     async fn test_sync_failed_mural_payouts_to_labrinth_success() {
-        with_test_environment(
-            None,
-            |env: TestEnvironment<ApiV3>| async move {
-                let db = &env.db.pool;
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let db = &env.db.pool;
 
-                // Setup test data
-                let uuid1 = uuid::Uuid::new_v4().to_string();
-                let uuid2 = uuid::Uuid::new_v4().to_string();
-                let uuid3 = uuid::Uuid::new_v4().to_string();
+            // Setup test data
+            let uuid1 = uuid::Uuid::new_v4().to_string();
+            let uuid2 = uuid::Uuid::new_v4().to_string();
+            let uuid3 = uuid::Uuid::new_v4().to_string();
 
-                setup_test_db_with_payouts(
-                    &db,
-                    vec![
-                        (1, uuid1.clone(), PayoutStatus::from_string("in_transit")), // Will be updated to cancelled
-                        (2, uuid2.clone(), PayoutStatus::from_string("success")), // Will be updated to failed
-                        (3, uuid3.clone(), PayoutStatus::from_string("success")), // Will remain unchanged
-                    ],
-                )
-                .await
-                .unwrap();
+            setup_test_db_with_payouts(
+                &db,
+                vec![
+                    (1, uuid1.clone(), PayoutStatus::from_string("in_transit")), // Will be updated to cancelled
+                    (2, uuid2.clone(), PayoutStatus::from_string("success")), // Will be updated to failed
+                    (3, uuid3.clone(), PayoutStatus::from_string("success")), // Will remain unchanged
+                ],
+            )
+            .await
+            .unwrap();
 
-                // Setup mock client
-                let mut mock_client = MockMuralClient::new();
-                mock_client.add_search_result(
-                    create_mock_payout_request(&uuid1, muralpay::PayoutStatus::Canceled),
-                );
-                mock_client.add_search_result(
-                    create_mock_payout_request(&uuid2, muralpay::PayoutStatus::Failed),
-                );
-                mock_client.add_search_result(
-                    create_mock_payout_request(&uuid::Uuid::new_v4().to_string(), muralpay::PayoutStatus::Failed), // No matching DB record
-                );
+            // Setup mock client
+            let mut mock_client = MockMuralClient::new();
+            mock_client.add_search_result(create_mock_payout_request(
+                &uuid1,
+                muralpay::PayoutStatus::Canceled,
+            ));
+            mock_client.add_search_result(create_mock_payout_request(
+                &uuid2,
+                muralpay::PayoutStatus::Failed,
+            ));
+            mock_client.add_search_result(
+                create_mock_payout_request(
+                    &uuid::Uuid::new_v4().to_string(),
+                    muralpay::PayoutStatus::Failed,
+                ), // No matching DB record
+            );
 
-                // Run the function
-                let result = sync_failed_mural_payouts_to_labrinth_with_client(&db, &mock_client, 10).await;
-                assert!(result.is_ok());
+            // Run the function
+            let result = sync_failed_mural_payouts_to_labrinth_with_client(
+                &db,
+                &mock_client,
+                10,
+            )
+            .await;
+            assert!(result.is_ok());
 
-                // Verify results
-                let updated_payouts = sqlx::query!(
+            // Verify results
+            let updated_payouts = sqlx::query!(
                     "SELECT id, status FROM payouts WHERE id IN (1, 2, 3) ORDER BY id"
                 )
                 .fetch_all(db)
                 .await
                 .unwrap();
 
-                assert_eq!(updated_payouts.len(), 3);
-                assert_eq!(updated_payouts[0].status, "cancelled"); // search_req_1 -> canceled
-                assert_eq!(updated_payouts[1].status, "failed"); // search_req_2 -> failed
-                assert_eq!(updated_payouts[2].status, "success"); // search_req_3 unchanged
-            },
-        );
+            assert_eq!(updated_payouts.len(), 3);
+            assert_eq!(updated_payouts[0].status, "cancelled"); // search_req_1 -> canceled
+            assert_eq!(updated_payouts[1].status, "failed"); // search_req_2 -> failed
+            assert_eq!(updated_payouts[2].status, "success"); // search_req_3 unchanged
+        });
     }
 
     #[actix_rt::test]
     async fn test_sync_failed_mural_payouts_to_labrinth_handles_wrong_status() {
-        with_test_environment(
-            None,
-            |env: TestEnvironment<ApiV3>| async move {
-                let db = &env.db.pool;
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let db = &env.db.pool;
 
-                // Setup test data
-                let uuid1 = uuid::Uuid::new_v4().to_string();
+            // Setup test data
+            let uuid1 = uuid::Uuid::new_v4().to_string();
 
-                setup_test_db_with_payouts(
-                    &db,
-                    vec![
-                        (1, uuid1.clone(), PayoutStatus::from_string("in_transit")),
-                    ],
-                )
-                .await
-                .unwrap();
+            setup_test_db_with_payouts(
+                &db,
+                vec![(
+                    1,
+                    uuid1.clone(),
+                    PayoutStatus::from_string("in_transit"),
+                )],
+            )
+            .await
+            .unwrap();
 
-                // Setup mock client with a payout that has unexpected status
-                let mut mock_client = MockMuralClient::new();
-                mock_client.add_search_result(
-                    create_mock_payout_request(&uuid1, muralpay::PayoutStatus::Pending), // Should be filtered out
-                );
+            // Setup mock client with a payout that has unexpected status
+            let mut mock_client = MockMuralClient::new();
+            mock_client.add_search_result(
+                create_mock_payout_request(
+                    &uuid1,
+                    muralpay::PayoutStatus::Pending,
+                ), // Should be filtered out
+            );
 
-                // Run the function - should handle this gracefully
-                let result = sync_failed_mural_payouts_to_labrinth_with_client(&db, &mock_client, 10).await;
-                assert!(result.is_ok());
+            // Run the function - should handle this gracefully
+            let result = sync_failed_mural_payouts_to_labrinth_with_client(
+                &db,
+                &mock_client,
+                10,
+            )
+            .await;
+            assert!(result.is_ok());
 
-                // Verify status remains unchanged
-                let payout = sqlx::query!(
-                    "SELECT status FROM payouts WHERE id = 1"
-                )
-                .fetch_one(db)
-                .await
-                .unwrap();
+            // Verify status remains unchanged
+            let payout =
+                sqlx::query!("SELECT status FROM payouts WHERE id = 1")
+                    .fetch_one(db)
+                    .await
+                    .unwrap();
 
-                assert_eq!(payout.status, "in_transit"); // Unchanged
-            },
-        );
+            assert_eq!(payout.status, "in_transit"); // Unchanged
+        });
     }
 
     #[actix_rt::test]
