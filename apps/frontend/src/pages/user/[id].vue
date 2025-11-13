@@ -318,7 +318,10 @@
 					</span>
 					<span v-else class="text">{{ formatMessage(messages.profileNoProjectsLabel) }}</span>
 				</div>
-				<div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
+				<div
+					v-if="!route.params.projectType || route.params.projectType === 'collections'"
+					class="collections-grid"
+				>
 					<nuxt-link
 						v-for="collection in collections.sort(
 							(a, b) => new Date(b.created) - new Date(a.created),
@@ -902,6 +905,7 @@ export default defineNuxtComponent({
 	}
 
 	gap: var(--gap-md);
+	margin-bottom: var(--gap-md);
 
 	.collection-item {
 		display: flex;
