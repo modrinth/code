@@ -133,6 +133,8 @@ async fn ingest_report(
     redis: web::Data<RedisPool>,
     web::Json(report): web::Json<DelphiReport>,
 ) -> Result<HttpResponse, ApiError> {
+    tracing::error!("!! INGEST !!");
+
     if report.issues.is_empty() {
         info!("No issues found for file {}", report.url);
         return Ok(HttpResponse::NoContent().finish());
