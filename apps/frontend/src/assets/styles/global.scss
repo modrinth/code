@@ -37,6 +37,7 @@ html {
 	--icon-32: 2rem;
 
 	interpolate-size: allow-keywords;
+	scrollbar-gutter: stable;
 }
 
 .light-mode {
@@ -89,7 +90,7 @@ html {
 	--color-hr: var(--color-text);
 
 	--color-table-border: #dfe2e5;
-	--color-table-alternate-row: #f2f4f7;
+	--color-table-alternate-row: #f0f1f2;
 
 	--landing-maze-bg: url('https://cdn.modrinth.com/landing-new/landing-light.webp');
 	--landing-maze-gradient-bg: url('https://cdn.modrinth.com/landing-new/landing-lower-light.webp');

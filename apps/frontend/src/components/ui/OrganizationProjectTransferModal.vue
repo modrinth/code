@@ -152,7 +152,7 @@ const onSubmitHandler = () => {
 	border-radius: var(--radius-md);
 	overflow: hidden;
 	margin-top: var(--gap-md);
-	border: 1px solid var(--color-button-bg);
+	border: 1px solid var(--color-divider);
 	background-color: var(--color-raised-bg);
 
 	.table-row {

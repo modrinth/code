@@ -164,23 +164,31 @@ function setColorFill(
 }
 
 const colorVariables = computed(() => {
+	const defaultShadow =
+		props.type === 'standard' || props.type === 'highlight' || props.highlighted
+			? 'var(--shadow-button)'
+			: 'none'
+
 	if (props.highlighted) {
 		const colors = {
 			bg:
 				props.highlightedStyle === 'main-nav-primary'
-					? 'var(--color-brand-highlight)'
+					? 'var(--color-button-bg-selected)'
 					: 'var(--color-button-bg)',
-			text: 'var(--color-contrast)',
+			text:
+				props.highlightedStyle === 'main-nav-primary'
+					? 'var(--color-button-text-selected)'
+					: 'var(--color-contrast)',
 			icon:
 				props.type === 'chip'
 					? 'var(--color-contrast)'
 					: props.highlightedStyle === 'main-nav-primary'
-						? 'var(--color-brand)'
+						? 'var(--color-button-text-selected)'
 						: 'var(--color-contrast)',
 		}
 		const hoverColors = JSON.parse(JSON.stringify(colors))
 		const boxShadow =
-			props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : 'none'
+			props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : defaultShadow
 		return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_icon: ${colors.icon}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_hover-icon: ${hoverColors.icon}; --_box-shadow: ${boxShadow};`
 	}
 
@@ -217,7 +225,8 @@ const colorVariables = computed(() => {
 		)
 	}
 
-	const boxShadow = props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : 'none'
+	const boxShadow =
+		props.type === 'chip' && colorVar.value ? `0 0 0 2px ${colorVar.value}` : defaultShadow
 	return `--_bg: ${colors.bg}; --_text: ${colors.text}; --_hover-bg: ${hoverColors.bg}; --_hover-text: ${hoverColors.text}; --_box-shadow: ${boxShadow};`
 })
 

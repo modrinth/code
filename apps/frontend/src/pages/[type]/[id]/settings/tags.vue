@@ -36,7 +36,7 @@
 			</p>
 			<template v-else>
 				<template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
-					<div class="label">
+					<div class="label mb-3">
 						<h4>
 							<span class="label__title">{{ formatCategoryHeader(header) }}</span>
 						</h4>
@@ -134,6 +134,7 @@
 
 <script setup lang="ts">
 import { SaveIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
+import { Checkbox } from '@modrinth/ui'
 import {
 	formatCategory,
 	formatCategoryHeader,
@@ -142,8 +143,6 @@ import {
 	sortedCategories,
 } from '@modrinth/utils'
 import { computed, ref } from 'vue'
-
-import Checkbox from '~/components/ui/Checkbox.vue'
 
 interface Category {
 	name: string
@@ -337,7 +336,7 @@ const saveChanges = () => {
 	margin-bottom: var(--spacing-card-md);
 
 	:deep(.category-selector) {
-		margin-bottom: 0.5rem;
+		margin-bottom: 0.75rem;
 
 		.category-selector__label {
 			display: flex;

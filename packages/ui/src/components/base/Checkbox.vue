@@ -1,31 +1,38 @@
 <template>
-	<div
-		class="checkbox-outer button-within"
-		:class="{ disabled }"
-		role="presentation"
+	<button
+		class="group bg-transparent border-none p-0 m-0 flex items-center gap-3 checkbox-outer outline-offset-4 text-contrast"
+		:disabled="disabled"
+		:class="
+			disabled
+				? 'cursor-not-allowed opacity-50'
+				: 'cursor-pointer hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]'
+		"
+		:aria-label="description"
+		:aria-checked="modelValue"
+		role="checkbox"
 		@click="toggle"
 	>
-		<button
-			class="checkbox border-none"
-			role="checkbox"
-			:disabled="disabled"
-			:class="{ checked: modelValue, collapsing: collapsingToggleStyle }"
-			:aria-label="description"
-			:aria-checked="modelValue"
+		<span
+			class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid"
+			:class="
+				(modelValue
+					? 'bg-brand border-button-border text-brand-inverted'
+					: 'bg-surface-2 border-surface-5') +
+				(disabled ? '' : ' checkbox-shadow group-active:scale-95')
+			"
 		>
-			<MinusIcon v-if="indeterminate" aria-hidden="true" />
-			<CheckIcon v-else-if="modelValue && !collapsingToggleStyle" aria-hidden="true" />
-			<DropdownIcon v-else-if="collapsingToggleStyle" aria-hidden="true" />
-		</button>
+			<MinusIcon v-if="indeterminate" aria-hidden="true" stroke-width="3" />
+			<CheckIcon v-else-if="modelValue" aria-hidden="true" stroke-width="3" />
+		</span>
 		<!-- aria-hidden is set so screenreaders only use the <button>'s aria-label -->
-		<p v-if="label" aria-hidden="true" class="checkbox-label">
+		<span v-if="label" aria-hidden="true">
 			{{ label }}
-		</p>
+		</span>
 		<slot v-else />
-	</div>
+	</button>
 </template>
 <script setup lang="ts">
-import { CheckIcon, DropdownIcon, MinusIcon } from '@modrinth/assets'
+import { CheckIcon, MinusIcon } from '@modrinth/assets'
 
 const emit = defineEmits<{
 	'update:modelValue': [boolean]
@@ -38,7 +45,6 @@ const props = withDefaults(
 		description?: string
 		modelValue: boolean
 		clickEvent?: () => void
-		collapsingToggleStyle?: boolean
 		indeterminate?: boolean
 	}>(),
 	{
@@ -47,7 +53,6 @@ const props = withDefaults(
 		description: '',
 		modelValue: false,
 		clickEvent: () => {},
-		collapsingToggleStyle: false,
 		indeterminate: false,
 	},
 )
@@ -60,86 +65,7 @@ function toggle() {
 </script>
 
 <style lang="scss" scoped>
-.checkbox-outer {
-	display: flex;
-	align-items: center;
-	cursor: pointer;
-
-	p {
-		user-select: none;
-		padding: 0.2rem 0;
-		margin: 0;
-	}
-
-	&.disabled {
-		cursor: not-allowed;
-	}
-}
-
-.checkbox {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-
-	min-width: 1rem;
-	min-height: 1rem;
-
-	padding: 0;
-	margin: 0 0.5rem 0 0;
-
-	color: var(--color-contrast);
-	background-color: var(--color-button-bg);
-	border-radius: var(--radius-xs);
-	box-shadow:
-		var(--shadow-inset-sm),
-		0 0 0 0 transparent;
-
-	&.checked {
-		background-color: var(--color-brand);
-
-		svg {
-			color: var(--color-accent-contrast);
-		}
-	}
-
-	svg {
-		color: var(--color-secondary);
-		stroke-width: 0.2rem;
-		height: 0.8rem;
-		width: 0.8rem;
-		flex-shrink: 0;
-	}
-
-	&.collapsing {
-		background-color: transparent !important;
-		box-shadow: none;
-
-		svg {
-			color: inherit;
-			height: 1rem;
-			width: 1rem;
-			transition: transform 0.25s ease-in-out;
-
-			@media (prefers-reduced-motion) {
-				transition: none !important;
-			}
-		}
-
-		&.checked {
-			svg {
-				transform: rotate(180deg);
-			}
-		}
-	}
-
-	&:disabled {
-		box-shadow: none;
-		cursor: not-allowed;
-	}
-}
-
-.checkbox-label {
-	color: var(--color-base);
+.checkbox-shadow {
+	box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.08);
 }
 </style>
