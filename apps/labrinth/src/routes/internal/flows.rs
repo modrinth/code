@@ -1046,6 +1046,9 @@ pub struct AuthorizationInit {
     #[serde(default)]
     pub provider: AuthProvider,
     pub token: Option<String>,
+    /// If the user is already logged in, and is linking a PayPal account,
+    /// this will be set to the user's auth token from the frontend.
+    pub auth_token: Option<String>,
 }
 #[derive(Serialize, Deserialize)]
 pub struct Authorization {
@@ -1068,16 +1071,21 @@ pub async fn init(
     //
     // This can happen when linking to a PayPal account (logging in) when already
     // logged in.
-    let existing_user_id = get_user_from_headers(
-        &req,
-        &**client,
-        &redis,
-        &session_queue,
-        Scopes::SESSION_ACCESS,
-    )
-    .await
-    .map(|(_, user)| DBUserId::from(user.id))
-    .ok();
+    let existing_user_id = if let Some(auth_token) = &info.auth_token {
+        get_user_record_from_bearer_token(
+            &req,
+            Some(auth_token),
+            &**client,
+            &redis,
+            &session_queue,
+        )
+        .await
+        .ok()
+        .flatten()
+        .map(|(_scopes, user)| user.id)
+    } else {
+        None
+    };
 
     let url =
         url::Url::parse(&info.url).map_err(|_| AuthenticationError::Url)?;
