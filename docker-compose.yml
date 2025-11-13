@@ -122,13 +122,18 @@ services:
     ports:
       - '59999:59999'
     environment:
-      LABRINTH_ENDPOINT: http://labrinth:8000/_internal/delphi/ingest
+      LABRINTH_ENDPOINT: http://host.docker.internal:8000/_internal/delphi/ingest
       LABRINTH_ADMIN_KEY: feedbeef
     healthcheck:
-      test: ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:59999/health']
+      test:
+        ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:59999/health']
       interval: 3s
       timeout: 5s
       retries: 3
+    extra_hosts:
+      # Delphi must send a message on a webhook to our backend,
+      # so it must have access to our local network
+      - 'host.docker.internal:host-gateway'
 volumes:
   meilisearch-data:
   db-data:
