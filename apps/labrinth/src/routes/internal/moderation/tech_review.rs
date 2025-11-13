@@ -14,21 +14,22 @@ use crate::{
         DBProject,
         models::{
             DBFileId, DBProjectId, DBThread, DBThreadId, DelphiReportId,
-            DelphiReportIssueId, ProjectTypeId,
+            DelphiReportIssueDetailsId, DelphiReportIssueId, ProjectTypeId,
             delphi_report_item::{
-                DBDelphiReportIssue, DBDelphiReportIssueDetails, DelphiSeverity,
+                DBDelphiReportIssue, DBDelphiReportIssueDetails,
+                DelphiReportIssueStatus, DelphiSeverity,
             },
         },
         redis::RedisPool,
     },
     models::{pats::Scopes, projects::Project, threads::Thread},
     queue::session::AuthQueue,
-    routes::ApiError,
+    routes::{ApiError, internal::moderation::Ownership},
     util::error::Context,
 };
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(search_projects);
+    cfg.service(search_projects).service(update_issue);
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
@@ -83,7 +84,7 @@ impl fmt::Display for SearchProjectsSort {
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectReview {
     pub project: Project,
-    pub project_owner: (),
+    pub project_owner: Ownership,
     pub thread: DBThread,
     pub reports: Vec<ProjectReport>,
 }
@@ -123,7 +124,7 @@ pub struct FileReview {
     /// Name of the flagged file.
     pub file_name: String,
     /// Size of the flagged file, in bytes.
-    pub file_size: u64,
+    pub file_size: i32,
     /// What issues appeared in the file.
     pub issues: Vec<FileIssue>,
 }
@@ -143,6 +144,8 @@ pub struct FileIssue {
     pub kind: String,
     /// How important is this issue, as flagged by Delphi?
     pub severity: DelphiSeverity,
+    /// Is this issue valid (malicious) or a false positive (safe)?
+    pub status: DelphiReportIssueStatus,
     /// Details of why this issue might have been raised, such as what file it
     /// was found in.
     pub details: Vec<FileIssueDetails>,
@@ -181,7 +184,9 @@ async fn search_projects(
     #[derive(Debug)]
     struct IssueRecord {
         file_name: String,
-        file_size: u64,
+        file_size: i32,
+        issue_type: String,
+        details: IndexMap<DelphiReportIssueDetailsId, FileIssueDetails>,
     }
 
     check_is_moderator_from_headers(
@@ -214,10 +219,11 @@ async fn search_projects(
             m.id AS "project_id!: DBProjectId",
             t.id AS "project_thread_id!: DBThreadId",
             dr.created AS "report_created!",
-            dri.id AS "issue_id",
+            dri.id AS "issue_id?: DelphiReportIssueId",
             dri.issue_type AS "issue_type?",
             f.filename AS "file_name?",
             f.size AS "file_size?",
+            drid.id AS "issue_detail_id?: DelphiReportIssueDetailsId",
             drid.internal_class_name AS "issue_detail_class_name?",
             drid.decompiled_source AS "issue_detail_decompiled_source?",
             drid.severity AS "issue_detail_severity?: DelphiSeverity"
@@ -277,21 +283,46 @@ async fn search_projects(
                 }
             });
         let report =
-            project
-                .reports
-                .entry(row.report_id)
-                .or_insert(|| ReportRecord {
+            project.reports.entry(row.report_id).or_insert_with(|| {
+                ReportRecord {
                     created: row.report_created,
                     issues: IndexMap::new(),
+                }
+            });
+
+        let (
+            Some(issue_id),
+            Some(file_name),
+            Some(file_size),
+            Some(issue_type),
+        ) = (row.issue_id, row.file_name, row.file_size, row.issue_type)
+        else {
+            continue;
+        };
+        let issue =
+            report
+                .issues
+                .entry(issue_id)
+                .or_insert_with(|| IssueRecord {
+                    file_name,
+                    file_size,
+                    issue_type,
+                    details: IndexMap::new(),
                 });
-        // report.issues.entry(row.issue).or_inser
-        // .push(ReportRecord {
-        //     created: row.report_created,
-        //     issues:
-        //     flag_reason: FlagReason::Delphi,
-        //     files:
-        //     created: row.report_created,
-        // });
+
+        let (Some(issue_detail_id), Some(class_name), Some(decompiled_source)) = (
+            row.issue_detail_id,
+            row.issue_detail_class_name,
+            row.issue_detail_decompiled_source,
+        ) else {
+            continue;
+        };
+        issue.details.entry(issue_detail_id).or_insert_with(|| {
+            FileIssueDetails {
+                class_name,
+                decompiled_source,
+            }
+        });
     }
 
     let projects = DBProject::get_many_ids(&project_ids, &**pool, &redis)
@@ -335,6 +366,15 @@ async fn search_projects(
                             .map(|(_, issue_record)| FileReview {
                                 file_name: issue_record.file_name,
                                 file_size: issue_record.file_size,
+                                issues: issue_record
+                                    .details
+                                    .into_iter()
+                                    .map(|(issue_id, detail)| FileIssue {
+                                        issue_id,
+                                        kind: issue_record,
+                                        kind: details,
+                                    })
+                                    .collect(),
                             })
                             .collect(),
                     })
@@ -344,4 +384,47 @@ async fn search_projects(
         .collect::<Result<Vec<_>, _>>()?;
 
     Ok(web::Json(projects))
+}
+
+/// Updates the state of a technical review issue.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct UpdateIssue {
+    /// Status to set the issue to.
+    pub status: DelphiReportIssueStatus,
+}
+
+#[utoipa::path]
+#[post("/issue/{id}")]
+async fn update_issue(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    update_req: web::Json<UpdateIssue>,
+    path: web::Path<(DelphiReportIssueId,)>,
+) -> Result<(), ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await?;
+    let (issue_id,) = path.into_inner();
+
+    sqlx::query!(
+        "
+        UPDATE delphi_report_issues
+        SET status = $1
+        WHERE id = $2
+        ",
+        update_req.status as DelphiReportIssueStatus,
+        issue_id as DelphiReportIssueId,
+    )
+    .execute(&**pool)
+    .await
+    .wrap_internal_err("failed to update issue")?;
+
+    Ok(())
 }

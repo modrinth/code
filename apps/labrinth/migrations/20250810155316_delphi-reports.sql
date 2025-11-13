@@ -1,6 +1,6 @@
 CREATE TYPE delphi_severity AS ENUM ('low', 'medium', 'high', 'severe');
 
-CREATE TYPE delphi_report_issue_status AS ENUM ('pending', 'approved', 'rejected');
+CREATE TYPE delphi_report_issue_status AS ENUM ('pending', 'safe', 'unsafe');
 
 -- A Delphi analysis report for a project version
 CREATE TABLE delphi_reports (
