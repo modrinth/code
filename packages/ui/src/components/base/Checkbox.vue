@@ -23,11 +23,10 @@
 		>
 			<MinusIcon v-if="indeterminate" aria-hidden="true" stroke-width="3" />
 			<CheckIcon
-				v-else-if="modelValue && !collapsingToggleStyle"
+				v-else-if="modelValue"
 				aria-hidden="true"
 				stroke-width="3"
 			/>
-			<DropdownIcon v-else-if="collapsingToggleStyle" stroke-width="3" aria-hidden="true" />
 		</span>
 		<!-- aria-hidden is set so screenreaders only use the <button>'s aria-label -->
 		<span v-if="label" aria-hidden="true">
@@ -37,7 +36,7 @@
 	</button>
 </template>
 <script setup lang="ts">
-import { CheckIcon, DropdownIcon, MinusIcon } from '@modrinth/assets'
+import { CheckIcon, MinusIcon } from '@modrinth/assets'
 
 const emit = defineEmits<{
 	'update:modelValue': [boolean]
@@ -50,7 +49,6 @@ const props = withDefaults(
 		description?: string
 		modelValue: boolean
 		clickEvent?: () => void
-		collapsingToggleStyle?: boolean
 		indeterminate?: boolean
 	}>(),
 	{
@@ -59,7 +57,6 @@ const props = withDefaults(
 		description: '',
 		modelValue: false,
 		clickEvent: () => {},
-		collapsingToggleStyle: false,
 		indeterminate: false,
 	},
 )

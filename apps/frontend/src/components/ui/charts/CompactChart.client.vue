@@ -162,7 +162,7 @@ defineExpose({
 	border: 1px solid var(--color-divider);
 	border-radius: var(--radius-md);
 	background-color: var(--color-raised-bg);
-	box-shadow: var(--shadow-floating);
+	box-shadow: var(--shadow-card);
 
 	color: var(--color-base);
 	font-size: var(--font-size-nm);
