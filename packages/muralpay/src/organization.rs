@@ -15,6 +15,8 @@ impl MuralPay {
         &self,
         req: SearchRequest,
     ) -> Result<SearchResponse<OrganizationId, Organization>, MuralError> {
+        mock!(self, search_organizations(req.clone()));
+
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body {
@@ -64,6 +66,8 @@ impl MuralPay {
         &self,
         id: OrganizationId,
     ) -> Result<Organization, MuralError> {
+        mock!(self, get_organization(id));
+
         self.http_post(|base| format!("{base}/api/organizations/{id}"))
             .send_mural()
             .await

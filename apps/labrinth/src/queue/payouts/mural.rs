@@ -2,9 +2,7 @@ use ariadne::ids::UserId;
 use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
-use muralpay::{
-    MuralError, MuralPay, PayoutRequest, PayoutRequestId, TokenFeeRequest,
-};
+use muralpay::{MuralError, MuralPay, TokenFeeRequest};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -20,48 +18,6 @@ use crate::{
         gotenberg::{GotenbergClient, PaymentStatement},
     },
 };
-
-#[async_trait::async_trait]
-pub trait MuralClient: Send + Sync {
-    async fn get_payout_request(
-        &self,
-        id: PayoutRequestId,
-    ) -> Result<PayoutRequest, MuralError>;
-    async fn search_payout_requests(
-        &self,
-        status_filter: Option<muralpay::PayoutStatusFilter>,
-        search_params: Option<
-            muralpay::SearchParams<muralpay::PayoutRequestId>,
-        >,
-    ) -> Result<
-        muralpay::SearchResponse<muralpay::PayoutRequestId, PayoutRequest>,
-        MuralError,
-    >;
-}
-
-#[async_trait::async_trait]
-impl MuralClient for MuralPay {
-    async fn get_payout_request(
-        &self,
-        id: PayoutRequestId,
-    ) -> Result<PayoutRequest, MuralError> {
-        self.get_payout_request(id).await
-    }
-
-    async fn search_payout_requests(
-        &self,
-        status_filter: Option<muralpay::PayoutStatusFilter>,
-        search_params: Option<
-            muralpay::SearchParams<muralpay::PayoutRequestId>,
-        >,
-    ) -> Result<
-        muralpay::SearchResponse<muralpay::PayoutRequestId, PayoutRequest>,
-        MuralError,
-    > {
-        self.search_payout_requests(status_filter, search_params)
-            .await
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
@@ -309,16 +265,6 @@ pub async fn sync_pending_payouts_from_mural(
     mural: &MuralPay,
     limit: u32,
 ) -> eyre::Result<()> {
-    sync_pending_payouts_from_mural_with_client(db, mural, limit).await
-}
-
-/// Internal version of [`sync_pending_payouts_from_mural`] that accepts any
-/// [`MuralClient`] implementation for testing.
-async fn sync_pending_payouts_from_mural_with_client<M: MuralClient>(
-    db: &PgPool,
-    mural: &M,
-    limit: u32,
-) -> eyre::Result<()> {
     #[derive(Debug)]
     struct UpdatePayoutOp {
         payout_id: i64,
@@ -423,16 +369,6 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
     mural: &MuralPay,
     limit: u32,
 ) -> eyre::Result<()> {
-    sync_failed_mural_payouts_to_labrinth_with_client(db, mural, limit).await
-}
-
-/// Internal version of [`sync_failed_mural_payouts_to_labrinth`] that accepts
-/// any [`MuralClient`] implementation for testing.
-async fn sync_failed_mural_payouts_to_labrinth_with_client<M: MuralClient>(
-    db: &PgPool,
-    mural: &M,
-    limit: u32,
-) -> eyre::Result<()> {
     let mut next_id = None;
     loop {
         let search_resp = mural
@@ -505,78 +441,17 @@ async fn sync_failed_mural_payouts_to_labrinth_with_client<M: MuralClient>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        queue::payouts::mural::MuralClient,
-        test::{
-            api_v3::ApiV3,
-            environment::{TestEnvironment, with_test_environment},
-        },
+    use crate::test::{
+        api_v3::ApiV3,
+        environment::{TestEnvironment, with_test_environment},
     };
-    use std::collections::HashMap;
-
-    struct MockMuralClient {
-        payout_requests: HashMap<String, PayoutRequest>,
-        search_results: Vec<PayoutRequest>,
-    }
-
-    impl MockMuralClient {
-        fn new() -> Self {
-            Self {
-                payout_requests: HashMap::new(),
-                search_results: Vec::new(),
-            }
-        }
-
-        fn add_payout_request(&mut self, id: &str, request: PayoutRequest) {
-            self.payout_requests.insert(id.to_string(), request);
-        }
-
-        fn add_search_result(&mut self, request: PayoutRequest) {
-            self.search_results.push(request);
-        }
-    }
-
-    #[async_trait::async_trait]
-    impl MuralClient for MockMuralClient {
-        async fn get_payout_request(
-            &self,
-            id: PayoutRequestId,
-        ) -> Result<PayoutRequest, MuralError> {
-            let id_str = id.to_string();
-            match self.payout_requests.get(&id_str) {
-                Some(request) => Ok(request.clone()),
-                None => Err(MuralError::Api(muralpay::ApiError {
-                    error_instance_id: uuid::Uuid::new_v4(),
-                    name: "Not found".to_string(),
-                    message: "Payout request not found".to_string(),
-                    details: vec![],
-                    params: std::collections::HashMap::new(),
-                })),
-            }
-        }
-
-        async fn search_payout_requests(
-            &self,
-            _status_filter: Option<muralpay::PayoutStatusFilter>,
-            _search_params: Option<
-                muralpay::SearchParams<muralpay::PayoutRequestId>,
-            >,
-        ) -> Result<
-            muralpay::SearchResponse<muralpay::PayoutRequestId, PayoutRequest>,
-            MuralError,
-        > {
-            Ok(muralpay::SearchResponse {
-                total: self.search_results.len() as u64,
-                results: self.search_results.clone(),
-                next_id: None,
-            })
-        }
-    }
+    use muralpay::MuralPay;
+    use muralpay::mock::MuralPayMock;
 
     fn create_mock_payout_request(
         id: &str,
         status: muralpay::PayoutStatus,
-    ) -> PayoutRequest {
+    ) -> muralpay::PayoutRequest {
         use muralpay::*;
 
         PayoutRequest {
@@ -587,22 +462,30 @@ mod tests {
             transaction_hash: None,
             memo: None,
             status,
-            payouts: vec![Payout {
-                id: PayoutId(uuid::Uuid::new_v4()),
-                created_at: chrono::Utc::now(),
-                updated_at: chrono::Utc::now(),
-                amount: TokenAmount {
-                    token_symbol: USDC.to_string(),
-                    token_amount: rust_decimal::Decimal::from(100),
-                },
-                details: PayoutDetails::Blockchain(BlockchainPayoutDetails {
-                    wallet_address:
-                        "0x1234567890123456789012345678901234567890".to_string(),
-                    blockchain: Blockchain::Polygon,
-                    status: BlockchainPayoutStatus::Pending,
-                }),
-            }],
+            payouts: vec![],
         }
+    }
+
+    fn create_mock_muralpay() -> MuralPay {
+        MuralPay::from_mock(MuralPayMock {
+            get_payout_request: Box::new(|_id| {
+                Err(muralpay::MuralError::Api(muralpay::ApiError {
+                    error_instance_id: uuid::Uuid::new_v4(),
+                    name: "Not found".to_string(),
+                    message: "Payout request not found".to_string(),
+                    details: vec![],
+                    params: std::collections::HashMap::new(),
+                }))
+            }),
+            search_payout_requests: Box::new(|_filter, _params| {
+                Ok(muralpay::SearchResponse {
+                    total: 0,
+                    next_id: None,
+                    results: vec![],
+                })
+            }),
+            ..Default::default()
+        })
     }
 
     async fn setup_test_db_with_payouts(
@@ -669,44 +552,70 @@ mod tests {
             assert_eq!(updated_payouts[2].status, PayoutStatus::Cancelling);
             assert_eq!(updated_payouts[3].status, PayoutStatus::InTransit);
 
-            // Setup mock client
-            let mut mock_client = MockMuralClient::new();
-            mock_client.add_payout_request(
+            // Setup mock client with proper responses
+            let mut mock = MuralPayMock::default();
+
+            // Create mock payout requests
+            let payout1 = create_mock_payout_request(
                 &uuid1,
-                create_mock_payout_request(
-                    &uuid1,
-                    muralpay::PayoutStatus::Executed,
-                ),
+                muralpay::PayoutStatus::Executed,
             );
-            mock_client.add_payout_request(
+            let payout2 = create_mock_payout_request(
                 &uuid2,
-                create_mock_payout_request(
-                    &uuid2,
-                    muralpay::PayoutStatus::Canceled,
-                ),
+                muralpay::PayoutStatus::Canceled,
             );
-            mock_client.add_payout_request(
+            let payout3 = create_mock_payout_request(
                 &uuid3,
-                create_mock_payout_request(
-                    &uuid3,
-                    muralpay::PayoutStatus::Failed,
-                ),
+                muralpay::PayoutStatus::Failed,
             );
-            mock_client.add_payout_request(
+            let payout4 = create_mock_payout_request(
                 &uuid4,
-                create_mock_payout_request(
-                    &uuid4,
-                    muralpay::PayoutStatus::Pending,
-                ), // Still pending
+                muralpay::PayoutStatus::Pending,
             );
 
+            // Mock get_payout_request
+            let payout_requests = std::collections::HashMap::from([
+                (uuid1.clone(), payout1.clone()),
+                (uuid2.clone(), payout2.clone()),
+                (uuid3.clone(), payout3.clone()),
+                (uuid4.clone(), payout4.clone()),
+            ]);
+
+            mock.get_payout_request = Box::new(move |id| {
+                let id_str = id.to_string();
+                match payout_requests.get(&id_str) {
+                    Some(request) => Ok(request.clone()),
+                    None => {
+                        Err(muralpay::MuralError::Api(muralpay::ApiError {
+                            error_instance_id: uuid::Uuid::new_v4(),
+                            name: "Not found".to_string(),
+                            message: "Payout request not found".to_string(),
+                            details: vec![],
+                            params: std::collections::HashMap::new(),
+                        }))
+                    }
+                }
+            });
+
+            // Mock search_payout_requests
+            mock.search_payout_requests = Box::new(move |_filter, _params| {
+                Ok(muralpay::SearchResponse {
+                    total: 4,
+                    results: vec![
+                        payout1.clone(),
+                        payout2.clone(),
+                        payout3.clone(),
+                        payout4.clone(),
+                    ],
+                    next_id: None,
+                })
+            });
+
+            let mock_client = MuralPay::from_mock(mock);
+
             // Run the function
-            let result = sync_pending_payouts_from_mural_with_client(
-                db,
-                &mock_client,
-                10,
-            )
-            .await;
+            let result =
+                sync_pending_payouts_from_mural(db, &mock_client, 10).await;
             assert!(result.is_ok());
 
             // Verify results
@@ -752,10 +661,10 @@ mod tests {
                 .await
                 .unwrap();
 
-            let mock_client = MockMuralClient::new();
+            let mock_client = create_mock_muralpay();
 
             // Run the function - should not fail even with null platform_id
-            sync_pending_payouts_from_mural_with_client(
+            sync_pending_payouts_from_mural(
                 db,
                 &mock_client,
                 10,
@@ -786,29 +695,41 @@ mod tests {
             .unwrap();
 
             // Setup mock client
-            let mut mock_client = MockMuralClient::new();
-            mock_client.add_search_result(create_mock_payout_request(
+            let mut mock = MuralPayMock::default();
+
+            // Create mock payout requests
+            let payout1 = create_mock_payout_request(
                 &uuid1,
                 muralpay::PayoutStatus::Canceled,
-            ));
-            mock_client.add_search_result(create_mock_payout_request(
+            );
+            let payout2 = create_mock_payout_request(
                 &uuid2,
                 muralpay::PayoutStatus::Failed,
-            ));
-            mock_client.add_search_result(
-                create_mock_payout_request(
-                    &uuid::Uuid::new_v4().to_string(),
-                    muralpay::PayoutStatus::Failed,
-                ), // No matching DB record
             );
+            let payout3 = create_mock_payout_request(
+                &uuid::Uuid::new_v4().to_string(),
+                muralpay::PayoutStatus::Failed,
+            ); // No matching DB record
+
+            // Mock search_payout_requests
+            mock.search_payout_requests = Box::new(move |_filter, _params| {
+                Ok(muralpay::SearchResponse {
+                    total: 3,
+                    results: vec![
+                        payout1.clone(),
+                        payout2.clone(),
+                        payout3.clone(),
+                    ],
+                    next_id: None,
+                })
+            });
+
+            let mock_client = MuralPay::from_mock(mock);
 
             // Run the function
-            let result = sync_failed_mural_payouts_to_labrinth_with_client(
-                db,
-                &mock_client,
-                10,
-            )
-            .await;
+            let result =
+                sync_failed_mural_payouts_to_labrinth(db, &mock_client, 10)
+                    .await;
             assert!(result.is_ok());
 
             // Verify results
@@ -849,16 +770,26 @@ mod tests {
             .unwrap();
 
             // Setup mock client with a payout that has unexpected status
-            let mut mock_client = MockMuralClient::new();
-            mock_client.add_search_result(
-                create_mock_payout_request(
-                    &uuid1,
-                    muralpay::PayoutStatus::Pending,
-                ), // Should be filtered out
-            );
+            let mut mock = MuralPayMock::default();
+
+            let payout1 = create_mock_payout_request(
+                &uuid1,
+                muralpay::PayoutStatus::Pending,
+            ); // Should be filtered out
+
+            // Mock search_payout_requests
+            mock.search_payout_requests = Box::new(move |_filter, _params| {
+                Ok(muralpay::SearchResponse {
+                    total: 1,
+                    results: vec![payout1.clone()],
+                    next_id: None,
+                })
+            });
+
+            let mock_client = MuralPay::from_mock(mock);
 
             // Run the function - should handle this gracefully
-            sync_failed_mural_payouts_to_labrinth_with_client(
+            sync_failed_mural_payouts_to_labrinth(
                 db,
                 &mock_client,
                 10,
