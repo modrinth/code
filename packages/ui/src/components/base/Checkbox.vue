@@ -22,11 +22,7 @@
 			"
 		>
 			<MinusIcon v-if="indeterminate" aria-hidden="true" stroke-width="3" />
-			<CheckIcon
-				v-else-if="modelValue"
-				aria-hidden="true"
-				stroke-width="3"
-			/>
+			<CheckIcon v-else-if="modelValue" aria-hidden="true" stroke-width="3" />
 		</span>
 		<!-- aria-hidden is set so screenreaders only use the <button>'s aria-label -->
 		<span v-if="label" aria-hidden="true">

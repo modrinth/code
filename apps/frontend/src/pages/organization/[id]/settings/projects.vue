@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<NewModal ref="editLinksModal" header="Edit links">
-			<div class="universal-modal !p-0 links-modal">
+			<div class="universal-modal links-modal !p-0">
 				<p>
 					Any links you specify below will be overwritten on each of the selected projects. Any you
 					leave blank will be ignored. You can clear a link from all selected projects using the
@@ -228,7 +228,11 @@
 						<div>Status</div>
 						<div />
 					</div>
-					<div v-for="project in sortedProjects" :key="`project-${project.id}`" class="grid-table__row">
+					<div
+						v-for="project in sortedProjects"
+						:key="`project-${project.id}`"
+						class="grid-table__row"
+					>
 						<div>
 							<Checkbox
 								:disabled="(project.permissions & EDIT_DETAILS) === EDIT_DETAILS"
@@ -279,7 +283,11 @@
 						</div>
 
 						<div>
-							{{ formatProjectType(getProjectTypeForUrl(project.project_types[0] ?? 'project', project.loaders)) }}
+							{{
+								formatProjectType(
+									getProjectTypeForUrl(project.project_types[0] ?? 'project', project.loaders),
+								)
+							}}
 						</div>
 
 						<div>
@@ -332,8 +340,8 @@ import { Multiselect } from 'vue-multiselect'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import OrganizationProjectTransferModal from '~/components/ui/OrganizationProjectTransferModal.vue'
-import { injectOrganizationContext } from '~/providers/organization-context.ts'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
+import { injectOrganizationContext } from '~/providers/organization-context.ts'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

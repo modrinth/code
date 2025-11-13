@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<NewModal ref="editLinksModal" header="Edit links">
-			<div class="universal-modal !p-0 links-modal">
+			<div class="universal-modal links-modal !p-0">
 				<p>
 					Any links you specify below will be overwritten on each of the selected projects. Any you
 					leave blank will be ignored. You can clear a link from all selected projects using the
@@ -334,7 +334,8 @@ import {
 	CopyCode,
 	injectNotificationManager,
 	NewModal,
-	ProjectStatusBadge} from '@modrinth/ui'
+	ProjectStatusBadge,
+} from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
