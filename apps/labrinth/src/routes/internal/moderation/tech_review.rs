@@ -94,6 +94,8 @@ pub struct ProjectReport {
     pub created_at: DateTime<Utc>,
     /// Why this project was flagged.
     pub flag_reason: FlagReason,
+    /// According to this report, how likely is the project malicious?
+    pub severity: DelphiSeverity,
     /// What files were flagged in this review.
     pub files: Vec<FileReview>,
 }
@@ -141,8 +143,6 @@ pub struct FileIssue {
     /// Labrinth does not know the full set of kinds of issues, so this is kept
     /// as a string.
     pub kind: String,
-    /// How important is this issue, as flagged by Delphi?
-    pub severity: DelphiSeverity,
     /// Is this issue valid (malicious) or a false positive (safe)?
     pub status: DelphiReportIssueStatus,
     /// Details of why this issue might have been raised, such as what file it
@@ -157,6 +157,8 @@ pub struct FileIssueDetail {
     pub class_name: String,
     /// Decompiled, pretty-printed source of the Java class.
     pub decompiled_source: String,
+    /// How important is this issue, as flagged by Delphi?
+    pub severity: DelphiSeverity,
 }
 
 /// Searches all projects which are awaiting technical review.
@@ -177,6 +179,7 @@ async fn search_projects(
     #[derive(Debug)]
     struct ReportRecord {
         created: DateTime<Utc>,
+        severity: DelphiSeverity,
         files: IndexMap<DBFileId, FileRecord>,
     }
 
@@ -227,6 +230,7 @@ async fn search_projects(
             m.id AS "project_id!: DBProjectId",
             t.id AS "project_thread_id!: DBThreadId",
             dr.created AS "report_created!",
+            dr.severity AS "report_severity!: DelphiSeverity",
             dri.id AS "issue_id!: DelphiReportIssueId",
             dri.issue_type AS "issue_type!",
             dri.status AS "issue_status!: DelphiReportIssueStatus",
@@ -294,6 +298,7 @@ async fn search_projects(
             project.reports.entry(row.report_id).or_insert_with(|| {
                 ReportRecord {
                     created: row.report_created,
+                    severity: row.report_severity,
                     files: IndexMap::new(),
                 }
             });
@@ -315,17 +320,25 @@ async fn search_projects(
                     details: IndexMap::new(),
                 });
 
-        let (Some(issue_detail_id), Some(class_name), Some(decompiled_source)) = (
+        let (
+            Some(issue_detail_id),
+            Some(class_name),
+            Some(decompiled_source),
+            Some(severity),
+        ) = (
             row.issue_detail_id,
             row.issue_detail_class_name,
             row.issue_detail_decompiled_source,
-        ) else {
+            row.issue_detail_severity,
+        )
+        else {
             continue;
         };
         issue.details.entry(issue_detail_id).or_insert_with(|| {
             FileIssueDetail {
                 class_name,
                 decompiled_source,
+                severity,
             }
         });
     }
@@ -382,6 +395,7 @@ async fn search_projects(
                     .map(|(_, report_record)| ProjectReport {
                         created_at: report_record.created,
                         flag_reason: FlagReason::Delphi,
+                        severity: report_record.severity,
                         files: report_record
                             .files
                             .into_iter()
@@ -404,6 +418,7 @@ async fn search_projects(
                                                         .class_name,
                                                     decompiled_source: detail
                                                         .decompiled_source,
+                                                    severity: detail.severity,
                                                 }
                                             })
                                             .collect(),
