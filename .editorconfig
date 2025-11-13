@@ -23,3 +23,6 @@ indent_style = space
 
 [*.rs]
 indent_style = space
+
+[*.{js,vue}]
+indent_size = 4

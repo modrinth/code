@@ -76,6 +76,7 @@ import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { list } from '@/helpers/profile.js'
+import { check_reachable } from '@/helpers/auth.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import {
@@ -295,6 +296,16 @@ async function setupApp() {
 		settings.pending_update_toast_for_version = null
 		await setSettings(settings)
 	}
+	
+	check_reachable().then((_resp) => {
+		console.log("Auth servers are reachable")
+	}).catch((err) => {
+		criticalErrorMessage.value = {
+			header: "Cannot reach authentication servers",
+			body: "Minecraft authentication servers may be down right now. Check your internet connection and try again later"
+		};
+		console.warn("Failed to reach auth servers", err)
+	})
 
 	if (osType === 'windows') {
 		await processPendingSurveys()

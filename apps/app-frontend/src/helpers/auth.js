@@ -14,6 +14,14 @@ import { invoke } from '@tauri-apps/api/core'
 // }
 
 /**
+ * Check if the authentication servers are reachable, throwing an exception if
+ * not reachable.
+ */
+export async function check_reachable() {
+  await invoke('plugin:auth|check_reachable')
+}
+
+/**
  * Authenticate a user with Hydra - part 1.
  * This begins the authentication flow quasi-synchronously.
  *
@@ -22,7 +30,7 @@ import { invoke } from '@tauri-apps/api/core'
  * @property {string} user_code - The code to enter on the verification_uri page.
  */
 export async function login() {
-	return await invoke('plugin:auth|login')
+  return await invoke('plugin:auth|login')
 }
 
 /**
@@ -30,7 +38,7 @@ export async function login() {
  * @return {Promise<UUID | undefined>}
  */
 export async function get_default_user() {
-	return await invoke('plugin:auth|get_default_user')
+  return await invoke('plugin:auth|get_default_user')
 }
 
 /**
@@ -38,7 +46,7 @@ export async function get_default_user() {
  * @param {UUID} user
  */
 export async function set_default_user(user) {
-	return await invoke('plugin:auth|set_default_user', { user })
+  return await invoke('plugin:auth|set_default_user', { user })
 }
 
 /**
@@ -46,7 +54,7 @@ export async function set_default_user(user) {
  * @param {UUID} user
  */
 export async function remove_user(user) {
-	return await invoke('plugin:auth|remove_user', { user })
+  return await invoke('plugin:auth|remove_user', { user })
 }
 
 /**
@@ -54,5 +62,5 @@ export async function remove_user(user) {
  * @returns {Promise<Credential[]>}
  */
 export async function users() {
-	return await invoke('plugin:auth|get_users')
+  return await invoke('plugin:auth|get_users')
 }
