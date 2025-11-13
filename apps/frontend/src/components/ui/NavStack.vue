@@ -1,6 +1,8 @@
 <template>
 	<nav :aria-label="ariaLabel" class="w-full">
-		<ul class="m-0 flex list-none flex-col items-start gap-1.5 rounded-2xl bg-bg-raised p-4">
+		<ul
+			class="card-shadow m-0 flex list-none flex-col items-start gap-1.5 rounded-2xl bg-bg-raised p-4"
+		>
 			<slot v-if="hasSlotContent" />
 
 			<template v-else>

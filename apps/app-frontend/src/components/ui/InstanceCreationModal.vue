@@ -34,7 +34,7 @@
 			</div>
 			<div class="input-row">
 				<p class="input-label">Game version</p>
-				<div class="versions">
+				<div class="flex gap-4 items-center">
 					<multiselect
 						v-model="game_version"
 						class="selector"
@@ -45,7 +45,7 @@
 						open-direction="top"
 						:show-labels="false"
 					/>
-					<Checkbox v-model="showSnapshots" class="filter-checkbox" label="Show all versions" />
+					<Checkbox v-model="showSnapshots" class="shrink-0" label="Show all versions" />
 				</div>
 			</div>
 			<div v-if="loader !== 'vanilla'" class="input-row">
@@ -544,12 +544,6 @@ const next = async () => {
 
 .warning {
 	font-style: italic;
-}
-
-.versions {
-	display: flex;
-	flex-direction: row;
-	gap: 1rem;
 }
 
 :deep(button.checkbox) {

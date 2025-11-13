@@ -88,7 +88,10 @@
 						</button>
 					</ButtonStyled>
 				</div>
-				<div v-if="server && projectType.id === 'modpack'" class="rounded-2xl bg-bg-raised">
+				<div
+					v-if="server && projectType.id === 'modpack'"
+					class="card-shadow rounded-2xl bg-bg-raised"
+				>
 					<div class="flex flex-row items-center gap-2 px-6 py-4 text-contrast">
 						<h3 class="m-0 text-lg">Options</h3>
 					</div>
@@ -107,7 +110,10 @@
 						the selected modpack.
 					</div>
 				</div>
-				<div v-if="server && projectType.id !== 'modpack'" class="rounded-2xl bg-bg-raised p-4">
+				<div
+					v-if="server && projectType.id !== 'modpack'"
+					class="card-shadow rounded-2xl bg-bg-raised p-4"
+				>
 					<Checkbox
 						v-model="serverHideInstalled"
 						label="Hide installed content"
@@ -126,7 +132,7 @@
 					:class="
 						filtersMenuOpen
 							? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
-							: 'rounded-2xl bg-bg-raised'
+							: 'card-shadow rounded-2xl bg-bg-raised'
 					"
 					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
 					content-class="mb-4 mx-3"

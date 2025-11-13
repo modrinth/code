@@ -40,7 +40,7 @@
 
 			<div class="flex flex-col">
 				<div
-					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-1.5 md:p-2"
+					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-divider p-1.5 md:p-2"
 				>
 					<span class="my-auto flex flex-row items-center gap-2 text-sm leading-none md:text-base"
 						><span
@@ -58,7 +58,7 @@
 				<div
 					v-for="(date, i) in dateSegments"
 					:key="date.date"
-					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-button-bg p-1.5 md:p-2"
+					class="flex flex-row justify-between border-0 !border-b-[2px] border-solid border-divider p-1.5 md:p-2"
 				>
 					<span class="my-auto flex flex-row items-center gap-2 text-sm leading-none md:text-base">
 						<span
@@ -123,7 +123,7 @@
 			}}</span>
 			<div class="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-2 lg:grid-cols-3">
 				<button
-					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-700 p-4 text-inverted shadow-md transition-all duration-200 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 md:p-5"
+					class="relative flex flex-col overflow-hidden rounded-2xl bg-gradient-to-r from-green to-green-700 p-4 text-inverted shadow-md transition-all duration-200 hover:brightness-105 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100 md:p-5"
 					:disabled="hasTinMismatch"
 					@click="openWithdrawModal"
 				>

@@ -261,9 +261,14 @@ import {
 	SendIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { CopyCode, injectNotificationManager, MarkdownEditor, OverflowMenu } from '@modrinth/ui'
+import {
+	Checkbox,
+	CopyCode,
+	injectNotificationManager,
+	MarkdownEditor,
+	OverflowMenu,
+} from '@modrinth/ui'
 
-import Checkbox from '~/components/ui/Checkbox.vue'
 import Modal from '~/components/ui/Modal.vue'
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'

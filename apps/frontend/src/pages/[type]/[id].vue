@@ -547,14 +547,8 @@
 								</div>
 							</template>
 						</Tooltip>
-						<ClientOnly>
-							<ButtonStyled
-								size="large"
-								circular
-								:color="following ? 'red' : 'standard'"
-								color-fill="none"
-								hover-color-fill="background"
-							>
+						<ButtonStyled size="large" circular>
+							<ClientOnly>
 								<button
 									v-if="auth.user"
 									v-tooltip="
@@ -579,94 +573,74 @@
 								>
 									<HeartIcon aria-hidden="true" />
 								</nuxt-link>
-							</ButtonStyled>
-							<ButtonStyled size="large" circular>
-								<PopoutMenu
-									v-if="auth.user"
-									:tooltip="
-										collections.some((x) => x.projects.includes(project.id))
-											? formatMessage(commonMessages.savedLabel)
-											: formatMessage(commonMessages.saveButton)
-									"
-									from="top-right"
-									:aria-label="formatMessage(commonMessages.saveButton)"
-									:dropdown-id="`${baseId}-save`"
-								>
-									<BookmarkIcon
-										aria-hidden="true"
-										:fill="
-											collections.some((x) => x.projects.includes(project.id))
-												? 'currentColor'
-												: 'none'
-										"
-									/>
-									<template #menu>
-										<input
-											v-model="displayCollectionsSearch"
-											type="text"
-											:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-											class="search-input menu-search"
-										/>
-										<div v-if="collections.length > 0" class="collections-list text-primary">
-											<Checkbox
-												v-for="option in collections
-													.slice()
-													.sort((a, b) => a.name.localeCompare(b.name))"
-												:key="option.id"
-												:model-value="option.projects.includes(project.id)"
-												class="popout-checkbox"
-												@update:model-value="() => onUserCollectProject(option, project.id)"
-											>
-												{{ option.name }}
-											</Checkbox>
-										</div>
-
-										<div v-else class="menu-text">
-											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
-										</div>
-										<button
-											class="btn collection-button"
-											@click="(event) => $refs.modal_collection.show(event)"
-										>
-											<PlusIcon aria-hidden="true" />
-											{{ formatMessage(messages.createNewCollection) }}
-										</button>
-									</template>
-								</PopoutMenu>
-								<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
-									<BookmarkIcon aria-hidden="true" />
-								</nuxt-link>
-							</ButtonStyled>
-							<template #fallback>
-								<ButtonStyled size="large" circular>
-									<button
-										v-if="auth.user"
-										:v-tooltip="formatMessage(commonMessages.followButton)"
-										:aria-label="formatMessage(commonMessages.followButton)"
-										@click="userFollowProject(project)"
-									>
-										<HeartIcon aria-hidden="true" />
-									</button>
+								<template #fallback>
 									<nuxt-link
-										v-else
 										v-tooltip="formatMessage(commonMessages.followButton)"
 										to="/auth/sign-in"
 										:aria-label="formatMessage(commonMessages.followButton)"
 									>
 										<HeartIcon aria-hidden="true" />
 									</nuxt-link>
-								</ButtonStyled>
-								<ButtonStyled size="large" circular>
-									<nuxt-link
-										v-tooltip="formatMessage(commonMessages.saveButton)"
-										to="/auth/sign-in"
-										:aria-label="formatMessage(commonMessages.saveButton)"
+								</template>
+							</ClientOnly>
+						</ButtonStyled>
+						<ButtonStyled size="large" circular>
+							<PopoutMenu
+								v-if="auth.user"
+								:tooltip="
+									collections.some((x) => x.projects.includes(project.id))
+										? formatMessage(commonMessages.savedLabel)
+										: formatMessage(commonMessages.saveButton)
+								"
+								from="top-right"
+								:aria-label="formatMessage(commonMessages.saveButton)"
+								:dropdown-id="`${baseId}-save`"
+							>
+								<BookmarkIcon
+									aria-hidden="true"
+									:fill="
+										collections.some((x) => x.projects.includes(project.id))
+											? 'currentColor'
+											: 'none'
+									"
+								/>
+								<template #menu>
+									<input
+										v-model="displayCollectionsSearch"
+										type="text"
+										:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+										class="search-input menu-search"
+									/>
+									<div v-if="collections.length > 0" class="collections-list text-primary">
+										<Checkbox
+											v-for="option in collections
+												.slice()
+												.sort((a, b) => a.name.localeCompare(b.name))"
+											:key="option.id"
+											:model-value="option.projects.includes(project.id)"
+											class="popout-checkbox"
+											@update:model-value="() => onUserCollectProject(option, project.id)"
+										>
+											{{ option.name }}
+										</Checkbox>
+									</div>
+
+									<div v-else class="menu-text">
+										<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
+									</div>
+									<button
+										class="btn collection-button"
+										@click="(event) => $refs.modal_collection.show(event)"
 									>
-										<BookmarkIcon aria-hidden="true" />
-									</nuxt-link>
-								</ButtonStyled>
-							</template>
-						</ClientOnly>
+										<PlusIcon aria-hidden="true" />
+										{{ formatMessage(messages.createNewCollection) }}
+									</button>
+								</template>
+							</PopoutMenu>
+							<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+								<BookmarkIcon aria-hidden="true" />
+							</nuxt-link>
+						</ButtonStyled>
 						<ButtonStyled v-if="auth.user && currentMember" size="large" circular>
 							<nuxt-link
 								v-tooltip="formatMessage(commonMessages.settingsLabel)"
@@ -1672,10 +1646,12 @@ const projectTypeDisplay = computed(() =>
 	),
 )
 
-const following = computed(
-	() =>
-		user.value && user.value.follows && user.value.follows.find((x) => x.id === project.value.id),
-)
+const following = computed(() => {
+	if (!user.value?.follows) {
+		return false
+	}
+	return !!user.value.follows.find((x) => x.id === project.value.id)
+})
 
 const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`)
 const description = computed(

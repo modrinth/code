@@ -107,7 +107,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-6">
+				<div class="card-shadow flex flex-col gap-4 rounded-xl bg-bg-raised p-6">
 					<template v-if="!prefilled || !currentItemValid">
 						<div class="flex flex-col gap-2">
 							<span class="text-lg font-bold text-contrast">

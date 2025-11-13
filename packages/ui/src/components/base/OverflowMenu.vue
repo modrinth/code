@@ -14,7 +14,7 @@
 				<div
 					v-if="isDivider(option)"
 					:key="`divider-${index}`"
-					class="h-px mx-3 my-2 bg-button-bg"
+					class="h-px mx-3 my-2 bg-surface-5"
 				></div>
 				<Button
 					v-else
