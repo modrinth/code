@@ -1063,6 +1063,22 @@ pub async fn init(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, AuthenticationError> {
+    // If a user is logging into an OAuth method while already logged in,
+    // this may be present.
+    //
+    // This can happen when linking to a PayPal account (logging in) when already
+    // logged in.
+    let existing_user_id = get_user_from_headers(
+        &req,
+        &**client,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .map(|(_, user)| DBUserId::from(user.id))
+    .ok();
+
     let url =
         url::Url::parse(&info.url).map_err(|_| AuthenticationError::Url)?;
 
@@ -1095,6 +1111,7 @@ pub async fn init(
         user_id,
         url: info.url,
         provider: info.provider,
+        existing_user_id,
     }
     .insert(Duration::minutes(30), &redis)
     .await?;
@@ -1112,7 +1129,6 @@ pub async fn auth_callback(
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, crate::auth::templates::ErrorPage> {
     let state_string = query
         .get("state")
@@ -1128,6 +1144,7 @@ pub async fn auth_callback(
             user_id,
             provider,
             url,
+            existing_user_id,
         }) = flow
         else {
             return Err(AuthenticationError::InvalidCredentials);
@@ -1150,15 +1167,8 @@ pub async fn auth_callback(
         // Instead, we check who they're already logged in as, and just update
         // the PayPal info for that account.
         if provider == AuthProvider::PayPal {
-            let (_, existing_user) = get_user_from_headers(
-                &req,
-                &**client,
-                &redis,
-                &session_queue,
-                Scopes::USER_AUTH_WRITE,
-            )
-            .await?;
-            let user_id = DBUserId::from(existing_user.id) as DBUserId;
+            let existing_user_id = existing_user_id
+                .ok_or(AuthenticationError::InvalidCredentials)?;
 
             sqlx::query!(
                 "
@@ -1169,14 +1179,14 @@ pub async fn auth_callback(
                 oauth_user.country,
                 oauth_user.email,
                 oauth_user.id,
-                user_id as DBUserId,
+                existing_user_id as DBUserId,
             )
             .execute(&mut *transaction)
             .await?;
 
             transaction.commit().await?;
             crate::database::models::DBUser::clear_caches(
-                &[(user_id, None)],
+                &[(existing_user_id, None)],
                 &redis,
             )
             .await?;
