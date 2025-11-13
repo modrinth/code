@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use tokio_stream::StreamExt;
 
+use super::ownership::get_projects_ownership;
 use crate::{
     auth::check_is_moderator_from_headers,
     database::{
@@ -15,14 +16,11 @@ use crate::{
         models::{
             DBFileId, DBProjectId, DBThread, DBThreadId, DelphiReportId,
             DelphiReportIssueDetailsId, DelphiReportIssueId, ProjectTypeId,
-            delphi_report_item::{
-                DBDelphiReportIssue, DBDelphiReportIssueDetails,
-                DelphiReportIssueStatus, DelphiSeverity,
-            },
+            delphi_report_item::{DelphiReportIssueStatus, DelphiSeverity},
         },
         redis::RedisPool,
     },
-    models::{pats::Scopes, projects::Project, threads::Thread},
+    models::{pats::Scopes, projects::Project},
     queue::session::AuthQueue,
     routes::{ApiError, internal::moderation::Ownership},
     util::error::Context,
@@ -32,6 +30,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(search_projects).service(update_issue);
 }
 
+/// Arguments for searching project technical reviews.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct SearchProjects {
     #[serde(default = "default_limit")]
@@ -148,12 +147,12 @@ pub struct FileIssue {
     pub status: DelphiReportIssueStatus,
     /// Details of why this issue might have been raised, such as what file it
     /// was found in.
-    pub details: Vec<FileIssueDetails>,
+    pub details: Vec<FileIssueDetail>,
 }
 
 /// Occurrence of a [`FileIssue`] in a specific class in a scanned JAR file.
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct FileIssueDetails {
+pub struct FileIssueDetail {
     /// Name of the Java class in which this issue was found.
     pub class_name: String,
     /// Decompiled, pretty-printed source of the Java class.
@@ -178,15 +177,21 @@ async fn search_projects(
     #[derive(Debug)]
     struct ReportRecord {
         created: DateTime<Utc>,
+        files: IndexMap<DBFileId, FileRecord>,
+    }
+
+    #[derive(Debug)]
+    struct FileRecord {
+        file_name: String,
+        file_size: i32,
         issues: IndexMap<DelphiReportIssueId, IssueRecord>,
     }
 
     #[derive(Debug)]
     struct IssueRecord {
-        file_name: String,
-        file_size: i32,
         issue_type: String,
-        details: IndexMap<DelphiReportIssueDetailsId, FileIssueDetails>,
+        status: DelphiReportIssueStatus,
+        details: IndexMap<DelphiReportIssueDetailsId, FileIssueDetail>,
     }
 
     check_is_moderator_from_headers(
@@ -210,19 +215,22 @@ async fn search_projects(
     let mut project_records = IndexMap::<DBProjectId, ProjectRecord>::new();
     let mut project_ids = Vec::<DBProjectId>::new();
     let mut thread_ids = Vec::<DBThreadId>::new();
-    let mut file_ids = Vec::<DBFileId>::new();
+    let _file_ids = Vec::<DBFileId>::new();
 
     let mut rows = sqlx::query!(
         r#"
         SELECT
             dr.id AS "report_id!: DelphiReportId",
+            f.id AS "file_id!: DBFileId",
+            f.filename AS "file_name!",
+            f.size AS "file_size!",
             m.id AS "project_id!: DBProjectId",
             t.id AS "project_thread_id!: DBThreadId",
             dr.created AS "report_created!",
-            dri.id AS "issue_id?: DelphiReportIssueId",
-            dri.issue_type AS "issue_type?",
-            f.filename AS "file_name?",
-            f.size AS "file_size?",
+            dri.id AS "issue_id!: DelphiReportIssueId",
+            dri.issue_type AS "issue_type!",
+            dri.status AS "issue_status!: DelphiReportIssueStatus",
+            -- maybe null
             drid.id AS "issue_detail_id?: DelphiReportIssueDetailsId",
             drid.internal_class_name AS "issue_detail_class_name?",
             drid.decompiled_source AS "issue_detail_decompiled_source?",
@@ -238,7 +246,7 @@ async fn search_projects(
         INNER JOIN threads t ON t.mod_id = m.id
 
         -- fetch report issues and details
-        LEFT JOIN delphi_report_issues dri ON dri.report_id = dr.id
+        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
         LEFT JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id
 
         -- filtering
@@ -286,27 +294,24 @@ async fn search_projects(
             project.reports.entry(row.report_id).or_insert_with(|| {
                 ReportRecord {
                     created: row.report_created,
-                    issues: IndexMap::new(),
+                    files: IndexMap::new(),
                 }
             });
-
-        let (
-            Some(issue_id),
-            Some(file_name),
-            Some(file_size),
-            Some(issue_type),
-        ) = (row.issue_id, row.file_name, row.file_size, row.issue_type)
-        else {
-            continue;
-        };
-        let issue =
+        let file =
             report
-                .issues
-                .entry(issue_id)
+                .files
+                .entry(row.file_id)
+                .or_insert_with(|| FileRecord {
+                    file_name: row.file_name,
+                    file_size: row.file_size,
+                    issues: IndexMap::new(),
+                });
+        let issue =
+            file.issues
+                .entry(row.issue_id)
                 .or_insert_with(|| IssueRecord {
-                    file_name,
-                    file_size,
-                    issue_type,
+                    issue_type: row.issue_type,
+                    status: row.issue_status,
                     details: IndexMap::new(),
                 });
 
@@ -318,7 +323,7 @@ async fn search_projects(
             continue;
         };
         issue.details.entry(issue_detail_id).or_insert_with(|| {
-            FileIssueDetails {
+            FileIssueDetail {
                 class_name,
                 decompiled_source,
             }
@@ -338,6 +343,18 @@ async fn search_projects(
         .map(|thread| (thread.id, thread))
         .collect::<HashMap<_, _>>();
 
+    let project_list: Vec<Project> = projects.values().cloned().collect();
+
+    let ownerships = get_projects_ownership(&project_list, &pool, &redis)
+        .await
+        .wrap_internal_err("failed to fetch project ownerships")?;
+
+    let ownership_map = projects
+        .keys()
+        .copied()
+        .zip(ownerships)
+        .collect::<HashMap<_, _>>();
+
     let projects = project_records
         .into_iter()
         .map(|(project_id, project_record)| {
@@ -352,7 +369,12 @@ async fn search_projects(
                 })?;
             Ok::<_, ApiError>(ProjectReview {
                 project: project.clone(),
-                project_owner: (),
+                project_owner: ownership_map
+                    .get(&project_id)
+                    .cloned()
+                    .wrap_internal_err_with(|| {
+                        eyre!("no owner for {project_id:?}")
+                    })?,
                 thread: thread.clone(),
                 reports: project_record
                     .reports
@@ -361,18 +383,30 @@ async fn search_projects(
                         created_at: report_record.created,
                         flag_reason: FlagReason::Delphi,
                         files: report_record
-                            .issues
+                            .files
                             .into_iter()
-                            .map(|(_, issue_record)| FileReview {
-                                file_name: issue_record.file_name,
-                                file_size: issue_record.file_size,
-                                issues: issue_record
-                                    .details
+                            .map(|(_, file)| FileReview {
+                                file_name: file.file_name,
+                                file_size: file.file_size,
+                                issues: file
+                                    .issues
                                     .into_iter()
-                                    .map(|(issue_id, detail)| FileIssue {
+                                    .map(|(issue_id, issue)| FileIssue {
                                         issue_id,
-                                        kind: issue_record,
-                                        kind: details,
+                                        kind: issue.issue_type.clone(),
+                                        status: issue.status,
+                                        details: issue
+                                            .details
+                                            .into_iter()
+                                            .map(|(_, detail)| {
+                                                FileIssueDetail {
+                                                    class_name: detail
+                                                        .class_name,
+                                                    decompiled_source: detail
+                                                        .decompiled_source,
+                                                }
+                                            })
+                                            .collect(),
                                     })
                                     .collect(),
                             })

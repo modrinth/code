@@ -27,8 +27,8 @@
             "kind": {
               "Enum": [
                 "pending",
-                "approved",
-                "rejected"
+                "safe",
+                "unsafe"
               ]
             }
           }
@@ -96,8 +96,8 @@
             "kind": {
               "Enum": [
                 "pending",
-                "approved",
-                "rejected"
+                "safe",
+                "unsafe"
               ]
             }
           }
