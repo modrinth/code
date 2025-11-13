@@ -7,65 +7,6 @@ use ariadne::ids::UserId;
 use eyre::eyre;
 use sqlx::PgPool;
 
-/// Fetches ownership information for a single project.
-pub async fn get_project_ownership(
-    project_id: crate::models::ids::ProjectId,
-    team_id: crate::models::ids::TeamId,
-    organization: Option<OrganizationId>,
-    pool: &PgPool,
-    redis: &RedisPool,
-) -> Result<Ownership, crate::routes::ApiError> {
-    if let Some(org_id) = organization {
-        let org = DBOrganization::get(&org_id.to_string(), pool, redis)
-            .await
-            .wrap_internal_err("failed to fetch organization")?
-            .ok_or_else(|| {
-                crate::routes::ApiError::Internal(
-                    eyre!("project {project_id} is owned by an invalid organization {org_id}")
-                )
-            })?;
-
-        Ok(Ownership::Organization {
-            id: OrganizationId::from(org.id),
-            name: org.name.clone(),
-            icon_url: org.icon_url,
-        })
-    } else {
-        let team_members = DBTeamMember::get_from_team_full(
-            DBTeamId::from(team_id),
-            pool,
-            redis,
-        )
-        .await
-        .wrap_internal_err("failed to fetch team members")?;
-
-        let team_owner = team_members
-            .iter()
-            .find(|member| member.is_owner)
-            .ok_or_else(|| {
-                crate::routes::ApiError::Internal(eyre!(
-                    "project {project_id} is owned by a team {team_id} which has no valid owner"
-                ))
-            })?;
-
-        let user = DBUser::get(&team_owner.user_id.0.to_string(), pool, redis)
-            .await
-            .wrap_internal_err("failed to fetch user data")?
-            .ok_or_else(|| {
-                crate::routes::ApiError::Internal(eyre!(
-                    "project {project_id} is owned by a team {team_id} which has owner {} which does not exist",
-                    ariadne::ids::UserId::from(team_owner.user_id)
-                ))
-            })?;
-
-        Ok(Ownership::User {
-            id: ariadne::ids::UserId::from(user.id),
-            name: user.username.clone(),
-            icon_url: user.avatar_url,
-        })
-    }
-}
-
 /// Fetches ownership information for multiple projects efficiently
 pub async fn get_projects_ownership(
     projects: &[crate::models::projects::Project],
