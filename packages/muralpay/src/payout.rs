@@ -29,6 +29,8 @@ impl MuralPay {
         params: Option<SearchParams<PayoutRequestId>>,
     ) -> Result<SearchResponse<PayoutRequestId, PayoutRequest>, MuralError>
     {
+        mock!(self, search_payout_requests(filter, params));
+
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body {
@@ -50,6 +52,8 @@ impl MuralPay {
         &self,
         id: PayoutRequestId,
     ) -> Result<PayoutRequest, MuralError> {
+        mock!(self, get_payout_request(id));
+
         self.http_get(|base| format!("{base}/api/payouts/payout/{id}"))
             .send_mural()
             .await
@@ -59,6 +63,8 @@ impl MuralPay {
         &self,
         token_fee_requests: &[TokenFeeRequest],
     ) -> Result<Vec<TokenPayoutFee>, MuralError> {
+        mock!(self, get_fees_for_token_amount(token_fee_requests));
+
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body<'a> {
@@ -77,6 +83,8 @@ impl MuralPay {
         &self,
         fiat_fee_requests: &[FiatFeeRequest],
     ) -> Result<Vec<FiatPayoutFee>, MuralError> {
+        mock!(self, get_fees_for_fiat_amount(fiat_fee_requests));
+
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body<'a> {
@@ -97,6 +105,8 @@ impl MuralPay {
         memo: Option<impl AsRef<str>>,
         payouts: &[CreatePayout],
     ) -> Result<PayoutRequest, MuralError> {
+        mock!(self, create_payout_request(source_account_id, memo.as_ref().map(|x| x.as_ref()), payouts));
+
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body<'a> {
@@ -121,6 +131,8 @@ impl MuralPay {
         &self,
         id: PayoutRequestId,
     ) -> Result<PayoutRequest, TransferError> {
+        mock!(self, execute_payout_request(id));
+
         self.http_post(|base| format!("{base}/api/payouts/payout/{id}/execute"))
             .transfer_auth(self)?
             .send_mural()
@@ -132,6 +144,8 @@ impl MuralPay {
         &self,
         id: PayoutRequestId,
     ) -> Result<PayoutRequest, TransferError> {
+        mock!(self, cancel_payout_request(id));
+
         self.http_post(|base| format!("{base}/api/payouts/payout/{id}/cancel"))
             .transfer_auth(self)?
             .send_mural()
@@ -143,6 +157,8 @@ impl MuralPay {
         &self,
         fiat_currency_and_rail: &[FiatAndRailCode],
     ) -> Result<BankDetailsResponse, MuralError> {
+        mock!(self, get_bank_details(fiat_currency_and_rail));
+
         let query = fiat_currency_and_rail
             .iter()
             .map(|code| ("fiatCurrencyAndRail", code.to_string()))
@@ -207,7 +223,7 @@ impl FromStr for PayoutId {
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum PayoutStatusFilter {
-    PayoutStatus { statuses: Vec<String> },
+    PayoutStatus { statuses: Vec<PayoutStatus> },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

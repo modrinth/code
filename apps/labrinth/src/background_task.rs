@@ -9,6 +9,7 @@ use crate::search::indexing::index_projects;
 use crate::util::anrok;
 use crate::{database, search};
 use clap::ValueEnum;
+use muralpay::MuralPay;
 use sqlx::Postgres;
 use tracing::{error, info, warn};
 
@@ -19,6 +20,7 @@ pub enum BackgroundTask {
     ReleaseScheduled,
     UpdateVersions,
     Payouts,
+    SyncPayoutStatuses,
     IndexBilling,
     IndexSubscriptions,
     Migrations,
@@ -36,6 +38,7 @@ impl BackgroundTask {
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
+        mural_client: MuralPay,
     ) {
         use BackgroundTask::*;
         match self {
@@ -44,6 +47,9 @@ impl BackgroundTask {
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
             Payouts => payouts(pool, clickhouse, redis_pool).await,
+            SyncPayoutStatuses => {
+                sync_payout_statuses(pool, mural_client).await
+            }
             IndexBilling => {
                 index_billing(
                     stripe_client,
@@ -188,6 +194,31 @@ pub async fn payouts(
     }
 
     info!("Done running payouts");
+}
+
+pub async fn sync_payout_statuses(pool: sqlx::Pool<Postgres>, mural: MuralPay) {
+    const LIMIT: u32 = 1000;
+
+    info!("Started syncing payout statuses");
+
+    let result = crate::queue::payouts::mural::sync_pending_payouts_from_mural(
+        &pool, &mural, LIMIT,
+    )
+    .await;
+    if let Err(e) = result {
+        warn!("Failed to sync pending payouts from Mural: {e:?}");
+    }
+
+    let result =
+        crate::queue::payouts::mural::sync_failed_mural_payouts_to_labrinth(
+            &pool, &mural, LIMIT,
+        )
+        .await;
+    if let Err(e) = result {
+        warn!("Failed to sync failed Mural payouts to Labrinth: {e:?}");
+    }
+
+    info!("Done syncing payout statuses");
 }
 
 mod version_updater {
