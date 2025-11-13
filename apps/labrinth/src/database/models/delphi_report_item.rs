@@ -87,20 +87,29 @@ pub struct DBDelphiReportIssue {
 
 /// An status a Delphi report issue can have.
 #[derive(
-    Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash, sqlx::Type,
+    Deserialize,
+    Serialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    sqlx::Type,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "delphi_report_issue_status", rename_all = "snake_case")]
 pub enum DelphiReportIssueStatus {
     /// The issue is pending review by the moderation team.
     Pending,
-    /// The issue has been approved (i.e., reviewed as a valid, true positive).
-    /// The affected artifact has thus been verified to be potentially malicious.
-    Approved,
     /// The issue has been rejected (i.e., reviewed as a false positive).
     /// The affected artifact has thus been verified to be clean, other issues
     /// with it notwithstanding.
-    Rejected,
+    Safe,
+    /// The issue has been approved (i.e., reviewed as a valid, true positive).
+    /// The affected artifact has thus been verified to be potentially malicious.
+    Unsafe,
 }
 
 impl Display for DelphiReportIssueStatus {
