@@ -1,5 +1,14 @@
 #![doc = include_str!("../README.md")]
 
+macro_rules! mock {
+    ($self:expr, $fn:ident ( $($args:expr),* $(,)? )) => {
+        #[cfg(feature = "mock")]
+        if let Some(mock) = &*($self).mock.load() {
+            return (mock.$fn)($($args),*);
+        }
+    };
+}
+
 mod account;
 mod counterparty;
 mod error;
@@ -8,6 +17,9 @@ mod payout;
 mod payout_method;
 mod serde_iso3166;
 mod util;
+
+#[cfg(feature = "mock")]
+pub mod mock;
 
 pub use {
     account::*, counterparty::*, error::*, organization::*, payout::*,
@@ -32,6 +44,8 @@ pub struct MuralPay {
     pub api_url: String,
     pub api_key: SecretString,
     pub transfer_api_key: Option<SecretString>,
+    #[cfg(feature = "mock")]
+    mock: arc_swap::ArcSwapOption<mock::MuralPayMock>,
 }
 
 impl MuralPay {
@@ -45,6 +59,21 @@ impl MuralPay {
             api_url: api_url.into(),
             api_key: api_key.into(),
             transfer_api_key: transfer_api_key.map(Into::into),
+            #[cfg(feature = "mock")]
+            mock: arc_swap::ArcSwapOption::empty(),
+        }
+    }
+
+    /// Creates a client which mocks responses.
+    #[cfg(feature = "mock")]
+    #[must_use]
+    pub fn from_mock(mock: mock::MuralPayMock) -> Self {
+        Self {
+            http: reqwest::Client::new(),
+            api_url: "".into(),
+            api_key: SecretString::from(String::new()),
+            transfer_api_key: None,
+            mock: arc_swap::ArcSwapOption::from_pointee(mock),
         }
     }
 }

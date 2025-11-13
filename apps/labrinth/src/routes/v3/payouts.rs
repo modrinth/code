@@ -822,7 +822,9 @@ async fn mural_pay_payout(
         id: payout_id,
         user_id: user.id,
         created: Utc::now(),
-        status: PayoutStatus::Success,
+        // after the payout has been successfully executed,
+        // we wait for Mural's confirmation that the funds have been delivered
+        status: PayoutStatus::InTransit,
         amount: amount_minus_fee,
         fee: Some(total_fee),
         method: Some(PayoutMethodType::MuralPay),

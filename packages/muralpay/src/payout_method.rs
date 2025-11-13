@@ -19,6 +19,8 @@ impl MuralPay {
         counterparty_id: CounterpartyId,
         params: Option<SearchParams<PayoutMethodId>>,
     ) -> Result<SearchResponse<PayoutMethodId, PayoutMethod>, MuralError> {
+        mock!(self, search_payout_methods(counterparty_id, params));
+
         self.http_post(|base| {
             format!(
                 "{base}/api/counterparties/{counterparty_id}/payout-methods/search"
@@ -34,6 +36,8 @@ impl MuralPay {
         counterparty_id: CounterpartyId,
         payout_method_id: PayoutMethodId,
     ) -> Result<PayoutMethod, MuralError> {
+        mock!(self, get_payout_method(counterparty_id, payout_method_id));
+
         self.http_get(|base| format!("{base}/api/counterparties/{counterparty_id}/payout-methods/{payout_method_id}"))
             .send_mural()
             .await
@@ -45,6 +49,8 @@ impl MuralPay {
         alias: impl AsRef<str>,
         payout_method: &PayoutMethodDetails,
     ) -> Result<PayoutMethod, MuralError> {
+        mock!(self, create_payout_method(counterparty_id, alias.as_ref(), payout_method));
+
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body<'a> {
@@ -72,6 +78,8 @@ impl MuralPay {
         counterparty_id: CounterpartyId,
         payout_method_id: PayoutMethodId,
     ) -> Result<(), MuralError> {
+        mock!(self, delete_payout_method(counterparty_id, payout_method_id));
+
         self.http_delete(|base| format!("{base}/api/counterparties/{counterparty_id}/payout-methods/{payout_method_id}"))
             .send_mural()
             .await
