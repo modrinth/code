@@ -1,0 +1,144 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            dr.id AS \"report_id!: DelphiReportId\",\n            f.id AS \"file_id!: DBFileId\",\n            f.filename AS \"file_name!\",\n            f.size AS \"file_size!\",\n            m.id AS \"project_id!: DBProjectId\",\n            t.id AS \"project_thread_id!: DBThreadId\",\n            dr.created AS \"report_created!\",\n            dr.severity AS \"report_severity!: DelphiSeverity\",\n            dri.id AS \"issue_id!: DelphiReportIssueId\",\n            dri.issue_type AS \"issue_type!\",\n            dri.status AS \"issue_status!: DelphiReportIssueStatus\",\n            -- maybe null\n            drid.id AS \"issue_detail_id?: DelphiReportIssueDetailsId\",\n            drid.internal_class_name AS \"issue_detail_class_name?\",\n            drid.decompiled_source AS \"issue_detail_decompiled_source?\",\n            drid.severity AS \"issue_detail_severity?: DelphiSeverity\"\n        FROM delphi_reports dr\n\n        -- fetch the project this report is for, its type, and thread\n        INNER JOIN files f ON f.id = dr.file_id\n        INNER JOIN versions v ON v.id = f.version_id\n        INNER JOIN mods m ON m.id = v.mod_id\n        LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id\n        INNER JOIN categories c ON c.id = mc.joining_category_id\n        INNER JOIN threads t ON t.mod_id = m.id\n\n        -- fetch report issues and details\n        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id\n        LEFT JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id\n\n        -- filtering\n        WHERE\n            -- project type\n            (cardinality($1::int[]) = 0 OR c.project_type = ANY($1::int[]))\n\n        -- sorting\n        ORDER BY\n            CASE WHEN $2 = 'created_asc' THEN created ELSE TO_TIMESTAMP(0) END ASC,\n            CASE WHEN $2 = 'created_desc' THEN created ELSE TO_TIMESTAMP(0) END DESC\n\n        -- pagination\n        LIMIT $3\n        OFFSET $4\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "report_id!: DelphiReportId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "file_id!: DBFileId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "file_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "file_size!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "project_thread_id!: DBThreadId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "report_created!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "report_severity!: DelphiSeverity",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_severity",
+            "kind": {
+              "Enum": [
+                "low",
+                "medium",
+                "high",
+                "severe"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "issue_id!: DelphiReportIssueId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "issue_type!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "issue_status!: DelphiReportIssueStatus",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_report_issue_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "safe",
+                "unsafe"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "issue_detail_id?: DelphiReportIssueDetailsId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "issue_detail_class_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "issue_detail_decompiled_source?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "issue_detail_severity?: DelphiSeverity",
+        "type_info": {
+          "Custom": {
+            "name": "delphi_severity",
+            "kind": {
+              "Enum": [
+                "low",
+                "medium",
+                "high",
+                "severe"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4Array",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "a06d0f682b1e576e634b02102ab6bcab9fcba55df818cab6e98721a324659526"
+}
