@@ -33,7 +33,6 @@ export interface GeneratedState extends Labrinth.State.GeneratedState {
 	// Metadata
 	lastGenerated?: string
 	apiUrl?: string
-	errors?: number[]
 }
 
 /**
