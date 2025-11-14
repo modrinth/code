@@ -1052,18 +1052,6 @@
   "report.submit": {
     "message": "Odeslat hlášení"
   },
-  "revenue.transfers.total": {
-    "message": "Vybrali jste celkem {amount}."
-  },
-  "revenue.transfers.total.method": {
-    "message": "Vybrali jste {amount} skrze {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "V roce {year} jste vybrali {amount}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "V roce {year} jste vybrali {amount} skrze {method}."
-  },
   "scopes.analytics.label": {
     "message": "Přečíst analytiku"
   },

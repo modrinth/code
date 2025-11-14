@@ -17,14 +17,8 @@
   "nags.add-links.title": {
     "defaultMessage": "新增外部連結"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "你已選擇所有 {totalAvailableTags} 個可用標籤。這會讓標籤失去其原有目的，因為標籤的用意是幫助使用者找到相關專案。請只選擇與你的專案相關的標籤。"
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "選擇精確的標籤"
-  },
-  "nags.description-too-short.description": {
-    "defaultMessage": "你的描述有 {length} 個可讀字元。建議至少 {minChars} 個字元，以建立清晰且資訊豐富的描述。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "擴展描述"
@@ -52,9 +46,6 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "前往圖庫頁面"
-  },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{projectType}使用的授權條款要求必須提供原始碼。請為每個額外版本提供原始碼連結或原始碼檔案，或是考慮使用不同的授權條款。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
@@ -113,23 +104,11 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "在重新提交之前，請審閱並處理審核團隊提出的所有疑慮。"
   },
-  "nags.moderator-feedback.title": {
-    "defaultMessage": "審閱審核員意見"
-  },
-  "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "你選擇了 {count} 個解析度標籤 ({tags})。資源包通常應該只會有一個解析度標籤，且須符合其主要解析度。"
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "選擇你的{projectType}環境。"
-  },
   "nags.select-environments.title": {
     "defaultMessage": "選擇環境"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "請選擇你的{projectType}採用的授權條款。"
   },
   "nags.select-license.title": {
     "defaultMessage": "選擇授權條款"
@@ -170,26 +149,14 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "清理摘要"
   },
-  "nags.summary-too-short.description": {
-    "defaultMessage": "你的摘要有 {length} 個字元。建議至少 {minChars} 個字元，以建立一個內容豐富且引人入勝的摘要。"
-  },
   "nags.summary-too-short.title": {
     "defaultMessage": "擴展摘要"
-  },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "保持你的專案名稱簡潔，能讓它更易於記憶且更容易被找到。版本與載入器資訊會自動與你的專案一併顯示。"
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名稱"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "你選擇了 {tagCount} 個標籤。建議減少至 {maxTagCount} 個或更少，以確保你的專案出現在相關搜尋結果中。"
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "選擇精確的標籤"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "你的{type}至少需要一張圖庫圖片，以展示其內容{resourcepackMessage}。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上傳圖庫圖片"

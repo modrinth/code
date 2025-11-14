@@ -293,7 +293,7 @@ onBeforeUnmount(() => {
 	align-items: center;
 	gap: 0.5rem;
 	border-radius: var(--radius-md);
-	border: 1px solid var(--color-button-bg);
+	border: 1px solid var(--color-divider);
 	padding: var(--gap-sm) var(--gap-lg);
 }
 
@@ -356,7 +356,7 @@ onBeforeUnmount(() => {
 	gap: 1rem;
 	overflow: auto;
 	transition: all 0.2s ease-in-out;
-	border: 1px solid var(--color-button-bg);
+	border: 1px solid var(--color-divider);
 
 	&.hidden {
 		transform: translateY(-100%);
@@ -454,7 +454,7 @@ onBeforeUnmount(() => {
 	flex-direction: column;
 	overflow: auto;
 	transition: all 0.2s ease-in-out;
-	border: 1px solid var(--color-button-bg);
+	border: 1px solid var(--color-divider);
 	padding: var(--gap-md);
 
 	&.hidden {

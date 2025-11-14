@@ -14,6 +14,8 @@ use crate::{
 
 impl MuralPay {
     pub async fn get_all_accounts(&self) -> Result<Vec<Account>, MuralError> {
+        mock!(self, get_all_accounts());
+
         self.http_get(|base| format!("{base}/api/accounts"))
             .send_mural()
             .await
@@ -23,6 +25,8 @@ impl MuralPay {
         &self,
         id: AccountId,
     ) -> Result<Account, MuralError> {
+        mock!(self, get_account(id));
+
         self.http_get(|base| format!("{base}/api/accounts/{id}"))
             .send_mural()
             .await
@@ -33,6 +37,14 @@ impl MuralPay {
         name: impl AsRef<str>,
         description: Option<impl AsRef<str>>,
     ) -> Result<Account, MuralError> {
+        mock!(
+            self,
+            create_account(
+                name.as_ref(),
+                description.as_ref().map(|x| x.as_ref()),
+            )
+        );
+
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body<'a> {

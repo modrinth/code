@@ -175,9 +175,18 @@ impl PayoutMethodType {
 }
 
 #[derive(
-    Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug, utoipa::ToSchema,
+    Serialize,
+    Deserialize,
+    Copy,
+    Clone,
+    Eq,
+    PartialEq,
+    Debug,
+    utoipa::ToSchema,
+    sqlx::Type,
 )]
 #[serde(rename_all = "kebab-case")]
+#[sqlx(rename_all = "kebab-case")]
 pub enum PayoutStatus {
     Success,
     InTransit,

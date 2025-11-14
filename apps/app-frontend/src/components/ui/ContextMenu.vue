@@ -119,7 +119,7 @@ onBeforeUnmount(() => {
 	background-color: var(--color-raised-bg);
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-floating);
-	border: 1px solid var(--color-button-bg);
+	border: 1px solid var(--color-divider);
 	margin: 0;
 	position: fixed;
 	z-index: 1000000;
@@ -163,7 +163,7 @@ onBeforeUnmount(() => {
 	}
 
 	.divider {
-		border: 1px solid var(--color-button-bg);
+		border: 1px solid var(--color-divider);
 		margin: var(--gap-sm);
 		pointer-events: none;
 	}

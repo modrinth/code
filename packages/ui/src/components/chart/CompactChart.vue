@@ -161,10 +161,10 @@ const chartOptions = ref({
 	display: flex;
 	flex-direction: column;
 	gap: var(--gap-xs);
-	border: 1px solid var(--color-button-bg);
+	border: 1px solid var(--color-divider);
 	border-radius: var(--radius-md);
 	background-color: var(--color-raised-bg);
-	box-shadow: var(--shadow-floating);
+	box-shadow: var(--shadow-card);
 	color: var(--color-base);
 	font-size: var(--font-size-nm);
 	width: 100%;
@@ -190,7 +190,7 @@ svg {
 :deep(.apexcharts-yaxistooltip) {
 	background: var(--color-raised-bg) !important;
 	border-radius: var(--radius-sm) !important;
-	border: 1px solid var(--color-button-bg) !important;
+	border: 1px solid var(--color-divider) !important;
 	box-shadow: var(--shadow-floating) !important;
 	font-size: var(--font-size-nm) !important;
 }

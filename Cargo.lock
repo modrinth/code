@@ -5142,6 +5142,7 @@ dependencies = [
 name = "muralpay"
 version = "0.1.0"
 dependencies = [
+ "arc-swap",
  "bytes",
  "chrono",
  "clap",

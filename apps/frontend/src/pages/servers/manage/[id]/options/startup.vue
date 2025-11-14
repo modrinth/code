@@ -199,6 +199,10 @@ async function saveStartup() {
 				jdkVersionMap.find((v) => v.value === props.server.startup?.jdk_version)?.label || ''
 			jdkBuild.value =
 				jdkBuildMap.find((v) => v.value === props.server.startup?.jdk_build)?.label || ''
+
+			originalInvocation.value = invocation.value
+			originalJdkVersion.value = jdkVersion.value
+			originalJdkBuild.value = jdkBuild.value
 		}
 
 		addNotification({

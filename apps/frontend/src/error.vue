@@ -59,9 +59,21 @@ import { IntlFormatted } from '@vintl/vintl/components'
 import Logo404 from '~/assets/images/404.svg'
 
 import ModrinthLoadingIndicator from './components/ui/modrinth-loading-indicator.ts'
+import { createModrinthClient, provideModrinthClient } from './providers/api-client.ts'
 import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
 
+const auth = await useAuth()
+const config = useRuntimeConfig()
+
 provideNotificationManager(new FrontendNotificationManager())
+
+const client = createModrinthClient(auth.value, {
+	apiBaseUrl: config.public.apiBaseUrl.replace('/v2/', '/'),
+	archonBaseUrl: config.public.pyroBaseUrl.replace('/v2/', '/'),
+	rateLimitKey: config.rateLimitKey,
+})
+provideModrinthClient(client)
+
 const { formatMessage } = useVIntl()
 
 const props = defineProps({

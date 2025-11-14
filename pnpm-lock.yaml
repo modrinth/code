@@ -218,6 +218,9 @@ importers:
       '@ltd/j-toml':
         specifier: ^1.38.0
         version: 1.38.0
+      '@modrinth/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../../packages/assets
@@ -386,6 +389,19 @@ importers:
         version: 2.1.6(typescript@5.5.4)
 
   apps/labrinth: {}
+
+  packages/api-client:
+    dependencies:
+      '@tauri-apps/plugin-http':
+        specifier: ^2.0.0
+        version: 2.5.0
+      ofetch:
+        specifier: ^1.4.1
+        version: 1.4.1
+    devDependencies:
+      '@modrinth/tooling-config':
+        specifier: workspace:*
+        version: link:../tooling-config
 
   packages/app-lib: {}
 

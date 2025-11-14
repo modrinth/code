@@ -73,7 +73,7 @@ lettre = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 modrinth-maxmind = { workspace = true }
 modrinth-util = { workspace = true }
-muralpay = { workspace = true, features = ["utoipa"] }
+muralpay = { workspace = true, features = ["utoipa", "mock"] }
 murmur2 = { workspace = true }
 paste = { workspace = true }
 path-util = { workspace = true }

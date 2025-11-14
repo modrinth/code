@@ -7,14 +7,15 @@ import {
 	UnsavedChangesPopup,
 	useSavable,
 } from '@modrinth/ui'
-import { injectApi } from '@modrinth/ui/src/providers/api.ts'
 import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+
+import { injectModrinthClient } from '~/providers/api-client.ts'
 
 const { formatMessage } = useVIntl()
 
 const { projectV2: project, refreshProject } = injectProjectPageContext()
 const { handleError } = injectNotificationManager()
-const api = injectApi()
+const client = injectModrinthClient()
 
 const saving = ref(false)
 
@@ -34,7 +35,7 @@ const { saved, current, reset, save } = useSavable(
 
 		if (data) {
 			saving.value = true
-			api.projects
+			client.labrinth.projects_v2
 				.edit(project.value.id, { title, description: tagline, slug: url })
 				.then(() => refreshProject().then(reset))
 				.catch(handleError)

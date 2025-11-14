@@ -65,6 +65,69 @@
   "app.update.reload-to-update": {
     "message": "Herlaad om de update te installeren"
   },
+  "friends.action.add-friend": {
+    "message": "Voeg een vriend toe"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} vriend {count, plural,one {verzoek} other {verzoeken}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Stuur een vriendschapsverzoek"
+  },
+  "friends.add-friend.title": {
+    "message": "Een vriend toevoegen"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Het kan verschillen van hun Minecraft gebruikersnaam!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Voer Modrinth gebruikersnaam in..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Wat is de Modrinth gebruikersnaam van uw vriend?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Voeg vrienden</link> om te zien wat hun spelen!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Annuleer verzoek"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Verwijder vriend"
+  },
+  "friends.friend.request-sent": {
+    "message": "Vriendschapsverzoek gestuurd"
+  },
+  "friends.friend.view-profile": {
+    "message": "Bekijk profiel"
+  },
+  "friends.heading": {
+    "message": "Vrienden"
+  },
+  "friends.heading.active": {
+    "message": "Actief"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "In behandeling"
+  },
+  "friends.no-friends-match": {
+    "message": "Geen vrienden die overeenkomen met \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Zoek vrienden..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Log in op een Modrinth account</link> om vrienden toe te voegen en te kijken wat zij spelen!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Toevoegen en spelen"
   },

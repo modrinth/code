@@ -1,30 +1,30 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Необходимо описание, которое чётко описывает цель и функцию проекта."
+    "defaultMessage": "Требуется понятное описание функциональности и назначения проекта."
   },
   "nags.add-description.title": {
     "defaultMessage": "Добавьте описание"
   },
   "nags.add-icon.description": {
-    "defaultMessage": "Добавление уникальной, соответствующей и привлекательной иконки делает ваш проект узнаваемым и помогает выделяться."
+    "defaultMessage": "Уникальный, подходящий и привлекательный значок сделает проект узнаваемым и заметным."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Добавьте значок"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Добавьте любые соответствующие ссылки, ведущие за пределы Modrinth, например: открытый код, трекер проблем или приглашение на Discord сервер."
+    "defaultMessage": "Добавьте релевантные ссылки, ведущие за пределы Modrinth, например на исходный код, трекер проблем или сервер Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Добавьте внешние ссылки"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Вы выбрали все {totalAvailableTags} доступных тегов. Это противоречит цели тегов, которые должны помочь пользователям найти подходящие проекты. Пожалуйста, выберите только те теги, которые подходят вашему проекту."
+    "defaultMessage": "Выбраны все {totalAvailableTags, plural, one {# тег} few {# тега} many {# тегов} other {# тега}}. Не достигается их цель помогать искать релевантные результаты. Выберите только относящиеся к проекту теги."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Укажите точные теги"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Ваше описание содержит {length} читабельных символов. Как минимум {minChars} рекомендовано для создания чистого и информативного описания."
+    "defaultMessage": "Описание содержит {length, plural, one {# читаемый символ} few {# читаемых символа} many {# читаемых символов} other {# читаемого символа}}. Для ясного и информативного описания рекомендуется не менее {minChars, plural, one {# символа} few {# символов} many {# символов} other {# символа}}."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Расширьте описание"
@@ -45,7 +45,7 @@
     "defaultMessage": "Изменить название"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "Избранное изображение в галерее часто влияет на первое впечатление."
+    "defaultMessage": "Выделенное изображение в галерее часто создаёт первое впечатление о проекте."
   },
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Выделите изображение"
@@ -54,55 +54,55 @@
     "defaultMessage": "Открыть галерею"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Ваш {projectType} использует лицензию, которая требует, чтобы был доступен исходный код. Пожалуйста, предоставьте ссылку на исходный код или файл с исходным кодом для каждой дополнительной версии или подумайте об использовании другой лицензии."
+    "defaultMessage": "Лицензия {type, select, mod {мода} plugin {плагина} other {проекта}} обязывает публиковать исходный код. Укажите ссылку на исходный код или файл с исходным кодом для каждой версии или выберите другую лицензию."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Укажите исходный код"
   },
   "nags.image-heavy-description.description": {
-    "defaultMessage": "Описание должно содержать достаточное количество обычного текста или альтернативного текста изображения, чтобы оно было доступно для тех, кто пользуется программами чтения с экрана или медленным интернет соединением."
+    "defaultMessage": "Укажите в описании обычный и альтернативный текст для изображений, чтобы сделать его доступным для средств чтения с экрана и при медленном интернете."
   },
   "nags.image-heavy-description.title": {
     "defaultMessage": "Обеспечьте доступность"
   },
   "nags.invalid-license-url.description.default": {
-    "defaultMessage": "Недействительный URL лицензии."
+    "defaultMessage": "Ссылка на лицензию недействительна."
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "Ваш URL лицензии ведёт на {domain}, который не подходит для информации о лицензии. Ссылки на лицензии должны вести прямо на файл вашей лицензии, не социальные сети, игровые платформы и т. д."
+    "defaultMessage": "Домен {domain} не подходит для лицензий. Ссылка должна вести на файл лицензии, а не на соцсети, игровые платформы и т. п."
   },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "URL вашей лицензии, по-видимому, неверен. Пожалуйста, предоставьте действительный URL на текст вашей лицензии."
+    "defaultMessage": "Не удаётся распознать URL лицензии. Укажите действительную ссылку на текст лицензии."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Исправьте URL лицензии"
   },
   "nags.link-shortener-usage.description": {
-    "defaultMessage": "Использование сокращённых ссылок или других методов сокрытия того, на какие сторонние сервисы или ссылки на лицензии, запрещены, пожалуйста, используйте только соответствующие полноразмерные ссылки."
+    "defaultMessage": "Использование сервисов сокращения ссылок или других способов скрытия конечного адреса в ссылке на лицензию или во внешних ссылках запрещено. Указывайте полные ссылки."
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Не сокращайте ссылки"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "{count, plural, one {# Заголовок} other {# Заголовка (-ов)}} в вашем описании {count, plural, one {слишком длинный} other {слишком длинные}}. Заголовки должны быть краткими и выступать в роли названий разделов, а не полных предложений."
+    "defaultMessage": "{count, plural, one {# заголовок} few {# заголовка} many {# заголовков} other {# заголовка}} в описании слишком {count, plural, one {длинный} other {длинные}}. Заголовки должны быть краткими названиями разделов, а не предложениями."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Сократите заголовки"
   },
   "nags.minecraft-title-clause.description": {
-    "defaultMessage": "Проекты не должны содержать брендовый контент Minecraft или включать \"Minecraft\" как значительную часть названия."
+    "defaultMessage": "Проект не должен использовать бренд Minecraft или использовать «Minecraft» как основную часть названия."
   },
   "nags.minecraft-title-clause.title": {
     "defaultMessage": "Соблюдайте права бренда"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "У некоторых ваших изображений отсутствует текстовое описание, которое важно для доступности, особенно для слабовидящих пользователей."
+    "defaultMessage": "У некоторых изображений нет альтернативного текста, нужного для доступности, особенно для слабовидящих пользователей."
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Опишите изображения"
   },
   "nags.misused-discord-link-description": {
-    "defaultMessage": "Приглашения на Discord сервера не могут быть использованы для других типов ссылок. Пожалуйста, вставьте ссылку-приглашение Discord только в поле сыллки-приглашения Discord."
+    "defaultMessage": "Приглашение в Discord нельзя указывать не для своего типа ссылок. Переместите приглашение в предназначенное для него поле."
   },
   "nags.misused-discord-link.title": {
     "defaultMessage": "Переместите Discord"
@@ -111,34 +111,34 @@
     "defaultMessage": "Открыть ветку модерации"
   },
   "nags.moderator-feedback.description": {
-    "defaultMessage": "Перед повторной отправкой проверьте и устраните все замечания, высказанные модерацией."
+    "defaultMessage": "Перед повторной отправкой проекта на проверку исправьте все замечания модерации."
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Посмотрите замечания"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Вы выбрали {count} тегов разрешения ({tags}). Ресурс паки должны иметь только один тег разрешения, который соответствует их основному разрешению."
+    "defaultMessage": "{count, plural, one {Выбран # тег} few {Выбрано # тега} many {Выбрано # тегов} other {Выбрано # тега}} разрешения ({tags}). Рекомендуется оставить один тег с основным разрешением."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Укажите одно разрешение"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "Укажите среду в которой ваш {projectType} работает."
+    "defaultMessage": "Выберите среды, в которых работает {type, select, mod {мод} modpack {сборка} other {проект}}."
   },
   "nags.select-environments.title": {
     "defaultMessage": "Укажите среду"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Выберите лицензию, по которой распространяется ваш {projectType}."
+    "defaultMessage": "Выберите лицензию, по которой распространяется {type, select, mod {мод} modpack {сборка} resourcepack {набор ресурсов} shader {шейдер} plugin {плагин} datapack {набор данных} other {проект}}."
   },
   "nags.select-license.title": {
     "defaultMessage": "Выберите лицензию"
   },
   "nags.select-tags.description": {
-    "defaultMessage": "Выберите теги, которые подходят к вашему проекту, чтобы помогите нужным пользователям найти его."
+    "defaultMessage": "Выберите подходящие проекту теги, чтобы его могла найти своя аудитория."
   },
   "nags.select-tags.title": {
-    "defaultMessage": "Укажите тег"
+    "defaultMessage": "Укажите теги"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Настроить описание"
@@ -159,49 +159,49 @@
     "defaultMessage": "Открыть настройки"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Ваше краткое описание не может быть названием проекта. Важно создать информативное и привлекательное краткое содержание."
+    "defaultMessage": "Сводка не может совпадать с названием проекта. Сделайте её понятной и интересной."
   },
   "nags.summary-same-as-title.title": {
     "defaultMessage": "Разнообразьте сводку"
   },
   "nags.summary-special-formatting.description": {
-    "defaultMessage": "Ваше краткое описание не должно содержать форматирования, строк, специальных символов или ссылок, так как краткое содержание отображает только простой текст."
+    "defaultMessage": "Сводка отображается как простой текст. Она не должна содержать форматирование, переносы строк, ссылки и спецсимволы."
   },
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Уберите лишнее из краткого содержания"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Ваше краткое содержание состоит из {length} символов. Хотя бы {minChars} символов рекомендовано для создания информативного и привлекательного краткого содержания."
+    "defaultMessage": "Сводка содержит {length, plural, one {# символ} few {# символа} many {# символов} other {# символа}}. Для понятной и интересной сводки рекомендуется не менее {minChars, plural, one {# символа} few {# символов} many {# символов} other {# символа}}."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Увеличьте краткое содержание"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Сохраняйте название вашего проекта понятным и делайте его более запоминающимся и легким для поиска. Информация о версии и загрузчике автоматически отобразится с вашим проектом."
+    "defaultMessage": "Проект с простым названием проще запомнить и найти. Информация о версии и загрузчике указывается автоматически."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Сделайте название понятным"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Вы выбрали {tagCount} тегов. Сократите их количество до {maxTagCount} или меньше, чтобы убедиться, что ваш проект появится при релевантных результатах поиска."
+    "defaultMessage": "{tagCount, plural, one {Выбран # тег} few {Выбрано # тега} many {Выбрано # тегов} other {Выбрано # тега}}. Рекомендуется оставить не более {maxTagCount}, чтобы повысить релевантность проекта в поиске."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Укажите точные теги"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Хотя бы одно изображение в галерее требуется, чтобы показать контент вашего {type}{resourcepackMessage}."
+    "defaultMessage": "В галерее требуется хотя бы одно изображение, в котором показано содержимое {type, select, resourcepack {набора ресурсов. Если он содержит только звуки или переводы, укажите это в тегах} shader {шейдера} other {проекта}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Пополните галерею"
   },
   "nags.upload-version.description": {
-    "defaultMessage": "Хотя бы одна версия должна быть выбрана, чтобы отправить проект на проверку."
+    "defaultMessage": "Требуется хотя бы одна версия перед отправкой проекта на проверку."
   },
   "nags.upload-version.title": {
     "defaultMessage": "Загрузите версию"
   },
   "nags.verify-external-links.description": {
-    "defaultMessage": "Некоторые из ваших внешних ссылок могут использовать домены, неподходящий для этого типа ссылок."
+    "defaultMessage": "Одна из внешних ссылок использует домен, возможно, не подходящий для типа этой ссылки."
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Проверьте ссылки"

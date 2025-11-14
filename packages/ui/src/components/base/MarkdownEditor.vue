@@ -891,7 +891,7 @@ function openVideoModal() {
 }
 
 .markdown-body-wrapper {
-	border: 1px solid var(--color-button-bg);
+	border: 1px solid var(--color-divider);
 	border-radius: var(--radius-md);
 	width: 100%;
 	padding: var(--radius-md);

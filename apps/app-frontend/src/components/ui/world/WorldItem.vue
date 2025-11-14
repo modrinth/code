@@ -181,7 +181,7 @@ const messages = defineMessages({
 			/>
 		</template>
 		<div
-			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised smart-clickable:highlight-on-hover rounded-xl"
+			class="grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 bg-bg-raised card-shadow smart-clickable:highlight-on-hover rounded-xl"
 			:class="{
 				'world-item-highlighted': highlighted,
 			}"

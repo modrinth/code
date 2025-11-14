@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE payouts\n        SET status = u.status\n        FROM UNNEST($1::bigint[], $2::varchar[]) AS u(id, status)\n        WHERE payouts.id = u.id\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "VarcharArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3add5da682909ea515a65d27b385bbb47110c0f9c6bc9b7c4ef8864a03898900"
+}

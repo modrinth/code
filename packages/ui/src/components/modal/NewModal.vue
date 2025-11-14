@@ -151,21 +151,10 @@ const visible = ref(false)
 const scrollContainer = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
 
-// make modal opening not shift page when there's a vertical scrollbar
-function addBodyPadding() {
-	const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth
-	if (scrollBarWidth > 0) {
-		document.body.style.paddingRight = `${scrollBarWidth}px`
-	} else {
-		document.body.style.paddingRight = ''
-	}
-}
-
 function show(event?: MouseEvent) {
 	props.onShow?.()
 	open.value = true
 
-	addBodyPadding()
 	document.body.style.overflow = 'hidden'
 	window.addEventListener('mousedown', updateMousePosition)
 	window.addEventListener('keydown', handleKeyDown)
@@ -184,7 +173,6 @@ function hide() {
 	props.onHide?.()
 	visible.value = false
 	document.body.style.overflow = ''
-	document.body.style.paddingRight = ''
 	window.removeEventListener('mousedown', updateMousePosition)
 	window.removeEventListener('keydown', handleKeyDown)
 	setTimeout(() => {
