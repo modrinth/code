@@ -71,12 +71,12 @@ import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { check_reachable } from '@/helpers/auth.js'
 import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { list } from '@/helpers/profile.js'
-import { check_reachable } from '@/helpers/auth.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import {
@@ -139,7 +139,6 @@ const stateInitialized = ref(false)
 const criticalErrorMessage = ref()
 
 const isMaximized = ref(false)
-
 onMounted(async () => {
 	await useCheckDisableMouseover()
 
@@ -154,6 +153,29 @@ onUnmounted(async () => {
 	document.querySelector('body').removeEventListener('auxclick', handleAuxClick)
 
 	await unlistenUpdateDownload?.()
+})
+
+onMounted(async () => {
+	let checkInterval
+	const tick = () => {
+		check_reachable()
+			.then((_resp) => {
+				console.log('Auth servers are reachable')
+				criticalErrorMessage.value = null
+			})
+			.catch((err) => {
+				criticalErrorMessage.value = {
+					header: 'Cannot reach authentication servers',
+					body: 'Minecraft authentication servers may be down right now. Check your internet connection and try again later',
+				}
+				console.warn('Failed to reach auth servers', err)
+			})
+
+		checkInterval = setTimeout(tick, 5 * 60 * 1000)
+	}
+	tick()
+
+	onUnmounted(() => clearTimeout(checkInterval))
 })
 
 const { formatMessage } = useVIntl()
@@ -296,16 +318,18 @@ async function setupApp() {
 		settings.pending_update_toast_for_version = null
 		await setSettings(settings)
 	}
-	
-	check_reachable().then((_resp) => {
-		console.log("Auth servers are reachable")
-	}).catch((err) => {
-		criticalErrorMessage.value = {
-			header: "Cannot reach authentication servers",
-			body: "Minecraft authentication servers may be down right now. Check your internet connection and try again later"
-		};
-		console.warn("Failed to reach auth servers", err)
-	})
+
+	check_reachable()
+		.then((_resp) => {
+			console.log('Auth servers are reachable')
+		})
+		.catch((err) => {
+			criticalErrorMessage.value = {
+				header: 'Cannot reach authentication servers',
+				body: 'Minecraft authentication servers may be down right now. Check your internet connection and try again later',
+			}
+			console.warn('Failed to reach auth servers', err)
+		})
 
 	if (osType === 'windows') {
 		await processPendingSurveys()
@@ -336,7 +360,11 @@ const handleClose = async () => {
 
 const router = useRouter()
 router.afterEach((to, from, failure) => {
-	trackEvent('PageView', { path: to.path, fromPath: from.path, failed: failure })
+	trackEvent('PageView', {
+		path: to.path,
+		fromPath: from.path,
+		failed: failure,
+	})
 })
 const route = useRoute()
 
@@ -677,7 +705,8 @@ async function processPendingSurveys() {
 	const isActivePlayer =
 		instances.findIndex(
 			(instance) =>
-				isWithinLastTwoWeeks(instance.last_played) && !isWithinLastTwoWeeks(instance.created),
+				isWithinLastTwoWeeks(instance.last_played) &&
+				!isWithinLastTwoWeeks(instance.created),
 		) >= 0
 
 	let surveys = []
@@ -693,7 +722,8 @@ async function processPendingSurveys() {
 				localStorage.getItem(`survey-${survey.id}-display`) === null &&
 				survey.type === 'tally_app' &&
 				((survey.condition === 'active_player' && isActivePlayer) ||
-					(survey.assigned_users?.includes(userId) && !survey.dismissed_users?.includes(userId)))
+					(survey.assigned_users?.includes(userId) &&
+						!survey.dismissed_users?.includes(userId)))
 			),
 	)
 
@@ -763,7 +793,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton v-tooltip.right="'Home'" to="/">
 				<HomeIcon />
 			</NavButton>
-			<NavButton v-if="themeStore.featureFlags.worlds_tab" v-tooltip.right="'Worlds'" to="/worlds">
+			<NavButton
+				v-if="themeStore.featureFlags.worlds_tab"
+				v-tooltip.right="'Worlds'"
+				to="/worlds"
+			>
 				<WorldIcon />
 			</NavButton>
 			<NavButton
@@ -861,7 +895,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:options="[
 					{
 						id: 'view-profile',
-						action: () => openUrl('https://modrinth.com/user/' + credentials.user.username),
+						action: () =>
+							openUrl('https://modrinth.com/user/' + credentials.user.username),
 					},
 					{
 						id: 'sign-out',
@@ -885,11 +920,18 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</template>
 				<template #sign-out> <LogOutIcon /> Sign out </template>
 			</OverflowMenu>
-			<NavButton v-else v-tooltip.right="'Sign in to a Modrinth account'" :to="() => signIn()">
+			<NavButton
+				v-else
+				v-tooltip.right="'Sign in to a Modrinth account'"
+				:to="() => signIn()"
+			>
 				<LogInIcon class="text-brand" />
 			</NavButton>
 		</div>
-		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
+		<div
+			data-tauri-drag-region
+			class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex"
+		>
 			<div data-tauri-drag-region class="flex p-3">
 				<ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
 				<div data-tauri-drag-region class="flex items-center gap-1 ml-3">
@@ -927,8 +969,16 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 						<RunningAppBar />
 					</Suspense>
 				</div>
-				<section v-if="!nativeDecorations" class="window-controls" data-tauri-drag-region-exclude>
-					<Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
+				<section
+					v-if="!nativeDecorations"
+					class="window-controls"
+					data-tauri-drag-region-exclude
+				>
+					<Button
+						class="titlebar-button"
+						icon-only
+						@click="() => getCurrentWindow().minimize()"
+					>
 						<MinimizeIcon />
 					</Button>
 					<Button
@@ -962,10 +1012,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				>
 					<h2 class="text-lg font-extrabold mt-0 mb-2">Hey there Modrinth user!</h2>
 					<p class="m-0 leading-tight">
-						Would you mind answering a few questions about your experience with Modrinth App?
+						Would you mind answering a few questions about your experience with Modrinth
+						App?
 					</p>
 					<p class="mt-3 mb-4 leading-tight">
-						This feedback will go directly to the Modrinth team and help guide future updates!
+						This feedback will go directly to the Modrinth team and help guide future
+						updates!
 					</p>
 					<div class="flex gap-2">
 						<ButtonStyled color="brand">
@@ -1004,7 +1056,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-if="criticalErrorMessage"
 				class="m-6 mb-0 flex flex-col border-red bg-bg-red rounded-2xl border-2 border-solid p-4 gap-1 font-semibold text-contrast"
 			>
-				<h1 class="m-0 text-lg font-extrabold">{{ criticalErrorMessage.header }}</h1>
+				<h1 class="m-0 text-lg font-extrabold">
+					{{ criticalErrorMessage.header }}
+				</h1>
 				<div
 					class="markdown-body text-primary"
 					v-html="renderString(criticalErrorMessage.body ?? '')"
@@ -1036,7 +1090,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 							<AccountsCard ref="accounts" mode="small" />
 						</suspense>
 					</div>
-					<div class="py-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+					<div
+						class="py-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
+					>
 						<suspense>
 							<FriendsList
 								:credentials="credentials"
@@ -1046,7 +1102,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 						</suspense>
 					</div>
 					<div v-if="news && news.length > 0" class="p-4 pr-1 flex flex-col items-center">
-						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">News</h3>
+						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">
+							News
+						</h3>
 						<div class="space-y-4 flex flex-col items-center w-full">
 							<NewsArticleCard
 								v-for="(item, index) in news"
