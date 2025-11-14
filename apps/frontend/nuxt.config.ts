@@ -392,9 +392,6 @@ export default defineNuxtConfig({
 	},
 	nitro: {
 		moduleSideEffects: ['@vintl/compact-number/locale-data'],
-		externals: {
-			external: ['papaparse'],
-		},
 		rollupConfig: {
 			// @ts-expect-error it's not infinite.
 			plugins: [serverSidedVue()],

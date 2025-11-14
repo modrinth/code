@@ -1,12 +1,38 @@
 import { $fetch } from 'ofetch'
-import Papa from 'papaparse'
-
 import { AbstractModule } from '../../core/abstract-module'
 import type { ISO3166 } from './types'
 
 export type { ISO3166 } from './types'
 
 const ISO3166_REPO = 'https://raw.githubusercontent.com/ipregistry/iso3166/master'
+
+/**
+ * Parse CSV string into array of objects
+ * @param csv - CSV string to parse
+ * @returns Array of objects with header keys mapped to row values
+ */
+function parseCSV(csv: string): Record<string, string>[] {
+	const lines = csv
+		.trim()
+		.split('\n')
+		.filter((line) => line.trim() !== '')
+
+	if (lines.length === 0) return []
+
+	const headerLine = lines[0]
+	const headers = (headerLine.startsWith('#') ? headerLine.slice(1) : headerLine).split(',')
+
+	return lines.slice(1).map((line) => {
+		const values = line.split(',')
+		const row: Record<string, string> = {}
+
+		headers.forEach((header, index) => {
+			row[header] = values[index] || ''
+		})
+
+		return row
+	})
+}
 
 /**
  * Module for fetching ISO 3166 country and subdivision data
@@ -32,7 +58,6 @@ export class ISO3166Module extends AbstractModule {
 	 */
 	public async build(): Promise<ISO3166.State> {
 		try {
-			// Fetch CSV files in parallel
 			const [countriesCSV, subdivisionsCSV] = await Promise.all([
 				$fetch<string>(`${ISO3166_REPO}/countries.csv`, {
 					// @ts-expect-error supports text
@@ -44,19 +69,8 @@ export class ISO3166Module extends AbstractModule {
 				}),
 			])
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const countriesData = Papa.parse<Record<string, any>>(countriesCSV, {
-				header: true,
-				skipEmptyLines: true,
-				transformHeader: (header) => (header.startsWith('#') ? header.slice(1) : header),
-			}).data
-
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const subdivisionsData = Papa.parse<Record<string, any>>(subdivisionsCSV, {
-				header: true,
-				skipEmptyLines: true,
-				transformHeader: (header) => (header.startsWith('#') ? header.slice(1) : header),
-			}).data
+			const countriesData = parseCSV(countriesCSV)
+			const subdivisionsData = parseCSV(subdivisionsCSV)
 
 			const countries: ISO3166.Country[] = countriesData.map((c) => ({
 				alpha2: c.country_code_alpha2,
