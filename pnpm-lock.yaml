@@ -601,6 +601,9 @@ importers:
       floating-vue:
         specifier: ^5.2.2
         version: 5.2.2(@nuxt/kit@3.17.5(magicast@0.3.5))(vue@3.5.13(typescript@5.5.4))
+      fuse.js:
+        specifier: ^6.6.2
+        version: 6.6.2
       highlight.js:
         specifier: ^11.9.0
         version: 11.9.0
@@ -691,7 +694,7 @@ importers:
         version: 11.9.0
       highlightjs-mcfunction:
         specifier: github:modrinth/better-highlightjs-mcfunction
-        version: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166
+        version: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/aa999b763fd792ffb950d28347eeb6811c83ea8e
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
@@ -5078,8 +5081,8 @@ packages:
     resolution: {integrity: sha512-fJ7cW7fQGCYAkgv4CPfwFHrfd/cLS4Hau96JuJ+ZTOWhjnhoeN1ub1tFmALm/+lW5z4WCAuAV9bm05AP0mS6Gw==}
     engines: {node: '>=12.0.0'}
 
-  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166:
-    resolution: {tarball: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166}
+  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/aa999b763fd792ffb950d28347eeb6811c83ea8e:
+    resolution: {tarball: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/aa999b763fd792ffb950d28347eeb6811c83ea8e}
     version: 1.0.0
 
   hookable@5.5.3:
@@ -13785,7 +13788,7 @@ snapshots:
 
   highlight.js@11.9.0: {}
 
-  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166: {}
+  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/aa999b763fd792ffb950d28347eeb6811c83ea8e: {}
 
   hookable@5.5.3: {}
 

@@ -625,8 +625,8 @@ import {
 	injectNotificationManager,
 	OverflowMenu,
 	PurchaseModal,
+	ServerListing,
 } from '@modrinth/ui'
-import ServerListing from '@modrinth/ui/src/components/servers/ServerListing.vue'
 import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
