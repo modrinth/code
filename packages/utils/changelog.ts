@@ -11,6 +11,22 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-11-14T12:15:00-07:00`,
+		product: 'servers',
+		body: `## Improvements
+- Improved the performance of the servers list.
+- Fixed startup commands not being updated properly.
+- Fixed autocomplete on pardon-ip and ban-ip commands.`,
+	},
+	{
+		date: `2025-11-14T12:15:00-07:00`,
+		product: 'web',
+		body: `## Improvements
+- Improved contrast, visibility, and consistency of UI elements, especially in light mode.
+- Fixed the chargest page not working properly.
+- Fixed certain icons showing above the mobile navbar.`,
+	},
+	{
 		date: `2025-11-11T12:50:00-07:00`,
 		product: 'app',
 		version: '0.10.19',
