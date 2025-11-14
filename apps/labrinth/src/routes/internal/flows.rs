@@ -16,6 +16,7 @@ use crate::routes::ApiError;
 use crate::routes::internal::session::issue_session;
 use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;
+use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::validate::validation_errors_to_string;
@@ -27,6 +28,7 @@ use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use ariadne::ids::random_base62_rng;
 use base64::Engine;
 use chrono::{Duration, Utc};
+use eyre::eyre;
 use lettre::message::Mailbox;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
@@ -36,6 +38,7 @@ use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
+use tracing::info;
 use validator::Validate;
 use zxcvbn::Score;
 
@@ -1087,6 +1090,12 @@ pub async fn init(
         None
     };
 
+    info!(
+        ?existing_user_id,
+        auth_token_present = %info.auth_token.is_some(),
+        "Starting authentication flow"
+    );
+
     let url =
         url::Url::parse(&info.url).map_err(|_| AuthenticationError::Url)?;
 
@@ -1145,28 +1154,46 @@ pub async fn auth_callback(
 
     let state = state_string.clone();
     let res: Result<HttpResponse, AuthenticationError> = async move {
-        let flow = DBFlow::get(&state, &redis).await?;
+        let flow = DBFlow::get(&state, &redis)
+            .await
+            .wrap_err("failed to fetch flow state")?
+            .wrap_err("no flow for state")?;
 
         // Extract cookie header from request
-        let Some(DBFlow::OAuth {
+        let DBFlow::OAuth {
             user_id,
             provider,
             url,
             existing_user_id,
-        }) = flow
+        } = flow
         else {
-            return Err(AuthenticationError::InvalidCredentials);
+            return Err(AuthenticationError::Internal(eyre!(
+                "invalid flow kind"
+            )));
         };
 
-        DBFlow::remove(&state, &redis).await?;
+        DBFlow::remove(&state, &redis)
+            .await
+            .wrap_err("failed to remove flow")?;
 
-        let token = provider.get_token(query).await?;
-        let oauth_user = provider.get_user(&token).await?;
+        let token = provider
+            .get_token(query)
+            .await
+            .wrap_err("failed to get token from provider")?;
+        let oauth_user = provider
+            .get_user(&token)
+            .await
+            .wrap_err("failed to get user from provider")?;
 
-        let user_id_opt =
-            provider.get_user_id(&oauth_user.id, &**client).await?;
+        let user_id_opt = provider
+            .get_user_id(&oauth_user.id, &**client)
+            .await
+            .wrap_err("failed to get user ID from provider")?;
 
-        let mut transaction = client.begin().await?;
+        let mut transaction = client
+            .begin()
+            .await
+            .wrap_err("failed to begin transaction")?;
 
         // PayPal isn't actually an SSO method; we allow users to link their PayPal
         // account to their Modrinth account via this OAuth flow. However, we MUST
@@ -1175,8 +1202,9 @@ pub async fn auth_callback(
         // Instead, we check who they're already logged in as, and just update
         // the PayPal info for that account.
         if provider == AuthProvider::PayPal {
-            let existing_user_id = existing_user_id
-                .ok_or(AuthenticationError::InvalidCredentials)?;
+            let existing_user_id = existing_user_id.wrap_err(
+                "attempting to link a PayPal account without being logged in",
+            )?;
 
             sqlx::query!(
                 "
@@ -1190,14 +1218,19 @@ pub async fn auth_callback(
                 existing_user_id as DBUserId,
             )
             .execute(&mut *transaction)
-            .await?;
+            .await
+            .wrap_err("failed to update user PayPal info")?;
 
-            transaction.commit().await?;
+            transaction
+                .commit()
+                .await
+                .wrap_err("failed to commit transaction")?;
             crate::database::models::DBUser::clear_caches(
                 &[(existing_user_id, None)],
                 &redis,
             )
-            .await?;
+            .await
+            .wrap_err("failed to clear user caches")?;
 
             return Ok(HttpResponse::TemporaryRedirect()
                 .append_header(("Location", &*url))
