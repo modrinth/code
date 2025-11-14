@@ -31,10 +31,9 @@
 
 <script lang="ts" setup>
 import { ExternalIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { ButtonStyled, MedalBackgroundImage } from '@modrinth/ui'
 
 import MedalIcon from '~/assets/images/illustrations/medal_icon.svg?component'
-import MedalBackgroundImage from '~/components/ui/servers/marketing/MedalBackgroundImage.vue'
 </script>
 
 <style scoped lang="scss">

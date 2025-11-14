@@ -3,6 +3,7 @@ import { CheckIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	commonProjectSettingsMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	ProjectSettingsEnvSelector,
@@ -10,8 +11,6 @@ import {
 	useSavable,
 } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
-
-import { injectModrinthClient } from '~/providers/api-client.ts'
 
 const { formatMessage } = useVIntl()
 
@@ -28,7 +27,7 @@ const supportsEnvironment = computed(() =>
 const needsToVerify = computed(
 	() =>
 		projectV3.value.side_types_migration_review_status === 'pending' &&
-		projectV3.value.environment?.length > 0 &&
+		(projectV3.value.environment?.length ?? 0) > 0 &&
 		projectV3.value.environment?.[0] !== 'unknown' &&
 		supportsEnvironment.value,
 )
@@ -157,12 +156,12 @@ const messages = defineMessages({
 				/>
 				<ProjectSettingsEnvSelector
 					v-model="current.environment"
-					:disabled="!hasPermission || projectV3?.environment?.length > 1"
+					:disabled="!hasPermission || (projectV3?.environment?.length ?? 0) > 1"
 				/>
 			</template>
 		</div>
 		<UnsavedChangesPopup
-			v-if="supportsEnvironment && hasPermission && projectV3?.environment?.length <= 1"
+			v-if="supportsEnvironment && hasPermission && (projectV3?.environment?.length ?? 0) <= 1"
 			:original="saved"
 			:modified="current"
 			:saving="saving"

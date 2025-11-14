@@ -13,11 +13,13 @@
 		"test": "vue-tsc --noEmit"
 	},
 	"dependencies": {
-		"@sfirew/minecraft-motd-parser": "^1.1.6",
+		"@modrinth/api-client": "workspace:^",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/ui": "workspace:*",
 		"@modrinth/utils": "workspace:*",
 		"@sentry/vue": "^8.27.0",
+		"@sfirew/minecraft-motd-parser": "^1.1.6",
+		"@tanstack/vue-query": "^5.90.7",
 		"@tauri-apps/api": "^2.5.0",
 		"@tauri-apps/plugin-dialog": "^2.2.1",
 		"@tauri-apps/plugin-http": "^2.5.0",
@@ -41,9 +43,9 @@
 		"vue-virtual-scroller": "v2.0.0-beta.8"
 	},
 	"devDependencies": {
-		"@modrinth/tooling-config": "workspace:*",
 		"@eslint/compat": "^1.1.1",
 		"@formatjs/cli": "^6.2.12",
+		"@modrinth/tooling-config": "workspace:*",
 		"@nuxt/eslint-config": "^0.5.6",
 		"@taijased/vue-render-tracker": "^1.0.7",
 		"@vitejs/plugin-vue": "^5.0.4",

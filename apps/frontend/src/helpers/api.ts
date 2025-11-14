@@ -1,12 +1,13 @@
-import type { AbstractFeature, AuthConfig, NuxtClientConfig } from '@modrinth/api-client'
 import {
+	type AbstractFeature,
+	type AuthConfig,
 	AuthFeature,
 	CircuitBreakerFeature,
 	NuxtCircuitBreakerStorage,
+	type NuxtClientConfig,
 	NuxtModrinthClient,
 	VerboseLoggingFeature,
 } from '@modrinth/api-client'
-import { createContext } from '@modrinth/ui'
 
 export function createModrinthClient(
 	auth: { token: string | undefined },
@@ -35,8 +36,3 @@ export function createModrinthClient(
 
 	return new NuxtModrinthClient(clientConfig)
 }
-
-export const [injectModrinthClient, provideModrinthClient] = createContext<NuxtModrinthClient>(
-	'root',
-	'modrinthClient',
-)

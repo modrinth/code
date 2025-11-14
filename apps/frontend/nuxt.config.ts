@@ -1,22 +1,16 @@
 import { pathToFileURL } from 'node:url'
 
 import { match as matchLocale } from '@formatjs/intl-localematcher'
+import { GenericModrinthClient, type Labrinth } from '@modrinth/api-client'
 import serverSidedVue from '@vitejs/plugin-vue'
 import { consola } from 'consola'
 import { promises as fs } from 'fs'
 import { globIterate } from 'glob'
 import { defineNuxtConfig } from 'nuxt/config'
-import { $fetch } from 'ofetch'
-import Papa from 'papaparse'
 import { basename, relative, resolve } from 'pathe'
 import svgLoader from 'vite-svg-loader'
 
-import type { GeneratedState } from './src/composables/generated'
-
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
-// ISO 3166 data from https://github.com/ipregistry/iso3166
-// Licensed under CC BY-SA 4.0
-const ISO3166_REPO = 'https://raw.githubusercontent.com/ipregistry/iso3166/master'
 
 const preloadedFonts = [
 	'inter/Inter-Regular.woff2',
@@ -139,7 +133,7 @@ export default defineNuxtConfig({
 			// 30 minutes
 			const TTL = 30 * 60 * 1000
 
-			let state: Partial<GeneratedState> = {}
+			let state: Partial<Labrinth.State.GeneratedState & Record<string, any>> = {}
 
 			try {
 				state = JSON.parse(await fs.readFile('./src/generated/state.json', 'utf8'))
@@ -165,123 +159,18 @@ export default defineNuxtConfig({
 				return
 			}
 
+			const client = new GenericModrinthClient({
+				labrinthBaseUrl: API_URL.replace('/v2/', ''),
+				userAgent: 'Knossos generator (support@modrinth.com)',
+			})
+
+			const generatedState = await client.labrinth.state.build()
 			state.lastGenerated = new Date().toISOString()
-
 			state.apiUrl = API_URL
-
-			const headers = {
-				headers: {
-					'user-agent': 'Knossos generator (support@modrinth.com)',
-				},
+			state = {
+				...state,
+				...generatedState,
 			}
-
-			const caughtErrorCodes = new Set<number>()
-
-			function handleFetchError(err: any, defaultValue: any) {
-				console.error('Error generating state: ', err)
-				caughtErrorCodes.add(err.status)
-				return defaultValue
-			}
-
-			const [
-				categories,
-				loaders,
-				gameVersions,
-				donationPlatforms,
-				reportTypes,
-				homePageProjects,
-				homePageSearch,
-				homePageNotifs,
-				products,
-				muralBankDetails,
-				countriesCSV,
-				subdivisionsCSV,
-			] = await Promise.all([
-				$fetch(`${API_URL}tag/category`, headers).catch((err) => handleFetchError(err, [])),
-				$fetch(`${API_URL}tag/loader`, headers).catch((err) => handleFetchError(err, [])),
-				$fetch(`${API_URL}tag/game_version`, headers).catch((err) => handleFetchError(err, [])),
-				$fetch(`${API_URL}tag/donation_platform`, headers).catch((err) =>
-					handleFetchError(err, []),
-				),
-				$fetch(`${API_URL}tag/report_type`, headers).catch((err) => handleFetchError(err, [])),
-				$fetch(`${API_URL}projects_random?count=60`, headers).catch((err) =>
-					handleFetchError(err, []),
-				),
-				$fetch(`${API_URL}search?limit=3&query=leave&index=relevance`, headers).catch((err) =>
-					handleFetchError(err, {}),
-				),
-				$fetch(`${API_URL}search?limit=3&query=&index=updated`, headers).catch((err) =>
-					handleFetchError(err, {}),
-				),
-				$fetch(`${API_URL.replace('/v2/', '/_internal/')}billing/products`, headers).catch((err) =>
-					handleFetchError(err, []),
-				),
-				$fetch(`${API_URL.replace('/v2/', '/_internal/')}mural/bank-details`, headers).catch(
-					(err) => handleFetchError(err, null),
-				),
-				$fetch<string>(`${ISO3166_REPO}/countries.csv`, {
-					...headers,
-					responseType: 'text',
-				}).catch((err) => handleFetchError(err, '')),
-				$fetch<string>(`${ISO3166_REPO}/subdivisions.csv`, {
-					...headers,
-					responseType: 'text',
-				}).catch((err) => handleFetchError(err, '')),
-			])
-
-			const countriesData = Papa.parse(countriesCSV, {
-				header: true,
-				skipEmptyLines: true,
-				transformHeader: (header) => (header.startsWith('#') ? header.slice(1) : header),
-			}).data
-			const subdivisionsData = Papa.parse(subdivisionsCSV, {
-				header: true,
-				skipEmptyLines: true,
-				transformHeader: (header) => (header.startsWith('#') ? header.slice(1) : header),
-			}).data
-
-			const subdivisionsByCountry = (subdivisionsData as any[]).reduce(
-				(acc, sub) => {
-					const countryCode = sub.country_code_alpha2
-
-					if (!countryCode || typeof countryCode !== 'string' || countryCode.trim() === '') {
-						return acc
-					}
-
-					if (!acc[countryCode]) acc[countryCode] = []
-
-					acc[countryCode].push({
-						code: sub['subdivision_code_iso3166-2'],
-						name: sub.subdivision_name,
-						localVariant: sub.localVariant || null,
-						category: sub.category,
-						parent: sub.parent_subdivision || null,
-						language: sub.language_code,
-					})
-					return acc
-				},
-				{} as Record<string, any[]>,
-			)
-
-			state.categories = categories
-			state.loaders = loaders
-			state.gameVersions = gameVersions
-			state.donationPlatforms = donationPlatforms
-			state.reportTypes = reportTypes
-			state.homePageProjects = homePageProjects
-			state.homePageSearch = homePageSearch
-			state.homePageNotifs = homePageNotifs
-			state.products = products
-			state.muralBankDetails = muralBankDetails.bankDetails
-			state.countries = (countriesData as any[]).map((c) => ({
-				alpha2: c.country_code_alpha2,
-				alpha3: c.country_code_alpha3,
-				numeric: c.numeric_code,
-				nameShort: c.name_short,
-				nameLong: c.name_long,
-			}))
-			state.subdivisions = subdivisionsByCountry
-			state.errors = [...caughtErrorCodes]
 
 			await fs.writeFile('./src/generated/state.json', JSON.stringify(state))
 

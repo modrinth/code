@@ -1,5 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
-import type { ProjectV3 } from './types/v3'
+import type { Labrinth } from '../types'
 
 export class LabrinthProjectsV3Module extends AbstractModule {
 	public getModuleID(): string {
@@ -18,8 +18,8 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 	 * console.log(project.project_types) // v3 field
 	 * ```
 	 */
-	public async get(id: string): Promise<ProjectV3> {
-		return this.client.request<ProjectV3>(`/project/${id}`, {
+	public async get(id: string): Promise<Labrinth.Projects.v3.Project> {
+		return this.client.request<Labrinth.Projects.v3.Project>(`/project/${id}`, {
 			api: 'labrinth',
 			version: 3,
 			method: 'GET',
@@ -37,8 +37,8 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 	 * const projects = await client.labrinth.projects_v3.getMultiple(['sodium', 'lithium'])
 	 * ```
 	 */
-	public async getMultiple(ids: string[]): Promise<ProjectV3[]> {
-		return this.client.request<ProjectV3[]>(`/projects`, {
+	public async getMultiple(ids: string[]): Promise<Labrinth.Projects.v3.Project[]> {
+		return this.client.request<Labrinth.Projects.v3.Project[]>(`/projects`, {
 			api: 'labrinth',
 			version: 3,
 			method: 'GET',
@@ -59,7 +59,7 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 	 * })
 	 * ```
 	 */
-	public async edit(id: string, data: Partial<ProjectV3>): Promise<void> {
+	public async edit(id: string, data: Labrinth.Projects.v3.EditProjectRequest): Promise<void> {
 		return this.client.request(`/project/${id}`, {
 			api: 'labrinth',
 			version: 3,

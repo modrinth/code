@@ -1,4 +1,5 @@
 <script setup>
+import { AuthFeature, TauriModrinthClient } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
@@ -18,6 +19,7 @@ import {
 	RefreshCwIcon,
 	RestoreIcon,
 	RightArrowIcon,
+	ServerIcon,
 	SettingsIcon,
 	UserIcon,
 	WorldIcon,
@@ -32,6 +34,7 @@ import {
 	NotificationPanel,
 	OverflowMenu,
 	ProgressSpinner,
+	provideModrinthClient,
 	provideNotificationManager,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
@@ -101,6 +104,16 @@ const themeStore = useTheming()
 const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
 const { handleError, addNotification } = notificationManager
+
+const tauriApiClient = new TauriModrinthClient({
+	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
+	features: [
+		new AuthFeature({
+			token: async () => (await getCreds()).session,
+		}),
+	],
+})
+provideModrinthClient(tauriApiClient)
 
 const news = ref([])
 const availableSurvey = ref(false)
@@ -741,6 +754,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 			<NavButton v-if="themeStore.featureFlags.worlds_tab" v-tooltip.right="'Worlds'" to="/worlds">
 				<WorldIcon />
+			</NavButton>
+			<NavButton
+				v-if="themeStore.featureFlags.servers_in_app"
+				v-tooltip.right="'Servers'"
+				to="/servers/manage"
+			>
+				<ServerIcon />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="'Discover content'"

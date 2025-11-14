@@ -1,5 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
-import type { ProjectSearchParams, ProjectV2, SearchResult } from './types/v2'
+import type { Labrinth } from '../types'
 
 export class LabrinthProjectsV2Module extends AbstractModule {
 	public getModuleID(): string {
@@ -18,8 +18,8 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 	 * console.log(project.title) // "Sodium"
 	 * ```
 	 */
-	public async get(id: string): Promise<ProjectV2> {
-		return this.client.request<ProjectV2>(`/project/${id}`, {
+	public async get(id: string): Promise<Labrinth.Projects.v2.Project> {
+		return this.client.request<Labrinth.Projects.v2.Project>(`/project/${id}`, {
 			api: 'labrinth',
 			version: 2,
 			method: 'GET',
@@ -37,8 +37,8 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 	 * const projects = await client.labrinth.projects_v2.getMultiple(['sodium', 'lithium', 'phosphor'])
 	 * ```
 	 */
-	public async getMultiple(ids: string[]): Promise<ProjectV2[]> {
-		return this.client.request<ProjectV2[]>(`/projects`, {
+	public async getMultiple(ids: string[]): Promise<Labrinth.Projects.v2.Project[]> {
+		return this.client.request<Labrinth.Projects.v2.Project[]>(`/projects`, {
 			api: 'labrinth',
 			version: 2,
 			method: 'GET',
@@ -61,8 +61,10 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 	 * })
 	 * ```
 	 */
-	public async search(params: ProjectSearchParams): Promise<SearchResult> {
-		return this.client.request<SearchResult>(`/search`, {
+	public async search(
+		params: Labrinth.Projects.v2.ProjectSearchParams,
+	): Promise<Labrinth.Projects.v2.SearchResult> {
+		return this.client.request<Labrinth.Projects.v2.SearchResult>(`/search`, {
 			api: 'labrinth',
 			version: 2,
 			method: 'GET',
@@ -83,7 +85,7 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 	 * })
 	 * ```
 	 */
-	public async edit(id: string, data: Partial<ProjectV2>): Promise<void> {
+	public async edit(id: string, data: Partial<Labrinth.Projects.v2.Project>): Promise<void> {
 		return this.client.request(`/project/${id}`, {
 			api: 'labrinth',
 			version: 2,

@@ -47,6 +47,9 @@ importers:
 
   apps/app-frontend:
     dependencies:
+      '@modrinth/api-client':
+        specifier: workspace:^
+        version: link:../../packages/api-client
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../../packages/assets
@@ -62,6 +65,9 @@ importers:
       '@sfirew/minecraft-motd-parser':
         specifier: ^1.1.6
         version: 1.1.6
+      '@tanstack/vue-query':
+        specifier: ^5.90.7
+        version: 5.90.7(vue@3.5.13(typescript@5.5.4))
       '@tauri-apps/api':
         specifier: ^2.5.0
         version: 2.5.0
@@ -239,6 +245,9 @@ importers:
       '@pinia/nuxt':
         specifier: ^0.5.1
         version: 0.5.1(magicast@0.3.5)(rollup@4.28.1)(typescript@5.5.4)(vue@3.5.13(typescript@5.5.4))
+      '@tanstack/vue-query':
+        specifier: ^5.90.7
+        version: 5.90.7(vue@3.5.13(typescript@5.5.4))
       '@types/three':
         specifier: ^0.172.0
         version: 0.172.0
@@ -287,9 +296,6 @@ importers:
       markdown-it:
         specifier: 14.1.0
         version: 14.1.0
-      papaparse:
-        specifier: ^5.4.1
-        version: 5.5.3
       pathe:
         specifier: ^1.1.2
         version: 1.1.2
@@ -342,9 +348,6 @@ importers:
       '@types/node':
         specifier: ^20.1.0
         version: 20.14.11
-      '@types/papaparse':
-        specifier: ^5.3.15
-        version: 5.3.16
       '@vintl/compact-number':
         specifier: ^2.0.5
         version: 2.0.7(@formatjs/intl@2.10.4(typescript@5.5.4))
@@ -544,12 +547,18 @@ importers:
       '@codemirror/view':
         specifier: ^6.22.1
         version: 6.28.4
+      '@modrinth/api-client':
+        specifier: workspace:*
+        version: link:../api-client
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../assets
       '@modrinth/utils':
         specifier: workspace:*
         version: link:../utils
+      '@tanstack/vue-query':
+        specifier: ^5.90.7
+        version: 5.90.7(vue@3.5.13(typescript@5.5.4))
       '@tresjs/cientos':
         specifier: ^4.3.0
         version: 4.3.1(@tresjs/core@4.3.6(three@0.172.0)(typescript@5.5.4)(vue@3.5.13(typescript@5.5.4)))(@types/three@0.172.0)(react@19.1.1)(three@0.172.0)(typescript@5.5.4)(vue@3.5.13(typescript@5.5.4))
@@ -580,6 +589,9 @@ importers:
       floating-vue:
         specifier: ^5.2.2
         version: 5.2.2(@nuxt/kit@3.17.5(magicast@0.3.5))(vue@3.5.13(typescript@5.5.4))
+      fuse.js:
+        specifier: ^6.6.2
+        version: 6.6.2
       highlight.js:
         specifier: ^11.9.0
         version: 11.9.0
@@ -670,7 +682,7 @@ importers:
         version: 11.9.0
       highlightjs-mcfunction:
         specifier: github:modrinth/better-highlightjs-mcfunction
-        version: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166
+        version: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/aa999b763fd792ffb950d28347eeb6811c83ea8e
       markdown-it:
         specifier: ^14.1.0
         version: 14.1.0
@@ -2587,6 +2599,22 @@ packages:
     peerDependencies:
       vue: ^3.0.0
 
+  '@tanstack/match-sorter-utils@8.19.4':
+    resolution: {integrity: sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==}
+    engines: {node: '>=12'}
+
+  '@tanstack/query-core@5.90.7':
+    resolution: {integrity: sha512-6PN65csiuTNfBMXqQUxQhCNdtm1rV+9kC9YwWAIKcaxAauq3Wu7p18j3gQY3YIBJU70jT/wzCCZ2uqto/vQgiQ==}
+
+  '@tanstack/vue-query@5.90.7':
+    resolution: {integrity: sha512-2h0esebc2qVRVDge3gFArhss5+qn/Wb4abXuaEliSy+/xPWQMrEX7Ny0UKkCy1HcMZZjvfTtNRUfpYrx+vpipw==}
+    peerDependencies:
+      '@vue/composition-api': ^1.1.2
+      vue: ^2.6.0 || ^3.3.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+
   '@taplo/core@0.2.0':
     resolution: {integrity: sha512-r8bl54Zj1In3QLkiW/ex694bVzpPJ9EhwqT9xkcUVODnVUGirdB1JTsmiIv0o1uwqZiwhi8xNnTOQBRQCpizrQ==}
 
@@ -2805,9 +2833,6 @@ packages:
 
   '@types/offscreencanvas@2019.7.3':
     resolution: {integrity: sha512-ieXiYmgSRXUDeOntE1InxjWyvEelZGP63M+cGuquuRLuIKKT1osnkXjxev9B7d1nXSug5vpunx+gNlbVxMlC9A==}
-
-  '@types/papaparse@5.3.16':
-    resolution: {integrity: sha512-T3VuKMC2H0lgsjI9buTB3uuKj3EMD2eap1MOuEQuBQ44EnDx/IkGhU6EwiTf9zG3za4SKlmwKAImdDKdNnCsXg==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -5041,8 +5066,8 @@ packages:
     resolution: {integrity: sha512-fJ7cW7fQGCYAkgv4CPfwFHrfd/cLS4Hau96JuJ+ZTOWhjnhoeN1ub1tFmALm/+lW5z4WCAuAV9bm05AP0mS6Gw==}
     engines: {node: '>=12.0.0'}
 
-  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166:
-    resolution: {tarball: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166}
+  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/aa999b763fd792ffb950d28347eeb6811c83ea8e:
+    resolution: {tarball: https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/aa999b763fd792ffb950d28347eeb6811c83ea8e}
     version: 1.0.0
 
   hookable@5.5.3:
@@ -6184,9 +6209,6 @@ packages:
   pako@1.0.11:
     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
 
-  papaparse@5.5.3:
-    resolution: {integrity: sha512-5QvjGxYVjxO59MGU2lHVYpRWBBtKHnlIAcSe1uNFCkkptUh63NFRj0FJQm7nR67puEruUci/ZkjmEFrjCAyP4A==}
-
   param-case@3.0.4:
     resolution: {integrity: sha512-RXlj7zCYokReqWpOPH9oYivUzLYZ5vAPIfEmCTNViosC78F8F0H9y7T7gG2M39ymgutxF5gcFEsyZQSph9Bp3A==}
 
@@ -6886,6 +6908,9 @@ packages:
 
   remark-stringify@11.0.0:
     resolution: {integrity: sha512-1OSmLd3awB/t8qdoEOMazZkNsfVTeY4fTsgzcQFdXNq8ToTN4ZGwrMnlda4K6smTFKD+GRV6O48i6Z4iKgPPpw==}
+
+  remove-accents@0.5.0:
+    resolution: {integrity: sha512-8g3/Otx1eJaVD12e31UbJj1YzdtVvzH85HV7t+9MJYk/u3XmkOUJ5Ys9wQrf9PCPK8+xn4ymzqYCiZl6QWKn+A==}
 
   request-light@0.5.8:
     resolution: {integrity: sha512-3Zjgh+8b5fhRJBQZoy+zbVKpAQGLyka0MPgW3zruTF4dFFJ8Fqcfu9YsAvi/rvdcaTeWG3MkbZv4WKxAn/84Lg==}
@@ -10522,6 +10547,20 @@ snapshots:
     dependencies:
       vue: 3.5.13(typescript@5.5.4)
 
+  '@tanstack/match-sorter-utils@8.19.4':
+    dependencies:
+      remove-accents: 0.5.0
+
+  '@tanstack/query-core@5.90.7': {}
+
+  '@tanstack/vue-query@5.90.7(vue@3.5.13(typescript@5.5.4))':
+    dependencies:
+      '@tanstack/match-sorter-utils': 8.19.4
+      '@tanstack/query-core': 5.90.7
+      '@vue/devtools-api': 6.6.4
+      vue: 3.5.13(typescript@5.5.4)
+      vue-demi: 0.14.10(vue@3.5.13(typescript@5.5.4))
+
   '@taplo/core@0.2.0': {}
 
   '@taplo/lib@0.5.0':
@@ -10739,10 +10778,6 @@ snapshots:
   '@types/normalize-package-data@2.4.4': {}
 
   '@types/offscreencanvas@2019.7.3': {}
-
-  '@types/papaparse@5.3.16':
-    dependencies:
-      '@types/node': 20.14.11
 
   '@types/resolve@1.20.2': {}
 
@@ -13731,7 +13766,7 @@ snapshots:
 
   highlight.js@11.9.0: {}
 
-  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/68a27ae888cfc0e8737f4f2cf1abb67e82078166: {}
+  highlightjs-mcfunction@https://codeload.github.com/modrinth/better-highlightjs-mcfunction/tar.gz/aa999b763fd792ffb950d28347eeb6811c83ea8e: {}
 
   hookable@5.5.3: {}
 
@@ -15299,8 +15334,6 @@ snapshots:
 
   pako@1.0.11: {}
 
-  papaparse@5.5.3: {}
-
   param-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
@@ -16032,6 +16065,8 @@ snapshots:
       '@types/mdast': 4.0.4
       mdast-util-to-markdown: 2.1.0
       unified: 11.0.5
+
+  remove-accents@0.5.0: {}
 
   request-light@0.5.8: {}
 

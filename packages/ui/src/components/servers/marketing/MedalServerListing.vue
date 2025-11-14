@@ -80,7 +80,7 @@
 				</div>
 			</AutoLink>
 
-			<div class="z-10 ml-auto">
+			<div v-if="isNuxt" class="z-10 ml-auto">
 				<ButtonStyled color="medal-promo" type="outlined" size="large">
 					<button class="my-auto" @click="handleUpgrade"><RocketIcon /> Upgrade</button>
 				</ButtonStyled>
@@ -91,7 +91,7 @@
 			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
 			class="relative flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
 		>
-			<PanelSpinner />
+			<LoaderCircleIcon class="size-5 animate-spin" />
 			Your server's hardware is currently being upgraded and will be back online shortly.
 		</div>
 		<div
@@ -99,7 +99,7 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your Medal server trial has ended and your server has
+				<TriangleAlertIcon class="!size-5" /> Your Medal server trial has ended and your server has
 				been suspended. Please upgrade to continue to use your server.
 			</div>
 		</div>
@@ -108,8 +108,9 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your server has been suspended: {{ suspension_reason }}.
-				Please update your billing information or contact Modrinth Support for more information.
+				<TriangleAlertIcon class="!size-5" /> Your server has been suspended:
+				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
+				for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -118,7 +119,7 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<PanelErrorIcon class="!size-5" /> Your server has been suspended. Please update your
+				<TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your
 				billing information or contact Modrinth Support for more information.
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
@@ -127,39 +128,48 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRightIcon, LockIcon, RocketIcon, SparklesIcon } from '@modrinth/assets'
-import { AutoLink, Avatar, ButtonStyled, CopyCode } from '@modrinth/ui'
-import type { Project, Server } from '@modrinth/utils'
+import { type Archon, NuxtModrinthClient } from '@modrinth/api-client'
+import {
+	ChevronRightIcon,
+	LoaderCircleIcon,
+	LockIcon,
+	RocketIcon,
+	SparklesIcon,
+	TriangleAlertIcon,
+} from '@modrinth/assets'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
-import MedalBackgroundImage from '~/components/ui/servers/marketing/MedalBackgroundImage.vue'
-
-import PanelErrorIcon from '../icons/PanelErrorIcon.vue'
-import PanelSpinner from '../PanelSpinner.vue'
-import ServerInfoLabels from '../ServerInfoLabels.vue'
+import { injectModrinthClient } from '../../../providers/api-client'
+import AutoLink from '../../base/AutoLink.vue'
+import Avatar from '../../base/Avatar.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
+import CopyCode from '../../base/CopyCode.vue'
+import ServerInfoLabels from '../labels/ServerInfoLabels.vue'
+import MedalBackgroundImage from './MedalBackgroundImage.vue'
 
 dayjs.extend(dayjsDuration)
 
-const props = defineProps<Partial<Server>>()
+const props = defineProps<Partial<Archon.Servers.v0.Server>>()
 const emit = defineEmits<{ (e: 'upgrade'): void }>()
+
+const client = injectModrinthClient()
+
+const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 
 const showGameLabel = computed(() => !!props.game)
 const showLoaderLabel = computed(() => !!props.loader)
 
-let projectData: Ref<Project | null>
-if (props.upstream) {
-	const { data } = await useAsyncData<Project>(
-		`server-project-${props.server_id}`,
-		async (): Promise<Project> => {
-			const result = await useBaseFetch(`project/${props.upstream?.project_id}`)
-			return result as Project
-		},
-	)
-	projectData = data
-} else {
-	projectData = ref(null)
-}
+const { data: projectData } = useQuery({
+	queryKey: ['server-project', props.server_id, props.upstream?.project_id],
+	queryFn: async () => {
+		if (!props.upstream?.project_id) return null
+		return await client.labrinth.projects_v2.get(props.upstream.project_id)
+	},
+	enabled: !!props.upstream?.project_id,
+})
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined)
 const isConfiguring = computed(() => props.flows?.intro)

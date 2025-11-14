@@ -20,7 +20,7 @@ export type RequestOptions = {
 	 * - number: version number (e.g., 2 for v2, 3 for v3)
 	 * - 'internal': use internal API
 	 */
-	version: number | 'internal'
+	version: number | 'internal' | string
 
 	/**
 	 * HTTP method to use

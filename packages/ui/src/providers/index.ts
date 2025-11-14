@@ -78,5 +78,6 @@ export function createContext<ContextValue>(
 	return [injectContext, provideContext] as const
 }
 
+export * from './api-client'
 export * from './project-page'
 export * from './web-notifications'

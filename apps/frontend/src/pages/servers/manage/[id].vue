@@ -377,6 +377,8 @@ import {
 	ButtonStyled,
 	ErrorInformationCard,
 	injectNotificationManager,
+	ServerIcon,
+	ServerInfoLabels,
 	ServerNotice,
 } from '@modrinth/ui'
 import type {
@@ -398,8 +400,6 @@ import InstallingTicker from '~/components/ui/servers/InstallingTicker.vue'
 import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
 import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
-import ServerIcon from '~/components/ui/servers/ServerIcon.vue'
-import ServerInfoLabels from '~/components/ui/servers/ServerInfoLabels.vue'
 import ServerInstallation from '~/components/ui/servers/ServerInstallation.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'

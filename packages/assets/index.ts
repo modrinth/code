@@ -40,6 +40,7 @@ import _CurseForgeIcon from './external/curseforge.svg?component'
 import _DiscordIcon from './external/discord.svg?component'
 import _FacebookIcon from './external/facebook.svg?component'
 import _GithubIcon from './external/github.svg?component'
+import _MinecraftServerIcon from './external/illustrations/minecraft_server_icon.png?url'
 import _InstagramIcon from './external/instagram.svg?component'
 import _KoFiIcon from './external/kofi.svg?component'
 import _MastodonIcon from './external/mastodon.svg?component'
@@ -113,6 +114,7 @@ export const VenmoIcon = _VenmoIcon
 export const PolygonIcon = _PolygonIcon
 export const USDCColorIcon = _USDCColorIcon
 export const VisaIcon = _VisaIcon
+export const MinecraftServerIcon = _MinecraftServerIcon
 
 export * from './generated-icons'
 export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'

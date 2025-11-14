@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { EnvironmentV3 } from '@modrinth/utils'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
@@ -8,7 +7,7 @@ import LargeRadioButton from '../../../base/LargeRadioButton.vue'
 
 const { formatMessage } = useVIntl()
 
-const value = defineModel<EnvironmentV3 | undefined>({ required: true })
+const value = defineModel<string | undefined>({ required: true })
 
 withDefaults(
 	defineProps<{
@@ -135,7 +134,7 @@ type SubOptionKey = ValidKeys<(typeof OUTER_OPTIONS)[keyof typeof OUTER_OPTIONS]
 const currentOuterOption = ref<OuterOptionKey>()
 const currentSubOption = ref<SubOptionKey>()
 
-const computedOption = computed<EnvironmentV3>(() => {
+const computedOption = computed<string>(() => {
 	switch (currentOuterOption.value) {
 		case 'client':
 			return 'client_only'

@@ -13,13 +13,15 @@
 				v-else
 				class="h-full w-full select-none object-fill"
 				alt="Server Icon"
-				src="~/assets/images/servers/minecraft_server_icon.png"
+				:src="MinecraftServerIcon"
 			/>
 		</client-only>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { MinecraftServerIcon } from '@modrinth/assets'
+
 defineProps<{
 	image: string | undefined
 }>()
