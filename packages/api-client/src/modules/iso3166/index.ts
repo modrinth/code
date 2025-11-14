@@ -1,4 +1,5 @@
 import { $fetch } from 'ofetch'
+
 import { AbstractModule } from '../../core/abstract-module'
 import type { ISO3166 } from './types'
 
