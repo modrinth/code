@@ -112,8 +112,8 @@
 <script setup lang="ts">
 import { CheckCircleIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
 import {
-	reportQuickReplies,
 	type ExtendedReport,
+	reportQuickReplies,
 	type ReportQuickReply,
 } from '@modrinth/moderation'
 import {
@@ -126,11 +126,12 @@ import {
 } from '@modrinth/ui'
 import type { Thread, ThreadMessage as TypeThreadMessage, User } from '@modrinth/utils'
 import dayjs from 'dayjs'
+
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { isStaff } from '~/helpers/users.js'
-import ThreadMessage from './ThreadMessage.vue'
 
 import ChevronDownIcon from '../servers/icons/ChevronDownIcon.vue'
+import ThreadMessage from './ThreadMessage.vue'
 
 const { addNotification } = injectNotificationManager()
 

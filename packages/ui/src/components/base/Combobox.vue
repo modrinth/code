@@ -128,7 +128,7 @@ import {
 	watch,
 } from 'vue'
 
-export interface DropdownOption<T> {
+export interface ComboboxOption<T> {
 	value: T
 	label: string
 	icon?: Component
@@ -144,19 +144,19 @@ const DROPDOWN_VIEWPORT_MARGIN = 8
 const DEFAULT_MAX_HEIGHT = 300
 
 function isDropdownOption<T>(
-	opt: DropdownOption<T> | { type: 'divider' },
-): opt is DropdownOption<T> {
+	opt: ComboboxOption<T> | { type: 'divider' },
+): opt is ComboboxOption<T> {
 	return 'value' in opt
 }
 
-function isDivider<T>(opt: DropdownOption<T> | { type: 'divider' }): opt is { type: 'divider' } {
+function isDivider<T>(opt: ComboboxOption<T> | { type: 'divider' }): opt is { type: 'divider' } {
 	return opt.type === 'divider'
 }
 
 const props = withDefaults(
 	defineProps<{
 		modelValue?: T
-		options: (DropdownOption<T> | { type: 'divider' })[]
+		options: (ComboboxOption<T> | { type: 'divider' })[]
 		placeholder?: string
 		disabled?: boolean
 		searchable?: boolean
@@ -183,7 +183,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	'update:modelValue': [value: T]
-	select: [option: DropdownOption<T>]
+	select: [option: ComboboxOption<T>]
 	open: []
 	close: []
 }>()
@@ -220,9 +220,9 @@ const triggerClasses = computed(() => {
 	return classes
 })
 
-const selectedOption = computed<DropdownOption<T> | undefined>(() => {
+const selectedOption = computed<ComboboxOption<T> | undefined>(() => {
 	return props.options.find(
-		(opt): opt is DropdownOption<T> => isDropdownOption(opt) && opt.value === props.modelValue,
+		(opt): opt is ComboboxOption<T> => isDropdownOption(opt) && opt.value === props.modelValue,
 	)
 })
 
@@ -254,7 +254,7 @@ const filteredOptions = computed(() => {
 const shouldRoundBottomCorners = computed(() => isOpen.value && openDirection.value === 'down')
 const shouldRoundTopCorners = computed(() => isOpen.value && openDirection.value === 'up')
 
-function getOptionClasses(item: DropdownOption<T> & { key: string }, index: number) {
+function getOptionClasses(item: ComboboxOption<T> & { key: string }, index: number) {
 	return [
 		item.class,
 		{
@@ -386,7 +386,7 @@ function handleTriggerClick() {
 	}
 }
 
-function handleOptionClick(option: DropdownOption<T>, index: number) {
+function handleOptionClick(option: ComboboxOption<T>, index: number) {
 	if (option.disabled || option.type === 'divider') return
 
 	focusedIndex.value = index
