@@ -67,6 +67,7 @@ pub struct SearchProjectsFilter {
     Deserialize,
     utoipa::ToSchema,
 )]
+#[serde(rename_all = "snake_case")]
 pub enum SearchProjectsSort {
     CreatedAsc,
     CreatedDesc,
@@ -153,8 +154,8 @@ pub struct FileIssue {
 /// Occurrence of a [`FileIssue`] in a specific class in a scanned JAR file.
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct FileIssueDetail {
-    /// Name of the Java class in which this issue was found.
-    pub class_name: String,
+    /// Name of the Java class path in which this issue was found.
+    pub file_path: String,
     /// Decompiled, pretty-printed source of the Java class.
     pub decompiled_source: String,
     /// How important is this issue, as flagged by Delphi?
@@ -236,7 +237,7 @@ async fn search_projects(
             dri.status AS "issue_status!: DelphiReportIssueStatus",
             -- maybe null
             drid.id AS "issue_detail_id?: DelphiReportIssueDetailsId",
-            drid.internal_class_name AS "issue_detail_class_name?",
+            drid.file_path AS "issue_detail_file_path?",
             drid.decompiled_source AS "issue_detail_decompiled_source?",
             drid.severity AS "issue_detail_severity?: DelphiSeverity"
         FROM delphi_reports dr
@@ -322,12 +323,12 @@ async fn search_projects(
 
         let (
             Some(issue_detail_id),
-            Some(class_name),
+            Some(file_path),
             Some(decompiled_source),
             Some(severity),
         ) = (
             row.issue_detail_id,
-            row.issue_detail_class_name,
+            row.issue_detail_file_path,
             row.issue_detail_decompiled_source,
             row.issue_detail_severity,
         )
@@ -336,7 +337,7 @@ async fn search_projects(
         };
         issue.details.entry(issue_detail_id).or_insert_with(|| {
             FileIssueDetail {
-                class_name,
+                file_path,
                 decompiled_source,
                 severity,
             }
@@ -414,8 +415,7 @@ async fn search_projects(
                                             .into_iter()
                                             .map(|(_, detail)| {
                                                 FileIssueDetail {
-                                                    class_name: detail
-                                                        .class_name,
+                                                    file_path: detail.file_path,
                                                     decompiled_source: detail
                                                         .decompiled_source,
                                                     severity: detail.severity,

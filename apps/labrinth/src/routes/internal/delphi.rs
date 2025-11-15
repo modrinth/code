@@ -6,7 +6,7 @@ use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
 use sqlx::PgPool;
 use tokio::sync::Mutex;
-use tracing::info;
+use tracing::{info, warn};
 
 use crate::{
     auth::check_is_moderator_from_headers,
@@ -18,7 +18,6 @@ use crate::{
                 DBDelphiReport, DBDelphiReportIssue,
                 DBDelphiReportIssueDetails, DecompiledJavaClassSource,
                 DelphiReportIssueStatus, DelphiReportListOrder, DelphiSeverity,
-                InternalJavaClassName,
             },
         },
         redis::RedisPool,
@@ -61,7 +60,8 @@ static DELPHI_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
 
 #[derive(Deserialize)]
 struct DelphiReportIssueDetails {
-    pub internal_class_name: InternalJavaClassName,
+    pub file: String,
+    pub key: String,
     pub decompiled_source: Option<DecompiledJavaClassSource>,
     pub data: HashMap<String, serde_json::Value>,
     pub severity: DelphiSeverity,
@@ -94,14 +94,14 @@ impl DelphiReport {
 
         for (issue, trace) in &self.issues {
             for DelphiReportIssueDetails {
-                internal_class_name,
+                file,
                 decompiled_source,
                 ..
             } in trace
             {
                 write!(
                     &mut message_header,
-                    "\n issue {issue} found at class `{internal_class_name}`:\n```\n{}\n```",
+                    "\n issue {issue} found at class `{file}`:\n```\n{}\n```",
                     decompiled_source.as_ref().map_or(
                         "No decompiled source available",
                         |decompiled_source| &**decompiled_source
@@ -131,13 +131,21 @@ pub struct DelphiRunParameters {
 async fn ingest_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    web::Json(report): web::Json<DelphiReport>,
-) -> Result<HttpResponse, ApiError> {
-    tracing::error!("!! INGEST !!");
+    report: web::Bytes,
+    // web::Json(report): web::Json<DelphiReport>,
+) -> Result<(), ApiError> {
+    info!(
+        "Json: {}",
+        serde_json::to_string_pretty(
+            &serde_json::from_slice::<serde_json::Value>(&report).unwrap()
+        )
+        .unwrap()
+    );
+    let report = serde_json::from_slice::<DelphiReport>(&report).unwrap();
 
     if report.issues.is_empty() {
         info!("No issues found for file {}", report.url);
-        return Ok(HttpResponse::NoContent().finish());
+        return Ok(());
     }
 
     report.send_to_slack(&pool, &redis).await.ok();
@@ -154,6 +162,12 @@ async fn ingest_report(
     }
     .upsert(&mut transaction)
     .await?;
+
+    warn!(
+        "Delphi found {} issues in file {}",
+        report.issues.len(),
+        report.url
+    );
 
     for (issue_type, issue_details) in report.issues {
         let issue_id = DBDelphiReportIssue {
@@ -176,7 +190,8 @@ async fn ingest_report(
             DBDelphiReportIssueDetails {
                 id: DelphiReportIssueDetailsId(0), // This will be set by the database
                 issue_id,
-                internal_class_name: issue_detail.internal_class_name,
+                key: issue_detail.key,
+                file_path: issue_detail.file,
                 decompiled_source: issue_detail.decompiled_source,
                 data: issue_detail.data.into(),
                 severity: issue_detail.severity,
@@ -188,7 +203,7 @@ async fn ingest_report(
 
     transaction.commit().await?;
 
-    Ok(HttpResponse::NoContent().finish())
+    Ok(())
 }
 
 pub async fn run(
@@ -216,10 +231,18 @@ pub async fn run(
         run_parameters.file_id.0
     );
 
+    // fix for local file paths
+    // TODO: should we fix this upstream in whatever inserts the files row?
+    let url = if file_data.url.starts_with("/") {
+        format!("file://{}", file_data.url)
+    } else {
+        file_data.url
+    };
+
     DELPHI_CLIENT
         .post(dotenvy::var("DELPHI_URL")?)
         .json(&serde_json::json!({
-            "url": file_data.url,
+            "url": url,
             "project_id": ProjectId(file_data.project_id.0 as u64),
             "version_id": VersionId(file_data.version_id.0 as u64),
             "file_id": run_parameters.file_id,

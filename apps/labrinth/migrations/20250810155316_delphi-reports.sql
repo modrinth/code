@@ -39,7 +39,8 @@ CREATE TABLE delphi_report_issue_details (
 	issue_id BIGINT NOT NULL REFERENCES delphi_report_issues (id)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
-	internal_class_name TEXT NOT NULL,
+	key TEXT NOT NULL,
+	file_path TEXT NOT NULL,
 	decompiled_source TEXT,
 	data JSONB NOT NULL,
 	severity DELPHI_SEVERITY NOT NULL
