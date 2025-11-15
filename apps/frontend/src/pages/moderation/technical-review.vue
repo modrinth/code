@@ -13,10 +13,10 @@ import {
 	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
-	injectModrinthClient,
+	// injectModrinthClient, // TEMPORARY: Commented out while using mock data
 	Pagination,
 } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+// import { useQuery } from '@tanstack/vue-query' // TEMPORARY: Commented out while using mock data
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
@@ -25,8 +25,11 @@ import BatchScanProgressAlert, {
 } from '~/components/ui/moderation/BatchScanProgressAlert.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
+// TEMPORARY: Mock data for development
+import { generateMockProjectReviews } from '~/utils/mockTechReviewData'
+
 type ProjectReview = Labrinth.TechReview.Internal.ProjectReview
-const client = injectModrinthClient()
+// const client = injectModrinthClient() // TEMPORARY: Commented out while using mock data
 
 const currentPage = ref(1)
 const itemsPerPage = 15
@@ -216,6 +219,8 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
+// TEMPORARY: Commented out while using mock data
+/*
 function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSort {
 	switch (label) {
 		case 'Oldest':
@@ -225,7 +230,11 @@ function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSo
 			return 'CreatedDesc'
 	}
 }
+*/
 
+// TEMPORARY: Using mock data instead of API
+// Uncomment below to use real API data
+/*
 const {
 	data: reviewItems,
 	isLoading,
@@ -241,6 +250,14 @@ const {
 	},
 	initialData: [] as ProjectReview[],
 })
+*/
+
+// TEMPORARY: Mock data for development (58 items to match batch scan progress)
+const reviewItems = ref<ProjectReview[]>(generateMockProjectReviews(58))
+const isLoading = ref(false)
+const refetch = () => {
+	reviewItems.value = generateMockProjectReviews(58)
+}
 
 watch(currentSortType, () => {
 	goToPage(1)

@@ -7,7 +7,8 @@ import {
 	ShieldCheckIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, injectModrinthClient } from '@modrinth/ui'
+import { Avatar, ButtonStyled, getProjectTypeIcon, injectModrinthClient } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{
@@ -121,10 +122,16 @@ function toggleIssue(issueId: string) {
 							<div
 								class="flex items-center gap-1 rounded-full border border-surface-5 bg-surface-4 px-2.5 py-1"
 							>
-								<div class="h-4 w-4"></div>
-								<span class="text-sm font-medium text-secondary">{{
-									String(item.project.project_type).toUpperCase()
-								}}</span>
+								<component
+									:is="getProjectTypeIcon(item.project.project_types[0] as any)"
+									aria-hidden="true"
+									class="h-4 w-4"
+								/>
+								<span
+									class="text-sm font-medium text-secondary"
+									v-for="project_type in item.project.project_types"
+									>{{ formatProjectType(project_type) }}</span
+								>
 							</div>
 
 							<div class="rounded-full border border-surface-5 bg-surface-4 px-2.5 py-1">

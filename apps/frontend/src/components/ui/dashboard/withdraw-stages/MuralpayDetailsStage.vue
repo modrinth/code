@@ -222,7 +222,7 @@ import {
 	getBlockchainIcon,
 	getCurrencyColor,
 	getCurrencyIcon,
-} from '@/utils/finance-icons.ts'
+} from '@modrinth/ui'
 import { getRailConfig } from '@/utils/muralpay-rails'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 

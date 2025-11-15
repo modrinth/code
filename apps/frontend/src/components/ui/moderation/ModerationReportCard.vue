@@ -139,7 +139,7 @@ import {
 	OrganizationIcon,
 } from '@modrinth/assets'
 import type { ExtendedReport, ReportQuickReply } from '@modrinth/moderation'
-import type {
+import {
 	Avatar,
 	ButtonStyled,
 	CollapsibleRegion,
@@ -147,7 +147,7 @@ import type {
 	OverflowMenu,
 	type OverflowMenuOption,
 	useRelativeTime,
-} from '@modrinth/ui';
+} from '@modrinth/ui'
 import { computed } from 'vue'
 
 import ReportThread from '../thread/ReportThread.vue'
