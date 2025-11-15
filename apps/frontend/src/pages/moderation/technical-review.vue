@@ -20,15 +20,12 @@ import {
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
-import BatchScanProgressAlert, {
-	type BatchScanProgress,
-} from '~/components/ui/moderation/BatchScanProgressAlert.vue'
+import { type BatchScanProgress } from '~/components/ui/moderation/BatchScanProgressAlert.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
 // TEMPORARY: Mock data for development
 import { generateMockProjectReviews } from '~/utils/mockTechReviewData'
 
-type ProjectReview = Labrinth.TechReview.Internal.ProjectReview
 // const client = injectModrinthClient() // TEMPORARY: Commented out while using mock data
 
 const currentPage = ref(1)
@@ -127,7 +124,9 @@ const fuse = computed(() => {
 
 const searchResults = computed(() => {
 	if (!query.value || !fuse.value) return null
-	return fuse.value.search(query.value).map((result) => result.item as ProjectReview)
+	return fuse.value
+		.search(query.value)
+		.map((result) => result.item as Labrinth.TechReview.Internal.ProjectReview)
 })
 
 const baseFiltered = computed(() => {
@@ -146,7 +145,7 @@ const typeFiltered = computed(() => {
 	})
 })
 
-function getHighestSeverity(review: ProjectReview): string {
+function getHighestSeverity(review: Labrinth.TechReview.Internal.ProjectReview): string {
 	const severities = review.reports
 		.flatMap((r) => r.files)
 		.flatMap((f) => f.issues)
@@ -154,19 +153,16 @@ function getHighestSeverity(review: ProjectReview): string {
 		.map((d) => d.severity)
 
 	const order = { SEVERE: 3, HIGH: 2, MEDIUM: 1, LOW: 0 } as Record<string, number>
-	return (
-		severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] ||
-		('LOW' as Labrinth.TechReview.Internal.DelphiSeverity)
-	)
+	return severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] || 'LOW'
 }
 
-function hasPendingIssues(review: ProjectReview): boolean {
+function hasPendingIssues(review: Labrinth.TechReview.Internal.ProjectReview): boolean {
 	return review.reports.some((report) =>
 		report.files.some((file) => file.issues.some((issue) => issue.status === 'pending')),
 	)
 }
 
-function getEarliestDate(review: ProjectReview): number {
+function getEarliestDate(review: Labrinth.TechReview.Internal.ProjectReview): number {
 	const dates = review.reports.map((r) => new Date(r.created_at).getTime())
 	return Math.min(...dates)
 }
@@ -248,12 +244,14 @@ const {
 			sort_by: toApiSort(currentSortType.value),
 		})
 	},
-	initialData: [] as ProjectReview[],
+	initialData: [] as Labrinth.TechReview.Internal.ProjectReview[],
 })
 */
 
 // TEMPORARY: Mock data for development (58 items to match batch scan progress)
-const reviewItems = ref<ProjectReview[]>(generateMockProjectReviews(58))
+const reviewItems = ref<Labrinth.TechReview.Internal.ProjectReview[]>(
+	generateMockProjectReviews(58),
+)
 const isLoading = ref(false)
 const refetch = () => {
 	reviewItems.value = generateMockProjectReviews(58)
@@ -274,10 +272,10 @@ const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() 
 
 <template>
 	<div class="flex flex-col gap-6">
-		<BatchScanProgressAlert
+		<!-- <BatchScanProgressAlert
 			v-if="batchScanProgressInformation"
 			:progress="batchScanProgressInformation"
-		/>
+		/> -->
 
 		<div class="flex flex-col justify-between gap-2 lg:flex-row">
 			<div class="iconified-input flex-1 lg:max-w-md">
