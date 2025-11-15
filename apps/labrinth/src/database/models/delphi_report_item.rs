@@ -249,8 +249,9 @@ impl DBDelphiReportIssue {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DBDelphiReportIssueDetails {
     pub id: DelphiReportIssueDetailsId,
+    pub key: String,
     pub issue_id: DelphiReportIssueId,
-    pub internal_class_name: InternalJavaClassName,
+    pub file_path: String,
     pub decompiled_source: Option<DecompiledJavaClassSource>,
     pub data: Json<HashMap<String, serde_json::Value>>,
     pub severity: DelphiSeverity,
@@ -263,12 +264,13 @@ impl DBDelphiReportIssueDetails {
     ) -> Result<DelphiReportIssueDetailsId, DatabaseError> {
         Ok(DelphiReportIssueDetailsId(sqlx::query_scalar!(
             "
-            INSERT INTO delphi_report_issue_details (issue_id, internal_class_name, decompiled_source, data, severity)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO delphi_report_issue_details (issue_id, key, file_path, decompiled_source, data, severity)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING id
             ",
             self.issue_id as DelphiReportIssueId,
-            self.internal_class_name.0,
+            self.key,
+            self.file_path,
             self.decompiled_source.as_ref().map(|decompiled_source| &decompiled_source.0),
             &self.data as &Json<HashMap<String, serde_json::Value>>,
             self.severity as DelphiSeverity,

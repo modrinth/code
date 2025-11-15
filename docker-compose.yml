@@ -117,7 +117,7 @@ services:
   delphi:
     profiles:
       - with-delphi
-    image: ghcr.io/modrinth/delphi:main
+    image: ghcr.io/modrinth/delphi:feature-schema-rework
     container_name: labrinth-delphi
     ports:
       - '59999:59999'
@@ -130,6 +130,10 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
+    volumes:
+      # Labrinth deposits version files here;
+      # Delphi reads them from here
+      - /tmp/modrinth:/tmp/modrinth:ro
     extra_hosts:
       # Delphi must send a message on a webhook to our backend,
       # so it must have access to our local network
