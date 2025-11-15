@@ -8,7 +8,7 @@
 				<span>{{ progress?.complete }} of {{ progress?.total }} projects completed</span>
 			</div>
 			<ButtonStyled circular color="blue" type="outlined">
-				<button @click="emit('cancel-scan')" class="!px-4">Cancel scan</button>
+				<button class="!px-4" @click="emit('cancel-scan')">Cancel scan</button>
 			</ButtonStyled>
 		</div>
 		<div class="w-full rounded-full bg-highlight-blue">

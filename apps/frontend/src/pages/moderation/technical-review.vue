@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	FilterIcon,
 	SearchIcon,
@@ -7,17 +8,25 @@ import {
 	SortDescIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, DropdownSelect, Pagination } from '@modrinth/ui'
+import {
+	Button,
+	ButtonStyled,
+	Combobox,
+	type ComboboxOption,
+	injectModrinthClient,
+	Pagination,
+} from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
+
 import BatchScanProgressAlert, {
 	type BatchScanProgress,
 } from '~/components/ui/moderation/BatchScanProgressAlert.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
-import { fetchDelphiIssues, fetchIssueTypeSchema, type OrderBy } from '~/helpers/tech-review'
 
-type TechReviewItem = Awaited<ReturnType<typeof fetchDelphiIssues>>[number]
-const reviewItems = ref<TechReviewItem[]>([])
+type ProjectReview = Labrinth.TechReview.Internal.ProjectReview
+const client = injectModrinthClient()
 
 const currentPage = ref(1)
 const itemsPerPage = 15
@@ -72,29 +81,41 @@ watch(
 )
 
 const currentFilterType = ref('All issues')
-const rawIssueTypes = ref<string[] | null>(null)
-const filterTypes = computed<readonly string[]>(() => {
-	const base: string[] = ['All issues']
-	if (rawIssueTypes.value && rawIssueTypes.value.length) base.push(...rawIssueTypes.value)
-	return base
+
+const filterTypes = computed<ComboboxOption<string>[]>(() => {
+	const base: ComboboxOption<string>[] = [{ value: 'All issues', label: 'All issues' }]
+	if (!reviewItems.value) return base
+
+	const issueTypes = new Set(
+		reviewItems.value
+			.flatMap((review) => review.reports)
+			.flatMap((report) => report.files)
+			.flatMap((file) => file.issues)
+			.map((issue) => issue.kind),
+	)
+
+	const sortedTypes = Array.from(issueTypes).sort()
+	return [...base, ...sortedTypes.map((type) => ({ value: type, label: type }))]
 })
 
 const currentSortType = ref('Oldest')
-const sortTypes: readonly string[] = readonly([
-	'Oldest',
-	'Newest',
-	'Pending first',
-	'Severity ↑',
-	'Severity ↓',
-])
+const sortTypes: ComboboxOption<string>[] = [
+	{ value: 'Oldest', label: 'Oldest' },
+	{ value: 'Newest', label: 'Newest' },
+	{ value: 'Pending first', label: 'Pending first' },
+	{ value: 'Severity ↑', label: 'Severity ↑' },
+	{ value: 'Severity ↓', label: 'Severity ↓' },
+]
 
 const fuse = computed(() => {
 	if (!reviewItems.value || reviewItems.value.length === 0) return null
 	return new Fuse(reviewItems.value, {
 		keys: [
-			{ name: 'issue.issue_type', weight: 3 },
-			{ name: 'report.artifact_url', weight: 2 },
-			{ name: 'java_classes.internal_class_name', weight: 2 },
+			{ name: 'project.title', weight: 4 },
+			{ name: 'project.slug', weight: 3 },
+			{ name: 'reports.files.file_name', weight: 2 },
+			{ name: 'reports.files.issues.kind', weight: 3 },
+			{ name: 'project_owner.name', weight: 2 },
 		],
 		includeScore: true,
 		threshold: 0.4,
@@ -103,7 +124,7 @@ const fuse = computed(() => {
 
 const searchResults = computed(() => {
 	if (!query.value || !fuse.value) return null
-	return fuse.value.search(query.value).map((result) => result.item as TechReviewItem)
+	return fuse.value.search(query.value).map((result) => result.item as ProjectReview)
 })
 
 const baseFiltered = computed(() => {
@@ -114,36 +135,69 @@ const baseFiltered = computed(() => {
 const typeFiltered = computed(() => {
 	if (currentFilterType.value === 'All issues') return baseFiltered.value
 	const type = currentFilterType.value
-	return baseFiltered.value.filter((it) => it.issue.issue_type === type)
+
+	return baseFiltered.value.filter((review) => {
+		return review.reports.some((report) =>
+			report.files.some((file) => file.issues.some((issue) => issue.kind === type)),
+		)
+	})
 })
+
+function getHighestSeverity(review: ProjectReview): string {
+	const severities = review.reports
+		.flatMap((r) => r.files)
+		.flatMap((f) => f.issues)
+		.flatMap((i) => i.details)
+		.map((d) => d.severity)
+
+	const order = { SEVERE: 3, HIGH: 2, MEDIUM: 1, LOW: 0 } as Record<string, number>
+	return (
+		severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] ||
+		('LOW' as Labrinth.TechReview.Internal.DelphiSeverity)
+	)
+}
+
+function hasPendingIssues(review: ProjectReview): boolean {
+	return review.reports.some((report) =>
+		report.files.some((file) => file.issues.some((issue) => issue.status === 'pending')),
+	)
+}
+
+function getEarliestDate(review: ProjectReview): number {
+	const dates = review.reports.map((r) => new Date(r.created_at).getTime())
+	return Math.min(...dates)
+}
 
 const filteredItems = computed(() => {
 	const filtered = [...typeFiltered.value]
 
 	switch (currentSortType.value) {
 		case 'Oldest':
-			filtered.sort(
-				(a, b) => new Date(a.report.created).getTime() - new Date(b.report.created).getTime(),
-			)
+			filtered.sort((a, b) => getEarliestDate(a) - getEarliestDate(b))
 			break
 		case 'Newest':
-			filtered.sort(
-				(a, b) => new Date(b.report.created).getTime() - new Date(a.report.created).getTime(),
-			)
+			filtered.sort((a, b) => getEarliestDate(b) - getEarliestDate(a))
 			break
 		case 'Pending first': {
-			const p = (s: string) => (s === 'pending' ? 0 : 1)
-			filtered.sort((a, b) => p(a.issue.status) - p(b.issue.status))
+			filtered.sort((a, b) => {
+				const aPending = hasPendingIssues(a) ? 0 : 1
+				const bPending = hasPendingIssues(b) ? 0 : 1
+				return aPending - bPending
+			})
 			break
 		}
 		case 'Severity ↑': {
 			const order = { LOW: 0, MEDIUM: 1, HIGH: 2, SEVERE: 3 } as Record<string, number>
-			filtered.sort((a, b) => (order[a.report.severity] ?? 0) - (order[b.report.severity] ?? 0))
+			filtered.sort(
+				(a, b) => (order[getHighestSeverity(a)] ?? 0) - (order[getHighestSeverity(b)] ?? 0),
+			)
 			break
 		}
 		case 'Severity ↓': {
 			const order = { LOW: 0, MEDIUM: 1, HIGH: 2, SEVERE: 3 } as Record<string, number>
-			filtered.sort((a, b) => (order[b.report.severity] ?? 0) - (order[a.report.severity] ?? 0))
+			filtered.sort(
+				(a, b) => (order[getHighestSeverity(b)] ?? 0) - (order[getHighestSeverity(a)] ?? 0),
+			)
 			break
 		}
 	}
@@ -162,44 +216,37 @@ function goToPage(page: number) {
 	currentPage.value = page
 }
 
-function toOrderBy(label: string): OrderBy | null {
+function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSort {
 	switch (label) {
 		case 'Oldest':
-			return 'created_asc'
+			return 'CreatedAsc'
 		case 'Newest':
-			return 'created_desc'
-		case 'Pending first':
-			return 'pending_status_first'
-		case 'Severity ↑':
-			return 'severity_asc'
-		case 'Severity ↓':
-			return 'severity_desc'
 		default:
-			return null
+			return 'CreatedDesc'
 	}
 }
 
-onMounted(async () => {
-	rawIssueTypes.value = await fetchIssueTypeSchema()
-	const order_by = toOrderBy(currentSortType.value)
-	reviewItems.value = await fetchDelphiIssues({ count: 350, offset: 0, order_by })
+const {
+	data: reviewItems,
+	isLoading,
+	refetch,
+} = useQuery({
+	queryKey: ['tech-reviews', currentSortType],
+	queryFn: async () => {
+		return await client.labrinth.tech_review_internal.searchProjects({
+			limit: 350,
+			page: 0,
+			sort_by: toApiSort(currentSortType.value),
+		})
+	},
+	initialData: [] as ProjectReview[],
 })
 
-watch(currentFilterType, async (val) => {
-	const type = val === 'All issues' ? null : val
-	const order_by = toOrderBy(currentSortType.value)
-	reviewItems.value = await fetchDelphiIssues({ type, count: 350, offset: 0, order_by })
+watch(currentSortType, () => {
 	goToPage(1)
+	refetch()
 })
 
-watch(currentSortType, async (val) => {
-	const type = currentFilterType.value === 'All issues' ? null : currentFilterType.value
-	const order_by = toOrderBy(val)
-	reviewItems.value = await fetchDelphiIssues({ type, count: 350, offset: 0, order_by })
-	goToPage(1)
-})
-
-// TODO: Live way to update this via the backend, polling?
 const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() => {
 	return {
 		total: 58,
@@ -237,34 +284,37 @@ const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() 
 			</div>
 
 			<div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0">
-				<DropdownSelect
-					v-slot="{ selected }"
+				<Combobox
 					v-model="currentFilterType"
 					class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
-					:name="formatMessage(messages.filterBy)"
-					:options="filterTypes as unknown[]"
-					@change="goToPage(1)"
+					:options="filterTypes"
+					:placeholder="formatMessage(messages.filterBy)"
+					searchable
+					@select="goToPage(1)"
 				>
-					<span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
-						<FilterIcon class="size-4 flex-shrink-0" />
-						<span class="truncate">{{ selected }} ({{ filteredItems.length }})</span>
-					</span>
-				</DropdownSelect>
+					<template #selected>
+						<span class="flex flex-row gap-2 align-middle font-semibold text-primary">
+							<FilterIcon class="size-4 flex-shrink-0" />
+							<span class="truncate">{{ currentFilterType }} ({{ filteredItems.length }})</span>
+						</span>
+					</template>
+				</Combobox>
 
-				<DropdownSelect
-					v-slot="{ selected }"
+				<Combobox
 					v-model="currentSortType"
 					class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
-					:name="formatMessage(messages.sortBy)"
-					:options="sortTypes as unknown[]"
-					@change="goToPage(1)"
+					:options="sortTypes"
+					:placeholder="formatMessage(messages.sortBy)"
+					@select="goToPage(1)"
 				>
-					<span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
-						<SortAscIcon v-if="selected === 'Oldest'" class="size-4 flex-shrink-0" />
-						<SortDescIcon v-else class="size-4 flex-shrink-0" />
-						<span class="truncate">{{ selected }}</span>
-					</span>
-				</DropdownSelect>
+					<template #selected>
+						<span class="flex flex-row gap-2 align-middle font-semibold text-primary">
+							<SortAscIcon v-if="currentSortType === 'Oldest'" class="size-4 flex-shrink-0" />
+							<SortDescIcon v-else class="size-4 flex-shrink-0" />
+							<span class="truncate">{{ currentSortType }}</span>
+						</span>
+					</template>
+				</Combobox>
 
 				<ButtonStyled color="orange">
 					<button><ShieldAlertIcon /> Batch scan</button>
@@ -277,9 +327,12 @@ const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() 
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<div v-if="paginatedItems.length === 0" class="universal-card h-24 animate-pulse"></div>
-			<div v-else v-for="(item, idx) in paginatedItems" :key="item.issue.id ?? idx" class="">
-				<ModerationTechRevCard :item="item" />
+			<div
+				v-if="isLoading || paginatedItems.length === 0"
+				class="universal-card h-24 animate-pulse"
+			></div>
+			<div v-for="(item, idx) in paginatedItems" v-else :key="item.project.id ?? idx" class="">
+				<ModerationTechRevCard :item="item" @refetch="refetch" />
 			</div>
 		</div>
 
