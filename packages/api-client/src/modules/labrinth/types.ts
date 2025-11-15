@@ -450,4 +450,122 @@ export namespace Labrinth {
 			errors: unknown[]
 		}
 	}
+
+	export namespace TechReview {
+		export namespace Internal {
+			export type SearchProjectsRequest = {
+				limit?: number
+				page?: number
+				filter?: SearchProjectsFilter
+				sort_by?: SearchProjectsSort
+			}
+
+			export type SearchProjectsFilter = {
+				project_type?: string[]
+			}
+
+			export type SearchProjectsSort = 'CreatedAsc' | 'CreatedDesc'
+
+			export type UpdateIssueRequest = {
+				status: DelphiReportIssueStatus
+			}
+
+			export type ProjectReview = {
+				project: Projects.v3.Project
+				project_owner: Ownership
+				thread: DBThread
+				reports: ProjectReport[]
+			}
+
+			export type ProjectReport = {
+				created_at: string
+				flag_reason: FlagReason
+				severity: DelphiSeverity
+				files: FileReview[]
+			}
+
+			export type FileReview = {
+				file_name: string
+				file_size: number
+				issues: FileIssue[]
+			}
+
+			export type FileIssue = {
+				issue_id: string
+				kind: string
+				status: DelphiReportIssueStatus
+				details: FileIssueDetail[]
+			}
+
+			export type FileIssueDetail = {
+				class_name: string
+				decompiled_source: string
+				severity: DelphiSeverity
+			}
+
+			export type Ownership =
+				| {
+						kind: 'user'
+						id: string
+						name: string
+						icon_url?: string
+				  }
+				| {
+						kind: 'organization'
+						id: string
+						name: string
+						icon_url?: string
+				  }
+
+			export type DBThread = {
+				id: string
+				project_id?: string
+				report_id?: string
+				type_: ThreadType
+				messages: DBThreadMessage[]
+				members: string[]
+			}
+
+			export type DBThreadMessage = {
+				id: string
+				thread_id: string
+				author_id?: string
+				body: MessageBody
+				created: string
+				hide_identity: boolean
+			}
+
+			export type MessageBody =
+				| {
+						type: 'text'
+						body: string
+						private?: boolean
+						replying_to?: string
+						associated_images?: string[]
+				  }
+				| {
+						type: 'status_change'
+						new_status: Projects.v2.ProjectStatus
+						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'thread_closure'
+				  }
+				| {
+						type: 'thread_reopen'
+				  }
+				| {
+						type: 'deleted'
+						private?: boolean
+				  }
+
+			export type ThreadType = 'report' | 'project' | 'direct_message'
+
+			export type FlagReason = 'delphi'
+
+			export type DelphiSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'SEVERE'
+
+			export type DelphiReportIssueStatus = 'pending' | 'safe' | 'unsafe'
+		}
+	}
 }
