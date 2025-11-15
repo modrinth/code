@@ -6,7 +6,7 @@ use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
 use sqlx::PgPool;
 use tokio::sync::Mutex;
-use tracing::{info, warn};
+use tracing::info;
 
 use crate::{
     auth::check_is_moderator_from_headers,
@@ -72,7 +72,7 @@ struct DelphiReport {
     pub url: String,
     pub project_id: crate::models::ids::ProjectId,
     #[serde(rename = "version_id")]
-    pub _version_id: crate::models::ids::VersionId,
+    pub version_id: crate::models::ids::VersionId,
     pub file_id: crate::models::ids::FileId,
     /// A sequential, monotonically increasing version number for the
     /// Delphi version that generated this report.
@@ -128,23 +128,23 @@ pub struct DelphiRunParameters {
 }
 
 #[post("ingest", guard = "admin_key_guard")]
+#[tracing::instrument(
+    level = "info",
+    skip_all,
+    fields(
+        %report.url,
+        %report.file_id,
+        %report.project_id,
+        %report.version_id,
+    )
+)]
 async fn ingest_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    report: web::Bytes,
-    // web::Json(report): web::Json<DelphiReport>,
+    web::Json(report): web::Json<DelphiReport>,
 ) -> Result<(), ApiError> {
-    info!(
-        "Json: {}",
-        serde_json::to_string_pretty(
-            &serde_json::from_slice::<serde_json::Value>(&report).unwrap()
-        )
-        .unwrap()
-    );
-    let report = serde_json::from_slice::<DelphiReport>(&report).unwrap();
-
     if report.issues.is_empty() {
-        info!("No issues found for file {}", report.url);
+        info!("No issues found for file");
         return Ok(());
     }
 
@@ -163,10 +163,9 @@ async fn ingest_report(
     .upsert(&mut transaction)
     .await?;
 
-    warn!(
-        "Delphi found {} issues in file {}",
-        report.issues.len(),
-        report.url
+    info!(
+        num_issues = %report.issues.len(),
+        "Delphi found issues in file",
     );
 
     for (issue_type, issue_details) in report.issues {
