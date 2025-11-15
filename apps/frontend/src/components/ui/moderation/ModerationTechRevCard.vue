@@ -117,7 +117,7 @@ function toggleIssue(issueId: string) {
 
 					<div class="flex flex-col gap-1.5">
 						<div class="flex items-center gap-2">
-							<span class="text-xl font-semibold text-contrast">{{ item.project.title }}</span>
+							<span class="text-lg font-semibold text-contrast">{{ item.project.name }}</span>
 
 							<div
 								class="flex items-center gap-1 rounded-full border border-surface-5 bg-surface-4 px-2.5 py-1"
@@ -130,7 +130,7 @@ function toggleIssue(issueId: string) {
 								<span
 									class="text-sm font-medium text-secondary"
 									v-for="project_type in item.project.project_types"
-									>{{ formatProjectType(project_type) }}</span
+									>{{ formatProjectType(project_type, true) }}</span
 								>
 							</div>
 
@@ -178,12 +178,12 @@ function toggleIssue(issueId: string) {
 			<div class="h-px w-full bg-surface-5"></div>
 
 			<div class="flex items-center gap-1 rounded-full bg-surface-3 p-1">
-				<button
+				<div
 					v-for="tab in tabs"
 					:key="tab"
-					class="rounded-full px-3 py-1.5 text-base font-semibold transition-colors"
+					class="rounded-full px-3 py-1.5 text-base font-semibold transition-colors hover:cursor-pointer"
 					:class="{
-						'bg-green/30 text-green': currentTab === tab,
+						'bg-highlight-green text-green': currentTab === tab,
 						'text-contrast': currentTab !== tab,
 					}"
 					@click="
@@ -194,7 +194,7 @@ function toggleIssue(issueId: string) {
 					"
 				>
 					{{ tab }}
-				</button>
+				</div>
 
 				<span
 					v-if="currentTab === 'Files' && selectedFile"
@@ -207,74 +207,14 @@ function toggleIssue(issueId: string) {
 
 		<div class="border-t border-surface-3 bg-surface-2">
 			<div v-if="currentTab === 'Thread'" class="p-4">
-				<div
-					v-if="item.thread.messages.length === 0"
-					class="flex min-h-[200px] items-center justify-center"
-				>
+				<div v-if="true" class="flex min-h-[75px] items-center justify-center">
 					<div class="text-center text-secondary">
-						<p class="text-sm">No messages yet</p>
+						<p class="text-sm">No messages yet {{ ':(' }}</p>
 					</div>
 				</div>
 
 				<div v-else class="flex flex-col gap-6">
-					<div v-for="message in item.thread.messages" :key="message.id" class="flex gap-3">
-						<Avatar
-							src="https://via.placeholder.com/40"
-							class="rounded-full border border-surface-5"
-							size="2.5rem"
-							circle
-						/>
-
-						<div class="flex flex-1 flex-col">
-							<div class="flex items-end gap-2">
-								<span class="font-semibold text-contrast">{{ message.author_id || 'System' }}</span>
-								<span class="text-xs text-secondary">{{
-									new Date(message.created).toLocaleTimeString()
-								}}</span>
-							</div>
-
-							<p v-if="message.body.type === 'text'" class="text-secondary">
-								{{ message.body.body }}
-							</p>
-							<p v-else-if="message.body.type === 'status_change'" class="italic text-secondary">
-								Status changed from {{ message.body.old_status }} to {{ message.body.new_status }}
-							</p>
-							<p v-else class="italic text-secondary">
-								{{ message.body.type }}
-							</p>
-						</div>
-					</div>
-
-					<div class="flex flex-col gap-3">
-						<div class="flex items-center gap-2">
-							<div
-								class="flex h-8 w-8 items-center justify-center rounded-full bg-surface-4 text-xs font-medium text-secondary"
-							>
-								Aa
-							</div>
-							<div class="flex h-8 w-8 items-center justify-center rounded-full bg-surface-4"></div>
-						</div>
-
-						<div class="rounded-2xl bg-surface-4 px-4 py-2.5">
-							<span class="text-secondary/60 text-sm">Message @{{ item.project_owner.name }}</span>
-						</div>
-
-						<div class="flex items-center justify-between">
-							<div class="flex items-center gap-2">
-								<ButtonStyled color="green" class="opacity-50">
-									<button>Reply</button>
-								</ButtonStyled>
-
-								<ButtonStyled class="opacity-50">
-									<button>Add note</button>
-								</ButtonStyled>
-
-								<ButtonStyled>
-									<button>Quick reply <ChevronDownIcon class="-scale-y-100" /></button>
-								</ButtonStyled>
-							</div>
-						</div>
-					</div>
+					<!-- TODO: Report thread stuff -->
 				</div>
 			</div>
 
@@ -282,7 +222,7 @@ function toggleIssue(issueId: string) {
 				<div
 					v-for="(file, idx) in allFiles"
 					:key="idx"
-					class="flex items-center justify-between border-x border-b border-surface-3 bg-surface-2 p-4"
+					class="flex items-center justify-between border-0 border-x border-b border-solid border-surface-3 bg-surface-2 px-4 py-3"
 					:class="{ 'rounded-bl-2xl rounded-br-2xl': idx === allFiles.length - 1 }"
 				>
 					<div class="flex items-center gap-3">

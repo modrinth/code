@@ -336,6 +336,10 @@ export namespace Labrinth {
 				monetization_status: v2.MonetizationStatus
 				side_types_migration_review_status: 'reviewed' | 'pending'
 				environment?: Environment[]
+
+				/**
+				 * @deprecated Not recommended to use.
+				 */
 				[key: string]: unknown
 			}
 
