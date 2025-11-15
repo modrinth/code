@@ -66,12 +66,19 @@ impl DBDelphiReport {
     sqlx::Type,
     utoipa::ToSchema,
 )]
-#[serde(rename_all = "UPPERCASE")]
+// The canonical serialized form of this enum is the snake_case representation.
+// We add `alias`es so we can deserialize it from how Delphi sends it,
+// which follows the Java conventions of `SCREAMING_SNAKE_CASE`.
+#[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "delphi_severity", rename_all = "snake_case")]
 pub enum DelphiSeverity {
+    #[serde(alias = "LOW")]
     Low,
+    #[serde(alias = "MEDIUM")]
     Medium,
+    #[serde(alias = "HIGH")]
     High,
+    #[serde(alias = "SEVERE")]
     Severe,
 }
 
