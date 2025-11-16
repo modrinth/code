@@ -468,7 +468,7 @@ export namespace Labrinth {
 				project_type?: string[]
 			}
 
-			export type SearchProjectsSort = 'CreatedAsc' | 'CreatedDesc'
+			export type SearchProjectsSort = 'created_asc' | 'created_desc'
 
 			export type UpdateIssueRequest = {
 				status: DelphiReportIssueStatus
