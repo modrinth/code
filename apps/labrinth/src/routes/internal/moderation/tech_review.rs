@@ -73,6 +73,8 @@ pub struct SearchProjectsFilter {
 pub enum SearchProjectsSort {
     CreatedAsc,
     CreatedDesc,
+    SeverityAsc,
+    SeverityDesc,
 }
 
 impl fmt::Display for SearchProjectsSort {
@@ -267,7 +269,10 @@ async fn search_projects(
         -- sorting
         ORDER BY
             CASE WHEN $2 = 'created_asc' THEN created ELSE TO_TIMESTAMP(0) END ASC,
-            CASE WHEN $2 = 'created_desc' THEN created ELSE TO_TIMESTAMP(0) END DESC
+            CASE WHEN $2 = 'created_desc' THEN created ELSE TO_TIMESTAMP(0) END DESC,
+            CASE WHEN $2 = 'pending_status_first' THEN dri.status ELSE 'pending'::delphi_report_issue_status END ASC,
+            CASE WHEN $2 = 'severity_asc' THEN dr.severity ELSE 'low'::delphi_severity END ASC,
+            CASE WHEN $2 = 'severity_desc' THEN dr.severity ELSE 'low'::delphi_severity END DESC
 
         -- pagination
         LIMIT $3
