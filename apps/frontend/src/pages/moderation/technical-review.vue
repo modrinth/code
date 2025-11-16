@@ -13,10 +13,10 @@ import {
 	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
-	// injectModrinthClient, // TEMPORARY: Commented out while using mock data
+	injectModrinthClient,
 	Pagination,
 } from '@modrinth/ui'
-// import { useQuery } from '@tanstack/vue-query' // TEMPORARY: Commented out while using mock data
+import { useQuery } from '@tanstack/vue-query'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
@@ -24,9 +24,9 @@ import { type BatchScanProgress } from '~/components/ui/moderation/BatchScanProg
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
 // TEMPORARY: Mock data for development
-import { generateMockProjectReviews } from '~/utils/mockTechReviewData'
+// import { generateMockProjectReviews } from '~/utils/mockTechReviewData'
 
-// const client = injectModrinthClient() // TEMPORARY: Commented out while using mock data
+const client = injectModrinthClient()
 
 const currentPage = ref(1)
 const itemsPerPage = 15
@@ -223,8 +223,6 @@ function goToPage(page: number, top = false) {
 	}
 }
 
-// TEMPORARY: Commented out while using mock data
-/*
 function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSort {
 	switch (label) {
 		case 'Oldest':
@@ -234,11 +232,7 @@ function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSo
 			return 'CreatedDesc'
 	}
 }
-*/
 
-// TEMPORARY: Using mock data instead of API
-// Uncomment below to use real API data
-/*
 const {
 	data: reviewItems,
 	isLoading,
@@ -254,16 +248,15 @@ const {
 	},
 	initialData: [] as Labrinth.TechReview.Internal.ProjectReview[],
 })
-*/
 
 // TEMPORARY: Mock data for development (58 items to match batch scan progress)
-const reviewItems = ref<Labrinth.TechReview.Internal.ProjectReview[]>(
-	generateMockProjectReviews(58),
-)
-const isLoading = ref(false)
-const refetch = () => {
-	reviewItems.value = generateMockProjectReviews(58)
-}
+// const reviewItems = ref<Labrinth.TechReview.Internal.ProjectReview[]>(
+// 	generateMockProjectReviews(58),
+// )
+// const isLoading = ref(false)
+// const refetch = () => {
+// 	reviewItems.value = generateMockProjectReviews(58)
+// }
 
 watch(currentSortType, () => {
 	goToPage(1)
