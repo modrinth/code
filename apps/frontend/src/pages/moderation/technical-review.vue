@@ -211,8 +211,16 @@ const paginatedItems = computed(() => {
 	const end = start + itemsPerPage
 	return filteredItems.value.slice(start, end)
 })
-function goToPage(page: number) {
+function goToPage(page: number, top = false) {
 	currentPage.value = page
+
+	if (top && window) {
+		window.scrollTo({
+			top: 0,
+			left: 0,
+			behavior: 'smooth',
+		})
+	}
 }
 
 // TEMPORARY: Commented out while using mock data
@@ -352,7 +360,11 @@ const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() 
 		</div>
 
 		<div v-if="totalPages > 1" class="mt-4 flex justify-center">
-			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
+			<Pagination
+				:page="currentPage"
+				:count="totalPages"
+				@switch-page="(num) => goToPage(num, true)"
+			/>
 		</div>
 	</div>
 </template>
