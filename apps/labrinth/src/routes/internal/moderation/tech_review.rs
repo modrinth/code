@@ -254,9 +254,8 @@ async fn search_projects(
         INNER JOIN versions v ON v.id = f.version_id
         INNER JOIN mods m ON m.id = v.mod_id
         LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-        INNER JOIN categories c ON c.id = mc.joining_category_id
+        LEFT JOIN categories c ON c.id = mc.joining_category_id
         INNER JOIN threads t ON t.mod_id = m.id
-
         -- fetch report issues and details
         INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
         LEFT JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id
@@ -270,7 +269,6 @@ async fn search_projects(
         ORDER BY
             CASE WHEN $2 = 'created_asc' THEN created ELSE TO_TIMESTAMP(0) END ASC,
             CASE WHEN $2 = 'created_desc' THEN created ELSE TO_TIMESTAMP(0) END DESC,
-            CASE WHEN $2 = 'pending_status_first' THEN dri.status ELSE 'pending'::delphi_report_issue_status END ASC,
             CASE WHEN $2 = 'severity_asc' THEN dr.severity ELSE 'low'::delphi_severity END ASC,
             CASE WHEN $2 = 'severity_desc' THEN dr.severity ELSE 'low'::delphi_severity END DESC
 
