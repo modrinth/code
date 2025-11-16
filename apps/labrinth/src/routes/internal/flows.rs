@@ -2,9 +2,9 @@ use crate::auth::validate::{
     get_full_user_from_headers, get_user_record_from_bearer_token,
 };
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
-use crate::database::models::DBUser;
 use crate::database::models::flow_item::DBFlow;
 use crate::database::models::notification_item::NotificationBuilder;
+use crate::database::models::{DBUser, DBUserId};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::notifications::NotificationBody;
@@ -16,6 +16,7 @@ use crate::routes::ApiError;
 use crate::routes::internal::session::issue_session;
 use crate::util::captcha::check_hcaptcha;
 use crate::util::env::parse_strings_from_var;
+use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::validate::validation_errors_to_string;
@@ -27,6 +28,7 @@ use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use ariadne::ids::random_base62_rng;
 use base64::Engine;
 use chrono::{Duration, Utc};
+use eyre::eyre;
 use lettre::message::Mailbox;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
@@ -36,6 +38,7 @@ use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
+use tracing::info;
 use validator::Validate;
 use zxcvbn::Score;
 
@@ -1046,6 +1049,9 @@ pub struct AuthorizationInit {
     #[serde(default)]
     pub provider: AuthProvider,
     pub token: Option<String>,
+    /// If the user is already logged in, and is linking a PayPal account,
+    /// this will be set to the user's auth token from the frontend.
+    pub auth_token: Option<String>,
 }
 #[derive(Serialize, Deserialize)]
 pub struct Authorization {
@@ -1063,6 +1069,33 @@ pub async fn init(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, AuthenticationError> {
+    // If a user is logging into an OAuth method while already logged in,
+    // this may be present.
+    //
+    // This can happen when linking to a PayPal account (logging in) when already
+    // logged in.
+    let existing_user_id = if let Some(auth_token) = &info.auth_token {
+        get_user_record_from_bearer_token(
+            &req,
+            Some(auth_token),
+            &**client,
+            &redis,
+            &session_queue,
+        )
+        .await
+        .ok()
+        .flatten()
+        .map(|(_scopes, user)| user.id)
+    } else {
+        None
+    };
+
+    info!(
+        ?existing_user_id,
+        auth_token_present = %info.auth_token.is_some(),
+        "Starting authentication flow"
+    );
+
     let url =
         url::Url::parse(&info.url).map_err(|_| AuthenticationError::Url)?;
 
@@ -1095,6 +1128,7 @@ pub async fn init(
         user_id,
         url: info.url,
         provider: info.provider,
+        existing_user_id,
     }
     .insert(Duration::minutes(30), &redis)
     .await?;
@@ -1120,111 +1154,182 @@ pub async fn auth_callback(
 
     let state = state_string.clone();
     let res: Result<HttpResponse, AuthenticationError> = async move {
-        let flow = DBFlow::get(&state, &redis).await?;
+        let flow = DBFlow::get(&state, &redis)
+            .await
+            .wrap_err("failed to fetch flow state")?
+            .wrap_err("no flow for state")?;
 
         // Extract cookie header from request
-        if let Some(DBFlow::OAuth {
-                        user_id,
-                        provider,
-                        url,
-                    }) = flow
-        {
-            DBFlow::remove(&state, &redis).await?;
+        let DBFlow::OAuth {
+            user_id,
+            provider,
+            url,
+            existing_user_id,
+        } = flow
+        else {
+            return Err(AuthenticationError::Internal(eyre!(
+                "invalid flow kind"
+            )));
+        };
 
-            let token = provider.get_token(query).await?;
-            let oauth_user = provider.get_user(&token).await?;
+        DBFlow::remove(&state, &redis)
+            .await
+            .wrap_err("failed to remove flow")?;
 
-            let user_id_opt = provider.get_user_id(&oauth_user.id, &**client).await?;
+        let token = provider
+            .get_token(query)
+            .await
+            .wrap_err("failed to get token from provider")?;
+        let oauth_user = provider
+            .get_user(&token)
+            .await
+            .wrap_err("failed to get user from provider")?;
 
-            let mut transaction = client.begin().await?;
-            if let Some(id) = user_id {
-                if user_id_opt.is_some() {
-                    return Err(AuthenticationError::DuplicateUser);
-                }
+        let user_id_opt = provider
+            .get_user_id(&oauth_user.id, &**client)
+            .await
+            .wrap_err("failed to get user ID from provider")?;
 
-                provider
-                    .update_user_id(id, Some(&oauth_user.id), &mut transaction)
+        let mut transaction = client
+            .begin()
+            .await
+            .wrap_err("failed to begin transaction")?;
+
+        // PayPal isn't actually an SSO method; we allow users to link their PayPal
+        // account to their Modrinth account via this OAuth flow. However, we MUST
+        // NOT actually create an account with their username.
+        //
+        // Instead, we check who they're already logged in as, and just update
+        // the PayPal info for that account.
+        if provider == AuthProvider::PayPal {
+            let existing_user_id = existing_user_id.wrap_err(
+                "attempting to link a PayPal account without being logged in",
+            )?;
+
+            sqlx::query!(
+                "
+                UPDATE users
+                SET paypal_country = $1, paypal_email = $2, paypal_id = $3
+                WHERE id = $4
+                ",
+                oauth_user.country,
+                oauth_user.email,
+                oauth_user.id,
+                existing_user_id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to update user PayPal info")?;
+
+            transaction
+                .commit()
+                .await
+                .wrap_err("failed to commit transaction")?;
+            crate::database::models::DBUser::clear_caches(
+                &[(existing_user_id, None)],
+                &redis,
+            )
+            .await
+            .wrap_err("failed to clear user caches")?;
+
+            return Ok(HttpResponse::TemporaryRedirect()
+                .append_header(("Location", &*url))
+                .json(serde_json::json!({ "url": url })));
+        }
+
+        if let Some(id) = user_id {
+            if user_id_opt.is_some() {
+                return Err(AuthenticationError::DuplicateUser);
+            }
+
+            provider
+                .update_user_id(id, Some(&oauth_user.id), &mut transaction)
+                .await?;
+
+            let user =
+                crate::database::models::DBUser::get_id(id, &**client, &redis)
                     .await?;
 
-                let user = crate::database::models::DBUser::get_id(id, &**client, &redis).await?;
+            if let Some(user) = user {
+                NotificationBuilder {
+                    body: NotificationBody::AuthProviderAdded {
+                        provider: provider.as_str().to_string(),
+                    },
+                }
+                .insert(user.id, &mut transaction, &redis)
+                .await?;
+            }
 
-                if provider == AuthProvider::PayPal  {
-                    sqlx::query!(
-                        "
-                        UPDATE users
-                        SET paypal_country = $1, paypal_email = $2, paypal_id = $3
-                        WHERE (id = $4)
-                        ",
-                        oauth_user.country,
-                        oauth_user.email,
-                        oauth_user.id,
-                        id as crate::database::models::ids::DBUserId,
-                    )
-                        .execute(&mut *transaction)
+            transaction.commit().await?;
+            crate::database::models::DBUser::clear_caches(
+                &[(id, None)],
+                &redis,
+            )
+            .await?;
+
+            Ok(HttpResponse::TemporaryRedirect()
+                .append_header(("Location", &*url))
+                .json(serde_json::json!({ "url": url })))
+        } else {
+            let user_id = if let Some(user_id) = user_id_opt {
+                let user = crate::database::models::DBUser::get_id(
+                    user_id, &**client, &redis,
+                )
+                .await?
+                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+                if user.totp_secret.is_some() {
+                    let flow = DBFlow::Login2FA { user_id: user.id }
+                        .insert(Duration::minutes(30), &redis)
                         .await?;
-                } else if let Some(user) = user {
-                    NotificationBuilder { body: NotificationBody::AuthProviderAdded { provider: provider.as_str().to_string() } }
-                        .insert(user.id, &mut transaction, &redis)
-                        .await?;
+
+                    let redirect_url = format!(
+                        "{}{}error=2fa_required&flow={}",
+                        url,
+                        if url.contains('?') { "&" } else { "?" },
+                        flow
+                    );
+
+                    return Ok(HttpResponse::TemporaryRedirect()
+                        .append_header(("Location", &*redirect_url))
+                        .json(serde_json::json!({ "url": redirect_url })));
                 }
 
-                transaction.commit().await?;
-                crate::database::models::DBUser::clear_caches(&[(id, None)], &redis).await?;
-
-                Ok(HttpResponse::TemporaryRedirect()
-                    .append_header(("Location", &*url))
-                    .json(serde_json::json!({ "url": url })))
+                user_id
             } else {
-                let user_id = if let Some(user_id) = user_id_opt {
-                    let user = crate::database::models::DBUser::get_id(user_id, &**client, &redis)
-                        .await?
-                        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+                oauth_user
+                    .create_account(
+                        provider,
+                        &mut transaction,
+                        &client,
+                        &file_host,
+                        &redis,
+                    )
+                    .await?
+            };
 
-                    if user.totp_secret.is_some() {
-                        let flow = DBFlow::Login2FA { user_id: user.id }
-                            .insert(Duration::minutes(30), &redis)
-                            .await?;
+            let session =
+                issue_session(req, user_id, &mut transaction, &redis).await?;
+            transaction.commit().await?;
 
-                        let redirect_url = format!(
-                            "{}{}error=2fa_required&flow={}",
-                            url,
-                            if url.contains('?') { "&" } else { "?" },
-                            flow
-                        );
-
-                        return Ok(HttpResponse::TemporaryRedirect()
-                            .append_header(("Location", &*redirect_url))
-                            .json(serde_json::json!({ "url": redirect_url })));
-                    }
-
-                    user_id
+            let redirect_url = format!(
+                "{}{}code={}{}",
+                url,
+                if url.contains('?') { '&' } else { '?' },
+                session.session,
+                if user_id_opt.is_none() {
+                    "&new_account=true"
                 } else {
-                    oauth_user.create_account(provider, &mut transaction, &client, &file_host, &redis).await?
-                };
+                    ""
+                }
+            );
 
-                let session = issue_session(req, user_id, &mut transaction, &redis).await?;
-                transaction.commit().await?;
-
-                let redirect_url = format!(
-                    "{}{}code={}{}",
-                    url,
-                    if url.contains('?') { '&' } else { '?' },
-                    session.session,
-                    if user_id_opt.is_none() {
-                        "&new_account=true"
-                    } else {
-                        ""
-                    }
-                );
-
-                Ok(HttpResponse::TemporaryRedirect()
-                    .append_header(("Location", &*redirect_url))
-                    .json(serde_json::json!({ "url": redirect_url })))
-            }
-        } else {
-            Err::<HttpResponse, AuthenticationError>(AuthenticationError::InvalidCredentials)
+            Ok(HttpResponse::TemporaryRedirect()
+                .append_header(("Location", &*redirect_url))
+                .json(serde_json::json!({ "url": redirect_url })))
         }
-    }.await;
+    }
+    .await;
 
     Ok(res?)
 }
