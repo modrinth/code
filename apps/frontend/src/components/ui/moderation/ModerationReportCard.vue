@@ -138,14 +138,13 @@ import {
 	LinkIcon,
 	OrganizationIcon,
 } from '@modrinth/assets'
-import type { ExtendedReport, ReportQuickReply } from '@modrinth/moderation'
+import type { ExtendedReport } from '@modrinth/moderation'
+import type { OverflowMenuOption } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
-	CollapsibleRegion,
 	injectNotificationManager,
 	OverflowMenu,
-	type OverflowMenuOption,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { computed } from 'vue'
@@ -159,7 +158,7 @@ const props = defineProps<{
 }>()
 
 const reportThread = ref<InstanceType<typeof ReportThread> | null>(null)
-const collapsibleRegion = ref<InstanceType<typeof CollapsibleRegion> | null>(null)
+// const collapsibleRegion = ref<InstanceType<typeof CollapsibleRegion> | null>(null)
 
 const formatRelativeTime = useRelativeTime()
 
@@ -198,14 +197,14 @@ const quickActions: OverflowMenuOption[] = [
 	},
 ]
 
-async function handleQuickReply(reply: ReportQuickReply) {
-	const message =
-		typeof reply.message === 'function' ? await reply.message(props.report) : reply.message
+// async function handleQuickReply(reply: ReportQuickReply) {
+// 	const message =
+// 		typeof reply.message === 'function' ? await reply.message(props.report) : reply.message
 
-	collapsibleRegion.value?.setCollapsed(false)
-	await nextTick()
-	reportThread.value?.setReplyContent(message)
-}
+// 	collapsibleRegion.value?.setCollapsed(false)
+// 	await nextTick()
+// 	reportThread.value?.setReplyContent(message)
+// }
 
 const reportItemAvatarUrl = computed(() => {
 	switch (props.report.item_type) {

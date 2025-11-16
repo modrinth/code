@@ -168,8 +168,9 @@ function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
 									class="h-4 w-4"
 								/>
 								<span
-									class="text-sm font-medium text-secondary"
 									v-for="project_type in item.project.project_types"
+									:key="project_type + item.project.id"
+									class="text-sm font-medium text-secondary"
 									>{{ formatProjectType(project_type, true) }}</span
 								>
 							</div>
@@ -377,9 +378,9 @@ function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
 							>
 								<ButtonStyled circular type="transparent">
 									<button
+										v-tooltip="`Copy code`"
 										class="absolute right-2 top-2 border-[1px]"
 										@click="copyToClipboard(detail.decompiled_source)"
-										v-tooltip="`Copy code`"
 									>
 										<CopyIcon v-if="!showCopyFeedback" />
 										<CheckIcon v-else />

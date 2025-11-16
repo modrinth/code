@@ -20,7 +20,6 @@ import { useQuery } from '@tanstack/vue-query'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
-import { type BatchScanProgress } from '~/components/ui/moderation/BatchScanProgressAlert.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
 // TEMPORARY: Mock data for development
@@ -263,12 +262,12 @@ watch(currentSortType, () => {
 	refetch()
 })
 
-const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() => {
-	return {
-		total: 58,
-		complete: 20,
-	}
-})
+// const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() => {
+// 	return {
+// 		total: 58,
+// 		complete: 20,
+// 	}
+// })
 </script>
 
 <template>

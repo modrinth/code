@@ -88,7 +88,7 @@ const BLOCKCHAIN_CONFIG: Record<string, { icon: Component; color: string }> = {
 	polygon: { icon: PolygonIcon, color: 'text-purple' },
 }
 
-const CODE_EXTENSIONS = [
+const CODE_EXTENSIONS: string[] = [
 	'json',
 	'json5',
 	'jsonc',
@@ -115,9 +115,18 @@ const CODE_EXTENSIONS = [
 	'go',
 ] as const
 
-const TEXT_EXTENSIONS = ['txt', 'md', 'log', 'cfg', 'conf', 'properties', 'ini', 'sk'] as const
-const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'] as const
-const ARCHIVE_EXTENSIONS = ['zip', 'jar', 'tar', 'gz', 'rar', '7z'] as const
+const TEXT_EXTENSIONS: string[] = [
+	'txt',
+	'md',
+	'log',
+	'cfg',
+	'conf',
+	'properties',
+	'ini',
+	'sk',
+] as const
+const IMAGE_EXTENSIONS: string[] = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'] as const
+const ARCHIVE_EXTENSIONS: string[] = ['zip', 'jar', 'tar', 'gz', 'rar', '7z'] as const
 
 export function getProjectTypeIcon(projectType: ProjectType): Component {
 	return PROJECT_TYPE_ICONS[projectType] ?? BoxIcon
@@ -144,18 +153,18 @@ export function getDirectoryIcon(name: string): Component {
 }
 
 export function getFileExtensionIcon(extension: string): Component {
-	const ext = extension.toLowerCase()
+	const ext: string = extension.toLowerCase()
 
-	if (CODE_EXTENSIONS.includes(ext as any)) {
+	if (CODE_EXTENSIONS.includes(ext)) {
 		return FileCodeIcon
 	}
-	if (TEXT_EXTENSIONS.includes(ext as any)) {
+	if (TEXT_EXTENSIONS.includes(ext)) {
 		return FileTextIcon
 	}
-	if (IMAGE_EXTENSIONS.includes(ext as any)) {
+	if (IMAGE_EXTENSIONS.includes(ext)) {
 		return FileImageIcon
 	}
-	if (ARCHIVE_EXTENSIONS.includes(ext as any)) {
+	if (ARCHIVE_EXTENSIONS.includes(ext)) {
 		return FileArchiveIcon
 	}
 

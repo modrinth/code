@@ -79,10 +79,7 @@ import { computed, ref, shallowRef } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { useRoute, useRouter } from 'vue-router'
 
-import {
-	UiServersIconsCogFolderIcon,
-	UiServersIconsEarthIcon,
-} from '#components'
+import { UiServersIconsCogFolderIcon, UiServersIconsEarthIcon } from '#components'
 import PaletteIcon from '~/assets/icons/palette.svg?component'
 
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
