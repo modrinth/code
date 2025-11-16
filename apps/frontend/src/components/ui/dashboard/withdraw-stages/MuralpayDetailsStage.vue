@@ -207,6 +207,10 @@ import {
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
+	getBlockchainColor,
+	getBlockchainIcon,
+	getCurrencyColor,
+	getCurrencyIcon,
 } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
@@ -217,12 +221,6 @@ import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { useGeneratedState } from '@/composables/generated'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import {
-	getBlockchainColor,
-	getBlockchainIcon,
-	getCurrencyColor,
-	getCurrencyIcon,
-} from '@modrinth/ui'
 import { getRailConfig } from '@/utils/muralpay-rails'
 import { normalizeChildren } from '@/utils/vue-children.ts'
 
