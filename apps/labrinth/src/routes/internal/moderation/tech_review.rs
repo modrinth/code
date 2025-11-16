@@ -34,8 +34,10 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct SearchProjects {
     #[serde(default = "default_limit")]
+    #[schema(default = 20)]
     pub limit: u64,
     #[serde(default)]
+    #[schema(default = 0)]
     pub page: u64,
     #[serde(default)]
     pub filter: SearchProjectsFilter,
@@ -163,7 +165,10 @@ pub struct FileIssueDetail {
 }
 
 /// Searches all projects which are awaiting technical review.
-#[utoipa::path]
+#[utoipa::path(
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = inline(Vec<ProjectReview>)))
+)]
 #[post("/search")]
 async fn search_projects(
     req: HttpRequest,
@@ -209,7 +214,7 @@ async fn search_projects(
 
     let sort_by = search_req.sort_by.to_string();
     let limit = search_req.limit.max(50);
-    let offset = limit * search_req.page;
+    let offset = limit.saturating_mul(search_req.page);
 
     let limit =
         i64::try_from(limit).wrap_request_err("limit cannot fit into `i64`")?;
@@ -435,14 +440,18 @@ async fn search_projects(
     Ok(web::Json(projects))
 }
 
-/// Updates the state of a technical review issue.
+/// See [`update_issue`].
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UpdateIssue {
     /// Status to set the issue to.
     pub status: DelphiReportIssueStatus,
 }
 
-#[utoipa::path]
+/// Updates the state of a technical review issue.
+#[utoipa::path(
+    security(("bearer_auth" = [])),
+    responses((status = NO_CONTENT))
+)]
 #[post("/issue/{id}")]
 async fn update_issue(
     req: HttpRequest,
