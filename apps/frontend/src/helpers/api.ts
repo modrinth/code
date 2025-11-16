@@ -8,9 +8,10 @@ import {
 	NuxtModrinthClient,
 	VerboseLoggingFeature,
 } from '@modrinth/api-client'
+import type { Ref } from 'vue'
 
 export function createModrinthClient(
-	auth: { token: string | undefined },
+	auth: Ref<{ token: string | undefined }>,
 	config: { apiBaseUrl: string; archonBaseUrl: string; rateLimitKey?: string },
 ): NuxtModrinthClient {
 	const optionalFeatures = [
@@ -23,7 +24,7 @@ export function createModrinthClient(
 		rateLimitKey: config.rateLimitKey,
 		features: [
 			new AuthFeature({
-				token: async () => auth.token,
+				token: async () => auth.value.token,
 			} as AuthConfig),
 			new CircuitBreakerFeature({
 				storage: new NuxtCircuitBreakerStorage(),
