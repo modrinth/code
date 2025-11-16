@@ -20,7 +20,7 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 	 * const reviews = await client.labrinth.tech_review_internal.searchProjects({
 	 *   limit: 20,
 	 *   page: 0,
-	 *   sort_by: 'CreatedAsc',
+	 *   sort_by: 'created_asc',
 	 *   filter: {
 	 *     project_type: ['mod', 'modpack']
 	 *   }

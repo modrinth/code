@@ -226,10 +226,10 @@ function goToPage(page: number, top = false) {
 function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSort {
 	switch (label) {
 		case 'Oldest':
-			return 'CreatedAsc'
+			return 'created_asc'
 		case 'Newest':
 		default:
-			return 'CreatedDesc'
+			return 'created_desc'
 	}
 }
 
