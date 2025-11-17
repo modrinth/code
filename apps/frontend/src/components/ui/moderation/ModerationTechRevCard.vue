@@ -3,13 +3,23 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	ChevronDownIcon,
+	ClipboardCopyIcon,
 	CopyIcon,
 	DownloadIcon,
-	MoreVerticalIcon,
+	EllipsisVerticalIcon,
+	LinkIcon,
 	ShieldCheckIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
-import { Avatar, ButtonStyled, getProjectTypeIcon, injectModrinthClient } from '@modrinth/ui'
+import {
+	Avatar,
+	ButtonStyled,
+	getProjectTypeIcon,
+	injectModrinthClient,
+	injectNotificationManager,
+	OverflowMenu,
+	type OverflowMenuOption,
+} from '@modrinth/ui'
 import { capitalizeString, formatProjectType, highlightCodeLines } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
@@ -17,9 +27,40 @@ const props = defineProps<{
 	item: Labrinth.TechReview.Internal.ProjectReview
 }>()
 
+const { addNotification } = injectNotificationManager()
+
 const emit = defineEmits<{
 	refetch: []
 }>()
+
+const quickActions: OverflowMenuOption[] = [
+	{
+		id: 'copy-link',
+		action: () => {
+			const base = window.location.origin
+			const reportUrl = `${base}/moderation/technical-review/${props.item.project.id}`
+			navigator.clipboard.writeText(reportUrl).then(() => {
+				addNotification({
+					type: 'success',
+					title: 'Technical Report link copied',
+					text: 'The link to this report has been copied to your clipboard.',
+				})
+			})
+		},
+	},
+	{
+		id: 'copy-id',
+		action: () => {
+			navigator.clipboard.writeText(props.item.project.id).then(() => {
+				addNotification({
+					type: 'success',
+					title: 'Technical Report ID copied',
+					text: 'The ID of this report has been copied to your clipboard.',
+				})
+			})
+		},
+	},
+]
 
 type Tab = 'Thread' | 'Files'
 const tabs: readonly Tab[] = ['Thread', 'Files']
@@ -77,6 +118,10 @@ function formatFileSize(bytes: number): string {
 
 function viewFileFlags(file: Labrinth.TechReview.Internal.FileReview) {
 	selectedFile.value = file
+	// Automatically expand the first issue
+	if (file.issues.length > 0) {
+		expandedIssues.value.add(file.issues[0].issue_id)
+	}
 }
 
 function backToFileList() {
@@ -212,7 +257,19 @@ function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
 						</ButtonStyled>
 
 						<ButtonStyled circular>
-							<button><MoreVerticalIcon /></button>
+							<OverflowMenu :options="quickActions">
+								<template #default>
+									<EllipsisVerticalIcon class="size-4" />
+								</template>
+								<template #copy-id>
+									<ClipboardCopyIcon />
+									<span class="hidden sm:inline">Copy ID</span>
+								</template>
+								<template #copy-link>
+									<LinkIcon />
+									<span class="hidden sm:inline">Copy link</span>
+								</template>
+							</OverflowMenu>
 						</ButtonStyled>
 					</div>
 				</div>
@@ -253,7 +310,9 @@ function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
 			<div v-if="currentTab === 'Thread'" class="p-4">
 				<div v-if="true" class="flex min-h-[75px] items-center justify-center">
 					<div class="text-center text-secondary">
-						<p class="text-sm">No messages yet {{ ':(' }}</p>
+						<p class="text-sm">
+							Not yet implemented. See reports in prod for how thread will look (its the same)
+						</p>
 					</div>
 				</div>
 
@@ -277,6 +336,11 @@ function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
 							}}</span>
 						</div>
 						<div
+							class="border-red/60 flex items-center gap-1 rounded-full border border-solid bg-highlight-red px-2.5 py-1 text-sm text-red"
+						>
+							{{ file.issues.length }} flags
+						</div>
+						<!-- <div
 							v-for="severityItem in getSeverityBreakdown(file)"
 							:key="severityItem.severity"
 							class="rounded-full border border-solid px-2.5 py-1"
@@ -292,7 +356,7 @@ function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
 								>{{ severityItem.count }}
 								{{ capitalizeString(severityItem.severity.toLowerCase()) }}</span
 							>
-						</div>
+						</div> -->
 					</div>
 
 					<div class="flex items-center gap-2">

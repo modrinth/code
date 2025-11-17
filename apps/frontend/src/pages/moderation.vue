@@ -22,9 +22,9 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 
 import NavTabs from '@/components/ui/NavTabs.vue'
 
-definePageMeta({
-	middleware: 'auth',
-})
+// definePageMeta({
+// 	middleware: 'auth',
+// })
 
 const { formatMessage } = useVIntl()
 const route = useRoute()
