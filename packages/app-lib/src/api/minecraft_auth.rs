@@ -1,7 +1,23 @@
 //! Authentication flow interface
 
+use reqwest::StatusCode;
+
 use crate::State;
 use crate::state::{Credentials, MinecraftLoginFlow};
+use crate::util::fetch::REQWEST_CLIENT;
+
+#[tracing::instrument]
+pub async fn check_reachable() -> crate::Result<()> {
+    let resp = REQWEST_CLIENT
+        .get("https://api.minecraftservices.com/entitlements/mcstore")
+        .send()
+        .await?;
+    if resp.status() == StatusCode::UNAUTHORIZED {
+        return Ok(());
+    }
+    resp.error_for_status()?;
+    Ok(())
+}
 
 #[tracing::instrument]
 pub async fn begin_login() -> crate::Result<MinecraftLoginFlow> {

@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft authentication servers may be down right now. Check your internet connection and try again later."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Cannot reach authentication servers"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },

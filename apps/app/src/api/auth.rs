@@ -7,6 +7,7 @@ use theseus::prelude::*;
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::<R>::new("auth")
         .invoke_handler(tauri::generate_handler![
+            check_reachable,
             login,
             remove_user,
             get_default_user,
@@ -14,6 +15,13 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             get_users,
         ])
         .build()
+}
+
+/// Checks if the authentication servers are reachable.
+#[tauri::command]
+pub async fn check_reachable() -> Result<()> {
+    minecraft_auth::check_reachable().await?;
+    Ok(())
 }
 
 /// Authenticate a user with Hydra - part 1
