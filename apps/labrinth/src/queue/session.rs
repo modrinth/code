@@ -11,6 +11,7 @@ use sqlx::PgPool;
 use std::collections::{HashMap, HashSet};
 use tokio::sync::Mutex;
 
+#[derive(Debug)]
 pub struct AuthQueue {
     session_queue: Mutex<HashMap<DBSessionId, SessionMetadata>>,
     pat_queue: Mutex<HashSet<DBPatId>>,

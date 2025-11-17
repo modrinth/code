@@ -1,5 +1,4 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
-use crate::database;
 use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::{
@@ -17,6 +16,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::img;
 use crate::util::routes::read_typed_from_payload;
+use crate::{App, database};
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::parse_base62;
@@ -513,19 +513,13 @@ pub async fn report_edit(
 
 pub async fn report_delete(
     req: HttpRequest,
+    app: web::Data<App>,
     pool: web::Data<PgPool>,
     info: web::Path<(crate::models::ids::ReportId,)>,
     redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::REPORT_DELETE,
-    )
-    .await?;
+    check_is_moderator_from_headers(&app, &req, &**pool, Scopes::REPORT_DELETE)
+        .await?;
 
     let mut transaction = pool.begin().await?;
 

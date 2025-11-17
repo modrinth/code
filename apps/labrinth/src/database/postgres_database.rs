@@ -7,7 +7,7 @@ use std::ops::{Deref, DerefMut};
 use std::time::Duration;
 use tracing::info;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[repr(transparent)]
 pub struct ReadOnlyPgPool(PgPool);
 

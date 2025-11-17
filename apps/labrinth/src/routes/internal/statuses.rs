@@ -1,10 +1,10 @@
+use crate::App;
 use crate::auth::AuthenticationError;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::models::friend_item::DBFriend;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::User;
-use crate::queue::session::AuthQueue;
 use crate::queue::socket::{
     ActiveSocket, ActiveSockets, SocketId, TunnelSocketType,
 };
@@ -45,19 +45,18 @@ struct LauncherHeartbeatInit {
 #[get("launcher_socket")]
 pub async fn ws_init(
     req: HttpRequest,
+    app: Data<App>,
     pool: Data<PgPool>,
     web::Query(auth): web::Query<LauncherHeartbeatInit>,
     body: Payload,
     db: Data<ActiveSockets>,
     redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (scopes, db_user) = get_user_record_from_bearer_token(
+        &app,
         &req,
         Some(&auth.code),
         &**pool,
-        &redis,
-        &session_queue,
     )
     .await?
     .ok_or_else(|| {

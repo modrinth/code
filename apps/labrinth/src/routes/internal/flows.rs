@@ -20,6 +20,7 @@ use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::validate::validation_errors_to_string;
+use crate::{App, AppEnv};
 use actix_web::web::{Data, Query, ServiceConfig, scope};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use argon2::password_hash::SaltString;
@@ -33,6 +34,7 @@ use lettre::message::Mailbox;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use reqwest::header::AUTHORIZATION;
+use secrecy::ExposeSecret;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::HashMap;
@@ -254,43 +256,44 @@ impl TempUser {
 impl AuthProvider {
     pub fn get_redirect_url(
         &self,
+        app: &App,
         state: String,
     ) -> Result<String, AuthenticationError> {
-        let self_addr = dotenvy::var("SELF_ADDR")?;
+        let self_addr = &app.env.self_addr;
         let raw_redirect_uri = format!("{self_addr}/v2/auth/callback");
         let redirect_uri = urlencoding::encode(&raw_redirect_uri);
 
         Ok(match self {
             AuthProvider::GitHub => {
-                let client_id = dotenvy::var("GITHUB_CLIENT_ID")?;
+                let client_id = &app.env.github_client_id;
 
                 format!(
                     "https://github.com/login/oauth/authorize?client_id={client_id}&prompt=select_account&state={state}&scope=read%3Auser%20user%3Aemail&redirect_uri={redirect_uri}",
                 )
             }
             AuthProvider::Discord => {
-                let client_id = dotenvy::var("DISCORD_CLIENT_ID")?;
+                let client_id = &app.env.discord_client_id;
 
                 format!(
                     "https://discord.com/api/oauth2/authorize?client_id={client_id}&state={state}&response_type=code&scope=identify%20email&redirect_uri={redirect_uri}"
                 )
             }
             AuthProvider::Microsoft => {
-                let client_id = dotenvy::var("MICROSOFT_CLIENT_ID")?;
+                let client_id = &app.env.microsoft_client_id;
 
                 format!(
                     "https://login.live.com/oauth20_authorize.srf?client_id={client_id}&response_type=code&scope=user.read&state={state}&prompt=select_account&redirect_uri={redirect_uri}"
                 )
             }
             AuthProvider::GitLab => {
-                let client_id = dotenvy::var("GITLAB_CLIENT_ID")?;
+                let client_id = &app.env.gitlab_client_id;
 
                 format!(
                     "https://gitlab.com/oauth/authorize?client_id={client_id}&state={state}&scope=read_user+profile+email&response_type=code&redirect_uri={redirect_uri}",
                 )
             }
             AuthProvider::Google => {
-                let client_id = dotenvy::var("GOOGLE_CLIENT_ID")?;
+                let client_id = &app.env.google_client_id;
 
                 format!(
                     "https://accounts.google.com/o/oauth2/v2/auth?client_id={}&state={}&scope={}&response_type=code&redirect_uri={}",
@@ -316,8 +319,8 @@ impl AuthProvider {
                 )
             }
             AuthProvider::PayPal => {
-                let api_url = dotenvy::var("PAYPAL_API_URL")?;
-                let client_id = dotenvy::var("PAYPAL_CLIENT_ID")?;
+                let api_url = &app.env.paypal_api_url;
+                let client_id = &app.env.paypal_client_id;
 
                 let auth_url = if api_url.contains("sandbox") {
                     "sandbox.paypal.com"
@@ -337,10 +340,10 @@ impl AuthProvider {
 
     pub async fn get_token(
         &self,
+        app: &App,
         query: HashMap<String, String>,
     ) -> Result<String, AuthenticationError> {
-        let redirect_uri =
-            format!("{}/v2/auth/callback", dotenvy::var("SELF_ADDR")?);
+        let redirect_uri = format!("{}/v2/auth/callback", &app.env.self_addr);
 
         #[derive(Deserialize)]
         struct AccessToken {
@@ -352,8 +355,9 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let client_id = dotenvy::var("GITHUB_CLIENT_ID")?;
-                let client_secret = dotenvy::var("GITHUB_CLIENT_SECRET")?;
+                let client_id = &app.env.github_client_id;
+                let client_secret =
+                    &app.env.github_client_secret.expose_secret();
 
                 let url = format!(
                     "https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}&redirect_uri={redirect_uri}"
@@ -373,11 +377,12 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let client_id = dotenvy::var("DISCORD_CLIENT_ID")?;
-                let client_secret = dotenvy::var("DISCORD_CLIENT_SECRET")?;
+                let client_id = &app.env.discord_client_id;
+                let client_secret =
+                    app.env.discord_client_secret.expose_secret();
 
                 let mut map = HashMap::new();
-                map.insert("client_id", &*client_id);
+                map.insert("client_id", client_id.as_str());
                 map.insert("client_secret", &*client_secret);
                 map.insert("code", code);
                 map.insert("grant_type", "authorization_code");
@@ -398,11 +403,12 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let client_id = dotenvy::var("MICROSOFT_CLIENT_ID")?;
-                let client_secret = dotenvy::var("MICROSOFT_CLIENT_SECRET")?;
+                let client_id = &app.env.microsoft_client_id;
+                let client_secret =
+                    app.env.microsoft_client_secret.expose_secret();
 
                 let mut map = HashMap::new();
-                map.insert("client_id", &*client_id);
+                map.insert("client_id", client_id.as_str());
                 map.insert("client_secret", &*client_secret);
                 map.insert("code", code);
                 map.insert("grant_type", "authorization_code");
@@ -423,11 +429,12 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let client_id = dotenvy::var("GITLAB_CLIENT_ID")?;
-                let client_secret = dotenvy::var("GITLAB_CLIENT_SECRET")?;
+                let client_id = &app.env.gitlab_client_id;
+                let client_secret =
+                    app.env.gitlab_client_secret.expose_secret();
 
                 let mut map = HashMap::new();
-                map.insert("client_id", &*client_id);
+                map.insert("client_id", client_id.as_str());
                 map.insert("client_secret", &*client_secret);
                 map.insert("code", code);
                 map.insert("grant_type", "authorization_code");
@@ -448,12 +455,13 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let client_id = dotenvy::var("GOOGLE_CLIENT_ID")?;
-                let client_secret = dotenvy::var("GOOGLE_CLIENT_SECRET")?;
+                let client_id = &app.env.google_client_id;
+                let client_secret =
+                    app.env.google_client_secret.expose_secret();
 
                 let mut map = HashMap::new();
-                map.insert("client_id", &*client_id);
-                map.insert("client_secret", &*client_secret);
+                map.insert("client_id", client_id.as_str());
+                map.insert("client_secret", client_secret);
                 map.insert("code", code);
                 map.insert("grant_type", "authorization_code");
                 map.insert("redirect_uri", &redirect_uri);
@@ -528,9 +536,10 @@ impl AuthProvider {
                 let code = query
                     .get("code")
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-                let api_url = dotenvy::var("PAYPAL_API_URL")?;
-                let client_id = dotenvy::var("PAYPAL_CLIENT_ID")?;
-                let client_secret = dotenvy::var("PAYPAL_CLIENT_SECRET")?;
+                let api_url = &app.env.paypal_api_url;
+                let client_id = &app.env.paypal_client_id;
+                let client_secret =
+                    &app.env.paypal_client_secret.expose_secret();
 
                 let mut map = HashMap::new();
                 map.insert("code", code.as_str());
@@ -562,6 +571,7 @@ impl AuthProvider {
 
     pub async fn get_user(
         &self,
+        env: &AppEnv,
         token: &str,
     ) -> Result<TempUser, AuthenticationError> {
         let res = match self {
@@ -579,9 +589,7 @@ impl AuthProvider {
                         .get("x-oauth-client-id")
                         .and_then(|x| x.to_str().ok());
 
-                    if client_id
-                        != Some(&*dotenvy::var("GITHUB_CLIENT_ID").unwrap())
-                    {
+                    if client_id != Some(&env.github_client_id) {
                         return Err(AuthenticationError::InvalidClientId);
                     }
                 }
@@ -731,7 +739,7 @@ impl AuthProvider {
                 }
             }
             AuthProvider::Steam => {
-                let api_key = dotenvy::var("STEAM_API_KEY")?;
+                let api_key = env.steam_api_key.expose_secret();
 
                 #[derive(Deserialize)]
                 struct SteamResponse {
@@ -796,7 +804,7 @@ impl AuthProvider {
                     pub country: String,
                 }
 
-                let api_url = dotenvy::var("PAYPAL_API_URL")?;
+                let api_url = &env.paypal_api_url;
 
                 let paypal_user: PayPalUser = reqwest::Client::new()
                     .get(format!(
@@ -1063,11 +1071,10 @@ pub struct Authorization {
 // http://localhost:8000/auth/init?url=https://modrinth.com
 #[get("init")]
 pub async fn init(
+    app: Data<App>,
     req: HttpRequest,
     Query(info): Query<AuthorizationInit>, // callback url
     client: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, AuthenticationError> {
     // If a user is logging into an OAuth method while already logged in,
     // this may be present.
@@ -1076,11 +1083,10 @@ pub async fn init(
     // logged in.
     let existing_user_id = if let Some(auth_token) = &info.auth_token {
         get_user_record_from_bearer_token(
+            &app,
             &req,
             Some(auth_token),
             &**client,
-            &redis,
-            &session_queue,
         )
         .await
         .ok()
@@ -1110,11 +1116,10 @@ pub async fn init(
 
     let user_id = if let Some(token) = info.token {
         let (_, user) = get_user_record_from_bearer_token(
+            &app,
             &req,
             Some(&token),
             &**client,
-            &redis,
-            &session_queue,
         )
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -1130,10 +1135,10 @@ pub async fn init(
         provider: info.provider,
         existing_user_id,
     }
-    .insert(Duration::minutes(30), &redis)
+    .insert(Duration::minutes(30), &app.env.redis)
     .await?;
 
-    let url = info.provider.get_redirect_url(state)?;
+    let url = info.provider.get_redirect_url(&app, state)?;
     Ok(HttpResponse::TemporaryRedirect()
         .append_header(("Location", &*url))
         .json(serde_json::json!({ "url": url })))
@@ -1142,6 +1147,7 @@ pub async fn init(
 #[get("callback")]
 pub async fn auth_callback(
     req: HttpRequest,
+    app: Data<App>,
     Query(query): Query<HashMap<String, String>>,
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
@@ -1177,11 +1183,11 @@ pub async fn auth_callback(
             .wrap_err("failed to remove flow")?;
 
         let token = provider
-            .get_token(query)
+            .get_token(&app, query)
             .await
             .wrap_err("failed to get token from provider")?;
         let oauth_user = provider
-            .get_user(&token)
+            .get_user(&app.env, &token)
             .await
             .wrap_err("failed to get user from provider")?;
 
@@ -1393,11 +1399,12 @@ pub async fn delete_auth_provider(
 }
 
 pub async fn check_sendy_subscription(
+    app: &App,
     email: &str,
 ) -> Result<bool, AuthenticationError> {
-    let url = dotenvy::var("SENDY_URL")?;
-    let id = dotenvy::var("SENDY_LIST_ID")?;
-    let api_key = dotenvy::var("SENDY_API_KEY")?;
+    let url = &app.env.sendy_url;
+    let id = &app.env.sendy_list_id;
+    let api_key = app.env.sendy_api_key.expose_secret();
 
     if url.is_empty() || url == "none" {
         tracing::info!(
@@ -1934,21 +1941,15 @@ pub struct Remove2FA {
 
 #[delete("2fa")]
 pub async fn remove_2fa(
+    app: Data<App>,
     req: HttpRequest,
     pool: Data<PgPool>,
-    redis: Data<RedisPool>,
     login: web::Json<Remove2FA>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (scopes, user) = get_user_record_from_bearer_token(
-        &req,
-        None,
-        &**pool,
-        &redis,
-        &session_queue,
-    )
-    .await?
-    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+    let (scopes, user) =
+        get_user_record_from_bearer_token(&app, &req, None, &**pool)
+            .await?
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
     if !scopes.contains(Scopes::USER_AUTH_WRITE) {
         return Err(ApiError::Authentication(
@@ -1967,7 +1968,7 @@ pub async fn remove_2fa(
         })?,
         true,
         user.id,
-        &redis,
+        &app.env.redis,
         &pool,
         &mut transaction,
     )
@@ -2002,12 +2003,15 @@ pub async fn remove_2fa(
     NotificationBuilder {
         body: NotificationBody::TwoFactorRemoved,
     }
-    .insert(user.id, &mut transaction, &redis)
+    .insert(user.id, &mut transaction, &app.env.redis)
     .await?;
 
     transaction.commit().await?;
-    crate::database::models::DBUser::clear_caches(&[(user.id, None)], &redis)
-        .await?;
+    crate::database::models::DBUser::clear_caches(
+        &[(user.id, None)],
+        &app.env.redis,
+    )
+    .await?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -2116,18 +2120,18 @@ pub struct ChangePassword {
 
 #[patch("password")]
 pub async fn change_password(
+    app: Data<App>,
     req: HttpRequest,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
     change_password: web::Json<ChangePassword>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = if let Some(flow) = &change_password.flow {
-        let flow = DBFlow::get(flow, &redis).await?;
+        let flow = DBFlow::get(flow, &app.env.redis).await?;
 
         if let Some(DBFlow::ForgotPassword { user_id }) = flow {
             let user = crate::database::models::DBUser::get_id(
-                user_id, &**pool, &redis,
+                user_id,
+                &app.env.postgres,
+                &app.env.redis,
             )
             .await?
             .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -2146,11 +2150,10 @@ pub async fn change_password(
         user
     } else {
         let (scopes, user) = get_user_record_from_bearer_token(
+            &app,
             &req,
             None,
-            &**pool,
-            &redis,
-            &session_queue,
+            &app.env.postgres,
         )
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -2178,7 +2181,7 @@ pub async fn change_password(
         user
     };
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = app.env.postgres.begin().await?;
 
     let update_password = if let Some(new_password) =
         &change_password.new_password
@@ -2236,26 +2239,29 @@ pub async fn change_password(
     .await?;
 
     if let Some(flow) = &change_password.flow {
-        DBFlow::remove(flow, &redis).await?;
+        DBFlow::remove(flow, &app.env.redis).await?;
     }
 
     if update_password.is_some() {
         NotificationBuilder {
             body: NotificationBody::PasswordChanged,
         }
-        .insert(user.id, &mut transaction, &redis)
+        .insert(user.id, &mut transaction, &app.env.redis)
         .await?;
     } else {
         NotificationBuilder {
             body: NotificationBody::PasswordRemoved,
         }
-        .insert(user.id, &mut transaction, &redis)
+        .insert(user.id, &mut transaction, &app.env.redis)
         .await?;
     }
 
     transaction.commit().await?;
-    crate::database::models::DBUser::clear_caches(&[(user.id, None)], &redis)
-        .await?;
+    crate::database::models::DBUser::clear_caches(
+        &[(user.id, None)],
+        &app.env.redis,
+    )
+    .await?;
 
     Ok(HttpResponse::Ok().finish())
 }
@@ -2532,16 +2538,13 @@ pub async fn subscribe_newsletter(
 
 #[get("email/subscribe")]
 pub async fn get_newsletter_subscription_status(
+    app: Data<App>,
     req: HttpRequest,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_full_user_from_headers(
+        &app,
         &req,
-        &**pool,
-        &redis,
-        &session_queue,
+        &app.env.postgres,
         Scopes::USER_READ,
     )
     .await?
@@ -2549,7 +2552,7 @@ pub async fn get_newsletter_subscription_status(
 
     let is_subscribed = user.is_subscribed_to_newsletter
         || if let Some(email) = user.email {
-            check_sendy_subscription(&email).await?
+            check_sendy_subscription(&app, &email).await?
         } else {
             false
         };

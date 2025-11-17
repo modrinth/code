@@ -1,7 +1,7 @@
 use super::ApiError;
+use crate::App;
 use crate::models::projects::Project;
 use crate::models::v2::projects::LegacyProject;
-use crate::queue::session::AuthQueue;
 use crate::routes::internal;
 use crate::{database::redis::RedisPool, routes::v2_reroute};
 use actix_web::{HttpRequest, HttpResponse, get, web};
@@ -24,13 +24,14 @@ fn default_count() -> u16 {
 
 #[get("projects")]
 pub async fn get_projects(
+    app: web::Data<App>,
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     count: web::Query<ResultCount>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let response = internal::moderation::get_projects_internal(
+        app,
         req,
         pool.clone(),
         redis.clone(),
@@ -38,7 +39,6 @@ pub async fn get_projects(
             count: count.count,
             offset: 0,
         }),
-        session_queue,
     )
     .await
     .map(|resp| HttpResponse::Ok().json(resp))

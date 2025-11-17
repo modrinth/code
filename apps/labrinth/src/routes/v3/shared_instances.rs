@@ -1,3 +1,4 @@
+use crate::App;
 use crate::auth::get_user_from_headers;
 use crate::auth::validate::get_maybe_user_from_headers;
 use crate::database::models::shared_instance_item::{
@@ -150,19 +151,18 @@ pub async fn shared_instance_list(
 }
 
 pub async fn shared_instance_get(
+    app: Data<App>,
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     info: web::Path<(SharedInstanceId,)>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0.into();
 
     let user = get_maybe_user_from_headers(
+        &app,
         &req,
         &**pool,
-        &redis,
-        &session_queue,
         Scopes::SHARED_INSTANCE_READ,
     )
     .await?
@@ -357,19 +357,18 @@ pub async fn shared_instance_delete(
 }
 
 pub async fn shared_instance_version_list(
+    app: Data<App>,
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     info: web::Path<(SharedInstanceId,)>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0.into();
 
     let user = get_maybe_user_from_headers(
+        &app,
         &req,
         &**pool,
-        &redis,
-        &session_queue,
         Scopes::SHARED_INSTANCE_READ,
     )
     .await?
@@ -403,19 +402,18 @@ pub async fn shared_instance_version_list(
 }
 
 pub async fn shared_instance_version_get(
+    app: Data<App>,
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     info: web::Path<(SharedInstanceVersionId,)>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let version_id = info.into_inner().0.into();
 
     let user = get_maybe_user_from_headers(
+        &app,
         &req,
         &**pool,
-        &redis,
-        &session_queue,
         Scopes::SHARED_INSTANCE_READ,
     )
     .await?
@@ -562,20 +560,19 @@ async fn delete_instance_version(
 }
 
 pub async fn shared_instance_version_download(
+    app: Data<App>,
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     info: web::Path<(SharedInstanceVersionId,)>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<Redirect, ApiError> {
     let version_id = info.into_inner().0.into();
 
     let user = get_maybe_user_from_headers(
+        &app,
         &req,
         &**pool,
-        &redis,
-        &session_queue,
         Scopes::SHARED_INSTANCE_VERSION_READ,
     )
     .await?

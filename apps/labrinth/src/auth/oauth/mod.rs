@@ -1,6 +1,6 @@
 use std::fmt::Write;
 
-use crate::auth::get_user_from_headers;
+use crate::auth::get_user_from_headers_v2;
 use crate::auth::oauth::uris::{OAuthRedirectUris, ValidatedRedirectUri};
 use crate::auth::validate::extract_authorization_header;
 use crate::database::models::flow_item::DBFlow;
@@ -12,10 +12,9 @@ use crate::database::models::{
     generate_oauth_client_authorization_id,
 };
 use crate::database::redis::RedisPool;
-use crate::models;
 use crate::models::ids::OAuthClientId;
 use crate::models::pats::Scopes;
-use crate::queue::session::AuthQueue;
+use crate::{App, models};
 use actix_web::http::header::{CACHE_CONTROL, LOCATION, PRAGMA};
 use actix_web::web::{Data, Query, ServiceConfig};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
@@ -59,21 +58,16 @@ pub struct OAuthClientAccessRequest {
 
 #[get("authorize")]
 pub async fn init_oauth(
+    app: Data<App>,
     req: HttpRequest,
     Query(oauth_info): Query<OAuthInit>,
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, OAuthError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::USER_AUTH_WRITE,
-    )
-    .await?
-    .1;
+    let user =
+        get_user_from_headers_v2(&app, &req, &**pool, Scopes::USER_AUTH_WRITE)
+            .await?
+            .1;
 
     let client_id = oauth_info.client_id.into();
     let client = DBOAuthClient::get(client_id, &**pool).await?;
@@ -172,33 +166,22 @@ pub struct RespondToOAuthClientScopes {
 
 #[post("accept")]
 pub async fn accept_client_scopes(
+    app: Data<App>,
     req: HttpRequest,
     accept_body: web::Json<RespondToOAuthClientScopes>,
     pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, OAuthError> {
-    accept_or_reject_client_scopes(
-        true,
-        req,
-        accept_body,
-        pool,
-        redis,
-        session_queue,
-    )
-    .await
+    accept_or_reject_client_scopes(true, app, req, accept_body, pool).await
 }
 
 #[post("reject")]
 pub async fn reject_client_scopes(
+    app: Data<App>,
     req: HttpRequest,
     body: web::Json<RespondToOAuthClientScopes>,
     pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, OAuthError> {
-    accept_or_reject_client_scopes(false, req, body, pool, redis, session_queue)
-        .await
+    accept_or_reject_client_scopes(false, app, req, body, pool).await
 }
 
 #[derive(Serialize, Deserialize)]
@@ -314,26 +297,20 @@ pub async fn request_token(
 
 pub async fn accept_or_reject_client_scopes(
     accept: bool,
+    app: Data<App>,
     req: HttpRequest,
     body: web::Json<RespondToOAuthClientScopes>,
     pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, OAuthError> {
-    let current_user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::SESSION_ACCESS,
-    )
-    .await?
-    .1;
+    let current_user =
+        get_user_from_headers_v2(&app, &req, &**pool, Scopes::SESSION_ACCESS)
+            .await?
+            .1;
 
     let flow = DBFlow::take_if(
         &body.flow,
         |f| matches!(f, DBFlow::InitOAuthAppApproval { .. }),
-        &redis,
+        &app.env.redis,
     )
     .await?;
     if let Some(DBFlow::InitOAuthAppApproval {
@@ -379,7 +356,7 @@ pub async fn accept_or_reject_client_scopes(
                 scopes,
                 redirect_uris,
                 state,
-                &redis,
+                &app.env.redis,
             )
             .await
         } else {

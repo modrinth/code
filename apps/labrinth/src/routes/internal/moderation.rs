@@ -1,12 +1,11 @@
 use super::ApiError;
-use crate::database;
 use crate::database::models::{DBOrganization, DBTeamId, DBTeamMember, DBUser};
 use crate::database::redis::RedisPool;
 use crate::models::ids::{OrganizationId, TeamId};
 use crate::models::projects::{Project, ProjectStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
-use crate::queue::session::AuthQueue;
 use crate::util::error::Context;
+use crate::{App, database};
 use crate::{auth::check_is_moderator_from_headers, models::pats::Scopes};
 use actix_web::{HttpRequest, get, post, web};
 use ariadne::ids::{UserId, random_base62};
@@ -76,30 +75,24 @@ pub enum Ownership {
 )]
 #[get("/projects")]
 async fn get_projects(
+    app: web::Data<App>,
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     request_opts: web::Query<ProjectsRequestOptions>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<FetchedProject>>, ApiError> {
-    get_projects_internal(req, pool, redis, request_opts, session_queue).await
+    get_projects_internal(app, req, pool, redis, request_opts).await
 }
 
 pub async fn get_projects_internal(
+    app: web::Data<App>,
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     request_opts: web::Query<ProjectsRequestOptions>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<FetchedProject>>, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await?;
+    check_is_moderator_from_headers(&app, &req, &**pool, Scopes::PROJECT_READ)
+        .await?;
 
     use futures::stream::TryStreamExt;
 
@@ -207,19 +200,13 @@ pub async fn get_projects_internal(
 #[get("/project/{id}")]
 async fn get_project_meta(
     req: HttpRequest,
+    app: web::Data<App>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
     info: web::Path<(String,)>,
 ) -> Result<web::Json<MissingMetadata>, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await?;
+    check_is_moderator_from_headers(&app, &req, &**pool, Scopes::PROJECT_READ)
+        .await?;
 
     let project_id = info.into_inner().0;
     let project =
@@ -361,19 +348,12 @@ pub enum Judgement {
 #[post("/project")]
 async fn set_project_meta(
     req: HttpRequest,
+    app: web::Data<App>,
     pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
     judgements: web::Json<HashMap<String, Judgement>>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await?;
+    check_is_moderator_from_headers(&app, &req, &**pool, Scopes::PROJECT_READ)
+        .await?;
 
     let mut transaction = pool.begin().await?;
 

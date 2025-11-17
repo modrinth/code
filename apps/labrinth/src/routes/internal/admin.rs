@@ -1,3 +1,4 @@
+use crate::App;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
@@ -7,7 +8,6 @@ use crate::models::pats::Scopes;
 use crate::models::threads::MessageBody;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::moderation::AUTOMOD_ID;
-use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchConfig;
 use crate::util::date::get_current_tenths_of_ms;
@@ -46,11 +46,10 @@ pub struct DownloadBody {
 #[allow(clippy::too_many_arguments)]
 pub async fn count_download(
     req: HttpRequest,
+    app: web::Data<App>,
     pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
     maxmind: web::Data<MaxMind>,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
-    session_queue: web::Data<AuthQueue>,
     download_body: web::Json<DownloadBody>,
 ) -> Result<HttpResponse, ApiError> {
     let token = download_body
@@ -59,16 +58,10 @@ pub async fn count_download(
         .find(|x| x.0.to_lowercase() == "authorization")
         .map(|x| &**x.1);
 
-    let user = get_user_record_from_bearer_token(
-        &req,
-        token,
-        &**pool,
-        &redis,
-        &session_queue,
-    )
-    .await
-    .ok()
-    .flatten();
+    let user = get_user_record_from_bearer_token(&app, &req, token, &**pool)
+        .await
+        .ok()
+        .flatten();
 
     let project_id: crate::database::models::ids::DBProjectId =
         download_body.project_id.into();

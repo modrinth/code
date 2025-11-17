@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use std::time::Duration;
 
 use actix_web::web;
@@ -8,7 +8,8 @@ use queue::{
     analytics::AnalyticsQueue, email::EmailQueue, payouts::PayoutsQueue,
     session::AuthQueue, socket::ActiveSockets,
 };
-use sqlx::Postgres;
+use secrecy::SecretString;
+use sqlx::{PgPool, Postgres};
 use tracing::{info, warn};
 
 extern crate clickhouse as clickhouse_crate;
@@ -50,6 +51,7 @@ pub struct Pepper {
 
 #[derive(Clone)]
 pub struct LabrinthConfig {
+    pub app: App,
     pub pool: sqlx::Pool<Postgres>,
     pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
@@ -72,8 +74,52 @@ pub struct LabrinthConfig {
     pub gotenberg_client: GotenbergClient,
 }
 
+#[derive(Debug, Clone)]
+pub struct App {
+    pub env: AppEnv,
+    pub state: AppState,
+}
+
+#[derive(derive_more::Debug, Clone)]
+pub struct AppEnv {
+    pub postgres: PgPool,
+    pub postgres_ro: PgPool,
+    pub redis: RedisPool,
+    #[debug(skip)]
+    pub clickhouse: ::clickhouse::Client,
+    // env vars
+    pub self_addr: String,
+    pub rate_limit_ignore_key: String,
+    pub github_client_id: String,
+    pub github_client_secret: SecretString,
+    pub discord_client_id: String,
+    pub discord_client_secret: SecretString,
+    pub microsoft_client_id: String,
+    pub microsoft_client_secret: SecretString,
+    pub gitlab_client_id: String,
+    pub gitlab_client_secret: SecretString,
+    pub google_client_id: String,
+    pub google_client_secret: SecretString,
+    pub steam_api_key: SecretString,
+    pub paypal_api_url: String,
+    pub paypal_client_id: String,
+    pub paypal_client_secret: SecretString,
+    pub sendy_url: String,
+    pub sendy_list_id: String,
+    pub sendy_api_key: SecretString,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppState {
+    // TODO: fully own the `AuthQueue`
+    pub auth_queue: web::Data<AuthQueue>,
+}
+
+pub static APP: OnceLock<App> = OnceLock::new();
+
 #[allow(clippy::too_many_arguments)]
 pub fn app_setup(
+    env: AppEnv,
     pool: sqlx::Pool<Postgres>,
     ro_pool: ReadOnlyPgPool,
     redis_pool: RedisPool,
@@ -91,6 +137,16 @@ pub fn app_setup(
         "Starting labrinth on {}",
         dotenvy::var("BIND_ADDR").unwrap()
     );
+
+    let session_queue = web::Data::new(AuthQueue::new());
+    let state = AppState {
+        auth_queue: session_queue.clone(),
+    };
+    let app = App { env, state };
+
+    if APP.set(app.clone()).is_err() {
+        warn!("Setting `ENV` multiple times");
+    }
 
     let automated_moderation_queue =
         web::Data::new(AutomatedModerationQueue::default());
@@ -207,8 +263,6 @@ pub fn app_setup(
         });
     }
 
-    let session_queue = web::Data::new(AuthQueue::new());
-
     let pool_ref = pool.clone();
     let redis_ref = redis_pool.clone();
     let session_queue_ref = session_queue.clone();
@@ -270,6 +324,7 @@ pub fn app_setup(
     }
 
     LabrinthConfig {
+        app,
         pool,
         ro_pool,
         redis_pool,

@@ -1,3 +1,4 @@
+use crate::App;
 use crate::database::redis::RedisPool;
 use crate::models::reports::Report;
 use crate::models::v2::reports::LegacyReport;
@@ -181,13 +182,13 @@ pub async fn report_edit(
 #[delete("report/{id}")]
 pub async fn report_delete(
     req: HttpRequest,
+    app: web::Data<App>,
     pool: web::Data<PgPool>,
     info: web::Path<(crate::models::ids::ReportId,)>,
     redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::reports::report_delete(req, pool, info, redis, session_queue)
+    v3::reports::report_delete(req, app, pool, info, redis)
         .await
         .or_else(v2_reroute::flatten_404_error)
 }

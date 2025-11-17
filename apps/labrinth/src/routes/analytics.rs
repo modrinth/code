@@ -1,4 +1,5 @@
-use crate::auth::get_user_from_headers;
+use crate::App;
+use crate::auth::{get_user_from_headers, get_user_from_headers_v2};
 use crate::database::redis::RedisPool;
 use crate::models::analytics::{PageView, Playtime};
 use crate::models::pats::Scopes;
@@ -49,22 +50,16 @@ pub struct UrlInput {
 #[post("view")]
 pub async fn page_view_ingest(
     req: HttpRequest,
+    app: web::Data<App>,
     maxmind: web::Data<MaxMind>,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
-    session_queue: web::Data<AuthQueue>,
     url_input: web::Json<UrlInput>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::empty(),
-    )
-    .await
-    .ok();
+    let user = get_user_from_headers_v2(&app, &req, &**pool, Scopes::empty())
+        .await
+        .ok();
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = Url::parse(&url_input.url).map_err(|_| {

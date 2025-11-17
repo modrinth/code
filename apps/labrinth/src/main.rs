@@ -4,7 +4,6 @@ use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
 
-use labrinth::app_config;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::{S3BucketConfig, S3Host};
@@ -15,7 +14,9 @@ use labrinth::util::env::parse_var;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::utoipa_app_config;
+use labrinth::{AppEnv, app_config};
 use labrinth::{check_env_vars, clickhouse, database, file_hosting};
+use modrinth_util::env_var;
 use std::ffi::CStr;
 use std::sync::Arc;
 use tracing::{Instrument, error, info, info_span};
@@ -198,6 +199,14 @@ async fn main() -> std::io::Result<()> {
         .expect("Failed to register jemalloc metrics");
 
     let labrinth_config = labrinth::app_setup(
+        AppEnv {
+            self_addr: env_var("SELF_ADDR").unwrap(),
+            rate_limit_ignore_key: env_var("RATE_LIMIT_IGNORE_KEY").unwrap(),
+            postgres: pool.clone(),
+            postgres_ro: ro_pool.clone(),
+            redis: redis_pool.clone(),
+            clickhouse: clickhouse.clone(),
+        },
         pool.clone(),
         ro_pool.clone(),
         redis_pool.clone(),

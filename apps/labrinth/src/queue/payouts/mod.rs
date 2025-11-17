@@ -9,7 +9,6 @@ use crate::models::payouts::{
 use crate::models::projects::MonetizationStatus;
 use crate::queue::payouts::mural::MuralPayoutRequest;
 use crate::routes::ApiError;
-use crate::util::env::env_var;
 use crate::util::error::Context;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
@@ -20,6 +19,7 @@ use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
 use dashmap::DashMap;
 use eyre::{Result, eyre};
 use futures::TryStreamExt;
+use modrinth_util::env_var;
 use muralpay::MuralPay;
 use reqwest::Method;
 use rust_decimal::prelude::ToPrimitive;

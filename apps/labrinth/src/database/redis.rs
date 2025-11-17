@@ -20,7 +20,7 @@ use std::time::Duration;
 const DEFAULT_EXPIRY: i64 = 60 * 60 * 12; // 12 hours
 const ACTUAL_EXPIRY: i64 = 60 * 30; // 30 minutes
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct RedisPool {
     pub url: String,
     pub pool: deadpool_redis::Pool,

@@ -1,3 +1,4 @@
+use crate::App;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::payout_item::DBPayout;
@@ -439,25 +440,21 @@ pub struct WithdrawalFees {
 #[utoipa::path]
 #[post("/fees")]
 pub async fn calculate_fees(
+    app: web::Data<App>,
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
     body: web::Json<Withdrawal>,
-    session_queue: web::Data<AuthQueue>,
     payouts_queue: web::Data<PayoutsQueue>,
 ) -> Result<web::Json<WithdrawalFees>, ApiError> {
     // even though we don't use the user, we ensure they're logged in to make API calls
-    let (_, _user) = get_user_record_from_bearer_token(
-        &req,
-        None,
-        &**pool,
-        &redis,
-        &session_queue,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::Authentication(AuthenticationError::InvalidCredentials)
-    })?;
+    let (_, _user) =
+        get_user_record_from_bearer_token(&app, &req, None, &**pool)
+            .await?
+            .ok_or_else(|| {
+                ApiError::Authentication(
+                    AuthenticationError::InvalidCredentials,
+                )
+            })?;
 
     let fees = payouts_queue
         .calculate_fees(&body.method, &body.method_id, body.amount)
@@ -472,25 +469,22 @@ pub async fn calculate_fees(
 #[utoipa::path]
 #[post("")]
 pub async fn create_payout(
+    app: web::Data<App>,
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     body: web::Json<Withdrawal>,
-    session_queue: web::Data<AuthQueue>,
     payouts_queue: web::Data<PayoutsQueue>,
     gotenberg: web::Data<GotenbergClient>,
 ) -> Result<(), ApiError> {
-    let (scopes, user) = get_user_record_from_bearer_token(
-        &req,
-        None,
-        &**pool,
-        &redis,
-        &session_queue,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::Authentication(AuthenticationError::InvalidCredentials)
-    })?;
+    let (scopes, user) =
+        get_user_record_from_bearer_token(&app, &req, None, &**pool)
+            .await?
+            .ok_or_else(|| {
+                ApiError::Authentication(
+                    AuthenticationError::InvalidCredentials,
+                )
+            })?;
 
     if !scopes.contains(Scopes::PAYOUTS_WRITE) {
         return Err(ApiError::Authentication(

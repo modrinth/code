@@ -27,6 +27,7 @@ pub fn config(cfg: &mut ServiceConfig) {
     );
 }
 
+#[derive(Debug)]
 pub struct SessionMetadata {
     pub city: Option<String>,
     pub country: Option<String>,
