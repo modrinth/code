@@ -273,7 +273,12 @@ pub async fn search_for_project(
                         for (facet_inner_index, facet) in
                             facet_inner_list.iter().enumerate()
                         {
-                            filter_string.push_str(&facet.replace(':', " = "));
+                            let formatted_facet = if facet.contains("!=") {
+                                facet.replace("!=", " != ")
+                            } else {
+                                facet.replace(':', " = ")
+                            };
+                            filter_string.push_str(&formatted_facet);
                             if facet_inner_index != (facet_inner_list.len() - 1)
                             {
                                 filter_string.push_str(" AND ")
