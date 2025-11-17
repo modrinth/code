@@ -23,7 +23,7 @@ import Fuse from 'fuse.js'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
 // TEMPORARY: Mock data for development
-// import { generateMockProjectReviews } from '~/utils/mockTechReviewData'
+import { generateMockProjectReviews } from '~/utils/mockTechReviewData'
 
 const client = injectModrinthClient()
 
@@ -232,30 +232,30 @@ function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSo
 	}
 }
 
-const {
-	data: reviewItems,
-	isLoading,
-	refetch,
-} = useQuery({
-	queryKey: ['tech-reviews', currentSortType],
-	queryFn: async () => {
-		return await client.labrinth.tech_review_internal.searchProjects({
-			limit: 350,
-			page: 0,
-			sort_by: toApiSort(currentSortType.value),
-		})
-	},
-	initialData: [] as Labrinth.TechReview.Internal.ProjectReview[],
-})
+// const {
+// 	data: reviewItems,
+// 	isLoading,
+// 	refetch,
+// } = useQuery({
+// 	queryKey: ['tech-reviews', currentSortType],
+// 	queryFn: async () => {
+// 		return await client.labrinth.tech_review_internal.searchProjects({
+// 			limit: 350,
+// 			page: 0,
+// 			sort_by: toApiSort(currentSortType.value),
+// 		})
+// 	},
+// 	initialData: [] as Labrinth.TechReview.Internal.ProjectReview[],
+// })
 
 // TEMPORARY: Mock data for development (58 items to match batch scan progress)
-// const reviewItems = ref<Labrinth.TechReview.Internal.ProjectReview[]>(
-// 	generateMockProjectReviews(58),
-// )
-// const isLoading = ref(false)
-// const refetch = () => {
-// 	reviewItems.value = generateMockProjectReviews(58)
-// }
+const reviewItems = ref<Labrinth.TechReview.Internal.ProjectReview[]>(
+	generateMockProjectReviews(58),
+)
+const isLoading = ref(false)
+const refetch = () => {
+	reviewItems.value = generateMockProjectReviews(58)
+}
 
 watch(currentSortType, () => {
 	goToPage(1)
