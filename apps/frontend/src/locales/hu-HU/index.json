@@ -614,6 +614,66 @@
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Amerikai állampolgár vagy?"
   },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Folytatás limittel"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Részletek"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Mennyiség"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "FX rate"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Válaszd ki az országodat"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Országok keresése..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Régió"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Fiók tulajdonosa"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Érme"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Hálózat"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Fiók"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Fiók leválasztása"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Fizetési mód"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal fiók"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Csatlakoztasd a PayPal fiókodat hogy tudjál fizetni keresztül rajta."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Mentés"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Venmo handle sikeresen mentve!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Mentve"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Bejelentkezés PayPalálal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@felhasználónév"
+  },
   "error.collection.404.list_item.1": {
     "message": "Elírhatad a gyűjtemémyed URL-ét."
   },

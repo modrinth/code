@@ -125,6 +125,9 @@
   "friends.section.heading": {
     "message": "{title} - {count}"
   },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Mag-sign-in sa Modrinth account</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Idagdag at laruin"
   },
@@ -308,6 +311,9 @@
   "instance.settings.tabs.installation.install": {
     "message": "I-install"
   },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Nag-i-install ngayon"
+  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Bersiyon ng {loader}"
   },
@@ -322,6 +328,9 @@
   },
   "instance.settings.tabs.installation.reinstall.button": {
     "message": "I-reinstall ang modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Ini-re-reinstall ang modpack"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
     "message": "Ang pagrere-install ay maaaring mare-reset ang lahat ng na-install o binago na kontento sa kung anong ibibigay ng modpack, tatanggalin ang mga mods o kontentong idinagdag mo lalo na ang mga orihinal na modpack. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa instansiya, ngunit kung dumedepende na ang iyong mundo sa karagdagang kontento, maaari nitong masira ang mga umiiral na mundo."
@@ -385,6 +394,9 @@
   },
   "instance.settings.tabs.installation.unlink.description": {
     "message": "Ang instansiyang ito ay naka-link sa isang modpack, ibig sabihin ang mga mod ay hindi mai-update at hindi mo mapapalitan ang mod loader o ang bersiyon ng Minecraft."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "I-unlink sa modpack"
   },
   "instance.settings.tabs.java": {
     "message": "Java at memorya"

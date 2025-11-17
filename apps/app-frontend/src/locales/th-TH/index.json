@@ -65,6 +65,9 @@
   "app.update.reload-to-update": {
     "message": "รีโหลดเพื่อติดตั้งอัพเดต"
   },
+  "friends.heading": {
+    "message": "เพื่อน"
+  },
   "instance.add-server.add-and-play": {
     "message": "เพิ่มและเล่นทันที"
   },

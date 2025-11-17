@@ -656,6 +656,9 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "淨額"
   },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal 帳號"
+  },
   "error.collection.404.list_item.1": {
     "message": "你可能輸錯了該收藏的網址。"
   },

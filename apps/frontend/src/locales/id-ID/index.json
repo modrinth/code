@@ -209,11 +209,32 @@
   "auth.authorize.authorize-app-name": {
     "message": "Mengesahkan {appName}"
   },
+  "auth.authorize.redirect-url": {
+    "message": "Anda akan dialihkan ke <redirect-url>{url}</redirect-url>"
+  },
+  "auth.reset-password.method-choice.action": {
+    "message": "Kirim sur-el pemulihan"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Masukkan sur-el Anda di bawah dan kami akan mengirimkan tautan untuk memulihkan akun Anda."
+  },
+  "auth.reset-password.method-choice.email-username.label": {
+    "message": "Sur-el atau nama pengguna"
+  },
   "auth.reset-password.method-choice.email-username.placeholder": {
     "message": "Sur-el"
   },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Sur-el berisi instruksi telah dikirim kepada Anda bila sur-el tersebut sebelumnya tersimpan di akun Anda."
+  },
   "auth.reset-password.notification.email-sent.title": {
     "message": "Sur-el terkirim"
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Anda sekarang dapat masuk ke akun Anda dengan kata sandi baru."
+  },
+  "auth.reset-password.notification.password-reset.title": {
+    "message": "Kata sandi berhasil diatur ulang"
   },
   "auth.reset-password.post-challenge.action": {
     "message": "Atur ulang kata sandi"
@@ -221,11 +242,26 @@
   "auth.reset-password.post-challenge.confirm-password.label": {
     "message": "Konfirmasi kata sandi"
   },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Masukkan kata sandi baru di bawah untuk mengakses akun Anda."
+  },
   "auth.reset-password.title": {
     "message": "Atur Ulang Kata Sandi"
   },
   "auth.reset-password.title.long": {
     "message": "Atur ulang kata sandi Anda"
+  },
+  "auth.sign-in.2fa.description": {
+    "message": "Mohon masukkan kode autentikasi dwifaktor untuk melanjutkan."
+  },
+  "auth.sign-in.2fa.label": {
+    "message": "Masukkan kode dwifaktor"
+  },
+  "auth.sign-in.2fa.placeholder": {
+    "message": "Masukkan kode..."
+  },
+  "auth.sign-in.additional-options": {
+    "message": "<forgot-password-link>Lupa kata sandi?</forgot-password-link> • <create-account-link>Buat akun</create-account-link>"
   },
   "auth.sign-in.email-username.label": {
     "message": "Sur-el atau nama pengguna"
@@ -233,11 +269,32 @@
   "auth.sign-in.password.label": {
     "message": "Kata sandi"
   },
+  "auth.sign-in.sign-in-with": {
+    "message": "Masuk dengan"
+  },
+  "auth.sign-in.title": {
+    "message": "Masuk"
+  },
+  "auth.sign-in.use-password": {
+    "message": "Atau gunakan kata sandi"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Buat akun"
+  },
+  "auth.sign-up.confirm-password.label": {
+    "message": "Konfirmasi kata sandi"
+  },
   "auth.sign-up.email.label": {
     "message": "Sur-el"
   },
   "auth.sign-up.label.username": {
     "message": "Nama pengguna"
+  },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Dengan membuat sebuah akun, Anda menyetujui <terms-link>Ketentuan</terms-link> dan <privacy-policy-link>Kebijakan Privasi</privacy-policy-link> Modrinth."
+  },
+  "auth.sign-up.notification.password-mismatch.text": {
+    "message": "Kata sandi tidak cocok!"
   },
   "frog": {
     "message": "Anda terkodok-kodok!🐸"

@@ -683,17 +683,113 @@
   "dashboard.creator-withdraw-modal.method-selection.region": {
     "message": "Região"
   },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Alguns métodos de pagamento não estão disponíveis em determinadas regiões."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Selecionar método de levantamento"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "O teu limite de levantamento é <b>{amount}</b>, <tax-link>completa um formulário de imposto</tax-link> para levantar mais."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Dono da conta"
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Moeda"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Confirma o endereço da tua carteira"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Número de identificação nacional"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Insere o número de identificação nacional"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Número do passaporte"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Insere o número do passaporte"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Número de residência"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Insere o número da residência"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "Número RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Insere o número RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Número de identificação de imposto"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Insere o número de identificação de imposto"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Rede"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Estás próximo de atingir o limite de levantamento. Podes levantar <b>{amountRemaining}</b> agora, mas é necessário um formulário de imposto para levantar mais."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Conta"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Desconectar conta"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Método de pagamento"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "Conta PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Conecta a tua conta PayPal para receber pagamentos diretamente."
   },
   "dashboard.creator-withdraw-modal.paypal-details.save-button": {
     "message": "Guardar"
   },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Nome de utilizador Venmo guardado com sucesso!"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
     "message": "Guardado"
   },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Iniciar sessão com PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Insere o teu nome de utilizador Venmo para receber pagamentos."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Nome de utilizador Venmo"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
     "message": "@nome de utilizador"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Concluído"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Método"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Detalhes da conta"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Verificação"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Formulário de imposto"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Detalhes"
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Levantar"

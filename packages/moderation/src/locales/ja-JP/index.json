@@ -158,6 +158,9 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "名前を整理"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "{tagCount, plural, other {#個}}のタグを選択しました。関連する検索結果に表示されるように、{maxTagCount}個以下に減らすことを検討してください。"
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "正確なタグを選択"
   },

@@ -497,6 +497,9 @@
   "create.organization.error-title": {
     "message": "حدث خطأ"
   },
+  "create.organization.name-label": {
+    "message": ""
+  },
   "error.collection.404.list_item.3": {
     "message": "قد تكون هذه المجموعة قد أزالها فريق مراقبة مودرنث لانتهاك <tou-link>شروط الاستخدام</tou-link> الخاصة بنا."
   },

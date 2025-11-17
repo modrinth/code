@@ -168,7 +168,7 @@
     "defaultMessage": "Adres, wiersz 2 (niewymagane)"
   },
   "form.label.amount": {
-    "defaultMessage": "Kwota"
+    "defaultMessage": "Ilość"
   },
   "form.label.bank-name": {
     "defaultMessage": "Nazwa banku"
@@ -177,7 +177,7 @@
     "defaultMessage": "Nazwa przedsiębiorczości"
   },
   "form.label.city": {
-    "defaultMessage": "Miejscowość"
+    "defaultMessage": "Miasto"
   },
   "form.label.country": {
     "defaultMessage": "Kraj"
@@ -225,19 +225,19 @@
     "defaultMessage": "Wybierz kraj"
   },
   "form.placeholder.email": {
-    "defaultMessage": "Podaj adres e-mail"
+    "defaultMessage": "Wprowadź adres e-mail"
   },
   "form.placeholder.first-name": {
-    "defaultMessage": "Podaj imię"
+    "defaultMessage": "Wprowadź imię"
   },
   "form.placeholder.last-name": {
-    "defaultMessage": "Podaj nazwisko"
+    "defaultMessage": "Wprowadź nazwisko"
   },
   "form.placeholder.postal-code": {
-    "defaultMessage": "Podaj kod pocztowy"
+    "defaultMessage": "Wprowadź kod pocztowy"
   },
   "form.placeholder.state": {
-    "defaultMessage": "Podaj województwo"
+    "defaultMessage": "Wprowadź województwo"
   },
   "icon-select.edit": {
     "defaultMessage": "Edytuj ikonę"

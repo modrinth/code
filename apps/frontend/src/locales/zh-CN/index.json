@@ -6,7 +6,7 @@
     "message": "继续"
   },
   "admin.billing.error.not-found": {
-    "message": "未找到用户"
+    "message": "用户不存在"
   },
   "app-marketing.download.description": {
     "message": "我们的桌面应用程序可在所有平台上使用，请选择你想要的版本。"
@@ -1403,6 +1403,12 @@
   "layout.mobile.close-menu": {
     "message": ""
   },
+  "layout.mobile.open-menu": {
+    "message": "打开菜单"
+  },
+  "layout.nav.active-reports": {
+    "message": "进行中的举报"
+  },
   "layout.nav.analytics": {
     "message": "数据"
   },
@@ -1429,6 +1435,9 @@
   },
   "layout.nav.modrinth-home-page": {
     "message": "Modrinth 首页"
+  },
+  "layout.nav.my-servers": {
+    "message": "我的服务器"
   },
   "layout.nav.organizations": {
     "message": "组织"
@@ -1475,6 +1484,66 @@
   "moderation.technical.search.placeholder": {
     "message": "搜索技术评价……"
   },
+  "muralpay.account-type.checking": {
+    "message": "支票账户"
+  },
+  "muralpay.account-type.savings": {
+    "message": "储蓄账户"
+  },
+  "muralpay.country.at": {
+    "message": "奥地利"
+  },
+  "muralpay.country.be": {
+    "message": "比利时"
+  },
+  "muralpay.country.cy": {
+    "message": "塞浦路斯"
+  },
+  "muralpay.country.de": {
+    "message": "德国"
+  },
+  "muralpay.country.ee": {
+    "message": "爱沙尼亚"
+  },
+  "muralpay.country.es": {
+    "message": "西班牙"
+  },
+  "muralpay.country.fi": {
+    "message": "芬兰"
+  },
+  "muralpay.country.fr": {
+    "message": "法国"
+  },
+  "muralpay.country.gr": {
+    "message": "希腊"
+  },
+  "muralpay.country.ie": {
+    "message": "爱尔兰"
+  },
+  "muralpay.country.it": {
+    "message": "意大利"
+  },
+  "muralpay.country.lt": {
+    "message": "立陶宛"
+  },
+  "muralpay.country.lu": {
+    "message": "卢森堡"
+  },
+  "muralpay.country.lv": {
+    "message": "拉脱维亚"
+  },
+  "muralpay.country.mt": {
+    "message": "马耳他"
+  },
+  "muralpay.country.nl": {
+    "message": "荷兰"
+  },
+  "muralpay.country.pt": {
+    "message": "葡萄牙"
+  },
+  "muralpay.country.sk": {
+    "message": "斯洛伐克"
+  },
   "muralpay.document-type.national-id": {
     "message": "国民身份证"
   },
@@ -1487,8 +1556,14 @@
   "muralpay.document-type.ruc": {
     "message": "唯一纳税人登记号"
   },
+  "muralpay.document-type.tax-id": {
+    "message": "税号"
+  },
   "muralpay.field.clabe": {
     "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "国家"
   },
   "muralpay.field.cpf-cnpj": {
     "message": "CPF/CNPJ"

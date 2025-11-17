@@ -125,6 +125,9 @@
   "friends.section.heading": {
     "message": "{title} - {count}"
   },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Pag-sign-in sa Modrinth account</link> aron makadugang og mga higala ug mahibal-an ang ginadula nila!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Idugang ug dulaa"
   },
@@ -308,6 +311,9 @@
   "instance.settings.tabs.installation.install": {
     "message": "Itaud"
   },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Nagtaud karon"
+  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Bersiyon sa {loader}"
   },
@@ -322,6 +328,9 @@
   },
   "instance.settings.tabs.installation.reinstall.button": {
     "message": "Itaud pag-usab ang putos sa kausaban"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Nagtaud pag-usab sa putos sa kusaban"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
     "message": "Mahimo nga mobalik sa sinugdan ang tanang gitaod o giusab nga sulod sa unsay ihatag sa putos sa kausaban, tangtangon ang mga kausaban o sulod nga imong gidugang apil na ang lintunganay nga putos sa kausaban. Mahimo nga maayo ang mga tuhaw nga batasan kon naay pagbag-o sa pananglitan, apan kon gasalig na ang imong kalibutan sa dinugang nga sulod, mahimo nga madaut ani ang daan nga mga kalibutan."
@@ -385,6 +394,9 @@
   },
   "instance.settings.tabs.installation.unlink.description": {
     "message": "Nakakatay kining pananglitan sa usa ka putos sa kausaban, pasabot ani nga dili mapasibo ang mga kausaban og dili nimo mausab ang tigkarga sa kausaban o ang bersiyon sa Minecraft. Kanunay nga mabugto kining pananglitan og putos sa kausabon kun tangtangon ang katay."
+  },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Pagbugto sa putos sa kausaban"
   },
   "instance.settings.tabs.java": {
     "message": "Java at memorya"

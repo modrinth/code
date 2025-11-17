@@ -413,6 +413,9 @@
   "create.collection.cancel": {
     "message": "キャンセル"
   },
+  "create.collection.collection-info": {
+    "message": "新しいコレクションは、{count, plural, =0 {空の} other {#個のプロジェクトを含む}}公開コレクションとして作成されます。"
+  },
   "create.collection.create-collection": {
     "message": "コレクションを作成"
   },
@@ -436,6 +439,9 @@
   },
   "create.limit-alert.contact-support": {
     "message": "サポートに連絡"
+  },
+  "create.limit-alert.type-collection": {
+    "message": "コレクション"
   },
   "create.limit-alert.type-organization": {
     "message": "組織"
@@ -467,8 +473,14 @@
   "create.organization.name-placeholder": {
     "message": "組織名を入力…"
   },
+  "create.organization.summary-description": {
+    "message": "1~2文程度のあなたの組織の説明。"
+  },
   "create.organization.summary-label": {
     "message": "概要"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "…のための組織です"
   },
   "create.organization.title": {
     "message": "組織を作成"
@@ -515,6 +527,9 @@
   "create.project.visibility-unlisted": {
     "message": "限定公開"
   },
+  "dashboard.affiliate-links.create.button": {
+    "message": "アフィリエイトリンクを作成"
+  },
   "dashboard.collections.button.create-new": {
     "message": "新規作成"
   },
@@ -532,6 +547,18 @@
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "あなたはアメリカ国民ですか？"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "ネットワーク"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "アカウント"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "保存"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "保存済み"
   },
   "error.collection.404.list_item.1": {
     "message": "コレクションの URL を誤って入力した可能性があります。"
@@ -627,7 +654,7 @@
     "message": "データパック"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
-    "message": "modパック"
+    "message": "Modパック"
   },
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "mod"
@@ -728,8 +755,17 @@
   "layout.footer.about.status": {
     "message": "ステータス"
   },
+  "layout.footer.legal-disclaimer": {
+    "message": "Minecraftの公式サービスではありません。MojangまたはMicrosoftの承認または連携はありません。"
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "著作権ポリシーとDMCA"
+  },
   "layout.footer.legal.privacy-policy": {
     "message": "プライバシーポリシー"
+  },
+  "layout.footer.legal.rules": {
+    "message": "コンテンツルール"
   },
   "layout.footer.legal.security-notice": {
     "message": "セキュリティに関するお知らせ"
@@ -788,8 +824,26 @@
   "layout.nav.analytics": {
     "message": "統計"
   },
+  "layout.nav.get-modrinth-app": {
+    "message": "Modrinthアプリを入手"
+  },
   "layout.nav.home": {
     "message": "ホーム"
+  },
+  "layout.nav.host-a-server": {
+    "message": "サーバーをホスト"
+  },
+  "layout.nav.organizations": {
+    "message": "組織"
+  },
+  "layout.nav.profile": {
+    "message": "プロフィール"
+  },
+  "layout.nav.projects": {
+    "message": "プロジェクト"
+  },
+  "layout.nav.revenue": {
+    "message": "収益"
   },
   "layout.nav.search": {
     "message": "検索"
@@ -890,6 +944,12 @@
   "project-type.modpack.singular": {
     "message": "Modパック"
   },
+  "project-type.resourcepack.plural": {
+    "message": "リソースパック"
+  },
+  "project-type.shader.plural": {
+    "message": "シェーダー"
+  },
   "project.collections.create-new": {
     "message": "コレクションを作成"
   },
@@ -910,5 +970,26 @@
   },
   "project.navigation.changelog": {
     "message": "変更履歴"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "message": "ぼかし効果などの高度なレンダリングを有効にします。グラフィック アクセラレーションが使用できない場合は、パフォーマンスが低下する可能性があります。"
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "高度なレンダリング"
+  },
+  "settings.display.theme.description": {
+    "message": "このデバイスでのお好みのテーマを選択してください。"
+  },
+  "settings.display.theme.title": {
+    "message": "テーマ"
+  },
+  "settings.pats.modal.create.action": {
+    "message": "PATを作成"
+  },
+  "ui.latest-news-row.latest-news": {
+    "message": "Modrinthの最新ニュース"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "すべてのニュースを見る"
   }
 }
