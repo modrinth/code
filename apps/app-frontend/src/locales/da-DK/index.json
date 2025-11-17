@@ -32,6 +32,102 @@
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} er nu tilgængelig! Siden du er på et begrænset netværk, vi downloadede den ikke automatisk."
   },
+  "app.update-toast.changelog": {
+    "message": "Ændringslog"
+  },
+  "app.update-toast.download": {
+    "message": "Download ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Downloader..."
+  },
+  "app.update-toast.reload": {
+    "message": "Geninlæs"
+  },
+  "app.update-toast.title": {
+    "message": "Opdatering tilgængelig"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Download færdiggjort"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Klik her for at vise ændringslog."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Version {version} var installeret med succes!"
+  },
+  "app.update.download-update": {
+    "message": "Download opdatering"
+  },
+  "app.update.downloading-update": {
+    "message": "Downloader opdatering ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Genindlæs for at installere opdatering"
+  },
+  "friends.action.add-friend": {
+    "message": "Tilføj en ven"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} venne{count, plural, one {anmodning} other {anmodninger}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Send en venneanmodning"
+  },
+  "friends.add-friend.title": {
+    "message": "Tilføjer en ven"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Det er muligvis anderledes end deres Minecraft brugernavn!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Indskriv Modrinth brugernavn..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Hvad er din vens Modrinth brugernavn?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Tilføj venner</link> for at se hvad de spiller!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Annuller anmodning"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Fjern ven"
+  },
+  "friends.friend.request-sent": {
+    "message": "Venneanmodning sendt"
+  },
+  "friends.friend.view-profile": {
+    "message": "Vis profil"
+  },
+  "friends.heading": {
+    "message": "Venner"
+  },
+  "friends.heading.active": {
+    "message": "Aktiv"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Afventer"
+  },
+  "friends.no-friends-match": {
+    "message": "Ingen venner som matcher \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Søg venner..."
+  },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Log ind på en Modrinth konto</link> for at tilføje venner og se hvad de spiller!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Tilføj og spil"
   },

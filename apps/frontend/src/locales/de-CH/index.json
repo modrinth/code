@@ -1410,7 +1410,7 @@
     "message": "Aktive Meldungen"
   },
   "layout.nav.analytics": {
-    "message": "Analytik"
+    "message": "Analysen"
   },
   "layout.nav.discover": {
     "message": "Entdecken"
@@ -1812,7 +1812,7 @@
     "message": "Details"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {Projekt} other {Projekte}}"
+    "message": "{count} {count, plural, one {Download} other {Downloads}}"
   },
   "profile.label.joined": {
     "message": "Beigetreten"
@@ -1899,7 +1899,7 @@
     "message": "Erneut zur Überprüfung einreichen"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Dein Projekt wurde vom Modrinth-Team {status, select, rejected {abgelehnt} withheld {zurückgehalten} other {{status}}}."
+    "message": "Dein Projekt wurde vom Modrinth-Team {status, select, rejected {abgelehnt} withheld {zurückgehalten} other {{status}}}. In der Regel hast du die Möglichkeit, es nach Umsetzung der Anmerkungen erneut einzureichen."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Du musst die benötigten Schritte in der Veröffentlichungsliste abschliessen!"
@@ -2310,7 +2310,7 @@
     "message": "Zugriff auf Analysedaten"
   },
   "scopes.analytics.label": {
-    "message": "Lesezugriff Analytiks"
+    "message": "Lesezugriff Analysen"
   },
   "scopes.collectionCreate.description": {
     "message": "Kollektionen erstellen"

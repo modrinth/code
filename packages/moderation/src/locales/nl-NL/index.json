@@ -137,6 +137,9 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Verhelder de samenvatting"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Je samenvatting is {length, plural,one {# character} other {# characters}}. Minimaal {minChars, plural, one {# character}} is aanbevolen om een informatieve en interessante samevatting te maken."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Breidt de samenvatting uit"
   },

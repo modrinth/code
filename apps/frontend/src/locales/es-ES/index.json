@@ -653,6 +653,9 @@
   "dashboard.creator-withdraw-modal.method-selection.select-method": {
     "message": "Seleccionar método de retirada"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Dueño de la cuenta"
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Moneda"
   },

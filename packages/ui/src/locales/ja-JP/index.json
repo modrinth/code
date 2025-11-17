@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "アフィリエイトリンクを作成"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "新しいアフィリエイトコードを作成中"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "流入元が分かる名前を付けてください！"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "アフィリエイトリンクのタイトル"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "例：YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "アフィリエイトコードを作成するユーザー名"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "ユーザーネーム"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "ユーザーネームを入力…"
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "{user}によって作成"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "アフィリエイトリンクを作成中…"
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "アフィリエイトリンクを無効化"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "アナリティクスを表示"
+  },
   "badge.beta": {
     "defaultMessage": "ベータ"
   },
@@ -6,7 +42,10 @@
     "defaultMessage": "ベータ版リリース"
   },
   "badge.new": {
-    "defaultMessage": "新しい"
+    "defaultMessage": "New"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "アフィリエイトリンク"
   },
   "button.analytics": {
     "defaultMessage": "統計"
@@ -46,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "フォロー"
+  },
+  "button.max": {
+    "defaultMessage": "最大"
   },
   "button.more-options": {
     "defaultMessage": "追加のオプション"
@@ -119,6 +161,75 @@
   "collection.label.private": {
     "defaultMessage": "個人用"
   },
+  "form.label.address-line": {
+    "defaultMessage": "住所 1行目"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "住所 2行目(任意)"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "銀行名"
+  },
+  "form.label.city": {
+    "defaultMessage": "市区町村"
+  },
+  "form.label.country": {
+    "defaultMessage": "国"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "生年月日"
+  },
+  "form.label.email": {
+    "defaultMessage": "メールアドレス"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "名"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "姓"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "郵便番号"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "都道府県"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "住所を入力"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "マンション名・部屋番号など。"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "銀行名を入力"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "銀行名を選択"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "事業名を入力"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "市区町村を入力"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "国を選択"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "メールアドレスを入力"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "名を入力"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "姓を入力"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "郵便番号を入力"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "都道府県を入力"
+  },
   "icon-select.edit": {
     "defaultMessage": "アイコンを編集"
   },
@@ -157,6 +268,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "不明なゲームモード"
+  },
+  "label.available": {
+    "defaultMessage": "{amount}つが利用可能。"
   },
   "label.changes-saved": {
     "defaultMessage": "変更が保存されました"
@@ -353,6 +467,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -361,6 +478,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "寄付"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "寄付"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "ギフトカード"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "ギフトカード"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "バーチャル Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "バーチャル Visa"
   },
   "project-type.all": {
     "defaultMessage": "すべて"

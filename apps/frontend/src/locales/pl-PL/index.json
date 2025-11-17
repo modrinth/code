@@ -879,7 +879,7 @@
     "message": "Tutaj pojawią się otrzymane fundusze i wypłaty."
   },
   "dashboard.revenue.transactions.see-all": {
-    "message": "Pokaż wszystkie"
+    "message": "Zobacz wszystkie"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Twoje wypłaty są tymczasowo zablokowane, ponieważ Twój TIN lub SSN nie pasował do zapisów IRS. Skontaktuj się z obsługą, by resetować i ponownie wysłać Twój formularz podatkowy."
@@ -1572,7 +1572,7 @@
     "message": "Rodzaj numeru konta"
   },
   "muralpay.field.account-type": {
-    "message": "Rodzaj konta"
+    "message": "Typ konta"
   },
   "muralpay.field.bank-account-number": {
     "message": "Numer konta"
@@ -1650,7 +1650,7 @@
     "message": "E-mail"
   },
   "muralpay.pix-type.phone": {
-    "message": "Numer tel."
+    "message": "Numer telefonu"
   },
   "muralpay.placeholder.account-number": {
     "message": "Podaj numer konta"
@@ -1662,37 +1662,37 @@
     "message": "CBU lub CVU"
   },
   "muralpay.placeholder.cci": {
-    "message": "Podaj 20-cyfrowe CCI"
+    "message": "Wprowadź 20-cyfrowe CCI"
   },
   "muralpay.placeholder.cuit-cuil": {
-    "message": "Podaj CUIT lub CUIL"
+    "message": "Wprowadź CUIT lub CUIL"
   },
   "muralpay.placeholder.enter-account-number": {
-    "message": "Podaj numer konta"
+    "message": "Wprowadź numer konta"
   },
   "muralpay.placeholder.enter-branch-code": {
     "message": "Podaj kod oddziału"
   },
   "muralpay.placeholder.enter-clabe": {
-    "message": "Podaj 18-cyfrowe CLABE"
+    "message": "Wprowadź 18-cyfrowe CLABE"
   },
   "muralpay.placeholder.enter-cpf-cnpj": {
-    "message": "Podaj CPF lub CNPJ"
+    "message": "Wprowadź CPF lub CNPJ"
   },
   "muralpay.placeholder.enter-iban": {
-    "message": "Podaj IBAN"
+    "message": "Wprowadź IBAN"
   },
   "muralpay.placeholder.enter-pix-email": {
-    "message": "Podaj e-mail PIX"
+    "message": "Wprowadź e-mail PIX"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Podaj 9-cyfrowy numer rozliczeniowy"
   },
   "muralpay.placeholder.enter-swift-bic": {
-    "message": "Podaj kod SWIFT/BIC"
+    "message": "Wprowadź kod SWIFT/BIC"
   },
   "muralpay.placeholder.iban-crc": {
-    "message": "Podaj kostarykański IBAN"
+    "message": "Wprowadź kostarykański IBAN"
   },
   "muralpay.placeholder.phone-cop": {
     "message": "+57..."
@@ -1815,7 +1815,7 @@
     "message": "{count} {count, plural, one {pobranie} few {pobrania} other {pobrań}}"
   },
   "profile.label.joined": {
-    "message": "Dołączył/a"
+    "message": "Dołączył(-a)"
   },
   "profile.label.no": {
     "message": "Nie"

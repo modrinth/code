@@ -693,7 +693,7 @@
     "defaultMessage": "Nur Dedizierte Server"
   },
   "project.settings.environment.server_only.description": {
-    "defaultMessage": "Alle Funktionen werden auf dem Server ausgeführt und sind mit Vanilla-Clientskompatibel."
+    "defaultMessage": "Alle Funktionen werden auf dem Server ausgeführt und sind mit Vanilla-Clients kompatibel."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
     "defaultMessage": "Funktioniert auch im Einzelspieler"
@@ -906,7 +906,7 @@
     "defaultMessage": "Perfekt für 1 bis 5 Freunde mit ein paar leichten Mods."
   },
   "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Wähle die Menge an Arbeitsspeicher und Eigenschafter, welche deinen Anforderungen entsrechen."
+    "defaultMessage": "Wähle die RAM-Kapazität und die technischen Spezifikationen, die deinen Anforderungen entsprechen."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"
