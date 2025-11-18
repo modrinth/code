@@ -387,7 +387,7 @@ async function fetchCredentials() {
 	if (creds && creds.user_id) {
 		creds.user = await get_user(creds.user_id).catch(handleError)
 	}
-	credentials.value = creds
+	credentials.value = creds ?? null
 }
 
 async function signIn() {
@@ -434,19 +434,17 @@ const forceSidebar = computed(
 	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
 )
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
-const showAd = computed(() => !(!sidebarVisible.value || hasPlus.value))
-
-watch(
-	showAd,
-	() => {
-		if (!showAd.value) {
-			hide_ads_window(true)
-		} else {
-			init_ads_window(true)
-		}
-	},
-	{ immediate: true },
+const showAd = computed(
+	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
 )
+
+watch(showAd, () => {
+	if (!showAd.value) {
+		hide_ads_window(true)
+	} else {
+		init_ads_window(true)
+	}
+})
 
 onMounted(() => {
 	invoke('show_window')
