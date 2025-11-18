@@ -1,7 +1,6 @@
 use std::{
     collections::HashMap,
     fmt::{self, Display, Formatter},
-    ops::Deref,
 };
 
 use chrono::{DateTime, Utc};
@@ -149,7 +148,7 @@ impl Display for DelphiReportListOrder {
 pub struct DelphiReportIssueResult {
     pub issue: DBDelphiReportIssue,
     pub report: DBDelphiReport,
-    pub details: Vec<DBDelphiReportIssueDetails>,
+    pub details: Vec<ReportIssueDetail>,
     pub project_id: Option<DBProjectId>,
     pub project_published: Option<DateTime<Utc>>,
 }
@@ -195,7 +194,7 @@ impl DBDelphiReportIssue {
                 json_array(SELECT to_jsonb(delphi_report_issue_details)
                     FROM delphi_report_issue_details
                     WHERE issue_id = delphi_report_issues.id
-                ) AS "details: sqlx::types::Json<Vec<DBDelphiReportIssueDetails>>",
+                ) AS "details: sqlx::types::Json<Vec<ReportIssueDetail>>",
                 versions.mod_id AS "project_id?", mods.published AS "project_published?"
             FROM delphi_report_issues
             INNER JOIN delphi_reports ON delphi_reports.id = report_id
@@ -253,18 +252,32 @@ impl DBDelphiReportIssue {
 /// belongs to a specific issue, and an issue can have zero, one, or
 /// more details attached to it. (Some issues may be artifact-wide,
 /// or otherwise not really specific to any particular class.)
-#[derive(Debug, Deserialize, Serialize)]
-pub struct DBDelphiReportIssueDetails {
+#[derive(
+    Debug, Clone, Deserialize, Serialize, utoipa::ToSchema, sqlx::FromRow,
+)]
+pub struct ReportIssueDetail {
+    /// ID of this issue detail.
     pub id: DelphiReportIssueDetailsId,
-    pub key: String,
+    /// ID of the issue this detail belongs to.
     pub issue_id: DelphiReportIssueId,
+    /// Opaque identifier for where this issue detail is located, relative to
+    /// the file scanned.
+    ///
+    /// This acts as a stable identifier for an issue detail, even across
+    /// different versions of the same file.
+    pub key: String,
+    /// Name of the Java class path in which this issue was found.
     pub file_path: String,
-    pub decompiled_source: Option<DecompiledJavaClassSource>,
-    pub data: Json<HashMap<String, serde_json::Value>>,
+    /// Decompiled, pretty-printed source of the Java class.
+    pub decompiled_source: Option<String>,
+    /// Extra detail-specific info for this detail.
+    #[sqlx(json)]
+    pub data: HashMap<String, serde_json::Value>,
+    /// How important is this issue, as flagged by Delphi?
     pub severity: DelphiSeverity,
 }
 
-impl DBDelphiReportIssueDetails {
+impl ReportIssueDetail {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -278,8 +291,8 @@ impl DBDelphiReportIssueDetails {
             self.issue_id as DelphiReportIssueId,
             self.key,
             self.file_path,
-            self.decompiled_source.as_ref().map(|decompiled_source| &decompiled_source.0),
-            &self.data as &Json<HashMap<String, serde_json::Value>>,
+            self.decompiled_source,
+            sqlx::types::Json(&self.data) as Json<&HashMap<String, serde_json::Value>>,
             self.severity as DelphiSeverity,
         )
         .fetch_one(&mut **transaction)
@@ -297,57 +310,5 @@ impl DBDelphiReportIssueDetails {
         .execute(&mut **transaction)
         .await?
         .rows_affected())
-    }
-}
-
-/// A [Java class name] with dots replaced by forward slashes (/).
-///
-/// Because class names are usually the [binary names] passed to a classloader, top level interfaces and classes
-/// have a binary name that matches its canonical, fully qualified name, such canonical names are prefixed by the
-/// package path the class is in, and packages usually match the directory structure within a JAR for typical
-/// classloaders, this usually (but not necessarily) corresponds to the path to the class file within its JAR.
-///
-/// [Java class name]: https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Class.html#getName()
-/// [binary names]: https://docs.oracle.com/javase/specs/jls/se21/html/jls-13.html#jls-13.1
-#[derive(
-    Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash, sqlx::Type,
-)]
-#[serde(transparent)]
-#[sqlx(transparent)]
-pub struct InternalJavaClassName(String);
-
-impl Deref for InternalJavaClassName {
-    type Target = String;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl Display for InternalJavaClassName {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-/// The decompiled source code of a Java class.
-#[derive(
-    Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash, sqlx::Type,
-)]
-#[serde(transparent)]
-#[sqlx(transparent)]
-pub struct DecompiledJavaClassSource(String);
-
-impl Deref for DecompiledJavaClassSource {
-    type Target = String;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl Display for DecompiledJavaClassSource {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
     }
 }

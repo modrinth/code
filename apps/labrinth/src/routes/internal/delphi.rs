@@ -2,6 +2,7 @@ use std::{collections::HashMap, fmt::Write, sync::LazyLock, time::Instant};
 
 use actix_web::{HttpRequest, HttpResponse, get, post, put, web};
 use chrono::{DateTime, Utc};
+use eyre::eyre;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -15,9 +16,8 @@ use crate::{
             DBFileId, DelphiReportId, DelphiReportIssueDetailsId,
             DelphiReportIssueId,
             delphi_report_item::{
-                DBDelphiReport, DBDelphiReportIssue,
-                DBDelphiReportIssueDetails, DecompiledJavaClassSource,
-                DelphiReportIssueStatus, DelphiReportListOrder, DelphiSeverity,
+                DBDelphiReport, DBDelphiReportIssue, DelphiReportIssueStatus,
+                DelphiReportListOrder, DelphiSeverity, ReportIssueDetail,
             },
         },
         redis::RedisPool,
@@ -28,7 +28,7 @@ use crate::{
     },
     queue::session::AuthQueue,
     routes::ApiError,
-    util::guards::admin_key_guard,
+    util::{error::Context, guards::admin_key_guard},
 };
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -62,7 +62,6 @@ static DELPHI_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
 struct DelphiReportIssueDetails {
     pub file: String,
     pub key: String,
-    pub decompiled_source: Option<DecompiledJavaClassSource>,
     pub data: HashMap<String, serde_json::Value>,
     pub severity: DelphiSeverity,
 }
@@ -79,6 +78,9 @@ struct DelphiReport {
     pub delphi_version: i32,
     pub issues: HashMap<String, Vec<DelphiReportIssueDetails>>,
     pub severity: DelphiSeverity,
+    /// Map of [`DelphiReportIssueDetails::file`] to the decompiled Java source
+    /// code.
+    pub decompiled_sources: HashMap<String, Option<String>>,
 }
 
 impl DelphiReport {
@@ -93,12 +95,10 @@ impl DelphiReport {
             format!("⚠️ Suspicious traces found at {}", self.url);
 
         for (issue, trace) in &self.issues {
-            for DelphiReportIssueDetails {
-                file,
-                decompiled_source,
-                ..
-            } in trace
-            {
+            for DelphiReportIssueDetails { file, .. } in trace {
+                let decompiled_source =
+                    self.decompiled_sources.get(file).and_then(|o| o.as_ref());
+
                 write!(
                     &mut message_header,
                     "\n issue {issue} found at class `{file}`:\n```\n{}\n```",
@@ -128,6 +128,25 @@ pub struct DelphiRunParameters {
 }
 
 #[post("ingest", guard = "admin_key_guard")]
+async fn ingest_report(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    web::Json(report): web::Json<serde_json::Value>,
+) -> Result<(), ApiError> {
+    // treat this as an internal error, since it's not a bad request from the
+    // client's side - it's *our* fault for handling the Delphi schema wrong
+    // this could happen if Delphi updates and Labrinth doesn't
+    let report = serde_json::from_value::<DelphiReport>(report.clone())
+        .wrap_internal_err_with(|| {
+            eyre!(
+                "Delphi sent a response which does not match our schema\n\n{}",
+                serde_json::to_string_pretty(&report).unwrap()
+            )
+        })?;
+
+    ingest_report_deserialized(pool, redis, report).await
+}
+
 #[tracing::instrument(
     level = "info",
     skip_all,
@@ -138,10 +157,10 @@ pub struct DelphiRunParameters {
         %report.version_id,
     )
 )]
-async fn ingest_report(
+async fn ingest_report_deserialized(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    web::Json(report): web::Json<DelphiReport>,
+    report: DelphiReport,
 ) -> Result<(), ApiError> {
     if report.issues.is_empty() {
         info!("No issues found for file");
@@ -179,20 +198,20 @@ async fn ingest_report(
         .await?;
 
         // This is required to handle the case where the same Delphi version is re-run on the same file
-        DBDelphiReportIssueDetails::remove_all_by_issue_id(
-            issue_id,
-            &mut transaction,
-        )
-        .await?;
+        ReportIssueDetail::remove_all_by_issue_id(issue_id, &mut transaction)
+            .await?;
 
         for issue_detail in issue_details {
-            DBDelphiReportIssueDetails {
+            let decompiled_source =
+                report.decompiled_sources.get(&issue_detail.file);
+
+            ReportIssueDetail {
                 id: DelphiReportIssueDetailsId(0), // This will be set by the database
                 issue_id,
                 key: issue_detail.key,
                 file_path: issue_detail.file,
-                decompiled_source: issue_detail.decompiled_source,
-                data: issue_detail.data.into(),
+                decompiled_source: decompiled_source.cloned().flatten(),
+                data: issue_detail.data,
                 severity: issue_detail.severity,
             }
             .insert(&mut transaction)
