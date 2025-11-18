@@ -1,9 +1,7 @@
 use std::{collections::HashMap, fmt};
 
-use actix_web::{HttpRequest, post, web};
+use actix_web::{HttpRequest, get, post, web};
 use chrono::{DateTime, Utc};
-use eyre::eyre;
-use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use tokio_stream::StreamExt;
@@ -14,20 +12,29 @@ use crate::{
     database::{
         DBProject,
         models::{
-            DBFileId, DBProjectId, DBThread, DBThreadId, DelphiReportId,
-            DelphiReportIssueDetailsId, DelphiReportIssueId, ProjectTypeId,
-            delphi_report_item::{DelphiReportIssueStatus, DelphiSeverity},
+            DBFileId, DBProjectId, DBThread, DBThreadId, DBVersionId,
+            DelphiReportId, DelphiReportIssueId, ProjectTypeId,
+            delphi_report_item::{
+                DelphiReportIssueStatus, DelphiSeverity, ReportIssueDetail,
+            },
         },
         redis::RedisPool,
     },
-    models::{pats::Scopes, projects::Project},
+    models::{
+        ids::{ProjectId, ThreadId},
+        pats::Scopes,
+        projects::Project,
+    },
     queue::session::AuthQueue,
     routes::{ApiError, internal::moderation::Ownership},
     util::error::Context,
 };
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(search_projects).service(update_issue);
+    cfg.service(search_projects)
+        .service(get_report)
+        .service(get_issue)
+        .service(update_issue);
 }
 
 /// Arguments for searching project technical reviews.
@@ -86,23 +93,49 @@ impl fmt::Display for SearchProjectsSort {
 }
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct ProjectReview {
-    pub project: Project,
-    pub project_owner: Ownership,
-    pub thread: DBThread,
-    pub reports: Vec<ProjectReport>,
-}
-
-#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct ProjectReport {
-    /// When this report was created.
-    pub created_at: DateTime<Utc>,
+pub struct FileReport {
+    /// ID of this report.
+    pub id: DelphiReportId,
+    /// ID of the file that was scanned.
+    pub file_id: DBFileId,
+    /// ID of the project version this report is for.
+    pub version_id: DBVersionId,
+    /// ID of the project this report is for.
+    pub project_id: DBProjectId,
+    /// When the report for this file was created.
+    pub created: DateTime<Utc>,
     /// Why this project was flagged.
     pub flag_reason: FlagReason,
     /// According to this report, how likely is the project malicious?
     pub severity: DelphiSeverity,
-    /// What files were flagged in this review.
-    pub files: Vec<FileReview>,
+    /// Name of the flagged file.
+    pub file_name: String,
+    /// Size of the flagged file, in bytes.
+    pub file_size: i32,
+    /// What issues appeared in the file.
+    pub issues: Vec<FileIssue>,
+}
+
+/// Issue raised by Delphi in a flagged file.
+///
+/// The issue is scoped to the JAR, not any specific class, but issues can be
+/// raised because they appeared in a class - see [`FileIssueDetails`].
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct FileIssue {
+    /// ID of the issue.
+    pub id: DelphiReportIssueId,
+    /// ID of the report this issue is a part of.
+    pub report_id: DelphiReportId,
+    /// Delphi-determined kind of issue that this is, e.g. `OBFUSCATED_NAMES`.
+    ///
+    /// Labrinth does not know the full set of kinds of issues, so this is kept
+    /// as a string.
+    pub issue_type: String,
+    /// Is this issue valid (malicious) or a false positive (safe)?
+    pub status: DelphiReportIssueStatus,
+    /// Details of why this issue might have been raised, such as what file it
+    /// was found in.
+    pub details: Vec<ReportIssueDetail>,
 }
 
 /// Why a project was flagged for technical review.
@@ -123,53 +156,137 @@ pub enum FlagReason {
     Delphi,
 }
 
-/// Details of a JAR file which was flagged for technical review, as part of
-/// a [`ProjectReview`].
-#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct FileReview {
-    /// Name of the flagged file.
-    pub file_name: String,
-    /// Size of the flagged file, in bytes.
-    pub file_size: i32,
-    /// What issues appeared in the file.
-    pub issues: Vec<FileIssue>,
+/// Get info on an issue in a Delphi report.
+#[utoipa::path(
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = inline(FileIssue)))
+)]
+#[get("/issue/{issue_id}")]
+async fn get_issue(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(DelphiReportIssueId,)>,
+) -> Result<web::Json<FileIssue>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let (issue_id,) = path.into_inner();
+    let row = sqlx::query!(
+        r#"
+        SELECT
+            to_jsonb(dri)
+            || jsonb_build_object(
+                'details', json_array(
+                    SELECT to_jsonb(drid)
+                    FROM delphi_report_issue_details drid
+                    WHERE drid.issue_id = dri.id
+                )
+            ) AS "data!: sqlx::types::Json<FileIssue>"
+        FROM delphi_report_issues dri
+        LEFT JOIN delphi_report_issue_details drid ON dri.id = drid.issue_id
+        WHERE dri.id = $1
+        "#,
+        issue_id as DelphiReportIssueId,
+    )
+    .fetch_optional(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch issue from database")?
+    .ok_or(ApiError::NotFound)?;
+
+    Ok(web::Json(row.data.0))
 }
 
-/// Issue raised by Delphi in a flagged file.
-///
-/// The issue is scoped to the JAR, not any specific class, but issues can be
-/// raised because they appeared in a class - see [`FileIssueDetails`].
-#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct FileIssue {
-    /// ID of the issue.
-    pub issue_id: DelphiReportIssueId,
-    /// Delphi-determined kind of issue that this is, e.g. `OBFUSCATED_NAMES`.
-    ///
-    /// Labrinth does not know the full set of kinds of issues, so this is kept
-    /// as a string.
-    pub kind: String,
-    /// Is this issue valid (malicious) or a false positive (safe)?
-    pub status: DelphiReportIssueStatus,
-    /// Details of why this issue might have been raised, such as what file it
-    /// was found in.
-    pub details: Vec<FileIssueDetail>,
+/// Get info on a specific report for a project.
+#[utoipa::path(
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = inline(FileReport)))
+)]
+#[get("/report/{id}")]
+async fn get_report(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(DelphiReportId,)>,
+) -> Result<web::Json<FileReport>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await?;
+
+    let (report_id,) = path.into_inner();
+
+    let row = sqlx::query!(
+        r#"
+        SELECT
+            to_jsonb(dr)
+            || jsonb_build_object(
+                'file_id', f.id,
+                'version_id', v.id,
+                'project_id', v.mod_id,
+                'file_name', f.filename,
+                'file_size', f.size,
+                'flag_reason', 'delphi',
+                'issues', json_array(
+                    SELECT
+                        to_jsonb(dri)
+                        || jsonb_build_object(
+                            'details', json_array(
+                                SELECT to_jsonb(drid)
+                                FROM delphi_report_issue_details drid
+                                WHERE drid.issue_id = dri.id
+                            )
+                        )
+                    FROM delphi_report_issues dri
+                    WHERE dri.report_id = dr.id
+                )
+            ) AS "data!: sqlx::types::Json<FileReport>"
+        FROM delphi_reports dr
+        INNER JOIN files f ON f.id = dr.file_id
+        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
+        LEFT JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id
+        WHERE dr.id = $1
+        "#,
+        report_id as DelphiReportId,
+    )
+    .fetch_optional(&**pool)
+    .await
+    .wrap_internal_err("failed to fetch report from database")?
+    .ok_or(ApiError::NotFound)?;
+
+    Ok(web::Json(row.data.0))
 }
 
-/// Occurrence of a [`FileIssue`] in a specific class in a scanned JAR file.
+/// See [`search_projects`].
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct FileIssueDetail {
-    /// Name of the Java class path in which this issue was found.
-    pub file_path: String,
-    /// Decompiled, pretty-printed source of the Java class.
-    pub decompiled_source: String,
-    /// How important is this issue, as flagged by Delphi?
-    pub severity: DelphiSeverity,
+pub struct SearchResponse {
+    /// List of reports returned.
+    pub reports: Vec<FileReport>,
+    /// Fetched project information for projects in the returned reports.
+    pub projects: HashMap<ProjectId, Project>,
+    /// Fetched moderation threads for projects in the returned reports.
+    pub threads: HashMap<ThreadId, DBThread>,
+    /// Fetched owner information for projects.
+    pub ownership: HashMap<ProjectId, Ownership>,
 }
 
 /// Searches all projects which are awaiting technical review.
 #[utoipa::path(
     security(("bearer_auth" = [])),
-    responses((status = OK, body = inline(Vec<ProjectReview>)))
+    responses((status = OK, body = inline(Vec<SearchResponse>)))
 )]
 #[post("/search")]
 async fn search_projects(
@@ -178,33 +295,7 @@ async fn search_projects(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_req: web::Json<SearchProjects>,
-) -> Result<web::Json<Vec<ProjectReview>>, ApiError> {
-    #[derive(Debug)]
-    struct ProjectRecord {
-        reports: IndexMap<DelphiReportId, ReportRecord>,
-    }
-
-    #[derive(Debug)]
-    struct ReportRecord {
-        created: DateTime<Utc>,
-        severity: DelphiSeverity,
-        files: IndexMap<DBFileId, FileRecord>,
-    }
-
-    #[derive(Debug)]
-    struct FileRecord {
-        file_name: String,
-        file_size: i32,
-        issues: IndexMap<DelphiReportIssueId, IssueRecord>,
-    }
-
-    #[derive(Debug)]
-    struct IssueRecord {
-        issue_type: String,
-        status: DelphiReportIssueStatus,
-        details: IndexMap<DelphiReportIssueDetailsId, FileIssueDetail>,
-    }
-
+) -> Result<web::Json<SearchResponse>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -223,44 +314,55 @@ async fn search_projects(
     let offset = i64::try_from(offset)
         .wrap_request_err("offset cannot fit into `i64`")?;
 
-    let mut project_records = IndexMap::<DBProjectId, ProjectRecord>::new();
+    let mut reports = Vec::<FileReport>::new();
     let mut project_ids = Vec::<DBProjectId>::new();
     let mut thread_ids = Vec::<DBThreadId>::new();
-    let _file_ids = Vec::<DBFileId>::new();
-
     let mut rows = sqlx::query!(
         r#"
         SELECT
-            dr.id AS "report_id!: DelphiReportId",
-            f.id AS "file_id!: DBFileId",
-            f.filename AS "file_name!",
-            f.size AS "file_size!",
-            m.id AS "project_id!: DBProjectId",
-            t.id AS "project_thread_id!: DBThreadId",
-            dr.created AS "report_created!",
-            dr.severity AS "report_severity!: DelphiSeverity",
-            dri.id AS "issue_id!: DelphiReportIssueId",
-            dri.issue_type AS "issue_type!",
-            dri.status AS "issue_status!: DelphiReportIssueStatus",
-            -- maybe null
-            drid.id AS "issue_detail_id?: DelphiReportIssueDetailsId",
-            drid.file_path AS "issue_detail_file_path?",
-            drid.decompiled_source AS "issue_detail_decompiled_source?",
-            drid.severity AS "issue_detail_severity?: DelphiSeverity"
+            m.id AS "project_id: DBProjectId",
+            t.id AS "project_thread_id: DBThreadId",
+            to_jsonb(dr)
+            || jsonb_build_object(
+                'file_id', f.id,
+                'version_id', v.id,
+                'project_id', v.mod_id,
+                'file_name', f.filename,
+                'file_size', f.size,
+                'flag_reason', 'delphi',
+                'issues', json_array(
+                    SELECT
+                        to_jsonb(dri)
+                        || jsonb_build_object(
+                            'details', json_array(
+                                SELECT jsonb_build_object(
+                                    'id', drid.id,
+                                    'issue_id', drid.issue_id,
+                                    'key', drid.key,
+                                    'file_path', drid.file_path,
+                                    -- ignore `decompiled_source`
+                                    'data', drid.data,
+                                    'severity', drid.severity
+                                )
+                                FROM delphi_report_issue_details drid
+                                WHERE drid.issue_id = dri.id
+                            )
+                        )
+                    FROM delphi_report_issues dri
+                    WHERE dri.report_id = dr.id
+                )
+            ) AS "report!: sqlx::types::Json<FileReport>"
         FROM delphi_reports dr
-
-        -- fetch the project this report is for, its type, and thread
         INNER JOIN files f ON f.id = dr.file_id
         INNER JOIN versions v ON v.id = f.version_id
         INNER JOIN mods m ON m.id = v.mod_id
-        LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-        LEFT JOIN categories c ON c.id = mc.joining_category_id
         INNER JOIN threads t ON t.mod_id = m.id
-        -- fetch report issues and details
         INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
         LEFT JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id
 
         -- filtering
+        LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
+        LEFT JOIN categories c ON c.id = mc.joining_category_id
         WHERE
             -- project type
             (cardinality($1::int[]) = 0 OR c.project_type = ANY($1::int[]))
@@ -294,75 +396,24 @@ async fn search_projects(
         .transpose()
         .wrap_internal_err("failed to fetch reports")?
     {
+        reports.push(row.report.0);
         project_ids.push(row.project_id);
         thread_ids.push(row.project_thread_id);
-
-        let project =
-            project_records.entry(row.project_id).or_insert_with(|| {
-                ProjectRecord {
-                    reports: IndexMap::new(),
-                }
-            });
-        let report =
-            project.reports.entry(row.report_id).or_insert_with(|| {
-                ReportRecord {
-                    created: row.report_created,
-                    severity: row.report_severity,
-                    files: IndexMap::new(),
-                }
-            });
-        let file =
-            report
-                .files
-                .entry(row.file_id)
-                .or_insert_with(|| FileRecord {
-                    file_name: row.file_name,
-                    file_size: row.file_size,
-                    issues: IndexMap::new(),
-                });
-        let issue =
-            file.issues
-                .entry(row.issue_id)
-                .or_insert_with(|| IssueRecord {
-                    issue_type: row.issue_type,
-                    status: row.issue_status,
-                    details: IndexMap::new(),
-                });
-
-        let (
-            Some(issue_detail_id),
-            Some(file_path),
-            Some(decompiled_source),
-            Some(severity),
-        ) = (
-            row.issue_detail_id,
-            row.issue_detail_file_path,
-            row.issue_detail_decompiled_source,
-            row.issue_detail_severity,
-        )
-        else {
-            continue;
-        };
-        issue.details.entry(issue_detail_id).or_insert_with(|| {
-            FileIssueDetail {
-                file_path,
-                decompiled_source,
-                severity,
-            }
-        });
     }
 
     let projects = DBProject::get_many_ids(&project_ids, &**pool, &redis)
         .await
         .wrap_internal_err("failed to fetch projects")?
         .into_iter()
-        .map(|project| (project.inner.id, Project::from(project)))
+        .map(|project| {
+            (ProjectId::from(project.inner.id), Project::from(project))
+        })
         .collect::<HashMap<_, _>>();
     let threads = DBThread::get_many(&thread_ids, &**pool)
         .await
         .wrap_internal_err("failed to fetch threads")?
         .into_iter()
-        .map(|thread| (thread.id, thread))
+        .map(|thread| (ThreadId::from(thread.id), thread))
         .collect::<HashMap<_, _>>();
 
     let project_list: Vec<Project> = projects.values().cloned().collect();
@@ -370,77 +421,18 @@ async fn search_projects(
     let ownerships = get_projects_ownership(&project_list, &pool, &redis)
         .await
         .wrap_internal_err("failed to fetch project ownerships")?;
-
-    let ownership_map = projects
+    let ownership = projects
         .keys()
         .copied()
         .zip(ownerships)
         .collect::<HashMap<_, _>>();
 
-    let projects = project_records
-        .into_iter()
-        .map(|(project_id, project_record)| {
-            let project =
-                projects.get(&project_id).wrap_internal_err_with(|| {
-                    eyre!("no fetched project with ID {project_id:?}")
-                })?;
-            let thread = threads
-                .get(&DBThreadId::from(project.thread_id))
-                .wrap_internal_err_with(|| {
-                    eyre!("no fetched thread with ID {:?}", project.thread_id)
-                })?;
-            Ok::<_, ApiError>(ProjectReview {
-                project: project.clone(),
-                project_owner: ownership_map
-                    .get(&project_id)
-                    .cloned()
-                    .wrap_internal_err_with(|| {
-                        eyre!("no owner for {project_id:?}")
-                    })?,
-                thread: thread.clone(),
-                reports: project_record
-                    .reports
-                    .into_iter()
-                    .map(|(_, report_record)| ProjectReport {
-                        created_at: report_record.created,
-                        flag_reason: FlagReason::Delphi,
-                        severity: report_record.severity,
-                        files: report_record
-                            .files
-                            .into_iter()
-                            .map(|(_, file)| FileReview {
-                                file_name: file.file_name,
-                                file_size: file.file_size,
-                                issues: file
-                                    .issues
-                                    .into_iter()
-                                    .map(|(issue_id, issue)| FileIssue {
-                                        issue_id,
-                                        kind: issue.issue_type.clone(),
-                                        status: issue.status,
-                                        details: issue
-                                            .details
-                                            .into_iter()
-                                            .map(|(_, detail)| {
-                                                FileIssueDetail {
-                                                    file_path: detail.file_path,
-                                                    decompiled_source: detail
-                                                        .decompiled_source,
-                                                    severity: detail.severity,
-                                                }
-                                            })
-                                            .collect(),
-                                    })
-                                    .collect(),
-                            })
-                            .collect(),
-                    })
-                    .collect(),
-            })
-        })
-        .collect::<Result<Vec<_>, _>>()?;
-
-    Ok(web::Json(projects))
+    Ok(web::Json(SearchResponse {
+        reports,
+        projects,
+        threads,
+        ownership,
+    }))
 }
 
 /// See [`update_issue`].

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            to_jsonb(dr)\n            || jsonb_build_object(\n                'file_id', f.id,\n                'version_id', v.id,\n                'project_id', v.mod_id,\n                'file_name', f.filename,\n                'file_size', f.size,\n                'flag_reason', 'delphi',\n                'issues', json_array(\n                    SELECT\n                        to_jsonb(dri)\n                        || jsonb_build_object(\n                            'details', json_array(\n                                SELECT to_jsonb(drid)\n                                FROM delphi_report_issue_details drid\n                                WHERE drid.issue_id = dri.id\n                            )\n                        )\n                    FROM delphi_report_issues dri\n                    WHERE dri.report_id = dr.id\n                )\n            ) AS \"data!: sqlx::types::Json<FileReport>\"\n        FROM delphi_reports dr\n        INNER JOIN files f ON f.id = dr.file_id\n        INNER JOIN versions v ON v.id = f.version_id\n        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id\n        LEFT JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id\n        WHERE dr.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "data!: sqlx::types::Json<FileReport>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "7099e3a96324aadd3e7e0fbcc5e7023c1becd6d30e74a6110c14c0049d156118"
+}
