@@ -394,12 +394,192 @@ pub async fn refund_charge(
         transaction.commit().await?;
 
         if let Some(Err(error)) = anrok_result {
-            return Ok(HttpResponse::InternalServerError().json(serde_json::json!({
-                "error": "partial_failure",
-                "description": &format!("This refund was not processed by the tax processing system. It was still processed on Stripe's end. Manual intervention is required to add a tax record for the refund charge. This will not impact the customer. Tax API Error: {error}")
-            })));
+            if let anrok::AnrokError::Conflict(m) = &error
+                && m.contains("transactionExpectedVersionMismatch")
+            {
+                return Err(ApiError::InvalidInput(
+                    "This refund has been processed on Stripe's end, but not on the tax processor's end. The tax transaction has been modified externally since its creation. \
+                    This is likely caused by a change in nexus for the customer's jurisdiction, which lead to a new tax amount paid by the seller being calculated on the transaction. \
+                    Manual intervention is required to verify the tax transaction on the platform's end and update the refund's tax transaction record."
+                        .to_owned(),
+                ));
+            } else {
+                return Err(ApiError::InvalidInput(format!(
+                    "This refund has been processed on Stripe's end, but not on the tax processor's end. An unexpected error occurred, preventing the refund transaction from being processed \
+                    on the tax platform's end. Error: {error}"
+                )));
+            }
         }
     }
+
+    Ok(HttpResponse::NoContent().finish())
+}
+
+#[post("charge/{id}/tax/reprocess")]
+pub async fn reprocess_charge_tax(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    info: web::Path<(crate::models::ids::ChargeId,)>,
+    anrok_client: web::Data<anrok::Client>,
+    stripe_client: web::Data<stripe::Client>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await?
+    .1;
+
+    let (id,) = info.into_inner();
+
+    if !user.role.is_admin() {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to reprocess a tax transaction!"
+                .to_string(),
+        ));
+    }
+
+    let mut txn = pool.begin().await?;
+
+    let charge_refund = charge_item::DBCharge::get(id.into(), &mut *txn)
+        .await?
+        .ok_or_else(|| ApiError::NotFound)?;
+
+    let Some(parent_charge_id) = charge_refund.parent_charge_id else {
+        return Err(ApiError::InvalidInput(
+            "This charge does not have a parent!".to_string(),
+        ));
+    };
+
+    match charge_refund.tax_platform_id {
+        Some(_) => {
+            return Err(ApiError::InvalidInput(
+                "Refund charge already has a tax transaction ID!".to_string(),
+            ));
+        }
+        None => {
+            let charge =
+                charge_item::DBCharge::get(parent_charge_id, &mut *txn)
+                    .await?
+                    .ok_or_else(|| ApiError::NotFound)?;
+
+            let payment_platform_id = charge
+                .payment_platform_id
+                .ok_or_else(|| {
+                    ApiError::Internal(eyre::eyre!(
+                        "parent charge is missing a payment platform ID"
+                    ))
+                })?
+                .parse::<stripe::PaymentIntentId>()
+                .map_err(|_| {
+                    ApiError::Internal(eyre::eyre!(
+                        "parent charge has an invalid payment platform ID."
+                    ))
+                })?;
+
+            let pi = stripe::PaymentIntent::retrieve(
+                &stripe_client,
+                &payment_platform_id,
+                &["payment_method"],
+            )
+            .await?;
+
+            let Some(billing_address) = pi
+                .payment_method
+                .and_then(|x| x.into_object())
+                .and_then(|x| x.billing_details.address)
+            else {
+                return Err(ApiError::InvalidInput(
+                    "Missing billing address for payment method.".to_owned(),
+                ));
+            };
+
+            let tax_id =
+                product_info_by_product_price_id(charge.price_id, &mut *txn)
+                    .await?
+                    .ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "Could not find product tax info for price ID!"
+                                .to_owned(),
+                        )
+                    })?
+                    .tax_identifier
+                    .tax_processor_id;
+
+            let Some((
+                (original_tax_platform_id, original_tax_transaction_version),
+                original_tax_platform_accounting_time,
+            )) = charge
+                .tax_platform_id
+                .clone()
+                .zip(charge.tax_transaction_version)
+                .zip(charge.tax_platform_accounting_time)
+            else {
+                return Err(ApiError::InvalidInput(
+                    "Charge is missing full tax information. Please wait for the original charge to be synchronized with the tax processor."
+                        .to_owned(),
+                ));
+            };
+            let refund_id =
+                charge_refund.payment_platform_id.ok_or_else(|| {
+                    ApiError::Internal(eyre::eyre!(
+                        "Refund charge is missing a payment platform ID!"
+                    ))
+                })?;
+
+            let refund_id =
+                stripe::RefundId::from_str(&refund_id).map_err(|_| {
+                    ApiError::Internal(eyre::eyre!("Invalid refund ID!"))
+                })?;
+
+            let anrok_txn_result = anrok_client
+                .negate_or_create_partial_negation(
+                    original_tax_platform_id,
+                    original_tax_transaction_version,
+                    charge.amount + charge.tax_amount,
+                    &anrok::Transaction {
+                        id: anrok::transaction_id_stripe_pyr(&refund_id),
+                        fields: anrok::TransactionFields {
+                            customer_address:
+                                anrok::Address::from_stripe_address(
+                                    &billing_address,
+                                ),
+                            currency_code: charge.currency_code.clone(),
+                            accounting_time:
+                                original_tax_platform_accounting_time,
+                            accounting_time_zone:
+                                anrok::AccountingTimeZone::Utc,
+                            line_items: vec![
+                                anrok::LineItem::new_including_tax_amount(
+                                    tax_id,
+                                    -charge_refund.amount,
+                                ),
+                            ],
+                            customer_id: Some(format!(
+                                "stripe:cust:{}",
+                                user.stripe_customer_id
+                                    .unwrap_or_else(|| "unknown".to_owned())
+                            )),
+                            customer_name: Some("Customer".to_owned()),
+                        },
+                    },
+                )
+                .await;
+
+            if let Err(error) = anrok_txn_result {
+                return Err(ApiError::InvalidInput(format!(
+                    "There was an error processing the tax transaction: {error}. Please make sure the version has been incremented in case of an external modification."
+                )));
+            }
+        }
+    }
+
+    txn.commit().await?;
 
     Ok(HttpResponse::NoContent().finish())
 }
