@@ -327,7 +327,7 @@ watch(currentSortType, () => {
 				<SearchIcon aria-hidden="true" class="text-lg" />
 				<input
 					v-model="query"
-					class="h-[40px]"
+					class="h-4"
 					autocomplete="off"
 					spellcheck="false"
 					type="text"
