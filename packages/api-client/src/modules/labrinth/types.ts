@@ -474,36 +474,67 @@ export namespace Labrinth {
 				status: DelphiReportIssueStatus
 			}
 
-			export type ProjectReview = {
-				project: Projects.v3.Project
-				project_owner: Ownership
-				thread: DBThread
-				reports: ProjectReport[]
+			export type SearchResponse = {
+				/** Flat list of all file reports */
+				reports: FileReport[]
+				/** Project data lookup by project ID */
+				projects: Record<string, Projects.v3.Project>
+				/** Thread data lookup by thread ID */
+				threads: Record<string, DBThread>
+				/** Ownership data lookup by project ID */
+				ownership: Record<string, Ownership>
 			}
 
-			export type ProjectReport = {
-				created_at: string
+			export type FileReport = {
+				/** Unique ID of this report */
+				id: string
+				/** ID of the scanned file */
+				file_id: string
+				/** ID of the version this file belongs to */
+				version_id: string
+				/** ID of the project this file belongs to */
+				project_id: string
+				/** When this report was created (ISO datetime string) */
+				created: string
+				/** Why this file was flagged */
 				flag_reason: FlagReason
+				/** Overall severity of issues in this file */
 				severity: DelphiSeverity
-				files: FileReview[]
-			}
-
-			export type FileReview = {
+				/** Name of the flagged file */
 				file_name: string
+				/** Size of the file in bytes */
 				file_size: number
+				/** List of issues found in this file */
 				issues: FileIssue[]
 			}
 
 			export type FileIssue = {
-				issue_id: string
-				kind: string
+				/** Unique ID of this issue */
+				id: string
+				/** ID of the report this issue belongs to */
+				report_id: string
+				/** Type of issue (e.g., 'OBFUSCATED_NAMES', 'SUSPICIOUS_CODE') */
+				issue_type: string
+				/** Whether this issue is valid, false positive, or pending review */
 				status: DelphiReportIssueStatus
-				details: FileIssueDetail[]
+				/** Specific details about where/why this issue was raised */
+				details: ReportIssueDetail[]
 			}
 
-			export type FileIssueDetail = {
-				class_name: string
-				decompiled_source: string
+			export type ReportIssueDetail = {
+				/** Unique ID of this detail entry */
+				id: string
+				/** ID of the issue this detail belongs to */
+				issue_id: string
+				/** Key identifier for this detail (e.g., class or method name) */
+				key: string
+				/** File path where the issue was found (e.g., 'com/example/Class.class') */
+				file_path: string
+				/** Decompiled source code showing the issue (may be omitted for large files) */
+				decompiled_source: string | null
+				/** Additional structured metadata about this detail */
+				data: Record<string, unknown>
+				/** Severity level of this specific detail */
 				severity: DelphiSeverity
 			}
 

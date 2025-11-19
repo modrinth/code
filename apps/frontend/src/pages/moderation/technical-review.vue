@@ -21,9 +21,8 @@ import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
-
 // TEMPORARY: Mock data for development
-import { generateMockProjectReviews } from '~/utils/mockTechReviewData'
+// import { generateMockSearchResponse } from '~/utils/mockTechReviewData'
 
 const client = injectModrinthClient()
 
@@ -88,9 +87,8 @@ const filterTypes = computed<ComboboxOption<string>[]>(() => {
 	const issueTypes = new Set(
 		reviewItems.value
 			.flatMap((review) => review.reports)
-			.flatMap((report) => report.files)
-			.flatMap((file) => file.issues)
-			.map((issue) => issue.kind),
+			.flatMap((report) => report.issues)
+			.map((issue) => issue.issue_type),
 	)
 
 	const sortedTypes = Array.from(issueTypes).sort()
@@ -112,8 +110,8 @@ const fuse = computed(() => {
 		keys: [
 			{ name: 'project.title', weight: 4 },
 			{ name: 'project.slug', weight: 3 },
-			{ name: 'reports.files.file_name', weight: 2 },
-			{ name: 'reports.files.issues.kind', weight: 3 },
+			{ name: 'reports.file_name', weight: 2 },
+			{ name: 'reports.issues.issue_type', weight: 3 },
 			{ name: 'project_owner.name', weight: 2 },
 		],
 		includeScore: true,
@@ -123,9 +121,7 @@ const fuse = computed(() => {
 
 const searchResults = computed(() => {
 	if (!query.value || !fuse.value) return null
-	return fuse.value
-		.search(query.value)
-		.map((result) => result.item as Labrinth.TechReview.Internal.ProjectReview)
+	return fuse.value.search(query.value).map((result) => result.item)
 })
 
 const baseFiltered = computed(() => {
@@ -138,16 +134,19 @@ const typeFiltered = computed(() => {
 	const type = currentFilterType.value
 
 	return baseFiltered.value.filter((review) => {
-		return review.reports.some((report) =>
-			report.files.some((file) => file.issues.some((issue) => issue.kind === type)),
+		return review.reports.some((report: Labrinth.TechReview.Internal.FileReport) =>
+			report.issues.some(
+				(issue: Labrinth.TechReview.Internal.FileIssue) => issue.issue_type === type,
+			),
 		)
 	})
 })
 
-function getHighestSeverity(review: Labrinth.TechReview.Internal.ProjectReview): string {
+function getHighestSeverity(review: {
+	reports: Labrinth.TechReview.Internal.FileReport[]
+}): string {
 	const severities = review.reports
-		.flatMap((r) => r.files)
-		.flatMap((f) => f.issues)
+		.flatMap((r) => r.issues)
 		.flatMap((i) => i.details)
 		.map((d) => d.severity)
 
@@ -155,14 +154,12 @@ function getHighestSeverity(review: Labrinth.TechReview.Internal.ProjectReview):
 	return severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] || 'LOW'
 }
 
-function hasPendingIssues(review: Labrinth.TechReview.Internal.ProjectReview): boolean {
-	return review.reports.some((report) =>
-		report.files.some((file) => file.issues.some((issue) => issue.status === 'pending')),
-	)
+function hasPendingIssues(review: { reports: Labrinth.TechReview.Internal.FileReport[] }): boolean {
+	return review.reports.some((report) => report.issues.some((issue) => issue.status === 'pending'))
 }
 
-function getEarliestDate(review: Labrinth.TechReview.Internal.ProjectReview): number {
-	const dates = review.reports.map((r) => new Date(r.created_at).getTime())
+function getEarliestDate(review: { reports: Labrinth.TechReview.Internal.FileReport[] }): number {
+	const dates = review.reports.map((r) => new Date(r.created).getTime())
 	return Math.min(...dates)
 }
 
@@ -232,30 +229,78 @@ function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSo
 	}
 }
 
-// const {
-// 	data: reviewItems,
-// 	isLoading,
-// 	refetch,
-// } = useQuery({
-// 	queryKey: ['tech-reviews', currentSortType],
-// 	queryFn: async () => {
-// 		return await client.labrinth.tech_review_internal.searchProjects({
-// 			limit: 350,
-// 			page: 0,
-// 			sort_by: toApiSort(currentSortType.value),
-// 		})
-// 	},
-// 	initialData: [] as Labrinth.TechReview.Internal.ProjectReview[],
-// })
+const {
+	data: searchResponse,
+	isLoading,
+	refetch,
+} = useQuery({
+	queryKey: ['tech-reviews', currentSortType],
+	queryFn: async () => {
+		return await client.labrinth.tech_review_internal.searchProjects({
+			limit: 350,
+			page: 0,
+			sort_by: toApiSort(currentSortType.value),
+		})
+	},
+	initialData: {
+		reports: [],
+		projects: {},
+		threads: {},
+		ownership: {},
+	} as Labrinth.TechReview.Internal.SearchResponse,
+})
 
 // TEMPORARY: Mock data for development (58 items to match batch scan progress)
-const reviewItems = ref<Labrinth.TechReview.Internal.ProjectReview[]>(
-	generateMockProjectReviews(58),
-)
-const isLoading = ref(false)
-const refetch = () => {
-	reviewItems.value = generateMockProjectReviews(58)
-}
+// const searchResponse = ref<Labrinth.TechReview.Internal.SearchResponse>(
+// 	generateMockSearchResponse(58),
+// )
+// const isLoading = ref(false)
+// const refetch = () => {
+// 	searchResponse.value = generateMockSearchResponse(58)
+// }
+
+// Adapter: Transform flat SearchResponse into project-grouped structure
+// for easier consumption by existing UI components
+const reviewItems = computed(() => {
+	if (!searchResponse.value || searchResponse.value.reports.length === 0) {
+		return []
+	}
+
+	const response = searchResponse.value
+
+	// Group reports by project
+	const projectMap = new Map<
+		string,
+		{
+			project: Labrinth.Projects.v3.Project
+			project_owner: Labrinth.TechReview.Internal.Ownership
+			thread: Labrinth.TechReview.Internal.DBThread
+			reports: Labrinth.TechReview.Internal.FileReport[]
+		}
+	>()
+
+	for (const report of response.reports) {
+		const projectId = report.project_id
+
+		if (!projectMap.has(projectId)) {
+			// Find the thread associated with this project
+			const thread = Object.values(response.threads).find((t) => t.project_id === projectId)
+
+			if (!thread) continue // Skip if no thread found
+
+			projectMap.set(projectId, {
+				project: response.projects[projectId],
+				project_owner: response.ownership[projectId],
+				thread,
+				reports: [],
+			})
+		}
+
+		projectMap.get(projectId)!.reports.push(report)
+	}
+
+	return Array.from(projectMap.values())
+})
 
 watch(currentSortType, () => {
 	goToPage(1)

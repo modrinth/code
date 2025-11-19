@@ -9,15 +9,15 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 	/**
 	 * Search for projects awaiting technical review.
 	 *
-	 * Returns a list of projects that have been flagged for technical review,
-	 * along with their associated reports, ownership information, and moderation threads.
+	 * Returns a flat list of file reports with associated project data, ownership
+	 * information, and moderation threads provided as lookup maps.
 	 *
 	 * @param params - Search parameters including pagination, filters, and sorting
-	 * @returns Array of projects with their technical review details
+	 * @returns Response object containing reports array and lookup maps for projects, threads, and ownership
 	 *
 	 * @example
 	 * ```typescript
-	 * const reviews = await client.labrinth.tech_review_internal.searchProjects({
+	 * const response = await client.labrinth.tech_review_internal.searchProjects({
 	 *   limit: 20,
 	 *   page: 0,
 	 *   sort_by: 'created_asc',
@@ -25,18 +25,70 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 	 *     project_type: ['mod', 'modpack']
 	 *   }
 	 * })
+	 * // Access reports: response.reports
+	 * // Access project by ID: response.projects[projectId]
 	 * ```
 	 */
 	public async searchProjects(
 		params: Labrinth.TechReview.Internal.SearchProjectsRequest,
-	): Promise<Labrinth.TechReview.Internal.ProjectReview[]> {
-		return this.client.request<Labrinth.TechReview.Internal.ProjectReview[]>(
+	): Promise<Labrinth.TechReview.Internal.SearchResponse> {
+		return this.client.request<Labrinth.TechReview.Internal.SearchResponse>(
 			'/moderation/tech-review/search',
 			{
 				api: 'labrinth',
 				version: 'internal',
 				method: 'POST',
 				body: params,
+			},
+		)
+	}
+
+	/**
+	 * Get detailed information about a specific file report.
+	 *
+	 * @param reportId - The Delphi report ID
+	 * @returns Full report with all issues and details
+	 *
+	 * @example
+	 * ```typescript
+	 * const report = await client.labrinth.tech_review_internal.getReport('report-123')
+	 * console.log(report.file_name, report.issues.length)
+	 * ```
+	 */
+	public async getReport(
+		reportId: string,
+	): Promise<Labrinth.TechReview.Internal.FileReport> {
+		return this.client.request<Labrinth.TechReview.Internal.FileReport>(
+			`/moderation/tech-review/report/${reportId}`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
+	 * Get detailed information about a specific issue.
+	 *
+	 * @param issueId - The issue ID
+	 * @returns Issue with all its details
+	 *
+	 * @example
+	 * ```typescript
+	 * const issue = await client.labrinth.tech_review_internal.getIssue('issue-123')
+	 * console.log(issue.issue_type, issue.status)
+	 * ```
+	 */
+	public async getIssue(
+		issueId: string,
+	): Promise<Labrinth.TechReview.Internal.FileIssue> {
+		return this.client.request<Labrinth.TechReview.Internal.FileIssue>(
+			`/moderation/tech-review/issue/${issueId}`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
 			},
 		)
 	}

@@ -24,7 +24,12 @@ import { capitalizeString, formatProjectType, highlightCodeLines } from '@modrin
 import { computed, ref } from 'vue'
 
 const props = defineProps<{
-	item: Labrinth.TechReview.Internal.ProjectReview
+	item: {
+		project: Labrinth.Projects.v3.Project
+		project_owner: Labrinth.TechReview.Internal.Ownership
+		thread: Labrinth.TechReview.Internal.DBThread
+		reports: Labrinth.TechReview.Internal.FileReport[]
+	}
 }>()
 
 const { addNotification } = injectNotificationManager()
@@ -66,19 +71,18 @@ type Tab = 'Thread' | 'Files'
 const tabs: readonly Tab[] = ['Thread', 'Files']
 const currentTab = ref<Tab>('Thread')
 
-type SelectedFile = Labrinth.TechReview.Internal.FileReview | null
+type SelectedFile = Labrinth.TechReview.Internal.FileReport | null
 const selectedFile = ref<SelectedFile>(null)
 
 const client = injectModrinthClient()
 
 const allFiles = computed(() => {
-	return props.item.reports.flatMap((report) => report.files)
+	return props.item.reports
 })
 
 const highestSeverity = computed(() => {
 	const severities = props.item.reports
-		.flatMap((r) => r.files)
-		.flatMap((f) => f.issues)
+		.flatMap((r) => r.issues)
 		.flatMap((i) => i.details)
 		.map((d) => d.severity)
 
@@ -101,7 +105,7 @@ const severityColor = computed(() => {
 })
 
 const formattedDate = computed(() => {
-	const dates = props.item.reports.map((r) => new Date(r.created_at))
+	const dates = props.item.reports.map((r) => new Date(r.created))
 	const earliest = new Date(Math.min(...dates.map((d) => d.getTime())))
 	const now = new Date()
 	const diffDays = Math.floor((now.getTime() - earliest.getTime()) / (1000 * 60 * 60 * 24))
@@ -116,11 +120,11 @@ function formatFileSize(bytes: number): string {
 	return `${(bytes / (1024 * 1024)).toFixed(2)} MiB`
 }
 
-function viewFileFlags(file: Labrinth.TechReview.Internal.FileReview) {
+function viewFileFlags(file: Labrinth.TechReview.Internal.FileReport) {
 	selectedFile.value = file
 	// Automatically expand the first issue
 	if (file.issues.length > 0) {
-		expandedIssues.value.add(file.issues[0].issue_id)
+		expandedIssues.value.add(file.issues[0].id)
 	}
 }
 
@@ -163,30 +167,30 @@ function toggleIssue(issueId: string) {
 	}
 }
 
-function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
-	const counts = {
-		SEVERE: 0,
-		HIGH: 0,
-		MEDIUM: 0,
-		LOW: 0,
-	}
+// function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReport) {
+// 	const counts = {
+// 		SEVERE: 0,
+// 		HIGH: 0,
+// 		MEDIUM: 0,
+// 		LOW: 0,
+// 	}
 
-	file.issues.forEach((issue) => {
-		issue.details.forEach((detail) => {
-			if (detail.severity in counts) {
-				counts[detail.severity as keyof typeof counts]++
-			}
-		})
-	})
+// 	file.issues.forEach((issue) => {
+// 		issue.details.forEach((detail) => {
+// 			if (detail.severity in counts) {
+// 				counts[detail.severity as keyof typeof counts]++
+// 			}
+// 		})
+// 	})
 
-	const breakdown = []
-	if (counts.SEVERE > 0) breakdown.push({ count: counts.SEVERE, severity: 'SEVERE' })
-	if (counts.HIGH > 0) breakdown.push({ count: counts.HIGH, severity: 'HIGH' })
-	if (counts.MEDIUM > 0) breakdown.push({ count: counts.MEDIUM, severity: 'MEDIUM' })
-	if (counts.LOW > 0) breakdown.push({ count: counts.LOW, severity: 'LOW' })
+// 	const breakdown = []
+// 	if (counts.SEVERE > 0) breakdown.push({ count: counts.SEVERE, severity: 'SEVERE' })
+// 	if (counts.HIGH > 0) breakdown.push({ count: counts.HIGH, severity: 'HIGH' })
+// 	if (counts.MEDIUM > 0) breakdown.push({ count: counts.MEDIUM, severity: 'MEDIUM' })
+// 	if (counts.LOW > 0) breakdown.push({ count: counts.LOW, severity: 'LOW' })
 
-	return breakdown
-}
+// 	return breakdown
+// }
 </script>
 
 <template>
@@ -374,7 +378,7 @@ function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
 			<div v-else-if="currentTab === 'Files' && selectedFile" class="flex flex-col">
 				<div
 					v-for="(issue, idx) in selectedFile.issues"
-					:key="issue.issue_id"
+					:key="issue.id"
 					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
 					:class="{ 'rounded-bl-2xl rounded-br-2xl': idx === selectedFile.issues.length - 1 }"
 				>
@@ -383,15 +387,15 @@ function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
 							<ButtonStyled type="transparent" circular>
 								<button
 									class="transition-transform"
-									:class="{ 'rotate-180': !expandedIssues.has(issue.issue_id) }"
-									@click="toggleIssue(issue.issue_id)"
+									:class="{ 'rotate-180': !expandedIssues.has(issue.id) }"
+									@click="toggleIssue(issue.id)"
 								>
 									<ChevronDownIcon class="h-5 w-5 text-contrast" />
 								</button>
 							</ButtonStyled>
 
 							<span class="text-base font-semibold text-contrast">{{
-								issue.kind.replace(/_/g, ' ')
+								issue.issue_type.replace(/_/g, ' ')
 							}}</span>
 
 							<div
@@ -415,26 +419,26 @@ function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
 
 						<div class="flex items-center gap-2">
 							<ButtonStyled color="brand" type="outlined">
-								<button class="!border-[1px]" @click="updateIssueStatus(issue.issue_id, 'safe')">
+								<button class="!border-[1px]" @click="updateIssueStatus(issue.id, 'safe')">
 									Safe
 								</button>
 							</ButtonStyled>
 
 							<ButtonStyled color="red" type="outlined">
-								<button class="!border-[1px]" @click="updateIssueStatus(issue.issue_id, 'unsafe')">
+								<button class="!border-[1px]" @click="updateIssueStatus(issue.id, 'unsafe')">
 									Malware
 								</button>
 							</ButtonStyled>
 						</div>
 					</div>
 
-					<div v-if="expandedIssues.has(issue.issue_id)" class="flex flex-col gap-4 px-4 pb-4">
+					<div v-if="expandedIssues.has(issue.id)" class="flex flex-col gap-4 px-4 pb-4">
 						<div
 							v-for="(detail, detailIdx) in issue.details"
 							:key="detailIdx"
 							class="flex flex-col"
 						>
-							<p class="mt-0 pt-0 font-mono text-sm text-secondary">{{ detail.class_name }}</p>
+							<p class="mt-0 pt-0 font-mono text-sm text-secondary">{{ detail.file_path }}</p>
 
 							<div
 								v-if="detail.decompiled_source"
@@ -468,6 +472,9 @@ function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReview) {
 										</div>
 									</div>
 								</div>
+							</div>
+							<div v-else class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4">
+								<p class="text-sm text-secondary">Source code not available for this flag.</p>
 							</div>
 						</div>
 					</div>

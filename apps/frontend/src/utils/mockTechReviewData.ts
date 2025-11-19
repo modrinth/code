@@ -1,10 +1,9 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-type ProjectReview = Labrinth.TechReview.Internal.ProjectReview
-type ProjectReport = Labrinth.TechReview.Internal.ProjectReport
-type FileReview = Labrinth.TechReview.Internal.FileReview
+type SearchResponse = Labrinth.TechReview.Internal.SearchResponse
+type FileReport = Labrinth.TechReview.Internal.FileReport
 type FileIssue = Labrinth.TechReview.Internal.FileIssue
-type FileIssueDetail = Labrinth.TechReview.Internal.FileIssueDetail
+type ReportIssueDetail = Labrinth.TechReview.Internal.ReportIssueDetail
 type DelphiSeverity = Labrinth.TechReview.Internal.DelphiSeverity
 type DelphiReportIssueStatus = Labrinth.TechReview.Internal.DelphiReportIssueStatus
 type Ownership = Labrinth.TechReview.Internal.Ownership
@@ -343,10 +342,10 @@ function randomElement<T>(array: T[]): T {
 	return array[Math.floor(Math.random() * array.length)]
 }
 
-function randomElements<T>(array: T[], count: number): T[] {
-	const shuffled = [...array].sort(() => Math.random() - 0.5)
-	return shuffled.slice(0, Math.min(count, array.length))
-}
+// function randomElements<T>(array: T[], count: number): T[] {
+// 	const shuffled = [...array].sort(() => Math.random() - 0.5)
+// 	return shuffled.slice(0, Math.min(count, array.length))
+// }
 
 function randomInt(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min
@@ -382,63 +381,144 @@ function generateSlug(name: string): string {
 		.replace(/^-|-$/g, '')
 }
 
-function generateFileIssueDetail(issueType: string, severity: DelphiSeverity): FileIssueDetail {
+function generateReportIssueDetail(
+	issueType: string,
+	severity: DelphiSeverity,
+	issueId: string,
+): ReportIssueDetail {
 	const snippets = CODE_SNIPPETS[issueType] || CODE_SNIPPETS.obfuscated_code
 	const snippet = randomElement(snippets)
 
-	const classNames: Record<string, string[]> = {
-		obfuscated_code: ['a', 'b', 'ObfuscatedClass', 'l', 'ClassLoader'],
-		suspicious_network_activity: [
-			'NetworkHandler',
-			'DataCollector',
-			'TelemetryClient',
-			'UpdateChecker',
+	const filePaths: Record<string, string[]> = {
+		obfuscated_code: [
+			'com/obfuscated/a.class',
+			'org/unknown/b.class',
+			'net/evil/ObfuscatedClass.class',
+			'l.class',
+			'ClassLoader.class',
 		],
-		runtime_exec_usage: ['CommandExecutor', 'SystemHelper', 'ProcessManager'],
-		credential_access: ['AuthStealer', 'CredentialHarvester', 'SessionManager'],
-		file_system_write: ['FileManager', 'SystemWriter', 'PersistenceHelper'],
-		reflection_abuse: ['ReflectionUtils', 'SecurityBypass', 'AccessHelper'],
-		native_code_loading: ['NativeLoader', 'LibraryManager', 'JNIHelper'],
-		data_exfiltration: ['DataUploader', 'AnalyticsClient', 'StatsCollector'],
-		telemetry_without_consent: ['TelemetryService', 'UsageTracker', 'MetricsCollector'],
-		cryptominer_detected: ['MiningThread', 'HashComputer', 'PoolConnector'],
-		malicious_payload: ['PayloadDeployer', 'Ransomware', 'BackdoorInstaller'],
-		unsafe_deserialization: ['ConfigLoader', 'DataDeserializer', 'ObjectReader'],
-		command_injection_risk: ['CommandProcessor', 'ShellExecutor', 'SystemCommand'],
-		path_traversal_risk: ['FileAccessor', 'ResourceLoader', 'PathResolver'],
-		arbitrary_code_execution: ['ScriptEvaluator', 'PluginLoader', 'CodeExecutor'],
+		suspicious_network_activity: [
+			'com/mod/network/NetworkHandler.class',
+			'com/mod/telemetry/DataCollector.class',
+			'com/mod/client/TelemetryClient.class',
+			'com/mod/update/UpdateChecker.class',
+		],
+		runtime_exec_usage: [
+			'com/mod/system/CommandExecutor.class',
+			'com/mod/util/SystemHelper.class',
+			'com/mod/process/ProcessManager.class',
+		],
+		credential_access: [
+			'com/evil/stealer/AuthStealer.class',
+			'com/malware/CredentialHarvester.class',
+			'com/mod/session/SessionManager.class',
+		],
+		file_system_write: [
+			'com/mod/io/FileManager.class',
+			'com/mod/system/SystemWriter.class',
+			'com/malware/PersistenceHelper.class',
+		],
+		reflection_abuse: [
+			'com/mod/util/ReflectionUtils.class',
+			'com/evil/SecurityBypass.class',
+			'com/mod/access/AccessHelper.class',
+		],
+		native_code_loading: [
+			'com/mod/native/NativeLoader.class',
+			'com/mod/lib/LibraryManager.class',
+			'com/mod/jni/JNIHelper.class',
+		],
+		data_exfiltration: [
+			'com/evil/DataUploader.class',
+			'com/mod/analytics/AnalyticsClient.class',
+			'com/mod/stats/StatsCollector.class',
+		],
+		telemetry_without_consent: [
+			'com/mod/telemetry/TelemetryService.class',
+			'com/mod/tracking/UsageTracker.class',
+			'com/mod/metrics/MetricsCollector.class',
+		],
+		cryptominer_detected: [
+			'com/evil/mining/MiningThread.class',
+			'com/malware/crypto/HashComputer.class',
+			'com/evil/pool/PoolConnector.class',
+		],
+		malicious_payload: [
+			'com/evil/PayloadDeployer.class',
+			'com/malware/Ransomware.class',
+			'com/evil/backdoor/BackdoorInstaller.class',
+		],
+		unsafe_deserialization: [
+			'com/mod/config/ConfigLoader.class',
+			'com/mod/data/DataDeserializer.class',
+			'com/mod/io/ObjectReader.class',
+		],
+		command_injection_risk: [
+			'com/mod/cmd/CommandProcessor.class',
+			'com/mod/shell/ShellExecutor.class',
+			'com/mod/system/SystemCommand.class',
+		],
+		path_traversal_risk: [
+			'com/mod/file/FileAccessor.class',
+			'com/mod/resource/ResourceLoader.class',
+			'com/mod/path/PathResolver.class',
+		],
+		arbitrary_code_execution: [
+			'com/mod/script/ScriptEvaluator.class',
+			'com/mod/plugin/PluginLoader.class',
+			'com/mod/eval/CodeExecutor.class',
+		],
 	}
 
-	const className = randomElement(classNames[issueType] || ['UnknownClass'])
+	const filePath = randomElement(filePaths[issueType] || ['com/unknown/UnknownClass.class'])
+	const className = filePath.split('/').pop()?.replace('.class', '') || 'UnknownClass'
+
+	// Sometimes omit decompiled source (for performance/size reasons)
+	const includeSource = Math.random() > 0.15 // 85% include source
 
 	return {
-		class_name: className,
-		decompiled_source: snippet,
+		id: `detail_${Math.random().toString(36).slice(2, 11)}`,
+		issue_id: issueId,
+		key: className,
+		file_path: filePath,
+		decompiled_source: includeSource ? snippet : null,
+		data: {
+			// Additional metadata
+			line_count: includeSource ? snippet.split('\n').length : 0,
+			bytecode_size: randomInt(100, 5000),
+			detection_confidence: Math.random() * 100,
+		},
 		severity,
 	}
 }
 
-function generateFileIssue(issueType: string, status: DelphiReportIssueStatus): FileIssue {
+function generateFileIssue(
+	issueType: string,
+	status: DelphiReportIssueStatus,
+	reportId: string,
+): FileIssue {
 	const severities: DelphiSeverity[] = ['LOW', 'MEDIUM', 'HIGH', 'SEVERE']
 	const weights = [10, 30, 40, 20] // More medium/high issues
 	const severity = weightedRandom(severities, weights)
 
+	const issueId = `issue_${Math.random().toString(36).slice(2, 11)}`
 	const detailCount = randomInt(1, 2)
-	const details: FileIssueDetail[] = []
+	const details: ReportIssueDetail[] = []
 
 	for (let i = 0; i < detailCount; i++) {
-		details.push(generateFileIssueDetail(issueType, severity))
+		details.push(generateReportIssueDetail(issueType, severity, issueId))
 	}
 
 	return {
-		issue_id: `issue_${Math.random().toString(36).substr(2, 9)}`,
-		kind: issueType,
+		id: issueId,
+		report_id: reportId,
+		issue_type: issueType,
 		status,
 		details,
 	}
 }
 
-function generateFileReview(): FileReview {
+function generateFileReport(projectId: string, versionId: string, daysAgo: number): FileReport {
 	const fileExtensions = ['.jar', '.class', '.zip']
 	const fileNames = [
 		'core',
@@ -460,6 +540,9 @@ function generateFileReview(): FileReview {
 	const fileName = randomElement(fileNames) + randomElement(fileExtensions)
 	const fileSize = randomInt(1024, 10 * 1024 * 1024) // 1 KB to 10 MB
 
+	const reportId = `report_${Math.random().toString(36).slice(2, 11)}`
+	const fileId = `file_${Math.random().toString(36).slice(2, 11)}`
+
 	const issueCount = randomInt(1, 3)
 	const issues: FileIssue[] = []
 
@@ -469,29 +552,11 @@ function generateFileReview(): FileReview {
 	for (let i = 0; i < issueCount; i++) {
 		const issueType = randomElement([...ISSUE_TYPES])
 		const status = weightedRandom(statuses, statusWeights)
-		issues.push(generateFileIssue(issueType, status))
-	}
-
-	return {
-		file_name: fileName,
-		file_size: fileSize,
-		issues,
-	}
-}
-
-function generateProjectReport(daysAgo: number): ProjectReport {
-	const fileCount = randomInt(1, 5)
-	const files: FileReview[] = []
-
-	for (let i = 0; i < fileCount; i++) {
-		files.push(generateFileReview())
+		issues.push(generateFileIssue(issueType, status, reportId))
 	}
 
 	// Calculate overall severity from all issues
-	const allSeverities = files
-		.flatMap((f) => f.issues)
-		.flatMap((i) => i.details)
-		.map((d) => d.severity)
+	const allSeverities = issues.flatMap((i) => i.details).map((d) => d.severity)
 
 	const severityOrder: Record<DelphiSeverity, number> = { LOW: 0, MEDIUM: 1, HIGH: 2, SEVERE: 3 }
 	const maxSeverity = allSeverities.reduce<DelphiSeverity>(
@@ -500,10 +565,16 @@ function generateProjectReport(daysAgo: number): ProjectReport {
 	)
 
 	return {
-		created_at: randomDate(daysAgo),
+		id: reportId,
+		file_id: fileId,
+		version_id: versionId,
+		project_id: projectId,
+		created: randomDate(daysAgo),
 		flag_reason: 'delphi',
 		severity: maxSeverity,
-		files,
+		file_name: fileName,
+		file_size: fileSize,
+		issues,
 	}
 }
 
@@ -514,7 +585,7 @@ function generateOwnership(): Ownership {
 		const name = randomElement(ORG_NAMES)
 		return {
 			kind: 'organization',
-			id: `org_${Math.random().toString(36).substr(2, 9)}`,
+			id: `org_${Math.random().toString(36).slice(2, 11)}`,
 			name,
 			icon_url: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,
 		}
@@ -522,7 +593,7 @@ function generateOwnership(): Ownership {
 		const name = randomElement(USERNAMES)
 		return {
 			kind: 'user',
-			id: `user_${Math.random().toString(36).substr(2, 9)}`,
+			id: `user_${Math.random().toString(36).slice(2, 11)}`,
 			name,
 			icon_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`,
 		}
@@ -534,7 +605,7 @@ function generateThreadMessages(projectId: string, threadId: string): DBThreadMe
 
 	// Initial status change message
 	messages.push({
-		id: `msg_${Math.random().toString(36).substr(2, 9)}`,
+		id: `msg_${Math.random().toString(36).slice(2, 11)}`,
 		thread_id: threadId,
 		author_id: undefined,
 		body: {
@@ -561,7 +632,7 @@ function generateThreadMessages(projectId: string, threadId: string): DBThreadMe
 
 	for (let i = 0; i < commentCount; i++) {
 		messages.push({
-			id: `msg_${Math.random().toString(36).substr(2, 9)}`,
+			id: `msg_${Math.random().toString(36).slice(2, 11)}`,
 			thread_id: threadId,
 			author_id: `user_mod_${randomInt(1, 5)}`,
 			body: {
@@ -578,7 +649,7 @@ function generateThreadMessages(projectId: string, threadId: string): DBThreadMe
 }
 
 function generateThread(projectId: string): DBThread {
-	const threadId = `thread_${Math.random().toString(36).substr(2, 9)}`
+	const threadId = `thread_${Math.random().toString(36).slice(2, 11)}`
 
 	return {
 		id: threadId,
@@ -590,7 +661,7 @@ function generateThread(projectId: string): DBThread {
 }
 
 function generateProject(): Project {
-	const projectId = `proj_${Math.random().toString(36).substr(2, 9)}`
+	const projectId = `proj_${Math.random().toString(36).slice(2, 11)}`
 	const name = randomElement(MOD_NAMES)
 	const slug = generateSlug(name)
 	const projectType = randomElement(PROJECT_TYPES)
@@ -600,7 +671,7 @@ function generateProject(): Project {
 		slug,
 		project_types: [projectType],
 		games: ['minecraft'],
-		team_id: `team_${Math.random().toString(36).substr(2, 9)}`,
+		team_id: `team_${Math.random().toString(36).slice(2, 11)}`,
 		name,
 		summary: `An awesome ${projectType} that enhances your Minecraft experience`,
 		description: `# ${name}\n\nThis is a detailed description of the ${projectType}.`,
@@ -622,35 +693,41 @@ function generateProject(): Project {
 		link_urls: {},
 		gallery: [],
 		color: randomInt(0, 16777215),
-		thread_id: `thread_${Math.random().toString(36).substr(2, 9)}`,
+		thread_id: `thread_${Math.random().toString(36).slice(2, 11)}`,
 		monetization_status: 'monetized',
 		side_types_migration_review_status: 'reviewed',
 	}
 }
 
-export function generateMockProjectReviews(count: number): ProjectReview[] {
-	const reviews: ProjectReview[] = []
+export function generateMockSearchResponse(projectCount: number): SearchResponse {
+	const reports: FileReport[] = []
+	const projects: Record<string, Project> = {}
+	const threads: Record<string, DBThread> = {}
+	const ownership: Record<string, Ownership> = {}
 
-	for (let i = 0; i < count; i++) {
+	for (let i = 0; i < projectCount; i++) {
 		const project = generateProject()
 		const owner = generateOwnership()
 		const thread = generateThread(project.id)
 
-		// Generate 1-3 reports per project
+		// Store in lookup maps
+		projects[project.id] = project
+		threads[thread.id] = thread
+		ownership[project.id] = owner
+
+		// Generate 1-3 file reports per project
 		const reportCount = randomInt(1, 3)
-		const reports: ProjectReport[] = []
 
 		for (let j = 0; j < reportCount; j++) {
-			reports.push(generateProjectReport(60))
+			const versionId = `version_${Math.random().toString(36).slice(2, 11)}`
+			reports.push(generateFileReport(project.id, versionId, 60))
 		}
-
-		reviews.push({
-			project,
-			project_owner: owner,
-			thread,
-			reports,
-		})
 	}
 
-	return reviews
+	return {
+		reports,
+		projects,
+		threads,
+		ownership,
+	}
 }
