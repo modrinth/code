@@ -197,7 +197,8 @@ pub async fn payouts(
 }
 
 pub async fn sync_payout_statuses(pool: sqlx::Pool<Postgres>, mural: MuralPay) {
-    const LIMIT: u32 = 1000;
+    // Mural sets a max limit of 100 for search payouts endpoint
+    const LIMIT: u32 = 100;
 
     info!("Started syncing payout statuses");
 

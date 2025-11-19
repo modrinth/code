@@ -6,7 +6,7 @@ use muralpay::{MuralError, MuralPay, TokenFeeRequest};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use tracing::warn;
+use tracing::{info, warn};
 
 use crate::{
     database::models::DBPayoutId,
@@ -271,6 +271,8 @@ pub async fn sync_pending_payouts_from_mural(
         status: PayoutStatus,
     }
 
+    info!("Syncing pending payouts from Mural");
+
     let mut txn = db
         .begin()
         .await
@@ -298,6 +300,8 @@ pub async fn sync_pending_payouts_from_mural(
     .fetch_all(&mut *txn)
     .await
     .wrap_internal_err("failed to fetch incomplete Mural payouts")?;
+
+    info!("Found {} incomplete Mural payouts", rows.len());
 
     let futs = rows.into_iter().map(|row| async move {
         let platform_id = row.platform_id.wrap_err("no platform ID")?;
@@ -369,6 +373,8 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
     mural: &MuralPay,
     limit: u32,
 ) -> eyre::Result<()> {
+    info!("Syncing failed Mural payouts to Labrinth");
+
     let mut next_id = None;
     loop {
         let search_resp = mural
@@ -392,6 +398,11 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
         if search_resp.results.is_empty() {
             break;
         }
+
+        info!(
+            "Found {} canceled or failed Mural payouts",
+            search_resp.results.len()
+        );
 
         let mut payout_platform_id = Vec::<String>::new();
         let mut payout_new_status = Vec::<String>::new();
@@ -429,6 +440,11 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
         .execute(db)
         .await
         .wrap_internal_err("failed to update payout statuses")?;
+
+        info!(
+            "Updated {} payouts in database from Mural info",
+            payout_platform_id.len()
+        );
 
         if next_id.is_none() {
             break;
