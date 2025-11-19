@@ -301,6 +301,7 @@ import {
 	get_organization_many,
 	get_project_many,
 	get_team_many,
+	get_version,
 	get_version_many,
 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
@@ -314,6 +315,7 @@ import {
 } from '@/helpers/profile.js'
 import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
+import { installVersionDependencies } from '@/store/install'
 
 const { handleError } = injectNotificationManager()
 
@@ -662,6 +664,21 @@ const updateProject = async (mod: ProjectListEntry) => {
 	mod.updating = true
 	await new Promise((resolve) => setTimeout(resolve, 0))
 	mod.path = await update_project(props.instance.path, mod.path).catch(handleError)
+
+	if (mod.updateVersion) {
+		const versionData = await get_version(mod.updateVersion, 'must_revalidate').catch(handleError)
+
+		if (versionData) {
+			const profile = {
+				path: props.instance.path,
+				loader: props.instance.loader,
+				game_version: props.instance.game_version
+			}
+
+			await installVersionDependencies(profile, versionData).catch(handleError)
+		}
+	}
+
 	mod.updating = false
 
 	mod.outdated = false
