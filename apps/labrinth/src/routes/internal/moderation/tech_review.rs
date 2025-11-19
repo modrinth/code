@@ -273,11 +273,24 @@ pub struct SearchResponse {
     /// List of reports returned.
     pub reports: Vec<FileReport>,
     /// Fetched project information for projects in the returned reports.
-    pub projects: HashMap<ProjectId, Project>,
+    pub projects: HashMap<ProjectId, ProjectModerationInfo>,
     /// Fetched moderation threads for projects in the returned reports.
     pub threads: HashMap<ThreadId, DBThread>,
     /// Fetched owner information for projects.
     pub ownership: HashMap<ProjectId, Ownership>,
+}
+
+/// Limited set of project information returned by [`search_projects`].
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectModerationInfo {
+    /// Projecet ID.
+    pub id: ProjectId,
+    /// Project name.
+    pub name: String,
+    /// The aggregated project typos of the versions of this project
+    pub project_types: Vec<String>,
+    /// The URL of the icon of the project
+    pub icon_url: Option<String>,
 }
 
 /// Searches all projects which are awaiting technical review.
@@ -434,7 +447,20 @@ async fn search_projects(
 
     Ok(web::Json(SearchResponse {
         reports,
-        projects,
+        projects: projects
+            .into_iter()
+            .map(|(id, project)| {
+                (
+                    id,
+                    ProjectModerationInfo {
+                        id,
+                        name: project.name,
+                        project_types: project.project_types,
+                        icon_url: project.icon_url,
+                    },
+                )
+            })
+            .collect(),
         threads,
         ownership,
     }))
