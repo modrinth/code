@@ -191,7 +191,6 @@ async fn get_issue(
                 )
             ) AS "data!: sqlx::types::Json<FileIssue>"
         FROM delphi_report_issues dri
-        LEFT JOIN delphi_report_issue_details drid ON dri.id = drid.issue_id
         WHERE dri.id = $1
         "#,
         issue_id as DelphiReportIssueId,
@@ -230,7 +229,7 @@ async fn get_report(
 
     let row = sqlx::query!(
         r#"
-        SELECT
+        SELECT DISTINCT ON (dr.id)
             to_jsonb(dr)
             || jsonb_build_object(
                 'file_id', to_base62(f.id),
@@ -256,8 +255,6 @@ async fn get_report(
         FROM delphi_reports dr
         INNER JOIN files f ON f.id = dr.file_id
         INNER JOIN versions v ON v.id = f.version_id
-        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-        LEFT JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id
         WHERE dr.id = $1
         "#,
         report_id as DelphiReportId,
@@ -320,59 +317,67 @@ async fn search_projects(
     let mut rows = sqlx::query!(
         r#"
         SELECT
-            m.id AS "project_id: DBProjectId",
-            t.id AS "project_thread_id: DBThreadId",
-            to_jsonb(dr)
-            || jsonb_build_object(
-                'file_id', to_base62(f.id),
-                'version_id', to_base62(v.id),
-                'project_id', to_base62(v.mod_id),
-                'file_name', f.filename,
-                'file_size', f.size,
-                'flag_reason', 'delphi',
-                'issues', json_array(
-                    SELECT
-                        to_jsonb(dri)
-                        || jsonb_build_object(
-                            'details', json_array(
-                                SELECT jsonb_build_object(
-                                    'id', drid.id,
-                                    'issue_id', drid.issue_id,
-                                    'key', drid.key,
-                                    'file_path', drid.file_path,
-                                    -- ignore `decompiled_source`
-                                    'data', drid.data,
-                                    'severity', drid.severity
-                                )
-                                FROM delphi_report_issue_details drid
-                                WHERE drid.issue_id = dri.id
-                            )
-                        )
-                    FROM delphi_report_issues dri
-                    WHERE dri.report_id = dr.id
-                )
-            ) AS "report!: sqlx::types::Json<FileReport>"
-        FROM delphi_reports dr
-        INNER JOIN files f ON f.id = dr.file_id
-        INNER JOIN versions v ON v.id = f.version_id
-        INNER JOIN mods m ON m.id = v.mod_id
-        INNER JOIN threads t ON t.mod_id = m.id
-        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-        LEFT JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id
+            project_id AS "project_id: DBProjectId",
+            project_thread_id AS "project_thread_id: DBThreadId",
+            report AS "report!: sqlx::types::Json<FileReport>"
+        FROM (
+            SELECT DISTINCT ON (dr.id)
+                dr.id       AS report_id,
+                dr.created  AS report_created,
+                dr.severity AS report_severity,
+                m.id        AS project_id,
+                t.id        AS project_thread_id,
 
-        -- filtering
-        LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-        LEFT JOIN categories c ON c.id = mc.joining_category_id
-        WHERE
-            -- project type
-            (cardinality($1::int[]) = 0 OR c.project_type = ANY($1::int[]))
+                to_jsonb(dr)
+                || jsonb_build_object(
+                    'file_id', to_base62(f.id),
+                    'version_id', to_base62(v.id),
+                    'project_id', to_base62(v.mod_id),
+                    'file_name', f.filename,
+                    'file_size', f.size,
+                    'flag_reason', 'delphi',
+                    'issues', json_array(
+                        SELECT
+                            to_jsonb(dri)
+                            || jsonb_build_object(
+                                'details', json_array(
+                                    SELECT jsonb_build_object(
+                                        'id', drid.id,
+                                        'issue_id', drid.issue_id,
+                                        'key', drid.key,
+                                        'file_path', drid.file_path,
+                                        -- ignore `decompiled_source`
+                                        'data', drid.data,
+                                        'severity', drid.severity
+                                    )
+                                    FROM delphi_report_issue_details drid
+                                    WHERE drid.issue_id = dri.id
+                                )
+                            )
+                        FROM delphi_report_issues dri
+                        WHERE dri.report_id = dr.id
+                    )
+                ) AS report
+            FROM delphi_reports dr
+            INNER JOIN files f ON f.id = dr.file_id
+            INNER JOIN versions v ON v.id = f.version_id
+            INNER JOIN mods m ON m.id = v.mod_id
+            INNER JOIN threads t ON t.mod_id = m.id
+
+            -- filtering
+            LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
+            LEFT JOIN categories c ON c.id = mc.joining_category_id
+            WHERE
+                -- project type
+                (cardinality($1::int[]) = 0 OR c.project_type = ANY($1::int[]))
+        ) t
 
         -- sorting
         ORDER BY
-            CASE WHEN $2 = 'created_asc' THEN created ELSE TO_TIMESTAMP(0) END ASC,
-            CASE WHEN $2 = 'created_desc' THEN created ELSE TO_TIMESTAMP(0) END DESC,
-            CASE WHEN $2 = 'severity_asc' THEN dr.severity ELSE 'low'::delphi_severity END ASC,
-            CASE WHEN $2 = 'severity_desc' THEN dr.severity ELSE 'low'::delphi_severity END DESC
+            CASE WHEN $2 = 'created_asc' THEN t.report_created ELSE TO_TIMESTAMP(0) END ASC,
+            CASE WHEN $2 = 'created_desc' THEN t.report_created ELSE TO_TIMESTAMP(0) END DESC,
+            CASE WHEN $2 = 'severity_asc' THEN t.report_severity ELSE 'low'::delphi_severity END ASC,
+            CASE WHEN $2 = 'severity_desc' THEN t.report_severity ELSE 'low'::delphi_severity END DESC
 
         -- pagination
         LIMIT $3
