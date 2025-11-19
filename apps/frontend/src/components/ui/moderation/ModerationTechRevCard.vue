@@ -132,12 +132,12 @@ function backToFileList() {
 	selectedFile.value = null
 }
 
-async function copyToClipboard(code: string) {
+async function copyToClipboard(code: string, detailId: string) {
 	try {
 		await navigator.clipboard.writeText(code)
-		showCopyFeedback.value = true
+		showCopyFeedback.value.set(detailId, true)
 		setTimeout(() => {
-			showCopyFeedback.value = false
+			showCopyFeedback.value.delete(detailId)
 		}, 2000)
 	} catch (error) {
 		console.error('Failed to copy code:', error)
@@ -157,7 +157,7 @@ async function updateIssueStatus(
 }
 
 const expandedIssues = ref<Set<string>>(new Set())
-const showCopyFeedback = ref(false)
+const showCopyFeedback = ref<Map<string, boolean>>(new Map())
 
 function toggleIssue(issueId: string) {
 	if (expandedIssues.value.has(issueId)) {
@@ -382,14 +382,13 @@ function toggleIssue(issueId: string) {
 					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
 					:class="{ 'rounded-bl-2xl rounded-br-2xl': idx === selectedFile.issues.length - 1 }"
 				>
-					<div class="flex items-center justify-between p-4">
+					<div
+						class="flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-surface-3"
+						@click="toggleIssue(issue.id)"
+					>
 						<div class="my-auto flex items-center gap-2">
 							<ButtonStyled type="transparent" circular>
-								<button
-									class="transition-transform"
-									:class="{ 'rotate-180': !expandedIssues.has(issue.id) }"
-									@click="toggleIssue(issue.id)"
-								>
+								<button class="transition-transform" :class="{ 'rotate-180': expandedIssues.has(issue.id) }">
 									<ChevronDownIcon class="h-5 w-5 text-contrast" />
 								</button>
 							</ButtonStyled>
@@ -417,7 +416,7 @@ function toggleIssue(issueId: string) {
 							</div>
 						</div>
 
-						<div class="flex items-center gap-2">
+						<div class="flex items-center gap-2" @click.stop>
 							<ButtonStyled color="brand" type="outlined">
 								<button class="!border-[1px]" @click="updateIssueStatus(issue.id, 'safe')">
 									Safe
@@ -448,9 +447,9 @@ function toggleIssue(issueId: string) {
 									<button
 										v-tooltip="`Copy code`"
 										class="absolute right-2 top-2 border-[1px]"
-										@click="copyToClipboard(detail.decompiled_source)"
+										@click="copyToClipboard(detail.decompiled_source, `${issue.id}-${detailIdx}`)"
 									>
-										<CopyIcon v-if="!showCopyFeedback" />
+										<CopyIcon v-if="!showCopyFeedback.get(`${issue.id}-${detailIdx}`)" />
 										<CheckIcon v-else />
 									</button>
 								</ButtonStyled>
