@@ -307,6 +307,7 @@ import {
 import { profile_listener } from '@/helpers/events.js'
 import {
 	add_project_from_path,
+	get,
 	get_projects,
 	remove_project,
 	toggle_disable_project,
@@ -629,10 +630,15 @@ const sortProjects = (filter: string) => {
 
 const updateAll = async () => {
 	const setProjects = []
+	const outdatedProjects = []
+
 	for (const [i, project] of projects.value.entries()) {
 		if (project.outdated) {
 			project.updating = true
 			setProjects.push(i)
+			if (project.updateVersion) {
+				outdatedProjects.push(project.updateVersion)
+			}
 		}
 	}
 
@@ -648,6 +654,21 @@ const updateAll = async () => {
 			projects.value[index].updateVersion = undefined
 		}
 	}
+
+	if (outdatedProjects.length > 0) {
+		const profile = await get(props.instance.path).catch(handleError)
+
+		if (profile) {
+			for (const versionId of outdatedProjects) {
+				const versionData = await get_version(versionId, 'must_revalidate').catch(handleError)
+
+				if (versionData) {
+					await installVersionDependencies(profile, versionData).catch(handleError)
+				}
+			}
+		}
+	}
+
 	for (const project of setProjects) {
 		projects.value[project].updating = false
 	}
@@ -669,13 +690,11 @@ const updateProject = async (mod: ProjectListEntry) => {
 		const versionData = await get_version(mod.updateVersion, 'must_revalidate').catch(handleError)
 
 		if (versionData) {
-			const profile = {
-				path: props.instance.path,
-				loader: props.instance.loader,
-				game_version: props.instance.game_version
-			}
+			const profile = await get(props.instance.path).catch(handleError)
 
-			await installVersionDependencies(profile, versionData).catch(handleError)
+			if (profile) {
+				await installVersionDependencies(profile, versionData).catch(handleError)
+			}
 		}
 	}
 
