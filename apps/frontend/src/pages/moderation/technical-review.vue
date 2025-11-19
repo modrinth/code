@@ -32,6 +32,142 @@ const { formatMessage } = useVIntl()
 const route = useRoute()
 const router = useRouter()
 
+const CACHE_TTL = 24 * 60 * 60 * 1000
+
+type CachedSource = {
+	source: string
+	timestamp: number
+}
+
+function getCachedSource(detailId: string): string | null {
+	try {
+		const cached = localStorage.getItem(`tech_review_source_${detailId}`)
+		if (!cached) return null
+
+		const data: CachedSource = JSON.parse(cached)
+		const now = Date.now()
+
+		if (now - data.timestamp > CACHE_TTL) {
+			localStorage.removeItem(`tech_review_source_${detailId}`)
+			return null
+		}
+
+		return data.source
+	} catch {
+		return null
+	}
+}
+
+function setCachedSource(detailId: string, source: string): void {
+	try {
+		const data: CachedSource = {
+			source,
+			timestamp: Date.now(),
+		}
+		localStorage.setItem(`tech_review_source_${detailId}`, JSON.stringify(data))
+	} catch (error) {
+		console.error('Failed to cache source:', error)
+	}
+}
+
+function clearExpiredCache(): void {
+	try {
+		const now = Date.now()
+		const keys = Object.keys(localStorage)
+
+		for (const key of keys) {
+			if (key.startsWith('tech_review_source_')) {
+				const cached = localStorage.getItem(key)
+				if (cached) {
+					const data: CachedSource = JSON.parse(cached)
+					if (now - data.timestamp > CACHE_TTL) {
+						localStorage.removeItem(key)
+					}
+				}
+			}
+		}
+	} catch (error) {
+		console.error('Failed to clear expired cache:', error)
+	}
+}
+
+clearExpiredCache()
+
+const loadingIssues = ref<Set<string>>(new Set())
+
+async function loadIssueSource(issueId: string, projectId: string): Promise<void> {
+	if (loadingIssues.value.has(issueId)) return
+
+	loadingIssues.value.add(issueId)
+
+	try {
+		const issueData = await client.labrinth.tech_review_internal.getIssue(issueId)
+
+		for (const detail of issueData.details) {
+			if (detail.decompiled_source) {
+				setCachedSource(detail.id, detail.decompiled_source)
+
+				const review = reviewItems.value.find((r) => r.project.id === projectId)
+				if (review) {
+					for (const report of review.reports) {
+						for (const issue of report.issues) {
+							if (issue.id === issueId) {
+								const existingDetail = issue.details.find((d) => d.id === detail.id)
+								if (existingDetail) {
+									existingDetail.decompiled_source = detail.decompiled_source
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	} catch (error) {
+		console.error('Failed to load issue source:', error)
+	} finally {
+		loadingIssues.value.delete(issueId)
+	}
+}
+
+function tryLoadCachedSources(issueId: string, projectId: string): void {
+	const review = reviewItems.value.find((r) => r.project.id === projectId)
+	if (!review) return
+
+	for (const report of review.reports) {
+		for (const issue of report.issues) {
+			if (issue.id === issueId) {
+				for (const detail of issue.details) {
+					if (!detail.decompiled_source) {
+						const cached = getCachedSource(detail.id)
+						if (cached) {
+							detail.decompiled_source = cached
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+function handleLoadSource(issueId: string, projectId: string): void {
+	tryLoadCachedSources(issueId, projectId)
+
+	const review = reviewItems.value.find((r) => r.project.id === projectId)
+	if (!review) return
+
+	for (const report of review.reports) {
+		for (const issue of report.issues) {
+			if (issue.id === issueId) {
+				const hasUncached = issue.details.some((d) => !d.decompiled_source)
+				if (hasUncached) {
+					loadIssueSource(issueId, projectId)
+				}
+				return
+			}
+		}
+	}
+}
+
 const messages = defineMessages({
 	searchPlaceholder: {
 		id: 'moderation.search.placeholder',
@@ -200,6 +336,18 @@ const filteredItems = computed(() => {
 	return filtered
 })
 
+const filteredIssuesCount = computed(() => {
+	return filteredItems.value.reduce((total, review) => {
+		if (currentFilterType.value === 'All issues') {
+			return total + review.reports.reduce((sum, report) => sum + report.issues.length, 0)
+		} else {
+			return total + review.reports.reduce((sum, report) => {
+				return sum + report.issues.filter((issue) => issue.issue_type === currentFilterType.value).length
+			}, 0)
+		}
+	}, 0)
+})
+
 const totalPages = computed(() => Math.ceil((filteredItems.value?.length || 0) / itemsPerPage))
 const paginatedItems = computed(() => {
 	if (!filteredItems.value) return []
@@ -241,13 +389,7 @@ const {
 			page: 0,
 			sort_by: toApiSort(currentSortType.value),
 		})
-	},
-	initialData: {
-		reports: [],
-		projects: {},
-		threads: {},
-		ownership: {},
-	} as Labrinth.TechReview.Internal.SearchResponse,
+	}
 })
 
 // TEMPORARY: Mock data for development (58 items to match batch scan progress)
@@ -259,8 +401,6 @@ const {
 // 	searchResponse.value = generateMockSearchResponse(58)
 // }
 
-// Adapter: Transform flat SearchResponse into project-grouped structure
-// for easier consumption by existing UI components
 const reviewItems = computed(() => {
 	if (!searchResponse.value || searchResponse.value.reports.length === 0) {
 		return []
@@ -283,13 +423,14 @@ const reviewItems = computed(() => {
 		const projectId = report.project_id
 
 		if (!projectMap.has(projectId)) {
-			// Find the thread associated with this project
-			const thread = Object.values(response.threads).find((t) => t.project_id === projectId)
+			// Get project and thread using direct lookups
+			const project = response.projects[projectId]
+			const thread = project?.thread_id ? response.threads[project.thread_id] : undefined
 
 			if (!thread) continue // Skip if no thread found
 
 			projectMap.set(projectId, {
-				project: response.projects[projectId],
+				project,
 				project_owner: response.ownership[projectId],
 				thread,
 				reports: [],
@@ -301,6 +442,8 @@ const reviewItems = computed(() => {
 
 	return Array.from(projectMap.values())
 })
+
+console.log(reviewItems.value)
 
 watch(currentSortType, () => {
 	goToPage(1)
@@ -355,7 +498,7 @@ watch(currentSortType, () => {
 					<template #selected>
 						<span class="flex flex-row gap-2 align-middle font-semibold text-primary">
 							<FilterIcon class="size-4 flex-shrink-0" />
-							<span class="truncate">{{ currentFilterType }} ({{ filteredItems.length }})</span>
+							<span class="truncate">{{ currentFilterType }} ({{ filteredIssuesCount }})</span>
 						</span>
 					</template>
 				</Combobox>
@@ -392,7 +535,12 @@ watch(currentSortType, () => {
 				class="universal-card h-24 animate-pulse"
 			></div>
 			<div v-for="(item, idx) in paginatedItems" v-else :key="item.project.id ?? idx" class="">
-				<ModerationTechRevCard :item="item" @refetch="refetch" />
+				<ModerationTechRevCard
+					:item="item"
+					:loading-issues="loadingIssues"
+					@refetch="refetch"
+					@load-source="(issueId: string) => handleLoadSource(issueId, item.project.id)"
+				/>
 			</div>
 		</div>
 
