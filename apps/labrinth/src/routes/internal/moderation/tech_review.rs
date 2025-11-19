@@ -12,8 +12,8 @@ use crate::{
     database::{
         DBProject,
         models::{
-            DBFileId, DBProjectId, DBThread, DBThreadId, DBVersionId,
-            DelphiReportId, DelphiReportIssueId, ProjectTypeId,
+            DBProjectId, DBThread, DBThreadId, DelphiReportId,
+            DelphiReportIssueId, ProjectTypeId,
             delphi_report_item::{
                 DelphiReportIssueStatus, DelphiSeverity, ReportIssueDetail,
             },
@@ -21,7 +21,7 @@ use crate::{
         redis::RedisPool,
     },
     models::{
-        ids::{ProjectId, ThreadId},
+        ids::{FileId, ProjectId, ThreadId, VersionId},
         pats::Scopes,
         projects::Project,
     },
@@ -97,11 +97,11 @@ pub struct FileReport {
     /// ID of this report.
     pub id: DelphiReportId,
     /// ID of the file that was scanned.
-    pub file_id: DBFileId,
+    pub file_id: FileId,
     /// ID of the project version this report is for.
-    pub version_id: DBVersionId,
+    pub version_id: VersionId,
     /// ID of the project this report is for.
-    pub project_id: DBProjectId,
+    pub project_id: ProjectId,
     /// When the report for this file was created.
     pub created: DateTime<Utc>,
     /// Why this project was flagged.
@@ -233,9 +233,9 @@ async fn get_report(
         SELECT
             to_jsonb(dr)
             || jsonb_build_object(
-                'file_id', f.id,
-                'version_id', v.id,
-                'project_id', v.mod_id,
+                'file_id', to_base62(f.id),
+                'version_id', to_base62(v.id),
+                'project_id', to_base62(v.mod_id),
                 'file_name', f.filename,
                 'file_size', f.size,
                 'flag_reason', 'delphi',
@@ -324,9 +324,9 @@ async fn search_projects(
             t.id AS "project_thread_id: DBThreadId",
             to_jsonb(dr)
             || jsonb_build_object(
-                'file_id', f.id,
-                'version_id', v.id,
-                'project_id', v.mod_id,
+                'file_id', to_base62(f.id),
+                'version_id', to_base62(v.id),
+                'project_id', to_base62(v.mod_id),
                 'file_name', f.filename,
                 'file_size', f.size,
                 'flag_reason', 'delphi',
