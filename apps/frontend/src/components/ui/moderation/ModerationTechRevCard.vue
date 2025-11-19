@@ -8,6 +8,7 @@ import {
 	DownloadIcon,
 	EllipsisVerticalIcon,
 	LinkIcon,
+	LoaderCircleIcon,
 	ShieldCheckIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
@@ -30,12 +31,14 @@ const props = defineProps<{
 		thread: Labrinth.TechReview.Internal.DBThread
 		reports: Labrinth.TechReview.Internal.FileReport[]
 	}
+	loadingIssues: Set<string>
 }>()
 
 const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
 	refetch: []
+	loadSource: [issueId: string]
 }>()
 
 const quickActions: OverflowMenuOption[] = [
@@ -164,6 +167,7 @@ function toggleIssue(issueId: string) {
 		expandedIssues.value.delete(issueId)
 	} else {
 		expandedIssues.value.add(issueId)
+		emit('loadSource', issueId)
 	}
 }
 
@@ -414,6 +418,17 @@ function toggleIssue(issueId: string) {
 									issue.details[0].severity.slice(1).toLowerCase()
 								}}</span>
 							</div>
+
+							<Transition name="fade">
+								<div
+									v-if="loadingIssues.has(issue.id)"
+									class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
+								>
+									<span class="text-sm font-medium text-secondary">
+										<LoaderCircleIcon class="animate-spin size-5" />
+										  Loading source...</span>
+								</div>
+							</Transition>
 						</div>
 
 						<div class="flex items-center gap-2" @click.stop>
@@ -488,5 +503,19 @@ pre {
 	all: unset;
 	display: inline;
 	white-space: pre;
+}
+
+.fade-enter-active {
+	transition: opacity 0.3s ease-in;
+	transition-delay: 0.2s;
+}
+
+.fade-leave-active {
+	transition: opacity 0.15s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
 }
 </style>
