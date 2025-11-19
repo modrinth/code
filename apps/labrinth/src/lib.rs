@@ -9,7 +9,7 @@ use queue::{
     session::AuthQueue, socket::ActiveSockets,
 };
 use sqlx::Postgres;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
@@ -240,14 +240,14 @@ pub fn app_setup(
             let redis_ref = redis_ref.clone();
 
             async move {
-                info!("Indexing analytics queue");
+                debug!("Indexing analytics queue");
                 let result = analytics_queue_ref
                     .index(client_ref, &redis_ref, &pool_ref)
                     .await;
                 if let Err(e) = result {
                     warn!("Indexing analytics queue failed: {:?}", e);
                 }
-                info!("Done indexing analytics queue");
+                debug!("Done indexing analytics queue");
             }
         });
     }
