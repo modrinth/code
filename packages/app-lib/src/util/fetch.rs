@@ -5,6 +5,7 @@ use crate::LAUNCHER_USER_AGENT;
 use crate::event::LoadingBarId;
 use crate::event::emit::emit_loading;
 use bytes::Bytes;
+use chrono::DateTime;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
@@ -77,13 +78,14 @@ pub async fn fetch_advanced(
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<Bytes> {
     let _permit = semaphore.0.acquire().await?;
+    let is_modrinth = url.starts_with("https://cdn.modrinth.com")
+        || url.starts_with(env!("MODRINTH_API_URL"))
+        || url.starts_with(env!("MODRINTH_API_URL_V3"));
 
     let creds = if header
         .as_ref()
         .is_none_or(|x| &*x.0.to_lowercase() != "authorization")
-        && (url.starts_with("https://cdn.modrinth.com")
-            || url.starts_with(env!("MODRINTH_API_URL"))
-            || url.starts_with(env!("MODRINTH_API_URL_V3")))
+        && is_modrinth
     {
         crate::state::ModrinthCredentials::get_active(exec).await?
     } else {
@@ -116,15 +118,39 @@ pub async fn fetch_advanced(
                     || resp.status().is_server_error()
                 {
                     let backup_error = resp.error_for_status_ref().unwrap_err();
-                    if resp.status() == 429
-                        && let Some(reset_header) =
-                            resp.headers().get("X-Ratelimit-Reset")
-                        && let Ok(seconds) = reset_header.to_str()
-                        && let Ok(seconds) = seconds.parse::<u64>()
-                        && attempt <= FETCH_ATTEMPTS
-                    {
-                        sleep(Duration::from_secs(seconds)).await;
-                        continue;
+                    if resp.status() == 429 && attempt <= FETCH_ATTEMPTS {
+                        if is_modrinth // x-ratelimit-reset is not portable across different servers
+                            && let Some(reset_header) =
+                                resp.headers().get("X-Ratelimit-Reset")
+                            && let Ok(seconds) = reset_header.to_str()
+                            && let Ok(seconds) = seconds.parse::<u64>()
+                        {
+                            sleep(Duration::from_secs(seconds)).await;
+                            continue;
+                        } else if let Some(retry_header) =
+                            resp.headers().get("Retry-After")
+                            && let Ok(retry) = retry_header.to_str()
+                        {
+                            if let Ok(seconds) = retry.parse::<u64>() {
+                                // when retry-after retruns a delay in seconds
+                                sleep(Duration::from_secs(seconds)).await;
+                                continue;
+                            } else if let Ok(date) =
+                                DateTime::parse_from_rfc2822(retry)
+                            // when retry-after returns an http date
+                            {
+                                let now = chrono::Utc::now();
+                                // Convert now to the same timezone as date
+                                let now_fixed =
+                                    now.with_timezone(date.offset());
+                                let wait_duration = date - now_fixed;
+                                sleep(Duration::from_secs(
+                                    wait_duration.num_seconds() as u64,
+                                ))
+                                .await;
+                                continue;
+                            }
+                        }
                     }
                     if let Ok(error) = resp.json().await {
                         return Err(ErrorKind::LabrinthError(error).into());
@@ -163,6 +189,7 @@ pub async fn fetch_advanced(
                     if let Some(sha1) = sha1 {
                         let hash = sha1_async(bytes.clone()).await?;
                         if &*hash != sha1 {
+                            dbg!(&bytes);
                             if attempt <= FETCH_ATTEMPTS {
                                 continue;
                             } else {
