@@ -804,10 +804,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
 				:is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
 			>
-				<CompassIcon />
+				<CompassIcon class="compass-icon"/>
 			</NavButton>
 			<NavButton v-tooltip.right="'Skins (Beta)'" to="/skins">
-				<ChangeSkinIcon />
+				<ChangeSkinIcon id="change-skin-icon"/>
 			</NavButton>
 			<NavButton
 				v-tooltip.right="'Library'"
@@ -819,7 +819,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 							route.query.i)
 				"
 			>
-				<LibraryIcon />
+				<LibraryIcon id="library-icon"/>
 			</NavButton>
 			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<suspense>
@@ -1349,6 +1349,99 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 .toast-enter-from,
 .toast-leave-to {
 	opacity: 0;
+}
+
+.compass-icon:hover {
+	animation: compass-spin 0.75s cubic-bezier(0.68, -0.46, 0.34, 1.37);
+
+	@keyframes compass-spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+}
+
+#change-skin-icon {
+	width: 3rem;
+}
+#change-skin-icon:hover :deep(.hook) {
+	transform-origin: 24.704px 7.7px;
+	animation: swing 0.75s linear;
+	--swing-angle: 30deg;
+}
+
+#change-skin-icon:hover :deep(.shirt) {
+	transform-origin: 24px 19.102px;
+	animation: swing 0.75s ease-out 0.15s;
+	--swing-angle: 40deg;
+}
+
+@keyframes swing {
+	0%,
+	100% {
+		transform: rotate(0deg);
+	}
+	25%,
+	32% {
+		transform: rotate(var(--swing-angle));
+	}
+	65% {
+		transform: rotate(calc(var(--swing-angle) * -0.75));
+	}
+	85% {
+		transform: rotate(7deg);
+	}
+}
+
+#library-icon {
+	height: 3rem;
+	--jump-duration: 0.5s;
+	--jump-timing: cubic-bezier(1, 0, 0.75, 1);
+	--jump-delay: 0.1s;
+}
+
+#library-icon:hover :deep(.item1) {
+	animation: jump var(--jump-duration) var(--jump-timing);
+}
+
+#library-icon:hover :deep(.item2) {
+	animation: jump var(--jump-duration) var(--jump-timing) var(--jump-delay);
+}
+
+#library-icon:hover :deep(.item3) {
+	animation: jump var(--jump-duration) var(--jump-timing) calc(var(--jump-delay) * 2);
+}
+
+#library-icon:hover :deep(.item4) {
+	transform-origin: 20px 20px;
+	animation: lean 0.65s cubic-bezier(0.2, 0.5, 0.7, 0.3) calc(var(--jump-delay) * 2.7);
+}
+
+@keyframes jump {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-30%);
+	}
+}
+
+@keyframes lean {
+	0%,
+	100% {
+		transform: rotate(0deg);
+	}
+	25%,
+	70% {
+		transform: rotate(14deg);
+	}
+	50% {
+		transform: rotate(16deg);
+	}
 }
 
 @media (prefers-reduced-motion: no-preference) {
