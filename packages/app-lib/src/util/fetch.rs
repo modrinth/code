@@ -189,7 +189,6 @@ pub async fn fetch_advanced(
                     if let Some(sha1) = sha1 {
                         let hash = sha1_async(bytes.clone()).await?;
                         if &*hash != sha1 {
-                            dbg!(&bytes);
                             if attempt <= FETCH_ATTEMPTS {
                                 continue;
                             } else {
