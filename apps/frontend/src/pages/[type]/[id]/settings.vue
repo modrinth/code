@@ -104,7 +104,7 @@ const navItems = computed(() => {
 			chevron: true,
 		},
 		{
-			link: `/${base}/versions`,
+			link: `/${base}/settings/versions`,
 			label: formatMessage(commonProjectSettingsMessages.versions),
 			icon: VersionIcon,
 			chevron: true,
