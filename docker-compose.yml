@@ -6,7 +6,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - '127.0.0.1:5432:5432'
     environment:
       POSTGRES_USER: labrinth
       POSTGRES_PASSWORD: labrinth
@@ -21,7 +21,7 @@ services:
     container_name: labrinth-meilisearch
     restart: on-failure
     ports:
-      - '7700:7700'
+      - '127.0.0.1:7700:7700'
     volumes:
       - meilisearch-data:/data.ms
     environment:
@@ -37,7 +37,7 @@ services:
     container_name: labrinth-redis
     restart: on-failure
     ports:
-      - '6379:6379'
+      - '127.0.0.1:6379:6379'
     volumes:
       - redis-data:/data
     healthcheck:
@@ -49,7 +49,7 @@ services:
     image: clickhouse/clickhouse-server
     container_name: labrinth-clickhouse
     ports:
-      - '8123:8123'
+      - '127.0.0.1:8123:8123'
     environment:
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: default
@@ -62,8 +62,8 @@ services:
     image: axllent/mailpit:v1.27
     container_name: labrinth-mail
     ports:
-      - '1025:1025'
-      - '8025:8025'
+      - '127.0.0.1:1025:1025'
+      - '127.0.0.1:8025:8025'
     environment:
       MP_ENABLE_SPAMASSASSIN: postmark
     healthcheck:
@@ -82,7 +82,7 @@ services:
     image: gotenberg/gotenberg:8
     container_name: labrinth-gotenberg
     ports:
-      - '13000:3000'
+      - '127.0.0.1:13000:3000'
     extra_hosts:
       # Gotenberg must send a message on a webhook to our backend,
       # so it must have access to our local network
@@ -95,7 +95,7 @@ services:
       dockerfile: ./apps/labrinth/Dockerfile
     container_name: labrinth
     ports:
-      - '8000:8000'
+      - '127.0.0.1:8000:8000'
     env_file: ./apps/labrinth/.env.docker-compose
     volumes:
       - labrinth-cdn-data:/tmp/modrinth
