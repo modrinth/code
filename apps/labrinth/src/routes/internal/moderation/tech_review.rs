@@ -12,7 +12,7 @@ use crate::{
     database::{
         DBProject,
         models::{
-            DBProjectId, DBThread, DBThreadId, DelphiReportId,
+            DBProjectId, DBThread, DBThreadId, DBUser, DelphiReportId,
             DelphiReportIssueId, ProjectTypeId,
             delphi_report_item::{
                 DelphiReportIssueStatus, DelphiSeverity, ReportIssueDetail,
@@ -24,6 +24,7 @@ use crate::{
         ids::{FileId, ProjectId, ThreadId, VersionId},
         pats::Scopes,
         projects::Project,
+        threads::Thread,
     },
     queue::session::AuthQueue,
     routes::{ApiError, internal::moderation::Ownership},
@@ -275,7 +276,7 @@ pub struct SearchResponse {
     /// Fetched project information for projects in the returned reports.
     pub projects: HashMap<ProjectId, ProjectModerationInfo>,
     /// Fetched moderation threads for projects in the returned reports.
-    pub threads: HashMap<ThreadId, DBThread>,
+    pub threads: HashMap<ThreadId, Thread>,
     /// Fetched owner information for projects.
     pub ownership: HashMap<ProjectId, Ownership>,
 }
@@ -285,6 +286,8 @@ pub struct SearchResponse {
 pub struct ProjectModerationInfo {
     /// Projecet ID.
     pub id: ProjectId,
+    /// Project moderation thread ID.
+    pub thread_id: ThreadId,
     /// Project name.
     pub name: String,
     /// The aggregated project typos of the versions of this project
@@ -306,7 +309,7 @@ async fn search_projects(
     session_queue: web::Data<AuthQueue>,
     search_req: web::Json<SearchProjects>,
 ) -> Result<web::Json<SearchResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    let user = check_is_moderator_from_headers(
         &req,
         &**pool,
         &redis,
@@ -427,11 +430,26 @@ async fn search_projects(
             (ProjectId::from(project.inner.id), Project::from(project))
         })
         .collect::<HashMap<_, _>>();
-    let threads = DBThread::get_many(&thread_ids, &**pool)
+    let db_threads = DBThread::get_many(&thread_ids, &**pool)
         .await
-        .wrap_internal_err("failed to fetch threads")?
+        .wrap_internal_err("failed to fetch threads")?;
+    let thread_author_ids = db_threads
+        .iter()
+        .flat_map(|thread| thread.members.clone())
+        .collect::<Vec<_>>();
+    let thread_authors =
+        DBUser::get_many_ids(&thread_author_ids, &**pool, &redis)
+            .await
+            .wrap_internal_err("failed to fetch thread authors")?
+            .into_iter()
+            .map(From::from)
+            .collect::<Vec<_>>();
+    let threads = db_threads
         .into_iter()
-        .map(|thread| (ThreadId::from(thread.id), thread))
+        .map(|thread| {
+            let thread = Thread::from(thread, thread_authors.clone(), &user);
+            (thread.id, thread)
+        })
         .collect::<HashMap<_, _>>();
 
     let project_list: Vec<Project> = projects.values().cloned().collect();
@@ -454,6 +472,7 @@ async fn search_projects(
                     id,
                     ProjectModerationInfo {
                         id,
+                        thread_id: project.thread_id,
                         name: project.name,
                         project_types: project.project_types,
                         icon_url: project.icon_url,
