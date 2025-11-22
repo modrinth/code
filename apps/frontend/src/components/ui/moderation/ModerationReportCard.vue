@@ -117,7 +117,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="border-1 bg-surface-2 rounded-b-3xl border-solid border-bg-raised p-4 pt-2">
+		<div class="border-1 rounded-b-3xl border-solid border-bg-raised bg-surface-2 p-4 pt-2">
 			<ThreadView
 				v-if="report.thread"
 				ref="reportThread"

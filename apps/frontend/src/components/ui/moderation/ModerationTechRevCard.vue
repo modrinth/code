@@ -4,13 +4,11 @@ import {
 	CheckIcon,
 	ChevronDownIcon,
 	ClipboardCopyIcon,
+	CodeIcon,
 	CopyIcon,
-	DownloadIcon,
 	EllipsisVerticalIcon,
 	LinkIcon,
 	LoaderCircleIcon,
-	ShieldCheckIcon,
-	TriangleAlertIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
@@ -21,7 +19,12 @@ import {
 	OverflowMenu,
 	type OverflowMenuOption,
 } from '@modrinth/ui'
-import { capitalizeString, formatProjectType, highlightCodeLines, type Thread } from '@modrinth/utils'
+import {
+	capitalizeString,
+	formatProjectType,
+	highlightCodeLines,
+	type Thread,
+} from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
@@ -43,34 +46,52 @@ const emit = defineEmits<{
 	loadSource: [issueId: string]
 }>()
 
-const quickActions: OverflowMenuOption[] = [
-	{
-		id: 'copy-link',
-		action: () => {
-			const base = window.location.origin
-			const reportUrl = `${base}/moderation/technical-review/${props.item.project.id}`
-			navigator.clipboard.writeText(reportUrl).then(() => {
-				addNotification({
-					type: 'success',
-					title: 'Technical Report link copied',
-					text: 'The link to this report has been copied to your clipboard.',
+const quickActions = computed<OverflowMenuOption[]>(() => {
+	const actions: OverflowMenuOption[] = []
+
+	// Add view source if URL exists
+	const sourceUrl = props.item.project.link_urls?.['source']?.url
+	if (sourceUrl) {
+		actions.push({
+			id: 'view-source',
+			action: () => {
+				window.open(sourceUrl, '_blank', 'noopener,noreferrer')
+			},
+		})
+	}
+
+	// Always add these actions
+	actions.push(
+		{
+			id: 'copy-link',
+			action: () => {
+				const base = window.location.origin
+				const reportUrl = `${base}/moderation/technical-review/${props.item.project.id}`
+				navigator.clipboard.writeText(reportUrl).then(() => {
+					addNotification({
+						type: 'success',
+						title: 'Technical Report link copied',
+						text: 'The link to this report has been copied to your clipboard.',
+					})
 				})
-			})
+			},
 		},
-	},
-	{
-		id: 'copy-id',
-		action: () => {
-			navigator.clipboard.writeText(props.item.project.id).then(() => {
-				addNotification({
-					type: 'success',
-					title: 'Technical Report ID copied',
-					text: 'The ID of this report has been copied to your clipboard.',
+		{
+			id: 'copy-id',
+			action: () => {
+				navigator.clipboard.writeText(props.item.project.id).then(() => {
+					addNotification({
+						type: 'success',
+						title: 'Technical Report ID copied',
+						text: 'The ID of this report has been copied to your clipboard.',
+					})
 				})
-			})
+			},
 		},
-	},
-]
+	)
+
+	return actions
+})
 
 type Tab = 'Thread' | 'Files'
 const tabs: readonly Tab[] = ['Thread', 'Files']
@@ -91,19 +112,32 @@ const highestSeverity = computed(() => {
 		.flatMap((i) => i.details)
 		.map((d) => d.severity)
 
-	const order = { SEVERE: 3, HIGH: 2, MEDIUM: 1, LOW: 0 } as Record<string, number>
-	return severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] || 'LOW'
+	const order = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
+	return severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] || 'low'
 })
+
+function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeverity): string {
+	switch (severity) {
+		case 'severe':
+			return 'border-red/60 border bg-highlight-red text-red'
+		case 'high':
+		case 'medium':
+			return 'border-orange/60 border bg-highlight-orange text-orange'
+		case 'low':
+		default:
+			return 'border-green/60 border bg-highlight-green text-green'
+	}
+}
 
 const severityColor = computed(() => {
 	switch (highestSeverity.value) {
-		case 'SEVERE':
+		case 'severe':
 			return 'text-red bg-highlight-red border-solid border-[1px] border-red'
-		case 'HIGH':
+		case 'high':
 			return 'text-orange bg-highlight-orange border-solid border-[1px] border-orange'
-		case 'MEDIUM':
+		case 'medium':
 			return 'text-blue bg-highlight-blue border-solid border-[1px] border-blue'
-		case 'LOW':
+		case 'low':
 		default:
 			return 'text-green bg-highlight-green border-solid border-[1px] border-green'
 	}
@@ -216,7 +250,13 @@ function handleThreadUpdate() {
 
 					<div class="flex flex-col gap-1.5">
 						<div class="flex items-center gap-2">
-							<span class="text-lg font-semibold text-contrast">{{ item.project.name }}</span>
+							<NuxtLink
+								:to="`/${item.project.project_types[0]}/${item.project.slug ?? item.project.id}`"
+								target="_blank"
+								class="text-lg font-semibold text-contrast hover:underline"
+							>
+								{{ item.project.name }}
+							</NuxtLink>
 
 							<div
 								class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
@@ -254,7 +294,13 @@ function handleThreadUpdate() {
 								size="1.5rem"
 								circle
 							/>
-							<span class="text-sm font-medium text-secondary">{{ item.project_owner.name }}</span>
+							<NuxtLink
+								:to="`/${item.project_owner.kind}/${item.project_owner.id}`"
+								target="_blank"
+								class="text-sm font-medium text-secondary hover:underline"
+							>
+								{{ item.project_owner.name }}
+							</NuxtLink>
 						</div>
 					</div>
 				</div>
@@ -262,16 +308,8 @@ function handleThreadUpdate() {
 				<div class="flex items-center gap-3">
 					<span class="text-base text-secondary">{{ formattedDate }}</span>
 					<div class="flex items-center gap-2">
-						<ButtonStyled color="green">
-							<button><ShieldCheckIcon /> Safe</button>
-						</ButtonStyled>
-
-						<ButtonStyled color="red">
-							<button><TriangleAlertIcon /> Malware</button>
-						</ButtonStyled>
-
-						<ButtonStyled circular>
-							<OverflowMenu :options="quickActions">
+						<ButtonStyled circular type="outlined">
+							<OverflowMenu :options="quickActions" class="!border-px !border-surface-4">
 								<template #default>
 									<EllipsisVerticalIcon class="size-4" />
 								</template>
@@ -282,6 +320,10 @@ function handleThreadUpdate() {
 								<template #copy-link>
 									<LinkIcon />
 									<span class="hidden sm:inline">Copy link</span>
+								</template>
+								<template #view-source>
+									<CodeIcon />
+									<span class="hidden sm:inline">View source</span>
 								</template>
 							</OverflowMenu>
 						</ButtonStyled>
@@ -322,10 +364,7 @@ function handleThreadUpdate() {
 
 		<div class="border-t border-surface-3 bg-surface-2">
 			<div v-if="currentTab === 'Thread'" class="p-4">
-				<ThreadView
-					:thread="item.thread as Thread"
-					@update-thread="handleThreadUpdate"
-				/>
+				<ThreadView :thread="item.thread as Thread" @update-thread="handleThreadUpdate" />
 			</div>
 
 			<div v-else-if="currentTab === 'Files' && !selectedFile" class="flex flex-col">
@@ -371,9 +410,17 @@ function handleThreadUpdate() {
 							<button @click="viewFileFlags(file)">Flags</button>
 						</ButtonStyled>
 
-						<ButtonStyled outline>
-							<button><DownloadIcon /> Download</button>
-						</ButtonStyled>
+						<!-- TODO: Impl when backend supports it -->
+						<!-- <ButtonStyled type="outlined">
+							<a
+								:href="`https://api.modrinth.com/v2/version_file/${file.file_id}/download`"
+								:title="`Download ${file.file_name}`"
+								class="!border-px !border-surface-4"
+								tabindex="0"
+							>
+								<DownloadIcon /> Download
+							</a>
+						</ButtonStyled> -->
 					</div>
 				</div>
 			</div>
@@ -391,7 +438,10 @@ function handleThreadUpdate() {
 					>
 						<div class="my-auto flex items-center gap-2">
 							<ButtonStyled type="transparent" circular>
-								<button class="transition-transform" :class="{ 'rotate-180': expandedIssues.has(issue.id) }">
+								<button
+									class="transition-transform"
+									:class="{ 'rotate-180': expandedIssues.has(issue.id) }"
+								>
 									<ChevronDownIcon class="h-5 w-5 text-contrast" />
 								</button>
 							</ButtonStyled>
@@ -403,18 +453,10 @@ function handleThreadUpdate() {
 							<div
 								v-if="issue.details.length > 0"
 								class="rounded-full px-2.5 py-1"
-								:class="{
-									'border-red/60 border bg-highlight-red text-red':
-										issue.details[0].severity === 'SEVERE',
-									'border-orange/60 border bg-highlight-orange text-orange':
-										issue.details[0].severity === 'HIGH' || issue.details[0].severity === 'MEDIUM',
-									'border-green/60 border bg-highlight-green text-green':
-										issue.details[0].severity === 'LOW',
-								}"
+								:class="getSeverityBadgeColor(issue.details[0].severity)"
 							>
 								<span class="text-sm font-medium">{{
-									issue.details[0].severity.charAt(0) +
-									issue.details[0].severity.slice(1).toLowerCase()
+									capitalizeString(issue.details[0].severity)
 								}}</span>
 							</div>
 
@@ -424,8 +466,9 @@ function handleThreadUpdate() {
 									class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
 								>
 									<span class="text-sm font-medium text-secondary">
-										<LoaderCircleIcon class="animate-spin size-5" />
-										  Loading source...</span>
+										<LoaderCircleIcon class="size-5 animate-spin" />
+										Loading source...</span
+									>
 								</div>
 							</Transition>
 						</div>

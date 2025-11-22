@@ -55,9 +55,7 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 	 * console.log(report.file_name, report.issues.length)
 	 * ```
 	 */
-	public async getReport(
-		reportId: string,
-	): Promise<Labrinth.TechReview.Internal.FileReport> {
+	public async getReport(reportId: string): Promise<Labrinth.TechReview.Internal.FileReport> {
 		return this.client.request<Labrinth.TechReview.Internal.FileReport>(
 			`/moderation/tech-review/report/${reportId}`,
 			{
@@ -80,9 +78,7 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 	 * console.log(issue.issue_type, issue.status)
 	 * ```
 	 */
-	public async getIssue(
-		issueId: string,
-	): Promise<Labrinth.TechReview.Internal.FileIssue> {
+	public async getIssue(issueId: string): Promise<Labrinth.TechReview.Internal.FileIssue> {
 		return this.client.request<Labrinth.TechReview.Internal.FileIssue>(
 			`/moderation/tech-review/issue/${issueId}`,
 			{
