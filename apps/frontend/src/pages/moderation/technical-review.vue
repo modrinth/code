@@ -3,26 +3,22 @@ import type { Labrinth } from '@modrinth/api-client'
 import {
 	FilterIcon,
 	SearchIcon,
-	ShieldAlertIcon,
 	SortAscIcon,
 	SortDescIcon,
-	XIcon,
+	XIcon
 } from '@modrinth/assets'
 import {
 	Button,
-	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
 	injectModrinthClient,
-	Pagination,
+	Pagination
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
-// TEMPORARY: Mock data for development
-// import { generateMockSearchResponse } from '~/utils/mockTechReviewData'
 
 const client = injectModrinthClient()
 
@@ -392,15 +388,6 @@ const {
 	}
 })
 
-// TEMPORARY: Mock data for development (58 items to match batch scan progress)
-// const searchResponse = ref<Labrinth.TechReview.Internal.SearchResponse>(
-// 	generateMockSearchResponse(58),
-// )
-// const isLoading = ref(false)
-// const refetch = () => {
-// 	searchResponse.value = generateMockSearchResponse(58)
-// }
-
 const reviewItems = computed(() => {
 	if (!searchResponse.value || searchResponse.value.reports.length === 0) {
 		return []
@@ -414,7 +401,7 @@ const reviewItems = computed(() => {
 		{
 			project: Labrinth.Projects.v3.Project
 			project_owner: Labrinth.TechReview.Internal.Ownership
-			thread: Labrinth.TechReview.Internal.DBThread
+			thread: Labrinth.TechReview.Internal.Thread
 			reports: Labrinth.TechReview.Internal.FileReport[]
 		}
 	>()
@@ -450,6 +437,7 @@ watch(currentSortType, () => {
 	refetch()
 })
 
+// TODO: Reimpl when backend is available
 // const batchScanProgressInformation = computed<BatchScanProgress | undefined>(() => {
 // 	return {
 // 		total: 58,
@@ -460,17 +448,18 @@ watch(currentSortType, () => {
 
 <template>
 	<div class="flex flex-col gap-6">
+		<!-- TODO: Reimpl when backend is available -->
 		<!-- <BatchScanProgressAlert
 			v-if="batchScanProgressInformation"
 			:progress="batchScanProgressInformation"
 		/> -->
 
 		<div class="flex flex-col justify-between gap-2 lg:flex-row">
-			<div class="iconified-input flex-1 lg:max-w-md">
+			<div class="iconified-input flex-1 lg:max-w-md ">
 				<SearchIcon aria-hidden="true" class="text-lg" />
 				<input
 					v-model="query"
-					class="h-4"
+					class="!h-10"
 					autocomplete="off"
 					spellcheck="false"
 					type="text"
@@ -519,9 +508,9 @@ watch(currentSortType, () => {
 					</template>
 				</Combobox>
 
-				<ButtonStyled color="orange">
-					<button><ShieldAlertIcon /> Batch scan</button>
-				</ButtonStyled>
+				<!-- <ButtonStyled color="orange">
+					<button class="!h-10"><ShieldAlertIcon /> Batch scan</button>
+				</ButtonStyled> -->
 			</div>
 		</div>
 
