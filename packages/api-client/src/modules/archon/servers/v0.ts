@@ -54,4 +54,16 @@ export class ArchonServersV0Module extends AbstractModule {
 			method: 'GET',
 		})
 	}
+
+	/**
+	 * Get WebSocket authentication credentials for a server
+	 * GET /modrinth/v0/servers/:id/ws
+	 */
+	public async getWebSocketAuth(serverId: string): Promise<Archon.Websocket.v0.WSAuth> {
+		return this.client.request<Archon.Websocket.v0.WSAuth>(`/servers/${serverId}/ws`, {
+			api: 'archon',
+			version: 'modrinth/v0',
+			method: 'GET',
+		})
+	}
 }

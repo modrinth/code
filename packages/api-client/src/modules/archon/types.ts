@@ -125,4 +125,100 @@ export namespace Archon {
 			}
 		}
 	}
+
+	export namespace Websocket {
+		export namespace v0 {
+			export type WSAuth = {
+				url: string
+				token: string
+			}
+
+			export type BackupState = 'ongoing' | 'done' | 'failed' | 'cancelled' | 'unchanged'
+			export type BackupTask = 'create' | 'restore'
+
+			export type WSBackupProgressEvent = {
+				event: 'backup-progress'
+				id: string
+				task: BackupTask
+				state: BackupState
+				progress: number
+			}
+
+			export type WSLogEvent = {
+				event: 'log'
+				stream: 'stdout' | 'stderr'
+				message: string
+			}
+
+			export type WSStatsEvent = {
+				event: 'stats'
+				cpu_used: number
+				memory_used: number
+				memory_total: number
+				swap_used: number
+				swap_total: number
+				disk_used: number
+				disk_total: number
+				uptime: number
+			}
+
+			export type PowerState = 'running' | 'stopped' | 'starting' | 'stopping' | 'crashed'
+
+			export type WSPowerStateEvent = {
+				event: 'power-state'
+				state: PowerState
+			}
+
+			export type WSAuthExpiringEvent = {
+				event: 'auth-expiring'
+			}
+
+			export type WSAuthIncorrectEvent = {
+				event: 'auth-incorrect'
+			}
+
+			export type WSAuthOkEvent = {
+				event: 'auth-ok'
+			}
+
+			export type WSInstallationResultEvent = {
+				event: 'installation-result'
+				success: boolean
+			}
+
+			export type WSUptimeEvent = {
+				event: 'uptime'
+				uptime: number
+			}
+
+			export type WSNewModEvent = {
+				event: 'new-mod'
+				project_id: string
+				version_id: string
+			}
+
+			export type FilesystemOp = 'unarchive'
+
+			export type WSFilesystemOpsEvent = {
+				event: 'filesystem-ops'
+				op: FilesystemOp
+				progress: number
+			}
+
+			export type WSEvent =
+				| WSBackupProgressEvent
+				| WSLogEvent
+				| WSStatsEvent
+				| WSPowerStateEvent
+				| WSAuthExpiringEvent
+				| WSAuthIncorrectEvent
+				| WSAuthOkEvent
+				| WSInstallationResultEvent
+				| WSUptimeEvent
+				| WSNewModEvent
+				| WSFilesystemOpsEvent
+
+			export type WSEventType = WSEvent['event']
+		}
+	}
 }
