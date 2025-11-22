@@ -26,10 +26,7 @@
 		<template v-if="reportClosed">
 			<p class="text-secondary">This thread is closed and new messages cannot be sent to it.</p>
 			<ButtonStyled v-if="isStaff(auth.user)" color="green" class="mt-2">
-				<button
-					class="w-full gap-2 sm:w-auto"
-					@click="reopenReport()"
-				>
+				<button class="w-full gap-2 sm:w-auto" @click="reopenReport()">
 					<CheckCircleIcon class="size-4" />
 					Reopen Thread
 				</button>
@@ -50,31 +47,19 @@
 			>
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
 					<ButtonStyled v-if="sortedMessages.length > 0" color="brand">
-						<button
-							:disabled="!replyBody"
-							class="w-full gap-2 sm:w-auto"
-							@click="sendReply()"
-						>
+						<button :disabled="!replyBody" class="w-full gap-2 sm:w-auto" @click="sendReply()">
 							<ReplyIcon class="size-4" />
 							Reply
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-else color="brand">
-						<button
-							:disabled="!replyBody"
-							class="w-full gap-2 sm:w-auto"
-							@click="sendReply()"
-						>
+						<button :disabled="!replyBody" class="w-full gap-2 sm:w-auto" @click="sendReply()">
 							<SendIcon class="size-4" />
 							Send
 						</button>
 					</ButtonStyled>
 					<ButtonStyled v-if="isStaff(auth.user)">
-						<button
-							:disabled="!replyBody"
-							class="w-full sm:w-auto"
-							@click="sendReply(true)"
-						>
+						<button :disabled="!replyBody" class="w-full sm:w-auto" @click="sendReply(true)">
 							Add note
 						</button>
 					</ButtonStyled>
@@ -89,19 +74,13 @@
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
 					<template v-if="isStaff(auth.user)">
 						<ButtonStyled v-if="replyBody" color="red">
-							<button
-								class="w-full gap-2 sm:w-auto"
-								@click="closeReport(true)"
-							>
+							<button class="w-full gap-2 sm:w-auto" @click="closeReport(true)">
 								<CheckCircleIcon class="size-4" />
 								Reply and close
 							</button>
 						</ButtonStyled>
 						<ButtonStyled v-else color="red">
-							<button
-								class="w-full gap-2 sm:w-auto"
-								@click="closeReport()"
-							>
+							<button class="w-full gap-2 sm:w-auto" @click="closeReport()">
 								<CheckCircleIcon class="size-4" />
 								Close report
 							</button>
@@ -175,7 +154,9 @@ async function handleQuickReply(reply: ReportQuickReply) {
 	if (!props.report) return
 
 	const message =
-		typeof reply.message === 'function' ? await reply.message(props.report as ExtendedReport) : reply.message
+		typeof reply.message === 'function'
+			? await reply.message(props.report as ExtendedReport)
+			: reply.message
 
 	await nextTick()
 	setReplyContent(message)

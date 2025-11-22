@@ -599,7 +599,7 @@ export namespace Labrinth {
 
 			export type FlagReason = 'delphi'
 
-			export type DelphiSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'SEVERE'
+			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
 
 			export type DelphiReportIssueStatus = 'pending' | 'safe' | 'unsafe'
 		}

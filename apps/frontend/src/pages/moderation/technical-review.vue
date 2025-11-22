@@ -1,18 +1,12 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	FilterIcon,
-	SearchIcon,
-	SortAscIcon,
-	SortDescIcon,
-	XIcon
-} from '@modrinth/assets'
+import { FilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
 	Combobox,
 	type ComboboxOption,
 	injectModrinthClient,
-	Pagination
+	Pagination,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { defineMessages, useVIntl } from '@vintl/vintl'
@@ -282,8 +276,8 @@ function getHighestSeverity(review: {
 		.flatMap((i) => i.details)
 		.map((d) => d.severity)
 
-	const order = { SEVERE: 3, HIGH: 2, MEDIUM: 1, LOW: 0 } as Record<string, number>
-	return severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] || 'LOW'
+	const order = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
+	return severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] || 'low'
 }
 
 function hasPendingIssues(review: { reports: Labrinth.TechReview.Internal.FileReport[] }): boolean {
@@ -314,14 +308,14 @@ const filteredItems = computed(() => {
 			break
 		}
 		case 'Severity ↑': {
-			const order = { LOW: 0, MEDIUM: 1, HIGH: 2, SEVERE: 3 } as Record<string, number>
+			const order = { low: 0, medium: 1, high: 2, severe: 3 } as Record<string, number>
 			filtered.sort(
 				(a, b) => (order[getHighestSeverity(a)] ?? 0) - (order[getHighestSeverity(b)] ?? 0),
 			)
 			break
 		}
 		case 'Severity ↓': {
-			const order = { LOW: 0, MEDIUM: 1, HIGH: 2, SEVERE: 3 } as Record<string, number>
+			const order = { low: 0, medium: 1, high: 2, severe: 3 } as Record<string, number>
 			filtered.sort(
 				(a, b) => (order[getHighestSeverity(b)] ?? 0) - (order[getHighestSeverity(a)] ?? 0),
 			)
@@ -337,9 +331,15 @@ const filteredIssuesCount = computed(() => {
 		if (currentFilterType.value === 'All issues') {
 			return total + review.reports.reduce((sum, report) => sum + report.issues.length, 0)
 		} else {
-			return total + review.reports.reduce((sum, report) => {
-				return sum + report.issues.filter((issue) => issue.issue_type === currentFilterType.value).length
-			}, 0)
+			return (
+				total +
+				review.reports.reduce((sum, report) => {
+					return (
+						sum +
+						report.issues.filter((issue) => issue.issue_type === currentFilterType.value).length
+					)
+				}, 0)
+			)
 		}
 	}, 0)
 })
@@ -385,7 +385,7 @@ const {
 			page: 0,
 			sort_by: toApiSort(currentSortType.value),
 		})
-	}
+	},
 })
 
 const reviewItems = computed(() => {
@@ -455,7 +455,7 @@ watch(currentSortType, () => {
 		/> -->
 
 		<div class="flex flex-col justify-between gap-2 lg:flex-row">
-			<div class="iconified-input flex-1 lg:max-w-md ">
+			<div class="iconified-input flex-1 lg:max-w-md">
 				<SearchIcon aria-hidden="true" class="text-lg" />
 				<input
 					v-model="query"
