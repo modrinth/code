@@ -18,12 +18,16 @@
 				@update-thread="() => updateThreadLocal()"
 			/>
 		</div>
+		<div v-else class="flex flex-col items-center justify-center space-y-3 py-12">
+			<MessageIcon class="size-12 text-secondary" />
+			<p class="text-lg text-secondary">No messages yet</p>
+		</div>
 
 		<template v-if="reportClosed">
 			<p class="text-secondary">This thread is closed and new messages cannot be sent to it.</p>
-			<ButtonStyled v-if="isStaff(auth.user)" color="green" class="mt-2 w-full sm:w-auto">
+			<ButtonStyled v-if="isStaff(auth.user)" color="green" class="mt-2">
 				<button
-					class="flex w-full items-center justify-center gap-2 sm:w-auto"
+					class="w-full gap-2 sm:w-auto"
 					@click="reopenReport()"
 				>
 					<CheckCircleIcon class="size-4" />
@@ -33,7 +37,7 @@
 		</template>
 
 		<template v-else>
-			<div class="mt-4">
+			<div>
 				<MarkdownEditor
 					v-model="replyBody"
 					:placeholder="sortedMessages.length > 0 ? 'Reply to thread...' : 'Send a message...'"
@@ -45,30 +49,30 @@
 				class="mt-4 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center sm:gap-2"
 			>
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-					<ButtonStyled v-if="sortedMessages.length > 0" color="brand" class="w-full sm:w-auto">
+					<ButtonStyled v-if="sortedMessages.length > 0" color="brand">
 						<button
 							:disabled="!replyBody"
-							class="flex w-full items-center justify-center gap-2 sm:w-auto"
+							class="w-full gap-2 sm:w-auto"
 							@click="sendReply()"
 						>
 							<ReplyIcon class="size-4" />
 							Reply
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-else color="brand" class="w-full sm:w-auto">
+					<ButtonStyled v-else color="brand">
 						<button
 							:disabled="!replyBody"
-							class="flex w-full items-center justify-center gap-2 sm:w-auto"
+							class="w-full gap-2 sm:w-auto"
 							@click="sendReply()"
 						>
 							<SendIcon class="size-4" />
 							Send
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-if="isStaff(auth.user)" class="w-full sm:w-auto">
+					<ButtonStyled v-if="isStaff(auth.user)">
 						<button
 							:disabled="!replyBody"
-							class="flex w-full items-center justify-center gap-2 sm:w-auto"
+							class="w-full sm:w-auto"
 							@click="sendReply(true)"
 						>
 							Add note
@@ -84,18 +88,18 @@
 
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
 					<template v-if="isStaff(auth.user)">
-						<ButtonStyled v-if="replyBody" color="red" class="w-full sm:w-auto">
+						<ButtonStyled v-if="replyBody" color="red">
 							<button
-								class="flex w-full items-center justify-center gap-2 sm:w-auto"
+								class="w-full gap-2 sm:w-auto"
 								@click="closeReport(true)"
 							>
 								<CheckCircleIcon class="size-4" />
 								Reply and close
 							</button>
 						</ButtonStyled>
-						<ButtonStyled v-else color="red" class="w-full sm:w-auto">
+						<ButtonStyled v-else color="red">
 							<button
-								class="flex w-full items-center justify-center gap-2 sm:w-auto"
+								class="w-full gap-2 sm:w-auto"
 								@click="closeReport()"
 							>
 								<CheckCircleIcon class="size-4" />
@@ -110,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-import { CheckCircleIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
+import { CheckCircleIcon, MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
 import {
 	type ExtendedReport,
 	reportQuickReplies,
@@ -136,11 +140,13 @@ import ThreadMessage from './ThreadMessage.vue'
 const { addNotification } = injectNotificationManager()
 
 const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
+	if (!props.report) return []
+
 	return reportQuickReplies
 		.filter((reply) => {
 			if (reply.shouldShow === undefined) return true
 			if (typeof reply.shouldShow === 'function') {
-				return reply.shouldShow(props.report)
+				return reply.shouldShow(props.report! as ExtendedReport)
 			}
 
 			return reply.shouldShow
@@ -156,13 +162,20 @@ const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
 
 const props = defineProps<{
 	thread: Thread
-	reporter: User
-	report: ExtendedReport
+	reporter?: User
+	report?: Partial<ExtendedReport> & {
+		id?: string
+		thread_id?: string
+		closed?: boolean
+		created?: string
+	}
 }>()
 
 async function handleQuickReply(reply: ReportQuickReply) {
+	if (!props.report) return
+
 	const message =
-		typeof reply.message === 'function' ? await reply.message(props.report) : reply.message
+		typeof reply.message === 'function' ? await reply.message(props.report as ExtendedReport) : reply.message
 
 	await nextTick()
 	setReplyContent(message)
@@ -181,8 +194,9 @@ const emit = defineEmits<{
 const flags = useFeatureFlags()
 
 const members = computed(() => {
-	const membersMap: Record<string, User> = {
-		[props.reporter.id]: props.reporter,
+	const membersMap: Record<string, User> = {}
+	if (props.reporter) {
+		membersMap[props.reporter.id] = props.reporter
 	}
 	for (const member of props.thread.members) {
 		membersMap[member.id] = member
@@ -196,21 +210,25 @@ function setReplyContent(content: string) {
 }
 
 const sortedMessages = computed(() => {
-	const messages: TypeThreadMessage[] = [
-		{
+	const messages: TypeThreadMessage[] = []
+
+	// Add synthetic first message for reports
+	if (props.report?.created && props.reporter) {
+		messages.push({
 			id: null,
 			author_id: props.reporter.id,
 			body: {
 				type: 'text',
-				body: props.report.body || 'Report opened.',
+				body: props.report.body || 'Thread opened.',
 				private: false,
 				replying_to: null,
 				associated_images: [],
 			},
 			created: props.report.created,
 			hide_identity: false,
-		},
-	]
+		})
+	}
+
 	if (props.thread) {
 		messages.push(
 			...[...props.thread.messages].sort(
@@ -223,7 +241,7 @@ const sortedMessages = computed(() => {
 })
 
 async function updateThreadLocal() {
-	const threadId = props.report.thread_id
+	const threadId = props.report?.thread_id || props.thread.id
 	if (threadId) {
 		try {
 			const thread = (await useBaseFetch(`thread/${threadId}`)) as Thread
@@ -284,6 +302,8 @@ const reportClosed = computed(() => {
 })
 
 async function closeReport(reply = false) {
+	if (!props.report?.id) return
+
 	if (reply) {
 		await sendReply()
 	}
@@ -307,6 +327,8 @@ async function closeReport(reply = false) {
 }
 
 async function reopenReport() {
+	if (!props.report?.id) return
+
 	try {
 		await useBaseFetch(`report/${props.report.id}`, {
 			method: 'PATCH',

@@ -21,14 +21,16 @@ import {
 	OverflowMenu,
 	type OverflowMenuOption,
 } from '@modrinth/ui'
-import { capitalizeString, formatProjectType, highlightCodeLines } from '@modrinth/utils'
+import { capitalizeString, formatProjectType, highlightCodeLines, type Thread } from '@modrinth/utils'
 import { computed, ref } from 'vue'
+
+import ThreadView from '~/components/ui/thread/ThreadView.vue'
 
 const props = defineProps<{
 	item: {
 		project: Labrinth.Projects.v3.Project
 		project_owner: Labrinth.TechReview.Internal.Ownership
-		thread: Labrinth.TechReview.Internal.DBThread
+		thread: Labrinth.TechReview.Internal.Thread
 		reports: Labrinth.TechReview.Internal.FileReport[]
 	}
 	loadingIssues: Set<string>
@@ -171,6 +173,10 @@ function toggleIssue(issueId: string) {
 	}
 }
 
+function handleThreadUpdate() {
+	emit('refetch')
+}
+
 // function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReport) {
 // 	const counts = {
 // 		SEVERE: 0,
@@ -204,7 +210,7 @@ function toggleIssue(issueId: string) {
 				<div class="flex items-center gap-4">
 					<Avatar
 						:src="item.project.icon_url"
-						class="rounded-2xl border border-surface-5 bg-surface-4"
+						class="rounded-2xl border border-surface-5 bg-surface-4 !shadow-none"
 						size="4rem"
 					/>
 
@@ -244,7 +250,7 @@ function toggleIssue(issueId: string) {
 						<div class="flex items-center gap-1">
 							<Avatar
 								:src="item.project_owner.icon_url"
-								class="rounded-full border border-surface-5 bg-surface-4"
+								class="rounded-full border border-surface-5 bg-surface-4 !shadow-none"
 								size="1.5rem"
 								circle
 							/>
@@ -316,17 +322,10 @@ function toggleIssue(issueId: string) {
 
 		<div class="border-t border-surface-3 bg-surface-2">
 			<div v-if="currentTab === 'Thread'" class="p-4">
-				<div v-if="true" class="flex min-h-[75px] items-center justify-center">
-					<div class="text-center text-secondary">
-						<p class="text-sm">
-							Not yet implemented. See reports in prod for how thread will look (its the same)
-						</p>
-					</div>
-				</div>
-
-				<div v-else class="flex flex-col gap-6">
-					<!-- TODO: Report thread stuff -->
-				</div>
+				<ThreadView
+					:thread="item.thread as Thread"
+					@update-thread="handleThreadUpdate"
+				/>
 			</div>
 
 			<div v-else-if="currentTab === 'Files' && !selectedFile" class="flex flex-col">
@@ -383,11 +382,11 @@ function toggleIssue(issueId: string) {
 				<div
 					v-for="(issue, idx) in selectedFile.issues"
 					:key="issue.id"
-					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
+					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2 transition-colors duration-200 hover:bg-surface-4"
 					:class="{ 'rounded-bl-2xl rounded-br-2xl': idx === selectedFile.issues.length - 1 }"
 				>
 					<div
-						class="flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-surface-3"
+						class="flex cursor-pointer items-center justify-between p-4"
 						@click="toggleIssue(issue.id)"
 					>
 						<div class="my-auto flex items-center gap-2">

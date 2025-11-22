@@ -477,7 +477,7 @@ export namespace Labrinth {
 			export type SearchResponse = {
 				reports: FileReport[]
 				projects: Record<string, Projects.v3.Project>
-				threads: Record<string, DBThread>
+				threads: Record<string, Thread>
 				ownership: Record<string, Ownership>
 			}
 
@@ -569,6 +569,33 @@ export namespace Labrinth {
 				  }
 
 			export type ThreadType = 'report' | 'project' | 'direct_message'
+
+			export type User = {
+				id: string
+				username: string
+				avatar_url: string
+				role: string
+				badges: number
+				created: string
+				bio?: string
+			}
+
+			export type ThreadMessage = {
+				id: string | null
+				author_id: string | null
+				body: MessageBody
+				created: string
+				hide_identity: boolean
+			}
+
+			export type Thread = {
+				id: string
+				type: ThreadType
+				project_id: string | null
+				report_id: string | null
+				messages: ThreadMessage[]
+				members: User[]
+			}
 
 			export type FlagReason = 'delphi'
 

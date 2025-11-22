@@ -117,11 +117,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="border-1 bg-surface-l2 rounded-b-3xl border-solid border-bg-raised p-4">
-			<ReportThread
+		<div class="border-1 bg-surface-2 rounded-b-3xl border-solid border-bg-raised p-4 pt-2">
+			<ThreadView
 				v-if="report.thread"
 				ref="reportThread"
-				class="mb-16 sm:mb-0"
 				:thread="report.thread"
 				:report="report"
 				:reporter="report.reporter_user"
@@ -149,7 +148,7 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import ReportThread from '../thread/ReportThread.vue'
+import ThreadView from '../thread/ThreadView.vue'
 
 const { addNotification } = injectNotificationManager()
 
@@ -157,7 +156,7 @@ const props = defineProps<{
 	report: ExtendedReport
 }>()
 
-const reportThread = ref<InstanceType<typeof ReportThread> | null>(null)
+const reportThread = ref<InstanceType<typeof ThreadView> | null>(null)
 // const collapsibleRegion = ref<InstanceType<typeof CollapsibleRegion> | null>(null)
 
 const formatRelativeTime = useRelativeTime()
