@@ -249,18 +249,10 @@ pub async fn run(
         run_parameters.file_id.0
     );
 
-    // fix for local file paths
-    // TODO: should we fix this upstream in whatever inserts the files row?
-    let url = if file_data.url.starts_with("/") {
-        format!("file://{}", file_data.url)
-    } else {
-        file_data.url
-    };
-
     DELPHI_CLIENT
         .post(dotenvy::var("DELPHI_URL")?)
         .json(&serde_json::json!({
-            "url": url,
+            "url": file_data.url,
             "project_id": ProjectId(file_data.project_id.0 as u64),
             "version_id": VersionId(file_data.version_id.0 as u64),
             "file_id": run_parameters.file_id,
