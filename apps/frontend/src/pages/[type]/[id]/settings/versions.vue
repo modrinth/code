@@ -17,12 +17,21 @@
 
 <script lang="ts" setup>
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
+import type { Project, Version } from '@modrinth/utils'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
+import { provideVersionsContext } from '~/providers/versions'
 
 const modal = ref<InstanceType<typeof CreateProjectVersionModal>>()
-async function openModal() {
-	console.log('opening')
+
+function openModal() {
 	modal.value?.show?.()
 }
+
+const props = defineProps<{
+	project: Project
+	versions: Version[]
+}>()
+
+provideVersionsContext(props)
 </script>
