@@ -113,6 +113,8 @@ pub struct FileReport {
     pub file_name: String,
     /// Size of the flagged file, in bytes.
     pub file_size: i32,
+    /// URL to download the flagged file.
+    pub download_url: String,
     /// What issues appeared in the file.
     pub issues: Vec<FileIssue>,
 }
@@ -239,6 +241,7 @@ async fn get_report(
                 'file_name', f.filename,
                 'file_size', f.size,
                 'flag_reason', 'delphi',
+                'download_url', f.url,
                 'issues', json_array(
                     SELECT
                         to_jsonb(dri)
@@ -352,6 +355,7 @@ async fn search_projects(
                     'file_name', f.filename,
                     'file_size', f.size,
                     'flag_reason', 'delphi',
+                    'download_url', f.url,
                     'issues', json_array(
                         SELECT
                             to_jsonb(dri)
