@@ -6,7 +6,7 @@ use muralpay::{MuralError, MuralPay, TokenFeeRequest};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use tracing::{info, warn};
+use tracing::{info, trace, warn};
 
 use crate::{
     database::models::DBPayoutId,
@@ -399,13 +399,22 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
             break;
         }
 
+        let num_canceled = search_resp
+            .results
+            .iter()
+            .filter(|p| p.status == muralpay::PayoutStatus::Canceled)
+            .count();
+        let num_failed = search_resp
+            .results
+            .iter()
+            .filter(|p| p.status == muralpay::PayoutStatus::Failed)
+            .count();
         info!(
-            "Found {} canceled or failed Mural payouts",
-            search_resp.results.len()
+            "Found {num_canceled} canceled and {num_failed} failed Mural payouts"
         );
 
-        let mut payout_platform_id = Vec::<String>::new();
-        let mut payout_new_status = Vec::<String>::new();
+        let mut payout_platform_ids = Vec::<String>::new();
+        let mut payout_new_statuses = Vec::<String>::new();
 
         for payout_req in search_resp.results {
             let new_payout_status = match payout_req.status {
@@ -419,12 +428,17 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
                     continue;
                 }
             };
+            let payout_platform_id = payout_req.id;
 
-            payout_platform_id.push(payout_req.id.to_string());
-            payout_new_status.push(new_payout_status.to_string());
+            trace!(
+                "- Payout {payout_platform_id} set to {new_payout_status:?}",
+            );
+
+            payout_platform_ids.push(payout_platform_id.to_string());
+            payout_new_statuses.push(new_payout_status.to_string());
         }
 
-        sqlx::query!(
+        let result = sqlx::query!(
             "
             UPDATE payouts
             SET status = u.status
@@ -433,8 +447,8 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
                 payouts.method = $3
                 AND payouts.platform_id = u.platform_id
             ",
-            &payout_platform_id,
-            &payout_new_status,
+            &payout_platform_ids,
+            &payout_new_statuses,
             PayoutMethodType::MuralPay.as_str(),
         )
         .execute(db)
@@ -442,8 +456,9 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
         .wrap_internal_err("failed to update payout statuses")?;
 
         info!(
-            "Updated {} payouts in database from Mural info",
-            payout_platform_id.len()
+            "Attempted to update {} payouts in database from Mural info, {} rows affected",
+            payout_platform_ids.len(),
+            result.rows_affected()
         );
 
         if next_id.is_none() {
