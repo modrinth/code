@@ -1,138 +1,79 @@
 <template>
-	<NewModal
-		ref="createProjectModal"
-		:scrollable="true"
-		max-content-height="72vh"
-		:on-hide="onModalHide"
-	>
-		<!-- :closable="currentStage !== 'add-files'"
-		:hide-header="currentStage === 'add-files'"
-		:merge-header="currentStage === 'add-files'" -->
-		<template #title>
-			<div class="flex flex-wrap items-center gap-1 text-secondary">
-				<span class="text-lg font-bold text-contrast sm:text-xl">Modal title</span>
-			</div>
-		</template>
-		<div class="mx-auto w-full max-w-[496px] sm:mx-0 sm:min-w-[496px]">
-			<template v-if="currentStage === 'add-files'">
-				<AddFileStage></AddFileStage>
-			</template>
-		</div>
-		<template #actions>
-			<div class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
-				<ButtonStyled type="outlined">
-					<button
-						class="!border-surface-5"
-						:disabled="leftButtonConfig.disabled"
-						@click="leftButtonConfig.handler"
-					>
-						<component :is="leftButtonConfig.icon" />
-						{{ leftButtonConfig.label }}
-					</button>
-				</ButtonStyled>
-				<!-- <ButtonStyled :color="rightButtonConfig.color">
-					<button :disabled="rightButtonConfig.disabled" @click="rightButtonConfig.handler">
-						<component
-							:is="rightButtonConfig.icon"
-							v-if="rightButtonConfig.iconPosition === 'before'"
-							:class="rightButtonConfig.iconClass"
-						/>
-						{{ rightButtonConfig.label }}
-						<component
-							:is="rightButtonConfig.icon"
-							v-if="rightButtonConfig.iconPosition === 'after'"
-							:class="rightButtonConfig.iconClass"
-						/>
-					</button>
-				</ButtonStyled> -->
-			</div>
-		</template>
-	</NewModal>
+	<MultiStageModal ref="modal" :stages="stages" />
 </template>
 
 <script setup lang="ts">
-import { XIcon } from '@modrinth/assets'
-import { ButtonStyled, NewModal } from '@modrinth/ui'
-import { computed, ref, useTemplateRef } from 'vue'
+import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
+import { commonMessages } from '@modrinth/ui'
 
-import AddFileStage from './stages/AddFileStage.vue'
+import MultiStageModal from './MultiStageModal.vue'
+import AddChangelogStage from './stages/AddChangelogStage.vue'
+import AddDependenciesStage from './stages/AddDependenciesStage.vue'
+import AddDetailsStage from './stages/AddDetailsStage.vue'
+import AddFilesStage from './stages/AddFilesStage.vue'
+import AddMcVersionsStage from './stages/AddMcVersionsStage.vue'
 
-const createProjectModal = useTemplateRef<InstanceType<typeof NewModal>>('createProjectModal')
-const isSubmitting = ref(false)
+const { formatMessage } = useVIntl()
 
-type Stage = 'add-files' | 'add-details' | 'add-mc-versions' | 'add-changelog' | 'add-dependencies'
+const modal = useTemplateRef<InstanceType<typeof MultiStageModal>>('modal')
 
-const currentStage = ref<Stage>('add-files')
-
-function show(preferred?: Stage) {
-	if (preferred) {
-		// setStage(preferred, true)
-		createProjectModal.value?.show()
-		return
-	}
-
-	createProjectModal.value?.show()
+const defaultNextButton = {
+	icon: RightArrowIcon,
+	label: formatMessage(commonMessages.nextButton),
+	disabled: false,
+	color: 'standard' as const,
+	iconPosition: 'after' as const,
+	onClick: () => modal.value?.nextStage(),
 }
+
+const defaultBackButton = {
+	icon: LeftArrowIcon,
+	label: formatMessage(commonMessages.backButton),
+	disabled: false,
+	color: 'standard' as const,
+	iconPosition: 'before' as const,
+	onClick: () => modal.value?.prevStage(),
+}
+
+const stages: InstanceType<typeof MultiStageModal>['$props']['stages'] = [
+	{
+		title: 'Add Files',
+		stageContent: AddFilesStage,
+		leftButtonConfig: null,
+		rightButtonConfig: { ...defaultNextButton },
+	},
+	{
+		title: 'Add Details',
+		stageContent: AddDetailsStage,
+		leftButtonConfig: { ...defaultBackButton },
+		rightButtonConfig: { ...defaultNextButton },
+	},
+	{
+		title: 'Add Minecraft Versions',
+		stageContent: AddMcVersionsStage,
+		leftButtonConfig: { ...defaultBackButton },
+		rightButtonConfig: { ...defaultNextButton },
+	},
+	{
+		title: 'Add Changelog',
+		stageContent: AddChangelogStage,
+		leftButtonConfig: { ...defaultBackButton },
+		rightButtonConfig: { ...defaultNextButton },
+	},
+	{
+		title: 'Add Dependencies',
+		stageContent: AddDependenciesStage,
+		leftButtonConfig: { ...defaultBackButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			icon: null,
+			label: formatMessage(commonMessages.closeButton),
+			onClick: () => modal.value?.hide(),
+		},
+	},
+]
 
 defineExpose({
-	show,
+	show: () => modal.value?.show(),
 })
-
-// const { formatMessage } = useVIntl()
-// const { addNotification } = injectNotificationManager()
-
-// const withdrawContext = createWithdrawContext(
-// 	props.balance,
-// 	props.preloadedPaymentData || undefined,
-// )
-// provideWithdrawContext(withdrawContext)
-
-// const {
-// 	currentStage,
-// 	previousStep,
-// 	nextStep,
-// 	canProceed,
-// 	setStage,
-// 	withdrawData,
-// 	resetData,
-// 	stages,
-// 	submitWithdrawal,
-// 	restoreStateFromStorage,
-// 	clearSavedState,
-// } = withdrawContext
-
-const leftButtonConfig = computed(() => {
-	return {
-		icon: XIcon,
-		label: 'next',
-		handler: () => createProjectModal.value?.hide(),
-		disabled: isSubmitting.value,
-	}
-})
-
-// const rightButtonConfig = computed(() => {
-// 	return {
-// 		icon: RightArrowIcon,
-// 		label: 'Continue',
-// 		handler: () => setStage(nextStep.value),
-// 		disabled: !canProceed.value,
-// 		color: 'standard' as const,
-// 		iconPosition: 'after' as const,
-// 	}
-// })
-
-const emit = defineEmits<{
-	(e: 'refresh-data' | 'hide'): void
-}>()
-
-function onModalHide() {
-	emit('hide')
-}
-
-// function handleClose() {
-// 	createProjectModal.value?.hide()
-// 	emit('refresh-data')
-// }
-
-// const messages = defineMessages({})
 </script>
