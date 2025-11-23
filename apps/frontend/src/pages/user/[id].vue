@@ -304,7 +304,13 @@
 						/>
 					</div>
 				</div>
-				<div v-else-if="route.params.projectType !== 'collections'" class="error">
+				<div
+					v-else-if="
+						(route.params.projectType && route.params.projectType !== 'collections') ||
+						(!route.params.projectType && collections.length === 0)
+					"
+					class="error"
+				>
 					<UpToDate class="icon" />
 					<br />
 					<span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
