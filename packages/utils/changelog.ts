@@ -11,6 +11,16 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-11-19T15:15:00-08:00`,
+		product: 'app',
+		version: '0.10.20',
+		body: `## Improvements
+- Improved contrast, visibility, and consistency of UI elements, especially in light mode.
+- Fixed ads showing up in the loading screen, even when you have Modrinth+.
+- Added a warning banner when Minecraft's authentication servers are detected to be down.
+- Fixed icon when creating an instance not being saved.`,
+	},
+	{
 		date: `2025-11-14T12:15:00-08:00`,
 		product: 'servers',
 		body: `## Improvements
