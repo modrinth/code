@@ -59,7 +59,7 @@ const props = defineProps<{
 	stages: ModalStage[]
 }>()
 
-interface ButtonConfig {
+export interface ButtonConfig {
 	icon?: Component | null
 	label?: string
 	onClick?: () => void
@@ -69,7 +69,7 @@ interface ButtonConfig {
 	iconPosition?: 'after' | 'before'
 }
 
-interface ModalStage {
+export interface ModalStage {
 	title: string
 	stageContent: Component
 	leftButtonConfig: ButtonConfig | null
