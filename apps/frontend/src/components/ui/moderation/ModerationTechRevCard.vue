@@ -6,6 +6,7 @@ import {
 	ClipboardCopyIcon,
 	CodeIcon,
 	CopyIcon,
+	DownloadIcon,
 	EllipsisVerticalIcon,
 	LinkIcon,
 	LoaderCircleIcon,
@@ -19,14 +20,10 @@ import {
 	OverflowMenu,
 	type OverflowMenuOption,
 } from '@modrinth/ui'
-import {
-	capitalizeString,
-	formatProjectType,
-	highlightCodeLines,
-	type Thread,
-} from '@modrinth/utils'
+import { capitalizeString, formatProjectType, highlightCodeLines } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
+import NavTabs from '~/components/ui/NavTabs.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
 
 const props = defineProps<{
@@ -49,7 +46,6 @@ const emit = defineEmits<{
 const quickActions = computed<OverflowMenuOption[]>(() => {
 	const actions: OverflowMenuOption[] = []
 
-	// Add view source if URL exists
 	const sourceUrl = props.item.project.link_urls?.['source']?.url
 	if (sourceUrl) {
 		actions.push({
@@ -60,7 +56,6 @@ const quickActions = computed<OverflowMenuOption[]>(() => {
 		})
 	}
 
-	// Always add these actions
 	actions.push(
 		{
 			id: 'copy-link',
@@ -115,6 +110,37 @@ const highestSeverity = computed(() => {
 	const order = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
 	return severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] || 'low'
 })
+
+const navTabsLinks = computed(() => {
+	const links = tabs.map((tab) => ({
+		label: tab as string,
+		href: tab.toLowerCase(),
+	}))
+
+	if (selectedFile.value) {
+		links.push({
+			label: selectedFile.value.file_name,
+			href: 'file',
+		})
+	}
+
+	return links
+})
+
+const activeTabIndex = computed(() => {
+	if (selectedFile.value) {
+		return navTabsLinks.value.length - 1
+	}
+	return tabs.indexOf(currentTab.value)
+})
+
+// Handle tab clicks from NavTabs
+function handleTabClick(index: number) {
+	if (index < tabs.length) {
+		currentTab.value = tabs[index]
+		backToFileList()
+	}
+}
 
 function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeverity): string {
 	switch (severity) {
@@ -210,31 +236,6 @@ function toggleIssue(issueId: string) {
 function handleThreadUpdate() {
 	emit('refetch')
 }
-
-// function getSeverityBreakdown(file: Labrinth.TechReview.Internal.FileReport) {
-// 	const counts = {
-// 		SEVERE: 0,
-// 		HIGH: 0,
-// 		MEDIUM: 0,
-// 		LOW: 0,
-// 	}
-
-// 	file.issues.forEach((issue) => {
-// 		issue.details.forEach((detail) => {
-// 			if (detail.severity in counts) {
-// 				counts[detail.severity as keyof typeof counts]++
-// 			}
-// 		})
-// 	})
-
-// 	const breakdown = []
-// 	if (counts.SEVERE > 0) breakdown.push({ count: counts.SEVERE, severity: 'SEVERE' })
-// 	if (counts.HIGH > 0) breakdown.push({ count: counts.HIGH, severity: 'HIGH' })
-// 	if (counts.MEDIUM > 0) breakdown.push({ count: counts.MEDIUM, severity: 'MEDIUM' })
-// 	if (counts.LOW > 0) breakdown.push({ count: counts.LOW, severity: 'LOW' })
-
-// 	return breakdown
-// }
 </script>
 
 <template>
@@ -333,41 +334,24 @@ function handleThreadUpdate() {
 
 			<div class="h-px w-full bg-surface-5"></div>
 
-			<div class="flex items-center gap-1 rounded-full bg-surface-3 p-1">
-				<div
-					v-for="tab in tabs"
-					:key="tab"
-					class="rounded-full px-3 py-1.5 text-base font-semibold transition-colors hover:cursor-pointer"
-					:class="{
-						'bg-highlight-green text-green':
-							currentTab === tab && !(tab === 'Files' && selectedFile),
-						'text-contrast': currentTab !== tab || (tab === 'Files' && selectedFile),
-					}"
-					@click="
-						() => {
-							currentTab = tab
-							backToFileList()
-						}
-					"
-				>
-					{{ tab }}
-				</div>
-
-				<div
-					v-if="currentTab === 'Files' && selectedFile"
-					class="rounded-full bg-highlight-green px-3 py-1.5 text-base font-semibold text-green"
-				>
-					{{ selectedFile.file_name }}
-				</div>
-			</div>
+			<NavTabs
+				mode="local"
+				:links="navTabsLinks"
+				:active-index="activeTabIndex"
+				@tab-click="handleTabClick"
+			/>
 		</div>
 
 		<div class="border-t border-surface-3 bg-surface-2">
-			<div v-if="currentTab === 'Thread'" class="p-4">
-				<ThreadView :thread="item.thread as Thread" @update-thread="handleThreadUpdate" />
-			</div>
+			<template v-if="currentTab === 'Thread'">
+				<div class="bg-surface-2 p-4">
+					<!-- DEV-531 -->
+					<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
+					<ThreadView :thread="item.thread" @update-thread="handleThreadUpdate" />
+				</div>
+			</template>
 
-			<div v-else-if="currentTab === 'Files' && !selectedFile" class="flex flex-col">
+			<template v-else-if="currentTab === 'Files' && !selectedFile">
 				<div
 					v-for="(file, idx) in allFiles"
 					:key="idx"
@@ -386,46 +370,30 @@ function handleThreadUpdate() {
 						>
 							{{ file.issues.length }} flags
 						</div>
-						<!-- <div
-							v-for="severityItem in getSeverityBreakdown(file)"
-							:key="severityItem.severity"
-							class="rounded-full border border-solid px-2.5 py-1"
-							:class="{
-								'border-red/60 bg-highlight-red text-red': severityItem.severity === 'SEVERE',
-								'border-orange/60 bg-highlight-orange text-orange':
-									severityItem.severity === 'HIGH',
-								'border-blue/60 bg-highlight-blue text-blue': severityItem.severity === 'MEDIUM',
-								'border-green/60 bg-highlight-green text-green': severityItem.severity === 'LOW',
-							}"
-						>
-							<span class="text-sm font-medium"
-								>{{ severityItem.count }}
-								{{ capitalizeString(severityItem.severity.toLowerCase()) }}</span
-							>
-						</div> -->
 					</div>
 
 					<div class="flex items-center gap-2">
 						<ButtonStyled>
 							<button @click="viewFileFlags(file)">Flags</button>
 						</ButtonStyled>
-
-						<!-- TODO: Impl when backend supports it -->
-						<!-- <ButtonStyled type="outlined">
+						<ButtonStyled type="outlined">
 							<a
-								:href="`https://api.modrinth.com/v2/version_file/${file.file_id}/download`"
+								:href="file.download_url"
 								:title="`Download ${file.file_name}`"
+								:download="file.file_name"
+								target="_blank"
+								rel="noopener noreferrer"
 								class="!border-px !border-surface-4"
 								tabindex="0"
 							>
 								<DownloadIcon /> Download
 							</a>
-						</ButtonStyled> -->
+						</ButtonStyled>
 					</div>
 				</div>
-			</div>
+			</template>
 
-			<div v-else-if="currentTab === 'Files' && selectedFile" class="flex flex-col">
+			<template v-else-if="currentTab === 'Files' && selectedFile">
 				<div
 					v-for="(issue, idx) in selectedFile.issues"
 					:key="issue.id"
@@ -535,7 +503,7 @@ function handleThreadUpdate() {
 						</div>
 					</div>
 				</div>
-			</div>
+			</template>
 		</div>
 	</div>
 </template>
