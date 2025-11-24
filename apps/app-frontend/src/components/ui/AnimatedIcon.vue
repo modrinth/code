@@ -11,8 +11,10 @@ const props = defineProps({
 
 const isAnimating = ref(false)
 const iconRef = ref(null)
-let longestAnimation = 0
 let target = null
+let AnimationLength = 0
+let hover = false
+let isInfinite = false
 
 onMounted(async () => {
 	await nextTick()
@@ -25,26 +27,37 @@ onMounted(async () => {
 	// calculate animation duration
 	el.classList.add('animating')
 	el.offsetHeight
-	longestAnimation = calculateLongestAnimation(el)
+	AnimationLength = calculateLongestAnimation(el)
 	el.classList.remove('animating')
 
 	// use parent if it exists, otherwise fallback to component itself
 	target = el.parentElement || el
 	target.addEventListener('mouseenter', playAnimation)
+	target.addEventListener('mouseleave', stopHover)
 })
 
 onBeforeUnmount(() => {
-	if (target) target.removeEventListener('mouseenter', playAnimation)
+	if (!target) return
+	target.removeEventListener('mouseenter', playAnimation)
+	target.removeEventListener('mouseleave', stopHover)
 })
 
 const playAnimation = () => {
+	hover = true
 	if (isAnimating.value) return
 
 	isAnimating.value = true
 
 	setTimeout(() => {
 		isAnimating.value = false
-	}, longestAnimation)
+		if (isInfinite && hover) {
+			playAnimation()
+		}
+	}, AnimationLength)
+}
+
+function stopHover() {
+	hover = false
 }
 
 function calculateLongestAnimation(el) {
@@ -54,16 +67,30 @@ function calculateLongestAnimation(el) {
 	const iconElements = [el, ...el.querySelectorAll('*')]
 	iconElements.forEach((child) => {
 		const style = getComputedStyle(child)
-		const durations = style.animationDuration.split(',').map((s) => parseFloat(s) || 0)
-		const delays = style.animationDelay.split(',').map((s) => parseFloat(s) || 0)
+		const durations = style.animationDuration.split(',').map((s) => parseTimeMs(s))
+		const delays = style.animationDelay.split(',').map((s) => parseTimeMs(s))
+		const iterations = style.animationIterationCount.split(',').map((s) => {
+			if (s === 'infinite') {
+				isInfinite = true
+				return 1
+			}
+			return parseFloat(s) || 1
+		})
 
-		durations.forEach((d, i) => {
+		durations.forEach((duration, i) => {
 			const delay = delays[i] || 0
-			const total = (d + delay) * 1000
+			const iter = iterations[i] || 1
+			const total = duration * iter + delay
 			if (total > maxDuration) maxDuration = total
 		})
 	})
 
 	return maxDuration
+}
+
+function parseTimeMs(s) {
+	const num = parseFloat(s)
+	if (!num) return 0
+	return num * (s.endsWith('ms') ? 1 : 1000)
 }
 </script>

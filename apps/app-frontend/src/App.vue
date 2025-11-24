@@ -878,7 +878,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
 				:to="() => $refs.settingsModal.show()"
 			>
-				<SettingsIcon />
+				<AnimatedIcon :icon="SettingsIcon" />
 			</NavButton>
 			<OverflowMenu
 				v-if="credentials"
