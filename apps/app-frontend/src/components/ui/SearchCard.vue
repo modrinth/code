@@ -14,7 +14,7 @@
 		<div class="icon w-[96px] h-[96px] relative">
 			<Avatar :src="project.icon_url" size="96px" class="search-icon origin-top transition-all" />
 		</div>
-		<div class="flex flex-col gap-2 overflow-hidden">
+		<div class="flex flex-col gap-2 flex-1 overflow-hidden">
 			<div class="gap-2 overflow-hidden no-wrap text-ellipsis">
 				<span class="text-lg font-extrabold text-contrast m-0 leading-none">
 					{{ project.title }}
@@ -24,7 +24,10 @@
 			<div class="m-0 line-clamp-2">
 				{{ project.description }}
 			</div>
-			<div v-if="categories.length > 0" class="mt-auto flex items-center gap-1 no-wrap">
+			<div
+				v-if="categories.length > 0"
+				class="mt-auto flex items-center gap-1 no-wrap [mask-image:linear-gradient(to_right,black_95%,transparent)]"
+			>
 				<TagsIcon class="h-4 w-4 shrink-0" />
 				<div
 					v-if="project.project_type === 'mod' || project.project_type === 'modpack'"
@@ -65,13 +68,13 @@
 				<div
 					v-for="tag in categories"
 					:key="tag"
-					class="text-sm font-semibold text-secondary flex gap-1 px-[0.375rem] py-0.5 bg-button-bg rounded-full"
+					class="text-sm font-semibold text-secondary flex gap-1 px-[0.4rem] py-0.5 bg-button-bg rounded-full"
 				>
 					{{ formatCategory(tag.name) }}
 				</div>
 			</div>
 		</div>
-		<div class="flex flex-col gap-2 items-end shrink-0 ml-auto">
+		<div class="flex flex-col gap-2 items-end shrink-0">
 			<div class="flex items-center gap-2">
 				<DownloadIcon class="shrink-0" />
 				<span>
@@ -87,7 +90,7 @@
 				</span>
 			</div>
 			<div class="mt-auto relative">
-				<div class="absolute bottom-0 right-0 w-fit">
+				<div class="bottom-0 right-0 w-fit">
 					<ButtonStyled color="brand" type="outlined">
 						<button
 							:disabled="installed || installing"
