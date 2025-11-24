@@ -12,7 +12,8 @@ CREATE TABLE users_subscriptions_affiliations_payouts(
 	subscription_id BIGINT    NOT NULL REFERENCES users_subscriptions(id),
 	affiliate_code  BIGINT    NOT NULL REFERENCES affiliate_codes(id),
 	payout_value_id BIGSERIAL NOT NULL REFERENCES payouts_values(id),
-	UNIQUE (charge_id)
+	UNIQUE (charge_id),
+	UNIQUE (payout_value_id)
 );
 
 ALTER TABLE payouts_values

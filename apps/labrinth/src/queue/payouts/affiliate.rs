@@ -32,7 +32,13 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             c.currency_code,
             usa.affiliate_code,
             ac.affiliate as affiliate_user_id,
-            ac.revenue_split
+            ac.revenue_split,
+            (
+                SELECT COALESCE(SUM(refund_charges.net), 0)
+                FROM charges refund_charges
+                WHERE refund_charges.parent_charge_id = c.id
+                AND refund_charges.status = 'succeeded'
+            ) as refund_net_sum
         -- get any charges...
         FROM charges c
         -- ...which have a subscription...
@@ -78,6 +84,8 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             continue;
         };
         let net = Decimal::new(net, 2);
+        let refund_net_sum = row.refund_net_sum.unwrap_or_default();
+        let net_after_refunds = net - refund_net_sum;
         let tax_amount = Decimal::new(row.charge_tax_amount, 2);
 
         let Some(last_attempt) = row.charge_last_attempt else {
@@ -116,7 +124,7 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             continue;
         }
 
-        let affiliate_cut = (net - tax_amount) * revenue_split;
+        let affiliate_cut = (net_after_refunds - tax_amount) * revenue_split;
         let affiliate_user_id = DBUserId(row.affiliate_user_id);
         let affiliate_code_id = DBAffiliateCodeId(row.affiliate_code);
 
@@ -163,6 +171,94 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
     .execute(&mut *txn)
     .await
     .wrap_err("failed to associate charges with affiliate payouts")?;
+
+    txn.commit()
+        .await
+        .wrap_err("failed to commit transaction")?;
+
+    Ok(())
+}
+
+pub async fn remove_payouts_for_refunded_charges(
+    postgres: &PgPool,
+) -> Result<()> {
+    // process:
+    // - find refund charges
+    // - which have a parent charge
+    // - where that parent charge has a `usap` row
+    // - where the `usap.payout_value_id` is not available as of `now()`
+    //   - (don't revoke payout values which have already been issued to the affiliate)
+    // - delete the `usap` and `usap.payout_value_id` row
+
+    let mut txn = postgres
+        .begin()
+        .await
+        .wrap_err("failed to begin transaction")?;
+
+    let refundable_payouts = sqlx::query!(
+        r#"
+        SELECT
+            usap.id as usap_id,
+            usap.payout_value_id
+        FROM charges refund_charges
+        -- find original charges that have been refunded
+        INNER JOIN charges original_charges
+            ON original_charges.id = refund_charges.parent_charge_id
+        -- find affiliate payouts for those original charges
+        INNER JOIN users_subscriptions_affiliations_payouts usap
+            ON usap.charge_id = original_charges.id
+        -- only include payouts that haven't been issued yet (not available as of now)
+        INNER JOIN payouts_values pv
+            ON pv.id = usap.payout_value_id
+            AND pv.date_available > NOW()
+        WHERE
+            refund_charges.status = 'succeeded'
+            -- make sure it's actually a refund charge
+            AND refund_charges.charge_type = 'refund'
+        "#
+    )
+    .fetch_all(&mut *txn)
+    .await
+    .wrap_err("failed to fetch refundable affiliate payouts")?;
+
+    if refundable_payouts.is_empty() {
+        txn.commit()
+            .await
+            .wrap_err("failed to commit transaction")?;
+        return Ok(());
+    }
+
+    let mut usap_ids = Vec::new();
+    let mut payout_value_ids = Vec::new();
+
+    for payout in refundable_payouts {
+        usap_ids.push(payout.usap_id);
+        payout_value_ids.push(payout.payout_value_id);
+    }
+
+    // Delete the affiliate payout associations
+    sqlx::query!(
+        "
+        DELETE FROM users_subscriptions_affiliations_payouts
+        WHERE id = ANY($1::bigint[])
+        ",
+        &usap_ids[..]
+    )
+    .execute(&mut *txn)
+    .await
+    .wrap_err("failed to delete affiliate payout associations")?;
+
+    // Delete the payout values
+    sqlx::query!(
+        "
+        DELETE FROM payouts_values
+        WHERE id = ANY($1::bigint[])
+        ",
+        &payout_value_ids[..]
+    )
+    .execute(&mut *txn)
+    .await
+    .wrap_err("failed to delete payout values")?;
 
     txn.commit()
         .await

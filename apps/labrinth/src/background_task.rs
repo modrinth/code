@@ -4,7 +4,7 @@ use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
     insert_bank_balances_and_webhook, process_affiliate_payouts,
-    process_payout,
+    process_payout, remove_payouts_for_refunded_charges,
 };
 use crate::search::indexing::index_projects;
 use crate::util::anrok;
@@ -197,6 +197,11 @@ pub async fn payouts(
     let result = process_affiliate_payouts(&pool).await;
     if let Err(e) = result {
         warn!("Affiliate payouts run failed: {e:#?}");
+    }
+
+    let result = remove_payouts_for_refunded_charges(&pool).await;
+    if let Err(e) = result {
+        warn!("Removing affiliate payouts for refunded charges failed: {e:#?}");
     }
 
     info!("Done running payouts");
