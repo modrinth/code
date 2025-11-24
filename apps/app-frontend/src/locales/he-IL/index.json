@@ -1,4 +1,7 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. בדוק את חיבור האינטרנט שלך ונסה שוב מאוחר יותר."
+  },
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."
   },
@@ -64,6 +67,9 @@
   },
   "app.update.reload-to-update": {
     "message": "רענן בכדי להתקין את העדכונים"
+  },
+  "friends.action.add-friend": {
+    "message": "להוסיף חבר"
   },
   "friends.add-friends-to-share": {
     "message": "<link>הוסף חברים</link> כדי לראות במה הם משחקים!"
@@ -309,7 +315,7 @@
     "message": "התיקון מתקין מחדש את התלויות של מיינקראפט ובודק דברים מקולקלים. פעולה זו עשויה לפתור בעיות שמונעות את הפעלת המשחק עקב שגיאות הקשורות למשגר, אך לא תפתור בעיות או קריסות הקשורות למודים המותקנים."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "תקן"
+    "message": "לתקן את המכונה?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "תיקון בתהליך"

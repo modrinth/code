@@ -1559,6 +1559,9 @@
   "muralpay.document-type.tax-id": {
     "message": "税号"
   },
+  "muralpay.field.account-number": {
+    "message": "-"
+  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
