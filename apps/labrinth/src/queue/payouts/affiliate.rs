@@ -1,6 +1,4 @@
-use std::collections::HashMap;
-
-use chrono::{DateTime, Datelike, Duration, TimeZone, Utc};
+use chrono::{Datelike, Duration, TimeZone, Utc};
 use eyre::{Context, Result, eyre};
 use rust_decimal::Decimal;
 use sqlx::PgPool;
@@ -9,22 +7,13 @@ use tracing::warn;
 use crate::database::models::{DBAffiliateCodeId, DBUserId};
 
 pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
-    /// Data for an (affiliate user, affiliate code) pair.
-    #[derive(Debug, Default)]
-    struct AffiliatePayoutInfo {
-        /// How much the affiliate will earn from this code.
-        amount: Decimal,
-        /// Which (charge, subscription) pairs will be linked to this payout.
-        charge_subscription_ids: Vec<(i64, i64)>,
-    }
-
     // process:
     // - get any subscriptions which are in `users_subscriptions_affiliations`
     // - for those subscriptions, get any charges which are not in `users_subscriptions_affiliations_payouts`
     // - for each of those charges,
     //   - get the subscription's `affiliate_code`
     //   - get the affiliate user of that code
-    //   - add a payout for that affiliate user, proportional to the net of the charge
+    //   - add a payout for that affiliate user, proportional to the `net - tax` of the charge
     //   - add a record of this into `users_subscriptions_affiliations_payouts`
 
     let mut txn = postgres
@@ -32,12 +21,14 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
         .await
         .wrap_err("failed to begin transaction")?;
 
-    let rows = sqlx::query!(
+    let charges = sqlx::query!(
         r#"
         SELECT
             c.id as charge_id,
             c.subscription_id AS "subscription_id!",
             c.net as charge_net,
+            c.tax_amount as charge_tax_amount,
+            c.last_attempt as charge_last_attempt,
             c.currency_code,
             usa.affiliate_code,
             ac.affiliate as affiliate_user_id,
@@ -71,37 +62,14 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             .parse::<Decimal>()
             .wrap_err("`DEFAULT_AFFILIATE_REVENUE_SPLIT` is not a decimal")?;
 
-    let now = Utc::now();
-    let start: DateTime<Utc> = DateTime::from_naive_utc_and_offset(
-        (now - Duration::days(1))
-            .date_naive()
-            .and_hms_nano_opt(0, 0, 0, 0)
-            .unwrap_or_default(),
-        Utc,
-    );
+    let (
+        mut insert_usap_charges,
+        mut insert_usap_subscriptions,
+        mut insert_usap_affiliate_codes,
+        mut insert_usap_payout_values,
+    ) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
 
-    // affiliate payouts are Net 60 from the end of the month
-    let available = {
-        let now = Utc::now().date_naive();
-
-        let year = now.year();
-        let month = now.month();
-
-        // get the first day of the next month
-        let last_day_of_month = if month == 12 {
-            Utc.with_ymd_and_hms(year + 1, 1, 1, 0, 0, 0).unwrap()
-        } else {
-            Utc.with_ymd_and_hms(year, month + 1, 1, 0, 0, 0).unwrap()
-        };
-
-        last_day_of_month + Duration::days(59)
-    };
-
-    // collect the rev from each affiliate and their code, and sum up values
-    let mut payouts =
-        HashMap::<(DBUserId, DBAffiliateCodeId), AffiliatePayoutInfo>::new();
-
-    for row in rows {
+    for row in charges {
         let Some(net) = row.charge_net else {
             warn!(
                 "Charge {} has no net amount; cannot calculate affiliate payout",
@@ -110,6 +78,31 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             continue;
         };
         let net = Decimal::new(net, 2);
+        let tax_amount = Decimal::new(row.charge_tax_amount, 2);
+
+        let Some(last_attempt) = row.charge_last_attempt else {
+            warn!(
+                "Charge {} has no last attempt; cannot calculate affiliate payout",
+                row.charge_id
+            );
+            continue;
+        };
+
+        // affiliate payouts are Net 60 from the end of the month
+        // this is net 60 relative to the time of the charge's last attempt, not from now
+        let available = {
+            let year = last_attempt.year();
+            let month = last_attempt.month();
+
+            // get the first day of the next month
+            let last_day_of_month = if month == 12 {
+                Utc.with_ymd_and_hms(year + 1, 1, 1, 0, 0, 0).unwrap()
+            } else {
+                Utc.with_ymd_and_hms(year, month + 1, 1, 0, 0, 0).unwrap()
+            };
+
+            last_day_of_month + Duration::days(59)
+        };
 
         let revenue_split = row
             .revenue_split
@@ -117,27 +110,19 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             .unwrap_or(default_affiliate_revenue_split);
         if !(Decimal::from(0)..=Decimal::from(1)).contains(&revenue_split) {
             warn!(
-                "Charge {} has revenue split {} which is out of range",
-                row.charge_id, revenue_split
+                "Charge {} has revenue split {revenue_split} which is out of range",
+                row.charge_id,
             );
             continue;
         }
 
-        let affiliate_cut = (net - row.tax) * revenue_split;
+        let affiliate_cut = (net - tax_amount) * revenue_split;
         let affiliate_user_id = DBUserId(row.affiliate_user_id);
         let affiliate_code_id = DBAffiliateCodeId(row.affiliate_code);
 
-        let payout_info = payouts
-            .entry((affiliate_user_id, affiliate_code_id))
-            .or_default();
-        // a portion of this charge will be added as a payout to the affiliate...
-        payout_info.amount += affiliate_cut;
-        payout_info
-            .charge_subscription_ids
-            .push((row.charge_id, row.subscription_id));
-    }
+        // don't batch up affiliate code payouts into one big payout per (user, affiliate code)
+        // because we want to associate 1 payout to an affiliate, with 1 concrete charge
 
-    for ((affiliate_id, affiliate_code_id), payout_info) in payouts {
         let payout_value_id = sqlx::query!(
             "
             INSERT INTO payouts_values
@@ -146,48 +131,38 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             VALUES ($1, $2, $3, $4, $5)
             RETURNING id
             ",
-            affiliate_id.0,
-            payout_info.amount,
-            start,
+            affiliate_user_id as _,
+            affiliate_cut,
+            last_attempt,
             available,
-            affiliate_code_id.0,
+            affiliate_code_id as _,
         )
         .fetch_one(&mut *txn)
         .await
-        .wrap_err_with(|| eyre!("failed to insert payout value for ({affiliate_id:?}, {affiliate_code_id:?})"))?
+        .wrap_err_with(|| eyre!("failed to insert payout value for ({affiliate_user_id:?}, {affiliate_code_id:?})"))?
         .id;
 
-        let (
-            mut insert_usap_charges,
-            mut insert_usap_subscriptions,
-            mut insert_usap_affiliate_codes,
-            mut insert_usap_payout_values,
-        ) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
-
-        for (charge_id, subscription_id) in payout_info.charge_subscription_ids
-        {
-            insert_usap_charges.push(charge_id);
-            insert_usap_subscriptions.push(subscription_id);
-            insert_usap_affiliate_codes.push(affiliate_code_id.0);
-            insert_usap_payout_values.push(payout_value_id);
-        }
-
-        sqlx::query!(
-            "
-            INSERT INTO users_subscriptions_affiliations_payouts
-                (charge_id, subscription_id,
-                affiliate_code, payout_value_id)
-            SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::bigint[], $4::bigint[])
-            ",
-            &insert_usap_charges[..],
-            &insert_usap_subscriptions[..],
-            &insert_usap_affiliate_codes[..],
-            &insert_usap_payout_values[..],
-        )
-        .execute(&mut *txn)
-        .await
-        .wrap_err("failed to associate charges with affiliate payouts")?;
+        insert_usap_charges.push(row.charge_id);
+        insert_usap_subscriptions.push(row.subscription_id);
+        insert_usap_affiliate_codes.push(affiliate_code_id.0);
+        insert_usap_payout_values.push(payout_value_id);
     }
+
+    sqlx::query!(
+        "
+        INSERT INTO users_subscriptions_affiliations_payouts
+            (charge_id, subscription_id,
+            affiliate_code, payout_value_id)
+        SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::bigint[], $4::bigint[])
+        ",
+        &insert_usap_charges[..],
+        &insert_usap_subscriptions[..],
+        &insert_usap_affiliate_codes[..],
+        &insert_usap_payout_values[..],
+    )
+    .execute(&mut *txn)
+    .await
+    .wrap_err("failed to associate charges with affiliate payouts")?;
 
     txn.commit()
         .await
