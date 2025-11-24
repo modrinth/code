@@ -491,6 +491,7 @@ export namespace Labrinth {
 				severity: DelphiSeverity
 				file_name: string
 				file_size: number
+				download_url: string
 				issues: FileIssue[]
 			}
 
