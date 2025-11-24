@@ -3,7 +3,38 @@
 	xml:space="preserve"
 	transform="scale(-1 1)"
 	viewBox="-15.425 0 80 55"
+	class="shirt-icon"
 >
+	<style>
+		.shirt-icon.animating .hook{
+			transform-origin: 24.704px 7.7px;
+			animation: swing 0.75s linear;
+			--swing-angle: 30deg;
+		}
+
+		svg.animating .shirt{
+			transform-origin: 24px 19.102px;
+			animation: swing 0.75s ease-out 0.15s;
+			--swing-angle: 40deg;
+		}
+
+		@keyframes swing {
+			0%,
+			100% {
+				transform: rotate(0deg);
+			}
+			25%,
+			32% {
+				transform: rotate(var(--swing-angle));
+			}
+			65% {
+				transform: rotate(calc(var(--swing-angle) * -0.75));
+			}
+			85% {
+				transform: rotate(7deg);
+			}
+		}
+	</style>
 	<g class="hook">
 		<path
 			fill="none"

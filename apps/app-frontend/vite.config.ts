@@ -26,6 +26,9 @@ export default defineConfig({
 						name: 'preset-default',
 						params: {
 							overrides: {
+								cleanupIds: false,
+								inlineStyles: false,
+								minifyStyles: false,
 								removeViewBox: false,
 							},
 						},
