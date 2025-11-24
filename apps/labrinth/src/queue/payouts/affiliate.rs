@@ -48,7 +48,7 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
         INNER JOIN users_subscriptions_affiliations usa
             ON c.subscription_id = usa.subscription_id
             AND c.subscription_id IS NOT NULL
-            AND usa.deactivated_at IS NULL
+            AND (usa.deactivated_at IS NULL OR c.last_attempt < usa.deactivated_at)
         -- ...which have an affiliate code...
         INNER JOIN affiliate_codes ac
             ON usa.affiliate_code = ac.id
@@ -123,7 +123,7 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             continue;
         }
 
-        let affiliate_cut = net * revenue_split;
+        let affiliate_cut = (net - row.tax) * revenue_split;
         let affiliate_user_id = DBUserId(row.affiliate_user_id);
         let affiliate_code_id = DBAffiliateCodeId(row.affiliate_code);
 
