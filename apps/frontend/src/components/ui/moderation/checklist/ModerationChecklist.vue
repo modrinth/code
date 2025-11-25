@@ -85,6 +85,7 @@
 					<ModpackPermissionsFlow
 						v-model="modpackJudgements"
 						:project-id="project.id"
+						:project-updated="project.updated"
 						@complete="handleModpackPermissionsComplete"
 					/>
 				</div>
@@ -446,6 +447,11 @@ function resetProgress() {
 
 	localStorage.removeItem(`modpack-permissions-${props.project.id}`)
 	localStorage.removeItem(`modpack-permissions-index-${props.project.id}`)
+
+	sessionStorage.removeItem(`modpack-permissions-data-${props.project.id}`)
+	sessionStorage.removeItem(`modpack-permissions-permanent-no-${props.project.id}`)
+	sessionStorage.removeItem(`modpack-permissions-updated-${props.project.id}`)
+
 	modpackPermissionsComplete.value = false
 	modpackJudgements.value = {}
 
@@ -1331,6 +1337,11 @@ function clearProjectLocalStorage() {
 	localStorage.removeItem(`moderation-actions-${props.project.slug}`)
 	localStorage.removeItem(`moderation-inputs-${props.project.slug}`)
 	localStorage.removeItem(`moderation-stage-${props.project.slug}`)
+
+	sessionStorage.removeItem(`modpack-permissions-data-${props.project.id}`)
+	sessionStorage.removeItem(`modpack-permissions-permanent-no-${props.project.id}`)
+	sessionStorage.removeItem(`modpack-permissions-updated-${props.project.id}`)
+
 	actionStates.value = {}
 }
 
