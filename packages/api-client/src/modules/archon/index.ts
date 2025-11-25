@@ -1,3 +1,4 @@
-export * from './servers/types'
+export * from './types'
 export * from './servers/v0'
 export * from './servers/v1'
+export * from './backups/v1'

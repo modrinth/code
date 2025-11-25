@@ -126,6 +126,32 @@ export namespace Archon {
 		}
 	}
 
+	export namespace Backups {
+		export namespace v1 {
+			export type Backup = {
+				id: string
+				name: string
+				created_at: string
+				locked: boolean
+				automated: boolean
+				interrupted: boolean
+				ongoing: boolean
+			}
+
+			export type BackupRequest = {
+				name: string
+			}
+
+			export type PatchBackup = {
+				name?: string
+			}
+
+			export type PostBackupResponse = {
+				id: string
+			}
+		}
+	}
+
 	export namespace Websocket {
 		export namespace v0 {
 			export type WSAuth = {
