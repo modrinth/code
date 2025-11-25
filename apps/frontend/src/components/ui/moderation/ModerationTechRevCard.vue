@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	CheckCircleIcon,
 	CheckIcon,
 	ChevronDownIcon,
 	ClipboardCopyIcon,
@@ -10,6 +11,8 @@ import {
 	EllipsisVerticalIcon,
 	LinkIcon,
 	LoaderCircleIcon,
+	ShieldCheckIcon,
+	TriangleAlertIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
@@ -21,7 +24,7 @@ import {
 	type OverflowMenuOption,
 } from '@modrinth/ui'
 import { capitalizeString, formatProjectType, highlightCodeLines } from '@modrinth/utils'
-import { computed, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
@@ -224,6 +227,57 @@ async function updateIssueStatus(
 const expandedIssues = ref<Set<string>>(new Set())
 const showCopyFeedback = ref<Map<string, boolean>>(new Map())
 
+type ActionType = 'safe' | 'malware'
+type ButtonState = 'idle' | number | 'completed'
+
+const buttonStates = ref<Map<ActionType, ButtonState>>(new Map())
+const buttonIntervals = ref<Map<ActionType, ReturnType<typeof setInterval>>>(new Map())
+
+function getButtonState(action: ActionType): ButtonState {
+	return buttonStates.value.get(action) ?? 'idle'
+}
+
+// TODO: move this into new buttonstyled refactored component at a later date
+function handleTopLevelAction(action: ActionType) {
+	const currentState = getButtonState(action)
+
+	if (typeof currentState === 'number') {
+		const intervalId = buttonIntervals.value.get(action)
+		if (intervalId) clearInterval(intervalId)
+		buttonIntervals.value.delete(action)
+		buttonStates.value.delete(action)
+		return
+	}
+
+	if (currentState === 'completed') return
+
+	buttonStates.value.set(action, 5)
+
+	const intervalId = setInterval(() => {
+		const state = buttonStates.value.get(action)
+		if (typeof state === 'number' && state > 1) {
+			buttonStates.value.set(action, state - 1)
+		} else {
+			clearInterval(intervalId)
+			buttonIntervals.value.delete(action)
+			buttonStates.value.set(action, 'completed')
+
+			// TODO: call backend
+			console.log(`Top-level action: ${action}`)
+
+			setTimeout(() => {
+				buttonStates.value.delete(action)
+			}, 2000)
+		}
+	}, 1000)
+
+	buttonIntervals.value.set(action, intervalId)
+}
+
+onUnmounted(() => {
+	buttonIntervals.value.forEach((intervalId) => clearInterval(intervalId))
+})
+
 function toggleIssue(issueId: string) {
 	if (expandedIssues.value.has(issueId)) {
 		expandedIssues.value.delete(issueId)
@@ -309,6 +363,40 @@ function handleThreadUpdate() {
 				<div class="flex items-center gap-3">
 					<span class="text-base text-secondary">{{ formattedDate }}</span>
 					<div class="flex items-center gap-2">
+						<ButtonStyled color="brand">
+							<button
+								class="!shadow-none !w-[85px]"
+								:disabled="getButtonState('malware') !== 'idle'"
+								@click="handleTopLevelAction('safe')"
+							>
+								<LoaderCircleIcon
+									v-if="typeof getButtonState('safe') === 'number'"
+									class="animate-spin"
+								/>
+								<CheckCircleIcon v-else-if="getButtonState('safe') === 'completed'" />
+								<ShieldCheckIcon v-else />
+								{{ typeof getButtonState('safe') === 'number' ? getButtonState('safe') : 'Safe' }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="red">
+							<button
+								class="!shadow-none !w-[116px]"
+								:disabled="getButtonState('safe') !== 'idle'"
+								@click="handleTopLevelAction('malware')"
+							>
+								<LoaderCircleIcon
+									v-if="typeof getButtonState('malware') === 'number'"
+									class="animate-spin"
+								/>
+								<CheckCircleIcon v-else-if="getButtonState('malware') === 'completed'" />
+								<TriangleAlertIcon v-else />
+								{{
+									typeof getButtonState('malware') === 'number'
+										? getButtonState('malware')
+										: 'Malware'
+								}}
+							</button>
+						</ButtonStyled>
 						<ButtonStyled circular type="outlined">
 							<OverflowMenu :options="quickActions" class="!border-px !border-surface-4">
 								<template #default>
