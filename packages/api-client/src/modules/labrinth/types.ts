@@ -362,67 +362,69 @@ export namespace Labrinth {
 	}
 
 	export namespace Versions {
-		export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
+		export namespace v3 {
+			export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
 
-		export interface VersionDependency {
-			dependency_type: DependencyType
-			file_name?: string
-		}
+			export interface VersionDependency {
+				dependency_type: DependencyType
+				file_name?: string
+			}
 
-		export interface ProjectDependency {
-			dependency_type: DependencyType
-			project_id?: string
-		}
+			export interface ProjectDependency {
+				dependency_type: DependencyType
+				project_id?: string
+			}
 
-		export interface FileDependency {
-			dependency_type: DependencyType
-			file_name?: string
-		}
+			export interface FileDependency {
+				dependency_type: DependencyType
+				file_name?: string
+			}
 
-		export type Dependency = VersionDependency | ProjectDependency | FileDependency
+			export type Dependency = VersionDependency | ProjectDependency | FileDependency
 
-		export type VersionChannel = 'release' | 'beta' | 'alpha'
+			export type VersionChannel = 'release' | 'beta' | 'alpha'
 
-		export type VersionStatus =
-			| 'listed'
-			| 'archived'
-			| 'draft'
-			| 'unlisted'
-			| 'scheduled'
-			| 'unknown'
+			export type VersionStatus =
+				| 'listed'
+				| 'archived'
+				| 'draft'
+				| 'unlisted'
+				| 'scheduled'
+				| 'unknown'
 
-		export type FileType = 'required-resource-pack' | 'optional-resource-pack'
+			export type FileType = 'required-resource-pack' | 'optional-resource-pack'
 
-		export interface VersionFileHash {
-			sha512: string
-			sha1: string
-		}
+			export interface VersionFileHash {
+				sha512: string
+				sha1: string
+			}
 
-		export interface VersionFile {
-			hashes: VersionFileHash[]
-			url: string
-			filename: string
-			primary: boolean
-			size: number
-			file_type?: FileType
-		}
+			export interface VersionFile {
+				hashes: VersionFileHash[]
+				url: string
+				filename: string
+				primary: boolean
+				size: number
+				file_type?: FileType
+			}
 
-		export interface Version {
-			name: string
-			version_number: string
-			changelog?: string
-			dependencies: Dependency[]
-			game_versions: string[]
-			version_type: VersionChannel
-			loaders: string[]
-			featured: boolean
-			status: VersionStatus
-			id: string
-			project_id: string
-			author_id: string
-			date_published: string
-			downloads: number
-			files: VersionFile[]
+			export interface Version {
+				name: string
+				version_number: string
+				changelog?: string
+				dependencies: Dependency[]
+				game_versions: string[]
+				version_type: VersionChannel
+				loaders: string[]
+				featured: boolean
+				status: VersionStatus
+				id: string
+				project_id: string
+				author_id: string
+				date_published: string
+				downloads: number
+				files: VersionFile[]
+			}
 		}
 	}
 
