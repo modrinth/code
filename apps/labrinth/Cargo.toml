@@ -66,13 +66,12 @@ image = { workspace = true, features = [
   "tiff",
   "webp",
 ] }
-indexmap = { workspace = true }
 itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
 meilisearch-sdk = { workspace = true, features = ["reqwest"] }
 modrinth-maxmind = { workspace = true }
-modrinth-util = { workspace = true, features = ["decimal", "utoipa"] }
+modrinth-util = { workspace = true }
 muralpay = { workspace = true, features = ["mock", "utoipa"] }
 murmur2 = { workspace = true }
 paste = { workspace = true }
