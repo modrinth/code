@@ -5,8 +5,8 @@
 <script setup lang="ts">
 import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
 import { commonMessages } from '@modrinth/ui'
-
 import MultiStageModal from '@modrinth/ui/src/components/base/MultiStageModal.vue'
+
 import AddChangelogStage from './stages/AddChangelogStage.vue'
 import AddDependenciesStage from './stages/AddDependenciesStage.vue'
 import AddDetailsStage from './stages/AddDetailsStage.vue'

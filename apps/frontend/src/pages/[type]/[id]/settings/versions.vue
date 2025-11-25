@@ -16,8 +16,8 @@
 </template>
 
 <script lang="ts" setup>
+import type { Labrinth } from '@modrinth/api-client'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
-import type { Project, Version } from '@modrinth/utils'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { provideVersionsContext } from '~/providers/versions'
@@ -29,8 +29,8 @@ function openModal() {
 }
 
 const props = defineProps<{
-	project: Project
-	versions: Version[]
+	project: Labrinth.Projects.v3.Project
+	versions: Labrinth.Versions.Version[]
 }>()
 
 provideVersionsContext(props)
