@@ -23,7 +23,7 @@ use eyre::eyre;
 use hex::ToHex;
 use hmac::{Hmac, Mac};
 use reqwest::Method;
-use rust_decimal::Decimal;
+use rust_decimal::{Decimal, RoundingStrategy};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Sha256;
@@ -594,8 +594,8 @@ pub async fn create_payout(
     // we first make sure that `amount - total fees` is greater than zero,
     // then we issue a payout request with `amount - platform fees`
 
-    let amount_minus_fee = body.amount - fees.total_fee();
-    if amount_minus_fee.round_dp(2) <= Decimal::ZERO {
+    let amount_minus_fee = (body.amount - fees.total_fee()).round_dp(2);
+    if amount_minus_fee <= Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You need to withdraw more to cover the fee!".to_string(),
         ));
@@ -796,6 +796,8 @@ async fn mural_pay_payout(
 ) -> Result<DBPayout, ApiError> {
     let user_email = get_verified_email(user)?;
 
+    let amount_minus_fee =
+        amount_minus_fee.round_dp_with_strategy(2, RoundingStrategy::ToZero);
     let payout_request = payouts_queue
         .create_muralpay_payout_request(
             payout_id,
