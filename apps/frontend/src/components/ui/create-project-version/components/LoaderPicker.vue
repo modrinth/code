@@ -7,7 +7,6 @@
 			</ButtonStyled>
 		</div>
 
-		<!-- Each group rendered separately when it has loaders -->
 		<div
 			class="flex flex-1 flex-col gap-4 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3"
 		>
@@ -62,24 +61,20 @@ const toggleLoader = (loader: string) => {
 
 const onClearAll = () => emit('update:modelValue', [])
 
-// --- Labels for UI ---
 const GROUP_LABELS = {
 	mods: 'Mod loaders',
 	plugins: 'Plugin loaders',
+	packs: 'Packs',
 	shaders: 'Shader loaders',
-	resourcepacks: 'Resource Packs',
-	datapacks: 'Datapacks',
 	other: 'Other',
 }
 
-// --- Grouping logic ---
 function groupLoaders(loaders: Labrinth.Tags.v2.Loader[]) {
 	const groups = {
 		mods: [] as Labrinth.Tags.v2.Loader[],
 		plugins: [] as Labrinth.Tags.v2.Loader[],
+		packs: [] as Labrinth.Tags.v2.Loader[],
 		shaders: [] as Labrinth.Tags.v2.Loader[],
-		resourcepacks: [] as Labrinth.Tags.v2.Loader[],
-		datapacks: [] as Labrinth.Tags.v2.Loader[],
 		other: [] as Labrinth.Tags.v2.Loader[],
 	}
 
@@ -88,16 +83,16 @@ function groupLoaders(loaders: Labrinth.Tags.v2.Loader[]) {
 		'neoforge',
 		'forge',
 		'quilt',
-		'bta-babric',
-		'babric',
-		'legacy-fabric',
-		'risugami',
 		'liteloader',
 		'rift',
 		'ornithe',
-		'java-agent',
 		'nilloader',
+		'risugami',
+		'legacy-fabric',
+		'bta-babric',
+		'babric',
 		'modloader',
+		'java-agent',
 	]
 
 	const PLUGIN_SORT = [
@@ -106,21 +101,19 @@ function groupLoaders(loaders: Labrinth.Tags.v2.Loader[]) {
 		'spigot',
 		'bukkit',
 		'sponge',
-		'geyser',
+		'folia',
 		'bungeecord',
 		'velocity',
 		'waterfall',
-		'folia',
+		'geyser',
 	]
 
 	const SHADER_SORT = ['optifine', 'iris', 'canvas', 'vanilla']
-	const RESOURCEPACK_SORT = ['minecraft']
-	const DATAPACK_SORT = ['datapack']
+	const PACKS_SORT = ['minecraft', 'datapack']
 
 	for (const loader of loaders) {
 		const name = loader.name.toLowerCase()
-		if (DATAPACK_SORT.includes(name)) groups.datapacks.push(loader)
-		else if (RESOURCEPACK_SORT.includes(name)) groups.resourcepacks.push(loader)
+		if (PACKS_SORT.includes(name)) groups.packs.push(loader)
 		else if (SHADER_SORT.includes(name)) groups.shaders.push(loader)
 		else if (PLUGIN_SORT.includes(name)) groups.plugins.push(loader)
 		else if (MOD_SORT.includes(name)) groups.mods.push(loader)
@@ -133,8 +126,6 @@ function groupLoaders(loaders: Labrinth.Tags.v2.Loader[]) {
 	sortByOrder(groups.mods, MOD_SORT)
 	sortByOrder(groups.plugins, PLUGIN_SORT)
 	sortByOrder(groups.shaders, SHADER_SORT)
-	sortByOrder(groups.resourcepacks, RESOURCEPACK_SORT)
-	sortByOrder(groups.datapacks, DATAPACK_SORT)
 
 	return groups
 }
