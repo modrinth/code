@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                delphi_report_issues.id AS \"id\", report_id,\n                issue_type,\n                delphi_report_issues.status AS \"status: DelphiReportIssueStatus\",\n\n                file_id, delphi_version, artifact_url, created, severity AS \"severity: DelphiSeverity\",\n                json_array(SELECT to_jsonb(delphi_report_issue_details)\n                    FROM delphi_report_issue_details\n                    WHERE issue_id = delphi_report_issues.id\n                ) AS \"details: sqlx::types::Json<Vec<ReportIssueDetail>>\",\n                versions.mod_id AS \"project_id?\", mods.published AS \"project_published?\"\n            FROM delphi_report_issues\n            INNER JOIN delphi_reports ON delphi_reports.id = report_id\n            LEFT OUTER JOIN files ON files.id = file_id\n            LEFT OUTER JOIN versions ON versions.id = files.version_id\n            LEFT OUTER JOIN mods ON mods.id = versions.mod_id\n            WHERE\n                (issue_type = $1 OR $1 IS NULL)\n                AND (delphi_report_issues.status = $2 OR $2 IS NULL)\n            ORDER BY\n                CASE WHEN $3 = 'created_asc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END ASC,\n                CASE WHEN $3 = 'created_desc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END DESC,\n                CASE WHEN $3 = 'pending_status_first' THEN delphi_report_issues.status ELSE 'pending'::delphi_report_issue_status END ASC,\n                CASE WHEN $3 = 'severity_asc' THEN delphi_reports.severity ELSE 'low'::delphi_severity END ASC,\n                CASE WHEN $3 = 'severity_desc' THEN delphi_reports.severity ELSE 'low'::delphi_severity END DESC\n            OFFSET $5\n            LIMIT $4\n            ",
+  "query": "\n            SELECT\n                delphi_report_issues.id AS \"id\", report_id,\n                issue_type,\n                delphi_report_issues.status AS \"status: DelphiReportIssueStatus\",\n\n                file_id, delphi_version, artifact_url, created, severity AS \"severity: DelphiSeverity\",\n\n                -- TODO: replace with `json_array` in Postgres 16\n                (\n                    SELECT json_agg(to_jsonb(delphi_report_issue_details))\n                    FROM delphi_report_issue_details\n                    WHERE issue_id = delphi_report_issues.id\n                ) AS \"details: sqlx::types::Json<Vec<ReportIssueDetail>>\",\n                versions.mod_id AS \"project_id?\", mods.published AS \"project_published?\"\n            FROM delphi_report_issues\n            INNER JOIN delphi_reports ON delphi_reports.id = report_id\n            LEFT OUTER JOIN files ON files.id = file_id\n            LEFT OUTER JOIN versions ON versions.id = files.version_id\n            LEFT OUTER JOIN mods ON mods.id = versions.mod_id\n            WHERE\n                (issue_type = $1 OR $1 IS NULL)\n                AND (delphi_report_issues.status = $2 OR $2 IS NULL)\n            ORDER BY\n                CASE WHEN $3 = 'created_asc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END ASC,\n                CASE WHEN $3 = 'created_desc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END DESC,\n                CASE WHEN $3 = 'pending_status_first' THEN delphi_report_issues.status ELSE 'pending'::delphi_report_issue_status END ASC,\n                CASE WHEN $3 = 'severity_asc' THEN delphi_reports.severity ELSE 'low'::delphi_severity END ASC,\n                CASE WHEN $3 = 'severity_desc' THEN delphi_reports.severity ELSE 'low'::delphi_severity END DESC\n            OFFSET $5\n            LIMIT $4\n            ",
   "describe": {
     "columns": [
       {
@@ -74,7 +74,7 @@
       {
         "ordinal": 9,
         "name": "details: sqlx::types::Json<Vec<ReportIssueDetail>>",
-        "type_info": "Jsonb"
+        "type_info": "Json"
       },
       {
         "ordinal": 10,
@@ -122,5 +122,5 @@
       true
     ]
   },
-  "hash": "749fc694a88b419d30f820b7563aad9db6ed1b17ae7002172b4172b959bd7710"
+  "hash": "d9b6a1b7fb133f7aec7599e06e21ac8460088b70cd115c3d5ebf9474aa4d54fa"
 }

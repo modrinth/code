@@ -191,7 +191,10 @@ impl DBDelphiReportIssue {
                 delphi_report_issues.status AS "status: DelphiReportIssueStatus",
 
                 file_id, delphi_version, artifact_url, created, severity AS "severity: DelphiSeverity",
-                json_array(SELECT to_jsonb(delphi_report_issue_details)
+
+                -- TODO: replace with `json_array` in Postgres 16
+                (
+                    SELECT json_agg(to_jsonb(delphi_report_issue_details))
                     FROM delphi_report_issue_details
                     WHERE issue_id = delphi_report_issues.id
                 ) AS "details: sqlx::types::Json<Vec<ReportIssueDetail>>",

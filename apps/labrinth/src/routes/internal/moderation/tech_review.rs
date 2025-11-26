@@ -187,8 +187,9 @@ async fn get_issue(
         SELECT
             to_jsonb(dri)
             || jsonb_build_object(
-                'details', json_array(
-                    SELECT to_jsonb(drid)
+                -- TODO: replace with `json_array` in Postgres 16
+                'details', (
+                    SELECT json_agg(to_jsonb(drid))
                     FROM delphi_report_issue_details drid
                     WHERE drid.issue_id = dri.id
                 )
@@ -242,16 +243,19 @@ async fn get_report(
                 'file_size', f.size,
                 'flag_reason', 'delphi',
                 'download_url', f.url,
-                'issues', json_array(
-                    SELECT
+                -- TODO: replace with `json_array` in Postgres 16
+                'issues', (
+                    SELECT json_agg(
                         to_jsonb(dri)
                         || jsonb_build_object(
-                            'details', json_array(
-                                SELECT to_jsonb(drid)
+                            -- TODO: replace with `json_array` in Postgres 16
+                            'details', (
+                                SELECT json_agg(to_jsonb(drid))
                                 FROM delphi_report_issue_details drid
                                 WHERE drid.issue_id = dri.id
                             )
                         )
+                    )
                     FROM delphi_report_issues dri
                     WHERE dri.report_id = dr.id
                 )
@@ -356,24 +360,29 @@ async fn search_projects(
                     'file_size', f.size,
                     'flag_reason', 'delphi',
                     'download_url', f.url,
-                    'issues', json_array(
-                        SELECT
+                    -- TODO: replace with `json_array` in Postgres 16
+                    'issues', (
+                        SELECT json_agg(
                             to_jsonb(dri)
                             || jsonb_build_object(
-                                'details', json_array(
-                                    SELECT jsonb_build_object(
-                                        'id', drid.id,
-                                        'issue_id', drid.issue_id,
-                                        'key', drid.key,
-                                        'file_path', drid.file_path,
-                                        -- ignore `decompiled_source`
-                                        'data', drid.data,
-                                        'severity', drid.severity
+                                -- TODO: replace with `json_array` in Postgres 16
+                                'details', (
+                                    SELECT json_agg(
+                                        jsonb_build_object(
+                                            'id', drid.id,
+                                            'issue_id', drid.issue_id,
+                                            'key', drid.key,
+                                            'file_path', drid.file_path,
+                                            -- ignore `decompiled_source`
+                                            'data', drid.data,
+                                            'severity', drid.severity
+                                        )
                                     )
                                     FROM delphi_report_issue_details drid
                                     WHERE drid.issue_id = dri.id
                                 )
                             )
+                        )
                         FROM delphi_report_issues dri
                         WHERE dri.report_id = dr.id
                     )
