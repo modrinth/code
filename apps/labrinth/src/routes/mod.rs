@@ -161,6 +161,8 @@ pub enum ApiError {
     RateLimitError(u128, u32),
     #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
+    #[error("Error while interacting with Delphi: {0}")]
+    Delphi(reqwest::Error),
 }
 
 impl ApiError {
@@ -201,6 +203,7 @@ impl ApiError {
                 Self::Stripe(..) => "stripe_error",
                 Self::TaxProcessor(..) => "tax_processor_error",
                 Self::Slack(..) => "slack_error",
+                Self::Delphi(..) => "delphi_error",
             },
             description: match self {
                 Self::Internal(e) => format!("{e:#?}"),
@@ -249,6 +252,7 @@ impl actix_web::ResponseError for ApiError {
             Self::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
             Self::TaxProcessor(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Slack(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Delphi(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

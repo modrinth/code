@@ -7,7 +7,7 @@ use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Thread {
     pub id: ThreadId,
     #[serde(rename = "type")]
@@ -18,7 +18,7 @@ pub struct Thread {
     pub members: Vec<User>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ThreadMessage {
     pub id: ThreadMessageId,
     pub author_id: Option<UserId>,
@@ -27,7 +27,7 @@ pub struct ThreadMessage {
     pub hide_identity: bool,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum MessageBody {
     Text {
@@ -50,7 +50,9 @@ pub enum MessageBody {
     },
 }
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum ThreadType {
     Report,

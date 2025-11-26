@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            to_jsonb(dri)\n            || jsonb_build_object(\n                -- TODO: replace with `json_array` in Postgres 16\n                'details', (\n                    SELECT json_agg(to_jsonb(drid))\n                    FROM delphi_report_issue_details drid\n                    WHERE drid.issue_id = dri.id\n                )\n            ) AS \"data!: sqlx::types::Json<FileIssue>\"\n        FROM delphi_report_issues dri\n        WHERE dri.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "data!: sqlx::types::Json<FileIssue>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "7d1f49699e242f3e002afee9bf466b6696052ac6d5ebe131b9e7242104f700af"
+}

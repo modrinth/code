@@ -1,0 +1,39 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO delphi_report_issue_details (issue_id, key, file_path, decompiled_source, data, severity)\n            VALUES ($1, $2, $3, $4, $5, $6)\n            RETURNING id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Text",
+        "Text",
+        "Jsonb",
+        {
+          "Custom": {
+            "name": "delphi_severity",
+            "kind": {
+              "Enum": [
+                "low",
+                "medium",
+                "high",
+                "severe"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "b65094517546487e43b65a76aa38efd9e422151b683d9897a071ee0c4bac1cd4"
+}
