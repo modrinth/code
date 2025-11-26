@@ -53,40 +53,16 @@
 				maxlength="32"
 			/>
 		</div>
-		<div class="flex flex-col gap-2">
-			<div class="flex items-center justify-between">
-				<span class="font-semibold text-contrast"> Loaders <span class="text-red">*</span> </span>
-				<ButtonStyled type="transparent" size="standard">
-					<button @click="clearAllLoaders()">Clear all</button>
-				</ButtonStyled>
-			</div>
-			<div
-				class="flex flex-wrap gap-1.5 gap-y-2 rounded-xl border border-solid border-surface-5 p-3 py-4"
-			>
-				<ButtonStyled
-					v-for="loader in generatedState.loaders.map((x) => x.name)"
-					:key="`platform-tag-${loader}`"
-					:color="selectedLoaders.includes(loader) ? 'green' : undefined"
-					:highlighted="selectedLoaders.includes(loader)"
-					type="chip"
-					size="standard"
-				>
-					<button :style="`color: var(--color-platform-${loader})`" @click="toggleLoader(loader)">
-						<div>
-							<!-- eslint-disable-next-line vue/no-v-html -->
-							<div v-html="generatedState.loaders?.find((x) => x.name === loader)?.icon"></div>
-						</div>
-						{{ formatCategory(loader) }}
-					</button>
-				</ButtonStyled>
-			</div>
+		<div>
+			<LoaderPicker v-model="selectedLoaders" :loaders="generatedState.loaders" />
 		</div>
 	</div>
 </template>
 
 <script lang="ts" setup>
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
-import { formatCategory } from '@modrinth/utils'
+
+import LoaderPicker from '../components/LoaderPicker.vue'
 
 const generatedState = useGeneratedState()
 
@@ -96,16 +72,4 @@ const versionNumber = ref('')
 const versionSubtitle = ref('')
 
 const selectedLoaders = ref<string[]>([])
-
-const toggleLoader = (loader: string) => {
-	if (selectedLoaders.value.includes(loader)) {
-		selectedLoaders.value = selectedLoaders.value.filter((l) => l !== loader)
-	} else {
-		selectedLoaders.value.push(loader)
-	}
-}
-
-const clearAllLoaders = () => {
-	selectedLoaders.value = []
-}
 </script>
