@@ -1,7 +1,8 @@
 name: labrinth
 services:
   postgres_db:
-    image: postgres:alpine
+    # staging/prod Labrinth are currently using this version of Postgres
+    image: postgres:15-alpine
     container_name: labrinth-postgres
     volumes:
       - db-data:/var/lib/postgresql/data
