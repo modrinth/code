@@ -935,17 +935,19 @@ pub async fn upload_file(
         || force_primary
         || total_files_len == 1;
 
-    let file_path = format!(
+    let file_path_encode = format!(
         "data/{project_id}/versions/{version_id}/{}",
         urlencoding::encode(file_name)
     );
+    let file_path =
+        format!("data/{project_id}/versions/{version_id}/{file_name}");
 
     let upload_data = file_host
         .upload_file(content_type, &file_path, FileHostPublicity::Public, data)
         .await?;
 
     uploaded_files.push(UploadedFile {
-        name: file_path.clone(),
+        name: file_path,
         publicity: FileHostPublicity::Public,
     });
 
@@ -971,7 +973,7 @@ pub async fn upload_file(
 
     version_files.push(VersionFileBuilder {
         filename: file_name.to_string(),
-        url: format!("{}/{file_path}", dotenvy::var("CDN_URL")?),
+        url: format!("{}/{file_path_encode}", dotenvy::var("CDN_URL")?),
         hashes: vec![
             models::version_item::HashBuilder {
                 algorithm: "sha1".to_string(),
