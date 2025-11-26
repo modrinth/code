@@ -29,9 +29,12 @@ function openModal() {
 }
 
 const props = defineProps<{
-	project: Labrinth.Projects.v3.Project
+	projectV3: Labrinth.Projects.v3.Project
 	versions: Labrinth.Versions.v3.Version[]
 }>()
 
-provideVersionsContext(props)
+provideVersionsContext({
+	project: props.projectV3,
+	versions: props.versions,
+})
 </script>

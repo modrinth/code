@@ -29,9 +29,9 @@
 						@remove="onRemoveFile(idx)"
 					/>
 				</div>
-				<span
-					>The primary file is the default file a user downloads when installing the project.</span
-				>
+				<span>
+					The primary file is the default file a user downloads when installing the project.
+				</span>
 			</div>
 		</template>
 	</div>
