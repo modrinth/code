@@ -7,6 +7,18 @@ export class ArchonServersV0Module extends AbstractModule {
 	}
 
 	/**
+	 * Get a specific server by ID
+	 * GET /modrinth/v0/servers/:id
+	 */
+	public async get(serverId: string): Promise<Archon.Servers.v0.Server> {
+		return this.client.request<Archon.Servers.v0.Server>(`/servers/${serverId}`, {
+			api: 'archon',
+			method: 'GET',
+			version: 'modrinth/v0',
+		})
+	}
+
+	/**
 	 * Get list of servers for the authenticated user
 	 * GET /modrinth/v0/servers
 	 */

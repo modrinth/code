@@ -128,6 +128,14 @@ export namespace Archon {
 
 	export namespace Backups {
 		export namespace v1 {
+			export type BackupState = 'ongoing' | 'done' | 'failed' | 'cancelled' | 'unchanged'
+			export type BackupTask = 'create' | 'restore'
+
+			export type BackupTaskProgress = {
+				progress: number // 0.0 to 1.0
+				state: BackupState
+			}
+
 			export type Backup = {
 				id: string
 				name: string
@@ -136,6 +144,10 @@ export namespace Archon {
 				automated: boolean
 				interrupted: boolean
 				ongoing: boolean
+				task?: {
+					create?: BackupTaskProgress
+					restore?: BackupTaskProgress
+				}
 			}
 
 			export type BackupRequest = {

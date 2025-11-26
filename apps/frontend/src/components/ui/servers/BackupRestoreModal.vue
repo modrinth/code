@@ -17,29 +17,35 @@
 </template>
 
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import type { NewModal } from '@modrinth/ui'
-import { ConfirmModal, injectNotificationManager } from '@modrinth/ui'
-import type { Backup } from '@modrinth/utils'
+import { ConfirmModal, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
 import BackupItem from '~/components/ui/servers/BackupItem.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { injectModrinthServerContext } from '~/providers/server-context.ts'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const ctx = injectModrinthServerContext()
 
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const backupsQueryKey = ['backups', 'list', ctx.serverId]
+const restoreMutation = useMutation({
+	mutationFn: (backupId: string) => client.archon.backups_v1.restore(ctx.serverId, backupId),
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+})
 
 const modal = ref<InstanceType<typeof NewModal>>()
-const currentBackup = ref<Backup | null>(null)
+const currentBackup = ref<Archon.Backups.v1.Backup | null>(null)
 
-function show(backup: Backup) {
+function show(backup: Archon.Backups.v1.Backup) {
 	currentBackup.value = backup
 	modal.value?.show()
 }
 
-const restoreBackup = async () => {
+const restoreBackup = () => {
 	if (!currentBackup.value) {
 		addNotification({
 			type: 'error',
@@ -49,12 +55,15 @@ const restoreBackup = async () => {
 		return
 	}
 
-	try {
-		await props.server.backups?.restore(currentBackup.value.id)
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error)
-		addNotification({ type: 'error', title: 'Failed to restore backup', text: message })
-	}
+	restoreMutation.mutate(currentBackup.value.id, {
+		onSuccess: () => {
+			modal.value?.hide()
+		},
+		onError: (error) => {
+			const message = error instanceof Error ? error.message : String(error)
+			addNotification({ type: 'error', title: 'Failed to restore backup', text: message })
+		},
+	})
 }
 
 defineExpose({

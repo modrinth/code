@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import {
 	BotIcon,
 	DownloadIcon,
@@ -14,7 +15,6 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from '@modrinth/ui'
-import type { Backup } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
@@ -29,7 +29,7 @@ const emit = defineEmits<{
 
 const props = withDefaults(
 	defineProps<{
-		backup: Backup
+		backup: Archon.Backups.v1.Backup
 		preview?: boolean
 		kyrosUrl?: string
 		jwt?: string

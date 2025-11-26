@@ -362,6 +362,7 @@
 
 <script setup lang="ts">
 import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
+import type { Archon } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	CopyIcon,
@@ -376,6 +377,7 @@ import {
 import {
 	ButtonStyled,
 	ErrorInformationCard,
+	injectModrinthClient,
 	injectNotificationManager,
 	ServerIcon,
 	ServerInfoLabels,
@@ -384,11 +386,11 @@ import {
 import type {
 	Backup,
 	PowerAction,
-	ServerState,
 	Stats,
 	WSEvent,
 	WSInstallationResultEvent,
 } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import type { MessageDescriptor } from '@vintl/vintl'
 import DOMPurify from 'dompurify'
 import { computed, onMounted, onUnmounted, type Reactive, ref } from 'vue'
@@ -404,9 +406,11 @@ import ServerInstallation from '~/components/ui/servers/ServerInstallation.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
+import { type PowerState, provideModrinthServerContext } from '~/providers/server-context.ts'
 import { useModrinthServersConsole } from '~/store/console.ts'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
 
 const socket = ref<WebSocket | null>(null)
 const isReconnecting = ref(false)
@@ -429,6 +433,12 @@ const createdAt = ref(
 const route = useNativeRoute()
 const router = useRouter()
 const serverId = route.params.id as string
+
+// TODO: ditch useModrinthServers for this + ctx DI.
+const { data: n_server } = useQuery({
+	queryKey: ['servers', 'detail', serverId],
+	queryFn: () => client.archon.servers_v0.get(serverId)!,
+})
 
 const server: Reactive<ModrinthServer> = await useModrinthServers(serverId, ['general', 'ws'])
 
@@ -453,8 +463,16 @@ const cpuData = ref<number[]>([])
 const ramData = ref<number[]>([])
 const isActioning = ref(false)
 const isServerRunning = computed(() => serverPowerState.value === 'running')
-const serverPowerState = ref<ServerState>('stopped')
+const serverPowerState = ref<PowerState>('stopped')
 const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>()
+
+provideModrinthServerContext({
+	serverId,
+	server: n_server as Ref<Archon.Servers.v0.Server>,
+	isConnected,
+	powerState: serverPowerState,
+	isServerRunning,
+})
 
 const uptimeSeconds = ref(0)
 const firstConnect = ref(true)
@@ -929,7 +947,7 @@ const updateStats = (currentStats: Stats['current']) => {
 }
 
 const updatePowerState = (
-	state: ServerState,
+	state: PowerState,
 	details?: { oom_killed?: boolean; exit_code?: number },
 ) => {
 	serverPowerState.value = state

@@ -1,8 +1,5 @@
 <template>
-	<div
-		v-if="server.moduleErrors.backups"
-		class="flex w-full flex-col items-center justify-center gap-4 p-4"
-	>
+	<div v-if="error" class="flex w-full flex-col items-center justify-center gap-4 p-4">
 		<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
 			<div class="flex flex-col items-center text-center">
 				<div class="flex flex-col items-center gap-4">
@@ -15,62 +12,60 @@
 					We couldn't load your server's backups. Here's what went wrong:
 				</p>
 				<p>
-					<span class="break-all font-mono">{{
-						JSON.stringify(server.moduleErrors.backups.error)
-					}}</span>
+					<span class="break-all font-mono">{{ error.message }}</span>
 				</p>
-				<ButtonStyled size="large" color="brand" @click="() => server.refresh(['backups'])">
+				<ButtonStyled size="large" color="brand" @click="refetch">
 					<button class="mt-6 !w-full">Retry</button>
 				</ButtonStyled>
 			</div>
 		</div>
 	</div>
-	<div v-else-if="data" class="contents">
-		<BackupCreateModal ref="createBackupModal" :server="server" />
-		<BackupRenameModal ref="renameBackupModal" :server="server" />
-		<BackupRestoreModal ref="restoreBackupModal" :server="server" />
-		<BackupDeleteModal ref="deleteBackupModal" :server="server" @delete="deleteBackup" />
-		<BackupSettingsModal ref="backupSettingsModal" :server="server" />
+	<div v-else class="contents">
+		<BackupCreateModal ref="createBackupModal" />
+		<BackupRenameModal ref="renameBackupModal" />
+		<BackupRestoreModal ref="restoreBackupModal" />
+		<BackupDeleteModal ref="deleteBackupModal" @delete="deleteBackup" />
+		<!-- <BackupSettingsModal ref="backupSettingsModal" /> -->
 
 		<div class="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
 			<div class="flex flex-col gap-2">
 				<div class="flex items-center gap-2">
 					<h1 class="m-0 text-2xl font-extrabold text-contrast">Backups</h1>
 					<TagItem
-						v-tooltip="`${data.backup_quota - data.used_backup_quota} backup slots remaining`"
+						v-tooltip="`${server.backup_quota - server.used_backup_quota} backup slots remaining`"
 						class="cursor-help"
 						:style="{
 							'--_color':
-								data.backup_quota <= data.used_backup_quota
+								server.backup_quota <= server.used_backup_quota
 									? 'var(--color-red)'
-									: data.backup_quota - data.used_backup_quota <= 3
+									: server.backup_quota - server.used_backup_quota <= 3
 										? 'var(--color-orange)'
 										: undefined,
 							'--_bg-color':
-								data.backup_quota <= data.used_backup_quota
+								server.backup_quota <= server.used_backup_quota
 									? 'var(--color-red-bg)'
-									: data.backup_quota - data.used_backup_quota <= 3
+									: server.backup_quota - server.used_backup_quota <= 3
 										? 'var(--color-orange-bg)'
 										: undefined,
 						}"
 					>
-						{{ data.used_backup_quota }} / {{ data.backup_quota }}
+						{{ server.used_backup_quota }} / {{ server.backup_quota }}
 					</TagItem>
 				</div>
 				<p class="m-0">
-					You can have up to {{ data.backup_quota }} backups at once, stored securely off-site.
+					You can have up to {{ server.backup_quota }} backups at once, stored securely off-site.
 				</p>
 			</div>
 			<div
 				class="grid w-full grid-cols-[repeat(auto-fit,_minmax(180px,1fr))] gap-2 sm:flex sm:w-fit sm:flex-row"
 			>
 				<ButtonStyled type="standard">
+					<!-- TODO: When auto backups are implemented re-add the @click event -->
 					<button
 						v-tooltip="
 							'Auto backups are currently unavailable; we apologize for the inconvenience.'
 						"
-						:disabled="true || server.general?.status === 'installing'"
-						@click="showbackupSettingsModal"
+						:disabled="true || server.status === 'installing'"
 					>
 						<SettingsIcon class="h-5 w-5" />
 						Auto backups
@@ -95,7 +90,7 @@
 				v-if="backups.length === 0"
 				class="mt-6 flex items-center justify-center gap-2 text-center text-secondary"
 			>
-				<template v-if="data.used_backup_quota">
+				<template v-if="server.used_backup_quota">
 					<SpinnerIcon class="animate-spin" />
 					Loading backups...
 				</template>
@@ -105,8 +100,8 @@
 				v-for="backup in backups"
 				:key="`backup-${backup.id}`"
 				:backup="backup"
-				:kyros-url="props.server.general?.node.instance"
-				:jwt="props.server.general?.node.token"
+				:kyros-url="server.node?.instance"
+				:jwt="server.node?.token"
 				@download="() => triggerDownloadAnimation()"
 				@rename="() => renameBackupModal?.show(backup)"
 				@restore="() => restoreBackupModal?.show(backup)"
@@ -149,9 +144,15 @@
 </template>
 
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import { DownloadIcon, IssuesIcon, PlusIcon, SettingsIcon, SpinnerIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, TagItem } from '@modrinth/ui'
-import type { Backup } from '@modrinth/utils'
+import {
+	ButtonStyled,
+	injectModrinthClient,
+	injectNotificationManager,
+	TagItem,
+} from '@modrinth/ui'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
@@ -160,17 +161,20 @@ import BackupDeleteModal from '~/components/ui/servers/BackupDeleteModal.vue'
 import BackupItem from '~/components/ui/servers/BackupItem.vue'
 import BackupRenameModal from '~/components/ui/servers/BackupRenameModal.vue'
 import BackupRestoreModal from '~/components/ui/servers/BackupRestoreModal.vue'
-import BackupSettingsModal from '~/components/ui/servers/BackupSettingsModal.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+// import BackupSettingsModal from '~/components/ui/servers/BackupSettingsModal.vue'
+import { injectModrinthServerContext } from '~/providers/server-context.ts'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const { server } = injectModrinthServerContext()
+
 const props = defineProps<{
-	server: ModrinthServer
 	isServerRunning: boolean
 }>()
 
 const route = useNativeRoute()
-const serverId = route.params.id
+const serverId = route.params.id as string
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 	backupWhileRunning: false,
@@ -178,42 +182,69 @@ const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 
 defineEmits(['onDownload'])
 
-const data = computed(() => props.server.general)
-const backups = computed(() => {
-	if (!props.server.backups?.data) return []
+const backupsQueryKey = ['backups', 'list', serverId]
+const {
+	data: backupsData,
+	error,
+	refetch,
+} = useQuery({
+	queryKey: backupsQueryKey,
+	queryFn: () => client.archon.backups_v1.list(serverId),
+})
 
-	return [...props.server.backups.data].sort((a, b) => {
+const deleteMutation = useMutation({
+	mutationFn: (backupId: string) => client.archon.backups_v1.delete(serverId, backupId),
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+})
+
+const lockMutation = useMutation({
+	mutationFn: (backupId: string) => client.archon.backups_v1.lock(serverId, backupId),
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+})
+
+const unlockMutation = useMutation({
+	mutationFn: (backupId: string) => client.archon.backups_v1.unlock(serverId, backupId),
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+})
+
+const retryMutation = useMutation({
+	mutationFn: (backupId: string) => client.archon.backups_v1.retry(serverId, backupId),
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+})
+
+const backups = computed(() => {
+	if (!backupsData.value) return []
+	return [...backupsData.value].sort((a, b) => {
 		return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
 	})
 })
 
 useHead({
-	title: `Backups - ${data.value?.name ?? 'Server'} - Modrinth`,
+	title: `Backups - ${server.value.name ?? 'Server'} - Modrinth`,
 })
 
 const overTheTopDownloadAnimation = ref()
-
 const createBackupModal = ref<InstanceType<typeof BackupCreateModal>>()
 const renameBackupModal = ref<InstanceType<typeof BackupRenameModal>>()
 const restoreBackupModal = ref<InstanceType<typeof BackupRestoreModal>>()
 const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>()
-const backupSettingsModal = ref<InstanceType<typeof BackupSettingsModal>>()
+// const backupSettingsModal = ref<InstanceType<typeof BackupSettingsModal>>()
 
 const backupCreationDisabled = computed(() => {
 	if (props.isServerRunning && !userPreferences.value.backupWhileRunning) {
 		return 'Cannot create backup while server is running'
 	}
 	if (
-		data.value?.used_backup_quota !== undefined &&
-		data.value?.backup_quota !== undefined &&
-		data.value?.used_backup_quota >= data.value?.backup_quota
+		server.value.used_backup_quota !== undefined &&
+		server.value.backup_quota !== undefined &&
+		server.value.used_backup_quota >= server.value.backup_quota
 	) {
-		return `All ${data.value.backup_quota} of your backup slots are in use`
+		return `All ${server.value.backup_quota} of your backup slots are in use`
 	}
 	if (backups.value.some((backup) => backup.task?.create?.state === 'ongoing')) {
 		return 'A backup is already in progress'
 	}
-	if (props.server.general?.status === 'installing') {
+	if (server.value.status === 'installing') {
 		return 'Cannot create backup while server is installing'
 	}
 	return undefined
@@ -223,43 +254,40 @@ const showCreateModel = () => {
 	createBackupModal.value?.show()
 }
 
-const showbackupSettingsModal = () => {
-	backupSettingsModal.value?.show()
-}
+// const showbackupSettingsModal = () => {
+// 	backupSettingsModal.value?.show()
+// }
 
 function triggerDownloadAnimation() {
 	overTheTopDownloadAnimation.value = true
 	setTimeout(() => (overTheTopDownloadAnimation.value = false), 500)
 }
 
-const lockBackup = async (backupId: string) => {
-	try {
-		await props.server.backups?.lock(backupId)
-		await props.server.refresh(['backups'])
-	} catch (error) {
-		console.error('Failed to toggle lock:', error)
-	}
+const lockBackup = (backupId: string) => {
+	lockMutation.mutate(backupId, {
+		onError: (err) => {
+			console.error('Failed to lock backup:', err)
+		},
+	})
 }
 
-const unlockBackup = async (backupId: string) => {
-	try {
-		await props.server.backups?.unlock(backupId)
-		await props.server.refresh(['backups'])
-	} catch (error) {
-		console.error('Failed to toggle lock:', error)
-	}
+const unlockBackup = (backupId: string) => {
+	unlockMutation.mutate(backupId, {
+		onError: (err) => {
+			console.error('Failed to unlock backup:', err)
+		},
+	})
 }
 
-const retryBackup = async (backupId: string) => {
-	try {
-		await props.server.backups?.retry(backupId)
-		await props.server.refresh(['backups'])
-	} catch (error) {
-		console.error('Failed to retry backup:', error)
-	}
+const retryBackup = (backupId: string) => {
+	retryMutation.mutate(backupId, {
+		onError: (err) => {
+			console.error('Failed to retry backup:', err)
+		},
+	})
 }
 
-async function deleteBackup(backup?: Backup) {
+function deleteBackup(backup?: Archon.Backups.v1.Backup) {
 	if (!backup) {
 		addNotification({
 			type: 'error',
@@ -269,17 +297,16 @@ async function deleteBackup(backup?: Backup) {
 		return
 	}
 
-	try {
-		await props.server.backups?.delete(backup.id)
-		await props.server.refresh()
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error)
-		addNotification({
-			type: 'error',
-			title: 'Error deleting backup',
-			text: message,
-		})
-	}
+	deleteMutation.mutate(backup.id, {
+		onError: (err) => {
+			const message = err instanceof Error ? err.message : String(err)
+			addNotification({
+				type: 'error',
+				title: 'Error deleting backup',
+				text: message,
+			})
+		},
+	})
 }
 </script>
 
