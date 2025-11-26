@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-4 flex flex-col gap-4">
+	<div class="mb-4 flex w-full max-w-[496px] flex-col gap-4">
 		<FileInput
 			prompt="Drag and drop to upload or click to select"
 			aria-label="Upload additional file"

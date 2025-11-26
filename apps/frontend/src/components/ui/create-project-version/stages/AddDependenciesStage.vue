@@ -1,13 +1,7 @@
 <template>
-  <div>
-    
-  </div>
+	<div class="w-full max-w-[496px]"></div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup></script>
 
-</script>
-
-<style>
-
-</style>
+<style></style>

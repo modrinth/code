@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-6">
+	<div class="flex w-full max-w-[496px] flex-col gap-6">
 		<div class="space-y-2">
 			<span class="font-semibold text-contrast">
 				Minecraft versions <span class="text-red">*</span>

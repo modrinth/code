@@ -14,9 +14,7 @@
 			</div>
 		</template>
 
-		<div class="mx-auto w-full max-w-[496px] sm:mx-0 sm:min-w-[496px]">
-			<component :is="stages[currentStageIndex].stageContent" />
-		</div>
+		<component :is="stages[currentStageIndex].stageContent" />
 
 		<template #actions>
 			<div class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
