@@ -49,7 +49,7 @@ const stages: InstanceType<typeof MultiStageModal>['$props']['stages'] = [
 		rightButtonConfig: { ...defaultNextButton },
 	},
 	{
-		title: 'Add Minecraft Versions',
+		title: 'Add MC Versions',
 		stageContent: AddMcVersionsStage,
 		leftButtonConfig: { ...defaultBackButton },
 		rightButtonConfig: { ...defaultNextButton },
