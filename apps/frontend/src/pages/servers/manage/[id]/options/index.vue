@@ -84,16 +84,19 @@
 								@change="uploadFile"
 							/>
 							<div
-								class="absolute top-0 hidden size-[6rem] flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
+								class="absolute top-0 hidden size-24 flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
 							>
 								<EditIcon class="h-8 w-8 text-contrast" />
 							</div>
-							<ServerIcon :image="icon" />
+							<ServerIcon class="size-24" :image="icon" />
 						</div>
 						<ButtonStyled>
-							<button v-tooltip="'Synchronize icon with installed modpack'" @click="resetIcon">
-								<TransferIcon class="h-6 w-6" />
-								<span>Sync icon</span>
+							<button
+								v-tooltip="'Synchronize icon with installed modpack'"
+								class="my-auto"
+								@click="resetIcon"
+							>
+								<TransferIcon /> Sync icon
 							</button>
 						</ButtonStyled>
 					</div>
@@ -112,8 +115,8 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, ServerIcon, TransferIcon } from '@modrinth/assets'
-import { injectNotificationManager } from '@modrinth/ui'
+import { EditIcon, TransferIcon } from '@modrinth/assets'
+import { injectNotificationManager, ServerIcon } from '@modrinth/ui'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
