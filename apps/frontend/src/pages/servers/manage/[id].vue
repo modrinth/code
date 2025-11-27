@@ -640,11 +640,11 @@ const handleLog = (data: Archon.Websocket.v0.WSLogEvent) => {
 
 const handleStats = (data: Archon.Websocket.v0.WSStatsEvent) => {
 	updateStats({
-		cpu_percent: data.cpu_used,
-		ram_usage_bytes: data.memory_used,
-		ram_total_bytes: data.memory_total,
-		storage_usage_bytes: data.disk_used,
-		storage_total_bytes: data.disk_total,
+		cpu_percent: data.cpu_percent,
+		ram_usage_bytes: data.ram_usage_bytes,
+		ram_total_bytes: data.ram_total_bytes,
+		storage_usage_bytes: data.storage_usage_bytes,
+		storage_total_bytes: data.storage_total_bytes,
 	})
 }
 
@@ -703,27 +703,25 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 		return
 	}
 
-	// The filesystem-ops event has an 'all' property with the full list of ops
-	const allOps = (data as any).all
-	if (!allOps) return
+	const allOps = data.all
 
 	if (JSON.stringify(server.fs.ops) !== JSON.stringify(allOps)) {
-		server.fs.ops = allOps
+		server.fs.ops = allOps as unknown as ModrinthServer['fs']['ops']
 	}
 
 	server.fs.queuedOps = server.fs.queuedOps.filter(
-		(queuedOp) => !allOps.some((x: any) => x.src === queuedOp.src),
+		(queuedOp) => !allOps.some((x) => x.src === queuedOp.src),
 	)
 
-	const cancelled = allOps.filter((x: any) => x.state === 'cancelled')
-	Promise.all(cancelled.map((x: any) => server.fs?.modifyOp(x.id, 'dismiss')))
+	const cancelled = allOps.filter((x) => x.state === 'cancelled')
+	Promise.all(cancelled.map((x) => server.fs?.modifyOp(x.id, 'dismiss')))
 
-	const completed = allOps.filter((x: any) => x.state === 'done')
+	const completed = allOps.filter((x) => x.state === 'done')
 	if (completed.length > 0) {
 		setTimeout(
 			async () =>
 				await Promise.all(
-					completed.map((x: any) => {
+					completed.map((x) => {
 						if (!server.fs?.opsQueuedForModification.includes(x.id)) {
 							server.fs?.opsQueuedForModification.push(x.id)
 							return server.fs?.modifyOp(x.id, 'dismiss')

@@ -190,14 +190,13 @@ export namespace Archon {
 
 			export type WSStatsEvent = {
 				event: 'stats'
-				cpu_used: number
-				memory_used: number
-				memory_total: number
-				swap_used: number
-				swap_total: number
-				disk_used: number
-				disk_total: number
-				uptime: number
+				cpu_percent: number
+				ram_usage_bytes: number
+				ram_total_bytes: number
+				storage_usage_bytes: number
+				storage_total_bytes: number
+				net_tx_bytes: number
+				net_rx_bytes: number
 			}
 
 			export type PowerState = 'running' | 'stopped' | 'starting' | 'stopping' | 'crashed'
@@ -247,12 +246,33 @@ export namespace Archon {
 				version_id: string
 			}
 
-			export type FilesystemOp = 'unarchive'
+			export type FilesystemOpKind = 'unarchive'
+
+			export type FilesystemOpState =
+				| 'queued'
+				| 'ongoing'
+				| 'done'
+				| 'cancelled'
+				| 'failure-corrupted'
+				| 'failure-invalid-path'
+
+			export type FilesystemOperation = {
+				op: FilesystemOpKind
+				id: string
+				progress: number
+				bytes_processed: number
+				files_processed: number
+				state: FilesystemOpState
+				mime: string
+				current_file?: string
+				invalid_path?: string
+				src: string
+				started: string
+			}
 
 			export type WSFilesystemOpsEvent = {
 				event: 'filesystem-ops'
-				op: FilesystemOp
-				progress: number
+				all: FilesystemOperation[]
 			}
 
 			// Outgoing messages (client -> server)
