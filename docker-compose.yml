@@ -1,7 +1,8 @@
 name: labrinth
 services:
   postgres_db:
-    image: postgres:alpine
+    # staging/prod Labrinth are currently using this version of Postgres
+    image: postgres:15-alpine
     container_name: labrinth-postgres
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -12,7 +13,7 @@ services:
       POSTGRES_PASSWORD: labrinth
       POSTGRES_HOST_AUTH_METHOD: trust
     healthcheck:
-      test: ['CMD', 'pg_isready']
+      test: ['CMD', 'pg_isready', '-U', 'labrinth']
       interval: 3s
       timeout: 5s
       retries: 3
@@ -114,6 +115,30 @@ services:
       watch:
         - path: ./apps/labrinth
           action: rebuild
+  delphi:
+    profiles:
+      - with-delphi
+    image: ghcr.io/modrinth/delphi:feature-schema-rework
+    container_name: labrinth-delphi
+    ports:
+      - '127.0.0.1:59999:59999'
+    environment:
+      LABRINTH_ENDPOINT: http://host.docker.internal:8000/_internal/delphi/ingest
+      LABRINTH_ADMIN_KEY: feedbeef
+    healthcheck:
+      test:
+        ['CMD', 'wget', '-q', '-O/dev/null', 'http://localhost:59999/health']
+      interval: 3s
+      timeout: 5s
+      retries: 3
+    volumes:
+      # Labrinth deposits version files here;
+      # Delphi reads them from here
+      - /tmp/modrinth:/tmp/modrinth:ro
+    extra_hosts:
+      # Delphi must send a message on a webhook to our backend,
+      # so it must have access to our local network
+      - 'host.docker.internal:host-gateway'
 volumes:
   meilisearch-data:
   db-data:

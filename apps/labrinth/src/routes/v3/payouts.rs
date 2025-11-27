@@ -22,8 +22,9 @@ use chrono::{DateTime, Duration, Utc};
 use eyre::eyre;
 use hex::ToHex;
 use hmac::{Hmac, Mac};
+use modrinth_util::decimal::Decimal2dp;
 use reqwest::Method;
-use rust_decimal::Decimal;
+use rust_decimal::{Decimal, RoundingStrategy};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Sha256;
@@ -423,8 +424,7 @@ pub async fn tremendous_webhook(
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Withdrawal {
-    #[serde(with = "rust_decimal::serde::float")]
-    amount: Decimal,
+    amount: Decimal2dp,
     #[serde(flatten)]
     method: PayoutMethodRequest,
     method_id: String,
@@ -432,7 +432,7 @@ pub struct Withdrawal {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WithdrawalFees {
-    pub fee: Decimal,
+    pub fee: Decimal2dp,
     pub exchange_rate: Option<Decimal>,
 }
 
@@ -583,7 +583,8 @@ pub async fn create_payout(
 
     let fees = payouts_queue
         .calculate_fees(&body.method, &body.method_id, body.amount)
-        .await?;
+        .await
+        .wrap_internal_err("failed to compute fees")?;
 
     // fees are a bit complicated here, since we have 2 types:
     // - method fees - this is what Tremendous, Mural, etc. will take from us
@@ -595,14 +596,18 @@ pub async fn create_payout(
     // then we issue a payout request with `amount - platform fees`
 
     let amount_minus_fee = body.amount - fees.total_fee();
-    if amount_minus_fee.round_dp(2) <= Decimal::ZERO {
+    if amount_minus_fee <= Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You need to withdraw more to cover the fee!".to_string(),
         ));
     }
 
-    let sent_to_method = (body.amount - fees.platform_fee).round_dp(2);
-    assert!(sent_to_method > Decimal::ZERO);
+    let sent_to_method = body.amount - fees.platform_fee;
+    if sent_to_method <= Decimal::ZERO {
+        return Err(ApiError::InvalidInput(
+            "You need to withdraw more to cover the fee!".to_string(),
+        ));
+    }
 
     let payout_id = generate_payout_id(&mut transaction)
         .await
@@ -653,13 +658,13 @@ struct PayoutContext<'a> {
     body: &'a Withdrawal,
     user: &'a DBUser,
     payout_id: DBPayoutId,
-    gross_amount: Decimal,
+    gross_amount: Decimal2dp,
     fees: PayoutFees,
     /// Set as the [`DBPayout::amount`] field.
-    amount_minus_fee: Decimal,
+    amount_minus_fee: Decimal2dp,
     /// Set as the [`DBPayout::fee`] field.
-    total_fee: Decimal,
-    sent_to_method: Decimal,
+    total_fee: Decimal2dp,
+    sent_to_method: Decimal2dp,
     payouts_queue: &'a PayoutsQueue,
 }
 
@@ -721,7 +726,10 @@ async fn tremendous_payout(
             forex.forex.get(&currency_code).wrap_internal_err_with(|| {
                 eyre!("no Tremendous forex data for {currency}")
             })?;
-        (sent_to_method * *exchange_rate, Some(currency_code))
+        (
+            sent_to_method.mul_round(*exchange_rate, RoundingStrategy::ToZero),
+            Some(currency_code),
+        )
     } else {
         (sent_to_method, None)
     };
@@ -770,8 +778,8 @@ async fn tremendous_payout(
         user_id: user.id,
         created: Utc::now(),
         status: PayoutStatus::InTransit,
-        amount: amount_minus_fee,
-        fee: Some(total_fee),
+        amount: amount_minus_fee.get(),
+        fee: Some(total_fee.get()),
         method: Some(PayoutMethodType::Tremendous),
         method_id: Some(body.method_id.clone()),
         method_address: Some(user_email.to_string()),
@@ -825,8 +833,8 @@ async fn mural_pay_payout(
         // after the payout has been successfully executed,
         // we wait for Mural's confirmation that the funds have been delivered
         status: PayoutStatus::InTransit,
-        amount: amount_minus_fee,
-        fee: Some(total_fee),
+        amount: amount_minus_fee.get(),
+        fee: Some(total_fee.get()),
         method: Some(PayoutMethodType::MuralPay),
         method_id: Some(method_id),
         method_address: Some(user_email.to_string()),
@@ -962,8 +970,8 @@ async fn paypal_payout(
         user_id: user.id,
         created: Utc::now(),
         status: PayoutStatus::InTransit,
-        amount: amount_minus_fee,
-        fee: Some(total_fee),
+        amount: amount_minus_fee.get(),
+        fee: Some(total_fee.get()),
         method: Some(body.method.method_type()),
         method_id: Some(body.method_id.clone()),
         method_address: Some(display_address.clone()),

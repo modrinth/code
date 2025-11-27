@@ -2,11 +2,12 @@ use ariadne::ids::UserId;
 use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
+use modrinth_util::decimal::Decimal2dp;
 use muralpay::{MuralError, MuralPay, TokenFeeRequest};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use tracing::{info, warn};
+use tracing::{info, trace, warn};
 
 use crate::{
     database::models::DBPayoutId,
@@ -35,7 +36,7 @@ pub enum MuralPayoutRequest {
 impl PayoutsQueue {
     pub async fn compute_muralpay_fees(
         &self,
-        amount: Decimal,
+        amount: Decimal2dp,
         fiat_and_rail_code: muralpay::FiatAndRailCode,
     ) -> Result<muralpay::TokenPayoutFee, ApiError> {
         let muralpay = self.muralpay.load();
@@ -48,7 +49,7 @@ impl PayoutsQueue {
             .get_fees_for_token_amount(&[TokenFeeRequest {
                 amount: muralpay::TokenAmount {
                     token_symbol: muralpay::USDC.into(),
-                    token_amount: amount,
+                    token_amount: amount.get(),
                 },
                 fiat_and_rail_code,
             }])
@@ -65,7 +66,7 @@ impl PayoutsQueue {
         &self,
         payout_id: DBPayoutId,
         user_id: UserId,
-        gross_amount: Decimal,
+        gross_amount: Decimal2dp,
         fees: PayoutFees,
         payout_details: MuralPayoutRequest,
         recipient_info: muralpay::PayoutRecipientInfo,
@@ -107,9 +108,9 @@ impl PayoutsQueue {
 
         let recipient_address = recipient_info.physical_address();
         let recipient_email = recipient_info.email().to_string();
-        let gross_amount_cents = gross_amount * Decimal::from(100);
-        let net_amount_cents = net_amount * Decimal::from(100);
-        let fees_cents = fees.total_fee() * Decimal::from(100);
+        let gross_amount_cents = gross_amount.get() * Decimal::from(100);
+        let net_amount_cents = net_amount.get() * Decimal::from(100);
+        let fees_cents = fees.total_fee().get() * Decimal::from(100);
         let address_line_3 = format!(
             "{}, {}, {}",
             recipient_address.city,
@@ -153,7 +154,7 @@ impl PayoutsQueue {
 
         let payout = muralpay::CreatePayout {
             amount: muralpay::TokenAmount {
-                token_amount: sent_to_method,
+                token_amount: sent_to_method.get(),
                 token_symbol: muralpay::USDC.into(),
             },
             payout_details,
@@ -399,13 +400,22 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
             break;
         }
 
+        let num_canceled = search_resp
+            .results
+            .iter()
+            .filter(|p| p.status == muralpay::PayoutStatus::Canceled)
+            .count();
+        let num_failed = search_resp
+            .results
+            .iter()
+            .filter(|p| p.status == muralpay::PayoutStatus::Failed)
+            .count();
         info!(
-            "Found {} canceled or failed Mural payouts",
-            search_resp.results.len()
+            "Found {num_canceled} canceled and {num_failed} failed Mural payouts"
         );
 
-        let mut payout_platform_id = Vec::<String>::new();
-        let mut payout_new_status = Vec::<String>::new();
+        let mut payout_platform_ids = Vec::<String>::new();
+        let mut payout_new_statuses = Vec::<String>::new();
 
         for payout_req in search_resp.results {
             let new_payout_status = match payout_req.status {
@@ -419,12 +429,17 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
                     continue;
                 }
             };
+            let payout_platform_id = payout_req.id;
 
-            payout_platform_id.push(payout_req.id.to_string());
-            payout_new_status.push(new_payout_status.to_string());
+            trace!(
+                "- Payout {payout_platform_id} set to {new_payout_status:?}",
+            );
+
+            payout_platform_ids.push(payout_platform_id.to_string());
+            payout_new_statuses.push(new_payout_status.to_string());
         }
 
-        sqlx::query!(
+        let result = sqlx::query!(
             "
             UPDATE payouts
             SET status = u.status
@@ -433,8 +448,8 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
                 payouts.method = $3
                 AND payouts.platform_id = u.platform_id
             ",
-            &payout_platform_id,
-            &payout_new_status,
+            &payout_platform_ids,
+            &payout_new_statuses,
             PayoutMethodType::MuralPay.as_str(),
         )
         .execute(db)
@@ -442,8 +457,9 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
         .wrap_internal_err("failed to update payout statuses")?;
 
         info!(
-            "Updated {} payouts in database from Mural info",
-            payout_platform_id.len()
+            "Attempted to update {} payouts in database from Mural info, {} rows affected",
+            payout_platform_ids.len(),
+            result.rows_affected()
         );
 
         if next_id.is_none() {
