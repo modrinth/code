@@ -205,6 +205,8 @@ export namespace Archon {
 			export type WSPowerStateEvent = {
 				event: 'power-state'
 				state: PowerState
+				oom_killed?: boolean
+				exit_code?: number
 			}
 
 			export type WSAuthExpiringEvent = {
@@ -219,9 +221,19 @@ export namespace Archon {
 				event: 'auth-ok'
 			}
 
-			export type WSInstallationResultEvent = {
+			export type WSInstallationResultEvent =
+				| WSInstallationResultOkEvent
+				| WSInstallationResultErrEvent
+
+			export type WSInstallationResultOkEvent = {
 				event: 'installation-result'
-				success: boolean
+				result: 'ok'
+			}
+
+			export type WSInstallationResultErrEvent = {
+				event: 'installation-result'
+				result: 'err'
+				reason?: string
 			}
 
 			export type WSUptimeEvent = {
@@ -241,6 +253,19 @@ export namespace Archon {
 				event: 'filesystem-ops'
 				op: FilesystemOp
 				progress: number
+			}
+
+			// Outgoing messages (client -> server)
+			export type WSOutgoingMessage = WSAuthMessage | WSCommandMessage
+
+			export type WSAuthMessage = {
+				event: 'auth'
+				jwt: string
+			}
+
+			export type WSCommandMessage = {
+				event: 'command'
+				cmd: string
 			}
 
 			export type WSEvent =

@@ -341,7 +341,6 @@
 					:stats="stats"
 					:server-power-state="serverPowerState"
 					:power-state-details="powerStateDetails"
-					:socket="socket"
 					:server="server"
 					:backup-in-progress="backupInProgress"
 					@reinstall="onReinstall"
@@ -383,13 +382,7 @@ import {
 	ServerInfoLabels,
 	ServerNotice,
 } from '@modrinth/ui'
-import type {
-	Backup,
-	PowerAction,
-	Stats,
-	WSEvent,
-	WSInstallationResultEvent,
-} from '@modrinth/utils'
+import type { Backup, PowerAction, Stats } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import type { MessageDescriptor } from '@vintl/vintl'
 import DOMPurify from 'dompurify'
@@ -406,17 +399,16 @@ import ServerInstallation from '~/components/ui/servers/ServerInstallation.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
-import { type PowerState, provideModrinthServerContext } from '~/providers/server-context.ts'
+import { provideModrinthServerContext } from '~/providers/server-context.ts'
 import { useModrinthServersConsole } from '~/store/console.ts'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 
-const socket = ref<WebSocket | null>(null)
 const isReconnecting = ref(false)
 const isLoading = ref(true)
-const reconnectInterval = ref<ReturnType<typeof setInterval> | null>(null)
 const isMounted = ref(true)
+const unsubscribers = ref<(() => void)[]>([])
 const flags = useFeatureFlags()
 
 const INTERCOM_APP_ID = ref('ykeritl9')
@@ -463,7 +455,7 @@ const cpuData = ref<number[]>([])
 const ramData = ref<number[]>([])
 const isActioning = ref(false)
 const isServerRunning = computed(() => serverPowerState.value === 'running')
-const serverPowerState = ref<PowerState>('stopped')
+const serverPowerState = ref<Archon.Websocket.v0.PowerState>('stopped')
 const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>()
 
 provideModrinthServerContext({
@@ -475,7 +467,6 @@ provideModrinthServerContext({
 })
 
 const uptimeSeconds = ref(0)
-const firstConnect = ref(true)
 const copied = ref(false)
 const error = ref<Error | null>(null)
 
@@ -627,90 +618,6 @@ function showSurvey() {
 	}
 }
 
-const connectWebSocket = () => {
-	if (!isMounted.value) return
-
-	try {
-		const wsAuth = computed(() => server.ws)
-		socket.value = new WebSocket(`wss://${wsAuth.value?.url}`)
-
-		socket.value.onopen = () => {
-			if (!isMounted.value) {
-				socket.value?.close()
-				return
-			}
-
-			modrinthServersConsole.clear()
-			socket.value?.send(JSON.stringify({ event: 'auth', jwt: wsAuth.value?.token }))
-			isConnected.value = true
-			isReconnecting.value = false
-			isLoading.value = false
-
-			if (firstConnect.value) {
-				for (let i = 0; i < initialConsoleMessage.length; i++) {
-					modrinthServersConsole.addLine(initialConsoleMessage[i])
-				}
-			}
-
-			firstConnect.value = false
-
-			if (reconnectInterval.value) {
-				if (reconnectInterval.value !== null) {
-					clearInterval(reconnectInterval.value)
-				}
-				reconnectInterval.value = null
-			}
-		}
-
-		socket.value.onmessage = (event) => {
-			if (isMounted.value) {
-				const data: WSEvent = JSON.parse(event.data)
-				handleWebSocketMessage(data)
-			}
-		}
-
-		socket.value.onclose = () => {
-			if (isMounted.value) {
-				modrinthServersConsole.addLine(
-					"\nSomething went wrong with the connection, we're reconnecting...",
-				)
-				isConnected.value = false
-				scheduleReconnect()
-			}
-		}
-
-		socket.value.onerror = (error) => {
-			if (isMounted.value) {
-				console.error('Failed to connect WebSocket:', error)
-				isConnected.value = false
-				scheduleReconnect()
-			}
-		}
-	} catch (error) {
-		if (isMounted.value) {
-			console.error('Failed to connect WebSocket:', error)
-			isConnected.value = false
-			scheduleReconnect()
-		}
-	}
-}
-
-const scheduleReconnect = () => {
-	if (!isMounted.value) return
-
-	if (!reconnectInterval.value) {
-		isReconnecting.value = true
-		reconnectInterval.value = setInterval(() => {
-			if (isMounted.value) {
-				console.log('Attempting to reconnect...')
-				connectWebSocket()
-			} else {
-				reconnectInterval.value = null
-			}
-		}, 5000)
-	}
-}
-
 let uptimeIntervalId: ReturnType<typeof setInterval> | null = null
 
 const startUptimeUpdates = () => {
@@ -725,111 +632,112 @@ const stopUptimeUpdates = () => {
 	}
 }
 
-const handleWebSocketMessage = (data: WSEvent) => {
-	switch (data.event) {
-		case 'log':
-			// eslint-disable-next-line no-case-declarations
-			const log = data.message.split('\n').filter((l) => l.trim())
-			modrinthServersConsole.addLines(log)
-			break
-		case 'stats':
-			updateStats(data)
-			break
-		case 'auth-expiring':
-		case 'auth-incorrect':
-			reauthenticate()
-			break
-		case 'power-state':
-			if (data.state === 'crashed') {
-				updatePowerState(data.state, {
-					oom_killed: data.oom_killed,
-					exit_code: data.exit_code,
-				})
-			} else {
-				updatePowerState(data.state)
-			}
-			break
-		case 'installation-result':
-			handleInstallationResult(data)
-			break
-		case 'new-mod':
-			server.refresh(['content'])
-			console.log('New mod:', data)
-			break
-		case 'auth-ok':
-			break
-		case 'uptime':
-			stopUptimeUpdates()
-			uptimeSeconds.value = data.uptime
-			startUptimeUpdates()
-			break
-		case 'backup-progress': {
-			// Update a backup's state
-			const curBackup = server.backups?.data.find((backup) => backup.id === data.id)
+// Individual WebSocket event handlers
+const handleLog = (data: Archon.Websocket.v0.WSLogEvent) => {
+	const log = data.message.split('\n').filter((l) => l.trim())
+	modrinthServersConsole.addLines(log)
+}
 
-			if (!curBackup) {
-				console.log(`Ignoring backup-progress event for unknown backup: ${data.id}`)
-			} else {
-				console.log(
-					`Handling backup progress for ${curBackup.name} (${data.id}) task: ${data.task} state: ${data.state} progress: ${data.progress}`,
-				)
+const handleStats = (data: Archon.Websocket.v0.WSStatsEvent) => {
+	updateStats({
+		cpu_percent: data.cpu_used,
+		ram_usage_bytes: data.memory_used,
+		ram_total_bytes: data.memory_total,
+		storage_usage_bytes: data.disk_used,
+		storage_total_bytes: data.disk_total,
+	})
+}
 
-				if (!curBackup.task) {
-					curBackup.task = {}
-				}
-
-				const currentState = curBackup.task[data.task]?.state
-				const shouldUpdate = !(currentState === 'ongoing' && data.state === 'unchanged')
-
-				if (shouldUpdate) {
-					curBackup.task[data.task] = {
-						progress: data.progress,
-						state: data.state,
-					}
-				}
-
-				curBackup.ongoing = data.task === 'create' && data.state === 'ongoing'
-			}
-
-			break
-		}
-		case 'filesystem-ops': {
-			if (!server.fs) {
-				console.error('FilesystemOps received, but server.fs is not available', data.all)
-				break
-			}
-			if (JSON.stringify(server.fs.ops) !== JSON.stringify(data.all)) {
-				server.fs.ops = data.all
-			}
-
-			server.fs.queuedOps = server.fs.queuedOps.filter(
-				(queuedOp) => !data.all.some((x) => x.src === queuedOp.src),
-			)
-
-			const cancelled = data.all.filter((x) => x.state === 'cancelled')
-			Promise.all(cancelled.map((x) => server.fs?.modifyOp(x.id, 'dismiss')))
-
-			const completed = data.all.filter((x) => x.state === 'done')
-			if (completed.length > 0) {
-				setTimeout(
-					async () =>
-						await Promise.all(
-							completed.map((x) => {
-								if (!server.fs?.opsQueuedForModification.includes(x.id)) {
-									server.fs?.opsQueuedForModification.push(x.id)
-									return server.fs?.modifyOp(x.id, 'dismiss')
-								}
-								return Promise.resolve()
-							}),
-						),
-					3000,
-				)
-			}
-			break
-		}
-		default:
-			console.warn('Unhandled WebSocket event:', data)
+const handlePowerState = (data: Archon.Websocket.v0.WSPowerStateEvent) => {
+	if (data.state === 'crashed') {
+		updatePowerState(data.state, {
+			oom_killed: data.oom_killed,
+			exit_code: data.exit_code,
+		})
+	} else {
+		updatePowerState(data.state)
 	}
+}
+
+const handleUptime = (data: Archon.Websocket.v0.WSUptimeEvent) => {
+	stopUptimeUpdates()
+	uptimeSeconds.value = data.uptime
+	startUptimeUpdates()
+}
+
+const handleAuthIncorrect = () => {
+	isWSAuthIncorrect.value = true
+}
+
+const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) => {
+	const curBackup = server.backups?.data.find((backup) => backup.id === data.id)
+
+	if (!curBackup) {
+		console.log(`Ignoring backup-progress event for unknown backup: ${data.id}`)
+	} else {
+		console.log(
+			`Handling backup progress for ${curBackup.name} (${data.id}) task: ${data.task} state: ${data.state} progress: ${data.progress}`,
+		)
+
+		if (!curBackup.task) {
+			curBackup.task = {}
+		}
+
+		const currentState = curBackup.task[data.task]?.state
+		const shouldUpdate = !(currentState === 'ongoing' && data.state === 'unchanged')
+
+		if (shouldUpdate) {
+			curBackup.task[data.task] = {
+				progress: data.progress,
+				state: data.state,
+			}
+		}
+
+		curBackup.ongoing = data.task === 'create' && data.state === 'ongoing'
+	}
+}
+
+const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => {
+	if (!server.fs) {
+		console.error('FilesystemOps received, but server.fs is not available', data)
+		return
+	}
+
+	// The filesystem-ops event has an 'all' property with the full list of ops
+	const allOps = (data as any).all
+	if (!allOps) return
+
+	if (JSON.stringify(server.fs.ops) !== JSON.stringify(allOps)) {
+		server.fs.ops = allOps
+	}
+
+	server.fs.queuedOps = server.fs.queuedOps.filter(
+		(queuedOp) => !allOps.some((x: any) => x.src === queuedOp.src),
+	)
+
+	const cancelled = allOps.filter((x: any) => x.state === 'cancelled')
+	Promise.all(cancelled.map((x: any) => server.fs?.modifyOp(x.id, 'dismiss')))
+
+	const completed = allOps.filter((x: any) => x.state === 'done')
+	if (completed.length > 0) {
+		setTimeout(
+			async () =>
+				await Promise.all(
+					completed.map((x: any) => {
+						if (!server.fs?.opsQueuedForModification.includes(x.id)) {
+							server.fs?.opsQueuedForModification.push(x.id)
+							return server.fs?.modifyOp(x.id, 'dismiss')
+						}
+						return Promise.resolve()
+					}),
+				),
+			3000,
+		)
+	}
+}
+
+const handleNewMod = () => {
+	server.refresh(['content'])
 }
 
 const newLoader = ref<string | null>(null)
@@ -860,7 +768,7 @@ const onReinstall = (potentialArgs: any) => {
 	errorMessage.value = 'An unexpected error occurred.'
 }
 
-const handleInstallationResult = async (data: WSInstallationResultEvent) => {
+const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
 	switch (data.result) {
 		case 'ok': {
 			if (!serverData.value) break
@@ -947,7 +855,7 @@ const updateStats = (currentStats: Stats['current']) => {
 }
 
 const updatePowerState = (
-	state: PowerState,
+	state: Archon.Websocket.v0.PowerState,
 	details?: { oom_killed?: boolean; exit_code?: number },
 ) => {
 	serverPowerState.value = state
@@ -968,17 +876,6 @@ const updateGraphData = (dataArray: number[], newValue: number): number[] => {
 	const updated = [...dataArray, newValue]
 	if (updated.length > 10) updated.shift()
 	return updated
-}
-
-const reauthenticate = async () => {
-	try {
-		await server.refresh()
-		const wsAuth = computed(() => server.ws)
-		socket.value?.send(JSON.stringify({ event: 'auth', jwt: wsAuth.value?.token }))
-	} catch (error) {
-		console.error('Reauthentication failed:', error)
-		isWSAuthIncorrect.value = true
-	}
 }
 
 const toAdverb = (word: string) => {
@@ -1168,25 +1065,11 @@ const cleanup = () => {
 	shutdown()
 
 	stopUptimeUpdates()
-	if (reconnectInterval.value) {
-		clearInterval(reconnectInterval.value)
-		reconnectInterval.value = null
-	}
 
-	if (socket.value) {
-		socket.value.onopen = null
-		socket.value.onmessage = null
-		socket.value.onclose = null
-		socket.value.onerror = null
+	unsubscribers.value.forEach((unsub) => unsub())
+	unsubscribers.value = []
 
-		if (
-			socket.value.readyState === WebSocket.OPEN ||
-			socket.value.readyState === WebSocket.CONNECTING
-		) {
-			socket.value.close()
-		}
-		socket.value = null
-	}
+	client.archon.sockets.disconnect(serverId)
 
 	isConnected.value = false
 	isReconnecting.value = false
@@ -1234,7 +1117,35 @@ onMounted(() => {
 	if (server.moduleErrors.general?.error) {
 		isLoading.value = false
 	} else {
-		connectWebSocket()
+		client.archon.sockets
+			.safeConnect(serverId)
+			.then(() => {
+				modrinthServersConsole.clear()
+				isConnected.value = true
+				isLoading.value = false
+
+				for (const line of initialConsoleMessage) {
+					modrinthServersConsole.addLine(line)
+				}
+
+				unsubscribers.value = [
+					client.archon.sockets.on(serverId, 'log', handleLog),
+					client.archon.sockets.on(serverId, 'stats', handleStats),
+					client.archon.sockets.on(serverId, 'power-state', handlePowerState),
+					client.archon.sockets.on(serverId, 'uptime', handleUptime),
+					client.archon.sockets.on(serverId, 'auth-incorrect', handleAuthIncorrect),
+					client.archon.sockets.on(serverId, 'auth-ok', () => {}),
+					client.archon.sockets.on(serverId, 'installation-result', handleInstallationResult),
+					client.archon.sockets.on(serverId, 'backup-progress', handleBackupProgress),
+					client.archon.sockets.on(serverId, 'filesystem-ops', handleFilesystemOps),
+					client.archon.sockets.on(serverId, 'new-mod', handleNewMod),
+				]
+			})
+			.catch((error) => {
+				console.error('Failed to connect WebSocket:', error)
+				isConnected.value = false
+				isLoading.value = false
+			})
 	}
 
 	if (server.general?.flows?.intro && server.general?.project) {

@@ -101,6 +101,15 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 		}
 	}
 
+	send(serverId: string, message: Archon.Websocket.v0.WSOutgoingMessage): void {
+		const connection = this.connections.get(serverId)
+		if (!connection || connection.socket.readyState !== WebSocket.OPEN) {
+			console.warn(`Cannot send message: WebSocket not connected for server ${serverId}`)
+			return
+		}
+		connection.socket.send(JSON.stringify(message))
+	}
+
 	private scheduleReconnect(serverId: string, auth: Archon.Websocket.v0.WSAuth): void {
 		const connection = this.connections.get(serverId)
 		if (!connection) return

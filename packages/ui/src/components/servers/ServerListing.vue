@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon, ProjectV2 } from '@modrinth/api-client'
+import type { Archon } from '@modrinth/api-client'
 import {
 	ChevronRightIcon,
 	LoaderCircleIcon,
@@ -144,7 +144,7 @@ export type PendingChange = {
 	verb: string
 }
 
-const props = defineProps<Partial<Archon.Servers.v0.Server> & { pendingChange?: PendingChange }>()
+const props = defineProps<Partial<Archon.Servers.v0.Server & { pendingChange: PendingChange }>>()
 
 const { archon, kyros, labrinth } = injectModrinthClient()
 
@@ -153,7 +153,7 @@ const showLoaderLabel = computed(() => !!props.loader)
 
 const { data: projectData } = useQuery({
 	queryKey: ['project', props.upstream?.project_id] as const,
-	queryFn: async (): Promise<ProjectV2 | null> => {
+	queryFn: async () => {
 		if (!props.upstream?.project_id) return null
 		return await labrinth.projects_v2.get(props.upstream.project_id)
 	},

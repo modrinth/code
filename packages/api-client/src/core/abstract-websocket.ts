@@ -48,6 +48,8 @@ export abstract class AbstractWebSocketClient {
 
 	abstract disconnectAll(): void
 
+	abstract send(serverId: string, message: Archon.Websocket.v0.WSOutgoingMessage): void
+
 	async safeConnect(serverId: string, options?: { force?: boolean }): Promise<void> {
 		const status = this.getStatus(serverId)
 
