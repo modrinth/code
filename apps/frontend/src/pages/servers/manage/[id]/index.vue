@@ -651,7 +651,7 @@ const getSuggestions = (input: string): string[] => {
 
 const sendCommand = () => {
 	const cmd = commandInput.value.trim()
-	if (!socket.value || !cmd) return
+	if (!props.isConnected || !cmd) return
 	try {
 		sendConsoleCommand(cmd)
 		commandInput.value = ''
