@@ -3,6 +3,9 @@
 mod error;
 pub mod log;
 
+#[cfg(feature = "decimal")]
+pub mod decimal;
+
 pub use error::*;
 
 use eyre::{Result, eyre};
