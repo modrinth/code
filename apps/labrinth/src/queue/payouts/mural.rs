@@ -2,6 +2,7 @@ use ariadne::ids::UserId;
 use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
+use modrinth_util::decimal::Decimal2dp;
 use muralpay::{MuralError, MuralPay, TokenFeeRequest};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
@@ -35,7 +36,7 @@ pub enum MuralPayoutRequest {
 impl PayoutsQueue {
     pub async fn compute_muralpay_fees(
         &self,
-        amount: Decimal,
+        amount: Decimal2dp,
         fiat_and_rail_code: muralpay::FiatAndRailCode,
     ) -> Result<muralpay::TokenPayoutFee, ApiError> {
         let muralpay = self.muralpay.load();
@@ -48,7 +49,7 @@ impl PayoutsQueue {
             .get_fees_for_token_amount(&[TokenFeeRequest {
                 amount: muralpay::TokenAmount {
                     token_symbol: muralpay::USDC.into(),
-                    token_amount: amount,
+                    token_amount: amount.get(),
                 },
                 fiat_and_rail_code,
             }])
@@ -65,7 +66,7 @@ impl PayoutsQueue {
         &self,
         payout_id: DBPayoutId,
         user_id: UserId,
-        gross_amount: Decimal,
+        gross_amount: Decimal2dp,
         fees: PayoutFees,
         payout_details: MuralPayoutRequest,
         recipient_info: muralpay::PayoutRecipientInfo,
@@ -107,9 +108,9 @@ impl PayoutsQueue {
 
         let recipient_address = recipient_info.physical_address();
         let recipient_email = recipient_info.email().to_string();
-        let gross_amount_cents = gross_amount * Decimal::from(100);
-        let net_amount_cents = net_amount * Decimal::from(100);
-        let fees_cents = fees.total_fee() * Decimal::from(100);
+        let gross_amount_cents = gross_amount.get() * Decimal::from(100);
+        let net_amount_cents = net_amount.get() * Decimal::from(100);
+        let fees_cents = fees.total_fee().get() * Decimal::from(100);
         let address_line_3 = format!(
             "{}, {}, {}",
             recipient_address.city,
@@ -153,7 +154,7 @@ impl PayoutsQueue {
 
         let payout = muralpay::CreatePayout {
             amount: muralpay::TokenAmount {
-                token_amount: sent_to_method,
+                token_amount: sent_to_method.get(),
                 token_symbol: muralpay::USDC.into(),
             },
             payout_details,
