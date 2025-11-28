@@ -1,4 +1,4 @@
-import type { ISO3166 } from '../iso3166/types'
+import type { ISO3166 } from '..'
 
 export namespace Labrinth {
 	export namespace Billing {
@@ -13,7 +13,7 @@ export namespace Labrinth {
 				price_id: string
 				interval: PriceDuration
 				status: SubscriptionStatus
-				created: string // ISO datetime string
+				created: string
 				metadata?: SubscriptionMetadata
 			}
 
@@ -40,8 +40,8 @@ export namespace Labrinth {
 				amount: number
 				currency_code: string
 				status: ChargeStatus
-				due: string // ISO datetime string
-				last_attempt: string | null // ISO datetime string
+				due: string
+				last_attempt: string | null
 				type: ChargeType
 				subscription_id: string | null
 				subscription_interval: PriceDuration | null
@@ -336,6 +336,10 @@ export namespace Labrinth {
 				monetization_status: v2.MonetizationStatus
 				side_types_migration_review_status: 'reviewed' | 'pending'
 				environment?: Environment[]
+
+				/**
+				 * @deprecated Not recommended to use.
+				 **/
 				[key: string]: unknown
 			}
 
@@ -379,7 +383,7 @@ export namespace Labrinth {
 			export interface GameVersion {
 				version: string
 				version_type: string
-				date: string // RFC 3339 DateTime
+				date: string
 				major: boolean
 			}
 
@@ -448,6 +452,157 @@ export namespace Labrinth {
 			subdivisions: Record<string, ISO3166.Subdivision[]>
 
 			errors: unknown[]
+		}
+	}
+
+	export namespace TechReview {
+		export namespace Internal {
+			export type SearchProjectsRequest = {
+				limit?: number
+				page?: number
+				filter?: SearchProjectsFilter
+				sort_by?: SearchProjectsSort
+			}
+
+			export type SearchProjectsFilter = {
+				project_type?: string[]
+			}
+
+			export type SearchProjectsSort = 'created_asc' | 'created_desc'
+
+			export type UpdateIssueRequest = {
+				status: DelphiReportIssueStatus
+			}
+
+			export type SearchResponse = {
+				reports: FileReport[]
+				projects: Record<string, Projects.v3.Project>
+				threads: Record<string, Thread>
+				ownership: Record<string, Ownership>
+			}
+
+			export type FileReport = {
+				id: string
+				file_id: string
+				version_id: string
+				project_id: string
+				created: string
+				flag_reason: FlagReason
+				severity: DelphiSeverity
+				file_name: string
+				file_size: number
+				download_url: string
+				issues: FileIssue[]
+			}
+
+			export type FileIssue = {
+				id: string
+				report_id: string
+				issue_type: string
+				status: DelphiReportIssueStatus
+				details: ReportIssueDetail[]
+			}
+
+			export type ReportIssueDetail = {
+				id: string
+				issue_id: string
+				key: string
+				file_path: string
+				decompiled_source: string | null
+				data: Record<string, unknown>
+				severity: DelphiSeverity
+			}
+
+			export type Ownership =
+				| {
+						kind: 'user'
+						id: string
+						name: string
+						icon_url?: string
+				  }
+				| {
+						kind: 'organization'
+						id: string
+						name: string
+						icon_url?: string
+				  }
+
+			export type DBThread = {
+				id: string
+				project_id?: string
+				report_id?: string
+				type_: ThreadType
+				messages: DBThreadMessage[]
+				members: string[]
+			}
+
+			export type DBThreadMessage = {
+				id: string
+				thread_id: string
+				author_id?: string
+				body: MessageBody
+				created: string
+				hide_identity: boolean
+			}
+
+			export type MessageBody =
+				| {
+						type: 'text'
+						body: string
+						private?: boolean
+						replying_to?: string
+						associated_images?: string[]
+				  }
+				| {
+						type: 'status_change'
+						new_status: Projects.v2.ProjectStatus
+						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'thread_closure'
+				  }
+				| {
+						type: 'thread_reopen'
+				  }
+				| {
+						type: 'deleted'
+						private?: boolean
+				  }
+
+			export type ThreadType = 'report' | 'project' | 'direct_message'
+
+			export type User = {
+				id: string
+				username: string
+				avatar_url: string
+				role: string
+				badges: number
+				created: string
+				bio?: string
+			}
+
+			export type ThreadMessage = {
+				id: string | null
+				author_id: string | null
+				body: MessageBody
+				created: string
+				hide_identity: boolean
+			}
+
+			export type Thread = {
+				id: string
+				type: ThreadType
+				project_id: string | null
+				report_id: string | null
+				messages: ThreadMessage[]
+				members: User[]
+			}
+
+			export type FlagReason = 'delphi'
+
+			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
+
+			export type DelphiReportIssueStatus = 'pending' | 'safe' | 'unsafe'
 		}
 	}
 }

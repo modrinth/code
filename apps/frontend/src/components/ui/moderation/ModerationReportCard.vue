@@ -1,164 +1,191 @@
 <template>
-	<div class="universal-card">
+	<div>
 		<div
-			class="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0"
+			:class="[
+				'bg-bg-raised p-4 transition-[border-radius] duration-200',
+				isThreadCollapsed ? 'rounded-2xl' : 'rounded-t-2xl',
+			]"
 		>
-			<span class="text-md flex flex-col gap-2 sm:flex-row sm:items-center">
-				<span class="flex items-center gap-2">
-					Reported for
-					<span class="whitespace-nowrap rounded-full align-middle font-semibold text-contrast">
-						{{ formattedReportType }}
+			<div
+				class="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0"
+			>
+				<span class="text-md flex flex-col gap-2 sm:flex-row sm:items-center">
+					<span class="flex items-center gap-2">
+						<span class="text-secondary">Reported for</span>
+						<span class="font-semibold text-contrast">
+							{{ formattedReportType }}
+						</span>
+					</span>
+					<span class="flex items-center gap-2">
+						<span class="hidden text-secondary sm:inline">By</span>
+						<span class="text-secondary sm:hidden">Reporter:</span>
+						<nuxt-link
+							:to="`/user/${report.reporter_user.username}`"
+							target="_blank"
+							class="inline-flex flex-row items-center gap-1 transition-colors duration-100 ease-in-out hover:text-brand"
+						>
+							<Avatar
+								:src="report.reporter_user.avatar_url"
+								circle
+								size="1.75rem"
+								class="flex-shrink-0"
+							/>
+							<span class="truncate">{{ report.reporter_user.username }}</span>
+						</nuxt-link>
 					</span>
 				</span>
-				<span class="flex items-center gap-2">
-					<span class="hidden sm:inline">By</span>
-					<span class="sm:hidden">Reporter:</span>
-					<nuxt-link
-						:to="`/user/${report.reporter_user.username}`"
-						class="inline-flex flex-row items-center gap-1 transition-colors duration-100 ease-in-out hover:text-brand"
-					>
-						<Avatar
-							:src="report.reporter_user.avatar_url"
-							circle
-							size="1.75rem"
-							class="flex-shrink-0"
-						/>
-						<span class="truncate">{{ report.reporter_user.username }}</span>
-					</nuxt-link>
-				</span>
-			</span>
 
-			<div class="flex flex-row items-center gap-2 self-end sm:self-auto">
-				<span class="text-md whitespace-nowrap text-secondary">{{
-					formatRelativeTime(report.created)
-				}}</span>
-				<ButtonStyled v-if="visibleQuickReplies.length > 0" circular>
-					<OverflowMenu :options="visibleQuickReplies">
-						<span class="hidden sm:inline">Quick Reply</span>
-						<span class="sr-only sm:hidden">Quick Reply</span>
-						<ChevronDownIcon />
-					</OverflowMenu>
-				</ButtonStyled>
-				<ButtonStyled circular>
-					<OverflowMenu :options="quickActions">
-						<template #default>
-							<EllipsisVerticalIcon />
-						</template>
-						<template #copy-id>
-							<ClipboardCopyIcon />
-							<span class="hidden sm:inline">Copy ID</span>
-						</template>
-						<template #copy-link>
-							<LinkIcon />
-							<span class="hidden sm:inline">Copy link</span>
-						</template>
-					</OverflowMenu>
-				</ButtonStyled>
+				<div class="flex flex-row items-center gap-2 self-end sm:self-auto">
+					<span class="whitespace-nowrap text-sm text-secondary">{{
+						formatRelativeTime(report.created)
+					}}</span>
+					<ButtonStyled circular>
+						<OverflowMenu :options="quickActions">
+							<template #default>
+								<EllipsisVerticalIcon class="size-4" />
+							</template>
+							<template #copy-id>
+								<ClipboardCopyIcon />
+								<span class="hidden sm:inline">Copy ID</span>
+							</template>
+							<template #copy-link>
+								<LinkIcon />
+								<span class="hidden sm:inline">Copy link</span>
+							</template>
+						</OverflowMenu>
+					</ButtonStyled>
+				</div>
 			</div>
-		</div>
 
-		<hr class="my-4 rounded-xl border-solid text-divider" />
+			<div class="my-4 h-px bg-surface-5" />
 
-		<div class="flex flex-col gap-4">
-			<div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-				<div class="flex min-w-0 flex-1 items-center gap-3">
+			<div class="flex items-center justify-between">
+				<div class="flex items-center gap-4">
 					<Avatar
 						:src="reportItemAvatarUrl"
 						:circle="report.item_type === 'user'"
-						size="3rem"
-						class="flex-shrink-0"
+						size="4rem"
+						:class="[
+							'flex-shrink-0 border border-surface-5 bg-surface-4 !shadow-none',
+							report.item_type !== 'user' && 'rounded-2xl',
+						]"
 					/>
-					<div class="min-w-0 flex-1">
-						<span class="block truncate text-lg font-semibold">{{ reportItemTitle }}</span>
-						<div class="flex flex-col gap-2 text-sm text-secondary sm:flex-row sm:items-center">
-							<nuxt-link
-								v-if="report.target && report.item_type != 'user'"
-								:to="`/${report.target.type}/${report.target.slug}`"
-								class="inline-flex flex-row items-center gap-1 truncate transition-colors duration-100 ease-in-out hover:text-brand"
-							>
-								<Avatar
-									:src="report.target?.avatar_url"
-									:circle="report.target.type === 'user'"
-									size="1rem"
-									class="flex-shrink-0"
-								/>
-								<span class="truncate">
-									<OrganizationIcon
-										v-if="report.target.type === 'organization'"
-										class="align-middle"
-									/>
-									{{ report.target.name || 'Unknown User' }}
-								</span>
-							</nuxt-link>
 
-							<div class="flex flex-wrap items-center gap-2">
-								<span
-									class="whitespace-nowrap rounded-full bg-button-bg p-0.5 px-2 text-xs font-semibold text-secondary"
-								>
-									{{ formattedItemType }}
-								</span>
-								<span
-									v-if="report.item_type === 'version' && report.version"
-									class="max-w-[200px] truncate font-mono text-xs sm:max-w-none"
-								>
-									{{
-										report.version.files.find((file) => file.primary)?.filename || 'Unknown Version'
-									}}
+					<div v-if="report.item_type === 'user'" class="flex flex-col gap-1.5">
+						<NuxtLink
+							:to="`/user/${report.user?.username}`"
+							target="_blank"
+							class="text-base font-semibold text-contrast hover:underline"
+						>
+							{{ report.user?.username || 'Unknown User' }}
+						</NuxtLink>
+
+						<span
+							v-if="report.user?.created"
+							v-tooltip="formatExactDate(report.user.created)"
+							class="cursor-help text-sm text-secondary"
+						>
+							Joined {{ formatRelativeTime(report.user.created) }}
+						</span>
+					</div>
+
+					<div v-else class="flex flex-col gap-1.5">
+						<div class="flex items-center gap-2">
+							<NuxtLink
+								:to="reportItemUrl"
+								target="_blank"
+								class="text-base font-semibold text-contrast hover:underline"
+							>
+								{{ reportItemTitle }}
+							</NuxtLink>
+
+							<div
+								v-if="report.project?.project_type"
+								class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
+							>
+								<component
+									:is="getProjectTypeIcon(report.project.project_type as any)"
+									aria-hidden="true"
+									class="h-4 w-4"
+								/>
+								<span class="text-sm font-medium text-secondary">
+									{{ formatProjectType(report.project.project_type, true) }}
 								</span>
 							</div>
+
+							<span
+								v-if="report.item_type === 'version' && report.version"
+								class="text-sm text-secondary"
+							>
+								{{ report.version.files.find((f) => f.primary)?.filename || 'Unknown Version' }}
+							</span>
+						</div>
+
+						<div v-if="report.target" class="flex items-center gap-1">
+							<Avatar
+								:src="report.target.avatar_url"
+								size="1.5rem"
+								circle
+								class="border border-surface-5 bg-surface-4 !shadow-none"
+							/>
+							<NuxtLink
+								:to="`/${report.target.type}/${report.target.slug}`"
+								target="_blank"
+								class="text-sm font-medium text-secondary hover:underline"
+							>
+								{{ report.target.name }}
+							</NuxtLink>
 						</div>
 					</div>
 				</div>
 
-				<div class="flex justify-end sm:justify-start">
-					<ButtonStyled circular>
-						<nuxt-link :to="reportItemUrl">
-							<EyeIcon />
-						</nuxt-link>
-					</ButtonStyled>
-				</div>
+				<ButtonStyled circular type="transparent">
+					<button @click="isThreadCollapsed = !isThreadCollapsed">
+						<ChevronDownIcon
+							class="h-5 w-5 transition-transform"
+							:class="{ 'rotate-180': !isThreadCollapsed }"
+						/>
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
-
-		<CollapsibleRegion ref="collapsibleRegion" class="my-4">
-			<ReportThread
-				v-if="report.thread"
-				ref="reportThread"
-				class="mb-16 sm:mb-0"
-				:thread="report.thread"
-				:report="report"
-				:reporter="report.reporter_user"
-				@update-thread="updateThread"
-			/>
-		</CollapsibleRegion>
+		<Collapsible :collapsed="isThreadCollapsed">
+			<div class="border-1 rounded-b-2xl border-solid border-bg-raised bg-surface-2 p-4 pt-2">
+				<ThreadView
+					v-if="report.thread"
+					ref="reportThread"
+					:thread="report.thread"
+					:report="report"
+					:reporter="report.reporter_user"
+					@update-thread="updateThread"
+				/>
+			</div>
+		</Collapsible>
 	</div>
 </template>
 <script setup lang="ts">
 import {
+	ChevronDownIcon,
 	ClipboardCopyIcon,
 	EllipsisVerticalIcon,
-	EyeIcon,
 	LinkIcon,
-	OrganizationIcon,
 } from '@modrinth/assets'
-import {
-	type ExtendedReport,
-	reportQuickReplies,
-	type ReportQuickReply,
-} from '@modrinth/moderation'
+import type { ExtendedReport } from '@modrinth/moderation'
+import type { OverflowMenuOption } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
-	CollapsibleRegion,
+	Collapsible,
+	getProjectTypeIcon,
 	injectNotificationManager,
 	OverflowMenu,
-	type OverflowMenuOption,
 	useRelativeTime,
 } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
+import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-import ChevronDownIcon from '../servers/icons/ChevronDownIcon.vue'
-import ReportThread from '../thread/ReportThread.vue'
+import ThreadView from '../thread/ThreadView.vue'
 
 const { addNotification } = injectNotificationManager()
 
@@ -166,10 +193,14 @@ const props = defineProps<{
 	report: ExtendedReport
 }>()
 
-const reportThread = ref<InstanceType<typeof ReportThread> | null>(null)
-const collapsibleRegion = ref<InstanceType<typeof CollapsibleRegion> | null>(null)
+const reportThread = ref<InstanceType<typeof ThreadView> | null>(null)
+const isThreadCollapsed = ref(true)
 
 const formatRelativeTime = useRelativeTime()
+
+function formatExactDate(date: string): string {
+	return dayjs(date).format('MMMM D, YYYY [at] h:mm A')
+}
 
 function updateThread(newThread: any) {
 	if (props.report.thread) {
@@ -206,34 +237,6 @@ const quickActions: OverflowMenuOption[] = [
 	},
 ]
 
-const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
-	return reportQuickReplies
-		.filter((reply) => {
-			if (reply.shouldShow === undefined) return true
-			if (typeof reply.shouldShow === 'function') {
-				return reply.shouldShow(props.report)
-			}
-
-			return reply.shouldShow
-		})
-		.map(
-			(reply) =>
-				({
-					id: reply.label,
-					action: () => handleQuickReply(reply),
-				}) as OverflowMenuOption,
-		)
-})
-
-async function handleQuickReply(reply: ReportQuickReply) {
-	const message =
-		typeof reply.message === 'function' ? await reply.message(props.report) : reply.message
-
-	collapsibleRegion.value?.setCollapsed(false)
-	await nextTick()
-	reportThread.value?.setReplyContent(message)
-}
-
 const reportItemAvatarUrl = computed(() => {
 	switch (props.report.item_type) {
 		case 'project':
@@ -265,11 +268,6 @@ const reportItemUrl = computed(() => {
 	}
 })
 
-const formattedItemType = computed(() => {
-	const itemType = props.report.item_type
-	return itemType.charAt(0).toUpperCase() + itemType.slice(1)
-})
-
 const formattedReportType = computed(() => {
 	const reportType = props.report.report_type
 
@@ -278,5 +276,3 @@ const formattedReportType = computed(() => {
 	return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 })
 </script>
-
-<style lang="scss" scoped></style>
