@@ -5,6 +5,7 @@ import type { ModrinthApiError } from '../core/errors'
 import type { CircuitBreakerState, CircuitBreakerStorage } from '../features/circuit-breaker'
 import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'
+import { GenericWebSocketClient } from './websocket-generic'
 
 /**
  * Circuit breaker storage using Nuxt's useState
@@ -71,6 +72,17 @@ export interface NuxtClientConfig extends ClientConfig {
  */
 export class NuxtModrinthClient extends AbstractModrinthClient {
 	protected declare config: NuxtClientConfig
+
+	constructor(config: NuxtClientConfig) {
+		super(config)
+
+		Object.defineProperty(this.archon, 'sockets', {
+			value: new GenericWebSocketClient(this),
+			writable: false,
+			enumerable: true,
+			configurable: false,
+		})
+	}
 
 	protected async executeRequest<T>(url: string, options: RequestOptions): Promise<T> {
 		try {

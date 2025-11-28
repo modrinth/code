@@ -182,7 +182,7 @@
 
 <script setup lang="ts">
 import { IssuesIcon, TerminalSquareIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { ButtonStyled, injectModrinthClient } from '@modrinth/ui'
 import type { ServerState, Stats } from '@modrinth/utils'
 
 import PanelServerStatus from '~/components/ui/servers/PanelServerStatus.vue'
@@ -191,7 +191,6 @@ import ServerStats from '~/components/ui/servers/ServerStats.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 type ServerProps = {
-	socket: WebSocket | null
 	isConnected: boolean
 	isWsAuthIncorrect: boolean
 	stats: Stats
@@ -288,11 +287,8 @@ if (props.serverPowerState === 'crashed' && !props.powerStateDetails?.oom_killed
 	inspectError()
 }
 
-const socket = ref(props.socket)
-
-watch(props, (newAttrs) => {
-	socket.value = newAttrs.socket
-})
+const client = injectModrinthClient()
+const serverId = props.server.serverId
 
 const DYNAMIC_ARG = Symbol('DYNAMIC_ARG')
 
@@ -655,7 +651,7 @@ const getSuggestions = (input: string): string[] => {
 
 const sendCommand = () => {
 	const cmd = commandInput.value.trim()
-	if (!socket.value || !cmd) return
+	if (!props.isConnected || !cmd) return
 	try {
 		sendConsoleCommand(cmd)
 		commandInput.value = ''
@@ -668,7 +664,7 @@ const sendCommand = () => {
 
 const sendConsoleCommand = (cmd: string) => {
 	try {
-		socket.value?.send(JSON.stringify({ event: 'command', cmd }))
+		client.archon.sockets.send(serverId, { event: 'command', cmd })
 	} catch (error) {
 		console.error('Error sending command:', error)
 	}

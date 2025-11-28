@@ -23,8 +23,8 @@
 		</div>
 		<div class="mt-2 flex justify-start gap-2">
 			<ButtonStyled color="brand">
-				<button :disabled="isRenaming || nameExists" @click="renameBackup">
-					<template v-if="isRenaming">
+				<button :disabled="renameMutation.isPending.value || nameExists" @click="renameBackup">
+					<template v-if="renameMutation.isPending.value">
 						<SpinnerIcon class="animate-spin" />
 						Renaming...
 					</template>
@@ -45,41 +45,61 @@
 </template>
 
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import { IssuesIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
-import type { Backup } from '@modrinth/utils'
+import {
+	ButtonStyled,
+	injectModrinthClient,
+	injectNotificationManager,
+	NewModal,
+} from '@modrinth/ui'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { injectModrinthServerContext } from '~/providers/server-context.ts'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const ctx = injectModrinthServerContext()
 
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const backupsQueryKey = ['backups', 'list', ctx.serverId]
+const { data: backups } = useQuery({
+	queryKey: backupsQueryKey,
+	queryFn: () => client.archon.backups_v1.list(ctx.serverId),
+})
+
+const renameMutation = useMutation({
+	mutationFn: ({ backupId, name }: { backupId: string; name: string }) =>
+		client.archon.backups_v1.rename(ctx.serverId, backupId, { name }),
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+})
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const input = ref<HTMLInputElement>()
 const backupName = ref('')
 const originalName = ref('')
-const isRenaming = ref(false)
 
-const currentBackup = ref<Backup | null>(null)
+const currentBackup = ref<Archon.Backups.v1.Backup | null>(null)
 
 const trimmedName = computed(() => backupName.value.trim())
 
 const nameExists = computed(() => {
-	if (!props.server.backups?.data || trimmedName.value === originalName.value || isRenaming.value) {
+	if (
+		!backups.value ||
+		trimmedName.value === originalName.value ||
+		renameMutation.isPending.value
+	) {
 		return false
 	}
 
-	return props.server.backups.data.some(
-		(backup: Backup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
+	return backups.value.some(
+		(backup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
 	)
 })
 
 const backupNumber = computed(
-	() => (props.server.backups?.data?.findIndex((b) => b.id === currentBackup.value?.id) ?? 0) + 1,
+	() => (backups.value?.findIndex((b) => b.id === currentBackup.value?.id) ?? 0) + 1,
 )
 
 const focusInput = () => {
@@ -90,11 +110,10 @@ const focusInput = () => {
 	})
 }
 
-function show(backup: Backup) {
+function show(backup: Archon.Backups.v1.Backup) {
 	currentBackup.value = backup
 	backupName.value = backup.name
 	originalName.value = backup.name
-	isRenaming.value = false
 	modal.value?.show()
 }
 
@@ -102,7 +121,7 @@ function hide() {
 	modal.value?.hide()
 }
 
-const renameBackup = async () => {
+const renameBackup = () => {
 	if (!currentBackup.value) {
 		addNotification({
 			type: 'error',
@@ -117,24 +136,24 @@ const renameBackup = async () => {
 		return
 	}
 
-	isRenaming.value = true
-	try {
-		let newName = trimmedName.value
-
-		if (newName.length === 0) {
-			newName = `Backup #${backupNumber.value}`
-		}
-
-		await props.server.backups?.rename(currentBackup.value.id, newName)
-		hide()
-		await props.server.refresh()
-	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error)
-		addNotification({ type: 'error', title: 'Error renaming backup', text: message })
-	} finally {
-		hide()
-		isRenaming.value = false
+	let newName = trimmedName.value
+	if (newName.length === 0) {
+		newName = `Backup #${backupNumber.value}`
 	}
+
+	renameMutation.mutate(
+		{ backupId: currentBackup.value.id, name: newName },
+		{
+			onSuccess: () => {
+				hide()
+			},
+			onError: (error) => {
+				const message = error instanceof Error ? error.message : String(error)
+				addNotification({ type: 'error', title: 'Error renaming backup', text: message })
+				hide()
+			},
+		},
+	)
 }
 
 defineExpose({

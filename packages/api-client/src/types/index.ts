@@ -6,6 +6,7 @@ export type {
 	CircuitBreakerStorage,
 } from '../features/circuit-breaker'
 export type { BackoffStrategy, RetryConfig } from '../features/retry'
+export type { Archon } from '../modules/archon/types'
 export type { ClientConfig, RequestHooks } from './client'
 export type { ApiErrorData, ModrinthErrorResponse } from './errors'
 export { isModrinthErrorResponse } from './errors'

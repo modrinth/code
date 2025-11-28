@@ -13,7 +13,7 @@
 				:placeholder="`Backup #${newBackupAmount}`"
 				maxlength="48"
 			/>
-			<div v-if="nameExists && !isCreating" class="flex items-center gap-1">
+			<div v-if="nameExists && !createMutation.isPending.value" class="flex items-center gap-1">
 				<IssuesIcon class="hidden text-orange sm:block" />
 				<span class="text-sm text-orange">
 					You already have a backup named '<span class="font-semibold">{{ trimmedName }}</span
@@ -26,7 +26,7 @@
 		</div>
 		<div class="mt-2 flex justify-start gap-2">
 			<ButtonStyled color="brand">
-				<button :disabled="isCreating || nameExists" @click="createBackup">
+				<button :disabled="createMutation.isPending.value || nameExists" @click="createBackup">
 					<PlusIcon />
 					Create backup
 				</button>
@@ -43,33 +43,46 @@
 
 <script setup lang="ts">
 import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, NewModal } from '@modrinth/ui'
-import { ModrinthServersFetchError, type ServerBackup } from '@modrinth/utils'
+import {
+	ButtonStyled,
+	injectModrinthClient,
+	injectNotificationManager,
+	NewModal,
+} from '@modrinth/ui'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { injectModrinthServerContext } from '~/providers/server-context.ts'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const ctx = injectModrinthServerContext()
 
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const backupsQueryKey = ['backups', 'list', ctx.serverId]
+
+const { data: backups } = useQuery({
+	queryKey: backupsQueryKey,
+	queryFn: () => client.archon.backups_v1.list(ctx.serverId),
+})
+
+const createMutation = useMutation({
+	mutationFn: (name: string) => client.archon.backups_v1.create(ctx.serverId, { name }),
+	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+})
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const input = ref<HTMLInputElement>()
-const isCreating = ref(false)
 const isRateLimited = ref(false)
 const backupName = ref('')
-const newBackupAmount = computed(() =>
-	props.server.backups?.data?.length === undefined ? 1 : props.server.backups?.data?.length + 1,
-)
+const newBackupAmount = computed(() => (backups.value?.length ?? 0) + 1)
 
 const trimmedName = computed(() => backupName.value.trim())
 
 const nameExists = computed(() => {
-	if (!props.server.backups?.data) return false
-	return props.server.backups.data.some(
-		(backup: ServerBackup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
+	if (!backups.value) return false
+	return backups.value.some(
+		(backup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
 	)
 })
 
@@ -83,7 +96,7 @@ const focusInput = () => {
 
 function show() {
 	backupName.value = ''
-	isCreating.value = false
+	isRateLimited.value = false
 	modal.value?.show()
 }
 
@@ -91,32 +104,28 @@ const hideModal = () => {
 	modal.value?.hide()
 }
 
-const createBackup = async () => {
-	if (backupName.value.trim().length === 0) {
-		backupName.value = `Backup #${newBackupAmount.value}`
-	}
-
-	isCreating.value = true
+const createBackup = () => {
+	const name = trimmedName.value || `Backup #${newBackupAmount.value}`
 	isRateLimited.value = false
-	try {
-		await props.server.backups?.create(trimmedName.value)
-		hideModal()
-		await props.server.refresh()
-	} catch (error) {
-		if (error instanceof ModrinthServersFetchError && error?.statusCode === 429) {
-			isRateLimited.value = true
-			addNotification({
-				type: 'error',
-				title: 'Error creating backup',
-				text: "You're creating backups too fast.",
-			})
-		} else {
-			const message = error instanceof Error ? error.message : String(error)
-			addNotification({ type: 'error', title: 'Error creating backup', text: message })
-		}
-	} finally {
-		isCreating.value = false
-	}
+
+	createMutation.mutate(name, {
+		onSuccess: () => {
+			hideModal()
+		},
+		onError: (error) => {
+			if (error instanceof Error && error.message.includes('429')) {
+				isRateLimited.value = true
+				addNotification({
+					type: 'error',
+					title: 'Error creating backup',
+					text: "You're creating backups too fast.",
+				})
+			} else {
+				const message = error instanceof Error ? error.message : String(error)
+				addNotification({ type: 'error', title: 'Error creating backup', text: message })
+			}
+		},
+	})
 }
 
 defineExpose({

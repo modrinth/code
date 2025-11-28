@@ -2,7 +2,9 @@ import { $fetch, FetchError } from 'ofetch'
 
 import { AbstractModrinthClient } from '../core/abstract-client'
 import type { ModrinthApiError } from '../core/errors'
+import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'
+import { GenericWebSocketClient } from './websocket-generic'
 
 /**
  * Generic platform client using ofetch
@@ -23,6 +25,17 @@ import type { RequestOptions } from '../types/request'
  * ```
  */
 export class GenericModrinthClient extends AbstractModrinthClient {
+	constructor(config: ClientConfig) {
+		super(config)
+
+		Object.defineProperty(this.archon, 'sockets', {
+			value: new GenericWebSocketClient(this),
+			writable: false,
+			enumerable: true,
+			configurable: false,
+		})
+	}
+
 	protected async executeRequest<T>(url: string, options: RequestOptions): Promise<T> {
 		try {
 			const response = await $fetch<T>(url, {

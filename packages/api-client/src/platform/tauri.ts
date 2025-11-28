@@ -2,6 +2,7 @@ import { AbstractModrinthClient } from '../core/abstract-client'
 import type { ModrinthApiError } from '../core/errors'
 import type { ClientConfig } from '../types/client'
 import type { RequestOptions } from '../types/request'
+import { GenericWebSocketClient } from './websocket-generic'
 
 /**
  * Tauri-specific configuration
@@ -37,6 +38,17 @@ interface HttpError extends Error {
  */
 export class TauriModrinthClient extends AbstractModrinthClient {
 	protected declare config: TauriClientConfig
+
+	constructor(config: TauriClientConfig) {
+		super(config)
+
+		Object.defineProperty(this.archon, 'sockets', {
+			value: new GenericWebSocketClient(this),
+			writable: false,
+			enumerable: true,
+			configurable: false,
+		})
+	}
 
 	protected async executeRequest<T>(url: string, options: RequestOptions): Promise<T> {
 		try {

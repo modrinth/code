@@ -18,20 +18,20 @@
 </template>
 
 <script setup lang="ts">
+import type { Archon } from '@modrinth/api-client'
 import { ConfirmModal } from '@modrinth/ui'
-import type { Backup } from '@modrinth/utils'
 import { ref } from 'vue'
 
 import BackupItem from '~/components/ui/servers/BackupItem.vue'
 
 const emit = defineEmits<{
-	(e: 'delete', backup: Backup | undefined): void
+	(e: 'delete', backup: Archon.Backups.v1.Backup | undefined): void
 }>()
 
 const modal = ref<InstanceType<typeof ConfirmModal>>()
-const currentBackup = ref<Backup | undefined>(undefined)
+const currentBackup = ref<Archon.Backups.v1.Backup>()
 
-function show(backup: Backup) {
+function show(backup: Archon.Backups.v1.Backup) {
 	currentBackup.value = backup
 	modal.value?.show()
 }
