@@ -17,7 +17,10 @@
 						type="chip"
 						size="small"
 					>
-						<button class="w-16 !text-contrast" @click="toggleVersion(version)">
+						<button
+							class="w-16 !text-contrast focus:outline-none"
+							@click="toggleVersion(version, $event)"
+						>
 							{{ version }}
 						</button>
 					</ButtonStyled>
@@ -29,7 +32,7 @@
 
 <script lang="ts" setup>
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{
 	modelValue: string[]
@@ -40,6 +43,9 @@ const emit = defineEmits<{
 	(e: 'update:modelValue', value: string[]): void
 }>()
 
+const lastClickedVersion = ref<string | null>(null)
+const anchorVersion = ref<string | null>(null)
+
 const releaseVersions = computed(() =>
 	props.gameVersions.filter((v) => v.version_type === 'release'),
 )
@@ -48,12 +54,30 @@ const groupedGameVersions = computed(() =>
 	groupVersions(releaseVersions.value.map((v) => v.version)),
 )
 
-const toggleVersion = (version: string) => {
-	const next = props.modelValue.includes(version)
-		? props.modelValue.filter((v) => v !== version)
-		: [...props.modelValue, version]
+const allVersionsFlat = computed(() => groupedGameVersions.value.flatMap((g) => g.versions))
 
-	emit('update:modelValue', next)
+const toggleVersion = (version: string, event: MouseEvent) => {
+	if (event.shiftKey && anchorVersion.value) {
+		const anchorIdx = allVersionsFlat.value.indexOf(anchorVersion.value)
+		const endIdx = allVersionsFlat.value.indexOf(version)
+		const [minIdx, maxIdx] = anchorIdx <= endIdx ? [anchorIdx, endIdx] : [endIdx, anchorIdx]
+		const rangeVersions = allVersionsFlat.value.slice(minIdx, maxIdx + 1)
+
+		const next = Array.from(new Set([...props.modelValue, ...rangeVersions])).sort((a, b) =>
+			compareVersions(b, a),
+		)
+
+		emit('update:modelValue', next)
+	} else {
+		const next = props.modelValue.includes(version)
+			? props.modelValue.filter((v) => v !== version)
+			: [...props.modelValue, version]
+
+		emit('update:modelValue', next)
+		anchorVersion.value = version
+	}
+
+	lastClickedVersion.value = version
 }
 
 // Create group keys like: "1.20.4" → "1.20"
