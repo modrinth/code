@@ -75,6 +75,7 @@ import _FileImageIcon from './icons/file-image.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
 import _FilterXIcon from './icons/filter-x.svg?component'
+import _FolderIcon from './icons/folder.svg?component'
 import _FolderArchiveIcon from './icons/folder-archive.svg?component'
 import _FolderOpenIcon from './icons/folder-open.svg?component'
 import _FolderSearchIcon from './icons/folder-search.svg?component'
@@ -299,6 +300,7 @@ export const FilterIcon = _FilterIcon
 export const FolderArchiveIcon = _FolderArchiveIcon
 export const FolderOpenIcon = _FolderOpenIcon
 export const FolderSearchIcon = _FolderSearchIcon
+export const FolderIcon = _FolderIcon
 export const GameIcon = _GameIcon
 export const GapIcon = _GapIcon
 export const GaugeIcon = _GaugeIcon
