@@ -4,29 +4,15 @@
 			<span class="font-semibold text-contrast">
 				Version type <span class="text-red">*</span>
 			</span>
-			<div class="flex gap-2.5">
-				<ButtonStyled
-					:color="versionType === 'Release' ? 'green' : 'standard'"
-					:highlighted="versionType === 'Release'"
-					type="chip"
-				>
-					<button @click="versionType = 'Release'">Release</button>
-				</ButtonStyled>
-				<ButtonStyled
-					:color="versionType === 'Alpha' ? 'green' : 'standard'"
-					:highlighted="versionType === 'Alpha'"
-					type="chip"
-				>
-					<button @click="versionType = 'Alpha'">Alpha</button>
-				</ButtonStyled>
-				<ButtonStyled
-					:color="versionType === 'Beta' ? 'green' : 'standard'"
-					:highlighted="versionType === 'Beta'"
-					type="chip"
-				>
-					<button @click="versionType = 'Beta'">Beta</button>
-				</ButtonStyled>
-			</div>
+			<Chips
+				v-model="versionType"
+				:items="['Release', 'Alpha', 'Beta']"
+				:never-empty="false"
+				:capitalize="true"
+			/>
+			<!-- :format-label="
+					(item) => (item === 'Release' ? formatMessage(messages.release) : item === 'Alpha' ? formatMessage(messages.alpha) : formatMessage(messages.beta))
+				" -->
 		</div>
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">
@@ -60,7 +46,7 @@
 </template>
 
 <script lang="ts" setup>
-import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
+import Chips from '@modrinth/ui/src/components/base/Chips.vue'
 
 import LoaderPicker from '../components/LoaderPicker.vue'
 
