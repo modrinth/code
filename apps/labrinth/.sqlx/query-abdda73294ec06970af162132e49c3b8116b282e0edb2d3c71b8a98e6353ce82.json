@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE users_subscriptions_affiliations\n            SET deactivated_at = NOW()\n            WHERE subscription_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "abdda73294ec06970af162132e49c3b8116b282e0edb2d3c71b8a98e6353ce82"
+}

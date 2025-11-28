@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO users_subscriptions_affiliations\n                (subscription_id, affiliate_code, deactivated_at)\n            VALUES ($1, $2, $3)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "64844433bb6c7e5a48890ec42786f56a5e220c21aa9d0fc0c03f57bee864fb63"
+}
