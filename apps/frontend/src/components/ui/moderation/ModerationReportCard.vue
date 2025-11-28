@@ -21,6 +21,7 @@
 						<span class="text-secondary sm:hidden">Reporter:</span>
 						<nuxt-link
 							:to="`/user/${report.reporter_user.username}`"
+							target="_blank"
 							class="inline-flex flex-row items-center gap-1 transition-colors duration-100 ease-in-out hover:text-brand"
 						>
 							<Avatar
@@ -58,7 +59,6 @@
 
 			<div class="my-4 h-px bg-surface-5" />
 
-			<!-- Report Item Layout -->
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-4">
 					<Avatar
@@ -71,10 +71,10 @@
 						]"
 					/>
 
-					<!-- User-specific content -->
 					<div v-if="report.item_type === 'user'" class="flex flex-col gap-1.5">
 						<NuxtLink
 							:to="`/user/${report.user?.username}`"
+							target="_blank"
 							class="text-base font-semibold text-contrast hover:underline"
 						>
 							{{ report.user?.username || 'Unknown User' }}
@@ -89,11 +89,11 @@
 						</span>
 					</div>
 
-					<!-- Project/Version-specific content -->
 					<div v-else class="flex flex-col gap-1.5">
 						<div class="flex items-center gap-2">
 							<NuxtLink
 								:to="reportItemUrl"
+								target="_blank"
 								class="text-base font-semibold text-contrast hover:underline"
 							>
 								{{ reportItemTitle }}
@@ -130,6 +130,7 @@
 							/>
 							<NuxtLink
 								:to="`/${report.target.type}/${report.target.slug}`"
+								target="_blank"
 								class="text-sm font-medium text-secondary hover:underline"
 							>
 								{{ report.target.name }}
@@ -138,7 +139,6 @@
 					</div>
 				</div>
 
-				<!-- Collapse button -->
 				<ButtonStyled circular type="transparent">
 					<button @click="isThreadCollapsed = !isThreadCollapsed">
 						<ChevronDownIcon
