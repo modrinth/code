@@ -18,7 +18,9 @@
 							type="chip"
 							size="small"
 						>
-							<button class="w-16" @click="toggleVersion(version)">{{ version }}</button>
+							<button class="w-16 !text-contrast" @click="toggleVersion(version)">
+								{{ version }}
+							</button>
 						</ButtonStyled>
 					</div>
 				</div>
@@ -43,7 +45,10 @@
 							type="chip"
 							size="small"
 						>
-							<button class="w-16" @click="toggleVersion(version)">{{ version }}</button>
+							<button class="w-20 !text-contrast" @click="toggleVersion(version)">
+								{{ version }}
+								<XIcon />
+							</button>
 						</ButtonStyled>
 					</div>
 				</div>
@@ -56,7 +61,10 @@
 							type="chip"
 							size="small"
 						>
-							<button class="w-16" @click="toggleVersion(version)">{{ version }}</button>
+							<button class="w-20 !text-contrast" @click="toggleVersion(version)">
+								{{ version }}
+								<XIcon />
+							</button>
 						</ButtonStyled>
 					</div>
 				</div>
@@ -66,6 +74,7 @@
 </template>
 
 <script lang="ts" setup>
+import { XIcon } from '@modrinth/assets'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 import { computed } from 'vue'
 

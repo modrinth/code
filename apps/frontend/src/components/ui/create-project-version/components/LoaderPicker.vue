@@ -1,5 +1,5 @@
 <template>
-	<div class="flex max-h-full flex-col gap-2">
+	<div class="flex max-h-[240px] flex-col gap-2">
 		<div class="flex items-center justify-between">
 			<span class="font-semibold text-contrast">Loaders <span class="text-red">*</span></span>
 			<ButtonStyled type="transparent" size="standard">
