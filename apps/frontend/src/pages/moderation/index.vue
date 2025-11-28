@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-3">
+	<div class="flex flex-col gap-4">
 		<div class="flex flex-col justify-between gap-3 lg:flex-row">
 			<div class="iconified-input flex-1 lg:max-w-md">
 				<SearchIcon aria-hidden="true" class="text-lg" />
@@ -79,7 +79,7 @@
 			<ConfettiExplosion v-if="visible" />
 		</div>
 
-		<div class="mt-4 flex flex-col gap-4">
+		<div class="flex flex-col gap-4">
 			<div v-if="paginatedProjects.length === 0" class="universal-card h-24 animate-pulse"></div>
 			<ModerationQueueCard
 				v-for="item in paginatedProjects"

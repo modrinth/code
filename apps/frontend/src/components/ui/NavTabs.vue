@@ -12,14 +12,17 @@
 				ref="tabLinkElements"
 				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
 				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
-				:class="{
-					'text-button-textSelected': currentActiveIndex === index && !subpageSelected,
-					'text-contrast':
-						(currentActiveIndex === index && subpageSelected) || currentActiveIndex !== index,
-				}"
 			>
-				<component :is="link.icon" v-if="link.icon" class="size-5" />
-				<span class="text-nowrap">{{ link.label }}</span>
+				<component
+					:is="link.icon"
+					v-if="link.icon"
+					class="size-5"
+					:class="{
+						'text-brand': currentActiveIndex === index && !subpageSelected,
+						'text-secondary': currentActiveIndex !== index || subpageSelected,
+					}"
+				/>
+				<span class="text-nowrap text-contrast">{{ link.label }}</span>
 			</NuxtLink>
 		</template>
 		<template v-else>
@@ -29,15 +32,18 @@
 				:key="link.href"
 				ref="tabLinkElements"
 				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 hover:cursor-pointer focus:rounded-full"
-				:class="{
-					'text-button-textSelected': currentActiveIndex === index && !subpageSelected,
-					'text-contrast':
-						(currentActiveIndex === index && subpageSelected) || currentActiveIndex !== index,
-				}"
 				@click="emit('tabClick', index, link)"
 			>
-				<component :is="link.icon" v-if="link.icon" class="size-5" />
-				<span class="text-nowrap">{{ link.label }}</span>
+				<component
+					:is="link.icon"
+					v-if="link.icon"
+					class="size-5"
+					:class="{
+						'text-brand': currentActiveIndex === index && !subpageSelected,
+						'text-secondary': currentActiveIndex !== index || subpageSelected,
+					}"
+				/>
+				<span class="text-nowrap text-contrast">{{ link.label }}</span>
 			</div>
 		</template>
 		<div
@@ -58,6 +64,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Component } from 'vue'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 const route = useNativeRoute()
@@ -66,7 +73,7 @@ interface Tab {
 	label: string
 	href: string
 	shown?: boolean
-	icon?: string
+	icon?: Component
 	subpages?: string[]
 }
 

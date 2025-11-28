@@ -447,7 +447,7 @@ watch(currentSortType, () => {
 </script>
 
 <template>
-	<div class="flex flex-col gap-6">
+	<div class="flex flex-col gap-4">
 		<!-- TODO: Reimpl when backend is available -->
 		<!-- <BatchScanProgressAlert
 			v-if="batchScanProgressInformation"
