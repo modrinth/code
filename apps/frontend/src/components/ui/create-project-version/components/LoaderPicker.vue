@@ -23,7 +23,7 @@
 							size="small"
 						>
 							<button
-								:style="`color: var(--color-platform-${loader.name})`"
+								:style="`--_icon: var(--color-platform-${loader.name}); color: var(--color-platform-${loader.name})`"
 								@click="toggleLoader(loader.name)"
 							>
 								<div v-html="loader.icon"></div>
