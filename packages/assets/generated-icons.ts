@@ -115,6 +115,7 @@ import _LinkIcon from './icons/link.svg?component'
 import _ListIcon from './icons/list.svg?component'
 import _ListBulletedIcon from './icons/list-bulleted.svg?component'
 import _ListEndIcon from './icons/list-end.svg?component'
+import _ListFilterIcon from './icons/list-filter.svg?component'
 import _ListOrderedIcon from './icons/list-ordered.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _LoaderCircleIcon from './icons/loader-circle.svg?component'
@@ -334,6 +335,7 @@ export const LightBulbIcon = _LightBulbIcon
 export const LinkIcon = _LinkIcon
 export const ListBulletedIcon = _ListBulletedIcon
 export const ListEndIcon = _ListEndIcon
+export const ListFilterIcon = _ListFilterIcon
 export const ListOrderedIcon = _ListOrderedIcon
 export const ListIcon = _ListIcon
 export const LoaderCircleIcon = _LoaderCircleIcon

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { FilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
+import { ListFilterIcon, SearchIcon, SortAscIcon, SortDescIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
 	Combobox,
@@ -225,7 +225,7 @@ const currentSortType = ref('Oldest')
 const sortTypes: ComboboxOption<string>[] = [
 	{ value: 'Oldest', label: 'Oldest' },
 	{ value: 'Newest', label: 'Newest' },
-	{ value: 'Pending first', label: 'Pending first' },
+	{ value: 'Pending', label: 'Pending' },
 	{ value: 'Severity ↑', label: 'Severity ↑' },
 	{ value: 'Severity ↓', label: 'Severity ↓' },
 ]
@@ -299,7 +299,7 @@ const filteredItems = computed(() => {
 		case 'Newest':
 			filtered.sort((a, b) => getEarliestDate(b) - getEarliestDate(a))
 			break
-		case 'Pending first': {
+		case 'Pending': {
 			filtered.sort((a, b) => {
 				const aPending = hasPendingIssues(a) ? 0 : 1
 				const bPending = hasPendingIssues(b) ? 0 : 1
@@ -485,9 +485,11 @@ watch(currentSortType, () => {
 					@select="goToPage(1)"
 				>
 					<template #selected>
-						<span class="flex flex-row gap-2 align-middle font-semibold text-primary">
-							<FilterIcon class="size-4 flex-shrink-0" />
-							<span class="truncate">{{ currentFilterType }} ({{ filteredIssuesCount }})</span>
+						<span class="flex flex-row gap-2 align-middle font-semibold">
+							<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
+							<span class="truncate text-contrast"
+								>{{ currentFilterType }} ({{ filteredIssuesCount }})</span
+							>
 						</span>
 					</template>
 				</Combobox>
@@ -500,10 +502,13 @@ watch(currentSortType, () => {
 					@select="goToPage(1)"
 				>
 					<template #selected>
-						<span class="flex flex-row gap-2 align-middle font-semibold text-primary">
-							<SortAscIcon v-if="currentSortType === 'Oldest'" class="size-4 flex-shrink-0" />
-							<SortDescIcon v-else class="size-4 flex-shrink-0" />
-							<span class="truncate">{{ currentSortType }}</span>
+						<span class="flex flex-row gap-2 align-middle font-semibold">
+							<SortAscIcon
+								v-if="currentSortType === 'Oldest'"
+								class="size-5 flex-shrink-0 text-secondary"
+							/>
+							<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
+							<span class="truncate text-contrast">{{ currentSortType }}</span>
 						</span>
 					</template>
 				</Combobox>
