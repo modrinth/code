@@ -72,7 +72,7 @@
 			<ConfettiExplosion v-if="visible" />
 		</div>
 
-		<div class="mt-4 flex flex-col gap-2">
+		<div class="mt-4 flex flex-col gap-4">
 			<div v-if="paginatedProjects.length === 0" class="universal-card h-24 animate-pulse"></div>
 			<ModerationQueueCard
 				v-for="item in paginatedProjects"
