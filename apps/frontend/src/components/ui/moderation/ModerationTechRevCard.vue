@@ -17,6 +17,7 @@ import {
 import {
 	Avatar,
 	ButtonStyled,
+	Collapsible,
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -365,7 +366,7 @@ function handleThreadUpdate() {
 					<div class="flex items-center gap-2">
 						<ButtonStyled color="brand">
 							<button
-								class="!shadow-none !w-[85px]"
+								class="!w-[85px] !shadow-none"
 								:disabled="getButtonState('malware') !== 'idle'"
 								@click="handleTopLevelAction('safe')"
 							>
@@ -380,7 +381,7 @@ function handleThreadUpdate() {
 						</ButtonStyled>
 						<ButtonStyled color="red">
 							<button
-								class="!shadow-none !w-[116px]"
+								class="!w-[116px] !shadow-none"
 								:disabled="getButtonState('safe') !== 'idle'"
 								@click="handleTopLevelAction('malware')"
 							>
@@ -544,52 +545,57 @@ function handleThreadUpdate() {
 						</div>
 					</div>
 
-					<div v-if="expandedIssues.has(issue.id)" class="flex flex-col gap-4 px-4 pb-4">
-						<div
-							v-for="(detail, detailIdx) in issue.details"
-							:key="detailIdx"
-							class="flex flex-col"
-						>
-							<p class="mt-0 pt-0 font-mono text-sm text-secondary">{{ detail.file_path }}</p>
-
+					<Collapsible :collapsed="!expandedIssues.has(issue.id)">
+						<div class="flex flex-col gap-4 px-4 pb-4">
 							<div
-								v-if="detail.decompiled_source"
-								class="relative overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
+								v-for="(detail, detailIdx) in issue.details"
+								:key="detailIdx"
+								class="flex flex-col"
 							>
-								<ButtonStyled circular type="transparent">
-									<button
-										v-tooltip="`Copy code`"
-										class="absolute right-2 top-2 border-[1px]"
-										@click="copyToClipboard(detail.decompiled_source, `${issue.id}-${detailIdx}`)"
-									>
-										<CopyIcon v-if="!showCopyFeedback.get(`${issue.id}-${detailIdx}`)" />
-										<CheckIcon v-else />
-									</button>
-								</ButtonStyled>
+								<p class="mt-0 pt-0 font-mono text-sm text-secondary">{{ detail.file_path }}</p>
 
-								<div class="overflow-x-auto bg-surface-3 py-3">
-									<div
-										v-for="(line, n) in highlightCodeLines(detail.decompiled_source, 'java')"
-										:key="n"
-										class="flex font-mono text-[13px] leading-[1.6]"
-									>
-										<div
-											class="select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
-											style="min-width: 3.5rem"
+								<div
+									v-if="detail.decompiled_source"
+									class="relative overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
+								>
+									<ButtonStyled circular type="transparent">
+										<button
+											v-tooltip="`Copy code`"
+											class="absolute right-2 top-2 border-[1px]"
+											@click="copyToClipboard(detail.decompiled_source, `${issue.id}-${detailIdx}`)"
 										>
-											{{ n + 1 }}
-										</div>
-										<div class="flex-1 px-4 py-0 text-primary">
-											<pre v-html="line || ' '"></pre>
+											<CopyIcon v-if="!showCopyFeedback.get(`${issue.id}-${detailIdx}`)" />
+											<CheckIcon v-else />
+										</button>
+									</ButtonStyled>
+
+									<div class="overflow-x-auto bg-surface-3 py-3">
+										<div
+											v-for="(line, n) in highlightCodeLines(detail.decompiled_source, 'java')"
+											:key="n"
+											class="flex font-mono text-[13px] leading-[1.6]"
+										>
+											<div
+												class="select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
+												style="min-width: 3.5rem"
+											>
+												{{ n + 1 }}
+											</div>
+											<div class="flex-1 px-4 py-0 text-primary">
+												<pre v-html="line || ' '"></pre>
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							<div v-else class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4">
-								<p class="text-sm text-secondary">Source code not available for this flag.</p>
+								<div
+									v-else
+									class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4"
+								>
+									<p class="text-sm text-secondary">Source code not available for this flag.</p>
+								</div>
 							</div>
 						</div>
-					</div>
+					</Collapsible>
 				</div>
 			</template>
 		</div>

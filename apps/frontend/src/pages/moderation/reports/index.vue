@@ -57,7 +57,7 @@
 			<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
 		</div>
 
-		<div class="mt-4 flex flex-col gap-2">
+		<div class="mt-4 flex flex-col gap-4">
 			<div v-if="paginatedReports.length === 0" class="universal-card h-24 animate-pulse"></div>
 			<ReportCard v-for="report in paginatedReports" v-else :key="report.id" :report="report" />
 		</div>
