@@ -23,6 +23,7 @@ import type { Ref } from 'vue'
 import { computed, inject, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 
 import type AccountsCard from '@/components/ui/AccountsCard.vue'
+import AnimatedIcon from '@/components/ui/AnimatedIcon.vue'
 import EditSkinModal from '@/components/ui/skin/EditSkinModal.vue'
 import SelectCapeModal from '@/components/ui/skin/SelectCapeModal.vue'
 import UploadSkinModal from '@/components/ui/skin/UploadSkinModal.vue'
@@ -353,7 +354,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 										)
 								"
 							>
-								<UpdatedIcon />
+								<AnimatedIcon :icon="UpdatedIcon" />
 								Change cape
 							</button>
 						</ButtonStyled>

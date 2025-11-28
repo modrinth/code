@@ -97,6 +97,7 @@ import {
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
+import AnimatedIcon from './components/ui/AnimatedIcon.vue'
 
 import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
@@ -804,10 +805,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
 				:is-subpage="(route) => route.path.startsWith('/project') && !route.query.i"
 			>
-				<CompassIcon />
+				<AnimatedIcon :icon="CompassIcon" />
 			</NavButton>
 			<NavButton v-tooltip.right="'Skins (Beta)'" to="/skins">
-				<ChangeSkinIcon />
+				<AnimatedIcon :icon="ChangeSkinIcon" id="change-skin-icon" />
 			</NavButton>
 			<NavButton
 				v-tooltip.right="'Library'"
@@ -819,7 +820,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 							route.query.i)
 				"
 			>
-				<LibraryIcon />
+				<AnimatedIcon :icon="LibraryIcon" id="library-icon" />
 			</NavButton>
 			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<suspense>
@@ -877,7 +878,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-tooltip.right="formatMessage(commonMessages.settingsLabel)"
 				:to="() => $refs.settingsModal.show()"
 			>
-				<SettingsIcon />
+				<AnimatedIcon :icon="SettingsIcon" />
 			</NavButton>
 			<OverflowMenu
 				v-if="credentials"
@@ -1349,6 +1350,14 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 .toast-enter-from,
 .toast-leave-to {
 	opacity: 0;
+}
+
+#change-skin-icon {
+	width: 3rem;
+}
+
+#library-icon {
+	height: 2rem;
 }
 
 @media (prefers-reduced-motion: no-preference) {

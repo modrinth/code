@@ -1,1 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"></path><path d="M12 6v14"></path><path d="M8 8v12"></path><path d="M4 4v16"></path></svg>
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	width="24"
+	height="24"
+	viewBox="0 0 24 24"
+	fill="none"
+	stroke="currentColor"
+	stroke-width="2"
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	class="library-icon"
+>
+	<style>
+		.leaning-book {
+			transform-origin: 20px 20px;
+		}
+
+		.library-icon.animating .vertical-book{
+			animation: jump 0.5s cubic-bezier(1, 0, 0.75, 1) calc(0.1s * var(--index));
+		}
+		.library-icon.animating .leaning-book {
+			animation: lean 0.7s cubic-bezier(0.2, 0.5, 0.7, 0.3) 0.25s;
+		}
+
+		@keyframes jump {
+			0%,
+			100% {
+				transform: translateY(0);
+			}
+			50% {
+				transform: translateY(-30%);
+			}
+		}
+
+		@keyframes lean {
+			0%,
+			100% {
+				transform: rotate(0deg);
+			}
+			25%,
+			75% {
+				transform: rotate(14deg);
+			}
+			50% {
+				transform: rotate(16deg);
+			}
+		}
+	</style>
+
+	<path d="M4 4v16" class="vertical-book" style="--index: 0" />
+	<path d="M8 8v12" class="vertical-book" style="--index: 1" />
+	<path d="M12 6v14" class="vertical-book" style="--index: 2" />
+	<path d="m16 6 4 14" class="leaning-book" />
+</svg>
