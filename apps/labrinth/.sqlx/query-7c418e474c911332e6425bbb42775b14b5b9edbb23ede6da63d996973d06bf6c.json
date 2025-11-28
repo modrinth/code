@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT DISTINCT version.id version_id, mod.id FROM versions version\n                INNER JOIN mods mod ON version.mod_id = mod.id\n                INNER JOIN dependencies d ON version.id = d.dependent_id\n            WHERE mod.status = 'approved' AND d.mod_dependency_id = $1\n            ORDER BY mod.id;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "7c418e474c911332e6425bbb42775b14b5b9edbb23ede6da63d996973d06bf6c"
+}
