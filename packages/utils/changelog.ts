@@ -11,6 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-11-28T11:45:00-08:00`,
+		product: 'app',
+		version: '0.10.21',
+		body: `## Improvements
+- Install dependencies added in an update automatically.
+- Fixed auth server check.`,
+	},
+	{
 		date: `2025-11-19T15:15:00-08:00`,
 		product: 'app',
 		version: '0.10.20',
