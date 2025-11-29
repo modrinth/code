@@ -45,8 +45,7 @@ const handleSearch = async (query: string) => {
 			const results = await client.labrinth.projects_v2.search({
 				query: query,
 				limit: 20,
-				// @ts-ignore - for some reason, facet need to be wrapped in another array. either type is wrong or api client implementation is wrong
-				facets: [[['project_type:mod']]],
+				facets: JSON.stringify([['project_type:mod']]),
 			})
 
 			options.value = results.hits.map((hit) => ({
