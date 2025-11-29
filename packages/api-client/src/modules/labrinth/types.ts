@@ -264,7 +264,7 @@ export namespace Labrinth {
 
 			export type ProjectSearchParams = {
 				query?: string
-				facets?: string[][]
+				facets?: string[][][]
 				filters?: string
 				index?: 'relevance' | 'downloads' | 'follows' | 'newest' | 'updated'
 				offset?: number
