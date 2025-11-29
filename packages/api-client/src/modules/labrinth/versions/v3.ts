@@ -1,0 +1,199 @@
+import { AbstractModule } from '../../../core/abstract-module'
+import type { Labrinth } from '../types'
+
+export class LabrinthVersionsV3Module extends AbstractModule {
+	public getModuleID(): string {
+		return 'labrinth_versions_v3'
+	}
+
+	/**
+	 * Get versions for a project (v3)
+	 *
+	 * @param id - Project ID or slug (e.g., 'sodium' or 'AANobbMI')
+	 * @returns Promise resolving to an array of v3 versions
+	 *
+	 * @example
+	 * ```typescript
+	 * const versions = await client.labrinth.versions_v3.getProjectVersions('sodium')
+	 * console.log(versions[0].version_number)
+	 * ```
+	 */
+	public async getProjectVersions(id: string): Promise<Labrinth.Versions.v3.Version[]> {
+		return this.client.request<Labrinth.Versions.v3.Version[]>(`/project/${id}/versions`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'GET',
+		})
+	}
+
+	/**
+	 * Get a specific version by ID (v3)
+	 *
+	 * @param id - Version ID
+	 * @returns Promise resolving to the v3 version data
+	 *
+	 * @example
+	 * ```typescript
+	 * const version = await client.labrinth.versions_v3.getVersion('DXtmvS8i')
+	 * console.log(version.version_number)
+	 * ```
+	 */
+	public async getVersion(id: string): Promise<Labrinth.Versions.v3.Version> {
+		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${id}`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'GET',
+		})
+	}
+
+	/**
+	 * Get multiple versions by IDs (v3)
+	 *
+	 * @param ids - Array of version IDs
+	 * @returns Promise resolving to an array of v3 versions
+	 *
+	 * @example
+	 * ```typescript
+	 * const versions = await client.labrinth.versions_v3.getVersions(['DXtmvS8i', 'abc123'])
+	 * console.log(versions[0].version_number)
+	 * ```
+	 */
+	public async getVersions(ids: string[]): Promise<Labrinth.Versions.v3.Version[]> {
+		return this.client.request<Labrinth.Versions.v3.Version[]>(`/versions`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'GET',
+			params: { ids: JSON.stringify(ids) },
+		})
+	}
+
+	/**
+	 * Delete a version by ID (v3)
+	 *
+	 * @param id - Version ID
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.versions_v3.deleteVersion('DXtmvS8i')
+	 * ```
+	 */
+	public async deleteVersion(id: string): Promise<void> {
+		return this.client.request(`/version/${id}`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'DELETE',
+		})
+	}
+
+	/**
+	 * Modify a version by ID (v3)
+	 *
+	 * @param id - Version ID
+	 * @param data - Version update data
+	 * @returns Promise resolving to the updated v3 version data
+	 *
+	 * @example
+	 * ```typescript
+	 * const updated = await client.labrinth.versions_v3.modifyVersion('DXtmvS8i', {
+	 *   name: 'v1.0.1',
+	 *   featured: true,
+	 *   status: 'listed'
+	 * })
+	 * ```
+	 */
+	public async modifyVersion(
+		id: string,
+		data: Labrinth.Versions.v3.ModifyVersionRequest,
+	): Promise<Labrinth.Versions.v3.Version> {
+		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${id}`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'PATCH',
+			body: data,
+		})
+	}
+
+	/**
+	 * Get a version from a project by version ID or number (v3)
+	 *
+	 * @param projectId - Project ID or slug
+	 * @param versionId - Version ID or version number
+	 * @returns Promise resolving to the v3 version data
+	 *
+	 * @example
+	 * ```typescript
+	 * const version = await client.labrinth.versions_v3.getVersionFromIdOrNumber('sodium', 'DXtmvS8i')
+	 * const versionByNumber = await client.labrinth.versions_v3.getVersionFromIdOrNumber('sodium', '0.4.12')
+	 * ```
+	 */
+	public async getVersionFromIdOrNumber(
+		projectId: string,
+		versionId: string,
+	): Promise<Labrinth.Versions.v3.Version> {
+		return this.client.request<Labrinth.Versions.v3.Version>(
+			`/project/${projectId}/version/${versionId}`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
+	 * Create a new version for a project (v3)
+	 *
+	 * @param projectId - Project ID or slug
+	 * @param data - Version creation data
+	 * @returns Promise resolving to the created v3 version data
+	 *
+	 * @example
+	 * ```typescript
+	 * const version = await client.labrinth.versions_v3.createVersion('sodium', {
+	 *   name: 'v0.5.0',
+	 *   version_number: '0.5.0',
+	 *   version_type: 'release',
+	 *   loaders: ['fabric'],
+	 *   game_versions: ['1.20.1'],
+	 *   file_parts: ['part_0']
+	 * })
+	 * ```
+	 */
+	public async createVersion(
+		projectId: string,
+		data: Labrinth.Versions.v3.CreateVersionRequest,
+	): Promise<Labrinth.Versions.v3.Version> {
+		return this.client.request<Labrinth.Versions.v3.Version>(`/project/${projectId}/version`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'POST',
+			body: data,
+		})
+	}
+
+	/**
+	 * Add files to an existing version (v3)
+	 *
+	 * @param versionId - Version ID
+	 * @param data - Files to add (file parts)
+	 * @returns Promise resolving to the updated v3 version data
+	 *
+	 * @example
+	 * ```typescript
+	 * const updated = await client.labrinth.versions_v3.addFilesToVersion('DXtmvS8i', {
+	 *   file_parts: ['part_0', 'part_1']
+	 * })
+	 * ```
+	 */
+	public async addFilesToVersion(
+		versionId: string,
+		data: Labrinth.Versions.v3.AddFilesToVersionRequest,
+	): Promise<Labrinth.Versions.v3.Version> {
+		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${versionId}/files`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'POST',
+			body: data,
+		})
+	}
+}

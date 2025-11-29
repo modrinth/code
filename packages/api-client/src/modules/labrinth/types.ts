@@ -425,6 +425,35 @@ export namespace Labrinth {
 				downloads: number
 				files: VersionFile[]
 			}
+
+			export type ModifyVersionRequest = {
+				name?: string
+				version_number?: string
+				changelog?: string
+				dependencies?: Dependency[]
+				game_versions?: string[]
+				version_type?: VersionChannel
+				loaders?: string[]
+				featured?: boolean
+				status?: VersionStatus
+			}
+
+			export type CreateVersionRequest = {
+				name: string
+				version_number: string
+				changelog?: string
+				dependencies?: Dependency[]
+				game_versions: string[]
+				version_type: VersionChannel
+				loaders: string[]
+				featured?: boolean
+				status?: VersionStatus
+				file_parts: string[]
+			}
+
+			export type AddFilesToVersionRequest = {
+				file_parts: string[]
+			}
 		}
 	}
 
