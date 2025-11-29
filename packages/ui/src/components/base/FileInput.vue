@@ -107,7 +107,7 @@ label {
 		grid-gap: 0.5rem;
 		background-color: var(--color-button-bg);
 		border-radius: var(--radius-sm);
-		border: dashed 0.3rem var(--color-contrast);
+		border: dashed 2px var(--color-contrast);
 		cursor: pointer;
 		color: var(--color-contrast);
 	}
