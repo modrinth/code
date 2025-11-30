@@ -127,12 +127,13 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	): Promise<Labrinth.Versions.v3.Version> {
 		const formData = new FormData()
 
-		data.file_parts = files.map((_, i) => `file-part-${i}`)
+		data.file_parts = files.map((_, i) => String(i))
+		data.primary_file = '0' // first file in array is primary
 
 		formData.append('data', JSON.stringify(data))
 
 		files.forEach((file, i) => {
-			formData.append(`file-part-${i}`, file)
+			formData.append(String(i), file)
 		})
 
 		return this.client.request<Labrinth.Versions.v3.Version>(`/project/${projectId}/version`, {

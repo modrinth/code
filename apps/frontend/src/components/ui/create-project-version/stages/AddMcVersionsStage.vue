@@ -1,5 +1,5 @@
 <template>
-	<div class="flex w-full max-w-[496px] flex-col gap-6">
+	<div class="flex w-full max-w-[576px] flex-col gap-6">
 		<McVersionPicker v-model="selectedVersions" :game-versions="gameVersions" />
 		<div class="space-y-2">
 			<div class="flex items-center justify-between">
@@ -67,6 +67,8 @@ const detectedVersions = ['1.18.2', '1.19', '1.19.1']
 
 const generatedState = useGeneratedState()
 const gameVersions = generatedState.value.gameVersions
+
+// TODO, use draftVersion
 
 const toggleVersion = (version: string) => {
 	if (selectedVersions.value.includes(version)) {

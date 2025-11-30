@@ -1,5 +1,5 @@
 <template>
-	<div class="w-[496px] max-w-[496px]">
+	<div class="w-[576px] max-w-[576px]">
 		<div class="grid gap-6">
 			<div class="flex flex-col gap-4">
 				<span class="font-semibold text-contrast">Add dependency</span>
@@ -62,21 +62,12 @@
 				<span class="font-semibold text-contrast">Add dependency</span>
 				<div class="5 flex flex-col gap-2">
 					<AddedDependencyRow
-						v-for="(dependency, index) in [
-							{
-								project: {
-									title: 'Example Mod',
-									icon_url: 'https://cdn.modrinth.com/data/8fGzKJ0U/icon.png',
-								},
-								dependency_type: 'required',
-								version: { name: '1.0.0' },
-							},
-						]"
+						v-for="(dependency, index) in addedDependencies"
 						:key="index"
-						:name="dependency.project ? dependency.project.title : 'Unknown Project'"
-						:icon="dependency.project ? dependency.project.icon_url : ''"
-						:dependency-type="dependency.dependency_type"
-						:version-name="dependency.version.name"
+						:name="dependency.name"
+						:icon="dependency.icon"
+						:dependency-type="dependency.dependencyType"
+						:version-name="dependency.versionName"
 						@remove="() => {} /* TODO: remove dependency */"
 					/>
 				</div>
@@ -91,12 +82,27 @@ import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 import Combobox from '@modrinth/ui/src/components/base/Combobox.vue'
 
 import ModSelect from '~/components/ui/create-project-version/components/ModSelect.vue'
+import { useManageVersion } from '~/composables/versions/manage-version'
 
 import AddedDependencyRow from '../components/AddedDependencyRow.vue'
 
 const newDependencyId = ref('')
 const newDependencyType = ref<'required' | 'optional' | 'incompatible' | 'embedded'>('required')
 const version = ref('')
+
+const { draftVersion } = useManageVersion()
+
+const addedDependencies = computed(() =>
+	(draftVersion.value.dependencies || []).map((_dep) => {
+		// todo: fetch project and version data, or pass in fields from search
+		return {
+			name: '',
+			icon: '',
+			dependencyType: 'required' as const,
+			versionName: '',
+		}
+	}),
+)
 
 export interface ProjectDependency {
 	project: Labrinth.Projects.v3.Project

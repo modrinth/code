@@ -1,11 +1,11 @@
 <template>
-	<div class="flex w-full max-w-[496px] flex-col gap-6">
+	<div class="flex w-full max-w-[576px] flex-col gap-6">
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">
 				Version type <span class="text-red">*</span>
 			</span>
 			<Chips
-				v-model="versionType"
+				v-model="draftVersion.version_type"
 				:items="['Release', 'Alpha', 'Beta']"
 				:never-empty="false"
 				:capitalize="true"
@@ -20,8 +20,8 @@
 			</span>
 			<input
 				id="version-number"
-				v-model="versionNumber"
-				placeholder="Enter version subtitle..."
+				v-model="draftVersion.version_number"
+				placeholder="Enter version number..."
 				type="text"
 				autocomplete="off"
 				maxlength="32"
@@ -34,8 +34,8 @@
 			</span>
 			<input
 				id="version-number"
-				v-model="versionSubtitle"
-				placeholder="Enter version subtitle..."
+				v-model="draftVersion.name"
+				placeholder="Enter subtitle..."
 				type="text"
 				autocomplete="off"
 				maxlength="32"
@@ -50,14 +50,13 @@
 <script lang="ts" setup>
 import Chips from '@modrinth/ui/src/components/base/Chips.vue'
 
+import { useManageVersion } from '~/composables/versions/manage-version'
+
 import LoaderPicker from '../components/LoaderPicker.vue'
 
 const generatedState = useGeneratedState()
 
-type VersionType = 'Release' | 'Alpha' | 'Beta'
-const versionType = ref<VersionType>('Release')
-const versionNumber = ref('')
-const versionSubtitle = ref('')
+const { draftVersion } = useManageVersion()
 
 const selectedLoaders = ref<string[]>([])
 </script>

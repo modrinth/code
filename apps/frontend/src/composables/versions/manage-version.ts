@@ -13,17 +13,23 @@ const EMPTY_DRAFT_VERSION: DraftVersion = {
 	game_versions: [],
 	featured: false,
 	status: 'draft',
-	changelog: null,
+	changelog: '',
 	dependencies: [],
 	files: [],
 }
 
 const draftVersion = ref<DraftVersion>(EMPTY_DRAFT_VERSION)
 
-export const useManageVersion = () => {
+export function useManageVersion() {
 	function newDraftVersion() {
 		draftVersion.value = structuredClone(EMPTY_DRAFT_VERSION)
 	}
 
-	return { draftVersion, newDraftVersion }
+	function setPrimaryFile(index: number) {
+		const files = draftVersion.value.files
+		if (index <= 0 || index >= files.length) return
+		;[files[0], files[index]] = [files[index], files[0]]
+	}
+
+	return { draftVersion, newDraftVersion, setPrimaryFile }
 }

@@ -1,6 +1,6 @@
 <template>
 	<MarkdownEditor
-		v-model="changelog"
+		v-model="draftVersion.changelog"
 		:on-image-upload="onImageUpload"
 		:style="'background-color: red;'"
 		:max-height="500"
@@ -11,8 +11,9 @@
 import MarkdownEditor from '@modrinth/ui/src/components/base/MarkdownEditor.vue'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { useManageVersion } from '~/composables/versions/manage-version'
 
-const changelog = ref<string>('')
+const { draftVersion } = useManageVersion()
 
 async function onImageUpload(file: File) {
 	const response = await useImageUpload(file, { context: 'version' })

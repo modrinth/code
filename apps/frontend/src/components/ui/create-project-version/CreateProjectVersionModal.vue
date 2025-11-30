@@ -7,6 +7,8 @@ import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
 import { commonMessages } from '@modrinth/ui'
 import MultiStageModal from '@modrinth/ui/src/components/base/MultiStageModal.vue'
 
+import { useManageVersion } from '~/composables/versions/manage-version'
+
 import AddChangelogStage from './stages/AddChangelogStage.vue'
 import AddDependenciesStage from './stages/AddDependenciesStage.vue'
 import AddDetailsStage from './stages/AddDetailsStage.vue'
@@ -73,7 +75,12 @@ const stages: InstanceType<typeof MultiStageModal>['$props']['stages'] = [
 	},
 ]
 
+const { newDraftVersion } = useManageVersion()
+
 defineExpose({
-	show: () => modal.value?.show(),
+	show: () => {
+		newDraftVersion()
+		modal.value?.show()
+	},
 })
 </script>

@@ -427,7 +427,7 @@ export namespace Labrinth {
 				version_number: string
 
 				/** A changelog for this version. Nullable. */
-				changelog?: string | null
+				changelog: string
 
 				/** A list of specific versions of projects that this version depends on. */
 				dependencies?: Array<{
