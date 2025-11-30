@@ -42,30 +42,65 @@
 					<button
 						class="self-start"
 						:disabled="!newDependencyId"
-						@click="addDependency(newDependencyId, newDependencyType)"
+						@click="
+							addDependency({
+								project_id: newDependencyId,
+								version_id: version,
+								dependency_type: newDependencyType,
+								project: {} as any,
+								version: {} as any,
+								link: '',
+							})
+						"
 					>
 						Add Dependency
 					</button>
 				</ButtonStyled>
+			</div>
+
+			<div class="flex flex-col gap-4">
+				<span class="font-semibold text-contrast">Add dependency</span>
+				<div class="5 flex flex-col gap-2">
+					<AddedDependencyRow
+						v-for="(dependency, index) in [] as any"
+						:key="index"
+						:name="dependency.project ? dependency.project.title : 'Unknown Project'"
+						:icon="dependency.project ? dependency.project.icon_url : ''"
+						:dependency-type="dependency.dependency_type as Labrinth.Versions.v3.DependencyType"
+						:version-name="dependency.version ? dependency.version.name : 'Unknown Version'"
+						@remove="/* TODO: remove dependency */"
+					/>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script lang="ts" setup>
+import type { Labrinth } from '@modrinth/api-client'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 import Combobox from '@modrinth/ui/src/components/base/Combobox.vue'
 
 import ModSelect from '~/components/ui/create-project-version/components/ModSelect.vue'
 
+import AddedDependencyRow from '../components/AddedDependencyRow.vue'
+
 const newDependencyId = ref('')
 const newDependencyType = ref<'required' | 'optional' | 'incompatible' | 'embedded'>('required')
 const version = ref('')
 
-const addDependency = (
-	_id: string,
-	_type: 'required' | 'optional' | 'incompatible' | 'embedded',
-) => {
+export interface ProjectDependency {
+	project: Labrinth.Projects.v3.Project
+	project_id: string
+
+	version: Labrinth.Versions.v3.Version
+	version_id: string
+
+	dependency_type: string
+	link: string
+}
+
+const addDependency = (_dependency: ProjectDependency) => {
 	// todo
 }
 </script>
