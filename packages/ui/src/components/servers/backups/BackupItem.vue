@@ -14,12 +14,12 @@ import {
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-const flags = useFeatureFlags()
+import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from '../../..'
+
 const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
@@ -33,11 +33,13 @@ const props = withDefaults(
 		preview?: boolean
 		kyrosUrl?: string
 		jwt?: string
+		showDebugInfo?: boolean
 	}>(),
 	{
 		preview: false,
 		kyrosUrl: undefined,
 		jwt: undefined,
+		showDebugInfo: false,
 	},
 )
 
@@ -269,7 +271,7 @@ const messages = defineMessages({
 			</template>
 		</div>
 		<pre
-			v-if="!preview && flags.advancedDebugInfo"
+			v-if="!preview && showDebugInfo"
 			class="col-span-full m-0 rounded-xl bg-button-bg text-xs"
 			>{{ backup }}</pre
 		>

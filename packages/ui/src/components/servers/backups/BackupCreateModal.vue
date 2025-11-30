@@ -43,16 +43,11 @@
 
 <script setup lang="ts">
 import { IssuesIcon, PlusIcon, XIcon } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	injectModrinthClient,
-	injectNotificationManager,
-	NewModal,
-} from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
-import { injectModrinthServerContext } from '~/providers/server-context.ts'
+import { ButtonStyled, injectModrinthClient, injectNotificationManager, NewModal } from '../../..'
+import { injectModrinthServerContext } from '../../../providers'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()

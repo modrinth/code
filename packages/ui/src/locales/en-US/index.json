@@ -842,6 +842,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.item.automated": {
+    "defaultMessage": "Automated"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Creating backup..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Failed to create backup"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Failed to restore from backup"
+  },
+  "servers.backups.item.lock": {
+    "defaultMessage": "Lock"
+  },
+  "servers.backups.item.locked": {
+    "defaultMessage": "Locked"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Queued for backup"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Rename"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Restore"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Restoring from backup..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Retry"
+  },
+  "servers.backups.item.unlock": {
+    "defaultMessage": "Unlock"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Dismiss"
   },

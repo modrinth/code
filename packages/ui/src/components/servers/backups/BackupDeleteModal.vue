@@ -19,10 +19,10 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { ConfirmModal } from '@modrinth/ui'
 import { ref } from 'vue'
 
-import BackupItem from '~/components/ui/servers/BackupItem.vue'
+import { ConfirmModal } from '../../..'
+import BackupItem from './BackupItem.vue'
 
 const emit = defineEmits<{
 	(e: 'delete', backup: Archon.Backups.v1.Backup | undefined): void

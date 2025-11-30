@@ -1,6 +1,7 @@
 import type { Archon } from '@modrinth/api-client'
-import { createContext } from '@modrinth/ui'
 import type { ComputedRef, Ref } from 'vue'
+
+import { createContext } from '.'
 
 export interface ModrinthServerContext {
 	readonly serverId: string

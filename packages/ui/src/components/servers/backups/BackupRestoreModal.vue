@@ -18,13 +18,13 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import type { NewModal } from '@modrinth/ui'
-import { ConfirmModal, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
-import BackupItem from '~/components/ui/servers/BackupItem.vue'
-import { injectModrinthServerContext } from '~/providers/server-context.ts'
+import type { NewModal } from '../../..'
+import { ConfirmModal, injectModrinthClient, injectNotificationManager } from '../../..'
+import { injectModrinthServerContext } from '../../../providers'
+import BackupItem from './BackupItem.vue'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()

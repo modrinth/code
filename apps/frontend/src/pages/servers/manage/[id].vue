@@ -378,6 +378,7 @@ import {
 	ErrorInformationCard,
 	injectModrinthClient,
 	injectNotificationManager,
+	provideModrinthServerContext,
 	ServerIcon,
 	ServerInfoLabels,
 	ServerNotice,
@@ -399,7 +400,6 @@ import ServerInstallation from '~/components/ui/servers/ServerInstallation.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
-import { provideModrinthServerContext } from '~/providers/server-context.ts'
 import { useModrinthServersConsole } from '~/store/console.ts'
 
 const { addNotification } = injectNotificationManager()
