@@ -1,8 +1,11 @@
 <template>
 	<NewModal ref="modal" header="Restore backup" fade="warning">
 		<div class="flex flex-col gap-6 max-w-[600px]">
+			<Admonition v-if="ctx.isServerRunning.value" type="critical" header="Server is running">
+				Stop the server before restoring a backup.
+			</Admonition>
 			<!-- TODO: Worlds: Replace "server" with "world" -->
-			<Admonition type="warning" header="Restore warning">
+			<Admonition v-else type="warning" header="Restore warning">
 				This will overwrite all files in the server and replace them with the files from the backup.
 			</Admonition>
 
@@ -25,7 +28,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="red">
-					<button :disabled="isRestoring" @click="restoreBackup">
+					<button :disabled="isRestoring || ctx.isServerRunning.value" @click="restoreBackup">
 						<SpinnerIcon v-if="isRestoring" class="animate-spin" />
 						<RotateCounterClockwiseIcon v-else />
 						{{ isRestoring ? 'Restoring...' : 'Restore backup' }}

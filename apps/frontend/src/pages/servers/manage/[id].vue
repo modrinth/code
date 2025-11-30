@@ -383,7 +383,7 @@ import {
 	ServerInfoLabels,
 	ServerNotice,
 } from '@modrinth/ui'
-import type { Backup, PowerAction, Stats } from '@modrinth/utils'
+import type { PowerAction, Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { MessageDescriptor } from '@vintl/vintl'
 import DOMPurify from 'dompurify'
@@ -460,6 +460,11 @@ const serverPowerState = ref<Archon.Websocket.v0.PowerState>('stopped')
 const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>()
 const backupsState = reactive(new Map())
 const completedBackupTasks = new Set<string>()
+const cancelledBackups = new Set<string>()
+
+const markBackupCancelled = (backupId: string) => {
+	cancelledBackups.add(backupId)
+}
 
 provideModrinthServerContext({
 	serverId,
@@ -468,6 +473,7 @@ provideModrinthServerContext({
 	powerState: serverPowerState,
 	isServerRunning,
 	backupsState,
+	markBackupCancelled,
 })
 
 const uptimeSeconds = ref(0)
@@ -683,6 +689,10 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 	const taskKey = `${backupId}:${data.task}`
 
 	if (completedBackupTasks.has(taskKey)) {
+		return
+	}
+
+	if (cancelledBackups.has(backupId)) {
 		return
 	}
 
@@ -957,15 +967,13 @@ const CreateInProgressReason = {
 } satisfies BackupInProgressReason
 
 const backupInProgress = computed(() => {
-	const backups = server.backups?.data
-	if (!backups) {
-		return undefined
-	}
-	if (backups.find((backup: Backup) => backup?.task?.create?.state === 'ongoing')) {
-		return CreateInProgressReason
-	}
-	if (backups.find((backup: Backup) => backup?.task?.restore?.state === 'ongoing')) {
-		return RestoreInProgressReason
+	for (const entry of backupsState.values()) {
+		if (entry.create?.state === 'ongoing') {
+			return CreateInProgressReason
+		}
+		if (entry.restore?.state === 'ongoing') {
+			return RestoreInProgressReason
+		}
 	}
 	return undefined
 })
@@ -1096,6 +1104,7 @@ const cleanup = () => {
 	isLoading.value = true
 
 	completedBackupTasks.clear()
+	cancelledBackups.clear()
 
 	DOMPurify.removeHook('afterSanitizeAttributes')
 }

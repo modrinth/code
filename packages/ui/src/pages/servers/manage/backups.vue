@@ -84,7 +84,7 @@
 										v-for="backup in group.backups"
 										:key="`backup-${backup.id}`"
 										:backup="backup"
-										:disabled="anyRestoreInProgress"
+										:disabled="backupOperationDisabled"
 										:kyros-url="server.node?.instance"
 										:jwt="server.node?.token"
 										:show-debug-info="showDebugInfo"
@@ -139,7 +139,6 @@
 import type { Archon } from '@modrinth/api-client'
 import { CalendarIcon, DownloadIcon, IssuesIcon, PlusIcon, SpinnerIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import type { Component } from 'vue'
 import { computed, ref } from 'vue'
@@ -160,7 +159,7 @@ import {
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { server, backupsState } = injectModrinthServerContext()
+const { server, backupsState, markBackupCancelled } = injectModrinthServerContext()
 
 const props = defineProps<{
 	isServerRunning: boolean
@@ -169,11 +168,6 @@ const props = defineProps<{
 
 const route = useRoute()
 const serverId = route.params.id as string
-
-// TODO: pinia
-const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
-	backupWhileRunning: false,
-})
 
 defineEmits(['onDownload'])
 
@@ -189,7 +183,11 @@ const {
 
 const deleteMutation = useMutation({
 	mutationFn: (backupId: string) => client.archon.backups_v0.delete(serverId, backupId),
-	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
+	onSuccess: (_data, backupId) => {
+		markBackupCancelled(backupId)
+		backupsState.delete(backupId)
+		queryClient.invalidateQueries({ queryKey: backupsQueryKey })
+	},
 })
 
 const lockMutation = useMutation({
@@ -285,12 +283,23 @@ const restoreBackupModal = ref<InstanceType<typeof BackupRestoreModal>>()
 const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>()
 // const backupSettingsModal = ref<InstanceType<typeof BackupSettingsModal>>()
 
-const anyRestoreInProgress = computed(() => {
-	return backups.value.some((backup) => backup.task?.restore?.state === 'ongoing')
+const backupOperationDisabled = computed(() => {
+	if (props.isServerRunning) {
+		return 'Cannot perform backup operations while server is running'
+	}
+	for (const entry of backupsState.values()) {
+		if (entry.create?.state === 'ongoing') {
+			return 'Cannot perform backup operations while a backup is being created'
+		}
+		if (entry.restore?.state === 'ongoing') {
+			return 'Cannot perform backup operations while a backup is being restored'
+		}
+	}
+	return undefined
 })
 
 const backupCreationDisabled = computed(() => {
-	if (props.isServerRunning && !userPreferences.value.backupWhileRunning) {
+	if (props.isServerRunning) {
 		return 'Cannot create backup while server is running'
 	}
 	if (
@@ -300,11 +309,14 @@ const backupCreationDisabled = computed(() => {
 	) {
 		return `All ${server.value.backup_quota} of your backup slots are in use`
 	}
-	if (backups.value.some((backup) => backup.task?.create?.state === 'ongoing')) {
-		return 'A backup is already in progress'
-	}
-	if (anyRestoreInProgress.value) {
-		return 'Cannot create backup while a restore is in progress'
+
+	for (const entry of backupsState.values()) {
+		if (entry.create?.state === 'ongoing') {
+			return 'A backup is already in progress'
+		}
+		if (entry.restore?.state === 'ongoing') {
+			return 'Cannot create backup while a restore is in progress'
+		}
 	}
 	if (server.value.status === 'installing') {
 		return 'Cannot create backup while server is installing'

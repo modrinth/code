@@ -37,14 +37,14 @@ const props = withDefaults(
 		kyrosUrl?: string
 		jwt?: string
 		showDebugInfo?: boolean
-		disabled?: boolean
+		disabled?: string
 	}>(),
 	{
 		preview: false,
 		kyrosUrl: undefined,
 		jwt: undefined,
 		showDebugInfo: false,
-		disabled: false,
+		disabled: undefined,
 	},
 )
 
@@ -116,7 +116,7 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 			id: 'delete',
 			color: 'red',
 			action: () => emit('delete'),
-			disabled: props.disabled,
+			disabled: !!props.disabled,
 		})
 	}
 
@@ -271,7 +271,9 @@ const messages = defineMessages({
 			<template v-else-if="restoring">
 				<div class="flex items-center justify-between">
 					<span class="text-purple">
-						{{ formatMessage(restoreQueued ? messages.queuedForRestore : messages.restoringBackup) }}
+						{{
+							formatMessage(restoreQueued ? messages.queuedForRestore : messages.restoringBackup)
+						}}
 					</span>
 					<div class="flex items-center gap-1 text-sm text-secondary">
 						<span>{{ Math.round(restoring.progress * 100) }}%</span>
@@ -332,7 +334,12 @@ const messages = defineMessages({
 			</template>
 			<template v-else>
 				<ButtonStyled color="brand" type="outlined">
-					<button class="!border-[1px]" :disabled="props.disabled" @click="() => emit('restore')">
+					<button
+						v-tooltip="props.disabled"
+						class="!border-[1px]"
+						:disabled="!!props.disabled"
+						@click="() => emit('restore')"
+					>
 						<RotateCounterClockwiseIcon class="size-5" />
 						{{ formatMessage(messages.restore) }}
 					</button>

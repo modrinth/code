@@ -25,6 +25,7 @@ export interface ModrinthServerContext {
 	readonly powerState: Ref<Archon.Websocket.v0.PowerState>
 	readonly isServerRunning: ComputedRef<boolean>
 	readonly backupsState: Reactive<BackupsState>
+	markBackupCancelled: (backupId: string) => void
 }
 
 export const [injectModrinthServerContext, provideModrinthServerContext] =
