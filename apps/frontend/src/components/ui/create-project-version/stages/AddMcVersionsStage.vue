@@ -1,6 +1,6 @@
 <template>
 	<div class="flex w-full max-w-[576px] flex-col gap-6">
-		<McVersionPicker v-model="selectedVersions" :game-versions="gameVersions" />
+		<McVersionPicker v-model="draftVersion.game_versions" :game-versions="gameVersions" />
 		<div class="space-y-2">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast"> Added versions </span>
@@ -32,9 +32,9 @@
 				<div class="space-y-2">
 					<span class="font-medium">Selected</span>
 					<div class="flex flex-wrap gap-2">
-						<template v-if="selectedVersions.length">
+						<template v-if="draftVersion.game_versions.length">
 							<ButtonStyled
-								v-for="version in selectedVersions"
+								v-for="version in draftVersion.game_versions"
 								:key="version"
 								type="chip"
 								size="small"
@@ -58,27 +58,27 @@
 <script lang="ts" setup>
 import { XIcon } from '@modrinth/assets'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
-import { ref } from 'vue'
+
+import { useManageVersion } from '~/composables/versions/manage-version'
 
 import McVersionPicker from '../components/McVersionPicker.vue'
 
-const selectedVersions = ref<string[]>([])
-const detectedVersions = ['1.18.2', '1.19', '1.19.1']
+const detectedVersions: string[] = [] // TODO, implement detected versions logic
 
 const generatedState = useGeneratedState()
 const gameVersions = generatedState.value.gameVersions
 
-// TODO, use draftVersion
+const { draftVersion } = useManageVersion()
 
 const toggleVersion = (version: string) => {
-	if (selectedVersions.value.includes(version)) {
-		selectedVersions.value = selectedVersions.value.filter((v) => v !== version)
+	if (draftVersion.value.game_versions.includes(version)) {
+		draftVersion.value.game_versions = draftVersion.value.game_versions.filter((v) => v !== version)
 	} else {
-		selectedVersions.value.push(version)
+		draftVersion.value.game_versions.push(version)
 	}
 }
 
 const clearAllVersions = () => {
-	selectedVersions.value = []
+	draftVersion.value.game_versions = []
 }
 </script>
