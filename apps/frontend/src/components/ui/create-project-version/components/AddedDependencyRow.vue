@@ -3,12 +3,16 @@
 		class="flex items-center justify-between gap-2 rounded-xl bg-button-bg px-4 py-2 text-button-text"
 	>
 		<div class="flex items-center gap-2">
-			<Avatar v-if="icon" :src="icon" alt="dependency-icon" size="sm" />
-			<span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium">{{ name }}</span>
-			<TagItem>{{ dependencyType }}</TagItem>
+			<Avatar v-if="icon" :src="icon" alt="dependency-icon" size="20px" />
+			<span class="overflow-hidden font-semibold text-contrast">
+				{{ name }}
+			</span>
+			<div class="rounded-full border border-solid px-2.5 py-1 font-medium capitalize">
+				{{ dependencyType }}
+			</div>
 		</div>
 
-		<span class="font-medium">{{ versionName }}</span>
+		<span class="text-ellipsis whitespace-nowrap font-medium">{{ versionName }}</span>
 
 		<div class="flex items-center gap-1">
 			<ButtonStyled size="standard">
@@ -23,7 +27,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { XIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled, TagItem } from '@modrinth/ui'
+import { Avatar, ButtonStyled } from '@modrinth/ui'
 
 const emit = defineEmits<{
 	(e: 'fileTypeChange', type: string): void
