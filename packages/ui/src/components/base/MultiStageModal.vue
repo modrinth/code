@@ -8,13 +8,11 @@
 	>
 		<template #title>
 			<div class="flex flex-wrap items-center gap-1 text-secondary">
-				<span class="text-lg font-bold text-contrast sm:text-xl">{{
-					stages[currentStageIndex].title
-				}}</span>
+				<span class="text-lg font-bold text-contrast sm:text-xl">{{ currentStage.title }}</span>
 			</div>
 		</template>
 
-		<component :is="stages[currentStageIndex].stageContent" />
+		<component :is="currentStage.stageContent" />
 
 		<template #actions>
 			<div class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
