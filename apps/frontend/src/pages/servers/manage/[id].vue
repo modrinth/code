@@ -691,11 +691,14 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 	const previousProgress = current[data.task]?.progress
 
 	if (previousState !== data.state || previousProgress !== data.progress) {
-		current[data.task] = {
-			progress: data.progress,
-			state: data.state,
-		}
-		backupsState.set(backupId, current)
+		// (mutating same reference doesn't work)
+		backupsState.set(backupId, {
+			...current,
+			[data.task]: {
+				progress: data.progress,
+				state: data.state,
+			},
+		})
 	}
 
 	const isTerminalState =
