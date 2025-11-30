@@ -62,13 +62,22 @@
 				<span class="font-semibold text-contrast">Add dependency</span>
 				<div class="5 flex flex-col gap-2">
 					<AddedDependencyRow
-						v-for="(dependency, index) in [] as any"
+						v-for="(dependency, index) in [
+							{
+								project: {
+									title: 'Example Mod',
+									icon_url: 'https://cdn.modrinth.com/data/8fGzKJ0U/icon.png',
+								},
+								dependency_type: 'required',
+								version: { name: '1.0.0' },
+							},
+						]"
 						:key="index"
 						:name="dependency.project ? dependency.project.title : 'Unknown Project'"
 						:icon="dependency.project ? dependency.project.icon_url : ''"
-						:dependency-type="dependency.dependency_type as Labrinth.Versions.v3.DependencyType"
-						:version-name="dependency.version ? dependency.version.name : 'Unknown Version'"
-						@remove="/* TODO: remove dependency */"
+						:dependency-type="dependency.dependency_type"
+						:version-name="dependency.version.name"
+						@remove="() => {} /* TODO: remove dependency */"
 					/>
 				</div>
 			</div>
