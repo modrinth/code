@@ -1,7 +1,20 @@
 import type { Archon } from '@modrinth/api-client'
-import type { ComputedRef, Ref } from 'vue'
+import type { ComputedRef, Reactive, Ref } from 'vue'
 
 import { createContext } from '.'
+
+export type BackupTaskState = {
+	progress: number
+	state: Archon.Backups.v1.BackupState
+}
+
+export type BackupProgressEntry = {
+	file?: BackupTaskState
+	create?: BackupTaskState
+	restore?: BackupTaskState
+}
+
+export type BackupsState = Map<string, BackupProgressEntry>
 
 export interface ModrinthServerContext {
 	readonly serverId: string
@@ -11,6 +24,7 @@ export interface ModrinthServerContext {
 	readonly isConnected: Ref<boolean>
 	readonly powerState: Ref<Archon.Websocket.v0.PowerState>
 	readonly isServerRunning: ComputedRef<boolean>
+	readonly backupsState: Reactive<BackupsState>
 }
 
 export const [injectModrinthServerContext, provideModrinthServerContext] =

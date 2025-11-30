@@ -47,22 +47,27 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { IssuesIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
-import { ButtonStyled, injectModrinthClient, injectNotificationManager, NewModal } from '../../..'
-import { injectModrinthServerContext } from '../../../providers'
+import {
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+} from '../../../providers'
+import ButtonStyled from '../../base/ButtonStyled.vue'
+import NewModal from '../../modal/NewModal.vue'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const ctx = injectModrinthServerContext()
 
+const props = defineProps<{
+	backups?: Archon.Backups.v1.Backup[]
+}>()
+
 const backupsQueryKey = ['backups', 'list', ctx.serverId]
-const { data: backups } = useQuery({
-	queryKey: backupsQueryKey,
-	queryFn: () => client.archon.backups_v0.list(ctx.serverId),
-})
 
 const renameMutation = useMutation({
 	mutationFn: ({ backupId, name }: { backupId: string; name: string }) =>
@@ -81,20 +86,20 @@ const trimmedName = computed(() => backupName.value.trim())
 
 const nameExists = computed(() => {
 	if (
-		!backups.value ||
+		!props.backups ||
 		trimmedName.value === originalName.value ||
 		renameMutation.isPending.value
 	) {
 		return false
 	}
 
-	return backups.value.some(
+	return props.backups.some(
 		(backup) => backup.name.trim().toLowerCase() === trimmedName.value.toLowerCase(),
 	)
 })
 
 const backupNumber = computed(
-	() => (backups.value?.findIndex((b) => b.id === currentBackup.value?.id) ?? 0) + 1,
+	() => (props.backups?.findIndex((b) => b.id === currentBackup.value?.id) ?? 0) + 1,
 )
 
 const focusInput = () => {

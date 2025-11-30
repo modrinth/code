@@ -1,171 +1,165 @@
 <template>
-	<div v-if="error" class="flex w-full flex-col items-center justify-center gap-4 p-4">
-		<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-			<div class="flex flex-col items-center text-center">
-				<div class="flex flex-col items-center gap-4">
-					<div class="grid place-content-center rounded-full bg-bg-orange p-4">
-						<IssuesIcon class="size-12 text-orange" />
+	<Transition name="fade" mode="out-in">
+		<div
+			v-if="error"
+			key="error"
+			class="flex w-full flex-col items-center justify-center gap-4 p-4"
+		>
+			<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
+				<div class="flex flex-col items-center text-center">
+					<div class="flex flex-col items-center gap-4">
+						<div class="grid place-content-center rounded-full bg-bg-orange p-4">
+							<IssuesIcon class="size-12 text-orange" />
+						</div>
+						<h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load backups</h1>
 					</div>
-					<h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load backups</h1>
+					<p class="text-lg text-secondary">
+						We couldn't load your server's backups. Here's what went wrong:
+					</p>
+					<p>
+						<span class="break-all font-mono">{{ error.message }}</span>
+					</p>
+					<ButtonStyled size="large" color="brand" @click="refetch">
+						<button class="mt-6 !w-full">Retry</button>
+					</ButtonStyled>
 				</div>
-				<p class="text-lg text-secondary">
-					We couldn't load your server's backups. Here's what went wrong:
-				</p>
-				<p>
-					<span class="break-all font-mono">{{ error.message }}</span>
-				</p>
-				<ButtonStyled size="large" color="brand" @click="refetch">
-					<button class="mt-6 !w-full">Retry</button>
-				</ButtonStyled>
 			</div>
 		</div>
-	</div>
-	<div v-else class="contents">
-		<BackupCreateModal ref="createBackupModal" />
-		<BackupRenameModal ref="renameBackupModal" />
-		<BackupRestoreModal ref="restoreBackupModal" />
-		<BackupDeleteModal ref="deleteBackupModal" @delete="deleteBackup" />
-		<!-- <BackupSettingsModal ref="backupSettingsModal" /> -->
 
-		<div class="mb-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
-			<div class="flex flex-col gap-2">
-				<div class="flex items-center gap-2">
-					<h1 class="m-0 text-2xl font-extrabold text-contrast">Backups</h1>
-					<TagItem
-						v-tooltip="`${server.backup_quota - server.used_backup_quota} backup slots remaining`"
-						class="cursor-help"
-						:style="{
-							'--_color':
-								server.backup_quota <= server.used_backup_quota
-									? 'var(--color-red)'
-									: server.backup_quota - server.used_backup_quota <= 3
-										? 'var(--color-orange)'
-										: undefined,
-							'--_bg-color':
-								server.backup_quota <= server.used_backup_quota
-									? 'var(--color-red-bg)'
-									: server.backup_quota - server.used_backup_quota <= 3
-										? 'var(--color-orange-bg)'
-										: undefined,
-						}"
-					>
-						{{ server.used_backup_quota }} / {{ server.backup_quota }}
-					</TagItem>
-				</div>
-				<p class="m-0">
-					You can have up to {{ server.backup_quota }} backups at once, stored securely off-site.
-				</p>
-			</div>
-			<div
-				class="grid w-full grid-cols-[repeat(auto-fit,_minmax(180px,1fr))] gap-2 sm:flex sm:w-fit sm:flex-row"
-			>
-				<ButtonStyled type="standard">
-					<!-- TODO: When auto backups are implemented re-add the @click event -->
-					<button
-						v-tooltip="
-							'Auto backups are currently unavailable; we apologize for the inconvenience.'
-						"
-						:disabled="true || server.status === 'installing'"
-					>
-						<SettingsIcon class="h-5 w-5" />
-						Auto backups
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="standard" color="brand">
+		<div v-else key="content" class="contents">
+			<BackupCreateModal ref="createBackupModal" :backups="backupsData ?? []" />
+			<BackupRenameModal ref="renameBackupModal" :backups="backupsData ?? []" />
+			<BackupRestoreModal ref="restoreBackupModal" />
+			<BackupDeleteModal ref="deleteBackupModal" @delete="deleteBackup" />
+
+			<div class="mb-6 flex items-center justify-between">
+				<h1 class="m-0 text-2xl font-semibold text-contrast">Backups</h1>
+				<ButtonStyled color="brand">
 					<button
 						v-tooltip="backupCreationDisabled"
-						class="w-full sm:w-fit"
 						:disabled="!!backupCreationDisabled"
 						@click="showCreateModel"
 					>
-						<PlusIcon class="h-5 w-5" />
+						<PlusIcon class="size-5" />
 						Create backup
 					</button>
 				</ButtonStyled>
 			</div>
-		</div>
 
-		<div class="flex w-full flex-col gap-2">
-			<div
-				v-if="backups.length === 0"
-				class="mt-6 flex items-center justify-center gap-2 text-center text-secondary"
-			>
-				<template v-if="server.used_backup_quota">
-					<SpinnerIcon class="animate-spin" />
-					Loading backups...
-				</template>
-				<template v-else> You don't have any backups yet. </template>
+			<div class="flex w-full flex-col gap-1.5">
+				<Transition name="fade" mode="out-in">
+					<div
+						v-if="groupedBackups.length === 0"
+						key="empty"
+						class="mt-6 flex items-center justify-center gap-2 text-center text-secondary"
+					>
+						<template v-if="server.used_backup_quota">
+							<SpinnerIcon class="animate-spin" />
+							Loading backups...
+						</template>
+						<template v-else>You don't have any backups yet.</template>
+					</div>
+
+					<div v-else key="list" class="flex flex-col gap-1.5">
+						<template v-for="(group, index) in groupedBackups" :key="group.label">
+							<div class="flex items-center gap-2">
+								<component :is="group.icon" v-if="group.icon" class="size-6 text-secondary" />
+								<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
+							</div>
+
+							<div class="flex gap-2">
+								<div class="flex w-5 justify-center">
+									<div
+										class="h-full w-px"
+										:class="
+											index === groupedBackups.length - 1
+												? 'bg-gradient-to-b from-surface-5 from-50% to-transparent'
+												: 'bg-surface-5'
+										"
+									/>
+								</div>
+
+								<TransitionGroup name="list" tag="div" class="flex flex-1 flex-col gap-3 py-3">
+									<BackupItem
+										v-for="backup in group.backups"
+										:key="`backup-${backup.id}`"
+										:backup="backup"
+										:kyros-url="server.node?.instance"
+										:jwt="server.node?.token"
+										:show-debug-info="showDebugInfo"
+										@download="() => triggerDownloadAnimation()"
+										@rename="() => renameBackupModal?.show(backup)"
+										@restore="() => restoreBackupModal?.show(backup)"
+										@lock="
+											() => {
+												if (backup.locked) {
+													unlockBackup(backup.id)
+												} else {
+													lockBackup(backup.id)
+												}
+											}
+										"
+										@delete="
+											(skipConfirmation?: boolean) =>
+												!skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
+										"
+										@retry="() => retryBackup(backup.id)"
+									/>
+								</TransitionGroup>
+							</div>
+						</template>
+					</div>
+				</Transition>
 			</div>
-			<BackupItem
-				v-for="backup in backups"
-				:key="`backup-${backup.id}`"
-				:backup="backup"
-				:kyros-url="server.node?.instance"
-				:jwt="server.node?.token"
-				:show-debug-info="showDebugInfo"
-				@download="() => triggerDownloadAnimation()"
-				@rename="() => renameBackupModal?.show(backup)"
-				@restore="() => restoreBackupModal?.show(backup)"
-				@lock="
-					() => {
-						if (backup.locked) {
-							unlockBackup(backup.id)
-						} else {
-							lockBackup(backup.id)
-						}
-					}
-				"
-				@delete="
-					(skipConfirmation?: boolean) =>
-						!skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
-				"
-				@retry="() => retryBackup(backup.id)"
-			/>
-		</div>
 
-		<div
-			class="over-the-top-download-animation"
-			:class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
-		>
-			<div>
-				<div
-					class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
-				></div>
-				<div
-					class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
-				></div>
-				<div
-					class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
-				>
-					<DownloadIcon class="h-20 w-20 text-contrast" />
+			<div
+				class="over-the-top-download-animation"
+				:class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
+			>
+				<div>
+					<div
+						class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+					></div>
+					<div
+						class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+					></div>
+					<div
+						class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
+					>
+						<DownloadIcon class="h-20 w-20 text-contrast" />
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	</Transition>
 </template>
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { DownloadIcon, IssuesIcon, PlusIcon, SettingsIcon, SpinnerIcon } from '@modrinth/assets'
+import { CalendarIcon, DownloadIcon, IssuesIcon, PlusIcon, SpinnerIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
+import dayjs from 'dayjs'
+import type { Component } from 'vue'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { injectModrinthClient, injectModrinthServerContext, injectNotificationManager } from '../../../providers'
-
 import ButtonStyled from '../../../components/base/ButtonStyled.vue'
-import TagItem from '../../../components/base/TagItem.vue'
 import BackupCreateModal from '../../../components/servers/backups/BackupCreateModal.vue'
 import BackupDeleteModal from '../../../components/servers/backups/BackupDeleteModal.vue'
 import BackupItem from '../../../components/servers/backups/BackupItem.vue'
 import BackupRenameModal from '../../../components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '../../../components/servers/backups/BackupRestoreModal.vue'
+import {
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+} from '../../../providers'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { server } = injectModrinthServerContext()
+const { server, backupsState } = injectModrinthServerContext()
 
 const props = defineProps<{
 	isServerRunning: boolean
@@ -214,9 +208,73 @@ const retryMutation = useMutation({
 
 const backups = computed(() => {
 	if (!backupsData.value) return []
-	return [...backupsData.value].sort((a, b) => {
+
+	const merged = backupsData.value.map((backup) => {
+		const progressState = backupsState.get(backup.id)
+		if (progressState) {
+			const hasOngoingTask = Object.values(progressState).some((task) => task?.state === 'ongoing')
+			const hasCompletedTask = Object.values(progressState).some((task) => task?.state === 'done')
+
+			return {
+				...backup,
+				task: {
+					...backup.task,
+					...progressState,
+				},
+
+				ongoing: hasOngoingTask || (backup.ongoing && !hasCompletedTask),
+			}
+		}
+		return backup
+	})
+
+	return merged.sort((a, b) => {
 		return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
 	})
+})
+
+type BackupGroup = {
+	label: string
+	icon: Component | null
+	backups: Archon.Backups.v1.Backup[]
+}
+
+const groupedBackups = computed((): BackupGroup[] => {
+	if (!backups.value.length) return []
+
+	const now = dayjs()
+	const groups: BackupGroup[] = []
+
+	const addToGroup = (label: string, icon: Component | null, backup: Archon.Backups.v1.Backup) => {
+		let group = groups.find((g) => g.label === label)
+		if (!group) {
+			group = { label, icon, backups: [] }
+			groups.push(group)
+		}
+		group.backups.push(backup)
+	}
+
+	for (const backup of backups.value) {
+		const created = dayjs(backup.created_at)
+		const diffMinutes = now.diff(created, 'minute')
+		const isToday = created.isSame(now, 'day')
+		const isYesterday = created.isSame(now.subtract(1, 'day'), 'day')
+		const diffDays = now.diff(created, 'day')
+
+		if (diffMinutes < 30 && isToday) {
+			addToGroup('Just now', null, backup)
+		} else if (isToday) {
+			addToGroup('Earlier today', CalendarIcon, backup)
+		} else if (isYesterday) {
+			addToGroup('Yesterday', CalendarIcon, backup)
+		} else if (diffDays <= 14) {
+			addToGroup('Last 2 weeks', CalendarIcon, backup)
+		} else {
+			addToGroup('Older', CalendarIcon, backup)
+		}
+	}
+
+	return groups
 })
 
 const overTheTopDownloadAnimation = ref()
@@ -307,6 +365,38 @@ function deleteBackup(backup?: Archon.Backups.v1.Backup) {
 </script>
 
 <style scoped>
+.fade-enter-active,
+.fade-leave-active {
+	transition:
+		opacity 300ms ease-in-out,
+		transform 300ms ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+	transform: scale(0.98);
+}
+
+.list-enter-active,
+.list-leave-active {
+	transition: all 200ms ease-in-out;
+}
+
+.list-enter-from {
+	opacity: 0;
+	transform: translateY(-10px);
+}
+
+.list-leave-to {
+	opacity: 0;
+	transform: translateY(10px);
+}
+
+.list-move {
+	transition: transform 200ms ease-in-out;
+}
+
 .over-the-top-download-animation {
 	position: fixed;
 	z-index: 100;

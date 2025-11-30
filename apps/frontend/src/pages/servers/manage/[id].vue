@@ -384,10 +384,10 @@ import {
 	ServerNotice,
 } from '@modrinth/ui'
 import type { Backup, PowerAction, Stats } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { MessageDescriptor } from '@vintl/vintl'
 import DOMPurify from 'dompurify'
-import { computed, onMounted, onUnmounted, type Reactive, ref } from 'vue'
+import { computed, onMounted, onUnmounted, type Reactive, reactive, ref } from 'vue'
 
 import { reloadNuxtApp } from '#app'
 import NavTabs from '~/components/ui/NavTabs.vue'
@@ -451,12 +451,15 @@ const serverData = computed(() => server.general)
 const isConnected = ref(false)
 const isWSAuthIncorrect = ref(false)
 const modrinthServersConsole = useModrinthServersConsole()
+const queryClient = useQueryClient()
 const cpuData = ref<number[]>([])
 const ramData = ref<number[]>([])
 const isActioning = ref(false)
 const isServerRunning = computed(() => serverPowerState.value === 'running')
 const serverPowerState = ref<Archon.Websocket.v0.PowerState>('stopped')
 const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>()
+const backupsState = reactive(new Map())
+const completedBackupTasks = new Set<string>()
 
 provideModrinthServerContext({
 	serverId,
@@ -464,6 +467,7 @@ provideModrinthServerContext({
 	isConnected,
 	powerState: serverPowerState,
 	isServerRunning,
+	backupsState,
 })
 
 const uptimeSeconds = ref(0)
@@ -670,30 +674,44 @@ const handleAuthIncorrect = () => {
 }
 
 const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) => {
-	const curBackup = server.backups?.data.find((backup) => backup.id === data.id)
+	// Ignore 'file' task events - these are per-file progress updates sent continuously
+	if (data.task === 'file') {
+		return
+	}
 
-	if (!curBackup) {
-		console.log(`Ignoring backup-progress event for unknown backup: ${data.id}`)
-	} else {
-		console.log(
-			`Handling backup progress for ${curBackup.name} (${data.id}) task: ${data.task} state: ${data.state} progress: ${data.progress}`,
-		)
+	const backupId = data.id
+	const taskKey = `${backupId}:${data.task}`
 
-		if (!curBackup.task) {
-			curBackup.task = {}
+	if (completedBackupTasks.has(taskKey)) {
+		return
+	}
+
+	const current = backupsState.get(backupId) ?? {}
+	const previousState = current[data.task]?.state
+
+	if (previousState !== data.state) {
+		current[data.task] = {
+			progress: data.progress,
+			state: data.state,
 		}
+		backupsState.set(backupId, current)
+	}
 
-		const currentState = curBackup.task[data.task]?.state
-		const shouldUpdate = !(currentState === 'ongoing' && data.state === 'unchanged')
-
-		if (shouldUpdate) {
-			curBackup.task[data.task] = {
-				progress: data.progress,
-				state: data.state,
+	const isTerminalState =
+		data.state === 'done' || data.state === 'failed' || data.state === 'cancelled'
+	if (isTerminalState) {
+		completedBackupTasks.add(taskKey)
+		queryClient.invalidateQueries({ queryKey: ['backups', 'list', serverId] }).then(() => {
+			const entry = backupsState.get(backupId)
+			if (entry) {
+				const { [data.task]: _, ...remaining } = entry
+				if (Object.keys(remaining).length === 0) {
+					backupsState.delete(backupId)
+				} else {
+					backupsState.set(backupId, remaining)
+				}
 			}
-		}
-
-		curBackup.ongoing = data.task === 'create' && data.state === 'ongoing'
+		})
 	}
 }
 
@@ -1072,6 +1090,8 @@ const cleanup = () => {
 	isConnected.value = false
 	isReconnecting.value = false
 	isLoading.value = true
+
+	completedBackupTasks.clear()
 
 	DOMPurify.removeHook('afterSanitizeAttributes')
 }

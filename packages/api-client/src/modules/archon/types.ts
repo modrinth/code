@@ -129,7 +129,7 @@ export namespace Archon {
 	export namespace Backups {
 		export namespace v1 {
 			export type BackupState = 'ongoing' | 'done' | 'failed' | 'cancelled' | 'unchanged'
-			export type BackupTask = 'create' | 'restore'
+			export type BackupTask = 'file' | 'create' | 'restore'
 
 			export type BackupTaskProgress = {
 				progress: number // 0.0 to 1.0
@@ -145,9 +145,13 @@ export namespace Archon {
 				interrupted: boolean
 				ongoing: boolean
 				task?: {
+					file?: BackupTaskProgress
 					create?: BackupTaskProgress
 					restore?: BackupTaskProgress
 				}
+				// TODO: Uncomment when API supports these fields
+				// size?: number // bytes
+				// creator_id?: string // user ID, or 'auto' for automated backups
 			}
 
 			export type BackupRequest = {
@@ -172,7 +176,7 @@ export namespace Archon {
 			}
 
 			export type BackupState = 'ongoing' | 'done' | 'failed' | 'cancelled' | 'unchanged'
-			export type BackupTask = 'create' | 'restore'
+			export type BackupTask = 'file' | 'create' | 'restore'
 
 			export type WSBackupProgressEvent = {
 				event: 'backup-progress'

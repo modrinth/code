@@ -1,24 +1,27 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import {
-	BotIcon,
+	ClockIcon,
 	DownloadIcon,
 	EditIcon,
-	FolderArchiveIcon,
-	HistoryIcon,
 	LockIcon,
 	LockOpenIcon,
 	MoreVerticalIcon,
 	RotateCounterClockwiseIcon,
+	ShieldIcon,
 	SpinnerIcon,
 	TrashIcon,
+	UserIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-import { ButtonStyled, commonMessages, OverflowMenu, ProgressBar } from '../../..'
+import { commonMessages } from '../../../utils'
+import ButtonStyled from '../../base/ButtonStyled.vue'
+import OverflowMenu, { type Option as OverflowOption } from '../../base/OverflowMenu.vue'
+import ProgressBar from '../../base/ProgressBar.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -48,7 +51,7 @@ const backupQueued = computed(
 		props.backup.task?.create?.progress === 0 ||
 		(props.backup.ongoing && !props.backup.task?.create),
 )
-const automated = computed(() => props.backup.automated)
+// const automated = computed(() => props.backup.automated)
 const failedToCreate = computed(() => props.backup.interrupted)
 
 const inactiveStates = ['failed', 'cancelled']
@@ -77,6 +80,52 @@ const restoring = computed(() => {
 
 const failedToRestore = computed(() => props.backup.task?.restore?.state === 'failed')
 
+// Icon varies based on backup type
+const backupIcon = computed(() => {
+	if (props.backup.automated) {
+		return props.backup.locked ? ShieldIcon : ClockIcon
+	}
+	return UserIcon
+})
+
+// Overflow menu options - filtered based on backup state
+const overflowMenuOptions = computed<OverflowOption[]>(() => {
+	const options: OverflowOption[] = []
+
+	// Download only available when not creating
+	if (!creating.value) {
+		options.push({
+			id: 'download',
+			action: () => emit('download'),
+			link: `https://${props.kyrosUrl}/modrinth/v0/backups/${props.backup.id}/download?auth=${props.jwt}`,
+			disabled: !props.kyrosUrl || !props.jwt,
+		})
+	}
+
+	options.push({ id: 'rename', action: () => emit('rename') })
+	options.push({ id: 'lock', action: () => emit('lock') })
+
+	// Delete only available when not creating (has separate Cancel button)
+	if (!creating.value) {
+		options.push({ divider: true })
+		options.push({
+			id: 'delete',
+			color: 'red',
+			action: () => emit('delete'),
+			disabled: !!restoring.value,
+		})
+	}
+
+	return options
+})
+
+// TODO: Uncomment when API supports size field
+// const formatBytes = (bytes?: number) => {
+// 	if (!bytes) return ''
+// 	const mb = bytes / (1024 * 1024)
+// 	return `${mb.toFixed(0)} MiB`
+// }
+
 const messages = defineMessages({
 	locked: {
 		id: 'servers.backups.item.locked',
@@ -100,7 +149,7 @@ const messages = defineMessages({
 	},
 	queuedForBackup: {
 		id: 'servers.backups.item.queued-for-backup',
-		defaultMessage: 'Queued for backup',
+		defaultMessage: 'Backup queued',
 	},
 	creatingBackup: {
 		id: 'servers.backups.item.creating-backup',
@@ -118,9 +167,17 @@ const messages = defineMessages({
 		id: 'servers.backups.item.failed-to-restore-backup',
 		defaultMessage: 'Failed to restore from backup',
 	},
-	automated: {
-		id: 'servers.backups.item.automated',
-		defaultMessage: 'Automated',
+	auto: {
+		id: 'servers.backups.item.auto',
+		defaultMessage: 'Auto',
+	},
+	backupSchedule: {
+		id: 'servers.backups.item.backup-schedule',
+		defaultMessage: 'Backup schedule',
+	},
+	manualBackup: {
+		id: 'servers.backups.item.manual-backup',
+		defaultMessage: 'Manual backup',
 	},
 	retry: {
 		id: 'servers.backups.item.retry',
@@ -130,150 +187,171 @@ const messages = defineMessages({
 </script>
 <template>
 	<div
-		:class="
-			preview
-				? 'grid-cols-[min-content_1fr_1fr] sm:grid-cols-[min-content_3fr_2fr_1fr] md:grid-cols-[auto_3fr_2fr_1fr]'
-				: 'grid-cols-[min-content_1fr_1fr] sm:grid-cols-[min-content_3fr_2fr_1fr] md:grid-cols-[auto_3fr_2fr_1fr_2fr]'
-		"
-		class="grid items-center gap-4 rounded-2xl bg-bg-raised px-4 py-3"
+		class="grid items-center gap-4 rounded-2xl bg-bg-raised p-4 shadow-sm"
+		:class="preview ? 'grid-cols-2' : 'grid-cols-[auto_1fr_auto] md:grid-cols-[400px_1fr_auto]'"
 	>
-		<div
-			class="flex h-12 w-12 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg"
-		>
-			<SpinnerIcon
-				v-if="creating"
-				class="h-6 w-6 animate-spin"
-				:class="{ 'text-orange': backupQueued, 'text-green': !backupQueued }"
-			/>
-			<FolderArchiveIcon v-else class="h-6 w-6" />
-		</div>
-		<div class="col-span-2 flex flex-col gap-1 sm:col-span-1">
-			<span class="font-bold text-contrast">
-				{{ backup.name }}
-			</span>
-			<div class="flex flex-wrap items-center gap-2 text-sm">
-				<span v-if="backup.locked" class="flex items-center gap-1 text-sm text-secondary">
-					<LockIcon /> {{ formatMessage(messages.locked) }}
-				</span>
-				<span v-if="automated && backup.locked">•</span>
-				<span v-if="automated" class="flex items-center gap-1 text-secondary">
-					<BotIcon /> {{ formatMessage(messages.automated) }}
-				</span>
-				<span v-if="(failedToCreate || failedToRestore) && (automated || backup.locked)">•</span>
-				<span
-					v-if="failedToCreate || failedToRestore"
-					class="flex items-center gap-1 text-sm text-red"
-				>
-					<XIcon />
-					{{
-						formatMessage(
-							failedToCreate ? messages.failedToCreateBackup : messages.failedToRestoreBackup,
-						)
-					}}
-				</span>
+		<div class="flex flex-row gap-4 items-center">
+			<div
+				class="flex size-12 shrink-0 items-center justify-center rounded-2xl border-solid border-[1px] border-surface-5 bg-surface-4 md:size-16"
+			>
+				<component :is="backupIcon" class="size-7 text-secondary md:size-10" />
+			</div>
+
+			<div class="flex min-w-0 flex-col gap-1.5">
+				<div class="flex flex-wrap items-center gap-2">
+					<span class="truncate font-semibold text-contrast max-w-[400px]">{{ backup.name }}</span>
+					<span
+						v-if="backup.automated"
+						class="rounded-full border-solid border-[1px] border-surface-5 bg-surface-4 px-2.5 py-1 text-sm text-secondary"
+					>
+						{{ formatMessage(messages.auto) }}
+					</span>
+					<span v-if="backup.locked" class="flex items-center gap-1 text-sm text-secondary">
+						<LockIcon class="size-4" />
+					</span>
+				</div>
+				<div class="flex items-center gap-1.5 text-sm text-secondary">
+					<template v-if="failedToCreate || failedToRestore">
+						<XIcon class="size-4 text-red" />
+						<span class="text-red">
+							{{
+								formatMessage(
+									failedToCreate ? messages.failedToCreateBackup : messages.failedToRestoreBackup,
+								)
+							}}
+						</span>
+					</template>
+					<template v-else>
+						<!-- TODO: Uncomment when API supports creator_id field -->
+						<!-- <template v-if="backup.creator_id && backup.creator_id !== 'auto'">
+						<Avatar ... class="size-6 rounded-full" />
+						<span>{{ creatorName }}</span>
+					</template>
+					<template v-else> -->
+						<span>
+							{{
+								formatMessage(backup.automated ? messages.backupSchedule : messages.manualBackup)
+							}}
+						</span>
+						<!-- </template> -->
+					</template>
+				</div>
 			</div>
 		</div>
-		<div v-if="creating" class="col-span-2 flex flex-col gap-3">
-			<span v-if="backupQueued" class="text-orange">
-				{{ formatMessage(messages.queuedForBackup) }}
-			</span>
-			<span v-else class="text-green"> {{ formatMessage(messages.creatingBackup) }} </span>
-			<ProgressBar
-				:progress="creating.progress"
-				:color="backupQueued ? 'orange' : 'green'"
-				:waiting="creating.progress === 0"
-				class="max-w-full"
-			/>
-		</div>
-		<div v-else-if="restoring" class="col-span-2 flex flex-col gap-3 text-purple">
-			{{ formatMessage(messages.restoringBackup) }}
-			<ProgressBar
-				:progress="restoring.progress"
-				color="purple"
-				:waiting="restoring.progress === 0"
-				class="max-w-full"
-			/>
-		</div>
-		<template v-else>
-			<div class="col-span-2">
-				{{ dayjs(backup.created_at).format('MMMM D, YYYY [at] h:mm A') }}
-			</div>
-			<div v-if="false">{{ 245 }} MiB</div>
-		</template>
+
+		<!-- Date/Progress Section -->
 		<div
-			v-if="!preview"
-			class="col-span-full flex justify-normal gap-2 md:col-span-1 md:justify-end"
+			class="col-span-full row-start-2 flex flex-col gap-2 md:col-span-1 md:row-start-auto md:mr-16 max-w-[400px]"
 		>
+			<template v-if="creating">
+				<div class="flex items-center justify-between">
+					<span class="text-contrast">
+						{{ formatMessage(backupQueued ? messages.queuedForBackup : messages.creatingBackup) }}
+					</span>
+					<div class="flex items-center gap-1 text-sm text-secondary">
+						<span>{{ Math.round(creating.progress * 100) }}%</span>
+						<SpinnerIcon class="size-5 animate-spin" />
+					</div>
+				</div>
+				<ProgressBar
+					:progress="creating.progress"
+					:color="backupQueued ? 'orange' : 'brand'"
+					:waiting="creating.progress === 0"
+					full-width
+				/>
+			</template>
+			<template v-else-if="restoring">
+				<div class="flex items-center justify-between">
+					<span class="text-purple">{{ formatMessage(messages.restoringBackup) }}</span>
+					<div class="flex items-center gap-1 text-sm text-secondary">
+						<span>{{ Math.round(restoring.progress * 100) }}%</span>
+						<SpinnerIcon class="size-5 animate-spin" />
+					</div>
+				</div>
+				<ProgressBar
+					full-width
+					:progress="restoring.progress"
+					color="purple"
+					:waiting="restoring.progress === 0"
+				/>
+			</template>
+			<template v-else>
+				<span class="font-medium text-contrast">
+					{{ dayjs(backup.created_at).format('MMMM Do YYYY, h:mm A') }}
+				</span>
+				<!-- TODO: Uncomment when API supports size field -->
+				<!-- <span class="text-secondary">{{ formatBytes(backup.size) }}</span> -->
+			</template>
+		</div>
+
+		<div v-if="!preview" class="flex shrink-0 items-center gap-2">
 			<template v-if="failedToCreate">
 				<ButtonStyled>
 					<button @click="() => emit('retry')">
-						<RotateCounterClockwiseIcon />
+						<RotateCounterClockwiseIcon class="size-5" />
 						{{ formatMessage(messages.retry) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled>
 					<button @click="() => emit('delete', true)">
-						<TrashIcon />
-						Remove
+						<TrashIcon class="size-5" />
+						{{ formatMessage(commonMessages.deleteLabel) }}
 					</button>
 				</ButtonStyled>
 			</template>
-			<ButtonStyled v-else-if="creating">
-				<button @click="() => emit('delete')">
-					<XIcon />
-					{{ formatMessage(commonMessages.cancelButton) }}
-				</button>
-			</ButtonStyled>
-			<template v-else>
-				<ButtonStyled>
-					<a
-						:class="{
-							disabled: !kyrosUrl || !jwt,
-						}"
-						:href="`https://${kyrosUrl}/modrinth/v0/backups/${backup.id}/download?auth=${jwt}`"
-						@click="() => emit('download')"
-					>
-						<DownloadIcon />
-						{{ formatMessage(commonMessages.downloadButton) }}
-					</a>
+			<template v-else-if="creating">
+				<ButtonStyled type="outlined">
+					<button class="!border-[1px] !border-surface-5" @click="() => emit('delete')">
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
-					<OverflowMenu
-						:options="[
-							{ id: 'rename', action: () => emit('rename') },
-							{
-								id: 'restore',
-								action: () => emit('restore'),
-								disabled: !!restoring,
-							},
-							{ id: 'lock', action: () => emit('lock') },
-							{ divider: true },
-							{
-								id: 'delete',
-								color: 'red',
-								action: () => emit('delete'),
-								disabled: !!restoring,
-							},
-						]"
-					>
-						<MoreVerticalIcon />
-						<template #rename> <EditIcon /> {{ formatMessage(messages.rename) }} </template>
-						<template #restore> <HistoryIcon /> {{ formatMessage(messages.restore) }} </template>
-						<template v-if="backup.locked" #lock>
-							<LockOpenIcon /> {{ formatMessage(messages.unlock) }}
+					<OverflowMenu :options="overflowMenuOptions">
+						<MoreVerticalIcon class="size-5" />
+						<template #rename>
+							<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
 						</template>
-						<template v-else #lock> <LockIcon /> {{ formatMessage(messages.lock) }} </template>
+						<template v-if="backup.locked" #lock>
+							<LockOpenIcon class="size-5" /> {{ formatMessage(messages.unlock) }}
+						</template>
+						<template v-else #lock>
+							<LockIcon class="size-5" /> {{ formatMessage(messages.lock) }}
+						</template>
+					</OverflowMenu>
+				</ButtonStyled>
+			</template>
+			<template v-else>
+				<ButtonStyled color="brand" type="outlined">
+					<button class="!border-[1px]" :disabled="!!restoring" @click="() => emit('restore')">
+						<RotateCounterClockwiseIcon class="size-5" />
+						{{ formatMessage(messages.restore) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled circular type="transparent">
+					<OverflowMenu :options="overflowMenuOptions">
+						<MoreVerticalIcon class="size-5" />
+						<template #download>
+							<DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}
+						</template>
+						<template #rename>
+							<EditIcon class="size-5" /> {{ formatMessage(messages.rename) }}
+						</template>
+						<template v-if="backup.locked" #lock>
+							<LockOpenIcon class="size-5" /> {{ formatMessage(messages.unlock) }}
+						</template>
+						<template v-else #lock>
+							<LockIcon class="size-5" /> {{ formatMessage(messages.lock) }}
+						</template>
 						<template #delete>
-							<TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}
+							<TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
 			</template>
 		</div>
-		<pre
-			v-if="!preview && showDebugInfo"
-			class="col-span-full m-0 rounded-xl bg-button-bg text-xs"
-			>{{ backup }}</pre
-		>
+
+		<pre v-if="!preview && showDebugInfo" class="w-full rounded-xl bg-surface-4 p-2 text-xs">{{
+			backup
+		}}</pre>
 	</div>
 </template>

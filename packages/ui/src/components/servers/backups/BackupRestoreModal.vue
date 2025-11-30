@@ -1,29 +1,54 @@
 <template>
-	<ConfirmModal
-		ref="modal"
-		danger
-		title="Are you sure you want to restore from this backup?"
-		proceed-label="Restore from backup"
-		description="This will **overwrite all files on your server** and replace them with the files from the backup."
-		@proceed="restoreBackup"
-	>
-		<BackupItem
-			v-if="currentBackup"
-			:backup="currentBackup"
-			preview
-			class="border-px border-solid border-button-border"
-		/>
-	</ConfirmModal>
+	<NewModal ref="modal" header="Restore backup" fade="warning">
+		<div class="flex flex-col gap-6 max-w-[600px]">
+			<!-- TODO: Worlds: Replace "server" with "world" -->
+			<Admonition type="warning" header="Restore warning">
+				This will overwrite all files in the server and replace them with the files from the backup.
+			</Admonition>
+
+			<div v-if="currentBackup" class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">Backup</span>
+				<BackupItem
+					:backup="currentBackup"
+					preview
+					class="!bg-surface-2 border-solid border-[1px] border-surface-5 light:shadow-xl"
+				/>
+			</div>
+		</div>
+
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled>
+					<button @click="modal?.hide()">
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="red">
+					<button @click="restoreBackup">
+						<RotateCounterClockwiseIcon />
+						Restore backup
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 </template>
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
+import { RotateCounterClockwiseIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
-import type { NewModal } from '../../..'
-import { ConfirmModal, injectModrinthClient, injectNotificationManager } from '../../..'
-import { injectModrinthServerContext } from '../../../providers'
+import {
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+} from '../../../providers'
+import Admonition from '../../base/Admonition.vue'
+import ButtonStyled from '../../base/ButtonStyled.vue'
+import NewModal from '../../modal/NewModal.vue'
 import BackupItem from './BackupItem.vue'
 
 const { addNotification } = injectNotificationManager()
