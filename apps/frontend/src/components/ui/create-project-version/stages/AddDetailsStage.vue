@@ -21,6 +21,7 @@
 			<input
 				id="version-number"
 				v-model="versionNumber"
+				placeholder="Enter version subtitle..."
 				type="text"
 				autocomplete="off"
 				maxlength="32"
@@ -34,6 +35,7 @@
 			<input
 				id="version-number"
 				v-model="versionSubtitle"
+				placeholder="Enter version subtitle..."
 				type="text"
 				autocomplete="off"
 				maxlength="32"
