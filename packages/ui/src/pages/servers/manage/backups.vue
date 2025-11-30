@@ -84,6 +84,7 @@
 										v-for="backup in group.backups"
 										:key="`backup-${backup.id}`"
 										:backup="backup"
+										:disabled="anyRestoreInProgress"
 										:kyros-url="server.node?.instance"
 										:jwt="server.node?.token"
 										:show-debug-info="showDebugInfo"
@@ -284,6 +285,10 @@ const restoreBackupModal = ref<InstanceType<typeof BackupRestoreModal>>()
 const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>()
 // const backupSettingsModal = ref<InstanceType<typeof BackupSettingsModal>>()
 
+const anyRestoreInProgress = computed(() => {
+	return backups.value.some((backup) => backup.task?.restore?.state === 'ongoing')
+})
+
 const backupCreationDisabled = computed(() => {
 	if (props.isServerRunning && !userPreferences.value.backupWhileRunning) {
 		return 'Cannot create backup while server is running'
@@ -297,6 +302,9 @@ const backupCreationDisabled = computed(() => {
 	}
 	if (backups.value.some((backup) => backup.task?.create?.state === 'ongoing')) {
 		return 'A backup is already in progress'
+	}
+	if (anyRestoreInProgress.value) {
+		return 'Cannot create backup while a restore is in progress'
 	}
 	if (server.value.status === 'installing') {
 		return 'Cannot create backup while server is installing'

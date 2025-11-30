@@ -25,9 +25,10 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="red">
-					<button @click="restoreBackup">
-						<RotateCounterClockwiseIcon />
-						Restore backup
+					<button :disabled="isRestoring" @click="restoreBackup">
+						<SpinnerIcon v-if="isRestoring" class="animate-spin" />
+						<RotateCounterClockwiseIcon v-else />
+						{{ isRestoring ? 'Restoring...' : 'Restore backup' }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -37,7 +38,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { RotateCounterClockwiseIcon, XIcon } from '@modrinth/assets'
+import { RotateCounterClockwiseIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
@@ -64,6 +65,7 @@ const restoreMutation = useMutation({
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const currentBackup = ref<Archon.Backups.v1.Backup | null>(null)
+const isRestoring = ref(false)
 
 function show(backup: Archon.Backups.v1.Backup) {
 	currentBackup.value = backup
@@ -71,22 +73,32 @@ function show(backup: Archon.Backups.v1.Backup) {
 }
 
 const restoreBackup = () => {
-	if (!currentBackup.value) {
-		addNotification({
-			type: 'error',
-			title: 'Failed to restore backup',
-			text: 'Current backup is null',
-		})
+	if (!currentBackup.value || isRestoring.value) {
+		if (!currentBackup.value) {
+			addNotification({
+				type: 'error',
+				title: 'Failed to restore backup',
+				text: 'Current backup is null',
+			})
+		}
 		return
 	}
 
+	isRestoring.value = true
 	restoreMutation.mutate(currentBackup.value.id, {
 		onSuccess: () => {
+			// Optimistically update backupsState to show restore in progress immediately
+			ctx.backupsState.set(currentBackup.value!.id, {
+				restore: { progress: 0, state: 'ongoing' },
+			})
 			modal.value?.hide()
 		},
 		onError: (error) => {
 			const message = error instanceof Error ? error.message : String(error)
 			addNotification({ type: 'error', title: 'Failed to restore backup', text: message })
+		},
+		onSettled: () => {
+			isRestoring.value = false
 		},
 	})
 }

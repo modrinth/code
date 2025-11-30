@@ -37,12 +37,14 @@ const props = withDefaults(
 		kyrosUrl?: string
 		jwt?: string
 		showDebugInfo?: boolean
+		disabled?: boolean
 	}>(),
 	{
 		preview: false,
 		kyrosUrl: undefined,
 		jwt: undefined,
 		showDebugInfo: false,
+		disabled: false,
 	},
 )
 
@@ -78,6 +80,8 @@ const restoring = computed(() => {
 	return undefined
 })
 
+const restoreQueued = computed(() => restoring.value?.progress === 0)
+
 const failedToRestore = computed(() => props.backup.task?.restore?.state === 'failed')
 
 // Icon varies based on backup type
@@ -112,7 +116,7 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 			id: 'delete',
 			color: 'red',
 			action: () => emit('delete'),
-			disabled: !!restoring.value,
+			disabled: props.disabled,
 		})
 	}
 
@@ -150,6 +154,10 @@ const messages = defineMessages({
 	queuedForBackup: {
 		id: 'servers.backups.item.queued-for-backup',
 		defaultMessage: 'Backup queued',
+	},
+	queuedForRestore: {
+		id: 'servers.backups.item.queued-for-restore',
+		defaultMessage: 'Restore queued',
 	},
 	creatingBackup: {
 		id: 'servers.backups.item.creating-backup',
@@ -262,7 +270,9 @@ const messages = defineMessages({
 			</template>
 			<template v-else-if="restoring">
 				<div class="flex items-center justify-between">
-					<span class="text-purple">{{ formatMessage(messages.restoringBackup) }}</span>
+					<span class="text-purple">
+						{{ formatMessage(restoreQueued ? messages.queuedForRestore : messages.restoringBackup) }}
+					</span>
 					<div class="flex items-center gap-1 text-sm text-secondary">
 						<span>{{ Math.round(restoring.progress * 100) }}%</span>
 						<SpinnerIcon class="size-5 animate-spin" />
@@ -322,7 +332,7 @@ const messages = defineMessages({
 			</template>
 			<template v-else>
 				<ButtonStyled color="brand" type="outlined">
-					<button class="!border-[1px]" :disabled="!!restoring" @click="() => emit('restore')">
+					<button class="!border-[1px]" :disabled="props.disabled" @click="() => emit('restore')">
 						<RotateCounterClockwiseIcon class="size-5" />
 						{{ formatMessage(messages.restore) }}
 					</button>

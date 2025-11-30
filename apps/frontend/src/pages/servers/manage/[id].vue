@@ -688,8 +688,9 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 
 	const current = backupsState.get(backupId) ?? {}
 	const previousState = current[data.task]?.state
+	const previousProgress = current[data.task]?.progress
 
-	if (previousState !== data.state) {
+	if (previousState !== data.state || previousProgress !== data.progress) {
 		current[data.task] = {
 			progress: data.progress,
 			state: data.state,
