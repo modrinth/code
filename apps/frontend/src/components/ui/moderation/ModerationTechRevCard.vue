@@ -44,7 +44,9 @@ const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
 	refetch: []
-	loadSource: [issueId: string]
+	loadFileSources: [reportId: string]
+	markComplete: [projectId: string]
+	markIssueSafe: [projectId: string, reportId: string, issueId: string]
 }>()
 
 const quickActions = computed<OverflowMenuOption[]>(() => {
@@ -191,10 +193,11 @@ function formatFileSize(bytes: number): string {
 
 function viewFileFlags(file: Labrinth.TechReview.Internal.FileReport) {
 	selectedFile.value = file
-	// Automatically expand the first issue
+
 	if (file.issues.length > 0) {
 		expandedIssues.value.add(file.issues[0].id)
 	}
+	emit('loadFileSources', file.id)
 }
 
 function backToFileList() {
@@ -215,13 +218,34 @@ async function copyToClipboard(code: string, detailId: string) {
 
 async function updateIssueStatus(
 	issueId: string,
+	reportId: string,
 	status: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
 ) {
 	try {
 		await client.labrinth.tech_review_internal.updateIssue(issueId, { status })
-		emit('refetch')
+
+		if (status === 'safe') {
+			emit('markIssueSafe', props.item.project.id, reportId, issueId)
+			addNotification({
+				type: 'success',
+				title: 'Issue marked as safe',
+				text: 'This issue has been marked as a false positive.',
+			})
+		} else if (status === 'unsafe') {
+			emit('markComplete', props.item.project.id)
+			addNotification({
+				type: 'success',
+				title: 'Marked as malware',
+				text: 'This issue has been confirmed as malicious. The project has been rejected.',
+			})
+		}
 	} catch (error) {
 		console.error('Failed to update issue status:', error)
+		addNotification({
+			type: 'error',
+			title: 'Failed to update issue',
+			text: 'An error occurred while updating the issue status.',
+		})
 	}
 }
 
@@ -239,7 +263,7 @@ function getButtonState(action: ActionType): ButtonState {
 }
 
 // TODO: move this into new buttonstyled refactored component at a later date
-function handleTopLevelAction(action: ActionType) {
+async function handleTopLevelAction(action: ActionType) {
 	const currentState = getButtonState(action)
 
 	if (typeof currentState === 'number') {
@@ -254,21 +278,42 @@ function handleTopLevelAction(action: ActionType) {
 
 	buttonStates.value.set(action, 5)
 
-	const intervalId = setInterval(() => {
+	const intervalId = setInterval(async () => {
 		const state = buttonStates.value.get(action)
 		if (typeof state === 'number' && state > 1) {
 			buttonStates.value.set(action, state - 1)
 		} else {
 			clearInterval(intervalId)
 			buttonIntervals.value.delete(action)
-			buttonStates.value.set(action, 'completed')
 
-			// TODO: call backend
-			console.log(`Top-level action: ${action}`)
+			try {
+				const status = action === 'safe' ? 'safe' : 'unsafe'
+				await Promise.all(
+					props.item.reports.map((report) =>
+						client.labrinth.tech_review_internal.updateReport(report.id, { status }),
+					),
+				)
 
-			setTimeout(() => {
+				buttonStates.value.set(action, 'completed')
+				emit('markComplete', props.item.project.id)
+
+				addNotification({
+					type: 'success',
+					title: action === 'safe' ? 'Marked as safe' : 'Marked as malware',
+					text:
+						action === 'safe'
+							? 'All reports for this project have been marked as safe.'
+							: 'All reports for this project have been marked as malware. The project has been rejected.',
+				})
+			} catch (error) {
+				console.error('Failed to update reports:', error)
 				buttonStates.value.delete(action)
-			}, 2000)
+				addNotification({
+					type: 'error',
+					title: 'Failed to update reports',
+					text: 'An error occurred while updating the report status.',
+				})
+			}
 		}
 	}, 1000)
 
@@ -284,7 +329,6 @@ function toggleIssue(issueId: string) {
 		expandedIssues.value.delete(issueId)
 	} else {
 		expandedIssues.value.add(issueId)
-		emit('loadSource', issueId)
 	}
 }
 
@@ -532,13 +576,19 @@ function handleThreadUpdate() {
 
 						<div class="flex items-center gap-2" @click.stop>
 							<ButtonStyled color="brand" type="outlined">
-								<button class="!border-[1px]" @click="updateIssueStatus(issue.id, 'safe')">
+								<button
+									class="!border-[1px]"
+									@click="updateIssueStatus(issue.id, selectedFile.id, 'safe')"
+								>
 									Safe
 								</button>
 							</ButtonStyled>
 
 							<ButtonStyled color="red" type="outlined">
-								<button class="!border-[1px]" @click="updateIssueStatus(issue.id, 'unsafe')">
+								<button
+									class="!border-[1px]"
+									@click="updateIssueStatus(issue.id, selectedFile.id, 'unsafe')"
+								>
 									Malware
 								</button>
 							</ButtonStyled>

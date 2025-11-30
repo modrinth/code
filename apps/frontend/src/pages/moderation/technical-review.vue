@@ -8,13 +8,14 @@ import {
 	injectModrinthClient,
 	Pagination,
 } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
 const client = injectModrinthClient()
+const queryClient = useQueryClient()
 
 const currentPage = ref(1)
 const itemsPerPage = 15
@@ -119,13 +120,11 @@ async function loadIssueSource(issueId: string, projectId: string): Promise<void
 	}
 }
 
-function tryLoadCachedSources(issueId: string, projectId: string): void {
-	const review = reviewItems.value.find((r) => r.project.id === projectId)
-	if (!review) return
-
-	for (const report of review.reports) {
-		for (const issue of report.issues) {
-			if (issue.id === issueId) {
+function tryLoadCachedSourcesForFile(reportId: string): void {
+	for (const review of reviewItems.value) {
+		const report = review.reports.find((r) => r.id === reportId)
+		if (report) {
+			for (const issue of report.issues) {
 				for (const detail of issue.details) {
 					if (!detail.decompiled_source) {
 						const cached = getCachedSource(detail.id)
@@ -135,25 +134,24 @@ function tryLoadCachedSources(issueId: string, projectId: string): void {
 					}
 				}
 			}
+			return
 		}
 	}
 }
 
-function handleLoadSource(issueId: string, projectId: string): void {
-	tryLoadCachedSources(issueId, projectId)
+function handleLoadFileSources(reportId: string): void {
+	tryLoadCachedSourcesForFile(reportId)
 
-	const review = reviewItems.value.find((r) => r.project.id === projectId)
-	if (!review) return
-
-	for (const report of review.reports) {
-		for (const issue of report.issues) {
-			if (issue.id === issueId) {
+	for (const review of reviewItems.value) {
+		const report = review.reports.find((r) => r.id === reportId)
+		if (report) {
+			for (const issue of report.issues) {
 				const hasUncached = issue.details.some((d) => !d.decompiled_source)
 				if (hasUncached) {
-					loadIssueSource(issueId, projectId)
+					loadIssueSource(issue.id, review.project.id)
 				}
-				return
 			}
+			return
 		}
 	}
 }
@@ -395,7 +393,6 @@ const reviewItems = computed(() => {
 
 	const response = searchResponse.value
 
-	// Group reports by project
 	const projectMap = new Map<
 		string,
 		{
@@ -410,11 +407,10 @@ const reviewItems = computed(() => {
 		const projectId = report.project_id
 
 		if (!projectMap.has(projectId)) {
-			// Get project and thread using direct lookups
 			const project = response.projects[projectId]
 			const thread = project?.thread_id ? response.threads[project.thread_id] : undefined
 
-			if (!thread) continue // Skip if no thread found
+			if (!thread) continue
 
 			projectMap.set(projectId, {
 				project,
@@ -430,7 +426,66 @@ const reviewItems = computed(() => {
 	return Array.from(projectMap.values())
 })
 
-console.log(reviewItems.value)
+function handleMarkComplete(projectId: string) {
+	queryClient.setQueryData(
+		['tech-reviews', currentSortType],
+		(oldData: Labrinth.TechReview.Internal.SearchResponse | undefined) => {
+			if (!oldData) return oldData
+
+			const remainingReports = oldData.reports.filter((report) => report.project_id !== projectId)
+
+			return {
+				...oldData,
+				reports: remainingReports,
+			}
+		},
+	)
+}
+
+function handleMarkIssueSafe(projectId: string, reportId: string, issueId: string) {
+	queryClient.setQueryData(
+		['tech-reviews', currentSortType],
+		(oldData: Labrinth.TechReview.Internal.SearchResponse | undefined) => {
+			if (!oldData) return oldData
+
+			const updatedReports = oldData.reports
+				.map((report) => {
+					if (report.id !== reportId) return report
+
+					const remainingIssues = report.issues.filter((issue) => issue.id !== issueId)
+
+					if (remainingIssues.length === 0) {
+						return null
+					}
+
+					return {
+						...report,
+						issues: remainingIssues,
+					}
+				})
+				.filter((report): report is Labrinth.TechReview.Internal.FileReport => report !== null)
+
+			const projectStillHasReports = updatedReports.some((report) => report.project_id === projectId)
+
+			if (!projectStillHasReports) {
+				const { [projectId]: _removedProject, ...remainingProjects } = oldData.projects
+				const { [projectId]: _removedOwnership, ...remainingOwnership } = oldData.ownership
+
+				return {
+					...oldData,
+					reports: updatedReports,
+					projects: remainingProjects,
+					ownership: remainingOwnership,
+				}
+			}
+
+			return {
+				...oldData,
+				reports: updatedReports,
+			}
+		},
+	)
+}
 
 watch(currentSortType, () => {
 	goToPage(1)
@@ -533,7 +588,9 @@ watch(currentSortType, () => {
 					:item="item"
 					:loading-issues="loadingIssues"
 					@refetch="refetch"
-					@load-source="(issueId: string) => handleLoadSource(issueId, item.project.id)"
+					@load-file-sources="handleLoadFileSources"
+					@mark-complete="handleMarkComplete"
+					@mark-issue-safe="handleMarkIssueSafe"
 				/>
 			</div>
 		</div>
