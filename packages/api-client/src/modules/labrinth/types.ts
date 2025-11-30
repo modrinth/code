@@ -416,30 +416,62 @@ export namespace Labrinth {
 				files: VersionFile[]
 			}
 
-			export type ModifyVersionRequest = {
-				name?: string
-				version_number?: string
-				changelog?: string
-				dependencies?: Dependency[]
-				game_versions?: string[]
-				version_type?: VersionChannel
-				loaders?: string[]
+			/**
+			 * Request data object for Modrinth “Create Version” API.
+			 */
+			export interface CreateVersionRequest {
+				/** The name of this version. */
+				name: string
+
+				/** The version number. Ideally will follow semantic versioning. */
+				version_number: string
+
+				/** A changelog for this version. Nullable. */
+				changelog?: string | null
+
+				/** A list of specific versions of projects that this version depends on. */
+				dependencies?: Array<{
+					/** The ID of the version that this version depends on. Nullable. */
+					version_id?: string | null
+					/** The ID of the project that this version depends on. Nullable. */
+					project_id?: string | null
+					/** The file name of the dependency, mostly used for showing external dependencies on modpacks. Nullable. */
+					file_name?: string | null
+					/** The type of dependency that this version has. One of "required" | "optional" | "incompatible" | "embedded". */
+					dependency_type: 'required' | 'optional' | 'incompatible' | 'embedded'
+				}>
+
+				/** A list of Minecraft game versions this version supports. */
+				game_versions: string[]
+
+				/** The release channel for this version. Allowed values: "release" | "beta" | "alpha". */
+				version_type: 'release' | 'beta' | 'alpha'
+
+				/** The mod loaders that this version supports. For resource packs, use "minecraft". */
+				loaders: string[]
+
+				/** Whether the version is featured or not. */
 				featured?: boolean
-				status?: VersionStatus
+
+				/** The status of the version. Allowed values: "listed" | "archived" | "draft" | "unlisted" | "scheduled" | "unknown". */
+				status?: 'listed' | 'archived' | 'draft' | 'unlisted' | 'scheduled' | 'unknown'
+
+				/** The requested status when submitting for review or scheduling. Nullable. Allowed values: "listed" | "archived" | "draft" | "unlisted". */
+				requested_status?: 'listed' | 'archived' | 'draft' | 'unlisted' | null
+
+				/** The ID of the project this version is for. */
+				project_id: string
+
+				/** A list of "file_parts" representing the multipart file upload items for this version. */
+				file_parts: string[]
+
+				/** The hash of the primary file (algorithm + hash) — if specifying which file is primary. */
+				primary_file?: string
 			}
 
-			export type CreateVersionRequest = {
-				name: string
-				version_number: string
-				changelog?: string
-				dependencies?: Dependency[]
-				game_versions: string[]
-				version_type: VersionChannel
-				loaders: string[]
-				featured?: boolean
-				status?: VersionStatus
-				file_parts: string[]
-			}
+			export type ModifyVersionRequest = Partial<
+				Omit<CreateVersionRequest, 'project_id' | 'file_parts' | 'primary_file'>
+			>
 
 			export type AddFilesToVersionRequest = {
 				file_parts: string[]

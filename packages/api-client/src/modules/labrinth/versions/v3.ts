@@ -68,52 +68,6 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	}
 
 	/**
-	 * Delete a version by ID (v3)
-	 *
-	 * @param id - Version ID
-	 *
-	 * @example
-	 * ```typescript
-	 * await client.labrinth.versions_v3.deleteVersion('DXtmvS8i')
-	 * ```
-	 */
-	public async deleteVersion(id: string): Promise<void> {
-		return this.client.request(`/version/${id}`, {
-			api: 'labrinth',
-			version: 3,
-			method: 'DELETE',
-		})
-	}
-
-	/**
-	 * Modify a version by ID (v3)
-	 *
-	 * @param id - Version ID
-	 * @param data - Version update data
-	 * @returns Promise resolving to the updated v3 version data
-	 *
-	 * @example
-	 * ```typescript
-	 * const updated = await client.labrinth.versions_v3.modifyVersion('DXtmvS8i', {
-	 *   name: 'v1.0.1',
-	 *   featured: true,
-	 *   status: 'listed'
-	 * })
-	 * ```
-	 */
-	public async modifyVersion(
-		id: string,
-		data: Labrinth.Versions.v3.ModifyVersionRequest,
-	): Promise<Labrinth.Versions.v3.Version> {
-		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${id}`, {
-			api: 'labrinth',
-			version: 3,
-			method: 'PATCH',
-			body: data,
-		})
-	}
-
-	/**
 	 * Get a version from a project by version ID or number (v3)
 	 *
 	 * @param projectId - Project ID or slug
@@ -143,31 +97,103 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	/**
 	 * Create a new version for a project (v3)
 	 *
-	 * @param projectId - Project ID or slug
-	 * @param data - Version creation data
-	 * @returns Promise resolving to the created v3 version data
+	 * Creates a new version on an existing project. At least one file must be
+	 * attached unless the version is created as a draft.
+	 *
+	 * @param projectId - The project ID or slug to create the version for
+	 * @param data - JSON metadata payload for the version (must include file_parts)
+	 * @param files - Array of uploaded files, in the same order as `data.file_parts`
+	 *
+	 * @returns A promise resolving to the newly created version data
 	 *
 	 * @example
-	 * ```typescript
+	 * ```ts
 	 * const version = await client.labrinth.versions_v3.createVersion('sodium', {
 	 *   name: 'v0.5.0',
 	 *   version_number: '0.5.0',
 	 *   version_type: 'release',
 	 *   loaders: ['fabric'],
 	 *   game_versions: ['1.20.1'],
-	 *   file_parts: ['part_0']
-	 * })
+	 *   project_id: 'sodium',
+	 *   file_parts: ['primary']
+	 * }, [fileObject])
 	 * ```
 	 */
+
 	public async createVersion(
 		projectId: string,
 		data: Labrinth.Versions.v3.CreateVersionRequest,
+		files: File[],
 	): Promise<Labrinth.Versions.v3.Version> {
+		const formData = new FormData()
+
+		// Append the metadata as JSON string
+		formData.append('data', JSON.stringify(data))
+
+		// Append each file using its corresponding field name from file_parts
+		data.file_parts.forEach((partName, index) => {
+			if (files[index]) {
+				formData.append(partName, files[index])
+			}
+		})
+
 		return this.client.request<Labrinth.Versions.v3.Version>(`/project/${projectId}/version`, {
 			api: 'labrinth',
 			version: 3,
 			method: 'POST',
+			body: formData,
+		})
+	}
+
+	/**
+	 * Modify an existing version by ID (v3)
+	 *
+	 * Partially updates a version’s metadata. Only JSON fields may be modified.
+	 * To update files, use the separate "Add files to version" endpoint.
+	 *
+	 * @param id - The version ID to update
+	 * @param data - PATCH metadata for this version (all fields optional)
+	 *
+	 * @returns A promise resolving to the updated version data
+	 *
+	 * @example
+	 * ```ts
+	 * const updated = await client.labrinth.versions_v3.modifyVersion('DXtmvS8i', {
+	 *   name: 'v1.0.1',
+	 *   changelog: 'Updated changelog',
+	 *   featured: true,
+	 *   status: 'listed'
+	 * })
+	 * ```
+	 */
+
+	public async modifyVersion(
+		id: string,
+		data: Labrinth.Versions.v3.ModifyVersionRequest,
+	): Promise<Labrinth.Versions.v3.Version> {
+		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${id}`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'PATCH',
 			body: data,
+		})
+	}
+
+	/**
+	 * Delete a version by ID (v3)
+	 *
+	 * @param id - Version ID
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.versions_v3.deleteVersion('DXtmvS8i')
+	 * ```
+	 */
+	public async deleteVersion(id: string): Promise<void> {
+		return this.client.request(`/version/${id}`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'DELETE',
 		})
 	}
 
