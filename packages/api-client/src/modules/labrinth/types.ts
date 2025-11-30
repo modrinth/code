@@ -365,22 +365,12 @@ export namespace Labrinth {
 		export namespace v3 {
 			export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
 
-			export interface VersionDependency {
-				dependency_type: DependencyType
-				file_name?: string
-			}
-
-			export interface ProjectDependency {
+			export interface Dependency {
 				dependency_type: DependencyType
 				project_id?: string
-			}
-
-			export interface FileDependency {
-				dependency_type: DependencyType
 				file_name?: string
+				version_id?: string
 			}
-
-			export type Dependency = VersionDependency | ProjectDependency | FileDependency
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'
 
