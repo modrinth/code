@@ -127,14 +127,12 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	): Promise<Labrinth.Versions.v3.Version> {
 		const formData = new FormData()
 
-		// Append the metadata as JSON string
+		data.file_parts = files.map((_, i) => `file-part-${i}`)
+
 		formData.append('data', JSON.stringify(data))
 
-		// Append each file using its corresponding field name from file_parts
-		data.file_parts.forEach((partName, index) => {
-			if (files[index]) {
-				formData.append(partName, files[index])
-			}
+		files.forEach((file, i) => {
+			formData.append(`file-part-${i}`, file)
 		})
 
 		return this.client.request<Labrinth.Versions.v3.Version>(`/project/${projectId}/version`, {

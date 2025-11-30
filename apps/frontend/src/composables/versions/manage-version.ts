@@ -1,6 +1,8 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-type DraftVersion = Labrinth.Versions.v3.CreateVersionRequest & { files: File[] }
+type DraftVersion = Omit<Labrinth.Versions.v3.CreateVersionRequest, 'file_parts'> & {
+	files: File[]
+}
 
 const EMPTY_DRAFT_VERSION: DraftVersion = {
 	project_id: '',
@@ -9,7 +11,6 @@ const EMPTY_DRAFT_VERSION: DraftVersion = {
 	version_type: 'alpha',
 	loaders: [],
 	game_versions: [],
-	file_parts: [],
 	featured: false,
 	status: 'draft',
 	changelog: null,
