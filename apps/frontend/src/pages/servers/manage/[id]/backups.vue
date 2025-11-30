@@ -189,26 +189,26 @@ const {
 	refetch,
 } = useQuery({
 	queryKey: backupsQueryKey,
-	queryFn: () => client.archon.backups_v1.list(serverId),
+	queryFn: () => client.archon.backups_v0.list(serverId),
 })
 
 const deleteMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v1.delete(serverId, backupId),
+	mutationFn: (backupId: string) => client.archon.backups_v0.delete(serverId, backupId),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
 const lockMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v1.lock(serverId, backupId),
+	mutationFn: (backupId: string) => client.archon.backups_v0.lock(serverId, backupId),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
 const unlockMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v1.unlock(serverId, backupId),
+	mutationFn: (backupId: string) => client.archon.backups_v0.unlock(serverId, backupId),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
 const retryMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v1.retry(serverId, backupId),
+	mutationFn: (backupId: string) => client.archon.backups_v0.retry(serverId, backupId),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 

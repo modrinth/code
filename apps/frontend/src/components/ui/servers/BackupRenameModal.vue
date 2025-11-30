@@ -66,12 +66,12 @@ const ctx = injectModrinthServerContext()
 const backupsQueryKey = ['backups', 'list', ctx.serverId]
 const { data: backups } = useQuery({
 	queryKey: backupsQueryKey,
-	queryFn: () => client.archon.backups_v1.list(ctx.serverId),
+	queryFn: () => client.archon.backups_v0.list(ctx.serverId),
 })
 
 const renameMutation = useMutation({
 	mutationFn: ({ backupId, name }: { backupId: string; name: string }) =>
-		client.archon.backups_v1.rename(ctx.serverId, backupId, { name }),
+		client.archon.backups_v0.rename(ctx.serverId, backupId, { name }),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 

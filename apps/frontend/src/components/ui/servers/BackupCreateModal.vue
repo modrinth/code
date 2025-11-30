@@ -63,11 +63,11 @@ const backupsQueryKey = ['backups', 'list', ctx.serverId]
 
 const { data: backups } = useQuery({
 	queryKey: backupsQueryKey,
-	queryFn: () => client.archon.backups_v1.list(ctx.serverId),
+	queryFn: () => client.archon.backups_v0.list(ctx.serverId),
 })
 
 const createMutation = useMutation({
-	mutationFn: (name: string) => client.archon.backups_v1.create(ctx.serverId, { name }),
+	mutationFn: (name: string) => client.archon.backups_v0.create(ctx.serverId, { name }),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
