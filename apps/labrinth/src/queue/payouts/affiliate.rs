@@ -55,7 +55,6 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
                 SELECT 1
                 FROM charges refund_charges
                 WHERE refund_charges.parent_charge_id = c.id
-                AND refund_charges.status = 'succeeded'
             )
         "#
     )
