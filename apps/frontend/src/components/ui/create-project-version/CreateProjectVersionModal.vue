@@ -6,6 +6,7 @@
 import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
 import { commonMessages } from '@modrinth/ui'
 import MultiStageModal from '@modrinth/ui/src/components/base/MultiStageModal.vue'
+import { defineMessages } from '@vintl/vintl'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
 
@@ -15,9 +16,23 @@ import AddDetailsStage from './stages/AddDetailsStage.vue'
 import AddFilesStage from './stages/AddFilesStage.vue'
 import AddMcVersionsStage from './stages/AddMcVersionsStage.vue'
 
+const { newDraftVersion, draftVersion } = useManageVersion()
+
 const { formatMessage } = useVIntl()
 
 const modal = useTemplateRef<InstanceType<typeof MultiStageModal>>('modal')
+
+const messages = defineMessages({
+	addFilesTitle: { id: 'create-project-version.stage.add-files.title', defaultMessage: 'Add Files' },
+	addDetailsTitle: { id: 'create-project-version.stage.add-details.title', defaultMessage: 'Add Details' },
+	addMcVersionsTitle: { id: 'create-project-version.stage.add-mc-versions.title', defaultMessage: 'Add MC Versions' },
+	addChangelogTitle: { id: 'create-project-version.stage.add-changelog.title', defaultMessage: 'Add Changelog' },
+	addDependenciesTitle: { id: 'create-project-version.stage.add-dependencies.title', defaultMessage: 'Add Dependencies' },
+	addDetailsButton: { id: 'create-project-version.button.add-details', defaultMessage: 'Add details' },
+	addMcVersionsButton: { id: 'create-project-version.button.add-mc-versions', defaultMessage: 'Add MC versions' },
+	addChangelogButton: { id: 'create-project-version.button.add-changelog', defaultMessage: 'Add changelog' },
+	addDependenciesButton: { id: 'create-project-version.button.add-dependencies', defaultMessage: 'Add dependencies' },
+})
 
 const defaultNextButton = {
 	icon: RightArrowIcon,
@@ -37,33 +52,54 @@ const defaultBackButton = {
 	onClick: () => modal.value?.prevStage(),
 }
 
-const stages: InstanceType<typeof MultiStageModal>['$props']['stages'] = [
+const addDetailsDisabled = computed(() => draftVersion.value.files.length === 0)
+
+const addMcVersionsDisabled = computed(() =>
+	draftVersion.value.name.trim().length === 0 ||
+	draftVersion.value.version_number.trim().length === 0
+)
+
+const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']>(() => [
 	{
-		title: 'Add Files',
+		title: formatMessage(messages.addFilesTitle),
 		stageContent: AddFilesStage,
 		leftButtonConfig: null,
-		rightButtonConfig: { ...defaultNextButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			disabled: addDetailsDisabled.value,
+			label: formatMessage(messages.addDetailsButton)
+		},
 	},
 	{
-		title: 'Add Details',
+		title: formatMessage(messages.addDetailsTitle),
 		stageContent: AddDetailsStage,
 		leftButtonConfig: { ...defaultBackButton },
-		rightButtonConfig: { ...defaultNextButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			disabled: addMcVersionsDisabled.value,
+			label: formatMessage(messages.addMcVersionsButton)
+		},
 	},
 	{
-		title: 'Add MC Versions',
+		title: formatMessage(messages.addMcVersionsTitle),
 		stageContent: AddMcVersionsStage,
 		leftButtonConfig: { ...defaultBackButton },
-		rightButtonConfig: { ...defaultNextButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			label: formatMessage(messages.addChangelogButton)
+		},
 	},
 	{
-		title: 'Add Changelog',
+		title: formatMessage(messages.addChangelogTitle),
 		stageContent: AddChangelogStage,
 		leftButtonConfig: { ...defaultBackButton },
-		rightButtonConfig: { ...defaultNextButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			label: formatMessage(messages.addDependenciesButton)
+		},
 	},
 	{
-		title: 'Add Dependencies',
+		title: formatMessage(messages.addDependenciesTitle),
 		stageContent: AddDependenciesStage,
 		leftButtonConfig: { ...defaultBackButton },
 		rightButtonConfig: {
@@ -73,9 +109,7 @@ const stages: InstanceType<typeof MultiStageModal>['$props']['stages'] = [
 			onClick: () => modal.value?.hide(),
 		},
 	},
-]
-
-const { newDraftVersion } = useManageVersion()
+] as InstanceType<typeof MultiStageModal>['$props']['stages'])
 
 defineExpose({
 	show: () => {

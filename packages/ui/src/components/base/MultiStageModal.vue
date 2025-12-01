@@ -47,9 +47,9 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from '@modrinth/ui'
-import type { Component } from 'vue'
-import { computed, ref, useTemplateRef } from 'vue'
+import { ButtonStyled, NewModal } from '@modrinth/ui';
+import type { Component } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 
 const props = defineProps<{
 	stages: ModalStage[]
