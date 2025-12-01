@@ -1,6 +1,6 @@
 use chrono::{Datelike, Duration, TimeZone, Utc};
 use eyre::{Context, Result, eyre};
-use rust_decimal::Decimal;
+use rust_decimal::{Decimal, dec};
 use sqlx::PgPool;
 use tracing::warn;
 
@@ -25,20 +25,14 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
         r#"
         SELECT
             c.id as charge_id,
-            c.subscription_id AS "subscription_id!",
+            c.subscription_id as "subscription_id!",
             c.net as charge_net,
             c.tax_amount as charge_tax_amount,
             c.last_attempt as charge_last_attempt,
             c.currency_code,
             usa.affiliate_code,
             ac.affiliate as affiliate_user_id,
-            ac.revenue_split,
-            (
-                SELECT COALESCE(SUM(refund_charges.net), 0)
-                FROM charges refund_charges
-                WHERE refund_charges.parent_charge_id = c.id
-                AND refund_charges.status = 'succeeded'
-            ) as refund_net_sum
+            ac.revenue_split
         -- get any charges...
         FROM charges c
         -- ...which have a subscription...
@@ -56,6 +50,13 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             c.status = 'succeeded'
             AND c.net > 0
             AND usap.id IS NULL
+            -- exclude charges that have refund charges
+            AND NOT EXISTS (
+                SELECT 1
+                FROM charges refund_charges
+                WHERE refund_charges.parent_charge_id = c.id
+                AND refund_charges.status = 'succeeded'
+            )
         "#
     )
     .fetch_all(&mut *txn)
@@ -84,8 +85,6 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             continue;
         };
         let net = Decimal::new(net, 2);
-        let refund_net_sum = row.refund_net_sum.unwrap_or_default();
-        let net_after_refunds = net - refund_net_sum;
         let tax_amount = Decimal::new(row.charge_tax_amount, 2);
 
         let Some(last_attempt) = row.charge_last_attempt else {
@@ -124,7 +123,11 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
             continue;
         }
 
-        let affiliate_cut = (net_after_refunds - tax_amount) * revenue_split;
+        let affiliate_cut = (net - tax_amount) * revenue_split;
+        if affiliate_cut < dec!(0.01) {
+            continue;
+        }
+
         let affiliate_user_id = DBUserId(row.affiliate_user_id);
         let affiliate_code_id = DBAffiliateCodeId(row.affiliate_code);
 
@@ -195,6 +198,8 @@ pub async fn remove_payouts_for_refunded_charges(
         .await
         .wrap_err("failed to begin transaction")?;
 
+    // note: this may return duplicate `usap_id` rows
+    // it's fine here, since we delete them all anyway
     let refundable_payouts = sqlx::query!(
         r#"
         SELECT
