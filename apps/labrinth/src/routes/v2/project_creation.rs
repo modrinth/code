@@ -133,7 +133,7 @@ struct ProjectCreateData {
     pub organization_id: Option<models::ids::OrganizationId>,
 }
 
-#[post("project")]
+#[post("/project")]
 pub async fn project_create(
     req: HttpRequest,
     payload: Multipart,
@@ -245,7 +245,7 @@ pub async fn project_create(
     .await?;
 
     // Call V3 project creation
-    let response = v3::project_creation::project_create(
+    let response = v3::project_creation::project_create_internal(
         req,
         payload,
         client.clone(),
