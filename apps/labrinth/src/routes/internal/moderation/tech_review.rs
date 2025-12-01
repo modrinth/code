@@ -401,7 +401,8 @@ async fn search_projects(
             WHERE
                 -- project type
                 (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
-                AND dr.status = $5
+                AND NOT m.status = 'draft'
+                AND dr.status = 'pending'
         ) t
 
         -- sorting
@@ -424,7 +425,6 @@ async fn search_projects(
             .iter()
             .map(|ty| ty.0)
             .collect::<Vec<_>>(),
-        DelphiReportIssueStatus::Pending as _,
     )
     .fetch(&**pool);
 
