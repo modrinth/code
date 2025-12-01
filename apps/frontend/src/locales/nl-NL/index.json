@@ -1193,6 +1193,9 @@
   "servers.plan.large.description": {
     "message": "Ideaal voor 15-25 spelers, modpacks of zwaar modificeren"
   },
+  "settings.billing.subscription.description": {
+    "message": ".."
+  },
   "settings.display.theme.description": {
     "message": "Selecteer je gewenste kleurschema voor Modrinth op dit apparaat."
   },
@@ -1204,6 +1207,12 @@
   },
   "settings.language.categories.search-result": {
     "message": "Zoekresultaten"
+  },
+  "settings.language.warning": {
+    "message": "Als je de sites taal veranderd kan het er voor zorgen dat sommige text nog steeds in het Engels staat als er geen vertaling beschikbaar is. De site is nog niet volledig vertaald, dus sommige content is misschien nog in het Engels voor sommige talen. We werken nog steeds om ons localiesatie team te verbeteren, dus sommige content kan er verkeerd uitzien."
+  },
+  "settings.pats.description": {
+    "message": "PAT's kunnen gebruikt worden om Modrinths API te gebruiken. Voor meer informatie, zie <doc-link> Modrinth's API-documentatie </doc-link>. Ze kunnen altijd gemaakt en teruggetrokken worden."
   },
   "settings.pats.modal.create.expires.label": {
     "message": "Verloopt"
@@ -1240,5 +1249,8 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Onbekend platform"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Zie all het nieuws"
   }
 }
