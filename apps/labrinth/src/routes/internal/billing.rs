@@ -4,9 +4,11 @@ use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::DBUserSubscriptionId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::products_tax_identifier_item::product_info_by_product_price_id;
+use crate::database::models::users_subscriptions_affiliations::DBUsersSubscriptionsAffiliations;
 use crate::database::models::users_subscriptions_credits::DBUserSubscriptionCredit;
 use crate::database::models::{
-    charge_item, generate_charge_id, product_item, user_subscription_item,
+    DBAffiliateCodeId, charge_item, generate_charge_id, product_item,
+    user_subscription_item,
 };
 use crate::database::redis::RedisPool;
 use crate::models::billing::{
@@ -14,6 +16,7 @@ use crate::models::billing::{
     Product, ProductMetadata, ProductPrice, SubscriptionMetadata,
     SubscriptionStatus, UserSubscription,
 };
+use crate::models::ids::AffiliateCodeId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::users::Badges;
@@ -793,6 +796,11 @@ pub async fn edit_subscription(
             ..
         } if open_charge.status == ChargeStatus::Failed => {
             if cancelled {
+                DBUsersSubscriptionsAffiliations::deactivate(
+                    subscription.id,
+                    &mut *transaction,
+                )
+                .await?;
                 open_charge.status = ChargeStatus::Cancelled;
             } else {
                 // Forces another resubscription attempt
@@ -812,6 +820,11 @@ pub async fn edit_subscription(
         ) =>
         {
             open_charge.status = if cancelled {
+                DBUsersSubscriptionsAffiliations::deactivate(
+                    subscription.id,
+                    &mut *transaction,
+                )
+                .await?;
                 ChargeStatus::Cancelled
             } else {
                 ChargeStatus::Open
@@ -1508,7 +1521,15 @@ pub enum ChargeRequestType {
 
 #[derive(Deserialize, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
-pub enum PaymentRequestMetadata {
+pub struct PaymentRequestMetadata {
+    #[serde(flatten)]
+    pub kind: PaymentRequestMetadataKind,
+    pub affiliate_code: Option<AffiliateCodeId>,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum PaymentRequestMetadataKind {
     Pyro {
         server_name: Option<String>,
         server_region: Option<String>,
@@ -2046,12 +2067,12 @@ pub async fn stripe_webhook(
                                 } else {
                                     let (server_name, server_region, source) =
                                         if let Some(
-                                            PaymentRequestMetadata::Pyro {
-                                                ref server_name,
-                                                ref server_region,
-                                                ref source,
+                                            PaymentRequestMetadataKind::Pyro {
+                                                server_name,
+                                                server_region,
+                                                source,
                                             },
-                                        ) = metadata.payment_metadata
+                                        ) = metadata.payment_metadata.as_ref().map(|m| &m.kind)
                                         {
                                             (
                                                 server_name.clone(),
@@ -2235,6 +2256,22 @@ pub async fn stripe_webhook(
                             }
                             .upsert(&mut transaction)
                             .await?;
+
+                            if let Some(affiliate_code) = metadata
+                                .payment_metadata
+                                .as_ref()
+                                .and_then(|m| m.affiliate_code)
+                            {
+                                DBUsersSubscriptionsAffiliations {
+                                    subscription_id: subscription.id,
+                                    affiliate_code: DBAffiliateCodeId::from(
+                                        affiliate_code,
+                                    ),
+                                    deactivated_at: None,
+                                }
+                                .insert(&mut *transaction)
+                                .await?;
+                            }
                         };
 
                         subscription.status = SubscriptionStatus::Provisioned;
