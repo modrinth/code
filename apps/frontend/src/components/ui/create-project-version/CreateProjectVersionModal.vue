@@ -4,13 +4,14 @@
 
 <script setup lang="ts">
 import { LeftArrowIcon, PlusIcon, RightArrowIcon } from '@modrinth/assets'
-import { commonMessages } from '@modrinth/ui'
+import { commonMessages, injectModrinthClient } from '@modrinth/ui'
 import MultiStageModal from '@modrinth/ui/src/components/base/MultiStageModal.vue'
 import { defineMessages } from '@vintl/vintl'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
 
 import { watch } from 'vue'
+import { injectVersionsContext } from '~/providers/versions'
 import AddChangelogStage from './stages/AddChangelogStage.vue'
 import AddDependenciesStage from './stages/AddDependenciesStage.vue'
 import AddDetailsStage from './stages/AddDetailsStage.vue'
@@ -151,15 +152,25 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 					iconPosition: 'before' as const,
 					color: 'green' as const,
 					label: 'Create version',
-					onClick: () => modal.value?.hide(),
+					onClick: handleCreateVersion,
 				},
 			},
 		] as InstanceType<typeof MultiStageModal>['$props']['stages'],
 )
+const client = injectModrinthClient()
+async function handleCreateVersion() {
+	const version = toRaw(draftVersion.value)
+	const projectId = version.project_id
+	const files = version.files
+	await client.labrinth.versions_v3.createVersion(projectId, version, files)
+	modal.value?.hide()
+}
+
+const { project } = injectVersionsContext()
 
 defineExpose({
 	show: () => {
-		newDraftVersion()
+		newDraftVersion(project.id)
 		modal.value?.setStage(0)
 		modal.value?.show()
 	},

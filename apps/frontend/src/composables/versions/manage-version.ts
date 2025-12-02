@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-type DraftVersion = Omit<Labrinth.Versions.v3.CreateVersionRequest, 'file_parts'> & {
+export type DraftVersion = Omit<Labrinth.Versions.v3.CreateVersionRequest, 'file_parts'> & {
 	files: File[]
 }
 
@@ -21,8 +21,9 @@ const EMPTY_DRAFT_VERSION: DraftVersion = {
 const draftVersion = ref<DraftVersion>(EMPTY_DRAFT_VERSION)
 
 export function useManageVersion() {
-	function newDraftVersion() {
+	function newDraftVersion(projectId: string) {
 		draftVersion.value = structuredClone(EMPTY_DRAFT_VERSION)
+		draftVersion.value.project_id = projectId
 	}
 
 	function setPrimaryFile(index: number) {

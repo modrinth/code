@@ -1,3 +1,4 @@
+import type { DraftVersion } from '../../../../../../apps/frontend/src/composables/versions/manage-version'
 import { AbstractModule } from '../../../core/abstract-module'
 import type { Labrinth } from '../types'
 
@@ -122,23 +123,26 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 
 	public async createVersion(
 		projectId: string,
-		data: Labrinth.Versions.v3.CreateVersionRequest,
+		draftVersion: DraftVersion,
 		files: File[],
 	): Promise<Labrinth.Versions.v3.Version> {
 		const formData = new FormData()
 
-		data.file_parts = files.map((_, i) => String(i))
-		data.primary_file = '0' // first file in array is primary
+		const data: Labrinth.Versions.v3.CreateVersionRequest = {
+			...draftVersion,
+			file_parts: files.map((file, i) => `${file.name}-${i}`),
+			primary_file: `${files[0].name}-${0}`, // first file in array is primary
+		}
 
 		formData.append('data', JSON.stringify(data))
 
 		files.forEach((file, i) => {
-			formData.append(String(i), file)
+			formData.append(`${file.name}-${i}`, new Blob([file]))
 		})
 
-		return this.client.request<Labrinth.Versions.v3.Version>(`/project/${projectId}/version`, {
+		return this.client.request<Labrinth.Versions.v3.Version>(`/version`, {
 			api: 'labrinth',
-			version: 3,
+			version: 2, // TODO: move this to v2 module
 			method: 'POST',
 			body: formData,
 		})

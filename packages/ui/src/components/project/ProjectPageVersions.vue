@@ -176,13 +176,13 @@ import {
 	formatNumber,
 	formatVersionsForDisplay,
 	type GameVersionTag,
-	type PlatformTag,
 	type Version,
 } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import type { Labrinth } from '@modrinth/api-client'
 import { useRelativeTime } from '../../composables'
 import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
@@ -207,7 +207,7 @@ const props = withDefaults(
 		versions: VersionWithDisplayUrlEnding[]
 		showFiles?: boolean
 		currentMember?: boolean
-		loaders: PlatformTag[]
+		loaders: Labrinth.Tags.v2.Loader[]
 		gameVersions: GameVersionTag[]
 		versionLink?: (version: Version) => string
 	}>(),
