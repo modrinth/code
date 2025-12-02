@@ -88,14 +88,16 @@ const defaultBackButton = {
 	onClick: () => modal.value?.prevStage(),
 }
 
-const addDetailsDisabled = computed(() => draftVersion.value.files.length === 0)
+const addFilesDisabled = computed(() => draftVersion.value.files.length === 0)
 
-const addMcVersionsDisabled = computed(
+const addDetailsDisabled = computed(
 	() =>
 		draftVersion.value.name.trim().length === 0 ||
 		draftVersion.value.version_number.trim().length === 0 ||
 		draftVersion.value.loaders.length === 0,
 )
+
+const addMcVersionsDisabled = computed(() => draftVersion.value.game_versions.length === 0)
 
 const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']>(
 	() =>
@@ -106,7 +108,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				leftButtonConfig: null,
 				rightButtonConfig: {
 					...defaultNextButton,
-					disabled: addDetailsDisabled.value,
+					disabled: addFilesDisabled.value,
 					label: formatMessage(messages.addDetailsButton),
 				},
 			},
@@ -116,7 +118,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
-					disabled: addMcVersionsDisabled.value,
+					disabled: addDetailsDisabled.value,
 					label: formatMessage(messages.addMcVersionsButton),
 				},
 			},
@@ -126,6 +128,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
+					disabled: addMcVersionsDisabled.value,
 					label: formatMessage(messages.addChangelogButton),
 				},
 			},

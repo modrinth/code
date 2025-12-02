@@ -19,9 +19,9 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	 * ```
 	 */
 	public async getProjectVersions(id: string): Promise<Labrinth.Versions.v3.Version[]> {
-		return this.client.request<Labrinth.Versions.v3.Version[]>(`/project/${id}/versions`, {
+		return this.client.request<Labrinth.Versions.v3.Version[]>(`/project/${id}/version`, {
 			api: 'labrinth',
-			version: 3,
+			version: 2, // TODO: move this to a versions v2 module to keep api-client clean and organized
 			method: 'GET',
 		})
 	}
