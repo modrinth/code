@@ -20,7 +20,6 @@
 							:color="modelValue.includes(loader.name) ? 'green' : undefined"
 							:highlighted="modelValue.includes(loader.name)"
 							type="chip"
-							size="small"
 						>
 							<button
 								:style="`--_icon: var(--color-platform-${loader.name}); color: var(--color-platform-${loader.name})`"
@@ -38,13 +37,13 @@
 </template>
 
 <script lang="ts" setup>
-import type { Labrinth } from '@modrinth/api-client';
-import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue';
-import { formatCategory } from '@modrinth/utils';
+import type { Labrinth } from '@modrinth/api-client'
+import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
+import { formatCategory } from '@modrinth/utils'
 
 const modelValue = defineModel<string[]>({ default: [] })
 
-const {loaders} = defineProps<{
+const { loaders } = defineProps<{
 	loaders: Labrinth.Tags.v2.Loader[]
 }>()
 
@@ -56,7 +55,7 @@ const toggleLoader = (loader: string) => {
 	}
 }
 
-const onClearAll = () => modelValue.value = []
+const onClearAll = () => (modelValue.value = [])
 
 const GROUP_LABELS = {
 	mods: 'Mod loaders',

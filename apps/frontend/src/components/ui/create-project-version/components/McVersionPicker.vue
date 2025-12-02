@@ -7,7 +7,7 @@
 			class="user-select-none flex max-h-60 flex-col gap-3 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
 		>
 			<div v-for="group in groupedGameVersions" :key="group.key" class="space-y-1.5">
-				<span class="text-sm font-semibold">{{ group.key }}</span>
+				<span class="font-semibold">{{ group.key }}</span>
 				<div class="flex flex-wrap gap-2 gap-x-1.5">
 					<ButtonStyled
 						v-for="version in group.versions"

@@ -15,12 +15,7 @@
 					<div class="space-y-2">
 						<span class="font-medium">Detected</span>
 						<div class="flex flex-wrap gap-2">
-							<ButtonStyled
-								v-for="version in detectedVersions"
-								:key="version"
-								type="chip"
-								size="small"
-							>
+							<ButtonStyled v-for="version in detectedVersions" :key="version" type="chip">
 								<button class="w-20 !text-contrast" @click="toggleVersion(version)">
 									{{ version }}
 									<XIcon />
@@ -37,7 +32,6 @@
 								v-for="version in draftVersion.game_versions"
 								:key="version"
 								type="chip"
-								size="small"
 							>
 								<button class="w-20 !text-contrast" @click="toggleVersion(version)">
 									{{ version }}

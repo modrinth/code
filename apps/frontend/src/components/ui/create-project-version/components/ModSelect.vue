@@ -1,36 +1,23 @@
 <template>
 	<Combobox
-		:model-value="modelValue"
+		v-model="projectId"
 		placeholder="Select project"
 		:options="options"
 		:searchable="true"
 		search-placeholder="Search by name, slug, or paste ID..."
-		@update:model-value="emit('update:modelValue', $event)"
 		@search-input="(query) => handleSearch(query)"
 	/>
 </template>
 
 <script lang="ts" setup>
 import { injectModrinthClient } from '@modrinth/ui'
+import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import Combobox from '@modrinth/ui/src/components/base/Combobox.vue'
 import { defineAsyncComponent, h } from 'vue'
 
-interface Props {
-	modelValue: string
-}
+const projectId = defineModel<string>()
 
-interface Emits {
-	(e: 'update:modelValue', value: string): void
-}
-
-withDefaults(defineProps<Props>(), {
-	modelValue: '',
-	dependencyType: null,
-})
-
-const emit = defineEmits<Emits>()
-
-const options = ref<Array<{ label: string; value: string; icon: Component }>>([])
+const options = ref<DropdownOption<string>[]>([])
 
 const client = injectModrinthClient()
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
