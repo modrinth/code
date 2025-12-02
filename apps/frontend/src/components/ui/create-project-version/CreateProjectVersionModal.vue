@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
+import { LeftArrowIcon, PlusIcon, RightArrowIcon } from '@modrinth/assets'
 import { commonMessages } from '@modrinth/ui'
 import MultiStageModal from '@modrinth/ui/src/components/base/MultiStageModal.vue'
 import { defineMessages } from '@vintl/vintl'
@@ -147,8 +147,10 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
-					icon: null,
-					label: formatMessage(commonMessages.closeButton),
+					icon: PlusIcon,
+					iconPosition: 'before' as const,
+					color: 'green' as const,
+					label: 'Create version',
 					onClick: () => modal.value?.hide(),
 				},
 			},
