@@ -6,14 +6,14 @@
 				<div class="grid gap-3 rounded-2xl border border-solid border-surface-5 p-4">
 					<div class="grid gap-2.5">
 						<span class="font-semibold text-contrast">Project <span class="text-red">*</span></span>
-						<ModSelect v-model="newDependencyId" />
+						<ModSelect v-model="newDependencyProjectId" />
 					</div>
 
-					<template v-if="newDependencyId">
+					<template v-if="newDependencyProjectId">
 						<div class="grid gap-2.5">
 							<span class="font-semibold text-contrast"> Version </span>
 							<Combobox
-								v-model="version"
+								v-model="newDependencyVersionId"
 								placeholder="Select version"
 								:options="[
 									{ label: 'Any version', value: null },
@@ -41,15 +41,12 @@
 				<ButtonStyled>
 					<button
 						class="self-start"
-						:disabled="!newDependencyId"
+						:disabled="!newDependencyProjectId"
 						@click="
 							addDependency({
-								project_id: newDependencyId,
-								version_id: version,
+								project_id: newDependencyProjectId,
+								version_id: newDependencyVersionId,
 								dependency_type: newDependencyType,
-								project: {} as any,
-								version: {} as any,
-								link: '',
 							})
 						"
 					>
@@ -59,7 +56,7 @@
 			</div>
 
 			<div class="flex flex-col gap-4">
-				<span class="font-semibold text-contrast">Add dependency</span>
+				<span class="font-semibold text-contrast">Added dependencies</span>
 				<div class="5 flex flex-col gap-2">
 					<AddedDependencyRow
 						v-for="(dependency, index) in addedDependencies"
@@ -86,9 +83,9 @@ import { useManageVersion } from '~/composables/versions/manage-version'
 
 import AddedDependencyRow from '../components/AddedDependencyRow.vue'
 
-const newDependencyId = ref('')
 const newDependencyType = ref<Labrinth.Versions.v3.DependencyType>('required')
-const version = ref<string | null>(null)
+const newDependencyProjectId = ref<string>()
+const newDependencyVersionId = ref<string>()
 
 const { draftVersion } = useManageVersion()
 
@@ -104,18 +101,11 @@ const addedDependencies = computed(() =>
 	}),
 )
 
-export interface ProjectDependency {
-	project: Labrinth.Projects.v3.Project
-	project_id: string
-
-	version: Labrinth.Versions.v3.Version
-	version_id: string | null
-
-	dependency_type: Labrinth.Versions.v3.DependencyType
-	link: string
-}
-
-const addDependency = (_dependency: ProjectDependency) => {
-	// todo
+const addDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
+	draftVersion.value.dependencies?.push({
+		project_id: dependency.project_id,
+		version_id: dependency.version_id,
+		dependency_type: dependency.dependency_type,
+	})
 }
 </script>
