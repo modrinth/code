@@ -627,8 +627,6 @@ pub async fn project_edit(
             ));
         }
 
-        tracing::info!("!! SLUG = {slug}");
-
         let existing = db_models::DBProject::get(
             &slug.to_lowercase(),
             &mut *transaction,
@@ -646,7 +644,12 @@ pub async fn project_edit(
         if !slug.eq(&project_item.inner.slug.clone().unwrap_or_default()) {
             let results = sqlx::query!(
                 "
-                SELECT EXISTS(SELECT 1 FROM mods WHERE slug = LOWER($1) OR text_id_lower = LOWER($1))
+                SELECT EXISTS(
+                    SELECT 1 FROM mods
+                    WHERE
+                        slug = LOWER($1)
+                        OR text_id_lower = LOWER($1)
+                )
                 ",
                 slug
             )

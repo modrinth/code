@@ -22,7 +22,6 @@ use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
 use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::UserId;
-use ariadne::ids::base62_impl::parse_base62;
 use futures::TryStreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -487,25 +486,17 @@ pub async fn organizations_edit(
                     ));
                 }
 
-                let name_organization_id_option: Option<u64> =
-                    parse_base62(slug).ok();
-                if let Some(name_organization_id) = name_organization_id_option
-                {
-                    let results = sqlx::query!(
-                        "
-                        SELECT EXISTS(SELECT 1 FROM organizations WHERE id=$1)
-                        ",
-                        name_organization_id as i64
-                    )
-                    .fetch_one(&mut *transaction)
-                    .await?;
-
-                    if results.exists.unwrap_or(true) {
-                        return Err(ApiError::InvalidInput(
-                            "slug collides with other organization's id!"
-                                .to_string(),
-                        ));
-                    }
+                let existing = DBOrganization::get(
+                    &slug.to_lowercase(),
+                    &mut *transaction,
+                    &redis,
+                )
+                .await?;
+                if existing.is_some() {
+                    return Err(ApiError::InvalidInput(
+                        "Slug collides with other organization's id!"
+                            .to_string(),
+                    ));
                 }
 
                 // Make sure the new name is different from the old one
@@ -513,7 +504,12 @@ pub async fn organizations_edit(
                 if !slug.eq(&organization_item.slug.clone()) {
                     let results = sqlx::query!(
                         "
-                        SELECT EXISTS(SELECT 1 FROM organizations WHERE LOWER(slug) = LOWER($1))
+                        SELECT EXISTS(
+                            SELECT 1 FROM organizations
+                            WHERE
+                                LOWER(slug) = LOWER($1)
+                                OR text_id_lower = LOWER($1)
+                        )
                         ",
                         slug
                     )
@@ -522,7 +518,7 @@ pub async fn organizations_edit(
 
                     if results.exists.unwrap_or(true) {
                         return Err(ApiError::InvalidInput(
-                            "slug collides with other organization's id!"
+                            "Slug collides with other organization's id!"
                                 .to_string(),
                         ));
                     }
@@ -531,7 +527,7 @@ pub async fn organizations_edit(
                 sqlx::query!(
                     "
                     UPDATE organizations
-                    SET slug = $1
+                    SET slug = LOWER($1)
                     WHERE (id = $2)
                     ",
                     Some(slug),
