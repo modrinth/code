@@ -38,28 +38,25 @@
 </template>
 
 <script lang="ts" setup>
-import type { Labrinth } from '@modrinth/api-client'
-import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
-import { formatCategory } from '@modrinth/utils'
+import type { Labrinth } from '@modrinth/api-client';
+import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue';
+import { formatCategory } from '@modrinth/utils';
 
-const props = defineProps<{
-	modelValue: string[]
+const modelValue = defineModel<string[]>({ default: [] })
+
+const {loaders} = defineProps<{
 	loaders: Labrinth.Tags.v2.Loader[]
 }>()
 
-const emit = defineEmits<{
-	(e: 'update:modelValue', value: string[]): void
-}>()
-
 const toggleLoader = (loader: string) => {
-	const next = props.modelValue.includes(loader)
-		? props.modelValue.filter((l) => l !== loader)
-		: [...props.modelValue, loader]
-
-	emit('update:modelValue', next)
+	if (modelValue.value.includes(loader)) {
+		modelValue.value = modelValue.value.filter((l) => l !== loader)
+	} else {
+		modelValue.value = [...modelValue.value, loader]
+	}
 }
 
-const onClearAll = () => emit('update:modelValue', [])
+const onClearAll = () => modelValue.value = []
 
 const GROUP_LABELS = {
 	mods: 'Mod loaders',
@@ -130,5 +127,5 @@ function groupLoaders(loaders: Labrinth.Tags.v2.Loader[]) {
 	return groups
 }
 
-const groupedLoaders = computed(() => groupLoaders(props.loaders))
+const groupedLoaders = computed(() => groupLoaders(loaders))
 </script>

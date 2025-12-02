@@ -6,7 +6,7 @@
 			</span>
 			<Chips
 				v-model="draftVersion.version_type"
-				:items="['Release', 'Alpha', 'Beta']"
+				:items="['release', 'alpha', 'beta']"
 				:never-empty="false"
 				:capitalize="true"
 			/>
@@ -40,9 +40,10 @@
 				autocomplete="off"
 				maxlength="32"
 			/>
+			<span> The version subtitle also displays in the changelog. </span>
 		</div>
 		<div>
-			<LoaderPicker v-model="selectedLoaders" :loaders="generatedState.loaders" />
+			<LoaderPicker v-model="draftVersion.loaders" :loaders="generatedState.loaders" />
 		</div>
 	</div>
 </template>
@@ -57,6 +58,4 @@ import LoaderPicker from '../components/LoaderPicker.vue'
 const generatedState = useGeneratedState()
 
 const { draftVersion } = useManageVersion()
-
-const selectedLoaders = ref<string[]>([])
 </script>

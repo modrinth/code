@@ -14,10 +14,10 @@
 							<span class="font-semibold text-contrast"> Version </span>
 							<Combobox
 								v-model="version"
-								placeholder="Select project"
+								placeholder="Select version"
 								:options="[
-									{ label: '1.0.0', value: '1.0.0' },
-									{ label: '2.0.0', value: '2.0.0' },
+									{ label: 'Any version', value: null },
+									// TODO: fetch versions from project id
 								]"
 								:searchable="true"
 							/>
@@ -27,7 +27,7 @@
 							<span class="font-semibold text-contrast"> Dependency relation </span>
 							<Combobox
 								v-model="newDependencyType"
-								placeholder="Select project"
+								placeholder="Select dependency type"
 								:options="[
 									{ label: 'Required', value: 'required' },
 									{ label: 'Optional', value: 'optional' },
@@ -87,8 +87,8 @@ import { useManageVersion } from '~/composables/versions/manage-version'
 import AddedDependencyRow from '../components/AddedDependencyRow.vue'
 
 const newDependencyId = ref('')
-const newDependencyType = ref<'required' | 'optional' | 'incompatible' | 'embedded'>('required')
-const version = ref('')
+const newDependencyType = ref<Labrinth.Versions.v3.DependencyType>('required')
+const version = ref<string | null>(null)
 
 const { draftVersion } = useManageVersion()
 
@@ -109,9 +109,9 @@ export interface ProjectDependency {
 	project_id: string
 
 	version: Labrinth.Versions.v3.Version
-	version_id: string
+	version_id: string | null
 
-	dependency_type: string
+	dependency_type: Labrinth.Versions.v3.DependencyType
 	link: string
 }
 

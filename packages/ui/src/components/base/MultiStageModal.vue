@@ -5,6 +5,7 @@
 		max-content-height="72vh"
 		:on-hide="onModalHide"
 		:closable="true"
+		:closeOnClickOutside="false"
 	>
 		<template #title>
 			<div class="flex flex-wrap items-center gap-1 text-secondary">
@@ -47,9 +48,9 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, NewModal } from '@modrinth/ui';
-import type { Component } from 'vue';
-import { computed, ref, useTemplateRef } from 'vue';
+import { ButtonStyled, NewModal } from '@modrinth/ui'
+import type { Component } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 
 const props = defineProps<{
 	stages: ModalStage[]
@@ -83,6 +84,11 @@ function hide() {
 	modal.value?.hide()
 }
 
+const setStage = (index: number) => {
+	if (index < 0 || index >= props.stages.length) return
+	currentStageIndex.value = index
+}
+
 const nextStage = () => {
 	if (currentStageIndex.value === -1) return
 	if (currentStageIndex.value >= props.stages.length - 1) return
@@ -97,12 +103,10 @@ const prevStage = () => {
 const currentStage = computed(() => props.stages[currentStageIndex.value])
 
 const leftButtonConfig = computed(() => {
-	console.log(currentStage.value?.leftButtonConfig)
 	return currentStage.value?.leftButtonConfig
 })
 
 const rightButtonConfig = computed(() => {
-	console.log(currentStage.value?.rightButtonConfig)
 	return currentStage.value?.rightButtonConfig
 })
 
@@ -117,6 +121,7 @@ function onModalHide() {
 defineExpose({
 	show,
 	hide,
+	setStage,
 	nextStage,
 	prevStage,
 })

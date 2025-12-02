@@ -8,7 +8,7 @@ const EMPTY_DRAFT_VERSION: DraftVersion = {
 	project_id: '',
 	name: '',
 	version_number: '',
-	version_type: 'alpha',
+	version_type: 'release',
 	loaders: [],
 	game_versions: [],
 	featured: false,

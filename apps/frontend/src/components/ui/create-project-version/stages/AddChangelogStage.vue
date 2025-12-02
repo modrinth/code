@@ -2,7 +2,6 @@
 	<MarkdownEditor
 		v-model="draftVersion.changelog"
 		:on-image-upload="onImageUpload"
-		:style="'background-color: red;'"
 		:max-height="500"
 	/>
 </template>

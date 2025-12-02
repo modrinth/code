@@ -438,7 +438,7 @@ export namespace Labrinth {
 					/** The file name of the dependency, mostly used for showing external dependencies on modpacks. Nullable. */
 					file_name?: string | null
 					/** The type of dependency that this version has. One of "required" | "optional" | "incompatible" | "embedded". */
-					dependency_type: 'required' | 'optional' | 'incompatible' | 'embedded'
+					dependency_type: DependencyType
 				}>
 
 				/** A list of Minecraft game versions this version supports. */
