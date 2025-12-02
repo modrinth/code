@@ -9,25 +9,6 @@
 		@proceed="deleteVersion()"
 	/>
 	<section class="experimental-styles-within overflow-visible">
-		<div
-			v-if="currentMember && isPermission(currentMember?.permissions, 1 << 0)"
-			class="card flex items-center gap-4"
-		>
-			<FileInput
-				:max-size="524288000"
-				:accept="acceptFileFromProjectType(project.project_type)"
-				prompt="Upload a version"
-				class="btn btn-primary"
-				aria-label="Upload a version"
-				@change="handleFiles"
-			>
-				<UploadIcon aria-hidden="true" />
-			</FileInput>
-			<span class="flex items-center gap-2">
-				<InfoIcon aria-hidden="true" /> Click to choose a file or drag one onto this page
-			</span>
-			<DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
-		</div>
 		<ProjectPageVersions
 			:project="project"
 			:versions="versions"
@@ -184,25 +165,14 @@ import {
 	DownloadIcon,
 	EditIcon,
 	ExternalIcon,
-	InfoIcon,
 	LinkIcon,
 	MoreVerticalIcon,
 	ReportIcon,
 	ShareIcon,
 	TrashIcon,
-	UploadIcon,
 } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	ConfirmModal,
-	DropArea,
-	FileInput,
-	OverflowMenu,
-	ProjectPageVersions,
-} from '@modrinth/ui'
+import { ButtonStyled, ConfirmModal, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
 
-import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
-import { isPermission } from '~/utils/permissions.ts'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const props = defineProps({
@@ -241,20 +211,6 @@ const baseDropdownId = useId()
 
 function getPrimaryFile(version) {
 	return version.files.find((x) => x.primary) || version.files[0]
-}
-
-async function handleFiles(files) {
-	await router.push({
-		name: 'type-id-version-version',
-		params: {
-			type: props.project.project_type,
-			id: props.project.slug ? props.project.slug : props.project.id,
-			version: 'create',
-		},
-		state: {
-			newPrimaryFile: files[0],
-		},
-	})
 }
 
 async function copyToClipboard(text) {
