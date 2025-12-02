@@ -17,7 +17,7 @@
 				<Combobox
 					v-model="selectedType"
 					:searchable="false"
-					class="w-[120px] rounded-xl border border-solid border-surface-5"
+					class="w-[126px] rounded-xl border border-solid border-surface-5"
 					:options="versionTypes"
 					:close-on-select="true"
 					:show-labels="false"
@@ -37,7 +37,6 @@
 
 <script setup lang="ts">
 import { CheckIcon, XIcon } from '@modrinth/assets'
-import { TagItem } from '@modrinth/ui'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 import Combobox, { type DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
