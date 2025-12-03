@@ -8,7 +8,7 @@
 		>
 			<MedalBackgroundImage />
 			<AutoLink
-				:to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`"
+				:to="status === 'suspended' ? '' : `/hosting/manage/${props.server_id}`"
 				class="z-10 flex flex-grow flex-row items-center overflow-x-hidden"
 				:class="status !== 'suspended' && 'active:scale-95'"
 			>

@@ -2346,7 +2346,7 @@ pub async fn stripe_webhook(
                                     .metadata
                                     .is_pyro()
                                 {
-                                    "Modrinth Servers"
+                                    "Modrinth Hosting"
                                 } else {
                                     "a Modrinth product"
                                 }

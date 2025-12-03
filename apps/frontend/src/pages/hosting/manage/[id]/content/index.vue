@@ -327,7 +327,7 @@
 						</ButtonStyled>
 						<div>or</div>
 						<ButtonStyled class="mt-8">
-							<NuxtLink :to="`/servers/manage/${props.server.serverId}/options/loader`">
+							<NuxtLink :to="`/hosting/manage/${props.server.serverId}/options/loader`">
 								<WrenchIcon />
 								Change platform
 							</NuxtLink>
