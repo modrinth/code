@@ -1,8 +1,17 @@
 <template>
 	<div class="space-y-2.5">
-		<span class="font-semibold text-contrast">
-			Minecraft versions <span class="text-red">*</span>
-		</span>
+		<div class="flex items-center justify-between">
+			<span class="font-semibold text-contrast">
+				Minecraft versions <span class="text-red">*</span>
+			</span>
+
+			<Chips
+				v-model="versionType"
+				:items="['release', 'all']"
+				:never-empty="false"
+				:capitalize="true"
+			/>
+		</div>
 		<div class="iconified-input w-full rounded-xl border-[1px] border-solid border-surface-5">
 			<SearchIcon aria-hidden="true" />
 			<input v-model="searchQuery" type="text" placeholder="Search versions" />
@@ -21,7 +30,8 @@
 						type="chip"
 					>
 						<button
-							class="w-16 !text-contrast focus:outline-none"
+							class="!text-contrast focus:outline-none"
+							:class="versionType === 'all' ? 'w-26' : 'w-16'"
 							@click="toggleVersion(version, $event)"
 						>
 							{{ version }}
@@ -36,10 +46,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { Labrinth } from '@modrinth/api-client';
-import { SearchIcon } from '@modrinth/assets';
-import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue';
-import { computed } from 'vue';
+import type { Labrinth } from '@modrinth/api-client'
+import { SearchIcon } from '@modrinth/assets'
+import { ButtonStyled, Chips } from '@modrinth/ui'
+import { computed } from 'vue'
+
+type GameVersion = Labrinth.Tags.v2.GameVersion
 
 const props = defineProps<{
 	modelValue: string[]
@@ -50,13 +62,15 @@ const emit = defineEmits<{
 	(e: 'update:modelValue', value: string[]): void
 }>()
 
+const versionType = ref<string | null>('release')
+
 const releaseVersions = computed(() =>
-	props.gameVersions.filter((v) => v.version_type === 'release').filter(searchFilter),
+	props.gameVersions
+		.filter((v) => versionType.value !== 'release' || v.version_type === versionType.value)
+		.filter(searchFilter),
 )
 
-const groupedGameVersions = computed(() =>
-	groupVersions(releaseVersions.value.map((v) => v.version)),
-)
+const groupedGameVersions = computed(() => groupVersions(releaseVersions.value))
 
 const toggleVersion = (version: string, event: MouseEvent) => {
 	const next = props.modelValue.includes(version)
@@ -65,7 +79,19 @@ const toggleVersion = (version: string, event: MouseEvent) => {
 	emit('update:modelValue', next)
 }
 
-function groupVersions(versions: string[]) {
+function groupVersions(gameVersions: GameVersion[]) {
+	if (versionType.value === 'all') {
+		return [
+			{
+				key: 'All versions',
+				versions: gameVersions
+					.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+					.map((v) => v.version),
+			},
+		]
+	}
+
+	const versions = gameVersions.map((v) => v.version)
 	const getGroupKey = (v: string) => v.split('.').slice(0, 2).join('.')
 	const groups: Record<string, string[]> = {}
 
@@ -80,7 +106,6 @@ function groupVersions(versions: string[]) {
 		key,
 		versions: groups[key].sort((a, b) => compareVersions(b, a)),
 	}))
-
 	return result
 }
 
