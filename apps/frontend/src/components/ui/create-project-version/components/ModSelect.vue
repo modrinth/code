@@ -10,11 +10,12 @@
 </template>
 
 <script lang="ts" setup>
-import { injectModrinthClient } from '@modrinth/ui'
+import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import Combobox from '@modrinth/ui/src/components/base/Combobox.vue'
 import { defineAsyncComponent, h } from 'vue'
 
+const { addNotification } = injectNotificationManager()
 const projectId = defineModel<string>()
 
 const options = ref<DropdownOption<string>[]>([])
@@ -49,8 +50,12 @@ const handleSearch = async (query: string) => {
 					}),
 				),
 			}))
-		} catch (error) {
-			console.error('Search failed:', error)
+		} catch (error: any) {
+			addNotification({
+				title: 'An error occurred',
+				text: error.data ? error.data.description : error,
+				type: 'error',
+			})
 		}
 	}, 500)
 }

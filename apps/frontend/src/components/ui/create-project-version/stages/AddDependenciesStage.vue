@@ -82,9 +82,19 @@ import Combobox from '@modrinth/ui/src/components/base/Combobox.vue'
 import ModSelect from '~/components/ui/create-project-version/components/ModSelect.vue'
 import { useManageVersion } from '~/composables/versions/manage-version'
 
-import { injectModrinthClient } from '@modrinth/ui'
+import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import AddedDependencyRow from '../components/AddedDependencyRow.vue'
+
+const { addNotification } = injectNotificationManager()
+
+const errorNotification = (err: any) => {
+	addNotification({
+		title: 'An error occurred',
+		text: err.data ? err.data.description : err,
+		type: 'error',
+	})
+}
 
 const newDependencyProjectId = ref<string>()
 const newDependencyType = ref<Labrinth.Versions.v3.DependencyType>('required')
@@ -100,13 +110,17 @@ watch(newDependencyProjectId, async () => {
 	if (!newDependencyProjectId.value) {
 		newDependencyVersions.value = []
 	} else {
-		const versions = await client.labrinth.versions_v3.getProjectVersions(
-			newDependencyProjectId.value,
-		)
-		newDependencyVersions.value = versions.map((version) => ({
-			label: version.name,
-			value: version.id,
-		}))
+		try {
+			const versions = await client.labrinth.versions_v3.getProjectVersions(
+				newDependencyProjectId.value,
+			)
+			newDependencyVersions.value = versions.map((version) => ({
+				label: version.name,
+				value: version.id,
+			}))
+		} catch (error: any) {
+			errorNotification(error)
+		}
 	}
 })
 
@@ -123,13 +137,21 @@ watch(
 
 		for (const dep of deps) {
 			if (dep?.project_id && !dependencyProjects.value[dep.project_id]) {
-				const project = await client.labrinth.projects_v3.get(dep.project_id)
-				dependencyProjects.value[dep.project_id] = project
+				try {
+					const project = await client.labrinth.projects_v3.get(dep.project_id)
+					dependencyProjects.value[dep.project_id] = project
+				} catch (error: any) {
+					errorNotification(error)
+				}
 			}
 
 			if (dep?.version_id && !dependencyVersions.value[dep.version_id]) {
-				const version = await client.labrinth.versions_v3.getVersion(dep.version_id)
-				dependencyVersions.value[dep.version_id] = version
+				try {
+					const version = await client.labrinth.versions_v3.getVersion(dep.version_id)
+					dependencyVersions.value[dep.version_id] = version
+				} catch (error: any) {
+					errorNotification(error)
+				}
 			}
 		}
 	},
@@ -164,7 +186,11 @@ const addDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
 			(d) => d.project_id === dependency.project_id && d.version_id === dependency.version_id,
 		)
 	) {
-		alert('Dependency already added') // TODO: replace with notification
+		addNotification({
+			title: 'Dependency already added',
+			text: 'You cannot add the same dependency twice.',
+			type: 'error',
+		})
 		return
 	}
 

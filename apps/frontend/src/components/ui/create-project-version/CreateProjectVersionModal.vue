@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { LeftArrowIcon, PlusIcon, RightArrowIcon } from '@modrinth/assets'
-import { commonMessages, injectModrinthClient } from '@modrinth/ui'
+import { commonMessages, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import MultiStageModal from '@modrinth/ui/src/components/base/MultiStageModal.vue'
 import { defineMessages } from '@vintl/vintl'
 
@@ -158,11 +158,22 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 		] as InstanceType<typeof MultiStageModal>['$props']['stages'],
 )
 const client = injectModrinthClient()
+
+const { addNotification } = injectNotificationManager()
+
 async function handleCreateVersion() {
 	const version = toRaw(draftVersion.value)
 	const files = version.files
-	await client.labrinth.versions_v3.createVersion(version, files)
-	modal.value?.hide()
+	try {
+		await client.labrinth.versions_v3.createVersion(version, files)
+		modal.value?.hide()
+	} catch (err: any) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
 }
 
 const { project } = injectVersionsContext()
