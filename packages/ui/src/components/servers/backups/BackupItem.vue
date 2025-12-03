@@ -56,14 +56,15 @@ const backupQueued = computed(
 // const automated = computed(() => props.backup.automated)
 const failedToCreate = computed(() => props.backup.interrupted)
 
-const inactiveStates = ['failed', 'cancelled']
+const inactiveStates = ['failed', 'cancelled', 'done']
 
 const creating = computed(() => {
 	const task = props.backup.task?.create
 	if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
 		return task
 	}
-	if (props.backup.ongoing) {
+
+	if (props.backup.ongoing && !props.backup.task?.restore) {
 		return {
 			progress: 0,
 			state: 'ongoing',
@@ -77,6 +78,13 @@ const restoring = computed(() => {
 	if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
 		return task
 	}
+
+	if (props.backup.ongoing && props.backup.task?.restore) {
+		return {
+			progress: 0,
+			state: 'ongoing',
+		}
+	}
 	return undefined
 })
 
@@ -84,7 +92,6 @@ const restoreQueued = computed(() => restoring.value?.progress === 0)
 
 const failedToRestore = computed(() => props.backup.task?.restore?.state === 'failed')
 
-// Icon varies based on backup type
 const backupIcon = computed(() => {
 	if (props.backup.automated) {
 		return props.backup.locked ? ShieldIcon : ClockIcon
@@ -92,7 +99,6 @@ const backupIcon = computed(() => {
 	return UserIcon
 })
 
-// Overflow menu options - filtered based on backup state
 const overflowMenuOptions = computed<OverflowOption[]>(() => {
 	const options: OverflowOption[] = []
 
@@ -195,7 +201,7 @@ const messages = defineMessages({
 </script>
 <template>
 	<div
-		class="grid items-center gap-4 rounded-2xl bg-bg-raised p-4 shadow-sm"
+		class="grid items-center gap-4 rounded-2xl bg-bg-raised p-4 shadow-md"
 		:class="preview ? 'grid-cols-2' : 'grid-cols-[auto_1fr_auto] md:grid-cols-[400px_1fr_auto]'"
 	>
 		<div class="flex flex-row gap-4 items-center">
@@ -247,7 +253,6 @@ const messages = defineMessages({
 			</div>
 		</div>
 
-		<!-- Date/Progress Section -->
 		<div
 			class="col-span-full row-start-2 flex flex-col gap-2 md:col-span-1 md:row-start-auto md:mr-16 max-w-[400px]"
 		>

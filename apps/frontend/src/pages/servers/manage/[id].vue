@@ -715,17 +715,37 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 		data.state === 'done' || data.state === 'failed' || data.state === 'cancelled'
 	if (isTerminalState) {
 		completedBackupTasks.add(taskKey)
-		queryClient.invalidateQueries({ queryKey: ['backups', 'list', serverId] }).then(() => {
-			const entry = backupsState.get(backupId)
-			if (entry) {
-				const { [data.task]: _, ...remaining } = entry
-				if (Object.keys(remaining).length === 0) {
-					backupsState.delete(backupId)
-				} else {
-					backupsState.set(backupId, remaining)
+
+		const attemptCleanup = (attempt: number = 1) => {
+			queryClient.invalidateQueries({ queryKey: ['backups', 'list', serverId] }).then(() => {
+				const backupData = queryClient.getQueryData<Archon.Backups.v1.Backup[]>([
+					'backups',
+					'list',
+					serverId,
+				])
+				const backup = backupData?.find((b) => b.id === backupId)
+
+				if (backup?.ongoing && attempt < 3) {
+					// retry 3 times, archon is slow compared to ws state
+					// jank as hell
+					setTimeout(() => attemptCleanup(attempt + 1), 1000)
+					return
 				}
-			}
-		})
+
+				// clean up on success/3 attempts failed hope and pray
+				const entry = backupsState.get(backupId)
+				if (entry) {
+					const { [data.task]: _, ...remaining } = entry
+					if (Object.keys(remaining).length === 0) {
+						backupsState.delete(backupId)
+					} else {
+						backupsState.set(backupId, remaining)
+					}
+				}
+			})
+		}
+
+		attemptCleanup()
 	}
 }
 

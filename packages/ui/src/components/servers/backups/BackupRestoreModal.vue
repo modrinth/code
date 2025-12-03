@@ -14,7 +14,7 @@
 				<BackupItem
 					:backup="currentBackup"
 					preview
-					class="!bg-surface-2 border-solid border-[1px] border-surface-5 light:shadow-xl"
+					class="!bg-surface-2"
 				/>
 			</div>
 		</div>
