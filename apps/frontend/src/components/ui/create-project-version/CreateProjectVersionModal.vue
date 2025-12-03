@@ -167,6 +167,13 @@ async function handleCreateVersion() {
 	try {
 		await client.labrinth.versions_v3.createVersion(version, files)
 		modal.value?.hide()
+		addNotification({
+			title: 'Project version created',
+			text: 'The version has been successfully added to your project.',
+			type: 'success',
+		})
+		// TODO: refetch versions here for project versions table
+		// (will have to not use page prop to get versions for table, instead use own state)
 	} catch (err: any) {
 		addNotification({
 			title: 'An error occurred',
