@@ -421,22 +421,22 @@ export namespace Labrinth {
 			 */
 			export interface CreateVersionRequest {
 				/** The name of this version. */
-				name: string
+				version_title: string
 
 				/** The version number. Ideally will follow semantic versioning. */
 				version_number: string
 
 				/** A changelog for this version. Nullable. */
-				changelog: string
+				version_body: string
 
 				/** A list of specific versions of projects that this version depends on. */
 				dependencies?: Array<{
 					/** The ID of the version that this version depends on. Nullable. */
-					version_id?: string | null
+					version_id?: string
 					/** The ID of the project that this version depends on. Nullable. */
-					project_id?: string | null
+					project_id?: string
 					/** The file name of the dependency, mostly used for showing external dependencies on modpacks. Nullable. */
-					file_name?: string | null
+					file_name?: string
 					/** The type of dependency that this version has. One of "required" | "optional" | "incompatible" | "embedded". */
 					dependency_type: DependencyType
 				}>
@@ -445,7 +445,7 @@ export namespace Labrinth {
 				game_versions: string[]
 
 				/** The release channel for this version. Allowed values: "release" | "beta" | "alpha". */
-				version_type: 'release' | 'beta' | 'alpha'
+				release_channel: 'release' | 'beta' | 'alpha'
 
 				/** The mod loaders that this version supports. For resource packs, use "minecraft". */
 				loaders: string[]

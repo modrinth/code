@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<CreateProjectVersionModal ref="modal"></CreateProjectVersionModal>
-		<div class="universal-card !mb-0 py-4">
+		<div class="universal-card py-4">
 			<div class="markdown-disclaimer">
 				<div class="flex items-center justify-between">
 					<span class="text-xl font-semibold text-contrast">Versions</span>
@@ -25,7 +25,7 @@
 
 		<ProjectPageVersions
 			:project="project"
-			:versions="versions"
+			:versions="versions.map((v) => ({ ...v, displayUrlEnding: v.version_number }))"
 			:show-files="flags.showVersionFilesInTable"
 			:current-member="!!currentMember"
 			:loaders="tags.loaders"

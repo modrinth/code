@@ -5,7 +5,7 @@
 				Version type <span class="text-red">*</span>
 			</span>
 			<Chips
-				v-model="draftVersion.version_type"
+				v-model="draftVersion.release_channel"
 				:items="['release', 'alpha', 'beta']"
 				:never-empty="false"
 				:capitalize="true"
@@ -34,7 +34,7 @@
 			</span>
 			<input
 				id="version-number"
-				v-model="draftVersion.name"
+				v-model="draftVersion.version_title"
 				placeholder="Enter subtitle..."
 				type="text"
 				autocomplete="off"

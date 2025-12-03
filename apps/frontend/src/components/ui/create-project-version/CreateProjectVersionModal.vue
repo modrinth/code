@@ -93,7 +93,7 @@ const addFilesDisabled = computed(() => draftVersion.value.files.length === 0)
 
 const addDetailsDisabled = computed(
 	() =>
-		draftVersion.value.name.trim().length === 0 ||
+		draftVersion.value.version_title.trim().length === 0 ||
 		draftVersion.value.version_number.trim().length === 0 ||
 		draftVersion.value.loaders.length === 0,
 )
@@ -160,9 +160,8 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 const client = injectModrinthClient()
 async function handleCreateVersion() {
 	const version = toRaw(draftVersion.value)
-	const projectId = version.project_id
 	const files = version.files
-	await client.labrinth.versions_v3.createVersion(projectId, version, files)
+	await client.labrinth.versions_v3.createVersion(version, files)
 	modal.value?.hide()
 }
 

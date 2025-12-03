@@ -6,14 +6,14 @@ export type DraftVersion = Omit<Labrinth.Versions.v3.CreateVersionRequest, 'file
 
 const EMPTY_DRAFT_VERSION: DraftVersion = {
 	project_id: '',
-	name: '',
+	version_title: '',
 	version_number: '',
-	version_type: 'release',
+	release_channel: 'release',
 	loaders: [],
 	game_versions: [],
 	featured: false,
 	status: 'draft',
-	changelog: '',
+	version_body: '',
 	dependencies: [],
 	files: [],
 }

@@ -101,7 +101,6 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	 * Creates a new version on an existing project. At least one file must be
 	 * attached unless the version is created as a draft.
 	 *
-	 * @param projectId - The project ID or slug to create the version for
 	 * @param data - JSON metadata payload for the version (must include file_parts)
 	 * @param files - Array of uploaded files, in the same order as `data.file_parts`
 	 *
@@ -122,22 +121,30 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	 */
 
 	public async createVersion(
-		projectId: string,
 		draftVersion: DraftVersion,
 		files: File[],
 	): Promise<Labrinth.Versions.v3.Version> {
 		const formData = new FormData()
 
 		const data: Labrinth.Versions.v3.CreateVersionRequest = {
-			...draftVersion,
-			file_parts: files.map((file, i) => `${file.name}-${i}`),
-			primary_file: `${files[0].name}-${0}`, // first file in array is primary
+			project_id: draftVersion.project_id,
+			version_number: draftVersion.version_number,
+			version_title: draftVersion.version_title || draftVersion.version_number,
+			version_body: draftVersion.version_body,
+			dependencies: draftVersion.dependencies || [],
+			game_versions: draftVersion.game_versions,
+			loaders: draftVersion.loaders,
+			release_channel: draftVersion.release_channel,
+			featured: !!draftVersion.featured,
+
+			file_parts: files.map((file, i) => `${file.name}-${i === 0 ? 'primary' : i}`),
+			primary_file: `${files[0].name}-primary`, // first file in array is primary
 		}
 
 		formData.append('data', JSON.stringify(data))
 
 		files.forEach((file, i) => {
-			formData.append(`${file.name}-${i}`, new Blob([file]))
+			formData.append(`${file.name}-${i}`, new Blob([file]), file.name)
 		})
 
 		return this.client.request<Labrinth.Versions.v3.Version>(`/version`, {
@@ -145,6 +152,9 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			version: 2, // TODO: move this to v2 module
 			method: 'POST',
 			body: formData,
+			headers: {
+				'Content-Type': '',
+			},
 		})
 	}
 

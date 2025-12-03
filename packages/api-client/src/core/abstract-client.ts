@@ -123,6 +123,11 @@ export abstract class AbstractModrinthClient {
 			},
 		}
 
+		const headers = mergedOptions.headers
+		if (headers && 'Content-Type' in headers && headers['Content-Type'] === '') {
+			delete headers['Content-Type']
+		}
+
 		const context = this.buildContext(url, path, mergedOptions)
 
 		try {
