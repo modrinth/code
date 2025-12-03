@@ -642,7 +642,6 @@ const stopUptimeUpdates = () => {
 	}
 }
 
-// Individual WebSocket event handlers
 const handleLog = (data: Archon.Websocket.v0.WSLogEvent) => {
 	const log = data.message.split('\n').filter((l) => l.trim())
 	modrinthServersConsole.addLines(log)
@@ -726,7 +725,7 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 				const backup = backupData?.find((b) => b.id === backupId)
 
 				if (backup?.ongoing && attempt < 3) {
-					// retry 3 times, archon is slow compared to ws state
+					// retry 3 times max, archon is slow compared to ws state
 					// jank as hell
 					setTimeout(() => attemptCleanup(attempt + 1), 1000)
 					return
