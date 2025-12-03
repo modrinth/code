@@ -25,7 +25,7 @@ import {
 	type OverflowMenuOption,
 } from '@modrinth/ui'
 import { capitalizeString, formatProjectType, highlightCodeLines } from '@modrinth/utils'
-import { computed, onUnmounted, ref } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
@@ -98,8 +98,18 @@ type Tab = 'Thread' | 'Files'
 const tabs: readonly Tab[] = ['Thread', 'Files']
 const currentTab = ref<Tab>('Thread')
 
-type SelectedFile = Labrinth.TechReview.Internal.FileReport | null
-const selectedFile = ref<SelectedFile>(null)
+const selectedFileId = ref<string | null>(null)
+
+const selectedFile = computed(() => {
+	if (!selectedFileId.value) return null
+	return props.item.reports.find((r) => r.id === selectedFileId.value) ?? null
+})
+
+watch(selectedFile, (newFile) => {
+	if (selectedFileId.value && (!newFile || newFile.issues.length === 0)) {
+		backToFileList()
+	}
+})
 
 const client = injectModrinthClient()
 
@@ -192,16 +202,12 @@ function formatFileSize(bytes: number): string {
 }
 
 function viewFileFlags(file: Labrinth.TechReview.Internal.FileReport) {
-	selectedFile.value = file
-
-	if (file.issues.length > 0) {
-		expandedIssues.value.add(file.issues[0].id)
-	}
+	selectedFileId.value = file.id
 	emit('loadFileSources', file.id)
 }
 
 function backToFileList() {
-	selectedFile.value = null
+	selectedFileId.value = null
 }
 
 async function copyToClipboard(code: string, detailId: string) {

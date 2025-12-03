@@ -465,7 +465,9 @@ function handleMarkIssueSafe(projectId: string, reportId: string, issueId: strin
 				})
 				.filter((report): report is Labrinth.TechReview.Internal.FileReport => report !== null)
 
-			const projectStillHasReports = updatedReports.some((report) => report.project_id === projectId)
+			const projectStillHasReports = updatedReports.some(
+				(report) => report.project_id === projectId,
+			)
 
 			if (!projectStillHasReports) {
 				const { [projectId]: _removedProject, ...remainingProjects } = oldData.projects
