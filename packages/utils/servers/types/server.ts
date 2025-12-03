@@ -48,12 +48,12 @@ export interface Allocation {
 export interface Startup {
 	invocation: string
 	original_invocation: string
-	jdk_version: 'lts8' | 'lts11' | 'lts17' | 'lts21'
+	jdk_version: 'lts8' | 'lts11' | 'lts17' | 'lts21' | 'lts25'
 	jdk_build: 'corretto' | 'temurin' | 'graal'
 }
 
 export type PowerAction = 'Start' | 'Stop' | 'Restart' | 'Kill'
-export type JDKVersion = 'lts8' | 'lts11' | 'lts17' | 'lts21'
+export type JDKVersion = 'lts8' | 'lts11' | 'lts17' | 'lts21' | 'lts25'
 export type JDKBuild = 'corretto' | 'temurin' | 'graal'
 
 export type Loaders =
