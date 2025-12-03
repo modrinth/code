@@ -69,14 +69,7 @@
 
 							<div class="flex gap-2">
 								<div class="flex w-5 justify-center">
-									<div
-										class="h-full w-px"
-										:class="
-											index === groupedBackups.length - 1
-												? 'bg-gradient-to-b from-surface-5 from-50% to-transparent'
-												: 'bg-surface-5'
-										"
-									/>
+									<div class="h-full w-px bg-surface-5" />
 								</div>
 
 								<TransitionGroup name="list" tag="div" class="flex flex-1 flex-col gap-3 py-3">
