@@ -9,7 +9,6 @@ import {
 	MoreVerticalIcon,
 	RotateCounterClockwiseIcon,
 	ShieldIcon,
-	SpinnerIcon,
 	TrashIcon,
 	UserIcon,
 	XIcon,
@@ -202,7 +201,7 @@ const messages = defineMessages({
 <template>
 	<div
 		class="grid items-center gap-4 rounded-2xl bg-bg-raised p-4 shadow-md"
-		:class="preview ? 'grid-cols-2' : 'grid-cols-[auto_1fr_auto] md:grid-cols-[1fr_350px_1fr]'"
+		:class="preview ? 'grid-cols-2' : 'grid-cols-[auto_1fr_auto] md:grid-cols-[1fr_400px_1fr]'"
 	>
 		<div class="flex flex-row gap-4 items-center">
 			<div
@@ -254,46 +253,23 @@ const messages = defineMessages({
 		</div>
 
 		<div
-			class="col-span-full row-start-2 flex flex-col gap-2 md:col-span-1 md:row-start-auto md:text-center"
+			class="col-span-full row-start-2 flex flex-col gap-2 md:col-span-1 md:row-start-auto md:items-center"
 		>
-			<template v-if="creating">
-				<div class="flex items-center justify-between">
-					<span class="text-contrast">
-						{{ formatMessage(backupQueued ? messages.queuedForBackup : messages.creatingBackup) }}
-					</span>
-					<div class="flex items-center gap-1 text-sm text-secondary">
-						<span>{{ Math.round(creating.progress * 100) }}%</span>
-						<SpinnerIcon class="size-5 animate-spin" />
-					</div>
-				</div>
+			<template v-if="creating || restoring">
 				<ProgressBar
-					:progress="creating.progress"
-					color="brand"
-					:waiting="creating.progress === 0"
+					:progress="(creating || restoring)!.progress"
+					:color="creating ? 'brand' : 'purple'"
+					:waiting="(creating || restoring)!.progress === 0"
+					:label="formatMessage(creating
+						? (backupQueued ? messages.queuedForBackup : messages.creatingBackup)
+						: (restoreQueued ? messages.queuedForRestore : messages.restoringBackup))"
+					:label-class="creating ? 'text-contrast' : 'text-purple'"
+					show-progress
 					full-width
-				/>
-			</template>
-			<template v-else-if="restoring">
-				<div class="flex items-center justify-between">
-					<span class="text-purple">
-						{{
-							formatMessage(restoreQueued ? messages.queuedForRestore : messages.restoringBackup)
-						}}
-					</span>
-					<div class="flex items-center gap-1 text-sm text-secondary">
-						<span>{{ Math.round(restoring.progress * 100) }}%</span>
-						<SpinnerIcon class="size-5 animate-spin" />
-					</div>
-				</div>
-				<ProgressBar
-					full-width
-					:progress="restoring.progress"
-					color="purple"
-					:waiting="restoring.progress === 0"
 				/>
 			</template>
 			<template v-else>
-				<span class="font-medium text-contrast">
+				<span class="w-full font-medium text-contrast md:text-center">
 					{{ dayjs(backup.created_at).format('MMMM Do YYYY, h:mm A') }}
 				</span>
 				<!-- TODO: Uncomment when API supports size field -->

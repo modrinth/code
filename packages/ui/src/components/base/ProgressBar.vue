@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import SpinnerIcon from '@modrinth/assets/icons/spinner.svg'
 
 const props = withDefaults(
 	defineProps<{
@@ -10,6 +11,9 @@ const props = withDefaults(
 		fullWidth?: boolean
 		striped?: boolean
 		gradientBorder?: boolean
+		label?: string
+		labelClass?: string
+		showProgress?: boolean
 	}>(),
 	{
 		max: 1,
@@ -18,6 +22,7 @@ const props = withDefaults(
 		fullWidth: false,
 		striped: false,
 		gradientBorder: true,
+		showProgress: false,
 	},
 )
 
@@ -55,20 +60,31 @@ const colors = {
 const percent = computed(() => props.progress / props.max)
 </script>
 <template>
-	<div
-		class="flex w-full h-2 rounded-full overflow-hidden"
-		:class="[colors[props.color].bg, fullWidth ? '' : 'max-w-[15rem]']"
-	>
+	<div class="flex w-full flex-col gap-2" :class="fullWidth ? '' : 'max-w-[15rem]'">
+		<div v-if="label || showProgress" class="flex items-center justify-between">
+			<span v-if="label" :class="labelClass">{{ label }}</span>
+			<div v-if="showProgress" class="flex items-center gap-1 text-sm text-secondary">
+				<span>{{ Math.round(percent * 100) }}%</span>
+				<slot name="progress-icon">
+					<SpinnerIcon class="size-5 animate-spin" />
+				</slot>
+			</div>
+		</div>
 		<div
-			class="rounded-full progress-bar"
-			:class="[
-				colors[props.color].fg,
-				{ 'progress-bar--waiting': waiting },
-				{ 'progress-bar--gradient-border': gradientBorder },
-				striped ? `progress-bar--striped--${color}` : '',
-			]"
-			:style="!waiting ? { width: `${percent * 100}%` } : {}"
-		></div>
+			class="flex h-2 w-full overflow-hidden rounded-full"
+			:class="[colors[props.color].bg]"
+		>
+			<div
+				class="rounded-full progress-bar"
+				:class="[
+					colors[props.color].fg,
+					{ 'progress-bar--waiting': waiting },
+					{ 'progress-bar--gradient-border': gradientBorder },
+					striped ? `progress-bar--striped--${color}` : '',
+				]"
+				:style="!waiting ? { width: `${percent * 100}%` } : {}"
+			></div>
+		</div>
 	</div>
 </template>
 <style scoped lang="scss">

@@ -32,8 +32,8 @@
 			<BackupRestoreModal ref="restoreBackupModal" />
 			<BackupDeleteModal ref="deleteBackupModal" @delete="deleteBackup" />
 
-			<div class="mb-6 flex items-center justify-between">
-				<h1 class="m-0 text-2xl font-semibold text-contrast">Backups</h1>
+			<div class="mb-2 flex items-center align-middle justify-between">
+				<span class="text-2xl font-semibold text-contrast">Backups</span>
 				<ButtonStyled color="brand">
 					<button
 						v-tooltip="backupCreationDisabled"
