@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM users_subscriptions_affiliations_payouts\n        WHERE id = ANY($1::bigint[])\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8b3990f01c62c20fc2ff66566282db593fd6e8990a7e32305c2daa4aac3f6d74"
+}

@@ -204,7 +204,7 @@
 			<template #description>
 				{{
 					formatMessage(failedToBuildBannerMessages.description, {
-						errors: generatedStateErrors,
+						errors: JSON.stringify(generatedStateErrors),
 						url: config.public.apiBaseUrl,
 					})
 				}}
