@@ -11,11 +11,7 @@
 
 			<div v-if="currentBackup" class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">Backup</span>
-				<BackupItem
-					:backup="currentBackup"
-					preview
-					class="!bg-surface-2"
-				/>
+				<BackupItem :backup="currentBackup" preview class="!bg-surface-2" />
 			</div>
 		</div>
 

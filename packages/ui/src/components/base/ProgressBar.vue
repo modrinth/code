@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import SpinnerIcon from '@modrinth/assets/icons/spinner.svg'
+import { computed } from 'vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -70,10 +70,7 @@ const percent = computed(() => props.progress / props.max)
 				</slot>
 			</div>
 		</div>
-		<div
-			class="flex h-2 w-full overflow-hidden rounded-full"
-			:class="[colors[props.color].bg]"
-		>
+		<div class="flex h-2 w-full overflow-hidden rounded-full" :class="[colors[props.color].bg]">
 			<div
 				class="rounded-full progress-bar"
 				:class="[

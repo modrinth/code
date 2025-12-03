@@ -260,9 +260,17 @@ const messages = defineMessages({
 					:progress="(creating || restoring)!.progress"
 					:color="creating ? 'brand' : 'purple'"
 					:waiting="(creating || restoring)!.progress === 0"
-					:label="formatMessage(creating
-						? (backupQueued ? messages.queuedForBackup : messages.creatingBackup)
-						: (restoreQueued ? messages.queuedForRestore : messages.restoringBackup))"
+					:label="
+						formatMessage(
+							creating
+								? backupQueued
+									? messages.queuedForBackup
+									: messages.creatingBackup
+								: restoreQueued
+									? messages.queuedForRestore
+									: messages.restoringBackup,
+						)
+					"
 					:label-class="creating ? 'text-contrast' : 'text-purple'"
 					show-progress
 					full-width

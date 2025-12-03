@@ -842,8 +842,11 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
-  "servers.backups.item.automated": {
-    "defaultMessage": "Automated"
+  "servers.backups.item.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Backup schedule"
   },
   "servers.backups.item.creating-backup": {
     "defaultMessage": "Creating backup..."
@@ -860,8 +863,14 @@
   "servers.backups.item.locked": {
     "defaultMessage": "Locked"
   },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Manual backup"
+  },
   "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Queued for backup"
+    "defaultMessage": "Backup queued"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Restore queued"
   },
   "servers.backups.item.rename": {
     "defaultMessage": "Rename"

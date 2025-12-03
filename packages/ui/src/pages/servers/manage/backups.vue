@@ -61,7 +61,7 @@
 					</div>
 
 					<div v-else key="list" class="flex flex-col gap-1.5">
-						<template v-for="(group, index) in groupedBackups" :key="group.label">
+						<template v-for="group in groupedBackups" :key="group.label">
 							<div class="flex items-center gap-2">
 								<component :is="group.icon" v-if="group.icon" class="size-6 text-secondary" />
 								<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
