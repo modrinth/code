@@ -46,18 +46,55 @@ import { acceptFileFromProjectType } from '@modrinth/utils'
 import { useManageVersion } from '~/composables/versions/manage-version'
 import { injectVersionsContext } from '~/providers/versions'
 
+import { inferVersionInfo } from '~/helpers/infer'
 import VersionFileRow from '../components/VersionFileRow.vue'
 const { project } = injectVersionsContext()
 const { formatMessage } = useVIntl()
 
+const tags = useGeneratedState()
+
 const { draftVersion, setPrimaryFile } = useManageVersion()
+
+// should be in infer.js, but gotta refactor that to ts first
+interface InferredVersionInfo {
+	name?: string
+	version_number?: string
+	version_type?: 'alpha' | 'beta' | 'release'
+	loaders?: string[]
+	game_versions?: string[]
+}
+
+const addDetectedData = async () => {
+	try {
+		const primaryFile = draftVersion.value.files[0]
+		const inferredData = (await inferVersionInfo(
+			primaryFile,
+			project,
+			tags.value.gameVersions,
+		)) as InferredVersionInfo
+
+		const mappedInferredData = {
+			...inferredData,
+			version_title: inferredData.name || '',
+		}
+
+		draftVersion.value = {
+			...draftVersion.value,
+			...mappedInferredData,
+		}
+	} catch (err) {
+		console.error('Error parsing version file data', err)
+	}
+}
 
 function handleNewFiles(newFiles: File[]) {
 	newFiles.forEach((file) => draftVersion.value.files.push(file))
+	addDetectedData()
 }
 
 function onRemoveFile(index: number) {
 	draftVersion.value.files.splice(index, 1)
+	addDetectedData()
 }
 
 const hasSupplementaryFiles = computed(() => draftVersion.value.files.length > 1)
