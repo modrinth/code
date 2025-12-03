@@ -10,7 +10,7 @@ import {
 	RotateCounterClockwiseIcon,
 	ShieldIcon,
 	TrashIcon,
-	UserIcon,
+	UserRoundIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@vintl/vintl'
@@ -95,7 +95,7 @@ const backupIcon = computed(() => {
 	if (props.backup.automated) {
 		return props.backup.locked ? ShieldIcon : ClockIcon
 	}
-	return UserIcon
+	return UserRoundIcon
 })
 
 const overflowMenuOptions = computed<OverflowOption[]>(() => {
