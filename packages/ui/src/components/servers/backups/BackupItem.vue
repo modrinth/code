@@ -202,7 +202,7 @@ const messages = defineMessages({
 <template>
 	<div
 		class="grid items-center gap-4 rounded-2xl bg-bg-raised p-4 shadow-md"
-		:class="preview ? 'grid-cols-2' : 'grid-cols-[auto_1fr_auto] md:grid-cols-[400px_1fr_auto]'"
+		:class="preview ? 'grid-cols-2' : 'grid-cols-[auto_1fr_auto] md:grid-cols-[1fr_350px_1fr]'"
 	>
 		<div class="flex flex-row gap-4 items-center">
 			<div
@@ -254,7 +254,7 @@ const messages = defineMessages({
 		</div>
 
 		<div
-			class="col-span-full row-start-2 flex flex-col gap-2 md:col-span-1 md:row-start-auto md:mr-16 max-w-[400px]"
+			class="col-span-full row-start-2 flex flex-col gap-2 md:col-span-1 md:row-start-auto md:text-center"
 		>
 			<template v-if="creating">
 				<div class="flex items-center justify-between">
@@ -268,7 +268,7 @@ const messages = defineMessages({
 				</div>
 				<ProgressBar
 					:progress="creating.progress"
-					:color="backupQueued ? 'orange' : 'brand'"
+					color="brand"
 					:waiting="creating.progress === 0"
 					full-width
 				/>
@@ -301,7 +301,7 @@ const messages = defineMessages({
 			</template>
 		</div>
 
-		<div v-if="!preview" class="flex shrink-0 items-center gap-2">
+		<div v-if="!preview" class="flex shrink-0 items-center gap-2 md:justify-self-end">
 			<template v-if="failedToCreate">
 				<ButtonStyled>
 					<button @click="() => emit('retry')">
