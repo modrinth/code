@@ -7,7 +7,7 @@
 		<GameIcon aria-hidden="true" class="size-5 shrink-0" />
 		<AutoLink
 			v-if="isLink"
-			:to="serverId ? `/servers/manage/${serverId}/options/loader` : ''"
+			:to="serverId ? `/hosting/manage/${serverId}/options/loader` : ''"
 			class="flex min-w-0 items-center truncate text-sm font-semibold"
 			:class="serverId ? 'hover:underline' : ''"
 		>

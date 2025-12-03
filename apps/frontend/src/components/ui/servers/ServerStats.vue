@@ -53,7 +53,7 @@
 			</div>
 		</div>
 		<nuxt-link
-			:to="loading ? undefined : `/servers/manage/${serverId}/files`"
+			:to="loading ? undefined : `/hosting/manage/${serverId}/files`"
 			class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
 			:class="loading ? '' : 'transition-transform duration-100 hover:scale-105 active:scale-100'"
 		>

@@ -122,7 +122,7 @@
 		<div
 			class="mb-6 flex items-end justify-between border-0 border-b border-solid border-divider pb-4"
 		>
-			<h1 class="m-0 text-2xl">Servers notices</h1>
+			<h1 class="m-0 text-2xl">Server notices</h1>
 			<ButtonStyled color="brand">
 				<button @click="openNewNoticeModal">
 					<PlusIcon />

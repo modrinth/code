@@ -126,7 +126,7 @@ import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 import LoadingIcon from './icons/LoadingIcon.vue'
 import PanelSpinner from './PanelSpinner.vue'
@@ -214,7 +214,7 @@ const menuOptions = computed(() => [
 		id: 'allServers',
 		label: 'All servers',
 		icon: ServerIcon,
-		action: () => router.push('/servers/manage'),
+		action: () => router.push('/hosting/manage'),
 	},
 	{
 		id: 'details',

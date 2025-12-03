@@ -407,14 +407,14 @@
 					<ButtonStyled
 						type="transparent"
 						:highlighted="
-							route.name?.startsWith('servers') ||
+							route.name?.startsWith('hosting') ||
 							(route.name?.startsWith('search-') && route.query.sid)
 						"
 						:highlighted-style="
-							route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'hosting' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/servers">
+						<nuxt-link to="/hosting">
 							<ServerIcon aria-hidden="true" />
 							{{ formatMessage(navMenuMessages.hostAServer) }}
 						</nuxt-link>
@@ -683,7 +683,7 @@
 							<LibraryIcon class="icon" />
 							{{ formatMessage(commonMessages.collectionsLabel) }}
 						</NuxtLink>
-						<NuxtLink class="iconified-button" to="/servers/manage">
+						<NuxtLink class="iconified-button" to="/hosting/manage">
 							<ServerIcon class="icon" />
 							{{ formatMessage(commonMessages.serversLabel) }}
 						</NuxtLink>
@@ -1366,7 +1366,7 @@ const userMenuOptions = computed(() => {
 		},
 		{
 			id: 'servers',
-			link: '/servers/manage',
+			link: '/hosting/manage',
 		},
 		{
 			id: 'flags',
@@ -1455,7 +1455,7 @@ const disableRandomProjects = ref(false)
 
 const disableRandomProjectsForRoute = computed(
 	() =>
-		route.name.startsWith('servers') ||
+		route.name.startsWith('hosting') ||
 		route.name.includes('settings') ||
 		route.name.includes('admin'),
 )
@@ -1685,11 +1685,11 @@ const footerLinks = [
 				),
 			},
 			{
-				href: '/servers',
+				href: '/hosting',
 				label: formatMessage(
 					defineMessage({
 						id: 'layout.footer.products.servers',
-						defaultMessage: 'Modrinth Servers',
+						defaultMessage: 'Modrinth Hosting',
 					}),
 				),
 			},

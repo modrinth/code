@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NuxtLink :to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`">
+		<NuxtLink :to="status === 'suspended' ? '' : `/hosting/manage/${props.server_id}`">
 			<div
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
 				:class="{

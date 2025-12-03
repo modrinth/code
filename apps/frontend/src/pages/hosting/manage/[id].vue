@@ -116,7 +116,7 @@
 		}"
 	>
 		<div>
-			<NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
+			<NuxtLink to="/hosting/manage" class="breadcrumb goto-link flex w-fit items-center">
 				<LeftArrowIcon />
 				All servers
 			</NuxtLink>
@@ -231,7 +231,7 @@
 									<ul class="m-0 mt-4 p-0 pl-4">
 										<li>
 											If this version of Minecraft was released recently, please check if Modrinth
-											Servers supports it.
+											Hosting supports it.
 										</li>
 										<li>
 											If you've installed a modpack, it may have been packaged incorrectly or may
@@ -261,7 +261,7 @@
 								<div
 									v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'"
 								>
-									An error occurred while installing your server because Modrinth Servers does not
+									An error occurred while installing your server because Modrinth Hosting does not
 									support the version of Minecraft or the loader you specified. Try reinstalling
 									your server with a different version or loader, and if the problem persists,
 									please contact Modrinth Support with your server's debug information.
@@ -284,7 +284,7 @@
 									<ButtonStyled color="red" type="standard">
 										<NuxtLink
 											class="whitespace-pre"
-											:to="`/servers/manage/${serverId}/options/loader`"
+											:to="`/hosting/manage/${serverId}/options/loader`"
 										>
 											<RightArrowIcon />
 											Change Loader
@@ -501,17 +501,17 @@ const showGameLabel = computed(() => !!serverData.value?.game)
 const showLoaderLabel = computed(() => !!serverData.value?.loader)
 
 const navLinks = [
-	{ label: 'Overview', href: `/servers/manage/${serverId}`, subpages: [] },
+	{ label: 'Overview', href: `/hosting/manage/${serverId}`, subpages: [] },
 	{
 		label: 'Content',
-		href: `/servers/manage/${serverId}/content`,
+		href: `/hosting/manage/${serverId}/content`,
 		subpages: ['mods', 'datapacks'],
 	},
-	{ label: 'Files', href: `/servers/manage/${serverId}/files`, subpages: [] },
-	{ label: 'Backups', href: `/servers/manage/${serverId}/backups`, subpages: [] },
+	{ label: 'Files', href: `/hosting/manage/${serverId}/files`, subpages: [] },
+	{ label: 'Backups', href: `/hosting/manage/${serverId}/backups`, subpages: [] },
 	{
 		label: 'Options',
-		href: `/servers/manage/${serverId}/options`,
+		href: `/hosting/manage/${serverId}/options`,
 		subpages: ['startup', 'network', 'properties', 'info'],
 	},
 ]
@@ -1117,7 +1117,7 @@ const suspendedAction = computed(() => ({
 
 const generalErrorAction = computed(() => ({
 	label: 'Go back to all servers',
-	onClick: () => router.push('/servers/manage'),
+	onClick: () => router.push('/hosting/manage'),
 	color: 'brand' as const,
 }))
 
@@ -1139,7 +1139,7 @@ const copyServerDebugInfo = () => {
 
 const openInstallLog = () => {
 	router.replace({
-		path: `/servers/manage/${serverId}/files`,
+		path: `/hosting/manage/${serverId}/files`,
 		query: { ...route.query, editing: errorLogFile.value },
 	})
 }

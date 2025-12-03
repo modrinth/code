@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servers"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
@@ -930,7 +930,7 @@
     "defaultMessage": "Where would you like your server to be located?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Servers next!</link>"
+    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Hosting next!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Southeast Asia"

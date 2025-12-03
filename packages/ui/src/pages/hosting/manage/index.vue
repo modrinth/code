@@ -30,8 +30,8 @@
 							on getting them back online.
 						</li>
 						<li>
-							If you recently purchased your Modrinth Server, it is currently in a queue and will
-							appear here as soon as it's ready. <br />
+							If you recently purchased your Modrinth Hosting server, it is currently in a queue and
+							will appear here as soon as it's ready. <br />
 							<span class="font-medium text-contrast"
 								>Do not attempt to purchase a new server.</span
 							>
@@ -96,7 +96,7 @@
 					"
 				/>
 				<h1 class="m-0 text-contrast">You don't have any servers yet!</h1>
-				<p class="m-0">Modrinth Servers is a new way to play modded Minecraft with your friends.</p>
+				<p class="m-0">Modrinth Hosting is a new way to play modded Minecraft with your friends.</p>
 				<ButtonStyled size="large" type="standard" color="brand">
 					<AutoLink to="/servers#plan">Create a Server</AutoLink>
 				</ButtonStyled>
