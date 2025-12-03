@@ -98,7 +98,7 @@
 				<h1 class="m-0 text-contrast">You don't have any servers yet!</h1>
 				<p class="m-0">Modrinth Hosting is a new way to play modded Minecraft with your friends.</p>
 				<ButtonStyled size="large" type="standard" color="brand">
-					<AutoLink to="/servers#plan">Create a Server</AutoLink>
+					<AutoLink to="/servers#plan">Create a server</AutoLink>
 				</ButtonStyled>
 			</div>
 
