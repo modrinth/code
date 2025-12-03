@@ -44,7 +44,7 @@ const sharedCpus = computed(() => {
 					`CPU bursting allows your server to temporarily use additional threads to help mitigate TPS spikes. Click for more info.`
 				"
 				class="flex"
-				to="https://modrinth.com/servers#cpu-burst"
+				to="https://modrinth.com/hosting#cpu-burst"
 				target="_blank"
 				@click="() => emit('click-bursting-link')"
 			>
