@@ -133,6 +133,7 @@ const jdkVersionMap = [
 	{ value: 'lts11', label: 'Java 11' },
 	{ value: 'lts17', label: 'Java 17' },
 	{ value: 'lts21', label: 'Java 21' },
+	{ value: 'lts25', label: 'Java 25' },
 ]
 
 const jdkBuildMap = [
@@ -167,7 +168,7 @@ const compatibleJavaVersions = computed(() => {
 	const [major, minor] = mcVersion.split('.').map(Number)
 
 	if (major >= 1) {
-		if (minor >= 20) return ['Java 21']
+		if (minor >= 20) return ['Java 21', 'Java 25']
 		if (minor >= 18) return ['Java 17', 'Java 21']
 		if (minor >= 17) return ['Java 16', 'Java 17', 'Java 21']
 		if (minor >= 12) return ['Java 8', 'Java 11', 'Java 17', 'Java 21']
