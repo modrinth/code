@@ -16,7 +16,7 @@
 						<span class="font-medium">Detected</span>
 						<div class="flex flex-wrap gap-2">
 							<ButtonStyled v-for="version in detectedVersions" :key="version" type="chip">
-								<button class="w-max text-secondary" @click="toggleVersion(version)">
+								<button class="w-max" @click="toggleVersion(version)">
 									{{ version }}
 									<XIcon />
 								</button>
@@ -33,7 +33,7 @@
 								:key="version"
 								type="chip"
 							>
-								<button class="w-max text-secondary" @click="toggleVersion(version)">
+								<button class="w-max" @click="toggleVersion(version)">
 									{{ version }}
 									<XIcon />
 								</button>

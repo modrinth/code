@@ -52,7 +52,7 @@
 			</ButtonStyled>
 		</div>
 
-		<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-4" v-if="addedDependencies.length">
 			<span class="font-semibold text-contrast">Added dependencies</span>
 			<div class="5 flex flex-col gap-2">
 				<template v-for="(dependency, index) in addedDependencies">

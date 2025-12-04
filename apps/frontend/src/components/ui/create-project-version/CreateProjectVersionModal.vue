@@ -122,7 +122,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				rightButtonConfig: {
 					...defaultNextButton,
 					disabled: addDetailsDisabled.value,
-					label: formatMessage(messages.addMcVersionsButton),
+					label: 'Set loaders',
 				},
 			},
 			{

@@ -3,7 +3,13 @@
 		<div class="flex flex-col gap-2.5">
 			<span class="font-semibold text-contrast">Loaders <span class="text-red">*</span></span>
 
-			<Chips v-model="loaderGroup" :items="groupLabels" :never-empty="false" :capitalize="true" />
+			<Chips
+				v-model="loaderGroup"
+				:items="groupLabels"
+				:never-empty="false"
+				:capitalize="true"
+				size="small"
+			/>
 
 			<div
 				class="flex flex-1 flex-col gap-4 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3"
