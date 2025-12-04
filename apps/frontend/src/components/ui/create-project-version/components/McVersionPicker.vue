@@ -41,7 +41,7 @@
 				</div>
 			</div>
 
-			<span v-if="!releaseVersions.length">No versions found.</span>
+			<span v-if="!filteredVersions.length">No versions found.</span>
 		</div>
 	</div>
 </template>
@@ -65,13 +65,13 @@ const emit = defineEmits<{
 
 const versionType = ref<string | null>('release')
 
-const releaseVersions = computed(() =>
+const filteredVersions = computed(() =>
 	props.gameVersions
-		.filter((v) => versionType.value !== 'release' || v.version_type === versionType.value)
+		.filter((v) => versionType.value === 'all' || v.version_type === versionType.value)
 		.filter(searchFilter),
 )
 
-const groupedGameVersions = computed(() => groupVersions(releaseVersions.value))
+const groupedGameVersions = computed(() => groupVersions(filteredVersions.value))
 
 const toggleVersion = (version: string, event: MouseEvent) => {
 	const next = props.modelValue.includes(version)
@@ -80,42 +80,31 @@ const toggleVersion = (version: string, event: MouseEvent) => {
 	emit('update:modelValue', next)
 }
 
+const DEV_RELEASE_KEY = 'development releases'
+
 function groupVersions(gameVersions: GameVersion[]) {
-	if (versionType.value === 'all') {
-		const grouped: Record<string, string[]> = {}
+	gameVersions = [...gameVersions].sort(
+		(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+	)
 
-		const sorted = [...gameVersions].sort(
-			(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-		)
-
-		for (const v of sorted) {
-			const d = new Date(v.date)
-			const label = d.toLocaleString('en-US', {
-				year: 'numeric',
-				month: 'long',
-			})
-
-			if (!grouped[label]) grouped[label] = []
-			grouped[label].push(v.version)
-		}
-
-		return Object.entries(grouped).map(([key, versions]) => ({
-			key,
-			versions,
-		}))
-	}
-
-	const versions = gameVersions.map((v) => v.version)
 	const getGroupKey = (v: string) => v.split('.').slice(0, 2).join('.')
 	const groups: Record<string, string[]> = {}
 
-	versions.forEach((version) => {
-		const groupKey = getGroupKey(version)
-		if (!groups[groupKey]) groups[groupKey] = []
-		groups[groupKey].push(version)
+	let currentGroupKey = getGroupKey(gameVersions.find((v) => v.major)?.version || '')
+
+	gameVersions.forEach((gameVersions) => {
+		if (gameVersions.version_type === 'release') {
+			currentGroupKey = getGroupKey(gameVersions.version)
+			if (!groups[currentGroupKey]) groups[currentGroupKey] = []
+			groups[currentGroupKey].push(gameVersions.version)
+		} else {
+			if (!groups[`${currentGroupKey} ${DEV_RELEASE_KEY}`])
+				groups[`${currentGroupKey} ${DEV_RELEASE_KEY}`] = []
+			groups[`${currentGroupKey} ${DEV_RELEASE_KEY}`].push(gameVersions.version)
+		}
 	})
 
-	const sortedKeys = Object.keys(groups).sort((a, b) => compareVersions(b, a))
+	const sortedKeys = Object.keys(groups).sort(compareGroupKeys)
 	const result = sortedKeys.map((key) => ({
 		key,
 		versions: groups[key].sort((a, b) => compareVersions(b, a)),
@@ -123,16 +112,35 @@ function groupVersions(gameVersions: GameVersion[]) {
 	return result
 }
 
+const getBaseVersion = (key: string) => key.split(' ')[0]
+
 function compareVersions(a: string, b: string) {
 	const pa = a.split('.').map(Number)
 	const pb = b.split('.').map(Number)
 
-	for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+	// checking major first, then minor, then patch
+	for (let i = 0; i < 2; i++) {
 		const na = pa[i] || 0
 		const nb = pb[i] || 0
 		if (na > nb) return 1
 		if (na < nb) return -1
 	}
+	return 0
+}
+
+function compareGroupKeys(a: string, b: string) {
+	const aBase = getBaseVersion(a)
+	const bBase = getBaseVersion(b)
+
+	const versionSort = compareVersions(aBase, bBase)
+	if (versionSort !== 0) return -versionSort // descending
+
+	const isADev = a.toLowerCase().includes(DEV_RELEASE_KEY)
+	const isBDev = b.toLowerCase().includes(DEV_RELEASE_KEY)
+
+	if (isADev && !isBDev) return 1
+	if (!isADev && isBDev) return -1
+
 	return 0
 }
 
