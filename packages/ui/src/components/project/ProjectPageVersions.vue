@@ -169,6 +169,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { CalendarIcon, DownloadIcon, StarIcon } from '@modrinth/assets'
 import {
 	formatBytes,
@@ -182,7 +183,6 @@ import { useVIntl } from '@vintl/vintl'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import type { Labrinth } from '@modrinth/api-client'
 import { useRelativeTime } from '../../composables'
 import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'

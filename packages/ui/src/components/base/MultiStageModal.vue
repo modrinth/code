@@ -5,7 +5,7 @@
 		max-content-height="72vh"
 		:on-hide="onModalHide"
 		:closable="true"
-		:closeOnClickOutside="false"
+		:close-on-click-outside="false"
 	>
 		<template #title>
 			<div class="flex flex-wrap items-center gap-1 text-secondary">

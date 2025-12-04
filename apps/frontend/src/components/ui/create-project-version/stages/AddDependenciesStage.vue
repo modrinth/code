@@ -76,14 +76,14 @@
 
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
+import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
+import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import Combobox from '@modrinth/ui/src/components/base/Combobox.vue'
 
 import ModSelect from '~/components/ui/create-project-version/components/ModSelect.vue'
 import { useManageVersion } from '~/composables/versions/manage-version'
 
-import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
-import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import AddedDependencyRow from '../components/AddedDependencyRow.vue'
 
 const { addNotification } = injectNotificationManager()
@@ -163,7 +163,7 @@ const addedDependencies = computed(() =>
 		if (!dep.project_id) return null
 
 		const dependencyProject = dependencyProjects.value[dep.project_id]
-		let versionName = dependencyVersions.value[dep.version_id || '']?.name ?? ''
+		const versionName = dependencyVersions.value[dep.version_id || '']?.name ?? ''
 
 		if (!dependencyProject) return null
 

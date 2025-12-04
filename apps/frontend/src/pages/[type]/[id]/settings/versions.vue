@@ -174,11 +174,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ButtonStyled, ConfirmModal, ProjectPageVersions } from '@modrinth/ui'
-
-import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
-import { provideVersionsContext } from '~/providers/versions'
-
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ClipboardCopyIcon,
 	DownloadIcon,
@@ -190,16 +186,18 @@ import {
 	ShareIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { OverflowMenu } from '@modrinth/ui'
+import { ButtonStyled, ConfirmModal, OverflowMenu,ProjectPageVersions  } from '@modrinth/ui'
 
-import type { Labrinth } from '@modrinth/api-client'
+import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
+import { provideVersionsContext } from '~/providers/versions'
 import { reportVersion } from '~/utils/report-helpers.ts'
+
 import { PlusIcon } from '../../../../../../../packages/assets/generated-icons'
 
 interface Props {
 	project: Labrinth.Projects.v2.Project
 	versions: Labrinth.Versions.v3.Version[]
-	currentMember?: Object
+	currentMember?: object
 }
 
 const { project, versions, currentMember } = defineProps<Props>()

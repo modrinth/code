@@ -11,11 +11,11 @@ import {
 	MultiStageModal,
 } from '@modrinth/ui'
 import { defineMessages } from '@vintl/vintl'
+import { watch } from 'vue'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
-
-import { watch } from 'vue'
 import { injectVersionsContext } from '~/providers/versions'
+
 import AddChangelogStage from './stages/AddChangelogStage.vue'
 import AddDependenciesStage from './stages/AddDependenciesStage.vue'
 import AddDetailsStage from './stages/AddDetailsStage.vue'
