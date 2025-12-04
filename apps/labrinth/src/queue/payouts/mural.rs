@@ -3,7 +3,7 @@ use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
 use modrinth_util::decimal::Decimal2dp;
-use muralpay::{MuralError, MuralPay, TokenFeeRequest};
+use muralpay::{Client, MuralError, TokenFeeRequest};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -369,9 +369,13 @@ pub async fn sync_pending_payouts_from_mural(
 
 /// Queries Mural for canceled or failed payouts, and updates the corresponding
 /// Labrinth payouts' statuses.
+///
+/// This will update:
+/// - Mural payout requests which are failed or canceled
+/// - Mural payout requests where all of the payouts are failed or canceled
 pub async fn sync_failed_mural_payouts_to_labrinth(
     db: &PgPool,
-    mural: &MuralPay,
+    mural: &muralpay::Client,
     limit: u32,
 ) -> eyre::Result<()> {
     info!("Syncing failed Mural payouts to Labrinth");
@@ -380,12 +384,7 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
     loop {
         let search_resp = mural
             .search_payout_requests(
-                Some(muralpay::PayoutStatusFilter::PayoutStatus {
-                    statuses: vec![
-                        muralpay::PayoutStatus::Canceled,
-                        muralpay::PayoutStatus::Failed,
-                    ],
-                }),
+                None,
                 Some(muralpay::SearchParams {
                     limit: Some(u64::from(limit)),
                     next_id,
@@ -395,48 +394,50 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
             .wrap_internal_err(
                 "failed to fetch failed payout requests from Mural",
             )?;
-        next_id = search_resp.next_id;
         if search_resp.results.is_empty() {
             break;
         }
-
-        let num_canceled = search_resp
-            .results
-            .iter()
-            .filter(|p| p.status == muralpay::PayoutStatus::Canceled)
-            .count();
-        let num_failed = search_resp
-            .results
-            .iter()
-            .filter(|p| p.status == muralpay::PayoutStatus::Failed)
-            .count();
-        info!(
-            "Found {num_canceled} canceled and {num_failed} failed Mural payouts"
-        );
+        next_id = search_resp.next_id;
 
         let mut payout_platform_ids = Vec::<String>::new();
         let mut payout_new_statuses = Vec::<String>::new();
 
-        for payout_req in search_resp.results {
-            let new_payout_status = match payout_req.status {
-                muralpay::PayoutStatus::Canceled => PayoutStatus::Cancelled,
-                muralpay::PayoutStatus::Failed => PayoutStatus::Failed,
-                _ => {
-                    warn!(
-                        "Found payout {} with status {:?}, which should have been filtered out by our Mural request - Mural bug",
-                        payout_req.id, payout_req.status
+        for payout_request in search_resp.results {
+            let payout_platform_id = payout_request.id;
+
+            let new_payout_status = match payout_request.status {
+                muralpay::PayoutStatus::Canceled => {
+                    trace!(
+                        "- Payout request {payout_platform_id} set to {} because it is cancelled in Mural",
+                        PayoutStatus::Cancelled
                     );
-                    continue;
+                    Some(PayoutStatus::Cancelled)
                 }
+                muralpay::PayoutStatus::Failed => {
+                    trace!(
+                        "- Payout request {payout_platform_id} set to {} because it is failed in Mural",
+                        PayoutStatus::Failed
+                    );
+                    Some(PayoutStatus::Failed)
+                }
+                _ if payout_request
+                    .payouts
+                    .iter()
+                    .all(payout_should_be_failed) =>
+                {
+                    trace!(
+                        "- Payout request {payout_platform_id} set to {} because all of its payouts are failed",
+                        PayoutStatus::Failed
+                    );
+                    Some(PayoutStatus::Failed)
+                }
+                _ => None,
             };
-            let payout_platform_id = payout_req.id;
 
-            trace!(
-                "- Payout {payout_platform_id} set to {new_payout_status:?}",
-            );
-
-            payout_platform_ids.push(payout_platform_id.to_string());
-            payout_new_statuses.push(new_payout_status.to_string());
+            if let Some(new_payout_status) = new_payout_status {
+                payout_platform_ids.push(payout_platform_id.to_string());
+                payout_new_statuses.push(new_payout_status.to_string());
+            }
         }
 
         let result = sqlx::query!(
@@ -468,6 +469,17 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
     }
 
     Ok(())
+}
+
+fn payout_should_be_failed(payout: &muralpay::Payout) -> bool {
+    matches!(
+        payout.details,
+        muralpay::PayoutDetails::Fiat(muralpay::FiatPayoutDetails {
+            fiat_payout_status: muralpay::FiatPayoutStatus::Failed { .. }
+                | muralpay::FiatPayoutStatus::Refunded { .. },
+            ..
+        })
+    )
 }
 
 #[cfg(test)]
