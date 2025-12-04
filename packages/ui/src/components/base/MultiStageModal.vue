@@ -13,7 +13,9 @@
 			</div>
 		</template>
 
-		<component :is="currentStage.stageContent" />
+		<div class="sm:w-[512px]">
+			<component :is="currentStage.stageContent" />
+		</div>
 
 		<template #actions>
 			<div class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">

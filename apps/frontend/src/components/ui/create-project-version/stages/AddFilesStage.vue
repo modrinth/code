@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-4 flex w-dvw max-w-[576px] flex-col gap-4">
+	<div class="mb-4 flex w-full flex-col gap-4">
 		<DropzoneFileInput
 			aria-label="Upload additional file"
 			multiple
@@ -37,11 +37,9 @@
 <script setup lang="ts">
 import { Admonition, DropzoneFileInput } from '@modrinth/ui'
 import { acceptFileFromProjectType } from '@modrinth/utils'
-
 import { useManageVersion } from '~/composables/versions/manage-version'
 import { inferVersionInfo } from '~/helpers/infer'
 import { injectVersionsContext } from '~/providers/versions'
-
 import VersionFileRow from '../components/VersionFileRow.vue'
 const { project } = injectVersionsContext()
 const { formatMessage } = useVIntl()

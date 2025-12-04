@@ -1,74 +1,72 @@
 <template>
-	<div class="w-[576px] max-w-[576px]">
-		<div class="grid gap-6">
-			<div class="flex flex-col gap-4">
-				<span class="font-semibold text-contrast">Add dependency</span>
-				<div class="grid gap-3 rounded-2xl border border-solid border-surface-5 p-4">
+	<div class="grid gap-6">
+		<div class="flex flex-col gap-4">
+			<span class="font-semibold text-contrast">Add dependency</span>
+			<div class="grid gap-3 rounded-2xl border border-solid border-surface-5 p-4">
+				<div class="grid gap-2.5">
+					<span class="font-semibold text-contrast">Project <span class="text-red">*</span></span>
+					<ModSelect v-model="newDependencyProjectId" />
+				</div>
+
+				<template v-if="newDependencyProjectId">
 					<div class="grid gap-2.5">
-						<span class="font-semibold text-contrast">Project <span class="text-red">*</span></span>
-						<ModSelect v-model="newDependencyProjectId" />
+						<span class="font-semibold text-contrast"> Version </span>
+						<Combobox
+							v-model="newDependencyVersionId"
+							placeholder="Select version"
+							:options="[{ label: 'Any version', value: null }, ...newDependencyVersions]"
+							:searchable="true"
+						/>
 					</div>
 
-					<template v-if="newDependencyProjectId">
-						<div class="grid gap-2.5">
-							<span class="font-semibold text-contrast"> Version </span>
-							<Combobox
-								v-model="newDependencyVersionId"
-								placeholder="Select version"
-								:options="[{ label: 'Any version', value: null }, ...newDependencyVersions]"
-								:searchable="true"
-							/>
-						</div>
-
-						<div class="grid gap-2.5">
-							<span class="font-semibold text-contrast"> Dependency relation </span>
-							<Combobox
-								v-model="newDependencyType"
-								placeholder="Select dependency type"
-								:options="[
-									{ label: 'Required', value: 'required' },
-									{ label: 'Optional', value: 'optional' },
-									{ label: 'Incompatible', value: 'incompatible' },
-									{ label: 'Embedded', value: 'embedded' },
-								]"
-							/>
-						</div>
-					</template>
-				</div>
-				<ButtonStyled>
-					<button
-						class="self-start"
-						:disabled="!newDependencyProjectId"
-						@click="
-							() =>
-								addDependency({
-									project_id: newDependencyProjectId,
-									version_id: newDependencyVersionId || undefined,
-									dependency_type: newDependencyType,
-								})
-						"
-					>
-						Add Dependency
-					</button>
-				</ButtonStyled>
-			</div>
-
-			<div class="flex flex-col gap-4">
-				<span class="font-semibold text-contrast">Added dependencies</span>
-				<div class="5 flex flex-col gap-2">
-					<template v-for="(dependency, index) in addedDependencies">
-						<AddedDependencyRow
-							v-if="dependency"
-							:key="index"
-							:name="dependency.name"
-							:icon="dependency.icon"
-							:dependency-type="dependency.dependencyType"
-							:version-name="dependency.versionName"
-							@remove="() => removeDependency(index)"
+					<div class="grid gap-2.5">
+						<span class="font-semibold text-contrast"> Dependency relation </span>
+						<Combobox
+							v-model="newDependencyType"
+							placeholder="Select dependency type"
+							:options="[
+								{ label: 'Required', value: 'required' },
+								{ label: 'Optional', value: 'optional' },
+								{ label: 'Incompatible', value: 'incompatible' },
+								{ label: 'Embedded', value: 'embedded' },
+							]"
 						/>
-					</template>
-					<span v-if="!addedDependencies.length"> No dependencies added. </span>
-				</div>
+					</div>
+				</template>
+			</div>
+			<ButtonStyled>
+				<button
+					class="self-start"
+					:disabled="!newDependencyProjectId"
+					@click="
+						() =>
+							addDependency({
+								project_id: newDependencyProjectId,
+								version_id: newDependencyVersionId || undefined,
+								dependency_type: newDependencyType,
+							})
+					"
+				>
+					Add Dependency
+				</button>
+			</ButtonStyled>
+		</div>
+
+		<div class="flex flex-col gap-4">
+			<span class="font-semibold text-contrast">Added dependencies</span>
+			<div class="5 flex flex-col gap-2">
+				<template v-for="(dependency, index) in addedDependencies">
+					<AddedDependencyRow
+						v-if="dependency"
+						:key="index"
+						:name="dependency.name"
+						:icon="dependency.icon"
+						:dependency-type="dependency.dependencyType"
+						:version-name="dependency.versionName"
+						@remove="() => removeDependency(index)"
+					/>
+				</template>
+				<span v-if="!addedDependencies.length"> No dependencies added. </span>
 			</div>
 		</div>
 	</div>

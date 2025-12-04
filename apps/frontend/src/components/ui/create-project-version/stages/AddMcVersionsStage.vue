@@ -1,5 +1,5 @@
 <template>
-	<div class="flex w-full max-w-[576px] flex-col gap-6">
+	<div class="flex flex-col gap-6">
 		<McVersionPicker v-model="draftVersion.game_versions" :game-versions="gameVersions" />
 		<div class="space-y-2">
 			<div class="flex items-center justify-between">

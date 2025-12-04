@@ -1,5 +1,5 @@
 <template>
-	<div class="flex w-full max-w-[576px] flex-col gap-6">
+	<div class="flex flex-col gap-6">
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">
 				Version type <span class="text-red">*</span>
