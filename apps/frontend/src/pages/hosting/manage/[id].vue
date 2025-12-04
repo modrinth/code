@@ -15,7 +15,19 @@
 		/>
 	</div>
 	<div
-		v-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
+		v-if="serverData && serverData.node === null && serverData.status !== 'suspended'"
+		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
+	>
+		<ErrorInformationCard
+			title="We're getting your server ready"
+			description="Your server's hardware is being prepared and will be available shortly!"
+			:icon="TransferIcon"
+			icon-color="blue"
+			:action="generalErrorAction"
+		/>
+	</div>
+	<div
+		v-else-if="serverData?.status === 'suspended' && serverData.suspension_reason === 'upgrading'"
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
@@ -1146,6 +1158,12 @@ const nodeAccessible = ref(true)
 onMounted(() => {
 	isMounted.value = true
 	if (server.general?.status === 'suspended') {
+		isLoading.value = false
+		return
+	}
+
+	// Skip node test if node is null (upgrading/provisioning)
+	if (server.general?.node === null) {
 		isLoading.value = false
 		return
 	}
