@@ -11,7 +11,6 @@ import {
 	MultiStageModal,
 } from '@modrinth/ui'
 import { defineMessages } from '@vintl/vintl'
-import { watch } from 'vue'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
 import { injectVersionsContext } from '~/providers/versions'
@@ -20,17 +19,10 @@ import AddChangelogStage from './stages/AddChangelogStage.vue'
 import AddDependenciesStage from './stages/AddDependenciesStage.vue'
 import AddDetailsStage from './stages/AddDetailsStage.vue'
 import AddFilesStage from './stages/AddFilesStage.vue'
+import AddLoadersStage from './stages/AddLoadersStage.vue'
 import AddMcVersionsStage from './stages/AddMcVersionsStage.vue'
 
 const { newDraftVersion, draftVersion } = useManageVersion()
-
-watch(
-	draftVersion,
-	() => {
-		console.log(toRaw(draftVersion.value))
-	},
-	{ deep: true },
-)
 
 const { formatMessage } = useVIntl()
 
@@ -98,10 +90,10 @@ const addFilesDisabled = computed(() => draftVersion.value.files.length === 0)
 const addDetailsDisabled = computed(
 	() =>
 		draftVersion.value.version_title.trim().length === 0 ||
-		draftVersion.value.version_number.trim().length === 0 ||
-		draftVersion.value.loaders.length === 0,
+		draftVersion.value.version_number.trim().length === 0,
 )
 
+const addLoadersDisabled = computed(() => draftVersion.value.loaders.length === 0)
 const addMcVersionsDisabled = computed(() => draftVersion.value.game_versions.length === 0)
 
 const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']>(
@@ -131,6 +123,16 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 					...defaultNextButton,
 					disabled: addDetailsDisabled.value,
 					label: formatMessage(messages.addMcVersionsButton),
+				},
+			},
+			{
+				title: 'Add loaders',
+				stageContent: AddLoadersStage,
+				leftButtonConfig: { ...defaultBackButton },
+				rightButtonConfig: {
+					...defaultNextButton,
+					disabled: addLoadersDisabled.value,
+					label: 'Set MC versions',
 				},
 			},
 			{

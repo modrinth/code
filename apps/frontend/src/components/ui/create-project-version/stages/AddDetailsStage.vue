@@ -42,9 +42,6 @@
 			/>
 			<span> The version subtitle also displays in the changelog. </span>
 		</div>
-		<div>
-			<LoaderPicker v-model="draftVersion.loaders" :loaders="generatedState.loaders" />
-		</div>
 	</div>
 </template>
 
@@ -52,10 +49,6 @@
 import Chips from '@modrinth/ui/src/components/base/Chips.vue'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
-
-import LoaderPicker from '../components/LoaderPicker.vue'
-
-const generatedState = useGeneratedState()
 
 const { draftVersion } = useManageVersion()
 </script>
