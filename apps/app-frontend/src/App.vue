@@ -794,7 +794,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton
 				v-if="themeStore.featureFlags.servers_in_app"
 				v-tooltip.right="'Servers'"
-				to="/servers/manage"
+				to="/hosting/manage"
 			>
 				<ServerIcon />
 			</NavButton>

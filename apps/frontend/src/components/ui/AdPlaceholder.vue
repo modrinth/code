@@ -62,21 +62,21 @@ useHead({
 
 const AD_PRESETS = {
 	medal: {
-		light: 'https://cdn-raw.modrinth.com/medal-modrinth-servers-light-new.webp',
-		dark: 'https://cdn-raw.modrinth.com/medal-modrinth-servers-dark-new.webp',
-		description: 'Host your next server with Modrinth Servers',
-		link: '/servers?plan&ref=medal',
+		light: 'https://cdn-raw.modrinth.com/modrinth-hosting-medal-light.webp',
+		dark: 'https://cdn-raw.modrinth.com/modrinth-hosting-medal-dark.webp',
+		description: 'Host your next server with Modrinth Hosting',
+		link: '/hosting?plan&ref=medal',
 	},
-	'modrinth-servers': {
-		light: 'https://cdn-raw.modrinth.com/modrinth-servers-placeholder-light.webp',
-		dark: 'https://cdn-raw.modrinth.com/modrinth-servers-placeholder-dark.webp',
-		description: 'Host your next server with Modrinth Servers',
-		link: '/servers',
+	'modrinth-hosting': {
+		light: 'https://cdn-raw.modrinth.com/modrinth-hosting-light.webp',
+		dark: 'https://cdn-raw.modrinth.com/modrinth-hosting-dark.webp',
+		description: 'Host your next server with Modrinth Hosting',
+		link: '/hosting',
 	},
 }
 
 const currentAd = computed(() =>
-	flags.value.enableMedalPromotion ? AD_PRESETS.medal : AD_PRESETS['modrinth-servers'],
+	flags.value.enableMedalPromotion ? AD_PRESETS.medal : AD_PRESETS['modrinth-hosting'],
 )
 
 onMounted(() => {

@@ -22,7 +22,7 @@ import { isAdmin as isUserAdmin, type User } from '@modrinth/utils'
 
 import ServerSidebar from '~/components/ui/servers/ServerSidebar.vue'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
-import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 const route = useRoute()
 const serverId = route.params.id as string
@@ -42,15 +42,15 @@ const isOwner = computed(() => (auth.value?.user as User | null)?.id === ownerId
 const isAdmin = computed(() => isUserAdmin(auth.value?.user))
 
 const navLinks = computed(() => [
-	{ icon: SettingsIcon, label: 'General', href: `/servers/manage/${serverId}/options` },
-	{ icon: WrenchIcon, label: 'Platform', href: `/servers/manage/${serverId}/options/loader` },
-	{ icon: TextQuoteIcon, label: 'Startup', href: `/servers/manage/${serverId}/options/startup` },
-	{ icon: VersionIcon, label: 'Network', href: `/servers/manage/${serverId}/options/network` },
-	{ icon: ListIcon, label: 'Properties', href: `/servers/manage/${serverId}/options/properties` },
+	{ icon: SettingsIcon, label: 'General', href: `/hosting/manage/${serverId}/options` },
+	{ icon: WrenchIcon, label: 'Platform', href: `/hosting/manage/${serverId}/options/loader` },
+	{ icon: TextQuoteIcon, label: 'Startup', href: `/hosting/manage/${serverId}/options/startup` },
+	{ icon: VersionIcon, label: 'Network', href: `/hosting/manage/${serverId}/options/network` },
+	{ icon: ListIcon, label: 'Properties', href: `/hosting/manage/${serverId}/options/properties` },
 	{
 		icon: UserIcon,
 		label: 'Preferences',
-		href: `/servers/manage/${serverId}/options/preferences`,
+		href: `/hosting/manage/${serverId}/options/preferences`,
 	},
 	{
 		icon: CardIcon,
@@ -66,6 +66,6 @@ const navLinks = computed(() => [
 		external: true,
 		shown: isAdmin.value,
 	},
-	{ icon: InfoIcon, label: 'Info', href: `/servers/manage/${serverId}/options/info` },
+	{ icon: InfoIcon, label: 'Info', href: `/hosting/manage/${serverId}/options/info` },
 ])
 </script>

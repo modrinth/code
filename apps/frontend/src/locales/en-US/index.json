@@ -1359,7 +1359,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Resources"
@@ -2001,7 +2001,7 @@
     "message": "Review project"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers is the easiest way to play with your friends without hassle!"
+    "message": "Modrinth Hosting is the easiest way to play with your friends without hassle!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Starting at {price}<small> / month</small>"

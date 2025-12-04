@@ -18,7 +18,7 @@
 			:customer="customer"
 			:payment-methods="paymentMethods"
 			:currency="selectedCurrency"
-			:return-url="`${config.public.siteUrl}/servers/manage`"
+			:return-url="`${config.public.siteUrl}/hosting/manage`"
 			:server-name="`${auth?.user?.username}'s server`"
 			:out-of-stock-url="outOfStockUrl"
 			:fetch-capacity-statuses="fetchCapacityStatuses"
@@ -40,13 +40,13 @@
 						{{ formatMessage(commonMessages.betaRelease) }}
 					</div>
 					<h1 class="relative m-0 max-w-3xl text-3xl font-bold !leading-[110%] md:text-6xl">
-						Host your next server with Modrinth Servers
+						Host your next server with Modrinth Hosting
 					</h1>
 				</div>
 				<h2
 					class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
 				>
-					Modrinth Servers is the easiest way to host your own Minecraft: Java Edition server.
+					Modrinth Hosting is the easiest way to host your own Minecraft: Java Edition server.
 					Seamlessly install and play your favorite mods and modpacks, all within the Modrinth
 					platform.
 				</h2>
@@ -61,7 +61,7 @@
 							</nuxt-link>
 						</ButtonStyled>
 						<ButtonStyled v-if="hasServers" type="outlined" size="large">
-							<nuxt-link class="w-fit" to="/servers/manage">
+							<nuxt-link class="w-fit" to="/hosting/manage">
 								<BoxIcon aria-hidden="true" /> Manage your servers
 							</nuxt-link>
 						</ButtonStyled>
@@ -110,7 +110,7 @@
 				<div
 					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
 				>
-					Why Modrinth Servers?
+					Why Modrinth Hosting?
 				</div>
 				<h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
 					Find a modpack. Now it's a server.
@@ -148,7 +148,7 @@
 						</svg>
 						<h2 class="m-0 text-lg font-bold">Play where your mods are</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Modrinth Servers seamlessly integrates the mod and modpack installation process into
+							Modrinth Hosting seamlessly integrates the mod and modpack installation process into
 							your server.
 						</h3>
 					</div>
@@ -213,7 +213,7 @@
 						</svg>
 						<h2 class="m-0 text-lg font-bold">Experience modern, reliable hosting</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Modrinth Servers are hosted on
+							Modrinth Hosting servers are hosted on
 							<span class="text-contrast">high-performance AMD CPUs with DDR5 RAM</span>, running on
 							custom-built software to ensure your server performs smoothly.
 						</h3>
@@ -341,7 +341,7 @@
 							A powerful console, server properties manager, and more
 						</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Modrinth Servers come with powerful tools to manage your server.
+							Modrinth Hosting comes with powerful tools to manage your server.
 						</h3>
 					</div>
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
@@ -378,7 +378,7 @@
 						<TransferIcon class="size-8 text-brand" />
 						<h2 class="m-0 text-lg font-bold">SFTP access</h2>
 						<h3 class="m-0 text-base font-normal text-secondary">
-							Access your server files directly with SFTP built into Modrinth Servers.
+							Access your server's files directly with SFTP built into Modrinth Hosting.
 						</h3>
 					</div>
 					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
@@ -398,11 +398,11 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								What kind of CPUs do Modrinth Servers run on?
+								What kind of CPUs do Modrinth Hosting servers run on?
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								Modrinth Servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+
-								GHz, paired with DDR5 memory.
+								Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs
+								at 5+ GHz, paired with DDR5 memory.
 							</p>
 						</details>
 						<details nav-hash="cpu-burst" class="group" :open="$route.hash === '#cpu-burst'">
@@ -426,11 +426,11 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								Do Modrinth Servers have DDoS protection?
+								Do Modrinth Hosting servers have DDoS protection?
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								Yes. All Modrinth Servers come with DDoS protection, with up to 17Tbps capacity in
-								some locations.
+								Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17Tbps
+								capacity in some locations.
 							</p>
 						</details>
 
@@ -439,7 +439,7 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								Where are Modrinth Servers located? Can I choose a region?
+								Where are Modrinth Hosting servers located? Can I choose a region?
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
 								We have servers available in North America, Europe, and Southeast Asia at the moment
@@ -466,13 +466,13 @@
 								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
 									<RightArrowIcon />
 								</span>
-								How fast are Modrinth Servers?
+								How fast are Modrinth Hosting servers?
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								Modrinth Servers are hosted on very modern high-performance hardware, but it's tough
-								to say how exactly that will translate into how fast your server will run because
-								there are so many factors that affect it, such as the mods, data packs, or plugins
-								you're running on your server, and even user behavior.
+								Modrinth Hosting servers are hosted on very modern high-performance hardware, but
+								it's tough to say how exactly that will translate into how fast your server will run
+								because there are so many factors that affect it, such as the mods, data packs, or
+								plugins you're running on your server, and even user behavior.
 							</p>
 							<p class="mb-0 ml-6 mt-3 leading-[160%]">
 								Most performance issues that arise tend to be the fault of an unoptimized modpack,
@@ -502,8 +502,8 @@
 								What Minecraft versions and loaders can be used?
 							</summary>
 							<p class="m-0 ml-6 leading-[160%]">
-								Modrinth Servers can run any version of Minecraft: Java Edition going all the way
-								back to version 1.2.5, including snapshot versions.
+								Modrinth Hosting servers can run any version of Minecraft: Java Edition going all
+								the way back to version 1.2.5, including snapshot versions.
 							</p>
 							<p class="m-0 ml-6 mt-3 leading-[160%]">
 								We also support a wide range of mod and plugin loaders, including Fabric, Quilt,
@@ -705,7 +705,7 @@ const lowestPrice = computed(() => {
 	return amount ? amount / monthsInInterval[billingPeriod.value] : undefined
 })
 
-const title = 'Modrinth Servers'
+const title = 'Modrinth Hosting'
 const description =
 	'Start your own Minecraft server directly on Modrinth. Play your favorite mods, plugins, and datapacks — without the hassle of setup.'
 

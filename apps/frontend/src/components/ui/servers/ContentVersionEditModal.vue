@@ -208,7 +208,7 @@
 				the mod.
 				<NuxtLink
 					class="mt-2 flex items-center gap-1"
-					:to="`/servers/manage/${props.serverId}/options/loader`"
+					:to="`/hosting/manage/${props.serverId}/options/loader`"
 					target="_blank"
 				>
 					<ExternalIcon class="size-5 flex-none"></ExternalIcon> Modify modpack version
