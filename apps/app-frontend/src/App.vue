@@ -1,5 +1,5 @@
 <script setup>
-import { AuthFeature, TauriModrinthClient } from '@modrinth/api-client'
+import { AuthFeature, PanelVersionFeature, TauriModrinthClient } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
@@ -115,6 +115,7 @@ const tauriApiClient = new TauriModrinthClient({
 		new AuthFeature({
 			token: async () => (await getCreds()).session,
 		}),
+		new PanelVersionFeature(),
 	],
 })
 provideModrinthClient(tauriApiClient)
