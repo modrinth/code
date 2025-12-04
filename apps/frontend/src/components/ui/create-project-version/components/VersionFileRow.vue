@@ -9,7 +9,12 @@
 			<span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium" :title="file.name">
 				{{ file.name }}
 			</span>
-			<TagItem v-if="isPrimary">Primary</TagItem>
+			<div
+				v-if="isPrimary"
+				class="rounded-full border border-solid border-brand bg-highlight-green px-2.5 py-1 text-sm font-medium text-brand"
+			>
+				Primary
+			</div>
 		</div>
 
 		<div class="flex items-center gap-1">
@@ -17,7 +22,7 @@
 				<Combobox
 					v-model="selectedType"
 					:searchable="false"
-					class="w-[126px] rounded-xl border border-solid border-surface-5"
+					class="w-28 rounded-xl border border-solid border-surface-5"
 					:options="versionTypes"
 					:close-on-select="true"
 					:show-labels="false"
@@ -26,8 +31,8 @@
 				/>
 			</template>
 
-			<ButtonStyled size="standard">
-				<button aria-label="Remove file" @click="emitRemove">
+			<ButtonStyled size="standard" :circular="true">
+				<button aria-label="Remove file" @click="emitRemove" class="!shadow-none">
 					<XIcon aria-hidden="true" />
 				</button>
 			</ButtonStyled>
@@ -37,7 +42,7 @@
 
 <script setup lang="ts">
 import { CheckIcon, XIcon } from '@modrinth/assets'
-import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
+import { ButtonStyled } from '@modrinth/ui'
 import Combobox, { type DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
 const selectedType = ref<string>('other')
