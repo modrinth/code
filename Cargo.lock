@@ -5057,6 +5057,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "modrinth-log"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "dotenvy",
+ "tracing",
+ "tracing-ecs",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "modrinth-maxmind"
 version = "0.0.0"
 dependencies = [
@@ -5082,12 +5093,10 @@ dependencies = [
  "derive_more 2.0.1",
  "dotenvy",
  "eyre",
+ "modrinth-log",
  "rust_decimal",
  "serde",
  "serde_json",
- "tracing",
- "tracing-ecs",
- "tracing-subscriber",
  "utoipa",
 ]
 
