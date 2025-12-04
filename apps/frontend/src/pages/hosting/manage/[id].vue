@@ -108,7 +108,7 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-6 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
+		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverData.image
 				? `url(${serverData.image})`
@@ -726,20 +726,8 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 
 				if (backup?.ongoing && attempt < 3) {
 					// retry 3 times max, archon is slow compared to ws state
-					// jank as hell
 					setTimeout(() => attemptCleanup(attempt + 1), 1000)
 					return
-				}
-
-				// clean up on success/3 attempts failed hope and pray
-				const entry = backupsState.get(backupId)
-				if (entry) {
-					const { [data.task]: _, ...remaining } = entry
-					if (Object.keys(remaining).length === 0) {
-						backupsState.delete(backupId)
-					} else {
-						backupsState.set(backupId, remaining)
-					}
 				}
 			})
 		}
