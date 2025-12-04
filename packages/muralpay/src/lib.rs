@@ -20,7 +20,8 @@ mod transaction;
 mod util;
 
 pub use {
-    account::*, counterparty::*, organization::*, payout::*, payout_method::*, transaction::*,
+    account::*, counterparty::*, organization::*, payout::*, payout_method::*,
+    transaction::*,
 };
 use {
     rust_decimal::Decimal,
@@ -81,7 +82,9 @@ pub enum FiatAccountType {
 
 crate::util::display_as_serialize!(FiatAccountType);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, strum::EnumIter)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, strum::EnumIter,
+)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "kebab-case")]
 pub enum FiatAndRailCode {

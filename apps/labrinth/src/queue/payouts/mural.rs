@@ -3,7 +3,7 @@ use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
 use modrinth_util::decimal::Decimal2dp;
-use muralpay::{Client, MuralError, TokenFeeRequest};
+use muralpay::{MuralError, TokenFeeRequest};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -69,7 +69,7 @@ impl PayoutsQueue {
         gross_amount: Decimal2dp,
         fees: PayoutFees,
         payout_details: MuralPayoutRequest,
-        recipient_info: muralpay::PayoutRecipientInfo,
+        recipient_info: muralpay::CreatePayoutRecipientInfo,
         gotenberg: &GotenbergClient,
     ) -> Result<muralpay::PayoutRequest, ApiError> {
         let muralpay = self.muralpay.load();
@@ -183,36 +183,27 @@ impl PayoutsQueue {
                 ),
             })?;
 
-        // try to immediately execute the payout request...
-        // use a poor man's try/catch block using this `async move {}`
-        // to catch any errors within this block
-        let result = async move {
-            muralpay
-                .client
-                .execute_payout_request(payout_request.id)
-                .await
-                .wrap_internal_err("failed to execute payout request")?;
-            eyre::Ok(())
-        }
-        .await;
-
-        // and if it fails, make sure to immediately cancel it -
-        // we don't want floating payout requests
-        if let Err(err) = result {
-            muralpay
-                .client
-                .cancel_payout_request(payout_request.id)
-                .await
-                .wrap_internal_err_with(|| {
-                    eyre!("failed to cancel unexecuted payout request\noriginal error: {err:#?}")
-                })?;
-            return Err(ApiError::Internal(err));
-        }
-
         Ok(payout_request)
     }
 
-    pub async fn cancel_muralpay_payout_request(
+    pub async fn execute_mural_payout_request(
+        &self,
+        id: muralpay::PayoutRequestId,
+    ) -> Result<(), ApiError> {
+        let muralpay = self.muralpay.load();
+        let muralpay = muralpay
+            .as_ref()
+            .wrap_internal_err("Mural Pay client not available")?;
+
+        muralpay
+            .client
+            .execute_payout_request(id)
+            .await
+            .wrap_internal_err("failed to execute payout request")?;
+        Ok(())
+    }
+
+    pub async fn cancel_mural_payout_request(
         &self,
         id: muralpay::PayoutRequestId,
     ) -> Result<()> {
@@ -263,7 +254,7 @@ impl PayoutsQueue {
 /// Mural state, and updates the payout status.
 pub async fn sync_pending_payouts_from_mural(
     db: &PgPool,
-    mural: &MuralPay,
+    mural: &muralpay::Client,
     limit: u32,
 ) -> eyre::Result<()> {
     #[derive(Debug)]
@@ -489,8 +480,7 @@ mod tests {
         api_v3::ApiV3,
         environment::{TestEnvironment, with_test_environment},
     };
-    use muralpay::MuralPay;
-    use muralpay::mock::MuralPayMock;
+    use muralpay::MuralPayMock;
 
     fn create_mock_payout_request(
         id: &str,
@@ -510,8 +500,8 @@ mod tests {
         }
     }
 
-    fn create_mock_muralpay() -> MuralPay {
-        MuralPay::from_mock(MuralPayMock {
+    fn create_mock_muralpay() -> muralpay::Client {
+        muralpay::Client::from_mock(MuralPayMock {
             get_payout_request: Box::new(|_id| {
                 Err(muralpay::MuralError::Api(muralpay::ApiError {
                     error_instance_id: uuid::Uuid::new_v4(),
@@ -655,7 +645,7 @@ mod tests {
                 })
             });
 
-            let mock_client = MuralPay::from_mock(mock);
+            let mock_client = muralpay::Client::from_mock(mock);
 
             // Run the function
             let result =
@@ -768,7 +758,7 @@ mod tests {
                 })
             });
 
-            let mock_client = MuralPay::from_mock(mock);
+            let mock_client = muralpay::Client::from_mock(mock);
 
             // Run the function
             let result =
@@ -830,7 +820,7 @@ mod tests {
                 })
             });
 
-            let mock_client = MuralPay::from_mock(mock);
+            let mock_client = muralpay::Client::from_mock(mock);
 
             // Run the function - should handle this gracefully
             sync_failed_mural_payouts_to_labrinth(
