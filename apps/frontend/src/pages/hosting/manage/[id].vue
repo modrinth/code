@@ -969,7 +969,7 @@ export type BackupInProgressReason = {
 	tooltip: MessageDescriptor
 }
 
-const RestoreInProgressReason = {
+const restoreInProgressReason = {
 	type: 'restore',
 	tooltip: defineMessage({
 		id: 'servers.backup.restore.in-progress.tooltip',
@@ -977,21 +977,10 @@ const RestoreInProgressReason = {
 	}),
 } satisfies BackupInProgressReason
 
-const CreateInProgressReason = {
-	type: 'create',
-	tooltip: defineMessage({
-		id: 'servers.backup.create.in-progress.tooltip',
-		defaultMessage: 'Backup creation in progress',
-	}),
-} satisfies BackupInProgressReason
-
 const backupInProgress = computed(() => {
 	for (const entry of backupsState.values()) {
-		if (entry.create?.state === 'ongoing') {
-			return CreateInProgressReason
-		}
 		if (entry.restore?.state === 'ongoing') {
-			return RestoreInProgressReason
+			return restoreInProgressReason
 		}
 	}
 	return undefined
