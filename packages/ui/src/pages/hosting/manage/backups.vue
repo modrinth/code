@@ -32,7 +32,7 @@
 			<BackupRestoreModal ref="restoreBackupModal" />
 			<BackupDeleteModal ref="deleteBackupModal" @delete="deleteBackup" />
 
-			<div class="mb-2 flex items-center align-middle justify-between" v-if="backupsData?.length">
+			<div v-if="backupsData?.length" class="mb-2 flex items-center align-middle justify-between">
 				<span class="text-2xl font-semibold text-contrast">Backups</span>
 				<ButtonStyled color="brand">
 					<button
@@ -112,26 +112,25 @@
 											stroke-linejoin="round"
 										/>
 									</svg>
-
 								</div>
 								<div class="flex flex-col gap-4 -mt-4">
 									<div class="flex flex-col gap-1.5">
 										<span class="text-lg text-contrast md:text-2xl">No backups yet</span>
-									<span class="max-w-[256px] text-sm md:text-base leading-6 text-secondary">
-										Create your first backup
-									</span>
+										<span class="max-w-[256px] text-sm md:text-base leading-6 text-secondary">
+											Create your first backup
+										</span>
 									</div>
 									<ButtonStyled color="brand">
-					<button
-						v-tooltip="backupCreationDisabled"
-						:disabled="!!backupCreationDisabled"
-						@click="showCreateModel"
-						class="w-min mx-auto"
-					>
-						<PlusIcon class="size-5" />
-						Create backup
-					</button>
-				</ButtonStyled>
+										<button
+											v-tooltip="backupCreationDisabled"
+											:disabled="!!backupCreationDisabled"
+											class="w-min mx-auto"
+											@click="showCreateModel"
+										>
+											<PlusIcon class="size-5" />
+											Create backup
+										</button>
+									</ButtonStyled>
 								</div>
 							</div>
 						</template>
