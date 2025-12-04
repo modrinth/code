@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servers"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
@@ -842,6 +842,51 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Backup schedule"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Creating backup..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Failed to create backup"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Failed to restore from backup"
+  },
+  "servers.backups.item.lock": {
+    "defaultMessage": "Lock"
+  },
+  "servers.backups.item.locked": {
+    "defaultMessage": "Locked"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Manual backup"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Backup queued"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Restore queued"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Rename"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Restore"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Restoring from backup..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Retry"
+  },
+  "servers.backups.item.unlock": {
+    "defaultMessage": "Unlock"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Dismiss"
   },
@@ -930,7 +975,7 @@
     "defaultMessage": "Where would you like your server to be located?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Servers next!</link>"
+    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Hosting next!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Southeast Asia"

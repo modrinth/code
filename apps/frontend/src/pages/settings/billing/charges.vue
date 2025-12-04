@@ -17,7 +17,7 @@
 						<span class="font-bold text-primary">
 							<template v-if="charge.product?.metadata?.type === 'midas'"> Modrinth Plus </template>
 							<template v-else-if="charge.product?.metadata?.type === 'pyro'">
-								Modrinth Servers
+								Modrinth Hosting
 							</template>
 							<template v-else> Medal Server Trial </template>
 							<template v-if="charge.subscription_interval">

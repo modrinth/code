@@ -128,6 +128,11 @@ export { default as ThemeSelector } from './settings/ThemeSelector.vue'
 
 // Servers
 export { default as ServersSpecs } from './billing/ServersSpecs.vue'
+export { default as BackupCreateModal } from './servers/backups/BackupCreateModal.vue'
+export { default as BackupDeleteModal } from './servers/backups/BackupDeleteModal.vue'
+export { default as BackupItem } from './servers/backups/BackupItem.vue'
+export { default as BackupRenameModal } from './servers/backups/BackupRenameModal.vue'
+export { default as BackupRestoreModal } from './servers/backups/BackupRestoreModal.vue'
 export { default as BackupWarning } from './servers/backups/BackupWarning.vue'
 export { default as LoaderIcon } from './servers/icons/LoaderIcon.vue'
 export { default as ServerIcon } from './servers/icons/ServerIcon.vue'

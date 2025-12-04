@@ -4,7 +4,8 @@ use actix_web::{HttpRequest, get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
+use serde::{Deserialize, Serialize};
+use sqlx::{PgPool, PgTransaction};
 use tokio_stream::StreamExt;
 
 use super::ownership::get_projects_ownership;
@@ -25,10 +26,15 @@ use crate::{
         ids::{FileId, ProjectId, ThreadId, VersionId},
         pats::Scopes,
         projects::{Project, ProjectStatus},
-        threads::Thread,
+        threads::{MessageBody, Thread},
+        users::User,
     },
     queue::session::AuthQueue,
-    routes::{ApiError, internal::moderation::Ownership},
+    routes::{
+        ApiError,
+        internal::moderation::Ownership,
+        v3::threads::{NewThreadMessage, thread_send_message_internal},
+    },
     util::error::Context,
 };
 
@@ -402,6 +408,7 @@ async fn search_projects(
                 -- project type
                 (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
                 AND dr.status = $5
+                AND NOT m.status = 'draft'
         ) t
 
         -- sorting
@@ -507,6 +514,68 @@ async fn search_projects(
 pub struct UpdateStatus {
     /// Status to set the issue to.
     pub status: DelphiReportIssueStatus,
+    /// If `status` is [`DelphiReportIssueStatus::Unsafe`], provides a message
+    /// to reject the project.
+    pub message: Option<String>,
+}
+
+async fn maybe_reject_project(
+    report_id: DelphiReportId,
+    txn: &mut PgTransaction<'_>,
+    update_req: &UpdateStatus,
+    user: &User,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    if update_req.status != DelphiReportIssueStatus::Unsafe {
+        return Ok(());
+    };
+
+    let record = sqlx::query!(
+        r#"
+        UPDATE mods
+        SET status = $1
+        FROM delphi_reports dr
+        INNER JOIN files f ON f.id = dr.file_id
+        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN mods m ON v.mod_id = m.id
+        INNER JOIN threads t ON t.mod_id = m.id
+        WHERE dr.id = $2
+        RETURNING
+            m.id AS "project_id: DBProjectId",
+            t.id AS "thread_id: DBThreadId"
+        "#,
+        ProjectStatus::Rejected.as_str(),
+        report_id as DelphiReportId,
+    )
+    .fetch_one(&mut **txn)
+    .await
+    .wrap_internal_err("failed to mark project as rejected")?;
+
+    if let Some(body) = &update_req.message {
+        thread_send_message_internal(
+            user,
+            record.thread_id.into(),
+            pool,
+            NewThreadMessage {
+                body: MessageBody::Text {
+                    body: body.clone(),
+                    private: true,
+                    replying_to: None,
+                    associated_images: Vec::new(),
+                },
+            },
+            redis,
+        )
+        .await
+        .wrap_internal_err("failed to add moderation thread message")?;
+    }
+
+    DBProject::clear_cache(record.project_id, None, None, redis)
+        .await
+        .wrap_internal_err("failed to clear project cache")?;
+
+    Ok(())
 }
 
 /// Updates the state of a project based on a technical review report.
@@ -523,7 +592,7 @@ async fn update_report(
     update_req: web::Json<UpdateStatus>,
     path: web::Path<(DelphiReportId,)>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    let user = check_is_moderator_from_headers(
         &req,
         &**pool,
         &redis,
@@ -551,29 +620,15 @@ async fn update_report(
     .await
     .wrap_internal_err("failed to update report")?;
 
-    if update_req.status == DelphiReportIssueStatus::Unsafe {
-        let result = sqlx::query!(
-            "
-            UPDATE mods
-            SET status = $1
-            FROM delphi_reports dr
-            INNER JOIN files f ON f.id = dr.file_id
-            INNER JOIN versions v ON v.id = f.version_id
-            INNER JOIN mods m ON v.mod_id = m.id
-            WHERE dr.id = $2
-            ",
-            ProjectStatus::Rejected.as_str(),
-            report_id as DelphiReportId,
-        )
-        .execute(&mut *txn)
-        .await
-        .wrap_internal_err("failed to mark project as rejected")?;
-        if result.rows_affected() == 0 {
-            return Err(ApiError::Internal(eyre!(
-                "no project was marked as rejected"
-            )));
-        }
-    }
+    maybe_reject_project(
+        report_id,
+        &mut txn,
+        &update_req,
+        &user,
+        &pool,
+        &redis,
+    )
+    .await?;
 
     txn.commit()
         .await
@@ -596,7 +651,7 @@ async fn update_issue(
     update_req: web::Json<UpdateStatus>,
     path: web::Path<(DelphiReportIssueId,)>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    let user = check_is_moderator_from_headers(
         &req,
         &**pool,
         &redis,
@@ -611,43 +666,30 @@ async fn update_issue(
         .await
         .wrap_internal_err("failed to start transaction")?;
 
-    sqlx::query!(
-        "
-        UPDATE delphi_report_issues
+    let record = sqlx::query!(
+        r#"
+        UPDATE delphi_report_issues dri
         SET status = $1
-        WHERE id = $2
-        ",
+        FROM delphi_reports dr
+        WHERE dri.id = $2 AND dr.id = dri.report_id
+        RETURNING dr.id AS "report_id: DelphiReportId"
+        "#,
         update_req.status as DelphiReportIssueStatus,
         issue_id as DelphiReportIssueId,
     )
-    .execute(&mut *txn)
+    .fetch_one(&mut *txn)
     .await
     .wrap_internal_err("failed to update issue")?;
 
-    if update_req.status == DelphiReportIssueStatus::Unsafe {
-        let result = sqlx::query!(
-            "
-            UPDATE mods
-            SET status = $1
-            FROM delphi_report_issues dri
-            INNER JOIN delphi_reports dr ON dr.id = dri.report_id
-            INNER JOIN files f ON f.id = dr.file_id
-            INNER JOIN versions v ON v.id = f.version_id
-            INNER JOIN mods m ON v.mod_id = m.id
-            WHERE dri.id = $2
-            ",
-            ProjectStatus::Rejected.as_str(),
-            issue_id as DelphiReportIssueId,
-        )
-        .execute(&mut *txn)
-        .await
-        .wrap_internal_err("failed to mark project as rejected")?;
-        if result.rows_affected() == 0 {
-            return Err(ApiError::Internal(eyre!(
-                "no project was marked as rejected"
-            )));
-        }
-    }
+    maybe_reject_project(
+        record.report_id,
+        &mut txn,
+        &update_req,
+        &user,
+        &pool,
+        &redis,
+    )
+    .await?;
 
     txn.commit()
         .await

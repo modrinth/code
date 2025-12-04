@@ -15,7 +15,7 @@
 					class="flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-divider pb-4"
 				>
 					<nuxt-link
-						:to="`/servers/manage/${server.serverId}/content`"
+						:to="`/hosting/manage/${server.serverId}/content`"
 						tabindex="-1"
 						class="flex flex-col gap-4 text-primary"
 					>
@@ -40,7 +40,7 @@
 						</span>
 					</nuxt-link>
 					<ButtonStyled>
-						<nuxt-link :to="`/servers/manage/${server.serverId}/content`">
+						<nuxt-link :to="`/hosting/manage/${server.serverId}/content`">
 							<LeftArrowIcon />
 							Back to server
 						</nuxt-link>
@@ -537,7 +537,7 @@ async function serverInstall(project) {
 				eraseDataOnInstall.value,
 			)
 			project.installed = true
-			navigateTo(`/servers/manage/${server.value.serverId}/options/loader`)
+			navigateTo(`/hosting/manage/${server.value.serverId}/options/loader`)
 		} else if (projectType.value.id === 'mod') {
 			await server.value.content.install('mod', version.project_id, version.id)
 			await server.value.refresh(['content'])

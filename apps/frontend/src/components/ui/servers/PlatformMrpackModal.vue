@@ -69,7 +69,7 @@
 							</div>
 						</div>
 
-						<BackupWarning :backup-link="`/servers/manage/${props.server?.serverId}/backups`" />
+						<BackupWarning :backup-link="`/hosting/manage/${props.server?.serverId}/backups`" />
 					</div>
 					<div class="mt-4 flex justify-start gap-4">
 						<ButtonStyled :color="isDangerous ? 'red' : 'brand'">
@@ -133,7 +133,7 @@ import { ModrinthServersFetchError } from '@modrinth/utils'
 import { onMounted, onUnmounted } from 'vue'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers'
-import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 const { addNotification } = injectNotificationManager()
 

@@ -252,9 +252,9 @@ pub struct PayoutMethodFee {
 }
 
 impl PayoutMethodFee {
-    pub fn compute_fee(&self, value: Decimal) -> Decimal {
+    pub fn compute_fee(&self, value: impl Into<Decimal>) -> Decimal {
         cmp::min(
-            cmp::max(self.min, self.percentage * value),
+            cmp::max(self.min, self.percentage * value.into()),
             self.max.unwrap_or(Decimal::MAX),
         )
     }

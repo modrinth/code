@@ -182,7 +182,7 @@
 							"
 						>
 							<nuxt-link
-								:to="`/servers/manage/${subscription.metadata.id}`"
+								:to="`/hosting/manage/${subscription.metadata.id}`"
 								target="_blank"
 								class="w-fit"
 							>

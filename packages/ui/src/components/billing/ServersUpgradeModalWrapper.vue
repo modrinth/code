@@ -9,7 +9,7 @@
 		:customer="customer"
 		:payment-methods="paymentMethods"
 		:currency="selectedCurrency"
-		:return-url="`${props.siteUrl}/servers/manage`"
+		:return-url="`${props.siteUrl}/hosting/manage`"
 		:pings="regionPings"
 		:regions="regionsData"
 		:refresh-payment-methods="fetchPaymentData"
