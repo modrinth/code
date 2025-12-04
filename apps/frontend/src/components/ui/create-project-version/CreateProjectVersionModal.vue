@@ -3,9 +3,13 @@
 </template>
 
 <script setup lang="ts">
-import { LeftArrowIcon, PlusIcon, RightArrowIcon } from '@modrinth/assets'
-import { commonMessages, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
-import MultiStageModal from '@modrinth/ui/src/components/base/MultiStageModal.vue'
+import { LeftArrowIcon, PlusIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
+import {
+	commonMessages,
+	injectModrinthClient,
+	injectNotificationManager,
+	MultiStageModal,
+} from '@modrinth/ui'
 import { defineMessages } from '@vintl/vintl'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
@@ -106,7 +110,13 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			{
 				title: formatMessage(messages.addFilesTitle),
 				stageContent: AddFilesStage,
-				leftButtonConfig: null,
+				leftButtonConfig: {
+					...defaultBackButton,
+					label: 'Cancel',
+					icon: XIcon,
+					iconPosition: 'before' as const,
+					onClick: () => modal.value?.hide(),
+				},
 				rightButtonConfig: {
 					...defaultNextButton,
 					disabled: addFilesDisabled.value,
