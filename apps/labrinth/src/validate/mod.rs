@@ -221,6 +221,7 @@ async fn validate_minecraft_file(
                 FileType::RequiredResourcePack | FileType::OptionalResourcePack => {
                     return PackValidator.validate_maybe_protected_zip(&mut zip);
                 }
+                FileType::DevJar | FileType::SourcesJar | FileType::JavadocJar => {},
                 FileType::Unknown => {}
             }
         }
