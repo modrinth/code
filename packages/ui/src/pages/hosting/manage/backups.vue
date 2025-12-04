@@ -77,7 +77,7 @@
 										v-for="backup in group.backups"
 										:key="`backup-${backup.id}`"
 										:backup="backup"
-										:disabled="backupOperationDisabled"
+										:restore-disabled="backupRestoreDisabled"
 										:kyros-url="server.node?.instance"
 										:jwt="server.node?.token"
 										:show-debug-info="showDebugInfo"
@@ -276,25 +276,22 @@ const restoreBackupModal = ref<InstanceType<typeof BackupRestoreModal>>()
 const deleteBackupModal = ref<InstanceType<typeof BackupDeleteModal>>()
 // const backupSettingsModal = ref<InstanceType<typeof BackupSettingsModal>>()
 
-const backupOperationDisabled = computed(() => {
+const backupRestoreDisabled = computed(() => {
 	if (props.isServerRunning) {
-		return 'Cannot perform backup operations while server is running'
+		return 'Cannot restore backup while server is running'
 	}
 	for (const entry of backupsState.values()) {
 		if (entry.create?.state === 'ongoing') {
-			return 'Cannot perform backup operations while a backup is being created'
+			return 'Cannot restore backup while a backup is being created'
 		}
 		if (entry.restore?.state === 'ongoing') {
-			return 'Cannot perform backup operations while a backup is being restored'
+			return 'Cannot restore backup while another restore is in progress'
 		}
 	}
 	return undefined
 })
 
 const backupCreationDisabled = computed(() => {
-	if (props.isServerRunning) {
-		return 'Cannot create backup while server is running'
-	}
 	if (
 		server.value.used_backup_quota !== undefined &&
 		server.value.backup_quota !== undefined &&

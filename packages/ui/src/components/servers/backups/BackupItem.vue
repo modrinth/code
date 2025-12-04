@@ -36,14 +36,14 @@ const props = withDefaults(
 		kyrosUrl?: string
 		jwt?: string
 		showDebugInfo?: boolean
-		disabled?: string
+		restoreDisabled?: string
 	}>(),
 	{
 		preview: false,
 		kyrosUrl: undefined,
 		jwt: undefined,
 		showDebugInfo: false,
-		disabled: undefined,
+		restoreDisabled: undefined,
 	},
 )
 
@@ -121,7 +121,6 @@ const overflowMenuOptions = computed<OverflowOption[]>(() => {
 			id: 'delete',
 			color: 'red',
 			action: () => emit('delete'),
-			disabled: !!props.disabled,
 		})
 	}
 
@@ -324,9 +323,9 @@ const messages = defineMessages({
 			<template v-else>
 				<ButtonStyled color="brand" type="outlined">
 					<button
-						v-tooltip="props.disabled"
+						v-tooltip="props.restoreDisabled"
 						class="!border-[1px]"
-						:disabled="!!props.disabled"
+						:disabled="!!props.restoreDisabled"
 						@click="() => emit('restore')"
 					>
 						<RotateCounterClockwiseIcon class="size-5" />
