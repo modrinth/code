@@ -1,16 +1,13 @@
 <template>
-	<div class="mb-4 flex w-[576px] max-w-[576px] flex-col gap-4">
-		<FileInput
-			prompt="Drag and drop to upload or click to select"
+	<div class="mb-4 flex w-dvw max-w-[576px] flex-col gap-4">
+		<DropzoneFileInput
 			aria-label="Upload additional file"
 			multiple
 			long-style
 			:accept="acceptFileFromProjectType(project.project_type)"
 			:max-size="524288000"
 			@change="handleNewFiles"
-		>
-			<UploadIcon aria-hidden="true" />
-		</FileInput>
+		/>
 
 		<Admonition v-if="hasSupplementaryFiles" type="warning">
 			{{ formatMessage(messages.addFilesAdmonition) }}
@@ -38,15 +35,13 @@
 </template>
 
 <script setup lang="ts">
-import { UploadIcon } from '@modrinth/assets'
-import { FileInput } from '@modrinth/ui'
-import Admonition from '@modrinth/ui/src/components/base/Admonition.vue'
+import { Admonition, DropzoneFileInput } from '@modrinth/ui'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
+import { inferVersionInfo } from '~/helpers/infer'
 import { injectVersionsContext } from '~/providers/versions'
 
-import { inferVersionInfo } from '~/helpers/infer'
 import VersionFileRow from '../components/VersionFileRow.vue'
 const { project } = injectVersionsContext()
 const { formatMessage } = useVIntl()
