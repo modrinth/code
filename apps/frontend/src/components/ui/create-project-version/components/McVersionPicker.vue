@@ -10,6 +10,7 @@
 				:items="['release', 'all']"
 				:never-empty="false"
 				:capitalize="true"
+				size="small"
 			/>
 		</div>
 		<div class="iconified-input w-full rounded-xl border-[1px] border-solid border-surface-5">
@@ -17,7 +18,7 @@
 			<input v-model="searchQuery" type="text" placeholder="Search versions" />
 		</div>
 		<div
-			class="user-select-none flex max-h-60 flex-col gap-3 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
+			class="user-select-none flex max-h-72 flex-col gap-3 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
 		>
 			<div v-for="group in groupedGameVersions" :key="group.key" class="space-y-1.5">
 				<span class="font-semibold">{{ group.key }}</span>
@@ -81,14 +82,27 @@ const toggleVersion = (version: string, event: MouseEvent) => {
 
 function groupVersions(gameVersions: GameVersion[]) {
 	if (versionType.value === 'all') {
-		return [
-			{
-				key: 'All versions',
-				versions: gameVersions
-					.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-					.map((v) => v.version),
-			},
-		]
+		const grouped: Record<string, string[]> = {}
+
+		const sorted = [...gameVersions].sort(
+			(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+		)
+
+		for (const v of sorted) {
+			const d = new Date(v.date)
+			const label = d.toLocaleString('en-US', {
+				year: 'numeric',
+				month: 'long',
+			})
+
+			if (!grouped[label]) grouped[label] = []
+			grouped[label].push(v.version)
+		}
+
+		return Object.entries(grouped).map(([key, versions]) => ({
+			key,
+			versions,
+		}))
 	}
 
 	const versions = gameVersions.map((v) => v.version)
