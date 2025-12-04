@@ -5060,8 +5060,8 @@ dependencies = [
 name = "modrinth-log"
 version = "0.0.0"
 dependencies = [
- "anyhow",
  "dotenvy",
+ "eyre",
  "tracing",
  "tracing-ecs",
  "tracing-subscriber",

@@ -19,7 +19,6 @@ serde_json = { workspace = true }
 
 [features]
 decimal = ["dep:rust_decimal", "utoipa?/decimal"]
-error = []
 utoipa = ["dep:utoipa"]
 
 [lints]

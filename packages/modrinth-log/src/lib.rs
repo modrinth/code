@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use anyhow::{Context, Result, anyhow};
+use eyre::{Result, WrapErr, eyre};
 use tracing::level_filters::LevelFilter;
 use tracing_ecs::ECSLayerBuilder;
 use tracing_subscriber::{
@@ -63,7 +63,7 @@ pub fn init_with_config(compact: bool) -> Result<()> {
     let output_format = match env_var(OUTPUT_FORMAT_ENV_VAR) {
         Ok(format) => format
             .parse::<OutputFormat>()
-            .map_err(|_| anyhow!("invalid output format '{format}'"))?,
+            .map_err(|_| eyre!("invalid output format '{format}'"))?,
         Err(_) => OutputFormat::Human,
     };
 
@@ -89,17 +89,16 @@ pub fn init_with_config(compact: bool) -> Result<()> {
             .with(ECSLayerBuilder::default().stdout())
             .try_init(),
     };
-    result.context("failed to initialize tracing registry")?;
+    result.wrap_err("failed to initialize tracing registry")?;
 
     Ok(())
 }
 
-#[track_caller]
 fn env_var(key: &str) -> Result<String> {
     let value = dotenvy::var(key)
-        .with_context(|| anyhow!("missing environment variable `{key}`"))?;
+        .wrap_err_with(|| eyre!("missing environment variable `{key}`"))?;
     if value.is_empty() {
-        Err(anyhow!("environment variable `{key}` is empty"))
+        Err(eyre!("environment variable `{key}` is empty"))
     } else {
         Ok(value)
     }

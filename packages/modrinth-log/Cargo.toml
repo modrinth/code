@@ -5,8 +5,8 @@ rust-version.workspace = true
 repository.workspace = true
 
 [dependencies]
-anyhow = { workspace = true }
 dotenvy = { workspace = true }
+eyre = { workspace = true }
 tracing = { workspace = true }
 tracing-ecs = { workspace = true }
 tracing-subscriber = { workspace = true }
