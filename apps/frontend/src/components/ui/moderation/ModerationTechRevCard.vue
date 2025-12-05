@@ -14,6 +14,7 @@ import {
 	ShieldCheckIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
+import { techReviewQuickReplies, type TechReviewContext } from '@modrinth/moderation'
 import {
 	Avatar,
 	ButtonStyled,
@@ -341,6 +342,12 @@ function toggleIssue(issueId: string) {
 function handleThreadUpdate() {
 	emit('refetch')
 }
+
+const techReviewContext = computed<TechReviewContext>(() => ({
+	project: props.item.project,
+	project_owner: props.item.project_owner,
+	reports: props.item.reports,
+}))
 </script>
 
 <template>
@@ -486,7 +493,12 @@ function handleThreadUpdate() {
 				<div class="bg-surface-2 p-4">
 					<!-- DEV-531 -->
 					<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
-					<ThreadView :thread="item.thread" @update-thread="handleThreadUpdate" />
+					<ThreadView
+						:thread="item.thread"
+						:quick-replies="techReviewQuickReplies"
+						:quick-reply-context="techReviewContext"
+						@update-thread="handleThreadUpdate"
+					/>
 				</div>
 			</template>
 

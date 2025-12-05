@@ -15,10 +15,3 @@ export interface ExtendedReport extends Report {
 	version?: Version
 	target?: OwnershipTarget
 }
-
-export interface ReportQuickReply {
-	label: string
-	message: string | ((report: ExtendedReport) => Promise<string> | string)
-	shouldShow?: (report: ExtendedReport) => boolean
-	private?: boolean
-}

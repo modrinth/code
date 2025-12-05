@@ -12,7 +12,6 @@
 				:thread="thread"
 				:message="message"
 				:members="members"
-				:report="report"
 				:auth="auth"
 				raised
 				@update-thread="() => updateThreadLocal()"
@@ -23,14 +22,9 @@
 			<p class="text-lg text-secondary">No messages yet</p>
 		</div>
 
-		<template v-if="reportClosed">
+		<template v-if="closed">
 			<p class="text-secondary">This thread is closed and new messages cannot be sent to it.</p>
-			<ButtonStyled v-if="isStaff(auth.user)" color="green" class="mt-2">
-				<button class="w-full gap-2 sm:w-auto" @click="reopenReport()">
-					<CheckCircleIcon class="size-4" />
-					Reopen Thread
-				</button>
-			</ButtonStyled>
+			<slot name="closedActions" />
 		</template>
 
 		<template v-else>
@@ -72,33 +66,16 @@
 				</div>
 
 				<div class="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-					<template v-if="isStaff(auth.user)">
-						<ButtonStyled v-if="replyBody" color="red">
-							<button class="w-full gap-2 sm:w-auto" @click="closeReport(true)">
-								<CheckCircleIcon class="size-4" />
-								Reply and close
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else color="red">
-							<button class="w-full gap-2 sm:w-auto" @click="closeReport()">
-								<CheckCircleIcon class="size-4" />
-								Close report
-							</button>
-						</ButtonStyled>
-					</template>
+					<slot name="additionalActions" :has-reply="!!replyBody" />
 				</div>
 			</div>
 		</template>
 	</div>
 </template>
 
-<script setup lang="ts">
-import { CheckCircleIcon, MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
-import {
-	type ExtendedReport,
-	reportQuickReplies,
-	type ReportQuickReply,
-} from '@modrinth/moderation'
+<script setup lang="ts" generic="T">
+import { MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
+import { type QuickReply } from '@modrinth/moderation'
 import {
 	ButtonStyled,
 	CopyCode,
@@ -107,7 +84,7 @@ import {
 	OverflowMenu,
 	type OverflowMenuOption,
 } from '@modrinth/ui'
-import type { Thread, ThreadMessage as TypeThreadMessage, User } from '@modrinth/utils'
+import type { Thread, User } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
@@ -119,44 +96,35 @@ import ThreadMessage from './ThreadMessage.vue'
 const { addNotification } = injectNotificationManager()
 
 const visibleQuickReplies = computed<OverflowMenuOption[]>(() => {
-	if (!props.report) return []
+	const replies = props.quickReplies
+	const context = props.quickReplyContext
 
-	return reportQuickReplies
+	if (!replies || !context) return []
+
+	return replies
 		.filter((reply) => {
 			if (reply.shouldShow === undefined) return true
-			if (typeof reply.shouldShow === 'function') {
-				return reply.shouldShow(props.report! as ExtendedReport)
-			}
-
-			return reply.shouldShow
+			return reply.shouldShow(context)
 		})
 		.map(
 			(reply) =>
 				({
 					id: reply.label,
-					action: () => handleQuickReply(reply),
+					action: () => handleQuickReply(reply, context),
 				}) as OverflowMenuOption,
 		)
 })
 
 const props = defineProps<{
 	thread: Thread
-	reporter?: User
-	report?: Partial<ExtendedReport> & {
-		id?: string
-		thread_id?: string
-		closed?: boolean
-		created?: string
-	}
+	quickReplies?: ReadonlyArray<QuickReply<T>>
+	quickReplyContext?: T
+	closed?: boolean
 }>()
 
-async function handleQuickReply(reply: ReportQuickReply) {
-	if (!props.report) return
-
+async function handleQuickReply(reply: QuickReply<T>, context: T) {
 	const message =
-		typeof reply.message === 'function'
-			? await reply.message(props.report as ExtendedReport)
-			: reply.message
+		typeof reply.message === 'function' ? await reply.message(context) : reply.message
 
 	await nextTick()
 	setReplyContent(message)
@@ -164,6 +132,7 @@ async function handleQuickReply(reply: ReportQuickReply) {
 
 defineExpose({
 	setReplyContent,
+	sendReply,
 })
 
 const auth = await useAuth()
@@ -176,9 +145,6 @@ const flags = useFeatureFlags()
 
 const members = computed(() => {
 	const membersMap: Record<string, User> = {}
-	if (props.reporter) {
-		membersMap[props.reporter.id] = props.reporter
-	}
 	for (const member of props.thread.members) {
 		membersMap[member.id] = member
 	}
@@ -191,38 +157,15 @@ function setReplyContent(content: string) {
 }
 
 const sortedMessages = computed(() => {
-	const messages: TypeThreadMessage[] = []
+	if (!props.thread) return []
 
-	// Add synthetic first message for reports
-	if (props.report?.created && props.reporter) {
-		messages.push({
-			id: null,
-			author_id: props.reporter.id,
-			body: {
-				type: 'text',
-				body: props.report.body || 'Thread opened.',
-				private: false,
-				replying_to: null,
-				associated_images: [],
-			},
-			created: props.report.created,
-			hide_identity: false,
-		})
-	}
-
-	if (props.thread) {
-		messages.push(
-			...[...props.thread.messages].sort(
-				(a, b) => dayjs(a.created).toDate().getTime() - dayjs(b.created).toDate().getTime(),
-			),
-		)
-	}
-
-	return messages
+	return [...props.thread.messages].sort(
+		(a, b) => dayjs(a.created).toDate().getTime() - dayjs(b.created).toDate().getTime(),
+	)
 })
 
 async function updateThreadLocal() {
-	const threadId = props.report?.thread_id || props.thread.id
+	const threadId = props.thread.id
 	if (threadId) {
 		try {
 			const thread = (await useBaseFetch(`thread/${threadId}`)) as Thread
@@ -277,53 +220,4 @@ async function sendReply(privateMessage = false) {
 	}
 }
 
-const didCloseReport = ref(false)
-const reportClosed = computed(() => {
-	return didCloseReport.value || (props.report && props.report.closed)
-})
-
-async function closeReport(reply = false) {
-	if (!props.report?.id) return
-
-	if (reply) {
-		await sendReply()
-	}
-
-	try {
-		await useBaseFetch(`report/${props.report.id}`, {
-			method: 'PATCH',
-			body: {
-				closed: true,
-			},
-		})
-		await updateThreadLocal()
-		didCloseReport.value = true
-	} catch (err: any) {
-		addNotification({
-			title: 'Error closing report',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
-}
-
-async function reopenReport() {
-	if (!props.report?.id) return
-
-	try {
-		await useBaseFetch(`report/${props.report.id}`, {
-			method: 'PATCH',
-			body: {
-				closed: false,
-			},
-		})
-		await updateThreadLocal()
-	} catch (err: any) {
-		addNotification({
-			title: 'Error reopening report',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
-}
 </script>

@@ -155,22 +155,49 @@
 					v-if="report.thread"
 					ref="reportThread"
 					:thread="report.thread"
-					:report="report"
-					:reporter="report.reporter_user"
+					:quick-replies="reportQuickReplies"
+					:quick-reply-context="report"
+					:closed="reportClosed"
 					@update-thread="updateThread"
-				/>
+				>
+					<template #closedActions>
+						<ButtonStyled v-if="isStaff(auth.user)" color="green" class="mt-2">
+							<button class="w-full gap-2 sm:w-auto" @click="reopenReport()">
+								<CheckCircleIcon class="size-4" />
+								Reopen Thread
+							</button>
+						</ButtonStyled>
+					</template>
+					<template #additionalActions="{ hasReply }">
+						<template v-if="isStaff(auth.user)">
+							<ButtonStyled v-if="hasReply" color="red">
+								<button class="w-full gap-2 sm:w-auto" @click="closeReport(true)">
+									<CheckCircleIcon class="size-4" />
+									Reply and close
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else color="red">
+								<button class="w-full gap-2 sm:w-auto" @click="closeReport()">
+									<CheckCircleIcon class="size-4" />
+									Close report
+								</button>
+							</ButtonStyled>
+						</template>
+					</template>
+				</ThreadView>
 			</div>
 		</Collapsible>
 	</div>
 </template>
 <script setup lang="ts">
 import {
+	CheckCircleIcon,
 	ChevronDownIcon,
 	ClipboardCopyIcon,
 	EllipsisVerticalIcon,
 	LinkIcon,
 } from '@modrinth/assets'
-import type { ExtendedReport } from '@modrinth/moderation'
+import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
 import type { OverflowMenuOption } from '@modrinth/ui'
 import {
 	Avatar,
@@ -186,15 +213,67 @@ import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import ThreadView from '../thread/ThreadView.vue'
+import { isStaff } from '~/helpers/users.js'
 
 const { addNotification } = injectNotificationManager()
+const auth = await useAuth()
 
 const props = defineProps<{
 	report: ExtendedReport
 }>()
 
-const reportThread = ref<InstanceType<typeof ThreadView> | null>(null)
+const reportThread = ref<{
+	setReplyContent: (content: string) => void
+	sendReply: (privateMessage?: boolean) => Promise<void>
+} | null>(null)
 const isThreadCollapsed = ref(true)
+
+const didCloseReport = ref(false)
+const reportClosed = computed(() => {
+	return didCloseReport.value || props.report.closed
+})
+
+async function closeReport(reply = false) {
+	if (reply && reportThread.value) {
+		await reportThread.value.sendReply()
+	}
+
+	try {
+		await useBaseFetch(`report/${props.report.id}`, {
+			method: 'PATCH',
+			body: {
+				closed: true,
+			},
+		})
+		updateThread(props.report.thread)
+		didCloseReport.value = true
+	} catch (err: any) {
+		addNotification({
+			title: 'Error closing report',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
+}
+
+async function reopenReport() {
+	try {
+		await useBaseFetch(`report/${props.report.id}`, {
+			method: 'PATCH',
+			body: {
+				closed: false,
+			},
+		})
+		updateThread(props.report.thread)
+		didCloseReport.value = false
+	} catch (err: any) {
+		addNotification({
+			title: 'Error reopening report',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
+}
 
 const formatRelativeTime = useRelativeTime()
 
