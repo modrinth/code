@@ -76,12 +76,10 @@ export abstract class AbstractWebSocketClient {
 	): () => void {
 		const eventKey = `${serverId}:${eventType}` as keyof WSEventMap
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		this.emitter.on(eventKey, handler as any)
+		this.emitter.on(eventKey, handler as () => void)
 
 		return () => {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			this.emitter.off(eventKey, handler as any)
+			this.emitter.off(eventKey, handler as () => void)
 		}
 	}
 
