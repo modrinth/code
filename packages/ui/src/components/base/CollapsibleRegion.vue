@@ -54,7 +54,7 @@ const collapsed = defineModel<boolean>('collapsed', { default: true })
 <style scoped>
 .collapsible-region-content {
 	display: grid;
-	grid-template-rows: var(--collapsed-height);
+	grid-template-rows: 0fr;
 	transition: grid-template-rows 0.3s ease-in-out;
 }
 
@@ -70,5 +70,11 @@ const collapsed = defineModel<boolean>('collapsed', { default: true })
 
 .collapsible-region-content > div {
 	overflow: hidden;
+	min-height: var(--collapsed-height);
+	transition: min-height 0.3s;
+}
+
+.collapsible-region-content.open > div {
+	min-height: 0;
 }
 </style>

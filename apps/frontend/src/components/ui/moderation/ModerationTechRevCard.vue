@@ -504,12 +504,12 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 
 		<div class="border-t border-surface-3 bg-surface-2">
 			<template v-if="currentTab === 'Thread'">
-				<div class="bg-surface-2 p-4">
 					<CollapsibleRegion
 						v-model:collapsed="isThreadCollapsed"
 						:expand-text="threadExpandText"
 						collapse-text="Collapse thread"
 					>
+					<div class="bg-surface-2 p-4">
 						<!-- DEV-531 -->
 						<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
 						<ThreadView
@@ -518,8 +518,8 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 							:quick-reply-context="techReviewContext"
 							@update-thread="handleThreadUpdate"
 						/>
+			</div>
 					</CollapsibleRegion>
-				</div>
 			</template>
 
 			<template v-else-if="currentTab === 'Files' && !selectedFile">
