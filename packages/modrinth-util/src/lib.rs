@@ -1,12 +1,12 @@
 #![doc = include_str!("../README.md")]
 
 mod error;
-pub mod log;
 
 #[cfg(feature = "decimal")]
 pub mod decimal;
 
 pub use error::*;
+pub use modrinth_log as log;
 
 use eyre::{Result, eyre};
 

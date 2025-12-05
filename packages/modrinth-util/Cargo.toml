@@ -9,11 +9,9 @@ actix-web = { workspace = true }
 derive_more = { workspace = true, features = ["display", "error", "from"] }
 dotenvy = { workspace = true }
 eyre = { workspace = true }
+modrinth-log = { workspace = true }
 rust_decimal = { workspace = true, features = ["macros"], optional = true }
 serde = { workspace = true, features = ["derive"] }
-tracing = { workspace = true }
-tracing-ecs = { workspace = true }
-tracing-subscriber = { workspace = true }
 utoipa = { workspace = true, optional = true }
 
 [dev-dependencies]
