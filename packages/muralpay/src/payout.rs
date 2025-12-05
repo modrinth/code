@@ -6,170 +6,188 @@
     )
 )]
 
-use std::str::FromStr;
-
-use chrono::{DateTime, Utc};
-use derive_more::{Deref, Display, Error, From};
-use rust_decimal::Decimal;
-use rust_iso3166::CountryCode;
-use serde::{Deserialize, Serialize};
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use uuid::Uuid;
-
-use crate::{
-    AccountId, Blockchain, FiatAccountType, FiatAmount, FiatAndRailCode,
-    MuralError, MuralPay, SearchParams, SearchResponse, TokenAmount,
-    TransferError, WalletDetails, util::RequestExt,
+use {
+    crate::{
+        AccountId, Blockchain, CounterpartyId, CurrencyCode, FiatAccountType,
+        FiatAmount, FiatAndRailCode, PayoutMethodId, TokenAmount,
+        TransactionId, WalletDetails,
+    },
+    chrono::{DateTime, Utc},
+    derive_more::{Deref, Display, Error, From},
+    rust_decimal::Decimal,
+    rust_iso3166::CountryCode,
+    serde::{Deserialize, Serialize},
+    serde_with::{DeserializeFromStr, SerializeDisplay},
+    std::str::FromStr,
+    uuid::Uuid,
 };
 
-impl MuralPay {
-    pub async fn search_payout_requests(
-        &self,
-        filter: Option<PayoutStatusFilter>,
-        params: Option<SearchParams<PayoutRequestId>>,
-    ) -> Result<SearchResponse<PayoutRequestId, PayoutRequest>, MuralError>
-    {
-        mock!(self, search_payout_requests(filter, params));
+#[cfg(feature = "client")]
+const _: () = {
+    use crate::{MuralError, RequestExt, SearchParams, SearchResponse};
 
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Body {
-            // if we submit `null`, Mural errors; we have to explicitly exclude this field
-            #[serde(skip_serializing_if = "Option::is_none")]
+    impl crate::Client {
+        pub async fn search_payout_requests(
+            &self,
             filter: Option<PayoutStatusFilter>,
+            params: Option<SearchParams<PayoutRequestId>>,
+        ) -> Result<SearchResponse<PayoutRequestId, PayoutRequest>, MuralError>
+        {
+            #[derive(Debug, Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct Body {
+                // if we submit `null`, Mural errors; we have to explicitly exclude this field
+                #[serde(skip_serializing_if = "Option::is_none")]
+                filter: Option<PayoutStatusFilter>,
+            }
+
+            maybe_mock!(self, search_payout_requests(filter, params));
+
+            let body = Body { filter };
+
+            self.http_post(|base| format!("{base}/api/payouts/search"))
+                .query(&params.map(|p| p.to_query()).unwrap_or_default())
+                .json(&body)
+                .send_mural()
+                .await
         }
 
-        let body = Body { filter };
+        pub async fn get_payout_request(
+            &self,
+            id: PayoutRequestId,
+        ) -> Result<PayoutRequest, MuralError> {
+            maybe_mock!(self, get_payout_request(id));
 
-        self.http_post(|base| format!("{base}/api/payouts/search"))
-            .query(&params.map(|p| p.to_query()).unwrap_or_default())
+            self.http_get(|base| format!("{base}/api/payouts/payout/{id}"))
+                .send_mural()
+                .await
+        }
+
+        pub async fn get_fees_for_token_amount(
+            &self,
+            token_fee_requests: &[TokenFeeRequest],
+        ) -> Result<Vec<TokenPayoutFee>, MuralError> {
+            #[derive(Debug, Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct Body<'a> {
+                token_fee_requests: &'a [TokenFeeRequest],
+            }
+
+            maybe_mock!(self, get_fees_for_token_amount(token_fee_requests));
+
+            let body = Body { token_fee_requests };
+
+            self.http_post(|base| {
+                format!("{base}/api/payouts/fees/token-to-fiat")
+            })
             .json(&body)
             .send_mural()
             .await
-    }
-
-    pub async fn get_payout_request(
-        &self,
-        id: PayoutRequestId,
-    ) -> Result<PayoutRequest, MuralError> {
-        mock!(self, get_payout_request(id));
-
-        self.http_get(|base| format!("{base}/api/payouts/payout/{id}"))
-            .send_mural()
-            .await
-    }
-
-    pub async fn get_fees_for_token_amount(
-        &self,
-        token_fee_requests: &[TokenFeeRequest],
-    ) -> Result<Vec<TokenPayoutFee>, MuralError> {
-        mock!(self, get_fees_for_token_amount(token_fee_requests));
-
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Body<'a> {
-            token_fee_requests: &'a [TokenFeeRequest],
         }
 
-        let body = Body { token_fee_requests };
+        pub async fn get_fees_for_fiat_amount(
+            &self,
+            fiat_fee_requests: &[FiatFeeRequest],
+        ) -> Result<Vec<FiatPayoutFee>, MuralError> {
+            #[derive(Debug, Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct Body<'a> {
+                fiat_fee_requests: &'a [FiatFeeRequest],
+            }
 
-        self.http_post(|base| format!("{base}/api/payouts/fees/token-to-fiat"))
+            maybe_mock!(self, get_fees_for_fiat_amount(fiat_fee_requests));
+
+            let body = Body { fiat_fee_requests };
+
+            self.http_post(|base| {
+                format!("{base}/api/payouts/fees/fiat-to-token")
+            })
             .json(&body)
             .send_mural()
             .await
-    }
-
-    pub async fn get_fees_for_fiat_amount(
-        &self,
-        fiat_fee_requests: &[FiatFeeRequest],
-    ) -> Result<Vec<FiatPayoutFee>, MuralError> {
-        mock!(self, get_fees_for_fiat_amount(fiat_fee_requests));
-
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Body<'a> {
-            fiat_fee_requests: &'a [FiatFeeRequest],
         }
 
-        let body = Body { fiat_fee_requests };
-
-        self.http_post(|base| format!("{base}/api/payouts/fees/fiat-to-token"))
-            .json(&body)
-            .send_mural()
-            .await
-    }
-
-    pub async fn create_payout_request(
-        &self,
-        source_account_id: AccountId,
-        memo: Option<impl AsRef<str>>,
-        payouts: &[CreatePayout],
-    ) -> Result<PayoutRequest, MuralError> {
-        mock!(self, create_payout_request(source_account_id, memo.as_ref().map(|x| x.as_ref()), payouts));
-
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Body<'a> {
+        pub async fn create_payout_request(
+            &self,
             source_account_id: AccountId,
-            memo: Option<&'a str>,
-            payouts: &'a [CreatePayout],
+            memo: Option<impl AsRef<str>>,
+            payouts: &[CreatePayout],
+        ) -> Result<PayoutRequest, MuralError> {
+            #[derive(Debug, Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct Body<'a> {
+                source_account_id: AccountId,
+                memo: Option<&'a str>,
+                payouts: &'a [CreatePayout],
+            }
+
+            maybe_mock!(
+                self,
+                create_payout_request(
+                    source_account_id,
+                    memo.as_ref().map(AsRef::as_ref),
+                    payouts
+                )
+            );
+
+            let body = Body {
+                source_account_id,
+                memo: memo.as_ref().map(AsRef::as_ref),
+                payouts,
+            };
+
+            self.http_post(|base| format!("{base}/api/payouts/payout"))
+                .json(&body)
+                .send_mural()
+                .await
         }
 
-        let body = Body {
-            source_account_id,
-            memo: memo.as_ref().map(|x| x.as_ref()),
-            payouts,
-        };
+        pub async fn execute_payout_request(
+            &self,
+            id: PayoutRequestId,
+        ) -> Result<PayoutRequest, MuralError> {
+            maybe_mock!(self, execute_payout_request(id));
 
-        self.http_post(|base| format!("{base}/api/payouts/payout"))
-            .json(&body)
+            self.http_post(|base| {
+                format!("{base}/api/payouts/payout/{id}/execute")
+            })
+            .transfer_auth(self)
             .send_mural()
             .await
-    }
+        }
 
-    pub async fn execute_payout_request(
-        &self,
-        id: PayoutRequestId,
-    ) -> Result<PayoutRequest, TransferError> {
-        mock!(self, execute_payout_request(id));
+        pub async fn cancel_payout_request(
+            &self,
+            id: PayoutRequestId,
+        ) -> Result<PayoutRequest, MuralError> {
+            maybe_mock!(self, cancel_payout_request(id));
 
-        self.http_post(|base| format!("{base}/api/payouts/payout/{id}/execute"))
-            .transfer_auth(self)?
+            self.http_post(|base| {
+                format!("{base}/api/payouts/payout/{id}/cancel")
+            })
+            .transfer_auth(self)
             .send_mural()
             .await
-            .map_err(From::from)
+        }
+
+        pub async fn get_bank_details(
+            &self,
+            fiat_currency_and_rail: &[FiatAndRailCode],
+        ) -> Result<BankDetailsResponse, MuralError> {
+            maybe_mock!(self, get_bank_details(fiat_currency_and_rail));
+
+            let query = fiat_currency_and_rail
+                .iter()
+                .map(|code| ("fiatCurrencyAndRail", code.to_string()))
+                .collect::<Vec<_>>();
+
+            self.http_get(|base| format!("{base}/api/payouts/bank-details"))
+                .query(&query)
+                .send_mural()
+                .await
+        }
     }
-
-    pub async fn cancel_payout_request(
-        &self,
-        id: PayoutRequestId,
-    ) -> Result<PayoutRequest, TransferError> {
-        mock!(self, cancel_payout_request(id));
-
-        self.http_post(|base| format!("{base}/api/payouts/payout/{id}/cancel"))
-            .transfer_auth(self)?
-            .send_mural()
-            .await
-            .map_err(From::from)
-    }
-
-    pub async fn get_bank_details(
-        &self,
-        fiat_currency_and_rail: &[FiatAndRailCode],
-    ) -> Result<BankDetailsResponse, MuralError> {
-        mock!(self, get_bank_details(fiat_currency_and_rail));
-
-        let query = fiat_currency_and_rail
-            .iter()
-            .map(|code| ("fiatCurrencyAndRail", code.to_string()))
-            .collect::<Vec<_>>();
-
-        self.http_get(|base| format!("{base}/api/payouts/bank-details"))
-            .query(&query)
-            .send_mural()
-            .await
-    }
-}
+};
 
 #[derive(
     Debug,
@@ -192,6 +210,12 @@ impl FromStr for PayoutRequestId {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         s.parse::<Uuid>().map(Self)
+    }
+}
+
+impl From<PayoutRequestId> for Uuid {
+    fn from(value: PayoutRequestId) -> Self {
+        value.0
     }
 }
 
@@ -219,6 +243,12 @@ impl FromStr for PayoutId {
     }
 }
 
+impl From<PayoutId> for Uuid {
+    fn from(value: PayoutId) -> Self {
+        value.0
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
@@ -226,7 +256,7 @@ pub enum PayoutStatusFilter {
     PayoutStatus { statuses: Vec<PayoutStatus> },
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct PayoutRequest {
@@ -251,7 +281,7 @@ pub enum PayoutStatus {
     Failed,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct Payout {
@@ -260,9 +290,10 @@ pub struct Payout {
     pub updated_at: DateTime<Utc>,
     pub amount: TokenAmount,
     pub details: PayoutDetails,
+    pub recipient_info: PayoutRecipientInfo,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum PayoutDetails {
@@ -270,7 +301,7 @@ pub enum PayoutDetails {
     Blockchain(BlockchainPayoutDetails),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct FiatPayoutDetails {
@@ -286,7 +317,7 @@ pub struct FiatPayoutDetails {
     pub developer_fee: Option<DeveloperFee>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum FiatPayoutStatus {
@@ -310,7 +341,69 @@ pub enum FiatPayoutStatus {
         reason: String,
         error_code: FiatPayoutErrorCode,
     },
+    #[serde(rename_all = "camelCase")]
     Canceled,
+    // since 1.31
+    #[serde(rename_all = "camelCase")]
+    RefundInProgress {
+        error_code: RefundErrorCode,
+        failure_reason: String,
+        refund_initiated_at: DateTime<Utc>,
+    },
+    // since 1.31
+    #[serde(rename_all = "camelCase")]
+    Refunded {
+        error_code: RefundErrorCode,
+        failure_reason: String,
+        refund_completed_at: DateTime<Utc>,
+        refund_initiated_at: DateTime<Utc>,
+        refund_transaction_id: TransactionId,
+    },
+}
+
+// since 1.31
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum RefundErrorCode {
+    Unknown,
+    AccountNumberIncorrect,
+    RejectedByBank,
+    AccountTypeIncorrect,
+    AccountClosed,
+    BeneficiaryDocumentationIncorrect,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde(tag = "type", rename_all = "kebab-case")]
+pub enum FiatPayoutStatusKind {
+    Created,
+    Pending,
+    OnHold,
+    Completed,
+    Failed,
+    Canceled,
+    RefundInProgress,
+    Refunded,
+}
+
+impl FiatPayoutStatus {
+    #[must_use]
+    pub const fn kind(&self) -> FiatPayoutStatusKind {
+        match self {
+            Self::Created { .. } => FiatPayoutStatusKind::Created,
+            Self::Pending { .. } => FiatPayoutStatusKind::Pending,
+            Self::OnHold { .. } => FiatPayoutStatusKind::OnHold,
+            Self::Completed { .. } => FiatPayoutStatusKind::Completed,
+            Self::Failed { .. } => FiatPayoutStatusKind::Failed,
+            Self::Canceled { .. } => FiatPayoutStatusKind::Canceled,
+            Self::RefundInProgress { .. } => {
+                FiatPayoutStatusKind::RefundInProgress
+            }
+            Self::Refunded { .. } => FiatPayoutStatusKind::Refunded,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -325,7 +418,7 @@ pub enum FiatPayoutErrorCode {
     BeneficiaryDocumentationIncorrect,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct DeveloperFee {
@@ -333,7 +426,7 @@ pub struct DeveloperFee {
     pub developer_fee_percentage: Option<Decimal>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct BlockchainPayoutDetails {
@@ -353,13 +446,51 @@ pub enum BlockchainPayoutStatus {
     Canceled,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum PayoutRecipientInfo {
+    #[serde(rename_all = "camelCase")]
+    Counterparty {
+        counterparty_id: CounterpartyId,
+        payout_method_id: PayoutMethodId,
+    },
+    #[serde(rename_all = "camelCase")]
+    Inline {
+        name: String,
+        details: InlineRecipientDetails,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum InlineRecipientDetails {
+    #[serde(rename_all = "camelCase")]
+    Fiat { details: InlineFiatRecipientDetails },
+    #[serde(rename_all = "camelCase")]
+    Blockchain {
+        wallet_address: String,
+        blockchain: Blockchain,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde(rename_all = "camelCase")]
+pub struct InlineFiatRecipientDetails {
+    pub fiat_currency_code: CurrencyCode,
+    pub bank_name: String,
+    pub truncated_bank_account_number: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct CreatePayout {
     pub amount: TokenAmount,
     pub payout_details: CreatePayoutDetails,
-    pub recipient_info: PayoutRecipientInfo,
+    pub recipient_info: CreatePayoutRecipientInfo,
     pub supporting_details: Option<SupportingDetails>,
 }
 
@@ -487,7 +618,8 @@ pub enum FiatAndRailDetails {
 }
 
 impl FiatAndRailDetails {
-    pub fn code(&self) -> FiatAndRailCode {
+    #[must_use]
+    pub const fn code(&self) -> FiatAndRailCode {
         match self {
             Self::Usd { .. } => FiatAndRailCode::Usd,
             Self::Cop { .. } => FiatAndRailCode::Cop,
@@ -607,7 +739,7 @@ pub enum PixAccountType {
 #[derive(Debug, Clone, Serialize, Deserialize, From)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
-pub enum PayoutRecipientInfo {
+pub enum CreatePayoutRecipientInfo {
     #[serde(rename_all = "camelCase")]
     Individual {
         first_name: String,
@@ -624,20 +756,23 @@ pub enum PayoutRecipientInfo {
     },
 }
 
-impl PayoutRecipientInfo {
+impl CreatePayoutRecipientInfo {
+    #[must_use]
     pub fn email(&self) -> &str {
         match self {
-            PayoutRecipientInfo::Individual { email, .. } => email,
-            PayoutRecipientInfo::Business { email, .. } => email,
+            Self::Individual { email, .. } | Self::Business { email, .. } => {
+                email
+            }
         }
     }
 
-    pub fn physical_address(&self) -> &PhysicalAddress {
+    #[must_use]
+    pub const fn physical_address(&self) -> &PhysicalAddress {
         match self {
-            PayoutRecipientInfo::Individual {
+            Self::Individual {
                 physical_address, ..
-            } => physical_address,
-            PayoutRecipientInfo::Business {
+            }
+            | Self::Business {
                 physical_address, ..
             } => physical_address,
         }

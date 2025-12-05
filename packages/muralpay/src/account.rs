@@ -1,83 +1,65 @@
-use std::str::FromStr;
-
-use chrono::{DateTime, Utc};
-use derive_more::{Deref, Display};
-use rust_decimal::Decimal;
-use secrecy::ExposeSecret;
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-
-use crate::{
-    Blockchain, FiatAmount, MuralError, MuralPay, TokenAmount, WalletDetails,
-    util::RequestExt,
+use {
+    crate::{Blockchain, FiatAmount, TokenAmount, WalletDetails},
+    chrono::{DateTime, Utc},
+    derive_more::{Deref, Display},
+    rust_decimal::Decimal,
+    serde::{Deserialize, Serialize},
+    std::str::FromStr,
+    uuid::Uuid,
 };
 
-impl MuralPay {
-    pub async fn get_all_accounts(&self) -> Result<Vec<Account>, MuralError> {
-        mock!(self, get_all_accounts());
+#[cfg(feature = "client")]
+const _: () = {
+    use crate::{MuralError, RequestExt};
 
-        self.http_get(|base| format!("{base}/api/accounts"))
-            .send_mural()
-            .await
-    }
+    impl crate::Client {
+        pub async fn get_all_accounts(&self) -> Result<Vec<Account>, MuralError> {
+            maybe_mock!(self, get_all_accounts());
 
-    pub async fn get_account(
-        &self,
-        id: AccountId,
-    ) -> Result<Account, MuralError> {
-        mock!(self, get_account(id));
-
-        self.http_get(|base| format!("{base}/api/accounts/{id}"))
-            .send_mural()
-            .await
-    }
-
-    pub async fn create_account(
-        &self,
-        name: impl AsRef<str>,
-        description: Option<impl AsRef<str>>,
-    ) -> Result<Account, MuralError> {
-        mock!(
-            self,
-            create_account(
-                name.as_ref(),
-                description.as_ref().map(|x| x.as_ref()),
-            )
-        );
-
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Body<'a> {
-            name: &'a str,
-            description: Option<&'a str>,
+            self.http_get(|base| format!("{base}/api/accounts"))
+                .send_mural()
+                .await
         }
 
-        let body = Body {
-            name: name.as_ref(),
-            description: description.as_ref().map(|x| x.as_ref()),
-        };
+        pub async fn get_account(&self, id: AccountId) -> Result<Account, MuralError> {
+            maybe_mock!(self, get_account(id));
 
-        self.http
-            .post(format!("{}/api/accounts", self.api_url))
-            .bearer_auth(self.api_key.expose_secret())
-            .json(&body)
-            .send_mural()
-            .await
+            self.http_get(|base| format!("{base}/api/accounts/{id}"))
+                .send_mural()
+                .await
+        }
+
+        pub async fn create_account(
+            &self,
+            name: impl AsRef<str>,
+            description: Option<impl AsRef<str>>,
+        ) -> Result<Account, MuralError> {
+            #[derive(Debug, Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct Body<'a> {
+                name: &'a str,
+                description: Option<&'a str>,
+            }
+
+            maybe_mock!(
+                self,
+                create_account(name.as_ref(), description.as_ref().map(AsRef::as_ref))
+            );
+
+            let body = Body {
+                name: name.as_ref(),
+                description: description.as_ref().map(AsRef::as_ref),
+            };
+
+            self.http_post(|base| format!("{base}/api/accounts"))
+                .json(&body)
+                .send_mural()
+                .await
+        }
     }
-}
+};
 
-#[derive(
-    Debug,
-    Display,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
-    Deref,
-    Serialize,
-    Deserialize,
-)]
+#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Deref, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct AccountId(pub Uuid);
@@ -87,6 +69,12 @@ impl FromStr for AccountId {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         s.parse::<Uuid>().map(Self)
+    }
+}
+
+impl From<AccountId> for Uuid {
+    fn from(value: AccountId) -> Self {
+        value.0
     }
 }
 

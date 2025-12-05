@@ -1,91 +1,81 @@
-use std::str::FromStr;
-
-use chrono::{DateTime, Utc};
-use derive_more::{Deref, Display};
-use secrecy::ExposeSecret;
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-
-use crate::{
-    CurrencyCode, MuralError, MuralPay, SearchResponse, util::RequestExt,
+use {
+    crate::CurrencyCode,
+    chrono::{DateTime, Utc},
+    derive_more::{Deref, Display},
+    serde::{Deserialize, Serialize},
+    std::str::FromStr,
+    uuid::Uuid,
 };
 
-impl MuralPay {
-    pub async fn search_organizations(
-        &self,
-        req: SearchRequest,
-    ) -> Result<SearchResponse<OrganizationId, Organization>, MuralError> {
-        mock!(self, search_organizations(req.clone()));
+#[cfg(feature = "client")]
+const _: () = {
+    use crate::{MuralError, RequestExt, SearchResponse};
 
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Body {
-            #[serde(skip_serializing_if = "Option::is_none")]
-            filter: Option<Filter>,
+    impl crate::Client {
+        pub async fn search_organizations(
+            &self,
+            req: SearchRequest,
+        ) -> Result<SearchResponse<OrganizationId, Organization>, MuralError> {
+            #[derive(Debug, Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct Body {
+                #[serde(skip_serializing_if = "Option::is_none")]
+                filter: Option<Filter>,
+            }
+
+            #[derive(Debug, Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct Filter {
+                #[serde(rename = "type")]
+                ty: FilterType,
+                name: String,
+            }
+
+            #[derive(Debug, Clone, Copy, Serialize)]
+            #[serde(rename_all = "snake_case")]
+            pub enum FilterType {
+                Name,
+            }
+
+            maybe_mock!(self, search_organizations(req.clone()));
+
+            let query = [
+                req.limit.map(|limit| ("limit", limit.to_string())),
+                req.next_id
+                    .map(|next_id| ("nextId", next_id.hyphenated().to_string())),
+            ]
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>();
+
+            let body = Body {
+                filter: req.name.map(|name| Filter {
+                    ty: FilterType::Name,
+                    name,
+                }),
+            };
+
+            self.http_post(|base| format!("{base}/api/organizations/search"))
+                .query(&query)
+                .json(&body)
+                .send_mural()
+                .await
         }
 
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Filter {
-            #[serde(rename = "type")]
-            ty: FilterType,
-            name: String,
+        pub async fn get_organization(
+            &self,
+            id: OrganizationId,
+        ) -> Result<Organization, MuralError> {
+            maybe_mock!(self, get_organization(id));
+
+            self.http_post(|base| format!("{base}/api/organizations/{id}"))
+                .send_mural()
+                .await
         }
-
-        #[derive(Debug, Clone, Copy, Serialize)]
-        #[serde(rename_all = "snake_case")]
-        pub enum FilterType {
-            Name,
-        }
-
-        let query = [
-            req.limit.map(|limit| ("limit", limit.to_string())),
-            req.next_id
-                .map(|next_id| ("nextId", next_id.hyphenated().to_string())),
-        ]
-        .into_iter()
-        .flatten()
-        .collect::<Vec<_>>();
-
-        let body = Body {
-            filter: req.name.map(|name| Filter {
-                ty: FilterType::Name,
-                name,
-            }),
-        };
-
-        self.http_post(|base| format!("{base}/api/organizations/search"))
-            .bearer_auth(self.api_key.expose_secret())
-            .query(&query)
-            .json(&body)
-            .send_mural()
-            .await
     }
+};
 
-    pub async fn get_organization(
-        &self,
-        id: OrganizationId,
-    ) -> Result<Organization, MuralError> {
-        mock!(self, get_organization(id));
-
-        self.http_post(|base| format!("{base}/api/organizations/{id}"))
-            .send_mural()
-            .await
-    }
-}
-
-#[derive(
-    Debug,
-    Display,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
-    Deref,
-    Serialize,
-    Deserialize,
-)]
+#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Deref, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct OrganizationId(pub Uuid);
@@ -95,6 +85,12 @@ impl FromStr for OrganizationId {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         s.parse::<Uuid>().map(Self)
+    }
+}
+
+impl From<OrganizationId> for Uuid {
+    fn from(value: OrganizationId) -> Self {
+        value.0
     }
 }
 

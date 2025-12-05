@@ -1,6 +1,7 @@
 #![doc = include_str!("../README.md")]
 
-macro_rules! mock {
+#[cfg(feature = "client")]
+macro_rules! maybe_mock {
     ($self:expr, $fn:ident ( $($args:expr),* $(,)? )) => {
         #[cfg(feature = "mock")]
         if let Some(mock) = &*($self).mock.load() {
@@ -11,72 +12,34 @@ macro_rules! mock {
 
 mod account;
 mod counterparty;
-mod error;
 mod organization;
 mod payout;
 mod payout_method;
 mod serde_iso3166;
+mod transaction;
 mod util;
 
-#[cfg(feature = "mock")]
-pub mod mock;
-
 pub use {
-    account::*, counterparty::*, error::*, organization::*, payout::*,
-    payout_method::*,
+    account::*, counterparty::*, organization::*, payout::*, payout_method::*,
+    transaction::*,
+};
+use {
+    rust_decimal::Decimal,
+    serde::{Deserialize, Serialize},
+    std::{ops::Deref, str::FromStr},
+    uuid::Uuid,
 };
 
-use rust_decimal::Decimal;
-use secrecy::SecretString;
-use serde::{Deserialize, Serialize};
-use std::{ops::Deref, str::FromStr};
-use uuid::Uuid;
+#[cfg(feature = "client")]
+mod client;
+#[cfg(feature = "client")]
+pub use client::*;
 
 pub const API_URL: &str = "https://api.muralpay.com";
 pub const SANDBOX_API_URL: &str = "https://api-staging.muralpay.com";
 
 /// Default token symbol for [`TokenAmount::token_symbol`] values.
 pub const USDC: &str = "USDC";
-
-#[derive(Debug)]
-pub struct MuralPay {
-    pub http: reqwest::Client,
-    pub api_url: String,
-    pub api_key: SecretString,
-    pub transfer_api_key: Option<SecretString>,
-    #[cfg(feature = "mock")]
-    mock: arc_swap::ArcSwapOption<mock::MuralPayMock>,
-}
-
-impl MuralPay {
-    pub fn new(
-        api_url: impl Into<String>,
-        api_key: impl Into<SecretString>,
-        transfer_api_key: Option<impl Into<SecretString>>,
-    ) -> Self {
-        Self {
-            http: reqwest::Client::new(),
-            api_url: api_url.into(),
-            api_key: api_key.into(),
-            transfer_api_key: transfer_api_key.map(Into::into),
-            #[cfg(feature = "mock")]
-            mock: arc_swap::ArcSwapOption::empty(),
-        }
-    }
-
-    /// Creates a client which mocks responses.
-    #[cfg(feature = "mock")]
-    #[must_use]
-    pub fn from_mock(mock: mock::MuralPayMock) -> Self {
-        Self {
-            http: reqwest::Client::new(),
-            api_url: "".into(),
-            api_key: SecretString::from(String::new()),
-            transfer_api_key: None,
-            mock: arc_swap::ArcSwapOption::from_pointee(mock),
-        }
-    }
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
@@ -119,7 +82,9 @@ pub enum FiatAccountType {
 
 crate::util::display_as_serialize!(FiatAccountType);
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, strum::EnumIter)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, strum::EnumIter,
+)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "kebab-case")]
 pub enum FiatAndRailCode {
@@ -149,7 +114,7 @@ impl FromStr for FiatAndRailCode {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct WalletDetails {
@@ -157,7 +122,7 @@ pub struct WalletDetails {
     pub wallet_address: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct TokenAmount {
@@ -166,7 +131,7 @@ pub struct TokenAmount {
     pub token_symbol: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct FiatAmount {
@@ -195,7 +160,7 @@ impl<Id: Deref<Target = Uuid> + Clone> SearchParams<Id> {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(rename_all = "camelCase")]
 pub struct SearchResponse<Id, T> {

@@ -3,7 +3,6 @@ name = "muralpay"
 version = "0.1.0"
 edition.workspace = true
 description = "Mural Pay API"
-repository = "https://github.com/modrinth/code/"
 license = "MIT"
 keywords = []
 categories = ["api-bindings"]
@@ -18,26 +17,19 @@ derive_more = { workspace = true, features = [
   "error",
   "from",
 ] }
-reqwest = { workspace = true, features = ["default-tls", "http2", "json"] }
-rust_decimal = { workspace = true, features = ["macros"] }
+reqwest = { workspace = true, features = ["default-tls", "http2", "json"], optional = true }
+rust_decimal = { workspace = true, features = ["macros", "serde-with-float"] }
 rust_iso3166 = { workspace = true }
-secrecy = { workspace = true }
+secrecy = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
 strum = { workspace = true, features = ["derive"] }
-utoipa = { workspace = true, features = ["uuid"], optional = true }
+utoipa = { workspace = true, features = ["chrono", "decimal", "uuid"], optional = true }
 uuid = { workspace = true, features = ["serde"] }
 
-[dev-dependencies]
-clap = { workspace = true, features = ["derive"] }
-color-eyre = { workspace = true }
-dotenvy = { workspace = true }
-eyre = { workspace = true }
-tokio = { workspace = true, features = ["full"] }
-tracing-subscriber = { workspace = true }
-
 [features]
+client = ["dep:reqwest", "dep:secrecy"]
 mock = ["dep:arc-swap"]
 utoipa = ["dep:utoipa"]
 

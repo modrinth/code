@@ -1,96 +1,84 @@
-use chrono::{DateTime, Utc};
-use derive_more::{Deref, Display};
-use serde::{Deserialize, Serialize};
-use std::str::FromStr;
-use uuid::Uuid;
-
-use crate::{
-    MuralError, MuralPay, PhysicalAddress, SearchParams, SearchResponse,
-    util::RequestExt,
+use {
+    crate::PhysicalAddress,
+    chrono::{DateTime, Utc},
+    derive_more::{Deref, Display},
+    serde::{Deserialize, Serialize},
+    std::str::FromStr,
+    uuid::Uuid,
 };
 
-impl MuralPay {
-    pub async fn search_counterparties(
-        &self,
-        params: Option<SearchParams<CounterpartyId>>,
-    ) -> Result<SearchResponse<CounterpartyId, Counterparty>, MuralError> {
-        mock!(self, search_counterparties(params));
+#[cfg(feature = "client")]
+const _: () = {
+    use crate::{MuralError, RequestExt, SearchParams, SearchResponse};
 
-        self.http_post(|base| format!("{base}/api/counterparties/search"))
-            .query(&params.map(|p| p.to_query()).unwrap_or_default())
-            .send_mural()
-            .await
-    }
+    impl crate::Client {
+        pub async fn search_counterparties(
+            &self,
+            params: Option<SearchParams<CounterpartyId>>,
+        ) -> Result<SearchResponse<CounterpartyId, Counterparty>, MuralError> {
+            maybe_mock!(self, search_counterparties(params));
 
-    pub async fn get_counterparty(
-        &self,
-        id: CounterpartyId,
-    ) -> Result<Counterparty, MuralError> {
-        mock!(self, get_counterparty(id));
-
-        self.http_get(|base| {
-            format!("{base}/api/counterparties/counterparty/{id}")
-        })
-        .send_mural()
-        .await
-    }
-
-    pub async fn create_counterparty(
-        &self,
-        counterparty: &CreateCounterparty,
-    ) -> Result<Counterparty, MuralError> {
-        mock!(self, create_counterparty(counterparty));
-
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Body<'a> {
-            counterparty: &'a CreateCounterparty,
+            self.http_post(|base| format!("{base}/api/counterparties/search"))
+                .query(&params.map(|p| p.to_query()).unwrap_or_default())
+                .send_mural()
+                .await
         }
 
-        let body = Body { counterparty };
+        pub async fn get_counterparty(
+            &self,
+            id: CounterpartyId,
+        ) -> Result<Counterparty, MuralError> {
+            maybe_mock!(self, get_counterparty(id));
 
-        self.http_post(|base| format!("{base}/api/counterparties"))
-            .json(&body)
-            .send_mural()
-            .await
-    }
-
-    pub async fn update_counterparty(
-        &self,
-        id: CounterpartyId,
-        counterparty: &UpdateCounterparty,
-    ) -> Result<Counterparty, MuralError> {
-        mock!(self, update_counterparty(id, counterparty));
-
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Body<'a> {
-            counterparty: &'a UpdateCounterparty,
+            self.http_get(|base| format!("{base}/api/counterparties/counterparty/{id}"))
+                .send_mural()
+                .await
         }
 
-        let body = Body { counterparty };
+        pub async fn create_counterparty(
+            &self,
+            counterparty: &CreateCounterparty,
+        ) -> Result<Counterparty, MuralError> {
+            #[derive(Debug, Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct Body<'a> {
+                counterparty: &'a CreateCounterparty,
+            }
 
-        self.http_put(|base| {
-            format!("{base}/api/counterparties/counterparty/{id}")
-        })
-        .json(&body)
-        .send_mural()
-        .await
+            maybe_mock!(self, create_counterparty(counterparty));
+
+            let body = Body { counterparty };
+
+            self.http_post(|base| format!("{base}/api/counterparties"))
+                .json(&body)
+                .send_mural()
+                .await
+        }
+
+        pub async fn update_counterparty(
+            &self,
+            id: CounterpartyId,
+            counterparty: &UpdateCounterparty,
+        ) -> Result<Counterparty, MuralError> {
+            #[derive(Debug, Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct Body<'a> {
+                counterparty: &'a UpdateCounterparty,
+            }
+
+            maybe_mock!(self, update_counterparty(id, counterparty));
+
+            let body = Body { counterparty };
+
+            self.http_put(|base| format!("{base}/api/counterparties/counterparty/{id}"))
+                .json(&body)
+                .send_mural()
+                .await
+        }
     }
-}
+};
 
-#[derive(
-    Debug,
-    Display,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
-    Deref,
-    Serialize,
-    Deserialize,
-)]
+#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Deref, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct CounterpartyId(pub Uuid);
@@ -100,6 +88,12 @@ impl FromStr for CounterpartyId {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         s.parse::<Uuid>().map(Self)
+    }
+}
+
+impl From<CounterpartyId> for Uuid {
+    fn from(value: CounterpartyId) -> Self {
+        value.0
     }
 }
 

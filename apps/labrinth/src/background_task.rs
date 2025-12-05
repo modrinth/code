@@ -10,7 +10,6 @@ use crate::search::indexing::index_projects;
 use crate::util::anrok;
 use crate::{database, search};
 use clap::ValueEnum;
-use muralpay::MuralPay;
 use sqlx::Postgres;
 use tracing::{error, info, warn};
 
@@ -39,7 +38,7 @@ impl BackgroundTask {
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
-        mural_client: MuralPay,
+        mural_client: muralpay::Client,
     ) {
         use BackgroundTask::*;
         match self {
@@ -207,7 +206,10 @@ pub async fn payouts(
     info!("Done running payouts");
 }
 
-pub async fn sync_payout_statuses(pool: sqlx::Pool<Postgres>, mural: MuralPay) {
+pub async fn sync_payout_statuses(
+    pool: sqlx::Pool<Postgres>,
+    mural: muralpay::Client,
+) {
     // Mural sets a max limit of 100 for search payouts endpoint
     const LIMIT: u32 = 100;
 

@@ -150,7 +150,7 @@ pub struct TremendousForexResponse {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct MuralPayDetails {
     pub payout_details: MuralPayoutRequest,
-    pub recipient_info: muralpay::PayoutRecipientInfo,
+    pub recipient_info: muralpay::CreatePayoutRecipientInfo,
 }
 
 impl PayoutMethodType {
