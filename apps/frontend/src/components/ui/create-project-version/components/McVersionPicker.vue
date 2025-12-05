@@ -13,7 +13,7 @@
 				size="small"
 			/>
 		</div>
-		<div class="iconified-input w-full rounded-xl border-[1px] border-solid border-surface-5">
+		<div class="iconified-input w-full">
 			<SearchIcon aria-hidden="true" />
 			<input v-model="searchQuery" type="text" placeholder="Search versions" />
 		</div>
