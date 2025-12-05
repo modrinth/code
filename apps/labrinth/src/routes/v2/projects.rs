@@ -45,7 +45,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
                 web::scope("{project_id}")
                     .service(super::versions::version_list)
                     .service(super::versions::version_project_get)
-                    .service(dependency_list),
+                    .service(dependency_list)
+                    .service(dependents_list),
             ),
     );
 }
@@ -270,6 +271,52 @@ pub async fn dependency_list(
 ) -> Result<HttpResponse, ApiError> {
     // TODO: tests, probably
     let response = v3::projects::dependency_list(
+        req,
+        info,
+        pool.clone(),
+        redis.clone(),
+        session_queue,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
+
+    match v2_reroute::extract_ok_json::<
+        crate::routes::v3::projects::DependencyInfo,
+    >(response)
+    .await
+    {
+        Ok(dependency_info) => {
+            let converted_projects = LegacyProject::from_many(
+                dependency_info.projects,
+                &**pool,
+                &redis,
+            )
+            .await?;
+            let converted_versions = dependency_info
+                .versions
+                .into_iter()
+                .map(LegacyVersion::from)
+                .collect();
+
+            Ok(HttpResponse::Ok().json(DependencyInfo {
+                projects: converted_projects,
+                versions: converted_versions,
+            }))
+        }
+        Err(response) => Ok(response),
+    }
+}
+
+#[get("dependents")]
+pub async fn dependents_list(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    // TODO: tests, probably
+    let response = v3::projects::dependents_list(
         req,
         info,
         pool.clone(),
