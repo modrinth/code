@@ -8,7 +8,7 @@
 			<Chips
 				v-model="versionType"
 				:items="['release', 'all']"
-				:never-empty="false"
+				:never-empty="true"
 				:capitalize="true"
 				size="small"
 			/>
@@ -54,6 +54,7 @@
 
 			<span v-if="!filteredVersions.length">No versions found.</span>
 		</div>
+		<div>Hold shift and click to select range.</div>
 	</div>
 </template>
 
@@ -108,7 +109,7 @@ const anchorVersion = ref<string | null>(null)
 const handleToggleVersion = (version: string) => {
 	const flat = allVersionsFlat.value
 
-	if (holdingShift && anchorVersion.value && flat.length) {
+	if (holdingShift.value && anchorVersion.value && flat.length) {
 		const anchorIdx = flat.indexOf(anchorVersion.value)
 		const targetIdx = flat.indexOf(version)
 
@@ -121,6 +122,7 @@ const handleToggleVersion = (version: string) => {
 		const range = flat.slice(start, end + 1)
 
 		emit('update:modelValue', [...props.modelValue, ...range])
+		anchorVersion.value = ''
 		return
 	}
 
