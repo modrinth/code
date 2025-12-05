@@ -1,4 +1,4 @@
-import type { ISO3166 } from '..'
+import type { ISO3166 } from '../iso3166/types'
 
 export namespace Labrinth {
 	export namespace Billing {
