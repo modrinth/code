@@ -18,7 +18,7 @@
 			<input v-model="searchQuery" type="text" placeholder="Search versions" />
 		</div>
 		<div
-			class="user-select-none flex max-h-72 flex-col gap-3 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
+			class="flex max-h-72 select-none flex-col gap-3 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
 		>
 			<div v-for="group in groupedGameVersions" :key="group.key" class="space-y-1.5">
 				<span class="font-semibold">{{ group.key }}</span>
@@ -26,14 +26,25 @@
 					<ButtonStyled
 						v-for="version in group.versions"
 						:key="version"
-						:color="modelValue.includes(version) ? 'green' : 'standard'"
+						:color="
+							holdingShift && version === anchorVersion
+								? 'purple'
+								: modelValue.includes(version)
+									? 'green'
+									: 'standard'
+						"
 						:highlighted="modelValue.includes(version)"
 						type="chip"
 					>
 						<button
 							class="!text-contrast focus:outline-none"
 							:class="versionType === 'all' ? 'w-26' : 'w-16'"
-							@click="toggleVersion(version, $event)"
+							@click="() => handleToggleVersion(version)"
+							@blur="
+								() => {
+									if (!holdingShift) anchorVersion = ''
+								}
+							"
 						>
 							{{ version }}
 						</button>
@@ -50,7 +61,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, Chips } from '@modrinth/ui'
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 type GameVersion = Labrinth.Tags.v2.GameVersion
 
@@ -63,7 +74,25 @@ const emit = defineEmits<{
 	(e: 'update:modelValue', value: string[]): void
 }>()
 
+const holdingShift = ref(false)
+
+const handleKeyDown = (event: KeyboardEvent) => {
+	if (event.key === 'Shift') holdingShift.value = true
+}
+const handleKeyUp = (event: KeyboardEvent) => {
+	if (event.key === 'Shift') holdingShift.value = false
+}
+onMounted(() => {
+	window.addEventListener('keydown', handleKeyDown)
+	window.addEventListener('keyup', handleKeyUp)
+})
+onUnmounted(() => {
+	window.removeEventListener('keydown', handleKeyDown)
+	window.removeEventListener('keyup', handleKeyUp)
+})
+
 const versionType = ref<string | null>('release')
+const searchQuery = ref('')
 
 const filteredVersions = computed(() =>
 	props.gameVersions
@@ -73,14 +102,42 @@ const filteredVersions = computed(() =>
 
 const groupedGameVersions = computed(() => groupVersions(filteredVersions.value))
 
-const toggleVersion = (version: string, event: MouseEvent) => {
-	const next = props.modelValue.includes(version)
+const allVersionsFlat = computed(() => groupedGameVersions.value.flatMap((group) => group.versions))
+const anchorVersion = ref<string | null>(null)
+
+const handleToggleVersion = (version: string) => {
+	const flat = allVersionsFlat.value
+
+	if (holdingShift && anchorVersion.value && flat.length) {
+		const anchorIdx = flat.indexOf(anchorVersion.value)
+		const targetIdx = flat.indexOf(version)
+
+		if (anchorIdx === -1 || targetIdx === -1) {
+			return toggleVersion(version)
+		}
+
+		const start = Math.min(anchorIdx, targetIdx)
+		const end = Math.max(anchorIdx, targetIdx)
+		const range = flat.slice(start, end + 1)
+
+		emit('update:modelValue', [...props.modelValue, ...range])
+		return
+	}
+
+	toggleVersion(version)
+	anchorVersion.value = version
+}
+
+const toggleVersion = (version: string) => {
+	const isSelected = props.modelValue.includes(version)
+	const next = isSelected
 		? props.modelValue.filter((v) => v !== version)
 		: [...props.modelValue, version]
+
 	emit('update:modelValue', next)
 }
 
-const DEV_RELEASE_KEY = 'development releases'
+const DEV_RELEASE_KEY = 'Snapshots'
 
 function groupVersions(gameVersions: GameVersion[]) {
 	gameVersions = [...gameVersions].sort(
@@ -92,24 +149,23 @@ function groupVersions(gameVersions: GameVersion[]) {
 
 	let currentGroupKey = getGroupKey(gameVersions.find((v) => v.major)?.version || '')
 
-	gameVersions.forEach((gameVersions) => {
-		if (gameVersions.version_type === 'release') {
-			currentGroupKey = getGroupKey(gameVersions.version)
+	gameVersions.forEach((gameVersion) => {
+		if (gameVersion.version_type === 'release') {
+			currentGroupKey = getGroupKey(gameVersion.version)
 			if (!groups[currentGroupKey]) groups[currentGroupKey] = []
-			groups[currentGroupKey].push(gameVersions.version)
+			groups[currentGroupKey].push(gameVersion.version)
 		} else {
-			if (!groups[`${currentGroupKey} ${DEV_RELEASE_KEY}`])
-				groups[`${currentGroupKey} ${DEV_RELEASE_KEY}`] = []
-			groups[`${currentGroupKey} ${DEV_RELEASE_KEY}`].push(gameVersions.version)
+			const key = `${currentGroupKey} ${DEV_RELEASE_KEY}`
+			if (!groups[key]) groups[key] = []
+			groups[key].push(gameVersion.version)
 		}
 	})
 
 	const sortedKeys = Object.keys(groups).sort(compareGroupKeys)
-	const result = sortedKeys.map((key) => ({
+	return sortedKeys.map((key) => ({
 		key,
 		versions: groups[key].sort((a, b) => compareVersions(b, a)),
 	}))
-	return result
 }
 
 const getBaseVersion = (key: string) => key.split(' ')[0]
@@ -118,7 +174,6 @@ function compareVersions(a: string, b: string) {
 	const pa = a.split('.').map(Number)
 	const pb = b.split('.').map(Number)
 
-	// checking major first, then minor, then patch
 	for (let i = 0; i < 2; i++) {
 		const na = pa[i] || 0
 		const nb = pb[i] || 0
@@ -135,16 +190,14 @@ function compareGroupKeys(a: string, b: string) {
 	const versionSort = compareVersions(aBase, bBase)
 	if (versionSort !== 0) return -versionSort // descending
 
-	const isADev = a.toLowerCase().includes(DEV_RELEASE_KEY)
-	const isBDev = b.toLowerCase().includes(DEV_RELEASE_KEY)
+	const isADev = a.includes(DEV_RELEASE_KEY)
+	const isBDev = b.includes(DEV_RELEASE_KEY)
 
 	if (isADev && !isBDev) return 1
 	if (!isADev && isBDev) return -1
 
 	return 0
 }
-
-const searchQuery = ref('')
 
 function searchFilter(gameVersion: Labrinth.Tags.v2.GameVersion) {
 	return gameVersion.version.toLowerCase().includes(searchQuery.value.toLowerCase())
