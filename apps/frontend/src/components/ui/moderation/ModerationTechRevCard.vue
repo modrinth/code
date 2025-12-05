@@ -14,11 +14,12 @@ import {
 	ShieldCheckIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
-import { techReviewQuickReplies, type TechReviewContext } from '@modrinth/moderation'
+import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
 	Avatar,
 	ButtonStyled,
 	Collapsible,
+	CollapsibleRegion,
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -98,6 +99,19 @@ const quickActions = computed<OverflowMenuOption[]>(() => {
 type Tab = 'Thread' | 'Files'
 const tabs: readonly Tab[] = ['Thread', 'Files']
 const currentTab = ref<Tab>('Thread')
+
+const isThreadCollapsed = ref(true)
+
+const remainingMessageCount = computed(() => {
+	if (!props.item.thread?.messages) return 0
+	return Math.max(0, props.item.thread.messages.length - 1)
+})
+
+const threadExpandText = computed(() => {
+	if (remainingMessageCount.value === 0) return 'Expand'
+	if (remainingMessageCount.value === 1) return 'Show 1 more message'
+	return `Show ${remainingMessageCount.value} more messages`
+})
 
 const selectedFileId = ref<string | null>(null)
 
@@ -491,14 +505,20 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 		<div class="border-t border-surface-3 bg-surface-2">
 			<template v-if="currentTab === 'Thread'">
 				<div class="bg-surface-2 p-4">
-					<!-- DEV-531 -->
-					<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
-					<ThreadView
-						:thread="item.thread"
-						:quick-replies="techReviewQuickReplies"
-						:quick-reply-context="techReviewContext"
-						@update-thread="handleThreadUpdate"
-					/>
+					<CollapsibleRegion
+						v-model:collapsed="isThreadCollapsed"
+						:expand-text="threadExpandText"
+						collapse-text="Collapse thread"
+					>
+						<!-- DEV-531 -->
+						<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
+						<ThreadView
+							:thread="item.thread"
+							:quick-replies="techReviewQuickReplies"
+							:quick-reply-context="techReviewContext"
+							@update-thread="handleThreadUpdate"
+						/>
+					</CollapsibleRegion>
 				</div>
 			</template>
 

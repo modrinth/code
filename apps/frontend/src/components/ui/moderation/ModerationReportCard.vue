@@ -1,11 +1,6 @@
 <template>
-	<div>
-		<div
-			:class="[
-				'bg-bg-raised p-4 transition-[border-radius] duration-200',
-				isThreadCollapsed ? 'rounded-2xl' : 'rounded-t-2xl',
-			]"
-		>
+	<div class="overflow-hidden rounded-2xl">
+		<div class="bg-bg-raised p-4">
 			<div
 				class="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0"
 			>
@@ -138,19 +133,14 @@
 						</div>
 					</div>
 				</div>
-
-				<ButtonStyled circular type="transparent">
-					<button @click="isThreadCollapsed = !isThreadCollapsed">
-						<ChevronDownIcon
-							class="h-5 w-5 transition-transform"
-							:class="{ 'rotate-180': !isThreadCollapsed }"
-						/>
-					</button>
-				</ButtonStyled>
 			</div>
 		</div>
-		<Collapsible :collapsed="isThreadCollapsed">
-			<div class="border-1 rounded-b-2xl border-solid border-bg-raised bg-surface-2 p-4 pt-2">
+		<CollapsibleRegion
+			v-model:collapsed="isThreadCollapsed"
+			:expand-text="expandText"
+			collapse-text="Collapse thread"
+		>
+			<div class="bg-surface-2 p-4 pt-2">
 				<ThreadView
 					v-if="report.thread"
 					ref="reportThread"
@@ -186,13 +176,12 @@
 					</template>
 				</ThreadView>
 			</div>
-		</Collapsible>
+		</CollapsibleRegion>
 	</div>
 </template>
 <script setup lang="ts">
 import {
 	CheckCircleIcon,
-	ChevronDownIcon,
 	ClipboardCopyIcon,
 	EllipsisVerticalIcon,
 	LinkIcon,
@@ -202,7 +191,7 @@ import type { OverflowMenuOption } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
-	Collapsible,
+	CollapsibleRegion,
 	getProjectTypeIcon,
 	injectNotificationManager,
 	OverflowMenu,
@@ -212,8 +201,9 @@ import { formatProjectType } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-import ThreadView from '../thread/ThreadView.vue'
 import { isStaff } from '~/helpers/users.js'
+
+import ThreadView from '../thread/ThreadView.vue'
 
 const { addNotification } = injectNotificationManager()
 const auth = await useAuth()
@@ -231,6 +221,17 @@ const isThreadCollapsed = ref(true)
 const didCloseReport = ref(false)
 const reportClosed = computed(() => {
 	return didCloseReport.value || props.report.closed
+})
+
+const remainingMessageCount = computed(() => {
+	if (!props.report.thread?.messages) return 0
+	return Math.max(0, props.report.thread.messages.length - 1)
+})
+
+const expandText = computed(() => {
+	if (remainingMessageCount.value === 0) return 'Expand'
+	if (remainingMessageCount.value === 1) return 'Show 1 more message'
+	return `Show ${remainingMessageCount.value} more messages`
 })
 
 async function closeReport(reply = false) {

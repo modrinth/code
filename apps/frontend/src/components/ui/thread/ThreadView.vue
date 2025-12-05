@@ -75,7 +75,7 @@
 
 <script setup lang="ts" generic="T">
 import { MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
-import { type QuickReply } from '@modrinth/moderation'
+import type { QuickReply } from '@modrinth/moderation'
 import {
 	ButtonStyled,
 	CopyCode,
@@ -123,8 +123,7 @@ const props = defineProps<{
 }>()
 
 async function handleQuickReply(reply: QuickReply<T>, context: T) {
-	const message =
-		typeof reply.message === 'function' ? await reply.message(context) : reply.message
+	const message = typeof reply.message === 'function' ? await reply.message(context) : reply.message
 
 	await nextTick()
 	setReplyContent(message)
@@ -219,5 +218,4 @@ async function sendReply(privateMessage = false) {
 		})
 	}
 }
-
 </script>
