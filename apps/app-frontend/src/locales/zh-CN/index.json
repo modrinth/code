@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft 认证服务器可能现在无法使用。检查你的网络连接，稍后再试。"
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "无法连接到认证服务器"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "开发者模式已启用。"
   },

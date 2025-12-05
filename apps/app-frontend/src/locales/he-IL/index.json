@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "ייתכן ששרתי האימות של Minecraft מושבתים כרגע. בדוק את חיבור האינטרנט שלך ונסה שוב מאוחר יותר."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "לא ניתן לגשת לשרתי האימות"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."
   },
@@ -65,14 +71,62 @@
   "app.update.reload-to-update": {
     "message": "רענן בכדי להתקין את העדכונים"
   },
+  "friends.action.add-friend": {
+    "message": "להוסיף חבר"
+  },
+  "friends.add-friend.submit": {
+    "message": "שלח בקשת חברות"
+  },
+  "friends.add-friend.title": {
+    "message": "מוסיף חבר"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "הכנס שם משתמש של Modrinth..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "מה השם משתמש של החבר שלך בModrinth"
+  },
   "friends.add-friends-to-share": {
     "message": "<link>הוסף חברים</link> כדי לראות במה הם משחקים!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "בטל בקשה"
+  },
+  "friends.friend.remove-friend": {
+    "message": "הסר חבר"
+  },
+  "friends.friend.request-sent": {
+    "message": "בקשת חברות נשלחה"
+  },
+  "friends.friend.view-profile": {
+    "message": "הצג פרופיל"
   },
   "friends.heading": {
     "message": "חברים"
   },
+  "friends.heading.active": {
+    "message": "פעיל"
+  },
+  "friends.heading.offline": {
+    "message": "לא מקוון"
+  },
+  "friends.heading.online": {
+    "message": "מחובר"
+  },
+  "friends.heading.pending": {
+    "message": "ממתין"
+  },
+  "friends.no-friends-match": {
+    "message": "אין חברים התואמים ל \"{query}\""
+  },
+  "friends.search-friends-placeholder": {
+    "message": "חפש חברים..."
+  },
   "friends.section.heading": {
     "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>התחבר לחשבון Modrinth </link> כדי להוסיף חברים ולראות מה הם משחקים!"
   },
   "instance.add-server.add-and-play": {
     "message": "הוסף ושחק"
@@ -309,7 +363,7 @@
     "message": "התיקון מתקין מחדש את התלויות של מיינקראפט ובודק דברים מקולקלים. פעולה זו עשויה לפתור בעיות שמונעות את הפעלת המשחק עקב שגיאות הקשורות למשגר, אך לא תפתור בעיות או קריסות הקשורות למודים המותקנים."
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "תקן"
+    "message": "לתקן את המכונה?"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "תיקון בתהליך"
