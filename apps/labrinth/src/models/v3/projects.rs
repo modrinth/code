@@ -953,6 +953,7 @@ pub enum FileType {
     SourcesJar,
     DevJar,
     JavadocJar,
+    Signature,
     Unknown,
 }
 
@@ -972,6 +973,7 @@ impl FileType {
             FileType::DevJar => "dev-jar",
             FileType::JavadocJar => "javadoc-jar",
             FileType::Unknown => "unknown",
+            FileType::Signature => "signature",
         }
     }
 
@@ -983,6 +985,7 @@ impl FileType {
             "dev-jar" => FileType::DevJar,
             "javadoc-jar" => FileType::JavadocJar,
             "unknown" => FileType::Unknown,
+            "signature" => FileType::Signature,
             _ => FileType::Unknown,
         }
     }
