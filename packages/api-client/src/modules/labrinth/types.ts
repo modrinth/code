@@ -264,7 +264,7 @@ export namespace Labrinth {
 
 			export type ProjectSearchParams = {
 				query?: string
-				facets?: string[][]
+				facets?: string // in the format of [["categories:forge"],["versions:1.17.1"]]
 				filters?: string
 				index?: 'relevance' | 'downloads' | 'follows' | 'newest' | 'updated'
 				offset?: number
@@ -357,6 +357,124 @@ export namespace Labrinth {
 				side_types_migration_review_status?: 'reviewed' | 'pending'
 				environment?: Environment
 				[key: string]: unknown
+			}
+		}
+	}
+
+	export namespace Versions {
+		export namespace v3 {
+			export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
+
+			export interface Dependency {
+				dependency_type: DependencyType
+				project_id?: string
+				file_name?: string
+				version_id?: string
+			}
+
+			export type VersionChannel = 'release' | 'beta' | 'alpha'
+
+			export type VersionStatus =
+				| 'listed'
+				| 'archived'
+				| 'draft'
+				| 'unlisted'
+				| 'scheduled'
+				| 'unknown'
+
+			export type FileType = 'required-resource-pack' | 'optional-resource-pack'
+
+			export interface VersionFileHash {
+				sha512: string
+				sha1: string
+			}
+
+			export interface VersionFile {
+				hashes: VersionFileHash[]
+				url: string
+				filename: string
+				primary: boolean
+				size: number
+				file_type?: FileType
+			}
+
+			export interface Version {
+				name: string
+				version_number: string
+				changelog?: string
+				dependencies: Dependency[]
+				game_versions: string[]
+				version_type: VersionChannel
+				loaders: string[]
+				featured: boolean
+				status: VersionStatus
+				id: string
+				project_id: string
+				author_id: string
+				date_published: string
+				downloads: number
+				files: VersionFile[]
+			}
+
+			/**
+			 * Request data object for Modrinth “Create Version” API.
+			 */
+			export interface CreateVersionRequest {
+				/** The name of this version. */
+				version_title: string
+
+				/** The version number. Ideally will follow semantic versioning. */
+				version_number: string
+
+				/** A changelog for this version. Nullable. */
+				version_body: string
+
+				/** A list of specific versions of projects that this version depends on. */
+				dependencies?: Array<{
+					/** The ID of the version that this version depends on. Nullable. */
+					version_id?: string
+					/** The ID of the project that this version depends on. Nullable. */
+					project_id?: string
+					/** The file name of the dependency, mostly used for showing external dependencies on modpacks. Nullable. */
+					file_name?: string
+					/** The type of dependency that this version has. One of "required" | "optional" | "incompatible" | "embedded". */
+					dependency_type: DependencyType
+				}>
+
+				/** A list of Minecraft game versions this version supports. */
+				game_versions: string[]
+
+				/** The release channel for this version. Allowed values: "release" | "beta" | "alpha". */
+				release_channel: 'release' | 'beta' | 'alpha'
+
+				/** The mod loaders that this version supports. For resource packs, use "minecraft". */
+				loaders: string[]
+
+				/** Whether the version is featured or not. */
+				featured?: boolean
+
+				/** The status of the version. Allowed values: "listed" | "archived" | "draft" | "unlisted" | "scheduled" | "unknown". */
+				status?: 'listed' | 'archived' | 'draft' | 'unlisted' | 'scheduled' | 'unknown'
+
+				/** The requested status when submitting for review or scheduling. Nullable. Allowed values: "listed" | "archived" | "draft" | "unlisted". */
+				requested_status?: 'listed' | 'archived' | 'draft' | 'unlisted' | null
+
+				/** The ID of the project this version is for. */
+				project_id: string
+
+				/** A list of "file_parts" representing the multipart file upload items for this version. */
+				file_parts: string[]
+
+				/** The hash of the primary file (algorithm + hash) — if specifying which file is primary. */
+				primary_file?: string
+			}
+
+			export type ModifyVersionRequest = Partial<
+				Omit<CreateVersionRequest, 'project_id' | 'file_parts' | 'primary_file'>
+			>
+
+			export type AddFilesToVersionRequest = {
+				file_parts: string[]
 			}
 		}
 	}

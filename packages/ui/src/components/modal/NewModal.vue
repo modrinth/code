@@ -313,7 +313,7 @@ function handleKeyDown(event: KeyboardEvent) {
 		box-shadow: 4px 4px 26px 10px rgba(0, 0, 0, 0.08);
 		max-height: calc(100% - 2 * var(--gap-lg));
 		max-width: min(var(--_max-width, 60rem), calc(100% - 2 * var(--gap-lg)));
-		overflow-y: auto;
+		overflow-y: hidden;
 		overflow-x: hidden;
 		width: fit-content;
 		pointer-events: auto;

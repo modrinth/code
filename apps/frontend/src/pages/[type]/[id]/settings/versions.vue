@@ -1,24 +1,38 @@
 <template>
-	<ConfirmModal
-		v-if="currentMember"
-		ref="deleteVersionModal"
-		title="Are you sure you want to delete this version?"
-		description="This will remove this version forever (like really forever)."
-		:has-to-type="false"
-		proceed-label="Delete"
-		@proceed="deleteVersion()"
-	/>
-	<section class="experimental-styles-within overflow-visible">
+	<div>
+		<CreateProjectVersionModal ref="modal"></CreateProjectVersionModal>
+		<div class="universal-card py-4">
+			<div class="markdown-disclaimer">
+				<div class="flex items-center justify-between">
+					<span class="text-xl font-semibold text-contrast">Versions</span>
+
+					<ButtonStyled color="green">
+						<button @click="openModal"><PlusIcon /> Create version</button>
+					</ButtonStyled>
+				</div>
+			</div>
+
+			<ConfirmModal
+				v-if="currentMember"
+				ref="deleteVersionModal"
+				title="Are you sure you want to delete this version?"
+				description="This will remove this version forever (like really forever)."
+				:has-to-type="false"
+				proceed-label="Delete"
+				@proceed="deleteVersion()"
+			/>
+		</div>
+
 		<ProjectPageVersions
 			:project="project"
-			:versions="versions"
+			:versions="versions.map((v) => ({ ...v, displayUrlEnding: v.version_number }))"
 			:show-files="flags.showVersionFilesInTable"
 			:current-member="!!currentMember"
 			:loaders="tags.loaders"
 			:game-versions="tags.gameVersions"
 			:base-id="baseDropdownId"
 			:version-link="
-				(version) =>
+				(version: any) =>
 					`/${project.project_type}/${
 						project.slug ? project.slug : project.id
 					}/version/${encodeURI(version.displayUrlEnding)}`
@@ -79,13 +93,13 @@
 								action: () => (auth.user ? reportVersion(version.id) : navigateTo('/auth/sign-in')),
 								shown: !currentMember,
 							},
-							{ divider: true, shown: currentMember || flags.developerMode },
+							{ divider: true, shown: !!currentMember || flags.developerMode },
 							{
 								id: 'copy-id',
 								action: () => {
 									copyToClipboard(version.id)
 								},
-								shown: currentMember || flags.developerMode,
+								shown: !!currentMember || flags.developerMode,
 							},
 							{
 								id: 'copy-maven',
@@ -94,13 +108,13 @@
 								},
 								shown: flags.developerMode,
 							},
-							{ divider: true, shown: currentMember },
+							{ divider: true, shown: !!currentMember },
 							{
 								id: 'edit',
 								link: `/${project.project_type}/${
 									project.slug ? project.slug : project.id
 								}/version/${encodeURI(version.displayUrlEnding)}/edit`,
-								shown: currentMember,
+								shown: !!currentMember,
 							},
 							{
 								id: 'delete',
@@ -108,9 +122,9 @@
 								hoverFilled: true,
 								action: () => {
 									selectedVersion = version.id
-									deleteVersionModal.show()
+									deleteVersionModal?.show()
 								},
-								shown: currentMember,
+								shown: !!currentMember,
 							},
 						]"
 						aria-label="More options"
@@ -156,10 +170,11 @@
 				</ButtonStyled>
 			</template>
 		</ProjectPageVersions>
-	</section>
+	</div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ClipboardCopyIcon,
 	DownloadIcon,
@@ -171,49 +186,49 @@ import {
 	ShareIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, ConfirmModal, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
+import { ButtonStyled, ConfirmModal, OverflowMenu,ProjectPageVersions  } from '@modrinth/ui'
 
+import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
+import { provideVersionsContext } from '~/providers/versions'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
-const props = defineProps({
-	project: {
-		type: Object,
-		default() {
-			return {}
-		},
-	},
-	versions: {
-		type: Array,
-		default() {
-			return []
-		},
-	},
-	currentMember: {
-		type: Object,
-		default() {
-			return null
-		},
-	},
+import { PlusIcon } from '../../../../../../../packages/assets/generated-icons'
+
+interface Props {
+	project: Labrinth.Projects.v2.Project
+	versions: Labrinth.Versions.v3.Version[]
+	currentMember?: object
+}
+
+const { project, versions, currentMember } = defineProps<Props>()
+
+provideVersionsContext({
+	project,
+	versions,
 })
+
+const modal = ref<InstanceType<typeof CreateProjectVersionModal>>()
+
+function openModal() {
+	modal.value?.show?.()
+}
 
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
-const deleteVersionModal = ref()
-const selectedVersion = ref(null)
+const deleteVersionModal = ref<InstanceType<typeof ConfirmModal>>()
+const selectedVersion = ref<string | null>(null)
 
 const emit = defineEmits(['onDownload', 'deleteVersion'])
 
-const router = useNativeRouter()
-
 const baseDropdownId = useId()
 
-function getPrimaryFile(version) {
+function getPrimaryFile(version: Labrinth.Versions.v3.Version) {
 	return version.files.find((x) => x.primary) || version.files[0]
 }
 
-async function copyToClipboard(text) {
+async function copyToClipboard(text: string) {
 	await navigator.clipboard.writeText(text)
 }
 

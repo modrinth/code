@@ -169,6 +169,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { CalendarIcon, DownloadIcon, StarIcon } from '@modrinth/assets'
 import {
 	formatBytes,
@@ -176,7 +177,6 @@ import {
 	formatNumber,
 	formatVersionsForDisplay,
 	type GameVersionTag,
-	type PlatformTag,
 	type Version,
 } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
@@ -207,7 +207,7 @@ const props = withDefaults(
 		versions: VersionWithDisplayUrlEnding[]
 		showFiles?: boolean
 		currentMember?: boolean
-		loaders: PlatformTag[]
+		loaders: Labrinth.Tags.v2.Loader[]
 		gameVersions: GameVersionTag[]
 		versionLink?: (version: Version) => string
 	}>(),

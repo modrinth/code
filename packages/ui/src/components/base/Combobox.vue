@@ -61,6 +61,7 @@
 							:placeholder="searchPlaceholder"
 							class=""
 							@keydown.stop="handleSearchKeydown"
+							@input="emit('searchInput', searchQuery)"
 						/>
 					</div>
 				</div>
@@ -186,6 +187,7 @@ const emit = defineEmits<{
 	select: [option: DropdownOption<T>]
 	open: []
 	close: []
+	searchInput: [query: string]
 }>()
 
 const slots = useSlots()
