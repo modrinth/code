@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-3">
+	<div class="flex flex-col gap-4">
 		<div class="flex flex-col justify-between gap-3 lg:flex-row">
 			<div class="iconified-input flex-1 lg:max-w-md">
 				<SearchIcon aria-hidden="true" class="text-lg" />
@@ -24,34 +24,41 @@
 
 			<div class="flex flex-col justify-end gap-2 sm:flex-row lg:flex-shrink-0">
 				<div class="flex flex-col gap-2 sm:flex-row">
-					<DropdownSelect
-						v-slot="{ selected }"
+					<Combobox
 						v-model="currentFilterType"
 						class="!w-full flex-grow sm:!w-[280px] sm:flex-grow-0 lg:!w-[280px]"
-						:name="formatMessage(messages.filterBy)"
-						:options="filterTypes as unknown[]"
-						@change="goToPage(1)"
+						:options="filterTypes"
+						:placeholder="formatMessage(messages.filterBy)"
+						@select="goToPage(1)"
 					>
-						<span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
-							<FilterIcon class="size-4 flex-shrink-0" />
-							<span class="truncate">{{ selected }} ({{ filteredProjects.length }})</span>
-						</span>
-					</DropdownSelect>
+						<template #selected>
+							<span class="flex flex-row gap-2 align-middle font-semibold">
+								<ListFilterIcon class="size-5 flex-shrink-0 text-secondary" />
+								<span class="truncate text-contrast"
+									>{{ currentFilterType }} ({{ filteredProjects.length }})</span
+								>
+							</span>
+						</template>
+					</Combobox>
 
-					<DropdownSelect
-						v-slot="{ selected }"
+					<Combobox
 						v-model="currentSortType"
 						class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
-						:name="formatMessage(messages.sortBy)"
-						:options="sortTypes as unknown[]"
-						@change="goToPage(1)"
+						:options="sortTypes"
+						:placeholder="formatMessage(messages.sortBy)"
+						@select="goToPage(1)"
 					>
-						<span class="flex flex-row gap-2 align-middle font-semibold text-secondary">
-							<SortAscIcon v-if="selected === 'Oldest'" class="size-4 flex-shrink-0" />
-							<SortDescIcon v-else class="size-4 flex-shrink-0" />
-							<span class="truncate">{{ selected }}</span>
-						</span>
-					</DropdownSelect>
+						<template #selected>
+							<span class="flex flex-row gap-2 align-middle font-semibold">
+								<SortAscIcon
+									v-if="currentSortType === 'Oldest'"
+									class="size-5 flex-shrink-0 text-secondary"
+								/>
+								<SortDescIcon v-else class="size-5 flex-shrink-0 text-secondary" />
+								<span class="truncate text-contrast">{{ currentSortType }}</span>
+							</span>
+						</template>
+					</Combobox>
 				</div>
 
 				<ButtonStyled color="orange" class="w-full sm:w-auto">
@@ -59,7 +66,7 @@
 						class="flex !h-[40px] w-full items-center justify-center gap-2 sm:w-auto"
 						@click="moderateAllInFilter()"
 					>
-						<ScaleIcon class="size-4 flex-shrink-0" />
+						<ScaleIcon class="flex-shrink-0" />
 						<span class="hidden sm:inline">{{ formatMessage(messages.moderate) }}</span>
 						<span class="sm:hidden">Moderate</span>
 					</button>
@@ -72,7 +79,7 @@
 			<ConfettiExplosion v-if="visible" />
 		</div>
 
-		<div class="mt-4 flex flex-col gap-2">
+		<div class="flex flex-col gap-4">
 			<div v-if="paginatedProjects.length === 0" class="universal-card h-24 animate-pulse"></div>
 			<ModerationQueueCard
 				v-for="item in paginatedProjects"
@@ -91,14 +98,14 @@
 </template>
 <script setup lang="ts">
 import {
-	FilterIcon,
+	ListFilterIcon,
 	ScaleIcon,
 	SearchIcon,
 	SortAscIcon,
 	SortDescIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, DropdownSelect, Pagination } from '@modrinth/ui'
+import { Button, ButtonStyled, Combobox, type ComboboxOption, Pagination } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 import ConfettiExplosion from 'vue-confetti-explosion'
@@ -215,18 +222,21 @@ watch(
 )
 
 const currentFilterType = ref('All projects')
-const filterTypes: readonly string[] = readonly([
-	'All projects',
-	'Modpacks',
-	'Mods',
-	'Resource Packs',
-	'Data Packs',
-	'Plugins',
-	'Shaders',
-])
+const filterTypes: ComboboxOption<string>[] = [
+	{ value: 'All projects', label: 'All projects' },
+	{ value: 'Modpacks', label: 'Modpacks' },
+	{ value: 'Mods', label: 'Mods' },
+	{ value: 'Resource Packs', label: 'Resource Packs' },
+	{ value: 'Data Packs', label: 'Data Packs' },
+	{ value: 'Plugins', label: 'Plugins' },
+	{ value: 'Shaders', label: 'Shaders' },
+]
 
 const currentSortType = ref('Oldest')
-const sortTypes: readonly string[] = readonly(['Oldest', 'Newest'])
+const sortTypes: ComboboxOption<string>[] = [
+	{ value: 'Oldest', label: 'Oldest' },
+	{ value: 'Newest', label: 'Newest' },
+]
 
 const currentPage = ref(1)
 const itemsPerPage = 15

@@ -2,6 +2,8 @@ use std::{collections::HashMap, fmt};
 
 use actix_web::{HttpRequest, get, post, web};
 use chrono::{DateTime, Utc};
+use eyre::eyre;
+use serde::{Deserialize, Serialize};
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, PgTransaction};
 use tokio_stream::StreamExt;
@@ -405,8 +407,8 @@ async fn search_projects(
             WHERE
                 -- project type
                 (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
+                AND dr.status = $5
                 AND NOT m.status = 'draft'
-                AND dr.status = 'pending'
         ) t
 
         -- sorting
@@ -429,6 +431,7 @@ async fn search_projects(
             .iter()
             .map(|ty| ty.0)
             .collect::<Vec<_>>(),
+        DelphiReportIssueStatus::Pending as _,
     )
     .fetch(&**pool);
 

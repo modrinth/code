@@ -1,4 +1,5 @@
-import type { ReportQuickReply } from '../types/reports'
+import type { ExtendedReport } from '../types/reports'
+import type { QuickReply } from '../types/quick-reply'
 
 export default [
 	{
@@ -67,4 +68,4 @@ export default [
 		message: async () => (await import('./messages/reports/stale.md?raw')).default,
 		private: false,
 	},
-] as ReadonlyArray<ReportQuickReply>
+] as ReadonlyArray<QuickReply<ExtendedReport>>
