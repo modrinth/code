@@ -472,6 +472,8 @@ export namespace Labrinth {
 
 			export type UpdateIssueRequest = {
 				status: DelphiReportIssueStatus
+				/** Optional rejection message when status is 'unsafe' */
+				message?: string
 			}
 
 			export type SearchResponse = {

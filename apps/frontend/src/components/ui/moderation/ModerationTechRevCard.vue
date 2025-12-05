@@ -23,6 +23,8 @@ import {
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
+	MarkdownEditor,
+	NewModal,
 	OverflowMenu,
 	type OverflowMenuOption,
 } from '@modrinth/ui'
@@ -273,6 +275,9 @@ async function updateIssueStatus(
 const expandedIssues = ref<Set<string>>(new Set())
 const showCopyFeedback = ref<Map<string, boolean>>(new Map())
 
+const malwareModal = ref<InstanceType<typeof NewModal> | null>(null)
+const malwareReason = ref('')
+
 type ActionType = 'safe' | 'malware'
 type ButtonState = 'idle' | number | 'completed'
 
@@ -344,6 +349,37 @@ async function handleTopLevelAction(action: ActionType) {
 onUnmounted(() => {
 	buttonIntervals.value.forEach((intervalId) => clearInterval(intervalId))
 })
+
+async function confirmMalwareAction() {
+	try {
+		await Promise.all(
+			props.item.reports.map((report) =>
+				client.labrinth.tech_review_internal.updateReport(report.id, {
+					status: 'unsafe',
+					message: malwareReason.value || undefined,
+				}),
+			),
+		)
+
+		buttonStates.value.set('malware', 'completed')
+		emit('markComplete', props.item.project.id)
+		malwareModal.value?.hide()
+		malwareReason.value = ''
+
+		addNotification({
+			type: 'success',
+			title: 'Marked as malware',
+			text: 'All reports for this project have been marked as malware. The project has been rejected.',
+		})
+	} catch (error) {
+		console.error('Failed to update reports:', error)
+		addNotification({
+			type: 'error',
+			title: 'Failed to update reports',
+			text: 'An error occurred while updating the report status.',
+		})
+	}
+}
 
 function toggleIssue(issueId: string) {
 	if (expandedIssues.value.has(issueId)) {
@@ -454,19 +490,11 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 							<button
 								class="!w-[116px] !shadow-none"
 								:disabled="getButtonState('safe') !== 'idle'"
-								@click="handleTopLevelAction('malware')"
+								@click="malwareModal?.show()"
 							>
-								<LoaderCircleIcon
-									v-if="typeof getButtonState('malware') === 'number'"
-									class="animate-spin"
-								/>
-								<CheckCircleIcon v-else-if="getButtonState('malware') === 'completed'" />
+								<CheckCircleIcon v-if="getButtonState('malware') === 'completed'" />
 								<TriangleAlertIcon v-else />
-								{{
-									typeof getButtonState('malware') === 'number'
-										? getButtonState('malware')
-										: 'Malware'
-								}}
+								Malware
 							</button>
 						</ButtonStyled>
 						<ButtonStyled circular>
@@ -693,6 +721,32 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 			</template>
 		</div>
 	</div>
+
+	<NewModal ref="malwareModal" header="Confirm Malware" fade="danger">
+		<div class="flex flex-col gap-4">
+			<div class="flex flex-col gap-1">
+				<label class="text-md font-semibold text-contrast">Rejection reason (optional)</label>
+				<MarkdownEditor
+					v-model="malwareReason"
+					placeholder="Explain why this is malware/being rejected..."
+					:heading-buttons="false"
+				/>
+			</div>
+		</div>
+		<template #actions>
+			<div class="flex justify-end gap-2">
+				<ButtonStyled type="outlined">
+					<button @click="malwareModal?.hide()">Cancel</button>
+				</ButtonStyled>
+				<ButtonStyled color="red">
+					<button @click="confirmMalwareAction">
+						<TriangleAlertIcon />
+						Confirm Malware
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 </template>
 
 <style scoped>
