@@ -469,8 +469,8 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 								}}
 							</button>
 						</ButtonStyled>
-						<ButtonStyled circular type="outlined">
-							<OverflowMenu :options="quickActions" class="!border-px !border-surface-4">
+						<ButtonStyled circular>
+							<OverflowMenu :options="quickActions" class="!shadow-none">
 								<template #default>
 									<EllipsisVerticalIcon class="size-4" />
 								</template>
@@ -504,11 +504,11 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 
 		<div class="border-t border-surface-3 bg-surface-2">
 			<template v-if="currentTab === 'Thread'">
-					<CollapsibleRegion
-						v-model:collapsed="isThreadCollapsed"
-						:expand-text="threadExpandText"
-						collapse-text="Collapse thread"
-					>
+				<CollapsibleRegion
+					v-model:collapsed="isThreadCollapsed"
+					:expand-text="threadExpandText"
+					collapse-text="Collapse thread"
+				>
 					<div class="bg-surface-2 p-4">
 						<!-- DEV-531 -->
 						<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
@@ -518,8 +518,8 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 							:quick-reply-context="techReviewContext"
 							@update-thread="handleThreadUpdate"
 						/>
-			</div>
-					</CollapsibleRegion>
+					</div>
+				</CollapsibleRegion>
 			</template>
 
 			<template v-else-if="currentTab === 'Files' && !selectedFile">
@@ -527,7 +527,10 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 					v-for="(file, idx) in allFiles"
 					:key="idx"
 					class="flex items-center justify-between border-0 border-x border-b border-solid border-surface-3 bg-surface-2 px-4 py-3"
-					:class="{ 'rounded-bl-2xl rounded-br-2xl': idx === allFiles.length - 1 }"
+					:class="{
+						'rounded-bl-2xl rounded-br-2xl': idx === allFiles.length - 1,
+						'bg-[#E8E8E8] dark:bg-[#1A1C20]': idx % 2 === 1,
+					}"
 				>
 					<div class="flex items-center gap-3">
 						<span class="font-medium text-contrast">{{ file.file_name }}</span>
@@ -591,7 +594,7 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 
 							<div
 								v-if="issue.details.length > 0"
-								class="rounded-full px-2.5 py-1"
+								class="rounded-full border-solid px-2.5 py-1"
 								:class="getSeverityBadgeColor(issue.details[0].severity)"
 							>
 								<span class="text-sm font-medium">{{
@@ -679,7 +682,9 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 									v-else
 									class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4"
 								>
-									<p class="text-sm text-secondary">Source code not available for this flag.</p>
+									<p class="text-sm text-secondary">
+										Source code not available or failed to decompile for this flag.
+									</p>
 								</div>
 							</div>
 						</div>
