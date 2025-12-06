@@ -361,6 +361,122 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Versions {
+		export namespace v2 {
+			export type VersionType = 'release' | 'beta' | 'alpha'
+
+			export type VersionStatus =
+				| 'listed'
+				| 'archived'
+				| 'draft'
+				| 'unlisted'
+				| 'scheduled'
+				| 'unknown'
+
+			export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
+
+			export type FileType = 'required-resource-pack' | 'optional-resource-pack' | 'unknown'
+
+			export type VersionFile = {
+				hashes: Record<string, string>
+				url: string
+				filename: string
+				primary: boolean
+				size: number
+				file_type?: FileType
+			}
+
+			export type Dependency = {
+				file_name?: string
+				dependency_type: DependencyType
+			} & (
+				| {
+						project_id: string
+				  }
+				| {
+						version_id: string
+						project_id?: string
+				  }
+			)
+
+			export type Version = {
+				id: string
+				project_id: string
+				author_id: string
+				featured: boolean
+				name: string
+				version_number: string
+				changelog: string
+				changelog_url?: string | null
+				date_published: string
+				downloads: number
+				version_type: VersionType
+				status: VersionStatus
+				requested_status?: VersionStatus | null
+				files: VersionFile[]
+				dependencies: Dependency[]
+				game_versions: string[]
+				loaders: string[]
+			}
+		}
+
+		export namespace v3 {
+			export type VersionType = 'release' | 'beta' | 'alpha'
+
+			export type VersionStatus =
+				| 'listed'
+				| 'archived'
+				| 'draft'
+				| 'unlisted'
+				| 'scheduled'
+				| 'unknown'
+
+			export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
+
+			export type FileType = 'required-resource-pack' | 'optional-resource-pack' | 'unknown'
+
+			export type VersionFile = {
+				hashes: Record<string, string>
+				url: string
+				filename: string
+				primary: boolean
+				size: number
+				file_type?: FileType
+			}
+
+			export type Dependency = {
+				version_id?: string
+				project_id?: string
+				file_name?: string
+				dependency_type: DependencyType
+			}
+
+			export type Version = {
+				id: string
+				project_id: string
+				author_id: string
+				featured: boolean
+				name: string
+				version_number: string
+				project_types: string[]
+				games: string[]
+				changelog: string
+				date_published: string
+				downloads: number
+				version_type: VersionType
+				status: VersionStatus
+				requested_status?: VersionStatus | null
+				files: VersionFile[]
+				dependencies: Dependency[]
+				loaders: string[]
+				ordering?: number | null
+				game_versions?: string[]
+				mrpack_loaders?: string[]
+				environment?: string
+			}
+		}
+	}
+
 	export namespace Tags {
 		export namespace v2 {
 			export interface Category {

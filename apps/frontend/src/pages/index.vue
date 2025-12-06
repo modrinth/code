@@ -27,7 +27,7 @@
 			</h2>
 			<div class="button-group">
 				<ButtonStyled color="brand" size="large">
-					<nuxt-link to="/mods">
+					<nuxt-link to="/discover/mods">
 						<CompassIcon aria-hidden="true" />
 						{{ formatMessage(messages.discoverMods) }}
 					</nuxt-link>
