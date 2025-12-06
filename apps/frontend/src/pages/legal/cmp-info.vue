@@ -3,8 +3,8 @@
 		<h1>Rewards Program Information</h1>
 		<p><em>Last modified: Dec 6, 2025</em></p>
 		<p>
-			This page was created for transparency for how the rewards program works on Modrinth. Feel
-			free to join our Discord or email
+			This page was created to provide transparency about how the rewards program works on Modrinth.
+			Feel free to join our Discord or email
 			<a href="mailto:support@modrinth.com">support@modrinth.com</a> if you have any questions!
 		</p>
 		<p>
@@ -50,11 +50,11 @@
 			<li>Note: 230 is the sum of all page views and in-app downloads from above</li>
 		</ul>
 		<p>
-			Page views are counted when a legitimate browser views a project page. In-app downloads when a
-			user logged into the launcher downloads a project. Project downloads alongside modpack
-			downloads are counted equally. In each category, Modrinth actively removes botted downloads
-			and page views at our own discretion. If users are caught botting, they will be permanently
-			banned from using Modrinth's services.
+			Page views are counted when a legitimate browser views a project page. In-app downloads are
+			counted when a user logged into the launcher downloads a project. Project downloads alongside
+			modpack downloads are counted equally. In each category, Modrinth actively removes botted
+			downloads and page views at our own discretion. If users are caught botting, they will be
+			permanently banned from using Modrinth's services.
 		</p>
 		<p>
 			You can view your page views and project downloads in your
@@ -71,7 +71,7 @@
 			above algorithm. However, if you would like to withdraw money from your account, you must
 			enroll by adding your payment information.
 		</p>
-		<h3>What methods can I use withdraw money from my account? Are there any fees?</h3>
+		<h3>What methods can I use to withdraw money from my account? Are there any fees?</h3>
 		<p>
 			Right now, you can withdraw money from your Modrinth account using bank transfer, PayPal,
 			Venmo, crypto (USDC), gift cards, or by donating to charity. Availability of specific
