@@ -1,7 +1,7 @@
 <template>
 	<div class="markdown-body">
 		<h1>Rewards Program Information</h1>
-		<p><em>Last modified: Feb 20, 2025</em></p>
+		<p><em>Last modified: Dec 6, 2025</em></p>
 		<p>
 			This page was created for transparency for how the rewards program works on Modrinth. Feel
 			free to join our Discord or email
@@ -73,10 +73,10 @@
 		</p>
 		<h3>What methods can I use withdraw money from my account? Are there any fees?</h3>
 		<p>
-			Right now, you can use PayPal or Venmo to withdraw money from your Modrinth account. Gift card
-			withdrawal is also available. We are working on more methods to withdraw money from your
-			account. There are fees to withdraw money from your Modrinth account—see the revenue page in
-			your dashboard for more information.
+			Right now, you can withdraw money from your Modrinth account using bank transfer, PayPal,
+			Venmo, crypto (USDC), gift cards, or by donating to charity. Availability of specific
+			withdrawal methods may vary depending on your region. There are fees to withdraw money from
+			your Modrinth account—see the revenue page in your dashboard for more information.
 		</p>
 		<h3 id="pending">What does "pending" revenue mean in my dashboard?</h3>
 		<p>
