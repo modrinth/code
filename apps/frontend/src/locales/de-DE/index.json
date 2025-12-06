@@ -975,7 +975,7 @@
     "message": "Diese Kollektion ist eventuell Privat."
   },
   "error.collection.404.list_item.3": {
-    "message": "Diese Kollektion wurde vielleicht von Modrinth's Moderationsteam wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
+    "message": "Diese Kollektion wurde vielleicht von Modrinths Moderationsteam wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
   },
   "error.collection.404.list_title": {
     "message": "Warum?"
@@ -1017,7 +1017,7 @@
     "message": "Der Besitzer hat vielleicht die URL geändert oder die Organisation gelöscht."
   },
   "error.organization.404.list_item.3": {
-    "message": "Diese Organisation wurde vielleicht von Modrinth's Moderationsteam wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
+    "message": "Diese Organisation wurde vielleicht von Modrinths Moderationsteam wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
   },
   "error.organization.404.list_title": {
     "message": "Warum?"
@@ -1032,7 +1032,7 @@
     "message": "Der Besitzer des Projekts hat vielleicht die URL verändert, das Projekt auf Privat gestellt, oder es gelöscht."
   },
   "error.project.404.list_item.3": {
-    "message": "Dieses Projekt wurde vielleicht von Modrinth's Moderationsteam wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
+    "message": "Dieses Projekt wurde vielleicht von Modrinths Moderationsteam wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
   },
   "error.project.404.list_title": {
     "message": "Warum?"
@@ -1047,7 +1047,7 @@
     "message": "Dieser Nutzer hat vielleicht seinen Nutzernamen geändert oder seinen Account gelöscht."
   },
   "error.user.404.list_item.3": {
-    "message": "Dieser Nutzer wurde vielleicht wegen dem Verstoß gegen Modrinth's <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
+    "message": "Dieser Nutzer wurde vielleicht wegen dem Verstoß gegen Modrinths <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
   },
   "error.user.404.list_title": {
     "message": "Warum?"
@@ -2250,7 +2250,7 @@
     "message": "Konnte {item} nicht finden"
   },
   "report.for.violation": {
-    "message": "Verstoß gegen Modrinth's <rules-link>Regeln</rules-link> oder <terms-link>Nutzungsbedingungen</terms-link>"
+    "message": "Verstoß gegen Modrinths <rules-link>Regeln</rules-link> oder <terms-link>Nutzungsbedingungen</terms-link>"
   },
   "report.for.violation.description": {
     "message": "Beispiele hierfür sind bösartige, Spam-, beleidigende, trügerische, irreführende und illegale Inhalte."
@@ -2862,7 +2862,7 @@
     "message": "Erstelle ein PAT"
   },
   "settings.pats.description": {
-    "message": "PATs können für den Zugriff auf die API von Modrinth verwendet werden. Weitere Informationen finden Sie unter <doc-link>Modrinth's API documentation</doc-link>. Sie können jederzeit erstellt und widerrufen werden."
+    "message": "PATs können für den Zugriff auf die API von Modrinth verwendet werden. Weitere Informationen finden Sie unter <doc-link>Modrinths API documentation</doc-link>. Sie können jederzeit erstellt und widerrufen werden."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT erstellen"
