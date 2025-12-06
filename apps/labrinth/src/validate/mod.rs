@@ -221,6 +221,18 @@ async fn validate_minecraft_file(
                 FileType::RequiredResourcePack | FileType::OptionalResourcePack => {
                     return PackValidator.validate_maybe_protected_zip(&mut zip);
                 }
+                FileType::Signature => {
+                    // Not sure if we have a better way to detect if a file is a signature
+                    // should look into this?
+                    return if ["asc", "gpg", "sig"].contains(&file_extension.as_str()) {
+                        Ok(ValidationResult::Pass)
+                    } else {
+                        Err(ValidationError::InvalidInput(
+                            format!("File extension {file_extension} is invalid for input file").into(),
+                        ))
+                    };
+                }
+                FileType::DevJar | FileType::SourcesJar | FileType::JavadocJar => {},
                 FileType::Unknown => {}
             }
         }
