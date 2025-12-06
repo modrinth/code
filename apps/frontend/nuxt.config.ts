@@ -7,7 +7,7 @@ import { consola } from 'consola'
 import { promises as fs } from 'fs'
 import { globIterate } from 'glob'
 import { defineNuxtConfig } from 'nuxt/config'
-import { basename, relative, resolve } from 'pathe'
+import { basename, relative } from 'pathe'
 import svgLoader from 'vite-svg-loader'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
@@ -175,23 +175,6 @@ export default defineNuxtConfig({
 			await fs.writeFile('./src/generated/state.json', JSON.stringify(state))
 
 			console.log('Tags generated!')
-		},
-		'pages:extend'(routes) {
-			routes.splice(
-				routes.findIndex((x) => x.name === 'search-searchProjectType'),
-				1,
-			)
-
-			const types = ['mods', 'modpacks', 'plugins', 'resourcepacks', 'shaders', 'datapacks']
-
-			types.forEach((type) =>
-				routes.push({
-					name: `search-${type}`,
-					path: `/${type}`,
-					file: resolve(__dirname, 'src/pages/search/[searchProjectType].vue'),
-					children: [],
-				}),
-			)
 		},
 		async 'vintl:extendOptions'(opts) {
 			opts.locales ??= []

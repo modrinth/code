@@ -7,8 +7,12 @@
 	<Description>Search for mods on Modrinth, the open source modding platform.</Description>
 	<InputEncoding>UTF-8</InputEncoding>
 	<Image width="16" height="16" type="image/x-icon">https://modrinth.com/favicon.ico</Image>
-	<Url type="text/html" method="get" template="https://modrinth.com/mods?q={searchTerms}" />
+	<Url
+		type="text/html"
+		method="get"
+		template="https://modrinth.com/discover/mods?q={searchTerms}"
+	/>
 	<Developer>Rinth, Inc.</Developer>
 	<Attribution>Rinth, Inc.</Attribution>
-	<moz:SearchForm>https://modrinth.com/mods</moz:SearchForm>
+	<moz:SearchForm>https://modrinth.com/discover/mods</moz:SearchForm>
 </OpenSearchDescription>
