@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 import { ClientIcon, ServerIcon } from '@modrinth/assets'
 import { formatCategory, formatCategoryHeader, sortByNameOrNumber } from '@modrinth/utils'
 import { defineMessage, useVIntl } from '@vintl/vintl'
@@ -67,25 +68,10 @@ const ALL_PROJECT_TYPES: ProjectType[] = [
 	'plugin',
 ]
 
-export interface Platform {
-	name: string
-	icon: string
-	supported_project_types: ProjectType[]
-	default: boolean
-	formatted_name: string
-}
-
-export interface Category {
-	icon: string
-	name: string
-	project_type: ProjectType
-	header: string
-}
-
 export interface Tags {
-	gameVersions: GameVersion[]
-	loaders: Platform[]
-	categories: Category[]
+	gameVersions: Labrinth.Tags.v2.GameVersion[]
+	loaders: Labrinth.Tags.v2.Loader[]
+	categories: Labrinth.Tags.v2.Category[]
 }
 
 export interface SortType {

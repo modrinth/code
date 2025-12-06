@@ -56,6 +56,16 @@ const emit = defineEmits(['onOpen', 'onClose'])
 
 const slots = useSlots()
 
+watch(
+	() => props.openByDefault,
+	(newValue) => {
+		if (newValue !== toggledOpen.value) {
+			toggledOpen.value = newValue
+		}
+	},
+	{ immediate: true },
+)
+
 function open() {
 	toggledOpen.value = true
 	emit('onOpen')
