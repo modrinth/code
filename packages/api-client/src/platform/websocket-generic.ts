@@ -7,6 +7,8 @@ type WSEventMap = {
 	[K in Archon.Websocket.v0.WSEvent as `${string}:${K['event']}`]: K
 }
 
+const NORMAL_CLOSURE = 1000
+
 export class GenericWebSocketClient extends AbstractWebSocketClient {
 	protected emitter = mitt<WSEventMap>()
 
@@ -55,7 +57,7 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 				}
 
 				ws.onclose = (event) => {
-					if (event.code !== 1000) {
+					if (event.code !== NORMAL_CLOSURE) {
 						this.scheduleReconnect(serverId, auth)
 					}
 				}
@@ -83,7 +85,7 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 			connection.socket.readyState === WebSocket.OPEN ||
 			connection.socket.readyState === WebSocket.CONNECTING
 		) {
-			connection.socket.close(1000, 'Client disconnecting')
+			connection.socket.close(NORMAL_CLOSURE, 'Client disconnecting')
 		}
 
 		this.emitter.all.forEach((_handlers, type) => {

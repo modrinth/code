@@ -857,12 +857,6 @@
   "servers.backups.item.failed-to-restore-backup": {
     "defaultMessage": "Failed to restore from backup"
   },
-  "servers.backups.item.lock": {
-    "defaultMessage": "Lock"
-  },
-  "servers.backups.item.locked": {
-    "defaultMessage": "Locked"
-  },
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"
   },
@@ -883,9 +877,6 @@
   },
   "servers.backups.item.retry": {
     "defaultMessage": "Retry"
-  },
-  "servers.backups.item.unlock": {
-    "defaultMessage": "Unlock"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Dismiss"

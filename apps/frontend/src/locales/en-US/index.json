@@ -2558,9 +2558,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Backup creation in progress"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup restore in progress"
   },

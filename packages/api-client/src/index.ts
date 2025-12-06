@@ -15,6 +15,7 @@ export {
 	type CircuitBreakerStorage,
 	InMemoryCircuitBreakerStorage,
 } from './features/circuit-breaker'
+export { PANEL_VERSION, PanelVersionFeature } from './features/panel-version'
 export { type BackoffStrategy, type RetryConfig, RetryFeature } from './features/retry'
 export { type VerboseLoggingConfig, VerboseLoggingFeature } from './features/verbose-logging'
 export type { InferredClientModules } from './modules'
