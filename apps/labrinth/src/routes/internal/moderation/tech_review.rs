@@ -17,6 +17,7 @@ use crate::{
             delphi_report_item::{
                 DelphiReportIssueStatus, DelphiSeverity, ReportIssueDetail,
             },
+            thread_item::ThreadMessageBuilder,
         },
         redis::RedisPool,
     },
@@ -540,7 +541,8 @@ async fn maybe_reject_project(
         WHERE dr.id = $2
         RETURNING
             m.id AS "project_id: DBProjectId",
-            t.id AS "thread_id: DBThreadId"
+            t.id AS "thread_id: DBThreadId",
+            (SELECT status FROM mods WHERE id = m.id) AS "old_status!"
         "#,
         ProjectStatus::Rejected.as_str(),
         report_id as DelphiReportId,
@@ -567,6 +569,19 @@ async fn maybe_reject_project(
         .await
         .wrap_internal_err("failed to add moderation thread message")?;
     }
+
+    ThreadMessageBuilder {
+        author_id: Some(user.id.into()),
+        body: MessageBody::StatusChange {
+            new_status: ProjectStatus::Rejected,
+            old_status: ProjectStatus::from_string(&record.old_status),
+        },
+        thread_id: record.thread_id,
+        hide_identity: user.role.is_mod(),
+    }
+    .insert(txn)
+    .await
+    .wrap_internal_err("failed to add status change message")?;
 
     DBProject::clear_cache(record.project_id, None, None, redis)
         .await
