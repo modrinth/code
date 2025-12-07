@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "创建推广链接"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "创建新的推广代码"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "给你的推广链接起个名字，这样你就知道人们是从哪里来的了！"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "推广链接的标题"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "e.g. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "用于创建推广代码的用户名"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "用户名"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "输入用户名……"
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "{user} 创建"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "创建推广链接……"
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "撤销推广链接"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "查看分析"
+  },
   "badge.beta": {
     "defaultMessage": "测试版"
   },
@@ -7,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "新"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "推广链接"
   },
   "button.analytics": {
     "defaultMessage": "数据"
@@ -46,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "关注"
+  },
+  "button.max": {
+    "defaultMessage": "最大"
   },
   "button.more-options": {
     "defaultMessage": "更多选项"
@@ -119,6 +161,84 @@
   "collection.label.private": {
     "defaultMessage": "私人"
   },
+  "form.label.address-line": {
+    "defaultMessage": "地址第一行"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "地址第二行（选填）"
+  },
+  "form.label.amount": {
+    "defaultMessage": "金额"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "银行名称"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "公司名称"
+  },
+  "form.label.city": {
+    "defaultMessage": "市"
+  },
+  "form.label.country": {
+    "defaultMessage": "国家"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "出生日期"
+  },
+  "form.label.email": {
+    "defaultMessage": "电子邮箱"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "名字"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "姓氏"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "邮政编码"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "州/省"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "输入地址"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "公寓、套房等"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "输入金额"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "输入银行名称"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "选择银行名称"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "输入企业名称"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "输入城市"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "选择国家"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "输入电子邮件地址"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "输入名字"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "输入姓氏"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "输入邮政编码"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "输入州/省"
+  },
   "icon-select.edit": {
     "defaultMessage": "编辑图标"
   },
@@ -158,6 +278,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "游戏模式未知"
   },
+  "label.available": {
+    "defaultMessage": "{amount} 可用。"
+  },
   "label.changes-saved": {
     "defaultMessage": "更改已保存"
   },
@@ -165,7 +288,7 @@
     "defaultMessage": "收藏"
   },
   "label.created-ago": {
-    "defaultMessage": "创建于 {ago}"
+    "defaultMessage": "{ago}创建"
   },
   "label.dashboard": {
     "defaultMessage": "数据面板"
@@ -205,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "已回绝"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "我同意<terms-link>激励计划条款</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "已保存"
@@ -353,14 +479,38 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal 国际版"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "银联"
   },
   "omorphia.component.purchase_modal.payment_method_type.unknown": {
-    "defaultMessage": "未知付款方式"
+    "defaultMessage": "未知支付方式"
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "慈善"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "慈善"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "礼品卡"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "礼品卡"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Visa 虚拟信用卡"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Visa 虚拟信用卡"
   },
   "project-type.all": {
     "defaultMessage": "全部"
@@ -723,10 +873,10 @@
     "defaultMessage": "你现在还不会被收费。"
   },
   "servers.purchase.step.payment.prompt": {
-    "defaultMessage": "请选择付款方式"
+    "defaultMessage": "请选择支付方式"
   },
   "servers.purchase.step.payment.title": {
-    "defaultMessage": "付款方式"
+    "defaultMessage": "支付方式"
   },
   "servers.purchase.step.plan.billed": {
     "defaultMessage": "按{interval}付款"

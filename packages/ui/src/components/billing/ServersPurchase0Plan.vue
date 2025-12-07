@@ -1,23 +1,25 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { formatPrice } from '@modrinth/utils'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, provide } from 'vue'
 
-import { monthsInInterval, type ServerBillingInterval, type ServerPlan } from '../../utils/billing'
+import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import OptionGroup from '../base/OptionGroup.vue'
 import ModalBasedServerPlan from './ModalBasedServerPlan.vue'
+import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 
 const { formatMessage, locale } = useVIntl()
 
 const props = defineProps<{
-	availableProducts: ServerPlan[]
+	availableProducts: Labrinth.Billing.Internal.Product[]
 	currency: string
-	existingPlan?: ServerPlan
+	existingPlan?: Labrinth.Billing.Internal.Product
 }>()
 
 const availableBillingIntervals = ['monthly', 'quarterly']
 
-const selectedPlan = defineModel<ServerPlan>('plan')
+const selectedPlan = defineModel<Labrinth.Billing.Internal.Product>('plan')
 const selectedInterval = defineModel<ServerBillingInterval>('interval')
 const emit = defineEmits<{
 	(e: 'choose-custom'): void
@@ -75,7 +77,10 @@ const isSameAsExistingPlan = computed(() => {
 })
 
 const plansByRam = computed(() => {
-	const byName: Record<'small' | 'medium' | 'large', ServerPlan | undefined> = {
+	const byName: Record<
+		'small' | 'medium' | 'large',
+		Labrinth.Billing.Internal.Product | undefined
+	> = {
 		small: undefined,
 		medium: undefined,
 		large: undefined,
@@ -93,13 +98,11 @@ function handleCustomPlan() {
 	emit('choose-custom')
 }
 
-function pricePerMonth(plan?: ServerPlan) {
-	if (!plan) return undefined
-	const total = plan.prices?.find((x) => x.currency_code === props.currency)?.prices?.intervals?.[
-		selectedInterval.value!
-	]
+function pricePerMonth(plan?: Labrinth.Billing.Internal.Product) {
+	if (!plan || !selectedInterval.value) return undefined
+	const total = getPriceForInterval(plan, props.currency, selectedInterval.value)
 	if (!total) return undefined
-	return total / monthsInInterval[selectedInterval.value!]
+	return total / monthsInInterval[selectedInterval.value]
 }
 
 const customPricePerGb = computed(() => {
@@ -107,7 +110,9 @@ const customPricePerGb = computed(() => {
 	let min: number | undefined
 	for (const p of props.availableProducts) {
 		const perMonth = pricePerMonth(p)
-		const ramGb = (p?.metadata?.ram ?? 0) / 1024
+		const metadata = p?.metadata
+		if (!metadata || (metadata.type !== 'pyro' && metadata.type !== 'medal')) continue
+		const ramGb = metadata.ram / 1024
 		if (perMonth && ramGb > 0) {
 			const perGb = perMonth / ramGb
 			if (min === undefined || perGb < min) min = perGb

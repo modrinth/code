@@ -120,17 +120,16 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Checkbox, NewModal } from '@modrinth/ui'
+import { ButtonStyled, Checkbox, NewModal, ServerInfoLabels } from '@modrinth/ui'
 import type { PowerAction as ServerPowerAction, ServerState } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 import LoadingIcon from './icons/LoadingIcon.vue'
 import PanelSpinner from './PanelSpinner.vue'
-import ServerInfoLabels from './ServerInfoLabels.vue'
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 const flags = useFeatureFlags()
@@ -215,7 +214,7 @@ const menuOptions = computed(() => [
 		id: 'allServers',
 		label: 'All servers',
 		icon: ServerIcon,
-		action: () => router.push('/servers/manage'),
+		action: () => router.push('/hosting/manage'),
 	},
 	{
 		id: 'details',

@@ -50,7 +50,7 @@
 		<template v-for="(version, index) in currentVersions" :key="index">
 			<!-- Row divider -->
 			<div
-				class="versions-grid-row h-px w-full bg-button-bg"
+				class="versions-grid-row h-px w-full bg-surface-5"
 				:class="{
 					'max-sm:!hidden': index === 0,
 				}"

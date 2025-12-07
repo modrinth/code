@@ -625,13 +625,13 @@ import {
 	injectNotificationManager,
 	OverflowMenu,
 	PurchaseModal,
+	ServerListing,
 } from '@modrinth/ui'
 import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import { useBaseFetch } from '@/composables/fetch.js'
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
-import ServerListing from '~/components/ui/servers/ServerListing.vue'
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'

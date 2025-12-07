@@ -2,6 +2,7 @@ import 'floating-vue/dist/style.css'
 
 import * as Sentry from '@sentry/vue'
 import { VueScanPlugin } from '@taijased/vue-render-tracker'
+import { VueQueryPlugin } from '@tanstack/vue-query'
 import { createPlugin } from '@vintl/vintl/plugin'
 import FloatingVue from 'floating-vue'
 import { createPinia } from 'pinia'
@@ -45,6 +46,7 @@ Sentry.init({
 	tracesSampleRate: 0.1,
 })
 
+app.use(VueQueryPlugin)
 app.use(vueScan)
 app.use(router)
 app.use(pinia)

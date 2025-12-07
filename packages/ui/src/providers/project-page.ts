@@ -1,11 +1,13 @@
-import type { Project, ProjectV3Partial, TeamMember } from '@modrinth/utils'
+import type { Labrinth } from '@modrinth/api-client/src/modules/types'
+// TODO: api client this shit
+import type { TeamMember } from '@modrinth/utils'
 import type { Ref } from 'vue'
 
 import { createContext } from '.'
 
 export interface ProjectPageContext {
-	projectV2: Ref<Project>
-	projectV3: Ref<ProjectV3Partial>
+	projectV2: Ref<Labrinth.Projects.v2.Project>
+	projectV3: Ref<Labrinth.Projects.v3.Project>
 	refreshProject: () => Promise<void>
 	currentMember: Ref<TeamMember>
 }

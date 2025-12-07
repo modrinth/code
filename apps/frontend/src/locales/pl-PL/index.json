@@ -566,6 +566,27 @@
   "create.project.visibility-unlisted": {
     "message": "Niepubliczny"
   },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Utwórz link afiliacyjny"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Błąd podczas ładowania linków afiliacyjnych"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Twoje linki afiliacyjne"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Unieważni to nieodwołalnie kod afiliacyjny `{id}`. Wszystkie udostępnione linki używające tego kodu zostaną unieważnione."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Unieważnij"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Czy na pewno chcesz unieważnić link afiliacyjny \"{title}\"?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Szukaj linku afiliacyjnego..."
+  },
   "dashboard.collections.button.create-new": {
     "message": "Stwórz nową"
   },
@@ -613,6 +634,339 @@
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Czy jesteś obywatelem Stanów Zjednoczonych?"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Wypełnij formularz podatkowy"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Kontynuuj z limitem"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Szczegóły"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Kwota"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Kurs walutowy"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Opłata"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Kwota netto"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Podmiot gospodarczy"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "Podmiot gospodarczy to na przykład korporacja, spółka osobowa bądź sp. z o.o."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Czy wypłacasz jako osoba prywatna, czy jako podmiot gospodarczy?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Osoba prywatna"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Wybierz swój kraj"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Szukaj kraju..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Nie udało się odczytać dostępnych metod płatniczych. Spróbuj ponownie później."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Nie udało się odczytać dostępnych metod płatniczych"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Region"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Niektóre sposoby wypłacania nie są dostępne w niektórych regionach."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Wybierz metodę wypłacania"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Twój limit wypłat wynosi <b>{amount}</b>, <tax-link>wypełnij formularz podatkowy</tax-link> by wypłacić więcej."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Właściciel konta"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Waluta"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Potwierdź adres portfela"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Numer identyfikatora krajowego"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Podaj numer identyfikatora krajowego"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Numer paszportu"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Podaj numer paszportu"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Numer identyfikatora rezydenta"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Podaj numer identyfikatora rezydenta"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "Numer RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Podaj numer RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Numer identyfikatora podatkowego"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Podaj numer identyfikatora podatkowego"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Sieć"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Niedługo przekroczysz limit wypłat. Możesz wypłacić jeszcze <b>{amountRemaining}</b>. By wypłacić więcej, musisz wypełnić formularz podatkowy."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Odłącz konto"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Metoda płatności"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "Konto PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Połącz konto PayPal, by bezpośrednio otrzymywać wypłaty."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Zapisz"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Nazwa użytkownika Venmo została zapisana pomyślnie!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Zapisano"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Zaloguj się z PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Podaj nazwę użytkownika Venmo, by otrzymywać wypłaty."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Nazwa użytkownika Venmo"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@nazwa_użytkownika"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Zakończ"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Metoda"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Szczegóły konta"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Weryfikacja"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Formularz podatkowy"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Szczegóły"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "By wypłacić całe saldo konta (<b>{available}</b>) musisz wypełnić ten formularz. Jest on wymagany dla sprawozdawczości podatkowej i musi być wypełniony tylko raz."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "Musisz wypełnić formularz podatkowy W-9 lub W-8 dla zapisów podatkowych Modrinth, abyśmy mogli zachować zgodność z przepisami podatkowymi."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Wymagany jest formularz podatkowy"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Metoda płatności"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Nagroda"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Wybierz nagrodę"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Nagrody"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Adres e-mail nie jest zweryfikowany"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "Podany adres e-mail nie jest powiązany z Twoim kontem Modrinth. Modrinth nie może odzyskać nagród wysłanych na niepoprawny adres e-mail."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Dostępne niższe opłaty"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "Wybrano walutę USD w opcji międzynarodowej PayPal. <direct-paypal-link>Przełącz się na bezpośredni PayPal</direct-paypal-link> dla niższych opłat (≈2% zamiast ≈6%)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Wypłać"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "Limit wypłat"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "Przekroczono limit wypłat (<b>{withdrawLimit}</b>). Musisz wypełnić formularz podatkowy, by wypłacić więcej."
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Dostępne teraz"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Saldo"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "Szacunkowe przychody mogą ulec zmianie do momentu ich udostępnienia."
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "Kliknij tutaj, by dowiedzieć się, jak Modrinth oblicza Twoje przychody."
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Oszacowane na {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Przetwarzane"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "Przychody są przetwarzane do końca miesiąca, po czym są dostępne 60 dni później."
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Otrzymane"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Transakcje"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "Wypłacone"
+  },
+  "dashboard.revenue.tos": {
+    "message": "Udostępniając projekty na Modrinth i wypłacając pieniądze z konta, wyrażasz zgodę na <terms-link>Warunki programu wynagrodzenia</terms-link>. Dowiedz się więcej o <info-link>programie wynagrodzenia</info-link>."
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Pobierz jako CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Transakcje"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Brak transakcji"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Tutaj pojawią się otrzymane fundusze i wypłaty."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Zobacz wszystkie"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "Twoje wypłaty są tymczasowo zablokowane, ponieważ Twój TIN lub SSN nie pasował do zapisów IRS. Skontaktuj się z obsługą, by resetować i ponownie wysłać Twój formularz podatkowy."
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "Wypłać z salda Twojego konta poprzez daną metodę płatności."
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "Wypłata"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "Wypłata"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Konto"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Kwota"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Zamknij"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Data"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "Otrzymasz e-mail na adres <b>{email}</b> z instrukcjami, jak otrzymać wypłatę."
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Kurs walut"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Opłata"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Metoda"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "Kwota netto"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Odbiorca"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Wypłata ukończona"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "Transakcje"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Portfel"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "Nie udało się przesłać prośby o wypłatę, sprawdź podane dane lub skontaktuj się z obsługą."
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "Wypłata nie powiodła się"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "Podany adres nie mógł być zweryfikowany. Sprawdź ponownie adres."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Weryfikacja adresu nie powiodła się"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Podane detale bankowe są nieprawidłowe. Zweryfikuj podane informacje."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "Nieprawidłowe detale bankowe"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "Podany portfel krypto jest nieprawidłowy. Zweryfikuj podane informacje."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Nieprawidłowy adres portfela"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Kwota do wypłaty (po opłatach) jest zbyt niska. Podaj wyższą kwotę do wypłaty."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Zbyt niska kwota"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "Musisz wypełnić formularz podatkowy, by móc złożyć wniosek o wypłatę."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "Wypełnij formularz podatkowy"
   },
   "error.collection.404.list_item.1": {
     "message": "Mogłeś źle napisać URL kolekcji."
@@ -869,6 +1223,9 @@
   "layout.action.lookup-by-email": {
     "message": "Szukaj po e-mailu"
   },
+  "layout.action.manage-affiliates": {
+    "message": "Zarządzaj linkami afiliacyjnymi"
+  },
   "layout.action.manage-server-notices": {
     "message": "Zarządzaj ogłoszeniami serwera"
   },
@@ -957,10 +1314,13 @@
     "message": "Wiadomości"
   },
   "layout.footer.about.rewards-program": {
-    "message": "Program nagród"
+    "message": "Program wynagrodzenia"
   },
   "layout.footer.about.status": {
     "message": "Status"
+  },
+  "layout.footer.copyright": {
+    "message": "© {year} Rinth, Inc."
   },
   "layout.footer.legal": {
     "message": "Polityka"
@@ -1040,6 +1400,15 @@
   "layout.meta.og-description": {
     "message": "Odkrywaj i publikuj zawartość Minecraft!"
   },
+  "layout.mobile.close-menu": {
+    "message": "Zamknij menu"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Otwórz menu"
+  },
+  "layout.nav.active-reports": {
+    "message": "Aktywne raporty"
+  },
   "layout.nav.analytics": {
     "message": "Analizy"
   },
@@ -1066,6 +1435,9 @@
   },
   "layout.nav.modrinth-home-page": {
     "message": "Strona główna Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Moje serwery"
   },
   "layout.nav.organizations": {
     "message": "Organizacje"
@@ -1112,6 +1484,273 @@
   "moderation.technical.search.placeholder": {
     "message": "Wyszukaj recenzje technologiczne..."
   },
+  "muralpay.account-type.checking": {
+    "message": "Czekowe"
+  },
+  "muralpay.account-type.savings": {
+    "message": "Oszczędnościowe"
+  },
+  "muralpay.country.at": {
+    "message": "Austria"
+  },
+  "muralpay.country.be": {
+    "message": "Belgia"
+  },
+  "muralpay.country.cy": {
+    "message": "Cypr"
+  },
+  "muralpay.country.de": {
+    "message": "Niemcy"
+  },
+  "muralpay.country.ee": {
+    "message": "Estonia"
+  },
+  "muralpay.country.es": {
+    "message": "Hiszpania"
+  },
+  "muralpay.country.fi": {
+    "message": "Finlandia"
+  },
+  "muralpay.country.fr": {
+    "message": "Francja"
+  },
+  "muralpay.country.gr": {
+    "message": "Grecja"
+  },
+  "muralpay.country.ie": {
+    "message": "Irlandia"
+  },
+  "muralpay.country.it": {
+    "message": "Włochy"
+  },
+  "muralpay.country.lt": {
+    "message": "Litwa"
+  },
+  "muralpay.country.lu": {
+    "message": "Luksemburg"
+  },
+  "muralpay.country.lv": {
+    "message": "Łotwa"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Niderlandy"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugalia"
+  },
+  "muralpay.country.sk": {
+    "message": "Słowacja"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "Identyfikator krajowy"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Paszport"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "Identyfikator rezydenta"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "Identyfikator podatkowy"
+  },
+  "muralpay.field.account-number": {
+    "message": "Numer konta"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Numer konta (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Numer konta (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Rodzaj numeru konta"
+  },
+  "muralpay.field.account-type": {
+    "message": "Typ konta"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Numer konta"
+  },
+  "muralpay.field.branch-code": {
+    "message": "Kod oddziału"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "Kraj"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.document-type": {
+    "message": "Rodzaj dokumentu"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "Numer tel."
+  },
+  "muralpay.field.pix-email": {
+    "message": "E-mail PIX"
+  },
+  "muralpay.field.pix-key-type": {
+    "message": "Rodzaj klucza PIX"
+  },
+  "muralpay.field.pix-phone": {
+    "message": "Tel. PIX"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Numer rozliczeniowy"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
+  },
+  "muralpay.field.wallet-address": {
+    "message": "Adres portfela"
+  },
+  "muralpay.help.cbu-cvu": {
+    "message": "Clave Bancaria Uniforme lub Clave Virtual Uniforme"
+  },
+  "muralpay.help.cci": {
+    "message": "Código de Cuenta Interbancaria"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (Meksykański numer konta bankowego)"
+  },
+  "muralpay.help.cpf-cnpj": {
+    "message": "Brazylijski numer identyfikacyjny podatków"
+  },
+  "muralpay.help.cuit-cuil": {
+    "message": "Argentyńskie ID podatków"
+  },
+  "muralpay.help.iban": {
+    "message": "Międzynarodowy numer rachunku bankowego (IBAN)"
+  },
+  "muralpay.help.swift-bic": {
+    "message": "Kod identyfikujący bank (BIC)"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Konto bankowe"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "E-mail"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "Numer telefonu"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Podaj numer konta"
+  },
+  "muralpay.placeholder.cbu-cvu": {
+    "message": "Podaj CBU lub CVU"
+  },
+  "muralpay.placeholder.cbu-cvu-type": {
+    "message": "CBU lub CVU"
+  },
+  "muralpay.placeholder.cci": {
+    "message": "Wprowadź 20-cyfrowe CCI"
+  },
+  "muralpay.placeholder.cuit-cuil": {
+    "message": "Wprowadź CUIT lub CUIL"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Wprowadź numer konta"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "Podaj kod oddziału"
+  },
+  "muralpay.placeholder.enter-clabe": {
+    "message": "Wprowadź 18-cyfrowe CLABE"
+  },
+  "muralpay.placeholder.enter-cpf-cnpj": {
+    "message": "Wprowadź CPF lub CNPJ"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Wprowadź IBAN"
+  },
+  "muralpay.placeholder.enter-pix-email": {
+    "message": "Wprowadź e-mail PIX"
+  },
+  "muralpay.placeholder.enter-routing-number": {
+    "message": "Podaj 9-cyfrowy numer rozliczeniowy"
+  },
+  "muralpay.placeholder.enter-swift-bic": {
+    "message": "Wprowadź kod SWIFT/BIC"
+  },
+  "muralpay.placeholder.iban-crc": {
+    "message": "Wprowadź kostarykański IBAN"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "Przelew bankowy (ARS)"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "Przelew PIX (BRL)"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "Przelew bankowy (CLP)"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "Przelew bankowy (COP)"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "Przelew bankowy (CRC)"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "Przelew bankowy (EUR)"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "Przelew bankowy (MXN)"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "Przelew bankowy (PEN)"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "Przelew bankowy (USD - Peru)"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Przelew bankowy (USD)"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "Przelew bankowy (ZAR)"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "Krypto (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "Sprawdź podwójnie adres portfela. Fundusze przesłane na nieprawidłowy portfel nie mogą być odzyskane."
+  },
   "profile.bio.fallback.creator": {
     "message": "Twórca Modrinth."
   },
@@ -1129,6 +1768,12 @@
   },
   "profile.button.manage-projects": {
     "message": "Zarządzaj projektami"
+  },
+  "profile.button.remove-affiliate": {
+    "message": "Usuń afiliację"
+  },
+  "profile.button.set-affiliate": {
+    "message": "Ustaw jako afiliację"
   },
   "profile.details.label.auth-providers": {
     "message": "Dostawcy uwierzytelniania"
@@ -1154,6 +1799,9 @@
   "profile.error.not-found": {
     "message": "Nie znaleziono użytkownika"
   },
+  "profile.label.affiliate": {
+    "message": "Afiliacja"
+  },
   "profile.label.badges": {
     "message": "Odznaki"
   },
@@ -1167,7 +1815,7 @@
     "message": "{count} {count, plural, one {pobranie} few {pobrania} other {pobrań}}"
   },
   "profile.label.joined": {
-    "message": "Dołączył/a"
+    "message": "Dołączył(-a)"
   },
   "profile.label.no": {
     "message": "Nie"
@@ -1251,7 +1899,7 @@
     "message": "Wyślij ponownie do przeglądu"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Twój projekt został {status} przez pracowników Modrinth. W większości przypadków możesz ponownie przesłać go do oceny po uwzględnieniu uwag pracowników."
+    "message": "Twój projekt został {status, select, rejected {odrzucony} witheld {wstrzymany} other {{status}}} przez zespół Modrinth. W większości przypadków możesz ponownie wysłać swój projekt do sprawdzenia po rozwiązaniu wspomnianego problemu."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Należy wykonać wszystkie czynności wymienione w liście kontrolnej dotyczącej publikacji!"
@@ -1657,18 +2305,6 @@
   },
   "report.submit": {
     "message": "Wyślij zgłoszenie"
-  },
-  "revenue.transfers.total": {
-    "message": "Razem wypłacono {amount}."
-  },
-  "revenue.transfers.total.method": {
-    "message": "Wypłacono {amount} przez {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "W roku {year} wypłaciłeś kwotę {amount}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "W roku {year} wypłaciłeś {amount} za pomocą {method}."
   },
   "scopes.analytics.description": {
     "message": "Dostęp do danych analityki"

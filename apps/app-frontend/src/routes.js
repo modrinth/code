@@ -1,3 +1,4 @@
+import { ServersManagePageIndex } from '@modrinth/ui'
 import { createRouter, createWebHistory } from 'vue-router'
 
 import * as Pages from '@/pages'
@@ -25,6 +26,14 @@ export default new createRouter({
 			component: Pages.Worlds,
 			meta: {
 				breadcrumb: [{ name: 'Worlds' }],
+			},
+		},
+		{
+			path: '/hosting/manage/',
+			name: 'Servers',
+			component: ServersManagePageIndex,
+			meta: {
+				breadcrumb: [{ name: 'Servers' }],
 			},
 		},
 		{

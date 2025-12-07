@@ -15,7 +15,7 @@
 					class="flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-divider pb-4"
 				>
 					<nuxt-link
-						:to="`/servers/manage/${server.serverId}/content`"
+						:to="`/hosting/manage/${server.serverId}/content`"
 						tabindex="-1"
 						class="flex flex-col gap-4 text-primary"
 					>
@@ -40,7 +40,7 @@
 						</span>
 					</nuxt-link>
 					<ButtonStyled>
-						<nuxt-link :to="`/servers/manage/${server.serverId}/content`">
+						<nuxt-link :to="`/hosting/manage/${server.serverId}/content`">
 							<LeftArrowIcon />
 							Back to server
 						</nuxt-link>
@@ -88,7 +88,10 @@
 						</button>
 					</ButtonStyled>
 				</div>
-				<div v-if="server && projectType.id === 'modpack'" class="rounded-2xl bg-bg-raised">
+				<div
+					v-if="server && projectType.id === 'modpack'"
+					class="card-shadow rounded-2xl bg-bg-raised"
+				>
 					<div class="flex flex-row items-center gap-2 px-6 py-4 text-contrast">
 						<h3 class="m-0 text-lg">Options</h3>
 					</div>
@@ -107,7 +110,10 @@
 						the selected modpack.
 					</div>
 				</div>
-				<div v-if="server && projectType.id !== 'modpack'" class="rounded-2xl bg-bg-raised p-4">
+				<div
+					v-if="server && projectType.id !== 'modpack'"
+					class="card-shadow rounded-2xl bg-bg-raised p-4"
+				>
 					<Checkbox
 						v-model="serverHideInstalled"
 						label="Hide installed content"
@@ -126,7 +132,7 @@
 					:class="
 						filtersMenuOpen
 							? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
-							: 'rounded-2xl bg-bg-raised'
+							: 'card-shadow rounded-2xl bg-bg-raised'
 					"
 					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
 					content-class="mb-4 mx-3"
@@ -531,7 +537,7 @@ async function serverInstall(project) {
 				eraseDataOnInstall.value,
 			)
 			project.installed = true
-			navigateTo(`/servers/manage/${server.value.serverId}/options/loader`)
+			navigateTo(`/hosting/manage/${server.value.serverId}/options/loader`)
 		} else if (projectType.value.id === 'mod') {
 			await server.value.content.install('mod', version.project_id, version.id)
 			await server.value.refresh(['content'])

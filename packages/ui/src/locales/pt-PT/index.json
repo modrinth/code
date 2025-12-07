@@ -347,6 +347,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal Internacional"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -355,6 +358,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Intituição de cariedade"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Instituições de cariedade"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Cartão-presente"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Cartões-presente"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Visa Virtual"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Visas Virtuais"
   },
   "project-type.all": {
     "defaultMessage": "Todos"

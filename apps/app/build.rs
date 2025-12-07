@@ -12,6 +12,7 @@ fn main() {
                 "auth",
                 InlinedPlugin::new()
                     .commands(&[
+                        "check_reachable",
                         "login",
                         "remove_user",
                         "get_default_user",

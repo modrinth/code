@@ -54,12 +54,12 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
 			const motd = await this.getMotd()
 			if (motd === 'A Minecraft Server') {
 				await this.setMotd(
-					`§b${data.project?.title || data.loader + ' ' + data.mc_version} §f♦ §aModrinth Servers`,
+					`§b${data.project?.title || data.loader + ' ' + data.mc_version} §f♦ §aModrinth Hosting`,
 				)
 			}
 			data.motd = motd
 		} catch {
-			console.error('[Modrinth Servers] [General] Failed to fetch MOTD.')
+			console.error('[Modrinth Hosting] [General] Failed to fetch MOTD.')
 			data.motd = undefined
 		}
 
@@ -224,7 +224,7 @@ export class GeneralModule extends ServerModule implements ServerGeneral {
 			}
 		} catch {
 			console.error(
-				'[Modrinth Servers] [General] Failed to set MOTD due to lack of server properties file.',
+				'[Modrinth Hosting] [General] Failed to set MOTD due to lack of server properties file.',
 			)
 		}
 	}

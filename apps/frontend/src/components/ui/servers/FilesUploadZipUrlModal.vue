@@ -52,7 +52,7 @@
 				/>
 				<div v-if="submitted && error" class="text-red">{{ error }}</div>
 			</div>
-			<BackupWarning :backup-link="`/servers/manage/${props.server.serverId}/backups`" />
+			<BackupWarning :backup-link="`/hosting/manage/${props.server.serverId}/backups`" />
 			<div class="flex justify-start gap-2">
 				<ButtonStyled color="brand">
 					<button v-tooltip="error" :disabled="submitted || !!error" type="submit">

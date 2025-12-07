@@ -39,13 +39,11 @@
 
 <script setup lang="ts">
 import { ClockIcon, RocketIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { ButtonStyled, MedalBackgroundImage } from '@modrinth/ui'
 import type { UserSubscription } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 import type { ComponentPublicInstance } from 'vue'
-
-import MedalBackgroundImage from '~/components/ui/servers/marketing/MedalBackgroundImage.vue'
 
 import ServersUpgradeModalWrapper from '../ServersUpgradeModalWrapper.vue'
 

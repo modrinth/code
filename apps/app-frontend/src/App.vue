@@ -1,4 +1,5 @@
 <script setup>
+import { AuthFeature, PanelVersionFeature, TauriModrinthClient } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
@@ -18,12 +19,14 @@ import {
 	RefreshCwIcon,
 	RestoreIcon,
 	RightArrowIcon,
+	ServerIcon,
 	SettingsIcon,
 	UserIcon,
 	WorldIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	Avatar,
 	Button,
 	ButtonStyled,
@@ -32,9 +35,12 @@ import {
 	NotificationPanel,
 	OverflowMenu,
 	ProgressSpinner,
+	provideModrinthClient,
 	provideNotificationManager,
+	useDebugLogger,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
@@ -68,6 +74,7 @@ import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
+import { check_reachable } from '@/helpers/auth.js'
 import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
@@ -102,6 +109,17 @@ const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
 const { handleError, addNotification } = notificationManager
 
+const tauriApiClient = new TauriModrinthClient({
+	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
+	features: [
+		new AuthFeature({
+			token: async () => (await getCreds()).session,
+		}),
+		new PanelVersionFeature(),
+	],
+})
+provideModrinthClient(tauriApiClient)
+
 const news = ref([])
 const availableSurvey = ref(false)
 
@@ -125,6 +143,27 @@ const stateInitialized = ref(false)
 const criticalErrorMessage = ref()
 
 const isMaximized = ref(false)
+
+const authUnreachableDebug = useDebugLogger('AuthReachableChecker')
+const authServerQuery = useQuery({
+	queryKey: ['authServerReachability'],
+	queryFn: async () => {
+		await check_reachable()
+		authUnreachableDebug('Auth servers are reachable')
+		return true
+	},
+	refetchInterval: 5 * 60 * 1000, // 5 minutes
+	retry: false,
+	refetchOnWindowFocus: false,
+})
+
+const authUnreachable = computed(() => {
+	if (authServerQuery.isError.value && !authServerQuery.isLoading.value) {
+		console.warn('Failed to reach auth servers', authServerQuery.error.value)
+		return true
+	}
+	return false
+})
 
 onMounted(async () => {
 	await useCheckDisableMouseover()
@@ -163,6 +202,15 @@ const messages = defineMessages({
 	downloadingUpdate: {
 		id: 'app.update.downloading-update',
 		defaultMessage: 'Downloading update ({percent}%)',
+	},
+	authUnreachableHeader: {
+		id: 'app.auth-servers.unreachable.header',
+		defaultMessage: 'Cannot reach authentication servers',
+	},
+	authUnreachableBody: {
+		id: 'app.auth-servers.unreachable.body',
+		defaultMessage:
+			'Minecraft authentication servers may be down right now. Check your internet connection and try again later.',
 	},
 })
 
@@ -312,7 +360,11 @@ const handleClose = async () => {
 
 const router = useRouter()
 router.afterEach((to, from, failure) => {
-	trackEvent('PageView', { path: to.path, fromPath: from.path, failed: failure })
+	trackEvent('PageView', {
+		path: to.path,
+		fromPath: from.path,
+		failed: failure,
+	})
 })
 const route = useRoute()
 
@@ -336,7 +388,7 @@ async function fetchCredentials() {
 	if (creds && creds.user_id) {
 		creds.user = await get_user(creds.user_id).catch(handleError)
 	}
-	credentials.value = creds
+	credentials.value = creds ?? null
 }
 
 async function signIn() {
@@ -383,19 +435,17 @@ const forceSidebar = computed(
 	() => route.path.startsWith('/browse') || route.path.startsWith('/project'),
 )
 const sidebarVisible = computed(() => sidebarToggled.value || forceSidebar.value)
-const showAd = computed(() => !(!sidebarVisible.value || hasPlus.value))
-
-watch(
-	showAd,
-	() => {
-		if (!showAd.value) {
-			hide_ads_window(true)
-		} else {
-			init_ads_window(true)
-		}
-	},
-	{ immediate: true },
+const showAd = computed(
+	() => sidebarVisible.value && !hasPlus.value && credentials.value !== undefined,
 )
+
+watch(showAd, () => {
+	if (!showAd.value) {
+		hide_ads_window(true)
+	} else {
+		init_ads_window(true)
+	}
+})
 
 onMounted(() => {
 	invoke('show_window')
@@ -743,6 +793,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<WorldIcon />
 			</NavButton>
 			<NavButton
+				v-if="themeStore.featureFlags.servers_in_app"
+				v-tooltip.right="'Servers'"
+				to="/hosting/manage"
+			>
+				<ServerIcon />
+			</NavButton>
+			<NavButton
 				v-tooltip.right="'Discover content'"
 				to="/browse/modpack"
 				:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
@@ -765,7 +822,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			>
 				<LibraryIcon />
 			</NavButton>
-			<div class="h-px w-6 mx-auto my-2 bg-button-bg"></div>
+			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<suspense>
 				<QuickInstanceSwitcher />
 			</suspense>
@@ -969,16 +1026,25 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					width: 'calc(100% - var(--right-bar-width))',
 				}"
 			></div>
-			<div
+			<Admonition
 				v-if="criticalErrorMessage"
-				class="m-6 mb-0 flex flex-col border-red bg-bg-red rounded-2xl border-2 border-solid p-4 gap-1 font-semibold text-contrast"
+				type="critical"
+				:header="criticalErrorMessage.header"
+				class="m-6 mb-0"
 			>
-				<h1 class="m-0 text-lg font-extrabold">{{ criticalErrorMessage.header }}</h1>
 				<div
 					class="markdown-body text-primary"
 					v-html="renderString(criticalErrorMessage.body ?? '')"
 				></div>
-			</div>
+			</Admonition>
+			<Admonition
+				v-if="authUnreachable"
+				type="warning"
+				:header="formatMessage(messages.authUnreachableHeader)"
+				class="m-6 mb-0"
+			>
+				{{ formatMessage(messages.authUnreachableBody) }}
+			</Admonition>
 			<RouterView v-slot="{ Component }">
 				<template v-if="Component">
 					<Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	ChevronRightIcon,
@@ -7,23 +8,12 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { UserSubscription } from '@modrinth/utils'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import type Stripe from 'stripe'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import { useStripe } from '../../composables/stripe'
 import { commonMessages } from '../../utils'
-import type {
-	CreatePaymentIntentRequest,
-	CreatePaymentIntentResponse,
-	ServerBillingInterval,
-	ServerPlan,
-	ServerRegion,
-	ServerStockRequest,
-	UpdatePaymentIntentRequest,
-	UpdatePaymentIntentResponse,
-} from '../../utils/billing'
 import { ButtonStyled } from '../index'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
 import NewModal from '../modal/NewModal.vue'
@@ -39,6 +29,9 @@ export type RegionPing = {
 	ping: number
 }
 
+// Type alias for billing interval that matches both the local and api-client types
+export type ServerBillingInterval = 'monthly' | 'quarterly' | 'yearly'
+
 const props = defineProps<{
 	publishableKey: string
 	returnUrl: string
@@ -46,23 +39,30 @@ const props = defineProps<{
 	customer: Stripe.Customer
 	currency: string
 	pings: RegionPing[]
-	regions: ServerRegion[]
-	availableProducts: ServerPlan[]
+	regions: Archon.Servers.v1.Region[]
+	availableProducts: Labrinth.Billing.Internal.Product[]
 	planStage?: boolean
-	existingPlan?: ServerPlan
-	existingSubscription?: UserSubscription
+	existingPlan?: Labrinth.Billing.Internal.Product
+	existingSubscription?: Labrinth.Billing.Internal.UserSubscription
 	refreshPaymentMethods: () => Promise<void>
-	fetchStock: (region: ServerRegion, request: ServerStockRequest) => Promise<number>
+	fetchStock: (
+		region: Archon.Servers.v1.Region,
+		request: Archon.Servers.v0.StockRequest,
+	) => Promise<number>
 	initiatePayment: (
-		body: CreatePaymentIntentRequest | UpdatePaymentIntentRequest,
-	) => Promise<UpdatePaymentIntentResponse | CreatePaymentIntentResponse | null>
+		body: Labrinth.Billing.Internal.InitiatePaymentRequest,
+	) => Promise<
+		| Labrinth.Billing.Internal.InitiatePaymentResponse
+		| Labrinth.Billing.Internal.EditSubscriptionResponse
+		| null
+	>
 	onError: (err: Error) => void
 	onFinalizeNoPaymentChange?: () => Promise<void>
 	affiliateCode?: string | null
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
-const selectedPlan = ref<ServerPlan>()
+const selectedPlan = ref<Labrinth.Billing.Internal.Product>()
 const selectedInterval = ref<ServerBillingInterval>('quarterly')
 const loading = ref(false)
 const selectedRegion = ref<string>()
@@ -237,7 +237,7 @@ watch(selectedPlan, () => {
 	}
 })
 
-const defaultPlan = computed<ServerPlan | undefined>(() => {
+const defaultPlan = computed<Labrinth.Billing.Internal.Product | undefined>(() => {
 	return (
 		props.availableProducts.find((p) => p?.metadata?.type === 'pyro' && p.metadata.ram === 6144) ??
 		props.availableProducts.find((p) => p?.metadata?.type === 'pyro') ??
@@ -245,7 +245,11 @@ const defaultPlan = computed<ServerPlan | undefined>(() => {
 	)
 })
 
-function begin(interval: ServerBillingInterval, plan?: ServerPlan, project?: string) {
+function begin(
+	interval: ServerBillingInterval,
+	plan?: Labrinth.Billing.Internal.Product | null,
+	project?: string,
+) {
 	loading.value = false
 
 	if (plan === null) {

@@ -3,20 +3,20 @@ import { CheckIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	commonProjectSettingsMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	ProjectSettingsEnvSelector,
 	UnsavedChangesPopup,
 	useSavable,
 } from '@modrinth/ui'
-import { injectApi } from '@modrinth/ui/src/providers/api.ts'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 
 const { formatMessage } = useVIntl()
 
 const { currentMember, projectV2, projectV3, refreshProject } = injectProjectPageContext()
 const { handleError } = injectNotificationManager()
-const api = injectApi()
+const client = injectModrinthClient()
 
 const saving = ref(false)
 
@@ -27,7 +27,7 @@ const supportsEnvironment = computed(() =>
 const needsToVerify = computed(
 	() =>
 		projectV3.value.side_types_migration_review_status === 'pending' &&
-		projectV3.value.environment?.length > 0 &&
+		(projectV3.value.environment?.length ?? 0) > 0 &&
 		projectV3.value.environment?.[0] !== 'unknown' &&
 		supportsEnvironment.value,
 )
@@ -49,8 +49,8 @@ const { saved, current, reset, save } = useSavable(
 	({ environment, side_types_migration_review_status }) => {
 		saving.value = true
 		side_types_migration_review_status = 'reviewed'
-		api.projects
-			.editV3(projectV2.value.id, { environment, side_types_migration_review_status })
+		client.labrinth.projects_v3
+			.edit(projectV2.value.id, { environment, side_types_migration_review_status })
 			.then(() => refreshProject().then(reset))
 			.catch(handleError)
 			.finally(() => (saving.value = false))
@@ -156,12 +156,12 @@ const messages = defineMessages({
 				/>
 				<ProjectSettingsEnvSelector
 					v-model="current.environment"
-					:disabled="!hasPermission || projectV3?.environment?.length > 1"
+					:disabled="!hasPermission || (projectV3?.environment?.length ?? 0) > 1"
 				/>
 			</template>
 		</div>
 		<UnsavedChangesPopup
-			v-if="supportsEnvironment && hasPermission && projectV3?.environment?.length <= 1"
+			v-if="supportsEnvironment && hasPermission && (projectV3?.environment?.length ?? 0) <= 1"
 			:original="saved"
 			:modified="current"
 			:saving="saving"

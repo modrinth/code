@@ -1,0 +1,6 @@
+{
+	"extends": "@modrinth/tooling-config/typescript/base.json",
+	"compilerOptions": {
+		"isolatedModules": false
+	}
+}

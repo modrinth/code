@@ -6,31 +6,21 @@
 	</NuxtLayout>
 </template>
 <script setup lang="ts">
-import { NotificationPanel, provideNotificationManager } from '@modrinth/ui'
-import { provideApi } from '@modrinth/ui/src/providers/api.ts'
-import { RestModrinthApi } from '@modrinth/utils'
+import { NotificationPanel, provideModrinthClient, provideNotificationManager } from '@modrinth/ui'
 
 import ModrinthLoadingIndicator from '~/components/ui/modrinth-loading-indicator.ts'
+import { createModrinthClient } from '~/helpers/api.ts'
+import { FrontendNotificationManager } from '~/providers/frontend-notifications.ts'
 
-import { FrontendNotificationManager } from './providers/frontend-notifications.ts'
+const auth = await useAuth()
+const config = useRuntimeConfig()
 
 provideNotificationManager(new FrontendNotificationManager())
 
-provideApi(
-	new RestModrinthApi((url: string, options?: object) => {
-		const match = url.match(/^\/v(\d+)\/(.+)$/)
-
-		if (match) {
-			const apiVersion = Number(match[1])
-			const path = match[2]
-
-			return useBaseFetch(path, {
-				...options,
-				apiVersion,
-			}) as Promise<Response>
-		} else {
-			throw new Error('Invalid format')
-		}
-	}),
-)
+const client = createModrinthClient(auth, {
+	apiBaseUrl: config.public.apiBaseUrl.replace('/v2/', '/'),
+	archonBaseUrl: config.public.pyroBaseUrl.replace('/v2/', '/'),
+	rateLimitKey: config.rateLimitKey,
+})
+provideModrinthClient(client)
 </script>

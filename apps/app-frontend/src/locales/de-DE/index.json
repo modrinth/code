@@ -15,7 +15,7 @@
     "message": "Funktionsflaggen"
   },
   "app.settings.tabs.java-installations": {
-    "message": "Java Installationen"
+    "message": "Java-Installationen"
   },
   "app.settings.tabs.privacy": {
     "message": "Datenschutz"
@@ -24,13 +24,13 @@
     "message": "Ressourcenmanagement"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} ist bereit zum Installieren! Lade neu um es jetzt zu updaten, oder automatisch wenn du die Modrinth App schließt."
+    "message": "Modrinth App v{version} ist bereit zur Installation! Neu laden, um jetzt zu aktualisieren, oder automatisch, wenn du die Modrinth App schließt."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} ist heruntergeladen. Lade neu um es jetzt zu updaten, oder wenn du die Modrinth App schließt."
+    "message": "Modrinth App v{version} wurde heruntergeladen. Neu laden, um jetzt zu aktualisieren, oder automatisch, wenn du die Modrinth App schließt."
   },
   "app.update-toast.body.metered": {
-    "message": "Die Modrinth App v{version} ist jetzt verfügbar! Da Sie sich in einem getakteten Netzwerk befinden, haben wir es nicht automatisch heruntergeladen."
+    "message": "Modrinth App v{version} ist jetzt verfügbar! Da du ein getaktetes Netzwerk nutzt, haben wir den Download nicht automatisch gestartet."
   },
   "app.update-toast.changelog": {
     "message": "Änderungsverlauf"
@@ -51,16 +51,16 @@
     "message": "Download abgeschlossen"
   },
   "app.update.complete-toast.text": {
-    "message": "Drücke hier, um den Änderungsverlauf zu sehen."
+    "message": "Hier klicken, um das Änderungsprotokoll anzuzeigen."
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} wurde erfolgreich installiert!"
   },
   "app.update.download-update": {
-    "message": "Lade Update herunter"
+    "message": "Update herunterladen"
   },
   "app.update.downloading-update": {
-    "message": "Lade Update Herunter ({percent}%)"
+    "message": "Update wird heruntergeladen ({percent}%)"
   },
   "app.update.reload-to-update": {
     "message": "Neu laden um Update zu installieren"
@@ -72,19 +72,22 @@
     "message": "{count} {count, plural, one {Freundesanfrage} other {Freundesanfragen}}"
   },
   "friends.add-friend.submit": {
-    "message": "Sende Freundesanfrage"
+    "message": "Freundesanfrage senden"
   },
   "friends.add-friend.title": {
     "message": "Einen Freund hinzufügen"
   },
   "friends.add-friend.username.description": {
-    "message": "Es kann vom Minecraft Nutzernamen abweichen!"
+    "message": "Er kann vom Minecraft-Nutzernamen abweichen!"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Gebe den Modrinth Nutzername ein..."
+    "message": "Modrinth-Benutzernamen eingeben..."
   },
   "friends.add-friend.username.title": {
-    "message": "Was ist der Modrinth Nutzername deines Freundes?"
+    "message": "Wie lautet der Modrinth-Benutzername deines Freundes?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Freunde hinzufügen</link>, um zu sehen, was sie spielen!"
   },
   "friends.friend.cancel-request": {
     "message": "Anfrage abbrechen"
@@ -117,10 +120,13 @@
     "message": "Keine Freunde die \"{query}\" entsprechen"
   },
   "friends.search-friends-placeholder": {
-    "message": "Suche nach Freunden..."
+    "message": "Freunde durchsuchen..."
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Melde dich bei einem Modrinth-Konto an</link>, um Freunde hinzuzufügen und zu sehen, was sie gerade spielen!"
   },
   "instance.add-server.add-and-play": {
     "message": "Hinzufügen und spielen"
@@ -150,7 +156,7 @@
     "message": "Name"
   },
   "instance.edit-world.placeholder-name": {
-    "message": "Minecraft Welt"
+    "message": "Minecraft-Welt"
   },
   "instance.edit-world.reset-icon": {
     "message": "Icon zurücksetzen"
@@ -171,7 +177,7 @@
     "message": "Name"
   },
   "instance.server-modal.placeholder-name": {
-    "message": "Minecraft Server"
+    "message": "Minecraft-Server"
   },
   "instance.server-modal.resource-pack": {
     "message": "Ressourcenpaket"
@@ -186,16 +192,16 @@
     "message": "Instanz löschen"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Löscht eine Instanz dauerhaft von deinem Gerät, einschließlich deiner Welten, Einstellungen und aller installierten Inhalte. Sei vorsichtig, eine gelöschte Instanz ist nicht wiederherstellbar."
+    "message": "Löscht eine Instanz dauerhaft von deinem Gerät, einschließlich deiner Welten, Einstellungen und aller installierten Inhalte. Sei vorsichtig, da eine gelöschte Instanz nicht wiederhergestellt werden kann."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Wird gelöscht..."
   },
   "instance.settings.tabs.general.duplicate-button": {
-    "message": "Duplizieren"
+    "message": "Kopieren"
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
-    "message": "Kann während der Installation nicht dupliziert werden."
+    "message": "Kann während der Installation nicht kopiert werden."
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "Instanz duplizieren"
@@ -222,7 +228,7 @@
     "message": "Neue Gruppe erstellen"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Bibliotheksgruppen ermöglichen es dir, deine Instanzen in verschiedene Abteile deiner Bibliothek einzuteilen."
+    "message": "Bibliotheksgruppen ermöglichen es dir, deine Instanzen in verschiedene Abschnitte deiner Bibliothek zu organisieren."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "Gruppenname eingeben"
@@ -240,25 +246,25 @@
     "message": "Hooks ermöglichen es fortgeschrittenen Benutzern, bestimmte Systembefehle vor und nach dem Spielstart auszuführen."
   },
   "instance.settings.tabs.hooks.post-exit": {
-    "message": "Nach dem Schließen des Spiels"
+    "message": "Nach dem Beenden"
   },
   "instance.settings.tabs.hooks.post-exit.description": {
-    "message": "Wird ausgeführt nach dem Beenden des Spiels."
+    "message": "Wird nach dem Beenden des Spiels ausgeführt."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
     "message": "Nach Spielbeendigung auszuführender Befehl eingeben..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Vor dem Starten des Spiels"
+    "message": "Vor dem Start"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Wird vor dem Starten des Spiels ausgeführt."
+    "message": "Wird vor dem Starten der Instanz ausgeführt."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Vor Spielstart auszuführender Befehl eingeben..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Start Hooks"
+    "message": "Start-Hooks"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
@@ -309,7 +315,7 @@
     "message": "Installieren"
   },
   "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Wird installiert"
+    "message": "Installation im Gange"
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} Version"
@@ -336,13 +342,13 @@
     "message": "Modpack wird neu installiert"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Durch die Neuinstallation werden alle installierten oder geänderten Inhalte auf die vom Modpack bereitgestellten Inhalte zurückgesetzt, wobei alle Mods oder Inhalte entfernt werden, die zusätzlich zur ursprünglichen Installation hinzugefügt wurden. Dies kann unerwartetes Verhalten beheben, wenn Änderungen an der Instanz vorgenommen wurden. Wenn Ihre Welten jedoch von zusätzlich installierten Inhalten abhängig sind, kann dies zu Fehlern in bestehenden Welten führen."
+    "message": "Eine Neuinstallation setzt alle installierten oder geänderten Inhalte auf den Zustand zurück, der vom Modpack bereitgestellt wird, und entfernt alle Mods oder Inhalte, die du zusätzlich zur ursprünglichen Installation hinzugefügt hast.\nDies kann unerwartetes Verhalten beheben, falls Änderungen an der Instanz vorgenommen wurden. Wenn deine Welten jedoch von zusätzlich installierten Inhalten abhängen, kann dies bestehende Welten beschädigen."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Bist du dir sicher, dass du diese Instanz neu installieren willst?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Setzt den Inhalt der Instanz auf seinen ursprünglichen Zustand zurück und entfernt alle Mods oder Inhalte, die zusätzlich zum ursprünglichen Modpack hinzugefügt wurden."
+    "message": "Setzt den Inhalt der Instanz auf den ursprünglichen Zustand zurück und entfernt alle Mods oder Inhalte, die du zusätzlich zum ursprünglichen Modpack hinzugefügt hast."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "Modpack neu installieren"
@@ -363,7 +369,7 @@
     "message": "Reparatur im Gange"
   },
   "instance.settings.tabs.installation.reset-selections": {
-    "message": "Auf aktuellen Wert zurücksetzen"
+    "message": "Auf aktuellen Stand zurücksetzen"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Alle Versionen anzeigen"
@@ -396,7 +402,7 @@
     "message": "Verknüpfung der Instanz trennen"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Wenn du fortfährst, kann die Instanz nicht erneut verknüpft werden, ohne eine völlig neue Instanz zu erstellen. Du erhältst keine Modpack-Updates mehr und es wird zu einer normalen Instanz."
+    "message": "Wenn du fortfährst, kannst du sie nicht erneut verknüpfen, ohne eine völlig neue Instanz zu erstellen. Du wirst keine Modpack-Updates mehr erhalten, und sie wird zu einer normalen Instanz."
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
     "message": "Möchtest du die Verknüpfungen dieser Instanz wirklich trennen?"
@@ -426,10 +432,10 @@
     "message": "Zugewiesener Arbeitsspeicher"
   },
   "instance.settings.tabs.window": {
-    "message": "Spielfenster"
+    "message": "Fenster"
   },
   "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Benutzerdefinierte Spielfenstereinstellungen"
+    "message": "Benutzerdefinierte Fenstereinstellungen"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Vollbild"
@@ -501,19 +507,19 @@
     "message": "Einzelspieler"
   },
   "instance.worlds.view_instance": {
-    "message": "Instanzen anzeigen"
+    "message": "Instanz anzeigen"
   },
   "instance.worlds.world_in_use": {
-    "message": "Welt ist aktuell in Benutzung"
+    "message": "Welt wird aktuell benutzt"
   },
   "search.filter.locked.instance": {
-    "message": "Von der Instanz bereitgestellt"
+    "message": "Von der Instanz vorgegeben"
   },
   "search.filter.locked.instance-game-version.title": {
     "message": "Spielversion ist von der Instanz vorgegeben"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Der Loader wird von der Instanz bereitgestellt"
+    "message": "Der Loader ist von der Instanz vorgegeben"
   },
   "search.filter.locked.instance.sync": {
     "message": "Mit Instanz synchronisieren"

@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Avbryt"
+  },
+  "action.continue": {
+    "message": "Fortsätt"
+  },
   "admin.billing.error.not-found": {
     "message": "Användaren hittades inte"
   },
@@ -170,6 +176,9 @@
   "app-marketing.features.youve-used-before": {
     "message": "du använt förut"
   },
+  "app-marketing.hero.app-screenshot-alt": {
+    "message": "Skärmdump av Modrinth App med en Cobblemon-instans öppen på sidan ”Innehåll”."
+  },
   "app-marketing.hero.description": {
     "message": "Modrinth App är en unik launcher med öppen källkod som låter dig spela dina favoritmods och hålla de uppdaterade, allt i ett smidigt litet paket."
   },
@@ -181,6 +190,9 @@
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
     "message": "Ladda ner Modrinth App för {os}"
+  },
+  "app-marketing.hero.minecraft-screenshot-alt": {
+    "message": "Skärmdump av huvudmenyn i Cobblemon-instansen."
   },
   "app-marketing.hero.more-download-options": {
     "message": "Fler nerladdningsalternativ"
@@ -407,6 +419,87 @@
   "collection.title": {
     "message": "{name} - samling"
   },
+  "common.no": {
+    "message": "Nej"
+  },
+  "common.yes": {
+    "message": "Ja"
+  },
+  "create.collection.cancel": {
+    "message": "Avbryt"
+  },
+  "create.collection.collection-info": {
+    "message": "Din nya samling kommer skapas som en offentlig samling med {count, plural, =0 {inga projekt} one {# projekt} other {# projekt}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Skapa samling"
+  },
+  "create.collection.error-title": {
+    "message": "Ett fel inträffade"
+  },
+  "create.collection.name-label": {
+    "message": "Namn"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Ange samlingens namn..."
+  },
+  "create.collection.summary-description": {
+    "message": "En mening eller två som beskriver din samling."
+  },
+  "create.collection.summary-label": {
+    "message": "Sammanfattning"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Det här är en samling av..."
+  },
+  "create.collection.title": {
+    "message": "Skapar samling"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "Nära {type}gränsen ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Du är nära {type}gränsen, kontakta support om du behöver mer än {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Kontakta support"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "{type}gräns nådd"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Du har nått din {type}gräns av {max}. Vänligen kontakta support för att öka gränsen."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "samling"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organisation"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "samling"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organisationer"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projekt"
+  },
+  "create.limit-alert.type-project": {
+    "message": "projekt"
+  },
+  "create.organization.cancel": {
+    "message": "Avbryt"
+  },
+  "create.organization.create-organization": {
+    "message": "Skapa organisation"
+  },
+  "create.organization.error-title": {
+    "message": "Ett fel inträffade"
+  },
+  "create.organization.name-label": {
+    "message": "Namn"
+  },
   "create.organization.summary-label": {
     "message": "Sammanfattning"
   },
@@ -421,6 +514,15 @@
   },
   "dashboard.collections.long-title": {
     "message": "Dina samlingar"
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Främmande entitet"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Privat individ"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "Är du en privat individ eller en del av en främmande entitet?"
   },
   "error.collection.404.list_item.1": {
     "message": "Du kan ha skrivit fel på samlingens URL."
@@ -970,9 +1072,6 @@
   },
   "project-moderation-nags.resubmit-for-review": {
     "message": "Begär ny granskning"
-  },
-  "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Ditt projekt har blivit {status} av Modrinths moderatorer. Vanligtvis kan du skicka in projektet igen efter du har åtgärdat problemet."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Du måste sltuföra alla steg i checklistan för publicering!"

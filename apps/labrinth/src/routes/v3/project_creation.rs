@@ -20,13 +20,14 @@ use crate::models::threads::ThreadType;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::indexing::IndexingError;
+use crate::util::guards::admin_key_guard;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::{self, Data};
-use actix_web::{HttpRequest, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, post};
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
@@ -42,7 +43,7 @@ use thiserror::Error;
 use validator::Validate;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
-    cfg.route("project", web::post().to(project_create));
+    cfg.service(project_create).service(project_create_with_id);
 }
 
 #[derive(Error, Debug)]
@@ -259,7 +260,27 @@ pub async fn undo_uploads(
     Ok(())
 }
 
+#[post("/project")]
 pub async fn project_create(
+    req: HttpRequest,
+    payload: Multipart,
+    client: Data<PgPool>,
+    redis: Data<RedisPool>,
+    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, CreateError> {
+    project_create_internal(
+        req,
+        payload,
+        client,
+        redis,
+        file_host,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn project_create_internal(
     req: HttpRequest,
     mut payload: Multipart,
     client: Data<PgPool>,
@@ -270,6 +291,9 @@ pub async fn project_create(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
+    let project_id: ProjectId =
+        models::generate_project_id(&mut transaction).await?.into();
+
     let result = project_create_inner(
         req,
         &mut payload,
@@ -279,6 +303,7 @@ pub async fn project_create(
         &client,
         &redis,
         &session_queue,
+        project_id,
     )
     .await;
 
@@ -296,6 +321,53 @@ pub async fn project_create(
 
     result
 }
+
+/// Allows creating a project with a specific ID.
+///
+/// This is a testing endpoint only accessible behind an admin key.
+#[post("/project/{id}", guard = "admin_key_guard")]
+pub async fn project_create_with_id(
+    req: HttpRequest,
+    mut payload: Multipart,
+    client: Data<PgPool>,
+    redis: Data<RedisPool>,
+    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: Data<AuthQueue>,
+    path: web::Path<(ProjectId,)>,
+) -> Result<HttpResponse, CreateError> {
+    let mut transaction = client.begin().await?;
+    let mut uploaded_files = Vec::new();
+
+    let (project_id,) = path.into_inner();
+
+    let result = project_create_inner(
+        req,
+        &mut payload,
+        &mut transaction,
+        &***file_host,
+        &mut uploaded_files,
+        &client,
+        &redis,
+        &session_queue,
+        project_id,
+    )
+    .await;
+
+    if result.is_err() {
+        let undo_result = undo_uploads(&***file_host, &uploaded_files).await;
+        let rollback_result = transaction.rollback().await;
+
+        undo_result?;
+        if let Err(e) = rollback_result {
+            return Err(e.into());
+        }
+    } else {
+        transaction.commit().await?;
+    }
+
+    result
+}
+
 /*
 
 Project Creation Steps:
@@ -338,6 +410,7 @@ async fn project_create_inner(
     pool: &PgPool,
     redis: &RedisPool,
     session_queue: &AuthQueue,
+    project_id: ProjectId,
 ) -> Result<HttpResponse, CreateError> {
     // The base URL for files uploaded to S3
     let cdn_url = dotenvy::var("CDN_URL")?;
@@ -357,8 +430,6 @@ async fn project_create_inner(
         return Err(CreateError::LimitReached);
     }
 
-    let project_id: ProjectId =
-        models::generate_project_id(transaction).await?.into();
     let all_loaders =
         models::loader_fields::Loader::list(&mut **transaction, redis).await?;
 
@@ -401,8 +472,10 @@ async fn project_create_inner(
             CreateError::InvalidInput(validation_errors_to_string(err, None))
         })?;
 
-        let slug_project_id_option: Option<ProjectId> =
-            serde_json::from_str(&format!("\"{}\"", create_data.slug)).ok();
+        let slug_project_id_option: Option<ProjectId> = serde_json::from_str(
+            &format!("\"{}\"", create_data.slug.to_lowercase()),
+        )
+        .ok();
 
         if let Some(slug_project_id) = slug_project_id_option {
             let slug_project_id: models::ids::DBProjectId =

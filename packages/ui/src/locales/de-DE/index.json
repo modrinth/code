@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Partnerlink erstellen"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Neuen Partnercode erstellen"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Gib deinem Partnerlink einen Namen, damit du weist, von wo Leute kommen!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Titel des Partnerlinks"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "z.B. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Der Benutzername des Benutzers, für den der Affiliate-Code erstellt werden soll"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Benutzername"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Benutzernamen eingeben..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Erstellt von {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Erstelle Partnerlink..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Partnerlink widerrufen"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Analysen anzeigen"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -8,8 +44,11 @@
   "badge.new": {
     "defaultMessage": "Neu"
   },
+  "button.affiliate-links": {
+    "defaultMessage": "Partnerlinks"
+  },
   "button.analytics": {
-    "defaultMessage": "Analytik"
+    "defaultMessage": "Analysen"
   },
   "button.back": {
     "defaultMessage": "Zurück"
@@ -46,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Folgen"
+  },
+  "button.max": {
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "Mehr Optionen"
@@ -119,6 +161,84 @@
   "collection.label.private": {
     "defaultMessage": "Privat"
   },
+  "form.label.address-line": {
+    "defaultMessage": "Adresszeile"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adresszeile 2 (Optional)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Menge"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Bankname"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Firmenname"
+  },
+  "form.label.city": {
+    "defaultMessage": "Stadt"
+  },
+  "form.label.country": {
+    "defaultMessage": "Land"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Geburtsdatum"
+  },
+  "form.label.email": {
+    "defaultMessage": "E-Mail"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Vorname"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Nachname"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Postleitzahl"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Bundesland/Kanton/Provinz"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Adresse eingeben"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Wohnung, Suite, etc."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Menge eingeben"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Bankname eingeben"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Banknamen auswählen"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Firmennamen eingeben"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Stadt eingeben"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Land auswählen"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "E-Mail-Adresse eingeben"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Vornamen eingeben"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Nachnamen eingeben"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Postleitzahl eingeben"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Bundesland/Kanton/Provinz eingeben"
+  },
   "icon-select.edit": {
     "defaultMessage": "Icon bearbeiten"
   },
@@ -132,7 +252,7 @@
     "defaultMessage": "Icon auswählen"
   },
   "input.search.placeholder": {
-    "defaultMessage": "Suche..."
+    "defaultMessage": "Suchen..."
   },
   "input.view.gallery": {
     "defaultMessage": "Galerieansicht"
@@ -158,6 +278,9 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unbekannter Spielmodus"
   },
+  "label.available": {
+    "defaultMessage": "{amount} verfügbar."
+  },
   "label.changes-saved": {
     "defaultMessage": "Änderungen gespeichert"
   },
@@ -180,7 +303,7 @@
     "defaultMessage": "Fehler"
   },
   "label.followed-projects": {
-    "defaultMessage": "Projekte, denen Du folgst"
+    "defaultMessage": "Gefolgte Projekte"
   },
   "label.loading": {
     "defaultMessage": "Lädt..."
@@ -206,11 +329,14 @@
   "label.rejected": {
     "defaultMessage": "Abgelehnt"
   },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Ich stimme den <terms-link>Bedingungen des Rewards-Programm</terms-link> zu"
+  },
   "label.saved": {
     "defaultMessage": "Gespeichert"
   },
   "label.scopes": {
-    "defaultMessage": "Anwendungsbereiche"
+    "defaultMessage": "Berechtigungen"
   },
   "label.server": {
     "defaultMessage": "Server"
@@ -246,7 +372,7 @@
     "defaultMessage": "Ein Fehler ist aufgetreten"
   },
   "omorphia.component.badge.label.accepted": {
-    "defaultMessage": "Angenommen"
+    "defaultMessage": "Akzeptiert"
   },
   "omorphia.component.badge.label.approved": {
     "defaultMessage": "Angenommen"
@@ -324,7 +450,7 @@
     "defaultMessage": "Nicht unterstützt"
   },
   "omorphia.component.purchase_modal.payment_method_card_display": {
-    "defaultMessage": "{card_brand} endet in {last_four}"
+    "defaultMessage": "{card_brand} mit Endung {last_four}"
   },
   "omorphia.component.purchase_modal.payment_method_type.amazon_pay": {
     "defaultMessage": "Amazon Pay"
@@ -353,6 +479,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -362,8 +491,29 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Wohltätigkeit"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Wohltätigkeiten"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Geschenkkarte"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Geschenkkarten"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Virtuelles Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Virtuelle Visa"
+  },
   "project-type.all": {
-    "defaultMessage": "Alle Projekte"
+    "defaultMessage": "Alle"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "{count, plural, one {Datenpaket} other {Datenpakete}}"
@@ -405,7 +555,7 @@
     "defaultMessage": "{count, plural, one {Ressourcenpaket} other {Ressourcenpakete}}"
   },
   "project-type.resourcepack.category": {
-    "defaultMessage": "Ressourcenpaket"
+    "defaultMessage": "Ressourcenpakete"
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {Ressourcenpaket} other {Ressourcenpakete}}"
@@ -456,25 +606,25 @@
     "defaultMessage": "Ersteller"
   },
   "project.about.details.created": {
-    "defaultMessage": "Erstellt vor {date}"
+    "defaultMessage": "Erstellt am {date}"
   },
   "project.about.details.licensed": {
-    "defaultMessage": "Lizenziert {license}"
+    "defaultMessage": "Lizenziert mit {license}"
   },
   "project.about.details.published": {
     "defaultMessage": "Veröffentlicht am {date}"
   },
   "project.about.details.submitted": {
-    "defaultMessage": "Veröffentlicht am {date}"
+    "defaultMessage": "Eingereicht am {date}"
   },
   "project.about.details.title": {
     "defaultMessage": "Details"
   },
   "project.about.details.updated": {
-    "defaultMessage": "Aktualisiert vor {date}"
+    "defaultMessage": "Aktualisiert am {date}"
   },
   "project.about.links.discord": {
-    "defaultMessage": "Discord Server beitreten"
+    "defaultMessage": "Discordserver beitreten"
   },
   "project.about.links.donate.bmac": {
     "defaultMessage": "Buy me a coffee"
@@ -507,52 +657,52 @@
     "defaultMessage": "Wiki besuchen"
   },
   "project.settings.analytics.title": {
-    "defaultMessage": "Analytik"
+    "defaultMessage": "Analysen"
   },
   "project.settings.description.title": {
     "defaultMessage": "Beschreibung"
   },
   "project.settings.environment.client_and_server.description": {
-    "defaultMessage": "Hat Funktionen auf Client und Server, auch wenn nur teilweise."
+    "defaultMessage": "Hat Funktionen auf Client und Server, wenn auch nur teilweise."
   },
   "project.settings.environment.client_and_server.optional_both.title": {
-    "defaultMessage": "Optional auf beiden Seiten. Funktioniert gleich, egal auf welcher Seite installiert"
+    "defaultMessage": "Optional auf beiden, funktioniert gleich egal auf welcher Seite installiert"
   },
   "project.settings.environment.client_and_server.optional_both_prefers_both.title": {
-    "defaultMessage": "Optional auf beiden Seiten. Funktioniert am besten, wenn auf beiden Seite installiert"
+    "defaultMessage": "Optional auf beiden Seiten. Funktioniert am besten wenn auf beiden Seiten installiert"
   },
   "project.settings.environment.client_and_server.optional_client.title": {
-    "defaultMessage": "Auf dem Client optional"
+    "defaultMessage": "Auf Client optional"
   },
   "project.settings.environment.client_and_server.optional_server.title": {
-    "defaultMessage": "Auf dem Server optional"
+    "defaultMessage": "Auf Server optional"
   },
   "project.settings.environment.client_and_server.required_both.title": {
-    "defaultMessage": "Auf beiden Seite erfordert"
+    "defaultMessage": "Auf beiden Seiten benötigt"
   },
   "project.settings.environment.client_and_server.title": {
     "defaultMessage": "Client und Server"
   },
   "project.settings.environment.client_only.description": {
-    "defaultMessage": "Alle Funktionen werden auf dem Client ausgeführt und sind mit Vanilla-Servern kompatibel."
+    "defaultMessage": "Alle Funktionen werden auf der Client-Seite ausgeführt und sind mit Vanilla-Servern kompatibel."
   },
   "project.settings.environment.client_only.title": {
-    "defaultMessage": "Nur clientseitig"
+    "defaultMessage": "Nur Clientseitig"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Nur Dedizierter Server"
   },
   "project.settings.environment.server_only.description": {
-    "defaultMessage": "Alle Funktionen werden auf dem Client ausgeführt und sind mit Vanilla-Servern kompatibel."
+    "defaultMessage": "Alle Funktionen werden auf dem Server ausgeführt und sind mit Vanilla-Clients kompatibel."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
-    "defaultMessage": "Funktioniert auch im Einzelspielermodus"
+    "defaultMessage": "Funktioniert auch im Einzelspieler"
   },
   "project.settings.environment.server_only.title": {
-    "defaultMessage": "Nur serverseitig"
+    "defaultMessage": "Nur Serverseitig"
   },
   "project.settings.environment.singleplayer.description": {
-    "defaultMessage": "Funktioniert nur im Einzelspielermodus oder, wenn keine Verbindung zu einem Mehrspieler-Server besteht."
+    "defaultMessage": "Funktioniert nur im Einzelspieler oder wenn nicht mit einem Mehrspieler-Server verbunden."
   },
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Nur Einzelspieler"
@@ -636,13 +786,13 @@
     "defaultMessage": "Nicht gelistet"
   },
   "project.visibility.unlisted-by-staff": {
-    "defaultMessage": "Von der Verwaltung ausgeblendet"
+    "defaultMessage": "Von Mitarbeitern entlistet"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter gesperrt"
   },
   "search.filter.locked.default.description": {
-    "defaultMessage": "Entsperrung dieses Filters könnte dir ermöglichen inkompatible Inhalte zu installieren."
+    "defaultMessage": "Durch das Entsperren dieses Filters installierst du möglicherweise inkompatible Inhalte."
   },
   "search.filter.locked.default.sync": {
     "defaultMessage": "Filter synchronisieren"
@@ -663,7 +813,7 @@
     "defaultMessage": "Server"
   },
   "search.filter_type.game_version": {
-    "defaultMessage": "Spiel Version"
+    "defaultMessage": "Spielversion"
   },
   "search.filter_type.game_version.all_versions": {
     "defaultMessage": "Alle Versionen anzeigen"
@@ -672,7 +822,7 @@
     "defaultMessage": "Lizenz"
   },
   "search.filter_type.license.open_source": {
-    "defaultMessage": "Quelle öffnen"
+    "defaultMessage": "Open Source"
   },
   "search.filter_type.mod_loader": {
     "defaultMessage": "Loader"
@@ -687,7 +837,7 @@
     "defaultMessage": "Plattform"
   },
   "search.filter_type.project_id": {
-    "defaultMessage": "Projekt ID"
+    "defaultMessage": "Projekt-ID"
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
@@ -696,7 +846,7 @@
     "defaultMessage": "Ausblenden"
   },
   "servers.notice.dismissable": {
-    "defaultMessage": "Entfernbar"
+    "defaultMessage": "Ausblendbar"
   },
   "servers.notice.heading.attention": {
     "defaultMessage": "Achtung"
@@ -708,7 +858,7 @@
     "defaultMessage": "Kritisch"
   },
   "servers.notice.level.info.name": {
-    "defaultMessage": "Informationen"
+    "defaultMessage": "Info"
   },
   "servers.notice.level.survey.name": {
     "defaultMessage": "Umfrage"
@@ -717,10 +867,10 @@
     "defaultMessage": "Warnung"
   },
   "servers.notice.undismissable": {
-    "defaultMessage": "Nicht entfernbar"
+    "defaultMessage": "Nicht ausblendbar"
   },
   "servers.purchase.step.payment.description": {
-    "defaultMessage": "Es werden Ihnen noch keine Kosten berechnet."
+    "defaultMessage": "Es werden dir noch keine Kosten berechnet."
   },
   "servers.purchase.step.payment.prompt": {
     "defaultMessage": "Zahlungsmethode auswählen"
@@ -729,22 +879,22 @@
     "defaultMessage": "Zahlungsmethode"
   },
   "servers.purchase.step.plan.billed": {
-    "defaultMessage": "in Rechnung gestellt {interval}"
+    "defaultMessage": "{interval} in Rechnung gestellt"
   },
   "servers.purchase.step.plan.custom.desc": {
-    "defaultMessage": "Wählen Sie einen individuellen Plan mit genau den Spezifikationen, die Sie benötigen."
+    "defaultMessage": "Wähle einen benutzerdefinierten Plan mit genau den Spezifikationen, die du brauchst."
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Loslegen"
   },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "Ideal für 15 bis 25 Spieler, Modpacks oder umfangreiche Modding-Projekte."
+    "defaultMessage": "Ideal für 15–25 Spieler, Modpacks oder umfangreiche Modding-Projekte."
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "Ideal für 6 bis 15 Spieler und mehrere Mods."
+    "defaultMessage": "Ideal für 6–15 Spieler und mehrere Mods."
   },
   "servers.purchase.step.plan.most-popular": {
-    "defaultMessage": "Bekannteste"
+    "defaultMessage": "Am beliebtesten"
   },
   "servers.purchase.step.plan.prompt": {
     "defaultMessage": "Wähle einen Plan aus"
@@ -753,10 +903,10 @@
     "defaultMessage": "Plan auswählen"
   },
   "servers.purchase.step.plan.small.desc": {
-    "defaultMessage": "Perfekt für 1–5 Freunde mit ein paar kleinen Modifikationen."
+    "defaultMessage": "Perfekt für 1–5 Freunde mit ein paar kleinen Mods."
   },
   "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Wählen Sie die RAM-Kapazität und die technischen Daten, die Ihren Anforderungen entsprechen."
+    "defaultMessage": "Wähle die RAM-Kapazität und die technischen Spezifikationen, die deinen Anforderungen entsprechen."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"
@@ -771,7 +921,7 @@
     "defaultMessage": "Zentraleuropa"
   },
   "servers.region.custom.prompt": {
-    "defaultMessage": "Wie viel RAM willst du für deinen Server haben?"
+    "defaultMessage": "Wie viel RAM soll dein Server haben?"
   },
   "servers.region.north-america": {
     "defaultMessage": "Nordamerika"
@@ -780,7 +930,7 @@
     "defaultMessage": "Wo soll sich dein Server befinden?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Region nicht aufgeführt? <link>Teilen Sie uns mit, wo Sie Modrinth-Server als Nächstes sehen möchten!</link>"
+    "defaultMessage": "Region nicht aufgeführt? <link>Teile uns mit, wo du Modrinth-Server als Nächstes sehen möchtest!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Südostasien"
@@ -792,7 +942,7 @@
     "defaultMessage": "Konto und Sicherheit"
   },
   "settings.appearance.title": {
-    "defaultMessage": "Aussehen"
+    "defaultMessage": "Erscheinungsbild"
   },
   "settings.applications.title": {
     "defaultMessage": "Deine Anwendungen"
@@ -801,7 +951,7 @@
     "defaultMessage": "Autorisierte Apps"
   },
   "settings.billing.title": {
-    "defaultMessage": "Rechnungsstellung und Abos"
+    "defaultMessage": "Abrechnung und Abonnements"
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Dunkel"

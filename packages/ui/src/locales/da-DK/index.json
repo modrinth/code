@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Opret affiliate link"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Opretter et nyt affiliate kode"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Giv dit affiliate link et navn så du ved hvor folk kommer fra!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Title af affiliate link"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "f.eks. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Brugernavnet af brugeren for at lave en affiliate kode til"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Brugernavn"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Indskriv brugernavn..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Lavet af {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Opretter affiliate link..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Fjern affiliate link"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Se analyser"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -8,6 +44,9 @@
   "badge.new": {
     "defaultMessage": "Ny"
   },
+  "button.affiliate-links": {
+    "defaultMessage": "Affiliate links"
+  },
   "button.analytics": {
     "defaultMessage": "Analytics"
   },
@@ -16,6 +55,12 @@
   },
   "button.cancel": {
     "defaultMessage": "Annuller"
+  },
+  "button.clear": {
+    "defaultMessage": "Ryd"
+  },
+  "button.close": {
+    "defaultMessage": "Luk"
   },
   "button.continue": {
     "defaultMessage": "Forsæt"
@@ -40,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Følg"
+  },
+  "button.max": {
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "Flere muligheder"
@@ -113,6 +161,84 @@
   "collection.label.private": {
     "defaultMessage": "Privat"
   },
+  "form.label.address-line": {
+    "defaultMessage": "Adresse"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adresse 2 (Valgfri)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Antal"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Bank navn"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Virksomhedens navn"
+  },
+  "form.label.city": {
+    "defaultMessage": "By"
+  },
+  "form.label.country": {
+    "defaultMessage": "Land"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Fødselsdags dato"
+  },
+  "form.label.email": {
+    "defaultMessage": "Email"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Fornavn"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Efternavn"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Postnummer/ZIP kode"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Stat/provins"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Indskriv adresse"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Lejlighed, suite osv."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Indskriv antal"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Indskriv bank navn"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Vælg bank navn"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Indskriv virksomhedsnavn"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Indskriv by"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Vælg land"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Indskriv email adresse"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Indskriv fornavn"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Indskriv efternavn"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Indskriv postkode"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Indskriv state/province"
+  },
   "icon-select.edit": {
     "defaultMessage": "Rediger ikon"
   },
@@ -148,6 +274,30 @@
   },
   "instance.worlds.game_mode.survival": {
     "defaultMessage": "Overlevelsestilstand"
+  },
+  "instance.worlds.game_mode.unknown": {
+    "defaultMessage": "Ukendt gamemode"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} tilgængelig."
+  },
+  "label.changes-saved": {
+    "defaultMessage": "Ændringer gemt"
+  },
+  "label.collections": {
+    "defaultMessage": "Samlinger"
+  },
+  "label.created-ago": {
+    "defaultMessage": "Oprettet {ago}"
+  },
+  "label.dashboard": {
+    "defaultMessage": "Kontrolpanel"
+  },
+  "label.delete": {
+    "defaultMessage": "Slet"
+  },
+  "label.description": {
+    "defaultMessage": "Beskrivelse"
   },
   "omorphia.component.badge.label.under-review": {
     "defaultMessage": "Under gennemgang"
@@ -209,11 +359,65 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Virtuelle Visas"
+  },
   "project-type.all": {
     "defaultMessage": "Alle"
   },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Data Pack} other {Data Packs}}"
+  },
+  "project-type.datapack.category": {
+    "defaultMessage": "Data Packs"
+  },
+  "project-type.datapack.lowercase": {
+    "defaultMessage": "{count, plural, one {data pack} other {data packs}}"
+  },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
+  "project-type.mod.category": {
+    "defaultMessage": "Mods"
+  },
   "project-type.mod.lowercase": {
     "defaultMessage": "{count, plural, one {modifikation} other {modifikationer}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Modpacks"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpack} other {modpacks}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Plugins"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packs}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Resource Packs"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Shaders"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shaders}}"
   },
   "project.about.links.donate.generic": {
     "defaultMessage": "Doner"

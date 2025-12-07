@@ -31,7 +31,6 @@ use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{HttpRequest, HttpResponse, web};
-use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use futures::TryStreamExt;
 use itertools::Itertools;
@@ -628,22 +627,16 @@ pub async fn project_edit(
             ));
         }
 
-        let slug_project_id_option: Option<u64> = parse_base62(slug).ok();
-        if let Some(slug_project_id) = slug_project_id_option {
-            let results = sqlx::query!(
-                "
-                SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
-                ",
-                slug_project_id as i64
-            )
-            .fetch_one(&mut *transaction)
-            .await?;
-
-            if results.exists.unwrap_or(true) {
-                return Err(ApiError::InvalidInput(
-                    "Slug collides with other project's id!".to_string(),
-                ));
-            }
+        let existing = db_models::DBProject::get(
+            &slug.to_lowercase(),
+            &mut *transaction,
+            &redis,
+        )
+        .await?;
+        if existing.is_some() {
+            return Err(ApiError::InvalidInput(
+                "Slug collides with other project's id!".to_string(),
+            ));
         }
 
         // Make sure the new slug is different from the old one
@@ -651,7 +644,12 @@ pub async fn project_edit(
         if !slug.eq(&project_item.inner.slug.clone().unwrap_or_default()) {
             let results = sqlx::query!(
                 "
-                SELECT EXISTS(SELECT 1 FROM mods WHERE slug = LOWER($1))
+                SELECT EXISTS(
+                    SELECT 1 FROM mods
+                    WHERE
+                        slug = LOWER($1)
+                        OR text_id_lower = LOWER($1)
+                )
                 ",
                 slug
             )

@@ -33,7 +33,7 @@
     "defaultMessage": "Partnerlink widerrufen"
   },
   "affiliate.viewAnalytics": {
-    "defaultMessage": "Analytiken ansehen"
+    "defaultMessage": "Analysen anzeigen"
   },
   "badge.beta": {
     "defaultMessage": "Beta"
@@ -85,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Folgen"
+  },
+  "button.max": {
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "Weitere Optionen"
@@ -158,6 +161,84 @@
   "collection.label.private": {
     "defaultMessage": "Privat"
   },
+  "form.label.address-line": {
+    "defaultMessage": "Adresszeile"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adresszeile 2 (Optional)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Menge"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Bankname"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Firmenname"
+  },
+  "form.label.city": {
+    "defaultMessage": "Stadt"
+  },
+  "form.label.country": {
+    "defaultMessage": "Land"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Geburtsdatum"
+  },
+  "form.label.email": {
+    "defaultMessage": "E-Mail"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Vorname"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Nachname"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Postleitzahl"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Bundesland/Kanton/Provinz"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Adresse eingeben"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Wohnung, Suite, etc."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Menge eingeben"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Bankname eingeben"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Banknamen auswählen"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Firmennamen eingeben"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Stadt eingeben"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Land auswählen"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "E-Mail-Adresse eingeben"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Vornamen eingeben"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Nachnamen eingeben"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Postleitzahl eingeben"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Bundesland/Kanton/Provinz eingeben"
+  },
   "icon-select.edit": {
     "defaultMessage": "Icon bearbeiten"
   },
@@ -196,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unbekannter Spielmodus"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} verfügbar."
   },
   "label.changes-saved": {
     "defaultMessage": "Änderungen gespeichert"
@@ -244,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Abgelehnt"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Ich stimme den <terms-link>Bedingungen des Rewards-Programm</terms-link> zu"
   },
   "label.saved": {
     "defaultMessage": "Gespeichert"
@@ -392,6 +479,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -400,6 +490,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Wohltätigkeit"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Wohltätigkeiten"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Geschenkkarte"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Geschenkkarten"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Virtuelles Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Virtuelle Visa"
   },
   "project-type.all": {
     "defaultMessage": "Alle"
@@ -582,7 +693,7 @@
     "defaultMessage": "Nur Dedizierte Server"
   },
   "project.settings.environment.server_only.description": {
-    "defaultMessage": "Alle Funktionen werden auf dem Server ausgeführt und sind mit Vanilla-Clientskompatibel."
+    "defaultMessage": "Alle Funktionen werden auf dem Server ausgeführt und sind mit Vanilla-Clients kompatibel."
   },
   "project.settings.environment.server_only.supports_singleplayer.title": {
     "defaultMessage": "Funktioniert auch im Einzelspieler"
@@ -795,7 +906,7 @@
     "defaultMessage": "Perfekt für 1 bis 5 Freunde mit ein paar leichten Mods."
   },
   "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Wähle die Menge an Arbeitsspeicher und Eigenschafter, welche deinen Anforderungen entsrechen."
+    "defaultMessage": "Wähle die RAM-Kapazität und die technischen Spezifikationen, die deinen Anforderungen entsprechen."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"

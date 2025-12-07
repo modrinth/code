@@ -1250,9 +1250,6 @@
   "project-moderation-nags.resubmit-for-review": {
     "message": "İncelemeye yeniden gönder"
   },
-  "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Modrinth'in kadrosu tarafından projeniz {status} hale getirildi. Çoğu durumda, kadronun mesajına değindikten sonra incelemeye yeniden yollayabilirsiniz."
-  },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Yayımlama kontrol listesindeki gerekli adımları tamamlamalısınız!"
   },
@@ -1657,18 +1654,6 @@
   },
   "report.submit": {
     "message": "Rapor gönder"
-  },
-  "revenue.transfers.total": {
-    "message": "Toplam {amount} çektiniz."
-  },
-  "revenue.transfers.total.method": {
-    "message": "{method} yoluyla toplam {amount} çektiniz."
-  },
-  "revenue.transfers.total.year": {
-    "message": "{year} yılında toplam {amount} çektiniz."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "{method} yoluyla, {year} yılında toplam {amount} çektiniz."
   },
   "scopes.analytics.description": {
     "message": "Analiz verilerinize erişin"

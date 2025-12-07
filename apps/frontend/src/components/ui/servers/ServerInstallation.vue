@@ -163,7 +163,7 @@ import { ButtonStyled, NewProjectCard } from '@modrinth/ui'
 import type { Loaders } from '@modrinth/utils'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
-import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 import LoaderSelector from './LoaderSelector.vue'
 import PlatformChangeModpackVersionModal from './PlatformChangeModpackVersionModal.vue'

@@ -9,6 +9,7 @@ keywords = []
 categories = ["api-bindings"]
 
 [dependencies]
+arc-swap = { workspace = true, optional = true }
 bytes = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true, features = [
@@ -37,6 +38,7 @@ tokio = { workspace = true, features = ["full"] }
 tracing-subscriber = { workspace = true }
 
 [features]
+mock = ["dep:arc-swap"]
 utoipa = ["dep:utoipa"]
 
 [lints]

@@ -1,4 +1,10 @@
 {
+  "action.cancel": {
+    "message": "Annuller"
+  },
+  "action.continue": {
+    "message": "Forsæt"
+  },
   "admin.billing.error.not-found": {
     "message": "Bruger ikke fundet"
   },
@@ -64,6 +70,24 @@
   },
   "app-marketing.features.mod-management.byAuthor": {
     "message": "af {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth gør det nemt at håndtere alle dine mods i et sted. Du kan installere, afinstallere, og opdatere mods med et enkelt klik."
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Installerede mods"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Navn"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Søg mods"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Mod håndtering"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Version"
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"

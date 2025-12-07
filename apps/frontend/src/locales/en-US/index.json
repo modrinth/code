@@ -1359,7 +1359,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Resources"
@@ -2004,7 +2004,7 @@
     "message": "Review project"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers is the easiest way to play with your friends without hassle!"
+    "message": "Modrinth Hosting is the easiest way to play with your friends without hassle!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Starting at {price}<small> / month</small>"
@@ -2561,47 +2561,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Backup creation in progress"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup restore in progress"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automated"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Creating backup..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Failed to create backup"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Failed to restore from backup"
-  },
-  "servers.backups.item.lock": {
-    "message": "Lock"
-  },
-  "servers.backups.item.locked": {
-    "message": "Locked"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Queued for backup"
-  },
-  "servers.backups.item.rename": {
-    "message": "Rename"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restore"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restoring from backup..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Retry"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Unlock"
   },
   "servers.notice.actions": {
     "message": "Actions"

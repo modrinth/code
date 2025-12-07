@@ -998,18 +998,6 @@
   "report.submit": {
     "message": "신고 제출"
   },
-  "revenue.transfers.total": {
-    "message": "총 {amount} 만큼 인출했습니다."
-  },
-  "revenue.transfers.total.method": {
-    "message": "{method}(으)로 총 {amount} 만큼 인출했습니다."
-  },
-  "revenue.transfers.total.year": {
-    "message": "{year}년에 총 {amount} 만큼 인출했습니다."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "{method}(으)로 {year}년에 총 {amount} 만큼 인출했습니다."
-  },
   "scopes.analytics.description": {
     "message": "통계 접근"
   },

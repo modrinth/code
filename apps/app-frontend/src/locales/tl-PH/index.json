@@ -125,11 +125,14 @@
   "friends.section.heading": {
     "message": "{title} - {count}"
   },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Mag-sign-in sa Modrinth account</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Idagdag at laruin"
   },
   "instance.add-server.add-server": {
-    "message": "Idagdag ang tagapagsilbi"
+    "message": "Idagdag ang pansilbi"
   },
   "instance.add-server.resource-pack.disabled": {
     "message": "Hindi pinahihintulotan"
@@ -141,10 +144,10 @@
     "message": "Magpahintulot"
   },
   "instance.add-server.title": {
-    "message": "Magdagdag ng tagapagsilbi"
+    "message": "Magdagdag ng pansilbi"
   },
   "instance.edit-server.title": {
-    "message": "Baguhin ang tagapagsilbi"
+    "message": "Baguhin ang pansilbi"
   },
   "instance.edit-world.hide-from-home": {
     "message": "Huwag ipakita sa panig ng Bahay"
@@ -156,7 +159,7 @@
     "message": "Minecraft na Daigdig"
   },
   "instance.edit-world.reset-icon": {
-    "message": "Walain ang lambana"
+    "message": "Isauli ang lambana"
   },
   "instance.edit-world.title": {
     "message": "Baguhin ang daigdig"
@@ -174,7 +177,7 @@
     "message": "Pangalan"
   },
   "instance.server-modal.placeholder-name": {
-    "message": "Minecraft na Tagapagsilbi"
+    "message": "Minecraft na Pansilbi"
   },
   "instance.server-modal.resource-pack": {
     "message": "Balot ng mapagkukunan"
@@ -308,6 +311,9 @@
   "instance.settings.tabs.installation.install": {
     "message": "Ikabit"
   },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Nagkakabit ngayon"
+  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Bersiyon ng {loader}"
   },
@@ -320,11 +326,20 @@
   "instance.settings.tabs.installation.platform": {
     "message": "Batyawan"
   },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Ikabit muli ang balot ng pambago"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Kinakabit muli ang balot ng pambago"
+  },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
     "message": "Maaaring mababalik sa dati ang lahat ng kinabit o binago na nilalaman sa kung anong ibibigay ng balot ng pambago, tatanggalin ang mga pambago o nilalamang idinagdag mo lalo na ang nangunang balot ng pambago. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa tularan, ngunit kung nakabatay na ang iyong daigdig sa karagdagang nilalaman, maaari nitong masira ang mga umiiral na daigdig."
   },
   "instance.settings.tabs.installation.reinstall.description": {
     "message": "Ibalik ang mga nilalaman ng tularan sa pangunahing kalagayan, tatanggalin ang mga pambago o nilalamang idinagdag mo lalo na ang nangunang balot ng pambago."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Ikabit muli ang balot ng pambago"
   },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Kumpunihin"
@@ -337,6 +352,12 @@
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Kumpunihin ang tularan?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Kinukumpuni ngayon"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Sa kasalukuyan isauli"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Ipakita ang lahat ng bersiyon"
@@ -365,17 +386,32 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(hindi kilalang bersiyon)"
   },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Paghiwalayin sa tularan"
+  },
   "instance.settings.tabs.installation.unlink.confirm.description": {
     "message": "Kung ipapatuloy mo, hindi mo na itong maaaring maikawing muli ng hindi lilikha ng panibagong tularan. Hindi ka makatatanggap ng mga pagsasapanahon ng pambalot ng pambago at magiging pangkaraniwan na itong."
   },
   "instance.settings.tabs.installation.unlink.description": {
     "message": "Nakakawing ang tularang ito sa isang pambalot ng pambago, ibig sabihin hindi maisapanahon ang mga pambago at hindi mo mapapalitan ang tagapagdala ng pambago o ang bersiyon ng Minecraft."
   },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Paghiwalayin sa balot ng pambago"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java at memorya"
+  },
   "instance.settings.tabs.java.hooks": {
     "message": "Mga kawit"
   },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Mga sadyansukat ng java"
+  },
   "instance.settings.tabs.java.java-installation": {
     "message": "Kabit ng Java"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Memoryang inilaan"
   },
   "instance.settings.tabs.window": {
     "message": "Durungawan"
@@ -383,28 +419,55 @@
   "instance.settings.tabs.window.custom-window-settings": {
     "message": "Mga kagustuhan sa pasadyang durungawan"
   },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Buong-tabing"
+  },
   "instance.settings.tabs.window.height": {
     "message": "Tayog"
   },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Ilagay ang taas..."
+  },
   "instance.settings.tabs.window.width": {
     "message": "Lapad"
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Ilagay ang lapad..."
   },
   "instance.settings.title": {
     "message": "Mga Kagustuhan"
   },
   "instance.worlds.a_minecraft_server": {
-    "message": "Isang Minecraft na Tagapagsilbi"
+    "message": "Isang Minecraft na Pansilbi"
   },
   "instance.worlds.copy_address": {
     "message": "Sipiin ang tinitirhan"
   },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Huwag ipakita sa Tirahan"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Magagamit"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Paraang pangdalubhasan"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Laruin ang tularan"
+  },
   "instance.worlds.type.server": {
-    "message": "Tagapagsilbi"
+    "message": "Pansilbi"
   },
   "instance.worlds.type.singleplayer": {
     "message": "Pang-isahang laro"
   },
   "instance.worlds.view_instance": {
     "message": "Tingnan ang tularan"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Ginagamit ang daigdig"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Makipagsabayan sa tularan"
   }
 }

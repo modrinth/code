@@ -1,3 +1,5 @@
+import type { ISO3166, Labrinth } from '@modrinth/api-client'
+
 import generatedState from '~/generated/state.json'
 
 export interface ProjectType {
@@ -15,38 +17,12 @@ export interface LoaderData {
 	hiddenModLoaders: string[]
 }
 
-export interface Country {
-	alpha2: string
-	alpha3: string
-	numeric: string
-	nameShort: string
-	nameLong: string
-}
+// Re-export types from api-client for convenience
+export type Country = ISO3166.Country
+export type Subdivision = ISO3166.Subdivision
 
-export interface Subdivision {
-	code: string // Full ISO 3166-2 code (e.g., "US-NY")
-	name: string // Official name in local language
-	localVariant: string | null // English variant if different
-	category: string // STATE, PROVINCE, REGION, etc.
-	parent: string | null // Parent subdivision code
-	language: string // Language code
-}
-
-export interface GeneratedState {
-	categories: any[]
-	loaders: any[]
-	gameVersions: any[]
-	donationPlatforms: any[]
-	reportTypes: any[]
-	muralBankDetails: Record<
-		string,
-		{
-			bankNames: string[]
-		}
-	>
-	countries: Country[]
-	subdivisions: Record<string, Subdivision[]>
-
+export interface GeneratedState extends Labrinth.State.GeneratedState {
+	// Additional runtime-defined fields not from the API
 	projectTypes: ProjectType[]
 	loaderData: LoaderData
 	projectViewModes: string[]
@@ -54,15 +30,9 @@ export interface GeneratedState {
 	rejectedStatuses: string[]
 	staffRoles: string[]
 
-	homePageProjects?: any[]
-	homePageSearch?: any
-	homePageNotifs?: any
-	products?: any[]
-
 	// Metadata
 	lastGenerated?: string
 	apiUrl?: string
-	errors?: number[]
 }
 
 /**
@@ -71,14 +41,18 @@ export interface GeneratedState {
  */
 export const useGeneratedState = () =>
 	useState<GeneratedState>('generatedState', () => ({
-		categories: generatedState.categories ?? [],
-		loaders: generatedState.loaders ?? [],
-		gameVersions: generatedState.gameVersions ?? [],
-		donationPlatforms: generatedState.donationPlatforms ?? [],
-		reportTypes: generatedState.reportTypes ?? [],
-		muralBankDetails: generatedState.muralBankDetails ?? null,
-		countries: generatedState.countries ?? [],
-		subdivisions: generatedState.subdivisions ?? {},
+		// Cast JSON data to typed API responses
+		categories: (generatedState.categories ?? []) as Labrinth.Tags.v2.Category[],
+		loaders: (generatedState.loaders ?? []) as Labrinth.Tags.v2.Loader[],
+		gameVersions: (generatedState.gameVersions ?? []) as Labrinth.Tags.v2.GameVersion[],
+		donationPlatforms: (generatedState.donationPlatforms ??
+			[]) as Labrinth.Tags.v2.DonationPlatform[],
+		reportTypes: (generatedState.reportTypes ?? []) as string[],
+		muralBankDetails: generatedState.muralBankDetails as
+			| Record<string, { bankNames: string[] }>
+			| undefined,
+		countries: (generatedState.countries ?? []) as ISO3166.Country[],
+		subdivisions: (generatedState.subdivisions ?? {}) as Record<string, ISO3166.Subdivision[]>,
 
 		projectTypes: [
 			{
@@ -135,10 +109,12 @@ export const useGeneratedState = () =>
 		rejectedStatuses: ['rejected', 'withheld'],
 		staffRoles: ['moderator', 'admin'],
 
-		homePageProjects: generatedState.homePageProjects,
-		homePageSearch: generatedState.homePageSearch,
-		homePageNotifs: generatedState.homePageNotifs,
-		products: generatedState.products,
+		homePageProjects: generatedState.homePageProjects as unknown as
+			| Labrinth.Projects.v2.Project[]
+			| undefined,
+		homePageSearch: generatedState.homePageSearch as Labrinth.Search.v2.SearchResults | undefined,
+		homePageNotifs: generatedState.homePageNotifs as Labrinth.Search.v2.SearchResults | undefined,
+		products: generatedState.products as Labrinth.Billing.Internal.Product[] | undefined,
 
 		lastGenerated: generatedState.lastGenerated,
 		apiUrl: generatedState.apiUrl,

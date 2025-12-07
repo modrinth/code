@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "建立聯盟行銷連結"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "建立新的聯盟行銷代碼"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "為你的聯盟行銷連結命名，以便你知道流量的來源了！"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "標題或聯盟行銷連結"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "例如：YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "欲建立聯盟行銷代碼的使用者名稱"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "使用者名稱"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "輸入使用者名稱..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "由 {user} 建立"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "正在建立聯盟行銷連結..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "撤銷聯盟行銷連結"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "檢視數據分析"
+  },
   "badge.beta": {
     "defaultMessage": "Beta 版"
   },
@@ -7,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "新功能"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "聯盟行銷連結"
   },
   "button.analytics": {
     "defaultMessage": "數據分析"
@@ -468,7 +507,7 @@
     "defaultMessage": "提交於 {date}"
   },
   "project.about.details.title": {
-    "defaultMessage": "詳細資料"
+    "defaultMessage": "詳細資訊"
   },
   "project.about.details.updated": {
     "defaultMessage": "更新於 {date}"

@@ -1,44 +1,42 @@
 <script setup lang="ts">
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { InfoIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { formatPrice } from '../../../../utils'
-import {
-	monthsInInterval,
-	type ServerBillingInterval,
-	type ServerPlan,
-	type ServerRegion,
-	type ServerStockRequest,
-} from '../../utils/billing'
+import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils.ts'
 import { regionOverrides } from '../../utils/regions.ts'
 import Slider from '../base/Slider.vue'
 import ModalLoadingIndicator from '../modal/ModalLoadingIndicator.vue'
-import type { RegionPing } from './ModrinthServersPurchaseModal.vue'
+import type { RegionPing, ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import ServersRegionButton from './ServersRegionButton.vue'
 import ServersSpecs from './ServersSpecs.vue'
 
 const { formatMessage, locale } = useVIntl()
 
 const props = defineProps<{
-	regions: ServerRegion[]
+	regions: Archon.Servers.v1.Region[]
 	pings: RegionPing[]
-	fetchStock: (region: ServerRegion, request: ServerStockRequest) => Promise<number>
+	fetchStock: (
+		region: Archon.Servers.v1.Region,
+		request: Archon.Servers.v0.StockRequest,
+	) => Promise<number>
 	custom: boolean
 	currency: string
 	interval: ServerBillingInterval
-	availableProducts: ServerPlan[]
+	availableProducts: Labrinth.Billing.Internal.Product[]
 }>()
 
 const loading = ref(true)
 const checkingCustomStock = ref(false)
-const selectedPlan = defineModel<ServerPlan>('plan')
+const selectedPlan = defineModel<Labrinth.Billing.Internal.Product>('plan')
 const selectedRegion = defineModel<string>('region')
 
 const selectedPrice = computed(() => {
-	const amount = selectedPlan.value?.prices?.find((price) => price.currency_code === props.currency)
-		?.prices?.intervals?.[props.interval]
+	if (!selectedPlan.value) return undefined
+	const amount = getPriceForInterval(selectedPlan.value, props.currency, props.interval)
 	return amount ? amount / monthsInInterval[props.interval] : undefined
 })
 
@@ -67,7 +65,13 @@ const selectedRam = ref<number>(-1)
 
 const ramOptions = computed(() => {
 	return props.availableProducts
-		.map((product) => (product.metadata.ram ?? 0) / 1024)
+		.map((product) => {
+			const metadata = product.metadata
+			if (metadata.type === 'pyro' || metadata.type === 'medal') {
+				return metadata.ram / 1024
+			}
+			return 0
+		})
 		.filter((x) => x > 0)
 })
 
@@ -80,38 +84,63 @@ const maxRam = computed(() => {
 
 const lowestProduct = computed(() => {
 	return (
-		props.availableProducts.find(
-			(product) => (product.metadata.ram ?? 0) / 1024 === minRam.value,
-		) ?? props.availableProducts[0]
+		props.availableProducts.find((product) => {
+			const metadata = product.metadata
+			return (
+				(metadata.type === 'pyro' || metadata.type === 'medal') &&
+				metadata.ram / 1024 === minRam.value
+			)
+		}) ?? props.availableProducts[0]
 	)
+})
+
+const selectedPlanSpecs = computed(() => {
+	if (!selectedPlan.value) return null
+	const metadata = selectedPlan.value.metadata
+	if (metadata.type === 'pyro' || metadata.type === 'medal') {
+		return {
+			ram: metadata.ram,
+			storage: metadata.storage,
+			cpu: metadata.cpu,
+		}
+	}
+	return null
 })
 
 function updateRamStock(regionToCheck: string, newRam: number) {
 	if (newRam > 0) {
 		checkingCustomStock.value = true
-		const plan = props.availableProducts.find(
-			(product) => (product.metadata.ram ?? 0) / 1024 === newRam,
-		)
+		const plan = props.availableProducts.find((product) => {
+			const metadata = product.metadata
+			return (
+				(metadata.type === 'pyro' || metadata.type === 'medal') && metadata.ram / 1024 === newRam
+			)
+		})
 		if (plan) {
 			const region = sortedRegions.value.find((region) => region.shortcode === regionToCheck)
 			if (region) {
-				props
-					.fetchStock(region, {
-						cpu: plan.metadata.cpu ?? 0,
-						memory_mb: plan.metadata.ram ?? 0,
-						swap_mb: plan.metadata.swap ?? 0,
-						storage_mb: plan.metadata.storage ?? 0,
-					})
-					.then((stock: number) => {
-						if (stock > 0) {
-							selectedPlan.value = plan
-						} else {
-							selectedPlan.value = undefined
-						}
-					})
-					.finally(() => {
-						checkingCustomStock.value = false
-					})
+				const metadata = plan.metadata
+				if (metadata.type === 'pyro' || metadata.type === 'medal') {
+					props
+						.fetchStock(region, {
+							cpu: metadata.cpu,
+							memory_mb: metadata.ram,
+							swap_mb: metadata.swap,
+							storage_mb: metadata.storage,
+						})
+						.then((stock: number) => {
+							if (stock > 0) {
+								selectedPlan.value = plan
+							} else {
+								selectedPlan.value = undefined
+							}
+						})
+						.finally(() => {
+							checkingCustomStock.value = false
+						})
+				} else {
+					checkingCustomStock.value = false
+				}
 			} else {
 				checkingCustomStock.value = false
 			}
@@ -141,7 +170,7 @@ const messages = defineMessages({
 	},
 	regionUnsupported: {
 		id: 'servers.region.region-unsupported',
-		defaultMessage: `Region not listed? <link>Let us know where you'd like to see Modrinth Servers next!</link>`,
+		defaultMessage: `Region not listed? <link>Let us know where you'd like to see Modrinth Hosting next!</link>`,
 	},
 	customPrompt: {
 		id: 'servers.region.custom.prompt',
@@ -151,22 +180,28 @@ const messages = defineMessages({
 
 async function updateStock() {
 	currentStock.value = {}
+
+	const getStockRequest = (
+		product: Labrinth.Billing.Internal.Product,
+	): Archon.Servers.v0.StockRequest => {
+		const metadata = product.metadata
+		if (metadata.type === 'pyro' || metadata.type === 'medal') {
+			return {
+				cpu: metadata.cpu,
+				memory_mb: metadata.ram,
+				swap_mb: metadata.swap,
+				storage_mb: metadata.storage,
+			}
+		}
+		return { cpu: 0, memory_mb: 0, swap_mb: 0, storage_mb: 0 }
+	}
+
 	const capacityChecks = sortedRegions.value.map((region) =>
 		props.fetchStock(
 			region,
 			selectedPlan.value
-				? {
-						cpu: selectedPlan.value?.metadata.cpu ?? 0,
-						memory_mb: selectedPlan.value?.metadata.ram ?? 0,
-						swap_mb: selectedPlan.value?.metadata.swap ?? 0,
-						storage_mb: selectedPlan.value?.metadata.storage ?? 0,
-					}
-				: {
-						cpu: lowestProduct.value.metadata.cpu ?? 0,
-						memory_mb: lowestProduct.value.metadata.ram ?? 0,
-						swap_mb: lowestProduct.value.metadata.swap ?? 0,
-						storage_mb: lowestProduct.value.metadata.storage ?? 0,
-					},
+				? getStockRequest(selectedPlan.value)
+				: getStockRequest(lowestProduct.value),
 		),
 	)
 	const results = await Promise.all(capacityChecks)
@@ -255,12 +290,12 @@ onMounted(() => {
 					<div v-if="checkingCustomStock" class="flex gap-2 items-center">
 						<SpinnerIcon class="size-5 shrink-0 animate-spin" /> Checking availability...
 					</div>
-					<div v-else-if="selectedPlan">
+					<div v-else-if="selectedPlanSpecs">
 						<ServersSpecs
 							class="!flex-row justify-between"
-							:ram="selectedPlan.metadata.ram ?? 0"
-							:storage="selectedPlan.metadata.storage ?? 0"
-							:cpus="selectedPlan.metadata.cpu ?? 0"
+							:ram="selectedPlanSpecs.ram"
+							:storage="selectedPlanSpecs.storage"
+							:cpus="selectedPlanSpecs.cpu"
 						/>
 					</div>
 					<div v-else class="flex gap-2 items-center">

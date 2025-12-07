@@ -425,6 +425,168 @@
   "common.yes": {
     "message": "Sim"
   },
+  "create.collection.cancel": {
+    "message": "Cancelar"
+  },
+  "create.collection.collection-info": {
+    "message": "A tua nova coleção vai ser criada como uma coleção pública {count, plural,=0 {sem projetos}one {com # projeto}other {com # projetos}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Criar coleção"
+  },
+  "create.collection.error-title": {
+    "message": "Ocorreu um erro"
+  },
+  "create.collection.name-label": {
+    "message": "Nome"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Insere o nome da coleção..."
+  },
+  "create.collection.summary-description": {
+    "message": "Uma ou duas frases que descrevem a tua coleção."
+  },
+  "create.collection.summary-label": {
+    "message": "Resumo"
+  },
+  "create.collection.summary-placeholder": {
+    "message": "Isto é uma coleção de..."
+  },
+  "create.collection.title": {
+    "message": "Criar uma coleção"
+  },
+  "create.limit-alert.approaching-limit": {
+    "message": "A alcançar o limite de {typePlural} ({current}/{max})"
+  },
+  "create.limit-alert.approaching-limit-description": {
+    "message": "Estás prestes a atingir o limite de {typePlural}, por favor contacta o suporte se precisas de mais do que {max} {typePlural}."
+  },
+  "create.limit-alert.contact-support": {
+    "message": "Contacta o suporte"
+  },
+  "create.limit-alert.limit-reached": {
+    "message": "limite de {typePlural} atingido"
+  },
+  "create.limit-alert.limit-reached-description": {
+    "message": "Atingiste o teu limite de {typePlural} de {max}. Por favor contacta o suporte para aumentar o teu limite."
+  },
+  "create.limit-alert.type-collection": {
+    "message": "coleção"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organização"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "coleções"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organizações"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "projetos"
+  },
+  "create.limit-alert.type-project": {
+    "message": "projeto"
+  },
+  "create.organization.cancel": {
+    "message": "Cancelar"
+  },
+  "create.organization.create-organization": {
+    "message": "Criar organização"
+  },
+  "create.organization.error-title": {
+    "message": "Ocorreu um erro"
+  },
+  "create.organization.name-label": {
+    "message": "Nome"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Inserir nome da organização..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Serás o dono desta organização, mas podes convidar outros membros e transferir o cargo de dono a qualquer momento."
+  },
+  "create.organization.summary-description": {
+    "message": "Uma ou duas frases que descrevem a tua organização."
+  },
+  "create.organization.summary-label": {
+    "message": "Resumo"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Uma organização para..."
+  },
+  "create.organization.title": {
+    "message": "Criar uma organização"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Cancelar"
+  },
+  "create.project.create-project": {
+    "message": "Criar projeto"
+  },
+  "create.project.error-title": {
+    "message": "Ocorreu um erro"
+  },
+  "create.project.name-label": {
+    "message": "Nome"
+  },
+  "create.project.name-placeholder": {
+    "message": "Insere o nome do projeto..."
+  },
+  "create.project.summary-description": {
+    "message": "Uma ou duas frases que descrevem o teu projeto."
+  },
+  "create.project.summary-label": {
+    "message": "Resumo"
+  },
+  "create.project.summary-placeholder": {
+    "message": "Este projeto adiciona..."
+  },
+  "create.project.title": {
+    "message": "Criar um projeto"
+  },
+  "create.project.url-label": {
+    "message": "URL"
+  },
+  "create.project.visibility-description": {
+    "message": "A visibilidade do teu projeto após ser aprovado."
+  },
+  "create.project.visibility-label": {
+    "message": "Visibilidade"
+  },
+  "create.project.visibility-private": {
+    "message": "Privado"
+  },
+  "create.project.visibility-public": {
+    "message": "Público"
+  },
+  "create.project.visibility-unlisted": {
+    "message": "Não listado"
+  },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Criar link de afiliado"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "Erro a carregar links de afiliado"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "Os teus links de afiliado"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "Isto vai revogar permanentemente o código de afiliado \"{id}\" e quaisquer links partilhados com este código deixarão de ser válidos."
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Revogar"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Tens a certeza que queres revogar o teu link de afiliado \"{title}\"?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Procurar links de afiliado..."
+  },
   "dashboard.collections.button.create-new": {
     "message": "Criar nova"
   },
@@ -436,6 +598,201 @@
   },
   "dashboard.collections.long-title": {
     "message": "As tuas coleções"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Transferir {formType}"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.success": {
+    "message": "O teu formulário de imposto {formType} foi enviado com sucesso!"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.support-text": {
+    "message": "Podes levantar fundos livremente agora. Se tiveres dúvidas ou precisares de atualizar os teus detalhes <support-link>contacta o suporte</support-link>."
+  },
+  "dashboard.creator-tax-form-modal.confirmation.title": {
+    "message": "Está tudo feito! 🎉"
+  },
+  "dashboard.creator-tax-form-modal.entity.description": {
+    "message": "Uma entidade estrangeira é uma entidade empresarial organizada fora dos Estados Unidos (tais como uma corporação, parceria ou LLC não americanas)."
+  },
+  "dashboard.creator-tax-form-modal.entity.foreign-entity": {
+    "message": "Entidade estrangeira"
+  },
+  "dashboard.creator-tax-form-modal.entity.private-individual": {
+    "message": "Indivíduo privado"
+  },
+  "dashboard.creator-tax-form-modal.entity.question": {
+    "message": "És um indivíduo privado ou parte de uma entidade estrangeira?"
+  },
+  "dashboard.creator-tax-form-modal.header": {
+    "message": "Formulário de imposto"
+  },
+  "dashboard.creator-tax-form-modal.security.description": {
+    "message": "Modrinth usa o provedor externo Track1099 para recolher e armazenar os teus formulários de imposto com segurança. <security-link>Sabe mais aqui.</security-link>"
+  },
+  "dashboard.creator-tax-form-modal.security.header": {
+    "message": "Práticas de segurança"
+  },
+  "dashboard.creator-tax-form-modal.us-citizen.question": {
+    "message": "És um cidadão dos EUA?"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Completar o formulário de imposto"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "Continuar com limite"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Detalhes"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Quantia"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "Taxa de câmbio"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Taxa"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Valor líquido"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "Entidade empresarial"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "Uma entidade empresarial refere-se a uma organização registada tais como uma corporação, parceria, ou LLC."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Estás a levantar como indivíduo ou como negócio?"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "Indivíduo privado"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Seleciona o teu país"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Pesquisar países..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Não foi possível obter os métodos de pagamento disponíveis. Tenta novamente mais tarde."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Erro a carregar os métodos de pagamento"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Região"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Alguns métodos de pagamento não estão disponíveis em determinadas regiões."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Selecionar método de levantamento"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "O teu limite de levantamento é <b>{amount}</b>, <tax-link>completa um formulário de imposto</tax-link> para levantar mais."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Dono da conta"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Moeda"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Confirma o endereço da tua carteira"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "Número de identificação nacional"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "Insere o número de identificação nacional"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Número do passaporte"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "Insere o número do passaporte"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "Número de residência"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "Insere o número da residência"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "Número RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "Insere o número RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Número de identificação de imposto"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Insere o número de identificação de imposto"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "Rede"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "Estás próximo de atingir o limite de levantamento. Podes levantar <b>{amountRemaining}</b> agora, mas é necessário um formulário de imposto para levantar mais."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Conta"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Desconectar conta"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Método de pagamento"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "Conta PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Conecta a tua conta PayPal para receber pagamentos diretamente."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Guardar"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Nome de utilizador Venmo guardado com sucesso!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Guardado"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Iniciar sessão com PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "Insere o teu nome de utilizador Venmo para receber pagamentos."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Nome de utilizador Venmo"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@nome de utilizador"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Concluído"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Método"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Detalhes da conta"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "Verificação"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Formulário de imposto"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Detalhes"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "Levantar"
   },
   "error.collection.404.list_item.1": {
     "message": "Podes ter inserido incorretamente o URL da coleção."
@@ -612,7 +969,7 @@
     "message": "plugins"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "pacote de recursos"
+    "message": "pacotes de recursos"
   },
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "servidores"
@@ -881,6 +1238,69 @@
   "moderation.technical.search.placeholder": {
     "message": "Pesquisar revisões técnicas..."
   },
+  "muralpay.country.at": {
+    "message": "Áustria"
+  },
+  "muralpay.country.be": {
+    "message": "Bélgica"
+  },
+  "muralpay.country.cy": {
+    "message": "Chipre"
+  },
+  "muralpay.country.de": {
+    "message": "Alemanha"
+  },
+  "muralpay.country.ee": {
+    "message": "Estónia"
+  },
+  "muralpay.country.es": {
+    "message": "Espanha"
+  },
+  "muralpay.country.fi": {
+    "message": "Finlândia"
+  },
+  "muralpay.country.fr": {
+    "message": "França"
+  },
+  "muralpay.country.gr": {
+    "message": "Grécia"
+  },
+  "muralpay.country.ie": {
+    "message": "Irlanda"
+  },
+  "muralpay.country.it": {
+    "message": "Itália"
+  },
+  "muralpay.country.lt": {
+    "message": "Lituânia"
+  },
+  "muralpay.country.lu": {
+    "message": "Luxemburgo"
+  },
+  "muralpay.country.lv": {
+    "message": "Letónia"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Holanda"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Eslováquia"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
   "profile.button.billing": {
     "message": "Gerir faturação do utilizador"
   },
@@ -899,6 +1319,9 @@
   "profile.label.details": {
     "message": "Detalhes"
   },
+  "profile.label.no": {
+    "message": "Não"
+  },
   "profile.label.no-collections": {
     "message": "Este utilizador não tem coleções!"
   },
@@ -913,6 +1336,12 @@
   },
   "profile.label.organizations": {
     "message": "Organizações"
+  },
+  "profile.label.saving": {
+    "message": "A guardar..."
+  },
+  "profile.label.yes": {
+    "message": "Sim"
   },
   "profile.meta.description": {
     "message": "Transfere os projetos de {username} no Modrinth"
@@ -964,9 +1393,6 @@
   },
   "project-moderation-nags.resubmit-for-review": {
     "message": "Reenviar para revisão"
-  },
-  "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "O teu projeto foi {status} pela equipa do Modrinth. Na maior parte dos casos, podes reenviar para revisão após resolver o que foi mencionado na mensagem da equipa."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Deves completar os passos necessários na lista de verificação de publicação!"
@@ -1366,18 +1792,6 @@
   },
   "report.submit": {
     "message": "Enviar denúncia"
-  },
-  "revenue.transfers.total": {
-    "message": "Levantaste {amount} no total."
-  },
-  "revenue.transfers.total.method": {
-    "message": "Levantaste {amount} através de {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "Levantaste {amount} em {year}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "Levantaste {amount} em {year} através de {method}."
   },
   "scopes.analytics.description": {
     "message": "Acede às tuas estatísticas"

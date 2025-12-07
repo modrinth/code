@@ -86,6 +86,9 @@
   "button.follow": {
     "defaultMessage": "Подписаться"
   },
+  "button.max": {
+    "defaultMessage": "Максимум"
+  },
   "button.more-options": {
     "defaultMessage": "Дополнительно"
   },
@@ -158,6 +161,84 @@
   "collection.label.private": {
     "defaultMessage": "Приватная"
   },
+  "form.label.address-line": {
+    "defaultMessage": "Строка адреса"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Строка адреса 2 (необязательно)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Сумма"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Наименование банка"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Наименование организации"
+  },
+  "form.label.city": {
+    "defaultMessage": "Город"
+  },
+  "form.label.country": {
+    "defaultMessage": "Страна"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Дата рождения"
+  },
+  "form.label.email": {
+    "defaultMessage": "Электронная почта"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Имя"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Фамилия"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Почтовый индекс"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Край/область"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Введите адрес"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Квартира, офис и т. п."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Введите сумму"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Введите наименование банка"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Выберите наименование банка"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Введите наименование организации"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Введите город"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Выберите страну"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Введите адрес электронной почты"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Введите имя"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Введите фамилию"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Введите почтовый индекс"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Введите край/область"
+  },
   "icon-select.edit": {
     "defaultMessage": "Изменить значок"
   },
@@ -196,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Неизвестный режим"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} доступно."
   },
   "label.changes-saved": {
     "defaultMessage": "Изменения сохранены"
@@ -244,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Отклонён"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Я принимаю <terms-link>условия программы вознаграждений</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "Сохранено"
@@ -392,6 +479,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -400,6 +490,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Благотворительность"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Благотворительность"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Подарочная карта"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Подарочные карты"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Виртуальная Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Виртуальные Visa"
   },
   "project-type.all": {
     "defaultMessage": "Всё"

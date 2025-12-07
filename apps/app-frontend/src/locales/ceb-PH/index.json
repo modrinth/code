@@ -125,6 +125,9 @@
   "friends.section.heading": {
     "message": "{title} - {count}"
   },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Pag-sign-in sa Modrinth account</link> aron makadugang og mga higala ug mahibal-an ang ginadula nila!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Idugang ug dulaa"
   },
@@ -156,7 +159,7 @@
     "message": "Minecraft nga Kalibutan"
   },
   "instance.edit-world.reset-icon": {
-    "message": "Walaa ang amoy"
+    "message": "Pag-usab sa amoy"
   },
   "instance.edit-world.title": {
     "message": "Usba ang kalibutan"
@@ -308,6 +311,9 @@
   "instance.settings.tabs.installation.install": {
     "message": "Itaud"
   },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Nagtaud karon"
+  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Bersiyon sa {loader}"
   },
@@ -320,11 +326,20 @@
   "instance.settings.tabs.installation.platform": {
     "message": "Pantawan"
   },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "Itaud pag-usab ang putos sa kausaban"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Nagtaud pag-usab sa putos sa kusaban"
+  },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
     "message": "Mahimo nga mobalik sa sinugdan ang tanang gitaod o giusab nga sulod sa unsay ihatag sa putos sa kausaban, tangtangon ang mga kausaban o sulod nga imong gidugang apil na ang lintunganay nga putos sa kausaban. Mahimo nga maayo ang mga tuhaw nga batasan kon naay pagbag-o sa pananglitan, apan kon gasalig na ang imong kalibutan sa dinugang nga sulod, mahimo nga madaut ani ang daan nga mga kalibutan."
   },
   "instance.settings.tabs.installation.reinstall.description": {
     "message": "Ibalik ang mga sulod sa pananglitan sa unang kahimtang, tangtangon ang mga kausaban o sulod nga imong gidugang apil na ang lintunganay nga putos sa kausaban."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "Itaud pag-usab ang putos sa kausaban"
   },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Ayohon"
@@ -337,6 +352,12 @@
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Ayohon ang pananglitan?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Nag-ayo karon"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Sa kasamtang pag-usab "
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Ipakita ang tanang bersiyon"
@@ -365,17 +386,32 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(diinilang bersiyon)"
   },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "Pagbugto sa pananglitan"
+  },
   "instance.settings.tabs.installation.unlink.confirm.description": {
     "message": "Kun imong ipadayon, dili na nimo makatay pagbalik nga wala mohimo og bag-o nga pananglitan. Dili na ka makadawat og pagpasibo sa putos sa kausaban ug mahimo kining naandan nga."
   },
   "instance.settings.tabs.installation.unlink.description": {
     "message": "Nakakatay kining pananglitan sa usa ka putos sa kausaban, pasabot ani nga dili mapasibo ang mga kausaban og dili nimo mausab ang tigkarga sa kausaban o ang bersiyon sa Minecraft. Kanunay nga mabugto kining pananglitan og putos sa kausabon kun tangtangon ang katay."
   },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "Pagbugto sa putos sa kausaban"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java at memorya"
+  },
   "instance.settings.tabs.java.hooks": {
     "message": "Mga kaw-it"
   },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Mga lantugi sa java"
+  },
   "instance.settings.tabs.java.java-installation": {
     "message": "Pagtaud sa Java"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Memoryang gigahin"
   },
   "instance.settings.tabs.window": {
     "message": "Tamboanan"
@@ -383,11 +419,20 @@
   "instance.settings.tabs.window.custom-window-settings": {
     "message": "Mga himutangan sa pinatuyo nga tamboanan"
   },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Punong-tabil"
+  },
   "instance.settings.tabs.window.height": {
     "message": "Gitas-on"
   },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Ibutang ang gitas-on..."
+  },
   "instance.settings.tabs.window.width": {
     "message": "Gilapdon"
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Ibutang ang gilapdon..."
   },
   "instance.settings.title": {
     "message": "Mga Himutangan"
@@ -398,6 +443,18 @@
   "instance.worlds.copy_address": {
     "message": "Awata ang padad-anan"
   },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Ayaw pakit-a sa Puloy-anan"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Magamit"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Mahanasnon nga paagi"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Dulai ang pananglitan"
+  },
   "instance.worlds.type.server": {
     "message": "Magsisilbi"
   },
@@ -406,5 +463,11 @@
   },
   "instance.worlds.view_instance": {
     "message": "Tan-awa ang pananglitan"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Gigamit ang kalibotan"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Pagdungan sa pananglitan"
   }
 }

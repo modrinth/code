@@ -140,9 +140,10 @@ const paypalEmail = computed(() => {
 
 const paypalAuthUrl = computed(() => {
 	const route = useRoute()
+	const authToken = useCookie('auth-token')
 	const separator = route.fullPath.includes('?') ? '&' : '?'
 	const returnUrl = `${route.fullPath}${separator}paypal_auth_return=true`
-	return getAuthUrl('paypal', returnUrl)
+	return `${getAuthUrl('paypal', returnUrl)}&auth_token=${authToken.value}`
 })
 
 function handlePayPalAuth() {

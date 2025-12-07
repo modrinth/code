@@ -395,17 +395,36 @@ pub async fn download_libraries(
                             .unwrap_or("https://libraries.minecraft.net/")
                     );
 
-                    let bytes =
-                        fetch(&url, None, &st.fetch_semaphore, &st.pool)
-                            .await?;
-
-                    write(&path, &bytes, &st.io_semaphore).await?;
-
                     tracing::trace!(
-                        "Fetched library {} to path {:?}",
-                        &library.name,
-                        &path
+                        "Attempting to fetch {} from {url}",
+                        library.name,
                     );
+
+                    // It's OK for this fetch to fail, since the URL might not even be valid.
+                    // We're constructing a download URL basically out of thin air, and hoping
+                    // that it's valid. Since PrismLauncher ignores the library (see above), a
+                    // failed download here is not a fatal condition.
+                    //
+                    // See DEV-479.
+                    match fetch(&url, None, &st.fetch_semaphore, &st.pool).await
+                    {
+                        Ok(bytes) => {
+                            write(&path, &bytes, &st.io_semaphore).await?;
+
+                            tracing::debug!(
+                                "Fetched library {} to path {:?}",
+                                &library.name,
+                                &path
+                            );
+                        }
+                        Err(err) => {
+                            tracing::debug!(
+                                "Failed to download library {} from {url} - \
+                                this is not necessarily an error: {err:#?}",
+                                &library.name
+                            );
+                        }
+                    }
                 }
             }
 

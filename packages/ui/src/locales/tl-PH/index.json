@@ -96,7 +96,7 @@
     "defaultMessage": "App"
   },
   "changelog.product.servers": {
-    "defaultMessage": "Mga tagapagsilbi"
+    "defaultMessage": "Mga pansilbi"
   },
   "changelog.product.web": {
     "defaultMessage": "Pahinarya"
@@ -189,10 +189,10 @@
     "defaultMessage": "Mga Sakop"
   },
   "label.server": {
-    "defaultMessage": "Tagapagsilbi"
+    "defaultMessage": "Pansilbi"
   },
   "label.servers": {
-    "defaultMessage": "Mga tagapagsilbi"
+    "defaultMessage": "Mga pansilbi"
   },
   "label.settings": {
     "defaultMessage": "Mga kagustuhan"
@@ -276,13 +276,13 @@
     "defaultMessage": "Kliyente"
   },
   "omorphia.component.environment-indicator.label.client-and-server": {
-    "defaultMessage": "Kliyente at tagapagsilbi"
+    "defaultMessage": "Kliyente at pansilbi"
   },
   "omorphia.component.environment-indicator.label.client-or-server": {
-    "defaultMessage": "Kliyente o tagapagsilbi"
+    "defaultMessage": "Kliyente o pansilbi"
   },
   "omorphia.component.environment-indicator.label.server": {
-    "defaultMessage": "Tagapagsilbi"
+    "defaultMessage": "Pansilbi"
   },
   "omorphia.component.environment-indicator.label.type": {
     "defaultMessage": "Isang {type}"
@@ -372,7 +372,7 @@
     "defaultMessage": "Gagana rin sa pang-isahang laro"
   },
   "project.settings.environment.singleplayer.description": {
-    "defaultMessage": "Gagana lamang sa Pang-isahang laro o kung hindi nakakonekta sa isang tagapagsilbing Pangmaramihang laro."
+    "defaultMessage": "Gagana lamang sa Pang-isahang laro o kung hindi nakakonekta sa isang pansilbing Pangmaramihang laro."
   },
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Pang-isahang laro lamang"
@@ -438,7 +438,7 @@
     "defaultMessage": "Kapaligiran"
   },
   "search.filter_type.environment.server": {
-    "defaultMessage": "Tagapagsilbi"
+    "defaultMessage": "Pansilbi"
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "Bukas na pinagmulan"

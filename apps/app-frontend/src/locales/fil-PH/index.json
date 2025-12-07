@@ -125,6 +125,9 @@
   "friends.section.heading": {
     "message": "{title} - {count}"
   },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Mag-sign-in sa Modrinth account</link> upang maidagdag ang mga kaibigan at malaman ang kanilang nilalaro!"
+  },
   "instance.add-server.add-and-play": {
     "message": "Idagdag at laruin"
   },
@@ -156,7 +159,7 @@
     "message": "Minecraft na Mundo"
   },
   "instance.edit-world.reset-icon": {
-    "message": "Walain ang ikono"
+    "message": "I-reset ang ikono"
   },
   "instance.edit-world.title": {
     "message": "Baguhin ang mundo"
@@ -308,6 +311,9 @@
   "instance.settings.tabs.installation.install": {
     "message": "I-install"
   },
+  "instance.settings.tabs.installation.install.in-progress": {
+    "message": "Nag-i-install ngayon"
+  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Bersiyon ng {loader}"
   },
@@ -320,11 +326,20 @@
   "instance.settings.tabs.installation.platform": {
     "message": "Plataporma"
   },
+  "instance.settings.tabs.installation.reinstall.button": {
+    "message": "I-reinstall ang modpack"
+  },
+  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
+    "message": "Ini-re-reinstall ang modpack"
+  },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
     "message": "Ang pagrere-install ay maaaring mare-reset ang lahat ng na-install o binago na kontento sa kung anong ibibigay ng modpack, tatanggalin ang mga mods o kontentong idinagdag mo lalo na ang mga orihinal na modpack. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa instansiya, ngunit kung dumedepende na ang iyong mundo sa karagdagang kontento, maaari nitong masira ang mga umiiral na mundo."
   },
   "instance.settings.tabs.installation.reinstall.description": {
     "message": "I-reset ang mga kontento ng instansiya sa orihinal niyang estado, tatanggalin ang mga mods o kontentong idinagdag mo lalo na ang mga orihinal na modpack."
+  },
+  "instance.settings.tabs.installation.reinstall.title": {
+    "message": "I-reinstall ang modpack"
   },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Ayusin"
@@ -337,6 +352,12 @@
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
     "message": "Ayusin ang instansiya?"
+  },
+  "instance.settings.tabs.installation.repair.in-progress": {
+    "message": "Inaayos ngayon"
+  },
+  "instance.settings.tabs.installation.reset-selections": {
+    "message": "Sa kasalukuyan i-reset"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Ipakita ang lahat ng bersiyon"
@@ -365,17 +386,32 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(hindi kilalang bersiyon)"
   },
+  "instance.settings.tabs.installation.unlink.button": {
+    "message": "I-unlink sa instansiya"
+  },
   "instance.settings.tabs.installation.unlink.confirm.description": {
     "message": "Kapag ipagpatuloy mo, hindi mo na itong mai-link muli ng hindi gagawa ng bagong instansiya. Hindi ka makakatanggap ng mga update ng modpack at magiging normal na itong."
   },
   "instance.settings.tabs.installation.unlink.description": {
     "message": "Ang instansiyang ito ay naka-link sa isang modpack, ibig sabihin ang mga mod ay hindi mai-update at hindi mo mapapalitan ang mod loader o ang bersiyon ng Minecraft."
   },
+  "instance.settings.tabs.installation.unlink.title": {
+    "message": "I-unlink sa modpack"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java at memorya"
+  },
   "instance.settings.tabs.java.hooks": {
     "message": "Mga hook"
   },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "Mga java argument"
+  },
   "instance.settings.tabs.java.java-installation": {
     "message": "Instalasyon ng Java"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "Memoryang inilaan"
   },
   "instance.settings.tabs.window": {
     "message": "Window"
@@ -383,11 +419,20 @@
   "instance.settings.tabs.window.custom-window-settings": {
     "message": "Mga setting sa custom na window"
   },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "Fullscreen"
+  },
   "instance.settings.tabs.window.height": {
     "message": "Taas"
   },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "Ilagay ang taas..."
+  },
   "instance.settings.tabs.window.width": {
     "message": "Lapad"
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "Ilagay ang lapad..."
   },
   "instance.settings.title": {
     "message": "Mga Setting"
@@ -398,6 +443,18 @@
   "instance.worlds.copy_address": {
     "message": "Kopyahin ang adres"
   },
+  "instance.worlds.dont_show_on_home": {
+    "message": "Huwag ipakita sa Home"
+  },
+  "instance.worlds.filter.available": {
+    "message": "Magagamit"
+  },
+  "instance.worlds.hardcore": {
+    "message": "Modong eksperto"
+  },
+  "instance.worlds.play_instance": {
+    "message": "Laruin ang instansiya"
+  },
   "instance.worlds.type.server": {
     "message": "Server"
   },
@@ -406,5 +463,11 @@
   },
   "instance.worlds.view_instance": {
     "message": "Tingnan ang instansiya"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "Ginagamit ang mundo"
+  },
+  "search.filter.locked.instance.sync": {
+    "message": "Maki-sync sa instansiya"
   }
 }

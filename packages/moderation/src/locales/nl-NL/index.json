@@ -17,14 +17,8 @@
   "nags.add-links.title": {
     "defaultMessage": "Voeg externe links toe"
   },
-  "nags.all-tags-selected.description": {
-    "defaultMessage": "Je hebt alle {totalAvailableTags} beschikbare tags geselecteerd. Dit gaat in tegen het doel van tags, die bedoeld zijn om gebruikers te helpen relevante projecten te vinden. Selecteer alleen de tags die relevant zijn voor je project."
-  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecteer relevante tags"
-  },
-  "nags.description-too-short.description": {
-    "defaultMessage": "Jouw beschrijving is {length} leesbare karakters. Minstens {minChars} karakters zijn aanbevolen om een duidelijke en informatieve beschrijving te maken."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Verleng de beschrijving"
@@ -52,9 +46,6 @@
   },
   "nags.gallery.title": {
     "defaultMessage": "Bezoek galerij pagina"
-  },
-  "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Uw {projectType} gebruikt een licentie die vereist dat de bron code beschikbaar is. Voeg alstublieft een link naar de bron code of bron bestand of overweeg een andere licentie te gebruiken."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
@@ -107,14 +98,8 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Bekijk en verhelp alle bezwaren van het moderatieteam voordat je het opnieuw indient."
   },
-  "nags.moderator-feedback.title": {
-    "defaultMessage": "Bekijk moderatie feedback"
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecteer juiste resolutie"
-  },
-  "nags.select-license.description": {
-    "defaultMessage": "Selecteer de licentie waaronder jouw {projectType} is uitgebracht."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selecteer een licentie"
@@ -153,25 +138,16 @@
     "defaultMessage": "Verhelder de samenvatting"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Jouw samenvatting is {length} karakters langs. Tenminste {minChars} karakters zijn aanbevolen om een informatieve en aantrekkelijke samenvatting te maken."
+    "defaultMessage": "Je samenvatting is {length, plural,one {# character} other {# characters}}. Minimaal {minChars, plural, one {# character}} is aanbevolen om een informatieve en interessante samevatting te maken."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Breidt de samenvatting uit"
   },
-  "nags.title-contains-technical-info.description": {
-    "defaultMessage": "De naam van je project duidelijk houden zorgt ervoor dat het makkelijk te vinden is. Versie en lader informatie is automatisch bij je project uitgelicht."
-  },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Maak de naam duidelijk"
   },
-  "nags.too-many-tags.description": {
-    "defaultMessage": "Je hebt {tagCount} tags geselecteerd. Overweeg om het aantal te verlagen naar {maxTagCount} of minder om ervoor te zorgen dat je project in relevante zoekresultaten verschijnt."
-  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecteer relevante tags"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": "Minimaal één galerijafbeelding is nodig om de inhoud van uw {type}{resourcepackMessage} te tonen."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Upload een galerijafbeelding"

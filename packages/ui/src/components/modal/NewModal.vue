@@ -10,12 +10,14 @@
 			@click="() => (closeOnClickOutside && closable ? hide() : {})"
 		/>
 		<div
-			:class="{
-				shown: visible,
-				noblur: props.noblur,
-				danger: danger,
-			}"
-			class="modal-overlay"
+			:class="[
+				'modal-overlay',
+				{
+					shown: visible,
+					noblur: props.noblur,
+				},
+				computedFade,
+			]"
 			@click="() => (closeOnClickOutside && closable ? hide() : {})"
 		/>
 		<div class="modal-container experimental-styles-within" :class="{ shown: visible }">
@@ -106,7 +108,7 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import { useScrollIndicator } from '../../composables/scroll-indicator'
 import ButtonStyled from '../base/ButtonStyled.vue'
@@ -115,7 +117,9 @@ const props = withDefaults(
 	defineProps<{
 		noblur?: boolean
 		closable?: boolean
+		/** @deprecated Use `fade="danger"` instead */
 		danger?: boolean
+		fade?: 'standard' | 'warning' | 'danger'
 		closeOnEsc?: boolean
 		closeOnClickOutside?: boolean
 		warnOnClose?: boolean
@@ -131,6 +135,7 @@ const props = withDefaults(
 		type: true,
 		closable: true,
 		danger: false,
+		fade: undefined,
 		closeOnClickOutside: true,
 		closeOnEsc: true,
 		warnOnClose: false,
@@ -145,27 +150,22 @@ const props = withDefaults(
 	},
 )
 
+const computedFade = computed(() => {
+	if (props.fade) return props.fade
+	if (props.danger) return 'danger'
+	return 'standard'
+})
+
 const open = ref(false)
 const visible = ref(false)
 
 const scrollContainer = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
 
-// make modal opening not shift page when there's a vertical scrollbar
-function addBodyPadding() {
-	const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth
-	if (scrollBarWidth > 0) {
-		document.body.style.paddingRight = `${scrollBarWidth}px`
-	} else {
-		document.body.style.paddingRight = ''
-	}
-}
-
 function show(event?: MouseEvent) {
 	props.onShow?.()
 	open.value = true
 
-	addBodyPadding()
 	document.body.style.overflow = 'hidden'
 	window.addEventListener('mousedown', updateMousePosition)
 	window.addEventListener('keydown', handleKeyDown)
@@ -184,7 +184,6 @@ function hide() {
 	props.onHide?.()
 	visible.value = false
 	document.body.style.overflow = ''
-	document.body.style.paddingRight = ''
 	window.removeEventListener('mousedown', updateMousePosition)
 	window.removeEventListener('keydown', handleKeyDown)
 	setTimeout(() => {
@@ -237,7 +236,6 @@ function handleKeyDown(event: KeyboardEvent) {
 	z-index: 19;
 	opacity: 0;
 	transition: all 0.2s ease-out;
-	background: linear-gradient(to bottom, rgba(29, 48, 43, 0.52) 0%, rgba(14, 21, 26, 0.95) 100%);
 	//transform: translate(
 	//    calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 2),
 	//    calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 2)
@@ -245,6 +243,19 @@ function handleKeyDown(event: KeyboardEvent) {
 	//  scaleX(0.8) scaleY(0.5);
 	border-radius: 180px;
 	//filter: blur(5px);
+
+	// Fade variants
+	&.standard {
+		background: linear-gradient(to bottom, rgba(29, 48, 43, 0.52) 0%, rgba(14, 21, 26, 0.95) 100%);
+	}
+
+	&.warning {
+		background: linear-gradient(to bottom, rgba(48, 38, 29, 0.52) 0%, rgba(26, 20, 14, 0.95) 100%);
+	}
+
+	&.danger {
+		background: linear-gradient(to bottom, rgba(43, 18, 26, 0.52) 0%, rgba(49, 10, 15, 0.95) 100%);
+	}
 
 	@media (prefers-reduced-motion) {
 		transition: none !important;
@@ -259,10 +270,6 @@ function handleKeyDown(event: KeyboardEvent) {
 	&.noblur {
 		backdrop-filter: none;
 		filter: none;
-	}
-
-	&.danger {
-		background: linear-gradient(to bottom, rgba(43, 18, 26, 0.52) 0%, rgba(49, 10, 15, 0.95) 100%);
 	}
 }
 

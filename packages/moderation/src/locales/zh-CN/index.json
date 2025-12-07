@@ -18,13 +18,13 @@
     "defaultMessage": "添加外部链接"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "你已选择全部 {totalAvailableTags} 个可用标签。这违背了标签的初衷——帮助用户发现相关项目。请仅选择与你项目相关的标签。"
+    "defaultMessage": "你已选择全部 {totalAvailableTags, plural, other {# 个可用标签}}。这违背了标签的初衷——帮助用户发现相关项目。请仅选择与你项目相关的标签。"
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "选择准确的标签"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "你的描述包含{length}个可读字符。建议描述至少包含{minChars}个字符，以便撰写清晰且信息充实的描述文案。"
+    "defaultMessage": "你的描述包含 {length, plural, other {# 个可读字符}}。建议描述至少包含 {minChars, plural, other {# 个字符}}，以便撰写清晰且信息充实的描述文案。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "扩展描述"
@@ -54,7 +54,7 @@
     "defaultMessage": "访问图库界面"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{projectType}所使用的版权许可要求源代码必须公开。请为每个新增版本提供源代码地址或源文件，或考虑使用其他的版权许可。"
+    "defaultMessage": "你的{type, select, mod {模组} plugin {插件} other {项目}}所使用的版权许可要求源代码必须公开。请为每个新增版本提供源代码地址或源文件，或考虑使用其他的版权许可。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供源代码"
@@ -114,22 +114,22 @@
     "defaultMessage": "请在重新提交前，检查并处理审核团队提出的所有问题。"
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "查看审核员反馈"
+    "defaultMessage": "Review feedback"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "你已选择{count}个分辨率标签（{tags}）。资源包通常应仅保留一个与其主要分辨率相匹配的标签。"
+    "defaultMessage": "你已选择 {count, plural, other {# 个分辨率标签}} ({tags})。资源包通常应仅保留一个与其主要分辨率相匹配的标签。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "选择你的{projectType}运行的环境。"
+    "defaultMessage": "选择你的{type, select, mod {模组} modpack {整合包} other {项目}}功能所适用的环境。"
   },
   "nags.select-environments.title": {
     "defaultMessage": "选择环境"
   },
   "nags.select-license.description": {
-    "defaultMessage": "请选择你的{projectType}所遵循的许可证。"
+    "defaultMessage": "选择你的{type, select, mod {模组} modpack {整合包} resourcepack {资源包} shader {光影包} plugin {插件} datapack {数据包} other {项目}}所采用的许可证类型。"
   },
   "nags.select-license.title": {
     "defaultMessage": "选择一个许可证"
@@ -171,7 +171,7 @@
     "defaultMessage": "清除简介"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "你的简介包含 {length} 个字符。建议：简介要至少包含 {minChars} 个字符，以便撰写兼具信息量与吸引力的内容。"
+    "defaultMessage": "你的摘要包含 {length, plural, other {# 个字符}}。建议至少达到 {minChars, plural, other {# 个字符}}，以创建信息丰富且引人入胜的摘要。"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "扩充你的简介"
@@ -183,13 +183,13 @@
     "defaultMessage": "清除名称"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "你已经选择了{tagCount}个标签了。建议将其数量减少到 {maxTagCount} 个或更少，以确保你的项目能准确地出现在相关搜索的结果中。"
+    "defaultMessage": "你已经选择了 {tagCount, plural, other {# 个标签}}了。建议将其数量减少到 {maxTagCount} 个或更少，以确保你的项目能准确地出现在相关搜索的结果中。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "选择准确的标签"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "至少需要上传一张图片来展示你的{type}{resourcepackMessage} 的内容。"
+    "defaultMessage": "展示你的{type, select, resourcepack {资源包，音频或本地化包除外。若你的包属于此类，请选择相应标签} shader {光影包} other {项目}}内容时，至少需提供一张展示图片。"
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "上传图片至项目图库"

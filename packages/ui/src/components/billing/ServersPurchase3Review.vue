@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import {
 	EditIcon,
 	ExternalIcon,
@@ -9,18 +10,13 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { formatPrice, getPingLevel, type UserSubscription } from '@modrinth/utils'
+import { formatPrice, getPingLevel } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'
 
-import {
-	monthsInInterval,
-	type ServerBillingInterval,
-	type ServerPlan,
-	type ServerRegion,
-} from '../../utils/billing'
+import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import { regionOverrides } from '../../utils/regions'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import Checkbox from '../base/Checkbox.vue'
@@ -28,6 +24,7 @@ import TagItem from '../base/TagItem.vue'
 import ModrinthServersIcon from '../servers/ModrinthServersIcon.vue'
 import ExpandableInvoiceTotal from './ExpandableInvoiceTotal.vue'
 import FormattedPaymentMethod from './FormattedPaymentMethod.vue'
+import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import ServersSpecs from './ServersSpecs.vue'
 
 const vintl = useVIntl()
@@ -38,8 +35,8 @@ const emit = defineEmits<{
 }>()
 
 const props = defineProps<{
-	plan: ServerPlan
-	region: ServerRegion
+	plan: Labrinth.Billing.Internal.Product
+	region: Archon.Servers.v1.Region
 	tax?: number
 	total?: number
 	currency: string
@@ -48,25 +45,28 @@ const props = defineProps<{
 	selectedPaymentMethod: Stripe.PaymentMethod | undefined
 	hasPaymentMethod?: boolean
 	noPaymentRequired?: boolean
-	existingPlan?: ServerPlan
-	existingSubscription?: UserSubscription
+	existingPlan?: Labrinth.Billing.Internal.Product
+	existingSubscription?: Labrinth.Billing.Internal.UserSubscription
 }>()
 
 const interval = defineModel<ServerBillingInterval>('interval', { required: true })
 const acceptedEula = defineModel<boolean>('acceptedEula', { required: true })
 
-const prices = computed(() => {
-	return props.plan.prices.find((x) => x.currency_code === props.currency)
-})
-
 const selectedPlanPriceForInterval = computed<number | undefined>(() => {
-	return prices.value?.prices?.intervals?.[interval.value as keyof typeof monthsInInterval]
+	return getPriceForInterval(props.plan, props.currency, interval.value)
 })
 
 const existingPlanPriceForInterval = computed<number | undefined>(() => {
 	if (!props.existingPlan) return undefined
-	const p = props.existingPlan.prices.find((x) => x.currency_code === props.currency)
-	return p?.prices?.intervals?.[interval.value as keyof typeof monthsInInterval]
+	return getPriceForInterval(props.existingPlan, props.currency, interval.value)
+})
+
+const monthlyPrice = computed<number | undefined>(() => {
+	return getPriceForInterval(props.plan, props.currency, 'monthly')
+})
+
+const quarterlyPrice = computed<number | undefined>(() => {
+	return getPriceForInterval(props.plan, props.currency, 'quarterly')
 })
 
 const upgradeDeltaPrice = computed<number | undefined>(() => {
@@ -137,6 +137,18 @@ const planName = computed(() => {
 	return 'Custom'
 })
 
+const planSpecs = computed(() => {
+	const metadata = props.plan.metadata
+	if (metadata.type === 'pyro' || metadata.type === 'medal') {
+		return {
+			ram: metadata.ram,
+			storage: metadata.storage,
+			cpu: metadata.cpu,
+		}
+	}
+	return null
+})
+
 const flag = computed(
 	() =>
 		regionOverrides[props.region.shortcode]?.flag ??
@@ -173,11 +185,11 @@ function setInterval(newInterval: ServerBillingInterval) {
 			</div>
 			<div>
 				<ServersSpecs
-					v-if="plan.metadata && plan.metadata.ram && plan.metadata.storage && plan.metadata.cpu"
+					v-if="planSpecs"
 					class="!grid sm:grid-cols-2"
-					:ram="plan.metadata.ram"
-					:storage="plan.metadata.storage"
-					:cpus="plan.metadata.cpu"
+					:ram="planSpecs.ram"
+					:storage="planSpecs.storage"
+					:cpus="planSpecs.cpu"
 				/>
 			</div>
 		</div>
@@ -234,8 +246,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 					>Pay monthly</span
 				>
 				<span class="text-sm text-secondary flex items-center gap-1"
-					>{{ formatPrice(locale, prices?.prices.intervals['monthly'], currency, true) }} /
-					month</span
+					>{{ formatPrice(locale, monthlyPrice, currency, true) }} / month</span
 				>
 			</div>
 		</button>
@@ -261,7 +272,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 					>{{
 						formatPrice(
 							locale,
-							(prices?.prices?.intervals?.['quarterly'] ?? 0) / monthsInInterval['quarterly'],
+							(quarterlyPrice ?? 0) / monthsInInterval['quarterly'],
 							currency,
 							true,
 						)
@@ -284,10 +295,10 @@ function setInterval(newInterval: ServerBillingInterval) {
 								{
 									title:
 										isProratedCharge && prorationDays
-											? `Modrinth Servers (${planName}) — prorated for ${prorationDays} day${
+											? `Modrinth Hosting (${planName}) — prorated for ${prorationDays} day${
 													prorationDays === 1 ? '' : 's'
 												}`
-											: `Modrinth Servers (${planName})`,
+											: `Modrinth Hosting (${planName})`,
 									amount: total - tax,
 								},
 								{

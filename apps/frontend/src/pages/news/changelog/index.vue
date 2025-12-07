@@ -6,13 +6,19 @@ import { getChangelog, type Product } from '@modrinth/utils'
 import NavTabs from '~/components/ui/NavTabs.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 const filter = ref<Product | undefined>(undefined)
 const allChangelogEntries = ref(getChangelog())
 
 function updateFilter() {
 	if (route.query.filter) {
-		filter.value = route.query.filter as Product
+		let value = route.query.filter
+		if (route.query.filter === 'servers') {
+			router.push({ query: { ...route.query, filter: 'hosting' } })
+			value = 'hosting'
+		}
+		filter.value = value as Product
 	} else {
 		filter.value = undefined
 	}
@@ -42,8 +48,8 @@ const changelogEntries = computed(() =>
 				href: 'web',
 			},
 			{
-				label: 'Servers',
-				href: 'servers',
+				label: 'Hosting',
+				href: 'hosting',
 			},
 			{
 				label: 'App',

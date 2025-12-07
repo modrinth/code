@@ -18,13 +18,13 @@
     "defaultMessage": "Adicione links externos"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Você selecionou todas as {totalAvailableTags} etiquetas disponíveis. Isso desvia do propósito das etiquetas, cujo intuito é o de ajudar os usuários a encontrar projetos relevantes. Selecione somente as etiquetas relevantes para o seu projeto."
+    "defaultMessage": "Você selecionou todas {totalAvailableTags, plural, one {# etiqueta disponível} other {# etiquetas disponíveis}}. Isso desvia do propósito das etiquetas, que são feitas para ajudar os usuários a acharem projetos relevantes. Por favor, selecione apenas as etiquetas relevantes a seu projeto."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecione etiquetas específicas"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "Sua descrição possui {length} caracteres legíveis. É recomendado ao menos {minChars} caracteres para criar uma descrição clara e informativa."
+    "defaultMessage": "Sua descrição é {length, plural, one {# caractére legível} other {# caractéres legíveis}}. É recomendado pelo menos {minChars, plural, one {# caractére} other {# caractéres}} para criar uma descrição informativa e limpa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Expandir a descrição"
@@ -54,7 +54,7 @@
     "defaultMessage": "Visitar página da galeria"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Seu {projectType} utiliza uma licença que exige um código-fonte para ser disponibilizado. Forneça um link de código-fonte ou seus arquivos de origem para cada versão adicional, ou considere utilizar outra licença."
+    "defaultMessage": "Seu {type, select, mod {mod} plugin {plugin} other {projeto}} usa uma licença que necessita que o código fonte esteja disponível. Por favor, providencie o link do código fonte ou o arquivo de origem para cada versão adicional, ou considere usar uma licença diferente."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Forneça o código-fonte"
@@ -114,22 +114,22 @@
     "defaultMessage": "Revise e resolva todos os problemas listados pela moderação antes de reenviar."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "Revise opinião de Moderador"
+    "defaultMessage": "Verificar feedback"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Você selecionou {count} etiquetas de resolução ({tags}). Os pacotes de recursos devem normalmente ter uma etiqueta de resolução que corresponda à resolução principal."
+    "defaultMessage": "Você selecionou {count, plural, one {# etiqueta de resolução} other {# etiquetas de resolução}} ({tags}). Resource packs devem tipicamente ter apenas uma etiqueta de resolução que corresponda a sua resolução primária"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecione a resolução correta"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "Selecione os ambientes em que seu {projectType} funciona."
+    "defaultMessage": "Selecione os ambientes em que seu {type, select, mod {mod} modpack {modpack} other {projeto}} trabalha."
   },
   "nags.select-environments.title": {
     "defaultMessage": "Selecione um ambiente"
   },
   "nags.select-license.description": {
-    "defaultMessage": "Selecione a licença sob a qual seu {projectType} é distribuído."
+    "defaultMessage": "Selecione a licença em que seu {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} está distribuido."
   },
   "nags.select-license.title": {
     "defaultMessage": "Selecione uma licença"
@@ -171,25 +171,25 @@
     "defaultMessage": "Limpe o resumo"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Seu resumo tem {length} caracteres. Recomendamos um mínimo de {minChars} caracteres para criar um resumo informativo e atraente."
+    "defaultMessage": "Seu sumário é {length, plural, one {# caractére} other {# caractéres}}. É recomendado pelo menos {minChars, plural, one {# caractére} other {# caractéres}} para criar um sumário informativo e atraente."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Aumente o resumo"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "Mantenha o nome do seu projeto limpo e fácil de memorizar para facilitar a localização. As informações sobre a versão e o carregador são exibidas automaticamente junto com o seu projeto."
+    "defaultMessage": "Manter o Nome do seu projeto limpo faz ele ser memorável e mais fácil de achar. As informações sobre a versão e o carregador são automaticamente exibidas com seu projeto."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Limpe o nome"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Você selecionou {tagCount} etiquetas. Considere reduzir para {maxTagCount} ou menos para garantir que seu projeto apareça em resultados de buscas relevantes."
+    "defaultMessage": "Você selecionou {tagCount, plural, one {# etiqueta} other {# etiquetas}}. Considere reduzir para {maxTagCount} ou menos para ter certeza que seu projeto aparece nos resultados de pesquisa relevantes."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecione etiquetas específicas"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Pelo menos uma imagem de galeria é necessária para mostrar o conteúdo do seu {type}{resourcepackMessage}."
+    "defaultMessage": "Pelo menos uma imagem da galeria é requerida para mostrar o conteúdo do seu {type, select, resourcepack {pacto de recursos, com excessão do áudio e pacotes de localização. Se isto descreve seu pacote, por favor selecione a etiqueta apropriada} shader {shader} other {projeto}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Envie uma imagem para a galeria"

@@ -18,13 +18,13 @@
     "defaultMessage": "تمبه ڤاءوتن لوارن"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "اندا تله مميليه کسموا {totalAvailableTags} تݢ يڠ ترسديا. اين مڠالهکن توجوان تݢ⹁ يڠ برتوجوان اونتوق ممبنتو ڤڠݢونا منچاري ڤروجيک يڠ برکاءيتن. سيلا ڤيليه هاڽ تݢ يڠ برکاءيتن دڠن ڤروجيک اندا."
+    "defaultMessage": "Anda telah memilih kesemua {totalAvailableTags, plural, other {# tag yang tersedia}}. Ini mengalahkan tujuan tag, yang bertujuan untuk membantu pengguna mencari projek yang berkaitan. Sila pilih hanya tag yang berkaitan dengan projek anda."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "ڤيليه تݢ يڠ تڤت"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "ڤنجڠ کترڠن اندا اياله {length} اکسارا يڠ بوليه دباچ. سکورڠ٢ڽ {minChars} اکسارا دشورکن اونتوق ممبوات کترڠن يڠ جلس دان برمعلومت."
+    "defaultMessage": "Panjang keterangan anda ialah {length, plural, other {# aksara yang boleh dibaca}}. Sekurang-kurangnya {minChars, plural, other {# aksara}} disyorkan untuk membuat keterangan yang jelas dan bermaklumat."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "کمبڠکن کترڠن"
@@ -54,7 +54,7 @@
     "defaultMessage": "لاوت لامن ݢالري"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "{projectType} اندا مڠݢوناکن ليسين يڠ ممرلوکن کود سومبر ترسديا. سيلا برايکن ڤاءوتن کود سومبر اتاو فاءيل سومبر اونتوق ستياڤ ۏرسي تمبهن اتاو ڤرتيمبڠکن اونتوق مڠݢوناکن ليسين يڠ بربيذا."
+    "defaultMessage": "{type, select, mod {Mod} plugin {Pemalam} other {Projek}} anda sedang menggunakan lesen yang memerlukan kod sumber tersedia. Sila berikan pautan kod sumber atau fail sumber untuk setiap versi tambahan atau pertimbangkan untuk menggunakan lesen yang berbeza."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "سدياکن کود سومبر"
@@ -114,22 +114,22 @@
     "defaultMessage": "سيمق دان تاڠني سموا کبيمبڠن درڤد ڤاسوقن ڤڽدرهان سبلوم مڽرهکن سمولا."
   },
   "nags.moderator-feedback.title": {
-    "defaultMessage": "سيمق معلوم بالس ڤڽدرهان"
+    "defaultMessage": "Semak maklum balas"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "اندا تله مميليه {count} تݢ ريسولوسي ({tags}). ڤيک سومبر بياساڽ هاڽ ممڤوڽاءي ساتو تݢ ريسولوسي يڠ سڤادن دڠن ريسولوسي اوتامڽ."
+    "defaultMessage": "Anda telah memilih {count, plural, other {# tag resolusi}} ({tags}). Pek sumber biasanya hanya mempunyai satu tag resolusi yang sepadan dengan resolusi utamanya."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "ڤيليه ريسولوسي يڠ بتول"
   },
   "nags.select-environments.description": {
-    "defaultMessage": "ڤيليه ڤرسکيترن دمان {projectType} اندا برفوڠسي."
+    "defaultMessage": "Pilih persekitaran di mana {type, select, mod {mod} modpack {pek mod} other {projek}} anda berfungsi."
   },
   "nags.select-environments.title": {
     "defaultMessage": "ڤيليه ڤرسکيترن"
   },
   "nags.select-license.description": {
-    "defaultMessage": "ڤيليه ليسين يڠ دݢوناکن اونتوق ڤڠيدرن {projectType} اندا."
+    "defaultMessage": "Pilih lesen yang digunakan untuk pengedaran {type, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}} anda."
   },
   "nags.select-license.title": {
     "defaultMessage": "ڤيليه ليسين"
@@ -171,25 +171,25 @@
     "defaultMessage": "برسيهکن ريڠکسن"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "ڤنجڠ ريڠکسن اندا اياله {length} اکسارا. سکورڠ٢ڽ {minChars} اکسارا دشورکن اونتوق ممبوات ريڠکسن يڠ برمعلومت دان مناريق."
+    "defaultMessage": "Panjang ringkasan anda ialah {length, plural, other {# aksara}}. Sekurang-kurangnya {minChars, plural, other {# aksara}} disyorkan untuk membuat ringkasan yang bermaklumat dan menarik."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "کمبڠکن ريڠکسن"
   },
   "nags.title-contains-technical-info.description": {
-    "defaultMessage": "نام ڤروجيک اندا يڠ کمس دان دايڠتي اکن منجاديکنڽ موده اونتوق دچاري. معلومت ۏرسي دان ڤموات دڤاڤرکن سچارا اءوتوماتيک برسام ڤروجيک اندا."
+    "defaultMessage": "Nama projek anda yang kemas akan menjadikannya lebih diingati dan mudah untuk dicari. Maklumat versi dan pemuat dipaparkan secara automatik bersama projek anda."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "برسيهکن نام"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "اندا تله مميليه سباڽق {tagCount} تݢ. ڤرتيمبڠکن اونتوق مڠورڠکنڽ کڤد {maxTagCount} اتاو کورڠ اونتوق ممستيکن ڤروجيک اندا دڤاڤرکن دالم حاصيل چارين يڠ برکاءيتن."
+    "defaultMessage": "Anda telah memilih sebanyak {tagCount, plural, other {# tag}} Pertimbangkan untuk mengurangkannya kepada kurang atau sama dengan {maxTagCount} untuk memastikan projek anda dipaparkan dalam hasil carian yang berkaitan."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "ڤيليه تݢ يڠ تڤت"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "سکورڠ٢ڽ ساتو ݢمبر ݢالري دڤرلوکن اونتوق ممڤاميرکن کاندوڠن {type}{resourcepackMessage} اندا."
+    "defaultMessage": "Sekurang-kurangnya satu gambar galeri diperlukan untuk mempamerkan kandungan {type, select, resourcepack {pek sumber anda, melainkan ianya pek audio atau terjemahan. Jika pek ini adalah pek audio atau terjemahan, sila pilih tag yang sesuai} shader {pembayang anda} other {projek anda}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "موات ناءيق ݢمبر ݢالري"

@@ -427,7 +427,7 @@ await Promise.all([loadCapes(), loadSkins(), loadCurrentUser()])
 
 	<div v-else class="flex items-center justify-center min-h-[50vh] pt-[25%]">
 		<div
-			class="bg-bg-raised rounded-lg p-7 flex flex-col gap-5 shadow-md relative max-w-xl w-full mx-auto"
+			class="bg-bg-raised card-shadow rounded-lg p-7 flex flex-col gap-5 shadow-md relative max-w-xl w-full mx-auto"
 		>
 			<img
 				:src="ExcitedRinthbot"

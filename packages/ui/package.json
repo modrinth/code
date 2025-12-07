@@ -4,14 +4,25 @@
 	"private": true,
 	"main": "./index.ts",
 	"types": "./index.ts",
+	"exports": {
+		".": {
+			"types": "./index.ts",
+			"default": "./index.ts"
+		},
+		"./pages": {
+			"types": "./src/pages/index.ts",
+			"default": "./src/pages/index.ts"
+		},
+		"./src/*": "./src/*"
+	},
 	"scripts": {
 		"lint": "eslint . && prettier --check .",
 		"fix": "eslint . --fix && prettier --write .",
 		"intl:extract": "formatjs extract \"src/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"src/**/*.d.ts\" --out-file src/locales/en-US/index.json --preserve-whitespace"
 	},
 	"devDependencies": {
-		"@modrinth/tooling-config": "workspace:*",
 		"@formatjs/cli": "^6.2.12",
+		"@modrinth/tooling-config": "workspace:*",
 		"@stripe/stripe-js": "^7.3.1",
 		"@vintl/unplugin": "^1.5.1",
 		"@vintl/vintl": "^4.4.1",
@@ -26,8 +37,10 @@
 		"@codemirror/language": "^6.9.3",
 		"@codemirror/state": "^6.3.2",
 		"@codemirror/view": "^6.22.1",
+		"@modrinth/api-client": "workspace:*",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/utils": "workspace:*",
+		"@tanstack/vue-query": "^5.90.7",
 		"@tresjs/cientos": "^4.3.0",
 		"@tresjs/core": "^4.3.4",
 		"@tresjs/post-processing": "^2.4.0",
@@ -38,6 +51,7 @@
 		"apexcharts": "^3.44.0",
 		"dayjs": "^1.11.10",
 		"floating-vue": "^5.2.2",
+		"fuse.js": "^6.6.2",
 		"highlight.js": "^11.9.0",
 		"markdown-it": "^13.0.2",
 		"postprocessing": "^6.37.6",

@@ -159,7 +159,7 @@
 
 				<BackupWarning
 					v-if="!initialSetup"
-					:backup-link="`/servers/manage/${props.server?.serverId}/backups`"
+					:backup-link="`/hosting/manage/${props.server?.serverId}/backups`"
 				/>
 			</div>
 
@@ -218,7 +218,7 @@ import { type Loaders, ModrinthServersFetchError } from '@modrinth/utils'
 import { $fetch } from 'ofetch'
 
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
-import type { BackupInProgressReason } from '~/pages/servers/manage/[id].vue'
+import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 import LoaderIcon from './icons/LoaderIcon.vue'
 import LoadingIcon from './icons/LoadingIcon.vue'

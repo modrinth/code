@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<Modal ref="editLinksModal" header="Edit links">
-			<div class="universal-modal links-modal">
+		<NewModal ref="editLinksModal" header="Edit links">
+			<div class="universal-modal links-modal !p-0">
 				<p>
 					Any links you specify below will be overwritten on each of the selected projects. Any you
 					leave blank will be ignored. You can clear a link from all selected projects using the
@@ -139,10 +139,8 @@
 				<Checkbox
 					v-if="selectedProjects.length > 3"
 					v-model="editLinks.showAffected"
-					:label="editLinks.showAffected ? 'Less' : 'More'"
-					description="Show all loaders"
-					:border="false"
-					:collapsing-toggle-style="true"
+					label="Show all projects"
+					description="Show all projects"
 				/>
 				<div class="push-right input-group">
 					<button class="iconified-button" @click="$refs.editLinksModal.hide()">
@@ -155,7 +153,7 @@
 					</button>
 				</div>
 			</div>
-		</Modal>
+		</NewModal>
 		<ModalCreation ref="modal_creation" />
 		<section class="universal-card">
 			<div class="header__row">
@@ -335,13 +333,13 @@ import {
 	commonMessages,
 	CopyCode,
 	injectNotificationManager,
+	NewModal,
 	ProjectStatusBadge,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { Multiselect } from 'vue-multiselect'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
-import Modal from '~/components/ui/Modal.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
 useHead({ title: 'Projects - Modrinth' })

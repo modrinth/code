@@ -6,7 +6,7 @@
     "message": "继续"
   },
   "admin.billing.error.not-found": {
-    "message": "未找到用户"
+    "message": "用户不存在"
   },
   "app-marketing.download.description": {
     "message": "我们的桌面应用程序可在所有平台上使用，请选择你想要的版本。"
@@ -566,6 +566,27 @@
   "create.project.visibility-unlisted": {
     "message": "未列出的"
   },
+  "dashboard.affiliate-links.create.button": {
+    "message": "创建推广链接"
+  },
+  "dashboard.affiliate-links.error.title": {
+    "message": "加载推广链接时出错"
+  },
+  "dashboard.affiliate-links.header": {
+    "message": "你的推广链接"
+  },
+  "dashboard.affiliate-links.revoke-confirm.body": {
+    "message": "这将永久撤销关联代码 `{id}`，任何分享的此代码链接将不再有效。"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "撤销"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "你确定要撤销你的 ''{title}'' 推广链接吗？"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "搜索推广链接……"
+  },
   "dashboard.collections.button.create-new": {
     "message": "新建"
   },
@@ -613,6 +634,339 @@
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "你是美国公民吗？"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "填写税务表格"
+  },
+  "dashboard.creator-withdraw-modal.continue-with-limit": {
+    "message": "有限制的下一步"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "详情"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "金额"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
+    "message": "外汇汇率"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "费用"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "净额"
+  },
+  "dashboard.creator-withdraw-modal.kyc.business-entity": {
+    "message": "企业实体"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-description": {
+    "message": "企业实体指的是如公司、合伙企业或有限责任公司等注册组织。"
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "你是作为个人还是企业进行提现？"
+  },
+  "dashboard.creator-withdraw-modal.kyc.private-individual": {
+    "message": "私人个体"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "选择你的国家"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "搜索国家……"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "无法获取可用的支付方式。请稍后再试。"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "加载支付方式失败"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "地区"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "某些支付方式在特定地区不可用。"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "选择提现方式"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "你的提现限额为<b>{amount}</b>，<tax-link>填写税务表格</tax-link>即可提高提现额度。"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "账户所有者"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "硬币"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "确认你的钱包地址"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "国民身份证号码"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "输入国民身份证号码"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "护照号码"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "输入护照号码"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "居民身份证号码"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "输入居民身份证号码"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "唯一纳税人登记号"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "输入唯一纳税人登记号"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "税务识别号"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "输入税务识别号"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "网络"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "你即将到达提现限额。你现在仅可以提取<b>{amountRemaining}</b>，提取更多需要填写税务表格。"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "账户"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "断开账户关联"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "支付方式"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal 账户"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "关联你的 PayPal 账户用于直接接收付款。"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "保存"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "Venmo 处理保存成功！"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "已保存"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "使用 PayPal 登录"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "输入你的 Venmo 账号以接收付款。"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "Venmo 账号"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@username"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "完成"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "方法"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "账户详情"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
+    "message": "核实"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "税务表格"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "详情"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "如需提取你全部的<b>{available}</b>可用余额，请填写下方表格。此操作仅需完成一次，系税务申报所需。"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "你必须填写 W-9 或 W-8 表格以供 Modrinth 存档，确保我们符合税务法规要求。"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "需要填写税务表格"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "支付方式"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "奖励"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "选择奖励"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "奖励"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "未验证的电子邮件"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "你输入的收件邮箱未与你的 Modrinth 账户关联。若奖励发送至错误邮箱地址，Modrinth 将无法进行追回。"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "有更低的服务费可用"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "你已为 PayPal 国际支付选择美元。<direct-paypal-link>切换至直接 PayPal 支付</direct-paypal-link>可享受更优惠的手续费（≈2%而非≈6%）。"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "提现"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "提现限额"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "你已用尽<b>{withdrawLimit}</b>的提现额度。若需继续提现，请先完成税务表格填写。"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "现在可用"
+  },
+  "dashboard.revenue.balance": {
+    "message": "平衡"
+  },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "预估收入可能随时变更，直至正式公布为止。"
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "点击了解 Modrinth 如何处理你的收入。"
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "预计日期：{date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "处理中"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "收入将维持在处理状态直至月底结束，随后在60天后方可使用。"
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "接收"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "交易"
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "撤回"
+  },
+  "dashboard.revenue.tos": {
+    "message": "通过将项目上传至 Modrinth 并从账户中提取资金，即表示你同意我们的<terms-link>激励计划条款</terms-link>。了解更多关于<info-link>激励计划</info-link>的信息。"
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "以 CSV 格式下载"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "交易"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "没有交易"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "您的支付和提现将在这里显示。"
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "查看所有"
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "由于你的纳税人识别号或社会安全号码与美国国税局记录不符，你的提现被暂时锁定。请联系客服重置并重新提交你的税表。"
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "从可用余额中提现至任何支付方式。"
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "提现"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "提现"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "账户"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "金额"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "关闭"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "日期"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "你将收到一封发至<b>{email}</b>的电子邮件，其中包含兑换提现的说明。"
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "汇率"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "费用"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "方法"
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "净额"
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "收件人"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "提现完成"
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "交易"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "钱包"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "我们无法提交你的提现请求，请检查你的详细信息或联系客服。"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "无法提现"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "你提供的地址无法验证。请检查你的地址信息。"
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "地址验证失败"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "你提供的银行账户信息无效。请核实你的信息。"
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "无效的银行信息"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "你提供的加密钱包地址无效。请仔细核对后重新尝试。"
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "无效的钱包地址"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "提现金额（扣除手续费后）未达到最低要求。请增加提现金额。"
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "金额过低"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "。"
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": ""
   },
   "error.collection.404.list_item.1": {
     "message": "你可能输错了收藏夹的连接。"
@@ -869,6 +1223,9 @@
   "layout.action.lookup-by-email": {
     "message": "通过电子邮箱查找"
   },
+  "layout.action.manage-affiliates": {
+    "message": "管理推广链接"
+  },
   "layout.action.manage-server-notices": {
     "message": "管理服务器通知"
   },
@@ -924,7 +1281,7 @@
     "message": "填写税务表格"
   },
   "layout.banner.tax.description": {
-    "message": "你今年已经从Modrinth提款了超过600美元。为了遵守税务规定，你需要填写一份税务表格。你的提款操作将暂停，直到提交此表格为止。"
+    "message": "你今年已经从Modrinth提现了超过600美元。为了遵守税务规定，你需要填写一份税务表格。你的提现操作将暂停，直到提交此表格为止。"
   },
   "layout.banner.tax.title": {
     "message": "需要填写税务表格"
@@ -933,7 +1290,7 @@
     "message": "联系客服"
   },
   "layout.banner.tin-mismatch.description": {
-    "message": "由于你的纳税人识别号或社会安全号码与美国国税局记录不符，你的提款被暂时锁定。请联系客服重置并重新提交你的税表。"
+    "message": "由于你的纳税人识别号或社会安全号码与美国国税局记录不符，你的提现被暂时锁定。请联系客服重置并重新提交你的税表。"
   },
   "layout.banner.tin-mismatch.title": {
     "message": "税务表格上报失败"
@@ -961,6 +1318,9 @@
   },
   "layout.footer.about.status": {
     "message": "服务器状态"
+  },
+  "layout.footer.copyright": {
+    "message": "© {year} Rinth, Inc."
   },
   "layout.footer.legal": {
     "message": "法律文件"
@@ -1040,6 +1400,15 @@
   "layout.meta.og-description": {
     "message": "浏览及发布 Minecraft 内容！"
   },
+  "layout.mobile.close-menu": {
+    "message": ""
+  },
+  "layout.mobile.open-menu": {
+    "message": "打开菜单"
+  },
+  "layout.nav.active-reports": {
+    "message": "进行中的举报"
+  },
   "layout.nav.analytics": {
     "message": "数据"
   },
@@ -1066,6 +1435,9 @@
   },
   "layout.nav.modrinth-home-page": {
     "message": "Modrinth 首页"
+  },
+  "layout.nav.my-servers": {
+    "message": "我的服务器"
   },
   "layout.nav.organizations": {
     "message": "组织"
@@ -1112,6 +1484,174 @@
   "moderation.technical.search.placeholder": {
     "message": "搜索技术评价……"
   },
+  "muralpay.account-type.checking": {
+    "message": "支票账户"
+  },
+  "muralpay.account-type.savings": {
+    "message": "储蓄账户"
+  },
+  "muralpay.country.at": {
+    "message": "奥地利"
+  },
+  "muralpay.country.be": {
+    "message": "比利时"
+  },
+  "muralpay.country.cy": {
+    "message": "塞浦路斯"
+  },
+  "muralpay.country.de": {
+    "message": "德国"
+  },
+  "muralpay.country.ee": {
+    "message": "爱沙尼亚"
+  },
+  "muralpay.country.es": {
+    "message": "西班牙"
+  },
+  "muralpay.country.fi": {
+    "message": "芬兰"
+  },
+  "muralpay.country.fr": {
+    "message": "法国"
+  },
+  "muralpay.country.gr": {
+    "message": "希腊"
+  },
+  "muralpay.country.ie": {
+    "message": "爱尔兰"
+  },
+  "muralpay.country.it": {
+    "message": "意大利"
+  },
+  "muralpay.country.lt": {
+    "message": "立陶宛"
+  },
+  "muralpay.country.lu": {
+    "message": "卢森堡"
+  },
+  "muralpay.country.lv": {
+    "message": "拉脱维亚"
+  },
+  "muralpay.country.mt": {
+    "message": "马耳他"
+  },
+  "muralpay.country.nl": {
+    "message": "荷兰"
+  },
+  "muralpay.country.pt": {
+    "message": "葡萄牙"
+  },
+  "muralpay.country.sk": {
+    "message": "斯洛伐克"
+  },
+  "muralpay.document-type.national-id": {
+    "message": "国民身份证"
+  },
+  "muralpay.document-type.passport": {
+    "message": "护照"
+  },
+  "muralpay.document-type.resident-id": {
+    "message": "居民身份证"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "唯一纳税人登记号"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "税号"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "国家"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.field.phone-number": {
+    "message": "电话号码"
+  },
+  "muralpay.pix-type.document": {
+    "message": "个人纳税人身份号/公司纳税人身份号"
+  },
+  "muralpay.pix-type.email": {
+    "message": "电子邮箱"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "电话号码"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "输入账户号码"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "输入账户号码"
+  },
+  "muralpay.placeholder.enter-branch-code": {
+    "message": "输入分行代码"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "银行转账（阿根廷比索）"
+  },
+  "muralpay.rail.fiat-brl.name": {
+    "message": "PIX转账（巴西雷亚尔）"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "银行转账（智利比索）"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "银行转账（哥伦比亚比索）"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "银行转账（哥斯达黎加科朗）"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "银行转账（欧元）"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "银行转账（墨西哥比索）"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "银行转账（秘鲁新索尔）"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "银行转账（美元 - 秘鲁）"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "银行转账（美元）"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "银行转账（南非兰特）"
+  },
+  "muralpay.rail.usdc-base.name": {
+    "message": "USDC (Base)"
+  },
+  "muralpay.rail.usdc-celo.name": {
+    "message": "USDC (Celo)"
+  },
+  "muralpay.rail.usdc-ethereum.name": {
+    "message": "USDC (Ethereum)"
+  },
+  "muralpay.rail.usdc-polygon.name": {
+    "message": "加密货币 (USDC)"
+  },
+  "muralpay.warning.wallet-address": {
+    "message": "请再次确认你的钱包地址。发送到错误地址的资金将无法追回。"
+  },
   "profile.bio.fallback.creator": {
     "message": "一位 Modrinth 创作者。"
   },
@@ -1129,6 +1669,12 @@
   },
   "profile.button.manage-projects": {
     "message": "管理项目"
+  },
+  "profile.button.remove-affiliate": {
+    "message": "解除作为联盟伙伴"
+  },
+  "profile.button.set-affiliate": {
+    "message": "设置为联盟伙伴"
   },
   "profile.details.label.auth-providers": {
     "message": "身份验证提供者"
@@ -1153,6 +1699,9 @@
   },
   "profile.error.not-found": {
     "message": "未找到用户"
+  },
+  "profile.label.affiliate": {
+    "message": "联盟"
   },
   "profile.label.badges": {
     "message": "徽章"
@@ -1251,7 +1800,7 @@
     "message": "重新提交审核"
   },
   "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "你的项目被Modrinth管理人员列为{status}。一般来说，在解决管理人员的消息里提到的问题后，就可以重新提交审核。"
+    "message": "你的项目已被 Modrinth 工作人员{status, select, rejected {拒绝} withheld {暂缓} other { {status}}} 。在多数情况下，你可在处理工作人员反馈后重新提交审核。"
   },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "你必须完成发布前检查单中必需的步骤！"
@@ -1658,18 +2207,6 @@
   "report.submit": {
     "message": "提交举报"
   },
-  "revenue.transfers.total": {
-    "message": "你总共提现了 {amount} 。"
-  },
-  "revenue.transfers.total.method": {
-    "message": "你通过 {method} 提现了 {amount} 。"
-  },
-  "revenue.transfers.total.year": {
-    "message": "你在 {year} 年提现了 {amount} 。"
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "你在 {year} 年通过 {method} 提现了 {amount} 。"
-  },
   "scopes.analytics.description": {
     "message": "访问你的分析数据"
   },
@@ -1761,7 +2298,7 @@
     "message": "写入个人访问令牌"
   },
   "scopes.payoutsRead.description": {
-    "message": "读取你的提款数据"
+    "message": "读取你的提现数据"
   },
   "scopes.payoutsRead.label": {
     "message": "读取提款"
@@ -2019,13 +2556,13 @@
     "message": "确定要取消订阅吗？"
   },
   "settings.billing.modal.delete.action": {
-    "message": "移除这个付款方式"
+    "message": "移除这个支付方式"
   },
   "settings.billing.modal.delete.description": {
-    "message": "这将永久（真的是永远）删除此付款方式。"
+    "message": "这将永久（真的是永远）删除此支付方式。"
   },
   "settings.billing.modal.delete.title": {
-    "message": "确定要删除这个付款方式吗？"
+    "message": "确定要删除这个支付方式吗？"
   },
   "settings.billing.payment_method.action.add": {
     "message": "添加支付方式"
@@ -2034,7 +2571,7 @@
     "message": "查看更改历史记录"
   },
   "settings.billing.payment_method.action.primary": {
-    "message": "设为主要付款方式"
+    "message": "设为主要支付方式"
   },
   "settings.billing.payment_method.card_display": {
     "message": "{card_brand} 尾号 {last_four}"
@@ -2043,13 +2580,13 @@
     "message": "有效期至 {year} 年 {month} 月"
   },
   "settings.billing.payment_method.none": {
-    "message": "你还没有添加付款方式。"
+    "message": "你还没有添加支付方式。"
   },
   "settings.billing.payment_method.primary": {
     "message": "主要"
   },
   "settings.billing.payment_method.title": {
-    "message": "付款方式"
+    "message": "支付方式"
   },
   "settings.billing.payment_method_type.amazon_pay": {
     "message": "Amazon Pay"
@@ -2082,7 +2619,7 @@
     "message": "银联"
   },
   "settings.billing.payment_method_type.unknown": {
-    "message": "未知付款方式"
+    "message": "未知支付方式"
   },
   "settings.billing.payment_method_type.visa": {
     "message": "Visa"

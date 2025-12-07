@@ -1,6 +1,42 @@
 {
+  "action.continue": {
+    "message": "Συνέχεια"
+  },
   "admin.billing.error.not-found": {
     "message": "Ο χρήστης δε βρέθηκε"
+  },
+  "app-marketing.download.description": {
+    "message": "Η εφαρμογή μας για υπολογιστές είναι διαθέσιμη σε όλες τις πλατφόρμες, επιλέξτε την έκδοση που επιθυμείτε."
+  },
+  "app-marketing.download.download-appimage": {
+    "message": "Λήψη του AppImages"
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Λήψη της beta"
+  },
+  "app-marketing.download.download-deb": {
+    "message": "Λήψη του DEB"
+  },
+  "app-marketing.download.download-rpm": {
+    "message": "Λήψη του RPM"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.linux-disclaimer": {
+    "message": "Οι εκδόσεις Linux της εφαρμογής Modrinth είναι <issues-link>γνωστό ότι παρουσιάζουν προβλήματα</issues-link> σε ορισμένα συστήματα και διαμορφώσεις. Εάν η εφαρμογή Modrinth είναι ασταθής στο σύστημά σας, σας ενθαρρύνουμε να δοκιμάσετε άλλες εφαρμογές όπως το <prism-link>Prism Launcher</prism-link> για να εγκαταστήσετε εύκολα το περιεχόμενο του Modrinth."
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Επιλογές λήψης"
+  },
+  "app-marketing.download.terms": {
+    "message": "Με τη λήψη του Modrinth App, συμφωνείτε με τους <terms-link>Όρους</terms-link> και την <privacy-link>Πολιτική Απορρήτου</privacy-link> μας."
+  },
+  "app-marketing.download.third-party-packages": {
+    "message": "Πακέτα τρίτων"
   },
   "auth.authorize.action.authorize": {
     "message": "Εξουσιοδότηση"

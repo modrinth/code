@@ -1,4 +1,13 @@
 {
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "pl: YouTube"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Felhasználónév"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Írj be a felhasználónevet..."
+  },
   "badge.beta": {
     "defaultMessage": "Béta"
   },
@@ -118,6 +127,48 @@
   },
   "collection.label.private": {
     "defaultMessage": "Privát"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Cím"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Cím 2 (választható)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Összeg"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Bank neve"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Cég név"
+  },
+  "form.label.city": {
+    "defaultMessage": "Város"
+  },
+  "form.label.country": {
+    "defaultMessage": "Ország"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Születési idő"
+  },
+  "form.label.email": {
+    "defaultMessage": "Email-cím"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Keresztnév"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Vezetéknév"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Irányítószám"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Megye/tartomány"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Adja meg a címet"
   },
   "icon-select.edit": {
     "defaultMessage": "Ikon szerkesztése"

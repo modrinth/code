@@ -74,6 +74,9 @@
   "friends.add-friend.submit": {
     "message": "发送好友请求"
   },
+  "friends.add-friend.title": {
+    "message": "添加好友"
+  },
   "friends.add-friend.username.description": {
     "message": "可能和他们的 Minecraft 用户名不一样！"
   },

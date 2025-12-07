@@ -1250,9 +1250,6 @@
   "project-moderation-nags.resubmit-for-review": {
     "message": "Ripresenta per la revisione"
   },
-  "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Il tuo progetto è stato {status} dallo staff di Modrinth. Nella maggioranza dei casi, potrai ripresentarlo per una revisione dopo aver risposto al messaggio dello staff."
-  },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Devi completare i passaggi obbligatori nella checklist di pubblicazione!"
   },
@@ -1657,18 +1654,6 @@
   },
   "report.submit": {
     "message": "Invia segnalazione"
-  },
-  "revenue.transfers.total": {
-    "message": "Hai prelevato in tutto {amount}."
-  },
-  "revenue.transfers.total.method": {
-    "message": "Hai prelevato {amount} tramite {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "Hai prelevato {amount} nel {year}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "Hai prelevato {amount} nel {year} tramite {method}."
   },
   "scopes.analytics.description": {
     "message": "Accedere ai tuoi dati analitici"

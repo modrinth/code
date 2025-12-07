@@ -15,11 +15,11 @@
 				<div class="flex flex-col gap-1">
 					<div class="flex items-center gap-1">
 						<span class="font-bold text-primary">
-							<template v-if="charge.product.metadata.type === 'midas'"> Modrinth Plus </template>
-							<template v-else-if="charge.product.metadata.type === 'pyro'">
-								Modrinth Servers
+							<template v-if="charge.product?.metadata?.type === 'midas'"> Modrinth Plus </template>
+							<template v-else-if="charge.product?.metadata?.type === 'pyro'">
+								Modrinth Hosting
 							</template>
-							<template v-else> Unknown product </template>
+							<template v-else> Medal Server Trial </template>
 							<template v-if="charge.subscription_interval">
 								{{ charge.subscription_interval }}
 							</template>

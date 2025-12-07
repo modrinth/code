@@ -14,6 +14,8 @@ impl MuralPay {
         &self,
         params: Option<SearchParams<CounterpartyId>>,
     ) -> Result<SearchResponse<CounterpartyId, Counterparty>, MuralError> {
+        mock!(self, search_counterparties(params));
+
         self.http_post(|base| format!("{base}/api/counterparties/search"))
             .query(&params.map(|p| p.to_query()).unwrap_or_default())
             .send_mural()
@@ -24,6 +26,8 @@ impl MuralPay {
         &self,
         id: CounterpartyId,
     ) -> Result<Counterparty, MuralError> {
+        mock!(self, get_counterparty(id));
+
         self.http_get(|base| {
             format!("{base}/api/counterparties/counterparty/{id}")
         })
@@ -35,6 +39,8 @@ impl MuralPay {
         &self,
         counterparty: &CreateCounterparty,
     ) -> Result<Counterparty, MuralError> {
+        mock!(self, create_counterparty(counterparty));
+
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body<'a> {
@@ -54,6 +60,8 @@ impl MuralPay {
         id: CounterpartyId,
         counterparty: &UpdateCounterparty,
     ) -> Result<Counterparty, MuralError> {
+        mock!(self, update_counterparty(id, counterparty));
+
         #[derive(Debug, Serialize)]
         #[serde(rename_all = "camelCase")]
         struct Body<'a> {

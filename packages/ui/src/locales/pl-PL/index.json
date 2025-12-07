@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Utwórz link afiliacyjny"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Tworzenie nowego linku afiliacyjnego"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Nadaj swojemu linkowi afiliacyjnemu nazwę, by wiedzieć, gdzie znajdują go ludzie!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Nazwa linku afiliacyjnego"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "np. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "Nazwa użytkownika, któremu ma być utworzony ten kod"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Nazwa użytkownika"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Podaj nazwę użytkownika..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Stworzony przez {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Tworzenie linku afiliacyjnego..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Usuń link afiliacyjny"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Pokaż dane analityczne"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -7,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "Nowe"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Linki afiliacyjne"
   },
   "button.analytics": {
     "defaultMessage": "Analityka"
@@ -46,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Obserwuj"
+  },
+  "button.max": {
+    "defaultMessage": "Maks."
   },
   "button.more-options": {
     "defaultMessage": "Więcej opcji"
@@ -119,6 +161,84 @@
   "collection.label.private": {
     "defaultMessage": "Prywatna"
   },
+  "form.label.address-line": {
+    "defaultMessage": "Adres, wiersz 1"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "Adres, wiersz 2 (niewymagane)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Ilość"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Nazwa banku"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Nazwa przedsiębiorczości"
+  },
+  "form.label.city": {
+    "defaultMessage": "Miasto"
+  },
+  "form.label.country": {
+    "defaultMessage": "Kraj"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Data urodzenia"
+  },
+  "form.label.email": {
+    "defaultMessage": "E-mail"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Imię"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Nazwisko"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Kod pocztowy"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Województwo"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Podaj adres"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Aparatament, mieszkanie, itp."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Podaj kwotę"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Podaj nazwę banku"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Wybierz nazwę banku"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Podaj nazwę przedsiębiorczości"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Podaj miasto"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Wybierz kraj"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Wprowadź adres e-mail"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Wprowadź imię"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Wprowadź nazwisko"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Wprowadź kod pocztowy"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Wprowadź województwo"
+  },
   "icon-select.edit": {
     "defaultMessage": "Edytuj ikonę"
   },
@@ -157,6 +277,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Nieznany tryb gry"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} dostępne."
   },
   "label.changes-saved": {
     "defaultMessage": "Zmiany zapisane"
@@ -205,6 +328,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Odrzucony"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Wyrażam zgodę na <terms-link>Warunki programu wynagrodzenia</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "Zapisano"
@@ -353,6 +479,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "Międzynarodowy PayPal"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -361,6 +490,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Organizacja charytatywna"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Organizacje charytatywne"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Karta podarunkowa"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Karty podarunkowe"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Wirtualna karta Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Wirtualne karty Visa"
   },
   "project-type.all": {
     "defaultMessage": "Wszystko"

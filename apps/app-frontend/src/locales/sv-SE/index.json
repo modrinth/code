@@ -2,6 +2,9 @@
   "app.settings.developer-mode-enabled": {
     "message": "Utvecklarläge aktiverat."
   },
+  "app.settings.downloading": {
+    "message": "Ladda ner v{version}"
+  },
   "app.settings.tabs.appearance": {
     "message": "Utseende"
   },
@@ -19,6 +22,111 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Resurshantering"
+  },
+  "app.update-toast.body": {
+    "message": "Modrinth App v{version} är redo att laddas ner! Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
+  },
+  "app.update-toast.body.download-complete": {
+    "message": "Modrinth App v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
+  },
+  "app.update-toast.body.metered": {
+    "message": "Modrinth App v{version} är nu tillgänglig! Eftersom du använder ett nätverk med datatrafikbegränsningar har vi inte laddat ner det automatiskt."
+  },
+  "app.update-toast.changelog": {
+    "message": "Ändringslogg"
+  },
+  "app.update-toast.download": {
+    "message": "Ladda ner ({size})"
+  },
+  "app.update-toast.downloading": {
+    "message": "Laddar ner..."
+  },
+  "app.update-toast.reload": {
+    "message": "Ladda om"
+  },
+  "app.update-toast.title": {
+    "message": "Uppdatering tillgänglig"
+  },
+  "app.update-toast.title.download-complete": {
+    "message": "Nedladdning slutförd"
+  },
+  "app.update.complete-toast.text": {
+    "message": "Tryck här för att visa ändringsloggen."
+  },
+  "app.update.complete-toast.title": {
+    "message": "Version {version} har installerats!"
+  },
+  "app.update.download-update": {
+    "message": "Ladda ner uppdatering"
+  },
+  "app.update.downloading-update": {
+    "message": "Laddar ner uppdatering ({percent}%)"
+  },
+  "app.update.reload-to-update": {
+    "message": "Ladda om för att installera uppdatering"
+  },
+  "friends.action.add-friend": {
+    "message": "Lägg till en vän"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} vän{count, plural, one {förfrågan} other {förfrågningar}}"
+  },
+  "friends.add-friend.submit": {
+    "message": "Skicka vänförfrågan"
+  },
+  "friends.add-friend.title": {
+    "message": "Lägga till en vän"
+  },
+  "friends.add-friend.username.description": {
+    "message": "Det kan vara annorlunda från deras Minecraft-användarnamn!"
+  },
+  "friends.add-friend.username.placeholder": {
+    "message": "Ange Modrinth-användarnamn..."
+  },
+  "friends.add-friend.username.title": {
+    "message": "Vad är din väns Modrinth-användarnamn?"
+  },
+  "friends.add-friends-to-share": {
+    "message": "<link>Lägg till vänner</link> för att se vad de spelar!"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Avbryt förfrågan"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Ta bort vän"
+  },
+  "friends.friend.request-sent": {
+    "message": "Vänförfrågan skickad"
+  },
+  "friends.friend.view-profile": {
+    "message": "Visa profil"
+  },
+  "friends.heading": {
+    "message": "Vänner"
+  },
+  "friends.heading.active": {
+    "message": "Aktiva"
+  },
+  "friends.heading.offline": {
+    "message": "Offline"
+  },
+  "friends.heading.online": {
+    "message": "Online"
+  },
+  "friends.heading.pending": {
+    "message": "Väntar"
+  },
+  "friends.no-friends-match": {
+    "message": "Inga vänner matchar ''{query}''"
+  },
+  "friends.search-friends-placeholder": {
+    "message": "Sök efter vänner..."
+  },
+  "friends.section.heading": {
+    "message": "{title}: {count}"
+  },
+  "friends.sign-in-to-add-friends": {
+    "message": "<link>Logga in på ett Modrinth-konto</link> för att lägga till vänner och se vad de spelar!"
   },
   "instance.add-server.add-and-play": {
     "message": "Lägg till och spela"

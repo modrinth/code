@@ -1193,9 +1193,6 @@
   "project-moderation-nags.resubmit-for-review": {
     "message": "Soumettre à nouveau pour révision"
   },
-  "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "Ton projet a été {status} par le personnel de Modrinth. Tu peux soumettre à nouveau pour examen après avoir adressé le message du personnel."
-  },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Vous devez compléter les étapes obligatoires dans la liste de contrôle de publication !"
   },
@@ -1601,18 +1598,6 @@
   "report.submit": {
     "message": "Soumettre le signalement"
   },
-  "revenue.transfers.total": {
-    "message": "Vous avez retiré {amount} au total."
-  },
-  "revenue.transfers.total.method": {
-    "message": "Vous avez retiré {amount} via {method}."
-  },
-  "revenue.transfers.total.year": {
-    "message": "Vous avez retiré {amount} en {year}."
-  },
-  "revenue.transfers.total.year_method": {
-    "message": "Vous avez retiré {amount} en {year} via {method}."
-  },
   "scopes.analytics.description": {
     "message": "Accéder à vos données analytiques"
   },
@@ -1876,12 +1861,6 @@
   },
   "servers.backups.item.creating-backup": {
     "message": "Création de sauvegarde..."
-  },
-  "servers.backups.item.downloading": {
-    "message": "Téléchargement"
-  },
-  "servers.backups.item.downloading-backup": {
-    "message": "Téléchargement de la backup..."
   },
   "servers.backups.item.failed-to-create-backup": {
     "message": "Échec de la création de la sauvegarde"

@@ -1,0 +1,25 @@
+{
+	"name": "@modrinth/api-client",
+	"version": "0.1.0",
+	"description": "An API client for Modrinth's API for use in nuxt, tauri and plain node/browser environments.",
+	"main": "./src/index.ts",
+	"scripts": {
+		"lint": "eslint . && prettier --check .",
+		"fix": "eslint . --fix && prettier --write ."
+	},
+	"dependencies": {
+		"mitt": "^3.0.1",
+		"ofetch": "^1.4.1"
+	},
+	"devDependencies": {
+		"@modrinth/tooling-config": "workspace:*"
+	},
+	"peerDependencies": {
+		"@tauri-apps/plugin-http": "^2.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@tauri-apps/plugin-http": {
+			"optional": true
+		}
+	}
+}

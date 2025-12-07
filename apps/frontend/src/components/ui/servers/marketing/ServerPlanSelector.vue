@@ -141,7 +141,7 @@ const billingMonths = computed(() => {
 				:ram="ram"
 				:storage="storage"
 				:cpus="cpus"
-				:bursting-link="'/servers#cpu-burst'"
+				:bursting-link="'/hosting#cpu-burst'"
 				@click-bursting-link="() => emit('scroll-to-faq')"
 			/>
 		</div>

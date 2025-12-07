@@ -5,7 +5,7 @@
 				<template v-if="productType === 'midas'">Subscribe to Modrinth+!</template>
 				<template v-else-if="productType === 'pyro'">
 					<template v-if="existingSubscription"> Upgrade server plan </template>
-					<template v-else> Subscribe to Modrinth Servers! </template>
+					<template v-else> Subscribe to Modrinth Hosting! </template>
 				</template>
 				<template v-else>Purchase product</template>
 			</span>
@@ -143,7 +143,7 @@
 								Max Burst CPUs
 								<UnknownIcon
 									v-tooltip="
-										'CPU bursting allows your server to temporarily use additional threads to help mitigate TPS spikes. See Modrinth Servers FAQ for more info.'
+										'CPU bursting allows your server to temporarily use additional threads to help mitigate TPS spikes. See Modrinth Hosting FAQ for more info.'
 									"
 									class="h-4 w-4text-secondary opacity-60"
 								/>
@@ -292,7 +292,7 @@
 					<p class="my-2 text-lg font-bold text-primary">Purchase details</p>
 					<div class="mb-2 flex justify-between">
 						<span class="text-secondary">
-							{{ mutatedProduct.metadata.type === 'midas' ? 'Modrinth+' : 'Modrinth Servers' }}
+							{{ mutatedProduct.metadata.type === 'midas' ? 'Modrinth+' : 'Modrinth Hosting' }}
 							{{
 								existingPlan
 									? `(${dayjs(renewalDate).diff(dayjs(), 'days')} days prorated)`
@@ -552,7 +552,7 @@ import Checkbox from '../base/Checkbox.vue'
 import Slider from '../base/Slider.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
 import NewModal from '../modal/NewModal.vue'
-import LoaderIcon from '../servers/LoaderIcon.vue'
+import LoaderIcon from '../servers/icons/LoaderIcon.vue'
 
 const { locale, formatMessage } = useVIntl()
 
