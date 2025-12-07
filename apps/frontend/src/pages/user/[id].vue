@@ -538,7 +538,7 @@ const messages = defineMessages({
 	},
 	emailVerifiedLabel: {
 		id: 'profile.details.label.email-verified',
-		defaultMessage: 'Email Verified',
+		defaultMessage: 'Email verified',
 	},
 	emailVerifiedTooltip: {
 		id: 'profile.details.tooltip.email-verified',
