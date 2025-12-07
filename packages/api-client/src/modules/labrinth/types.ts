@@ -172,6 +172,7 @@ export namespace Labrinth {
 				| 'shader'
 				| 'plugin'
 				| 'datapack'
+				| 'project'
 
 			export type GalleryImage = {
 				url: string

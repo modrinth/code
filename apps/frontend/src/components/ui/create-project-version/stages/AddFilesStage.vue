@@ -46,8 +46,10 @@ const { formatMessage } = useVIntl()
 const { draftVersion, setPrimaryFile, setInferredVersionData } = useManageVersion()
 
 const addDetectedData = async () => {
+	const primaryFile = draftVersion.value.files[0]
+	if (!primaryFile) return
+
 	try {
-		const primaryFile = draftVersion.value.files[0]
 		const inferredData = await setInferredVersionData(primaryFile, projectV2.value)
 		const mappedInferredData = {
 			...inferredData,

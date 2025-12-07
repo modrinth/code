@@ -21,6 +21,7 @@
 		</div>
 
 		<input
+			ref="fileInput"
 			type="file"
 			:multiple="multiple"
 			:accept="accept"
@@ -35,6 +36,8 @@
 import { UploadIcon } from '@modrinth/assets'
 import { fileIsValid } from '@modrinth/utils'
 import { ref } from 'vue'
+
+const fileInput = ref<HTMLInputElement | null>(null)
 
 const emit = defineEmits<{
 	(e: 'change', files: File[]): void
@@ -74,6 +77,8 @@ function addFiles(incoming: FileList, shouldNotReset = false) {
 	if (files.value.length > 0) {
 		emit('change', files.value)
 	}
+
+	if (fileInput.value) fileInput.value.value = ''
 }
 
 function handleDrop(e: DragEvent) {
