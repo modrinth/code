@@ -8,12 +8,12 @@ import {
 	commonMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	injectProjectPageContext,
 	MultiStageModal,
 } from '@modrinth/ui'
 import { defineMessages } from '@vintl/vintl'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
-import { injectVersionsContext } from '~/providers/versions'
 
 import AddChangelogStage from './stages/AddChangelogStage.vue'
 import AddDependenciesStage from './stages/AddDependenciesStage.vue'
@@ -85,16 +85,12 @@ const defaultBackButton = {
 	onClick: () => modal.value?.prevStage(),
 }
 
-const addFilesDisabled = computed(() => draftVersion.value.files.length === 0)
+const addFilesNextDisabled = computed(() => draftVersion.value.files.length === 0)
 
-const addDetailsDisabled = computed(
-	() =>
-		draftVersion.value.version_title.trim().length === 0 ||
-		draftVersion.value.version_number.trim().length === 0,
-)
+const addDetailsNextDisabled = computed(() => draftVersion.value.version_number.trim().length === 0)
 
-const addLoadersDisabled = computed(() => draftVersion.value.loaders.length === 0)
-const addMcVersionsDisabled = computed(() => draftVersion.value.game_versions.length === 0)
+const addLoadersNextDisabled = computed(() => draftVersion.value.loaders.length === 0)
+const addMcVersionsNextDisabled = computed(() => draftVersion.value.game_versions.length === 0)
 
 const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']>(
 	() =>
@@ -111,7 +107,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				},
 				rightButtonConfig: {
 					...defaultNextButton,
-					disabled: addFilesDisabled.value,
+					disabled: addFilesNextDisabled.value,
 					label: formatMessage(messages.addDetailsButton),
 				},
 			},
@@ -121,17 +117,28 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
-					disabled: addDetailsDisabled.value,
+					disabled: addDetailsNextDisabled.value,
 					label: 'Set loaders',
+					onClick: () => {
+						// if has detected loaders, skip step (jump straight to next step)
+						// check if has detected versions
+						// -true: go to dependencies
+						// -else: go to version picker
+						// if has detected versions skip step (jump straight to next step)
+						// check if has detected loaders
+						// -true: go to dependencies
+						// -else: go to loaders select
+					},
 				},
 			},
 			{
+				// dont show for resource packs
 				title: 'Add loaders',
 				stageContent: AddLoadersStage,
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
-					disabled: addLoadersDisabled.value,
+					disabled: addLoadersNextDisabled.value,
 					label: 'Set MC versions',
 				},
 			},
@@ -141,20 +148,12 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
-					disabled: addMcVersionsDisabled.value,
+					disabled: addMcVersionsNextDisabled.value,
 					label: formatMessage(messages.addChangelogButton),
 				},
 			},
 			{
-				title: formatMessage(messages.addChangelogTitle),
-				stageContent: AddChangelogStage,
-				leftButtonConfig: { ...defaultBackButton },
-				rightButtonConfig: {
-					...defaultNextButton,
-					label: formatMessage(messages.addDependenciesButton),
-				},
-			},
-			{
+				// skip this step for modpacks
 				title: formatMessage(messages.addDependenciesTitle),
 				stageContent: AddDependenciesStage,
 				leftButtonConfig: { ...defaultBackButton },
@@ -165,6 +164,15 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 					color: 'green' as const,
 					label: 'Create version',
 					onClick: handleCreateVersion,
+				},
+			},
+			{
+				title: formatMessage(messages.addChangelogTitle),
+				stageContent: AddChangelogStage,
+				leftButtonConfig: { ...defaultBackButton },
+				rightButtonConfig: {
+					...defaultNextButton,
+					label: formatMessage(messages.addDependenciesButton),
 				},
 			},
 		] as InstanceType<typeof MultiStageModal>['$props']['stages'],
@@ -195,11 +203,11 @@ async function handleCreateVersion() {
 	}
 }
 
-const { project } = injectVersionsContext()
+const { projectV2 } = injectProjectPageContext()
 
 defineExpose({
 	show: () => {
-		newDraftVersion(project.id)
+		newDraftVersion(projectV2.value.id)
 		modal.value?.setStage(0)
 		modal.value?.show()
 	},

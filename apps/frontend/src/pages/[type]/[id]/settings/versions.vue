@@ -186,10 +186,9 @@ import {
 	ShareIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, ConfirmModal, OverflowMenu,ProjectPageVersions  } from '@modrinth/ui'
+import { ButtonStyled, ConfirmModal, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
-import { provideVersionsContext } from '~/providers/versions'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 import { PlusIcon } from '../../../../../../../packages/assets/generated-icons'
@@ -201,11 +200,6 @@ interface Props {
 }
 
 const { project, versions, currentMember } = defineProps<Props>()
-
-provideVersionsContext({
-	project,
-	versions,
-})
 
 const modal = ref<InstanceType<typeof CreateProjectVersionModal>>()
 

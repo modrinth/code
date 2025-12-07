@@ -4,7 +4,7 @@
 			aria-label="Upload additional file"
 			multiple
 			long-style
-			:accept="acceptFileFromProjectType(project.project_type)"
+			:accept="acceptFileFromProjectType(projectV2.project_type)"
 			:max-size="524288000"
 			@change="handleNewFiles"
 		/>
@@ -35,37 +35,20 @@
 </template>
 
 <script setup lang="ts">
-import { Admonition, DropzoneFileInput } from '@modrinth/ui'
+import { Admonition, DropzoneFileInput, injectProjectPageContext } from '@modrinth/ui'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 import { useManageVersion } from '~/composables/versions/manage-version'
-import { inferVersionInfo } from '~/helpers/infer'
-import { injectVersionsContext } from '~/providers/versions'
 import VersionFileRow from '../components/VersionFileRow.vue'
-const { project } = injectVersionsContext()
+
+const { projectV2 } = injectProjectPageContext()
 const { formatMessage } = useVIntl()
 
-const tags = useGeneratedState()
-
-const { draftVersion, setPrimaryFile } = useManageVersion()
-
-// should be in infer.js, but gotta refactor that to ts first
-interface InferredVersionInfo {
-	name?: string
-	version_number?: string
-	version_type?: 'alpha' | 'beta' | 'release'
-	loaders?: string[]
-	game_versions?: string[]
-}
+const { draftVersion, setPrimaryFile, setInferredVersionData } = useManageVersion()
 
 const addDetectedData = async () => {
 	try {
 		const primaryFile = draftVersion.value.files[0]
-		const inferredData = (await inferVersionInfo(
-			primaryFile,
-			project,
-			tags.value.gameVersions,
-		)) as InferredVersionInfo
-
+		const inferredData = await setInferredVersionData(primaryFile, projectV2.value)
 		const mappedInferredData = {
 			...inferredData,
 			version_title: inferredData.name || '',

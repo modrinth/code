@@ -10,9 +10,6 @@
 				:never-empty="false"
 				:capitalize="true"
 			/>
-			<!-- :format-label="
-					(item) => (item === 'Release' ? formatMessage(messages.release) : item === 'Alpha' ? formatMessage(messages.alpha) : formatMessage(messages.beta))
-				" -->
 		</div>
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">
@@ -26,12 +23,10 @@
 				autocomplete="off"
 				maxlength="32"
 			/>
-			<span> The version number appears as the version name and used by the API. </span>
+			<span> The version number differentiates this specific version from others. </span>
 		</div>
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">
-				Version subtitle <span class="text-red">*</span>
-			</span>
+			<span class="font-semibold text-contrast"> Version subtitle </span>
 			<input
 				id="version-number"
 				v-model="draftVersion.version_title"
@@ -40,7 +35,6 @@
 				autocomplete="off"
 				maxlength="32"
 			/>
-			<span> The version subtitle also displays in the changelog. </span>
 		</div>
 	</div>
 </template>
