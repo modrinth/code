@@ -1,7 +1,7 @@
 <template>
 	<div
 		v-if="filteredNotices.length > 0"
-		class="experimental-styles-within relative mx-auto flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6 mb-4"
+		class="experimental-styles-within relative mx-auto mb-4 flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
 	>
 		<ServerNotice
 			v-for="notice in filteredNotices"
