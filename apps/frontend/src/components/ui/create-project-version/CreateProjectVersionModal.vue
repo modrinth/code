@@ -68,18 +68,18 @@ function getNextLabel() {
 	const next = visibleStages[currentStageIndex + 1]
 	if (!next) return 'Done'
 
-	switch (next.title) {
-		case 'Add Details':
+	switch (next.id) {
+		case 'add-details':
 			return 'Add details'
-		case 'Add Files':
+		case 'add-files':
 			return 'Add files'
-		case 'Add loaders':
+		case 'add-loaders':
 			return 'Set loaders'
-		case 'Add MC Versions':
+		case 'add-mc-versions':
 			return 'Set MC versions'
-		case 'Add Dependencies':
+		case 'add-dependencies':
 			return 'Set dependencies'
-		case 'Add Changelog':
+		case 'add-changelog':
 			return 'Add changelog'
 		default:
 			return 'Next'
@@ -91,6 +91,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 		[
 			{
 				title: 'Add files',
+				id: 'add-files',
 				stageContent: AddFilesStage,
 				leftButtonConfig: {
 					...defaultBackButton,
@@ -107,6 +108,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			},
 			{
 				title: 'Add details',
+				id: 'add-details',
 				stageContent: AddDetailsStage,
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
@@ -117,6 +119,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			},
 			hideAddLoadersStage.value === false && {
 				title: 'Add loaders',
+				id: 'add-loaders',
 				stageContent: AddLoadersStage,
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
@@ -127,6 +130,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			},
 			hideAddMcVersionsStage.value === false && {
 				title: 'Add MC versions',
+				id: 'add-mc-versions',
 				stageContent: AddMcVersionsStage,
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
@@ -137,6 +141,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			},
 			hideAddDependenciesStage.value === false && {
 				title: 'Add dependencies',
+				id: 'add-dependencies',
 				stageContent: AddDependenciesStage,
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
@@ -146,6 +151,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			},
 			{
 				title: 'Add changelog',
+				id: 'add-changelog',
 				stageContent: AddChangelogStage,
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
@@ -159,11 +165,12 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			},
 			{
 				title: 'Edit loaders',
+				id: 'edit-loaders',
 				stageContent: AddLoadersStage,
 				leftButtonConfig: {
 					...defaultBackButton,
 					label: 'Save',
-					onClick: () => modal.value?.setStage(1),
+					onClick: () => modal.value?.setStage('add-details'),
 				},
 				rightButtonConfig: {
 					...defaultNextButton,
@@ -173,11 +180,12 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			},
 			{
 				title: 'Edit MC versions',
+				id: 'edit-mc-versions',
 				stageContent: AddMcVersionsStage,
 				leftButtonConfig: {
 					...defaultBackButton,
 					label: 'Save',
-					onClick: () => modal.value?.setStage(1),
+					onClick: () => modal.value?.setStage('add-details'),
 				},
 				rightButtonConfig: {
 					...defaultNextButton,
@@ -187,8 +195,6 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			},
 		].filter(Boolean) as InstanceType<typeof MultiStageModal>['$props']['stages'],
 )
-
-watch(stages, () => console.log(stages.value))
 
 const client = injectModrinthClient()
 

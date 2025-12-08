@@ -70,6 +70,7 @@ export interface ButtonConfig {
 
 export interface ModalStage {
 	title: string
+	id: string
 	stageContent: Component
 	leftButtonConfig: ButtonConfig | null
 	rightButtonConfig: ButtonConfig | null
@@ -86,9 +87,16 @@ function hide() {
 	modal.value?.hide()
 }
 
-const setStage = (index: number) => {
-	if (index < 0 || index >= props.stages.length) return
-	currentStageIndex.value = index
+const setStage = (indexOrId: number | string) => {
+	if (typeof indexOrId === 'number') {
+		const index = indexOrId
+		if (index < 0 || index >= props.stages.length) return
+		currentStageIndex.value = index
+	} else {
+		const index = props.stages.findIndex((stage) => stage.id === indexOrId)
+		if (index === -1) return
+		currentStageIndex.value = index
+	}
 }
 
 const nextStage = () => {
@@ -127,6 +135,5 @@ defineExpose({
 	nextStage,
 	prevStage,
 	currentStageIndex,
-	stages: props.stages,
 })
 </script>

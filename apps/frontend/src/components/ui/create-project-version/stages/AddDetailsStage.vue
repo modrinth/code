@@ -121,13 +121,9 @@ const loaders = computed(() => generatedState.value.loaders)
 const createVersionModal = inject<Ref<InstanceType<typeof MultiStageModal>>>('createVersionModal')
 
 const editLoaders = () => {
-	createVersionModal?.value?.setStage(
-		createVersionModal?.value?.stages.findIndex((stage) => stage.title === 'Edit loaders'),
-	)
+	createVersionModal?.value?.setStage('edit-loaders')
 }
 const editVersions = () => {
-	createVersionModal?.value?.setStage(
-		createVersionModal?.value?.stages.findIndex((stage) => stage.title === 'Edit MC versions'),
-	)
+	createVersionModal?.value?.setStage('edit-mc-versions')
 }
 </script>
