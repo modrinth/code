@@ -55,7 +55,7 @@ const collapsed = defineModel<boolean>('collapsed', { default: true })
 .collapsible-region-content {
 	display: grid;
 	grid-template-rows: 0fr;
-	transition: grid-template-rows 0.3s ease-in-out;
+	transition: grid-template-rows 0.3s linear;
 }
 
 @media (prefers-reduced-motion) {
@@ -71,7 +71,7 @@ const collapsed = defineModel<boolean>('collapsed', { default: true })
 .collapsible-region-content > div {
 	overflow: hidden;
 	min-height: var(--collapsed-height);
-	transition: min-height 0.3s;
+	transition: min-height 0.3s linear;
 }
 
 .collapsible-region-content.open > div {

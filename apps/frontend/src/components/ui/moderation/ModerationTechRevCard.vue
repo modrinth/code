@@ -578,7 +578,7 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 					collapse-text="Collapse thread"
 					class="border-x border-b border-solid border-surface-3"
 				>
-					<div class="bg-surface-2 p-4">
+					<div class="bg-surface-2 p-4 pt-0">
 						<!-- DEV-531 -->
 						<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
 						<ThreadView
