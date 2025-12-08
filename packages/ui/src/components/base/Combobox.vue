@@ -108,7 +108,7 @@
 				</div>
 
 				<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
-					No results found
+					{{ noOptionsMessage }}
 				</div>
 			</div>
 		</Teleport>
@@ -169,6 +169,7 @@ const props = withDefaults(
 		extraPosition?: 'top' | 'bottom'
 		triggerClass?: string
 		forceDirection?: 'up' | 'down'
+		noOptionsMessage?: string
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -179,6 +180,7 @@ const props = withDefaults(
 		showChevron: true,
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		extraPosition: 'bottom',
+		noOptionsMessage: 'No results found',
 	},
 )
 

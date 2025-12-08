@@ -2,7 +2,7 @@
 	<div class="grid gap-6">
 		<div class="flex flex-col gap-4">
 			<span class="font-semibold text-contrast">Add dependency</span>
-			<div class="grid gap-3 rounded-2xl border border-solid border-surface-5 p-4">
+			<div class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 p-4">
 				<div class="grid gap-2.5">
 					<span class="font-semibold text-contrast">Project <span class="text-red">*</span></span>
 					<ModSelect v-model="newDependencyProjectId" />
@@ -32,24 +32,27 @@
 							]"
 						/>
 					</div>
+
+					<ButtonStyled>
+						<button
+							class="self-start"
+							:disabled="!newDependencyProjectId"
+							@click="
+								() =>
+									addDependency(
+										toRaw({
+											project_id: newDependencyProjectId,
+											version_id: newDependencyVersionId || undefined,
+											dependency_type: newDependencyType,
+										}),
+									)
+							"
+						>
+							Add Dependency
+						</button>
+					</ButtonStyled>
 				</template>
 			</div>
-			<ButtonStyled>
-				<button
-					class="self-start"
-					:disabled="!newDependencyProjectId"
-					@click="
-						() =>
-							addDependency({
-								project_id: newDependencyProjectId,
-								version_id: newDependencyVersionId || undefined,
-								dependency_type: newDependencyType,
-							})
-					"
-				>
-					Add Dependency
-				</button>
-			</ButtonStyled>
 		</div>
 
 		<div v-if="addedDependencies.length" class="flex flex-col gap-4">
@@ -169,7 +172,7 @@ const addedDependencies = computed(() =>
 			projectId: dep.project_id,
 			name: dependencyProject?.name || 'Unknown Project',
 			icon: dependencyProject?.icon_url,
-			dependencyType: 'required' as const,
+			dependencyType: dep.dependency_type,
 			versionName,
 		}
 	}),
@@ -192,12 +195,7 @@ const addDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
 		return
 	}
 
-	draftVersion.value.dependencies.push({
-		project_id: dependency.project_id,
-		version_id: dependency.version_id,
-		dependency_type: dependency.dependency_type,
-	})
-
+	draftVersion.value.dependencies.push(dependency)
 	newDependencyProjectId.value = undefined
 }
 

@@ -5,6 +5,7 @@
 		:options="options"
 		:searchable="true"
 		search-placeholder="Search by name, slug, or paste ID..."
+		:noOptionsMessage="searchLoading ? 'Loading...' : 'No results found'"
 		@search-input="(query) => handleSearch(query)"
 	/>
 </template>
@@ -18,6 +19,7 @@ import { defineAsyncComponent, h } from 'vue'
 const { addNotification } = injectNotificationManager()
 const projectId = defineModel<string>()
 
+const searchLoading = ref(false)
 const options = ref<DropdownOption<string>[]>([])
 
 const client = injectModrinthClient()
@@ -26,7 +28,12 @@ let searchTimeout: ReturnType<typeof setTimeout> | null = null
 const handleSearch = async (query: string) => {
 	if (searchTimeout) clearTimeout(searchTimeout)
 
-	if (!query.trim()) return
+	if (!query.trim()) {
+		searchLoading.value = false
+		return
+	}
+
+	searchLoading.value = true
 
 	searchTimeout = setTimeout(async () => {
 		try {
@@ -50,6 +57,8 @@ const handleSearch = async (query: string) => {
 					}),
 				),
 			}))
+
+			searchLoading.value = false
 		} catch (error: any) {
 			addNotification({
 				title: 'An error occurred',
