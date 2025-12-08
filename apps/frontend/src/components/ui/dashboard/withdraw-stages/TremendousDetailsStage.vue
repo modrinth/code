@@ -115,6 +115,12 @@
 				{{ formatMoney(selectedMethodDetails.interval?.standard?.max ?? effectiveMaxAmount) }}
 				max withdrawal amount.
 			</span>
+			<span
+				v-if="selectedMethodDetails && effectiveMinAmount > roundedMaxAmount"
+				class="text-sm text-red"
+			>
+				You need at least {{ formatMoney(effectiveMinAmount) }} to use this gift card.
+			</span>
 		</div>
 
 		<div class="flex flex-col gap-2.5">
@@ -391,23 +397,45 @@ const selectedMethodDetails = computed(() => {
 })
 
 const useFixedDenominations = computed(() => {
-	const hasFixed = !!selectedMethodDetails.value?.interval?.fixed?.values
-	debug('Use fixed denominations:', hasFixed, selectedMethodDetails.value?.interval)
-	return hasFixed
+	const interval = selectedMethodDetails.value?.interval
+	if (!interval) return false
+
+	if (interval.fixed?.values?.length) {
+		debug('Use fixed denominations: true (has fixed values)')
+		return true
+	}
+
+	// treat min=max as single fixed value
+	if (interval.standard) {
+		const { min, max } = interval.standard
+		const isSingleValue = min === max
+		debug('Use fixed denominations:', isSingleValue, '(min=max:', min, '=', max, ')')
+		return isSingleValue
+	}
+	return false
 })
 
 const denominationOptions = computed(() => {
-	const fixedValues = selectedMethodDetails.value?.interval?.fixed?.values
-	if (!fixedValues) return []
+	const interval = selectedMethodDetails.value?.interval
+	if (!interval) return []
 
-	const filtered = fixedValues
-		.filter((amount) => amount <= roundedMaxAmount.value)
-		.sort((a, b) => a - b)
+	let values: number[] = []
+
+	if (interval.fixed?.values) {
+		values = [...interval.fixed.values]
+	} else if (interval.standard && interval.standard.min === interval.standard.max) {
+		// min=max case: treat as single fixed value
+		values = [interval.standard.min]
+	}
+
+	if (values.length === 0) return []
+
+	const filtered = values.filter((amount) => amount <= roundedMaxAmount.value).sort((a, b) => a - b)
 	debug(
 		'Denomination options (filtered by max):',
 		filtered,
 		'from',
-		fixedValues,
+		values,
 		'max:',
 		roundedMaxAmount.value,
 	)
