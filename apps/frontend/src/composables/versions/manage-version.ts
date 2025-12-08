@@ -37,6 +37,9 @@ const inferredVersionData = ref<InferredVersionInfo>()
 
 const projectType = ref<Labrinth.Projects.v2.ProjectType>()
 
+const dependencyProjects = ref<Record<string, Labrinth.Projects.v3.Project>>({})
+const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
+
 const detectedLoaders = computed(() => (inferredVersionData.value?.loaders?.length || 0) > 0)
 const detectedVersions = computed(() => (inferredVersionData.value?.game_versions?.length || 0) > 0)
 
@@ -104,6 +107,8 @@ export function useManageVersion() {
 		detectedLoaders,
 		detectedVersions,
 		projectType,
+		dependencyProjects,
+		dependencyVersions,
 		newDraftVersion,
 		setPrimaryFile,
 		setInferredVersionData,

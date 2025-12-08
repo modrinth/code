@@ -125,11 +125,8 @@ watch(newDependencyProjectId, async () => {
 	}
 })
 
-const { draftVersion } = useManageVersion()
+const { draftVersion, dependencyProjects, dependencyVersions } = useManageVersion()
 const client = injectModrinthClient()
-
-const dependencyProjects = ref<Record<string, Labrinth.Projects.v3.Project>>({})
-const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
 
 watch(
 	draftVersion,
@@ -160,22 +157,24 @@ watch(
 )
 
 const addedDependencies = computed(() =>
-	(draftVersion.value.dependencies || []).map((dep) => {
-		if (!dep.project_id) return null
+	(draftVersion.value.dependencies || [])
+		.map((dep) => {
+			if (!dep.project_id) return null
 
-		const dependencyProject = dependencyProjects.value[dep.project_id]
-		const versionName = dependencyVersions.value[dep.version_id || '']?.name ?? ''
+			const dependencyProject = dependencyProjects.value[dep.project_id]
+			const versionName = dependencyVersions.value[dep.version_id || '']?.name ?? ''
 
-		if (!dependencyProject) return null
+			if (!dependencyProject) return null
 
-		return {
-			projectId: dep.project_id,
-			name: dependencyProject?.name || 'Unknown Project',
-			icon: dependencyProject?.icon_url,
-			dependencyType: dep.dependency_type,
-			versionName,
-		}
-	}),
+			return {
+				projectId: dep.project_id,
+				name: dependencyProject?.name || 'Unknown Project',
+				icon: dependencyProject?.icon_url,
+				dependencyType: dep.dependency_type,
+				versionName,
+			}
+		})
+		.filter(Boolean),
 )
 
 const addDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
