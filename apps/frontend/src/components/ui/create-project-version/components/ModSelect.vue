@@ -57,8 +57,6 @@ const handleSearch = async (query: string) => {
 					}),
 				),
 			}))
-
-			searchLoading.value = false
 		} catch (error: any) {
 			addNotification({
 				title: 'An error occurred',
@@ -66,6 +64,7 @@ const handleSearch = async (query: string) => {
 				type: 'error',
 			})
 		}
+		searchLoading.value = false
 	}, 500)
 }
 </script>

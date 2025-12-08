@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { LeftArrowIcon, PlusIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
+import { LeftArrowIcon, PlusIcon, RightArrowIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
 	injectModrinthClient,
 	injectNotificationManager,
@@ -156,10 +156,12 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
-					icon: PlusIcon,
 					iconPosition: 'before' as const,
 					color: 'green' as const,
 					label: 'Create version',
+					icon: isSubmitting.value ? SpinnerIcon : PlusIcon,
+					iconClass: isSubmitting.value ? 'animate-spin' : undefined,
+					disabled: isSubmitting.value,
 					onClick: handleCreateVersion,
 				},
 			},
@@ -202,9 +204,12 @@ const client = injectModrinthClient()
 
 const { addNotification } = injectNotificationManager()
 
+const isSubmitting = ref(false)
+
 async function handleCreateVersion() {
 	const version = toRaw(draftVersion.value)
 	const files = version.files
+	isSubmitting.value = true
 	try {
 		await client.labrinth.versions_v3.createVersion(version, files)
 		modal.value?.hide()
@@ -222,6 +227,7 @@ async function handleCreateVersion() {
 			type: 'error',
 		})
 	}
+	isSubmitting.value = false
 }
 
 const { projectV2 } = injectProjectPageContext()
