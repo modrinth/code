@@ -365,11 +365,11 @@
   "auth.welcome.title": {
     "message": "Welcome"
   },
-  "collection.button.delete-icon": {
-    "message": "Delete icon"
-  },
   "collection.button.edit-icon": {
     "message": "Edit icon"
+  },
+  "collection.button.remove-icon": {
+    "message": "Remove icon"
   },
   "collection.button.remove-project": {
     "message": "Remove project"
@@ -401,29 +401,32 @@
   "collection.error.not-found": {
     "message": "Collection not found"
   },
-  "collection.label.collection": {
-    "message": "Collection"
-  },
   "collection.label.created-at": {
     "message": "Created {ago}"
   },
   "collection.label.curated-by": {
     "message": "Curated by"
   },
+  "collection.label.description": {
+    "message": "Description"
+  },
+  "collection.label.details": {
+    "message": "Details"
+  },
   "collection.label.no-projects": {
-    "message": "This collection has no projects!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "You don't have any projects.\nWould you like to <create-link>add one</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Owner"
+    "message": "No projects in collection yet"
   },
   "collection.label.projects-count": {
     "message": "{count, plural, =0 {No projects yet} one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Updated {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Your collections"
+  },
+  "collection.return-link.user": {
+    "message": "{user}'s profile"
   },
   "collection.title": {
     "message": "{name} - Collection"
