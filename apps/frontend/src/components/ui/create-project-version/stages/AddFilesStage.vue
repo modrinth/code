@@ -22,8 +22,8 @@
 						:key="file.name"
 						:file="file"
 						:is-primary="idx === 0"
-						@set-primary-file="setPrimaryFile(idx)"
-						@remove="onRemoveFile(idx)"
+						@set-primary-file="handleSetPrimaryFile(idx)"
+						@remove="handleRemoveFile(idx)"
 					/>
 				</div>
 				<span>
@@ -72,8 +72,13 @@ function handleNewFiles(newFiles: File[]) {
 	addDetectedData()
 }
 
-function onRemoveFile(index: number) {
+function handleRemoveFile(index: number) {
 	draftVersion.value.files.splice(index, 1)
+	addDetectedData()
+}
+
+function handleSetPrimaryFile(index: number) {
+	setPrimaryFile(index)
 	addDetectedData()
 }
 
