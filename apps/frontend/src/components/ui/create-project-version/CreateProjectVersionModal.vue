@@ -177,6 +177,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 					label: 'Save & continue',
 					onClick: () => modal.value?.setStage(2),
 				},
+				nonProgressStage: true,
 			},
 			{
 				title: 'Edit MC versions',
@@ -192,6 +193,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 					label: 'Save & continue',
 					onClick: () => modal.value?.setStage(2),
 				},
+				nonProgressStage: true,
 			},
 		].filter(Boolean) as InstanceType<typeof MultiStageModal>['$props']['stages'],
 )

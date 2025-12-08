@@ -13,6 +13,15 @@
 			</div>
 		</template>
 
+		<progress
+			id="load-bar"
+			:value="
+				((currentStageIndex + 1) / stages.filter((stage) => !stage.nonProgressStage).length) * 100
+			"
+			max="100"
+			class="w-full h-1 appearance-none border-none absolute top-0 left-0"
+		></progress>
+
 		<div class="sm:w-[512px]">
 			<component :is="currentStage.stageContent" />
 		</div>
@@ -74,6 +83,7 @@ export interface ModalStage {
 	stageContent: Component
 	leftButtonConfig: ButtonConfig | null
 	rightButtonConfig: ButtonConfig | null
+	nonProgressStage?: boolean
 }
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
@@ -137,3 +147,17 @@ defineExpose({
 	currentStageIndex,
 })
 </script>
+
+<style scoped>
+progress::-webkit-progress-bar {
+	@apply bg-surface-3;
+}
+
+progress::-webkit-progress-value {
+	@apply bg-contrast;
+}
+
+progress::-moz-progress-bar {
+	@apply bg-contrast;
+}
+</style>
