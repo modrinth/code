@@ -411,6 +411,7 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
                     );
                     Some(PayoutStatus::Failed)
                 }
+                // this will also fail any payout request which has no payouts
                 _ if payout_request
                     .payouts
                     .iter()
@@ -481,6 +482,7 @@ mod tests {
         environment::{TestEnvironment, with_test_environment},
     };
     use muralpay::MuralPayMock;
+    use rust_decimal::dec;
 
     fn create_mock_payout_request(
         id: &str,
@@ -496,7 +498,46 @@ mod tests {
             transaction_hash: None,
             memo: None,
             status,
-            payouts: vec![],
+            payouts: vec![Payout {
+                id: PayoutId(uuid::Uuid::new_v4()),
+                created_at: chrono::Utc::now(),
+                updated_at: chrono::Utc::now(),
+                amount: TokenAmount {
+                    token_amount: dec!(10.00),
+                    token_symbol: "USDC".into(),
+                },
+                details: PayoutDetails::Fiat(FiatPayoutDetails {
+                    fiat_and_rail_code: FiatAndRailCode::Usd,
+                    fiat_payout_status: FiatPayoutStatus::Pending {
+                        initiated_at: chrono::Utc::now(),
+                    },
+                    fiat_amount: FiatAmount {
+                        fiat_amount: dec!(10.00),
+                        fiat_currency_code: CurrencyCode::Usd,
+                    },
+                    transaction_fee: TokenAmount {
+                        token_amount: dec!(1.00),
+                        token_symbol: "USDC".into(),
+                    },
+                    exchange_fee_percentage: dec!(0.0),
+                    exchange_rate: dec!(1.0),
+                    fee_total: TokenAmount {
+                        token_amount: dec!(1.00),
+                        token_symbol: "USDC".into(),
+                    },
+                    developer_fee: None,
+                }),
+                recipient_info: PayoutRecipientInfo::Inline {
+                    name: "John Smith".into(),
+                    details: InlineRecipientDetails::Fiat {
+                        details: InlineFiatRecipientDetails {
+                            fiat_currency_code: CurrencyCode::Usd,
+                            bank_name: "Foo Bank".into(),
+                            truncated_bank_account_number: "1234".into(),
+                        },
+                    },
+                },
+            }],
         }
     }
 
