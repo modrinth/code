@@ -14,7 +14,7 @@
 		</template>
 
 		<progress
-			id="load-bar"
+			v-if="currentStage.nonProgressStage !== true"
 			:value="
 				((currentStageIndex + 1) / stages.filter((stage) => !stage.nonProgressStage).length) * 100
 			"
