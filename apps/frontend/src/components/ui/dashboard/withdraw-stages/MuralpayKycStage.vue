@@ -285,10 +285,21 @@ const subdivisionOptions = computed(() => {
 
 	const subdivisions = generatedState.value.subdivisions?.[selectedCountry] ?? []
 
-	return subdivisions.map((sub) => ({
-		value: sub.code.includes('-') ? sub.code.split('-')[1] : sub.code,
-		label: sub.localVariant || sub.name,
-	}))
+	// Deduplicate by code, preferring entries with localVariant (English name)
+	const deduped = new Map<string, (typeof subdivisions)[0]>()
+	for (const sub of subdivisions) {
+		const existing = deduped.get(sub.code)
+		if (!existing || (sub.localVariant && !existing.localVariant)) {
+			deduped.set(sub.code, sub)
+		}
+	}
+
+	return Array.from(deduped.values())
+		.sort((a, b) => (a.localVariant || a.name).localeCompare(b.localVariant || b.name))
+		.map((sub) => ({
+			value: sub.code,
+			label: sub.localVariant || sub.name,
+		}))
 })
 
 watch(
