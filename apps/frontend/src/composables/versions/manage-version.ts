@@ -72,6 +72,8 @@ export function useManageVersion() {
 	function newDraftVersion(projectId: string) {
 		draftVersion.value = structuredClone(EMPTY_DRAFT_VERSION)
 		draftVersion.value.project_id = projectId
+		inferredVersionData.value = undefined
+		projectType.value = undefined
 	}
 
 	function setPrimaryFile(index: number) {

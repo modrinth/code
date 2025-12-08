@@ -39,7 +39,7 @@
 
 		<template v-if="inferredVersionData?.loaders?.length">
 			<div class="flex flex-col">
-				<div class="flex justify-between">
+				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast"> Detected loaders </span>
 
 					<ButtonStyled type="transparent" size="standard">
@@ -76,7 +76,7 @@
 
 		<template v-if="inferredVersionData?.game_versions?.length">
 			<div class="flex flex-col">
-				<div class="flex justify-between">
+				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast"> Detected versions </span>
 
 					<ButtonStyled type="transparent" size="standard">
