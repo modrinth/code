@@ -142,7 +142,7 @@
 						{{ formatMessage(returnLink.message, { user: creator.username }) }}
 					</nuxt-link>
 				</ClientOnly>
-				<div class="grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_auto] gap-4">
+				<div class="grid grid-cols-[auto_1fr] gap-4 sm:grid-cols-[auto_1fr_auto]">
 					<Avatar :src="collection.icon_url" size="64px" />
 					<div class="flex flex-col gap-3">
 						<h1 class="heading-2xl">
@@ -192,7 +192,7 @@
 							</span>
 						</div>
 					</div>
-					<div class="flex gap-2 col-span-2 sm:col-span-1">
+					<div class="col-span-2 flex gap-2 sm:col-span-1">
 						<template v-if="canEdit">
 							<ButtonStyled>
 								<button @click="openEditModal">
