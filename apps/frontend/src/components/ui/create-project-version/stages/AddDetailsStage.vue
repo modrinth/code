@@ -40,7 +40,9 @@
 		<template v-if="inferredVersionData?.loaders?.length">
 			<div class="flex flex-col">
 				<div class="flex items-center justify-between">
-					<span class="font-semibold text-contrast"> Detected loaders </span>
+					<span class="font-semibold text-contrast">
+						{{ selectedIsDetectedLoaders ? 'Detected loaders' : 'Loaders' }}
+					</span>
 
 					<ButtonStyled type="transparent" size="standard">
 						<button @click="editLoaders">
@@ -59,16 +61,18 @@
 								loaders.find((loader) => selectedLoader === loader.name),
 							)"
 						>
-							<div
+							<TagItem
 								v-if="loader"
 								:key="`loader-${loader.name}`"
-								:style="`--_icon: var(--color-platform-${loader.name}); color: var(--color-platform-${loader.name})`"
-								class="flex items-center gap-2 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium"
+								class="hover:no-underline"
+								:style="`--_color: var(--color-platform-${loader.name})`"
 							>
-								<div v-html="loader.icon" class="grid place-content-center"></div>
+								<div v-html="loader.icon"></div>
 								{{ formatCategory(loader.name) }}
-							</div>
+							</TagItem>
 						</template>
+
+						<span v-if="!draftVersion.loaders.length">No loaders selected.</span>
 					</div>
 				</div>
 			</div>
@@ -77,7 +81,9 @@
 		<template v-if="inferredVersionData?.game_versions?.length">
 			<div class="flex flex-col">
 				<div class="flex items-center justify-between">
-					<span class="font-semibold text-contrast"> Detected versions </span>
+					<span class="font-semibold text-contrast">
+						{{ selectedIsDetectedVersions ? 'Detected versions' : 'Versions' }}
+					</span>
 
 					<ButtonStyled type="transparent" size="standard">
 						<button @click="editVersions">
@@ -91,13 +97,11 @@
 					class="flex flex-col gap-1.5 gap-y-4 rounded-xl border border-solid border-surface-5 p-3 py-4"
 				>
 					<div class="flex flex-wrap gap-2">
-						<div
-							v-for="version in draftVersion.game_versions"
-							:key="version"
-							class="flex items-center gap-2 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium"
-						>
+						<TagItem v-for="version in draftVersion.game_versions" :key="version">
 							{{ version }}
-						</div>
+						</TagItem>
+
+						<span v-if="!draftVersion.game_versions.length">No versions selected.</span>
 					</div>
 				</div>
 			</div>
@@ -107,7 +111,7 @@
 
 <script lang="ts" setup>
 import { EditIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips } from '@modrinth/ui'
+import { ButtonStyled, Chips, TagItem } from '@modrinth/ui'
 import type MultiStageModal from '@modrinth/ui/src/components/base/MultiStageModal.vue'
 import { formatCategory } from '@modrinth/utils'
 import { useGeneratedState } from '~/composables/generated'
@@ -126,4 +130,28 @@ const editLoaders = () => {
 const editVersions = () => {
 	createVersionModal?.value?.setStage('edit-mc-versions')
 }
+
+const selectedIsDetectedVersions = computed(() => {
+	if (!inferredVersionData.value?.game_versions) return false
+
+	const versionsMatch =
+		draftVersion.value.game_versions.length === inferredVersionData.value.game_versions.length &&
+		draftVersion.value.game_versions.every((version) =>
+			inferredVersionData.value?.game_versions?.includes(version),
+		)
+
+	return versionsMatch
+})
+
+const selectedIsDetectedLoaders = computed(() => {
+	if (!inferredVersionData.value?.loaders) return false
+
+	const loadersMatch =
+		draftVersion.value.loaders.length === inferredVersionData.value.loaders.length &&
+		draftVersion.value.loaders.every((loader) =>
+			inferredVersionData.value?.loaders?.includes(loader),
+		)
+
+	return loadersMatch
+})
 </script>

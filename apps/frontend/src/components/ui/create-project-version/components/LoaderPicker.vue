@@ -23,7 +23,7 @@
 						:class="
 							selectedLoaders.includes(loader.name)
 								? 'border-brand bg-highlight-green text-brand'
-								: 'border-transparent'
+								: 'border-surface-5'
 						"
 						:style="`--_color: var(--color-platform-${loader.name})`"
 					>

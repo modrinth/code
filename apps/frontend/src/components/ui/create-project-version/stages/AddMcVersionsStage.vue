@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col gap-6">
 		<McVersionPicker v-model="draftVersion.game_versions" :game-versions="gameVersions" />
-		<div v-if="draftVersion.game_versions.length" class="space-y-2">
+		<div v-if="draftVersion.game_versions.length">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast"> Added versions </span>
 				<ButtonStyled type="transparent" size="standard">
@@ -13,12 +13,15 @@
 			>
 				<div class="flex flex-wrap gap-2">
 					<template v-if="draftVersion.game_versions.length">
-						<ButtonStyled v-for="version in draftVersion.game_versions" :key="version" type="chip">
-							<button class="w-max" @click="toggleVersion(version)">
-								{{ version }}
-								<XIcon />
-							</button>
-						</ButtonStyled>
+						<TagItem
+							v-for="version in draftVersion.game_versions"
+							:key="version"
+							:action="() => toggleVersion(version)"
+							class="!transition-all hover:bg-button-bgHover hover:no-underline"
+						>
+							{{ version }}
+							<XIcon />
+						</TagItem>
 					</template>
 					<template v-else>
 						<span>No versions selected.</span>
@@ -31,10 +34,8 @@
 
 <script lang="ts" setup>
 import { XIcon } from '@modrinth/assets'
-import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
-
+import { ButtonStyled, TagItem } from '@modrinth/ui'
 import { useManageVersion } from '~/composables/versions/manage-version'
-
 import McVersionPicker from '../components/McVersionPicker.vue'
 
 const generatedState = useGeneratedState()

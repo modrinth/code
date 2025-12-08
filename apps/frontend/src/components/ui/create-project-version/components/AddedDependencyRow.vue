@@ -7,11 +7,10 @@
 			<span class="overflow-hidden font-semibold text-contrast">
 				{{ name }}
 			</span>
-			<div
-				class="rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium capitalize"
-			>
+
+			<TagItem class="border !border-solid border-surface-5">
 				{{ dependencyType }}
-			</div>
+			</TagItem>
 		</div>
 
 		<span class="text-ellipsis whitespace-nowrap font-medium">{{ versionName }}</span>
@@ -29,7 +28,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { XIcon } from '@modrinth/assets'
-import { Avatar, ButtonStyled } from '@modrinth/ui'
+import { Avatar, ButtonStyled, TagItem } from '@modrinth/ui'
 
 const emit = defineEmits<{
 	(e: 'fileTypeChange', type: string): void

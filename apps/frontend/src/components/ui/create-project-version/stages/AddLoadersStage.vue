@@ -22,12 +22,12 @@
 							v-if="loader"
 							:key="`loader-${loader.name}`"
 							:action="() => toggleLoader(loader.name)"
-							class="hover:no-underline"
+							class="border !border-solid border-surface-5 !transition-all hover:bg-button-bgHover hover:no-underline"
 							:style="`--_color: var(--color-platform-${loader.name})`"
 						>
 							<div v-html="loader.icon"></div>
 							{{ formatCategory(loader.name) }}
-							<XIcon class="text-primary" />
+							<XIcon class="text-secondary" />
 						</TagItem>
 					</template>
 				</div>
