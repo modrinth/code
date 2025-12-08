@@ -261,7 +261,7 @@
 				</ContentPageHeader>
 			</div>
 			<div class="normal-page__content">
-				<div v-if="navLinks.length >= 2" class="mb-4 max-w-full overflow-x-auto">
+				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
 					<NavTabs :links="navLinks" />
 				</div>
 				<div v-if="projects.length > 0">
@@ -337,7 +337,7 @@
 						class="card collection-item"
 					>
 						<div class="collection">
-							<Avatar :src="collection.icon_url" class="icon" />
+							<Avatar :src="collection.icon_url" size="64px" />
 							<div class="details">
 								<h2 class="title">{{ collection.name }}</h2>
 								<div class="stats">

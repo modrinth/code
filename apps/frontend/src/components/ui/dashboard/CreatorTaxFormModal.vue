@@ -158,12 +158,18 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Admonition, ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
+import {
+	Admonition,
+	ButtonStyled,
+	Chips,
+	injectNotificationManager,
+	NewModal,
+	normalizeChildren,
+} from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 
 import { type FormRequestResponse, useAvalara1099 } from '@/composables/avalara1099'
-import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const props = withDefaults(
 	defineProps<{

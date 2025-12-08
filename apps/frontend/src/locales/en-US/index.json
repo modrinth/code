@@ -374,11 +374,17 @@
   "collection.button.remove-project": {
     "message": "Remove project"
   },
+  "collection.button.replace-icon": {
+    "message": "Replace icon"
+  },
+  "collection.button.select-icon": {
+    "message": "Select icon"
+  },
   "collection.button.unfollow-project": {
     "message": "Unfollow project"
   },
   "collection.delete-modal.description": {
-    "message": "This will remove this collection forever. This action cannot be undone."
+    "message": "This will permanently delete this collection. This action cannot be undone."
   },
   "collection.delete-modal.title": {
     "message": "Are you sure you want to delete this collection?"
@@ -388,6 +394,9 @@
   },
   "collection.description.following": {
     "message": "Auto-generated collection of all the projects you're following."
+  },
+  "collection.editing": {
+    "message": "Editing collection"
   },
   "collection.error.not-found": {
     "message": "Collection not found"
@@ -411,7 +420,7 @@
     "message": "Owner"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
+    "message": "{count, plural, =0 {No projects yet} one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Updated {ago}"

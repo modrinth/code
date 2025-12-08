@@ -437,6 +437,10 @@ export const commonProjectTypeCategoryMessages = defineMessages({
 		id: 'project-type.server.category',
 		defaultMessage: 'Servers',
 	},
+	project: {
+		id: 'project-type.project.category',
+		defaultMessage: 'Projects',
+	}
 })
 
 export const commonProjectTypeTitleMessages = defineMessages({
@@ -468,6 +472,10 @@ export const commonProjectTypeTitleMessages = defineMessages({
 		id: 'project-type.server.capital',
 		defaultMessage: '{count, plural, one {Server} other {Servers}}',
 	},
+	project: {
+		id: 'project-type.project.lowercase',
+		defaultMessage: '{count, plural, one {Project} other {Projects}}',
+	},
 })
 
 export const commonProjectTypeSentenceMessages = defineMessages({
@@ -498,6 +506,10 @@ export const commonProjectTypeSentenceMessages = defineMessages({
 	server: {
 		id: 'project-type.server.lowercase',
 		defaultMessage: '{count, plural, one {server} other {servers}}',
+	},
+	project: {
+		id: 'project-type.project.lowercase',
+		defaultMessage: '{count, plural, one {project} other {projects}}',
 	},
 })
 
