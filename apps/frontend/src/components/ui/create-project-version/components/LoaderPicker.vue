@@ -15,21 +15,21 @@
 		>
 			<div v-if="groupedLoaders[loaderGroup].length" class="flex flex-col gap-1.5">
 				<div class="flex flex-wrap gap-2">
-					<ButtonStyled
+					<TagItem
 						v-for="loader in groupedLoaders[loaderGroup]"
 						:key="`loader-${loader.name}`"
-						:color="selectedLoaders.includes(loader.name) ? 'green' : undefined"
-						:highlighted="selectedLoaders.includes(loader.name)"
-						type="chip"
+						:action="() => toggleLoader(loader.name)"
+						class="border !border-solid hover:no-underline"
+						:class="
+							selectedLoaders.includes(loader.name)
+								? 'border-brand bg-highlight-green text-brand'
+								: 'border-transparent'
+						"
+						:style="`--_color: var(--color-platform-${loader.name})`"
 					>
-						<button
-							:style="`--_icon: var(--color-platform-${loader.name}); color: var(--color-platform-${loader.name})`"
-							@click="toggleLoader(loader.name)"
-						>
-							<div v-html="loader.icon"></div>
-							{{ formatCategory(loader.name) }}
-						</button>
-					</ButtonStyled>
+						<div v-html="loader.icon"></div>
+						{{ formatCategory(loader.name) }}
+					</TagItem>
 				</div>
 			</div>
 		</div>
@@ -40,8 +40,7 @@
 
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
-import { Chips } from '@modrinth/ui'
-import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
+import { Chips, TagItem } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 
 const selectedLoaders = defineModel<string[]>({ default: [] })

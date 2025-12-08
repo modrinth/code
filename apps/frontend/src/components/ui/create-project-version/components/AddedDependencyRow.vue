@@ -7,7 +7,9 @@
 			<span class="overflow-hidden font-semibold text-contrast">
 				{{ name }}
 			</span>
-			<div class="rounded-full border border-solid px-2.5 py-1 font-medium capitalize">
+			<div
+				class="rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1 text-sm font-medium capitalize"
+			>
 				{{ dependencyType }}
 			</div>
 		</div>

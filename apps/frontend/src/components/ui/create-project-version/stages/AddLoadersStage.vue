@@ -18,16 +18,17 @@
 							loaders.find((loader) => loaderName === loader.name),
 						)"
 					>
-						<ButtonStyled v-if="loader" :key="`loader-${loader.name}`" type="chip">
-							<button
-								:style="`--_icon: var(--color-platform-${loader.name}); color: var(--color-platform-${loader.name})`"
-								@click="toggleLoader(loader.name)"
-							>
-								<div v-html="loader.icon"></div>
-								{{ formatCategory(loader.name) }}
-								<XIcon class="text-primary" />
-							</button>
-						</ButtonStyled>
+						<TagItem
+							v-if="loader"
+							:key="`loader-${loader.name}`"
+							:action="() => toggleLoader(loader.name)"
+							class="hover:no-underline"
+							:style="`--_color: var(--color-platform-${loader.name})`"
+						>
+							<div v-html="loader.icon"></div>
+							{{ formatCategory(loader.name) }}
+							<XIcon class="text-primary" />
+						</TagItem>
 					</template>
 				</div>
 			</div>
@@ -38,6 +39,7 @@
 <script lang="ts" setup>
 import { XIcon } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
+import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
 import { formatCategory } from '@modrinth/utils'
 import { useManageVersion } from '~/composables/versions/manage-version'
 import LoaderPicker from '../components/LoaderPicker.vue'
