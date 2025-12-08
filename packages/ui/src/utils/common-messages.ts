@@ -440,7 +440,7 @@ export const commonProjectTypeCategoryMessages = defineMessages({
 	project: {
 		id: 'project-type.project.category',
 		defaultMessage: 'Projects',
-	}
+	},
 })
 
 export const commonProjectTypeTitleMessages = defineMessages({

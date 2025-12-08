@@ -17,8 +17,8 @@
 	</div>
 </template>
 <script setup lang="ts" generic="T">
-import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets';
-import { computed } from 'vue';
+import { RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
+import { computed } from 'vue'
 
 const props = withDefaults(
 	defineProps<{
