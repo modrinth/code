@@ -5,13 +5,12 @@
 <script setup lang="ts">
 import { LeftArrowIcon, PlusIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
 import {
-	commonMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	MultiStageModal,
 } from '@modrinth/ui'
-import { defineMessages } from '@vintl/vintl'
+import { provide } from 'vue'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
 
@@ -22,54 +21,16 @@ import AddFilesStage from './stages/AddFilesStage.vue'
 import AddLoadersStage from './stages/AddLoadersStage.vue'
 import AddMcVersionsStage from './stages/AddMcVersionsStage.vue'
 
-const { newDraftVersion, draftVersion } = useManageVersion()
-
-const { formatMessage } = useVIntl()
+const { newDraftVersion, draftVersion, detectedLoaders, detectedVersions, projectType } =
+	useManageVersion()
 
 const modal = useTemplateRef<InstanceType<typeof MultiStageModal>>('modal')
 
-const messages = defineMessages({
-	addFilesTitle: {
-		id: 'create-project-version.stage.add-files.title',
-		defaultMessage: 'Add Files',
-	},
-	addDetailsTitle: {
-		id: 'create-project-version.stage.add-details.title',
-		defaultMessage: 'Add Details',
-	},
-	addMcVersionsTitle: {
-		id: 'create-project-version.stage.add-mc-versions.title',
-		defaultMessage: 'Add MC Versions',
-	},
-	addChangelogTitle: {
-		id: 'create-project-version.stage.add-changelog.title',
-		defaultMessage: 'Add Changelog',
-	},
-	addDependenciesTitle: {
-		id: 'create-project-version.stage.add-dependencies.title',
-		defaultMessage: 'Add Dependencies',
-	},
-	addDetailsButton: {
-		id: 'create-project-version.button.add-details',
-		defaultMessage: 'Add details',
-	},
-	addMcVersionsButton: {
-		id: 'create-project-version.button.add-mc-versions',
-		defaultMessage: 'Add MC versions',
-	},
-	addChangelogButton: {
-		id: 'create-project-version.button.add-changelog',
-		defaultMessage: 'Add changelog',
-	},
-	addDependenciesButton: {
-		id: 'create-project-version.button.add-dependencies',
-		defaultMessage: 'Add dependencies',
-	},
-})
+provide('createVersionModal', modal)
 
 const defaultNextButton = {
 	icon: RightArrowIcon,
-	label: formatMessage(commonMessages.nextButton),
+	label: 'Next',
 	disabled: false,
 	color: 'standard' as const,
 	iconPosition: 'after' as const,
@@ -78,7 +39,7 @@ const defaultNextButton = {
 
 const defaultBackButton = {
 	icon: LeftArrowIcon,
-	label: formatMessage(commonMessages.backButton),
+	label: 'Back',
 	disabled: false,
 	color: 'standard' as const,
 	iconPosition: 'before' as const,
@@ -92,11 +53,44 @@ const addDetailsNextDisabled = computed(() => draftVersion.value.version_number.
 const addLoadersNextDisabled = computed(() => draftVersion.value.loaders.length === 0)
 const addMcVersionsNextDisabled = computed(() => draftVersion.value.game_versions.length === 0)
 
+const hideAddLoadersStage = computed(
+	() => projectType.value === 'resourcepack' || detectedLoaders.value,
+)
+const hideAddMcVersionsStage = computed(() => detectedVersions.value)
+
+const hideAddDependenciesStage = computed(() => projectType.value === 'modpack')
+
+function getNextLabel() {
+	const currentStageIndex = modal.value?.currentStageIndex || 0
+	const visibleStages = stages.value
+	if (!visibleStages) return 'Next'
+
+	const next = visibleStages[currentStageIndex + 1]
+	if (!next) return 'Done'
+
+	switch (next.title) {
+		case 'Add Details':
+			return 'Add details'
+		case 'Add Files':
+			return 'Add files'
+		case 'Add loaders':
+			return 'Set loaders'
+		case 'Add MC Versions':
+			return 'Set MC versions'
+		case 'Add Dependencies':
+			return 'Set dependencies'
+		case 'Add Changelog':
+			return 'Add changelog'
+		default:
+			return 'Next'
+	}
+}
+
 const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']>(
 	() =>
 		[
 			{
-				title: formatMessage(messages.addFilesTitle),
+				title: 'Add files',
 				stageContent: AddFilesStage,
 				leftButtonConfig: {
 					...defaultBackButton,
@@ -108,54 +102,51 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				rightButtonConfig: {
 					...defaultNextButton,
 					disabled: addFilesNextDisabled.value,
-					label: formatMessage(messages.addDetailsButton),
+					label: getNextLabel(),
 				},
 			},
 			{
-				title: formatMessage(messages.addDetailsTitle),
+				title: 'Add details',
 				stageContent: AddDetailsStage,
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
 					disabled: addDetailsNextDisabled.value,
-					label: 'Set loaders',
-					onClick: () => {
-						// if has detected loaders, skip step (jump straight to next step)
-						// check if has detected versions
-						// -true: go to dependencies
-						// -else: go to version picker
-						// if has detected versions skip step (jump straight to next step)
-						// check if has detected loaders
-						// -true: go to dependencies
-						// -else: go to loaders select
-					},
+					label: getNextLabel(),
 				},
 			},
-			{
-				// dont show for resource packs
+			hideAddLoadersStage.value === false && {
 				title: 'Add loaders',
 				stageContent: AddLoadersStage,
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
 					disabled: addLoadersNextDisabled.value,
-					label: 'Set MC versions',
+					label: getNextLabel(),
 				},
 			},
-			{
-				title: formatMessage(messages.addMcVersionsTitle),
+			hideAddMcVersionsStage.value === false && {
+				title: 'Add MC versions',
 				stageContent: AddMcVersionsStage,
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
 					disabled: addMcVersionsNextDisabled.value,
-					label: formatMessage(messages.addChangelogButton),
+					label: getNextLabel(),
+				},
+			},
+			hideAddDependenciesStage.value === false && {
+				title: 'Add dependencies',
+				stageContent: AddDependenciesStage,
+				leftButtonConfig: { ...defaultBackButton },
+				rightButtonConfig: {
+					...defaultNextButton,
+					label: getNextLabel(),
 				},
 			},
 			{
-				// skip this step for modpacks
-				title: formatMessage(messages.addDependenciesTitle),
-				stageContent: AddDependenciesStage,
+				title: 'Add changelog',
+				stageContent: AddChangelogStage,
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
@@ -167,16 +158,38 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				},
 			},
 			{
-				title: formatMessage(messages.addChangelogTitle),
-				stageContent: AddChangelogStage,
-				leftButtonConfig: { ...defaultBackButton },
+				title: 'Edit loaders',
+				stageContent: AddLoadersStage,
+				leftButtonConfig: {
+					...defaultBackButton,
+					label: 'Save',
+					onClick: () => modal.value?.setStage(1),
+				},
 				rightButtonConfig: {
 					...defaultNextButton,
-					label: formatMessage(messages.addDependenciesButton),
+					label: 'Save & continue',
+					onClick: () => modal.value?.setStage(2),
 				},
 			},
-		] as InstanceType<typeof MultiStageModal>['$props']['stages'],
+			{
+				title: 'Edit MC versions',
+				stageContent: AddMcVersionsStage,
+				leftButtonConfig: {
+					...defaultBackButton,
+					label: 'Save',
+					onClick: () => modal.value?.setStage(1),
+				},
+				rightButtonConfig: {
+					...defaultNextButton,
+					label: 'Save & continue',
+					onClick: () => modal.value?.setStage(2),
+				},
+			},
+		].filter(Boolean) as InstanceType<typeof MultiStageModal>['$props']['stages'],
 )
+
+watch(stages, () => console.log(stages.value))
+
 const client = injectModrinthClient()
 
 const { addNotification } = injectNotificationManager()

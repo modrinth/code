@@ -126,5 +126,7 @@ defineExpose({
 	setStage,
 	nextStage,
 	prevStage,
+	currentStageIndex,
+	stages: props.stages,
 })
 </script>
