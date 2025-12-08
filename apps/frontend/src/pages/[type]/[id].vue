@@ -1746,10 +1746,10 @@ async function patchProject(resData, quiet = false) {
 
 		await updateProjectRoute()
 
-		if (resData.license_id) {
+		if ('license_id' in resData) {
 			project.value.license.id = resData.license_id
 		}
-		if (resData.license_url) {
+		if ('license_url' in resData) {
 			project.value.license.url = resData.license_url
 		}
 
