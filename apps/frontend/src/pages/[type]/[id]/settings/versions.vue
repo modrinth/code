@@ -1,29 +1,19 @@
 <template>
 	<div>
 		<CreateProjectVersionModal ref="modal"></CreateProjectVersionModal>
-		<div class="universal-card py-4">
-			<div class="markdown-disclaimer">
-				<div class="flex items-center justify-between">
-					<span class="text-xl font-semibold text-contrast">Versions</span>
 
-					<ButtonStyled color="green">
-						<button @click="openModal"><PlusIcon /> Create version</button>
-					</ButtonStyled>
-				</div>
-			</div>
-
-			<ConfirmModal
-				v-if="currentMember"
-				ref="deleteVersionModal"
-				title="Are you sure you want to delete this version?"
-				description="This will remove this version forever (like really forever)."
-				:has-to-type="false"
-				proceed-label="Delete"
-				@proceed="deleteVersion()"
-			/>
-		</div>
+		<ConfirmModal
+			v-if="currentMember"
+			ref="deleteVersionModal"
+			title="Are you sure you want to delete this version?"
+			description="This will remove this version forever (like really forever)."
+			:has-to-type="false"
+			proceed-label="Delete"
+			@proceed="deleteVersion()"
+		/>
 
 		<ProjectPageVersions
+			v-if="versions.length > 0"
 			:project="project"
 			:versions="versions.map((v) => ({ ...v, displayUrlEnding: v.version_number }))"
 			:show-files="flags.showVersionFilesInTable"
@@ -37,6 +27,7 @@
 						project.slug ? project.slug : project.id
 					}/version/${encodeURI(version.displayUrlEnding)}`
 			"
+			:open-modal="openModal"
 		>
 			<template #actions="{ version }">
 				<ButtonStyled circular type="transparent">

@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-3 flex flex-wrap gap-2">
+	<div class="mb-3 flex flex-wrap justify-between gap-2">
 		<VersionFilterControl
 			ref="versionFilters"
 			:versions="versions"
@@ -7,12 +7,17 @@
 			:base-id="`${baseId}-filter`"
 			@update:query="updateQuery"
 		/>
+
 		<Pagination
 			:page="currentPage"
-			class="ml-auto mt-auto"
+			class="mt-auto"
 			:count="Math.ceil(filteredVersions.length / pageSize)"
 			@switch-page="switchPage"
 		/>
+
+		<ButtonStyled v-if="openModal" color="green">
+			<button @click="openModal"><PlusIcon /> Create version</button>
+		</ButtonStyled>
 	</div>
 	<div
 		v-if="versions.length > 0"
@@ -183,6 +188,8 @@ import { useVIntl } from '@vintl/vintl'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { PlusIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
 import { useRelativeTime } from '../../composables'
 import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
@@ -210,6 +217,7 @@ const props = withDefaults(
 		loaders: Labrinth.Tags.v2.Loader[]
 		gameVersions: GameVersionTag[]
 		versionLink?: (version: Version) => string
+		openModal?: () => void
 	}>(),
 	{
 		baseId: undefined,
