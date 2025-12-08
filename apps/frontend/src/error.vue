@@ -52,7 +52,12 @@
 
 <script setup>
 import { SadRinthbot } from '@modrinth/assets'
-import { NotificationPanel, provideModrinthClient, provideNotificationManager } from '@modrinth/ui'
+import {
+	NotificationPanel,
+	provideModrinthClient,
+	provideNotificationManager,
+	providePageContext,
+} from '@modrinth/ui'
 import { defineMessage, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
 
@@ -73,6 +78,10 @@ const client = createModrinthClient(auth.value, {
 	rateLimitKey: config.rateLimitKey,
 })
 provideModrinthClient(client)
+providePageContext({
+	hierarchicalSidebarAvailable: ref(false),
+	showAds: ref(false),
+})
 
 const { formatMessage } = useVIntl()
 

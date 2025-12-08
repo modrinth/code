@@ -1,395 +1,374 @@
 <template>
-	<div>
-		<ConfirmModal
-			v-if="canEdit"
-			ref="deleteModal"
-			:title="formatMessage(messages.deleteModalTitle)"
-			:description="formatMessage(messages.deleteModalDescription)"
-			:has-to-type="false"
-			:proceed-label="formatMessage(commonMessages.deleteLabel)"
-			@proceed="deleteCollection()"
-		/>
-		<div class="normal-page">
-			<div class="normal-page__sidebar">
-				<div class="card">
-					<div class="card__overlay input-group">
-						<template v-if="canEdit && isEditing === false">
-							<Button @click="isEditing = true">
-								<EditIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.editButton) }}
-							</Button>
-							<Button id="delete-collection" @click="() => $refs.deleteModal.show()">
-								<TrashIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.deleteLabel) }}
-							</Button>
-						</template>
-						<template v-else-if="canEdit && isEditing === true">
-							<PopoutMenu class="btn">
-								<EditIcon aria-hidden="true" />
-								{{ formatMessage(messages.editIconButton) }}
-								<template #menu>
-									<span class="icon-edit-menu">
-										<FileInput
-											id="project-icon"
-											:max-size="262144"
-											:show-icon="true"
-											accept="image/png,image/jpeg,image/gif,image/webp"
-											class="btn btn-transparent upload"
-											style="white-space: nowrap"
-											aria-label="Upload icon"
-											@change="showPreviewImage"
-										>
-											<UploadIcon aria-hidden="true" />
-										</FileInput>
-										<Button
-											v-if="!deletedIcon && (previewImage || collection.icon_url)"
-											style="white-space: nowrap"
-											transparent
-											@click="
-												() => {
-													deletedIcon = true
-													previewImage = null
-												}
-											"
-										>
-											<TrashIcon aria-hidden="true" />
-											{{ formatMessage(messages.deleteIconButton) }}
-										</Button>
-									</span>
-								</template>
-							</PopoutMenu>
-						</template>
-					</div>
-					<!-- Editing -->
-					<template v-if="isEditing">
-						<div class="inputs universal-labels">
-							<div class="avatar-section">
-								<Avatar
-									size="md"
-									:src="deletedIcon ? null : previewImage ? previewImage : collection.icon_url"
-								/>
+	<ConfirmModal
+		v-if="canEdit"
+		ref="deleteModal"
+		:title="formatMessage(messages.deleteModalTitle)"
+		:description="formatMessage(messages.deleteModalDescription)"
+		:has-to-type="false"
+		:proceed-label="formatMessage(commonMessages.deleteLabel)"
+		@proceed="deleteCollection()"
+	/>
+	<NewModal v-if="canEdit" ref="editModal" :header="formatMessage(messages.editingCollection)">
+		<div class="flex w-[30rem] flex-col gap-3">
+			<div class="flow-root">
+				<div class="group relative float-end ml-4">
+					<OverflowMenu
+						v-tooltip="formatMessage(messages.editIconButton)"
+						class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
+						:options="[
+							{
+								id: 'select',
+								action: () => {
+									const input = iconInputRef?.$el?.querySelector('input')
+									input?.click()
+								},
+							},
+							{
+								id: 'remove',
+								color: 'danger',
+								action: () => {
+									deletedIcon = true
+									previewImage = null
+								},
+								shown: !deletedIcon && (previewImage || collection.icon_url),
+							},
+						]"
+					>
+						<Avatar
+							:src="deletedIcon ? null : previewImage ? previewImage : collection.icon_url"
+							size="108px"
+							class="!border-4 group-hover:brightness-75"
+							no-shadow
+						/>
+						<div class="absolute right-0 top-0 m-2">
+							<div
+								class="m-0 flex aspect-square items-center justify-center rounded-full border-[1px] border-solid border-button-border bg-button-bg p-2 text-primary"
+							>
+								<EditIcon aria-hidden="true" class="h-4 w-4 text-primary" />
 							</div>
-							<label for="collection-title">
-								<span class="label__title">
-									{{ formatMessage(commonMessages.titleLabel) }}
-								</span>
-							</label>
-							<input id="collection-title" v-model="name" maxlength="255" type="text" />
-							<label for="collection-description">
-								<span class="label__title">
-									{{ formatMessage(commonMessages.descriptionLabel) }}
-								</span>
-							</label>
-							<div class="textarea-wrapper">
-								<textarea id="collection-description" v-model="summary" maxlength="255" />
-							</div>
-							<label for="visibility">
-								<span class="label__title">
-									{{ formatMessage(commonMessages.visibilityLabel) }}
-								</span>
-							</label>
-							<DropdownSelect
-								id="visibility"
-								v-model="visibility"
-								:options="['listed', 'unlisted', 'private']"
-								:disabled="visibility === 'rejected'"
-								:multiple="false"
-								:display-name="
-									(s) => {
-										if (s === 'listed') return formatMessage(commonMessages.publicLabel)
-										return formatMessage(commonMessages[`${s}Label`])
-									}
-								"
-								:searchable="false"
-							/>
 						</div>
-						<div class="push-right input-group">
-							<Button @click="isEditing = false">
-								<XIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.cancelButton) }}
-							</Button>
-							<Button color="primary" @click="saveChanges()">
-								<SaveIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.saveButton) }}
-							</Button>
-						</div>
+						<template #select>
+							<UploadIcon />
+							{{
+								previewImage || collection.icon_url
+									? formatMessage(messages.replaceIcon)
+									: formatMessage(messages.selectIcon)
+							}}
+						</template>
+						<template #remove>
+							<XIcon />
+							{{ formatMessage(messages.removeIconButton) }}
+						</template>
+					</OverflowMenu>
+					<FileInput
+						id="collection-icon-input"
+						ref="iconInputRef"
+						:max-size="262144"
+						:show-icon="false"
+						accept="image/png,image/jpeg,image/gif,image/webp"
+						class="hidden"
+						aria-label="Upload icon"
+						@change="showPreviewImage"
+					/>
+				</div>
+				<div class="overflow-hidden">
+					<label class="mb-2 block text-lg font-semibold text-contrast" for="collection-title">
+						{{ formatMessage(commonMessages.titleLabel) }}
+					</label>
+					<input
+						id="collection-title"
+						v-model="current.name"
+						maxlength="255"
+						type="text"
+						autocomplete="off"
+						class="w-full"
+					/>
+				</div>
+				<label
+					class="mb-2 mt-4 block text-lg font-semibold text-contrast"
+					for="collection-description"
+				>
+					{{ formatMessage(commonMessages.descriptionLabel) }}
+				</label>
+				<div class="textarea-wrapper h-24">
+					<textarea id="collection-description" v-model="current.description" maxlength="255" />
+				</div>
+				<label for="visibility" class="mb-2 mt-4 block text-lg font-semibold text-contrast">
+					{{ formatMessage(commonMessages.visibilityLabel) }}
+				</label>
+				<RadioButtons v-model="current.status" :items="['listed', 'unlisted', 'private']">
+					<template #default="{ item }">
+						<span class="flex items-center gap-1">
+							{{
+								item === 'listed'
+									? formatMessage(commonMessages.publicLabel)
+									: formatMessage(commonMessages[`${item}Label`])
+							}}
+						</span>
 					</template>
-					<!-- Content -->
-					<template v-if="!isEditing">
-						<div class="page-header__icon">
-							<Avatar size="md" :src="collection.icon_url" />
-						</div>
-						<div class="page-header__text">
-							<h1 class="title">{{ collection.name }}</h1>
-
-							<div>
-								<span class="collection-label">
-									<BoxIcon aria-hidden="true" />
-									{{ formatMessage(messages.collectionLabel) }}
-								</span>
-							</div>
-
-							<div class="collection-info">
-								<div class="metadata-item markdown-body collection-description">
-									<p>{{ collection.description }}</p>
-								</div>
-
-								<hr class="card-divider" />
-
-								<div v-if="canEdit" class="primary-stat">
+				</RadioButtons>
+			</div>
+			<div class="flex justify-end gap-2">
+				<ButtonStyled class="w-24">
+					<button @click="() => editModal?.hide()">
+						<XIcon aria-hidden="true" />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand" class="w-36">
+					<button :disabled="saving" @click="save()">
+						<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
+						<SaveIcon v-else aria-hidden="true" />
+						{{
+							saving
+								? formatMessage(commonMessages.savingButton)
+								: formatMessage(commonMessages.saveButton)
+						}}
+					</button>
+				</ButtonStyled>
+			</div>
+		</div>
+	</NewModal>
+	<NormalPage :sidebar="cosmetics.leftContentLayout ? 'left' : 'right'">
+		<template #header>
+			<div class="flex flex-col gap-6">
+				<ClientOnly>
+					<nuxt-link
+						v-if="returnLink"
+						:to="returnLink.link"
+						class="flex w-fit items-center gap-1 text-brand-blue hover:underline"
+					>
+						<ChevronLeftIcon aria-hidden="true" />
+						{{ formatMessage(returnLink.message, { user: creator.username }) }}
+					</nuxt-link>
+				</ClientOnly>
+				<div class="grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_auto] gap-4">
+					<Avatar :src="collection.icon_url" size="64px" />
+					<div class="flex flex-col gap-3">
+						<h1 class="heading-2xl">
+							{{ collection.name }}
+						</h1>
+						<div class="flex items-center gap-2">
+							<template v-if="canEdit || collection.status !== 'listed'">
+								<div class="flex items-center gap-1">
 									<template v-if="collection.status === 'listed'">
-										<GlobeIcon class="primary-stat__icon" aria-hidden="true" />
-										<div class="primary-stat__text">
-											<strong>
-												{{ formatMessage(commonMessages.publicLabel) }}
-											</strong>
-										</div>
+										<GlobeIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.publicLabel) }}
 									</template>
 									<template v-else-if="collection.status === 'unlisted'">
-										<LinkIcon class="primary-stat__icon" aria-hidden="true" />
-										<div class="primary-stat__text">
-											<strong>
-												{{ formatMessage(commonMessages.unlistedLabel) }}
-											</strong>
-										</div>
+										<LinkIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.unlistedLabel) }}
 									</template>
 									<template v-else-if="collection.status === 'private'">
-										<LockIcon class="primary-stat__icon" aria-hidden="true" />
-										<div class="primary-stat__text">
-											<strong>
-												{{ formatMessage(commonMessages.privateLabel) }}
-											</strong>
-										</div>
+										<LockIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.privateLabel) }}
 									</template>
 									<template v-else-if="collection.status === 'rejected'">
-										<XIcon class="primary-stat__icon" aria-hidden="true" />
-										<div class="primary-stat__text">
-											<strong>
-												{{ formatMessage(commonMessages.rejectedLabel) }}
-											</strong>
-										</div>
+										<XIcon aria-hidden="true" />
+										{{ formatMessage(commonMessages.rejectedLabel) }}
 									</template>
 								</div>
-							</div>
-
-							<div class="primary-stat">
-								<LibraryIcon class="primary-stat__icon" aria-hidden="true" />
-								<div v-if="projects" class="primary-stat__text">
-									<IntlFormatted
-										:message-id="messages.projectsCountLabel"
-										:values="{
-											count: formatCompactNumber(projects.length || 0),
-										}"
-									>
-										<template #stat="{ children }">
-											<span class="primary-stat__counter">
-												<component :is="() => normalizeChildren(children)" />
-											</span>
-										</template>
-									</IntlFormatted>
-								</div>
-							</div>
-
-							<div class="metadata-item">
-								<div
-									v-tooltip="
-										formatMessage(commonMessages.dateAtTimeTooltip, {
-											date: new Date(collection.created),
-											time: new Date(collection.created),
-										})
-									"
-									class="date"
-								>
-									<CalendarIcon aria-hidden="true" />
-									<label>
-										{{
-											formatMessage(messages.createdAtLabel, {
-												ago: formatRelativeTime(collection.created),
-											})
-										}}
-									</label>
-								</div>
-							</div>
-
-							<div v-if="collection.id !== 'following'" class="metadata-item">
-								<div
-									v-tooltip="
-										formatMessage(commonMessages.dateAtTimeTooltip, {
-											date: new Date(collection.updated),
-											time: new Date(collection.updated),
-										})
-									"
-									class="date"
-								>
-									<UpdatedIcon aria-hidden="true" />
-									<label>
-										{{
-											formatMessage(messages.updatedAtLabel, {
-												ago: formatRelativeTime(collection.updated),
-											})
-										}}
-									</label>
-								</div>
-							</div>
-						</div>
-
-						<hr class="card-divider" />
-
-						<div class="collection-info">
-							<h2 class="card-header">
-								{{ formatMessage(messages.curatedByLabel) }}
-							</h2>
-							<div class="metadata-item">
-								<nuxt-link
-									class="team-member columns button-transparent"
-									:to="'/user/' + creator.username"
-								>
-									<Avatar :src="creator.avatar_url" :alt="creator.username" size="sm" circle />
-
-									<div class="member-info">
-										<p class="name">{{ creator.username }}</p>
-										<p class="role">{{ formatMessage(messages.ownerLabel) }}</p>
-									</div>
-								</nuxt-link>
-							</div>
-							<!-- <hr class="card-divider" />
-            <div class="input-group">
-              <Button @click="() => $refs.shareModal.show()">
-                <ShareIcon />
-                Share
-              </Button>
-            </div> -->
-						</div>
-					</template>
-				</div>
-				<AdPlaceholder v-if="!auth.user" />
-			</div>
-			<div class="normal-page__content">
-				<nav class="navigation-card">
-					<NavRow
-						:links="[
-							{
-								label: formatMessage(commonMessages.allProjectType),
-								href: `/collection/${collection.id}`,
-							},
-							...projectTypes.map((x) => {
-								return {
-									label: formatMessage(getProjectTypeMessage(x, true)),
-									href: `/collection/${collection.id}/${x}s`,
-								}
-							}),
-						]"
-					/>
-					<button
-						v-tooltip="
-							formatMessage(
-								commonMessages[`${cosmetics.searchDisplayMode.collection || 'list'}InputView`],
-							)
-						"
-						:aria-label="
-							formatMessage(
-								commonMessages[`${cosmetics.searchDisplayMode.collection || 'list'}InputView`],
-							)
-						"
-						class="square-button"
-						@click="cycleSearchDisplayMode()"
-					>
-						<GridIcon v-if="cosmetics.searchDisplayMode.collection === 'grid'" />
-						<ImageIcon v-else-if="cosmetics.searchDisplayMode.collection === 'gallery'" />
-						<ListIcon v-else />
-					</button>
-				</nav>
-
-				<div
-					v-if="projects && projects?.length > 0"
-					:class="
-						'project-list display-mode--' + (cosmetics.searchDisplayMode.collection || 'list')
-					"
-				>
-					<ProjectCard
-						v-for="project in (route.params.projectType !== undefined
-							? projects.filter(
-									(x) =>
-										x.project_type ===
-										route.params.projectType.substr(0, route.params.projectType.length - 1),
-								)
-							: projects
-						)
-							.slice()
-							.sort((a, b) => b.downloads - a.downloads)"
-						:id="project.id"
-						:key="project.id"
-						:type="project.project_type"
-						:categories="project.categories"
-						:created-at="project.published"
-						:updated-at="project.updated"
-						:description="project.description"
-						:downloads="project.downloads ? project.downloads.toString() : '0'"
-						:follows="project.followers ? project.followers.toString() : '0'"
-						:featured-image="project.gallery.find((element) => element.featured)?.url"
-						:icon-url="project.icon_url"
-						:name="project.title"
-						:client-side="project.client_side"
-						:server-side="project.server_side"
-						:color="project.color"
-						:show-updated-date="!canEdit && collection.id !== 'following'"
-						:show-created-date="!canEdit && collection.id !== 'following'"
-					>
-						<button
-							v-if="canEdit"
-							class="iconified-button remove-btn"
-							@click="
-								() => {
-									removeProjects = [project]
-									saveChanges()
-								}
-							"
-						>
-							<TrashIcon aria-hidden="true" />
-							{{ formatMessage(messages.removeProjectButton) }}
-						</button>
-						<button
-							v-if="collection.id === 'following'"
-							class="iconified-button"
-							@click="unfollowProject(project)"
-						>
-							<TrashIcon aria-hidden="true" />
-							{{ formatMessage(messages.unfollowProjectButton) }}
-						</button>
-					</ProjectCard>
-				</div>
-				<div v-else class="error">
-					<UpToDate class="icon" />
-					<br />
-					<span v-if="auth.user && auth.user.id === creator.id" class="preserve-lines text">
-						<IntlFormatted :message-id="messages.noProjectsAuthLabel">
-							<template #create-link="{ children }">
-								<a class="link" @click.prevent="$router.push('/discover/mods')">
-									<component :is="() => children" />
-								</a>
+								<span class="text-secondary">•</span>
 							</template>
-						</IntlFormatted>
+							<span>
+								<IntlFormatted
+									:message-id="messages.projectsCountLabel"
+									:values="{
+										count: formatCompactNumber(projects.length || 0),
+										type: formatMessage(
+											commonProjectTypeSentenceMessages[
+												projectTypes.length === 1 ? projectTypes[0] : 'project'
+											],
+											{ count: projects.length || 0 },
+										),
+									}"
+								>
+									<template #stat="{ children }">
+										<span class="primary-stat__counter">
+											<component :is="() => normalizeChildren(children)" />
+										</span>
+									</template>
+								</IntlFormatted>
+							</span>
+						</div>
+					</div>
+					<div class="flex gap-2 col-span-2 sm:col-span-1">
+						<template v-if="canEdit">
+							<ButtonStyled>
+								<button @click="openEditModal">
+									<EditIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.editButton) }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled color="red" color-fill="text">
+								<button @click="() => $refs.deleteModal.show()">
+									<TrashIcon aria-hidden="true" />
+									{{ formatMessage(commonMessages.deleteLabel) }}
+								</button>
+							</ButtonStyled>
+						</template>
+					</div>
+				</div>
+				<HorizontalRule />
+			</div>
+		</template>
+		<template #sidebar>
+			<SidebarCard v-if="collection.description" :title="formatMessage(messages.descriptionLabel)">
+				<p class="m-0">{{ collection.description }}</p>
+			</SidebarCard>
+			<SidebarCard
+				v-if="collection.id !== 'following'"
+				:title="formatMessage(messages.curatedByLabel)"
+			>
+				<nuxt-link
+					class="group flex w-fit items-center gap-2 leading-[1.2] text-primary"
+					:to="`/user/${creator.username}`"
+				>
+					<Avatar :src="creator.avatar_url" :alt="creator.username" size="32px" circle />
+					<div class="flex flex-col">
+						<span
+							class="grid w-full grid-cols-[1fr_auto] flex-nowrap items-center gap-1 group-hover:underline"
+						>
+							<span class="min-w-0 overflow-hidden truncate">{{ creator.username }}</span>
+						</span>
+					</div>
+				</nuxt-link>
+			</SidebarCard>
+			<AdPlaceholder v-if="!auth.user" />
+			<SidebarCard
+				v-if="collection.id !== 'following'"
+				:title="formatMessage(messages.detailsLabel)"
+			>
+				<div class="flex flex-col gap-2">
+					<span
+						v-tooltip="dayjs(collection.created).format('MMMM D, YYYY [at] h:mm A')"
+						class="flex w-fit items-center gap-2"
+					>
+						<CalendarIcon aria-hidden="true" />
+						{{
+							formatMessage(messages.createdAtLabel, {
+								ago: formatRelativeTime(collection.created),
+							})
+						}}
 					</span>
-					<span v-else class="text">{{ formatMessage(messages.noProjectsLabel) }}</span>
+					<span
+						v-if="showUpdatedDate"
+						v-tooltip="dayjs(collection.updated).format('MMMM D, YYYY [at] h:mm A')"
+						class="flex w-fit items-center gap-2"
+					>
+						<UpdatedIcon aria-hidden="true" />
+						{{
+							formatMessage(messages.updatedAtLabel, {
+								ago: formatRelativeTime(collection.updated),
+							})
+						}}
+					</span>
+				</div>
+			</SidebarCard>
+		</template>
+		<NavTabs
+			v-if="projects && projectTypes.length > 1"
+			:links="[
+				{
+					label: formatMessage(commonMessages.allProjectType),
+					href: `/collection/${collection.id}`,
+				},
+				...projectTypes.map((x) => {
+					return {
+						label: formatMessage(commonProjectTypeCategoryMessages[x]),
+						href: `/collection/${collection.id}/${x}s`,
+					}
+				}),
+			]"
+		/>
+
+		<div
+			v-if="projects && projects?.length > 0"
+			:class="'project-list display-mode--' + (cosmetics.searchDisplayMode.collection || 'list')"
+		>
+			<ProjectCard
+				v-for="project in (route.params.projectType !== undefined
+					? projects.filter(
+							(x) =>
+								x.project_type ===
+								route.params.projectType.substr(0, route.params.projectType.length - 1),
+						)
+					: projects
+				)
+					.slice()
+					.sort((a, b) => b.downloads - a.downloads)"
+				:id="project.id"
+				:key="project.id"
+				:type="project.project_type"
+				:categories="project.categories"
+				:created-at="project.published"
+				:updated-at="project.updated"
+				:description="project.description"
+				:downloads="project.downloads ? project.downloads.toString() : '0'"
+				:follows="project.followers ? project.followers.toString() : '0'"
+				:featured-image="project.gallery.find((element) => element.featured)?.url"
+				:icon-url="project.icon_url"
+				:name="project.title"
+				:client-side="project.client_side"
+				:server-side="project.server_side"
+				:color="project.color"
+				:show-updated-date="!canEdit && collection.id !== 'following'"
+				:show-created-date="!canEdit && collection.id !== 'following'"
+			>
+				<button
+					v-if="canEdit"
+					class="iconified-button remove-btn"
+					:disabled="removing"
+					@click="() => removeProject(project)"
+				>
+					<SpinnerIcon v-if="removing" class="animate-spin" aria-hidden="true" />
+					<XIcon v-else aria-hidden="true" />
+					{{ formatMessage(messages.removeProjectButton) }}
+				</button>
+				<button
+					v-if="collection.id === 'following'"
+					class="iconified-button"
+					@click="unfollowProject(project)"
+				>
+					<HeartMinusIcon aria-hidden="true" />
+					{{ formatMessage(messages.unfollowProjectButton) }}
+				</button>
+			</ProjectCard>
+		</div>
+		<div v-else>
+			<div class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
+				<EmptyIllustration class="h-[120px] w-auto" />
+				<div class="-mt-4 flex flex-col gap-4">
+					<div class="flex flex-col items-center gap-1.5">
+						<span class="text-lg text-contrast md:text-2xl">{{
+							formatMessage(messages.noProjectsLabel)
+						}}</span>
+					</div>
+					<ButtonStyled v-if="auth.user && auth.user.id === creator.id" color="brand">
+						<nuxt-link class="mx-auto w-min" to="/discover/mods">
+							<CompassIcon class="size-5" />
+							Discover mods
+						</nuxt-link>
+					</ButtonStyled>
 				</div>
 			</div>
 		</div>
-	</div>
+	</NormalPage>
 </template>
 
 <script setup>
 import {
-	BoxIcon,
 	CalendarIcon,
+	ChevronLeftIcon,
+	CompassIcon,
 	EditIcon,
+	EmptyIllustration,
 	GlobeIcon,
-	GridIcon,
-	ImageIcon,
-	LibraryIcon,
+	HeartMinusIcon,
 	LinkIcon,
-	ListIcon,
 	LockIcon,
 	SaveIcon,
+	SpinnerIcon,
 	TrashIcon,
 	UpdatedIcon,
 	UploadIcon,
@@ -397,39 +376,54 @@ import {
 } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
+	ButtonStyled,
 	commonMessages,
+	commonProjectTypeCategoryMessages,
+	commonProjectTypeSentenceMessages,
 	ConfirmModal,
-	DropdownSelect,
 	FileInput,
+	HorizontalRule,
+	injectModrinthClient,
 	injectNotificationManager,
-	PopoutMenu,
+	NewModal,
+	normalizeChildren,
+	NormalPage,
+	OverflowMenu,
+	RadioButtons,
+	SidebarCard,
 	useRelativeTime,
+	useSavable,
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
+import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
-import UpToDate from 'assets/images/illustrations/up_to_date.svg'
+import dayjs from 'dayjs'
 
-import { getProjectTypeMessage } from '@/utils/i18n-project-type'
-import { normalizeChildren } from '@/utils/vue-children.ts'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
-import NavRow from '~/components/ui/NavRow.vue'
+import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 
-const { addNotification } = injectNotificationManager()
-const vintl = useVIntl()
-const { formatMessage } = vintl
+const { handleError } = injectNotificationManager()
+const api = injectModrinthClient()
+const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const formatCompactNumber = useCompactNumber()
+
+const route = useNativeRoute()
+const router = useRouter()
+const auth = await useAuth()
+const cosmetics = useCosmetics()
+
+if (route.params.id === 'following') {
+	definePageMeta({
+		middleware: 'auth',
+	})
+}
 
 const messages = defineMessages({
 	collectionDescription: {
 		id: 'collection.description',
 		defaultMessage: '{description} - View the collection {name} by {username} on Modrinth',
-	},
-	collectionLabel: {
-		id: 'collection.label.collection',
-		defaultMessage: 'Collection',
 	},
 	collectionTitle: {
 		id: 'collection.title',
@@ -439,9 +433,21 @@ const messages = defineMessages({
 		id: 'collection.button.edit-icon',
 		defaultMessage: 'Edit icon',
 	},
-	deleteIconButton: {
-		id: 'collection.button.delete-icon',
-		defaultMessage: 'Delete icon',
+	removeIconButton: {
+		id: 'collection.button.remove-icon',
+		defaultMessage: 'Remove icon',
+	},
+	selectIcon: {
+		id: 'collection.button.select-icon',
+		defaultMessage: 'Select icon',
+	},
+	replaceIcon: {
+		id: 'collection.button.replace-icon',
+		defaultMessage: 'Replace icon',
+	},
+	editingCollection: {
+		id: 'collection.editing',
+		defaultMessage: 'Editing collection',
 	},
 	createdAtLabel: {
 		id: 'collection.label.created-at',
@@ -455,9 +461,17 @@ const messages = defineMessages({
 		id: 'collection.label.curated-by',
 		defaultMessage: 'Curated by',
 	},
+	descriptionLabel: {
+		id: 'collection.label.description',
+		defaultMessage: 'Description',
+	},
+	detailsLabel: {
+		id: 'collection.label.details',
+		defaultMessage: 'Details',
+	},
 	deleteModalDescription: {
 		id: 'collection.delete-modal.description',
-		defaultMessage: 'This will remove this collection forever. This action cannot be undone.',
+		defaultMessage: 'This will permanently delete this collection. This action cannot be undone.',
 	},
 	deleteModalTitle: {
 		id: 'collection.delete-modal.title',
@@ -469,21 +483,12 @@ const messages = defineMessages({
 	},
 	noProjectsLabel: {
 		id: 'collection.label.no-projects',
-		defaultMessage: 'This collection has no projects!',
-	},
-	noProjectsAuthLabel: {
-		id: 'collection.label.no-projects-auth',
-		defaultMessage:
-			"You don't have any projects.\nWould you like to <create-link>add one</create-link>?",
-	},
-	ownerLabel: {
-		id: 'collection.label.owner',
-		defaultMessage: 'Owner',
+		defaultMessage: 'No projects in collection yet',
 	},
 	projectsCountLabel: {
 		id: 'collection.label.projects-count',
 		defaultMessage:
-			'{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}',
+			'{count, plural, =0 {No projects yet} one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}',
 	},
 	removeProjectButton: {
 		id: 'collection.button.remove-project',
@@ -499,22 +504,29 @@ const messages = defineMessages({
 	},
 })
 
-const data = useNuxtApp()
-const route = useNativeRoute()
-const auth = await useAuth()
-const cosmetics = useCosmetics()
-const tags = useGeneratedState()
+const returnLink = computed(() => {
+	const from = router.options?.history?.state?.back
+	if (from?.startsWith('/dashboard/collections')) {
+		return {
+			link: from,
+			message: defineMessage({
+				id: 'collection.return-link.dashboard-collections',
+				defaultMessage: 'Your collections',
+			}),
+		}
+	} else if (from?.startsWith('/user/')) {
+		return {
+			link: from,
+			message: defineMessage({
+				id: 'collection.return-link.user',
+				defaultMessage: `{user}'s profile`,
+			}),
+		}
+	}
+	return null
+})
 
-const isEditing = ref(false)
-
-function cycleSearchDisplayMode() {
-	cosmetics.value.searchDisplayMode.collection = data.$cycleValue(
-		cosmetics.value.searchDisplayMode.collection,
-		tags.value.projectViewModes,
-	)
-}
-
-let collection, refreshCollection, creator, projects, refreshProjects
+let collection, refreshCollection, creator, projects
 
 try {
 	if (route.params.id === 'following') {
@@ -528,7 +540,7 @@ try {
 			created: auth.value.user.created,
 			updated: auth.value.user.created,
 		})
-		;[{ data: projects, refresh: refreshProjects }] = await Promise.all([
+		;[{ data: projects }] = await Promise.all([
 			useAsyncData(
 				`user/${auth.value.user.id}/follows`,
 				() => useBaseFetch(`user/${auth.value.user.id}/follows`),
@@ -551,7 +563,7 @@ try {
 		)
 		collection = val.data
 		refreshCollection = val.refresh
-		;[{ data: creator }, { data: projects, refresh: refreshProjects }] = await Promise.all([
+		;[{ data: creator }, { data: projects }] = await Promise.all([
 			await useAsyncData(`user/${collection.value.user}`, () =>
 				useBaseFetch(`user/${collection.value.user}`),
 			),
@@ -623,93 +635,150 @@ const projectTypes = computed(() => {
 	return Array.from(projectSet)
 })
 
+const showUpdatedDate = computed(() => {
+	if (!collection.value?.updated || !collection.value?.created) {
+		return false
+	}
+	return dayjs(collection.value.updated).diff(dayjs(collection.value.created), 'minute') > 1
+})
+
+const editModal = ref(null)
+const iconInputRef = ref(null)
 const icon = ref(null)
 const deletedIcon = ref(false)
 const previewImage = ref(null)
+const saving = ref(false)
+const removing = ref(false)
 
-const name = ref(collection.value.name)
-const summary = ref(collection.value.description)
-const visibility = ref(collection.value.status)
-const removeProjects = ref([])
+const {
+	saved,
+	current,
+	reset,
+	save: saveCollection,
+} = useSavable(
+	() => ({
+		name: collection.value.name,
+		description: collection.value.description || null,
+		status: collection.value.status,
+	}),
+	async (changes) => {
+		saving.value = true
+		startLoading()
+		try {
+			if (deletedIcon.value) {
+				await api.labrinth.collections.deleteIcon(collection.value.id)
+			} else if (icon.value) {
+				const ext = icon.value?.type?.split('/').pop()
+				if (!ext) throw new Error('Invalid file type')
+				await api.labrinth.collections.editIcon(collection.value.id, icon.value, ext)
+			}
+
+			if (Object.keys(changes).length > 0) {
+				await api.labrinth.collections.edit(collection.value.id, changes)
+			}
+
+			await refreshCollection().then(reset)
+
+			icon.value = null
+			deletedIcon.value = false
+			previewImage.value = null
+
+			editModal.value?.hide()
+		} catch (err) {
+			handleError(err)
+		} finally {
+			await initUserCollections()
+			stopLoading()
+			saving.value = false
+		}
+	},
+)
 
 async function unfollowProject(project) {
 	await userFollowProject(project)
 	projects.value = projects.value.filter((x) => x.id !== project.id)
 }
 
-async function saveChanges() {
+async function removeProject(project) {
+	removing.value = true
 	startLoading()
 	try {
-		if (deletedIcon.value) {
-			await useBaseFetch(`collection/${collection.value.id}/icon`, {
-				method: 'DELETE',
-				apiVersion: 3,
-			})
-		} else if (icon.value) {
-			const ext = icon.value?.type?.split('/').pop()
-			if (!ext) throw new Error('Invalid file type')
-			await useBaseFetch(`collection/${collection.value.id}/icon?ext=${ext}`, {
-				method: 'PATCH',
-				body: icon.value,
-				apiVersion: 3,
-			})
-		}
+		const currentProjects = collection.value.projects || []
+		const updatedProjects = currentProjects.filter((id) => id !== project.id)
 
-		const projectsToRemove = removeProjects.value?.map((p) => p.id) ?? []
-		const newProjects = projects.value
-			.filter((p) => !projectsToRemove.includes(p.id))
-			.map((p) => p.id)
-		const newProjectIds = projectsToRemove.length > 0 ? newProjects : undefined
-
-		await useBaseFetch(`collection/${collection.value.id}`, {
-			method: 'PATCH',
-			body: {
-				name: name.value,
-				description: summary.value || null,
-				status: visibility.value,
-				new_projects: newProjectIds,
-			},
-			apiVersion: 3,
+		await api.labrinth.collections.edit(collection.value.id, {
+			new_projects: updatedProjects,
 		})
 
 		await refreshCollection()
-		await refreshProjects()
-
-		name.value = collection.value.name
-		summary.value = collection.value.description
-		visibility.value = collection.value.status
-		removeProjects.value = []
-
-		isEditing.value = false
+		projects.value = projects.value.filter((x) => x.id !== project.id)
+		await initUserCollections()
 	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err,
-			type: 'error',
-		})
+		handleError(err)
+	} finally {
+		removing.value = false
+		stopLoading()
 	}
-	await initUserCollections()
-	stopLoading()
+}
+
+const save = async () => {
+	const hasIconChanges = deletedIcon.value || icon.value
+	const hasCollectionChanges = computed(() => {
+		const keys = Object.keys(current.value)
+		for (const key of keys) {
+			if (saved.value[key] !== current.value[key]) {
+				return true
+			}
+		}
+		return false
+	}).value
+
+	if (!hasCollectionChanges && !hasIconChanges) {
+		return
+	}
+
+	if (hasCollectionChanges) {
+		saveCollection()
+	} else {
+		saving.value = true
+		startLoading()
+		try {
+			if (deletedIcon.value) {
+				await api.labrinth.collections.deleteIcon(collection.value.id)
+			} else if (icon.value) {
+				const ext = icon.value?.type?.split('/').pop()
+				if (!ext) throw new Error('Invalid file type')
+				await api.labrinth.collections.editIcon(collection.value.id, icon.value, ext)
+			}
+
+			await refreshCollection().then(reset)
+
+			icon.value = null
+			deletedIcon.value = false
+			previewImage.value = null
+
+			editModal.value?.hide()
+		} catch (err) {
+			handleError(err)
+		} finally {
+			await initUserCollections()
+			stopLoading()
+			saving.value = false
+		}
+	}
 }
 
 async function deleteCollection() {
 	startLoading()
 	try {
-		await useBaseFetch(`collection/${collection.value.id}`, {
-			method: 'DELETE',
-			apiVersion: 3,
-		})
+		await api.labrinth.collections.delete(collection.value.id)
 		if (auth.value.user.id === collection.value.user) {
 			await navigateTo('/dashboard/collections')
 		} else {
 			await navigateTo(`/user/${collection.value.user}/collections`)
 		}
 	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
+		handleError(err)
 	}
 	await initUserCollections()
 	stopLoading()
@@ -724,113 +793,19 @@ function showPreviewImage(files) {
 		previewImage.value = event.target.result
 	}
 }
+
+function openEditModal(event) {
+	reset()
+	icon.value = null
+	deletedIcon.value = false
+	previewImage.value = null
+	editModal.value?.show(event)
+}
 </script>
 
 <style scoped lang="scss">
 .animated-dropdown {
 	// Omorphia's dropdowns are harcoded in width, so we need to override that
 	width: 100% !important;
-}
-
-.inputs {
-	margin-bottom: 1rem;
-
-	input {
-		margin-top: 0.5rem;
-		width: 100%;
-	}
-
-	textarea {
-		min-height: 10rem;
-	}
-
-	label {
-		margin-bottom: 0;
-	}
-}
-
-.team-member {
-	align-items: center;
-	padding: 0.25rem 0.5rem;
-
-	.member-info {
-		overflow: hidden;
-		margin: auto 0 auto 0.75rem;
-
-		.name {
-			font-weight: bold;
-		}
-
-		p {
-			font-size: var(--font-size-sm);
-			margin: 0.2rem 0;
-		}
-	}
-}
-
-.remove-btn {
-	margin-top: auto;
-}
-
-.card {
-	padding: var(--spacing-card-lg);
-
-	.page-header__icon {
-		margin-block: 0;
-	}
-
-	.card__overlay {
-		top: var(--spacing-card-lg);
-		right: var(--spacing-card-lg);
-	}
-}
-
-.collection-info {
-	display: grid;
-	grid-template-columns: 1fr;
-}
-
-.date {
-	color: var(--color-text-secondary);
-	font-size: var(--font-size-nm);
-	display: flex;
-	align-items: center;
-	margin-bottom: 0.25rem;
-	cursor: default;
-
-	.label {
-		margin-right: 0.25rem;
-	}
-
-	svg {
-		height: 1rem;
-		margin-right: 0.25rem;
-	}
-}
-
-.card-header {
-	font-size: 1.125rem;
-	font-weight: bold;
-	color: var(--color-heading);
-	margin-bottom: 0.5rem;
-	width: fit-content;
-}
-
-.title {
-	margin: var(--gap-md) 0 var(--spacing-card-xs) 0;
-	font-size: var(--font-size-xl);
-	color: var(--color-text-dark);
-}
-
-.collection-label {
-	font-weight: 500;
-	display: flex;
-	align-items: center;
-	gap: 0.25rem;
-}
-
-.collection-description {
-	margin-top: var(--spacing-card-sm);
-	margin-bottom: 0;
 }
 </style>

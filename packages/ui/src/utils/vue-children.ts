@@ -23,3 +23,4 @@ function normalizeChild(child: any): VNode {
 export function normalizeChildren(children: any | any[]): VNode[] {
 	return Array.isArray(children) ? children.map(normalizeChild) : [normalizeChild(children)]
 }
+

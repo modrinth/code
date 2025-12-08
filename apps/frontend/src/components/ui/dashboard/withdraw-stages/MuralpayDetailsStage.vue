@@ -207,6 +207,7 @@ import {
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
+	normalizeChildren,
 } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
@@ -224,7 +225,6 @@ import {
 	getCurrencyIcon,
 } from '@/utils/finance-icons.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
-import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees } = useWithdrawContext()
 const { formatMessage } = useVIntl()

@@ -37,6 +37,7 @@ import {
 	ProgressSpinner,
 	provideModrinthClient,
 	provideNotificationManager,
+	providePageContext,
 	useDebugLogger,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
@@ -119,7 +120,10 @@ const tauriApiClient = new TauriModrinthClient({
 	],
 })
 provideModrinthClient(tauriApiClient)
-
+providePageContext({
+	hierarchicalSidebarAvailable: ref(true),
+	showAds: ref(false),
+})
 const news = ref([])
 const availableSurvey = ref(false)
 
