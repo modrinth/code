@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { GameVersion } from '@modrinth/ui'
 import { LoaderCircleIcon } from '@modrinth/assets'
+import type { GameVersion } from '@modrinth/ui'
 import { GAME_MODES, HeadingLink, injectNotificationManager } from '@modrinth/ui'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
