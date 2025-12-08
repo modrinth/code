@@ -9,7 +9,7 @@
 				</ButtonStyled>
 			</div>
 			<div
-				class="flex flex-col gap-1.5 gap-y-4 rounded-xl border border-solid border-surface-5 p-3 py-4"
+				class="flex max-h-56 flex-col gap-1.5 gap-y-4 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
 			>
 				<div class="flex flex-wrap gap-2">
 					<template v-if="draftVersion.game_versions.length">
