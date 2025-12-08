@@ -9,7 +9,7 @@ import useMemorySlider from '@/composables/useMemorySlider'
 import { edit, get_optimal_jre_key } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
 
-import type { AppSettings, InstanceSettingsTabProps, MemorySettings } from '../../../helpers/types'
+import type { AppSettings, InstanceSettingsTabProps } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -22,12 +22,12 @@ const overrideJavaInstall = ref(!!props.instance.java_path)
 const optimalJava = readonly(await get_optimal_jre_key(props.instance.path).catch(handleError))
 const javaInstall = ref({ path: optimalJava.path ?? props.instance.java_path })
 
-const overrideJavaArgs = ref(props.instance.extra_launch_args?.length !== undefined)
+const overrideJavaArgs = ref((props.instance.extra_launch_args?.length ?? 0) > 0)
 const javaArgs = ref(
 	(props.instance.extra_launch_args ?? globalSettings.extra_launch_args).join(' '),
 )
 
-const overrideEnvVars = ref(props.instance.custom_env_vars?.length !== undefined)
+const overrideEnvVars = ref((props.instance.custom_env_vars?.length ?? 0) > 0)
 const envVars = ref(
 	(props.instance.custom_env_vars ?? globalSettings.custom_env_vars)
 		.map((x) => x.join('='))
@@ -42,36 +42,23 @@ const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) a
 }
 
 const editProfileObject = computed(() => {
-	const editProfile: {
-		java_path?: string
-		extra_launch_args?: string[]
-		custom_env_vars?: string[][]
-		memory?: MemorySettings
-	} = {}
-
-	if (overrideJavaInstall.value) {
-		if (javaInstall.value.path !== '') {
-			editProfile.java_path = javaInstall.value.path.replace('java.exe', 'javaw.exe')
-		}
+	return {
+		java_path:
+			overrideJavaInstall.value && javaInstall.value.path !== ''
+				? javaInstall.value.path.replace('java.exe', 'javaw.exe')
+				: null,
+		extra_launch_args: overrideJavaArgs.value
+			? javaArgs.value.trim().split(/\s+/).filter(Boolean)
+			: null,
+		custom_env_vars: overrideEnvVars.value
+			? envVars.value
+					.trim()
+					.split(/\s+/)
+					.filter(Boolean)
+					.map((x) => x.split('=').filter(Boolean))
+			: null,
+		memory: overrideMemorySettings.value ? memory.value : null,
 	}
-
-	if (overrideJavaArgs.value) {
-		editProfile.extra_launch_args = javaArgs.value.trim().split(/\s+/).filter(Boolean)
-	}
-
-	if (overrideEnvVars.value) {
-		editProfile.custom_env_vars = envVars.value
-			.trim()
-			.split(/\s+/)
-			.filter(Boolean)
-			.map((x) => x.split('=').filter(Boolean))
-	}
-
-	if (overrideMemorySettings.value) {
-		editProfile.memory = memory.value
-	}
-
-	return editProfile
 })
 
 watch(
