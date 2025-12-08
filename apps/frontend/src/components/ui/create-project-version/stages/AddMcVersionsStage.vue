@@ -35,7 +35,9 @@
 <script lang="ts" setup>
 import { XIcon } from '@modrinth/assets'
 import { ButtonStyled, TagItem } from '@modrinth/ui'
+
 import { useManageVersion } from '~/composables/versions/manage-version'
+
 import McVersionPicker from '../components/McVersionPicker.vue'
 
 const generatedState = useGeneratedState()

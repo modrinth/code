@@ -41,7 +41,9 @@ import { XIcon } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
 import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
 import { formatCategory } from '@modrinth/utils'
+
 import { useManageVersion } from '~/composables/versions/manage-version'
+
 import LoaderPicker from '../components/LoaderPicker.vue'
 
 const generatedState = useGeneratedState()

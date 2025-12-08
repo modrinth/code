@@ -114,6 +114,7 @@ import { EditIcon } from '@modrinth/assets'
 import { ButtonStyled, Chips, TagItem } from '@modrinth/ui'
 import type MultiStageModal from '@modrinth/ui/src/components/base/MultiStageModal.vue'
 import { formatCategory } from '@modrinth/utils'
+
 import { useGeneratedState } from '~/composables/generated'
 import { useManageVersion } from '~/composables/versions/manage-version'
 

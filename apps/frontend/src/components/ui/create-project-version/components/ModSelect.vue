@@ -5,7 +5,7 @@
 		:options="options"
 		:searchable="true"
 		search-placeholder="Search by name, slug, or paste ID..."
-		:noOptionsMessage="searchLoading ? 'Loading...' : 'No results found'"
+		:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
 		@search-input="(query) => handleSearch(query)"
 	/>
 </template>

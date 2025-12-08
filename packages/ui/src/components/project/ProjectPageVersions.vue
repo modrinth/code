@@ -175,7 +175,8 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CalendarIcon, DownloadIcon, StarIcon } from '@modrinth/assets'
+import { CalendarIcon, DownloadIcon, PlusIcon, StarIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
 import {
 	formatBytes,
 	formatCategory,
@@ -188,8 +189,6 @@ import { useVIntl } from '@vintl/vintl'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { PlusIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
 import { useRelativeTime } from '../../composables'
 import { commonMessages } from '../../utils/common-messages'
 import AutoLink from '../base/AutoLink.vue'
