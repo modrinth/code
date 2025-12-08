@@ -642,12 +642,16 @@ export function createWithdrawContext(
 				)
 
 				if (selectedMethod?.interval) {
+					const userMax = Math.floor(maxWithdrawAmount.value * 100) / 100
 					if (selectedMethod.interval.standard) {
 						const { min, max } = selectedMethod.interval.standard
-						if (amount < min || amount > max) return false
+						const effectiveMax = Math.min(userMax, max)
+						const effectiveMin = Math.min(min, effectiveMax)
+						if (amount < effectiveMin || amount > effectiveMax) return false
 					}
 					if (selectedMethod.interval.fixed) {
-						if (!selectedMethod.interval.fixed.values.includes(amount)) return false
+						const validValues = selectedMethod.interval.fixed.values.filter((v) => v <= userMax)
+						if (!validValues.includes(amount)) return false
 					}
 				}
 
@@ -711,7 +715,11 @@ export function createWithdrawContext(
 				)
 				if (selectedMethod?.interval?.standard) {
 					const { min, max } = selectedMethod.interval.standard
-					if (amount < min || amount > max) return false
+					// Use effective limits that account for user's available balance
+					const userMax = Math.floor(maxWithdrawAmount.value * 100) / 100
+					const effectiveMax = Math.min(userMax, max)
+					const effectiveMin = Math.min(min, effectiveMax)
+					if (amount < effectiveMin || amount > effectiveMax) return false
 				}
 
 				const accountDetails = withdrawData.value.providerData.accountDetails
@@ -736,7 +744,11 @@ export function createWithdrawContext(
 				)
 				if (selectedMethod?.interval?.standard) {
 					const { min, max } = selectedMethod.interval.standard
-					if (amount < min || amount > max) return false
+					// Use effective limits that account for user's available balance
+					const userMax = Math.floor(maxWithdrawAmount.value * 100) / 100
+					const effectiveMax = Math.min(userMax, max)
+					const effectiveMin = Math.min(min, effectiveMax)
+					if (amount < effectiveMin || amount > effectiveMax) return false
 				}
 
 				return !!withdrawData.value.stageValidation?.paypalDetails
