@@ -110,6 +110,9 @@
   "changelog.product.app": {
     "defaultMessage": "Aplikasi"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "Peladen"
+  },
   "changelog.product.web": {
     "defaultMessage": "Situs web"
   },
@@ -775,6 +778,9 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "Lokasi manakah yang Anda inginkan untuk peladen Anda?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Wilayah tidak terdaftar? <link>Beri tahu kami di mana Anda ingin melihat Modrinth Servers untuk kedepannya!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Tenggara"

@@ -566,27 +566,6 @@
   "create.project.visibility-unlisted": {
     "message": "Nem nyílvános"
   },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Társulati (affiliate) link létrehozása"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Hiba történt a társulati linkek betöltésében"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "A társulati linkjeid"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Ez vissza fogja vonni a `{id}` számú társulati kódod, és bármely létező linket, ami ehhez a kódhoz van kötve, így a ezek a linkek többé nem lesznek validak."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Visszavonás"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Biztos vagy benne, hogy visszavonod a \"{title}\" társulati linked?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Társulati linkek keresése..."
-  },
   "dashboard.collections.button.create-new": {
     "message": "Új létrehozása"
   },
@@ -635,9 +614,6 @@
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Amerikai állampolgár vagy?"
   },
-  "dashboard.creator-withdraw-modal.complete-tax-form": {
-    "message": "Adóbevallás befejezése"
-  },
   "dashboard.creator-withdraw-modal.continue-with-limit": {
     "message": "Folytatás limittel"
   },
@@ -650,47 +626,14 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate": {
     "message": "FX rate"
   },
-  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
-    "message": "Díj"
-  },
-  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
-    "message": "Nettó összeg"
-  },
-  "dashboard.creator-withdraw-modal.kyc.business-entity": {
-    "message": "Üzleti szervezet"
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-description": {
-    "message": "Az \"Üzleti szervezet\" egy olyan regisztrált szervezetre utal, mint egy vállalat, partnerség vagy LLC."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Szervezetként vagy Személyként veszel ki?"
-  },
-  "dashboard.creator-withdraw-modal.kyc.private-individual": {
-    "message": "Magánszemély"
-  },
   "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
     "message": "Válaszd ki az országodat"
   },
   "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
     "message": "Országok keresése..."
   },
-  "dashboard.creator-withdraw-modal.method-selection.error-text": {
-    "message": "Nem sikerült a rendelkezésre álló fizetési módszereket előhívni. Kérlek próbálkozz újra később."
-  },
-  "dashboard.creator-withdraw-modal.method-selection.error-title": {
-    "message": "Nem sikerült betölteni a fizetési módszereket"
-  },
   "dashboard.creator-withdraw-modal.method-selection.region": {
     "message": "Régió"
-  },
-  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
-    "message": "Egyes kifizetési módszerek némely régiókban nem érhetőek el."
-  },
-  "dashboard.creator-withdraw-modal.method-selection.select-method": {
-    "message": "Válassza ki a kifizetési módszerét"
-  },
-  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
-    "message": "A kivételi limitje <b>{amount}</b>, <tax-link>töltsön ki egy adóbevallási űrlapot</tax-link>, hogy többet vehessen ki."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Fiók tulajdonosa"
@@ -698,38 +641,8 @@
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Érme"
   },
-  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
-    "message": "Erősítsd meg a pénztárca címed"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
-    "message": "Személyazonosító igazolvány szám"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
-    "message": "Írd be a személyazonosító számod"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
-    "message": "Útlevél szám"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
-    "message": "Írd be az útlevél számod"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
-    "message": "RUC szám"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
-    "message": "Írd be az RUC számod"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
-    "message": "Adószám"
-  },
-  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
-    "message": "Írd be az adószámod"
-  },
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "Hálózat"
-  },
-  "dashboard.creator-withdraw-modal.nearing-threshold": {
-    "message": "Közeledsz a kivételi limithez. Még kivehetsz <b>{amountRemaining}</b> most, de egy adóbevallási űrlap szükséges több kivételére."
   },
   "dashboard.creator-withdraw-modal.paypal-details.account": {
     "message": "Fiók"
@@ -758,62 +671,8 @@
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Bejelentkezés PayPalálal"
   },
-  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
-    "message": "Írd be a Venmo handle-t, hogy megkapd a kifizetéseket."
-  },
-  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
-    "message": "Venmo handle"
-  },
   "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
     "message": "@felhasználónév"
-  },
-  "dashboard.creator-withdraw-modal.stage.completion": {
-    "message": "Befejezés"
-  },
-  "dashboard.creator-withdraw-modal.stage.method-selection": {
-    "message": "Módszer"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
-    "message": "Fiók részletei"
-  },
-  "dashboard.creator-withdraw-modal.stage.muralpay-kyc": {
-    "message": "Megerősítés"
-  },
-  "dashboard.creator-withdraw-modal.stage.tax-form": {
-    "message": "Adóűrlap"
-  },
-  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
-    "message": "Részletek"
-  },
-  "dashboard.creator-withdraw-modal.tax-form-required.body": {
-    "message": "Ahhoz, hogy kivedd a teljes <b>{available}</b> rendelkezésre álló összeget, kérlek töltsd ki az űrlapot. Szükséges az adóbevalláshoz és csak egyszer kell megcsinálni."
-  },
-  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
-    "message": "Ki kell töltened egy W-9 vagy egy W-8 adóbevallási űrlapot Modrinth adóügyi nyilvántartásaihoz, hogy az adóügyi előírásoknak eleget tegyünk."
-  },
-  "dashboard.creator-withdraw-modal.tax-form-required.header": {
-    "message": "Adóbevallási űrlap szükséges"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
-    "message": "Kifizetési módok"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
-    "message": "Jutalom"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
-    "message": "Jutalom kiválasztása"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
-    "message": "Jutalmak"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
-    "message": "Megerősítettlen E-mail"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
-    "message": "A kiszállítási E-mail, amit megadtál nincs hozzákapcsolva a Modrinth fiókodhoz. A Modrinth nem tudja visszaállítani a jutalmakat, amik rossz E-mail címre lettek küldve."
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
-    "message": "Alacsonyabb díjak elérhetőek"
   },
   "error.collection.404.list_item.1": {
     "message": "Elírhatad a gyűjtemémyed URL-ét."
@@ -1060,6 +919,9 @@
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Források"

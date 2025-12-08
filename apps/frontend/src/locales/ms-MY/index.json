@@ -1355,6 +1355,9 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
+  },
   "layout.footer.resources": {
     "message": "Sumber"
   },
@@ -1994,6 +1997,9 @@
   "project.actions.review-project": {
     "message": "Semak projek"
   },
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Servers ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
+  },
   "project.actions.servers-promo.pricing": {
     "message": "Bermula pada harga {price}<small> / bulan</small>"
   },
@@ -2549,8 +2555,47 @@
   "search.filter.locked.server.sync": {
     "message": "Selaraskan dengan pelayan"
   },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Penciptaan sandaran sedang dijalankan"
+  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Pemulihan sandaran sedang dijalankan"
+  },
+  "servers.backups.item.automated": {
+    "message": "Diautomatikkan"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Sedang mencipta sandaran..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Gagal mencipta sandaran"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Gagal memulihkan daripada sandaran"
+  },
+  "servers.backups.item.lock": {
+    "message": "Kunci"
+  },
+  "servers.backups.item.locked": {
+    "message": "Dikunci"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "Dalam barisan untuk disandar"
+  },
+  "servers.backups.item.rename": {
+    "message": "Namakan semula"
+  },
+  "servers.backups.item.restore": {
+    "message": "Pulihkan"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Sedang memulihkan daripada sandaran..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Cuba semula"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Buka kunci"
   },
   "servers.notice.actions": {
     "message": "Tindakan"

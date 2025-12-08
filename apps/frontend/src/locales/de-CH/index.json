@@ -1359,7 +1359,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Modrinth Server"
   },
   "layout.footer.resources": {
     "message": "Resourcen"
@@ -2001,7 +2001,7 @@
     "message": "Projekt überprüfen"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting ist der einfachste Weg, ohne Aufwand mit deinen Freunden zu spielen!"
+    "message": "Modrinth Servers ist der einfachste weg, mit deinen Freunden und ohne Ärger zu spielen!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Ab {price}<small> / Monat</small>"
@@ -2558,8 +2558,47 @@
   "search.filter.locked.server.sync": {
     "message": "Mit Server synchronisieren"
   },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Backup-Erstellung im gange"
+  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup-Wiederherstellung im gange"
+  },
+  "servers.backups.item.automated": {
+    "message": "Automatisiert"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Erstelle Backup..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Erstellung eines Backup fehlgeschlagen"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Wiederherstellung von Backup fehlgeschlagen"
+  },
+  "servers.backups.item.lock": {
+    "message": "Sperren"
+  },
+  "servers.backups.item.locked": {
+    "message": "Gesperrt"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "Zur sicherung in warteschlange gestellt"
+  },
+  "servers.backups.item.rename": {
+    "message": "Umbenennen"
+  },
+  "servers.backups.item.restore": {
+    "message": "Wiederherstellen"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Stelle von backup wiederher..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Erneut versuchen"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Entsperren"
   },
   "servers.notice.actions": {
     "message": "Aktionen"

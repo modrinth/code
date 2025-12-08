@@ -1,12 +1,6 @@
 {
-  "app.auth-servers.unreachable.body": {
-    "message": "Os servidores de autenticação do Minecraft podem estar indisponíveis no momento. Verifique sua conexão com a internet e tente novamente mais tarde."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Não foi possível acessar os servidores de autenticação"
-  },
   "app.settings.developer-mode-enabled": {
-    "message": "Modo de desenvolvedor ativado."
+    "message": "Modo desenvolvedor."
   },
   "app.settings.downloading": {
     "message": "Baixando v{version}"

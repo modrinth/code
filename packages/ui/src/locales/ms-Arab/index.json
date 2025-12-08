@@ -152,6 +152,9 @@
   "changelog.product.app": {
     "defaultMessage": "اڤليکاسي"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "ڤلاين"
+  },
   "changelog.product.web": {
     "defaultMessage": "لامن سساوڠ"
   },
@@ -925,6 +928,9 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "دمانکه اندا ماهو ڤلاين اندا دتمڤتکن؟"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "رنتاو تيدق دسنارايکن؟ <link>بريتاهو کامي دمان اندا ايڠين مليهت Modrinth Servers ستروسڽ!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "اسيا تڠݢارا"

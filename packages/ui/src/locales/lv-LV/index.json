@@ -65,6 +65,9 @@
   "changelog.product.api": {
     "defaultMessage": "API"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "Serveri"
+  },
   "collection.label.private": {
     "defaultMessage": "Privāts"
   },

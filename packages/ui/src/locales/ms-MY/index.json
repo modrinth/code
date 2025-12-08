@@ -152,6 +152,9 @@
   "changelog.product.app": {
     "defaultMessage": "Aplikasi"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "Pelayan"
+  },
   "changelog.product.web": {
     "defaultMessage": "Laman Sesawang"
   },
@@ -925,6 +928,9 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "Di manakah anda mahu pelayan anda ditempatkan?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Rantau tidak disenaraikan? <link>Beritahu kami di mana anda ingin melihat Modrinth Servers seterusnya!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Tenggara"

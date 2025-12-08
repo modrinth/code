@@ -986,6 +986,9 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
+  },
   "layout.footer.resources": {
     "message": "Resurse"
   },
@@ -1285,6 +1288,9 @@
   },
   "project.actions.review-project": {
     "message": "Revizuiește proiectul"
+  },
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Servers sunt cea mai simplă modalitate de a te juca împreună cu prietenii fără bătăi de cap!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Începând de la {price}<small> / lună</small>"
@@ -1841,8 +1847,47 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizează cu serverul"
   },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Creare copie de rezervă în curs"
+  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restaurare copie de rezervă în curs"
+  },
+  "servers.backups.item.automated": {
+    "message": "Automat"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Se creează o copie de rezervă..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Eșec la crearea copiei de rezervă"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Eșec la restaurarea din copie de rezervă"
+  },
+  "servers.backups.item.lock": {
+    "message": "Blochează"
+  },
+  "servers.backups.item.locked": {
+    "message": "Blocat"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "Programat pentru copiere de rezervă"
+  },
+  "servers.backups.item.rename": {
+    "message": "Redenumește"
+  },
+  "servers.backups.item.restore": {
+    "message": "Restaurează"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Se restaurează din copie de rezervă..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Reîncearcă"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Deblochează"
   },
   "servers.notice.actions": {
     "message": "Acțiuni"

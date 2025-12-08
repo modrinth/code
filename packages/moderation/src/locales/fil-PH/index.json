@@ -32,9 +32,6 @@
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Magtampok ng gallery image"
   },
-  "nags.multiple-resolution-tags.title": {
-    "defaultMessage": "Piliin ang wastong resolusyon"
-  },
   "nags.select-environments.title": {
     "defaultMessage": "Pumili ng mga environment"
   },

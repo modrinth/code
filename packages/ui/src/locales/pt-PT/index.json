@@ -1,40 +1,4 @@
 {
-  "affiliate.create.button": {
-    "defaultMessage": "Criar link de afiliado"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Criando novo código de afiliado"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Dá um nome ao teu link de afiliado para saberes de onde vêm as pessoas!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Título do link de afiliado"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "e.g Youtube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "O nome do utilizador para quem será criado o código de afiliado"
-  },
-  "affiliate.create.user.label": {
-    "defaultMessage": "Nome de Utilizador"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Inserir nome de utilizador..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Criado por {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Criar link de afiliado..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Cancelar link de afiliado"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Ver estatísticas"
-  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -44,9 +8,6 @@
   "badge.new": {
     "defaultMessage": "Novo"
   },
-  "button.affiliate-links": {
-    "defaultMessage": "Links de afiliado"
-  },
   "button.analytics": {
     "defaultMessage": "Estatísticas"
   },
@@ -55,12 +16,6 @@
   },
   "button.cancel": {
     "defaultMessage": "Cancelar"
-  },
-  "button.clear": {
-    "defaultMessage": "Limpar"
-  },
-  "button.close": {
-    "defaultMessage": "Fechar"
   },
   "button.continue": {
     "defaultMessage": "Continuar"
@@ -85,9 +40,6 @@
   },
   "button.follow": {
     "defaultMessage": "Seguir"
-  },
-  "button.max": {
-    "defaultMessage": "Máximo"
   },
   "button.more-options": {
     "defaultMessage": "Mais opções"
@@ -152,89 +104,14 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "Servidores"
+  },
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
   "collection.label.private": {
     "defaultMessage": "Privada"
-  },
-  "form.label.address-line": {
-    "defaultMessage": "Endereço"
-  },
-  "form.label.address-line-2": {
-    "defaultMessage": "Endereço 2 (Opcional)"
-  },
-  "form.label.amount": {
-    "defaultMessage": "Montante"
-  },
-  "form.label.bank-name": {
-    "defaultMessage": "Nome do Banco"
-  },
-  "form.label.business-name": {
-    "defaultMessage": "Nome da Empresa"
-  },
-  "form.label.city": {
-    "defaultMessage": "Cidade"
-  },
-  "form.label.country": {
-    "defaultMessage": "País"
-  },
-  "form.label.date-of-birth": {
-    "defaultMessage": "Data de nascimento"
-  },
-  "form.label.email": {
-    "defaultMessage": "Email"
-  },
-  "form.label.first-name": {
-    "defaultMessage": "Primeiro nome"
-  },
-  "form.label.last-name": {
-    "defaultMessage": "Último nome"
-  },
-  "form.label.postal-code": {
-    "defaultMessage": "Código postal"
-  },
-  "form.label.state-province": {
-    "defaultMessage": "Região"
-  },
-  "form.placeholder.address": {
-    "defaultMessage": "Inserir endereço"
-  },
-  "form.placeholder.address-2": {
-    "defaultMessage": "Andar, porta, etc."
-  },
-  "form.placeholder.amount": {
-    "defaultMessage": "Inserir valor"
-  },
-  "form.placeholder.bank-name": {
-    "defaultMessage": "Inserir nome do banco"
-  },
-  "form.placeholder.bank-name-dropdown": {
-    "defaultMessage": "Seleciona o nome do banco"
-  },
-  "form.placeholder.business-name": {
-    "defaultMessage": "Inserir nome da empresa"
-  },
-  "form.placeholder.city": {
-    "defaultMessage": "Inserir cidade"
-  },
-  "form.placeholder.country": {
-    "defaultMessage": "Seleciona o país"
-  },
-  "form.placeholder.email": {
-    "defaultMessage": "Inserir endereço de email"
-  },
-  "form.placeholder.first-name": {
-    "defaultMessage": "Inserir primeiro nome"
-  },
-  "form.placeholder.last-name": {
-    "defaultMessage": "Inserir último nome"
-  },
-  "form.placeholder.postal-code": {
-    "defaultMessage": "Inserir código postal"
-  },
-  "form.placeholder.state": {
-    "defaultMessage": "Inserir região"
   },
   "icon-select.edit": {
     "defaultMessage": "Editar ícone"
@@ -274,9 +151,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modo de jogo desconhecido"
-  },
-  "label.available": {
-    "defaultMessage": "{amount} disponível."
   },
   "label.changes-saved": {
     "defaultMessage": "Alterações guardadas"
@@ -325,9 +199,6 @@
   },
   "label.rejected": {
     "defaultMessage": "Rejeitado"
-  },
-  "label.rewards-program-terms-agreement": {
-    "defaultMessage": "Concordo com os <terms-link>Termos do Programa de Recompensa</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "Guardado"
@@ -489,10 +360,10 @@
     "defaultMessage": "Visa"
   },
   "payment-method.charity": {
-    "defaultMessage": "Instituição de caridade"
+    "defaultMessage": "Intituição de cariedade"
   },
   "payment-method.charity-plural": {
-    "defaultMessage": "Instituições de caridade"
+    "defaultMessage": "Instituições de cariedade"
   },
   "payment-method.gift-card": {
     "defaultMessage": "Cartão-presente"
@@ -925,6 +796,9 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "Onde queres que o teu servidor esteja localizado?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Região não listada? <link>Deixa-nos saber onde gostavas de ver os Modrinth Servers a seguir!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste Asiático"

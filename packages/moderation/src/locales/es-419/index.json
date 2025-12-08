@@ -104,9 +104,6 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "Revisa y atiende todas las inquietudes del equipo de moderación antes de volver a enviar."
   },
-  "nags.moderator-feedback.title": {
-    "defaultMessage": "Revisar retroalimentación"
-  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Elige la resolución correcta"
   },
@@ -160,9 +157,6 @@
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Selecciona etiquetas adecuadas"
-  },
-  "nags.upload-gallery-image.description": {
-    "defaultMessage": ""
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Subir una imagen a la galería"

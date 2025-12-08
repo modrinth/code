@@ -11,9 +11,6 @@
   "affiliate.create.title.label": {
     "defaultMessage": "Ortaklık bağlantısının başlığı"
   },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "Örn. Youtube"
-  },
   "affiliate.create.user.description": {
     "defaultMessage": "Ortaklık kodunu oluşturmak için kullanıcının kullanıcı adı"
   },
@@ -152,8 +149,8 @@
   "changelog.product.app": {
     "defaultMessage": "Uygulama"
   },
-  "changelog.product.hosting": {
-    "defaultMessage": "Hosting"
+  "changelog.product.servers": {
+    "defaultMessage": "Sunucular"
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
@@ -170,17 +167,8 @@
   "form.label.amount": {
     "defaultMessage": "Miktar"
   },
-  "form.label.bank-name": {
-    "defaultMessage": "Banka ismi"
-  },
   "form.label.business-name": {
     "defaultMessage": "İşletme adı"
-  },
-  "form.label.city": {
-    "defaultMessage": "Şehir"
-  },
-  "form.label.country": {
-    "defaultMessage": "Ülke"
   },
   "form.label.date-of-birth": {
     "defaultMessage": "Doğum tarihi"
@@ -191,9 +179,6 @@
   "form.label.first-name": {
     "defaultMessage": "İlk adı"
   },
-  "form.label.last-name": {
-    "defaultMessage": "İkinci isim"
-  },
   "form.label.postal-code": {
     "defaultMessage": "Posta kodu"
   },
@@ -202,42 +187,6 @@
   },
   "form.placeholder.address": {
     "defaultMessage": "Adresi girin"
-  },
-  "form.placeholder.address-2": {
-    "defaultMessage": "Apartman, daire, vb."
-  },
-  "form.placeholder.amount": {
-    "defaultMessage": "Miktar giriniz"
-  },
-  "form.placeholder.bank-name": {
-    "defaultMessage": "Banka ismi giriniz"
-  },
-  "form.placeholder.bank-name-dropdown": {
-    "defaultMessage": "Banka ismini seçin"
-  },
-  "form.placeholder.business-name": {
-    "defaultMessage": "İşletme ismini girin"
-  },
-  "form.placeholder.city": {
-    "defaultMessage": "Şehir girin"
-  },
-  "form.placeholder.country": {
-    "defaultMessage": "Ülke seç"
-  },
-  "form.placeholder.email": {
-    "defaultMessage": "Eposta adresini girin"
-  },
-  "form.placeholder.first-name": {
-    "defaultMessage": "İlk ismi girin"
-  },
-  "form.placeholder.last-name": {
-    "defaultMessage": "İkinci ismi girin"
-  },
-  "form.placeholder.postal-code": {
-    "defaultMessage": "Posta kodunu giriniz"
-  },
-  "form.placeholder.state": {
-    "defaultMessage": "İl girin"
   },
   "icon-select.edit": {
     "defaultMessage": "Simgeyi düzenle"
@@ -277,9 +226,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Bilinmeyen oyun modu"
-  },
-  "label.available": {
-    "defaultMessage": "{amount} mevcut."
   },
   "label.changes-saved": {
     "defaultMessage": "Değişiklikler kaydedildi"
@@ -479,9 +425,6 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
-  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
-    "defaultMessage": "PayPal Uluslararası"
-  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -490,27 +433,6 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
-  },
-  "payment-method.charity": {
-    "defaultMessage": "Yardım kuruluşu"
-  },
-  "payment-method.charity-plural": {
-    "defaultMessage": "Yardım kuruluşları"
-  },
-  "payment-method.gift-card": {
-    "defaultMessage": "Hediye kartı"
-  },
-  "payment-method.gift-card-plural": {
-    "defaultMessage": "Hediye kartları"
-  },
-  "payment-method.venmo": {
-    "defaultMessage": "Venmo"
-  },
-  "payment-method.virtual-visa": {
-    "defaultMessage": "Sanal Visa"
-  },
-  "payment-method.virtual-visa-plural": {
-    "defaultMessage": "Sanal Visas"
   },
   "project-type.all": {
     "defaultMessage": "Tümü"
@@ -842,42 +764,6 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Yükleyici"
   },
-  "servers.backups.item.auto": {
-    "defaultMessage": "Otomatik"
-  },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Yedekleme sıklığı"
-  },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Yedekleniyor..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "Yedekleme başarısız"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "Yedekten geri yükleme başarısız"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Elle geri yükleme"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Yedekleme sırada"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Geri yükleme sırada"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Yeniden adlandır"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Geri yükle"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Yedekten geri yükleniyor..."
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "Tekrar dene"
-  },
   "servers.notice.dismiss": {
     "defaultMessage": "Görmezden gel"
   },
@@ -966,7 +852,7 @@
     "defaultMessage": "Sunucunun nerede bulunmasını istersin?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Bölge listede yok mu? <link>Modrinth Hosting'i gelecekte nerede görmek istediğini bize söyle!</link>"
+    "defaultMessage": "Bölge listede yok mu? <link>Modrinth Sunucularını ileride nerede görmek istediğini bize bildir!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Güneydoğu Asya"

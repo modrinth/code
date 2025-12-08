@@ -1,10 +1,4 @@
 {
-  "app.auth-servers.unreachable.body": {
-    "message": "Autořizační servery Minecraftu aktuálně nejsou k dispozici. Zkontrolujte si své připojení k internetu a zkuste to znovu později."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Připojení k autorizačním serverům se nezdařilo"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Vývojářský režim povolen."
   },
@@ -30,19 +24,19 @@
     "message": "Správa zdrojů"
   },
   "app.update-toast.body": {
-    "message": "Aplikace Modrinth v{version} je připravena k instalaci! Naninstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
+    "message": "Modrinth App v{version} je připravena k instalaci! Znovu načtěte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Stahování aplikace Modrinth v{version} bylo dokončeno. Naninstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
+    "message": "Modrinth App v{version} byla dokončena ke stažení. Znovu načtěte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
   },
   "app.update-toast.body.metered": {
-    "message": "Aplikace Modrinth v{version} je nyní k dispozici! Protože jste v měřené síti, nebyla stažena automaticky."
+    "message": "Modrinth App v{version} je nyní k dispozici! Protože jste v síti s měřením, nebyla stažena automaticky."
   },
   "app.update-toast.changelog": {
     "message": "Seznam změn"
   },
   "app.update-toast.download": {
-    "message": "Stahování ({size})"
+    "message": "Stáhnout ({size})"
   },
   "app.update-toast.downloading": {
     "message": "Stahování..."
@@ -51,10 +45,10 @@
     "message": "Načíst znovu"
   },
   "app.update-toast.title": {
-    "message": "Aktualizace je k dispozici"
+    "message": "K dispozici je aktualizace"
   },
   "app.update-toast.title.download-complete": {
-    "message": "Stahování bylo dokončeno"
+    "message": "Stahování dokončeno"
   },
   "app.update.complete-toast.text": {
     "message": "Kliknutím sem zobrazíte seznam změn."
@@ -69,37 +63,7 @@
     "message": "Stahování aktualizace ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "Restartovat aplikaci pro nainstalování aktualizace"
-  },
-  "friends.action.add-friend": {
-    "message": "Přidat kamaráda"
-  },
-  "friends.add-friend.submit": {
-    "message": "Poslat žádost o přátelství"
-  },
-  "friends.add-friend.title": {
-    "message": "Přidávání kamaráda"
-  },
-  "friends.add-friend.username.title": {
-    "message": "Jak se váš kamarád jmenuje na Modrinthu?"
-  },
-  "friends.friend.view-profile": {
-    "message": "Zobrazit profil"
-  },
-  "friends.heading": {
-    "message": "Kamarádi"
-  },
-  "friends.heading.active": {
-    "message": "Aktivní"
-  },
-  "friends.heading.offline": {
-    "message": "Offline"
-  },
-  "friends.heading.online": {
-    "message": "Online"
-  },
-  "friends.section.heading": {
-    "message": "{title} - {count}"
+    "message": "Znovu načíst pro nainstalování aktualizace"
   },
   "instance.add-server.add-and-play": {
     "message": "Přidat a hrát"
@@ -114,7 +78,7 @@
     "message": "Zapnuto"
   },
   "instance.add-server.resource-pack.prompt": {
-    "message": "Dotázat se"
+    "message": "Na dotaz"
   },
   "instance.add-server.title": {
     "message": "Přidat server"
@@ -123,7 +87,7 @@
     "message": "Upravit server"
   },
   "instance.edit-world.hide-from-home": {
-    "message": "Skrýt z domovské obrazovky"
+    "message": "Schovat z domovské stránky"
   },
   "instance.edit-world.name": {
     "message": "Název"
@@ -132,16 +96,16 @@
     "message": "Minecraft svět"
   },
   "instance.edit-world.reset-icon": {
-    "message": "Resetovat ikonu"
+    "message": "Reset ikony"
   },
   "instance.edit-world.title": {
     "message": "Upravit svět"
   },
   "instance.filter.disabled": {
-    "message": "Vypnuté projekty"
+    "message": "Vypnout projekty"
   },
   "instance.filter.updates-available": {
-    "message": "K dispozice jsou aktualizace"
+    "message": "Aktualizace jsou dostupné"
   },
   "instance.server-modal.address": {
     "message": "Adresa"
@@ -153,19 +117,19 @@
     "message": "Minecraft Server"
   },
   "instance.server-modal.resource-pack": {
-    "message": "Balíčky textur"
+    "message": "Balíček textur"
   },
   "instance.settings.tabs.general": {
     "message": "Obecné"
   },
   "instance.settings.tabs.general.delete": {
-    "message": "Odstranit instalaci"
+    "message": "Smazat instanci"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Odstranit instalaci"
+    "message": "Smazat instanci"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Trvale smaže instalaci z vašeho zařízení, včetně vašich světů, konfigurací a veškerého nainstalovaného obsahu. Buďte opatrní, protože jakmile instalaci smažete, nebude možné ji obnovit."
+    "message": "Trvale smaže instanci z vašeho zařízení, včetně vašich světů, konfigurací a veškerého nainstalovaného obsahu. Buďte opatrní, protože jakmile instanci smažete, není možné ji obnovit."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Mazání..."
@@ -177,37 +141,37 @@
     "message": "Nelze duplikovat při instalaci."
   },
   "instance.settings.tabs.general.duplicate-instance": {
-    "message": "Duplikovat instalaci"
+    "message": "Duplikovat instanci"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Vytvoří kopii této instalace, včetně světů, konfigurací, modů atd."
+    "message": "Vytvoří kopii této instance, včetně světů, konfigurací, modů atd."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Upravit ikonu"
   },
   "instance.settings.tabs.general.edit-icon.remove": {
-    "message": "Odstranit ikonu"
+    "message": "Icona odstranit"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "Změnit ikonu"
+    "message": "Ikona replikace"
   },
   "instance.settings.tabs.general.edit-icon.select": {
-    "message": "Vybrat ikonu"
+    "message": "Výber ikona"
   },
   "instance.settings.tabs.general.library-groups": {
     "message": "Skupina knihoven"
   },
   "instance.settings.tabs.general.library-groups.create": {
-    "message": "Vytvořit novou skupinu"
+    "message": "Vytvoří novou skupinu"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "Skupiny knihoven vám umožňují uspořádat instalace do různých sekcí."
+    "message": "Skupiny knihoven vám umožňují uspořádat instance do různých sekcí v knihovně."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Zadejte název skupiny"
+    "message": "Zadej název skupiny"
   },
   "instance.settings.tabs.general.name": {
-    "message": "Jméno"
+    "message": "Název"
   },
   "instance.settings.tabs.hooks": {
     "message": "Spouštěcí hooky"
@@ -231,7 +195,7 @@
     "message": "Před spuštěním"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
-    "message": "Spouštějí se před spuštěním instalace."
+    "message": "Spouštějí se před spuštěním instance."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Zadejte příkaz k provedení před spuštěním..."
@@ -252,28 +216,28 @@
     "message": "Instalace"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} pro Minecraft {game_version} již je nainstalována"
+    "message": "{platform} {version} pro Minecraft {game_version} již nainstalována"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "Vanilla {game_version} již je nainstalována"
+    "message": "Vanilla {game_version} již nainstalována"
   },
   "instance.settings.tabs.installation.change-version.button": {
-    "message": "Změnit verzi"
+    "message": "Změnit instalaci"
   },
   "instance.settings.tabs.installation.change-version.button.install": {
     "message": "Instalovat"
   },
   "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Probíhá nstalace"
+    "message": "Instalace"
   },
   "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
     "message": "Načítání verzí modpacku"
   },
   "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Instalace nové verze"
+    "message": "Instalace nových verzí"
   },
   "instance.settings.tabs.installation.currently-installed": {
-    "message": "Aktuálně nainstalováno"
+    "message": "Aktuální instalace"
   },
   "instance.settings.tabs.installation.debug-information": {
     "message": "Debugové informace:"
@@ -288,7 +252,7 @@
     "message": "Instalovat"
   },
   "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Probíhá instalace"
+    "message": "Probíhající instalace"
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} verze"
@@ -297,13 +261,13 @@
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "Nelze načíst podrobnosti o modpacku. Prosím, zkontrolujte své připojení k internetu."
+    "message": "Nelze načíst podrobnosti o modpacku. Zkontrolujte připojení k internetu."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
     "message": "{loader} není dostupný pro Minecraft {version}. Zkuste jiný mod loader."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Tato instalace je připojená k modpacku, který ake nebyl najit na Modrinthu."
+    "message": "Tato instalace je připojená k modpacku, ale modpack nebyl najit na Modrinthu."
   },
   "instance.settings.tabs.installation.platform": {
     "message": "Platforma"
@@ -315,7 +279,7 @@
     "message": "Přeinstalovávání modpacku"
   },
   "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Přeinstalace resetuje veškerý nainstalovaný nebo upravený obsah kromě toho, co poskytuje modpack, a odstraní všechny módy nebo obsah, které jste přidali do původní instalace. To může opravit neočekávané chyby, ale pokud vaše světy závisejí na doinstalovaném obsahu, možná budou poškozeny."
+    "message": "Přeinstalace resetuje veškerý nainstalovaný nebo upravený obsah na to, co poskytuje modpack, a odstraní všechny mody nebo obsah, které jste přidali do původní instalaci. To může opravit neočekávané chyby, ale pokud vaše světy závisejí na nově instalovaném obsahu, možná budou poškozeny."
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Opravdu si přejete přeinstalovat tuto instalaci?"

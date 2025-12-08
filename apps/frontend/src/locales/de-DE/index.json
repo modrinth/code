@@ -153,7 +153,7 @@
     "message": "Spiele mit den Mods, die du liebst"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Erstelle, teile und spiele Modpacks mit Tausenden von Mods und Modpacks, die hier auf Modrinth gehostet werden."
+    "message": "Erstelle, teile und spiele Modpacks mit Tausenden von Mods und Modpacks von Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
     "message": "Modpack"
@@ -177,7 +177,7 @@
     "message": "den du zuvor verwendet hast"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Screenshot der Modrinth App mit einer geöffneten Cobblemon Instanz auf der „Inhalte“-Seite."
+    "message": "Screenshot der Modrinth App mit einer geöffneten Cobblemon-Instanz auf der „Inhalte“-Seite."
   },
   "app-marketing.hero.description": {
     "message": "Die Modrinth App ist ein einzigartiger, quelloffener Launcher, mit dem du deine Lieblingsmods spielen und stets aktuell halten kannst. Alles in einem praktischen Paket."
@@ -219,7 +219,7 @@
     "message": "Wiederherstellungs E-Mail senden"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Gib unten deine E-Mail ein und wir senden dir einen Link, mit dem du dein Konto wiederherstellen kannst."
+    "message": "Gib deine E-Mail im folgenden Feld ein und wir werden dir einen Wiederherstellungs-Link senden, um dir zu erlauben, dein Konto wiederherzustellen."
   },
   "auth.reset-password.method-choice.email-username.label": {
     "message": "E-Mail oder Nutzername"
@@ -969,13 +969,13 @@
     "message": "Bitte Steuerformular ausfüllen"
   },
   "error.collection.404.list_item.1": {
-    "message": "Eventuell hast du die URL der Kollektion falsch eingegeben."
+    "message": "Möglicherweise hast du die URL der Kollektion falsch eingegeben."
   },
   "error.collection.404.list_item.2": {
     "message": "Diese Kollektion ist eventuell Privat."
   },
   "error.collection.404.list_item.3": {
-    "message": "Die Kollektion wurde eventuell vom Moderationsteam von Modrinth wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> entfernt."
+    "message": "Diese Kollektion wurde vielleicht von Modrinth's Moderationsteam wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
   },
   "error.collection.404.list_title": {
     "message": "Warum?"
@@ -990,13 +990,13 @@
     "message": "Seite nicht gefunden"
   },
   "error.generic.451.subtitle": {
-    "message": "Diese Seite wurde aus rechtlichen Gründen gesperrt, beispielsweise aufgrund staatlicher Zensur oder laufender Gerichtsverfahren."
+    "message": "Diese Seite wurde aufgrund rechtlicher Gründe blockiert, zB wegen Regierungszensur oder laufende Gerichtsverfahren."
   },
   "error.generic.451.title": {
     "message": "Inhalt aufgrund rechtlicher Gründe nicht verfügbar"
   },
   "error.generic.default.list_item.1": {
-    "message": "Schaue auf unserer <status-link>Statusseite</status-link> nach, ob Modrinth offline ist."
+    "message": "Prüfe auf der <status-link>Status-Webseite</status-link> ob Modrinth offline ist."
   },
   "error.generic.default.list_item.2": {
     "message": "Wenn dies häufiger passiert, solltest du das Modrinth-Team informieren, indem du unserem <discord-link>Discord-Server</discord-link> beitrittst."
@@ -1011,13 +1011,13 @@
     "message": "Oh nein!"
   },
   "error.organization.404.list_item.1": {
-    "message": "Eventuell hast du die URL der Organisation falsch eingegeben."
+    "message": "Du hast vielleicht die URL der Organisation falsch geschrieben."
   },
   "error.organization.404.list_item.2": {
-    "message": "Der Besitzer der Organisation hat eventuell die URL geändert oder sie gelöscht."
+    "message": "Der Besitzer hat vielleicht die URL geändert oder die Organisation gelöscht."
   },
   "error.organization.404.list_item.3": {
-    "message": "Die Organisation wurde eventuell vom Moderationsteam von Modrinth wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> entfernt."
+    "message": "Diese Organisation wurde vielleicht von Modrinth's Moderationsteam wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
   },
   "error.organization.404.list_title": {
     "message": "Warum?"
@@ -1026,10 +1026,10 @@
     "message": "Organisation nicht gefunden"
   },
   "error.project.404.list_item.1": {
-    "message": "Eventuell hast du die URL des Projekts falsch eingegeben."
+    "message": "Du hast vielleicht die Projekt-URL falsch geschrieben."
   },
   "error.project.404.list_item.2": {
-    "message": "Der Besitzer des Projekts hat eventuell die URL geändert, das Projekt auf privat gestellt oder es gelöscht."
+    "message": "Der Besitzer des Projekts hat vielleicht die URL verändert, das Projekt auf Privat gestellt, oder es gelöscht."
   },
   "error.project.404.list_item.3": {
     "message": "Dieses Projekt wurde vielleicht von Modrinth's Moderationsteam wegen Verstoßes gegen unsere <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
@@ -1041,10 +1041,10 @@
     "message": "Projekt nicht gefunden"
   },
   "error.user.404.list_item.1": {
-    "message": "Du hast eventuell den Benutzernamen falsch eingegeben."
+    "message": "Du hast vielleicht den Nutzernamen falsch geschrieben."
   },
   "error.user.404.list_item.2": {
-    "message": "Der Benutzer hat eventuell seinen Benutzernamen geändert oder sein Konto gelöscht."
+    "message": "Dieser Nutzer hat vielleicht seinen Nutzernamen geändert oder seinen Account gelöscht."
   },
   "error.user.404.list_item.3": {
     "message": "Dieser Nutzer wurde vielleicht wegen dem Verstoß gegen Modrinth's <tou-link>Nutzungsbedingungen</tou-link> gesperrt."
@@ -1254,7 +1254,7 @@
     "message": "Kontoeinstellungen besuchen"
   },
   "layout.banner.add-email.description": {
-    "message": "Aus Sicherheitsgründen verlangt Modrinth, dass du eine E-Mail-Adresse für dein Konto registrierst."
+    "message": "Aus Sicherheitsgründen musst du bei Modrinth eine E-Mail-Adresse für dein Konto registrieren."
   },
   "layout.banner.build-fail.description": {
     "message": "Bei der Bereitstellung des Modrinth-Frontends konnte kein Status aus der API generiert werden. Dies kann auf einen Ausfall oder einen Konfigurationsfehler zurückzuführen sein. Der Neustart erfolgt, sobald die API verfügbar ist. Fehlercodes: {errors}; aktuelle API URL: {url}"
@@ -1359,7 +1359,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Modrinth Server"
   },
   "layout.footer.resources": {
     "message": "Ressourcen"
@@ -1758,7 +1758,7 @@
     "message": "Ein Modrinth-Benutzer."
   },
   "profile.button.billing": {
-    "message": "Benutzerabrechnungen verwalten"
+    "message": "Verwalte Nutzer Zahlungen"
   },
   "profile.button.edit-role": {
     "message": "Rolle ändern"
@@ -1884,10 +1884,10 @@
     "message": "Erfolg"
   },
   "project-member-header.success-decline": {
-    "message": "Du hast die Teameinladung abgelehnt"
+    "message": "Du hast die Team-Einladung abgelehnt"
   },
   "project-member-header.success-join": {
-    "message": "Du bist dem Projektteam beigetreten"
+    "message": "Du bist dem Projekt-Team beigetreten"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Checkliste für die Veröffentlichung"
@@ -1902,7 +1902,7 @@
     "message": "Dein Projekt wurde vom Modrinth-Team {status, select, rejected {abgelehnt} withheld {zurückgehalten} other {{status}}}. In der Regel hast du die Möglichkeit, es nach Umsetzung der Anmerkungen erneut einzureichen."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
-    "message": "Du musst die erforderlichen Schritte in der Veröffentlichungs-Checkliste erledigen!"
+    "message": "Du musst erst die benötigten Schritte aus der Veröffentlichungsliste abschließen!"
   },
   "project-moderation-nags.submit-for-review": {
     "message": "Zur Überprüfung einreichen"
@@ -1974,7 +1974,7 @@
     "message": "Erstellt {date}"
   },
   "project.about.details.licensed": {
-    "message": "Lienziert unter {license}"
+    "message": "Lizenziert {license}"
   },
   "project.about.details.published": {
     "message": "Veröffentlicht {date}"
@@ -2001,7 +2001,7 @@
     "message": "Projekt überprüfen"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting ist der einfachste Weg, ohne Aufwand mit deinen Freunden zu spielen!"
+    "message": "Modrinth Servers ist der einfachste Weg, ohne Aufwand mit deinen Freunden zu spielen!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Ab {price}<small> / Monat</small>"
@@ -2091,7 +2091,7 @@
     "message": "Bitte die Umgebungsmetadaten überprüfen"
   },
   "project.error.loading": {
-    "message": "Fehler beim Laden der Projektdaten{message}"
+    "message": "Fehler beim laden der Projektdaten{message}"
   },
   "project.error.page-not-found": {
     "message": "Die Seite konnte nicht gefunden werden"
@@ -2148,7 +2148,7 @@
     "message": "Bitte überprüfe die untenstehenden Optionen"
   },
   "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Nur Mod- oder Modpackprojekte können Umgebungs-Metadaten haben."
+    "message": "Nur Mod- oder Modpack Projekte können Umgebungs-Metadaten haben."
   },
   "project.settings.environment.notice.wrong-project-type.title": {
     "message": "Dieser Projekttyp unterstützt keine Umgebungs-Metadaten"
@@ -2558,8 +2558,47 @@
   "search.filter.locked.server.sync": {
     "message": "Mit Server synchronisieren"
   },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Sicherung wird erstellt"
+  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Sicherung wird wiederhergestellt"
+  },
+  "servers.backups.item.automated": {
+    "message": "Automatisiert"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Erstelle Sicherung..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Sicherung konnte nicht erstellt werden"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Wiederherstellung aus der Sicherung fehlgeschlagen"
+  },
+  "servers.backups.item.lock": {
+    "message": "Sperren"
+  },
+  "servers.backups.item.locked": {
+    "message": "Gesperrt"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "Zur Sicherung vorgemerkt"
+  },
+  "servers.backups.item.rename": {
+    "message": "Umbenennen"
+  },
+  "servers.backups.item.restore": {
+    "message": "Wiederherstellen"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Stellt aus Sicherung wieder her..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Erneut versuchen"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Entsperren"
   },
   "servers.notice.actions": {
     "message": "Aktionen"
@@ -2622,7 +2661,7 @@
     "message": "Das löscht die Zahlungsmethode für immer (Wirklich für immer)."
   },
   "settings.billing.modal.delete.title": {
-    "message": "Möchtest du diese Zahlungsmethode wirklich entfernen?"
+    "message": "Bist Du Dir sicher, dass Du diese Zahlungsmethode löschen willst?"
   },
   "settings.billing.payment_method.action.add": {
     "message": "Zahlungsmethode hinzufügen"

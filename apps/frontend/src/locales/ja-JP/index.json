@@ -132,7 +132,7 @@
     "message": "Modrinthアプリ"
   },
   "app-marketing.features.performance.one-billion-percent": {
-    "message": "10億 ％"
+    "message": "10億％"
   },
   "app-marketing.features.performance.process-name": {
     "message": "プロセス名"
@@ -172,9 +172,6 @@
   },
   "app-marketing.features.website.title": {
     "message": "ウェブサイトとの統合"
-  },
-  "app-marketing.features.youve-used-before": {
-    "message": "以前に使用したことある"
   },
   "app-marketing.hero.download-button": {
     "message": "Modrinth アプリをダウンロードする"
@@ -533,12 +530,6 @@
   "dashboard.affiliate-links.create.button": {
     "message": "アフィリエイトリンクを作成"
   },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "「{title}」のアフィリエイトリンクを本当に解除しますか？"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "アフィリエイトリンクを検索..."
-  },
   "dashboard.collections.button.create-new": {
     "message": "新規作成"
   },
@@ -790,6 +781,9 @@
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth サーバー"
   },
   "layout.footer.resources": {
     "message": "リソース"

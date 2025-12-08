@@ -1,10 +1,4 @@
 {
-  "app.auth-servers.unreachable.body": {
-    "message": "I server di autenticazione di Minecraft stanno riscontrando problemi. Controlla la tua connessione a Internet e riprova più tardi."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Impossibile raggiungere i server di autenticazione"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Modalità sviluppatore attiva."
   },
@@ -30,13 +24,13 @@
     "message": "Gestione risorse"
   },
   "app.update-toast.body": {
-    "message": "Modrinth v{version} è pronta per essere installata! Ricarica per aggiornare ora, o avverrà quando chiudi l'app."
+    "message": "Modrinth App v{version} è pronta per essere installata! Ricarica per aggiornare ora, altrimenti ciò avverrà in automatico alla chiusura di Modrinth App."
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth v{version} è stata scaricata. Ricarica per aggiornare ora, o avverrà quando chiudi l'app."
+    "message": "Modrinth App v{version} è stata scaricata. Ricarica per aggiornare ora, altrimenti ciò avverrà in automatico alla chiusura di Modrinth App."
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth v{version} è ora disponibile! Poiché sei su una rete a consumo, non l'abbiamo scaricata automaticamente."
+    "message": "Modrinth App v{version} è ora disponibile! Poiché sei su una rete a consumo, non l'abbiamo scaricata automaticamente."
   },
   "app.update-toast.changelog": {
     "message": "Changelog"
@@ -69,7 +63,7 @@
     "message": "Scaricando aggiornamento ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "Ricarica per installare l'aggiornamento"
+    "message": "Ricarica per installare aggiornamento"
   },
   "friends.action.add-friend": {
     "message": "Stringi un'amicizia"
@@ -243,13 +237,13 @@
     "message": "Nome"
   },
   "instance.settings.tabs.hooks": {
-    "message": "Hook di avvio"
+    "message": "Appigli di lancio"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Hook di avvio personalizzati"
+    "message": "Appigli di lancio personalizzati"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Gli hook permettono a utenti avanzati di eseguire comandi di sistema prima e dopo l'avvio del gioco."
+    "message": "Gli appigli, o hook, permettono a utenti avanzati di eseguire comandi di sistema prima e dopo il lancio del gioco."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-uscita"
@@ -267,10 +261,10 @@
     "message": "Eseguito prima dell'avvio dell'istanza."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Inserisci comando di pre-avvio..."
+    "message": "Inserisci comando pre-lancio..."
   },
   "instance.settings.tabs.hooks.title": {
-    "message": "Hook del gioco"
+    "message": "Appigli all'avvio del gioco"
   },
   "instance.settings.tabs.hooks.wrapper": {
     "message": "Wrapper"
@@ -330,7 +324,7 @@
     "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
-    "message": "Non è stato possibile ottenere i dettagli del modpack collegato. Si prega di verificare la connessione a Internet."
+    "message": "Non è stato possibile ottenere i dettagli del modpack collegato. Si prega di verificare la connessione a internet."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
     "message": "{loader} non è disponibile per Minecraft {version}. Prova un altro loader."
@@ -375,7 +369,7 @@
     "message": "Riparazione in corso"
   },
   "instance.settings.tabs.installation.reset-selections": {
-    "message": "Resetta ad attuale"
+    "message": "Resetta a corrente"
   },
   "instance.settings.tabs.installation.show-all-versions": {
     "message": "Mostra tutte le versioni"
@@ -399,7 +393,7 @@
     "message": "Impossibile {action} senza connessione"
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": ""
+    "message": "Impossibile {action} durante la riparazione"
   },
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(versione sconosciuta)"
@@ -426,7 +420,7 @@
     "message": "Variabili d'ambiente"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "Hook"
+    "message": "Appigli"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Argomenti Java"

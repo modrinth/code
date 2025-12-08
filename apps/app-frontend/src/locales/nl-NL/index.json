@@ -1,7 +1,4 @@
 {
-  "app.auth-servers.unreachable.body": {
-    "message": "Minecraft verificatie servers zijn misschien offline. Check je internetverbinding en probeer opnieuw later."
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
   },

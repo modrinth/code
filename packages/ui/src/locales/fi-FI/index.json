@@ -89,6 +89,9 @@
   "changelog.product.app": {
     "defaultMessage": "Sovellus"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "Palvelimet"
+  },
   "changelog.product.web": {
     "defaultMessage": "Nettisivu"
   },
