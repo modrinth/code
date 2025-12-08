@@ -11,38 +11,18 @@
 			<div
 				class="flex flex-col gap-1.5 gap-y-4 rounded-xl border border-solid border-surface-5 p-3 py-4"
 			>
-				<template v-if="detectedVersions.length">
-					<div class="space-y-2">
-						<span class="font-medium">Detected</span>
-						<div class="flex flex-wrap gap-2">
-							<ButtonStyled v-for="version in detectedVersions" :key="version" type="chip">
-								<button class="w-max" @click="toggleVersion(version)">
-									{{ version }}
-									<XIcon />
-								</button>
-							</ButtonStyled>
-						</div>
-					</div>
-				</template>
-				<div class="space-y-2">
-					<span v-if="detectedVersions.length" class="font-medium">Selected</span>
-					<div class="flex flex-wrap gap-2">
-						<template v-if="draftVersion.game_versions.length">
-							<ButtonStyled
-								v-for="version in draftVersion.game_versions"
-								:key="version"
-								type="chip"
-							>
-								<button class="w-max" @click="toggleVersion(version)">
-									{{ version }}
-									<XIcon />
-								</button>
-							</ButtonStyled>
-						</template>
-						<template v-else>
-							<span>No versions selected.</span>
-						</template>
-					</div>
+				<div class="flex flex-wrap gap-2">
+					<template v-if="draftVersion.game_versions.length">
+						<ButtonStyled v-for="version in draftVersion.game_versions" :key="version" type="chip">
+							<button class="w-max" @click="toggleVersion(version)">
+								{{ version }}
+								<XIcon />
+							</button>
+						</ButtonStyled>
+					</template>
+					<template v-else>
+						<span>No versions selected.</span>
+					</template>
 				</div>
 			</div>
 		</div>
@@ -56,8 +36,6 @@ import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 import { useManageVersion } from '~/composables/versions/manage-version'
 
 import McVersionPicker from '../components/McVersionPicker.vue'
-
-const detectedVersions: string[] = [] // TODO, implement detected versions logic
 
 const generatedState = useGeneratedState()
 const gameVersions = generatedState.value.gameVersions
