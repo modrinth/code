@@ -37,8 +37,11 @@
 						type="chip"
 					>
 						<button
-							class="!text-contrast focus:outline-none"
-							:class="versionType === 'all' ? 'w-26' : 'w-16'"
+							class="focus:outline-none"
+							:class="[
+								versionType === 'all' ? 'w-26' : 'w-16',
+								modelValue.includes(version) ? '!text-contrast' : '',
+							]"
 							@click="() => handleToggleVersion(version)"
 							@blur="
 								() => {
