@@ -80,6 +80,16 @@ const navItems = computed(() => {
 			icon: BookTextIcon,
 		},
 		{
+			link: `/${base}/settings/versions`,
+			label: formatMessage(commonProjectSettingsMessages.versions),
+			icon: VersionIcon,
+		},
+		{
+			link: `/${base}/gallery`,
+			label: formatMessage(commonProjectSettingsMessages.gallery),
+			icon: ImageIcon,
+		},
+		{
 			link: `/${base}/settings/links`,
 			label: formatMessage(commonProjectSettingsMessages.links),
 			icon: LinkIcon,
@@ -89,25 +99,10 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.members),
 			icon: UsersIcon,
 		},
-		{ type: 'heading', label: formatMessage(commonProjectSettingsMessages.view) },
 		{
 			link: `/${base}/settings/analytics`,
 			label: formatMessage(commonProjectSettingsMessages.analytics),
 			icon: ChartIcon,
-			chevron: true,
-		},
-		{ type: 'heading', label: formatMessage(commonProjectSettingsMessages.upload) },
-		{
-			link: `/${base}/gallery`,
-			label: formatMessage(commonProjectSettingsMessages.gallery),
-			icon: ImageIcon,
-			chevron: true,
-		},
-		{
-			link: `/${base}/settings/versions`,
-			label: formatMessage(commonProjectSettingsMessages.versions),
-			icon: VersionIcon,
-			chevron: true,
 		},
 	]
 	return items.filter(Boolean) as any[]
