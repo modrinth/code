@@ -37,7 +37,9 @@
 <script setup lang="ts">
 import { Admonition, DropzoneFileInput, injectProjectPageContext } from '@modrinth/ui'
 import { acceptFileFromProjectType } from '@modrinth/utils'
+
 import { useManageVersion } from '~/composables/versions/manage-version'
+
 import VersionFileRow from '../components/VersionFileRow.vue'
 
 const { projectV2 } = injectProjectPageContext()

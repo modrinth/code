@@ -32,7 +32,7 @@
 			</template>
 
 			<ButtonStyled size="standard" :circular="true">
-				<button aria-label="Remove file" @click="emitRemove" class="!shadow-none">
+				<button aria-label="Remove file" class="!shadow-none" @click="emitRemove">
 					<XIcon aria-hidden="true" />
 				</button>
 			</ButtonStyled>

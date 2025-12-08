@@ -1,13 +1,13 @@
 <template>
 	<label
-		class="flex flex-col items-center justify-center gap-2.5 cursor-pointer p-8 rounded-3xl border-2 border-dashed border-surface-4 bg-surface-5 text-contrast"
+		class="flex flex-col items-center justify-center gap-2.5 cursor-pointer p-8 rounded-3xl border-2 border-dashed border-surface-5 bg-surface-4 text-contrast"
 		@drop.prevent="handleDrop"
 		@dragover.prevent
 	>
 		<div
 			class="h-14 w-14 grid place-content-center rounded-2xl text-brand border-brand border-solid border bg-highlight-green"
 		>
-			<UploadIcon aria-hidden="true" class="text-brand w-8 h-8" />
+			<FolderUpIcon aria-hidden="true" class="text-brand w-8 h-8" />
 		</div>
 
 		<div class="flex flex-col items-center justify-center gap-1 text-contrast text-center">
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { UploadIcon } from '@modrinth/assets'
+import { FolderUpIcon } from '@modrinth/assets'
 import { fileIsValid } from '@modrinth/utils'
 import { ref } from 'vue'
 

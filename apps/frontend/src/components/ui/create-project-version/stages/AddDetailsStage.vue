@@ -36,6 +36,30 @@
 				maxlength="32"
 			/>
 		</div>
+
+		<div class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast"> Detected loaders </span>
+			<input
+				id="version-number"
+				v-model="draftVersion.version_title"
+				placeholder="Enter subtitle..."
+				type="text"
+				autocomplete="off"
+				maxlength="32"
+			/>
+		</div>
+
+		<div class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast"> Detected versions </span>
+			<input
+				id="version-number"
+				v-model="draftVersion.version_title"
+				placeholder="Enter subtitle..."
+				type="text"
+				autocomplete="off"
+				maxlength="32"
+			/>
+		</div>
 	</div>
 </template>
 
