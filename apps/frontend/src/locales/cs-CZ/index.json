@@ -695,9 +695,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth servery"
-  },
   "layout.footer.resources": {
     "message": "Zdroje"
   },

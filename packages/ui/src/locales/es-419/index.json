@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "Aplicación"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servidores"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Sitio web"
@@ -842,6 +842,39 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Respaldo programado"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Creando respaldo..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Error al crear respaldo respaldo"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Error al restaurar desde el respaldo"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Respaldo manual"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Respaldo programado"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Restauración programada"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Renombrar"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Restaurar"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Restaurando desde respaldo..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Reintentar"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Descartar"
   },
@@ -930,7 +963,7 @@
     "defaultMessage": "¿Dónde te gustaría que se ubicara tu servidor?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "¿Tu región no aparece en la lista? <link>¡Cuéntanos dónde te gustaría que estén los servidores de Modrinth próximamente!</link>"
+    "defaultMessage": "¿Tu región no aparece en la lista? <link>¡Cuéntanos dónde te gustaría que esté Modrinth Hosting próximamente!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste asiático"

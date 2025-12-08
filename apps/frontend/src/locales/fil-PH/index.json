@@ -56,11 +56,17 @@
   "app-marketing.features.mod-management.search-mods": {
     "message": "Maghanap ng mga mod"
   },
+  "app-marketing.features.mod-management.version": {
+    "message": "Bersiyon"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
@@ -83,8 +89,14 @@
   "app-marketing.features.play.description": {
     "message": "Gamitin ang Modrinth App sa pagdownload at paglaro ng iyong mga paboritong mods at modpacks."
   },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Modpack"
+  },
   "app-marketing.features.sharing.share-button": {
     "message": "Ibahagi"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Magbahagi ng mga modpack"
   },
   "app-marketing.hero.download-button": {
     "message": "I-download ang Modrinth App"
@@ -98,23 +110,71 @@
   "app-marketing.hero.more-download-options": {
     "message": "Higit na Pagpipilian sa Pagdownload"
   },
+  "auth.authorize.action.decline": {
+    "message": "Tanggihan"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Ilagay ang iyong email sa ibaba at padadalhan ka namin ng recovery link upang maipanumbalik mo ang account mo."
+  },
   "auth.reset-password.method-choice.email-username.placeholder": {
     "message": "Email"
+  },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Isang email na may tagubilin ang ipinadala sa iyo kung antemanong na-save ang email sa iyong account."
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Maaari ka nang maglogin sa iyong akawnt gamit ang iyong bagong password."
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Ilagay ang iyong bagong password sa ibaba upang maakses ang iyong akawnt."
   },
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Nalimutan ang password?</forgot-password-link> • <create-account-link>Gumawa ng akawnt</create-account-link>"
   },
+  "auth.sign-in.sign-in-with": {
+    "message": "Mag-sign in gamit ang"
+  },
+  "auth.sign-in.title": {
+    "message": "Mag-sign In"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Gumawa ng account"
+  },
   "auth.sign-up.email.label": {
     "message": "Email"
   },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Sa paggawa ng akawnt, sumasang-ayon ka sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Mayroon ka nang account?"
+  },
+  "auth.sign-up.title": {
+    "message": "Mag-sign Up"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "O gawan mo ng account ang sarili mo"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Mag-sign up gamit ang"
+  },
   "auth.verify-email.action.account-settings": {
     "message": "Mga setting sa account"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Mag-sign in"
   },
   "auth.verify-email.post-verification.description": {
     "message": "Tagumpay na napatunayan ang adres ng iyong email!"
   },
   "auth.welcome.description": {
     "message": "Ikaw ay parte na ngayon ng kahanga-hangang komunidad na ito ng mga tagagawa at manlalalakbay na nagtataguyod, nagda-download, at nananatiling napapanahon sa mga nakamamanghang na mga mod."
+  },
+  "auth.welcome.label.tos": {
+    "message": "Sa paggawa ng akawnt, sumang-ayon ka na sa <terms-link>Mga Tuntunin</terms-link> at <privacy-policy-link>Patakaran sa Pribasiya</privacy-policy-link> ng Modrinth."
+  },
+  "auth.welcome.title": {
+    "message": "Maligayang Pagdating"
   },
   "collection.button.edit-icon": {
     "message": "Baguhin ang ikono"
@@ -124,6 +184,9 @@
   },
   "collection.delete-modal.description": {
     "message": "Habambuhay na matatanggal ang koleksiyong ito. Hindi mababawi ang pagkilos na ito."
+  },
+  "collection.delete-modal.title": {
+    "message": "Sigurado ka bang gusto mong i-delete ang koleksiyong ito?"
   },
   "collection.error.not-found": {
     "message": "Hindi mahanap ang koleksiyon"
@@ -143,11 +206,20 @@
   "create.collection.name-label": {
     "message": "Pangalan"
   },
+  "create.collection.summary-label": {
+    "message": "Buod"
+  },
+  "create.limit-alert.type-project": {
+    "message": "proyekto"
+  },
   "create.organization.cancel": {
     "message": "Kanselahin"
   },
   "create.organization.name-label": {
     "message": "Pangalan"
+  },
+  "create.organization.summary-label": {
+    "message": "Buod"
   },
   "create.organization.url-label": {
     "message": "URL"
@@ -158,14 +230,23 @@
   "create.project.name-label": {
     "message": "Pangalan"
   },
+  "create.project.summary-label": {
+    "message": "Buod"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.visibility-private": {
+    "message": "Pribado"
   },
   "create.project.visibility-public": {
     "message": "Publiko"
   },
   "create.project.visibility-unlisted": {
     "message": "Unlisted"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "I-revoke"
   },
   "dashboard.collections.label.search-input": {
     "message": "Maghanap sa iyong mga koleksiyon"
@@ -179,6 +260,99 @@
   "dashboard.creator-tax-form-modal.entity.question": {
     "message": "Isa ka bang pribadong indibidwal o parte ng isang banyagang entidad?"
   },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Detalye"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Halaga"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Singil"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Hindi maka-fetch ng mga magagamit na payment method. Mangyaring subukan muli mamaya."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Bigong ma-load ang mga payment method"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Rehiyon"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "May-ari ng account"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Barya"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Account"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "I-disconnect ang account"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Payment method"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "PayPal account"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "I-connect ang iyong PayPal account para direktang makatanggap ng bayad."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "I-save"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Na-save"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Mag-sign in gamit ang PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@username"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Metodo"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Detalye ng Account"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Detalye"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Payment method"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Gantimpala"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Mga Gantimpala"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Account"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Halaga"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Isara"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Petsa"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Singil"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Metodo"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Pitaka"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Imbalido ang iyong ibinigay na detalye ng bank account. Mangyaring pakipatunayan muna ang iyong impormasyon."
+  },
   "error.collection.404.list_title": {
     "message": "Bakit?"
   },
@@ -190,6 +364,12 @@
   },
   "error.project.404.list_title": {
     "message": "Bakit?"
+  },
+  "error.user.404.list_item.2": {
+    "message": "Maaaring nagpalit ng pangalan o dinelete ng may-ari ang kanilang account."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Maaaring tinapos ang kanyang account dahil sa paglabag sa <tou-link>Mga Tuntunin sa Paggamit</tou-link> ng Modrinth."
   },
   "error.user.404.list_title": {
     "message": "Bakit?"
@@ -215,11 +395,26 @@
   "landing.heading.the-place-for-minecraft": {
     "message": "Ang lugar para sa Minecraft na {content}"
   },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "mga data pack"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "mga modpack"
+  },
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "mga mod"
   },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "mga plugin"
+  },
   "landing.heading.the-place-for-minecraft.resource-packs": {
     "message": "mga resource pack"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "mga server"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "mga shader"
   },
   "landing.notifications.has-been-updated": {
     "message": "Na-update ang {title}!"
@@ -256,6 +451,9 @@
   },
   "layout.banner.build-fail.title": {
     "message": "May error sa pagbuo ng estado galing sa API habang nagpapatayo."
+  },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Mayroong mga subscription na bigong makapag-renew. Mangyaring i-update ang iyong payment method upang maiwasang mawalan ng akses!"
   },
   "layout.banner.verify-email.description": {
     "message": "Dahil sa mga kadahilang pangseguridad, kailangan ng Modrinth na mapatunayan ang email address sa iyong akawnt."
@@ -311,9 +509,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
-  },
   "layout.footer.resources": {
     "message": "Mga Mapagkukunan"
   },
@@ -353,6 +548,9 @@
   "layout.nav.search": {
     "message": "Maghanap"
   },
+  "moderation.filter.by": {
+    "message": "I-filter ayon sa"
+  },
   "moderation.page.projects": {
     "message": "Mga Proyekto"
   },
@@ -365,6 +563,120 @@
   "moderation.search.placeholder": {
     "message": "Maghanap..."
   },
+  "muralpay.country.at": {
+    "message": "Austria"
+  },
+  "muralpay.country.be": {
+    "message": "Belhika"
+  },
+  "muralpay.country.cy": {
+    "message": "Cyprus"
+  },
+  "muralpay.country.de": {
+    "message": "Alemanya"
+  },
+  "muralpay.country.ee": {
+    "message": "Estonya"
+  },
+  "muralpay.country.es": {
+    "message": "Espanya"
+  },
+  "muralpay.country.fi": {
+    "message": "Pinlandiya"
+  },
+  "muralpay.country.fr": {
+    "message": "Pransiya"
+  },
+  "muralpay.country.gr": {
+    "message": "Gresya"
+  },
+  "muralpay.country.ie": {
+    "message": "Irlanda"
+  },
+  "muralpay.country.it": {
+    "message": "Italya"
+  },
+  "muralpay.country.lt": {
+    "message": "Litwanya"
+  },
+  "muralpay.country.lu": {
+    "message": "Luksemburgo"
+  },
+  "muralpay.country.lv": {
+    "message": "Letonya"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Olanda"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Eslobakya"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "Tax ID"
+  },
+  "muralpay.field.account-number": {
+    "message": "Numero ng account"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Numero ng account (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Numero ng account (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Uri ng numero ng account"
+  },
+  "muralpay.field.account-type": {
+    "message": "Uri ng account"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Numero ng account"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "Bansa"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (Numero ng account sa Mehikong bangko)"
+  },
+  "muralpay.help.iban": {
+    "message": "International Bank Account Number"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Bank account"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Email"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Ilagay ang numero sa account"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Ilagay ang numero sa account"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
   "profile.bio.fallback.creator": {
     "message": "Isang tagagawa sa Modrinth."
   },
@@ -374,8 +686,14 @@
   "profile.details.label.email": {
     "message": "Email"
   },
+  "profile.details.label.payment-methods": {
+    "message": "Mga payment method"
+  },
   "profile.label.badges": {
     "message": "Tsapa"
+  },
+  "profile.label.details": {
+    "message": "Detalye"
   },
   "profile.label.joined": {
     "message": "Sumali"
@@ -395,8 +713,17 @@
   "project-member-header.accept": {
     "message": "Tanggapin"
   },
+  "project-member-header.decline": {
+    "message": "Tanggihan"
+  },
   "project-member-header.error": {
     "message": "Error"
+  },
+  "project-type.collection.plural": {
+    "message": "Mga Koleksiyon"
+  },
+  "project-type.collection.singular": {
+    "message": "Koleksiyon"
   },
   "project-type.datapack.plural": {
     "message": "Mga Data Pack"
@@ -410,14 +737,32 @@
   "project-type.mod.singular": {
     "message": "Mod"
   },
+  "project-type.modpack.plural": {
+    "message": "Mga Modpack"
+  },
+  "project-type.modpack.singular": {
+    "message": "Modpack"
+  },
+  "project-type.plugin.plural": {
+    "message": "Mga Plugin"
+  },
   "project-type.plugin.singular": {
     "message": "Plugin"
+  },
+  "project-type.project.plural": {
+    "message": "Mga Proyekto"
+  },
+  "project-type.project.singular": {
+    "message": "Proyekto"
   },
   "project-type.resourcepack.plural": {
     "message": "Mga Resource Pack"
   },
   "project-type.resourcepack.singular": {
     "message": "Resource Pack"
+  },
+  "project-type.shader.plural": {
+    "message": "Mga Shader"
   },
   "project-type.shader.singular": {
     "message": "Shader"
@@ -497,21 +842,6 @@
   "scopes.performAnalytics.description": {
     "message": "Gawin ang mga aksiyon sa analitika"
   },
-  "servers.backups.item.lock": {
-    "message": "I-lock"
-  },
-  "servers.backups.item.locked": {
-    "message": "Ni-lock"
-  },
-  "servers.backups.item.rename": {
-    "message": "I-rename"
-  },
-  "servers.backups.item.retry": {
-    "message": "Retry"
-  },
-  "servers.backups.item.unlock": {
-    "message": "I-unlock"
-  },
   "servers.notice.actions": {
     "message": "Mga Aksiyon"
   },
@@ -532,6 +862,24 @@
   },
   "servers.plan.small.name": {
     "message": "Small"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Tanggalin ang payment method na ito"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "Habambuhay nitong tatanggalin ang payment method na ito (hanggang sa wakas ng panahon)."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Sigurado ka bang gusto mong tanggalin ang payment method na ito?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Magdagdag ng payment method"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "Wala ka pang idinagdag na payment method."
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Mga payment method"
   },
   "settings.billing.payment_method_type.eftpos": {
     "message": "EFTPOS"
@@ -557,8 +905,20 @@
   "settings.display.project-list-layouts.description": {
     "message": "Pumili ng iyong gugustohing ayos ng bawat pahinang magpapakita sa mga listahan ng proyekto sa iyong device."
   },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Pahina ng Mga Mod"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Pahina ng Mga Modpack"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Pahina ng Mga Plugin"
+  },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Pahina ng Mga Resource Pack"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Pahina ng Mga Shader"
   },
   "settings.display.project-list-layouts.title": {
     "message": "Mga ayos ng listahan ng proyekto"

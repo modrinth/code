@@ -1,2 +1,9 @@
-{}
+{
+  "nags.edit-summary.title": {
+    "defaultMessage": "Redigeerimise kokkuvõte"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "."
+  }
+}
 

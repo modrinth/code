@@ -1355,9 +1355,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
-  },
   "layout.footer.resources": {
     "message": "سومبر"
   },
@@ -1997,9 +1994,6 @@
   "project.actions.review-project": {
     "message": "سيمق ڤروجيک"
   },
-  "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers اياله چارا ڤاليڠ موده اونتوق برماءين دڠن راکن اندا تنڤا ڤرلو برسوسه ڤايه!"
-  },
   "project.actions.servers-promo.pricing": {
     "message": "برمولا ڤد هرݢ {price}<small> / بولن</small>"
   },
@@ -2555,47 +2549,8 @@
   "search.filter.locked.server.sync": {
     "message": "سلارسکن دڠن ڤلاين"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "ڤنچيڤتاءن ساندرن سدڠ دجالنکن"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "ڤموليهن ساندرن سدڠ دجالنکن"
-  },
-  "servers.backups.item.automated": {
-    "message": "داءوتوماتيککن"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "سدڠ منچيڤتا ساندرن..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "ݢاݢل منچيڤتا ساندرن"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "ݢاݢل مموليهکن درڤد ساندرن"
-  },
-  "servers.backups.item.lock": {
-    "message": "کونچي"
-  },
-  "servers.backups.item.locked": {
-    "message": "دکونچي"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "دالم باريسن اونتوق دساندر"
-  },
-  "servers.backups.item.rename": {
-    "message": "نامکن سمولا"
-  },
-  "servers.backups.item.restore": {
-    "message": "ڤوليهکن"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "سدڠ مموليهکن درڤد ساندرن..."
-  },
-  "servers.backups.item.retry": {
-    "message": "چوبا سمولا"
-  },
-  "servers.backups.item.unlock": {
-    "message": "بوک کونچي"
   },
   "servers.notice.actions": {
     "message": "تيندقن"

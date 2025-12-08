@@ -1,4 +1,7 @@
 {
+  "app.auth-servers.unreachable.header": {
+    "message": "無法連線到驗證伺服器"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "開發人員模式已啟用。"
   },

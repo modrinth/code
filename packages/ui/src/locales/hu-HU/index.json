@@ -119,9 +119,6 @@
   "changelog.product.app": {
     "defaultMessage": "Alkalmazás"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Szerverek"
-  },
   "changelog.product.web": {
     "defaultMessage": "Weboldal"
   },
@@ -829,9 +826,6 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "Hol szeretné elhelyezni a szerverét?"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "Régió nincs listázva? <link> Tudassa velünk mit szeretne látni következőnek a Modrinth Szervereknél!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Délkelet-Ázsia"

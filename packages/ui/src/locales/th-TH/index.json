@@ -92,9 +92,6 @@
   "changelog.product.api": {
     "defaultMessage": "API"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "เซิร์ฟเวอร์"
-  },
   "changelog.product.web": {
     "defaultMessage": "เว็ปไซต์"
   },

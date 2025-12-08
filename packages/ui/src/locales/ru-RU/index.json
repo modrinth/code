@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servers"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Сайт"
@@ -842,6 +842,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Загрузчик"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Авто"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Автоматическая резервная копия"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Создание резервной копии..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Не удалось создать"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Не удалось восстановить"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Ручная резервная копия"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "В очереди на создание"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "В очереди на восстановление"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Переименовать"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Восстановить"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Восстановление из резервной копии..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Повторить"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Закрыть"
   },
@@ -930,7 +966,7 @@
     "defaultMessage": "Где вы хотите разместить свой сервер?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Нет нужного региона? <link>Расскажите, где запустить Modrinth Servers дальше!</link>"
+    "defaultMessage": "Нет нужного региона? <link>Расскажите, где запустить Modrinth Hosting дальше!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Юго-Восточная Азия"

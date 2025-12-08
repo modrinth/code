@@ -149,9 +149,6 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servers"
-  },
   "changelog.product.web": {
     "defaultMessage": "網站"
   },
@@ -817,9 +814,6 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "你希望伺服器部署在何處？"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "沒有想要的地區？<link>請告訴我們，你希望 Modrinth Severs 接下來在哪裡提供服務！</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "東南亞"

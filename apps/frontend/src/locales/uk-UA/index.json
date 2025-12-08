@@ -1112,9 +1112,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
-  },
   "layout.footer.resources": {
     "message": "Ресурси"
   },
@@ -1540,9 +1537,6 @@
   },
   "project.actions.review-project": {
     "message": "Переглянути проєкт"
-  },
-  "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers - це найлегший спосіб грати з друзями без зайвого клопоту!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Починаючи від {price}<small> / місяць</small>"
@@ -2099,47 +2093,8 @@
   "search.filter.locked.server.sync": {
     "message": "Синхронізувати з сервером"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Створення резервної копії триває"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Відновлення резервної копії триває"
-  },
-  "servers.backups.item.automated": {
-    "message": "Автоматично"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Створення резервної копії…"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Не вдалося створити резервну копію"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Помилка в відновленні з резервної копії"
-  },
-  "servers.backups.item.lock": {
-    "message": "Замкнути"
-  },
-  "servers.backups.item.locked": {
-    "message": "Замкнено"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "В черзі на створення резервної копії"
-  },
-  "servers.backups.item.rename": {
-    "message": "Перейменувати"
-  },
-  "servers.backups.item.restore": {
-    "message": "Відновити"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Відновлення з резервної копії…"
-  },
-  "servers.backups.item.retry": {
-    "message": "Повторити"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Розблокувати"
   },
   "servers.notice.actions": {
     "message": "Дії"

@@ -959,9 +959,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Serveurs Modrinth"
-  },
   "layout.footer.resources": {
     "message": "Ressources"
   },
@@ -1291,9 +1288,6 @@
   },
   "project.actions.review-project": {
     "message": "Vérifier le projet"
-  },
-  "project.actions.servers-promo.description": {
-    "message": "Les serveurs Modrinth sont la solution la plus facile pour jouer entre amis sans ennuis !"
   },
   "project.actions.servers-promo.pricing": {
     "message": "À partir de {price}<small> / mois</small>"
@@ -1850,47 +1844,8 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniser avec le serveur"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Création d'une sauvegarde en cours"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauration de sauvegarde en cours"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatisé"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Création de sauvegarde..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Échec de la création de la sauvegarde"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Échec de la restauration à partir de la sauvegarde"
-  },
-  "servers.backups.item.lock": {
-    "message": "Verrouille"
-  },
-  "servers.backups.item.locked": {
-    "message": "Verrouillé"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "En file pour sauvegarde"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renommer"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurer"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restauration à partir de la sauvegarde…"
-  },
-  "servers.backups.item.retry": {
-    "message": "Réessayer"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Déverrouiller"
   },
   "servers.notice.actions": {
     "message": "Actions"

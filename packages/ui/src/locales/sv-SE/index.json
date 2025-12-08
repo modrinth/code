@@ -95,9 +95,6 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servrar"
-  },
   "changelog.product.web": {
     "defaultMessage": "Webbplats"
   },

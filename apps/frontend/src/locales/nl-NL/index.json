@@ -884,9 +884,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
-  },
   "layout.footer.resources.api-docs": {
     "message": "API documentatie"
   },
@@ -1133,41 +1130,8 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniseer met de server"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Backup creatie in de werken"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup creatie in de werken"
-  },
-  "servers.backups.item.automated": {
-    "message": "Geautomatiseerd"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Back-up maken..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Maken van back-up mislukt"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Terugzetten van back-up mislukt"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Backup in de wachtrij"
-  },
-  "servers.backups.item.rename": {
-    "message": "Hernoem"
-  },
-  "servers.backups.item.restore": {
-    "message": "Herrestoreren"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Herrestoreren van backup"
-  },
-  "servers.backups.item.retry": {
-    "message": "Herproberen"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Heropen"
   },
   "servers.notice.actions": {
     "message": "Acties"
@@ -1193,6 +1157,9 @@
   "servers.plan.large.description": {
     "message": "Ideaal voor 15-25 spelers, modpacks of zwaar modificeren"
   },
+  "settings.billing.subscription.description": {
+    "message": ".."
+  },
   "settings.display.theme.description": {
     "message": "Selecteer je gewenste kleurschema voor Modrinth op dit apparaat."
   },
@@ -1204,6 +1171,12 @@
   },
   "settings.language.categories.search-result": {
     "message": "Zoekresultaten"
+  },
+  "settings.language.warning": {
+    "message": "Als je de sites taal veranderd kan het er voor zorgen dat sommige text nog steeds in het Engels staat als er geen vertaling beschikbaar is. De site is nog niet volledig vertaald, dus sommige content is misschien nog in het Engels voor sommige talen. We werken nog steeds om ons localiesatie team te verbeteren, dus sommige content kan er verkeerd uitzien."
+  },
+  "settings.pats.description": {
+    "message": "PAT's kunnen gebruikt worden om Modrinths API te gebruiken. Voor meer informatie, zie <doc-link> Modrinth's API-documentatie </doc-link>. Ze kunnen altijd gemaakt en teruggetrokken worden."
   },
   "settings.pats.modal.create.expires.label": {
     "message": "Verloopt"
@@ -1240,5 +1213,8 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Onbekend platform"
+  },
+  "ui.latest-news-row.view-all": {
+    "message": "Zie all het nieuws"
   }
 }
