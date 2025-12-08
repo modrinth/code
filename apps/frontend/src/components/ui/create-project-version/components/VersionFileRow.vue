@@ -4,7 +4,7 @@
 	>
 		<div class="flex items-center gap-2 overflow-hidden">
 			<div class="grid h-5 w-5 place-content-center rounded-full bg-green">
-				<CheckIcon class="text-md text-black" />
+				<CheckIcon class="text-sm text-black" />
 			</div>
 			<span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium" :title="file.name">
 				{{ file.name }}
@@ -19,16 +19,18 @@
 
 		<div class="flex items-center gap-1">
 			<template v-if="!isPrimary">
-				<Combobox
-					v-model="selectedType"
-					:searchable="false"
-					class="w-28 rounded-xl border border-solid border-surface-5"
-					:options="versionTypes"
-					:close-on-select="true"
-					:show-labels="false"
-					:allow-empty="false"
-					@update:model-value="emitFileTypeChange"
-				/>
+				<div class="w-28">
+					<Combobox
+						v-model="selectedType"
+						:searchable="false"
+						class="rounded-xl border border-solid border-surface-5"
+						:options="versionTypes"
+						:close-on-select="true"
+						:show-labels="false"
+						:allow-empty="false"
+						@update:model-value="emitFileTypeChange"
+					/>
+				</div>
 			</template>
 
 			<ButtonStyled size="standard" :circular="true">
