@@ -104,6 +104,16 @@ const currentTab = ref<Tab>('Thread')
 
 const isThreadCollapsed = ref(true)
 
+watch(
+	() => props.item.thread?.messages?.length,
+	(len) => {
+		if (!len || len <= 1) {
+			isThreadCollapsed.value = false
+		}
+	},
+	{ immediate: true },
+)
+
 const remainingMessageCount = computed(() => {
 	if (!props.item.thread?.messages) return 0
 	return Math.max(0, props.item.thread.messages.length - 1)
@@ -277,6 +287,7 @@ const showCopyFeedback = ref<Map<string, boolean>>(new Map())
 
 const malwareModal = ref<InstanceType<typeof NewModal> | null>(null)
 const malwareReason = ref('')
+const pendingMalwareIssue = ref<{ issueId: string } | null>(null)
 
 type ActionType = 'safe' | 'malware'
 type ButtonState = 'idle' | number | 'completed'
@@ -350,27 +361,56 @@ onUnmounted(() => {
 	buttonIntervals.value.forEach((intervalId) => clearInterval(intervalId))
 })
 
+function openMalwareModal(issueId?: string) {
+	if (issueId) {
+		pendingMalwareIssue.value = { issueId }
+	} else {
+		pendingMalwareIssue.value = null
+	}
+	malwareModal.value?.show()
+}
+
 async function confirmMalwareAction() {
 	try {
-		await Promise.all(
-			props.item.reports.map((report) =>
-				client.labrinth.tech_review_internal.updateReport(report.id, {
-					status: 'unsafe',
-					message: malwareReason.value || undefined,
-				}),
-			),
-		)
+		if (pendingMalwareIssue.value) {
+			const { issueId } = pendingMalwareIssue.value
+			await client.labrinth.tech_review_internal.updateIssue(issueId, {
+				status: 'unsafe',
+				message: malwareReason.value || undefined,
+			})
 
-		buttonStates.value.set('malware', 'completed')
-		emit('markComplete', props.item.project.id)
-		malwareModal.value?.hide()
-		malwareReason.value = ''
+			emit('markComplete', props.item.project.id)
+			malwareModal.value?.hide()
+			malwareReason.value = ''
+			pendingMalwareIssue.value = null
 
-		addNotification({
-			type: 'success',
-			title: 'Marked as malware',
-			text: 'All reports for this project have been marked as malware. The project has been rejected.',
-		})
+			addNotification({
+				type: 'success',
+				title: 'Marked as malware',
+				text: 'This issue has been confirmed as malicious. The project has been rejected.',
+			})
+		} else {
+			// top-level
+			await Promise.all(
+				props.item.reports.map((report) =>
+					client.labrinth.tech_review_internal.updateReport(report.id, {
+						status: 'unsafe',
+						message: malwareReason.value || undefined,
+					}),
+				),
+			)
+
+			buttonStates.value.set('malware', 'completed')
+			emit('markComplete', props.item.project.id)
+			malwareModal.value?.hide()
+			malwareReason.value = ''
+
+			addNotification({
+				type: 'success',
+				title: 'Marked as malware',
+				text: 'All reports for this project have been marked as malware. The project has been rejected.',
+			})
+		}
 	} catch (error) {
 		console.error('Failed to update reports:', error)
 		addNotification({
@@ -490,7 +530,7 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 							<button
 								class="!w-[116px] !shadow-none"
 								:disabled="getButtonState('safe') !== 'idle'"
-								@click="malwareModal?.show()"
+								@click="openMalwareModal()"
 							>
 								<CheckCircleIcon v-if="getButtonState('malware') === 'completed'" />
 								<TriangleAlertIcon v-else />
@@ -536,6 +576,7 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 					v-model:collapsed="isThreadCollapsed"
 					:expand-text="threadExpandText"
 					collapse-text="Collapse thread"
+					class="border-x border-b border-solid border-surface-3"
 				>
 					<div class="bg-surface-2 p-4">
 						<!-- DEV-531 -->
@@ -635,10 +676,10 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 									v-if="loadingIssues.has(issue.id)"
 									class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
 								>
-									<span class="text-sm font-medium text-secondary">
-										<LoaderCircleIcon class="size-5 animate-spin" />
-										Loading source...</span
-									>
+									<span class="flex items-center gap-1.5 text-sm font-medium text-secondary">
+										<LoaderCircleIcon class="size-4 animate-spin" />
+										Loading source...
+									</span>
 								</div>
 							</Transition>
 						</div>
@@ -654,12 +695,7 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 							</ButtonStyled>
 
 							<ButtonStyled color="red" type="outlined">
-								<button
-									class="!border-[1px]"
-									@click="updateIssueStatus(issue.id, selectedFile.id, 'unsafe')"
-								>
-									Malware
-								</button>
+								<button class="!border-[1px]" @click="openMalwareModal(issue.id)">Malware</button>
 							</ButtonStyled>
 						</div>
 					</div>
