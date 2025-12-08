@@ -1359,7 +1359,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Serwery Modrinth"
   },
   "layout.footer.resources": {
     "message": "Zasoby"
@@ -2001,7 +2001,7 @@
     "message": "Przegląd projektu"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting to najprostszy sposób na zabawę z przyjaciółmi bez żadnych kłopotów!"
+    "message": "Modrinth Servers to najprostszy sposób na zabawę z przyjaciółmi bez żadnych kłopotów!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Od {price}<small> / miesięcznie</small>"
@@ -2558,8 +2558,47 @@
   "search.filter.locked.server.sync": {
     "message": "Synchronizuj z serwerem"
   },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Tworzenie kopii zapasowej w toku"
+  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Trwa przywracanie kopii zapasowej"
+  },
+  "servers.backups.item.automated": {
+    "message": "Zautomatyzowane"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Tworzenie kopii zapasowej..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Nie udało się utworzyć kopii zapasowej"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Nie udało się przywrócić danych z kopii zapasowej"
+  },
+  "servers.backups.item.lock": {
+    "message": "Zablokuj"
+  },
+  "servers.backups.item.locked": {
+    "message": "Zablokowane"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "W kolejce do tworzenia kopii zapasowej"
+  },
+  "servers.backups.item.rename": {
+    "message": "Zmień nazwę"
+  },
+  "servers.backups.item.restore": {
+    "message": "Przywróć"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Przywracanie z kopii zapasowej..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Ponów"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Odblokuj"
   },
   "servers.notice.actions": {
     "message": "Akcje"

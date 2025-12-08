@@ -65,6 +65,9 @@
   "changelog.product.app": {
     "defaultMessage": "Aplikaĵo"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "Serviloj"
+  },
   "changelog.product.web": {
     "defaultMessage": "Retejo"
   },

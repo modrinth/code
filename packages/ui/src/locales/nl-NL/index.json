@@ -101,6 +101,9 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "Servers"
+  },
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
@@ -667,6 +670,9 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "Uit welk regio wil je een server?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Staat jouw regio hier niet bij? <link>Laat ons weten waar onze volgende Modrinth servers terecht moeten!</link>"
   },
   "servers.region.western-europe": {
     "defaultMessage": "West Europa"

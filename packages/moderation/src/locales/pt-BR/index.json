@@ -60,7 +60,7 @@
     "defaultMessage": "Forneça o código-fonte"
   },
   "nags.image-heavy-description.description": {
-    "defaultMessage": "Sua descrição deve conter texto simples ou uma imagem com texto alternativo, mantendo-a acessível para aqueles que usam leitores de tela ou têm conexões de rede lentas."
+    "defaultMessage": "Sua descrição deve conter texto simples ou uma imagem com texto alternativo, mantendo-a acessível para aqueles que usam leitores de tela ou têm conexões de internet lentas."
   },
   "nags.image-heavy-description.title": {
     "defaultMessage": "Garantir acessibilidade"

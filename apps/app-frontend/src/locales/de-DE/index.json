@@ -1,10 +1,4 @@
 {
-  "app.auth-servers.unreachable.body": {
-    "message": "Die Authentifizierungsserver von Minecraft sind eventuell momentan nicht erreichbar. Überprüfe deine Internetverbindung und versuche es später erneut."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Authentifizierungsserver sind nicht erreichbar"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Entwicklermodus aktiviert."
   },

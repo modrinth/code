@@ -1,10 +1,4 @@
 {
-  "app.auth-servers.unreachable.body": {
-    "message": "Serwery uwierzytelniania Minecraft mogą aktualnie nie działać. Sprawdź swoje połączenie z internetem i spróbuj ponownie później."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Nie udało się połączyć się z serwerami uwierzytelniania"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Tryb dewelopera włączony."
   },

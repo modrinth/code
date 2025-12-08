@@ -140,6 +140,9 @@
   "changelog.product.app": {
     "defaultMessage": "Aplicación"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "Servidores"
+  },
   "changelog.product.web": {
     "defaultMessage": "Sitio web"
   },
@@ -874,6 +877,9 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "¿Dónde le gustaría que estuviera ubicado su servidor?"
+  },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "¿Tu región no aparece en la lista? <link>¡Dinos dónde te gustaría ver los servidores Modrinth la próxima vez!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Sudeste Asiático"

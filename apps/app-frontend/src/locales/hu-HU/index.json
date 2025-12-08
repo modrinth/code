@@ -1,10 +1,4 @@
 {
-  "app.auth-servers.unreachable.body": {
-    "message": "A Minecraft hitelesítő szerverek lehet, hogy nem üzemelnek. Bizonyosodj meg róla, hogy van internetkapcsolatod és próbáld meg újra."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Nem lehet elérni a hitelesítési kiszolgálókat"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Fejlesztői mód bekapcsolva."
   },
@@ -525,7 +519,7 @@
     "message": "A játék verzió a profil által van megadva"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "A betöltő a pédány által van megadva"
+    "message": "A betöltő a profil által van megadva"
   },
   "search.filter.locked.instance.sync": {
     "message": "Profil Szinkronizálása"

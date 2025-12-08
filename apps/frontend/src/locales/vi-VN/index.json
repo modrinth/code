@@ -662,6 +662,9 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
+  "layout.footer.products.servers": {
+    "message": "Máy chủ Modrinth"
+  },
   "layout.footer.resources": {
     "message": "Tài nguyên"
   },

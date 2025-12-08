@@ -1359,7 +1359,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth 托管"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "资源"
@@ -1559,27 +1559,6 @@
   "muralpay.document-type.tax-id": {
     "message": "税号"
   },
-  "muralpay.field.account-number": {
-    "message": "-"
-  },
-  "muralpay.field.account-number-cbu-cvu": {
-    "message": "账号（CBU/CVU）"
-  },
-  "muralpay.field.account-number-cci": {
-    "message": "账号（CCI）"
-  },
-  "muralpay.field.account-number-type": {
-    "message": "账号类型"
-  },
-  "muralpay.field.account-type": {
-    "message": "账户类型"
-  },
-  "muralpay.field.bank-account-number": {
-    "message": "账号"
-  },
-  "muralpay.field.branch-code": {
-    "message": "分行代码"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1592,56 +1571,11 @@
   "muralpay.field.cuit-cuil": {
     "message": "CUIT/CUIL"
   },
-  "muralpay.field.document-type": {
-    "message": "文档类型"
-  },
   "muralpay.field.iban": {
     "message": "IBAN"
   },
   "muralpay.field.phone-number": {
     "message": "电话号码"
-  },
-  "muralpay.field.pix-email": {
-    "message": "PIX 邮箱"
-  },
-  "muralpay.field.pix-key-type": {
-    "message": "PIX 密钥类型"
-  },
-  "muralpay.field.pix-phone": {
-    "message": "PIX 手机号"
-  },
-  "muralpay.field.routing-number": {
-    "message": "路由号码"
-  },
-  "muralpay.field.swift-bic": {
-    "message": "SWIFT/BIC（银行识别码）"
-  },
-  "muralpay.field.wallet-address": {
-    "message": "钱包地址"
-  },
-  "muralpay.help.cbu-cvu": {
-    "message": "阿根廷银行/虚拟账号"
-  },
-  "muralpay.help.cci": {
-    "message": "银行间账户代码 （CCI）"
-  },
-  "muralpay.help.clabe": {
-    "message": "标准化银行代码（墨西哥银行账号）"
-  },
-  "muralpay.help.cpf-cnpj": {
-    "message": "巴西纳税识别号"
-  },
-  "muralpay.help.cuit-cuil": {
-    "message": "阿根廷纳税识别号"
-  },
-  "muralpay.help.iban": {
-    "message": "国际银行账户号码"
-  },
-  "muralpay.help.swift-bic": {
-    "message": "银行识别码"
-  },
-  "muralpay.pix-type.bank-account": {
-    "message": "银行账户"
   },
   "muralpay.pix-type.document": {
     "message": "个人纳税人身份号/公司纳税人身份号"
@@ -1655,44 +1589,11 @@
   "muralpay.placeholder.account-number": {
     "message": "输入账户号码"
   },
-  "muralpay.placeholder.cbu-cvu": {
-    "message": "输入 CBU 或 CVU"
-  },
-  "muralpay.placeholder.cbu-cvu-type": {
-    "message": "CBU 或 CVU"
-  },
-  "muralpay.placeholder.cci": {
-    "message": "输入 20 位 CCI"
-  },
-  "muralpay.placeholder.cuit-cuil": {
-    "message": "输入 CUIT 或 CUIL"
-  },
   "muralpay.placeholder.enter-account-number": {
     "message": "输入账户号码"
   },
   "muralpay.placeholder.enter-branch-code": {
     "message": "输入分行代码"
-  },
-  "muralpay.placeholder.enter-clabe": {
-    "message": "输入 18 位 CLABE"
-  },
-  "muralpay.placeholder.enter-cpf-cnpj": {
-    "message": "输入 CPF 或 CNPJ"
-  },
-  "muralpay.placeholder.enter-iban": {
-    "message": "输入 IBAN"
-  },
-  "muralpay.placeholder.enter-pix-email": {
-    "message": "输入 PIX 邮箱"
-  },
-  "muralpay.placeholder.enter-routing-number": {
-    "message": "输入 9 位路由号码"
-  },
-  "muralpay.placeholder.enter-swift-bic": {
-    "message": "输入 SWIFT/BIC 代码"
-  },
-  "muralpay.placeholder.iban-crc": {
-    "message": "输入哥斯达黎加 IBAN"
   },
   "muralpay.placeholder.phone-cop": {
     "message": "+57..."
@@ -2001,7 +1902,7 @@
     "message": "审核项目"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting 是让您轻松无忧地与朋友联机游玩的最简单方式！"
+    "message": "Modrinth Servers是你与朋友轻松游玩的最佳方式！"
   },
   "project.actions.servers-promo.pricing": {
     "message": "起价{price}<small> / 每月</small>"
@@ -2558,8 +2459,47 @@
   "search.filter.locked.server.sync": {
     "message": "跟随服务器"
   },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "正在创建备份"
+  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "正在恢复备份"
+  },
+  "servers.backups.item.automated": {
+    "message": "自动"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "正在创建备份……"
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "创建备份时失败"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "恢复备份时失败"
+  },
+  "servers.backups.item.lock": {
+    "message": "锁定"
+  },
+  "servers.backups.item.locked": {
+    "message": "已锁定"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "排队等待备份"
+  },
+  "servers.backups.item.rename": {
+    "message": "重命名"
+  },
+  "servers.backups.item.restore": {
+    "message": "恢复"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "正在恢复备份……"
+  },
+  "servers.backups.item.retry": {
+    "message": "重试"
+  },
+  "servers.backups.item.unlock": {
+    "message": "解锁"
   },
   "servers.notice.actions": {
     "message": "操作"

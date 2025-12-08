@@ -131,6 +131,9 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
+  },
   "layout.footer.resources": {
     "message": "Ресурслар"
   },
@@ -238,6 +241,18 @@
   },
   "project.versions.title": {
     "message": "Версияләр"
+  },
+  "servers.backups.item.lock": {
+    "message": "Ябу"
+  },
+  "servers.backups.item.locked": {
+    "message": "Ябык"
+  },
+  "servers.backups.item.retry": {
+    "message": "Кабатлау"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Ачу"
   },
   "servers.notice.actions": {
     "message": "Гамәлләр"

@@ -1,10 +1,4 @@
 {
-  "app.auth-servers.unreachable.body": {
-    "message": "Peladen autentikasi Minecraft mungkin sedang tidak tersedia saat ini. Periksa koneksi internet Anda dan coba lagi nanti."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Tidak dapat terhubung ke peladen autentikasi"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Mode pengembang dihidupkan."
   },

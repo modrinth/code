@@ -107,6 +107,9 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "Servere"
+  },
   "changelog.product.web": {
     "defaultMessage": "Nettside"
   },

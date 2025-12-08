@@ -791,125 +791,8 @@
   "dashboard.creator-withdraw-modal.stage.tremendous-details": {
     "message": "Detalhes"
   },
-  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
-    "message": "Método de pagamento"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
-    "message": "Recompensa"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
-    "message": "Seleciona a recompensa"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
-    "message": "Recompensas"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
-    "message": "Email não verificado"
-  },
-  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
-    "message": "Taxas mais baixas disponíveis"
-  },
   "dashboard.creator-withdraw-modal.withdraw-button": {
     "message": "Levantar"
-  },
-  "dashboard.creator-withdraw-modal.withdraw-limit": {
-    "message": "Limite de levantamento"
-  },
-  "dashboard.revenue.available-now": {
-    "message": "Disponível agora"
-  },
-  "dashboard.revenue.balance": {
-    "message": "Saldo"
-  },
-  "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Clica para ler sobre como Modrinth gere os teus rendimentos."
-  },
-  "dashboard.revenue.estimated-with-date": {
-    "message": "Estimado {date}"
-  },
-  "dashboard.revenue.processing": {
-    "message": "A processar"
-  },
-  "dashboard.revenue.processing.tooltip": {
-    "message": "Os rendimentos permanecem em processamento até ao fim do mês, depois ficam disponíveis após 60 dias."
-  },
-  "dashboard.revenue.stats.received": {
-    "message": "Recebido"
-  },
-  "dashboard.revenue.stats.transactions": {
-    "message": "Transações"
-  },
-  "dashboard.revenue.stats.withdrawn": {
-    "message": "Levantado"
-  },
-  "dashboard.revenue.transactions.btn.download-csv": {
-    "message": "Transferir como CSV"
-  },
-  "dashboard.revenue.transactions.header": {
-    "message": "Transações"
-  },
-  "dashboard.revenue.transactions.none": {
-    "message": "Sem transações"
-  },
-  "dashboard.revenue.transactions.none.desc": {
-    "message": "Os teus pagamentos e levantamentos aparecerão aqui."
-  },
-  "dashboard.revenue.transactions.see-all": {
-    "message": "Ver tudo"
-  },
-  "dashboard.revenue.withdraw.card.title": {
-    "message": "Levantar"
-  },
-  "dashboard.revenue.withdraw.header": {
-    "message": "Levantar"
-  },
-  "dashboard.withdraw.completion.account": {
-    "message": "Conta"
-  },
-  "dashboard.withdraw.completion.amount": {
-    "message": "Montante"
-  },
-  "dashboard.withdraw.completion.close-button": {
-    "message": "Fechar"
-  },
-  "dashboard.withdraw.completion.date": {
-    "message": "Data"
-  },
-  "dashboard.withdraw.completion.fee": {
-    "message": "Taxa"
-  },
-  "dashboard.withdraw.completion.method": {
-    "message": "Método"
-  },
-  "dashboard.withdraw.completion.net-amount": {
-    "message": "Valor líquido"
-  },
-  "dashboard.withdraw.completion.recipient": {
-    "message": "Destinatário"
-  },
-  "dashboard.withdraw.completion.title": {
-    "message": "Levantamento completo"
-  },
-  "dashboard.withdraw.completion.transactions-button": {
-    "message": "Transações"
-  },
-  "dashboard.withdraw.completion.wallet": {
-    "message": "Carteira"
-  },
-  "dashboard.withdraw.error.generic.title": {
-    "message": "Não foi possível efetuar o levantamento"
-  },
-  "dashboard.withdraw.error.invalid-address.title": {
-    "message": "Falha na verificação do endereço"
-  },
-  "dashboard.withdraw.error.invalid-bank.title": {
-    "message": "Dados bancários inválidos"
-  },
-  "dashboard.withdraw.error.invalid-wallet.title": {
-    "message": "Endereço de carteira inválido"
-  },
-  "dashboard.withdraw.error.minimum-not-met.title": {
-    "message": "Montante demasiado baixo"
   },
   "error.collection.404.list_item.1": {
     "message": "Podes ter inserido incorretamente o URL da coleção."
@@ -931,9 +814,6 @@
   },
   "error.generic.404.title": {
     "message": "Página não encontrada"
-  },
-  "error.generic.451.title": {
-    "message": "Conteúdo indisponível por motivos legais"
   },
   "error.generic.default.list_item.1": {
     "message": "Verifica se o Modrinth está em baixo na nossa <status-link>página de Status</status-link>."
@@ -1157,15 +1037,6 @@
   "layout.action.create-new": {
     "message": "Criar novo..."
   },
-  "layout.action.file-lookup": {
-    "message": "Pesquisa de ficheiros"
-  },
-  "layout.action.lookup-by-email": {
-    "message": "Pesquisa por email"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Gerir links de afiliado"
-  },
   "layout.action.new-collection": {
     "message": "Nova coleção"
   },
@@ -1174,12 +1045,6 @@
   },
   "layout.action.new-project": {
     "message": "Novo projeto"
-  },
-  "layout.action.reports": {
-    "message": "Denúncias"
-  },
-  "layout.action.review-projects": {
-    "message": "Rever projetos"
   },
   "layout.avatar.alt": {
     "message": "O teu avatar"
@@ -1214,9 +1079,6 @@
   "layout.banner.subscription-payment-failed.title": {
     "message": "Ação de faturação necessária."
   },
-  "layout.banner.tin-mismatch.action": {
-    "message": "Contactar o suporte"
-  },
   "layout.banner.verify-email.action": {
     "message": "Reenviar e-mail de verificação"
   },
@@ -1241,9 +1103,6 @@
   "layout.footer.about.status": {
     "message": "Estado"
   },
-  "layout.footer.copyright": {
-    "message": "© {year} Rinth, Inc."
-  },
   "layout.footer.legal": {
     "message": "Informação legal"
   },
@@ -1265,9 +1124,6 @@
   "layout.footer.legal.terms-of-use": {
     "message": "Termos de Uso"
   },
-  "layout.footer.modrinth-information": {
-    "message": "Informação do Modrinth"
-  },
   "layout.footer.open-source": {
     "message": "Modrinth é <github-link>open source</github-link>."
   },
@@ -1279,6 +1135,9 @@
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Recursos"
@@ -1319,21 +1178,6 @@
   "layout.meta.og-description": {
     "message": "Descobre e publica conteúdo de Minecraft!"
   },
-  "layout.mobile.close-menu": {
-    "message": "Fechar menu"
-  },
-  "layout.mobile.open-menu": {
-    "message": "Abrir menu"
-  },
-  "layout.nav.active-reports": {
-    "message": "Denúncias ativas"
-  },
-  "layout.nav.analytics": {
-    "message": "Estatísticas"
-  },
-  "layout.nav.discover": {
-    "message": "Descobrir"
-  },
   "layout.nav.discover-content": {
     "message": "Descobrir conteúdo"
   },
@@ -1355,9 +1199,6 @@
   "layout.nav.modrinth-home-page": {
     "message": "Página inicial do Modrinth"
   },
-  "layout.nav.my-servers": {
-    "message": "Meus servidores"
-  },
   "layout.nav.organizations": {
     "message": "Organizações"
   },
@@ -1366,12 +1207,6 @@
   },
   "layout.nav.projects": {
     "message": "Projetos"
-  },
-  "layout.nav.revenue": {
-    "message": "Rendimentos"
-  },
-  "layout.nav.saved-projects": {
-    "message": "Projetos Salvos"
   },
   "layout.nav.search": {
     "message": "Pesquisar"
@@ -1402,12 +1237,6 @@
   },
   "moderation.technical.search.placeholder": {
     "message": "Pesquisar revisões técnicas..."
-  },
-  "muralpay.account-type.checking": {
-    "message": "Conta corrente"
-  },
-  "muralpay.account-type.savings": {
-    "message": "Poupança"
   },
   "muralpay.country.at": {
     "message": "Áustria"
@@ -1463,60 +1292,6 @@
   "muralpay.country.sk": {
     "message": "Eslováquia"
   },
-  "muralpay.document-type.passport": {
-    "message": "Passaporte"
-  },
-  "muralpay.field.account-number": {
-    "message": "Número da conta"
-  },
-  "muralpay.field.account-number-type": {
-    "message": "Tipo de número de conta"
-  },
-  "muralpay.field.account-type": {
-    "message": "Tipo de conta"
-  },
-  "muralpay.field.bank-account-number": {
-    "message": "Número da conta"
-  },
-  "muralpay.field.country": {
-    "message": "País"
-  },
-  "muralpay.field.document-type": {
-    "message": "Tipo de Documento"
-  },
-  "muralpay.field.iban": {
-    "message": "IBAN"
-  },
-  "muralpay.field.phone-number": {
-    "message": "Número de telefone"
-  },
-  "muralpay.field.swift-bic": {
-    "message": "SWIFT/BIC"
-  },
-  "muralpay.field.wallet-address": {
-    "message": "Endereço da carteira"
-  },
-  "muralpay.help.swift-bic": {
-    "message": "Código Identificador do Banco"
-  },
-  "muralpay.pix-type.bank-account": {
-    "message": "Conta do banco"
-  },
-  "muralpay.pix-type.email": {
-    "message": "Email"
-  },
-  "muralpay.pix-type.phone": {
-    "message": "Número de telefone"
-  },
-  "muralpay.placeholder.account-number": {
-    "message": "Inserir número da conta"
-  },
-  "muralpay.placeholder.enter-account-number": {
-    "message": "Inserir número da conta"
-  },
-  "muralpay.placeholder.enter-iban": {
-    "message": "Inserir IBAN"
-  },
   "muralpay.placeholder.phone-cop": {
     "message": "+57..."
   },
@@ -1526,62 +1301,8 @@
   "muralpay.placeholder.wallet-address-eth": {
     "message": "0x..."
   },
-  "muralpay.rail.fiat-ars.name": {
-    "message": "Transferência Bancária (ARS)"
-  },
-  "muralpay.rail.fiat-brl.name": {
-    "message": "Transferência PIX (BRL)"
-  },
-  "muralpay.rail.fiat-clp.name": {
-    "message": "Transferência Bancária (CLP)"
-  },
-  "muralpay.rail.fiat-cop.name": {
-    "message": "Transferência Bancária (COP)"
-  },
-  "muralpay.rail.fiat-crc.name": {
-    "message": "Transferência Bancária (CRC)"
-  },
-  "muralpay.rail.fiat-eur.name": {
-    "message": "Transferência Bancária (EUR)"
-  },
-  "muralpay.rail.fiat-mxn.name": {
-    "message": "Transferência Bancária (MXN)"
-  },
-  "muralpay.rail.fiat-pen.name": {
-    "message": "Transferência Bancária (PEN)"
-  },
-  "muralpay.rail.fiat-usd-peru.name": {
-    "message": "Transferência Bancária (USD - Peru)"
-  },
-  "muralpay.rail.fiat-usd.name": {
-    "message": "Transferência Bancária (USD)"
-  },
-  "muralpay.rail.fiat-zar.name": {
-    "message": "Transferência Bancária (ZAR)"
-  },
-  "muralpay.rail.usdc-base.name": {
-    "message": "USDC (Base)"
-  },
-  "muralpay.rail.usdc-celo.name": {
-    "message": "USDC (Celo)"
-  },
-  "muralpay.rail.usdc-ethereum.name": {
-    "message": "USDC (Ethereum)"
-  },
-  "muralpay.rail.usdc-polygon.name": {
-    "message": "Crypto (USDC)"
-  },
-  "profile.bio.fallback.creator": {
-    "message": "Um criador Modrinth."
-  },
-  "profile.bio.fallback.user": {
-    "message": "Um utilizador Modrinth."
-  },
   "profile.button.billing": {
     "message": "Gerir faturação do utilizador"
-  },
-  "profile.button.edit-role": {
-    "message": "Editar cargo"
   },
   "profile.button.info": {
     "message": "Ver detalhes de utilizador"
@@ -1589,53 +1310,14 @@
   "profile.button.manage-projects": {
     "message": "Gerir projetos"
   },
-  "profile.button.remove-affiliate": {
-    "message": "Remover como afiliado"
-  },
-  "profile.button.set-affiliate": {
-    "message": "Definir como afiliado"
-  },
-  "profile.details.label.auth-providers": {
-    "message": "Fornecedores de Autenticação"
-  },
-  "profile.details.label.email": {
-    "message": "Email"
-  },
-  "profile.details.label.has-password": {
-    "message": "Tem password"
-  },
-  "profile.details.label.has-totp": {
-    "message": "Tem TOTP"
-  },
-  "profile.details.label.payment-methods": {
-    "message": "Métodos de pagamento"
-  },
-  "profile.details.tooltip.email-not-verified": {
-    "message": "Email não verificado"
-  },
-  "profile.details.tooltip.email-verified": {
-    "message": "Email verificado"
-  },
   "profile.error.not-found": {
     "message": "Utilizador não encontrado"
-  },
-  "profile.label.affiliate": {
-    "message": "Afiliado"
   },
   "profile.label.badges": {
     "message": "Emblemas"
   },
-  "profile.label.collection": {
-    "message": "Coleção"
-  },
   "profile.label.details": {
     "message": "Detalhes"
-  },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural,one {download} other {downloads}}"
-  },
-  "profile.label.joined": {
-    "message": "Entrou"
   },
   "profile.label.no": {
     "message": "Não"
@@ -1654,9 +1336,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizações"
-  },
-  "profile.label.projects": {
-    "message": "{count} {count, plural,one {projeto} other {projetos}}"
   },
   "profile.label.saving": {
     "message": "A guardar..."
@@ -1697,9 +1376,6 @@
   "project-member-header.invitation-title": {
     "message": "Convite para juntar ao projeto"
   },
-  "project-member-header.invitation-with-role": {
-    "message": "Foste convidado a ser membro deste projeto com o cargo de \"{role}\"."
-  },
   "project-member-header.success": {
     "message": "Sucesso"
   },
@@ -1718,17 +1394,11 @@
   "project-moderation-nags.resubmit-for-review": {
     "message": "Reenviar para revisão"
   },
-  "project-moderation-nags.resubmit-for-review-desc": {
-    "message": "O teu projeto foi {status, select, rejected {rejeitado} withheld {retido} other {{status}}} pelo staff do Modrinth. Na maioria dos casos, podes voltar a submeter para revisão depois de abordar a mensagem do staff."
-  },
   "project-moderation-nags.submit-checklist-tooltip": {
     "message": "Deves completar os passos necessários na lista de verificação de publicação!"
   },
   "project-moderation-nags.submit-for-review": {
     "message": "Enviar para revisão"
-  },
-  "project-moderation-nags.submit-for-review-button": {
-    "message": "Submeter para revisão"
   },
   "project-moderation-nags.submit-for-review-desc": {
     "message": "O teu projeto apenas é visível para membros do projeto. O projeto deve ser revisto por moderadores para ser publicado."
@@ -1820,8 +1490,8 @@
   "project.actions.review-project": {
     "message": "Rever projeto"
   },
-  "project.actions.servers-promo.pricing": {
-    "message": "A partir de {price}<small> / mês</small>"
+  "project.actions.servers-promo.description": {
+    "message": "Modrinth Servers é a forma mais fácil de jogares com os teus amigos sem complicações!"
   },
   "project.actions.servers-promo.title": {
     "message": "Cria um servidor"
@@ -2375,8 +2045,47 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar com o servidor"
   },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Criação de backup em curso"
+  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauro de backup em curso"
+  },
+  "servers.backups.item.automated": {
+    "message": "Automático"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Criando backup..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Falha a criar backup"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Falha a restaurar do backup"
+  },
+  "servers.backups.item.lock": {
+    "message": "Trancar"
+  },
+  "servers.backups.item.locked": {
+    "message": "Trancado"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "Na fila para backup"
+  },
+  "servers.backups.item.rename": {
+    "message": "Renomear"
+  },
+  "servers.backups.item.restore": {
+    "message": "Restaurar"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Restaurando do backup..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Tentar de novo"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Destrancar"
   },
   "servers.notice.actions": {
     "message": "Ações"

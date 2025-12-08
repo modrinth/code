@@ -41,9 +41,6 @@
   "button.follow": {
     "defaultMessage": "Sundi"
   },
-  "button.max": {
-    "defaultMessage": "Kinatas-an"
-  },
   "button.next": {
     "defaultMessage": "Sunod"
   },
@@ -78,13 +75,10 @@
     "defaultMessage": "Nagtipig"
   },
   "button.sign-in": {
-    "defaultMessage": "Pag-sign-in"
+    "defaultMessage": "Magsignin"
   },
   "button.sign-out": {
-    "defaultMessage": "Pag-sign-out"
-  },
-  "button.sign-up": {
-    "defaultMessage": "Pag-sign-up"
+    "defaultMessage": "Magsignout"
   },
   "button.stop": {
     "defaultMessage": "Paghunong"
@@ -101,23 +95,14 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
+  "changelog.product.servers": {
+    "defaultMessage": "Mga magsisilbi"
+  },
   "changelog.product.web": {
     "defaultMessage": "Balayan"
   },
   "collection.label.private": {
     "defaultMessage": "Pribado"
-  },
-  "form.label.amount": {
-    "defaultMessage": "Kantidad"
-  },
-  "form.label.city": {
-    "defaultMessage": "Dakbayan"
-  },
-  "form.label.country": {
-    "defaultMessage": "Nasod"
-  },
-  "form.label.email": {
-    "defaultMessage": "Dagiwat"
   },
   "icon-select.edit": {
     "defaultMessage": "Usba ang amoy"
@@ -227,12 +212,6 @@
   "label.visit-your-profile": {
     "defaultMessage": "Duawi ang imong profile"
   },
-  "modal.add-payment-method.action": {
-    "defaultMessage": "Pagdugang og pamaagi sa pagbayad"
-  },
-  "modal.add-payment-method.title": {
-    "defaultMessage": "Nagadugang og pamaagi sa pagbayad"
-  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Gidawat"
   },
@@ -341,12 +320,6 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
-  "payment-method.charity": {
-    "defaultMessage": "Karidad"
-  },
-  "payment-method.venmo": {
-    "defaultMessage": "Venmo"
-  },
   "project-type.all": {
     "defaultMessage": "Lahat"
   },
@@ -359,50 +332,8 @@
   "project-type.datapack.lowercase": {
     "defaultMessage": "{count, plural, one {putos sa lawsayod} other {mga putos sa lawsayod}}"
   },
-  "project-type.mod.capital": {
-    "defaultMessage": "{count, plural, one {Kausaban} other {Mga Kausaban}}"
-  },
   "project-type.mod.category": {
     "defaultMessage": "Mga Kausaban"
-  },
-  "project-type.mod.lowercase": {
-    "defaultMessage": "{count, plural, one {kausaban} other {mga kausaban}}"
-  },
-  "project-type.modpack.capital": {
-    "defaultMessage": "{count, plural, one {Putos sa Kausaban} other {Mga Putos sa Kausaban}}"
-  },
-  "project-type.modpack.category": {
-    "defaultMessage": "Mga Putos sa Kausaban"
-  },
-  "project-type.modpack.lowercase": {
-    "defaultMessage": "{count, plural, one {putos sa kausaban} other {mga putos sa kausaban}}"
-  },
-  "project-type.plugin.capital": {
-    "defaultMessage": "{count, plural, one {Pagsukip} other {Mga Pagsukip}}"
-  },
-  "project-type.plugin.category": {
-    "defaultMessage": "Mga Pagsukip"
-  },
-  "project-type.plugin.lowercase": {
-    "defaultMessage": "{count, plural, one {pagsukip} other {mga pagsukip}}"
-  },
-  "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, one {Putos sa Kahinguhaan} other {Mga Putos sa Kahinguhaan}}"
-  },
-  "project-type.resourcepack.category": {
-    "defaultMessage": "Mga Putos sa Kahinguhaan"
-  },
-  "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, one {putos sa kahinguhaan} other {mga putos sa kahinguhaan}}"
-  },
-  "project-type.shader.capital": {
-    "defaultMessage": "{count, plural, one {Tigpandong} other {Mga Tigpandong}}"
-  },
-  "project-type.shader.category": {
-    "defaultMessage": "Mga Tigpandong"
-  },
-  "project-type.shader.lowercase": {
-    "defaultMessage": "{count, plural, one {tigpandong} other {mga tigpandong}}"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Inusara nga dula"
@@ -425,9 +356,6 @@
   "project.about.details.published": {
     "defaultMessage": "Gimantala {date}"
   },
-  "project.about.details.title": {
-    "defaultMessage": "Kinuti"
-  },
   "project.about.details.updated": {
     "defaultMessage": "Nasibo {date}"
   },
@@ -444,16 +372,13 @@
     "defaultMessage": "Mugana sad sa inusara nga dula"
   },
   "project.settings.environment.singleplayer.description": {
-    "defaultMessage": "Mogana lamang sa Inusara nga dula o kon wala makutay sa usa ka magsisilbi nga Katalingbanon nga dula."
+    "defaultMessage": "Mogana lamang sa Insura nga dula o kun wala mokonekta sa usa ka magsisilbi nga Katalingbanon nga dula."
   },
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Inusara nga dula lamang"
   },
   "project.settings.environment.title": {
     "defaultMessage": "Kalikopan"
-  },
-  "project.settings.gallery.title": {
-    "defaultMessage": "Galeriya"
   },
   "project.settings.general.title": {
     "defaultMessage": "Tinanan"
@@ -512,9 +437,6 @@
   "search.filter_type.environment": {
     "defaultMessage": "Kalikopan"
   },
-  "search.filter_type.environment.client": {
-    "defaultMessage": "Kliyente"
-  },
   "search.filter_type.environment.server": {
     "defaultMessage": "Magsisilbi"
   },
@@ -545,12 +467,6 @@
   "servers.notice.level.survey.name": {
     "defaultMessage": "Pagpaniid"
   },
-  "servers.purchase.step.payment.prompt": {
-    "defaultMessage": "Pagpili og pamaagi sa pagbabayad"
-  },
-  "servers.purchase.step.payment.title": {
-    "defaultMessage": "Pamaagi sa pagbayad"
-  },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plano"
   },
@@ -559,9 +475,6 @@
   },
   "servers.purchase.step.review.title": {
     "defaultMessage": "Susiha"
-  },
-  "settings.account.title": {
-    "defaultMessage": "Kaakohan ug kahilwasan"
   },
   "settings.display.theme.dark": {
     "defaultMessage": "ngitngit"

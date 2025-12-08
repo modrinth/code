@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.hosting": {
-    "defaultMessage": "托管"
+  "changelog.product.servers": {
+    "defaultMessage": "服务器"
   },
   "changelog.product.web": {
     "defaultMessage": "网站"
@@ -842,42 +842,6 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "加载器"
   },
-  "servers.backups.item.auto": {
-    "defaultMessage": "自动"
-  },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "备份计划"
-  },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "正在创建备份……"
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "defaultMessage": "创建备份时失败"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "defaultMessage": "恢复备份时失败"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "手动备份"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "备份已排队"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "恢复已排队"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "重命名"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "恢复"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "正在恢复备份……"
-  },
-  "servers.backups.item.retry": {
-    "defaultMessage": "重试"
-  },
   "servers.notice.dismiss": {
     "defaultMessage": "隐藏"
   },
@@ -966,7 +930,7 @@
     "defaultMessage": "你希望服务器位于何处？"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "没有想要的地区？<link>让我们知道您希望看到 Modrinth 托管的下一个地区！</link>"
+    "defaultMessage": "没有想要的地区？<link>请告知我们你希望 Modrinth 之后在哪开设服务器！</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "东南亚"

@@ -1,7 +1,4 @@
 {
-  "app.auth-servers.unreachable.body": {
-    "message": ""
-  },
   "app.settings.developer-mode-enabled": {
     "message": "개발자 모드가 활성화되어 있습니다."
   },

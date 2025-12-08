@@ -1359,7 +1359,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Hosting"
+    "message": "Modrinth Servers"
   },
   "layout.footer.resources": {
     "message": "Ресурсы"
@@ -2001,7 +2001,7 @@
     "message": "Проверить проект"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hosting — самый простой способ играть с друзьями без лишних хлопот!"
+    "message": "Modrinth Servers это самый простой способ для игры с вашими друзьями без хлопот!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "От {price}<small> / месяц</small>"
@@ -2558,8 +2558,47 @@
   "search.filter.locked.server.sync": {
     "message": "Использовать с сервера"
   },
+  "servers.backup.create.in-progress.tooltip": {
+    "message": "Выполняется создание резервной копии"
+  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Выполняется восстановление из резервной копии"
+  },
+  "servers.backups.item.automated": {
+    "message": "Автоматически"
+  },
+  "servers.backups.item.creating-backup": {
+    "message": "Создание резервной копии..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "message": "Не удалось создать резервную копию"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "message": "Не удалось восстановить из резервной копии"
+  },
+  "servers.backups.item.lock": {
+    "message": "Заблокировать"
+  },
+  "servers.backups.item.locked": {
+    "message": "Заблокирована"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "message": "В очереди на создание"
+  },
+  "servers.backups.item.rename": {
+    "message": "Переименовать"
+  },
+  "servers.backups.item.restore": {
+    "message": "Восстановить"
+  },
+  "servers.backups.item.restoring-backup": {
+    "message": "Восстановление из резервной копии..."
+  },
+  "servers.backups.item.retry": {
+    "message": "Повторить"
+  },
+  "servers.backups.item.unlock": {
+    "message": "Разблокировать"
   },
   "servers.notice.actions": {
     "message": "Действия"

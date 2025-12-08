@@ -1,10 +1,4 @@
 {
-  "app.auth-servers.unreachable.body": {
-    "message": "Minecraft doğrulama sunucuları çökmüş olabilir. İnternet bağlantını kontrol et ve daha sonra tekrar dene."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Doğrulama sunucularına erişilemedi"
-  },
   "app.settings.developer-mode-enabled": {
     "message": "Geliştirici modu açıldı."
   },
@@ -66,7 +60,7 @@
     "message": "Güncellemeyi indir"
   },
   "app.update.downloading-update": {
-    "message": "Güncelleme indiriliyor ({percent}%)"
+    "message": "Güncelleme indiriliyor({percent}%)"
   },
   "app.update.reload-to-update": {
     "message": "Güncellemeyi yüklemek için yeniden yükleyin"
@@ -357,7 +351,7 @@
     "message": "Orijinal modpack'in üstüne eklediğin herşeyi silip kurulumun içeriğini eski haline döndürür."
   },
   "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Mod Paketini Tekrar İndir"
+    "message": "Modpack'i Tekrar İndir"
   },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Tamir Et"
@@ -381,7 +375,7 @@
     "message": "Bütün sürümleri göster"
   },
   "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "Sürümü Değiştir"
+    "message": "sürümü değiştir"
   },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "indirilemez"
