@@ -1,8 +1,12 @@
 <template>
 	<label
-		class="flex flex-col items-center justify-center gap-2.5 cursor-pointer p-8 rounded-3xl border-2 border-dashed border-surface-5 bg-surface-4 text-contrast"
+		@dragover.prevent="onDragOver"
+		@dragleave.prevent="onDragLeave"
 		@drop.prevent="handleDrop"
-		@dragover.prevent
+		:class="[
+			'flex flex-col items-center justify-center gap-2.5 cursor-pointer p-8 rounded-3xl border-2 border-dashed bg-surface-4 text-contrast transition-colors',
+			isDragOver ? 'border-purple' : 'border-surface-5',
+		]"
 	>
 		<div
 			class="h-14 w-14 grid place-content-center rounded-2xl text-brand border-brand border-solid border bg-highlight-green"
@@ -81,7 +85,19 @@ function addFiles(incoming: FileList, shouldNotReset = false) {
 	if (fileInput.value) fileInput.value.value = ''
 }
 
+const isDragOver = ref(false)
+
+function onDragOver() {
+	isDragOver.value = true
+}
+
+function onDragLeave() {
+	isDragOver.value = false
+}
+
 function handleDrop(e: DragEvent) {
+	isDragOver.value = false
+
 	if (!e.dataTransfer) return
 	addFiles(e.dataTransfer.files)
 }
