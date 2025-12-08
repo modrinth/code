@@ -92,7 +92,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			{
 				title: 'Add files',
 				id: 'add-files',
-				stageContent: AddFilesStage,
+				stageContent: markRaw(AddFilesStage),
 				leftButtonConfig: {
 					...defaultBackButton,
 					label: 'Cancel',
@@ -109,7 +109,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			{
 				title: 'Add details',
 				id: 'add-details',
-				stageContent: AddDetailsStage,
+				stageContent: markRaw(AddDetailsStage),
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
@@ -120,7 +120,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			hideAddLoadersStage.value === false && {
 				title: 'Add loaders',
 				id: 'add-loaders',
-				stageContent: AddLoadersStage,
+				stageContent: markRaw(AddLoadersStage),
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
@@ -131,7 +131,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			hideAddMcVersionsStage.value === false && {
 				title: 'Add MC versions',
 				id: 'add-mc-versions',
-				stageContent: AddMcVersionsStage,
+				stageContent: markRaw(AddMcVersionsStage),
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
@@ -142,7 +142,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			hideAddDependenciesStage.value === false && {
 				title: 'Add dependencies',
 				id: 'add-dependencies',
-				stageContent: AddDependenciesStage,
+				stageContent: markRaw(AddDependenciesStage),
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
@@ -152,7 +152,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 			{
 				title: 'Add changelog',
 				id: 'add-changelog',
-				stageContent: AddChangelogStage,
+				stageContent: markRaw(AddChangelogStage),
 				leftButtonConfig: { ...defaultBackButton },
 				rightButtonConfig: {
 					...defaultNextButton,
