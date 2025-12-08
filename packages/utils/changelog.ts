@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-12-08T10:30:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed license URL being unable to remove from projects.`,
+	},
+	{
 		date: `2025-12-05T12:00:00-08:00`,
 		product: 'hosting',
 		body: `## Improvements
