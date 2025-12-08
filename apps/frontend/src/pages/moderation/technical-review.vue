@@ -581,11 +581,14 @@ watch(currentSortType, () => {
 		</div>
 
 		<div class="flex flex-col gap-4">
+			<div v-if="isLoading" class="universal-card h-24 animate-pulse"></div>
 			<div
-				v-if="isLoading || paginatedItems.length === 0"
-				class="universal-card h-24 animate-pulse"
-			></div>
-			<div v-for="(item, idx) in paginatedItems" v-else :key="item.project.id ?? idx" class="">
+				v-else-if="paginatedItems.length === 0"
+				class="universal-card flex h-24 items-center justify-center text-secondary"
+			>
+				No projects in queue.
+			</div>
+			<div v-for="(item, idx) in paginatedItems" :key="item.project.id ?? idx">
 				<ModerationTechRevCard
 					:item="item"
 					:loading-issues="loadingIssues"
