@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "Aplikacja"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Serwery"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Strona internetowa"
@@ -842,6 +842,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Automatyczne"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Harmonogram kopii zapasowych"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Tworzenie kopii zapasowej..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Nie udało się utworzyć kopii zapasowej"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Nie udało się przywrócić danych z kopii zapasowej"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Ręczne kopie zapasowe"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Kopia zapasowa w kolejce"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Przywrócenie kopii zapasowej w kolejce"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Zmień nazwę"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Przywróć"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Przywracanie z kopii zapasowej..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Ponów"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Odrzuć"
   },
@@ -930,7 +966,7 @@
     "defaultMessage": "Gdzie chciałbyś(-abyś), aby znajdował się Twój serwer?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Nie ma na liście lokalizacji, którą potrzebujesz? <link>Daj nam znać, gdzie chcesz zobaczyć Serwery Modrinth w następnej kolejności!</link>"
+    "defaultMessage": "Nie ma na liście lokalizacji, którą potrzebujesz? <link>Daj nam znać, gdzie chcesz zobaczyć Modrinth Hosting!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Azja Południowo-Wschodnia"

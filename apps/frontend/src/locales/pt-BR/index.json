@@ -33,7 +33,7 @@
     "message": "Mac"
   },
   "app-marketing.download.options-title": {
-    "message": "Opções de download"
+    "message": "Opções de transferência"
   },
   "app-marketing.download.terms": {
     "message": "Ao baixar o Modrinth App, você concorda com nossos <terms-link>Termos</terms-link> e <privacy-link>Política de Privacidade</privacy-link>."
@@ -114,7 +114,7 @@
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Boa performance"
+    "message": "Bom desempenho"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -1358,9 +1358,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
-  },
   "layout.footer.resources": {
     "message": "Recursos"
   },
@@ -2000,9 +1997,6 @@
   "project.actions.review-project": {
     "message": "Revisar projeto"
   },
-  "project.actions.servers-promo.description": {
-    "message": "O Modrinth Servers é a maneira mais fácil de jogar com seus amigos sem complicações!"
-  },
   "project.actions.servers-promo.pricing": {
     "message": "A partir de {price}<small> / mês</small>"
   },
@@ -2558,47 +2552,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar com o servidor"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Criação de backup em andamento"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauração de backup em andamento"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatizado"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Criando backup..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Falha ao criar um backup"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Falha ao restaurar um backup"
-  },
-  "servers.backups.item.lock": {
-    "message": "Trancar"
-  },
-  "servers.backups.item.locked": {
-    "message": "Trancado"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Na fila para backup"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renomear"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurar"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restaurando do backup..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Tentar novamente"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Desbloquear"
   },
   "servers.notice.actions": {
     "message": "Ações"

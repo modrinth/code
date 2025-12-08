@@ -1,9 +1,15 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft 认证服务器可能现在无法使用。检查你的网络连接，稍后再试。"
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "无法连接到认证服务器"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "开发者模式已启用。"
   },
   "app.settings.downloading": {
-    "message": "下载{version}"
+    "message": "正在下载 v{version}"
   },
   "app.settings.tabs.appearance": {
     "message": "外观"
@@ -24,7 +30,7 @@
     "message": "资源管理"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} 准备好更新。现在重新启动以更新，或在您关闭Modrinth App时自动更新。"
+    "message": "Modrinth App v{version} 准备好更新。现在重新启动以更新，或在您关闭 Modrinth App 时自动更新。"
   },
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} 已经完成下载好。现在重新启动以更新，或在您关闭Modrinth App时自动更新。"
@@ -33,13 +39,13 @@
     "message": "Modrinth App v{version} 现在可用。自从您处在按流量计费的网络环境，我们没有自动下载更新。"
   },
   "app.update-toast.changelog": {
-    "message": "变更日志"
+    "message": "更新日志"
   },
   "app.update-toast.download": {
     "message": "下载（{size}）"
   },
   "app.update-toast.downloading": {
-    "message": "下载中... ..."
+    "message": "下载中..."
   },
   "app.update-toast.reload": {
     "message": "重新启动"
@@ -126,7 +132,7 @@
     "message": "{title} - {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "请登录你的 <link>Modrinth账号</link> 添加好友并查看他们在玩什么！"
+    "message": "请登录你的 <link> Modrinth 账号</link> 添加好友并查看他们在玩什么！"
   },
   "instance.add-server.add-and-play": {
     "message": "添加并游玩"

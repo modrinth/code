@@ -1091,9 +1091,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Servidores Modrinth"
-  },
   "layout.footer.resources": {
     "message": "Recursos"
   },
@@ -1531,9 +1528,6 @@
   },
   "project.actions.review-project": {
     "message": "Revisar proyecto"
-  },
-  "project.actions.servers-promo.description": {
-    "message": "¡Modrinth Servers es la forma más fácil de jugar con tus amigos sin complicaciones!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "A partir de {price}<small> / mes</small>"
@@ -2042,47 +2036,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Copia de seguridad en curso"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauración de copia de seguridad en curso"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatizado"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Creando copia de seguridad..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Error al crear la copia de seguridad"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Error al restaurar desde la copia de seguridad"
-  },
-  "servers.backups.item.lock": {
-    "message": "Bloquear"
-  },
-  "servers.backups.item.locked": {
-    "message": "Bloqueado"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "En cola para la copia de seguridad"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renombrar"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurar"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restaurando desde la copia de seguridad..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Reintentar"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Desbloquear"
   },
   "servers.notice.actions": {
     "message": "Acciones"

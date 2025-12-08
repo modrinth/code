@@ -647,9 +647,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth 서버"
-  },
   "layout.footer.resources": {
     "message": "정보"
   },
@@ -1225,39 +1222,6 @@
   },
   "search.filter.locked.server.sync": {
     "message": "서버와 동기화"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "백업 생성 중..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "백업 생성에 실패했습니다"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "백업을 복구하는데 실패했습니다"
-  },
-  "servers.backups.item.lock": {
-    "message": "잠금"
-  },
-  "servers.backups.item.locked": {
-    "message": "잠김"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "백업 대기열에 추가됨"
-  },
-  "servers.backups.item.rename": {
-    "message": "이름 변경"
-  },
-  "servers.backups.item.restore": {
-    "message": "복원"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "백업을 통해 복원하는 중..."
-  },
-  "servers.backups.item.retry": {
-    "message": "재시도"
-  },
-  "servers.backups.item.unlock": {
-    "message": "잠금 해제"
   },
   "servers.notice.actions": {
     "message": "활동"

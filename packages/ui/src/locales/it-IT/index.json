@@ -1,4 +1,40 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "Crea link affiliati"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "Creazione del nuovo link affiliati"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "Dai al tuo link affiliati un nome così da sapere da dove provengono gli utenti!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "Titolo del link affiliati"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "es. YouTube"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "L'username dell'utente per cui creare il link affiliati"
+  },
+  "affiliate.create.user.label": {
+    "defaultMessage": "Username"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Inserisci l'username..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Creato da {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "Creando link affiliati..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "Revoca link affiliati"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Mostra analitiche"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -7,6 +43,9 @@
   },
   "badge.new": {
     "defaultMessage": "Novità"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "Link affiliati"
   },
   "button.analytics": {
     "defaultMessage": "Analitiche"
@@ -46,6 +85,9 @@
   },
   "button.follow": {
     "defaultMessage": "Segui"
+  },
+  "button.max": {
+    "defaultMessage": "Max"
   },
   "button.more-options": {
     "defaultMessage": "Altre opzioni"
@@ -110,14 +152,89 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Server"
-  },
   "changelog.product.web": {
     "defaultMessage": "Sito web"
   },
   "collection.label.private": {
     "defaultMessage": "Privato"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "Indirizzo"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "2º indirizzo (opzionale)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Ammontare"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "Nome banca"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "Nome società"
+  },
+  "form.label.city": {
+    "defaultMessage": "Città"
+  },
+  "form.label.country": {
+    "defaultMessage": "Paese"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "Data di nascita"
+  },
+  "form.label.email": {
+    "defaultMessage": "Email"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "Nome"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Cognome"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Codice postale/ZIP"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Stato/provincia"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "Inserisci indirizzo"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "Appartamento, suite, ecc."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Inserisci ammontare"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "Inserisci nome banca"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "Seleziona nome banca"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Inserisci nome società"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Inserisci città"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Seleziona paese"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Inserisci indirizzo email"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Inserisci nome"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Inserisci cognome"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Inserisci codice postale"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Inserisci stato/provincia"
   },
   "icon-select.edit": {
     "defaultMessage": "Modifica icona"
@@ -157,6 +274,9 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modalità di gioco sconosciuta"
+  },
+  "label.available": {
+    "defaultMessage": "{amount} disponibile."
   },
   "label.changes-saved": {
     "defaultMessage": "Modifiche salvate"
@@ -205,6 +325,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Rifiutato"
+  },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "Acconsento ai <terms-link>termini del Programma Premi</terms-link>"
   },
   "label.saved": {
     "defaultMessage": "Salvato"
@@ -300,7 +423,7 @@
     "defaultMessage": "Non in elenco"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "Trattenuto"
+    "defaultMessage": "Sospeso"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Copia codice negli appunti"
@@ -353,6 +476,9 @@
   "omorphia.component.purchase_modal.payment_method_type.paypal": {
     "defaultMessage": "PayPal"
   },
+  "omorphia.component.purchase_modal.payment_method_type.paypal_international": {
+    "defaultMessage": "Intestatario PayPal"
+  },
   "omorphia.component.purchase_modal.payment_method_type.unionpay": {
     "defaultMessage": "UnionPay"
   },
@@ -361,6 +487,27 @@
   },
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Beneficenza"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Beneficenze"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Carta regalo"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Carte regalo"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Virtual Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Virtual Visa"
   },
   "project-type.all": {
     "defaultMessage": "Tutti"
@@ -778,9 +925,6 @@
   },
   "servers.region.prompt": {
     "defaultMessage": "Dove vorresti che il tuo server sia situato?"
-  },
-  "servers.region.region-unsupported": {
-    "defaultMessage": "Regione non in elenco? <link>Facci sapere dove vorresti che ci fossero server di Modrinth!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Sud-Orientale"

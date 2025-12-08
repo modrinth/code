@@ -296,6 +296,243 @@
   "auth.sign-up.notification.password-mismatch.text": {
     "message": "Kata sandi tidak cocok!"
   },
+  "auth.sign-up.password.label": {
+    "message": "Kata sandi"
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Sudah memiliki akun?"
+  },
+  "auth.sign-up.subscribe.label": {
+    "message": "Berlangganan pembaruan tentang Modrinth"
+  },
+  "auth.sign-up.title": {
+    "message": "Daftar"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Atau buat akun Anda sendiri"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Daftar dengan"
+  },
+  "auth.verify-email.action.account-settings": {
+    "message": "Pengaturan akun"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Masuk"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Sur-el Anda sudah terverifikasi!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Sur-el sudah terverifikasi"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Kirim ulang sur-el verifikasi"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "Kami tidak dapat memverifikasi sur-el Anda. Coba kirim ulang sur-el verifikasi melalui dasbor Anda dengan mendaftar masuk."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "Kami tidak dapat memverifikasi sur-el Anda. Coba kirim ulang sur-el verifikasi melalui tombol di bawah ini."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Verifikasi sur-el gagal"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Alamat sur-el Anda telah berhasil diverifikasi!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Verifikasi sur-el"
+  },
+  "auth.verify-email.title": {
+    "message": "Verifikasi Sur-el"
+  },
+  "auth.welcome.checkbox.subscribe": {
+    "message": "Berlangganan pembaruan tentang Modrinth"
+  },
+  "auth.welcome.description": {
+    "message": "Anda kini menjadi bagian dari komunitas kreator dan penjelajah hebat yang sudah membangun, mengunduh, dan terus mengikuti perkembangan terkini dari mod-mod yang luar biasa."
+  },
+  "auth.welcome.label.tos": {
+    "message": "Dengan membuat sebuah akun, Anda telah menyetujui <terms-link>Ketentuan</terms-link> dan <privacy-policy-link>Kebijakan Privasi</privacy-policy-link> Modrinth."
+  },
+  "auth.welcome.long-title": {
+    "message": "Selamat datang di Modrinth!"
+  },
+  "auth.welcome.title": {
+    "message": "Selamat Datang"
+  },
+  "collection.button.delete-icon": {
+    "message": "Hapus ikon"
+  },
+  "collection.button.edit-icon": {
+    "message": "Sunting ikon"
+  },
+  "collection.button.remove-project": {
+    "message": "Hapus proyek"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Berhenti ikuti proyek"
+  },
+  "collection.delete-modal.description": {
+    "message": "Ini akan menghapus koleksi ini selamanya. Tindakan ini tidak dapat dibatalkan."
+  },
+  "collection.delete-modal.title": {
+    "message": "Apakah Anda yakin ingin menghapus koleksi ini?"
+  },
+  "collection.description": {
+    "message": "{description} - Lihat koleksi {name} oleh {username} di Modrinth"
+  },
+  "collection.description.following": {
+    "message": "Koleksi semua proyek yang Anda ikuti yang dibuat secara otomatis."
+  },
+  "collection.error.not-found": {
+    "message": "Koleksi tidak ditemukan"
+  },
+  "collection.label.collection": {
+    "message": "Koleksi"
+  },
+  "collection.label.created-at": {
+    "message": "Dibuat {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Dikelola oleh"
+  },
+  "collection.label.no-projects": {
+    "message": "Koleksi ini tidak memiliki proyek!"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "Anda tidak memiliki proyek apa pun.\nApakah Anda ingin <create-link>membuatnya?</create-link>?"
+  },
+  "collection.label.owner": {
+    "message": "Pemilik"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, other {<stat>{count}</stat> proyek}}"
+  },
+  "collection.label.updated-at": {
+    "message": "Diperbarui {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - Koleksi"
+  },
+  "common.no": {
+    "message": "Tidak"
+  },
+  "common.yes": {
+    "message": "Ya"
+  },
+  "create.collection.cancel": {
+    "message": "Batal"
+  },
+  "create.collection.collection-info": {
+    "message": "Koleksi baru Anda akan dibuat sebagai koleksi publik dengan {count, plural, =0 {0 proyek} other {# proyek}}."
+  },
+  "create.collection.create-collection": {
+    "message": "Buat koleksi"
+  },
+  "create.collection.error-title": {
+    "message": "Terjadi kesalahan"
+  },
+  "create.collection.name-label": {
+    "message": "Nama"
+  },
+  "create.collection.name-placeholder": {
+    "message": "Masukkan nama koleksi..."
+  },
+  "create.collection.summary-description": {
+    "message": "Satu atau dua kalimat yang menjelaskan koleksi Anda."
+  },
+  "create.collection.summary-label": {
+    "message": "Ringkasan"
+  },
+  "create.collection.title": {
+    "message": "Membuat koleksi"
+  },
+  "create.limit-alert.type-collection": {
+    "message": "koleksi"
+  },
+  "create.limit-alert.type-organization": {
+    "message": "organisasi"
+  },
+  "create.limit-alert.type-plural-collection": {
+    "message": "koleksi"
+  },
+  "create.limit-alert.type-plural-organization": {
+    "message": "organisasi"
+  },
+  "create.limit-alert.type-plural-project": {
+    "message": "proyek"
+  },
+  "create.limit-alert.type-project": {
+    "message": "proyek"
+  },
+  "create.organization.cancel": {
+    "message": "Batal"
+  },
+  "create.organization.create-organization": {
+    "message": "Buat organisasi"
+  },
+  "create.organization.error-title": {
+    "message": "Terjadi kesalahan"
+  },
+  "create.organization.name-label": {
+    "message": "Nama"
+  },
+  "create.organization.name-placeholder": {
+    "message": "Masukkan nama organisasi..."
+  },
+  "create.organization.ownership-info": {
+    "message": "Anda akan menjadi pemilik organisasi ini, tetapi Anda dapat mengundang anggota lain dan memindahkan kepemilikan kapan saja."
+  },
+  "create.organization.summary-description": {
+    "message": "Satu atau dua kalimat yang menjelaskan organisasi Anda."
+  },
+  "create.organization.summary-label": {
+    "message": "Ringkasan"
+  },
+  "create.organization.summary-placeholder": {
+    "message": "Sebuah organisasi untuk..."
+  },
+  "create.organization.title": {
+    "message": "Membuat sebuah organisasi"
+  },
+  "create.organization.url-label": {
+    "message": "URL"
+  },
+  "create.project.cancel": {
+    "message": "Batal"
+  },
+  "create.project.create-project": {
+    "message": "Buat proyek"
+  },
+  "create.project.error-title": {
+    "message": "Terjadi kesalahan"
+  },
+  "create.project.name-label": {
+    "message": "Nama"
+  },
+  "create.project.name-placeholder": {
+    "message": "Masukkan nama proyek..."
+  },
+  "create.project.visibility-label": {
+    "message": "Visibilitas"
+  },
+  "create.project.visibility-public": {
+    "message": "Publik"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Cabut"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Buat baru"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Koleksi Anda"
+  },
+  "dashboard.creator-tax-form-modal.confirmation.download-button": {
+    "message": "Unduh {formType}"
+  },
   "frog": {
     "message": "Anda terkodok-kodok!🐸"
   }

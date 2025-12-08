@@ -170,14 +170,26 @@
   "nags.summary-special-formatting.title": {
     "defaultMessage": "Özetini düzenle"
   },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Özetin {length, plural, one {# karakter} other {# karakter}}. Bilgilendirici ve çekici bir özet oluşturmak için en az {minChars, plural, one {# karakter} other {# karakter}} önerilir."
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "Özeti uzat"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Projenizin Adını temiz tutmak onu unutulmaz yapar ve bulunmasını kolaylaştırır. Sürüm ve yükleyici bilgileri projenizin yanında otomatik olarak görüntülenir."
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "İsmi düzenle"
   },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "{tagCount, plural, one {# etiket} other {# etiket}} seçtiniz. Projenizin ilgili arama sonuçlarında görünmesini sağlamak için {maxTagCount} veya daha az etikete indirmeyi düşünün."
+  },
   "nags.too-many-tags.title": {
     "defaultMessage": "Uygun etiketleri seç"
+  },
+  "nags.upload-gallery-image.description": {
+    "defaultMessage": "{type, select, resourcepack {Kaynak paketinizin içeriğini sergilemek için en az bir galeri görseli gereklidir, ses veya yerelleştirme paketleri hariç. Bu paketinizi tanımlıyorsa, lütfen uygun etiketi seçin} shader {Shader'ınızın içeriğini sergilemek için en az bir galeri görseli gereklidir} other {Projenizin içeriğini sergilemek için en az bir galeri görseli gereklidir}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Galeriye resim yükle"

@@ -422,9 +422,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth serveri"
-  },
   "layout.footer.resources": {
     "message": "Resursi"
   },
@@ -989,47 +986,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sinhronizuj sa serverom"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Kreiranje backupa u toku"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Vraćanje iz backupa u toku"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatski"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Pravljenje backupa..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Neuspešno kreiranje backupa"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Neuspešno vraćanje iz backupa"
-  },
-  "servers.backups.item.lock": {
-    "message": "Zaključaj"
-  },
-  "servers.backups.item.locked": {
-    "message": "Zaključano"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "U redu za backup"
-  },
-  "servers.backups.item.rename": {
-    "message": "Preimenuj"
-  },
-  "servers.backups.item.restore": {
-    "message": "Vrati"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Vraćanje iz backupa..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Pokušaj ponovo"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Otključaj"
   },
   "servers.notice.actions": {
     "message": "Radnje"

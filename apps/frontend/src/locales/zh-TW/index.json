@@ -656,8 +656,32 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "淨額"
   },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "選擇你的國家"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "搜尋國家..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "地區"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "帳戶擁有者"
+  },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "PayPal 帳號"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "儲存"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "已儲存"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@使用者名稱"
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "下載為 CSV 檔案"
   },
   "error.collection.404.list_item.1": {
     "message": "你可能輸錯了該收藏的網址。"
@@ -1010,6 +1034,9 @@
   "layout.footer.about.status": {
     "message": "狀態"
   },
+  "layout.footer.copyright": {
+    "message": "© {year} Rinth, Inc."
+  },
   "layout.footer.legal": {
     "message": "法律"
   },
@@ -1047,7 +1074,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth 託管"
   },
   "layout.footer.resources": {
     "message": "資源"
@@ -1087,6 +1114,12 @@
   },
   "layout.meta.og-description": {
     "message": "探索及發布 Minecraft 內容！"
+  },
+  "layout.mobile.close-menu": {
+    "message": "關閉選單"
+  },
+  "layout.mobile.open-menu": {
+    "message": "開啟選單"
   },
   "layout.nav.analytics": {
     "message": "數據分析"
@@ -1159,6 +1192,9 @@
   },
   "moderation.technical.search.placeholder": {
     "message": "搜尋技術審查..."
+  },
+  "muralpay.document-type.national-id": {
+    "message": "國民身分證"
   },
   "profile.bio.fallback.creator": {
     "message": "一位 Modrinth 創作者。"
@@ -1405,9 +1441,6 @@
   },
   "project.actions.review-project": {
     "message": "審核專案"
-  },
-  "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers 是你與朋友輕鬆遊玩的最佳方式！"
   },
   "project.actions.servers-promo.pricing": {
     "message": "{price} 起<small> / 月</small>"
@@ -1964,47 +1997,8 @@
   "search.filter.locked.server.sync": {
     "message": "與伺服器同步"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "正在建立備份"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "正在還原備份"
-  },
-  "servers.backups.item.automated": {
-    "message": "自動"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "正在建立備份..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "無法建立備份"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "無法從備份還原"
-  },
-  "servers.backups.item.lock": {
-    "message": "鎖定"
-  },
-  "servers.backups.item.locked": {
-    "message": "已鎖定"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "已排入備份佇列"
-  },
-  "servers.backups.item.rename": {
-    "message": "重新命名"
-  },
-  "servers.backups.item.restore": {
-    "message": "還原"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "正在從備份還原..."
-  },
-  "servers.backups.item.retry": {
-    "message": "重試"
-  },
-  "servers.backups.item.unlock": {
-    "message": "解鎖"
   },
   "servers.notice.actions": {
     "message": "動作"

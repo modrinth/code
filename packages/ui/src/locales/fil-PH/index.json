@@ -41,6 +41,9 @@
   "button.follow": {
     "defaultMessage": "Sundan"
   },
+  "button.max": {
+    "defaultMessage": "Max"
+  },
   "button.next": {
     "defaultMessage": "Susunod"
   },
@@ -75,10 +78,13 @@
     "defaultMessage": "Sine-save"
   },
   "button.sign-in": {
-    "defaultMessage": "Mag-sign-in"
+    "defaultMessage": "Mag-sign in"
   },
   "button.sign-out": {
-    "defaultMessage": "Mag-sign-out"
+    "defaultMessage": "Mag-sign out"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Mag-sign up"
   },
   "button.stop": {
     "defaultMessage": "Maghinto"
@@ -95,14 +101,23 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Mga server"
-  },
   "changelog.product.web": {
     "defaultMessage": "Website"
   },
   "collection.label.private": {
     "defaultMessage": "Pribado"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Halaga"
+  },
+  "form.label.city": {
+    "defaultMessage": "Siyudad"
+  },
+  "form.label.country": {
+    "defaultMessage": "Bansa"
+  },
+  "form.label.email": {
+    "defaultMessage": "Email"
   },
   "icon-select.edit": {
     "defaultMessage": "Baguhin ang ikono"
@@ -212,6 +227,12 @@
   "label.visit-your-profile": {
     "defaultMessage": "Bisitahin ang iyong profile"
   },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Magdagdag ng payment method"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Nagdaragdag ng payment method"
+  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Tinanggap"
   },
@@ -320,6 +341,12 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Charity"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
   "project-type.all": {
     "defaultMessage": "Lahat"
   },
@@ -332,8 +359,50 @@
   "project-type.datapack.lowercase": {
     "defaultMessage": "{count, plural, one {data pack} other {mga data pack}}"
   },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mga Mod}}"
+  },
   "project-type.mod.category": {
     "defaultMessage": "Mga Mod"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} other {mga mod}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Mga Modpack}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Mga Modpack"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpack} other {mga modpack}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Mga Plugin}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Mga Plugin"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {mga plugin}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Resource Pack} other {Mga Resource Pack}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Mga Resource Pack"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {resource pack} other {mga resource pack}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Mga Shader}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Mga Shader"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {mga shader}}"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Pang-isahang laro"
@@ -355,6 +424,9 @@
   },
   "project.about.details.published": {
     "defaultMessage": "Inilathala {date}"
+  },
+  "project.about.details.title": {
+    "defaultMessage": "Detalye"
   },
   "project.about.details.updated": {
     "defaultMessage": "In-update {date}"
@@ -379,6 +451,9 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Environment"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Gallery"
   },
   "project.settings.general.title": {
     "defaultMessage": "General"
@@ -437,6 +512,9 @@
   "search.filter_type.environment": {
     "defaultMessage": "Environment"
   },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Client"
+  },
   "search.filter_type.environment.server": {
     "defaultMessage": "Server"
   },
@@ -467,6 +545,12 @@
   "servers.notice.level.survey.name": {
     "defaultMessage": "Survey"
   },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Pumili ng payment method"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Payment method"
+  },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"
   },
@@ -475,6 +559,9 @@
   },
   "servers.purchase.step.review.title": {
     "defaultMessage": "Suriin"
+  },
+  "settings.account.title": {
+    "defaultMessage": "Account at seguridad"
   },
   "settings.display.theme.dark": {
     "defaultMessage": "madilim"

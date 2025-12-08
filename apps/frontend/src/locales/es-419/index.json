@@ -1356,7 +1356,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Recursos"
@@ -1992,7 +1992,7 @@
     "message": "Revisar proyecto"
   },
   "project.actions.servers-promo.description": {
-    "message": "¡Modrinth Servers es la forma más fácil de jugar con tus amigos sin complicaciones!"
+    "message": "¡Modrinth Hosting es la forma más fácil de jugar con tus amigos sin complicaciones!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Desde {price}<small> / mes</small>"
@@ -2549,47 +2549,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Creación de respaldo en curso"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauración del respaldo en curso"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatizado"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Creando respaldo..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "No se pudo crear el respaldo"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Error al restaurar desde el respaldo"
-  },
-  "servers.backups.item.lock": {
-    "message": "Bloquear"
-  },
-  "servers.backups.item.locked": {
-    "message": "Bloqueado"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "En cola para respaldo"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renombrar"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurar"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restaurando desde el respaldo..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Reintentar"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Desbloquear"
   },
   "servers.notice.actions": {
     "message": "Acciones"

@@ -614,6 +614,9 @@
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "הינך אזרח מארה״ב?"
   },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "פרטים"
+  },
   "error.collection.404.list_item.1": {
     "message": "ייתכן שהקלדת כתובת URL שגויה של האוסף."
   },
@@ -925,9 +928,6 @@
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
-  },
-  "layout.footer.products.servers": {
-    "message": "שרתי Modrinth"
   },
   "layout.footer.resources": {
     "message": "משאבים"

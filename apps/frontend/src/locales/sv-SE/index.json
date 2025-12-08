@@ -875,9 +875,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth-servrar"
-  },
   "layout.footer.resources": {
     "message": "Resurser"
   },
@@ -1168,9 +1165,6 @@
   },
   "project.actions.review-project": {
     "message": "Granska projekt"
-  },
-  "project.actions.servers-promo.description": {
-    "message": "Modrinth servrar är det lättaste sättet att spela med dina vänner utan svårigheter!"
   },
   "project.actions.servers-promo.title": {
     "message": "Skapa en server"
@@ -1543,36 +1537,6 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Synkronisera med server"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Skapar säkerhetskopia..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Misslyckades med att skapa säkerhetskopia"
-  },
-  "servers.backups.item.lock": {
-    "message": "Lås"
-  },
-  "servers.backups.item.locked": {
-    "message": "Låst"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Köad för säkerhetskopiering"
-  },
-  "servers.backups.item.rename": {
-    "message": "Döp om"
-  },
-  "servers.backups.item.restore": {
-    "message": "Återställ"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Återställer från säkerhetskopia..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Försök igen"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Lås upp"
   },
   "servers.notice.actions": {
     "message": "Åtgärder"
