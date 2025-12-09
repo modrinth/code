@@ -418,14 +418,14 @@ const processingDate = computed<{ date: string; amount: number }>(() => {
 	const nextDates = nextDate.value
 	if (!nextDates.length) return { date: '', amount: 0 }
 
-	const now = dayjs()
+	const now = dayjs.utc()
 	const currentMonth = now.format('YYYY-MM')
 
 	// Find revenue from the current month (still "processing")
 	// Revenue earned in month X becomes available at end_of_month(X) + 60 days
 	// So we calculate: source_month = (date_available - 60 days).startOf('month')
 	for (const { date, amount } of nextDates) {
-		const availableDate = dayjs(date)
+		const availableDate = dayjs.utc(date)
 		const sourceMonthEnd = availableDate.subtract(60, 'days')
 		const sourceMonth = sourceMonthEnd.startOf('month').format('YYYY-MM')
 
