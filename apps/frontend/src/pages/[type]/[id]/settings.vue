@@ -75,14 +75,14 @@ const navItems = computed(() => {
 			icon: AlignLeftIcon,
 		},
 		{
-			link: `/${base}/settings/license`,
-			label: formatMessage(commonProjectSettingsMessages.license),
-			icon: BookTextIcon,
-		},
-		{
 			link: `/${base}/settings/versions`,
 			label: formatMessage(commonProjectSettingsMessages.versions),
 			icon: VersionIcon,
+		},
+		{
+			link: `/${base}/settings/license`,
+			label: formatMessage(commonProjectSettingsMessages.license),
+			icon: BookTextIcon,
 		},
 		{
 			link: `/${base}/gallery`,
