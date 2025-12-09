@@ -1,0 +1,14 @@
+@layer utilities {
+	.heading-xl {
+		@apply m-0 text-xl font-semibold leading-none text-contrast;
+	}
+	.heading-2xl {
+		@apply m-0 text-2xl font-semibold leading-none text-contrast;
+	}
+	.heading-3xl {
+		@apply m-0 text-3xl font-semibold leading-none text-contrast;
+	}
+	.heading-4xl {
+		@apply m-0 text-4xl font-semibold leading-none text-contrast;
+	}
+}

@@ -6,7 +6,12 @@
 	</NuxtLayout>
 </template>
 <script setup lang="ts">
-import { NotificationPanel, provideModrinthClient, provideNotificationManager } from '@modrinth/ui'
+import {
+	NotificationPanel,
+	provideModrinthClient,
+	provideNotificationManager,
+	providePageContext,
+} from '@modrinth/ui'
 
 import ModrinthLoadingIndicator from '~/components/ui/modrinth-loading-indicator.ts'
 import { createModrinthClient } from '~/helpers/api.ts'
@@ -23,4 +28,8 @@ const client = createModrinthClient(auth, {
 	rateLimitKey: config.rateLimitKey,
 })
 provideModrinthClient(client)
+providePageContext({
+	hierarchicalSidebarAvailable: ref(false),
+	showAds: ref(false),
+})
 </script>
