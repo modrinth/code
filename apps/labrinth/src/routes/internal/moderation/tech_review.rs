@@ -406,7 +406,7 @@ async fn search_projects(
             WHERE
                 -- project type
                 (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
-                AND m.status NOT IN ('draft', 'rejected')
+                AND m.status NOT IN ('draft', 'rejected', 'withheld')
                 AND dr.status = 'pending'
         ) t
 
