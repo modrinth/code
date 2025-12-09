@@ -529,12 +529,12 @@ pub async fn fetch_analytics(
     };
 
     if num_time_slices > MAX_TIME_SLICES {
-        return Err(ApiError::InvalidInput(format!(
+        return Err(ApiError::Request(eyre!(
             "Resolution is too fine or range is too large - maximum of {MAX_TIME_SLICES} time slices, was {num_time_slices}"
         )));
     }
     if resolution < MIN_RESOLUTION {
-        return Err(ApiError::InvalidInput(format!(
+        return Err(ApiError::Request(eyre!(
             "Resolution must be at least {MIN_RESOLUTION}, was {resolution}",
         )));
     }
@@ -691,15 +691,11 @@ pub async fn fetch_analytics(
         )
         .fetch(&**pool);
         while let Some(row) = rows.next().await.transpose()? {
-            let bucket = row.bucket.ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "bucket should be non-null - query bug!".into(),
-                )
-            })?;
-            let bucket = usize::try_from(bucket).map_err(|_| {
-                ApiError::InvalidInput(
-                    "bucket value {bucket} does not fit into `usize` - query bug!".into(),
-                )
+            let bucket = row
+                .bucket
+                .wrap_internal_err("bucket should be non-null - query bug!")?;
+            let bucket = usize::try_from(bucket).wrap_internal_err_with(|| {
+                eyre!("bucket value {bucket} does not fit into `usize` - query bug!")
             })?;
 
             if let Some(source_project) =
@@ -752,7 +748,9 @@ pub async fn fetch_analytics(
             let bucket = row
                 .bucket
                 .wrap_internal_err("bucket should be non-null - query bug!")?;
-            let bucket = usize::try_from(bucket).wrap_internal_err_with(|| eyre!("bucket value {bucket} does not fit into `usize` - query bug!"))?;
+            let bucket = usize::try_from(bucket).wrap_internal_err_with(|| {
+                eyre!("bucket value {bucket} does not fit into `usize` - query bug!")
+            })?;
 
             let source_affiliate_code =
                 AffiliateCodeId::from(DBAffiliateCodeId(
