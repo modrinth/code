@@ -18,12 +18,12 @@
 			</template>
 		</template>
 		<template #actions>
-			<ButtonStyled v-if="dismissable" circular>
+			<ButtonStyled v-if="dismissable" :color="NOTICE_TYPE_BTN[level]">
 				<button
 					v-tooltip="formatMessage(messages.dismiss)"
 					@click="() => (preview ? {} : emit('dismiss'))"
 				>
-					<XIcon />
+					<XIcon /> Dismiss
 				</button>
 			</ButtonStyled>
 		</template>
@@ -89,6 +89,12 @@ const NOTICE_TYPE: Record<string, 'info' | 'warning' | 'critical'> = {
 	info: 'info',
 	warn: 'warning',
 	critical: 'critical',
+}
+
+const NOTICE_TYPE_BTN: Record<string, 'blue' | 'orange' | 'red'> = {
+	info: 'blue',
+	warn: 'orange',
+	critical: 'red',
 }
 
 const heading = computed(() => NOTICE_HEADINGS[props.level] ?? messages.info)

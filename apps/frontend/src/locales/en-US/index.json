@@ -1796,6 +1796,9 @@
   "profile.details.label.email": {
     "message": "Email"
   },
+  "profile.details.label.email-verified": {
+    "message": "Email verified"
+  },
   "profile.details.label.has-password": {
     "message": "Has password"
   },

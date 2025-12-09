@@ -127,7 +127,7 @@
 									width: '100%',
 								}"
 							>
-								<template v-for="mod in visibleItems.items" :key="mod.filename">
+								<template v-for="mod in visibleItems.items" :key="getStableModKey(mod)">
 									<div
 										class="relative mb-2 flex w-full items-center justify-between rounded-xl bg-bg-raised"
 										:class="mod.disabled ? 'bg-table-alternateRow text-secondary' : ''"
@@ -245,7 +245,7 @@
 											</div>
 
 											<input
-												:id="`toggle-${mod.filename}`"
+												:id="`toggle-${getStableModKey(mod)}`"
 												:checked="!mod.disabled"
 												:disabled="mod.changing"
 												class="switch stylized-toggle"
@@ -593,6 +593,16 @@ function friendlyModName(mod: ContentItem) {
 	const lastDotIndex = cleanName.lastIndexOf('.')
 	if (lastDotIndex !== -1) cleanName = cleanName.substring(0, lastDotIndex)
 	return cleanName
+}
+
+function getStableModKey(mod: ContentItem): string {
+	if (mod.project_id) {
+		return `project-${mod.project_id}`
+	}
+
+	// external file
+	const baseFilename = mod.filename.endsWith('.disabled') ? mod.filename.slice(0, -9) : mod.filename
+	return `file-${baseFilename}`
 }
 
 async function toggleMod(mod: ContentItem) {

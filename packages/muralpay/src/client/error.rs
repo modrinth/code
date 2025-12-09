@@ -1,9 +1,10 @@
-use std::{collections::HashMap, fmt};
-
-use bytes::Bytes;
-use derive_more::{Display, Error, From};
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use {
+    bytes::Bytes,
+    derive_more::{Display, Error, From},
+    serde::{Deserialize, Serialize},
+    std::{collections::HashMap, fmt},
+    uuid::Uuid,
+};
 
 #[derive(Debug, Display, Error, From)]
 pub enum MuralError {
@@ -26,43 +27,6 @@ pub enum MuralError {
 }
 
 pub type Result<T, E = MuralError> = std::result::Result<T, E>;
-
-#[derive(Debug, Display, Error, From)]
-pub enum TransferError {
-    #[display("no transfer API key")]
-    NoTransferKey,
-    #[display("API error")]
-    Api(Box<ApiError>),
-    #[display("request error")]
-    Request(reqwest::Error),
-    #[display("failed to decode response\n{json:?}")]
-    #[from(skip)]
-    Decode {
-        source: serde_json::Error,
-        json: Bytes,
-    },
-    #[display("failed to decode error response\n{json:?}")]
-    #[from(skip)]
-    DecodeError {
-        source: serde_json::Error,
-        json: Bytes,
-    },
-}
-
-impl From<MuralError> for TransferError {
-    fn from(value: MuralError) -> Self {
-        match value {
-            MuralError::Api(x) => Self::Api(Box::new(x)),
-            MuralError::Request(x) => Self::Request(x),
-            MuralError::Decode { source, json } => {
-                Self::Decode { source, json }
-            }
-            MuralError::DecodeError { source, json } => {
-                Self::DecodeError { source, json }
-            }
-        }
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize, Error)]
 #[serde(rename_all = "camelCase")]
@@ -96,7 +60,7 @@ where
 
 impl fmt::Display for ApiError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut lines = vec![self.message.to_string()];
+        let mut lines = vec![self.message.clone()];
 
         if !self.details.is_empty() {
             lines.push("details:".into());
@@ -105,8 +69,7 @@ impl fmt::Display for ApiError {
 
         if !self.params.is_empty() {
             lines.push("params:".into());
-            lines
-                .extend(self.params.iter().map(|(k, v)| format!("- {k}: {v}")));
+            lines.extend(self.params.iter().map(|(k, v)| format!("- {k}: {v}")));
         }
 
         lines.push(format!("error name: {}", self.name));
