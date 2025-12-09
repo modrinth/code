@@ -94,7 +94,7 @@ const NOTICE_TYPE: Record<string, 'info' | 'warning' | 'critical'> = {
 const NOTICE_TYPE_BTN: Record<string, 'blue' | 'orange' | 'red'> = {
 	info: 'blue',
 	warn: 'orange',
-	critical: 'red'
+	critical: 'red',
 }
 
 const heading = computed(() => NOTICE_HEADINGS[props.level] ?? messages.info)
