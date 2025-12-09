@@ -104,15 +104,6 @@ const currentTab = ref<Tab>('Thread')
 
 const isThreadCollapsed = ref(true)
 
-watch(
-	() => props.item.thread?.messages?.length,
-	(len) => {
-		if (!len || len <= 1) {
-			isThreadCollapsed.value = false
-		}
-	},
-	{ immediate: true },
-)
 
 const remainingMessageCount = computed(() => {
 	if (!props.item.thread?.messages) return 0
