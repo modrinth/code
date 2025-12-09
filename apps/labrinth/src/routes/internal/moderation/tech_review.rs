@@ -392,6 +392,17 @@ async fn search_projects(
                         )
                         FROM delphi_report_issues dri
                         WHERE dri.report_id = dr.id
+                        AND NOT EXISTS (
+                            -- exclude issues with types that have been marked as safe for this project
+                            SELECT 1
+                            FROM delphi_report_issues dri_safe
+                            INNER JOIN delphi_reports dr_safe ON dr_safe.id = dri_safe.report_id
+                            INNER JOIN files f_safe ON f_safe.id = dr_safe.file_id
+                            INNER JOIN versions v_safe ON v_safe.id = f_safe.version_id
+                            WHERE dri_safe.issue_type = dri.issue_type
+                            AND dri_safe.status = 'safe'
+                            AND v_safe.mod_id = m.id
+                        )
                     )
                 ) AS report
             FROM delphi_reports dr
