@@ -4,8 +4,8 @@
 	>
 		<div class="flex items-center gap-2">
 			<Avatar v-if="icon" :src="icon" alt="dependency-icon" size="20px" />
-			<span class="overflow-hidden font-semibold text-contrast">
-				{{ name }}
+			<span class="overflow-hidden font-semibold text-contrast" :title="name || projectId">
+				{{ name || 'Unknown Project' }}
 			</span>
 
 			<TagItem class="border !border-solid border-surface-5">
@@ -35,8 +35,9 @@ const emit = defineEmits<{
 	(e: 'remove'): void
 }>()
 
-const { name, icon, dependencyType, versionName } = defineProps<{
-	name: string
+const { projectId, name, icon, dependencyType, versionName } = defineProps<{
+	projectId: string
+	name?: string
 	icon?: string
 	dependencyType: Labrinth.Versions.v3.DependencyType
 	versionName: string
