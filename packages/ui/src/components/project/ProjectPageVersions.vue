@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-3 flex flex-wrap gap-2">
+	<div class="mb-3 flex flex-wrap justify-between gap-2">
 		<VersionFilterControl
 			ref="versionFilters"
 			:versions="versions"
@@ -7,12 +7,17 @@
 			:base-id="`${baseId}-filter`"
 			@update:query="updateQuery"
 		/>
+
 		<Pagination
 			:page="currentPage"
-			class="ml-auto mt-auto"
+			class="mt-auto"
 			:count="Math.ceil(filteredVersions.length / pageSize)"
 			@switch-page="switchPage"
 		/>
+
+		<ButtonStyled v-if="openModal" color="green">
+			<button @click="openModal"><PlusIcon /> Create version</button>
+		</ButtonStyled>
 	</div>
 	<div
 		v-if="versions.length > 0"
@@ -169,14 +174,15 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { CalendarIcon, DownloadIcon, StarIcon } from '@modrinth/assets'
+import type { Labrinth } from '@modrinth/api-client'
+import { CalendarIcon, DownloadIcon, PlusIcon, StarIcon } from '@modrinth/assets'
+import { ButtonStyled } from '@modrinth/ui'
 import {
 	formatBytes,
 	formatCategory,
 	formatNumber,
 	formatVersionsForDisplay,
 	type GameVersionTag,
-	type PlatformTag,
 	type Version,
 } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
@@ -207,9 +213,10 @@ const props = withDefaults(
 		versions: VersionWithDisplayUrlEnding[]
 		showFiles?: boolean
 		currentMember?: boolean
-		loaders: PlatformTag[]
+		loaders: Labrinth.Tags.v2.Loader[]
 		gameVersions: GameVersionTag[]
 		versionLink?: (version: Version) => string
+		openModal?: () => void
 	}>(),
 	{
 		baseId: undefined,
