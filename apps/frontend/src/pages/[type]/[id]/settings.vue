@@ -25,6 +25,7 @@ defineProps<{
 	patchProject: any
 	patchIcon: any
 	resetProject: any
+	resetVersions: any
 	resetOrganization: any
 	resetMembers: any
 }>()
@@ -85,7 +86,7 @@ const navItems = computed(() => {
 			icon: BookTextIcon,
 		},
 		{
-			link: `/${base}/gallery`,
+			link: `/${base}/settings/gallery`,
 			label: formatMessage(commonProjectSettingsMessages.gallery),
 			icon: ImageIcon,
 		},
@@ -126,6 +127,7 @@ const navItems = computed(() => {
 				:patch-project="patchProject"
 				:patch-icon="patchIcon"
 				:reset-project="resetProject"
+				:reset-versions="resetVersions"
 				:reset-organization="resetOrganization"
 				:reset-members="resetMembers"
 			/>

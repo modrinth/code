@@ -213,7 +213,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
-const { refreshProject } = injectProjectPageContext()
+const { refreshVersions } = injectProjectPageContext()
 
 const isSubmitting = ref(false)
 
@@ -230,13 +230,7 @@ async function handleCreateVersion() {
 			text: 'The version has been successfully added to your project.',
 			type: 'success',
 		})
-		await refreshProject()
-		await navigateTo(
-			`/${projectV2.value.project_type}/${
-				projectV2.value.slug ? projectV2.value.slug : projectV2.value.id
-			}/version/${id}`,
-			{ replace: true },
-		)
+		await refreshVersions()
 	} catch (err: any) {
 		addNotification({
 			title: 'An error occurred',
@@ -285,13 +279,7 @@ async function handleSaveVersionEdits() {
 			text: 'The version has been successfully saved to your project.',
 			type: 'success',
 		})
-		await refreshProject()
-		await navigateTo(
-			`/${projectV2.value.project_type}/${
-				projectV2.value.slug ? projectV2.value.slug : projectV2.value.id
-			}/version/${version.version_id}`,
-			{ replace: true },
-		)
+		await refreshVersions()
 	} catch (err: any) {
 		addNotification({
 			title: 'An error occurred',

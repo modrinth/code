@@ -55,6 +55,7 @@
 				:patch-project="patchProject"
 				:patch-icon="patchIcon"
 				:reset-project="resetProject"
+				:reset-versions="resetVersions"
 				:reset-organization="resetOrganization"
 				:reset-members="resetMembers"
 				:route="route"
@@ -903,6 +904,7 @@
 					v-model:organization="organization"
 					:current-member="currentMember"
 					:reset-project="resetProject"
+					:reset-versions="resetVersions"
 					:reset-organization="resetOrganization"
 					:reset-members="resetMembers"
 					:route="route"
@@ -1446,6 +1448,7 @@ let project,
 	resetMembers,
 	dependencies,
 	versions,
+	resetVersions,
 	organization,
 	resetOrganization,
 	projectV2Error,
@@ -1459,7 +1462,7 @@ try {
 		{ data: projectV3, error: projectV3Error, refresh: resetProjectV3 },
 		{ data: allMembers, error: membersError, refresh: resetMembers },
 		{ data: dependencies, error: dependenciesError },
-		{ data: versions, error: versionsError },
+		{ data: versions, error: versionsError, refresh: resetVersions },
 		{ data: organization, refresh: resetOrganization },
 	] = await Promise.all([
 		useAsyncData(`project/${projectId.value}`, () => useBaseFetch(`project/${projectId.value}`), {
@@ -1917,6 +1920,7 @@ provideProjectPageContext({
 	projectV2: project,
 	projectV3,
 	refreshProject: resetProject,
+	refreshVersions: resetVersions,
 	currentMember,
 })
 </script>

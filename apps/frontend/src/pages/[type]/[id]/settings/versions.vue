@@ -286,13 +286,13 @@ interface Props {
 	currentMember?: object
 }
 
-defineProps<Props>()
+const { project, currentMember } = defineProps<Props>()
 
 const versions = defineModel<Labrinth.Versions.v3.Version[]>('versions', { required: true })
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
-const { refreshProject } = injectProjectPageContext()
+const { refreshVersions } = injectProjectPageContext()
 
 const modal = ref<InstanceType<typeof CreateProjectVersionModal>>()
 
@@ -347,8 +347,8 @@ async function deleteVersion() {
 			type: 'error',
 		})
 	}
-	refreshProject()
-	versions.value = versions.value.filter((v) => v.id !== id)
+
+	refreshVersions()
 	selectedVersion.value = null
 
 	stopLoading()
