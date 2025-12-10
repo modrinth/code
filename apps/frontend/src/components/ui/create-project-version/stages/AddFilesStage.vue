@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-4 flex w-full flex-col gap-4">
+	<div class="flex w-full flex-col gap-4">
 		<DropzoneFileInput
 			aria-label="Upload additional file"
 			multiple

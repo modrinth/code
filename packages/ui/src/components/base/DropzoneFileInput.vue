@@ -4,7 +4,7 @@
 		@dragleave.prevent="onDragLeave"
 		@drop.prevent="handleDrop"
 		:class="[
-			'flex flex-col items-center justify-center gap-2.5 cursor-pointer p-8 rounded-3xl border-2 border-dashed bg-surface-4 text-contrast transition-colors',
+			'flex flex-col items-center justify-center gap-4 cursor-pointer p-8 rounded-3xl border-2 border-dashed bg-surface-4 text-contrast transition-colors',
 			isDragOver ? 'border-purple' : 'border-surface-5',
 		]"
 	>

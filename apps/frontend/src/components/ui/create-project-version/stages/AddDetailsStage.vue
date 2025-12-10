@@ -64,7 +64,7 @@
 							<TagItem
 								v-if="loader"
 								:key="`loader-${loader.name}`"
-								class="hover:no-underline"
+								class="border !border-solid border-surface-5 hover:no-underline"
 								:style="`--_color: var(--color-platform-${loader.name})`"
 							>
 								<div v-html="loader.icon"></div>
