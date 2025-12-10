@@ -223,10 +223,10 @@
 						</Button>
 					</template>
 				</template>
-			</div>
-			<div class="preview">
-				<Toggle id="preview" v-model="previewMode" />
-				<label class="label" for="preview"> Preview </label>
+				<div class="preview">
+					<Toggle id="preview" v-model="previewMode" />
+					<label class="label" for="preview"> Preview </label>
+				</div>
 			</div>
 		</div>
 		<div ref="editorRef" :class="{ hide: previewMode }" />
@@ -270,7 +270,7 @@
 import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
 import { Compartment, EditorState } from '@codemirror/state'
-import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
+import { placeholder as cm_placeholder, EditorView, keymap } from '@codemirror/view'
 import {
 	AlignLeftIcon,
 	BoldIcon,
