@@ -19,11 +19,11 @@
 
 		<div class="flex items-center gap-1">
 			<template v-if="!isPrimary">
-				<div class="w-28">
+				<div class="w-36">
 					<Combobox
 						v-model="selectedType"
 						:searchable="false"
-						class="rounded-xl border border-solid border-surface-5"
+						class="rounded-xl border border-solid border-surface-5 text-sm"
 						:options="versionTypes"
 						:close-on-select="true"
 						:show-labels="false"
@@ -43,14 +43,16 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
 import Combobox, { type DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
-const selectedType = ref<string>('other')
+const selectedType = defineModel<Labrinth.Versions.v3.FileType | 'primary'>({ default: 'unknown' })
 
 const emit = defineEmits<{
 	(e: 'setPrimaryFile'): void
+	(e: 'setFileType', type: Labrinth.Versions.v3.FileType): void
 }>()
 
 const { name, isPrimary, onRemove } = defineProps<{
@@ -59,13 +61,19 @@ const { name, isPrimary, onRemove } = defineProps<{
 	onRemove?: () => void
 }>()
 
-const versionTypes: DropdownOption<string>[] = [
-	{ value: 'primary', label: 'Primary' },
-	{ value: 'other', label: 'Other' },
+const versionTypes: DropdownOption<Labrinth.Versions.v3.FileType | 'primary'>[] = [
+	{ class: 'text-sm', value: 'primary', label: 'Primary' },
+	{ class: 'text-sm', value: 'unknown', label: 'Other' },
+	{ class: 'text-sm', value: 'required-resource-pack', label: 'Required RP' },
+	{ class: 'text-sm', value: 'optional-resource-pack', label: 'Optional RP' },
+	{ class: 'text-sm', value: 'sources-jar', label: 'Sources JAR' },
+	{ class: 'text-sm', value: 'dev-jar', label: 'Dev JAR' },
+	{ class: 'text-sm', value: 'javadoc-jar', label: 'Javadoc JAR' },
+	{ class: 'text-sm', value: 'signature', label: 'Signature' },
 ]
 
 function emitFileTypeChange() {
-	if (selectedType.value) emit('setPrimaryFile')
-	selectedType.value = isPrimary ? 'primary' : 'other'
+	if (selectedType.value === 'primary') emit('setPrimaryFile')
+	else emit('setFileType', selectedType.value)
 }
 </script>

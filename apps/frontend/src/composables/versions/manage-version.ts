@@ -86,6 +86,8 @@ export function useManageVersion() {
 	function setPrimaryFile(index: number) {
 		const files = filesToAdd.value
 		if (index <= 0 || index >= files.length) return
+		files[0].fileType = 'unknown'
+		files[index].fileType = 'unknown'
 		;[files[0], files[index]] = [files[index], files[0]]
 	}
 

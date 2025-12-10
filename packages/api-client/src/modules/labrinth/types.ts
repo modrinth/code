@@ -383,12 +383,14 @@ export namespace Labrinth {
 				| 'scheduled'
 				| 'unknown'
 
-			export type FileType = 'required-resource-pack' | 'optional-resource-pack'
-			// | 'sources-jar'
-			// | 'dev-jar'
-			// | 'javadoc-jar'
-			// | 'signature'
-			// | 'unknown'
+			export type FileType =
+				| 'required-resource-pack'
+				| 'optional-resource-pack'
+				| 'sources-jar'
+				| 'dev-jar'
+				| 'javadoc-jar'
+				| 'signature'
+				| 'unknown'
 
 			export interface VersionFileHash {
 				sha512: string

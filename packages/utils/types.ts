@@ -283,7 +283,14 @@ export interface FileDependency {
 export type Dependency = VersionDependency | ProjectDependency | FileDependency
 export type VersionChannel = 'release' | 'beta' | 'alpha'
 export type VersionStatus = 'listed' | 'archived' | 'draft' | 'unlisted' | 'scheduled' | 'unknown'
-export type FileType = 'required-resource-pack' | 'optional-resource-pack'
+export type FileType =
+	| 'required-resource-pack'
+	| 'optional-resource-pack'
+	| 'sources-jar'
+	| 'dev-jar'
+	| 'javadoc-jar'
+	| 'signature'
+	| 'unknown'
 
 export interface VersionFileHash {
 	sha512: string

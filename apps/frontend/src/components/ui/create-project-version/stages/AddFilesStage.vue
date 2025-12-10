@@ -22,6 +22,8 @@
 						:key="versionFile.filename"
 						:name="versionFile.filename"
 						:is-primary="versionFile.primary"
+						:selected-type="versionFile.file_type"
+						@set-file-type="(type) => (versionFile.file_type = type)"
 						:onRemove="
 							versionFile.primary
 								? undefined
@@ -34,7 +36,8 @@
 						:name="versionFile.file.name"
 						:is-primary="idx === 0 && !draftVersion.existing_files?.some((f) => f.primary)"
 						@set-primary-file="handleSetPrimaryFile(idx)"
-						@remove="handleRemoveFile(idx)"
+						@set-file-type="(type) => (versionFile.fileType = type)"
+						:onRemove="() => handleRemoveFile(idx)"
 					/>
 				</div>
 				<span>
