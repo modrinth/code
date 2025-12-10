@@ -243,7 +243,7 @@ h3 {
 }
 
 ::-webkit-scrollbar-track {
-	background: var(--surface-4);
+	background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -253,5 +253,5 @@ h3 {
 // Firefox scrollbar
 * {
 	scrollbar-width: thin;
-	scrollbar-color: var(--color-button-bg) var(--surface-3);
+	scrollbar-color: var(--color-button-bg) transparent;
 }
