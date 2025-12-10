@@ -42,6 +42,15 @@
 					</a>
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
+					<a
+						v-tooltip="`Edit version`"
+						aria-label="Edit"
+						@click="() => handleOpenEditVersionModal(version)"
+					>
+						<EditIcon aria-hidden="true" />
+					</a>
+				</ButtonStyled>
+				<ButtonStyled circular type="transparent">
 					<OverflowMenu
 						class="group-hover:!bg-button-bg"
 						:dropdown-id="`${baseDropdownId}-${version.id}`"
@@ -102,32 +111,7 @@
 							{ divider: true, shown: !!currentMember },
 							{
 								id: 'edit',
-								action: async () => {
-									selectedVersion = version.id
-									try {
-										const versionData = await client.labrinth.versions_v3.getVersion(version.id)
-										console.log(versionData)
-
-										modal?.show({
-											project_id: project.id,
-											version_id: version.id,
-											version_title: versionData.name,
-											version_number: versionData.version_number,
-											version_body: versionData.changelog || '',
-											game_versions: versionData.game_versions,
-											loaders: versionData.loaders,
-											release_channel: versionData.version_type,
-											dependencies: versionData.dependencies,
-											existing_files: versionData.files,
-										})
-									} catch (err: any) {
-										addNotification({
-											title: 'An error occurred',
-											text: err.data ? err.data.description : err,
-											type: 'error',
-										})
-									}
-								},
+								action: () => handleOpenEditVersionModal(version),
 								shown: !!currentMember,
 							},
 							{
@@ -352,5 +336,31 @@ async function deleteVersion() {
 	selectedVersion.value = null
 
 	stopLoading()
+}
+
+async function handleOpenEditVersionModal(version: Labrinth.Versions.v3.Version) {
+	selectedVersion.value = version.id
+	try {
+		const versionData = await client.labrinth.versions_v3.getVersion(version.id)
+
+		modal.value?.show({
+			project_id: project.id,
+			version_id: version.id,
+			version_title: versionData.name,
+			version_number: versionData.version_number,
+			version_body: versionData.changelog || '',
+			game_versions: versionData.game_versions,
+			loaders: versionData.loaders,
+			release_channel: versionData.version_type,
+			dependencies: versionData.dependencies,
+			existing_files: versionData.files,
+		})
+	} catch (err: any) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
 }
 </script>
