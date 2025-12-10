@@ -247,7 +247,7 @@ async function createProject() {
 		})
 
 		modal.value.hide()
-		await router.push(`project/${slug.value}/settings`)
+		await router.push(`/project/${slug.value}/settings`)
 	} catch (err) {
 		addNotification({
 			title: formatMessage(messages.errorTitle),
