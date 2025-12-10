@@ -157,6 +157,8 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
                 min: Decimal::ZERO,
                 max: Some(Decimal::ZERO),
             },
+            currency_code: None,
+            exchange_rate: None,
         })
         .collect()
 }
@@ -450,6 +452,8 @@ impl PayoutsQueue {
                         min: Decimal::from(1) / Decimal::from(4),
                         max: Some(Decimal::from(1)),
                     },
+                    currency_code: None,
+                    exchange_rate: None,
                 };
 
                 let mut venmo = paypal_us.clone();
@@ -960,6 +964,8 @@ async fn get_tremendous_payout_methods(
                 }
             },
             fee,
+            currency_code: Some(currency.clone()),
+            exchange_rate: Some(currency_to_usd),
         };
 
         methods.push(method);
