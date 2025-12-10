@@ -37,9 +37,9 @@
 						type="chip"
 					>
 						<button
-							class="focus:outline-none"
+							class="!py-1.5 focus:outline-none"
 							:class="[
-								versionType === 'all' ? 'w-26' : 'w-16',
+								versionType === 'all' && !group.isReleaseGroup ? 'w-max' : 'w-16',
 								modelValue.includes(version) ? '!text-contrast' : '',
 							]"
 							@click="() => handleToggleVersion(version)"
@@ -179,6 +179,7 @@ function groupVersions(gameVersions: GameVersion[]) {
 	return sortedKeys.map((key) => ({
 		key,
 		versions: groups[key].sort((a, b) => compareVersions(b, a)),
+		isReleaseGroup: !key.includes(DEV_RELEASE_KEY),
 	}))
 }
 

@@ -19,7 +19,7 @@
 						v-for="loader in groupedLoaders[loaderGroup]"
 						:key="`loader-${loader.name}`"
 						:action="() => toggleLoader(loader.name)"
-						class="border !border-solid hover:no-underline"
+						class="border !border-solid border-surface-5 !transition-all hover:bg-button-bgHover hover:no-underline"
 						:class="
 							selectedLoaders.includes(loader.name)
 								? 'border-brand bg-highlight-green text-brand'
