@@ -10,6 +10,7 @@
 	/>
 	<section class="experimental-styles-within overflow-visible">
 		<ProjectPageVersions
+			v-if="versions.length"
 			:project="project"
 			:versions="versions"
 			:show-files="flags.showVersionFilesInTable"
@@ -156,6 +157,11 @@
 				</ButtonStyled>
 			</template>
 		</ProjectPageVersions>
+		<template v-else>
+			<p class="ml-2">
+				No versions in project. Visit project settings to upload your first version.
+			</p>
+		</template>
 	</section>
 </template>
 

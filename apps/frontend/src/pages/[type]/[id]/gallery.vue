@@ -195,7 +195,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="items">
+		<div class="items" v-if="project.gallery.length">
 			<div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
 				<a class="gallery-thumbnail" @click="expandImage(item, index)">
 					<img
@@ -221,6 +221,9 @@
 				</div>
 			</div>
 		</div>
+		<template v-else>
+			<p class="ml-2">No items in gallery. Visit project settings to add a description.</p>
+		</template>
 	</div>
 </template>
 
