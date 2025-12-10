@@ -212,8 +212,8 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 )
 
 const client = injectModrinthClient()
-
 const { addNotification } = injectNotificationManager()
+const { refreshProject } = injectProjectPageContext()
 
 const isSubmitting = ref(false)
 
@@ -223,15 +223,20 @@ async function handleCreateVersion() {
 	isSubmitting.value = true
 
 	try {
-		await client.labrinth.versions_v3.createVersion(version, files)
+		const { id } = await client.labrinth.versions_v3.createVersion(version, files)
 		modal.value?.hide()
 		addNotification({
 			title: 'Project version created',
 			text: 'The version has been successfully added to your project.',
 			type: 'success',
 		})
-		// TODO: refetch versions here for project versions table
-		// (will have to not use page prop to get versions for table, instead use own state)
+		await refreshProject()
+		await navigateTo(
+			`/${projectV2.value.project_type}/${
+				projectV2.value.slug ? projectV2.value.slug : projectV2.value.id
+			}/version/${id}`,
+			{ replace: true },
+		)
 	} catch (err: any) {
 		addNotification({
 			title: 'An error occurred',
@@ -280,8 +285,13 @@ async function handleSaveVersionEdits() {
 			text: 'The version has been successfully saved to your project.',
 			type: 'success',
 		})
-		// TODO: refetch versions here for project versions table
-		// (will have to not use page prop to get versions for table, instead use own state)
+		await refreshProject()
+		await navigateTo(
+			`/${projectV2.value.project_type}/${
+				projectV2.value.slug ? projectV2.value.slug : projectV2.value.id
+			}/version/${version.version_id}`,
+			{ replace: true },
+		)
 	} catch (err: any) {
 		addNotification({
 			title: 'An error occurred',

@@ -15,7 +15,7 @@
 		<ProjectPageVersions
 			v-if="versions.length > 0"
 			:project="project"
-			:versions="versions.map((v) => ({ ...v, displayUrlEnding: v.version_number }))"
+			:versions="versionsWithDisplayUrl"
 			:show-files="flags.showVersionFilesInTable"
 			:current-member="!!currentMember"
 			:loaders="tags.loaders"
@@ -273,6 +273,7 @@ import {
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,
+	injectProjectPageContext,
 	OverflowMenu,
 	ProjectPageVersions,
 } from '@modrinth/ui'
@@ -282,14 +283,16 @@ import { reportVersion } from '~/utils/report-helpers.ts'
 
 interface Props {
 	project: Labrinth.Projects.v2.Project
-	versions: Labrinth.Versions.v3.Version[]
 	currentMember?: object
 }
 
-const { project, versions, currentMember } = defineProps<Props>()
+defineProps<Props>()
+
+const versions = defineModel<Labrinth.Versions.v3.Version[]>('versions', { required: true })
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+const { refreshProject } = injectProjectPageContext()
 
 const modal = ref<InstanceType<typeof CreateProjectVersionModal>>()
 
@@ -304,7 +307,14 @@ const auth = await useAuth()
 const deleteVersionModal = ref<InstanceType<typeof ConfirmModal>>()
 const selectedVersion = ref<string | null>(null)
 
-const emit = defineEmits(['onDownload', 'deleteVersion'])
+const versionsWithDisplayUrl = computed(() =>
+	versions.value.map((v) => ({
+		...v,
+		displayUrlEnding: v.version_number,
+	})),
+)
+
+const emit = defineEmits(['onDownload'])
 
 const baseDropdownId = useId()
 
@@ -316,8 +326,31 @@ async function copyToClipboard(text: string) {
 	await navigator.clipboard.writeText(text)
 }
 
-function deleteVersion() {
-	emit('deleteVersion', selectedVersion.value)
+async function deleteVersion() {
+	const id = selectedVersion.value
+	if (!id) return
+
+	startLoading()
+
+	try {
+		await client.labrinth.versions_v3.deleteVersion(id)
+
+		addNotification({
+			title: 'Version deleted',
+			text: 'The version has been successfully deleted.',
+			type: 'success',
+		})
+	} catch (err: any) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
+	refreshProject()
+	versions.value = versions.value.filter((v) => v.id !== id)
 	selectedVersion.value = null
+
+	stopLoading()
 }
 </script>
