@@ -27,7 +27,6 @@ const EMPTY_DRAFT_VERSION: Labrinth.Versions.v3.DraftVersion = {
 }
 
 const draftVersion = ref<Labrinth.Versions.v3.DraftVersion>(EMPTY_DRAFT_VERSION)
-
 const filesToAdd = ref<Labrinth.Versions.v3.DraftVersionFile[]>([])
 const existingFilesToDelete = ref<Labrinth.Versions.v3.VersionFileHash['sha1'][]>([])
 
@@ -76,6 +75,8 @@ export function useManageVersion() {
 	) {
 		draftVersion.value = structuredClone(version ?? EMPTY_DRAFT_VERSION)
 		draftVersion.value.project_id = projectId
+		filesToAdd.value = []
+		existingFilesToDelete.value = []
 		inferredVersionData.value = undefined
 		projectType.value = undefined
 	}

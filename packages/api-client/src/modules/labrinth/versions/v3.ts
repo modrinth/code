@@ -125,7 +125,20 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	): Promise<Labrinth.Versions.v3.Version> {
 		const formData = new FormData()
 
-		const files = versionFiles.map((file) => file.file)
+		const files = versionFiles.map((vf) => vf.file)
+		const fileTypes = versionFiles.map((vf) => vf.fileType || null)
+
+		const fileParts = files.map((file, i) => {
+			return `${file.name}-${i === 0 ? 'primary' : i}`
+		})
+
+		const fileTypeMap = fileParts.reduce<Record<string, Labrinth.Versions.v3.FileType | null>>(
+			(acc, key, i) => {
+				acc[key] = fileTypes[i]
+				return acc
+			},
+			{},
+		)
 
 		const data: Labrinth.Versions.v3.CreateVersionRequest = {
 			project_id: draftVersion.project_id,
@@ -137,16 +150,15 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			loaders: draftVersion.loaders,
 			release_channel: draftVersion.release_channel,
 			featured: !!draftVersion.featured,
-
-			file_parts: files.map((file, i) => `${file.name}-${i === 0 ? 'primary' : i}`),
-			file_types: versionFiles.map((file) => file.fileType || null),
-			primary_file: `${files[0].name}-primary`, // first file in array is primary
+			file_parts: fileParts,
+			file_types: fileTypeMap,
+			primary_file: fileParts[0],
 		}
 
 		formData.append('data', JSON.stringify(data))
 
 		files.forEach((file, i) => {
-			formData.append(`${file.name}-${i}`, new Blob([file]), file.name)
+			formData.append(fileParts[i], new Blob([file]), file.name)
 		})
 
 		return this.client.request<Labrinth.Versions.v3.Version>(`/version`, {

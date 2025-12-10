@@ -486,7 +486,7 @@ export namespace Labrinth {
 				/** The hash of the primary file (algorithm + hash) — if specifying which file is primary. */
 				primary_file?: string
 
-				file_types?: (FileType | null)[]
+				file_types?: Record<string, Labrinth.Versions.v3.FileType | null>
 			}
 
 			export type ModifyVersionRequest = Partial<
