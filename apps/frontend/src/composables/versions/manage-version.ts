@@ -34,6 +34,8 @@ const inferredVersionData = ref<InferredVersionInfo>()
 
 const projectType = ref<Labrinth.Projects.v2.ProjectType>()
 
+const editingVersion = computed(() => Boolean(draftVersion.value.version_id))
+
 const dependencyProjects = ref<Record<string, Labrinth.Projects.v3.Project>>({})
 const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
 
@@ -113,6 +115,7 @@ export function useManageVersion() {
 		projectType,
 		dependencyProjects,
 		dependencyVersions,
+		editingVersion,
 		newDraftVersion,
 		setPrimaryFile,
 		setInferredVersionData,

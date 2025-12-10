@@ -25,10 +25,12 @@ import AddMcVersionsStage from './stages/AddMcVersionsStage.vue'
 const {
 	newDraftVersion,
 	filesToAdd,
+	editingVersion,
 	draftVersion,
 	detectedLoaders,
 	detectedVersions,
 	projectType,
+	existingFilesToDelete,
 } = useManageVersion()
 
 const modal = useTemplateRef<InstanceType<typeof MultiStageModal>>('modal')
@@ -54,7 +56,7 @@ const defaultBackButton = {
 }
 
 const addFilesNextDisabled = computed(
-	() => filesToAdd.value.length === 0 && (draftVersion.value.existingFiles?.length ?? 0) === 0,
+	() => filesToAdd.value.length === 0 && (draftVersion.value.existing_files?.length ?? 0) === 0,
 )
 
 const addDetailsNextDisabled = computed(() => draftVersion.value.version_number.trim().length === 0)
@@ -79,17 +81,17 @@ function getNextLabel() {
 
 	switch (next.id) {
 		case 'add-details':
-			return 'Add details'
+			return editingVersion.value ? 'Edit details' : 'Add details'
 		case 'add-files':
-			return 'Add files'
+			return editingVersion.value ? 'Edit files' : 'Add files'
 		case 'add-loaders':
-			return 'Set loaders'
+			return editingVersion.value ? 'Edit loaders' : 'Set loaders'
 		case 'add-mc-versions':
-			return 'Set MC versions'
+			return editingVersion.value ? 'Edit MC versions' : 'Set MC versions'
 		case 'add-dependencies':
-			return 'Set dependencies'
+			return editingVersion.value ? 'Edit dependencies' : 'Set dependencies'
 		case 'add-changelog':
-			return 'Add changelog'
+			return editingVersion.value ? 'Edit changelog' : 'Add changelog'
 		default:
 			return 'Next'
 	}
@@ -99,7 +101,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 	() =>
 		[
 			{
-				title: 'Add files',
+				title: editingVersion.value ? 'Edit files' : 'Add files',
 				id: 'add-files',
 				stageContent: markRaw(AddFilesStage),
 				leftButtonConfig: {
@@ -116,7 +118,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				},
 			},
 			{
-				title: 'Add details',
+				title: editingVersion.value ? 'Edit details' : 'Add details',
 				id: 'add-details',
 				stageContent: markRaw(AddDetailsStage),
 				leftButtonConfig: { ...defaultBackButton },
@@ -127,7 +129,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				},
 			},
 			hideAddLoadersStage.value === false && {
-				title: 'Add loaders',
+				title: editingVersion.value ? 'Edit loaders' : 'Add loaders',
 				id: 'add-loaders',
 				stageContent: markRaw(AddLoadersStage),
 				leftButtonConfig: { ...defaultBackButton },
@@ -138,7 +140,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				},
 			},
 			hideAddMcVersionsStage.value === false && {
-				title: 'Add MC versions',
+				title: editingVersion.value ? 'Edit MC versions' : 'Add MC versions',
 				id: 'add-mc-versions',
 				stageContent: markRaw(AddMcVersionsStage),
 				leftButtonConfig: { ...defaultBackButton },
@@ -149,7 +151,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				},
 			},
 			hideAddDependenciesStage.value === false && {
-				title: 'Add dependencies',
+				title: editingVersion.value ? 'Edit dependencies' : 'Add dependencies',
 				id: 'add-dependencies',
 				stageContent: markRaw(AddDependenciesStage),
 				leftButtonConfig: { ...defaultBackButton },
@@ -159,7 +161,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				},
 			},
 			{
-				title: 'Add changelog',
+				title: editingVersion.value ? 'Edit changelog' : 'Add changelog',
 				id: 'add-changelog',
 				stageContent: markRaw(AddChangelogStage),
 				leftButtonConfig: { ...defaultBackButton },
@@ -167,11 +169,11 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 					...defaultNextButton,
 					iconPosition: 'before' as const,
 					color: 'green' as const,
-					label: 'Create version',
+					label: editingVersion.value ? 'Save changes' : 'Create version',
 					icon: isSubmitting.value ? SpinnerIcon : PlusIcon,
 					iconClass: isSubmitting.value ? 'animate-spin' : undefined,
 					disabled: isSubmitting.value,
-					onClick: handleCreateVersion,
+					onClick: () => (editingVersion.value ? handleSaveVersionEdits() : handleCreateVersion()),
 				},
 			},
 			{
@@ -180,12 +182,12 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				stageContent: AddLoadersStage,
 				leftButtonConfig: {
 					...defaultBackButton,
-					label: 'Save',
+					label: 'Back',
 					onClick: () => modal.value?.setStage('add-details'),
 				},
 				rightButtonConfig: {
 					...defaultNextButton,
-					label: 'Save & continue',
+					label: 'Continue',
 					onClick: () => modal.value?.setStage(2),
 				},
 				nonProgressStage: true,
@@ -196,12 +198,12 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				stageContent: AddMcVersionsStage,
 				leftButtonConfig: {
 					...defaultBackButton,
-					label: 'Save',
+					label: 'Back',
 					onClick: () => modal.value?.setStage('add-details'),
 				},
 				rightButtonConfig: {
 					...defaultNextButton,
-					label: 'Save & continue',
+					label: 'Continue',
 					onClick: () => modal.value?.setStage(2),
 				},
 				nonProgressStage: true,
@@ -226,6 +228,56 @@ async function handleCreateVersion() {
 		addNotification({
 			title: 'Project version created',
 			text: 'The version has been successfully added to your project.',
+			type: 'success',
+		})
+		// TODO: refetch versions here for project versions table
+		// (will have to not use page prop to get versions for table, instead use own state)
+	} catch (err: any) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
+	isSubmitting.value = false
+}
+
+async function handleSaveVersionEdits() {
+	const version = toRaw(draftVersion.value)
+	const files = toRaw(filesToAdd.value)
+	const filesToDelete = toRaw(existingFilesToDelete.value)
+
+	isSubmitting.value = true
+
+	try {
+		if (!version.version_id) throw new Error('Version ID is required to save edits.')
+
+		await client.labrinth.versions_v3.modifyVersion(version.version_id, {
+			version_title: version.version_title || version.version_number,
+			version_number: version.version_number,
+			version_body: version.version_body,
+			release_channel: version.release_channel,
+			dependencies: version.dependencies || [],
+			game_versions: version.game_versions,
+			loaders: version.loaders,
+			featured: version.featured,
+		})
+
+		if (files.length > 0) {
+			await client.labrinth.versions_v3.addFilesToVersion(version.version_id, files)
+		}
+
+		// Delete files that were marked for deletion
+		for (const hash of filesToDelete) {
+			await useBaseFetch(`version_file/${hash}?version_id=${version.version_id}`, {
+				method: 'DELETE',
+			})
+		}
+
+		modal.value?.hide()
+		addNotification({
+			title: 'Project version saved',
+			text: 'The version has been successfully saved to your project.',
 			type: 'success',
 		})
 		// TODO: refetch versions here for project versions table

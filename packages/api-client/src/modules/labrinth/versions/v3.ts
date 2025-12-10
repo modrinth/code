@@ -178,7 +178,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	 * Partially updates a version’s metadata. Only JSON fields may be modified.
 	 * To update files, use the separate "Add files to version" endpoint.
 	 *
-	 * @param id - The version ID to update
+	 * @param versionId - The version ID to update
 	 * @param data - PATCH metadata for this version (all fields optional)
 	 *
 	 * @returns A promise resolving to the updated version data
@@ -195,12 +195,12 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	 */
 
 	public async modifyVersion(
-		id: string,
+		versionId: string,
 		data: Labrinth.Versions.v3.ModifyVersionRequest,
 	): Promise<Labrinth.Versions.v3.Version> {
-		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${id}`, {
+		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${versionId}`, {
 			api: 'labrinth',
-			version: 3,
+			version: 2,
 			method: 'PATCH',
 			body: data,
 		})
@@ -209,44 +209,54 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	/**
 	 * Delete a version by ID (v3)
 	 *
-	 * @param id - Version ID
+	 * @param versionId - Version ID
 	 *
 	 * @example
 	 * ```typescript
 	 * await client.labrinth.versions_v3.deleteVersion('DXtmvS8i')
 	 * ```
 	 */
-	public async deleteVersion(id: string): Promise<void> {
-		return this.client.request(`/version/${id}`, {
+	public async deleteVersion(versionId: string): Promise<void> {
+		return this.client.request(`/version/${versionId}`, {
 			api: 'labrinth',
-			version: 3,
+			version: 2,
 			method: 'DELETE',
 		})
 	}
 
-	/**
-	 * Add files to an existing version (v3)
-	 *
-	 * @param versionId - Version ID
-	 * @param data - Files to add (file parts)
-	 * @returns Promise resolving to the updated v3 version data
-	 *
-	 * @example
-	 * ```typescript
-	 * const updated = await client.labrinth.versions_v3.addFilesToVersion('DXtmvS8i', {
-	 *   file_parts: ['part_0', 'part_1']
-	 * })
-	 * ```
-	 */
 	public async addFilesToVersion(
 		versionId: string,
-		data: Labrinth.Versions.v3.AddFilesToVersionRequest,
+		versionFiles: Labrinth.Versions.v3.DraftVersionFile[],
 	): Promise<Labrinth.Versions.v3.Version> {
-		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${versionId}/files`, {
+		const formData = new FormData()
+
+		const files = versionFiles.map((vf) => vf.file)
+		const fileTypes = versionFiles.map((vf) => vf.fileType || null)
+
+		const fileParts = files.map((file, i) => `${file.name}-${i}`)
+
+		const fileTypeMap = fileParts.reduce<Record<string, Labrinth.Versions.v3.FileType | null>>(
+			(acc, key, i) => {
+				acc[key] = fileTypes[i]
+				return acc
+			},
+			{},
+		)
+
+		formData.append('data', JSON.stringify({ file_types: fileTypeMap }))
+
+		files.forEach((file, i) => {
+			formData.append(fileParts[i], new Blob([file]), file.name)
+		})
+
+		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${versionId}/file`, {
 			api: 'labrinth',
-			version: 3,
+			version: 2,
 			method: 'POST',
-			body: data,
+			body: formData,
+			headers: {
+				'Content-Type': '',
+			},
 		})
 	}
 }

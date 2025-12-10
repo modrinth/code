@@ -6,8 +6,8 @@
 			<div class="grid h-5 w-5 place-content-center rounded-full bg-green">
 				<CheckIcon class="text-sm text-black" />
 			</div>
-			<span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium" :title="file.name">
-				{{ file.name }}
+			<span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium" :title="name">
+				{{ name }}
 			</span>
 			<div
 				v-if="isPrimary"
@@ -33,8 +33,8 @@
 				</div>
 			</template>
 
-			<ButtonStyled size="standard" :circular="true">
-				<button aria-label="Remove file" class="!shadow-none" @click="emitRemove">
+			<ButtonStyled v-if="onRemove" size="standard" :circular="true">
+				<button aria-label="Remove file" class="!shadow-none" @click="onRemove">
 					<XIcon aria-hidden="true" />
 				</button>
 			</ButtonStyled>
@@ -50,12 +50,13 @@ import Combobox, { type DropdownOption } from '@modrinth/ui/src/components/base/
 const selectedType = ref<string>('other')
 
 const emit = defineEmits<{
-	(e: 'setPrimaryFile' | 'remove'): void
+	(e: 'setPrimaryFile'): void
 }>()
 
-const { file, isPrimary } = defineProps<{
-	file: File
+const { name, isPrimary, onRemove } = defineProps<{
+	name: string
 	isPrimary: boolean
+	onRemove?: () => void
 }>()
 
 const versionTypes: DropdownOption<string>[] = [
@@ -66,9 +67,5 @@ const versionTypes: DropdownOption<string>[] = [
 function emitFileTypeChange() {
 	if (selectedType.value) emit('setPrimaryFile')
 	selectedType.value = isPrimary ? 'primary' : 'other'
-}
-
-function emitRemove() {
-	emit('remove')
 }
 </script>

@@ -102,9 +102,32 @@
 							{ divider: true, shown: !!currentMember },
 							{
 								id: 'edit',
-								link: `/${project.project_type}/${
-									project.slug ? project.slug : project.id
-								}/version/${encodeURI(version.displayUrlEnding)}/edit`,
+								action: async () => {
+									selectedVersion = version.id
+									try {
+										const versionData = await client.labrinth.versions_v3.getVersion(version.id)
+										console.log(versionData)
+
+										modal?.show({
+											project_id: project.id,
+											version_id: version.id,
+											version_title: versionData.name,
+											version_number: versionData.version_number,
+											version_body: versionData.changelog || '',
+											game_versions: versionData.game_versions,
+											loaders: versionData.loaders,
+											release_channel: versionData.version_type,
+											dependencies: versionData.dependencies,
+											existing_files: versionData.files,
+										})
+									} catch (err: any) {
+										addNotification({
+											title: 'An error occurred',
+											text: err.data ? err.data.description : err,
+											type: 'error',
+										})
+									}
+								},
 								shown: !!currentMember,
 							},
 							{
@@ -245,7 +268,14 @@ import {
 	ShareIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, ConfirmModal, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	ConfirmModal,
+	injectModrinthClient,
+	injectNotificationManager,
+	OverflowMenu,
+	ProjectPageVersions,
+} from '@modrinth/ui'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
@@ -257,6 +287,9 @@ interface Props {
 }
 
 const { project, versions, currentMember } = defineProps<Props>()
+
+const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 
 const modal = ref<InstanceType<typeof CreateProjectVersionModal>>()
 

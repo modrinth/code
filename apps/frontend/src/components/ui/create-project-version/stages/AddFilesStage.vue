@@ -13,15 +13,26 @@
 			{{ formatMessage(messages.addFilesAdmonition) }}
 		</Admonition>
 
-		<template v-if="filesToAdd.length">
+		<template v-if="filesToAdd.length || draftVersion.existing_files?.length">
 			<div class="flex flex-col gap-2">
 				<span class="text-base font-semibold text-contrast">Uploaded files</span>
 				<div class="flex flex-col gap-2.5">
 					<VersionFileRow
+						v-for="versionFile in draftVersion.existing_files"
+						:key="versionFile.filename"
+						:name="versionFile.filename"
+						:is-primary="versionFile.primary"
+						:onRemove="
+							versionFile.primary
+								? undefined
+								: () => handleRemoveExistingFile(versionFile.hashes.sha1 || '')
+						"
+					/>
+					<VersionFileRow
 						v-for="(versionFile, idx) in filesToAdd"
 						:key="versionFile.file.name"
-						:file="versionFile.file"
-						:is-primary="idx === 0"
+						:name="versionFile.file.name"
+						:is-primary="idx === 0 && !draftVersion.existing_files?.some((f) => f.primary)"
 						@set-primary-file="handleSetPrimaryFile(idx)"
 						@remove="handleRemoveFile(idx)"
 					/>
@@ -45,10 +56,18 @@ import VersionFileRow from '../components/VersionFileRow.vue'
 const { projectV2 } = injectProjectPageContext()
 const { formatMessage } = useVIntl()
 
-const { draftVersion, filesToAdd, existingFilesToDelete, setPrimaryFile, setInferredVersionData } =
-	useManageVersion()
+const {
+	draftVersion,
+	filesToAdd,
+	existingFilesToDelete,
+	setPrimaryFile,
+	setInferredVersionData,
+	editingVersion,
+} = useManageVersion()
 
 const addDetectedData = async () => {
+	if (editingVersion.value) return
+
 	const primaryFile = filesToAdd.value[0]?.file
 	if (!primaryFile) return
 
@@ -76,6 +95,13 @@ function handleNewFiles(newFiles: File[]) {
 function handleRemoveFile(index: number) {
 	filesToAdd.value.splice(index, 1)
 	addDetectedData()
+}
+
+function handleRemoveExistingFile(sha1: string) {
+	existingFilesToDelete.value.push(sha1)
+	draftVersion.value.existing_files = draftVersion.value.existing_files?.filter(
+		(file) => file.hashes.sha1 !== sha1,
+	)
 }
 
 function handleSetPrimaryFile(index: number) {

@@ -396,7 +396,7 @@ export namespace Labrinth {
 			}
 
 			export interface VersionFile {
-				hashes: VersionFileHash[]
+				hashes: VersionFileHash
 				url: string
 				filename: string
 				primary: boolean
@@ -431,7 +431,8 @@ export namespace Labrinth {
 				Labrinth.Versions.v3.CreateVersionRequest,
 				'file_parts' | 'primary_file' | 'file_types'
 			> & {
-				existingFiles?: VersionFile[]
+				existing_files?: VersionFile[]
+				version_id?: string
 			}
 
 			/**
@@ -495,6 +496,7 @@ export namespace Labrinth {
 
 			export type AddFilesToVersionRequest = {
 				file_parts: string[]
+				file_types?: Record<string, Labrinth.Versions.v3.FileType | null>
 			}
 		}
 	}

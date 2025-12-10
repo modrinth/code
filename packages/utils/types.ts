@@ -291,7 +291,7 @@ export interface VersionFileHash {
 }
 
 export interface VersionFile {
-	hashes: VersionFileHash[]
+	hashes: VersionFileHash
 	url: string
 	filename: string
 	primary: boolean
