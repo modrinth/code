@@ -18,6 +18,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import AddChangelogStage from './stages/AddChangelogStage.vue'
 import AddDependenciesStage from './stages/AddDependenciesStage.vue'
 import AddDetailsStage from './stages/AddDetailsStage.vue'
+import AddEnvironmentStage from './stages/AddEnvironmentStage.vue'
 import AddFilesStage from './stages/AddFilesStage.vue'
 import AddLoadersStage from './stages/AddLoadersStage.vue'
 import AddMcVersionsStage from './stages/AddMcVersionsStage.vue'
@@ -31,6 +32,7 @@ const {
 	detectedVersions,
 	projectType,
 	existingFilesToDelete,
+	setProjectType,
 } = useManageVersion()
 
 const modal = useTemplateRef<InstanceType<typeof MultiStageModal>>('modal')
@@ -71,6 +73,10 @@ const hideAddMcVersionsStage = computed(() => detectedVersions.value)
 
 const hideAddDependenciesStage = computed(() => projectType.value === 'modpack')
 
+const hideAddEnvironmentStage = computed(
+	() => projectType.value !== 'mod' && projectType.value !== 'modpack',
+)
+
 function getNextLabel() {
 	const currentStageIndex = modal.value?.currentStageIndex || 0
 	const visibleStages = stages.value
@@ -90,6 +96,8 @@ function getNextLabel() {
 			return editingVersion.value ? 'Edit MC versions' : 'Set MC versions'
 		case 'add-dependencies':
 			return editingVersion.value ? 'Edit dependencies' : 'Set dependencies'
+		case 'add-environment':
+			return editingVersion.value ? 'Edit environment' : 'Add environment'
 		case 'add-changelog':
 			return editingVersion.value ? 'Edit changelog' : 'Add changelog'
 		default:
@@ -147,6 +155,16 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 				rightButtonConfig: {
 					...defaultNextButton,
 					disabled: addMcVersionsNextDisabled.value,
+					label: getNextLabel(),
+				},
+			},
+			hideAddEnvironmentStage.value === false && {
+				title: editingVersion.value ? 'Edit environment' : 'Add environment',
+				id: 'add-environment',
+				stageContent: markRaw(AddEnvironmentStage),
+				leftButtonConfig: { ...defaultBackButton },
+				rightButtonConfig: {
+					...defaultNextButton,
 					label: getNextLabel(),
 				},
 			},
@@ -223,7 +241,7 @@ async function handleCreateVersion() {
 	isSubmitting.value = true
 
 	try {
-		const { id } = await client.labrinth.versions_v3.createVersion(version, files)
+		await client.labrinth.versions_v3.createVersion(version, files)
 		modal.value?.hide()
 		addNotification({
 			title: 'Project version created',
@@ -250,6 +268,7 @@ async function handleSaveVersionEdits() {
 
 	try {
 		if (!version.version_id) throw new Error('Version ID is required to save edits.')
+		// TODO DEV-595 need to properly pass version.environment into request body for creating and modifying a version
 
 		await client.labrinth.versions_v3.modifyVersion(version.version_id, {
 			version_title: version.version_title || version.version_number,
@@ -295,6 +314,7 @@ const { projectV2 } = injectProjectPageContext()
 defineExpose({
 	show: (version: Labrinth.Versions.v3.DraftVersion | null = null) => {
 		newDraftVersion(projectV2.value.id, version)
+		setProjectType(projectV2.value)
 		modal.value?.setStage(0)
 		modal.value?.show()
 	},

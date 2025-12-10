@@ -42,19 +42,34 @@ const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
 const detectedLoaders = computed(() => (inferredVersionData.value?.loaders?.length || 0) > 0)
 const detectedVersions = computed(() => (inferredVersionData.value?.game_versions?.length || 0) > 0)
 
-async function getProjectType(
-	file: File,
+async function setProjectType(
 	project: Labrinth.Projects.v2.Project,
+	file: File | null = null,
 ): Promise<Labrinth.Projects.v2.ProjectType | undefined> {
-	if (project.project_type && project.project_type !== 'project') return project.project_type
+	if (project.project_type && project.project_type !== 'project') {
+		projectType.value = project.project_type
+		return projectType.value
+	}
+
+	if (
+		draftVersion.value.loaders?.some((loader) =>
+			['fabric', 'forge', 'quilt', 'neoforge'].includes(loader),
+		)
+	) {
+		projectType.value = 'mod'
+		return projectType.value
+	}
 
 	// if file extension is .mrpack, it's a modpack
-	if (file.name.toLowerCase().endsWith('.mrpack')) {
-		return 'modpack'
+	if (file && file.name.toLowerCase().endsWith('.mrpack')) {
+		projectType.value = 'modpack'
+		return projectType.value
 	}
 
 	// if inside file zip, has pack.mcmeta and assets directory both in root, its a resource pack
 	try {
+		if (!file) return undefined
+
 		const jszip = await JSZip.loadAsync(file)
 
 		const hasMcmeta = Object.keys(jszip.files).some(
@@ -64,10 +79,14 @@ async function getProjectType(
 			(f) => f.toLowerCase() === 'assets/' || f.toLowerCase().startsWith('assets/'),
 		)
 
-		if (hasMcmeta && hasAssetsDir) return 'resourcepack'
+		if (hasMcmeta && hasAssetsDir) {
+			projectType.value = 'resourcepack'
+			return projectType.value
+		}
 	} catch {
 		// not a zip
 	}
+	return undefined
 }
 
 export function useManageVersion() {
@@ -102,7 +121,7 @@ export function useManageVersion() {
 
 		inferredVersionData.value = inferred
 
-		projectType.value = await getProjectType(file, project)
+		projectType.value = await setProjectType(project, file)
 
 		return inferred
 	}
@@ -121,5 +140,6 @@ export function useManageVersion() {
 		newDraftVersion,
 		setPrimaryFile,
 		setInferredVersionData,
+		setProjectType,
 	}
 }

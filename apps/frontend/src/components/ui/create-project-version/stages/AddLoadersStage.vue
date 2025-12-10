@@ -38,7 +38,7 @@
 
 <script lang="ts" setup>
 import { XIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { ButtonStyled, injectProjectPageContext } from '@modrinth/ui'
 import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
 import { formatCategory } from '@modrinth/utils'
 
@@ -48,9 +48,10 @@ import LoaderPicker from '../components/LoaderPicker.vue'
 
 const generatedState = useGeneratedState()
 
+const { projectV2 } = injectProjectPageContext()
 const loaders = computed(() => generatedState.value.loaders)
 
-const { draftVersion } = useManageVersion()
+const { draftVersion, setProjectType } = useManageVersion()
 
 const toggleLoader = (loader: string) => {
 	if (draftVersion.value.loaders.includes(loader)) {
@@ -58,6 +59,7 @@ const toggleLoader = (loader: string) => {
 	} else {
 		draftVersion.value.loaders = [...draftVersion.value.loaders, loader]
 	}
+	setProjectType(projectV2.value)
 }
 
 const onClearAll = () => (draftVersion.value.loaders = [])

@@ -342,7 +342,6 @@ async function handleOpenEditVersionModal(version: Labrinth.Versions.v3.Version)
 	selectedVersion.value = version.id
 	try {
 		const versionData = await client.labrinth.versions_v3.getVersion(version.id)
-
 		modal.value?.show({
 			project_id: project.id,
 			version_id: version.id,
@@ -354,6 +353,7 @@ async function handleOpenEditVersionModal(version: Labrinth.Versions.v3.Version)
 			release_channel: versionData.version_type,
 			dependencies: versionData.dependencies,
 			existing_files: versionData.files,
+			environment: versionData.environment,
 		})
 	} catch (err: any) {
 		addNotification({

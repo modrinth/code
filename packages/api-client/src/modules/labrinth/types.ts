@@ -422,6 +422,7 @@ export namespace Labrinth {
 				date_published: string
 				downloads: number
 				files: VersionFile[]
+				environment?: Labrinth.Projects.v3.Environment
 			}
 
 			export interface DraftVersionFile {
@@ -435,6 +436,7 @@ export namespace Labrinth {
 			> & {
 				existing_files?: VersionFile[]
 				version_id?: string
+				environment?: Labrinth.Projects.v3.Environment
 			}
 
 			/**
