@@ -14,6 +14,7 @@ import { provide } from 'vue'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
 
+import type { Labrinth } from '@modrinth/api-client'
 import AddChangelogStage from './stages/AddChangelogStage.vue'
 import AddDependenciesStage from './stages/AddDependenciesStage.vue'
 import AddDetailsStage from './stages/AddDetailsStage.vue'
@@ -21,8 +22,14 @@ import AddFilesStage from './stages/AddFilesStage.vue'
 import AddLoadersStage from './stages/AddLoadersStage.vue'
 import AddMcVersionsStage from './stages/AddMcVersionsStage.vue'
 
-const { newDraftVersion, draftVersion, detectedLoaders, detectedVersions, projectType } =
-	useManageVersion()
+const {
+	newDraftVersion,
+	filesToAdd,
+	draftVersion,
+	detectedLoaders,
+	detectedVersions,
+	projectType,
+} = useManageVersion()
 
 const modal = useTemplateRef<InstanceType<typeof MultiStageModal>>('modal')
 
@@ -46,7 +53,9 @@ const defaultBackButton = {
 	onClick: () => modal.value?.prevStage(),
 }
 
-const addFilesNextDisabled = computed(() => draftVersion.value.files.length === 0)
+const addFilesNextDisabled = computed(
+	() => filesToAdd.value.length === 0 && (draftVersion.value.existingFiles?.length ?? 0) === 0,
+)
 
 const addDetailsNextDisabled = computed(() => draftVersion.value.version_number.trim().length === 0)
 
@@ -208,8 +217,9 @@ const isSubmitting = ref(false)
 
 async function handleCreateVersion() {
 	const version = toRaw(draftVersion.value)
-	const files = version.files
+	const files = toRaw(filesToAdd.value)
 	isSubmitting.value = true
+
 	try {
 		await client.labrinth.versions_v3.createVersion(version, files)
 		modal.value?.hide()
@@ -233,8 +243,8 @@ async function handleCreateVersion() {
 const { projectV2 } = injectProjectPageContext()
 
 defineExpose({
-	show: () => {
-		newDraftVersion(projectV2.value.id)
+	show: (version: Labrinth.Versions.v3.DraftVersion | null = null) => {
+		newDraftVersion(projectV2.value.id, version)
 		modal.value?.setStage(0)
 		modal.value?.show()
 	},

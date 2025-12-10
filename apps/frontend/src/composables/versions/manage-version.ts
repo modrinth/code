@@ -13,11 +13,7 @@ export interface InferredVersionInfo {
 	project_type?: Labrinth.Projects.v2.ProjectType
 }
 
-export type DraftVersion = Omit<Labrinth.Versions.v3.CreateVersionRequest, 'file_parts'> & {
-	files: File[]
-}
-
-const EMPTY_DRAFT_VERSION: DraftVersion = {
+const EMPTY_DRAFT_VERSION: Labrinth.Versions.v3.DraftVersion = {
 	project_id: '',
 	version_title: '',
 	version_number: '',
@@ -28,10 +24,12 @@ const EMPTY_DRAFT_VERSION: DraftVersion = {
 	status: 'draft',
 	version_body: '',
 	dependencies: [],
-	files: [],
 }
 
-const draftVersion = ref<DraftVersion>(EMPTY_DRAFT_VERSION)
+const draftVersion = ref<Labrinth.Versions.v3.DraftVersion>(EMPTY_DRAFT_VERSION)
+
+const filesToAdd = ref<Labrinth.Versions.v3.DraftVersionFile[]>([])
+const existingFilesToDelete = ref<Labrinth.Versions.v3.VersionFileHash['sha1'][]>([])
 
 const inferredVersionData = ref<InferredVersionInfo>()
 
@@ -72,15 +70,18 @@ async function getProjectType(
 }
 
 export function useManageVersion() {
-	function newDraftVersion(projectId: string) {
-		draftVersion.value = structuredClone(EMPTY_DRAFT_VERSION)
+	function newDraftVersion(
+		projectId: string,
+		version: Labrinth.Versions.v3.DraftVersion | null = null,
+	) {
+		draftVersion.value = structuredClone(version ?? EMPTY_DRAFT_VERSION)
 		draftVersion.value.project_id = projectId
 		inferredVersionData.value = undefined
 		projectType.value = undefined
 	}
 
 	function setPrimaryFile(index: number) {
-		const files = draftVersion.value.files
+		const files = filesToAdd.value
 		if (index <= 0 || index >= files.length) return
 		;[files[0], files[index]] = [files[index], files[0]]
 	}
@@ -104,6 +105,8 @@ export function useManageVersion() {
 	return {
 		inferredVersionData,
 		draftVersion,
+		filesToAdd,
+		existingFilesToDelete,
 		detectedLoaders,
 		detectedVersions,
 		projectType,

@@ -13,14 +13,14 @@
 			{{ formatMessage(messages.addFilesAdmonition) }}
 		</Admonition>
 
-		<template v-if="draftVersion.files.length">
+		<template v-if="filesToAdd.length">
 			<div class="flex flex-col gap-2">
 				<span class="text-base font-semibold text-contrast">Uploaded files</span>
 				<div class="flex flex-col gap-2.5">
 					<VersionFileRow
-						v-for="(file, idx) in draftVersion.files"
-						:key="file.name"
-						:file="file"
+						v-for="(versionFile, idx) in filesToAdd"
+						:key="versionFile.file.name"
+						:file="versionFile.file"
 						:is-primary="idx === 0"
 						@set-primary-file="handleSetPrimaryFile(idx)"
 						@remove="handleRemoveFile(idx)"
@@ -45,10 +45,11 @@ import VersionFileRow from '../components/VersionFileRow.vue'
 const { projectV2 } = injectProjectPageContext()
 const { formatMessage } = useVIntl()
 
-const { draftVersion, setPrimaryFile, setInferredVersionData } = useManageVersion()
+const { draftVersion, filesToAdd, existingFilesToDelete, setPrimaryFile, setInferredVersionData } =
+	useManageVersion()
 
 const addDetectedData = async () => {
-	const primaryFile = draftVersion.value.files[0]
+	const primaryFile = filesToAdd.value[0]?.file
 	if (!primaryFile) return
 
 	try {
@@ -68,12 +69,12 @@ const addDetectedData = async () => {
 }
 
 function handleNewFiles(newFiles: File[]) {
-	newFiles.forEach((file) => draftVersion.value.files.push(file))
+	newFiles.forEach((file) => filesToAdd.value.push({ file }))
 	addDetectedData()
 }
 
 function handleRemoveFile(index: number) {
-	draftVersion.value.files.splice(index, 1)
+	filesToAdd.value.splice(index, 1)
 	addDetectedData()
 }
 
@@ -82,7 +83,7 @@ function handleSetPrimaryFile(index: number) {
 	addDetectedData()
 }
 
-const hasSupplementaryFiles = computed(() => draftVersion.value.files.length > 1)
+const hasSupplementaryFiles = computed(() => filesToAdd.value.length > 1)
 
 const messages = defineMessages({
 	addFilesAdmonition: {

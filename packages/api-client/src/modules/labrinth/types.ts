@@ -384,6 +384,11 @@ export namespace Labrinth {
 				| 'unknown'
 
 			export type FileType = 'required-resource-pack' | 'optional-resource-pack'
+			// | 'sources-jar'
+			// | 'dev-jar'
+			// | 'javadoc-jar'
+			// | 'signature'
+			// | 'unknown'
 
 			export interface VersionFileHash {
 				sha512: string
@@ -415,6 +420,18 @@ export namespace Labrinth {
 				date_published: string
 				downloads: number
 				files: VersionFile[]
+			}
+
+			export interface DraftVersionFile {
+				fileType?: FileType
+				file: File
+			}
+
+			export type DraftVersion = Omit<
+				Labrinth.Versions.v3.CreateVersionRequest,
+				'file_parts' | 'primary_file' | 'file_types'
+			> & {
+				existingFiles?: VersionFile[]
 			}
 
 			/**
@@ -468,6 +485,8 @@ export namespace Labrinth {
 
 				/** The hash of the primary file (algorithm + hash) — if specifying which file is primary. */
 				primary_file?: string
+
+				file_types?: (FileType | null)[]
 			}
 
 			export type ModifyVersionRequest = Partial<

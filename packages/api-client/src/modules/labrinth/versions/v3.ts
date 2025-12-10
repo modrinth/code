@@ -1,4 +1,3 @@
-import type { DraftVersion } from '../../../../../../apps/frontend/src/composables/versions/manage-version'
 import { AbstractModule } from '../../../core/abstract-module'
 import type { Labrinth } from '../types'
 
@@ -121,10 +120,12 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	 */
 
 	public async createVersion(
-		draftVersion: DraftVersion,
-		files: File[],
+		draftVersion: Labrinth.Versions.v3.DraftVersion,
+		versionFiles: Labrinth.Versions.v3.DraftVersionFile[],
 	): Promise<Labrinth.Versions.v3.Version> {
 		const formData = new FormData()
+
+		const files = versionFiles.map((file) => file.file)
 
 		const data: Labrinth.Versions.v3.CreateVersionRequest = {
 			project_id: draftVersion.project_id,
@@ -138,6 +139,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			featured: !!draftVersion.featured,
 
 			file_parts: files.map((file, i) => `${file.name}-${i === 0 ? 'primary' : i}`),
+			file_types: versionFiles.map((file) => file.fileType || null),
 			primary_file: `${files[0].name}-primary`, // first file in array is primary
 		}
 
