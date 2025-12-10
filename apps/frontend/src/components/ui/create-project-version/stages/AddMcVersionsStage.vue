@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col gap-6">
 		<McVersionPicker v-model="draftVersion.game_versions" :game-versions="gameVersions" />
-		<div v-if="draftVersion.game_versions.length">
+		<div v-if="draftVersion.game_versions.length" class="space-y-1">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast"> Added versions </span>
 				<ButtonStyled type="transparent" size="standard">

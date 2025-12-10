@@ -2,7 +2,7 @@
 	<div class="space-y-6">
 		<LoaderPicker v-model="draftVersion.loaders" :loaders="generatedState.loaders" />
 
-		<div v-if="draftVersion.loaders.length">
+		<div v-if="draftVersion.loaders.length" class="space-y-1">
 			<div class="flex items-center justify-between">
 				<span class="font-semibold text-contrast"> Added loaders </span>
 				<ButtonStyled type="transparent" size="standard">

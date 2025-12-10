@@ -38,7 +38,7 @@
 		</div>
 
 		<template v-if="inferredVersionData?.loaders?.length">
-			<div class="flex flex-col">
+			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast">
 						{{ selectedIsDetectedLoaders ? 'Detected loaders' : 'Loaders' }}
@@ -79,7 +79,7 @@
 		</template>
 
 		<template v-if="inferredVersionData?.game_versions?.length">
-			<div class="flex flex-col">
+			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast">
 						{{ selectedIsDetectedVersions ? 'Detected versions' : 'Versions' }}
