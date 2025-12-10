@@ -13,7 +13,9 @@
 			</TagItem>
 		</div>
 
-		<span class="text-ellipsis whitespace-nowrap font-medium">{{ versionName }}</span>
+		<span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium" :title="versionName">
+			{{ versionName }}
+		</span>
 
 		<div class="flex items-center gap-1">
 			<ButtonStyled size="standard">
