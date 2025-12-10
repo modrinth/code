@@ -97,13 +97,6 @@
 							},
 							{ divider: true, shown: currentMember },
 							{
-								id: 'edit',
-								link: `/${project.project_type}/${
-									project.slug ? project.slug : project.id
-								}/version/${encodeURI(version.displayUrlEnding)}/edit`,
-								shown: currentMember,
-							},
-							{
 								id: 'delete',
 								color: 'red',
 								hoverFilled: true,
