@@ -523,7 +523,16 @@ useSeoMeta({
 					:placeholder="`Search ${projectType.display}s...`"
 					@input="throttledSearch()"
 				/>
-				<Button v-if="query" class="r-btn" @click="() => { query = ''; updateSearchResults() }">
+				<Button
+					v-if="query"
+					class="r-btn"
+					@click="
+						() => {
+							query = ''
+							updateSearchResults()
+						}
+					"
+				>
 					<XIcon />
 				</Button>
 			</div>
