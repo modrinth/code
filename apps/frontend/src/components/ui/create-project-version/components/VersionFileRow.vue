@@ -48,21 +48,23 @@ import { CheckIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, Combobox } from '@modrinth/ui'
 import { type DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
-const selectedType = defineModel<Labrinth.Versions.v3.FileType | 'primary'>({ default: 'unknown' })
-
 const emit = defineEmits<{
 	(e: 'setPrimaryFile'): void
 	(e: 'setFileType', type: Labrinth.Versions.v3.FileType): void
 }>()
 
-const { name, isPrimary, onRemove } = defineProps<{
+const { name, isPrimary, onRemove, initialFileType, editingVersion } = defineProps<{
 	name: string
 	isPrimary: boolean
 	onRemove?: () => void
+	initialFileType?: Labrinth.Versions.v3.FileType | 'primary'
+	editingVersion: boolean
 }>()
 
-const versionTypes: DropdownOption<Labrinth.Versions.v3.FileType | 'primary'>[] = [
-	{ class: 'text-sm', value: 'primary', label: 'Primary' },
+const selectedType = ref<Labrinth.Versions.v3.FileType | 'primary'>(initialFileType || 'unknown')
+
+const versionTypes = [
+	!editingVersion && { class: 'text-sm', value: 'primary', label: 'Primary' },
 	{ class: 'text-sm', value: 'unknown', label: 'Other' },
 	{ class: 'text-sm', value: 'required-resource-pack', label: 'Required RP' },
 	{ class: 'text-sm', value: 'optional-resource-pack', label: 'Optional RP' },
@@ -70,7 +72,7 @@ const versionTypes: DropdownOption<Labrinth.Versions.v3.FileType | 'primary'>[] 
 	{ class: 'text-sm', value: 'dev-jar', label: 'Dev JAR' },
 	{ class: 'text-sm', value: 'javadoc-jar', label: 'Javadoc JAR' },
 	{ class: 'text-sm', value: 'signature', label: 'Signature' },
-]
+].filter(Boolean) as DropdownOption<Labrinth.Versions.v3.FileType | 'primary'>[]
 
 function emitFileTypeChange() {
 	if (selectedType.value === 'primary') emit('setPrimaryFile')
