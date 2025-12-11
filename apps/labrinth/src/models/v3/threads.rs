@@ -54,6 +54,18 @@ pub enum MessageBody {
     },
 }
 
+impl MessageBody {
+    pub fn is_private(&self) -> bool {
+        match self {
+            Self::Text { private, .. } | Self::Deleted { private } => *private,
+            Self::TechReview { .. } => true,
+            Self::StatusChange { .. }
+            | Self::ThreadClosure
+            | Self::ThreadReopen => false,
+        }
+    }
+}
+
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
 )]
@@ -106,16 +118,7 @@ impl Thread {
             messages: data
                 .messages
                 .into_iter()
-                .filter(|x| {
-                    if let MessageBody::Text { private, .. } = x.body {
-                        !private || user.role.is_mod()
-                    } else if let MessageBody::Deleted { private, .. } = x.body
-                    {
-                        !private || user.role.is_mod()
-                    } else {
-                        true
-                    }
-                })
+                .filter(|x| user.role.is_mod() || x.body.is_private())
                 .map(|x| ThreadMessage::from(x, user))
                 .collect(),
             members: users,
