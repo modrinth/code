@@ -750,9 +750,12 @@ pub async fn fetch_analytics(
                 COUNT(*) AS conversions
             FROM users_subscriptions_affiliations usa
             INNER JOIN affiliate_codes ac ON ac.id = usa.affiliate_code
+            INNER JOIN users_subscriptions us ON us.id = usa.subscription_id
+            INNER JOIN charges c ON c.subscription_id = us.id
             WHERE
                 ac.affiliate = $4
                 AND usa.created_at BETWEEN $1 AND $2
+                AND c.status = 'succeeded'
             GROUP BY bucket, affiliate_code",
             req.time_range.start,
             req.time_range.end,
