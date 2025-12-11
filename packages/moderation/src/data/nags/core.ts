@@ -39,7 +39,7 @@ export const coreNags: Nag[] = [
 		status: 'required',
 		shouldShow: (context: NagContext) => context.versions.length < 1,
 		link: {
-			path: 'versions',
+			path: 'settings/versions',
 			title: defineMessage({
 				id: 'nags.versions.title',
 				defaultMessage: 'Visit versions page',
@@ -126,7 +126,7 @@ export const coreNags: Nag[] = [
 			)
 		},
 		link: {
-			path: 'gallery',
+			path: 'settings/gallery',
 			title: defineMessage({
 				id: 'nags.gallery.title',
 				defaultMessage: 'Visit gallery page',
@@ -151,7 +151,7 @@ export const coreNags: Nag[] = [
 			return context.project?.gallery?.length === 0 || !featuredGalleryImage
 		},
 		link: {
-			path: 'gallery',
+			path: 'settings/gallery',
 			title: defineMessage({
 				id: 'nags.gallery.title',
 				defaultMessage: 'Visit gallery page',
