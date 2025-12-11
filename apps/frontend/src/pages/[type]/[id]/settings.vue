@@ -18,7 +18,7 @@ import {
 } from '@modrinth/ui'
 import type { Project, ProjectV3Partial } from '@modrinth/utils'
 import { useVIntl } from '@vintl/vintl'
-import { useLocalStorage } from '@vueuse/core'
+import { useLocalStorage, useScroll } from '@vueuse/core'
 import { computed } from 'vue'
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 
@@ -143,6 +143,14 @@ async function setProcessing() {
 
 	stopLoading()
 }
+
+// To persist scroll position through settings pages
+// This scroll code is jank asf, if anyone has a better way please do suggest it
+const scroll = useScroll(window)
+watch(route, () => {
+	const scrollY = scroll.y.value
+	setTimeout(() => window.scrollTo(0, scrollY), 100)
+})
 </script>
 
 <template>
