@@ -13,6 +13,7 @@
 <script lang="ts" setup>
 import { Combobox, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
+import { useDebounceFn } from '@vueuse/core'
 import { defineAsyncComponent, h } from 'vue'
 
 const { addNotification } = injectNotificationManager()
@@ -22,48 +23,48 @@ const searchLoading = ref(false)
 const options = ref<DropdownOption<string>[]>([])
 
 const { labrinth } = injectModrinthClient()
-let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
-const handleSearch = async (query: string) => {
-	if (searchTimeout) clearTimeout(searchTimeout)
-
+const search = async (query: string) => {
 	if (!query.trim()) {
 		searchLoading.value = false
 		return
 	}
 
+	try {
+		const results = await labrinth.projects_v2.search({
+			query: query,
+			limit: 20,
+			facets: [['project_type:mod']],
+		})
+
+		options.value = results.hits.map((hit) => ({
+			label: hit.title,
+			value: hit.project_id,
+			icon: defineAsyncComponent(() =>
+				Promise.resolve({
+					setup: () => () =>
+						h('img', {
+							src: hit.icon_url,
+							alt: hit.title,
+							class: 'h-5 w-5 rounded',
+						}),
+				}),
+			),
+		}))
+	} catch (error: any) {
+		addNotification({
+			title: 'An error occurred',
+			text: error.data ? error.data.description : error,
+			type: 'error',
+		})
+	}
+	searchLoading.value = false
+}
+
+const throttledSearch = useDebounceFn(search, 500)
+
+const handleSearch = async (query: string) => {
 	searchLoading.value = true
-
-	searchTimeout = setTimeout(async () => {
-		try {
-			const results = await labrinth.projects_v2.search({
-				query: query,
-				limit: 20,
-				facets: [['project_type:mod']],
-			})
-
-			options.value = results.hits.map((hit) => ({
-				label: hit.title,
-				value: hit.project_id,
-				icon: defineAsyncComponent(() =>
-					Promise.resolve({
-						setup: () => () =>
-							h('img', {
-								src: hit.icon_url,
-								alt: hit.title,
-								class: 'h-5 w-5 rounded',
-							}),
-					}),
-				),
-			}))
-		} catch (error: any) {
-			addNotification({
-				title: 'An error occurred',
-				text: error.data ? error.data.description : error,
-				type: 'error',
-			})
-		}
-		searchLoading.value = false
-	}, 500)
+	await throttledSearch(query)
 }
 </script>
