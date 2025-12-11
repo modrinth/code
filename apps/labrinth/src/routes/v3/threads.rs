@@ -646,14 +646,7 @@ pub async fn message_delete(
                 .await?;
         }
 
-        let private = if let MessageBody::Text { private, .. } = thread.body {
-            private
-        } else if let MessageBody::Deleted { private, .. } = thread.body {
-            private
-        } else {
-            false
-        };
-
+        let private = thread.body.is_private();
         database::models::DBThreadMessage::remove_full(
             thread.id,
             private,
