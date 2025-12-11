@@ -442,7 +442,7 @@ export namespace Labrinth {
 			export interface CreateVersionRequest {
 				version_title: string
 				version_number: string
-				version_body: string
+				changelog: string
 				dependencies?: Array<{
 					version_id?: string
 					project_id?: string
@@ -450,7 +450,7 @@ export namespace Labrinth {
 					dependency_type: DependencyType
 				}>
 				game_versions: string[]
-				release_channel: 'release' | 'beta' | 'alpha'
+				version_type: 'release' | 'beta' | 'alpha'
 				loaders: string[]
 				featured?: boolean
 				status?: 'listed' | 'archived' | 'draft' | 'unlisted' | 'scheduled' | 'unknown'

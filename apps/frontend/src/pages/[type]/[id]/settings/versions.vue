@@ -345,14 +345,14 @@ async function handleOpenEditVersionModal(version: Labrinth.Versions.v3.Version)
 		modal.value?.show({
 			project_id: project.id,
 			version_id: version.id,
-			version_title: versionData.name,
-			version_number: versionData.version_number,
-			version_body: versionData.changelog || '',
-			game_versions: versionData.game_versions,
-			loaders: versionData.loaders,
-			release_channel: versionData.version_type,
-			dependencies: versionData.dependencies,
-			existing_files: versionData.files,
+			version_title: versionData.name ?? '',
+			version_number: versionData.version_number ?? '',
+			changelog: versionData.changelog ?? '',
+			game_versions: versionData.game_versions ?? [],
+			version_type: versionData.version_type ?? 'release',
+			loaders: versionData.loaders ?? [],
+			dependencies: versionData.dependencies ?? [],
+			existing_files: versionData.files ?? [],
 			environment: versionData.environment,
 		})
 	} catch (err: any) {

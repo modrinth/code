@@ -1,6 +1,6 @@
 <template>
 	<MarkdownEditor
-		v-model="draftVersion.version_body"
+		v-model="draftVersion.changelog"
 		:on-image-upload="onImageUpload"
 		:max-height="500"
 	/>

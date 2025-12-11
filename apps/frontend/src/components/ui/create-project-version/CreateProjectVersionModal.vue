@@ -67,9 +67,12 @@ const addLoadersNextDisabled = computed(() => draftVersion.value.loaders.length 
 const addMcVersionsNextDisabled = computed(() => draftVersion.value.game_versions.length === 0)
 
 const hideAddLoadersStage = computed(
-	() => projectType.value === 'resourcepack' || detectedLoaders.value,
+	() =>
+		projectType.value === 'resourcepack' || detectedLoaders.value || editingVersion.value === true,
 )
-const hideAddMcVersionsStage = computed(() => detectedVersions.value)
+const hideAddMcVersionsStage = computed(
+	() => detectedVersions.value || editingVersion.value === true,
+)
 
 const hideAddDependenciesStage = computed(() => projectType.value === 'modpack')
 
@@ -273,12 +276,11 @@ async function handleSaveVersionEdits() {
 		await client.labrinth.versions_v3.modifyVersion(version.version_id, {
 			version_title: version.version_title || version.version_number,
 			version_number: version.version_number,
-			version_body: version.version_body,
-			release_channel: version.release_channel,
+			changelog: version.changelog,
+			version_type: version.version_type,
 			dependencies: version.dependencies || [],
 			game_versions: version.game_versions,
 			loaders: version.loaders,
-			featured: version.featured,
 		})
 
 		if (files.length > 0) {

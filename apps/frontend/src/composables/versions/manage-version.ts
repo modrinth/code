@@ -17,12 +17,12 @@ const EMPTY_DRAFT_VERSION: Labrinth.Versions.v3.DraftVersion = {
 	project_id: '',
 	version_title: '',
 	version_number: '',
-	release_channel: 'release',
+	version_type: 'release',
 	loaders: [],
 	game_versions: [],
 	featured: false,
 	status: 'draft',
-	version_body: '',
+	changelog: '',
 	dependencies: [],
 }
 
@@ -51,18 +51,21 @@ async function setProjectType(
 		return projectType.value
 	}
 
+	// if file extension is .mrpack, it's a modpack
+	if (
+		(file && file.name.toLowerCase().endsWith('.mrpack')) ||
+		(file && file.name.toLowerCase().endsWith('.mrpack-primary'))
+	) {
+		projectType.value = 'modpack'
+		return projectType.value
+	}
+
 	if (
 		draftVersion.value.loaders?.some((loader) =>
 			['fabric', 'forge', 'quilt', 'neoforge'].includes(loader),
 		)
 	) {
 		projectType.value = 'mod'
-		return projectType.value
-	}
-
-	// if file extension is .mrpack, it's a modpack
-	if (file && file.name.toLowerCase().endsWith('.mrpack')) {
-		projectType.value = 'modpack'
 		return projectType.value
 	}
 

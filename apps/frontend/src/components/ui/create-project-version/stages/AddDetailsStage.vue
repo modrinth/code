@@ -5,7 +5,7 @@
 				Version type <span class="text-red">*</span>
 			</span>
 			<Chips
-				v-model="draftVersion.release_channel"
+				v-model="draftVersion.version_type"
 				:items="['release', 'alpha', 'beta']"
 				:never-empty="false"
 				:capitalize="true"
@@ -37,7 +37,7 @@
 			/>
 		</div>
 
-		<template v-if="inferredVersionData?.loaders?.length">
+		<template v-if="inferredVersionData?.loaders?.length || editingVersion">
 			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast">
@@ -45,7 +45,11 @@
 					</span>
 
 					<ButtonStyled type="transparent" size="standard">
-						<button @click="editLoaders">
+						<button
+							@click="editLoaders"
+							:disabled="isModpack"
+							v-tooltip="isModpack ? 'Modpack versions cannot be edited' : undefined"
+						>
 							<EditIcon />
 							Edit
 						</button>
@@ -78,7 +82,7 @@
 			</div>
 		</template>
 
-		<template v-if="inferredVersionData?.game_versions?.length">
+		<template v-if="inferredVersionData?.game_versions?.length || editingVersion">
 			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast">
@@ -86,7 +90,11 @@
 					</span>
 
 					<ButtonStyled type="transparent" size="standard">
-						<button @click="editVersions">
+						<button
+							@click="editVersions"
+							:disabled="isModpack"
+							v-tooltip="isModpack ? 'Modpack versions cannot be edited' : undefined"
+						>
 							<EditIcon />
 							Edit
 						</button>
@@ -121,10 +129,11 @@ import { formatCategory } from '@modrinth/utils'
 import { useGeneratedState } from '~/composables/generated'
 import { useManageVersion } from '~/composables/versions/manage-version'
 
-const { draftVersion, inferredVersionData } = useManageVersion()
+const { draftVersion, inferredVersionData, projectType, editingVersion } = useManageVersion()
 
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
+const isModpack = computed(() => projectType.value === 'modpack')
 
 const createVersionModal = inject<Ref<InstanceType<typeof MultiStageModal>>>('createVersionModal')
 
