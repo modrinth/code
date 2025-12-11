@@ -56,7 +56,7 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 	 * ```typescript
 	 * const results = await client.labrinth.projects_v2.search({
 	 *   query: 'optimization',
-	 *   facets: "[['categories:optimization'], ['project_type:mod']]",
+	 *   facets: [['categories:optimization'], ['project_type:mod']],
 	 *   limit: 20
 	 * })
 	 * ```
@@ -68,7 +68,10 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 			api: 'labrinth',
 			version: 2,
 			method: 'GET',
-			params: params as Record<string, unknown>,
+			params: {
+				...params,
+				facets: params.facets ? JSON.stringify(params.facets) : undefined,
+			},
 		})
 	}
 

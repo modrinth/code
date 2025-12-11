@@ -22,7 +22,7 @@ const projectId = defineModel<string>()
 const searchLoading = ref(false)
 const options = ref<DropdownOption<string>[]>([])
 
-const client = injectModrinthClient()
+const { labrinth } = injectModrinthClient()
 let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
 const handleSearch = async (query: string) => {
@@ -37,10 +37,10 @@ const handleSearch = async (query: string) => {
 
 	searchTimeout = setTimeout(async () => {
 		try {
-			const results = await client.labrinth.projects_v2.search({
+			const results = await labrinth.projects_v2.search({
 				query: query,
 				limit: 20,
-				facets: JSON.stringify([['project_type:mod']]),
+				facets: [['project_type:mod']],
 			})
 
 			options.value = results.hits.map((hit) => ({
