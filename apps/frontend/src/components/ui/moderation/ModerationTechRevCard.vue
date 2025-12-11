@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	CheckCircleIcon,
 	CheckIcon,
 	ChevronDownIcon,
 	ClipboardCopyIcon,
@@ -11,8 +10,6 @@ import {
 	EllipsisVerticalIcon,
 	LinkIcon,
 	LoaderCircleIcon,
-	ShieldCheckIcon,
-	TriangleAlertIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
@@ -23,13 +20,11 @@ import {
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
-	MarkdownEditor,
-	NewModal,
 	OverflowMenu,
 	type OverflowMenuOption,
 } from '@modrinth/ui'
 import { capitalizeString, formatProjectType, highlightCodeLines } from '@modrinth/utils'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
@@ -75,8 +70,8 @@ const quickActions = computed<OverflowMenuOption[]>(() => {
 				navigator.clipboard.writeText(reportUrl).then(() => {
 					addNotification({
 						type: 'success',
-						title: 'Technical Report link copied',
-						text: 'The link to this report has been copied to your clipboard.',
+						title: 'Technical Review link copied',
+						text: 'The link to this review has been copied to your clipboard.',
 					})
 				})
 			},
@@ -103,7 +98,6 @@ const tabs: readonly Tab[] = ['Thread', 'Files']
 const currentTab = ref<Tab>('Thread')
 
 const isThreadCollapsed = ref(true)
-
 
 const remainingMessageCount = computed(() => {
 	if (!props.item.thread?.messages) return 0
@@ -135,14 +129,15 @@ const allFiles = computed(() => {
 	return props.item.reports
 })
 
+const severityOrder = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
+
 const highestSeverity = computed(() => {
 	const severities = props.item.reports
 		.flatMap((r) => r.issues)
 		.flatMap((i) => i.details)
 		.map((d) => d.severity)
 
-	const order = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
-	return severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] || 'low'
+	return severities.sort((a, b) => (severityOrder[b] ?? 0) - (severityOrder[a] ?? 0))[0] || 'low'
 })
 
 const navTabsLinks = computed(() => {
@@ -171,8 +166,27 @@ const activeTabIndex = computed(() => {
 // Handle tab clicks from NavTabs
 function handleTabClick(index: number) {
 	if (index < tabs.length) {
-		currentTab.value = tabs[index]
-		backToFileList()
+		const newTab = tabs[index]
+
+		// Set tab FIRST so ThreadView renders before nextTick callback
+		currentTab.value = newTab
+
+		// When switching to Thread tab, pre-fill composer if there are decisions
+		// Only prepopulate ONCE to avoid overwriting user's notes
+		if (newTab === 'Thread' && hasDecisions.value && !hasPrepopulatedComposer.value) {
+			nextTick(() => {
+				const summary = generateReviewSummary()
+				if (summary && threadViewRef.value) {
+					threadViewRef.value.setReplyContent(summary)
+					hasPrepopulatedComposer.value = true
+				}
+			})
+		}
+
+		// Only clear file selection when explicitly clicking "Files" tab
+		if (newTab === 'Files') {
+			backToFileList()
+		}
 	}
 }
 
@@ -240,6 +254,24 @@ async function copyToClipboard(code: string, detailId: string) {
 	}
 }
 
+// Track issue decisions locally for optimistic updates
+const issueDecisions = ref<Map<string, 'safe' | 'malware'>>(new Map())
+
+// Track if we've already prepopulated the composer (to avoid overwriting user's notes)
+const hasPrepopulatedComposer = ref(false)
+
+// Get issue decision: prioritize local optimistic state, fallback to backend status
+function getIssueDecision(
+	issueId: string,
+	backendStatus: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
+): 'safe' | 'malware' | 'pending' {
+	const localDecision = issueDecisions.value.get(issueId)
+	if (localDecision) return localDecision
+	if (backendStatus === 'safe') return 'safe'
+	if (backendStatus === 'unsafe') return 'malware'
+	return 'pending'
+}
+
 async function updateIssueStatus(
 	issueId: string,
 	reportId: string,
@@ -247,6 +279,9 @@ async function updateIssueStatus(
 ) {
 	try {
 		await client.labrinth.tech_review_internal.updateIssue(issueId, { status })
+
+		// Track decision locally (don't end review)
+		issueDecisions.value.set(issueId, status === 'safe' ? 'safe' : 'malware')
 
 		if (status === 'safe') {
 			emit('markIssueSafe', props.item.project.id, reportId, issueId)
@@ -256,11 +291,10 @@ async function updateIssueStatus(
 				text: 'This issue has been marked as a false positive.',
 			})
 		} else if (status === 'unsafe') {
-			emit('markComplete', props.item.project.id)
 			addNotification({
 				type: 'success',
-				title: 'Marked as malware',
-				text: 'This issue has been confirmed as malicious. The project has been rejected.',
+				title: 'Issue marked as malware',
+				text: 'This issue has been flagged as malicious.',
 			})
 		}
 	} catch (error) {
@@ -273,150 +307,62 @@ async function updateIssueStatus(
 	}
 }
 
-const expandedIssues = ref<Set<string>>(new Set())
+const expandedClasses = ref<Set<string>>(new Set())
 const showCopyFeedback = ref<Map<string, boolean>>(new Map())
 
-const malwareModal = ref<InstanceType<typeof NewModal> | null>(null)
-const malwareReason = ref('')
-const pendingMalwareIssue = ref<{ issueId: string } | null>(null)
-
-type ActionType = 'safe' | 'malware'
-type ButtonState = 'idle' | number | 'completed'
-
-const buttonStates = ref<Map<ActionType, ButtonState>>(new Map())
-const buttonIntervals = ref<Map<ActionType, ReturnType<typeof setInterval>>>(new Map())
-
-function getButtonState(action: ActionType): ButtonState {
-	return buttonStates.value.get(action) ?? 'idle'
+interface ClassGroup {
+	filePath: string
+	flags: Array<{
+		issueId: string
+		issueType: string
+		detail: Labrinth.TechReview.Internal.ReportIssueDetail
+		status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+	}>
 }
 
-// TODO: move this into new buttonstyled refactored component at a later date
-async function handleTopLevelAction(action: ActionType) {
-	const currentState = getButtonState(action)
+const groupedByClass = computed<ClassGroup[]>(() => {
+	if (!selectedFile.value) return []
 
-	if (typeof currentState === 'number') {
-		const intervalId = buttonIntervals.value.get(action)
-		if (intervalId) clearInterval(intervalId)
-		buttonIntervals.value.delete(action)
-		buttonStates.value.delete(action)
-		return
+	const classMap = new Map<string, ClassGroup>()
+
+	for (const issue of selectedFile.value.issues) {
+		for (const detail of issue.details) {
+			if (!classMap.has(detail.file_path)) {
+				classMap.set(detail.file_path, { filePath: detail.file_path, flags: [] })
+			}
+			classMap.get(detail.file_path)!.flags.push({
+				issueId: issue.id,
+				issueType: issue.issue_type,
+				detail,
+				status: issue.status,
+			})
+		}
 	}
 
-	if (currentState === 'completed') return
-
-	buttonStates.value.set(action, 5)
-
-	const intervalId = setInterval(async () => {
-		const state = buttonStates.value.get(action)
-		if (typeof state === 'number' && state > 1) {
-			buttonStates.value.set(action, state - 1)
-		} else {
-			clearInterval(intervalId)
-			buttonIntervals.value.delete(action)
-
-			try {
-				const status = action === 'safe' ? 'safe' : 'unsafe'
-				await Promise.all(
-					props.item.reports.map((report) =>
-						client.labrinth.tech_review_internal.updateReport(report.id, { status }),
-					),
-				)
-
-				buttonStates.value.set(action, 'completed')
-				emit('markComplete', props.item.project.id)
-
-				addNotification({
-					type: 'success',
-					title: action === 'safe' ? 'Marked as safe' : 'Marked as malware',
-					text:
-						action === 'safe'
-							? 'All reports for this project have been marked as safe.'
-							: 'All reports for this project have been marked as malware. The project has been rejected.',
-				})
-			} catch (error) {
-				console.error('Failed to update reports:', error)
-				buttonStates.value.delete(action)
-				addNotification({
-					type: 'error',
-					title: 'Failed to update reports',
-					text: 'An error occurred while updating the report status.',
-				})
-			}
-		}
-	}, 1000)
-
-	buttonIntervals.value.set(action, intervalId)
-}
-
-onUnmounted(() => {
-	buttonIntervals.value.forEach((intervalId) => clearInterval(intervalId))
+	return Array.from(classMap.values()).sort((a, b) => {
+		const aSeverity = getHighestSeverityInClass(a.flags)
+		const bSeverity = getHighestSeverityInClass(b.flags)
+		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
+	})
 })
 
-function openMalwareModal(issueId?: string) {
-	if (issueId) {
-		pendingMalwareIssue.value = { issueId }
-	} else {
-		pendingMalwareIssue.value = null
-	}
-	malwareModal.value?.show()
+function getHighestSeverityInClass(
+	flags: ClassGroup['flags'],
+): Labrinth.TechReview.Internal.DelphiSeverity {
+	return flags.reduce(
+		(highest, flag) =>
+			(severityOrder[flag.detail.severity] ?? 0) > (severityOrder[highest] ?? 0)
+				? flag.detail.severity
+				: highest,
+		'low' as Labrinth.TechReview.Internal.DelphiSeverity,
+	)
 }
 
-async function confirmMalwareAction() {
-	try {
-		if (pendingMalwareIssue.value) {
-			const { issueId } = pendingMalwareIssue.value
-			await client.labrinth.tech_review_internal.updateIssue(issueId, {
-				status: 'unsafe',
-				message: malwareReason.value || undefined,
-			})
-
-			emit('markComplete', props.item.project.id)
-			malwareModal.value?.hide()
-			malwareReason.value = ''
-			pendingMalwareIssue.value = null
-
-			addNotification({
-				type: 'success',
-				title: 'Marked as malware',
-				text: 'This issue has been confirmed as malicious. The project has been rejected.',
-			})
-		} else {
-			// top-level
-			await Promise.all(
-				props.item.reports.map((report) =>
-					client.labrinth.tech_review_internal.updateReport(report.id, {
-						status: 'unsafe',
-						message: malwareReason.value || undefined,
-					}),
-				),
-			)
-
-			buttonStates.value.set('malware', 'completed')
-			emit('markComplete', props.item.project.id)
-			malwareModal.value?.hide()
-			malwareReason.value = ''
-
-			addNotification({
-				type: 'success',
-				title: 'Marked as malware',
-				text: 'All reports for this project have been marked as malware. The project has been rejected.',
-			})
-		}
-	} catch (error) {
-		console.error('Failed to update reports:', error)
-		addNotification({
-			type: 'error',
-			title: 'Failed to update reports',
-			text: 'An error occurred while updating the report status.',
-		})
-	}
-}
-
-function toggleIssue(issueId: string) {
-	if (expandedIssues.value.has(issueId)) {
-		expandedIssues.value.delete(issueId)
+function toggleClass(filePath: string) {
+	if (expandedClasses.value.has(filePath)) {
+		expandedClasses.value.delete(filePath)
 	} else {
-		expandedIssues.value.add(issueId)
+		expandedClasses.value.add(filePath)
 	}
 }
 
@@ -429,6 +375,89 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 	project_owner: props.item.project_owner,
 	reports: props.item.reports,
 }))
+
+// Ref to ThreadView for setting pre-generated message
+const threadViewRef = ref<{ setReplyContent: (content: string) => void } | null>(null)
+
+// Generate summary message for thread composer
+function generateReviewSummary(): string {
+	const decisions: Array<{
+		filePath: string
+		issueType: string
+		severity: string
+		decision: 'safe' | 'malware'
+	}> = []
+
+	// Collect all decisions from all reports
+	for (const report of props.item.reports) {
+		for (const issue of report.issues) {
+			for (const detail of issue.details) {
+				const decision = getIssueDecision(issue.id, issue.status)
+				if (decision !== 'pending') {
+					decisions.push({
+						filePath: detail.file_path,
+						issueType: issue.issue_type.replace(/_/g, ' '),
+						severity: detail.severity,
+						decision,
+					})
+				}
+			}
+		}
+	}
+
+	if (decisions.length === 0) return ''
+
+	const safeCount = decisions.filter((d) => d.decision === 'safe').length
+	const malwareCount = decisions.filter((d) => d.decision === 'malware').length
+	const verdict = malwareCount > 0 ? 'Malware' : 'Safe'
+
+	const tableRows = decisions
+		.map(
+			(d) =>
+				`| \`${d.filePath}\` | ${d.issueType} | ${capitalizeString(d.severity)} | ${d.decision === 'safe' ? '✅ Safe' : '❌ Malware'} |`,
+		)
+		.join('\n')
+
+	return `## Tech Review Summary
+
+<details>
+<summary>Issues Reviewed (${decisions.length} total - ${safeCount} safe, ${malwareCount} malware)</summary>
+
+| Class | Issue Type | Severity | Decision |
+|-------|------------|----------|----------|
+${tableRows}
+
+</details>
+
+**Verdict:** ${verdict}
+
+**Notes:**
+
+`
+}
+
+// Check if there are any decisions made
+const hasDecisions = computed(() => {
+	if (issueDecisions.value.size > 0) return true
+
+	// Also check backend status
+	for (const report of props.item.reports) {
+		for (const issue of report.issues) {
+			if (issue.status === 'safe' || issue.status === 'unsafe') return true
+		}
+	}
+	return false
+})
+
+// Handle submit review (placeholder for backend)
+function handleSubmitReview() {
+	const summary = generateReviewSummary()
+	console.log('Submit Review:', {
+		projectId: props.item.project.id,
+		decisions: Object.fromEntries(issueDecisions.value),
+		summary,
+	})
+}
 </script>
 
 <template>
@@ -495,59 +524,32 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 							>
 								{{ item.project_owner.name }}
 							</NuxtLink>
+							<span class="text-tertiary text-sm">({{ item.project_owner.id }})</span>
 						</div>
 					</div>
 				</div>
 
 				<div class="flex items-center gap-3">
 					<span class="text-base text-secondary">{{ formattedDate }}</span>
-					<div class="flex items-center gap-2">
-						<ButtonStyled color="brand">
-							<button
-								class="!w-[85px] !shadow-none"
-								:disabled="getButtonState('malware') !== 'idle'"
-								@click="handleTopLevelAction('safe')"
-							>
-								<LoaderCircleIcon
-									v-if="typeof getButtonState('safe') === 'number'"
-									class="animate-spin"
-								/>
-								<CheckCircleIcon v-else-if="getButtonState('safe') === 'completed'" />
-								<ShieldCheckIcon v-else />
-								{{ typeof getButtonState('safe') === 'number' ? getButtonState('safe') : 'Safe' }}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="red">
-							<button
-								class="!w-[116px] !shadow-none"
-								:disabled="getButtonState('safe') !== 'idle'"
-								@click="openMalwareModal()"
-							>
-								<CheckCircleIcon v-if="getButtonState('malware') === 'completed'" />
-								<TriangleAlertIcon v-else />
-								Malware
-							</button>
-						</ButtonStyled>
-						<ButtonStyled circular>
-							<OverflowMenu :options="quickActions" class="!shadow-none">
-								<template #default>
-									<EllipsisVerticalIcon class="size-4" />
-								</template>
-								<template #copy-id>
-									<ClipboardCopyIcon />
-									<span class="hidden sm:inline">Copy ID</span>
-								</template>
-								<template #copy-link>
-									<LinkIcon />
-									<span class="hidden sm:inline">Copy link</span>
-								</template>
-								<template #view-source>
-									<CodeIcon />
-									<span class="hidden sm:inline">View source</span>
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</div>
+					<ButtonStyled circular>
+						<OverflowMenu :options="quickActions" class="!shadow-none">
+							<template #default>
+								<EllipsisVerticalIcon class="size-4" />
+							</template>
+							<template #copy-id>
+								<ClipboardCopyIcon />
+								<span class="hidden sm:inline">Copy ID</span>
+							</template>
+							<template #copy-link>
+								<LinkIcon />
+								<span class="hidden sm:inline">Copy link</span>
+							</template>
+							<template #view-source>
+								<CodeIcon />
+								<span class="hidden sm:inline">View source</span>
+							</template>
+						</OverflowMenu>
+					</ButtonStyled>
 				</div>
 			</div>
 
@@ -573,11 +575,20 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 						<!-- DEV-531 -->
 						<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
 						<ThreadView
+							ref="threadViewRef"
 							:thread="item.thread"
 							:quick-replies="techReviewQuickReplies"
 							:quick-reply-context="techReviewContext"
 							@update-thread="handleThreadUpdate"
-						/>
+						>
+							<template #additionalActions>
+								<ButtonStyled color="brand">
+									<button :disabled="!hasDecisions" @click="handleSubmitReview">
+										Submit Review
+									</button>
+								</ButtonStyled>
+							</template>
+						</ThreadView>
 					</div>
 				</CollapsibleRegion>
 			</template>
@@ -629,42 +640,47 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 
 			<template v-else-if="currentTab === 'Files' && selectedFile">
 				<div
-					v-for="(issue, idx) in selectedFile.issues"
-					:key="issue.id"
-					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2 transition-colors duration-200 hover:bg-surface-4"
-					:class="{ 'rounded-bl-2xl rounded-br-2xl': idx === selectedFile.issues.length - 1 }"
+					v-for="(classItem, idx) in groupedByClass"
+					:key="classItem.filePath"
+					class="border-x border-b border-t-0 border-solid border-surface-3 bg-surface-2"
+					:class="{ 'rounded-bl-2xl rounded-br-2xl': idx === groupedByClass.length - 1 }"
 				>
 					<div
-						class="flex cursor-pointer items-center justify-between p-4"
-						@click="toggleIssue(issue.id)"
+						class="flex cursor-pointer items-center justify-between p-4 transition-colors duration-200 hover:bg-surface-4"
+						@click="toggleClass(classItem.filePath)"
 					>
 						<div class="my-auto flex items-center gap-2">
 							<ButtonStyled type="transparent" circular>
 								<button
 									class="transition-transform"
-									:class="{ 'rotate-180': expandedIssues.has(issue.id) }"
+									:class="{ 'rotate-180': expandedClasses.has(classItem.filePath) }"
 								>
 									<ChevronDownIcon class="h-5 w-5 text-contrast" />
 								</button>
 							</ButtonStyled>
 
-							<span class="text-base font-semibold text-contrast">{{
-								issue.issue_type.replace(/_/g, ' ')
+							<span class="font-mono text-base font-semibold text-contrast">{{
+								classItem.filePath
 							}}</span>
 
 							<div
-								v-if="issue.details.length > 0"
 								class="rounded-full border-solid px-2.5 py-1"
-								:class="getSeverityBadgeColor(issue.details[0].severity)"
+								:class="getSeverityBadgeColor(getHighestSeverityInClass(classItem.flags))"
 							>
 								<span class="text-sm font-medium">{{
-									capitalizeString(issue.details[0].severity)
+									capitalizeString(getHighestSeverityInClass(classItem.flags))
 								}}</span>
+							</div>
+
+							<div
+								class="border-red/60 flex items-center gap-1 rounded-full border border-solid bg-highlight-red px-2.5 py-1 text-sm text-red"
+							>
+								{{ classItem.flags.length }} {{ classItem.flags.length === 1 ? 'flag' : 'flags' }}
 							</div>
 
 							<Transition name="fade">
 								<div
-									v-if="loadingIssues.has(issue.id)"
+									v-if="classItem.flags.some((f) => loadingIssues.has(f.issueId))"
 									class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1"
 								>
 									<span class="flex items-center gap-1.5 text-sm font-medium text-secondary">
@@ -674,73 +690,112 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 								</div>
 							</Transition>
 						</div>
-
-						<div class="flex items-center gap-2" @click.stop>
-							<ButtonStyled color="brand" type="outlined">
-								<button
-									class="!border-[1px]"
-									@click="updateIssueStatus(issue.id, selectedFile.id, 'safe')"
-								>
-									Safe
-								</button>
-							</ButtonStyled>
-
-							<ButtonStyled color="red" type="outlined">
-								<button class="!border-[1px]" @click="openMalwareModal(issue.id)">Malware</button>
-							</ButtonStyled>
-						</div>
 					</div>
 
-					<Collapsible :collapsed="!expandedIssues.has(issue.id)">
+					<Collapsible :collapsed="!expandedClasses.has(classItem.filePath)">
 						<div class="flex flex-col gap-4 px-4 pb-4">
 							<div
-								v-for="(detail, detailIdx) in issue.details"
-								:key="detailIdx"
-								class="flex flex-col"
+								v-for="(flag, flagIdx) in classItem.flags"
+								:key="`${flag.issueId}-${flag.detail.id}`"
+								class="flex flex-col gap-2 rounded-lg p-2"
+								:class="{ 'bg-[#E8E8E8] dark:bg-[#1A1C20]': flagIdx % 2 === 1 }"
 							>
-								<p class="mt-0 pt-0 font-mono text-sm text-secondary">{{ detail.file_path }}</p>
-
-								<div
-									v-if="detail.decompiled_source"
-									class="relative overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
-								>
-									<ButtonStyled circular type="transparent">
-										<button
-											v-tooltip="`Copy code`"
-											class="absolute right-2 top-2 border-[1px]"
-											@click="copyToClipboard(detail.decompiled_source, `${issue.id}-${detailIdx}`)"
-										>
-											<CopyIcon v-if="!showCopyFeedback.get(`${issue.id}-${detailIdx}`)" />
-											<CheckIcon v-else />
-										</button>
-									</ButtonStyled>
-
-									<div class="overflow-x-auto bg-surface-3 py-3">
+								<div class="flex items-center justify-between">
+									<div class="flex items-center gap-2">
+										<span class="text-base font-semibold text-contrast">{{
+											flag.issueType.replace(/_/g, ' ')
+										}}</span>
 										<div
-											v-for="(line, n) in highlightCodeLines(detail.decompiled_source, 'java')"
-											:key="n"
-											class="flex font-mono text-[13px] leading-[1.6]"
+											class="rounded-full border-solid px-2.5 py-1"
+											:class="getSeverityBadgeColor(flag.detail.severity)"
 										>
-											<div
-												class="select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
-												style="min-width: 3.5rem"
+											<span class="text-sm font-medium">{{
+												capitalizeString(flag.detail.severity)
+											}}</span>
+										</div>
+									</div>
+
+									<div class="flex items-center gap-2">
+										<ButtonStyled
+											color="brand"
+											:type="
+												getIssueDecision(flag.issueId, flag.status) === 'safe'
+													? undefined
+													: 'outlined'
+											"
+										>
+											<button
+												class="!border-[1px]"
+												@click="updateIssueStatus(flag.issueId, selectedFile.id, 'safe')"
 											>
-												{{ n + 1 }}
-											</div>
-											<div class="flex-1 px-4 py-0 text-primary">
-												<pre v-html="line || ' '"></pre>
-											</div>
+												Safe
+											</button>
+										</ButtonStyled>
+
+										<ButtonStyled
+											color="red"
+											:type="
+												getIssueDecision(flag.issueId, flag.status) === 'malware'
+													? undefined
+													: 'outlined'
+											"
+										>
+											<button
+												class="!border-[1px]"
+												@click="updateIssueStatus(flag.issueId, selectedFile.id, 'unsafe')"
+											>
+												Malware
+											</button>
+										</ButtonStyled>
+									</div>
+								</div>
+							</div>
+
+							<div
+								v-if="classItem.flags[0]?.detail.decompiled_source"
+								class="relative overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
+							>
+								<ButtonStyled circular type="transparent">
+									<button
+										v-tooltip="`Copy code`"
+										class="absolute right-2 top-2 border-[1px]"
+										@click="
+											copyToClipboard(
+												classItem.flags[0].detail.decompiled_source!,
+												classItem.filePath,
+											)
+										"
+									>
+										<CopyIcon v-if="!showCopyFeedback.get(classItem.filePath)" />
+										<CheckIcon v-else />
+									</button>
+								</ButtonStyled>
+
+								<div class="overflow-x-auto bg-surface-3 py-3">
+									<div
+										v-for="(line, n) in highlightCodeLines(
+											classItem.flags[0].detail.decompiled_source!,
+											'java',
+										)"
+										:key="n"
+										class="flex font-mono text-[13px] leading-[1.6]"
+									>
+										<div
+											class="select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
+											style="min-width: 3.5rem"
+										>
+											{{ n + 1 }}
+										</div>
+										<div class="flex-1 px-4 py-0 text-primary">
+											<pre v-html="line || ' '"></pre>
 										</div>
 									</div>
 								</div>
-								<div
-									v-else
-									class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4"
-								>
-									<p class="text-sm text-secondary">
-										Source code not available or failed to decompile for this flag.
-									</p>
-								</div>
+							</div>
+							<div v-else class="rounded-lg border border-solid border-surface-5 bg-surface-3 p-4">
+								<p class="text-sm text-secondary">
+									Source code not available or failed to decompile for this file.
+								</p>
 							</div>
 						</div>
 					</Collapsible>
@@ -748,32 +803,6 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 			</template>
 		</div>
 	</div>
-
-	<NewModal ref="malwareModal" header="Confirm Malware" fade="danger">
-		<div class="flex flex-col gap-4">
-			<div class="flex flex-col gap-1">
-				<label class="text-md font-semibold text-contrast">Rejection reason (optional)</label>
-				<MarkdownEditor
-					v-model="malwareReason"
-					placeholder="Explain why this is malware/being rejected..."
-					:heading-buttons="false"
-				/>
-			</div>
-		</div>
-		<template #actions>
-			<div class="flex justify-end gap-2">
-				<ButtonStyled type="outlined">
-					<button @click="malwareModal?.hide()">Cancel</button>
-				</ButtonStyled>
-				<ButtonStyled color="red">
-					<button @click="confirmMalwareAction">
-						<TriangleAlertIcon />
-						Confirm Malware
-					</button>
-				</ButtonStyled>
-			</div>
-		</template>
-	</NewModal>
 </template>
 
 <style scoped>
