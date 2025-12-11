@@ -2,8 +2,6 @@ use std::{collections::HashMap, fmt};
 
 use actix_web::{HttpRequest, get, post, web};
 use chrono::{DateTime, Utc};
-use eyre::eyre;
-use serde::{Deserialize, Serialize};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use tokio_stream::StreamExt;
@@ -439,7 +437,6 @@ async fn search_projects(
             .iter()
             .map(|ty| ty.0)
             .collect::<Vec<_>>(),
-        DelphiReportIssueStatus::Pending as _,
     )
     .fetch(&**pool);
 
