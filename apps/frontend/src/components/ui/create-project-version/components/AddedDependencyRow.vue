@@ -18,8 +18,8 @@
 		</span>
 
 		<div class="flex items-center gap-1">
-			<ButtonStyled size="standard">
-				<button aria-label="Remove file" @click="emitRemove">
+			<ButtonStyled size="standard" :circular="true">
+				<button aria-label="Remove file" class="!shadow-none" @click="emitRemove">
 					<XIcon aria-hidden="true" />
 				</button>
 			</ButtonStyled>
