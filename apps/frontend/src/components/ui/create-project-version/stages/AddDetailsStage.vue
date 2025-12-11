@@ -97,7 +97,11 @@
 					class="flex flex-col gap-1.5 gap-y-4 rounded-xl border border-solid border-surface-5 p-3 py-4"
 				>
 					<div class="flex flex-wrap gap-2">
-						<TagItem v-for="version in draftVersion.game_versions" :key="version">
+						<TagItem
+							v-for="version in draftVersion.game_versions"
+							:key="version"
+							class="border !border-solid border-surface-5 hover:no-underline"
+						>
 							{{ version }}
 						</TagItem>
 

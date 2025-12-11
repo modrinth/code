@@ -17,7 +17,7 @@
 							v-for="version in draftVersion.game_versions"
 							:key="version"
 							:action="() => toggleVersion(version)"
-							class="!transition-all hover:bg-button-bgHover hover:no-underline"
+							class="border !border-solid border-surface-5 !transition-all hover:bg-button-bgHover hover:no-underline"
 						>
 							{{ version }}
 							<XIcon />
