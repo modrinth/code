@@ -98,6 +98,9 @@ pub struct ReturnMetrics {
     pub project_playtime: Option<Metrics<ProjectPlaytimeField>>,
     /// How much payout revenue a project has generated.
     pub project_revenue: Option<Metrics<ProjectRevenueField>>,
+    /// How many times a product has been purchased with an affiliate code.
+    pub affiliate_code_conversions:
+        Option<Metrics<AffiliateCodeConversionsField>>,
     /// How much payout revenue an affiliate code has generated.
     pub affiliate_code_revenue: Option<Metrics<AffiliateCodeRevenueField>>,
 }
@@ -190,6 +193,16 @@ pub enum ProjectPlaytimeField {
 pub enum ProjectRevenueField {
     /// Project ID.
     ProjectId,
+}
+
+/// Fields for [`ReturnMetrics::affiliate_code_conversions`].
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum AffiliateCodeConversionsField {
+    /// Affiliate code ID.
+    AffiliateCodeId,
 }
 
 /// Fields for [`ReturnMetrics::affiliate_code_revenue`].
@@ -335,7 +348,15 @@ pub struct AffiliateCodeAnalytics {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case", tag = "metric_kind")]
 pub enum AffiliateCodeMetrics {
+    Conversions(AffiliateCodeConversions),
     Revenue(AffiliateCodeRevenue),
+}
+
+/// [`ReturnMetrics::affiliate_code_conversions`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AffiliateCodeConversions {
+    /// Total conversions for this bucket.
+    pub conversions: u64,
 }
 
 /// [`ReturnMetrics::affiliate_code_revenue`].
@@ -713,6 +734,58 @@ pub async fn fetch_analytics(
                     }),
                 )?;
             }
+        }
+    }
+
+    if let Some(metrics) = &req.return_metrics.affiliate_code_conversions {
+        let mut rows = sqlx::query!(
+            "SELECT
+                WIDTH_BUCKET(
+                    EXTRACT(EPOCH FROM usa.created_at)::bigint,
+                    EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
+                    EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
+                    $3::integer
+                ) AS bucket,
+                CASE WHEN $5 THEN affiliate_code ELSE 0 END AS affiliate_code,
+                COUNT(*) AS conversions
+            FROM users_subscriptions_affiliations usa
+            INNER JOIN affiliate_codes ac ON ac.id = usa.affiliate_code
+            WHERE
+                ac.affiliate = $4
+                AND usa.created_at BETWEEN $1 AND $2
+            GROUP BY bucket, affiliate_code",
+            req.time_range.start,
+            req.time_range.end,
+            num_time_slices as i64,
+            DBUserId::from(user.id) as DBUserId,
+            metrics.bucket_by.contains(&AffiliateCodeConversionsField::AffiliateCodeId),
+        )
+        .fetch(&**pool);
+        while let Some(row) = rows.next().await.transpose()? {
+            let bucket = row
+                .bucket
+                .wrap_internal_err("bucket should be non-null - query bug!")?;
+            let bucket = usize::try_from(bucket).wrap_internal_err_with(|| {
+                eyre!("bucket value {bucket} does not fit into `usize` - query bug!")
+            })?;
+
+            let source_affiliate_code = AffiliateCodeId::from(
+                DBAffiliateCodeId(row.affiliate_code.unwrap_or_default()),
+            );
+            let conversions =
+                u64::try_from(row.conversions.unwrap_or_default())
+                    .unwrap_or(u64::MAX);
+
+            add_to_time_slice(
+                &mut time_slices,
+                bucket,
+                AnalyticsData::AffiliateCode(AffiliateCodeAnalytics {
+                    source_affiliate_code,
+                    metrics: AffiliateCodeMetrics::Conversions(
+                        AffiliateCodeConversions { conversions },
+                    ),
+                }),
+            )?;
         }
     }
 
