@@ -4,7 +4,7 @@ import { injectPageContext } from '../../providers'
 const { hierarchicalSidebarAvailable } = injectPageContext()
 
 defineProps<{
-	title: string
+	title?: string
 }>()
 </script>
 <template>
@@ -14,7 +14,7 @@ defineProps<{
 			'card-shadow mb-4 last:mb-0 rounded-2xl bg-bg-raised': !hierarchicalSidebarAvailable,
 		}"
 	>
-		<span class="font-semibold">{{ title }}</span>
+		<span v-if="title" class="font-semibold">{{ title }}</span>
 		<slot />
 	</div>
 </template>

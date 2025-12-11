@@ -6,7 +6,7 @@
 			<slot name="icon" />
 			<div class="flex flex-col gap-1">
 				<div class="flex flex-wrap items-center gap-2">
-					<h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
+					<h1 class="m-0 text-2xl font-semibold leading-none text-contrast">
 						<slot name="title" />
 					</h1>
 					<slot name="title-suffix" />
