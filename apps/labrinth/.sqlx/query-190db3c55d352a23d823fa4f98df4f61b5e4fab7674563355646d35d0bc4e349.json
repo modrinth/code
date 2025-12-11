@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT EXISTS(\n            SELECT 1 FROM delphi_report_issues dri\n            WHERE\n                dri.report_id = $1\n                AND dri.status = 'unsafe'\n            LIMIT 1\n        ) AS \"has_unsafe_issues!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "has_unsafe_issues!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "190db3c55d352a23d823fa4f98df4f61b5e4fab7674563355646d35d0bc4e349"
+}
