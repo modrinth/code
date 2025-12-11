@@ -25,7 +25,7 @@ use crate::{
     models::{
         ids::{FileId, ProjectId, ThreadId, VersionId},
         pats::Scopes,
-        projects::Project,
+        projects::{Project, ProjectStatus},
         threads::{MessageBody, Thread},
     },
     queue::session::AuthQueue,
@@ -37,7 +37,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(search_projects)
         .service(get_report)
         .service(get_issue)
-        .service(update_report)
+        .service(submit_report)
         .service(update_issue);
 }
 
@@ -294,7 +294,7 @@ pub struct SearchResponse {
 /// Limited set of project information returned by [`search_projects`].
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectModerationInfo {
-    /// Projecet ID.
+    /// Project ID.
     pub id: ProjectId,
     /// Project moderation thread ID.
     pub thread_id: ThreadId,
@@ -514,16 +514,6 @@ async fn search_projects(
     }))
 }
 
-/// See [`update_report`] and [`update_issue`].
-#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct UpdateStatus {
-    /// Status to set the issue to.
-    pub status: DelphiVerdict,
-    /// If `status` is [`DelphiReportIssueStatus::Unsafe`], provides a message
-    /// to reject the project.
-    pub message: Option<String>,
-}
-
 // async fn maybe_reject_project(
 //     report_id: DelphiReportId,
 //     txn: &mut PgTransaction<'_>,
@@ -584,18 +574,34 @@ pub struct UpdateStatus {
 //     Ok(())
 // }
 
-/// Updates the state of a project based on a technical review report.
+/// See [`submit_report`].
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct SubmitReport {
+    /// Moderator message to send to the thread when rejecting the project.
+    pub message: Option<String>,
+}
+
+/// Submits a verdict for a technical report of a project.
+///
+/// Before this is called, all issues for this project must have been marked as
+/// either safe or unsafe. Otherwise, this will error with
+/// [`ApiError::TechReviewIssuesWithNoVerdict`], providing the issue IDs which
+/// are still unmarked.
+///
+/// If at least one issue is [`DelphiReportIssueStatus::Unsafe`], the report
+/// will be marked as unsafe and the project will be rejected. Otherwise, the
+/// report will be marked as safe.
 #[utoipa::path(
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
 #[post("/report/{id}")]
-async fn update_report(
+async fn submit_report(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    update_req: web::Json<UpdateStatus>,
+    submit_report: web::Json<SubmitReport>,
     path: web::Path<(DelphiReportId,)>,
 ) -> Result<(), ApiError> {
     let user = check_is_moderator_from_headers(
@@ -613,9 +619,52 @@ async fn update_report(
         .await
         .wrap_internal_err("failed to begin transaction")?;
 
-    let status = match update_req.status {
-        DelphiVerdict::Safe => DelphiReportIssueStatus::Safe,
-        DelphiVerdict::Unsafe => DelphiReportIssueStatus::Unsafe,
+    let pending_issues = sqlx::query!(
+        "
+        SELECT
+            dri.id AS issue_id
+        FROM delphi_report_issues dri
+        INNER JOIN delphi_reports dr ON dr.id = dri.report_id
+        WHERE
+            dr.id = $1
+            AND dri.status = 'pending'
+        ",
+        report_id as _,
+    )
+    .fetch_all(&mut *txn)
+    .await
+    .wrap_internal_err("failed to fetch pending issues")?;
+
+    if !pending_issues.is_empty() {
+        return Err(ApiError::TechReviewIssuesWithNoVerdict {
+            issues: pending_issues
+                .into_iter()
+                .map(|record| DelphiReportIssueId(record.issue_id))
+                .collect(),
+        });
+    }
+
+    let has_unsafe_issues = sqlx::query!(
+        r#"
+        SELECT EXISTS(
+            SELECT 1 FROM delphi_report_issues dri
+            WHERE
+                dri.report_id = $1
+                AND dri.status = 'unsafe'
+            LIMIT 1
+        ) AS "has_unsafe_issues!"
+        "#,
+        report_id as _,
+    )
+    .fetch_one(&mut *txn)
+    .await
+    .wrap_internal_err("failed to fetch unsafe issues")?
+    .has_unsafe_issues;
+
+    let (verdict, status) = if has_unsafe_issues {
+        (DelphiVerdict::Unsafe, DelphiReportIssueStatus::Unsafe)
+    } else {
+        (DelphiVerdict::Safe, DelphiReportIssueStatus::Safe)
     };
     let record = sqlx::query!(
         r#"
@@ -639,11 +688,26 @@ async fn update_report(
     .await
     .wrap_internal_err("failed to update report")?;
 
+    if let Some(body) = submit_report.0.message {
+        ThreadMessageBuilder {
+            author_id: Some(user.id.into()),
+            body: MessageBody::Text {
+                body,
+                private: true,
+                replying_to: None,
+                associated_images: Vec::new(),
+            },
+            thread_id: record.thread_id,
+            hide_identity: user.role.is_mod(),
+        }
+        .insert(&mut txn)
+        .await
+        .wrap_internal_err("failed to add moderator message")?;
+    }
+
     ThreadMessageBuilder {
         author_id: Some(user.id.into()),
-        body: MessageBody::TechReview {
-            verdict: update_req.status,
-        },
+        body: MessageBody::TechReview { verdict },
         thread_id: record.thread_id,
         hide_identity: user.role.is_mod(),
     }
@@ -651,11 +715,59 @@ async fn update_report(
     .await
     .wrap_internal_err("failed to add tech review message")?;
 
+    if verdict == DelphiVerdict::Unsafe {
+        let record = sqlx::query!(
+            r#"
+            UPDATE mods
+            SET status = $1
+            FROM delphi_reports dr
+            INNER JOIN files f ON f.id = dr.file_id
+            INNER JOIN versions v ON v.id = f.version_id
+            INNER JOIN mods m ON v.mod_id = m.id
+            INNER JOIN threads t ON t.mod_id = m.id
+            WHERE dr.id = $2
+            RETURNING
+                m.id AS "project_id: DBProjectId",
+                t.id AS "thread_id: DBThreadId",
+                (SELECT status FROM mods WHERE id = m.id) AS "old_status!"
+            "#,
+            ProjectStatus::Rejected.as_str(),
+            report_id as DelphiReportId,
+        )
+        .fetch_one(&mut *txn)
+        .await
+        .wrap_internal_err("failed to mark project as rejected")?;
+
+        ThreadMessageBuilder {
+            author_id: Some(user.id.into()),
+            body: MessageBody::StatusChange {
+                new_status: ProjectStatus::Rejected,
+                old_status: ProjectStatus::from_string(&record.old_status),
+            },
+            thread_id: record.thread_id,
+            hide_identity: user.role.is_mod(),
+        }
+        .insert(&mut txn)
+        .await
+        .wrap_internal_err("failed to add tech review message")?;
+
+        DBProject::clear_cache(record.project_id, None, None, &redis)
+            .await
+            .wrap_internal_err("failed to clear project cache")?;
+    }
+
     txn.commit()
         .await
         .wrap_internal_err("failed to commit transaction")?;
 
     Ok(())
+}
+
+/// See [`update_issue`].
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct UpdateIssue {
+    /// What the moderator has decided the outcome of this issue is.
+    pub verdict: DelphiVerdict,
 }
 
 /// Updates the state of a technical review issue.
@@ -672,7 +784,7 @@ async fn update_issue(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    update_req: web::Json<UpdateStatus>,
+    update_req: web::Json<UpdateIssue>,
     path: web::Path<(DelphiReportIssueId,)>,
 ) -> Result<(), ApiError> {
     let _user = check_is_moderator_from_headers(
@@ -690,7 +802,7 @@ async fn update_issue(
         .await
         .wrap_internal_err("failed to start transaction")?;
 
-    let status = match update_req.status {
+    let status = match update_req.verdict {
         DelphiVerdict::Safe => DelphiReportIssueStatus::Safe,
         DelphiVerdict::Unsafe => DelphiReportIssueStatus::Unsafe,
     };
