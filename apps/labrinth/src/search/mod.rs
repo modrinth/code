@@ -53,6 +53,7 @@ impl actix_web::ResponseError for SearchError {
                 SearchError::FormatError(..) => "invalid_input",
             },
             description: self.to_string(),
+            details: None,
         })
     }
 }

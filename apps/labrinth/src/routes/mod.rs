@@ -163,6 +163,8 @@ pub enum ApiError {
     Stripe(#[from] stripe::StripeError),
     #[error("Error while interacting with Delphi: {0}")]
     Delphi(reqwest::Error),
+    #[error(transparent)]
+    Mural(#[from] Box<muralpay::ApiError>),
 }
 
 impl ApiError {
@@ -204,12 +206,17 @@ impl ApiError {
                 Self::TaxProcessor(..) => "tax_processor_error",
                 Self::Slack(..) => "slack_error",
                 Self::Delphi(..) => "delphi_error",
+                Self::Mural(..) => "mural_error",
             },
             description: match self {
                 Self::Internal(e) => format!("{e:#?}"),
                 Self::Request(e) => format!("{e:#?}"),
                 Self::Auth(e) => format!("{e:#?}"),
                 _ => self.to_string(),
+            },
+            details: match self {
+                Self::Mural(err) => serde_json::to_value(err.clone()).ok(),
+                _ => None,
             },
         }
     }
@@ -253,6 +260,7 @@ impl actix_web::ResponseError for ApiError {
             Self::TaxProcessor(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Slack(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Delphi(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Mural(..) => StatusCode::BAD_REQUEST,
         }
     }
 

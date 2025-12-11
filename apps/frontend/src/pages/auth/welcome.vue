@@ -49,10 +49,8 @@
 
 <script setup>
 import { RightArrowIcon, WavingRinthbot } from '@modrinth/assets'
-import { Checkbox, commonMessages } from '@modrinth/ui'
+import { Checkbox, commonMessages, normalizeChildren } from '@modrinth/ui'
 import { IntlFormatted } from '@vintl/vintl/components'
-
-import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const route = useRoute()
 

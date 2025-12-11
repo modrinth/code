@@ -21,7 +21,6 @@ use dashmap::DashMap;
 use eyre::{Result, eyre};
 use futures::TryStreamExt;
 use modrinth_util::decimal::Decimal2dp;
-use muralpay::MuralPay;
 use reqwest::Method;
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::{Decimal, RoundingStrategy, dec};
@@ -48,7 +47,7 @@ pub struct PayoutsQueue {
 }
 
 pub struct MuralPayConfig {
-    pub client: MuralPay,
+    pub client: muralpay::Client,
     pub source_account_id: muralpay::AccountId,
 }
 
@@ -77,11 +76,11 @@ impl Default for PayoutsQueue {
     }
 }
 
-pub fn create_muralpay_client() -> Result<MuralPay> {
+pub fn create_muralpay_client() -> Result<muralpay::Client> {
     let api_url = env_var("MURALPAY_API_URL")?;
     let api_key = env_var("MURALPAY_API_KEY")?;
     let transfer_api_key = env_var("MURALPAY_TRANSFER_API_KEY")?;
-    Ok(MuralPay::new(api_url, api_key, Some(transfer_api_key)))
+    Ok(muralpay::Client::new(api_url, api_key, transfer_api_key))
 }
 
 pub fn create_muralpay() -> Result<MuralPayConfig> {

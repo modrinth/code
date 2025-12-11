@@ -62,6 +62,7 @@ import _WindowsIcon from './external/windows.svg?component'
 import _YouTubeIcon from './external/youtube.svg?component'
 import _YouTubeGaming from './external/youtubegaming.svg?component'
 import _YouTubeShortsIcon from './external/youtubeshorts.svg?component'
+import _EmptyIllustration from './illustrations/empty.svg?component'
 
 export const ModrinthIcon = _ModrinthIcon
 export const BrowserWindowSuccessIllustration = _BrowserWindowSuccessIllustration
@@ -119,3 +120,5 @@ export const MinecraftServerIcon = _MinecraftServerIcon
 export * from './generated-icons'
 export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'
 export { default as SlimPlayerModel } from './models/slim-player.gltf?url'
+
+export const EmptyIllustration = _EmptyIllustration

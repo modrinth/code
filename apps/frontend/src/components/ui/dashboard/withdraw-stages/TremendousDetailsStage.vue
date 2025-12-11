@@ -181,6 +181,7 @@ import {
 	financialMessages,
 	formFieldLabels,
 	formFieldPlaceholders,
+	normalizeChildren,
 	paymentMethodMessages,
 	useDebugLogger,
 } from '@modrinth/ui'
@@ -195,7 +196,6 @@ import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown
 import { useAuth } from '@/composables/auth.js'
 import { useBaseFetch } from '@/composables/fetch.js'
 import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const debug = useDebugLogger('TremendousDetailsStage')
 const {

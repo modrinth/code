@@ -304,7 +304,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
 	vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
 	vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
 	vars[`SUPPORT`] =
-		`please visit the [Modrinth Help Center](https://support.modrinth.com/) and click the green bubble to contact support.`
+		`please visit the [Modrinth Help Center](https://support.modrinth.com/) and click the blue bubble to contact support.`
 	vars[`MODPACK_PERMISSIONS_GUIDE`] =
 		`our guide to [Obtaining Modpack Permissions](https://support.modrinth.com/en/articles/8797527-obtaining-modpack-permissions)`
 	vars[`MODPACKS_ON_MODRINTH`] =

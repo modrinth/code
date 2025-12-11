@@ -151,6 +151,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::LimitReached => "limit_reached",
             },
             description: self.to_string(),
+            details: None,
         })
     }
 }

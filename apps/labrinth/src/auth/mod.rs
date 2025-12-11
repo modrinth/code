@@ -85,6 +85,7 @@ impl actix_web::ResponseError for AuthenticationError {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: self.error_name(),
             description: self.to_string(),
+            details: None,
         })
     }
 }

@@ -1,10 +1,12 @@
 import type { ISO3166, Labrinth } from '@modrinth/api-client'
+import type { DisplayProjectType } from '@modrinth/utils'
 
 import generatedState from '~/generated/state.json'
+import type { DisplayMode } from '~/plugins/cosmetics'
 
 export interface ProjectType {
 	actual: string
-	id: string
+	id: DisplayProjectType
 	display: string
 }
 
@@ -25,7 +27,7 @@ export interface GeneratedState extends Labrinth.State.GeneratedState {
 	// Additional runtime-defined fields not from the API
 	projectTypes: ProjectType[]
 	loaderData: LoaderData
-	projectViewModes: string[]
+	projectViewModes: DisplayMode[]
 	approvedStatuses: string[]
 	rejectedStatuses: string[]
 	staffRoles: string[]
