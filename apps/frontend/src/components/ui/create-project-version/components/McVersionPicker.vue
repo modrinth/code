@@ -65,7 +65,8 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
 import { ButtonStyled, Chips } from '@modrinth/ui'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useMagicKeys } from '@vueuse/core'
+import { computed, ref } from 'vue'
 
 type GameVersion = Labrinth.Tags.v2.GameVersion
 
@@ -78,22 +79,8 @@ const emit = defineEmits<{
 	(e: 'update:modelValue', value: string[]): void
 }>()
 
-const holdingShift = ref(false)
-
-const handleKeyDown = (event: KeyboardEvent) => {
-	if (event.key === 'Shift') holdingShift.value = true
-}
-const handleKeyUp = (event: KeyboardEvent) => {
-	if (event.key === 'Shift') holdingShift.value = false
-}
-onMounted(() => {
-	window.addEventListener('keydown', handleKeyDown)
-	window.addEventListener('keyup', handleKeyUp)
-})
-onUnmounted(() => {
-	window.removeEventListener('keydown', handleKeyDown)
-	window.removeEventListener('keyup', handleKeyUp)
-})
+const keys = useMagicKeys()
+const holdingShift = computed(() => keys.shift.value)
 
 const versionType = ref<string | null>('release')
 const searchQuery = ref('')
