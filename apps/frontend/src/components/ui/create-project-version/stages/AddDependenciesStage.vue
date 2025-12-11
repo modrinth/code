@@ -78,10 +78,14 @@
 
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
-import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
-import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
+import {
+	ButtonStyled,
+	Combobox,
+	injectModrinthClient,
+	injectNotificationManager,
+} from '@modrinth/ui'
+
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
-import Combobox from '@modrinth/ui/src/components/base/Combobox.vue'
 
 import ModSelect from '~/components/ui/create-project-version/components/ModSelect.vue'
 import { useManageVersion } from '~/composables/versions/manage-version'

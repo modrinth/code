@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import MarkdownEditor from '@modrinth/ui/src/components/base/MarkdownEditor.vue'
+import { MarkdownEditor } from '@modrinth/ui'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { useManageVersion } from '~/composables/versions/manage-version'

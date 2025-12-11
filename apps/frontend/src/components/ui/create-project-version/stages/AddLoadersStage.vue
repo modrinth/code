@@ -38,8 +38,7 @@
 
 <script lang="ts" setup>
 import { XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectProjectPageContext } from '@modrinth/ui'
-import TagItem from '@modrinth/ui/src/components/base/TagItem.vue'
+import { ButtonStyled, injectProjectPageContext, TagItem } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 
 import { useManageVersion } from '~/composables/versions/manage-version'

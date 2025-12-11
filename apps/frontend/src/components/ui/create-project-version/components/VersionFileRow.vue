@@ -45,8 +45,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
-import Combobox, { type DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
+import { ButtonStyled, Combobox } from '@modrinth/ui'
+import { type DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
 const selectedType = defineModel<Labrinth.Versions.v3.FileType | 'primary'>({ default: 'unknown' })
 

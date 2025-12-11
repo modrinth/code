@@ -11,9 +11,8 @@
 </template>
 
 <script lang="ts" setup>
-import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import { Combobox, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
-import Combobox from '@modrinth/ui/src/components/base/Combobox.vue'
 import { defineAsyncComponent, h } from 'vue'
 
 const { addNotification } = injectNotificationManager()

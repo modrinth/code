@@ -111,8 +111,7 @@
 
 <script lang="ts" setup>
 import { EditIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, TagItem } from '@modrinth/ui'
-import type MultiStageModal from '@modrinth/ui/src/components/base/MultiStageModal.vue'
+import { ButtonStyled, Chips, TagItem, type MultiStageModal } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 
 import { useGeneratedState } from '~/composables/generated'
