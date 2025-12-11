@@ -146,7 +146,7 @@ async function setProcessing() {
 </script>
 
 <template>
-	<div class="flex w-full flex-col gap-4">
+	<div class="mb-8 flex w-full flex-col gap-4">
 		<ModerationProjectNags
 			v-if="
 				(currentMember && project.status === 'draft') ||
