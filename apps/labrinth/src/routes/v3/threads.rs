@@ -452,7 +452,7 @@ pub async fn thread_send_message_internal(
     let result = database::models::DBThread::get(string, pool).await?;
 
     if let Some(thread) = result {
-        if !is_authorized_thread(&thread, &user, &pool).await? {
+        if !is_authorized_thread(&thread, user, pool).await? {
             return Err(ApiError::NotFound);
         }
 
@@ -469,7 +469,7 @@ pub async fn thread_send_message_internal(
 
         if let Some(project_id) = thread.project_id {
             let project =
-                database::models::DBProject::get_id(project_id, pool, &redis)
+                database::models::DBProject::get_id(project_id, pool, redis)
                     .await?;
 
             if let Some(project) = project
@@ -481,7 +481,7 @@ pub async fn thread_send_message_internal(
                     database::models::DBTeamMember::get_from_team_full(
                         project.inner.team_id,
                         pool,
-                        &redis,
+                        redis,
                     )
                     .await?;
 
@@ -496,7 +496,7 @@ pub async fn thread_send_message_internal(
                 .insert_many(
                     members.iter().map(|x| x.user_id).collect(),
                     &mut transaction,
-                    &redis,
+                    redis,
                 )
                 .await?;
 
@@ -508,7 +508,7 @@ pub async fn thread_send_message_internal(
                 .insert_many(
                     members.iter().map(|x| x.user_id).collect(),
                     &mut transaction,
-                    &redis,
+                    redis,
                 )
                 .await?;
             }
@@ -533,7 +533,7 @@ pub async fn thread_send_message_internal(
                             report_id: Some(report.id.into()),
                         },
                     }
-                    .insert(report.reporter, &mut transaction, &redis)
+                    .insert(report.reporter, &mut transaction, redis)
                     .await?;
                 }
             }
@@ -547,7 +547,7 @@ pub async fn thread_send_message_internal(
                 if let Some(db_image) = image_item::DBImage::get(
                     (*image_id).into(),
                     &mut *transaction,
-                    &redis,
+                    redis,
                 )
                 .await?
                 {
@@ -574,7 +574,7 @@ pub async fn thread_send_message_internal(
                     .execute(&mut *transaction)
                     .await?;
 
-                    image_item::DBImage::clear_cache(image.id.into(), &redis)
+                    image_item::DBImage::clear_cache(image.id.into(), redis)
                         .await?;
                 } else {
                     return Err(ApiError::InvalidInput(format!(

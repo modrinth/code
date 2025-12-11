@@ -55,7 +55,6 @@ onUnmounted(() => {
 	}
 })
 function updateFade(scrollTop, offsetHeight, scrollHeight) {
-	console.log(scrollTop, offsetHeight, scrollHeight)
 	scrollableAtBottom.value = Math.ceil(scrollTop + offsetHeight) >= scrollHeight
 	scrollableAtTop.value = scrollTop <= 0
 }

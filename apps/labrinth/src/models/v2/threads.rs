@@ -94,6 +94,16 @@ impl From<crate::models::v3::threads::MessageBody> for LegacyMessageBody {
                 new_status,
                 old_status,
             },
+            crate::models::v3::threads::MessageBody::TechReview { verdict } => {
+                LegacyMessageBody::Text {
+                    body: format!(
+                        "(legacy) Reviewed technical report and gave verdict {verdict:?}"
+                    ),
+                    private: true,
+                    replying_to: None,
+                    associated_images: Vec::new(),
+                }
+            }
             crate::models::v3::threads::MessageBody::ThreadClosure => {
                 LegacyMessageBody::ThreadClosure
             }

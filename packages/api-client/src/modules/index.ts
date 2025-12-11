@@ -7,6 +7,7 @@ import { ArchonServersV1Module } from './archon/servers/v1'
 import { ISO3166Module } from './iso3166'
 import { KyrosFilesV0Module } from './kyros/files/v0'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
+import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
 import { LabrinthStateModule } from './labrinth/state'
@@ -31,6 +32,7 @@ export const MODULE_REGISTRY = {
 	iso3166_data: ISO3166Module,
 	kyros_files_v0: KyrosFilesV0Module,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
+	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,
 	labrinth_state: LabrinthStateModule,

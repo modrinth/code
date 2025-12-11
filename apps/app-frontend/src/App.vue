@@ -1,5 +1,5 @@
 <script setup>
-import { AuthFeature, TauriModrinthClient } from '@modrinth/api-client'
+import { AuthFeature, PanelVersionFeature, TauriModrinthClient } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
@@ -37,6 +37,7 @@ import {
 	ProgressSpinner,
 	provideModrinthClient,
 	provideNotificationManager,
+	providePageContext,
 	useDebugLogger,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
@@ -115,10 +116,14 @@ const tauriApiClient = new TauriModrinthClient({
 		new AuthFeature({
 			token: async () => (await getCreds()).session,
 		}),
+		new PanelVersionFeature(),
 	],
 })
 provideModrinthClient(tauriApiClient)
-
+providePageContext({
+	hierarchicalSidebarAvailable: ref(true),
+	showAds: ref(false),
+})
 const news = ref([])
 const availableSurvey = ref(false)
 

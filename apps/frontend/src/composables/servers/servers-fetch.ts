@@ -1,3 +1,4 @@
+import { PANEL_VERSION } from '@modrinth/api-client'
 import type { V1ErrorInfo } from '@modrinth/utils'
 import { ModrinthServerError, ModrinthServersFetchError } from '@modrinth/utils'
 import { $fetch, FetchError } from 'ofetch'
@@ -103,6 +104,7 @@ export async function useServersFetch<T>(
 	const headers: Record<string, string> = {
 		'User-Agent': 'Modrinth/1.0 (https://modrinth.com)',
 		'X-Archon-Request': 'true',
+		'X-Panel-Version': String(PANEL_VERSION),
 		Vary: 'Accept, Origin',
 	}
 

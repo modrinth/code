@@ -1,3 +1,4 @@
+use crate::database::models::delphi_report_item::DelphiVerdict;
 use crate::models::ids::{
     ImageId, ProjectId, ReportId, ThreadId, ThreadMessageId,
 };
@@ -41,6 +42,9 @@ pub enum MessageBody {
     StatusChange {
         new_status: ProjectStatus,
         old_status: ProjectStatus,
+    },
+    TechReview {
+        verdict: DelphiVerdict,
     },
     ThreadClosure,
     ThreadReopen,

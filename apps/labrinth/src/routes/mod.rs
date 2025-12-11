@@ -1,3 +1,4 @@
+use crate::database::models::DelphiReportIssueId;
 use crate::file_hosting::FileHostingError;
 use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
@@ -7,6 +8,7 @@ use actix_files::Files;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, web};
 use futures::FutureExt;
+use serde_json::json;
 
 pub mod internal;
 pub mod v2;
@@ -163,6 +165,10 @@ pub enum ApiError {
     Stripe(#[from] stripe::StripeError),
     #[error("Error while interacting with Delphi: {0}")]
     Delphi(reqwest::Error),
+    #[error(transparent)]
+    Mural(#[from] Box<muralpay::ApiError>),
+    #[error("report still has {} issues with no verdict", issues.len())]
+    TechReviewIssuesWithNoVerdict { issues: Vec<DelphiReportIssueId> },
 }
 
 impl ApiError {
@@ -204,12 +210,27 @@ impl ApiError {
                 Self::TaxProcessor(..) => "tax_processor_error",
                 Self::Slack(..) => "slack_error",
                 Self::Delphi(..) => "delphi_error",
+                Self::Mural(..) => "mural_error",
+                Self::TechReviewIssuesWithNoVerdict { .. } => {
+                    "tech_review_issues_with_no_verdict"
+                }
             },
             description: match self {
                 Self::Internal(e) => format!("{e:#?}"),
                 Self::Request(e) => format!("{e:#?}"),
                 Self::Auth(e) => format!("{e:#?}"),
                 _ => self.to_string(),
+            },
+            details: match self {
+                Self::Mural(err) => serde_json::to_value(err.clone()).ok(),
+                Self::TechReviewIssuesWithNoVerdict { issues } => {
+                    let issues = serde_json::to_value(issues)
+                        .expect("issues should never fail to serialize");
+                    Some(json!({
+                        "issues": issues
+                    }))
+                }
+                _ => None,
             },
         }
     }
@@ -253,6 +274,10 @@ impl actix_web::ResponseError for ApiError {
             Self::TaxProcessor(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Slack(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Delphi(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Mural(..) => StatusCode::BAD_REQUEST,
+            Self::TechReviewIssuesWithNoVerdict { .. } => {
+                StatusCode::BAD_REQUEST
+            }
         }
     }
 

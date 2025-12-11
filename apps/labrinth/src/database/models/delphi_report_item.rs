@@ -91,7 +91,7 @@ pub struct DBDelphiReportIssue {
     pub status: DelphiReportIssueStatus,
 }
 
-/// An status a Delphi report issue can have.
+/// A status a Delphi report issue can have.
 #[derive(
     Deserialize,
     Serialize,
@@ -122,6 +122,30 @@ impl Display for DelphiReportIssueStatus {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         self.serialize(f)
     }
+}
+
+/// What verdict a moderator can give to a project flagged for technical review.
+#[derive(
+    Deserialize,
+    Serialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    sqlx::Type,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum DelphiVerdict {
+    /// The issue has been rejected (i.e., reviewed as a false positive).
+    /// The affected artifact has thus been verified to be clean, other issues
+    /// with it notwithstanding.
+    Safe,
+    /// The issue has been approved (i.e., reviewed as a valid, true positive).
+    /// The affected artifact has thus been verified to be potentially malicious.
+    Unsafe,
 }
 
 /// An order in which Delphi report issues can be sorted during queries.

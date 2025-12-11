@@ -6,6 +6,7 @@ import {
 	NuxtCircuitBreakerStorage,
 	type NuxtClientConfig,
 	NuxtModrinthClient,
+	PanelVersionFeature,
 	VerboseLoggingFeature,
 } from '@modrinth/api-client'
 import type { Ref } from 'vue'
@@ -31,6 +32,7 @@ export function createModrinthClient(
 				maxFailures: 3,
 				resetTimeout: 30000,
 			}),
+			new PanelVersionFeature(),
 			...optionalFeatures,
 		],
 	}

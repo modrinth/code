@@ -84,6 +84,7 @@ import {
 	ButtonStyled,
 	Combobox,
 	injectNotificationManager,
+	normalizeChildren,
 	useDebugLogger,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
@@ -93,7 +94,6 @@ import { useGeolocation } from '@vueuse/core'
 
 import { useCountries, useFormattedCountries, useUserCountry } from '@/composables/country.ts'
 import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
-import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const debug = useDebugLogger('MethodSelectionStage')
 const {

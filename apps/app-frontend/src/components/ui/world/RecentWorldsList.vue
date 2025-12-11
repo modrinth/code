@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { LoaderCircleIcon } from '@modrinth/assets'
 import type { GameVersion } from '@modrinth/ui'
 import { GAME_MODES, HeadingLink, injectNotificationManager } from '@modrinth/ui'
 import type { Dayjs } from 'dayjs'
@@ -39,6 +40,7 @@ const props = defineProps<{
 const theme = useTheming()
 
 const jumpBackInItems = ref<JumpBackInItem[]>([])
+const loading = ref(true)
 const serverData = ref<Record<string, ServerData>>({})
 const protocolVersions = ref<Record<string, ProtocolVersion | null>>({})
 const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
@@ -71,9 +73,13 @@ watch([() => props.recentInstances, () => showWorlds.value], async () => {
 	})
 })
 
-await populateJumpBackIn().catch(() => {
-	console.error('Failed to populate jump back in')
-})
+populateJumpBackIn()
+	.catch(() => {
+		console.error('Failed to populate jump back in')
+	})
+	.finally(() => {
+		loading.value = false
+	})
 
 async function populateJumpBackIn() {
 	console.info('Repopulating jump back in...')
@@ -233,7 +239,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<div v-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
+	<div v-if="loading" class="flex flex-col gap-2">
+		<span class="flex mt-1 mb-3 leading-none items-center gap-1 text-primary text-lg font-bold">
+			Jump back in
+		</span>
+		<div class="text-center py-4">
+			<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
+		</div>
+	</div>
+	<div v-else-if="jumpBackInItems.length > 0" class="flex flex-col gap-2">
 		<HeadingLink v-if="theme.getFeatureFlag('worlds_tab')" to="/worlds" class="mt-1">
 			Jump back in
 		</HeadingLink>

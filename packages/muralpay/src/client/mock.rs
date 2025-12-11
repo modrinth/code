@@ -1,14 +1,15 @@
 //! See [`MuralPayMock`].
 
-use std::fmt::{self, Debug};
-
-use crate::{
-    Account, AccountId, BankDetailsResponse, Counterparty, CounterpartyId,
-    CreateCounterparty, CreatePayout, FiatAndRailCode, FiatFeeRequest,
-    FiatPayoutFee, MuralError, Organization, OrganizationId, PayoutMethod,
-    PayoutMethodDetails, PayoutMethodId, PayoutRequest, PayoutRequestId,
-    PayoutStatusFilter, SearchParams, SearchRequest, SearchResponse,
-    TokenFeeRequest, TokenPayoutFee, TransferError, UpdateCounterparty,
+use {
+    crate::{
+        Account, AccountId, BankDetailsResponse, Counterparty, CounterpartyId, CreateCounterparty,
+        CreatePayout, FiatAndRailCode, FiatFeeRequest, FiatPayoutFee, MuralError, Organization,
+        OrganizationId, PayoutMethod, PayoutMethodDetails, PayoutMethodId, PayoutRequest,
+        PayoutRequestId, PayoutStatusFilter, SearchParams, SearchRequest, SearchResponse,
+        TokenFeeRequest, TokenPayoutFee, UpdateCounterparty,
+        transaction::{Transaction, TransactionId},
+    },
+    std::fmt::{self, Debug},
 };
 
 macro_rules! impl_mock {
@@ -43,8 +44,8 @@ impl_mock! {
     fn get_fees_for_token_amount(&[TokenFeeRequest]) -> Result<Vec<TokenPayoutFee>, MuralError>;
     fn get_fees_for_fiat_amount(&[FiatFeeRequest]) -> Result<Vec<FiatPayoutFee>, MuralError>;
     fn create_payout_request(AccountId, Option<&str>, &[CreatePayout]) -> Result<PayoutRequest, MuralError>;
-    fn execute_payout_request(PayoutRequestId) -> Result<PayoutRequest, TransferError>;
-    fn cancel_payout_request(PayoutRequestId) -> Result<PayoutRequest, TransferError>;
+    fn execute_payout_request(PayoutRequestId) -> Result<PayoutRequest, MuralError>;
+    fn cancel_payout_request(PayoutRequestId) -> Result<PayoutRequest, MuralError>;
     fn get_bank_details(&[FiatAndRailCode]) -> Result<BankDetailsResponse, MuralError>;
     fn search_payout_methods(CounterpartyId, Option<SearchParams<PayoutMethodId>>) -> Result<SearchResponse<PayoutMethodId, PayoutMethod>, MuralError>;
     fn get_payout_method(CounterpartyId, PayoutMethodId) -> Result<PayoutMethod, MuralError>;
@@ -56,6 +57,8 @@ impl_mock! {
     fn get_counterparty(CounterpartyId) -> Result<Counterparty, MuralError>;
     fn create_counterparty(&CreateCounterparty) -> Result<Counterparty, MuralError>;
     fn update_counterparty(CounterpartyId, &UpdateCounterparty) -> Result<Counterparty, MuralError>;
+    fn get_transaction(TransactionId) -> Result<Transaction, MuralError>;
+    fn search_transactions(AccountId, Option<SearchParams<AccountId>>) -> Result<SearchResponse<AccountId, Account>, MuralError>;
 }
 
 impl Debug for MuralPayMock {

@@ -209,8 +209,7 @@ import {
 	formFieldPlaceholders,
 	getBlockchainColor,
 	getBlockchainIcon,
-	getCurrencyColor,
-	getCurrencyIcon,
+	normalizeChildren,
 } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import { IntlFormatted } from '@vintl/vintl/components'
@@ -222,7 +221,6 @@ import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown
 import { useGeneratedState } from '@/composables/generated'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
-import { normalizeChildren } from '@/utils/vue-children.ts'
 
 const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees } = useWithdrawContext()
 const { formatMessage } = useVIntl()

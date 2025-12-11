@@ -97,6 +97,7 @@ import _Heading2Icon from './icons/heading-2.svg?component'
 import _Heading3Icon from './icons/heading-3.svg?component'
 import _HeartIcon from './icons/heart.svg?component'
 import _HeartHandshakeIcon from './icons/heart-handshake.svg?component'
+import _HeartMinusIcon from './icons/heart-minus.svg?component'
 import _HistoryIcon from './icons/history.svg?component'
 import _HomeIcon from './icons/home.svg?component'
 import _ImageIcon from './icons/image.svg?component'
@@ -319,6 +320,7 @@ export const Heading1Icon = _Heading1Icon
 export const Heading2Icon = _Heading2Icon
 export const Heading3Icon = _Heading3Icon
 export const HeartHandshakeIcon = _HeartHandshakeIcon
+export const HeartMinusIcon = _HeartMinusIcon
 export const HeartIcon = _HeartIcon
 export const HistoryIcon = _HistoryIcon
 export const HomeIcon = _HomeIcon

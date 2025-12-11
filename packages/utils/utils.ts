@@ -305,7 +305,7 @@ export const formatVersions = (versionArray, gameVersions) => {
 	return (output.length === 0 ? versionArray : output).join(', ')
 }
 
-export function cycleValue(value, values) {
+export function cycleValue<T extends string>(value: T, values: T[]): T {
 	const index = values.indexOf(value) + 1
 	return values[index % values.length]
 }

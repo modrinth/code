@@ -26,20 +26,16 @@ const fullscreenSetting: Ref<boolean> = ref(
 )
 
 const editProfileObject = computed(() => {
-	const editProfile: {
-		force_fullscreen?: boolean
-		game_resolution?: [number, number]
-	} = {}
-
-	if (overrideWindowSettings.value) {
-		editProfile.force_fullscreen = fullscreenSetting.value
-
-		if (!fullscreenSetting.value) {
-			editProfile.game_resolution = resolution.value
+	if (!overrideWindowSettings.value) {
+		return {
+			force_fullscreen: null,
+			game_resolution: null,
 		}
 	}
-
-	return editProfile
+	return {
+		force_fullscreen: fullscreenSetting.value,
+		game_resolution: fullscreenSetting.value ? null : resolution.value,
+	}
 })
 
 watch(
@@ -95,14 +91,6 @@ const messages = defineMessages({
 		<Checkbox
 			v-model="overrideWindowSettings"
 			:label="formatMessage(messages.customWindowSettings)"
-			@update:model-value="
-				(value) => {
-					if (!value) {
-						resolution = globalSettings.game_resolution
-						fullscreenSetting = globalSettings.force_fullscreen
-					}
-				}
-			"
 		/>
 		<div class="mt-2 flex items-center gap-4 justify-between">
 			<div>
