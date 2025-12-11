@@ -1,5 +1,5 @@
 <template>
-	<div class="mx-auto p-4 !py-8 sm:py-32 max-w-[1280px]">
+	<div class="mx-auto max-w-[1280px] p-4 !py-8 sm:py-32">
 		<div class="my-8 flex items-center justify-between">
 			<h2 class="m-0 mx-auto text-3xl font-extrabold sm:text-4xl">
 				{{ formatMessage(messages.latestNews) }}
