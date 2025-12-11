@@ -104,6 +104,8 @@ const newDependencyVersionId = ref<string | null>(null)
 
 const newDependencyVersions = ref<DropdownOption<string>[]>([])
 
+const projectsFetchLoading = ref(false)
+
 // reset to defaults when select different project
 watch(newDependencyProjectId, async () => {
 	newDependencyVersionId.value = null
@@ -153,6 +155,7 @@ watch(
 				}
 			}
 		}
+		projectsFetchLoading.value = false
 	},
 	{ immediate: true, deep: true },
 )
@@ -164,6 +167,8 @@ const addedDependencies = computed(() =>
 
 			const dependencyProject = dependencyProjects.value[dep.project_id]
 			const versionName = dependencyVersions.value[dep.version_id || '']?.name ?? ''
+
+			if (!dependencyProject && projectsFetchLoading.value) return null
 
 			return {
 				projectId: dep.project_id,
@@ -193,6 +198,7 @@ const addDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
 		return
 	}
 
+	projectsFetchLoading.value = true
 	draftVersion.value.dependencies.push(dependency)
 	newDependencyProjectId.value = undefined
 }
