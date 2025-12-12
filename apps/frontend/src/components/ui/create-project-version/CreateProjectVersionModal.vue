@@ -77,7 +77,9 @@ const hideAddMcVersionsStage = computed(
 const hideAddDependenciesStage = computed(() => projectType.value === 'modpack')
 
 const hideAddEnvironmentStage = computed(
-	() => projectType.value !== 'mod' && projectType.value !== 'modpack',
+	() => true,
+	// TODO-DEV-595: uncomment when environments working
+	// projectType.value !== 'mod' && projectType.value !== 'modpack',
 )
 
 function getNextLabel() {
