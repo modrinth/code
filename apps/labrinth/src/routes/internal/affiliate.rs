@@ -5,38 +5,50 @@ use crate::{
         redis::RedisPool,
     },
     models::{
-        ids::AffiliateCodeId,
-        pats::Scopes,
-        users::Badges,
-        v3::affiliate_code::{AdminAffiliateCode, AffiliateCode},
+        ids::AffiliateCodeId, pats::Scopes, users::Badges,
+        v3::affiliate_code::AffiliateCode,
     },
     queue::session::AuthQueue,
+    util::error::Context,
 };
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, delete, get, patch, put, web};
 use ariadne::ids::UserId;
 use chrono::Utc;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::routes::ApiError;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("affiliate")
-            .route("", web::get().to(get_all))
-            .route("", web::put().to(create))
-            .route("/{id}", web::get().to(get))
-            .route("/{id}", web::delete().to(delete))
-            .route("/{id}", web::patch().to(patch)),
-    );
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
+    cfg.service(ingest_click)
+        .service(get_all)
+        .service(create)
+        .service(get)
+        .service(delete)
+        .service(patch);
 }
 
+#[utoipa::path()]
+#[get("/ingest-click")]
+async fn ingest_click(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<(), ApiError> {
+    // TODO: insert into clickhouse - see `clickhouse/mod.rs` unfinished code
+}
+
+#[utoipa::path(
+    responses((status = OK, body = inline(Vec<AffiliateCode>)))
+)]
+#[get("")]
 async fn get_all(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<Vec<AffiliateCode>>, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -47,21 +59,24 @@ async fn get_all(
     .await?;
 
     if user.role.is_admin() {
-        let codes = DBAffiliateCode::get_all(&**pool).await?;
+        let codes = DBAffiliateCode::get_all(&**pool)
+            .await
+            .wrap_internal_err("failed to get all affiliate codes")?;
         let codes = codes
             .into_iter()
-            .map(AdminAffiliateCode::from)
+            .map(|code| AffiliateCode::from(code, true))
             .collect::<Vec<_>>();
-        Ok(HttpResponse::Ok().json(codes))
+        Ok(web::Json(codes))
     } else if user.badges.contains(Badges::AFFILIATE) {
         let codes =
             DBAffiliateCode::get_by_affiliate(DBUserId::from(user.id), &**pool)
-                .await?;
+                .await
+                .wrap_internal_err("failed to get all affiliate codes")?;
         let codes = codes
             .into_iter()
-            .map(AffiliateCode::from)
+            .map(|code| AffiliateCode::from(code, false))
             .collect::<Vec<_>>();
-        Ok(HttpResponse::Ok().json(codes))
+        Ok(web::Json(codes))
     } else {
         Err(ApiError::CustomAuthentication(
             "You do not have permission to view affiliate codes!".to_string(),
@@ -69,19 +84,23 @@ async fn get_all(
     }
 }
 
-#[derive(Deserialize)]
-struct CreateRequest {
-    affiliate: Option<UserId>,
-    source_name: String,
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct CreateRequest {
+    pub affiliate: Option<UserId>,
+    pub source_name: String,
 }
 
+#[utoipa::path(
+    responses((status = OK, body = inline(AffiliateCode)))
+)]
+#[put("")]
 async fn create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     body: web::Json<CreateRequest>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<AffiliateCode>, ApiError> {
     let (_, creator) = get_user_from_headers(
         &req,
         &**pool,
@@ -135,24 +154,29 @@ async fn create(
         affiliate: affiliate_id,
         source_name: body.source_name.clone(),
     };
-    code.insert(&mut *transaction).await?;
+    code.insert(&mut *transaction)
+        .await
+        .wrap_internal_err("failed to insert affiliate code")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
 
-    if is_admin {
-        Ok(HttpResponse::Created().json(AdminAffiliateCode::from(code)))
-    } else {
-        Ok(HttpResponse::Created().json(AffiliateCode::from(code)))
-    }
+    Ok(web::Json(AffiliateCode::from(code, is_admin)))
 }
 
+#[utoipa::path(
+    responses((status = OK, body = inline(AffiliateCode)))
+)]
+#[get("/{id}")]
 async fn get(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<AffiliateCode>, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -172,11 +196,7 @@ async fn get(
         let is_owner = model.affiliate == DBUserId::from(user.id);
 
         if is_admin || is_owner {
-            if is_admin {
-                Ok(HttpResponse::Ok().json(AdminAffiliateCode::from(model)))
-            } else {
-                Ok(HttpResponse::Ok().json(AffiliateCode::from(model)))
-            }
+            Ok(web::Json(AffiliateCode::from(model, is_admin)))
         } else {
             Err(ApiError::NotFound)
         }
@@ -185,13 +205,15 @@ async fn get(
     }
 }
 
+#[utoipa::path]
+#[delete("/{id}")]
 async fn delete(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<(), ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -214,7 +236,7 @@ async fn delete(
             let result =
                 DBAffiliateCode::remove(affiliate_code_id, &**pool).await?;
             if result.is_some() {
-                Ok(HttpResponse::NoContent().finish())
+                Ok(())
             } else {
                 Err(ApiError::NotFound)
             }
@@ -226,11 +248,13 @@ async fn delete(
     }
 }
 
-#[derive(Deserialize)]
-struct PatchRequest {
-    source_name: String,
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct PatchRequest {
+    pub source_name: String,
 }
 
+#[utoipa::path]
+#[patch("/{id}")]
 async fn patch(
     req: HttpRequest,
     path: web::Path<(AffiliateCodeId,)>,
@@ -238,7 +262,7 @@ async fn patch(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     body: web::Json<PatchRequest>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<(), ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -273,7 +297,8 @@ async fn patch(
         &body.source_name,
         &**pool,
     )
-    .await?;
+    .await
+    .wrap_internal_err("failed to update affiliate code source name")?;
 
-    Ok(HttpResponse::NoContent().finish())
+    Ok(())
 }
