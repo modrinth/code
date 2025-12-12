@@ -155,7 +155,6 @@ const getSuggestedDependencies = async () => {
 
 		try {
 			const versions = await labrinth.versions_v3.getProjectVersions(project.value.id, {
-				game_versions: draftVersion.value.game_versions,
 				loaders: draftVersion.value.loaders,
 			})
 
