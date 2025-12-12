@@ -16,7 +16,11 @@
 		<progress
 			v-if="currentStage.nonProgressStage !== true"
 			:value="
-				((currentStageIndex + 1) / stages.filter((stage) => !stage.nonProgressStage).length) * 100
+				(stages
+					.slice(0, currentStageIndex + 1)
+					.filter((stage) => !stage.nonProgressStage && !stage.skip).length /
+					stages.filter((stage) => !stage.nonProgressStage && !stage.skip).length) *
+				100
 			"
 			max="100"
 			class="w-full h-1 appearance-none border-none absolute top-0 left-0"
