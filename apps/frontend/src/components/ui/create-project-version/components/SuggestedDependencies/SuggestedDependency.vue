@@ -4,7 +4,7 @@
 	>
 		<div class="flex items-center gap-2">
 			<Avatar v-if="icon" :src="icon" alt="dependency-icon" size="20px" />
-			<span class="overflow-hidden font-semibold text-contrast" :title="name || projectId">
+			<span class="overflow-hidden font-semibold text-contrast" :title="name || 'Unknown Project'">
 				{{ name || 'Unknown Project' }}
 			</span>
 
@@ -23,8 +23,8 @@
 
 		<div class="flex items-center gap-1">
 			<ButtonStyled size="standard" :circular="true">
-				<button aria-label="Remove file" class="!shadow-none" @click="emitRemove">
-					<XIcon aria-hidden="true" />
+				<button aria-label="Add dependency" class="!shadow-none" @click="emitAddSuggestion">
+					<PlusIcon aria-hidden="true" />
 				</button>
 			</ButtonStyled>
 		</div>
@@ -33,23 +33,21 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { XIcon } from '@modrinth/assets'
+import { PlusIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, TagItem } from '@modrinth/ui'
 
 const emit = defineEmits<{
-	(e: 'fileTypeChange', type: string): void
-	(e: 'remove'): void
+	(e: 'onAddSuggestion'): void
 }>()
 
-const { projectId, name, icon, dependencyType, versionName } = defineProps<{
-	projectId: string
+const { name, icon, dependencyType, versionName } = defineProps<{
 	name?: string
 	icon?: string
 	dependencyType: Labrinth.Versions.v3.DependencyType
 	versionName?: string
 }>()
 
-function emitRemove() {
-	emit('remove')
+function emitAddSuggestion() {
+	emit('onAddSuggestion')
 }
 </script>

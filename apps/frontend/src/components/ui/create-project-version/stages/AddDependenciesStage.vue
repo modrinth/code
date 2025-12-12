@@ -55,6 +55,26 @@
 			</div>
 		</div>
 
+		<SuggestedDependencies
+			:suggestedDependencies="[
+				{
+					project_id: 'gvQqBUqZ',
+					name: 'Lithium',
+					icon: 'https://cdn.modrinth.com/data/gvQqBUqZ/bcc8686c13af0143adf4285d741256af824f70b7_96.webp',
+					dependency_type: 'required',
+					versionName: '',
+				},
+				{
+					project_id: 'XaDC71GB',
+					name: 'Lithostitched',
+					icon: 'https://cdn.modrinth.com/data/XaDC71GB/bc3425bcb318176adc7da99b6eec48787eed98d3.png',
+					dependency_type: 'optional',
+					versionName: '',
+				},
+			]"
+			@onAddSuggestion="handleAddSuggestedDependency"
+		/>
+
 		<div v-if="addedDependencies.length" class="flex flex-col gap-4">
 			<span class="font-semibold text-contrast">Added dependencies</span>
 			<div class="5 flex flex-col gap-2">
@@ -91,6 +111,7 @@ import ModSelect from '~/components/ui/create-project-version/components/ModSele
 import { useManageVersion } from '~/composables/versions/manage-version'
 
 import AddedDependencyRow from '../components/AddedDependencyRow.vue'
+import SuggestedDependencies from '../components/SuggestedDependencies/SuggestedDependencies.vue'
 
 const { addNotification } = injectNotificationManager()
 
@@ -210,5 +231,15 @@ const addDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
 const removeDependency = (index: number) => {
 	if (!draftVersion.value.dependencies) return
 	draftVersion.value.dependencies.splice(index, 1)
+}
+
+const handleAddSuggestedDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
+	// Implementation to be filled in
+	console.log(dependency)
+	draftVersion.value.dependencies?.push({
+		project_id: dependency.project_id,
+		version_id: dependency.version_id,
+		dependency_type: dependency.dependency_type,
+	})
 }
 </script>
