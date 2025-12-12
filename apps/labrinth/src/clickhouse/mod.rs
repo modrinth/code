@@ -135,5 +135,12 @@ pub async fn init_client_with_database(
         .execute()
         .await?;
 
+    // TODO
+    // client.query(&format!(
+    //     "
+    //     CREATE TABLE IF NOT EXISTS {database}.affiliate_code_clicks {cluster_line}
+    //     "
+    // ));
+
     Ok(client.with_database(database))
 }
