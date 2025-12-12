@@ -15,13 +15,6 @@
 			/>
 		</div>
 		<div class="card changelog-wrapper">
-			<p v-if="!filteredVersions.length" class="ml-2">
-				No versions in project. Visit
-				<NuxtLink to="settings/versions">
-					<span class="font-medium text-green hover:underline">project settings</span> to
-				</NuxtLink>
-				upload your first version.
-			</p>
 			<div
 				v-for="version in filteredVersions.slice((currentPage - 1) * 20, currentPage * 20)"
 				:key="version.id"

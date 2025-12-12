@@ -5,7 +5,7 @@
 		</div>
 		<p v-else class="ml-2">
 			No description provided. Visit
-			<NuxtLink to="settings/versions">
+			<NuxtLink :to="`${route.fullPath}/settings/description`">
 				<span class="font-medium text-green hover:underline">project settings</span> to
 			</NuxtLink>
 			add your description.
@@ -15,6 +15,8 @@
 
 <script setup>
 import { ProjectPageDescription } from '@modrinth/ui'
+
+const route = useRoute()
 
 defineProps({
 	project: {

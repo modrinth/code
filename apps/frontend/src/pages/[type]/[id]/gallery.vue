@@ -224,7 +224,7 @@
 		<template v-else>
 			<p class="ml-2">
 				No images in gallery. Visit
-				<NuxtLink to="settings/versions">
+				<NuxtLink to="settings/gallery">
 					<span class="font-medium text-green hover:underline">project settings</span> to
 				</NuxtLink>
 				upload images.
