@@ -11,20 +11,22 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2025-12-11T16:05:00-08:00`,
+		date: `2025-12-11T16:15:00-08:00`,
 		product: 'hosting',
 		body: `## Improvements
 - Fixed some issues with the content list when disabling content.
 - Improved the design of server notices.`,
 	},
 	{
-		date: `2025-12-11T16:05:00-08:00`,
+		date: `2025-12-11T16:15:00-08:00`,
 		product: 'web',
 		body: `## Improvements
 - Moved search pages to /discover/<type>.
 - Updated collections page design to be more modern.
 - Fixed some inconsistencies with collection icons around the site.
-- Fixed some issues with the revenue balance bar.`,
+- Fixed some issues with the revenue balance bar.
+- Fixed the width of news articles on the landing page.
+- Made game versions automatically update.`,
 	},
 	{
 		date: `2025-12-08T10:30:00-08:00`,
