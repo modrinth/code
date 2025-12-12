@@ -1,14 +1,11 @@
 <template>
 	<div
-		:class="[
-			'grid items-center justify-between gap-2 rounded-xl bg-button-bg px-4 py-1 text-button-text',
-			versionName ? 'grid-cols-[2fr_1fr_auto]' : 'grid-cols-[2fr_auto]',
-		]"
+		class="flex items-center justify-between gap-2 rounded-xl bg-button-bg px-4 py-1 text-button-text"
 	>
-		<div class="flex items-center gap-2">
+		<div class="grid max-w-[75%] grid-cols-[auto_1fr_auto] items-center gap-2">
 			<Avatar v-if="icon" :src="icon" alt="dependency-icon" size="20px" :no-shadow="true" />
 
-			<span class="text-wrap font-semibold text-contrast" :title="name || projectId">
+			<span class="truncate font-semibold text-contrast" v-tooltip="name || projectId">
 				{{ name || 'Unknown Project' }}
 			</span>
 
@@ -17,7 +14,11 @@
 			</TagItem>
 		</div>
 
-		<span v-if="versionName" class="truncate whitespace-nowrap font-medium" :title="versionName">
+		<span
+			v-if="versionName"
+			class="max-w-[35%] truncate whitespace-nowrap font-medium"
+			v-tooltip="versionName"
+		>
 			{{ versionName }}
 		</span>
 
