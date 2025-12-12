@@ -373,6 +373,11 @@ export namespace Labrinth {
 				version_id?: string
 			}
 
+			export interface GetProjectVersionsParams {
+				game_versions?: string[]
+				loaders?: string[]
+			}
+
 			export type VersionChannel = 'release' | 'beta' | 'alpha'
 
 			export type VersionStatus =

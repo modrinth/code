@@ -10,19 +10,36 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	 * Get versions for a project (v3)
 	 *
 	 * @param id - Project ID or slug (e.g., 'sodium' or 'AANobbMI')
+	 * @param options - Optional query parameters to filter versions
 	 * @returns Promise resolving to an array of v3 versions
 	 *
 	 * @example
 	 * ```typescript
 	 * const versions = await client.labrinth.versions_v3.getProjectVersions('sodium')
+	 * const filteredVersions = await client.labrinth.versions_v3.getProjectVersions('sodium', {
+	 *   game_versions: ['1.20.1'],
+	 *   loaders: ['fabric']
+	 * })
 	 * console.log(versions[0].version_number)
 	 * ```
 	 */
-	public async getProjectVersions(id: string): Promise<Labrinth.Versions.v3.Version[]> {
+	public async getProjectVersions(
+		id: string,
+		options?: Labrinth.Versions.v3.GetProjectVersionsParams,
+	): Promise<Labrinth.Versions.v3.Version[]> {
+		const params: Record<string, string> = {}
+		if (options?.game_versions?.length) {
+			params.game_versions = JSON.stringify(options.game_versions)
+		}
+		if (options?.loaders?.length) {
+			params.loaders = JSON.stringify(options.loaders)
+		}
+
 		return this.client.request<Labrinth.Versions.v3.Version[]>(`/project/${id}/version`, {
 			api: 'labrinth',
 			version: 2, // TODO: move this to a versions v2 module to keep api-client clean and organized
 			method: 'GET',
+			params: Object.keys(params).length > 0 ? params : undefined,
 		})
 	}
 

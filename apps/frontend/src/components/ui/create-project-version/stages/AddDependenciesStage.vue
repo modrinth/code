@@ -56,22 +56,7 @@
 		</div>
 
 		<SuggestedDependencies
-			:suggestedDependencies="[
-				{
-					project_id: 'gvQqBUqZ',
-					name: 'Lithium',
-					icon: 'https://cdn.modrinth.com/data/gvQqBUqZ/bcc8686c13af0143adf4285d741256af824f70b7_96.webp',
-					dependency_type: 'required',
-					versionName: '',
-				},
-				{
-					project_id: 'XaDC71GB',
-					name: 'Lithostitched',
-					icon: 'https://cdn.modrinth.com/data/XaDC71GB/bc3425bcb318176adc7da99b6eec48787eed98d3.png',
-					dependency_type: 'optional',
-					versionName: '',
-				},
-			]"
+			:suggestedDependencies="suggestedDependencies"
 			@onAddSuggestion="handleAddSuggestedDependency"
 		/>
 
@@ -103,6 +88,7 @@ import {
 	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,
+	injectProjectPageContext,
 } from '@modrinth/ui'
 
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
@@ -130,6 +116,9 @@ const newDependencyVersionId = ref<string | null>(null)
 const newDependencyVersions = ref<DropdownOption<string>[]>([])
 
 const projectsFetchLoading = ref(false)
+const suggestedDependencies = ref<
+	Array<Labrinth.Versions.v3.Dependency & { name?: string; icon?: string; versionName?: string }>
+>([])
 
 // reset to defaults when select different project
 watch(newDependencyProjectId, async () => {
@@ -154,7 +143,71 @@ watch(newDependencyProjectId, async () => {
 })
 
 const { draftVersion, dependencyProjects, dependencyVersions } = useManageVersion()
+const { projectV2: project } = injectProjectPageContext()
 const client = injectModrinthClient()
+
+const calculateSuggestedDependencies = async () => {
+	try {
+		suggestedDependencies.value = []
+
+		if (!draftVersion.value.game_versions?.length || !draftVersion.value.loaders?.length) {
+			return
+		}
+
+		try {
+			const versions = await client.labrinth.versions_v3.getProjectVersions(project.value.id, {
+				game_versions: draftVersion.value.game_versions,
+				loaders: draftVersion.value.loaders,
+			})
+
+			// Get the most recent matching version and extract its dependencies
+			if (versions.length > 0) {
+				const mostRecentVersion = versions[0]
+				for (const dep of mostRecentVersion.dependencies) {
+					suggestedDependencies.value.push({
+						project_id: dep.project_id,
+						version_id: dep.version_id,
+						dependency_type: dep.dependency_type,
+						file_name: dep.file_name,
+					})
+				}
+			}
+		} catch (error: any) {
+			console.error(`Failed to get versions for project ${project.value.id}:`, error)
+		}
+
+		for (const dep of suggestedDependencies.value) {
+			try {
+				if (dep.project_id && !dependencyProjects.value[dep.project_id]) {
+					const project = await client.labrinth.projects_v3.get(dep.project_id)
+					dependencyProjects.value[dep.project_id] = project
+					dep.name = project.name
+					dep.icon = project.icon_url
+				} else if (dep.project_id && dependencyProjects.value[dep.project_id]) {
+					const project = dependencyProjects.value[dep.project_id]
+					dep.name = project.name
+					dep.icon = project.icon_url
+				}
+
+				if (dep.version_id && !dependencyVersions.value[dep.version_id]) {
+					const version = await client.labrinth.versions_v3.getVersion(dep.version_id)
+					dependencyVersions.value[dep.version_id] = version
+					dep.versionName = version.name
+				} else if (dep.version_id && dependencyVersions.value[dep.version_id]) {
+					dep.versionName = dependencyVersions.value[dep.version_id].name
+				}
+			} catch (error: any) {
+				console.error(`Failed to fetch project/version data for dependency:`, error)
+			}
+		}
+	} catch (error: any) {
+		errorNotification(error)
+	}
+}
+
+onMounted(() => {
+	calculateSuggestedDependencies()
+})
 
 watch(
 	draftVersion,
