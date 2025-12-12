@@ -608,21 +608,17 @@ pub struct SubmitReport {
     pub message: Option<String>,
 }
 
-/// Submits a verdict for a technical report of a project.
+/// Submits a verdict for a project based on its technical reports.
 ///
-/// Before this is called, all issues for this project must have been marked as
-/// either safe or unsafe. Otherwise, this will error with
+/// Before this is called, all issues for this project's reports must have been
+/// marked as either safe or unsafe. Otherwise, this will error with
 /// [`ApiError::TechReviewIssuesWithNoVerdict`], providing the issue IDs which
 /// are still unmarked.
-///
-/// If at least one issue is [`DelphiReportIssueStatus::Unsafe`], the report
-/// will be marked as unsafe and the project will be rejected. Otherwise, the
-/// report will be marked as safe.
 #[utoipa::path(
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
-#[post("/report/{id}")]
+#[post("/submit/{project_id}")]
 async fn submit_report(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -640,6 +636,7 @@ async fn submit_report(
     )
     .await?;
     let (project_id,) = path.into_inner();
+    let project_id = DBProjectId::from(project_id);
 
     let mut txn = pool
         .begin()
@@ -652,11 +649,15 @@ async fn submit_report(
             dri.id AS issue_id
         FROM delphi_report_issues dri
         INNER JOIN delphi_reports dr ON dr.id = dri.report_id
+        INNER JOIN files f ON f.id = dr.file_id
+        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN mods m ON m.id = v.mod_id
         WHERE
-            dr.id = $1
+            m.id = $1
+            AND dr.status = 'pending'
             AND dri.status = 'pending'
         ",
-        report_id as _,
+        project_id as _,
     )
     .fetch_all(&mut *txn)
     .await
@@ -685,18 +686,16 @@ async fn submit_report(
         INNER JOIN versions v ON v.id = f.version_id
         INNER JOIN mods m ON v.mod_id = m.id
         INNER JOIN threads t ON t.mod_id = m.id
-        WHERE dr.id = $2
+        WHERE m.id = $2
         RETURNING
-            m.id AS "project_id: DBProjectId",
-            t.id AS "thread_id: DBThreadId",
-            (SELECT status FROM mods WHERE id = m.id) AS "old_status!"
+            t.id AS "thread_id: DBThreadId"
         "#,
         status as _,
-        report_id as _,
+        project_id as _,
     )
     .fetch_one(&mut *txn)
     .await
-    .wrap_internal_err("failed to update report")?;
+    .wrap_internal_err("failed to update reports")?;
 
     if let Some(body) = submit_report.0.message {
         ThreadMessageBuilder {
@@ -730,19 +729,15 @@ async fn submit_report(
             r#"
             UPDATE mods
             SET status = $1
-            FROM delphi_reports dr
-            INNER JOIN files f ON f.id = dr.file_id
-            INNER JOIN versions v ON v.id = f.version_id
-            INNER JOIN mods m ON v.mod_id = m.id
+            FROM mods m
             INNER JOIN threads t ON t.mod_id = m.id
-            WHERE dr.id = $2
+            WHERE m.id = $2
             RETURNING
-                m.id AS "project_id: DBProjectId",
                 t.id AS "thread_id: DBThreadId",
                 (SELECT status FROM mods WHERE id = m.id) AS "old_status!"
             "#,
             ProjectStatus::Rejected.as_str(),
-            report_id as DelphiReportId,
+            project_id as _,
         )
         .fetch_one(&mut *txn)
         .await
@@ -761,7 +756,7 @@ async fn submit_report(
         .await
         .wrap_internal_err("failed to add tech review message")?;
 
-        DBProject::clear_cache(record.project_id, None, None, &redis)
+        DBProject::clear_cache(project_id, None, None, &redis)
             .await
             .wrap_internal_err("failed to clear project cache")?;
     }
