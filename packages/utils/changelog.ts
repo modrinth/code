@@ -11,14 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2025-12-09T18:25:00-08:00`,
+		date: `2025-12-11T16:05:00-08:00`,
 		product: 'hosting',
 		body: `## Improvements
 - Fixed some issues with the content list when disabling content.
 - Improved the design of server notices.`,
 	},
 	{
-		date: `2025-12-09T18:25:00-08:00`,
+		date: `2025-12-11T16:05:00-08:00`,
 		product: 'web',
 		body: `## Improvements
 - Moved search pages to /discover/<type>.
