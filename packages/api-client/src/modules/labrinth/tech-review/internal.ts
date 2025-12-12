@@ -118,28 +118,23 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 		})
 	}
 
-	/**
-	 * Update the status of a technical review issue.
-	 *
-	 * Allows moderators to mark an issue as safe (false positive), unsafe (malicious),
-	 * or leave it as pending for further review.
-	 *
-	 * @param issueId - The ID of the issue to update
-	 * @param data - The new status for the issue
-	 * @returns Promise that resolves when the update is complete
-	 *
-	 * @example
-	 * ```typescript
-	 * await client.labrinth.tech_review_internal.updateIssue('issue-123', {
-	 *   status: 'safe'
-	 * })
-	 * ```
-	 */
 	public async updateIssue(
 		issueId: string,
 		data: Labrinth.TechReview.Internal.UpdateIssueRequest,
 	): Promise<void> {
 		return this.client.request<void>(`/moderation/tech-review/issue/${issueId}`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'POST',
+			body: data,
+		})
+	}
+
+	public async submitProject(
+		projectId: string,
+		data: Labrinth.TechReview.Internal.SubmitProjectRequest,
+	): Promise<void> {
+		return this.client.request<void>(`/moderation/tech-review/submit/${projectId}`, {
 			api: 'labrinth',
 			version: 'internal',
 			method: 'POST',

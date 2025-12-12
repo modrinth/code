@@ -131,6 +131,7 @@ async function handleQuickReply(reply: QuickReply<T>, context: T) {
 
 defineExpose({
 	setReplyContent,
+	getReplyContent,
 	sendReply,
 })
 
@@ -151,8 +152,13 @@ const members = computed(() => {
 })
 
 const replyBody = ref('')
+
 function setReplyContent(content: string) {
 	replyBody.value = content
+}
+
+function getReplyContent(): string {
+	return replyBody.value
 }
 
 const sortedMessages = computed(() => {

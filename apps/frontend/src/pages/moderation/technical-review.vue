@@ -386,44 +386,50 @@ const {
 	},
 })
 
+type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
+	id: string
+	version_id: string
+}
+
 const reviewItems = computed(() => {
-	if (!searchResponse.value || searchResponse.value.reports.length === 0) {
+	if (!searchResponse.value?.project_reports?.length) {
 		return []
 	}
 
 	const response = searchResponse.value
 
-	const projectMap = new Map<
-		string,
-		{
-			project: Labrinth.Projects.v3.Project
-			project_owner: Labrinth.TechReview.Internal.Ownership
-			thread: Labrinth.TechReview.Internal.Thread
-			reports: Labrinth.TechReview.Internal.FileReport[]
-		}
-	>()
-
-	for (const report of response.reports) {
-		const projectId = report.project_id
-
-		if (!projectMap.has(projectId)) {
-			const project = response.projects[projectId]
+	return response.project_reports
+		.map((projectReport) => {
+			const project = response.projects[projectReport.project_id]
 			const thread = project?.thread_id ? response.threads[project.thread_id] : undefined
 
-			if (!thread) continue
+			if (!thread) return null
 
-			projectMap.set(projectId, {
+			const reports: FlattenedFileReport[] = projectReport.versions.flatMap((version) =>
+				version.files.map((file) => ({
+					...file,
+					id: file.report_id,
+					version_id: version.version_id,
+				})),
+			)
+
+			return {
 				project,
-				project_owner: response.ownership[projectId],
+				project_owner: response.ownership[projectReport.project_id],
 				thread,
-				reports: [],
-			})
-		}
-
-		projectMap.get(projectId)!.reports.push(report)
-	}
-
-	return Array.from(projectMap.values())
+				reports,
+			}
+		})
+		.filter(
+			(
+				item,
+			): item is {
+				project: Labrinth.Projects.v3.Project
+				project_owner: Labrinth.TechReview.Internal.Ownership
+				thread: Labrinth.TechReview.Internal.Thread
+				reports: FlattenedFileReport[]
+			} => item !== null,
+		)
 })
 
 function handleMarkComplete(projectId: string) {
@@ -432,58 +438,18 @@ function handleMarkComplete(projectId: string) {
 		(oldData: Labrinth.TechReview.Internal.SearchResponse | undefined) => {
 			if (!oldData) return oldData
 
-			const remainingReports = oldData.reports.filter((report) => report.project_id !== projectId)
-
-			return {
-				...oldData,
-				reports: remainingReports,
-			}
-		},
-	)
-}
-
-function handleMarkIssueSafe(projectId: string, reportId: string, issueId: string) {
-	queryClient.setQueryData(
-		['tech-reviews', currentSortType],
-		(oldData: Labrinth.TechReview.Internal.SearchResponse | undefined) => {
-			if (!oldData) return oldData
-
-			const updatedReports = oldData.reports
-				.map((report) => {
-					if (report.id !== reportId) return report
-
-					const remainingIssues = report.issues.filter((issue) => issue.id !== issueId)
-
-					if (remainingIssues.length === 0) {
-						return null
-					}
-
-					return {
-						...report,
-						issues: remainingIssues,
-					}
-				})
-				.filter((report): report is Labrinth.TechReview.Internal.FileReport => report !== null)
-
-			const projectStillHasReports = updatedReports.some(
-				(report) => report.project_id === projectId,
+			const remainingProjectReports = oldData.project_reports.filter(
+				(pr) => pr.project_id !== projectId,
 			)
 
-			if (!projectStillHasReports) {
-				const { [projectId]: _removedProject, ...remainingProjects } = oldData.projects
-				const { [projectId]: _removedOwnership, ...remainingOwnership } = oldData.ownership
-
-				return {
-					...oldData,
-					reports: updatedReports,
-					projects: remainingProjects,
-					ownership: remainingOwnership,
-				}
-			}
+			const { [projectId]: _removedProject, ...remainingProjects } = oldData.projects
+			const { [projectId]: _removedOwnership, ...remainingOwnership } = oldData.ownership
 
 			return {
 				...oldData,
-				reports: updatedReports,
+				project_reports: remainingProjectReports,
+				projects: remainingProjects,
+				ownership: remainingOwnership,
 			}
 		},
 	)
@@ -595,7 +561,6 @@ watch(currentSortType, () => {
 					@refetch="refetch"
 					@load-file-sources="handleLoadFileSources"
 					@mark-complete="handleMarkComplete"
-					@mark-issue-safe="handleMarkIssueSafe"
 				/>
 			</div>
 		</div>

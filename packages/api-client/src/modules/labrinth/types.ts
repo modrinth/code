@@ -682,23 +682,35 @@ export namespace Labrinth {
 			export type SearchProjectsSort = 'created_asc' | 'created_desc'
 
 			export type UpdateIssueRequest = {
-				status: DelphiReportIssueStatus
-				/** Optional rejection message when status is 'unsafe' */
+				verdict: 'safe' | 'unsafe'
+			}
+
+			export type SubmitProjectRequest = {
+				verdict: 'safe' | 'unsafe'
 				message?: string
 			}
 
 			export type SearchResponse = {
-				reports: FileReport[]
+				project_reports: ProjectReport[]
 				projects: Record<string, Projects.v3.Project>
 				threads: Record<string, Thread>
 				ownership: Record<string, Ownership>
 			}
 
-			export type FileReport = {
-				id: string
-				file_id: string
-				version_id: string
+			export type ProjectReport = {
 				project_id: string
+				max_severity: DelphiSeverity
+				versions: VersionReport[]
+			}
+
+			export type VersionReport = {
+				version_id: string
+				files: FileReport[]
+			}
+
+			export type FileReport = {
+				report_id: string
+				file_id: string
 				created: string
 				flag_reason: FlagReason
 				severity: DelphiSeverity
@@ -811,7 +823,7 @@ export namespace Labrinth {
 				members: User[]
 			}
 
-			export type FlagReason = 'delphi'
+			export type FlagReason = 'delphi' | 'manual'
 
 			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
 

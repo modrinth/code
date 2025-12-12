@@ -23,18 +23,31 @@ import {
 	OverflowMenu,
 	type OverflowMenuOption,
 } from '@modrinth/ui'
-import { capitalizeString, formatProjectType, highlightCodeLines } from '@modrinth/utils'
-import { computed, nextTick, ref, watch } from 'vue'
+import {
+	capitalizeString,
+	formatProjectType,
+	highlightCodeLines,
+	type ThreadMessage,
+	type User,
+} from '@modrinth/utils'
+import { computed, ref, watch } from 'vue'
 
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
+
+const auth = await useAuth()
+
+type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
+	id: string
+	version_id: string
+}
 
 const props = defineProps<{
 	item: {
 		project: Labrinth.Projects.v3.Project
 		project_owner: Labrinth.TechReview.Internal.Ownership
 		thread: Labrinth.TechReview.Internal.Thread
-		reports: Labrinth.TechReview.Internal.FileReport[]
+		reports: FlattenedFileReport[]
 	}
 	loadingIssues: Set<string>
 }>()
@@ -45,7 +58,6 @@ const emit = defineEmits<{
 	refetch: []
 	loadFileSources: [reportId: string]
 	markComplete: [projectId: string]
-	markIssueSafe: [projectId: string, reportId: string, issueId: string]
 }>()
 
 const quickActions = computed<OverflowMenuOption[]>(() => {
@@ -97,7 +109,7 @@ type Tab = 'Thread' | 'Files'
 const tabs: readonly Tab[] = ['Thread', 'Files']
 const currentTab = ref<Tab>('Thread')
 
-const isThreadCollapsed = ref(true)
+const isThreadCollapsed = ref(false)
 
 const remainingMessageCount = computed(() => {
 	if (!props.item.thread?.messages) return 0
@@ -163,29 +175,15 @@ const activeTabIndex = computed(() => {
 	return tabs.indexOf(currentTab.value)
 })
 
-// Handle tab clicks from NavTabs
 function handleTabClick(index: number) {
 	if (index < tabs.length) {
 		const newTab = tabs[index]
-
-		// Set tab FIRST so ThreadView renders before nextTick callback
 		currentTab.value = newTab
 
-		// When switching to Thread tab, pre-fill composer if there are decisions
-		// Only prepopulate ONCE to avoid overwriting user's notes
-		if (newTab === 'Thread' && hasDecisions.value && !hasPrepopulatedComposer.value) {
-			nextTick(() => {
-				const summary = generateReviewSummary()
-				if (summary && threadViewRef.value) {
-					threadViewRef.value.setReplyContent(summary)
-					hasPrepopulatedComposer.value = true
-				}
-			})
-		}
+		backToFileList()
 
-		// Only clear file selection when explicitly clicking "Files" tab
-		if (newTab === 'Files') {
-			backToFileList()
+		if (newTab === 'Thread') {
+			isThreadCollapsed.value = false
 		}
 	}
 }
@@ -233,7 +231,7 @@ function formatFileSize(bytes: number): string {
 	return `${(bytes / (1024 * 1024)).toFixed(2)} MiB`
 }
 
-function viewFileFlags(file: Labrinth.TechReview.Internal.FileReport) {
+function viewFileFlags(file: FlattenedFileReport) {
 	selectedFileId.value = file.id
 	emit('loadFileSources', file.id)
 }
@@ -254,13 +252,9 @@ async function copyToClipboard(code: string, detailId: string) {
 	}
 }
 
-// Track issue decisions locally for optimistic updates
 const issueDecisions = ref<Map<string, 'safe' | 'malware'>>(new Map())
+const updatingIssues = ref<Set<string>>(new Set())
 
-// Track if we've already prepopulated the composer (to avoid overwriting user's notes)
-const hasPrepopulatedComposer = ref(false)
-
-// Get issue decision: prioritize local optimistic state, fallback to backend status
 function getIssueDecision(
 	issueId: string,
 	backendStatus: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
@@ -272,25 +266,21 @@ function getIssueDecision(
 	return 'pending'
 }
 
-async function updateIssueStatus(
-	issueId: string,
-	reportId: string,
-	status: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
-) {
+async function updateIssueStatus(issueId: string, verdict: 'safe' | 'unsafe') {
+	updatingIssues.value.add(issueId)
+
 	try {
-		await client.labrinth.tech_review_internal.updateIssue(issueId, { status })
+		await client.labrinth.tech_review_internal.updateIssue(issueId, { verdict })
 
-		// Track decision locally (don't end review)
-		issueDecisions.value.set(issueId, status === 'safe' ? 'safe' : 'malware')
+		issueDecisions.value.set(issueId, verdict === 'safe' ? 'safe' : 'malware')
 
-		if (status === 'safe') {
-			emit('markIssueSafe', props.item.project.id, reportId, issueId)
+		if (verdict === 'safe') {
 			addNotification({
 				type: 'success',
 				title: 'Issue marked as safe',
 				text: 'This issue has been marked as a false positive.',
 			})
-		} else if (status === 'unsafe') {
+		} else {
 			addNotification({
 				type: 'success',
 				title: 'Issue marked as malware',
@@ -304,6 +294,8 @@ async function updateIssueStatus(
 			title: 'Failed to update issue',
 			text: 'An error occurred while updating the issue status.',
 		})
+	} finally {
+		updatingIssues.value.delete(issueId)
 	}
 }
 
@@ -376,11 +368,12 @@ const techReviewContext = computed<TechReviewContext>(() => ({
 	reports: props.item.reports,
 }))
 
-// Ref to ThreadView for setting pre-generated message
-const threadViewRef = ref<{ setReplyContent: (content: string) => void } | null>(null)
+const threadViewRef = ref<{
+	setReplyContent: (content: string) => void
+	getReplyContent: () => string
+} | null>(null)
 
-// Generate summary message for thread composer
-function generateReviewSummary(): string {
+const reviewSummaryPreview = computed(() => {
 	const decisions: Array<{
 		filePath: string
 		issueType: string
@@ -388,7 +381,6 @@ function generateReviewSummary(): string {
 		decision: 'safe' | 'malware'
 	}> = []
 
-	// Collect all decisions from all reports
 	for (const report of props.item.reports) {
 		for (const issue of report.issues) {
 			for (const detail of issue.details) {
@@ -431,32 +423,109 @@ ${tableRows}
 
 **Verdict:** ${verdict}
 
-**Notes:**
+---
+
 
 `
-}
-
-// Check if there are any decisions made
-const hasDecisions = computed(() => {
-	if (issueDecisions.value.size > 0) return true
-
-	// Also check backend status
-	for (const report of props.item.reports) {
-		for (const issue of report.issues) {
-			if (issue.status === 'safe' || issue.status === 'unsafe') return true
-		}
-	}
-	return false
 })
 
-// Handle submit review (placeholder for backend)
-function handleSubmitReview() {
-	const summary = generateReviewSummary()
-	console.log('Submit Review:', {
-		projectId: props.item.project.id,
-		decisions: Object.fromEntries(issueDecisions.value),
-		summary,
-	})
+const threadWithPreview = computed(() => {
+	if (!reviewSummaryPreview.value) return props.item.thread
+
+	const user = auth.value?.user as User | null
+	if (!user) return props.item.thread
+
+	const previewMessage: ThreadMessage & { preview: true } = {
+		id: 'preview-message',
+		author_id: user.id,
+		body: {
+			type: 'text',
+			body: reviewSummaryPreview.value,
+			private: false,
+			replying_to: null,
+			associated_images: [],
+		},
+		created: new Date().toISOString(),
+		hide_identity: false,
+		preview: true,
+	}
+
+	return {
+		...props.item.thread,
+		messages: [...props.item.thread.messages, previewMessage],
+		members: props.item.thread.members.some((m) => m.id === user.id)
+			? props.item.thread.members
+			: [...props.item.thread.members, user],
+	}
+})
+
+const allIssuesResolved = computed(() => {
+	for (const report of props.item.reports) {
+		for (const issue of report.issues) {
+			const decision = getIssueDecision(issue.id, issue.status)
+			if (decision === 'pending') return false
+		}
+	}
+	return true
+})
+
+const computedVerdict = computed<'safe' | 'unsafe'>(() => {
+	for (const report of props.item.reports) {
+		for (const issue of report.issues) {
+			const decision = getIssueDecision(issue.id, issue.status)
+			if (decision === 'malware') return 'unsafe'
+		}
+	}
+	return 'safe'
+})
+
+const canSubmitReview = computed(() => {
+	const totalIssues = props.item.reports.reduce((sum, r) => sum + r.issues.length, 0)
+	if (totalIssues === 0) return true
+	return allIssuesResolved.value
+})
+
+async function handleSubmitReview() {
+	const editorContent = threadViewRef.value?.getReplyContent() || ''
+	const verdict = computedVerdict.value
+
+	let message: string | undefined
+	if (reviewSummaryPreview.value && editorContent) {
+		message = `${reviewSummaryPreview.value}${editorContent}`
+	} else if (reviewSummaryPreview.value) {
+		message = reviewSummaryPreview.value
+	} else if (editorContent) {
+		message = editorContent
+	}
+
+	try {
+		await client.labrinth.tech_review_internal.submitProject(props.item.project.id, {
+			verdict,
+			message,
+		})
+		emit('markComplete', props.item.project.id)
+		addNotification({
+			type: 'success',
+			title: 'Review submitted',
+			text: 'Technical review completed successfully.',
+		})
+	} catch (error: unknown) {
+		const err = error as { response?: { data?: { issues?: string[] } } }
+		if (err.response?.data?.issues) {
+			const missedCount = err.response.data.issues.length
+			addNotification({
+				type: 'error',
+				title: 'Pending issues remain',
+				text: `${missedCount} issue(s) still need a verdict before submitting.`,
+			})
+		} else {
+			addNotification({
+				type: 'error',
+				title: 'Submit failed',
+				text: 'Failed to submit review. Please try again.',
+			})
+		}
+	}
 }
 </script>
 
@@ -576,14 +645,14 @@ function handleSubmitReview() {
 						<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
 						<ThreadView
 							ref="threadViewRef"
-							:thread="item.thread"
+							:thread="threadWithPreview"
 							:quick-replies="techReviewQuickReplies"
 							:quick-reply-context="techReviewContext"
 							@update-thread="handleThreadUpdate"
 						>
 							<template #additionalActions>
 								<ButtonStyled color="brand">
-									<button :disabled="!hasDecisions" @click="handleSubmitReview">
+									<button :disabled="!canSubmitReview" @click="handleSubmitReview">
 										Submit Review
 									</button>
 								</ButtonStyled>
@@ -611,14 +680,27 @@ function handleSubmitReview() {
 							}}</span>
 						</div>
 						<div
+							v-if="file.issues.length > 0"
 							class="border-red/60 flex items-center gap-1 rounded-full border border-solid bg-highlight-red px-2.5 py-1 text-sm text-red"
 						>
-							{{ file.issues.length }} flags
+							{{ file.issues.length }} {{ file.issues.length === 1 ? 'flag' : 'flags' }}
+						</div>
+						<div
+							v-else-if="file.flag_reason === 'manual'"
+							class="border-blue/60 flex items-center gap-1 rounded-full border border-solid bg-highlight-blue px-2.5 py-1 text-sm text-blue"
+						>
+							Manual review
+						</div>
+						<div
+							v-else
+							class="border-green/60 flex items-center gap-1 rounded-full border border-solid bg-highlight-green px-2.5 py-1 text-sm text-green"
+						>
+							No flags
 						</div>
 					</div>
 
 					<div class="flex items-center gap-2">
-						<ButtonStyled>
+						<ButtonStyled v-if="file.issues.length > 0">
 							<button @click="viewFileFlags(file)">Flags</button>
 						</ButtonStyled>
 						<ButtonStyled type="outlined">
@@ -726,7 +808,8 @@ function handleSubmitReview() {
 										>
 											<button
 												class="!border-[1px]"
-												@click="updateIssueStatus(flag.issueId, selectedFile.id, 'safe')"
+												:disabled="updatingIssues.has(flag.issueId)"
+												@click="updateIssueStatus(flag.issueId, 'safe')"
 											>
 												Safe
 											</button>
@@ -742,7 +825,8 @@ function handleSubmitReview() {
 										>
 											<button
 												class="!border-[1px]"
-												@click="updateIssueStatus(flag.issueId, selectedFile.id, 'unsafe')"
+												:disabled="updatingIssues.has(flag.issueId)"
+												@click="updateIssueStatus(flag.issueId, 'unsafe')"
 											>
 												Malware
 											</button>
