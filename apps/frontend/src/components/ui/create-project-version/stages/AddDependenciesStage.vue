@@ -100,6 +100,7 @@ import AddedDependencyRow from '../components/AddedDependencyRow.vue'
 import SuggestedDependencies from '../components/SuggestedDependencies/SuggestedDependencies.vue'
 
 const { addNotification } = injectNotificationManager()
+const { labrinth } = injectModrinthClient()
 
 const errorNotification = (err: any) => {
 	addNotification({
@@ -129,9 +130,7 @@ watch(newDependencyProjectId, async () => {
 		newDependencyVersions.value = []
 	} else {
 		try {
-			const versions = await client.labrinth.versions_v3.getProjectVersions(
-				newDependencyProjectId.value,
-			)
+			const versions = await labrinth.versions_v3.getProjectVersions(newDependencyProjectId.value)
 			newDependencyVersions.value = versions.map((version) => ({
 				label: version.name,
 				value: version.id,
@@ -142,11 +141,11 @@ watch(newDependencyProjectId, async () => {
 	}
 })
 
-const { draftVersion, dependencyProjects, dependencyVersions } = useManageVersion()
+const { draftVersion, dependencyProjects, dependencyVersions, getProject, getVersion } =
+	useManageVersion()
 const { projectV2: project } = injectProjectPageContext()
-const client = injectModrinthClient()
 
-const calculateSuggestedDependencies = async () => {
+const getSuggestedDependencies = async () => {
 	try {
 		suggestedDependencies.value = []
 
@@ -155,7 +154,7 @@ const calculateSuggestedDependencies = async () => {
 		}
 
 		try {
-			const versions = await client.labrinth.versions_v3.getProjectVersions(project.value.id, {
+			const versions = await labrinth.versions_v3.getProjectVersions(project.value.id, {
 				game_versions: draftVersion.value.game_versions,
 				loaders: draftVersion.value.loaders,
 			})
@@ -178,23 +177,15 @@ const calculateSuggestedDependencies = async () => {
 
 		for (const dep of suggestedDependencies.value) {
 			try {
-				if (dep.project_id && !dependencyProjects.value[dep.project_id]) {
-					const project = await client.labrinth.projects_v3.get(dep.project_id)
-					dependencyProjects.value[dep.project_id] = project
-					dep.name = project.name
-					dep.icon = project.icon_url
-				} else if (dep.project_id && dependencyProjects.value[dep.project_id]) {
-					const project = dependencyProjects.value[dep.project_id]
-					dep.name = project.name
-					dep.icon = project.icon_url
+				if (dep.project_id) {
+					const proj = await getProject(dep.project_id)
+					dep.name = proj.name
+					dep.icon = proj.icon_url
 				}
 
-				if (dep.version_id && !dependencyVersions.value[dep.version_id]) {
-					const version = await client.labrinth.versions_v3.getVersion(dep.version_id)
-					dependencyVersions.value[dep.version_id] = version
+				if (dep.version_id) {
+					const version = await getVersion(dep.version_id)
 					dep.versionName = version.name
-				} else if (dep.version_id && dependencyVersions.value[dep.version_id]) {
-					dep.versionName = dependencyVersions.value[dep.version_id].name
 				}
 			} catch (error: any) {
 				console.error(`Failed to fetch project/version data for dependency:`, error)
@@ -206,7 +197,7 @@ const calculateSuggestedDependencies = async () => {
 }
 
 onMounted(() => {
-	calculateSuggestedDependencies()
+	getSuggestedDependencies()
 })
 
 watch(
@@ -215,19 +206,17 @@ watch(
 		const deps = draftVersion.dependencies || []
 
 		for (const dep of deps) {
-			if (dep?.project_id && !dependencyProjects.value[dep.project_id]) {
+			if (dep?.project_id) {
 				try {
-					const project = await client.labrinth.projects_v3.get(dep.project_id)
-					dependencyProjects.value[dep.project_id] = project
+					await getProject(dep.project_id)
 				} catch (error: any) {
 					errorNotification(error)
 				}
 			}
 
-			if (dep?.version_id && !dependencyVersions.value[dep.version_id]) {
+			if (dep?.version_id) {
 				try {
-					const version = await client.labrinth.versions_v3.getVersion(dep.version_id)
-					dependencyVersions.value[dep.version_id] = version
+					await getVersion(dep.version_id)
 				} catch (error: any) {
 					errorNotification(error)
 				}
@@ -287,8 +276,6 @@ const removeDependency = (index: number) => {
 }
 
 const handleAddSuggestedDependency = (dependency: Labrinth.Versions.v3.Dependency) => {
-	// Implementation to be filled in
-	console.log(dependency)
 	draftVersion.value.dependencies?.push({
 		project_id: dependency.project_id,
 		version_id: dependency.version_id,

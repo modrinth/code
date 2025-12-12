@@ -1,4 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { injectModrinthClient } from '@modrinth/ui'
 import JSZip from 'jszip'
 
 import { inferVersionInfo } from '~/helpers/infer'
@@ -95,6 +96,8 @@ async function setProjectType(
 }
 
 export function useManageVersion() {
+	const { labrinth } = injectModrinthClient()
+
 	function newDraftVersion(
 		projectId: string,
 		version: Labrinth.Versions.v3.DraftVersion | null = null,
@@ -115,9 +118,9 @@ export function useManageVersion() {
 		;[files[0], files[index]] = [files[index], files[0]]
 	}
 
-	async function setInferredVersionData(file: File, project: Labrinth.Projects.v2.Project) {
-		const tags = useGeneratedState()
+	const tags = useGeneratedState()
 
+	async function setInferredVersionData(file: File, project: Labrinth.Projects.v2.Project) {
 		const inferred = (await inferVersionInfo(
 			file,
 			project,
@@ -129,6 +132,24 @@ export function useManageVersion() {
 		projectType.value = await setProjectType(project, file)
 
 		return inferred
+	}
+
+	const getProject = async (projectId: string) => {
+		if (dependencyProjects.value[projectId]) {
+			return dependencyProjects.value[projectId]
+		}
+		const proj = await labrinth.projects_v3.get(projectId)
+		dependencyProjects.value[projectId] = proj
+		return proj
+	}
+
+	const getVersion = async (versionId: string) => {
+		if (dependencyVersions.value[versionId]) {
+			return dependencyVersions.value[versionId]
+		}
+		const version = await labrinth.versions_v3.getVersion(versionId)
+		dependencyVersions.value[versionId] = version
+		return version
 	}
 
 	return {
@@ -146,5 +167,7 @@ export function useManageVersion() {
 		setPrimaryFile,
 		setInferredVersionData,
 		setProjectType,
+		getProject,
+		getVersion,
 	}
 }

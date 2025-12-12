@@ -238,7 +238,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 	},
 ])
 
-const client = injectModrinthClient()
+const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { refreshVersions } = injectProjectPageContext()
 
@@ -250,7 +250,7 @@ async function handleCreateVersion() {
 	isSubmitting.value = true
 
 	try {
-		await client.labrinth.versions_v3.createVersion(version, files)
+		await labrinth.versions_v3.createVersion(version, files)
 		modal.value?.hide()
 		addNotification({
 			title: 'Project version created',
@@ -279,7 +279,7 @@ async function handleSaveVersionEdits() {
 		if (!version.version_id) throw new Error('Version ID is required to save edits.')
 		// TODO DEV-595 need to properly pass version.environment into request body for creating and modifying a version
 
-		await client.labrinth.versions_v3.modifyVersion(version.version_id, {
+		await labrinth.versions_v3.modifyVersion(version.version_id, {
 			version_title: version.version_title || version.version_number,
 			version_number: version.version_number,
 			changelog: version.changelog,
@@ -290,7 +290,7 @@ async function handleSaveVersionEdits() {
 		})
 
 		if (files.length > 0) {
-			await client.labrinth.versions_v3.addFilesToVersion(version.version_id, files)
+			await labrinth.versions_v3.addFilesToVersion(version.version_id, files)
 		}
 
 		// Delete files that were marked for deletion
