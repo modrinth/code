@@ -445,7 +445,7 @@ export namespace Labrinth {
 			}
 
 			export interface CreateVersionRequest {
-				version_title: string
+				name: string
 				version_number: string
 				changelog: string
 				dependencies?: Array<{

@@ -282,13 +282,14 @@ async function handleSaveVersionEdits() {
 		// TODO DEV-595 need to properly pass version.environment into request body for creating and modifying a version
 
 		await labrinth.versions_v3.modifyVersion(version.version_id, {
-			version_title: version.version_title || version.version_number,
+			name: version.name || version.version_number,
 			version_number: version.version_number,
 			changelog: version.changelog,
 			version_type: version.version_type,
 			dependencies: version.dependencies || [],
 			game_versions: version.game_versions,
 			loaders: version.loaders,
+			// environment: version.environment,
 		})
 
 		if (files.length > 0) {

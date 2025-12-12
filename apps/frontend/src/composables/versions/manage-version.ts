@@ -16,7 +16,7 @@ export interface InferredVersionInfo {
 
 const EMPTY_DRAFT_VERSION: Labrinth.Versions.v3.DraftVersion = {
 	project_id: '',
-	version_title: '',
+	name: '',
 	version_number: '',
 	version_type: 'release',
 	loaders: [],

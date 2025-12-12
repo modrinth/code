@@ -29,7 +29,7 @@
 			<span class="font-semibold text-contrast"> Version subtitle </span>
 			<input
 				id="version-number"
-				v-model="draftVersion.version_title"
+				v-model="draftVersion.name"
 				placeholder="Enter subtitle..."
 				type="text"
 				autocomplete="off"

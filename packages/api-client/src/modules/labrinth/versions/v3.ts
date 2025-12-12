@@ -162,7 +162,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 		const data: Labrinth.Versions.v3.CreateVersionRequest = {
 			project_id: draftVersion.project_id,
 			version_number: draftVersion.version_number,
-			version_title: draftVersion.version_title || draftVersion.version_number,
+			name: draftVersion.name || draftVersion.version_number,
 			changelog: draftVersion.changelog,
 			dependencies: draftVersion.dependencies || [],
 			game_versions: draftVersion.game_versions,

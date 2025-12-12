@@ -345,7 +345,7 @@ async function handleOpenEditVersionModal(version: Labrinth.Versions.v3.Version)
 		modal.value?.show({
 			project_id: project.id,
 			version_id: version.id,
-			version_title: versionData.name ?? '',
+			name: versionData.name ?? '',
 			version_number: versionData.version_number ?? '',
 			changelog: versionData.changelog ?? '',
 			game_versions: versionData.game_versions ?? [],
