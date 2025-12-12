@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     auth::get_user_from_headers,
     database::{
@@ -5,17 +7,22 @@ use crate::{
         redis::RedisPool,
     },
     models::{
-        ids::AffiliateCodeId, pats::Scopes, users::Badges,
-        v3::affiliate_code::AffiliateCode,
+        analytics::AffiliateCodeClick, ids::AffiliateCodeId, pats::Scopes,
+        users::Badges, v3::affiliate_code::AffiliateCode,
     },
-    queue::session::AuthQueue,
-    util::error::Context,
+    queue::{analytics::AnalyticsQueue, session::AuthQueue},
+    util::{
+        date::get_current_tenths_of_ms, env::parse_strings_from_var,
+        error::Context,
+    },
 };
-use actix_web::{HttpRequest, delete, get, patch, put, web};
+use actix_web::{HttpRequest, delete, get, patch, post, put, web};
 use ariadne::ids::UserId;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use tracing::trace;
+use url::Url;
 
 use crate::routes::ApiError;
 
@@ -28,15 +35,62 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(patch);
 }
 
-#[utoipa::path()]
-#[get("/ingest-click")]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct IngestClick {
+    pub url: Url,
+    pub affiliate_code_id: AffiliateCodeId,
+}
+
+#[utoipa::path]
+#[post("/ingest-click")]
 async fn ingest_click(
     req: HttpRequest,
+    web::Json(ingest_click): web::Json<IngestClick>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    analytics_queue: web::Data<Arc<AnalyticsQueue>>,
 ) -> Result<(), ApiError> {
-    // TODO: insert into clickhouse - see `clickhouse/mod.rs` unfinished code
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::empty(),
+    )
+    .await
+    .map(|(_, user)| user)
+    .ok();
+
+    let url = ingest_click.url;
+    let domain = url.host_str().ok_or_else(|| {
+        ApiError::InvalidInput("invalid page view URL specified!".to_string())
+    })?;
+    let url_origin = url.origin().ascii_serialization();
+
+    let is_valid_url_origin =
+        parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS")
+            .unwrap_or_default()
+            .iter()
+            .any(|origin| origin == "*" || url_origin == *origin);
+
+    if !is_valid_url_origin {
+        return Err(ApiError::InvalidInput(
+            "invalid page view URL specified!".to_string(),
+        ));
+    }
+
+    let click = AffiliateCodeClick {
+        recorded: get_current_tenths_of_ms(),
+        domain: domain.to_string(),
+        user_id: user.map(|user| user.id.0).unwrap_or_default(),
+        affiliate_code_id: ingest_click.affiliate_code_id.0,
+    };
+
+    trace!("Ingested affiliate code click {click:?}");
+    analytics_queue.add_affiliate_code_click(click);
+
+    Ok(())
 }
 
 #[utoipa::path(
