@@ -28,7 +28,7 @@ import {
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
 import { useThrottleFn } from '@vueuse/core'
-import { computed, type Reactive } from 'vue'
+import { computed, type Reactive, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -51,26 +51,12 @@ const auth = await useAuth()
 
 const { handleError } = injectNotificationManager()
 
-const props = defineProps<{
-	type: string
-}>()
+const currentType = computed(() =>
+	queryAsStringOrEmpty(route.params.type).replaceAll(/^\/|s\/?$/g, ''),
+)
 
-const projectType = ref()
-
-function setProjectType() {
-	const projType = tags.value.projectTypes.find((x) => x.id === props.type)
-
-	if (projType) {
-		projectType.value = projType
-	}
-}
-
-setProjectType()
-router.afterEach(() => {
-	setProjectType()
-})
-
-const projectTypes = computed(() => [projectType.value.id])
+const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
+const projectTypes = computed(() => (projectType.value ? [projectType.value.id] : []))
 
 const resultsDisplayLocation = computed<DisplayLocation | undefined>(
 	() => projectType.value?.id as DisplayLocation,
@@ -87,34 +73,51 @@ const eraseDataOnInstall = ref(false)
 
 const PERSISTENT_QUERY_PARAMS = ['sid', 'shi']
 
-await updateServerContext()
-
-watch(route, () => {
-	updateServerContext()
-})
-
 async function updateServerContext() {
 	const serverId = queryAsString(route.query.sid)
-	if (serverId && (!server.value || server.value.serverId !== serverId)) {
+
+	if (!serverId) {
+		server.value = undefined
+		return
+	}
+
+	try {
 		if (!auth.value.user) {
 			router.push('/auth/sign-in?redirect=' + encodeURIComponent(route.fullPath))
-		} else {
+			return
+		}
+
+		if (!server.value || server.value.serverId !== serverId) {
 			server.value = await useModrinthServers(serverId, ['general', 'content'])
 		}
-	}
 
-	if (server.value?.serverId !== serverId && routeNameAsString(route.name)?.startsWith('search')) {
+		if (route.query.shi && projectType.value?.id !== 'modpack' && server.value) {
+			serverHideInstalled.value = route.query.shi === 'true'
+		}
+	} catch (error) {
+		console.error('Failed to load server context:', error)
 		server.value = undefined
-	}
-
-	if (route.query.shi && projectType.value.id !== 'modpack' && server.value) {
-		serverHideInstalled.value = route.query.shi === 'true'
 	}
 }
 
+if (import.meta.client && route.query.sid) {
+	updateServerContext().catch((error) => {
+		console.error('Failed to initialize server context:', error)
+	})
+}
+
+watch(
+	() => route.query.sid,
+	() => {
+		updateServerContext().catch((error) => {
+			console.error('Failed to update server context:', error)
+		})
+	},
+)
+
 const serverFilters = computed(() => {
 	const filters = []
-	if (server.value && projectType.value.id !== 'modpack') {
+	if (server.value && projectType.value?.id !== 'modpack') {
 		const gameVersion = server.value.general?.mc_version
 		if (gameVersion) {
 			filters.push({
@@ -236,7 +239,7 @@ async function serverInstall(project: InstallableSearchResult) {
 					x.loaders.includes(server.value!.general.loader.toLowerCase()),
 			) ?? versions[0]
 
-		if (projectType.value.id === 'modpack') {
+		if (projectType.value?.id === 'modpack') {
 			await server.value.general.reinstall(
 				false,
 				project.project_id,
@@ -246,11 +249,11 @@ async function serverInstall(project: InstallableSearchResult) {
 			)
 			project.installed = true
 			navigateTo(`/hosting/manage/${server.value.serverId}/options/loader`)
-		} else if (projectType.value.id === 'mod') {
+		} else if (projectType.value?.id === 'mod') {
 			await server.value.content.install('mod', version.project_id, version.id)
 			await server.value.refresh(['content'])
 			project.installed = true
-		} else if (projectType.value.id === 'plugin') {
+		} else if (projectType.value?.id === 'plugin') {
 			await server.value.content.install('plugin', version.project_id, version.id)
 			await server.value.refresh(['content'])
 			project.installed = true
@@ -358,11 +361,12 @@ function setClosestMaxResults() {
 }
 
 const ogTitle = computed(
-	() => `Search ${projectType.value.display}s${query.value ? ' | ' + query.value : ''}`,
+	() =>
+		`Search ${projectType.value?.display ?? 'project'}s${query.value ? ' | ' + query.value : ''}`,
 )
 const description = computed(
 	() =>
-		`Search and browse thousands of Minecraft ${projectType.value.display}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value.display}s.`,
+		`Search and browse thousands of Minecraft ${projectType.value?.display ?? 'project'}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value?.display ?? 'project'}s.`,
 )
 
 useSeoMeta({
@@ -447,7 +451,7 @@ useSeoMeta({
 				</ButtonStyled>
 			</div>
 			<div
-				v-if="server && projectType.id === 'modpack'"
+				v-if="server && projectType?.id === 'modpack'"
 				class="card-shadow rounded-2xl bg-bg-raised"
 			>
 				<div class="flex flex-row items-center gap-2 px-6 py-4 text-contrast">
@@ -469,7 +473,7 @@ useSeoMeta({
 				</div>
 			</div>
 			<div
-				v-if="server && projectType.id !== 'modpack'"
+				v-if="server && projectType?.id !== 'modpack'"
 				class="card-shadow rounded-2xl bg-bg-raised p-4"
 			>
 				<Checkbox
@@ -520,7 +524,7 @@ useSeoMeta({
 					autocomplete="off"
 					spellcheck="false"
 					type="text"
-					:placeholder="`Search ${projectType.display}s...`"
+					:placeholder="`Search ${projectType?.display ?? 'project'}s...`"
 					@input="throttledSearch()"
 				/>
 				<Button
@@ -629,7 +633,9 @@ useSeoMeta({
 							:search="true"
 							:show-updated-date="!server && currentSortType.name !== 'newest'"
 							:show-created-date="!server"
-							:hide-loaders="['resourcepack', 'datapack'].includes(projectType.id)"
+							:hide-loaders="
+								projectType ? ['resourcepack', 'datapack'].includes(projectType.id) : false
+							"
 							:color="result.color ?? undefined"
 						>
 							<template v-if="server">
@@ -667,7 +673,7 @@ useSeoMeta({
 						</ProjectCard>
 						<NuxtLink
 							v-if="flags.newProjectCards"
-							:to="`/${projectType.id}/${result.slug ? result.slug : result.project_id}`"
+							:to="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
 						>
 							<NewProjectCard :project="result" :categories="result.display_categories">
 								<template v-if="false" #actions></template>
