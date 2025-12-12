@@ -6,7 +6,7 @@
 		]"
 	>
 		<div class="flex items-center gap-2">
-			<Avatar v-if="icon" :src="icon" alt="dependency-icon" size="20px" />
+			<Avatar v-if="icon" :src="icon" alt="dependency-icon" size="20px" :no-shadow="true" />
 
 			<span class="text-wrap font-semibold text-contrast" :title="name || 'Unknown Project'">
 				{{ name || 'Unknown Project' }}
