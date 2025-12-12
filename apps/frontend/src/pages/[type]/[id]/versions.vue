@@ -152,7 +152,12 @@
 		</ProjectPageVersions>
 		<template v-else>
 			<p class="ml-2">
-				No versions in project. Visit project settings to upload your first version.
+				No versions in project.
+				<NuxtLink to="settings/versions">
+					<span class="font-medium hover:underline"
+						>Visit project settings to upload your first version.</span
+					>
+				</NuxtLink>
 			</p>
 		</template>
 	</section>

@@ -222,7 +222,12 @@
 			</div>
 		</div>
 		<template v-else>
-			<p class="ml-2">No items in gallery. Visit project settings to add a description.</p>
+			<p class="ml-2">
+				No images in gallery.
+				<NuxtLink to="settings/gallery">
+					<span class="font-medium hover:underline"> Visit project settings to add images. </span>
+				</NuxtLink>
+			</p>
 		</template>
 	</div>
 </template>
