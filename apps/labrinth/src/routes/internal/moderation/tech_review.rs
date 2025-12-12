@@ -99,13 +99,9 @@ impl fmt::Display for SearchProjectsSort {
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct FileReport {
     /// ID of this report.
-    pub id: DelphiReportId,
+    pub report_id: DelphiReportId,
     /// ID of the file that was scanned.
     pub file_id: FileId,
-    /// ID of the project version this report is for.
-    pub version_id: VersionId,
-    /// ID of the project this report is for.
-    pub project_id: ProjectId,
     /// When the report for this file was created.
     pub created: DateTime<Utc>,
     /// Why this project was flagged.
@@ -281,14 +277,35 @@ async fn get_report(
 /// See [`search_projects`].
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct SearchResponse {
-    /// List of reports returned.
-    pub reports: Vec<FileReport>,
+    /// List of reported projects returned, and their report data.
+    pub project_reports: Vec<ProjectReport>,
     /// Fetched project information for projects in the returned reports.
     pub projects: HashMap<ProjectId, ProjectModerationInfo>,
     /// Fetched moderation threads for projects in the returned reports.
     pub threads: HashMap<ThreadId, Thread>,
     /// Fetched owner information for projects.
     pub ownership: HashMap<ProjectId, Ownership>,
+}
+
+/// Single project's reports from a search response.
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectReport {
+    /// ID of the project this report is for.
+    pub project_id: ProjectId,
+    /// Highest severity of any report of any file of any version under this
+    /// project.
+    pub max_severity: DelphiSeverity,
+    /// Reports for this project's versions.
+    pub versions: Vec<VersionReport>,
+}
+
+/// Single project version's reports from a search response.
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct VersionReport {
+    /// ID of the project version this report is for.
+    pub version_id: VersionId,
+    /// Reports for this version's files.
+    pub files: Vec<FileReport>,
 }
 
 /// Limited set of project information returned by [`search_projects`].
@@ -337,75 +354,80 @@ async fn search_projects(
     let offset = i64::try_from(offset)
         .wrap_request_err("offset cannot fit into `i64`")?;
 
-    let mut reports = Vec::<FileReport>::new();
+    let mut project_reports = Vec::<ProjectReport>::new();
     let mut project_ids = Vec::<DBProjectId>::new();
     let mut thread_ids = Vec::<DBThreadId>::new();
+
     let mut rows = sqlx::query!(
         r#"
         SELECT
             project_id AS "project_id: DBProjectId",
             project_thread_id AS "project_thread_id: DBThreadId",
-            report AS "report!: sqlx::types::Json<FileReport>"
+            report AS "report!: sqlx::types::Json<ProjectReport>"
         FROM (
-            SELECT DISTINCT ON (dr.id)
-                dr.id       AS report_id,
-                dr.created  AS report_created,
-                dr.severity AS report_severity,
-                m.id        AS project_id,
-                t.id        AS project_thread_id,
+            SELECT DISTINCT ON (m.id)
+                m.id             AS project_id,
+                t.id             AS project_thread_id,
+                MAX(dr.severity) AS severity,
+                MIN(dr.created)  AS earliest_report_created,
+                MAX(dr.created)  AS latest_report_created,
 
-                to_jsonb(dr)
-                || jsonb_build_object(
-                    'file_id', to_base62(f.id),
-                    'version_id', to_base62(v.id),
-                    'project_id', to_base62(v.mod_id),
-                    'file_name', f.filename,
-                    'file_size', f.size,
-                    'flag_reason', 'delphi',
-                    'download_url', f.url,
+                jsonb_build_object(
+                    'project_id', to_base62(m.id),
+                    'max_severity', MAX(dr.severity),
                     -- TODO: replace with `json_array` in Postgres 16
-                    'issues', (
-                        SELECT json_agg(
-                            to_jsonb(dri)
-                            || jsonb_build_object(
-                                -- TODO: replace with `json_array` in Postgres 16
-                                'details', (
-                                    SELECT json_agg(
-                                        jsonb_build_object(
-                                            'id', drid.id,
-                                            'issue_id', drid.issue_id,
-                                            'key', drid.key,
-                                            'file_path', drid.file_path,
-                                            -- ignore `decompiled_source`
-                                            'data', drid.data,
-                                            'severity', drid.severity
+                    'versions', (
+                        SELECT json_agg(jsonb_build_object(
+                            'version_id', to_base62(v.id),
+                            -- TODO: replace with `json_array` in Postgres 16
+                            'files', (
+                                SELECT json_agg(jsonb_build_object(
+                                    'report_id', dr.id,
+                                    'file_id', to_base62(f.id),
+                                    'created', dr.created,
+                                    'flag_reason', 'delphi',
+                                    'severity', dr.severity,
+                                    'file_name', f.filename,
+                                    'file_size', f.size,
+                                    'download_url', f.url,
+                                    -- TODO: replace with `json_array` in Postgres 16
+                                    'issues', (
+                                        SELECT json_agg(
+                                            to_jsonb(dri)
+                                            || jsonb_build_object(
+                                                -- TODO: replace with `json_array` in Postgres 16
+                                                'details', (
+                                                    SELECT json_agg(
+                                                        jsonb_build_object(
+                                                            'id', drid.id,
+                                                            'issue_id', drid.issue_id,
+                                                            'key', drid.key,
+                                                            'file_path', drid.file_path,
+                                                            -- ignore `decompiled_source`
+                                                            'data', drid.data,
+                                                            'severity', drid.severity
+                                                        )
+                                                    )
+                                                    FROM delphi_report_issue_details drid
+                                                    WHERE drid.issue_id = dri.id
+                                                )
+                                            )
                                         )
+                                        FROM delphi_report_issues dri
+                                        WHERE dri.report_id = dr.id
                                     )
-                                    FROM delphi_report_issue_details drid
-                                    WHERE drid.issue_id = dri.id
-                                )
+                                ))
+                                FROM delphi_reports dr
+                                WHERE dr.file_id = f.id
                             )
-                        )
-                        FROM delphi_report_issues dri
-                        WHERE dri.report_id = dr.id
-                        -- AND NOT EXISTS (
-                        --     -- exclude issues with types that have been marked as safe for this project
-                        --     SELECT 1
-                        --     FROM delphi_report_issues dri_safe
-                        --     INNER JOIN delphi_reports dr_safe ON dr_safe.id = dri_safe.report_id
-                        --     INNER JOIN files f_safe ON f_safe.id = dr_safe.file_id
-                        --     INNER JOIN versions v_safe ON v_safe.id = f_safe.version_id
-                        --     WHERE dri_safe.issue_type = dri.issue_type
-                        --     AND dri_safe.status = 'safe'
-                        --     AND v_safe.mod_id = m.id
-                        -- )
+                        ))
                     )
                 ) AS report
-            FROM delphi_reports dr
-            INNER JOIN files f ON f.id = dr.file_id
-            INNER JOIN versions v ON v.id = f.version_id
-            INNER JOIN mods m ON m.id = v.mod_id
+            FROM mods m
             INNER JOIN threads t ON t.mod_id = m.id
+            INNER JOIN versions v ON v.mod_id = m.id
+            INNER JOIN files f ON f.version_id = v.id
+            INNER JOIN delphi_reports dr ON dr.file_id = f.id
 
             -- filtering
             LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
@@ -415,14 +437,16 @@ async fn search_projects(
                 (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
                 AND m.status NOT IN ('draft', 'rejected', 'withheld')
                 AND dr.status = 'pending'
+
+            GROUP BY m.id, t.id
         ) t
 
         -- sorting
         ORDER BY
-            CASE WHEN $3 = 'created_asc' THEN t.report_created ELSE TO_TIMESTAMP(0) END ASC,
-            CASE WHEN $3 = 'created_desc' THEN t.report_created ELSE TO_TIMESTAMP(0) END DESC,
-            CASE WHEN $3 = 'severity_asc' THEN t.report_severity ELSE 'low'::delphi_severity END ASC,
-            CASE WHEN $3 = 'severity_desc' THEN t.report_severity ELSE 'low'::delphi_severity END DESC
+            CASE WHEN $3 = 'created_asc'   THEN t.earliest_report_created ELSE TO_TIMESTAMP(0)        END ASC,
+            CASE WHEN $3 = 'created_desc'  THEN t.latest_report_created   ELSE TO_TIMESTAMP(0)        END DESC,
+            CASE WHEN $3 = 'severity_asc'  THEN t.severity                ELSE 'low'::delphi_severity END ASC,
+            CASE WHEN $3 = 'severity_desc' THEN t.severity                ELSE 'low'::delphi_severity END DESC
 
         -- pagination
         LIMIT $1
@@ -446,7 +470,7 @@ async fn search_projects(
         .transpose()
         .wrap_internal_err("failed to fetch reports")?
     {
-        reports.push(row.report.0);
+        project_reports.push(row.report.0);
         project_ids.push(row.project_id);
         thread_ids.push(row.project_thread_id);
     }
@@ -493,7 +517,7 @@ async fn search_projects(
         .collect::<HashMap<_, _>>();
 
     Ok(web::Json(SearchResponse {
-        reports,
+        project_reports,
         projects: projects
             .into_iter()
             .map(|(id, project)| {
@@ -577,6 +601,9 @@ async fn search_projects(
 /// See [`submit_report`].
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct SubmitReport {
+    /// Does the moderator think this report shows that the project is safe or
+    /// unsafe?
+    pub verdict: DelphiVerdict,
     /// Moderator message to send to the thread when rejecting the project.
     pub message: Option<String>,
 }
@@ -602,7 +629,7 @@ async fn submit_report(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     submit_report: web::Json<SubmitReport>,
-    path: web::Path<(DelphiReportId,)>,
+    path: web::Path<(ProjectId,)>,
 ) -> Result<(), ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
@@ -612,7 +639,7 @@ async fn submit_report(
         Scopes::PROJECT_WRITE,
     )
     .await?;
-    let (report_id,) = path.into_inner();
+    let (project_id,) = path.into_inner();
 
     let mut txn = pool
         .begin()
@@ -644,27 +671,10 @@ async fn submit_report(
         });
     }
 
-    let has_unsafe_issues = sqlx::query!(
-        r#"
-        SELECT EXISTS(
-            SELECT 1 FROM delphi_report_issues dri
-            WHERE
-                dri.report_id = $1
-                AND dri.status = 'unsafe'
-            LIMIT 1
-        ) AS "has_unsafe_issues!"
-        "#,
-        report_id as _,
-    )
-    .fetch_one(&mut *txn)
-    .await
-    .wrap_internal_err("failed to fetch unsafe issues")?
-    .has_unsafe_issues;
-
-    let (verdict, status) = if has_unsafe_issues {
-        (DelphiVerdict::Unsafe, DelphiReportIssueStatus::Unsafe)
-    } else {
-        (DelphiVerdict::Safe, DelphiReportIssueStatus::Safe)
+    let verdict = submit_report.verdict;
+    let status = match verdict {
+        DelphiVerdict::Unsafe => DelphiReportIssueStatus::Unsafe,
+        DelphiVerdict::Safe => DelphiReportIssueStatus::Safe,
     };
     let record = sqlx::query!(
         r#"
