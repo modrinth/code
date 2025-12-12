@@ -4,12 +4,11 @@
 			<ProjectPageDescription :description="project.body" />
 		</div>
 		<p v-else class="ml-2">
-			No description provided.
-			<NuxtLink to="settings/description">
-				<span class="font-medium hover:underline">
-					Visit project settings to add your description.
-				</span>
+			No description provided. Visit
+			<NuxtLink to="settings/versions">
+				<span class="font-medium text-green hover:underline">project settings</span> to
 			</NuxtLink>
+			add your description.
 		</p>
 	</section>
 </template>

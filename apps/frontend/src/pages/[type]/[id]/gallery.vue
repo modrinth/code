@@ -223,10 +223,11 @@
 		</div>
 		<template v-else>
 			<p class="ml-2">
-				No images in gallery.
-				<NuxtLink to="settings/gallery">
-					<span class="font-medium hover:underline"> Visit project settings to add images. </span>
+				No images in gallery. Visit
+				<NuxtLink to="settings/versions">
+					<span class="font-medium text-green hover:underline">project settings</span> to
 				</NuxtLink>
+				upload images.
 			</p>
 		</template>
 	</div>
