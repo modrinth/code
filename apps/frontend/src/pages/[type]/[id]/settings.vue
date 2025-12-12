@@ -149,7 +149,7 @@ async function setProcessing() {
 const scroll = useScroll(window)
 watch(route, () => {
 	const scrollY = scroll.y.value
-	setTimeout(() => window.scrollTo(0, scrollY), 100)
+	setTimeout(() => window.scrollTo(0, scrollY), 10)
 })
 </script>
 
