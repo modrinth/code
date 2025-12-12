@@ -464,6 +464,7 @@ export namespace Labrinth {
 				file_parts: string[]
 				primary_file?: string
 				file_types?: Record<string, Labrinth.Versions.v3.FileType | null>
+				environment?: Labrinth.Projects.v3.Environment
 			}
 
 			export type ModifyVersionRequest = Partial<

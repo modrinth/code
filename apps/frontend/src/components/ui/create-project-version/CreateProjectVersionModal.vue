@@ -77,9 +77,7 @@ const hideAddMcVersionsStage = computed(
 const hideAddDependenciesStage = computed(() => projectType.value === 'modpack')
 
 const hideAddEnvironmentStage = computed(
-	() => true,
-	// TODO-DEV-595: uncomment when environments working
-	// projectType.value !== 'mod' && projectType.value !== 'modpack',
+	() => projectType.value !== 'mod' && projectType.value !== 'modpack',
 )
 
 function getNextLabel() {
@@ -279,7 +277,6 @@ async function handleSaveVersionEdits() {
 
 	try {
 		if (!version.version_id) throw new Error('Version ID is required to save edits.')
-		// TODO DEV-595 need to properly pass version.environment into request body for creating and modifying a version
 
 		await labrinth.versions_v3.modifyVersion(version.version_id, {
 			name: version.name || version.version_number,
@@ -289,7 +286,7 @@ async function handleSaveVersionEdits() {
 			dependencies: version.dependencies || [],
 			game_versions: version.game_versions,
 			loaders: version.loaders,
-			// environment: version.environment,
+			environment: version.environment,
 		})
 
 		if (files.length > 0) {

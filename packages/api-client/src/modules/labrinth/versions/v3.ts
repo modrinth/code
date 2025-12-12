@@ -172,6 +172,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			file_parts: fileParts,
 			file_types: fileTypeMap,
 			primary_file: fileParts[0],
+			environment: draftVersion.environment,
 		}
 
 		formData.append('data', JSON.stringify(data))
@@ -182,7 +183,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 
 		return this.client.request<Labrinth.Versions.v3.Version>(`/version`, {
 			api: 'labrinth',
-			version: 2, // TODO: move this to v2 module
+			version: 3,
 			method: 'POST',
 			body: formData,
 			headers: {
@@ -219,7 +220,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	): Promise<Labrinth.Versions.v3.Version> {
 		return this.client.request<Labrinth.Versions.v3.Version>(`/version/${versionId}`, {
 			api: 'labrinth',
-			version: 2,
+			version: 3,
 			method: 'PATCH',
 			body: data,
 		})
