@@ -220,14 +220,14 @@
 <script setup lang="ts">
 import { Chips, Combobox, formFieldLabels, formFieldPlaceholders } from '@modrinth/ui'
 import { useVIntl } from '@vintl/vintl'
+// TODO: Switch to using Muralpay's improved endpoint when it's available.
+import iso3166 from 'iso-3166-2'
 
 import { useFormattedCountries } from '@/composables/country.ts'
-import { useGeneratedState } from '@/composables/generated.ts'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
 const { withdrawData } = useWithdrawContext()
 const { formatMessage } = useVIntl()
-const generatedState = useGeneratedState()
 
 const providerData = withdrawData.value.providerData
 const existingKycData = providerData.type === 'muralpay' ? providerData.kycData : null
@@ -283,12 +283,15 @@ const subdivisionOptions = computed(() => {
 	const selectedCountry = formData.value.physicalAddress.country
 	if (!selectedCountry) return []
 
-	const subdivisions = generatedState.value.subdivisions?.[selectedCountry] ?? []
+	const country = iso3166.country(selectedCountry)
+	if (!country) return []
 
-	return subdivisions.map((sub) => ({
-		value: sub.code.includes('-') ? sub.code.split('-')[1] : sub.code,
-		label: sub.localVariant || sub.name,
-	}))
+	return Object.entries(country.sub)
+		.map(([code, sub]) => ({
+			value: code.split('-').slice(1).join('-'),
+			label: sub.name,
+		}))
+		.sort((a, b) => a.label.localeCompare(b.label))
 })
 
 watch(
