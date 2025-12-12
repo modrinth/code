@@ -6,7 +6,7 @@
 			<div class="grid h-5 w-5 place-content-center rounded-full bg-green">
 				<CheckIcon class="text-sm text-black" />
 			</div>
-			<span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium" :title="name">
+			<span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium" v-tooltip="name">
 				{{ name }}
 			</span>
 			<div
