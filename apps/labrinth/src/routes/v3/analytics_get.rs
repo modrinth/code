@@ -24,7 +24,8 @@ use crate::{
     database::{
         self, DBProject,
         models::{
-            DBAffiliateCodeId, DBProjectId, DBUser, DBUserId, DBVersionId,
+            DBAffiliateCode, DBAffiliateCodeId, DBProjectId, DBUser, DBUserId,
+            DBVersionId,
         },
         redis::RedisPool,
     },
@@ -98,6 +99,8 @@ pub struct ReturnMetrics {
     pub project_playtime: Option<Metrics<ProjectPlaytimeField>>,
     /// How much payout revenue a project has generated.
     pub project_revenue: Option<Metrics<ProjectRevenueField>>,
+    /// How many times an affiliate code has been clicked.
+    pub affiliate_code_clicks: Option<Metrics<AffiliateCodeClicksField>>,
     /// How many times a product has been purchased with an affiliate code.
     pub affiliate_code_conversions:
         Option<Metrics<AffiliateCodeConversionsField>>,
@@ -193,6 +196,16 @@ pub enum ProjectPlaytimeField {
 pub enum ProjectRevenueField {
     /// Project ID.
     ProjectId,
+}
+
+/// Fields for [`ReturnMetrics::affiliate_code_clicks`].
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum AffiliateCodeClicksField {
+    /// Affiliate code ID.
+    AffiliateCodeId,
 }
 
 /// Fields for [`ReturnMetrics::affiliate_code_conversions`].
@@ -348,8 +361,16 @@ pub struct AffiliateCodeAnalytics {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[serde(rename_all = "snake_case", tag = "metric_kind")]
 pub enum AffiliateCodeMetrics {
+    Clicks(AffiliateCodeClicks),
     Conversions(AffiliateCodeConversions),
     Revenue(AffiliateCodeRevenue),
+}
+
+/// [`ReturnMetrics::affiliate_code_clicks`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AffiliateCodeClicks {
+    /// Total clicks for this bucket.
+    pub clicks: u64,
 }
 
 /// [`ReturnMetrics::affiliate_code_conversions`].
@@ -370,7 +391,9 @@ pub struct AffiliateCodeRevenue {
 
 /// Clickhouse queries - separate from [`sqlx`] queries.
 mod query {
-    use crate::database::models::{DBProjectId, DBVersionId};
+    use crate::database::models::{
+        DBAffiliateCodeId, DBProjectId, DBVersionId,
+    };
     use const_format::formatcp;
 
     const TIME_RANGE_START: &str = "{time_range_start: UInt64}";
@@ -489,6 +512,33 @@ mod query {
             GROUP BY bucket, project_id, version_id, loader, game_version"
         )
     };
+
+    #[derive(Debug, clickhouse::Row, serde::Deserialize)]
+    pub struct AffiliateCodeClickRow {
+        pub bucket: u64,
+        pub affiliate_code_id: DBAffiliateCodeId,
+        pub clicks: u64,
+    }
+
+    pub const AFFILIATE_CODE_CLICKS: &str = {
+        const USE_AFFILIATE_CODE_ID: &str = "{use_affiliate_code_id: Bool}";
+        const AFFILIATE_CODE_IDS: &str = "{affiliate_code_ids: Array(UInt64)}";
+
+        formatcp!(
+            "SELECT
+                widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
+                if({USE_AFFILIATE_CODE_ID}, affiliate_code_id, 0) AS affiliate_code_id,
+                COUNT(*) AS clicks
+            FROM affiliate_code_clicks
+            WHERE
+                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                -- make sure that the REAL affiliate code id is included,
+                -- not the possibly-zero one,
+                -- by using `affiliate_code_clicks.affiliate_code_id` instead of `project_id`
+                -- AND affiliate_code_clicks.affiliate_code_id IN {AFFILIATE_CODE_IDS}
+            GROUP BY bucket, affiliate_code_id"
+        )
+    };
 }
 
 /// Fetches analytics data for the authorized user's projects.
@@ -569,11 +619,19 @@ pub async fn fetch_analytics(
     let project_ids =
         filter_allowed_project_ids(&project_ids, &user, &pool, &redis).await?;
 
+    let affiliate_code_ids =
+        DBAffiliateCode::get_by_affiliate(user.id.into(), &**pool)
+            .await?
+            .into_iter()
+            .map(|code| code.id)
+            .collect::<Vec<_>>();
+
     let mut query_clickhouse_cx = QueryClickhouseContext {
         clickhouse: &clickhouse,
         req: &req,
         time_slices: &mut time_slices,
         project_ids: &project_ids,
+        affiliate_code_ids: &affiliate_code_ids,
     };
 
     if let Some(metrics) = &req.return_metrics.project_views {
@@ -675,6 +733,29 @@ pub async fn fetch_analytics(
                         game_version: none_if_empty(row.game_version),
                         seconds: row.seconds,
                     }),
+                })
+            },
+        )
+        .await?;
+    }
+
+    if let Some(metrics) = &req.return_metrics.affiliate_code_clicks {
+        use AffiliateCodeClicksField as F;
+        let uses = |field| metrics.bucket_by.contains(&field);
+
+        tracing::info!("affiliate codes = {affiliate_code_ids:?}");
+
+        query_clickhouse::<query::AffiliateCodeClickRow>(
+            &mut query_clickhouse_cx,
+            query::AFFILIATE_CODE_CLICKS,
+            &[("use_affiliate_code_id", uses(F::AffiliateCodeId))],
+            |row| row.bucket,
+            |row| {
+                AnalyticsData::AffiliateCode(AffiliateCodeAnalytics {
+                    source_affiliate_code: row.affiliate_code_id.into(),
+                    metrics: AffiliateCodeMetrics::Clicks(
+                        AffiliateCodeClicks { clicks: row.clicks },
+                    ),
                 })
             },
         )
@@ -872,6 +953,7 @@ struct QueryClickhouseContext<'a> {
     req: &'a GetRequest,
     time_slices: &'a mut [TimeSlice],
     project_ids: &'a [DBProjectId],
+    affiliate_code_ids: &'a [DBAffiliateCodeId],
 }
 
 async fn query_clickhouse<Row>(
@@ -891,7 +973,8 @@ where
         .param("time_range_start", cx.req.time_range.start.timestamp())
         .param("time_range_end", cx.req.time_range.end.timestamp())
         .param("time_slices", cx.time_slices.len())
-        .param("project_ids", cx.project_ids);
+        .param("project_ids", cx.project_ids)
+        .param("affiliate_code_ids", cx.affiliate_code_ids);
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)
     }
