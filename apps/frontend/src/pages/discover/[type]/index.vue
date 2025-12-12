@@ -27,6 +27,7 @@ import {
 	useSearch,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
+import { useThrottleFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
@@ -277,6 +278,7 @@ const {
 		return `${base}search${requestParams.value}`
 	},
 	{
+		watch: false,
 		transform: (hits) => {
 			noLoad.value = false
 			return hits as Labrinth.Search.v2.SearchResults
@@ -333,6 +335,8 @@ function updateSearchResults(pageNumber: number = 1, resetScroll = true) {
 watch([currentFilters], () => {
 	updateSearchResults(1, false)
 })
+
+const throttledSearch = useThrottleFn(() => updateSearchResults(), 500, true)
 
 function cycleSearchDisplayMode() {
 	if (!resultsDisplayLocation.value) {
@@ -521,9 +525,18 @@ useSeoMeta({
 					spellcheck="false"
 					type="text"
 					:placeholder="`Search ${projectType?.display ?? 'project'}s...`"
-					@input="updateSearchResults()"
+					@input="throttledSearch()"
 				/>
-				<Button v-if="query" class="r-btn" @click="() => (query = '')">
+				<Button
+					v-if="query"
+					class="r-btn"
+					@click="
+						() => {
+							query = ''
+							updateSearchResults()
+						}
+					"
+				>
 					<XIcon />
 				</Button>
 			</div>
