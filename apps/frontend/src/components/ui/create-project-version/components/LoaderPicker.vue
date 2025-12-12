@@ -47,17 +47,10 @@ const selectedLoaders = defineModel<string[]>({ default: [] })
 
 const { loaders } = defineProps<{
 	loaders: Labrinth.Tags.v2.Loader[]
+	toggleLoader: (loader: string) => void
 }>()
 
 const loaderGroup = ref<GroupLabels>('mods')
-
-const toggleLoader = (loader: string) => {
-	if (selectedLoaders.value.includes(loader)) {
-		selectedLoaders.value = selectedLoaders.value.filter((l) => l !== loader)
-	} else {
-		selectedLoaders.value = [...selectedLoaders.value, loader]
-	}
-}
 
 type GroupLabels = 'mods' | 'plugins' | 'packs' | 'shaders' | 'other'
 

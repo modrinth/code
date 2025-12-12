@@ -1,6 +1,10 @@
 <template>
 	<div class="space-y-6">
-		<LoaderPicker v-model="draftVersion.loaders" :loaders="generatedState.loaders" />
+		<LoaderPicker
+			v-model="draftVersion.loaders"
+			:loaders="generatedState.loaders"
+			:toggleLoader="toggleLoader"
+		/>
 
 		<div v-if="draftVersion.loaders.length" class="space-y-1">
 			<div class="flex items-center justify-between">
@@ -61,5 +65,8 @@ const toggleLoader = (loader: string) => {
 	setProjectType(projectV2.value)
 }
 
-const onClearAll = () => (draftVersion.value.loaders = [])
+const onClearAll = () => {
+	draftVersion.value.loaders = []
+	setProjectType(projectV2.value)
+}
 </script>

@@ -82,10 +82,15 @@ const hideAddEnvironmentStage = computed(
 
 function getNextLabel() {
 	const currentStageIndex = modal.value?.currentStageIndex || 0
-	const visibleStages = stages.value
-	if (!visibleStages) return 'Next'
+	const allStages = stages.value
+	if (!allStages) return 'Next'
 
-	const next = visibleStages[currentStageIndex + 1]
+	let nextIndex = currentStageIndex + 1
+	while (nextIndex < allStages.length && allStages[nextIndex]?.skip) {
+		nextIndex++
+	}
+
+	const next = allStages[nextIndex]
 	if (!next) return 'Done'
 
 	switch (next.id) {
@@ -108,129 +113,130 @@ function getNextLabel() {
 	}
 }
 
-const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']>(
-	() =>
-		[
-			{
-				title: editingVersion.value ? 'Edit files' : 'Add files',
-				id: 'add-files',
-				stageContent: markRaw(AddFilesStage),
-				leftButtonConfig: {
-					...defaultBackButton,
-					label: 'Cancel',
-					icon: XIcon,
-					iconPosition: 'before' as const,
-					onClick: () => modal.value?.hide(),
-				},
-				rightButtonConfig: {
-					...defaultNextButton,
-					disabled: addFilesNextDisabled.value,
-					label: getNextLabel(),
-				},
-			},
-			{
-				title: editingVersion.value ? 'Edit details' : 'Add details',
-				id: 'add-details',
-				stageContent: markRaw(AddDetailsStage),
-				leftButtonConfig: { ...defaultBackButton },
-				rightButtonConfig: {
-					...defaultNextButton,
-					disabled: addDetailsNextDisabled.value,
-					label: getNextLabel(),
-				},
-			},
-			hideAddLoadersStage.value === false && {
-				title: editingVersion.value ? 'Edit loaders' : 'Add loaders',
-				id: 'add-loaders',
-				stageContent: markRaw(AddLoadersStage),
-				leftButtonConfig: { ...defaultBackButton },
-				rightButtonConfig: {
-					...defaultNextButton,
-					disabled: addLoadersNextDisabled.value,
-					label: getNextLabel(),
-				},
-			},
-			hideAddMcVersionsStage.value === false && {
-				title: editingVersion.value ? 'Edit MC versions' : 'Add MC versions',
-				id: 'add-mc-versions',
-				stageContent: markRaw(AddMcVersionsStage),
-				leftButtonConfig: { ...defaultBackButton },
-				rightButtonConfig: {
-					...defaultNextButton,
-					disabled: addMcVersionsNextDisabled.value,
-					label: getNextLabel(),
-				},
-			},
-			hideAddEnvironmentStage.value === false && {
-				title: editingVersion.value ? 'Edit environment' : 'Add environment',
-				id: 'add-environment',
-				stageContent: markRaw(AddEnvironmentStage),
-				leftButtonConfig: { ...defaultBackButton },
-				rightButtonConfig: {
-					...defaultNextButton,
-					label: getNextLabel(),
-				},
-			},
-			hideAddDependenciesStage.value === false && {
-				title: editingVersion.value ? 'Edit dependencies' : 'Add dependencies',
-				id: 'add-dependencies',
-				stageContent: markRaw(AddDependenciesStage),
-				leftButtonConfig: { ...defaultBackButton },
-				rightButtonConfig: {
-					...defaultNextButton,
-					label: getNextLabel(),
-				},
-			},
-			{
-				title: editingVersion.value ? 'Edit changelog' : 'Add changelog',
-				id: 'add-changelog',
-				stageContent: markRaw(AddChangelogStage),
-				leftButtonConfig: { ...defaultBackButton },
-				rightButtonConfig: {
-					...defaultNextButton,
-					iconPosition: 'before' as const,
-					color: 'green' as const,
-					label: editingVersion.value ? 'Save changes' : 'Create version',
-					icon: isSubmitting.value ? SpinnerIcon : PlusIcon,
-					iconClass: isSubmitting.value ? 'animate-spin' : undefined,
-					disabled: isSubmitting.value,
-					onClick: () => (editingVersion.value ? handleSaveVersionEdits() : handleCreateVersion()),
-				},
-			},
-			{
-				title: 'Edit loaders',
-				id: 'edit-loaders',
-				stageContent: AddLoadersStage,
-				leftButtonConfig: {
-					...defaultBackButton,
-					label: 'Back',
-					onClick: () => modal.value?.setStage('add-details'),
-				},
-				rightButtonConfig: {
-					...defaultNextButton,
-					label: 'Continue',
-					onClick: () => modal.value?.setStage(2),
-				},
-				nonProgressStage: true,
-			},
-			{
-				title: 'Edit MC versions',
-				id: 'edit-mc-versions',
-				stageContent: AddMcVersionsStage,
-				leftButtonConfig: {
-					...defaultBackButton,
-					label: 'Back',
-					onClick: () => modal.value?.setStage('add-details'),
-				},
-				rightButtonConfig: {
-					...defaultNextButton,
-					label: 'Continue',
-					onClick: () => modal.value?.setStage(2),
-				},
-				nonProgressStage: true,
-			},
-		].filter(Boolean) as InstanceType<typeof MultiStageModal>['$props']['stages'],
-)
+const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']>(() => [
+	{
+		title: editingVersion.value ? 'Edit files' : 'Add files',
+		id: 'add-files',
+		stageContent: markRaw(AddFilesStage),
+		leftButtonConfig: {
+			...defaultBackButton,
+			label: 'Cancel',
+			icon: XIcon,
+			iconPosition: 'before' as const,
+			onClick: () => modal.value?.hide(),
+		},
+		rightButtonConfig: {
+			...defaultNextButton,
+			disabled: addFilesNextDisabled.value,
+			label: getNextLabel(),
+		},
+	},
+	{
+		title: editingVersion.value ? 'Edit details' : 'Add details',
+		id: 'add-details',
+		stageContent: markRaw(AddDetailsStage),
+		leftButtonConfig: { ...defaultBackButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			disabled: addDetailsNextDisabled.value,
+			label: getNextLabel(),
+		},
+	},
+	{
+		title: editingVersion.value ? 'Edit loaders' : 'Add loaders',
+		id: 'add-loaders',
+		stageContent: markRaw(AddLoadersStage),
+		leftButtonConfig: { ...defaultBackButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			disabled: addLoadersNextDisabled.value,
+			label: getNextLabel(),
+		},
+		skip: hideAddLoadersStage.value,
+	},
+	{
+		title: editingVersion.value ? 'Edit MC versions' : 'Add MC versions',
+		id: 'add-mc-versions',
+		stageContent: markRaw(AddMcVersionsStage),
+		leftButtonConfig: { ...defaultBackButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			disabled: addMcVersionsNextDisabled.value,
+			label: getNextLabel(),
+		},
+		skip: hideAddMcVersionsStage.value,
+	},
+	{
+		title: editingVersion.value ? 'Edit environment' : 'Add environment',
+		id: 'add-environment',
+		stageContent: markRaw(AddEnvironmentStage),
+		leftButtonConfig: { ...defaultBackButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			label: getNextLabel(),
+		},
+		skip: hideAddEnvironmentStage.value,
+	},
+	{
+		title: editingVersion.value ? 'Edit dependencies' : 'Add dependencies',
+		id: 'add-dependencies',
+		stageContent: markRaw(AddDependenciesStage),
+		leftButtonConfig: { ...defaultBackButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			label: getNextLabel(),
+		},
+		skip: hideAddDependenciesStage.value,
+	},
+	{
+		title: editingVersion.value ? 'Edit changelog' : 'Add changelog',
+		id: 'add-changelog',
+		stageContent: markRaw(AddChangelogStage),
+		leftButtonConfig: { ...defaultBackButton },
+		rightButtonConfig: {
+			...defaultNextButton,
+			iconPosition: 'before' as const,
+			color: 'green' as const,
+			label: editingVersion.value ? 'Save changes' : 'Create version',
+			icon: isSubmitting.value ? SpinnerIcon : PlusIcon,
+			iconClass: isSubmitting.value ? 'animate-spin' : undefined,
+			disabled: isSubmitting.value,
+			onClick: () => (editingVersion.value ? handleSaveVersionEdits() : handleCreateVersion()),
+		},
+	},
+	{
+		title: 'Edit loaders',
+		id: 'edit-loaders',
+		stageContent: AddLoadersStage,
+		leftButtonConfig: {
+			...defaultBackButton,
+			label: 'Back',
+			onClick: () => modal.value?.setStage('add-details'),
+		},
+		rightButtonConfig: {
+			...defaultNextButton,
+			label: 'Continue',
+			onClick: () => modal.value?.setStage(2),
+		},
+		nonProgressStage: true,
+	},
+	{
+		title: 'Edit MC versions',
+		id: 'edit-mc-versions',
+		stageContent: AddMcVersionsStage,
+		leftButtonConfig: {
+			...defaultBackButton,
+			label: 'Back',
+			onClick: () => modal.value?.setStage('add-details'),
+		},
+		rightButtonConfig: {
+			...defaultNextButton,
+			label: 'Continue',
+			onClick: () => modal.value?.setStage(2),
+		},
+		nonProgressStage: true,
+	},
+])
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -313,12 +319,14 @@ async function handleSaveVersionEdits() {
 
 const { projectV2 } = injectProjectPageContext()
 
+function showCreateVersionModal(version: Labrinth.Versions.v3.DraftVersion | null = null) {
+	newDraftVersion(projectV2.value.id, version)
+	setProjectType(projectV2.value)
+	modal.value?.setStage(0)
+	modal.value?.show()
+}
+
 defineExpose({
-	show: (version: Labrinth.Versions.v3.DraftVersion | null = null) => {
-		newDraftVersion(projectV2.value.id, version)
-		setProjectType(projectV2.value)
-		modal.value?.setStage(0)
-		modal.value?.show()
-	},
+	show: showCreateVersionModal,
 })
 </script>

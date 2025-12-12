@@ -63,7 +63,7 @@ import { ButtonStyled, NewModal } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
 
-const props = defineProps<{
+const { stages } = defineProps<{
 	stages: ModalStage[]
 }>()
 
@@ -84,6 +84,7 @@ export interface ModalStage {
 	leftButtonConfig: ButtonConfig | null
 	rightButtonConfig: ButtonConfig | null
 	nonProgressStage?: boolean
+	skip?: boolean
 }
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
@@ -98,29 +99,46 @@ function hide() {
 }
 
 const setStage = (indexOrId: number | string) => {
+	let index: number = 0
 	if (typeof indexOrId === 'number') {
-		const index = indexOrId
-		if (index < 0 || index >= props.stages.length) return
-		currentStageIndex.value = index
+		index = indexOrId
+		if (index < 0 || index >= stages.length) return
 	} else {
-		const index = props.stages.findIndex((stage) => stage.id === indexOrId)
+		index = stages.findIndex((stage) => stage.id === indexOrId)
 		if (index === -1) return
+	}
+	while (index < stages.length && stages[index]?.skip) {
+		index++
+	}
+	if (index < stages.length) {
 		currentStageIndex.value = index
 	}
 }
 
 const nextStage = () => {
 	if (currentStageIndex.value === -1) return
-	if (currentStageIndex.value >= props.stages.length - 1) return
-	currentStageIndex.value = currentStageIndex.value + 1
+	if (currentStageIndex.value >= stages.length - 1) return
+	let nextIndex = currentStageIndex.value + 1
+	while (nextIndex < stages.length && stages[nextIndex]?.skip) {
+		nextIndex++
+	}
+	if (nextIndex < stages.length) {
+		currentStageIndex.value = nextIndex
+	}
 }
 
 const prevStage = () => {
 	if (currentStageIndex.value <= 0) return
-	currentStageIndex.value = currentStageIndex.value - 1
+	let prevIndex = currentStageIndex.value - 1
+	while (prevIndex >= 0 && stages[prevIndex]?.skip) {
+		prevIndex--
+	}
+	if (prevIndex >= 0) {
+		currentStageIndex.value = prevIndex
+	}
 }
 
-const currentStage = computed(() => props.stages[currentStageIndex.value])
+const currentStage = computed(() => stages[currentStageIndex.value])
 
 const leftButtonConfig = computed(() => {
 	return currentStage.value?.leftButtonConfig

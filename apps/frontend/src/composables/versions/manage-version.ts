@@ -89,6 +89,8 @@ async function setProjectType(
 	} catch {
 		// not a zip
 	}
+
+	projectType.value = undefined
 	return undefined
 }
 
