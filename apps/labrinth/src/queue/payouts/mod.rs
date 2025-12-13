@@ -157,6 +157,8 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
                 min: Decimal::ZERO,
                 max: Some(Decimal::ZERO),
             },
+            currency_code: None,
+            exchange_rate: None,
         })
         .collect()
 }
@@ -450,6 +452,8 @@ impl PayoutsQueue {
                         min: Decimal::from(1) / Decimal::from(4),
                         max: Some(Decimal::from(1)),
                     },
+                    currency_code: None,
+                    exchange_rate: None,
                 };
 
                 let mut venmo = paypal_us.clone();
@@ -817,13 +821,19 @@ async fn get_tremendous_payout_methods(
         products: Vec<Product>,
     }
 
+    let forex: TremendousForexResponse = queue
+        .make_tremendous_request(Method::GET, "forex", None::<()>)
+        .await
+        .wrap_err("failed to fetch Tremendous forex data")?;
+
     let response = queue
         .make_tremendous_request::<(), TremendousResponse>(
             Method::GET,
             "products",
             None,
         )
-        .await?;
+        .await
+        .wrap_err("failed to fetch Tremendous products data")?;
 
     let mut methods = Vec::new();
 
@@ -903,6 +913,16 @@ async fn get_tremendous_payout_methods(
             },
         };
 
+        let Some(currency) = product.currency_codes.first() else {
+            // cards with multiple currencies are not supported
+            continue;
+        };
+        let Some(&usd_to_currency) = forex.forex.get(currency) else {
+            warn!("No Tremendous forex data for {currency}");
+            continue;
+        };
+        let currency_to_usd = dec!(1) / usd_to_currency;
+
         let method = PayoutMethod {
             id: product.id,
             type_: PayoutMethodType::Tremendous,
@@ -927,15 +947,15 @@ async fn get_tremendous_payout_methods(
                 let mut values = product
                     .skus
                     .into_iter()
-                    .map(|x| PayoutDecimal(x.min))
+                    .map(|x| PayoutDecimal(x.min * currency_to_usd))
                     .collect::<Vec<_>>();
                 values.sort_by(|a, b| a.0.cmp(&b.0));
 
                 PayoutInterval::Fixed { values }
             } else if let Some(first) = product.skus.first() {
                 PayoutInterval::Standard {
-                    min: first.min,
-                    max: first.max,
+                    min: first.min * currency_to_usd,
+                    max: first.max * currency_to_usd,
                 }
             } else {
                 PayoutInterval::Standard {
@@ -944,14 +964,9 @@ async fn get_tremendous_payout_methods(
                 }
             },
             fee,
+            currency_code: Some(currency.clone()),
+            exchange_rate: Some(usd_to_currency),
         };
-
-        // we do not support interval gift cards with non US based currencies since we cannot do currency conversions properly
-        if let PayoutInterval::Fixed { .. } = method.interval
-            && !product.currency_codes.contains(&"USD".to_string())
-        {
-            continue;
-        }
 
         methods.push(method);
     }
