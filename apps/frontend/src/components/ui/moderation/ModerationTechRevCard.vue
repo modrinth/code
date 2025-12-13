@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BugIcon,
 	CheckIcon,
 	ChevronDownIcon,
 	ClipboardCopyIcon,
@@ -10,6 +11,7 @@ import {
 	EllipsisVerticalIcon,
 	LinkIcon,
 	LoaderCircleIcon,
+	ShieldCheckIcon,
 } from '@modrinth/assets'
 import { type TechReviewContext, techReviewQuickReplies } from '@modrinth/moderation'
 import {
@@ -30,6 +32,7 @@ import {
 	type ThreadMessage,
 	type User,
 } from '@modrinth/utils'
+import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
 import NavTabs from '~/components/ui/NavTabs.vue'
@@ -105,8 +108,8 @@ const quickActions = computed<OverflowMenuOption[]>(() => {
 	return actions
 })
 
-type Tab = 'Thread' | 'Files'
-const tabs: readonly Tab[] = ['Thread', 'Files']
+type Tab = 'Thread' | 'Files' | 'File'
+const tabs: readonly ('Thread' | 'Files')[] = ['Thread', 'Files']
 const currentTab = ref<Tab>('Thread')
 
 const isThreadCollapsed = ref(false)
@@ -169,10 +172,11 @@ const navTabsLinks = computed(() => {
 })
 
 const activeTabIndex = computed(() => {
-	if (selectedFile.value) {
+	if (currentTab.value === 'File' && selectedFile.value) {
 		return navTabsLinks.value.length - 1
 	}
-	return tabs.indexOf(currentTab.value)
+	const idx = tabs.indexOf(currentTab.value as 'Thread' | 'Files')
+	return idx >= 0 ? idx : 0
 })
 
 function handleTabClick(index: number) {
@@ -180,11 +184,12 @@ function handleTabClick(index: number) {
 		const newTab = tabs[index]
 		currentTab.value = newTab
 
-		backToFileList()
-
 		if (newTab === 'Thread') {
 			isThreadCollapsed.value = false
 		}
+	} else if (index === tabs.length && selectedFile.value) {
+		// Clicked the file tab
+		currentTab.value = 'File' as Tab
 	}
 }
 
@@ -233,11 +238,15 @@ function formatFileSize(bytes: number): string {
 
 function viewFileFlags(file: FlattenedFileReport) {
 	selectedFileId.value = file.id
+	currentTab.value = 'File'
 	emit('loadFileSources', file.id)
 }
 
 function backToFileList() {
 	selectedFileId.value = null
+	if (currentTab.value === 'File') {
+		currentTab.value = 'Files'
+	}
 }
 
 async function copyToClipboard(code: string, detailId: string) {
@@ -266,6 +275,17 @@ function getIssueDecision(
 	return 'pending'
 }
 
+function isPreReviewed(
+	issueId: string,
+	backendStatus: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
+): boolean {
+	return (backendStatus === 'safe' || backendStatus === 'unsafe') && !issueDecisions.value.has(issueId)
+}
+
+function getMarkedFlagsCount(flags: ClassGroup['flags']): number {
+	return flags.filter((f) => getIssueDecision(f.issueId, f.status) !== 'pending').length
+}
+
 async function updateIssueStatus(issueId: string, verdict: 'safe' | 'unsafe') {
 	updatingIssues.value.add(issueId)
 
@@ -273,6 +293,14 @@ async function updateIssueStatus(issueId: string, verdict: 'safe' | 'unsafe') {
 		await client.labrinth.tech_review_internal.updateIssue(issueId, { verdict })
 
 		issueDecisions.value.set(issueId, verdict === 'safe' ? 'safe' : 'malware')
+
+		for (const classGroup of groupedByClass.value) {
+			const hasThisIssue = classGroup.flags.some((f) => f.issueId === issueId)
+			if (hasThisIssue && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
+				expandedClasses.value.delete(classGroup.filePath)
+				break
+			}
+		}
 
 		if (verdict === 'safe') {
 			addNotification({
@@ -283,7 +311,7 @@ async function updateIssueStatus(issueId: string, verdict: 'safe' | 'unsafe') {
 		} else {
 			addNotification({
 				type: 'success',
-				title: 'Issue marked as malware',
+				title: 'Issue marked as unsafe',
 				text: 'This issue has been flagged as malicious.',
 			})
 		}
@@ -331,6 +359,19 @@ const groupedByClass = computed<ClassGroup[]>(() => {
 		}
 	}
 
+	for (const classGroup of classMap.values()) {
+		classGroup.flags.sort((a, b) => {
+			const aPreReviewed = isPreReviewed(a.issueId, a.status)
+			const bPreReviewed = isPreReviewed(b.issueId, b.status)
+
+			if (aPreReviewed !== bPreReviewed) {
+				return aPreReviewed ? 1 : -1
+			}
+
+			return (severityOrder[b.detail.severity] ?? 0) - (severityOrder[a.detail.severity] ?? 0)
+		})
+	}
+
 	return Array.from(classMap.values()).sort((a, b) => {
 		const aSeverity = getHighestSeverityInClass(a.flags)
 		const bSeverity = getHighestSeverityInClass(b.flags)
@@ -374,59 +415,85 @@ const threadViewRef = ref<{
 } | null>(null)
 
 const reviewSummaryPreview = computed(() => {
-	const decisions: Array<{
-		filePath: string
-		issueType: string
-		severity: string
-		decision: 'safe' | 'malware'
-	}> = []
+	interface FileDecisions {
+		fileName: string
+		fileSize: number
+		decisions: Array<{
+			filePath: string
+			issueType: string
+			severity: string
+			decision: 'safe' | 'malware'
+		}>
+		maxSeverity: string
+	}
+
+	const fileDecisions = new Map<string, FileDecisions>()
+	let totalSafe = 0
+	let totalUnsafe = 0
 
 	for (const report of props.item.reports) {
+		if (!fileDecisions.has(report.id)) {
+			fileDecisions.set(report.id, {
+				fileName: report.file_name,
+				fileSize: report.file_size,
+				decisions: [],
+				maxSeverity: 'low',
+			})
+		}
+		const fileData = fileDecisions.get(report.id)!
+
 		for (const issue of report.issues) {
+			const decision = getIssueDecision(issue.id, issue.status)
+			if (decision === 'pending') continue
+
 			for (const detail of issue.details) {
-				const decision = getIssueDecision(issue.id, issue.status)
-				if (decision !== 'pending') {
-					decisions.push({
-						filePath: detail.file_path,
-						issueType: issue.issue_type.replace(/_/g, ' '),
-						severity: detail.severity,
-						decision,
-					})
+				fileData.decisions.push({
+					filePath: detail.file_path,
+					issueType: issue.issue_type.replace(/_/g, ' '),
+					severity: detail.severity,
+					decision,
+				})
+
+				if ((severityOrder[detail.severity] ?? 0) > (severityOrder[fileData.maxSeverity] ?? 0)) {
+					fileData.maxSeverity = detail.severity
 				}
+
+				if (decision === 'safe') totalSafe++
+				else totalUnsafe++
 			}
 		}
 	}
 
-	if (decisions.length === 0) return ''
+	const totalDecisions = totalSafe + totalUnsafe
+	if (totalDecisions === 0) return ''
 
-	const safeCount = decisions.filter((d) => d.decision === 'safe').length
-	const malwareCount = decisions.filter((d) => d.decision === 'malware').length
-	const verdict = malwareCount > 0 ? 'Malware' : 'Safe'
+	const timestamp = dayjs().utc().format('MMMM D, YYYY [at] h:mm A [UTC]')
+	let markdown = `## Tech Review Summary\n*${timestamp}*\n\n`
 
-	const tableRows = decisions
-		.map(
-			(d) =>
-				`| \`${d.filePath}\` | ${d.issueType} | ${capitalizeString(d.severity)} | ${d.decision === 'safe' ? '✅ Safe' : '❌ Malware'} |`,
-		)
-		.join('\n')
+	for (const [, fileData] of fileDecisions) {
+		if (fileData.decisions.length === 0) continue
 
-	return `## Tech Review Summary
+		const fileSafe = fileData.decisions.filter((d) => d.decision === 'safe').length
+		const fileUnsafe = fileData.decisions.filter((d) => d.decision === 'malware').length
+		const fileVerdict = fileUnsafe > 0 ? 'Unsafe' : 'Safe'
 
-<details>
-<summary>Issues Reviewed (${decisions.length} total - ${safeCount} safe, ${malwareCount} malware)</summary>
+		markdown += `### ${fileData.fileName}\n`
+		markdown += `> ${formatFileSize(fileData.fileSize)} • ${fileData.decisions.length} issues • Max severity: ${fileData.maxSeverity} • **Verdict:** ${fileVerdict}\n\n`
+		markdown += `<details>\n<summary>Issues (${fileSafe} safe, ${fileUnsafe} unsafe)</summary>\n\n`
+		markdown += `| Class | Issue Type | Severity | Decision |\n`
+		markdown += `|-------|------------|----------|----------|\n`
 
-| Class | Issue Type | Severity | Decision |
-|-------|------------|----------|----------|
-${tableRows}
+		for (const d of fileData.decisions) {
+			const decisionText = d.decision === 'safe' ? '✅ Safe' : '❌ Unsafe'
+			markdown += `| \`${d.filePath}\` | ${d.issueType} | ${capitalizeString(d.severity)} | ${decisionText} |\n`
+		}
 
-</details>
+		markdown += `\n</details>\n\n`
+	}
 
-**Verdict:** ${verdict}
+	markdown += `---\n\n**Total:** ${totalDecisions} issues reviewed (${totalSafe} safe, ${totalUnsafe} unsafe)\n\n`
 
----
-
-
-`
+	return markdown
 })
 
 const threadWithPreview = computed(() => {
@@ -469,25 +536,14 @@ const allIssuesResolved = computed(() => {
 	return true
 })
 
-const computedVerdict = computed<'safe' | 'unsafe'>(() => {
-	for (const report of props.item.reports) {
-		for (const issue of report.issues) {
-			const decision = getIssueDecision(issue.id, issue.status)
-			if (decision === 'malware') return 'unsafe'
-		}
-	}
-	return 'safe'
-})
-
 const canSubmitReview = computed(() => {
 	const totalIssues = props.item.reports.reduce((sum, r) => sum + r.issues.length, 0)
 	if (totalIssues === 0) return true
 	return allIssuesResolved.value
 })
 
-async function handleSubmitReview() {
+async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 	const editorContent = threadViewRef.value?.getReplyContent() || ''
-	const verdict = computedVerdict.value
 
 	let message: string | undefined
 	if (reviewSummaryPreview.value && editorContent) {
@@ -652,8 +708,21 @@ async function handleSubmitReview() {
 						>
 							<template #additionalActions>
 								<ButtonStyled color="brand">
-									<button :disabled="!canSubmitReview" @click="handleSubmitReview">
-										Submit Review
+									<button
+										v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
+										:disabled="!canSubmitReview"
+										@click="handleSubmitReview('safe')"
+									>
+										<ShieldCheckIcon /> Safe
+									</button>
+								</ButtonStyled>
+								<ButtonStyled color="red">
+									<button
+										v-tooltip="!canSubmitReview ? 'There are still pending flags!' : undefined"
+										:disabled="!canSubmitReview"
+										@click="handleSubmitReview('unsafe')"
+									>
+										<BugIcon /> Unsafe
 									</button>
 								</ButtonStyled>
 							</template>
@@ -662,7 +731,7 @@ async function handleSubmitReview() {
 				</CollapsibleRegion>
 			</template>
 
-			<template v-else-if="currentTab === 'Files' && !selectedFile">
+			<template v-else-if="currentTab === 'Files'">
 				<div
 					v-for="(file, idx) in allFiles"
 					:key="idx"
@@ -673,7 +742,13 @@ async function handleSubmitReview() {
 					}"
 				>
 					<div class="flex items-center gap-3">
-						<span class="font-medium text-contrast">{{ file.file_name }}</span>
+						<span
+							class="font-medium text-contrast"
+							:class="{ 'cursor-pointer hover:underline': file.issues.length > 0 }"
+							@click="file.issues.length > 0 && viewFileFlags(file)"
+						>
+							{{ file.file_name }}
+						</span>
 						<div class="rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1">
 							<span class="text-sm font-medium text-secondary">{{
 								formatFileSize(file.file_size)
@@ -720,7 +795,7 @@ async function handleSubmitReview() {
 				</div>
 			</template>
 
-			<template v-else-if="currentTab === 'Files' && selectedFile">
+			<template v-else-if="currentTab === 'File' && selectedFile">
 				<div
 					v-for="(classItem, idx) in groupedByClass"
 					:key="classItem.filePath"
@@ -755,9 +830,18 @@ async function handleSubmitReview() {
 							</div>
 
 							<div
-								class="border-red/60 flex items-center gap-1 rounded-full border border-solid bg-highlight-red px-2.5 py-1 text-sm text-red"
+								class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1 text-sm"
+								:class="
+									getMarkedFlagsCount(classItem.flags) === classItem.flags.length
+										? 'border-green/60 bg-highlight-green text-green'
+										: 'border-red/60 bg-highlight-red text-red'
+								"
 							>
-								{{ classItem.flags.length }} {{ classItem.flags.length === 1 ? 'flag' : 'flags' }}
+								<CheckIcon
+									v-if="getMarkedFlagsCount(classItem.flags) === classItem.flags.length"
+									class="size-4"
+								/>
+								{{ getMarkedFlagsCount(classItem.flags) }}/{{ classItem.flags.length }} flags
 							</div>
 
 							<Transition name="fade">
@@ -780,7 +864,10 @@ async function handleSubmitReview() {
 								v-for="(flag, flagIdx) in classItem.flags"
 								:key="`${flag.issueId}-${flag.detail.id}`"
 								class="flex flex-col gap-2 rounded-lg p-2"
-								:class="{ 'bg-[#E8E8E8] dark:bg-[#1A1C20]': flagIdx % 2 === 1 }"
+								:class="{
+									'bg-[#E8E8E8] dark:bg-[#1A1C20]': flagIdx % 2 === 1,
+									'opacity-50': isPreReviewed(flag.issueId, flag.status),
+								}"
 							>
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-2">
@@ -828,7 +915,7 @@ async function handleSubmitReview() {
 												:disabled="updatingIssues.has(flag.issueId)"
 												@click="updateIssueStatus(flag.issueId, 'unsafe')"
 											>
-												Malware
+												Unsafe
 											</button>
 										</ButtonStyled>
 									</div>

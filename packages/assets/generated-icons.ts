@@ -28,6 +28,7 @@ import _BoxIcon from './icons/box.svg?component'
 import _BoxImportIcon from './icons/box-import.svg?component'
 import _BracesIcon from './icons/braces.svg?component'
 import _BrushCleaningIcon from './icons/brush-cleaning.svg?component'
+import _BugIcon from './icons/bug.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
 import _CardIcon from './icons/card.svg?component'
 import _ChangeSkinIcon from './icons/change-skin.svg?component'
@@ -252,6 +253,7 @@ export const BoxImportIcon = _BoxImportIcon
 export const BoxIcon = _BoxIcon
 export const BracesIcon = _BracesIcon
 export const BrushCleaningIcon = _BrushCleaningIcon
+export const BugIcon = _BugIcon
 export const CalendarIcon = _CalendarIcon
 export const CardIcon = _CardIcon
 export const ChangeSkinIcon = _ChangeSkinIcon
