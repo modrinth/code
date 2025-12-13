@@ -111,21 +111,29 @@
 				</Combobox>
 			</div>
 			<span v-if="selectedMethodDetails" class="text-secondary">
-				{{ formatMoney(effectiveMinAmount)
+				{{ formatMoney(fixedDenominationMin ?? effectiveMinAmount)
 				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
 					({{
 						formatAmountForDisplay(
-							effectiveMinAmount,
+							fixedDenominationMin ?? effectiveMinAmount,
 							selectedMethodCurrencyCode,
 							selectedMethodExchangeRate,
 						)
 					}})</template
 				>
-				min, {{ formatMoney(selectedMethodDetails.interval?.standard?.max ?? effectiveMaxAmount)
+				min,
+				{{
+					formatMoney(
+						fixedDenominationMax ??
+							selectedMethodDetails.interval?.standard?.max ??
+							effectiveMaxAmount,
+					)
 				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
 					({{
 						formatAmountForDisplay(
-							selectedMethodDetails.interval?.standard?.max ?? effectiveMaxAmount,
+							fixedDenominationMax ??
+								selectedMethodDetails.interval?.standard?.max ??
+								effectiveMaxAmount,
 							selectedMethodCurrencyCode,
 							selectedMethodExchangeRate,
 						)
@@ -159,17 +167,105 @@
 			</label>
 
 			<div v-if="showGiftCardSelector && useFixedDenominations" class="flex flex-col gap-2.5">
-				<Chips
-					v-model="selectedDenomination"
-					:items="denominationOptions"
-					:format-label="
-						(amt: number) =>
-							formatAmountForDisplay(amt, selectedMethodCurrencyCode, selectedMethodExchangeRate)
-					"
-					:never-empty="false"
-					:capitalize="false"
-				/>
-				<span v-if="denominationOptions.length === 0" class="text-error text-sm">
+				<template v-if="useDenominationSuggestions">
+					<input
+						v-model.number="denominationSearchInput"
+						type="number"
+						step="0.01"
+						:min="0"
+						:placeholder="denominationInputPlaceholder"
+						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+						@input="hasTouchedSuggestions = true"
+					/>
+					<Transition
+						enter-active-class="transition-opacity duration-200 ease-out"
+						enter-from-class="opacity-0"
+						enter-to-class="opacity-100"
+						leave-active-class="transition-opacity duration-150 ease-in"
+						leave-from-class="opacity-100"
+						leave-to-class="opacity-0"
+					>
+						<span v-if="!denominationSearchInput" class="text-sm text-secondary">
+							{{ formatMessage(messages.enterAmountHint) }}
+						</span>
+					</Transition>
+				</template>
+
+				<Transition
+					enter-active-class="transition-all duration-300 ease-out"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-96"
+					leave-active-class="transition-all duration-200 ease-in"
+					leave-from-class="opacity-100 max-h-96"
+					leave-to-class="opacity-0 max-h-0"
+				>
+					<div
+						v-if="!useDenominationSuggestions || displayedSuggestions.length > 0"
+						class="overflow-hidden"
+						:class="[useDenominationSuggestions ? 'p-[2px]' : '']"
+					>
+						<Chips
+							v-model="selectedDenomination"
+							:items="useDenominationSuggestions ? displayedSuggestions : denominationOptions"
+							:format-label="
+								(amt: number) =>
+									formatAmountForDisplay(
+										amt,
+										selectedMethodCurrencyCode,
+										selectedMethodExchangeRate,
+									)
+							"
+							:never-empty="false"
+							:capitalize="false"
+						/>
+					</div>
+				</Transition>
+
+				<Transition
+					enter-active-class="transition-opacity duration-200 ease-out"
+					enter-from-class="opacity-0"
+					enter-to-class="opacity-100"
+					leave-active-class="transition-opacity duration-150 ease-in"
+					leave-from-class="opacity-100"
+					leave-to-class="opacity-0"
+				>
+					<span
+						v-if="
+							useDenominationSuggestions &&
+							denominationSearchInput &&
+							displayedSuggestions.length === 0
+						"
+						class="text-sm text-secondary"
+					>
+						{{ noSuggestionsMessage }}
+					</span>
+				</Transition>
+
+				<Transition
+					enter-active-class="transition-opacity duration-200 ease-out"
+					enter-from-class="opacity-0"
+					enter-to-class="opacity-100"
+					leave-active-class="transition-opacity duration-150 ease-in"
+					leave-from-class="opacity-100"
+					leave-to-class="opacity-0"
+				>
+					<span
+						v-if="
+							useDenominationSuggestions &&
+							hasTouchedSuggestions &&
+							displayedSuggestions.length > 0 &&
+							!hasSelectedDenomination
+						"
+						class="text-sm text-orange"
+					>
+						{{ formatMessage(messages.selectDenominationRequired) }}
+					</span>
+				</Transition>
+
+				<span
+					v-if="!useDenominationSuggestions && denominationOptions.length === 0"
+					class="text-error text-sm"
+				>
 					No denominations available for your current balance
 				</span>
 			</div>
@@ -322,6 +418,9 @@ const formData = ref<Record<string, any>>({
 
 const selectedGiftCardId = ref<string | null>(withdrawData.value.selection.methodId || null)
 
+const denominationSearchInput = ref<number | undefined>(undefined)
+const hasTouchedSuggestions = ref(false)
+
 const currencyOptions = [
 	{ value: 'USD', label: 'USD' },
 	{ value: 'AUD', label: 'AUD' },
@@ -432,6 +531,14 @@ const selectedMethodDetails = computed(() => {
 const selectedMethodCurrencyCode = computed(() => selectedMethodDetails.value?.currencyCode || null)
 const selectedMethodExchangeRate = computed(() => selectedMethodDetails.value?.exchangeRate || null)
 
+const denominationInputPlaceholder = computed(() => {
+	const currency = selectedMethodCurrencyCode.value
+	if (currency && currency !== 'USD') {
+		return `Enter amount in ${currency}`
+	}
+	return formatMessage(messages.enterDenominationPlaceholder)
+})
+
 const giftCardCurrencyCode = computed(() => {
 	if (showPayPalCurrencySelector.value) {
 		return selectedCurrency.value !== 'USD' ? selectedCurrency.value : undefined
@@ -502,6 +609,93 @@ const useFixedDenominations = computed(() => {
 	return false
 })
 
+const useDenominationSuggestions = computed(() => {
+	if (!useFixedDenominations.value) return false
+	const interval = selectedMethodDetails.value?.interval
+	if (!interval?.fixed?.values) return false
+	return interval.fixed.values.length > 35
+})
+
+const denominationSuggestions = computed(() => {
+	const input = denominationSearchInput.value
+	if (!input || input <= 0) return []
+
+	const allDenominations = denominationOptions.value
+	if (allDenominations.length === 0) return []
+
+	// convert local currency input to USD for filtering (denominations are stored in USD)
+	const exchangeRate = selectedMethodExchangeRate.value
+	const inputInUsd = exchangeRate ? input / exchangeRate : input
+
+	const rangeSize = inputInUsd * 0.2
+	let lowerBound = inputInUsd - rangeSize / 2
+	let upperBound = inputInUsd + rangeSize / 2
+
+	const minAvailable = allDenominations[0]
+	const maxAvailable = allDenominations[allDenominations.length - 1]
+
+	// shift range when hitting boundaries to maintain ~20% total range
+	if (upperBound > maxAvailable) {
+		const overflow = upperBound - maxAvailable
+		upperBound = maxAvailable
+		lowerBound = Math.max(minAvailable, lowerBound - overflow)
+	} else if (lowerBound < minAvailable) {
+		const underflow = minAvailable - lowerBound
+		lowerBound = minAvailable
+		upperBound = Math.min(maxAvailable, upperBound + underflow)
+	}
+
+	return allDenominations
+		.filter((amt) => amt >= lowerBound && amt <= upperBound)
+		.sort((a, b) => a - b)
+})
+
+const maxDisplayedSuggestions = 10
+const displayedSuggestions = computed(() => {
+	const all = denominationSuggestions.value
+	if (all.length <= maxDisplayedSuggestions) return all
+
+	const input = denominationSearchInput.value
+	if (!input) return all.slice(0, maxDisplayedSuggestions)
+
+	const exchangeRate = selectedMethodExchangeRate.value
+	const inputInUsd = exchangeRate ? input / exchangeRate : input
+
+	// select values closest to input, then sort ascending for display
+	const closest = [...all]
+		.sort((a, b) => Math.abs(a - inputInUsd) - Math.abs(b - inputInUsd))
+		.slice(0, maxDisplayedSuggestions)
+
+	return closest.sort((a, b) => a - b)
+})
+
+const noSuggestionsMessage = computed(() => {
+	if (!denominationSearchInput.value || denominationSearchInput.value <= 0) {
+		return null
+	}
+	if (denominationSuggestions.value.length === 0) {
+		const maxDenom = fixedDenominationMax.value
+		if (maxDenom) {
+			const maxInLocal = formatAmountForDisplay(
+				maxDenom,
+				selectedMethodCurrencyCode.value,
+				selectedMethodExchangeRate.value,
+			)
+			return `No denominations near this amount. The highest available is ${maxInLocal}.`
+		}
+		return 'No denominations near this amount'
+	}
+	return null
+})
+
+const hasSelectedDenomination = computed(() => {
+	return (
+		formData.value.amount !== undefined &&
+		formData.value.amount > 0 &&
+		denominationOptions.value.includes(formData.value.amount)
+	)
+})
+
 const denominationOptions = computed(() => {
 	const interval = selectedMethodDetails.value?.interval
 	if (!interval) return []
@@ -539,6 +733,20 @@ const effectiveMaxAmount = computed(() => {
 		return Math.min(roundedMaxAmount.value, methodMax)
 	}
 	return roundedMaxAmount.value
+})
+
+const fixedDenominationMin = computed(() => {
+	if (!useFixedDenominations.value) return null
+	const options = denominationOptions.value
+	if (options.length === 0) return null
+	return options[0]
+})
+
+const fixedDenominationMax = computed(() => {
+	if (!useFixedDenominations.value) return null
+	const options = denominationOptions.value
+	if (options.length === 0) return null
+	return options[options.length - 1]
 })
 
 const selectedDenomination = computed({
@@ -681,6 +889,8 @@ watch(
 			selectedGiftCardId.value = null
 			calculatedFee.value = 0
 			exchangeRate.value = null
+			denominationSearchInput.value = undefined
+			hasTouchedSuggestions.value = false
 
 			// Clear currency when switching away from PayPal International
 			if (newMethod !== 'paypal' && withdrawData.value.providerData.type === 'tremendous') {
@@ -689,6 +899,15 @@ watch(
 		}
 	},
 )
+
+watch(selectedGiftCardId, (newId, oldId) => {
+	if (oldId && newId !== oldId) {
+		// Reset denomination search when gift card changes
+		denominationSearchInput.value = undefined
+		hasTouchedSuggestions.value = false
+		formData.value.amount = undefined
+	}
+})
 
 async function switchToDirectPaypal() {
 	withdrawData.value.selection.country = {
@@ -765,6 +984,22 @@ const messages = defineMessages({
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message',
 		defaultMessage:
 			'You selected USD for PayPal International. <direct-paypal-link>Switch to direct PayPal</direct-paypal-link> for better fees (≈2% instead of ≈6%).',
+	},
+	enterDenominationPlaceholder: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder',
+		defaultMessage: 'Enter amount to find available denominations',
+	},
+	enterAmountHint: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint',
+		defaultMessage: 'Enter an amount to see available gift card denominations',
+	},
+	selectDenominationHint: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint',
+		defaultMessage: 'Select a denomination:',
+	},
+	selectDenominationRequired: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required',
+		defaultMessage: 'Please select a denomination to continue',
 	},
 })
 </script>
