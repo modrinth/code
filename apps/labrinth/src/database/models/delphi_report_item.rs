@@ -88,7 +88,6 @@ pub struct DBDelphiReportIssue {
     pub id: DelphiReportIssueId,
     pub report_id: DelphiReportId,
     pub issue_type: String,
-    pub status: DelphiReportIssueStatus,
 }
 
 /// A status a Delphi report issue can have.
@@ -106,7 +105,7 @@ pub struct DBDelphiReportIssue {
 )]
 #[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "delphi_report_issue_status", rename_all = "snake_case")]
-pub enum DelphiReportIssueStatus {
+pub enum DelphiStatus {
     /// The issue is pending review by the moderation team.
     Pending,
     /// The issue has been rejected (i.e., reviewed as a false positive).
@@ -118,7 +117,7 @@ pub enum DelphiReportIssueStatus {
     Unsafe,
 }
 
-impl Display for DelphiReportIssueStatus {
+impl Display for DelphiStatus {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         self.serialize(f)
     }
@@ -185,92 +184,16 @@ impl DBDelphiReportIssue {
         Ok(DelphiReportIssueId(
             sqlx::query_scalar!(
                 "
-                INSERT INTO delphi_report_issues (report_id, issue_type, status)
-                VALUES ($1, $2, $3)
-                ON CONFLICT (report_id, issue_type) DO UPDATE SET status = $3
+                INSERT INTO delphi_report_issues (report_id, issue_type)
+                VALUES ($1, $2)
                 RETURNING id
                 ",
                 self.report_id as DelphiReportId,
                 self.issue_type,
-                self.status as DelphiReportIssueStatus,
             )
             .fetch_one(&mut **transaction)
             .await?,
         ))
-    }
-
-    pub async fn find_all_by(
-        ty: Option<String>,
-        status: Option<DelphiReportIssueStatus>,
-        order_by: Option<DelphiReportListOrder>,
-        count: Option<u16>,
-        offset: Option<i64>,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Postgres>,
-    ) -> Result<Vec<DelphiReportIssueResult>, DatabaseError> {
-        Ok(sqlx::query!(
-            r#"
-            SELECT
-                delphi_report_issues.id AS "id", report_id,
-                issue_type,
-                delphi_report_issues.status AS "status: DelphiReportIssueStatus",
-
-                file_id, delphi_version, artifact_url, created, severity AS "severity: DelphiSeverity",
-
-                -- TODO: replace with `json_array` in Postgres 16
-                (
-                    SELECT json_agg(to_jsonb(delphi_report_issue_details))
-                    FROM delphi_report_issue_details
-                    WHERE issue_id = delphi_report_issues.id
-                ) AS "details: sqlx::types::Json<Vec<ReportIssueDetail>>",
-                versions.mod_id AS "project_id?", mods.published AS "project_published?"
-            FROM delphi_report_issues
-            INNER JOIN delphi_reports ON delphi_reports.id = report_id
-            LEFT OUTER JOIN files ON files.id = file_id
-            LEFT OUTER JOIN versions ON versions.id = files.version_id
-            LEFT OUTER JOIN mods ON mods.id = versions.mod_id
-            WHERE
-                (issue_type = $1 OR $1 IS NULL)
-                AND (delphi_report_issues.status = $2 OR $2 IS NULL)
-            ORDER BY
-                CASE WHEN $3 = 'created_asc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END ASC,
-                CASE WHEN $3 = 'created_desc' THEN delphi_reports.created ELSE TO_TIMESTAMP(0) END DESC,
-                CASE WHEN $3 = 'pending_status_first' THEN delphi_report_issues.status ELSE 'pending'::delphi_report_issue_status END ASC,
-                CASE WHEN $3 = 'severity_asc' THEN delphi_reports.severity ELSE 'low'::delphi_severity END ASC,
-                CASE WHEN $3 = 'severity_desc' THEN delphi_reports.severity ELSE 'low'::delphi_severity END DESC
-            OFFSET $5
-            LIMIT $4
-            "#,
-            ty,
-            status as Option<DelphiReportIssueStatus>,
-            order_by.map(|order_by| order_by.to_string()),
-            count.map(|count| count as i64),
-            offset,
-        )
-        .map(|row| DelphiReportIssueResult {
-            issue: DBDelphiReportIssue {
-                id: DelphiReportIssueId(row.id),
-                report_id: DelphiReportId(row.report_id),
-                issue_type: row.issue_type,
-                status: row.status,
-            },
-            report: DBDelphiReport {
-                id: DelphiReportId(row.report_id),
-                file_id: row.file_id.map(DBFileId),
-                delphi_version: row.delphi_version,
-                artifact_url: row.artifact_url,
-                created: row.created,
-                severity: row.severity,
-            },
-            details: row
-                .details
-                .into_iter()
-                .flat_map(|details_list| details_list.0)
-                .collect(),
-            project_id: row.project_id.map(DBProjectId),
-            project_published: row.project_published,
-        })
-        .fetch_all(exec)
-        .await?)
     }
 }
 
@@ -302,6 +225,8 @@ pub struct ReportIssueDetail {
     pub data: HashMap<String, serde_json::Value>,
     /// How important is this issue, as flagged by Delphi?
     pub severity: DelphiSeverity,
+    /// Has this issue detail been marked as safe or unsafe?
+    pub status: DelphiStatus,
 }
 
 impl ReportIssueDetail {
@@ -311,8 +236,8 @@ impl ReportIssueDetail {
     ) -> Result<DelphiReportIssueDetailsId, DatabaseError> {
         Ok(DelphiReportIssueDetailsId(sqlx::query_scalar!(
             "
-            INSERT INTO delphi_report_issue_details (issue_id, key, file_path, decompiled_source, data, severity)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO delphi_report_issue_details (issue_id, key, file_path, decompiled_source, data, severity, status)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING id
             ",
             self.issue_id as DelphiReportIssueId,
@@ -321,6 +246,7 @@ impl ReportIssueDetail {
             self.decompiled_source,
             sqlx::types::Json(&self.data) as Json<&HashMap<String, serde_json::Value>>,
             self.severity as DelphiSeverity,
+            self.status as _,
         )
         .fetch_one(&mut **transaction)
         .await?))

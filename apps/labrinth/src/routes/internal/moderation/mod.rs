@@ -111,9 +111,18 @@ pub async fn get_projects_internal(
 
     let project_ids = sqlx::query!(
         "
-        SELECT id FROM mods
-        WHERE status = $1
-        ORDER BY queued ASC
+        SELECT m.id FROM mods m
+
+        -- exclude projects in tech review queue
+        LEFT JOIN versions v ON v.mod_id = m.id
+        LEFT JOIN files f ON f.version_id = v.id
+        LEFT JOIN delphi_reports dr ON dr.file_id = f.id
+
+        WHERE
+            m.status = $1
+            AND dr.file_id IS NULL
+
+        ORDER BY m.queued ASC
         OFFSET $3
         LIMIT $2
         ",

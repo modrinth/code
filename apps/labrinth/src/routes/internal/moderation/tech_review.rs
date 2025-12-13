@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fmt};
 
-use actix_web::{HttpRequest, get, post, web};
+use actix_web::{HttpRequest, get, patch, post, web};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -13,10 +13,9 @@ use crate::{
         DBProject,
         models::{
             DBProjectId, DBThread, DBThreadId, DBUser, DelphiReportId,
-            DelphiReportIssueId, ProjectTypeId,
+            DelphiReportIssueDetailsId, DelphiReportIssueId, ProjectTypeId,
             delphi_report_item::{
-                DelphiReportIssueStatus, DelphiSeverity, DelphiVerdict,
-                ReportIssueDetail,
+                DelphiSeverity, DelphiStatus, DelphiVerdict, ReportIssueDetail,
             },
             thread_item::ThreadMessageBuilder,
         },
@@ -38,7 +37,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(get_report)
         .service(get_issue)
         .service(submit_report)
-        .service(update_issue);
+        .service(update_issue_detail);
 }
 
 /// Arguments for searching project technical reviews.
@@ -133,8 +132,6 @@ pub struct FileIssue {
     /// Labrinth does not know the full set of kinds of issues, so this is kept
     /// as a string.
     pub issue_type: String,
-    /// Is this issue valid (malicious) or a false positive (safe)?
-    pub status: DelphiReportIssueStatus,
     /// Details of why this issue might have been raised, such as what file it
     /// was found in.
     pub details: Vec<ReportIssueDetail>,
@@ -405,7 +402,8 @@ async fn search_projects(
                                                             'file_path', drid.file_path,
                                                             -- ignore `decompiled_source`
                                                             'data', drid.data,
-                                                            'severity', drid.severity
+                                                            'severity', drid.severity,
+                                                            'status', drid.status
                                                         )
                                                     )
                                                     FROM delphi_report_issue_details drid
@@ -427,7 +425,12 @@ async fn search_projects(
             INNER JOIN threads t ON t.mod_id = m.id
             INNER JOIN versions v ON v.mod_id = m.id
             INNER JOIN files f ON f.version_id = v.id
+
+            -- only return projects with at least 1 pending drid
             INNER JOIN delphi_reports dr ON dr.file_id = f.id
+            INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
+            INNER JOIN delphi_report_issue_details drid
+                ON drid.issue_id = dri.id AND drid.status = 'pending'
 
             -- filtering
             LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
@@ -436,7 +439,6 @@ async fn search_projects(
                 -- project type
                 (cardinality($4::int[]) = 0 OR c.project_type = ANY($4::int[]))
                 AND m.status NOT IN ('draft', 'rejected', 'withheld')
-                AND dr.status = 'pending'
 
             GROUP BY m.id, t.id
         ) t
@@ -486,10 +488,17 @@ async fn search_projects(
     let db_threads = DBThread::get_many(&thread_ids, &**pool)
         .await
         .wrap_internal_err("failed to fetch threads")?;
+    tracing::info!("db threads = {db_threads:?}");
     let thread_author_ids = db_threads
         .iter()
-        .flat_map(|thread| thread.members.clone())
+        .flat_map(|thread| {
+            thread
+                .messages
+                .iter()
+                .filter_map(|message| message.author_id)
+        })
         .collect::<Vec<_>>();
+    tracing::info!("thread author ids = {thread_author_ids:?}");
     let thread_authors =
         DBUser::get_many_ids(&thread_author_ids, &**pool, &redis)
             .await
@@ -538,66 +547,6 @@ async fn search_projects(
     }))
 }
 
-// async fn maybe_reject_project(
-//     report_id: DelphiReportId,
-//     txn: &mut PgTransaction<'_>,
-//     update_req: &UpdateStatus,
-//     user: &User,
-//     pool: &PgPool,
-//     redis: &RedisPool,
-// ) -> Result<(), ApiError> {
-//     if update_req.status != DelphiVerdict::Unsafe {
-//         return Ok(());
-//     };
-
-//     let record = sqlx::query!(
-//         r#"
-//         UPDATE mods
-//         SET status = $1
-//         FROM delphi_reports dr
-//         INNER JOIN files f ON f.id = dr.file_id
-//         INNER JOIN versions v ON v.id = f.version_id
-//         INNER JOIN mods m ON v.mod_id = m.id
-//         INNER JOIN threads t ON t.mod_id = m.id
-//         WHERE dr.id = $2
-//         RETURNING
-//             m.id AS "project_id: DBProjectId",
-//             t.id AS "thread_id: DBThreadId",
-//             (SELECT status FROM mods WHERE id = m.id) AS "old_status!"
-//         "#,
-//         ProjectStatus::Rejected.as_str(),
-//         report_id as DelphiReportId,
-//     )
-//     .fetch_one(&mut **txn)
-//     .await
-//     .wrap_internal_err("failed to mark project as rejected")?;
-
-//     if let Some(body) = &update_req.message {
-//         thread_send_message_internal(
-//             user,
-//             record.thread_id.into(),
-//             pool,
-//             NewThreadMessage {
-//                 body: MessageBody::Text {
-//                     body: body.clone(),
-//                     private: true,
-//                     replying_to: None,
-//                     associated_images: Vec::new(),
-//                 },
-//             },
-//             redis,
-//         )
-//         .await
-//         .wrap_internal_err("failed to add moderation thread message")?;
-//     }
-
-//     // DBProject::clear_cache(record.project_id, None, None, redis)
-//     //     .await
-//     //     .wrap_internal_err("failed to clear project cache")?;
-
-//     Ok(())
-// }
-
 /// See [`submit_report`].
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct SubmitReport {
@@ -624,7 +573,7 @@ async fn submit_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    submit_report: web::Json<SubmitReport>,
+    web::Json(submit_report): web::Json<SubmitReport>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<(), ApiError> {
     let user = check_is_moderator_from_headers(
@@ -643,19 +592,19 @@ async fn submit_report(
         .await
         .wrap_internal_err("failed to begin transaction")?;
 
-    let pending_issues = sqlx::query!(
+    let pending_issue_details = sqlx::query!(
         "
         SELECT
-            dri.id AS issue_id
-        FROM delphi_report_issues dri
-        INNER JOIN delphi_reports dr ON dr.id = dri.report_id
-        INNER JOIN files f ON f.id = dr.file_id
-        INNER JOIN versions v ON v.id = f.version_id
-        INNER JOIN mods m ON m.id = v.mod_id
+            drid.id AS issue_detail_id
+        FROM mods m
+        INNER JOIN versions v ON v.mod_id = m.id
+        INNER JOIN files f ON f.version_id = v.id
+        INNER JOIN delphi_reports dr ON dr.file_id = f.id
+        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
+        INNER JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id
         WHERE
             m.id = $1
-            AND dr.status = 'pending'
-            AND dri.status = 'pending'
+            AND drid.status = 'pending'
         ",
         project_id as _,
     )
@@ -663,41 +612,31 @@ async fn submit_report(
     .await
     .wrap_internal_err("failed to fetch pending issues")?;
 
-    if !pending_issues.is_empty() {
-        return Err(ApiError::TechReviewIssuesWithNoVerdict {
-            issues: pending_issues
+    if !pending_issue_details.is_empty() {
+        return Err(ApiError::TechReviewDetailsWithNoVerdict {
+            details: pending_issue_details
                 .into_iter()
-                .map(|record| DelphiReportIssueId(record.issue_id))
+                .map(|record| {
+                    DelphiReportIssueDetailsId(record.issue_detail_id)
+                })
                 .collect(),
         });
     }
 
-    let verdict = submit_report.verdict;
-    let status = match verdict {
-        DelphiVerdict::Unsafe => DelphiReportIssueStatus::Unsafe,
-        DelphiVerdict::Safe => DelphiReportIssueStatus::Safe,
-    };
     let record = sqlx::query!(
         r#"
-        UPDATE delphi_reports
-        SET status = $1
-        FROM delphi_reports dr
-        INNER JOIN files f ON f.id = dr.file_id
-        INNER JOIN versions v ON v.id = f.version_id
-        INNER JOIN mods m ON v.mod_id = m.id
+        SELECT t.id AS "thread_id: DBThreadId"
+        FROM mods m
         INNER JOIN threads t ON t.mod_id = m.id
-        WHERE m.id = $2
-        RETURNING
-            t.id AS "thread_id: DBThreadId"
+        WHERE m.id = $1
         "#,
-        status as _,
         project_id as _,
     )
     .fetch_one(&mut *txn)
     .await
     .wrap_internal_err("failed to update reports")?;
 
-    if let Some(body) = submit_report.0.message {
+    if let Some(body) = submit_report.message {
         ThreadMessageBuilder {
             author_id: Some(user.id.into()),
             body: MessageBody::Text {
@@ -714,6 +653,7 @@ async fn submit_report(
         .wrap_internal_err("failed to add moderator message")?;
     }
 
+    let verdict = submit_report.verdict;
     ThreadMessageBuilder {
         author_id: Some(user.id.into()),
         body: MessageBody::TechReview { verdict },
@@ -775,7 +715,7 @@ pub struct UpdateIssue {
     pub verdict: DelphiVerdict,
 }
 
-/// Updates the state of a technical review issue.
+/// Updates the state of a technical review issue detail.
 ///
 /// This will not automatically reject the project for malware, but just flag
 /// this issue with a verdict.
@@ -783,16 +723,16 @@ pub struct UpdateIssue {
     security(("bearer_auth" = [])),
     responses((status = NO_CONTENT))
 )]
-#[post("/issue/{id}")]
-async fn update_issue(
+#[patch("/issue-detail/{id}")]
+async fn update_issue_detail(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     update_req: web::Json<UpdateIssue>,
-    path: web::Path<(DelphiReportIssueId,)>,
+    path: web::Path<(DelphiReportIssueDetailsId,)>,
 ) -> Result<(), ApiError> {
-    let _user = check_is_moderator_from_headers(
+    check_is_moderator_from_headers(
         &req,
         &**pool,
         &redis,
@@ -800,7 +740,7 @@ async fn update_issue(
         Scopes::PROJECT_WRITE,
     )
     .await?;
-    let (issue_id,) = path.into_inner();
+    let (issue_detail_id,) = path.into_inner();
 
     let mut txn = pool
         .begin()
@@ -808,23 +748,21 @@ async fn update_issue(
         .wrap_internal_err("failed to start transaction")?;
 
     let status = match update_req.verdict {
-        DelphiVerdict::Safe => DelphiReportIssueStatus::Safe,
-        DelphiVerdict::Unsafe => DelphiReportIssueStatus::Unsafe,
+        DelphiVerdict::Safe => DelphiStatus::Safe,
+        DelphiVerdict::Unsafe => DelphiStatus::Unsafe,
     };
-    let _record = sqlx::query!(
+    sqlx::query!(
         r#"
-        UPDATE delphi_report_issues dri
+        UPDATE delphi_report_issue_details drid
         SET status = $1
-        FROM delphi_reports dr
-        WHERE dri.id = $2 AND dr.id = dri.report_id
-        RETURNING dr.id AS "report_id: DelphiReportId"
+        WHERE drid.id = $2
         "#,
         status as _,
-        issue_id as _,
+        issue_detail_id as _,
     )
-    .fetch_one(&mut *txn)
+    .execute(&mut *txn)
     .await
-    .wrap_internal_err("failed to update issue")?;
+    .wrap_internal_err("failed to update issue detail")?;
 
     txn.commit()
         .await
