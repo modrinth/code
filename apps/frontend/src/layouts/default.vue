@@ -465,6 +465,11 @@
 								link: '/moderation/',
 							},
 							{
+								id: 'tech-review',
+								color: 'orange',
+								link: '/moderation/technical-review',
+							},
+							{
 								id: 'review-reports',
 								color: 'orange',
 								link: '/moderation/reports',
@@ -510,6 +515,9 @@
 						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
 						<template #review-projects>
 							<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProjects) }}
+						</template>
+						<template #tech-review>
+							<ShieldAlertIcon aria-hidden="true" /> {{ formatMessage(messages.techReview) }}
 						</template>
 						<template #review-reports>
 							<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.reports) }}
@@ -942,6 +950,7 @@ import {
 	SearchIcon,
 	ServerIcon,
 	SettingsIcon,
+	ShieldAlertIcon,
 	SunIcon,
 	TwitterIcon,
 	UserIcon,
@@ -1197,11 +1206,15 @@ const messages = defineMessages({
 	},
 	reviewProjects: {
 		id: 'layout.action.review-projects',
-		defaultMessage: 'Review projects',
+		defaultMessage: 'Project review',
+	},
+	techReview: {
+		id: 'layout.action.tech-review',
+		defaultMessage: 'Tech review',
 	},
 	reports: {
 		id: 'layout.action.reports',
-		defaultMessage: 'Reports',
+		defaultMessage: 'Review reports',
 	},
 	lookupByEmail: {
 		id: 'layout.action.lookup-by-email',

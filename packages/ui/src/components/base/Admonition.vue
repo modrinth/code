@@ -8,7 +8,10 @@
 		<div :class="['flex gap-2 items-start', (header || $slots.header) && 'flex-col']">
 			<div class="flex gap-2 items-start" :class="header || $slots.header ? 'w-full' : 'contents'">
 				<slot name="icon" :icon-class="['h-6 w-6 flex-none', iconClasses[type]]">
-					<component :is="icons[type]" :class="['h-6 w-6 flex-none', iconClasses[type]]" />
+					<component
+						:is="getSeverityIcon(type)"
+						:class="['h-6 w-6 flex-none', iconClasses[type]]"
+					/>
 				</slot>
 				<div v-if="header || $slots.header" class="font-semibold text-base">
 					<slot name="header">{{ header }}</slot>
@@ -25,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { InfoIcon, IssuesIcon, XCircleIcon } from '@modrinth/assets'
+import { getSeverityIcon } from '../../utils'
 
 withDefaults(
 	defineProps<{
@@ -52,11 +55,5 @@ const iconClasses = {
 	info: 'text-brand-blue',
 	warning: 'text-brand-orange',
 	critical: 'text-brand-red',
-}
-
-const icons = {
-	info: InfoIcon,
-	warning: IssuesIcon,
-	critical: XCircleIcon,
 }
 </script>

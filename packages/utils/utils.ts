@@ -134,11 +134,29 @@ export const formatWallet = (name) => {
 	return capitalizeString(name)
 }
 
-export const formatProjectType = (name) => {
+export const formatProjectType = (name, short = false) => {
+	if (short) {
+		if (name === 'resourcepack') {
+			return 'RPK'
+		} else if (name === 'mod') {
+			return 'MOD'
+		} else if (name === 'modpack') {
+			return 'MPK'
+		} else if (name === 'shader') {
+			return 'SHD'
+		} else if (name === 'plugin') {
+			return 'PLG'
+		} else if (name === 'datapack') {
+			return 'DPK'
+		}
+	}
+
 	if (name === 'resourcepack') {
 		return 'Resource Pack'
 	} else if (name === 'datapack') {
 		return 'Data Pack'
+	} else if (name === 'modpack') {
+		return 'Modpack'
 	}
 
 	return capitalizeString(name)

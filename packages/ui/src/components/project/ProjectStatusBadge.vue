@@ -3,22 +3,11 @@
 </template>
 
 <script setup lang="ts">
-import {
-	ArchiveIcon,
-	CalendarIcon,
-	FileTextIcon,
-	GlobeIcon,
-	LinkIcon,
-	LockIcon,
-	UnknownIcon,
-	UpdatedIcon,
-	XIcon,
-} from '@modrinth/assets'
 import type { ProjectStatus } from '@modrinth/utils'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
-import type { Component } from 'vue'
 import { computed } from 'vue'
 
+import { PROJECT_STATUS_ICONS } from '../../utils'
 import Badge from '../base/SimpleBadge.vue'
 
 const props = defineProps<{
@@ -28,76 +17,66 @@ const props = defineProps<{
 const { formatMessage } = useVIntl()
 
 const metadata = computed(() => ({
-	icon: statusMetadata[props.status]?.icon ?? statusMetadata.unknown.icon,
+	icon: PROJECT_STATUS_ICONS[props.status] ?? PROJECT_STATUS_ICONS.unknown,
 	formattedName: formatMessage(statusMetadata[props.status]?.message ?? props.status),
 }))
 
-const statusMetadata: Record<ProjectStatus, { icon?: Component; message: MessageDescriptor }> = {
+const statusMetadata: Record<ProjectStatus, { message: MessageDescriptor }> = {
 	approved: {
-		icon: GlobeIcon,
 		message: defineMessage({
 			id: 'project.visibility.public',
 			defaultMessage: 'Public',
 		}),
 	},
 	unlisted: {
-		icon: LinkIcon,
 		message: defineMessage({
 			id: 'project.visibility.unlisted',
 			defaultMessage: 'Unlisted',
 		}),
 	},
 	withheld: {
-		icon: LinkIcon,
 		message: defineMessage({
 			id: 'project.visibility.unlisted-by-staff',
 			defaultMessage: 'Unlisted by staff',
 		}),
 	},
 	private: {
-		icon: LockIcon,
 		message: defineMessage({
 			id: 'project.visibility.private',
 			defaultMessage: 'Private',
 		}),
 	},
 	scheduled: {
-		icon: CalendarIcon,
 		message: defineMessage({
 			id: 'project.visibility.scheduled',
 			defaultMessage: 'Scheduled',
 		}),
 	},
 	draft: {
-		icon: FileTextIcon,
 		message: defineMessage({
 			id: 'project.visibility.draft',
 			defaultMessage: 'Draft',
 		}),
 	},
 	archived: {
-		icon: ArchiveIcon,
 		message: defineMessage({
 			id: 'project.visibility.archived',
 			defaultMessage: 'Archived',
 		}),
 	},
 	rejected: {
-		icon: XIcon,
 		message: defineMessage({
 			id: 'project.visibility.rejected',
 			defaultMessage: 'Rejected',
 		}),
 	},
 	processing: {
-		icon: UpdatedIcon,
 		message: defineMessage({
 			id: 'project.visibility.under-review',
 			defaultMessage: 'Under review',
 		}),
 	},
 	unknown: {
-		icon: UnknownIcon,
 		message: defineMessage({
 			id: 'project.visibility.unknown',
 			defaultMessage: 'Unknown',

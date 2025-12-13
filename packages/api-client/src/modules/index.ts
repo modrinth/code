@@ -11,6 +11,7 @@ import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
 import { LabrinthStateModule } from './labrinth/state'
+import { LabrinthTechReviewInternalModule } from './labrinth/tech-review/internal'
 
 type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
 
@@ -35,6 +36,7 @@ export const MODULE_REGISTRY = {
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,
 	labrinth_state: LabrinthStateModule,
+	labrinth_tech_review_internal: LabrinthTechReviewInternalModule,
 } as const satisfies Record<string, ModuleConstructor>
 
 export type ModuleID = keyof typeof MODULE_REGISTRY
