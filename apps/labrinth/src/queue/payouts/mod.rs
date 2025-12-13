@@ -965,7 +965,7 @@ async fn get_tremendous_payout_methods(
             },
             fee,
             currency_code: Some(currency.clone()),
-            exchange_rate: Some(currency_to_usd),
+            exchange_rate: Some(usd_to_currency),
         };
 
         methods.push(method);
