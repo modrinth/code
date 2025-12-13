@@ -162,7 +162,9 @@
 		<div class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast"
-					>{{ formatMessage(formFieldLabels.amount) }} <span class="text-red">*</span></span
+					>{{ formatMessage(formFieldLabels.amount) }}
+					<template v-if="useDenominationSuggestions"> ({{ selectedMethodCurrencyCode }})</template>
+					<span class="text-red">*</span></span
 				>
 			</label>
 
@@ -173,7 +175,7 @@
 						type="number"
 						step="0.01"
 						:min="0"
-						:placeholder="denominationInputPlaceholder"
+						:placeholder="formatMessage(messages.enterDenominationPlaceholder)"
 						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
 						@input="hasTouchedSuggestions = true"
 					/>
@@ -530,14 +532,6 @@ const selectedMethodDetails = computed(() => {
 
 const selectedMethodCurrencyCode = computed(() => selectedMethodDetails.value?.currencyCode || null)
 const selectedMethodExchangeRate = computed(() => selectedMethodDetails.value?.exchangeRate || null)
-
-const denominationInputPlaceholder = computed(() => {
-	const currency = selectedMethodCurrencyCode.value
-	if (currency && currency !== 'USD') {
-		return `Enter amount in ${currency}`
-	}
-	return formatMessage(messages.enterDenominationPlaceholder)
-})
 
 const giftCardCurrencyCode = computed(() => {
 	if (showPayPalCurrencySelector.value) {
@@ -987,7 +981,7 @@ const messages = defineMessages({
 	},
 	enterDenominationPlaceholder: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder',
-		defaultMessage: 'Enter amount to find available denominations',
+		defaultMessage: 'Enter amount',
 	},
 	enterAmountHint: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint',
