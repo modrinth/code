@@ -261,14 +261,14 @@ async function copyToClipboard(code: string, detailId: string) {
 	}
 }
 
-const issueDecisions = ref<Map<string, 'safe' | 'malware'>>(new Map())
-const updatingIssues = ref<Set<string>>(new Set())
+const detailDecisions = ref<Map<string, 'safe' | 'malware'>>(new Map())
+const updatingDetails = ref<Set<string>>(new Set())
 
-function getIssueDecision(
-	issueId: string,
+function getDetailDecision(
+	detailId: string,
 	backendStatus: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
 ): 'safe' | 'malware' | 'pending' {
-	const localDecision = issueDecisions.value.get(issueId)
+	const localDecision = detailDecisions.value.get(detailId)
 	if (localDecision) return localDecision
 	if (backendStatus === 'safe') return 'safe'
 	if (backendStatus === 'unsafe') return 'malware'
@@ -276,27 +276,27 @@ function getIssueDecision(
 }
 
 function isPreReviewed(
-	issueId: string,
+	detailId: string,
 	backendStatus: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
 ): boolean {
-	return (backendStatus === 'safe' || backendStatus === 'unsafe') && !issueDecisions.value.has(issueId)
+	return (backendStatus === 'safe' || backendStatus === 'unsafe') && !detailDecisions.value.has(detailId)
 }
 
 function getMarkedFlagsCount(flags: ClassGroup['flags']): number {
-	return flags.filter((f) => getIssueDecision(f.issueId, f.status) !== 'pending').length
+	return flags.filter((f) => getDetailDecision(f.detail.id, f.detail.status) !== 'pending').length
 }
 
-async function updateIssueStatus(issueId: string, verdict: 'safe' | 'unsafe') {
-	updatingIssues.value.add(issueId)
+async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') {
+	updatingDetails.value.add(detailId)
 
 	try {
-		await client.labrinth.tech_review_internal.updateIssue(issueId, { verdict })
+		await client.labrinth.tech_review_internal.updateIssueDetail(detailId, { verdict })
 
-		issueDecisions.value.set(issueId, verdict === 'safe' ? 'safe' : 'malware')
+		detailDecisions.value.set(detailId, verdict === 'safe' ? 'safe' : 'malware')
 
 		for (const classGroup of groupedByClass.value) {
-			const hasThisIssue = classGroup.flags.some((f) => f.issueId === issueId)
-			if (hasThisIssue && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
+			const hasThisDetail = classGroup.flags.some((f) => f.detail.id === detailId)
+			if (hasThisDetail && getMarkedFlagsCount(classGroup.flags) === classGroup.flags.length) {
 				expandedClasses.value.delete(classGroup.filePath)
 				break
 			}
@@ -316,14 +316,14 @@ async function updateIssueStatus(issueId: string, verdict: 'safe' | 'unsafe') {
 			})
 		}
 	} catch (error) {
-		console.error('Failed to update issue status:', error)
+		console.error('Failed to update detail status:', error)
 		addNotification({
 			type: 'error',
 			title: 'Failed to update issue',
 			text: 'An error occurred while updating the issue status.',
 		})
 	} finally {
-		updatingIssues.value.delete(issueId)
+		updatingDetails.value.delete(detailId)
 	}
 }
 
@@ -335,8 +335,9 @@ interface ClassGroup {
 	flags: Array<{
 		issueId: string
 		issueType: string
-		detail: Labrinth.TechReview.Internal.ReportIssueDetail
-		status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+		detail: Labrinth.TechReview.Internal.ReportIssueDetail & {
+			status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+		}
 	}>
 }
 
@@ -350,19 +351,22 @@ const groupedByClass = computed<ClassGroup[]>(() => {
 			if (!classMap.has(detail.file_path)) {
 				classMap.set(detail.file_path, { filePath: detail.file_path, flags: [] })
 			}
+			// Cast detail to include status (backend will provide this field)
+			const detailWithStatus = detail as Labrinth.TechReview.Internal.ReportIssueDetail & {
+				status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+			}
 			classMap.get(detail.file_path)!.flags.push({
 				issueId: issue.id,
 				issueType: issue.issue_type,
-				detail,
-				status: issue.status,
+				detail: detailWithStatus,
 			})
 		}
 	}
 
 	for (const classGroup of classMap.values()) {
 		classGroup.flags.sort((a, b) => {
-			const aPreReviewed = isPreReviewed(a.issueId, a.status)
-			const bPreReviewed = isPreReviewed(b.issueId, b.status)
+			const aPreReviewed = isPreReviewed(a.detail.id, a.detail.status)
+			const bPreReviewed = isPreReviewed(b.detail.id, b.detail.status)
 
 			if (aPreReviewed !== bPreReviewed) {
 				return aPreReviewed ? 1 : -1
@@ -443,10 +447,14 @@ const reviewSummaryPreview = computed(() => {
 		const fileData = fileDecisions.get(report.id)!
 
 		for (const issue of report.issues) {
-			const decision = getIssueDecision(issue.id, issue.status)
-			if (decision === 'pending') continue
-
 			for (const detail of issue.details) {
+				// TODO: proper types when backend pushes
+				const detailWithStatus = detail as typeof detail & {
+					status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+				}
+				const decision = getDetailDecision(detailWithStatus.id, detailWithStatus.status)
+				if (decision === 'pending') continue
+
 				fileData.decisions.push({
 					filePath: detail.file_path,
 					issueType: issue.issue_type.replace(/_/g, ' '),
@@ -529,8 +537,13 @@ const threadWithPreview = computed(() => {
 const allIssuesResolved = computed(() => {
 	for (const report of props.item.reports) {
 		for (const issue of report.issues) {
-			const decision = getIssueDecision(issue.id, issue.status)
-			if (decision === 'pending') return false
+			for (const detail of issue.details) {
+				const detailWithStatus = detail as typeof detail & {
+					status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+				}
+				const decision = getDetailDecision(detailWithStatus.id, detailWithStatus.status)
+				if (decision === 'pending') return false
+			}
 		}
 	}
 	return true
@@ -866,7 +879,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								class="flex flex-col gap-2 rounded-lg p-2"
 								:class="{
 									'bg-[#E8E8E8] dark:bg-[#1A1C20]': flagIdx % 2 === 1,
-									'opacity-50': isPreReviewed(flag.issueId, flag.status),
+									'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
 								}"
 							>
 								<div class="flex items-center justify-between">
@@ -888,15 +901,15 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 										<ButtonStyled
 											color="brand"
 											:type="
-												getIssueDecision(flag.issueId, flag.status) === 'safe'
+												getDetailDecision(flag.detail.id, flag.detail.status) === 'safe'
 													? undefined
 													: 'outlined'
 											"
 										>
 											<button
 												class="!border-[1px]"
-												:disabled="updatingIssues.has(flag.issueId)"
-												@click="updateIssueStatus(flag.issueId, 'safe')"
+												:disabled="updatingDetails.has(flag.detail.id)"
+												@click="updateDetailStatus(flag.detail.id, 'safe')"
 											>
 												Safe
 											</button>
@@ -905,15 +918,15 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 										<ButtonStyled
 											color="red"
 											:type="
-												getIssueDecision(flag.issueId, flag.status) === 'malware'
+												getDetailDecision(flag.detail.id, flag.detail.status) === 'malware'
 													? undefined
 													: 'outlined'
 											"
 										>
 											<button
 												class="!border-[1px]"
-												:disabled="updatingIssues.has(flag.issueId)"
-												@click="updateIssueStatus(flag.issueId, 'unsafe')"
+												:disabled="updatingDetails.has(flag.detail.id)"
+												@click="updateDetailStatus(flag.detail.id, 'unsafe')"
 											>
 												Unsafe
 											</button>

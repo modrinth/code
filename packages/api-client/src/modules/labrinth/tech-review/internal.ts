@@ -90,42 +90,22 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 	}
 
 	/**
-	 * Update the status of a technical review report.
+	 * Update the status of a technical review issue detail.
 	 *
-	 * Allows moderators to mark an entire report as safe (false positive) or unsafe (malicious).
-	 * If marked as unsafe, the associated project will be rejected.
+	 * Allows moderators to mark an individual issue detail as safe (false positive) or unsafe (malicious).
 	 *
-	 * @param reportId - The ID of the report to update
-	 * @param data - The new status for the report
+	 * @param detailId - The ID of the issue detail to update
+	 * @param data - The verdict for the detail
 	 * @returns Promise that resolves when the update is complete
-	 *
-	 * @example
-	 * ```typescript
-	 * await client.labrinth.tech_review_internal.updateReport('report-123', {
-	 *   status: 'safe'
-	 * })
-	 * ```
 	 */
-	public async updateReport(
-		reportId: string,
+	public async updateIssueDetail(
+		detailId: string,
 		data: Labrinth.TechReview.Internal.UpdateIssueRequest,
 	): Promise<void> {
-		return this.client.request<void>(`/moderation/tech-review/report/${reportId}`, {
+		return this.client.request<void>(`/moderation/tech-review/issue-detail/${detailId}`, {
 			api: 'labrinth',
 			version: 'internal',
-			method: 'POST',
-			body: data,
-		})
-	}
-
-	public async updateIssue(
-		issueId: string,
-		data: Labrinth.TechReview.Internal.UpdateIssueRequest,
-	): Promise<void> {
-		return this.client.request<void>(`/moderation/tech-review/issue/${issueId}`, {
-			api: 'labrinth',
-			version: 'internal',
-			method: 'POST',
+			method: 'PATCH',
 			body: data,
 		})
 	}
