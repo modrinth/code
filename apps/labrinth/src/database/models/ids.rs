@@ -94,7 +94,7 @@ macro_rules! generate_bulk_ids {
 
 macro_rules! impl_db_id_interface {
     ($id_struct:ident, $db_id_struct:ident, $(, generator: $generator_function:ident @ $db_table:expr, $(bulk_generator: $bulk_generator_function:ident,)?)?) => {
-        #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash)]
+        #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash, utoipa::ToSchema)]
         #[sqlx(transparent)]
         pub struct $db_id_struct(pub i64);
 
@@ -140,8 +140,8 @@ macro_rules! db_id_interface {
     };
 }
 
-macro_rules! short_id_type {
-    ($name:ident) => {
+macro_rules! id_type {
+    ($name:ident as $type:ty) => {
         #[derive(
             Copy,
             Clone,
@@ -152,9 +152,10 @@ macro_rules! short_id_type {
             Eq,
             PartialEq,
             Hash,
+            utoipa::ToSchema,
         )]
         #[sqlx(transparent)]
-        pub struct $name(pub i32);
+        pub struct $name(pub $type);
     };
 }
 
@@ -268,14 +269,17 @@ db_id_interface!(
     generator: generate_affiliate_code_id @ "affiliate_codes",
 );
 
-short_id_type!(CategoryId);
-short_id_type!(GameId);
-short_id_type!(LinkPlatformId);
-short_id_type!(LoaderFieldEnumId);
-short_id_type!(LoaderFieldEnumValueId);
-short_id_type!(LoaderFieldId);
-short_id_type!(LoaderId);
-short_id_type!(NotificationActionId);
-short_id_type!(ProjectTypeId);
-short_id_type!(ReportTypeId);
-short_id_type!(StatusId);
+id_type!(CategoryId as i32);
+id_type!(GameId as i32);
+id_type!(LinkPlatformId as i32);
+id_type!(LoaderFieldEnumId as i32);
+id_type!(LoaderFieldEnumValueId as i32);
+id_type!(LoaderFieldId as i32);
+id_type!(LoaderId as i32);
+id_type!(NotificationActionId as i32);
+id_type!(ProjectTypeId as i32);
+id_type!(ReportTypeId as i32);
+id_type!(StatusId as i32);
+id_type!(DelphiReportId as i64);
+id_type!(DelphiReportIssueId as i64);
+id_type!(DelphiReportIssueDetailsId as i64);

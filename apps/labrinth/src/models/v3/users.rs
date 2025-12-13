@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 pub const DELETED_USER: UserId = UserId(127155982985829);
 
 bitflags::bitflags! {
-    #[derive(Copy, Clone, Debug)]
+    #[derive(Debug, Clone, Copy)]
     pub struct Badges: u64 {
         const MIDAS = 1 << 0;
         const EARLY_MODPACK_ADOPTER = 1 << 1;
@@ -21,6 +21,23 @@ bitflags::bitflags! {
     }
 }
 
+impl utoipa::PartialSchema for Badges {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        u64::schema()
+    }
+}
+
+impl utoipa::ToSchema for Badges {
+    fn schemas(
+        schemas: &mut Vec<(
+            String,
+            utoipa::openapi::RefOr<utoipa::openapi::schema::Schema>,
+        )>,
+    ) {
+        u64::schemas(schemas);
+    }
+}
+
 bitflags_serde_impl!(Badges, u64);
 
 impl Default for Badges {
@@ -29,7 +46,7 @@ impl Default for Badges {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct User {
     pub id: UserId,
     pub username: String,
@@ -52,7 +69,7 @@ pub struct User {
     pub github_id: Option<u64>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UserPayoutData {
     pub paypal_address: Option<String>,
     pub paypal_country: Option<String>,
@@ -137,7 +154,9 @@ impl User {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Debug)]
+#[derive(
+    Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, utoipa::ToSchema,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum Role {
     Developer,

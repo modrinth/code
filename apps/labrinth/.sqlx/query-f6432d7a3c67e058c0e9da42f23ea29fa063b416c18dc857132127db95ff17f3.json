@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT t.id AS \"thread_id: DBThreadId\"\n        FROM mods m\n        INNER JOIN threads t ON t.mod_id = m.id\n        WHERE m.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "thread_id: DBThreadId",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "f6432d7a3c67e058c0e9da42f23ea29fa063b416c18dc857132127db95ff17f3"
+}
