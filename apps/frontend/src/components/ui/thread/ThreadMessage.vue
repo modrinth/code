@@ -42,7 +42,7 @@
 				/>
 				<span
 					v-if="message.preview"
-					class="rounded-full border border-solid border-blue/60 bg-highlight-blue px-2 py-0.5 text-xs font-semibold text-blue"
+					class="border-blue/60 rounded-full border border-solid bg-highlight-blue px-2 py-0.5 text-xs font-semibold text-blue"
 				>
 					Preview
 				</span>

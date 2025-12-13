@@ -279,7 +279,9 @@ function isPreReviewed(
 	detailId: string,
 	backendStatus: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
 ): boolean {
-	return (backendStatus === 'safe' || backendStatus === 'unsafe') && !detailDecisions.value.has(detailId)
+	return (
+		(backendStatus === 'safe' || backendStatus === 'unsafe') && !detailDecisions.value.has(detailId)
+	)
 }
 
 function getMarkedFlagsCount(flags: ClassGroup['flags']): number {

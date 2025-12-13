@@ -29,9 +29,9 @@
 </template>
 
 <script setup lang="ts">
-import { CollapseIcon, ExpandIcon } from '@modrinth/assets';
+import { CollapseIcon, ExpandIcon } from '@modrinth/assets'
 
-import ButtonStyled from './ButtonStyled.vue';
+import ButtonStyled from './ButtonStyled.vue'
 
 withDefaults(
 	defineProps<{
