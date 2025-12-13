@@ -111,15 +111,43 @@
 				</Combobox>
 			</div>
 			<span v-if="selectedMethodDetails" class="text-secondary">
-				{{ formatMoney(effectiveMinAmount) }} min,
-				{{ formatMoney(selectedMethodDetails.interval?.standard?.max ?? effectiveMaxAmount) }}
+				{{ formatMoney(effectiveMinAmount)
+				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
+					({{
+						formatAmountForDisplay(
+							effectiveMinAmount,
+							selectedMethodCurrencyCode,
+							selectedMethodExchangeRate,
+						)
+					}})</template
+				>
+				min, {{ formatMoney(selectedMethodDetails.interval?.standard?.max ?? effectiveMaxAmount)
+				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
+					({{
+						formatAmountForDisplay(
+							selectedMethodDetails.interval?.standard?.max ?? effectiveMaxAmount,
+							selectedMethodCurrencyCode,
+							selectedMethodExchangeRate,
+						)
+					}})</template
+				>
 				max withdrawal amount.
 			</span>
 			<span
 				v-if="selectedMethodDetails && effectiveMinAmount > roundedMaxAmount"
 				class="text-sm text-red"
 			>
-				You need at least {{ formatMoney(effectiveMinAmount) }} to use this gift card.
+				You need at least {{ formatMoney(effectiveMinAmount)
+				}}<template v-if="selectedMethodCurrencyCode && selectedMethodCurrencyCode !== 'USD'">
+					({{
+						formatAmountForDisplay(
+							effectiveMinAmount,
+							selectedMethodCurrencyCode,
+							selectedMethodExchangeRate,
+						)
+					}})</template
+				>
+				to use this gift card.
 			</span>
 		</div>
 
@@ -134,7 +162,10 @@
 				<Chips
 					v-model="selectedDenomination"
 					:items="denominationOptions"
-					:format-label="(amt: number) => formatMoney(amt)"
+					:format-label="
+						(amt: number) =>
+							formatAmountForDisplay(amt, selectedMethodCurrencyCode, selectedMethodExchangeRate)
+					"
 					:never-empty="false"
 					:capitalize="false"
 				/>
@@ -159,8 +190,8 @@
 				:amount="formData.amount || 0"
 				:fee="calculatedFee"
 				:fee-loading="feeLoading"
-				:exchange-rate="exchangeRate"
-				:local-currency="showPayPalCurrencySelector ? selectedCurrency : undefined"
+				:exchange-rate="giftCardExchangeRate"
+				:local-currency="giftCardCurrencyCode"
 			/>
 
 			<Checkbox v-model="agreedTerms">
@@ -379,6 +410,8 @@ const rewardOptions = ref<
 				fixed?: { values: number[] }
 				standard?: { min: number; max: number }
 			}
+			currencyCode?: string | null
+			exchangeRate?: number | null
 		}
 	}>
 >([])
@@ -395,6 +428,60 @@ const selectedMethodDetails = computed(() => {
 	debug('Selected method details:', option?.methodDetails)
 	return option?.methodDetails || null
 })
+
+const selectedMethodCurrencyCode = computed(() => selectedMethodDetails.value?.currencyCode || null)
+const selectedMethodExchangeRate = computed(() => selectedMethodDetails.value?.exchangeRate || null)
+
+const giftCardCurrencyCode = computed(() => {
+	if (showPayPalCurrencySelector.value) {
+		return selectedCurrency.value !== 'USD' ? selectedCurrency.value : undefined
+	}
+
+	if (
+		showGiftCardSelector.value &&
+		selectedMethodCurrencyCode.value &&
+		selectedMethodCurrencyCode.value !== 'USD'
+	) {
+		return selectedMethodCurrencyCode.value
+	}
+	return undefined
+})
+
+const giftCardExchangeRate = computed(() => {
+	if (showPayPalCurrencySelector.value) {
+		return exchangeRate.value
+	}
+
+	if (
+		showGiftCardSelector.value &&
+		selectedMethodCurrencyCode.value &&
+		selectedMethodCurrencyCode.value !== 'USD'
+	) {
+		return selectedMethodExchangeRate.value
+	}
+	return exchangeRate.value
+})
+
+function formatAmountForDisplay(
+	usdAmount: number,
+	currencyCode: string | null | undefined,
+	rate: number | null | undefined,
+): string {
+	if (!currencyCode || currencyCode === 'USD' || !rate) {
+		return formatMoney(usdAmount)
+	}
+	const localAmount = usdAmount * rate
+	try {
+		return new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: currencyCode,
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		}).format(localAmount)
+	} catch {
+		return `${currencyCode} ${localAmount.toFixed(2)}`
+	}
+}
 
 const useFixedDenominations = computed(() => {
 	const interval = selectedMethodDetails.value?.interval
@@ -570,6 +657,8 @@ onMounted(async () => {
 				id: m.id,
 				name: m.name,
 				interval: m.interval,
+				currencyCode: m.currency_code,
+				exchangeRate: m.exchange_rate,
 			},
 		}))
 

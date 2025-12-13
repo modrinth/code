@@ -58,6 +58,8 @@ export interface PayoutMethod {
 		fiat?: string | null
 		blockchain?: string[]
 	}
+	currency_code?: string | null
+	exchange_rate?: number | null
 }
 
 export interface PaymentOption {
@@ -284,9 +286,12 @@ interface PayoutPayload {
 }
 
 function buildPayoutPayload(data: WithdrawData): PayoutPayload {
+	// Round amount to 2 decimal places for API
+	const amount = Math.round(data.calculation.amount * 100) / 100
+
 	if (data.selection.provider === 'paypal' || data.selection.provider === 'venmo') {
 		return {
-			amount: data.calculation.amount,
+			amount,
 			method: data.selection.provider,
 			method_id: data.selection.methodId!,
 		}
@@ -301,7 +306,7 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 			methodDetails.currency = data.providerData.currency
 		}
 		return {
-			amount: data.calculation.amount,
+			amount,
 			method: 'tremendous',
 			method_id: data.selection.methodId!,
 			method_details: methodDetails,
@@ -317,7 +322,7 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 
 		if (rail.type === 'crypto') {
 			return {
-				amount: data.calculation.amount,
+				amount,
 				method: 'muralpay',
 				method_id: data.selection.methodId!,
 				method_details: {
@@ -346,7 +351,7 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 			}
 
 			return {
-				amount: data.calculation.amount,
+				amount,
 				method: 'muralpay',
 				method_id: data.selection.methodId!,
 				method_details: {
@@ -480,7 +485,7 @@ export function createWithdrawContext(
 				label: paymentMethodMessages.paypalInternational,
 				icon: PayPalColorIcon,
 				methodId: internationalPaypalMethod.id,
-				fee: '≈ 3.84%',
+				fee: '≈ 3.84%, min $0.25',
 				type: 'tremendous',
 			})
 		}
