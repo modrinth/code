@@ -70,6 +70,7 @@ const {
 	setPrimaryFile,
 	setInferredVersionData,
 	editingVersion,
+	projectType,
 } = useManageVersion()
 
 const addDetectedData = async () => {
@@ -88,6 +89,10 @@ const addDetectedData = async () => {
 		draftVersion.value = {
 			...draftVersion.value,
 			...mappedInferredData,
+		}
+
+		if (projectType.value === 'resourcepack') {
+			draftVersion.value.loaders = ['minecraft']
 		}
 	} catch (err) {
 		console.error('Error parsing version file data', err)
