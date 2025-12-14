@@ -47,10 +47,7 @@ const detectedEnvironment = computed(() => !!inferredVersionData.value?.environm
 
 const noLoadersProject = computed(() => projectType.value === 'resourcepack')
 const noEnvironmentProject = computed(
-	() =>
-		projectType.value !== 'mod' &&
-		projectType.value !== 'modpack' &&
-		projectType.value !== 'datapack',
+	() => projectType.value !== 'mod' && projectType.value !== 'modpack',
 )
 const noDependenciesProject = computed(() => projectType.value === 'modpack')
 
