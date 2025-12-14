@@ -57,6 +57,7 @@ import { acceptFileFromProjectType } from '@modrinth/utils'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
 
+import type { Labrinth } from '@modrinth/api-client'
 import VersionFileRow from '../components/VersionFileRow.vue'
 
 const { projectV2 } = injectProjectPageContext()
@@ -79,9 +80,9 @@ const addDetectedData = async () => {
 
 	try {
 		const inferredData = await setInferredVersionData(primaryFile, projectV2.value)
-		const mappedInferredData = {
+		const mappedInferredData: Partial<Labrinth.Versions.v3.DraftVersion> = {
 			...inferredData,
-			version_title: inferredData.name || '',
+			name: inferredData.name || '',
 		}
 
 		draftVersion.value = {

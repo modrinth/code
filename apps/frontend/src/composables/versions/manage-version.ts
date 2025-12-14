@@ -12,6 +12,7 @@ export interface InferredVersionInfo {
 	loaders?: string[]
 	game_versions?: string[]
 	project_type?: Labrinth.Projects.v2.ProjectType
+	environment?: Labrinth.Projects.v3.Environment
 }
 
 const EMPTY_DRAFT_VERSION: Labrinth.Versions.v3.DraftVersion = {
@@ -42,6 +43,13 @@ const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
 
 const detectedLoaders = computed(() => (inferredVersionData.value?.loaders?.length || 0) > 0)
 const detectedVersions = computed(() => (inferredVersionData.value?.game_versions?.length || 0) > 0)
+const detectedEnvironment = computed(() => !!inferredVersionData.value?.environment)
+
+const noLoadersProject = computed(() => draftVersion.value.loaders.length === 0)
+const noEnvironmentProject = computed(
+	() => projectType.value !== 'mod' && projectType.value !== 'modpack',
+)
+const noDependenciesProject = computed(() => projectType.value === 'modpack')
 
 async function setProjectType(
 	project: Labrinth.Projects.v2.Project,
@@ -120,7 +128,10 @@ export function useManageVersion() {
 
 	const tags = useGeneratedState()
 
-	async function setInferredVersionData(file: File, project: Labrinth.Projects.v2.Project) {
+	async function setInferredVersionData(
+		file: File,
+		project: Labrinth.Projects.v2.Project,
+	): Promise<InferredVersionInfo> {
 		const inferred = (await inferVersionInfo(
 			file,
 			project,
@@ -130,6 +141,15 @@ export function useManageVersion() {
 		inferredVersionData.value = inferred
 
 		projectType.value = await setProjectType(project, file)
+
+		const versions = await labrinth.versions_v3.getProjectVersions(project.id, {
+			loaders: inferred.loaders ?? [],
+		})
+
+		if (versions.length > 0) {
+			const mostRecentVersion = versions[0]
+			inferred.environment = mostRecentVersion.environment
+		}
 
 		return inferred
 	}
@@ -159,10 +179,14 @@ export function useManageVersion() {
 		existingFilesToDelete,
 		detectedLoaders,
 		detectedVersions,
+		detectedEnvironment,
 		projectType,
 		dependencyProjects,
 		dependencyVersions,
 		editingVersion,
+		noLoadersProject,
+		noEnvironmentProject,
+		noDependenciesProject,
 		newDraftVersion,
 		setPrimaryFile,
 		setInferredVersionData,

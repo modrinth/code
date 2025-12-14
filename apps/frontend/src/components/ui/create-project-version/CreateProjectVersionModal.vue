@@ -30,8 +30,11 @@ const {
 	draftVersion,
 	detectedLoaders,
 	detectedVersions,
-	projectType,
+	detectedEnvironment,
 	existingFilesToDelete,
+	noEnvironmentProject,
+	noLoadersProject,
+	noDependenciesProject,
 	setProjectType,
 } = useManageVersion()
 
@@ -64,21 +67,24 @@ const addFilesNextDisabled = computed(
 const addDetailsNextDisabled = computed(() => draftVersion.value.version_number.trim().length === 0)
 
 const addLoadersNextDisabled = computed(() => draftVersion.value.loaders.length === 0)
+
 const addMcVersionsNextDisabled = computed(() => draftVersion.value.game_versions.length === 0)
 
+const addEnvironmentNextDisabled = computed(() => !draftVersion.value.environment)
+
 const hideAddLoadersStage = computed(
-	() =>
-		projectType.value === 'resourcepack' || detectedLoaders.value || editingVersion.value === true,
+	() => noLoadersProject.value || detectedLoaders.value || editingVersion.value === true,
 )
+
 const hideAddMcVersionsStage = computed(
 	() => detectedVersions.value || editingVersion.value === true,
 )
 
-const hideAddDependenciesStage = computed(() => projectType.value === 'modpack')
-
 const hideAddEnvironmentStage = computed(
-	() => projectType.value !== 'mod' && projectType.value !== 'modpack',
+	() => noEnvironmentProject.value || !!detectedEnvironment.value,
 )
+
+const hideAddDependenciesStage = computed(() => noDependenciesProject.value)
 
 function getNextLabel() {
 	const currentStageIndex = modal.value?.currentStageIndex || 0
@@ -174,6 +180,7 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 		rightButtonConfig: {
 			...defaultNextButton,
 			label: getNextLabel(),
+			disabled: addEnvironmentNextDisabled.value,
 		},
 		skip: hideAddEnvironmentStage.value,
 	},
@@ -207,32 +214,54 @@ const stages = computed<InstanceType<typeof MultiStageModal>['$props']['stages']
 	{
 		title: 'Edit loaders',
 		id: 'edit-loaders',
-		stageContent: AddLoadersStage,
+		stageContent: markRaw(AddLoadersStage),
 		leftButtonConfig: {
 			...defaultBackButton,
 			label: 'Back',
 			onClick: () => modal.value?.setStage('add-details'),
+			disabled: addLoadersNextDisabled.value,
 		},
 		rightButtonConfig: {
 			...defaultNextButton,
 			label: 'Continue',
 			onClick: () => modal.value?.setStage(2),
+			disabled: addLoadersNextDisabled.value,
 		},
 		nonProgressStage: true,
 	},
 	{
 		title: 'Edit MC versions',
 		id: 'edit-mc-versions',
-		stageContent: AddMcVersionsStage,
+		stageContent: markRaw(AddMcVersionsStage),
 		leftButtonConfig: {
 			...defaultBackButton,
 			label: 'Back',
 			onClick: () => modal.value?.setStage('add-details'),
+			disabled: addMcVersionsNextDisabled.value,
 		},
 		rightButtonConfig: {
 			...defaultNextButton,
 			label: 'Continue',
 			onClick: () => modal.value?.setStage(2),
+			disabled: addMcVersionsNextDisabled.value,
+		},
+		nonProgressStage: true,
+	},
+	{
+		title: 'Edit environment',
+		id: 'edit-environment',
+		stageContent: markRaw(AddEnvironmentStage),
+		leftButtonConfig: {
+			...defaultBackButton,
+			label: 'Back',
+			onClick: () => modal.value?.setStage('add-details'),
+			disabled: addEnvironmentNextDisabled.value,
+		},
+		rightButtonConfig: {
+			...defaultNextButton,
+			label: 'Continue',
+			onClick: () => modal.value?.setStage(2),
+			disabled: addEnvironmentNextDisabled.value,
 		},
 		nonProgressStage: true,
 	},

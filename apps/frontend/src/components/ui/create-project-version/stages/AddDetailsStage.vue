@@ -37,11 +37,11 @@
 			/>
 		</div>
 
-		<template v-if="inferredVersionData?.loaders?.length || editingVersion">
+		<template v-if="!noLoadersProject && (inferredVersionData?.loaders?.length || editingVersion)">
 			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast">
-						{{ selectedIsDetectedLoaders ? 'Detected loaders' : 'Loaders' }}
+						{{ usingDetectedLoaders ? 'Detected loaders' : 'Loaders' }}
 					</span>
 
 					<ButtonStyled type="transparent" size="standard">
@@ -86,7 +86,7 @@
 			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast">
-						{{ selectedIsDetectedVersions ? 'Detected versions' : 'Versions' }}
+						{{ usingDetectedVersions ? 'Detected versions' : 'Versions' }}
 					</span>
 
 					<ButtonStyled type="transparent" size="standard">
@@ -118,6 +118,34 @@
 				</div>
 			</div>
 		</template>
+
+		<template v-if="!noEnvironmentProject && (inferredVersionData?.environment || editingVersion)">
+			<div class="flex flex-col gap-1">
+				<div class="flex items-center justify-between">
+					<span class="font-semibold text-contrast">
+						{{ usingDetectedEnvironment ? 'Detected environment' : 'Environment' }}
+					</span>
+
+					<ButtonStyled type="transparent" size="standard">
+						<button @click="editEnvironment">
+							<EditIcon />
+							Edit
+						</button>
+					</ButtonStyled>
+				</div>
+
+				<div class="flex flex-col gap-1.5 gap-y-4 rounded-xl bg-surface-2 p-3 py-4">
+					<div v-if="draftVersion.environment" class="flex flex-col gap-1">
+						<div class="font-semibold text-contrast">
+							{{ environmentCopy.title }}
+						</div>
+						<div class="text-sm font-medium">{{ environmentCopy.description }}</div>
+					</div>
+
+					<span v-else class="text-sm font-medium">No environment has been set.</span>
+				</div>
+			</div>
+		</template>
 	</div>
 </template>
 
@@ -129,7 +157,14 @@ import { formatCategory } from '@modrinth/utils'
 import { useGeneratedState } from '~/composables/generated'
 import { useManageVersion } from '~/composables/versions/manage-version'
 
-const { draftVersion, inferredVersionData, projectType, editingVersion } = useManageVersion()
+const {
+	draftVersion,
+	inferredVersionData,
+	projectType,
+	editingVersion,
+	noLoadersProject,
+	noEnvironmentProject,
+} = useManageVersion()
 
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
@@ -143,8 +178,11 @@ const editLoaders = () => {
 const editVersions = () => {
 	createVersionModal?.value?.setStage('edit-mc-versions')
 }
+const editEnvironment = () => {
+	createVersionModal?.value?.setStage('edit-environment')
+}
 
-const selectedIsDetectedVersions = computed(() => {
+const usingDetectedVersions = computed(() => {
 	if (!inferredVersionData.value?.game_versions) return false
 
 	const versionsMatch =
@@ -156,7 +194,7 @@ const selectedIsDetectedVersions = computed(() => {
 	return versionsMatch
 })
 
-const selectedIsDetectedLoaders = computed(() => {
+const usingDetectedLoaders = computed(() => {
 	if (!inferredVersionData.value?.loaders) return false
 
 	const loadersMatch =
@@ -166,5 +204,58 @@ const selectedIsDetectedLoaders = computed(() => {
 		)
 
 	return loadersMatch
+})
+
+const usingDetectedEnvironment = computed(() => {
+	return draftVersion.value.environment === inferredVersionData.value?.environment
+})
+
+const environmentCopy = computed(() => {
+	const emptyMessage = {
+		title: 'No environment set',
+		description: 'The environment for this version has not been specified.',
+	}
+	if (!draftVersion.value.environment) return emptyMessage
+
+	const envCopy: Record<string, { title: string; description: string }> = {
+		client_only: {
+			title: 'Client-side only',
+			description: 'All functionality is done client-side and is compatible with vanilla servers.',
+		},
+		server_only: {
+			title: 'Server-side only',
+			description: 'All functionality is done server-side and is compatible with vanilla clients.',
+		},
+		singleplayer_only: {
+			title: 'Singleplayer only',
+			description: 'Only functions in Singleplayer or when not connected to a Multiplayer server.',
+		},
+		dedicated_server_only: {
+			title: 'Server-side only',
+			description: 'All functionality is done server-side and is compatible with vanilla clients.',
+		},
+		client_and_server: {
+			title: 'Client and server',
+			description: 'Has some functionality on both the client and server, even if only partially.',
+		},
+		client_only_server_optional: {
+			title: 'Client and server',
+			description: 'Has some functionality on both the client and server, even if only partially.',
+		},
+		server_only_client_optional: {
+			title: 'Client and server',
+			description: 'Has some functionality on both the client and server, even if only partially.',
+		},
+		client_or_server: {
+			title: 'Client and server',
+			description: 'Has some functionality on both the client and server, even if only partially.',
+		},
+		client_or_server_prefers_both: {
+			title: 'Client and server',
+			description: 'Has some functionality on both the client and server, even if only partially.',
+		},
+	}
+
+	return envCopy[draftVersion.value.environment] || emptyMessage
 })
 </script>
