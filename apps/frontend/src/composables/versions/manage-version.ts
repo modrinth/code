@@ -45,7 +45,7 @@ const detectedLoaders = computed(() => (inferredVersionData.value?.loaders?.leng
 const detectedVersions = computed(() => (inferredVersionData.value?.game_versions?.length || 0) > 0)
 const detectedEnvironment = computed(() => !!inferredVersionData.value?.environment)
 
-const noLoadersProject = computed(() => draftVersion.value.loaders.length === 0)
+const noLoadersProject = computed(() => projectType.value === 'resourcepack')
 const noEnvironmentProject = computed(
 	() => projectType.value !== 'mod' && projectType.value !== 'modpack',
 )
