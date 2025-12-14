@@ -142,13 +142,18 @@ export function useManageVersion() {
 
 		projectType.value = await setProjectType(project, file)
 
-		const versions = await labrinth.versions_v3.getProjectVersions(project.id, {
-			loaders: inferred.loaders ?? [],
-		})
+		try {
+			const versions = await labrinth.versions_v3.getProjectVersions(project.id, {
+				loaders: inferred.loaders ?? [],
+			})
 
-		if (versions.length > 0) {
-			const mostRecentVersion = versions[0]
-			inferred.environment = mostRecentVersion.environment
+			if (versions.length > 0) {
+				const mostRecentVersion = versions[0]
+				const version = await labrinth.versions_v3.getVersion(mostRecentVersion.id)
+				inferred.environment = version.environment
+			}
+		} catch (error) {
+			console.error('Error fetching versions for environment inference:', error)
 		}
 
 		return inferred
