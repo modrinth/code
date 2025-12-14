@@ -316,6 +316,13 @@ async function handleSaveVersionEdits() {
 			game_versions: version.game_versions,
 			loaders: version.loaders,
 			environment: version.environment,
+			file_types: version.existing_files
+				?.filter((file) => file.file_type)
+				.map((file) => ({
+					algorithm: 'sha1',
+					hash: file.hashes.sha1,
+					file_type: file.file_type ?? null,
+				})),
 		})
 
 		if (files.length > 0) {

@@ -468,8 +468,14 @@ export namespace Labrinth {
 			}
 
 			export type ModifyVersionRequest = Partial<
-				Omit<CreateVersionRequest, 'project_id' | 'file_parts' | 'primary_file'>
-			>
+				Omit<CreateVersionRequest, 'project_id' | 'file_parts' | 'primary_file' | 'file_types'>
+			> & {
+				file_types?: {
+					algorithm: string
+					hash: string
+					file_type: Labrinth.Versions.v3.FileType | null
+				}[]
+			}
 
 			export type AddFilesToVersionRequest = {
 				file_parts: string[]
