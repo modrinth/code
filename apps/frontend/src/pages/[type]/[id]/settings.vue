@@ -3,7 +3,6 @@ import {
 	AlignLeftIcon,
 	BookTextIcon,
 	ChartIcon,
-	GlobeIcon,
 	ImageIcon,
 	InfoIcon,
 	LinkIcon,
@@ -60,15 +59,6 @@ const navItems = computed(() => {
 					label: formatMessage(commonProjectSettingsMessages.general),
 					badge: formatMessage(commonMessages.newBadge),
 					icon: InfoIcon,
-				}
-			: null,
-		flags.value.newProjectEnvironmentSettings &&
-		projectV3.value.project_types.some((type: string) => ['mod', 'modpack'].includes(type))
-			? {
-					link: `/${base}/settings/environment`,
-					label: formatMessage(commonProjectSettingsMessages.environment),
-					badge: formatMessage(commonMessages.newBadge),
-					icon: GlobeIcon,
 				}
 			: null,
 		{
