@@ -118,7 +118,8 @@ const handleToggleVersion = (version: string) => {
 				props.modelValue.filter((v) => !range.includes(v)),
 			)
 		} else {
-			emit('update:modelValue', [...props.modelValue, ...range])
+			const newVersions = range.filter((v) => !props.modelValue.includes(v))
+			emit('update:modelValue', [...props.modelValue, ...newVersions])
 		}
 
 		anchorVersion.value = ''
