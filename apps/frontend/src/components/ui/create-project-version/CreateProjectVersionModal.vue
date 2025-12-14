@@ -81,7 +81,7 @@ const hideAddMcVersionsStage = computed(
 )
 
 const hideAddEnvironmentStage = computed(
-	() => noEnvironmentProject.value || !!detectedEnvironment.value,
+	() => noEnvironmentProject.value || !!detectedEnvironment.value || editingVersion.value === true,
 )
 
 const hideAddDependenciesStage = computed(() => noDependenciesProject.value)
