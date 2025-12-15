@@ -3,13 +3,11 @@ import type { JWTAuth, ModuleError, ModuleName } from '@modrinth/utils'
 import { ModrinthServerError } from '@modrinth/utils'
 
 import {
-	BackupsModule,
 	ContentModule,
 	FSModule,
 	GeneralModule,
 	NetworkModule,
 	StartupModule,
-	WSModule,
 } from './modules/index.ts'
 import { useServersFetch } from './servers-fetch.ts'
 
@@ -36,10 +34,8 @@ export class ModrinthServer {
 
 	readonly general: GeneralModule
 	readonly content: ContentModule
-	readonly backups: BackupsModule
 	readonly network: NetworkModule
 	readonly startup: StartupModule
-	readonly ws: WSModule
 	readonly fs: FSModule
 
 	constructor(serverId: string) {
@@ -47,10 +43,8 @@ export class ModrinthServer {
 
 		this.general = new GeneralModule(this)
 		this.content = new ContentModule(this)
-		this.backups = new BackupsModule(this)
 		this.network = new NetworkModule(this)
 		this.startup = new StartupModule(this)
-		this.ws = new WSModule(this)
 		this.fs = new FSModule(this)
 	}
 
@@ -242,7 +236,7 @@ export class ModrinthServer {
 		const modulesToRefresh =
 			modules.length > 0
 				? modules
-				: (['general', 'content', 'backups', 'network', 'startup', 'ws', 'fs'] as ModuleName[])
+				: (['general', 'content', 'network', 'startup', 'fs'] as ModuleName[])
 
 		for (const module of modulesToRefresh) {
 			this.errors[module] = undefined
@@ -274,17 +268,11 @@ export class ModrinthServer {
 					case 'content':
 						await this.content.fetch()
 						break
-					case 'backups':
-						await this.backups.fetch()
-						break
 					case 'network':
 						await this.network.fetch()
 						break
 					case 'startup':
 						await this.startup.fetch()
-						break
-					case 'ws':
-						await this.ws.fetch()
 						break
 					case 'fs':
 						await this.fs.fetch()
