@@ -7,7 +7,7 @@
 			<Chips
 				v-model="draftVersion.version_type"
 				:items="['release', 'alpha', 'beta']"
-				:never-empty="false"
+				:never-empty="true"
 				:capitalize="true"
 			/>
 		</div>
