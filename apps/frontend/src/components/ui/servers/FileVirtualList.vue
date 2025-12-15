@@ -35,6 +35,7 @@
 					@move="$emit('move', item)"
 					@move-direct-to="$emit('moveDirectTo', $event)"
 					@edit="$emit('edit', item)"
+					@hover="$emit('hover', item)"
 					@contextmenu="(x, y) => $emit('contextmenu', item, x, y)"
 				/>
 			</ul>
@@ -53,7 +54,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	(
-		e: 'delete' | 'rename' | 'download' | 'move' | 'edit' | 'moveDirectTo' | 'extract',
+		e: 'delete' | 'rename' | 'download' | 'move' | 'edit' | 'moveDirectTo' | 'extract' | 'hover',
 		item: any,
 	): void
 	(e: 'contextmenu', item: any, x: number, y: number): void
@@ -92,7 +93,7 @@ const visibleItems = computed(() => {
 	return props.items.slice(visibleRange.value.start, visibleRange.value.end)
 })
 
-const handleScroll = () => {
+function handleScroll() {
 	windowScrollY.value = window.scrollY
 
 	if (!listContainer.value) return
@@ -105,7 +106,7 @@ const handleScroll = () => {
 	}
 }
 
-const handleResize = () => {
+function handleResize() {
 	windowHeight.value = window.innerHeight
 }
 

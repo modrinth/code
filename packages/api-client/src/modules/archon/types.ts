@@ -293,8 +293,11 @@ export namespace Archon {
 				| 'ongoing'
 				| 'done'
 				| 'cancelled'
-				| 'failure-corrupted'
-				| 'failure-invalid-path'
+				| 'failed-corrupted'
+				| 'failed-invalid-path'
+				| 'failed-cf-no-serverpack'
+				| 'failed-cf-not-available'
+				| 'failed-not-reachable'
 
 			export type FilesystemOperation = {
 				op: FilesystemOpKind
@@ -305,7 +308,7 @@ export namespace Archon {
 				state: FilesystemOpState
 				mime: string
 				current_file?: string
-				invalid_path?: string
+				failed_path?: string
 				src: string
 				started: string
 			}

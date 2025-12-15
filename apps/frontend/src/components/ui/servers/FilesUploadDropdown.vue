@@ -102,14 +102,13 @@
 
 <script setup lang="ts">
 import { CheckCircleIcon, FolderOpenIcon, XCircleIcon } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
+import { ButtonStyled, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import { computed, nextTick, ref, watch } from 'vue'
-
-import type { FSModule } from '~/composables/servers/modules/fs.ts'
 
 import PanelSpinner from './PanelSpinner.vue'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
 
 interface UploadItem {
 	file: File
@@ -123,7 +122,7 @@ interface UploadItem {
 		| 'cancelled'
 		| 'incorrect-type'
 	size: string
-	uploader?: any
+	uploader?: ReturnType<typeof client.kyros.files_v0.uploadFile>
 	error?: Error
 }
 
@@ -132,7 +131,6 @@ interface Props {
 	fileType?: string
 	marginBottom?: number
 	acceptedTypes?: Array<string>
-	fs: FSModule
 }
 
 defineOptions({
@@ -208,6 +206,7 @@ const cancelUpload = (item: UploadItem) => {
 }
 
 const badFileTypeMsg = 'Upload had incorrect file type'
+
 const uploadFile = async (file: File) => {
 	const uploadItem: UploadItem = {
 		file,
@@ -229,19 +228,18 @@ const uploadFile = async (file: File) => {
 
 		uploadItem.status = 'uploading'
 		const filePath = `${props.currentPath}/${file.name}`.replace('//', '/')
-		const uploader = await props.fs.uploadFile(filePath, file)
-		uploadItem.uploader = uploader
 
-		if (uploader?.onProgress) {
-			uploader.onProgress(({ progress }: { progress: number }) => {
+		const uploader = client.kyros.files_v0.uploadFile(filePath, file, {
+			onProgress: ({ progress }) => {
 				const index = uploadQueue.value.findIndex((item) => item.file.name === file.name)
 				if (index !== -1) {
 					uploadQueue.value[index].progress = Math.round(progress)
 				}
-			})
-		}
+			},
+		})
+		uploadItem.uploader = uploader
 
-		await uploader?.promise
+		await uploader.promise
 		const index = uploadQueue.value.findIndex((item) => item.file.name === file.name)
 		if (index !== -1 && uploadQueue.value[index].status !== 'cancelled') {
 			uploadQueue.value[index].status = 'completed'

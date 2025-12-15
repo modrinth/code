@@ -12,6 +12,7 @@
 		@click="selectItem"
 		@contextmenu="openContextMenu"
 		@keydown="(e) => e.key === 'Enter' && selectItem()"
+		@mouseenter="handleMouseEnter"
 		@dragstart="handleDragStart"
 		@dragend="handleDragEnd"
 		@dragenter.prevent="handleDragEnter"
@@ -73,13 +74,14 @@ import {
 	FolderOpenIcon,
 	MoreHorizontalIcon,
 	PackageOpenIcon,
+	PaletteIcon,
 	RightArrowIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
 import { computed, ref, shallowRef } from 'vue'
-import { renderToString } from 'vue/server-renderer'
 import { useRoute, useRouter } from 'vue-router'
+import { renderToString } from 'vue/server-renderer'
 
 import {
 	UiServersIconsCodeFileIcon,
@@ -88,7 +90,6 @@ import {
 	UiServersIconsImageFileIcon,
 	UiServersIconsTextFileIcon,
 } from '#components'
-import PaletteIcon from '~/assets/icons/palette.svg?component'
 
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
@@ -106,7 +107,7 @@ const props = defineProps<FileItemProps>()
 
 const emit = defineEmits<{
 	(
-		e: 'rename' | 'move' | 'download' | 'delete' | 'edit' | 'extract',
+		e: 'rename' | 'move' | 'download' | 'delete' | 'edit' | 'extract' | 'hover',
 		item: { name: string; type: string; path: string },
 	): void
 	(e: 'moveDirectTo', item: { name: string; type: string; path: string; destination: string }): void
@@ -263,12 +264,18 @@ const formattedSize = computed(() => {
 	return `${size} ${units[exponent]}`
 })
 
-const openContextMenu = (event: MouseEvent) => {
+function openContextMenu(event: MouseEvent) {
 	event.preventDefault()
 	emit('contextmenu', event.clientX, event.clientY)
 }
 
-const navigateToFolder = () => {
+function handleMouseEnter() {
+	if (props.type === 'directory') {
+		emit('hover', { name: props.name, type: props.type, path: props.path })
+	}
+}
+
+function navigateToFolder() {
 	const currentPath = route.value.query.path?.toString() || ''
 	const newPath = currentPath.endsWith('/')
 		? `${currentPath}${props.name}`
@@ -278,7 +285,7 @@ const navigateToFolder = () => {
 
 const isNavigating = ref(false)
 
-const selectItem = () => {
+function selectItem() {
 	if (isNavigating.value) return
 	isNavigating.value = true
 
@@ -293,7 +300,7 @@ const selectItem = () => {
 	}, 500)
 }
 
-const getDragIcon = async () => {
+async function getDragIcon() {
 	let iconToUse
 
 	if (props.type === 'directory') {
@@ -322,7 +329,7 @@ const getDragIcon = async () => {
 	return await renderToString(h(iconToUse))
 }
 
-const handleDragStart = async (event: DragEvent) => {
+async function handleDragStart(event: DragEvent) {
 	if (!event.dataTransfer) return
 	isDragging.value = true
 
@@ -363,29 +370,29 @@ const handleDragStart = async (event: DragEvent) => {
 	event.dataTransfer.effectAllowed = 'move'
 }
 
-const isChildPath = (parentPath: string, childPath: string) => {
+function isChildPath(parentPath: string, childPath: string) {
 	return childPath.startsWith(parentPath + '/')
 }
 
-const handleDragEnd = () => {
+function handleDragEnd() {
 	isDragging.value = false
 }
 
-const handleDragEnter = () => {
+function handleDragEnter() {
 	if (props.type !== 'directory') return
 	isDragOver.value = true
 }
 
-const handleDragOver = (event: DragEvent) => {
+function handleDragOver(event: DragEvent) {
 	if (props.type !== 'directory' || !event.dataTransfer) return
 	event.dataTransfer.dropEffect = 'move'
 }
 
-const handleDragLeave = () => {
+function handleDragLeave() {
 	isDragOver.value = false
 }
 
-const handleDrop = (event: DragEvent) => {
+function handleDrop(event: DragEvent) {
 	isDragOver.value = false
 	if (props.type !== 'directory' || !event.dataTransfer) return
 

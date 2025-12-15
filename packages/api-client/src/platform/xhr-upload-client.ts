@@ -125,7 +125,16 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 			xhr.addEventListener('error', () => reject(new ModrinthApiError('Upload failed')))
 			xhr.addEventListener('abort', () => reject(new ModrinthApiError('Upload cancelled')))
 
-			xhr.open('POST', context.url)
+			// Build URL with params (unlike $fetch, XHR doesn't handle params automatically)
+			let url = context.url
+			if (context.options.params) {
+				const queryString = new URLSearchParams(
+					Object.entries(context.options.params).map(([k, v]) => [k, String(v)]),
+				).toString()
+				url += (url.includes('?') ? '&' : '?') + queryString
+			}
+
+			xhr.open('POST', url)
 
 			// Apply headers from context (features may have modified them)
 			for (const [key, value] of Object.entries(context.options.headers ?? {})) {

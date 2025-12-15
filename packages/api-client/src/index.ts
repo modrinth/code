@@ -9,6 +9,7 @@ export {
 } from './core/abstract-websocket'
 export { ModrinthApiError, ModrinthServerError } from './core/errors'
 export { type AuthConfig, AuthFeature } from './features/auth'
+export { type NodeAuth, type NodeAuthConfig, NodeAuthFeature } from './features/node-auth'
 export {
 	type CircuitBreakerConfig,
 	CircuitBreakerFeature,
@@ -27,5 +28,6 @@ export { NuxtCircuitBreakerStorage, NuxtModrinthClient } from './platform/nuxt'
 export type { TauriClientConfig } from './platform/tauri'
 export { TauriModrinthClient } from './platform/tauri'
 export { XHRUploadClient } from './platform/xhr-upload-client'
+export { clearNodeAuthState, nodeAuthState, setNodeAuthState } from './state/node-auth'
 export * from './types'
 export { withJWTRetry } from './utils/jwt-retry'

@@ -1,7 +1,7 @@
 <template>
 	<div data-pyro-file-manager-root class="contents">
 		<FilesCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
-		<FilesUploadZipUrlModal ref="uploadZipModal" :server="server" />
+		<FilesUploadZipUrlModal ref="uploadZipModal" />
 		<FilesUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
 
 		<FilesRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
@@ -129,11 +129,9 @@
 									:class="{ active: op.state === 'done' }"
 									@click="
 										() => {
-											op.state === 'done'
-												? server.fs?.modifyOp(op.id, 'dismiss')
-												: 'id' in op
-													? server.fs?.modifyOp(op.id, 'cancel')
-													: () => {}
+											if ('id' in op && op.id) {
+												dismissOrCancelOp(op.id, op.state === 'done' ? 'dismiss' : 'cancel')
+											}
 										}
 									"
 								>
@@ -148,11 +146,9 @@
 						>
 					</div>
 					<FilesUploadDropdown
-						v-if="props.server.fs"
 						ref="uploadDropdownRef"
 						class="rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow"
 						:current-path="currentPath"
-						:fs="props.server.fs"
 						@upload-complete="refreshList()"
 					/>
 				</div>
@@ -207,6 +203,7 @@
 						@move="showMoveModal"
 						@move-direct-to="handleDirectMove"
 						@edit="editFile"
+						@hover="handleItemHover"
 						@contextmenu="showContextMenu"
 						@load-more="handleLoadMore"
 					/>
@@ -258,6 +255,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Kyros } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	FolderOpenIcon,
@@ -267,10 +265,16 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, injectNotificationManager, ProgressBar } from '@modrinth/ui'
-import type { DirectoryItem, DirectoryResponse, FilesystemOp, FSQueuedOp } from '@modrinth/utils'
-import { formatBytes, ModrinthServersFetchError } from '@modrinth/utils'
-import { useInfiniteScroll } from '@vueuse/core'
+import {
+	ButtonStyled,
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+	ProgressBar,
+} from '@modrinth/ui'
+import type { FilesystemOp, FSQueuedOp } from '@modrinth/utils'
+import { formatBytes } from '@modrinth/utils'
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import FileManagerError from '~/components/ui/servers/FileManagerError.vue'
@@ -293,8 +297,12 @@ import { handleServersError } from '~/composables/servers/modrinth-servers.ts'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
+const client = injectModrinthClient()
+const serverContext = injectModrinthServerContext()
+const { fsOps, fsQueuedOps } = serverContext
 const flags = useFeatureFlags()
 const baseId = useId()
+const queryClient = useQueryClient()
 
 interface BaseOperation {
 	type: 'move' | 'rename'
@@ -328,7 +336,6 @@ const router = useRouter()
 
 const VAceEditor = ref()
 const mainContent = ref<HTMLElement | null>(null)
-const scrollContainer = ref<HTMLElement | null>(null)
 const contextMenu = ref()
 const operationHistory = ref<Operation[]>([])
 const redoStack = ref<Operation[]>([])
@@ -337,10 +344,8 @@ const searchQuery = ref('')
 const sortMethod = ref('name')
 const sortDesc = ref(false)
 
-const maxResults = 100
-const currentPage = ref(1)
-
-const currentPath = ref(typeof route.query.path === 'string' ? route.query.path : '')
+const serverId = computed(() => props.server.serverId)
+const currentPath = computed(() => (typeof route.query.path === 'string' ? route.query.path : '/'))
 
 const isAtBottom = ref(false)
 const contextMenuInfo = ref<any>({ item: null, x: 0, y: 0 })
@@ -370,7 +375,7 @@ const data = computed(() => props.server.general)
 
 const viewFilter = ref('all')
 
-const handleFilter = (type: string) => {
+function handleFilter(type: string) {
 	viewFilter.value = type
 	sortMethod.value = 'name'
 	sortDesc.value = false
@@ -380,72 +385,256 @@ useHead({
 	title: computed(() => `Files - ${data.value?.name ?? 'Server'} - Modrinth`),
 })
 
-const fetchDirectoryContents = async (): Promise<DirectoryResponse> => {
-	await modulesLoaded
+const {
+	data: directoryData,
+	isLoading,
+	error: loadError,
+	fetchNextPage,
+	hasNextPage,
+	isFetchingNextPage,
+} = useInfiniteQuery({
+	queryKey: computed(() => ['files', serverId.value, currentPath.value]),
+	queryFn: async ({ pageParam = 1 }) => {
+		console.log('[query] fetching with currentPath:', currentPath.value, '| key:', ['files', serverId.value, currentPath.value])
+		await modulesLoaded
+		return client.kyros.files_v0.listDirectory(currentPath.value, pageParam, 100)
+	},
+	getNextPageParam: (lastPage, allPages) =>
+		allPages.length < lastPage.total ? allPages.length + 1 : undefined,
+	staleTime: 30_000,
+	initialPageParam: 1,
+})
 
-	const path = Array.isArray(currentPath.value) ? currentPath.value.join('') : currentPath.value
-	try {
-		const data = await props.server.fs?.listDirContents(path, currentPage.value, maxResults)
+const items = computed(() => directoryData.value?.pages.flatMap((page) => page.items) ?? [])
 
-		if (!data || !data.items) {
-			throw new Error('Invalid data structure received from server.')
-		}
+// prefetch directory contents on hover (150ms debounce)
+function prefetchDirectory(path: string) {
+	queryClient.prefetchInfiniteQuery({
+		queryKey: ['files', serverId.value, path],
+		queryFn: async () => {
+			await modulesLoaded
+			return client.kyros.files_v0.listDirectory(path, 1, 100)
+		},
+		initialPageParam: 1,
+		staleTime: 30_000,
+	})
+}
 
-		if (currentPage.value === 1) {
-			return {
-				items: data.items,
-				total: data.total,
-			}
-		}
+let prefetchTimeout: ReturnType<typeof setTimeout> | null = null
 
-		return {
-			items: [...(directoryData.value?.items || []), ...data.items],
-			total: data.total,
-		}
-	} catch (error) {
-		console.error('Error fetching directory contents:', error)
-		if (error instanceof ModrinthServersFetchError && error.statusCode === 400) {
-			return directoryData.value || { items: [], total: 0 }
-		}
-		throw error
+function handleItemHover(item: { type: string; path: string; name: string }) {
+	if (prefetchTimeout) {
+		clearTimeout(prefetchTimeout)
+		prefetchTimeout = null
+	}
+
+	if (item.type === 'directory') {
+		prefetchTimeout = setTimeout(() => {
+			const routePath = typeof route.query.path === 'string' ? route.query.path : ''
+			const navPath = routePath.endsWith('/')
+				? `${routePath}${item.name}`
+				: `${routePath}/${item.name}`
+			console.log('[prefetch] navPath:', navPath)
+			prefetchDirectory(navPath)
+		}, 150)
 	}
 }
 
-const {
-	data: directoryData,
-	refresh: refreshData,
-	status,
-	error: loadError,
-} = useLazyAsyncData(() => fetchDirectoryContents(), {
-	watch: [],
-	default: () => ({ items: [], total: 0 }),
-	immediate: true,
-})
-
-const isLoading = computed(() => status.value === 'pending')
-
-const items = computed(() => directoryData.value?.items || [])
-
-const refreshList = () => {
-	currentPage.value = 1
-	refreshData()
-	reset()
+function getQueryKey() {
+	return ['files', serverId.value, currentPath.value]
 }
 
-const undoLastOperation = async () => {
+const deleteMutation = useMutation({
+	mutationFn: ({ path, recursive }: { path: string; recursive: boolean }) =>
+		client.kyros.files_v0.deleteFileOrFolder(path, recursive),
+
+	onMutate: async ({ path }) => {
+		const queryKey = getQueryKey()
+		await queryClient.cancelQueries({ queryKey })
+		const previous = queryClient.getQueryData(queryKey)
+
+		// optimistically remove the item
+		queryClient.setQueryData(queryKey, (old: any) => ({
+			...old,
+			pages: old?.pages?.map((page: any) => ({
+				...page,
+				items: page.items.filter((item: any) => item.path !== path),
+				total: Math.max(0, page.total - 1),
+			})),
+		}))
+		return { previous }
+	},
+
+	onError: (err: any, _vars, context) => {
+		queryClient.setQueryData(getQueryKey(), context?.previous)
+		addNotification({ title: 'Delete failed', text: err.message, type: 'error' })
+	},
+
+	onSuccess: () => {
+		addNotification({ title: 'File deleted', text: 'Your file has been deleted.', type: 'success' })
+	},
+
+	onSettled: () => {
+		queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+	},
+})
+
+const renameMutation = useMutation({
+	mutationFn: ({ path, newName }: { path: string; newName: string }) =>
+		client.kyros.files_v0.renameFileOrFolder(path, newName),
+
+	onMutate: async ({ path, newName }) => {
+		const queryKey = getQueryKey()
+		await queryClient.cancelQueries({ queryKey })
+		const previous = queryClient.getQueryData(queryKey)
+
+		// optimistically rename the item
+		queryClient.setQueryData(queryKey, (old: any) => ({
+			...old,
+			pages: old?.pages?.map((page: any) => ({
+				...page,
+				items: page.items.map((item: any) =>
+					item.path === path
+						? { ...item, name: newName, path: item.path.replace(/[^/]+$/, newName) }
+						: item,
+				),
+			})),
+		}))
+		return { previous }
+	},
+
+	onError: (err: any, _vars, context) => {
+		queryClient.setQueryData(getQueryKey(), context?.previous)
+		addNotification({ title: 'Rename failed', text: err.message, type: 'error' })
+	},
+
+	onSuccess: (_, { newName }) => {
+		addNotification({ title: 'Renamed', text: `Renamed to ${newName}`, type: 'success' })
+	},
+
+	onSettled: () => {
+		queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+	},
+})
+
+const moveMutation = useMutation({
+	mutationFn: ({ source, destination }: { source: string; destination: string }) =>
+		client.kyros.files_v0.moveFileOrFolder(source, destination),
+
+	onMutate: async ({ source }) => {
+		const queryKey = getQueryKey()
+		await queryClient.cancelQueries({ queryKey })
+		const previous = queryClient.getQueryData(queryKey)
+
+		// optimistically remove from current directory
+		queryClient.setQueryData(queryKey, (old: any) => ({
+			...old,
+			pages: old?.pages?.map((page: any) => ({
+				...page,
+				items: page.items.filter((item: any) => item.path !== source),
+				total: Math.max(0, page.total - 1),
+			})),
+		}))
+		return { previous }
+	},
+
+	onError: (err: any, _vars, context) => {
+		queryClient.setQueryData(getQueryKey(), context?.previous)
+		addNotification({ title: 'Move failed', text: err.message, type: 'error' })
+	},
+
+	onSuccess: (_, { destination }) => {
+		addNotification({ title: 'Moved', text: `Moved to ${destination}`, type: 'success' })
+	},
+
+	onSettled: () => {
+		queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+	},
+})
+
+const createMutation = useMutation({
+	mutationFn: ({ path, type }: { path: string; type: 'file' | 'directory' }) =>
+		client.kyros.files_v0.createFileOrFolder(path, type),
+
+	onMutate: async ({ path, type }) => {
+		const queryKey = getQueryKey()
+		await queryClient.cancelQueries({ queryKey })
+		const previous = queryClient.getQueryData(queryKey)
+
+		const name = path.split('/').pop()!
+		const now = new Date().toISOString()
+
+		// optimistically add new item
+		queryClient.setQueryData(queryKey, (old: any) => ({
+			...old,
+			pages: old?.pages?.map((page: any, i: number) =>
+				i === 0
+					? {
+							...page,
+							items: [{ name, path, type, size: 0, modified: now, created: now }, ...page.items],
+							total: page.total + 1,
+						}
+					: page,
+			),
+		}))
+		return { previous }
+	},
+
+	onError: (err: any, _vars, context) => {
+		queryClient.setQueryData(getQueryKey(), context?.previous)
+		addNotification({ title: 'Create failed', text: err.message, type: 'error' })
+	},
+
+	onSuccess: (_, { path, type }) => {
+		const name = path.split('/').pop()
+		addNotification({
+			title: `${type === 'directory' ? 'Folder' : 'File'} created`,
+			text: `Created ${name}`,
+			type: 'success',
+		})
+	},
+
+	onSettled: () => {
+		queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+	},
+})
+
+// (no optimistic update - uses ws for progress)
+const extractMutation = useMutation({
+	mutationFn: ({ path, override }: { path: string; override: boolean }) =>
+		client.kyros.files_v0.extractFile(path, override, false),
+
+	onSuccess: () => {
+		addNotification({ title: 'Extraction started', type: 'success' })
+	},
+
+	onError: (err: any) => {
+		addNotification({ title: 'Extract failed', text: err.message, type: 'error' })
+	},
+
+	onSettled: () => {
+		queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+	},
+})
+
+function refreshList() {
+	queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+}
+
+async function undoLastOperation() {
 	const lastOperation = operationHistory.value.pop()
 	if (!lastOperation) return
 
 	try {
 		switch (lastOperation.type) {
 			case 'move':
-				await props.server.fs?.moveFileOrFolder(
+				await client.kyros.files_v0.moveFileOrFolder(
 					`${lastOperation.destinationPath}/${lastOperation.fileName}`.replace('//', '/'),
 					`${lastOperation.sourcePath}/${lastOperation.fileName}`.replace('//', '/'),
 				)
 				break
 			case 'rename':
-				await props.server.fs?.renameFileOrFolder(
+				await client.kyros.files_v0.renameFileOrFolder(
 					`${lastOperation.path}/${lastOperation.newName}`.replace('//', '/'),
 					lastOperation.oldName,
 				)
@@ -470,20 +659,20 @@ const undoLastOperation = async () => {
 	}
 }
 
-const redoLastOperation = async () => {
+async function redoLastOperation() {
 	const lastOperation = redoStack.value.pop()
 	if (!lastOperation) return
 
 	try {
 		switch (lastOperation.type) {
 			case 'move':
-				await props.server.fs?.moveFileOrFolder(
+				await client.kyros.files_v0.moveFileOrFolder(
 					`${lastOperation.sourcePath}/${lastOperation.fileName}`.replace('//', '/'),
 					`${lastOperation.destinationPath}/${lastOperation.fileName}`.replace('//', '/'),
 				)
 				break
 			case 'rename':
-				await props.server.fs?.renameFileOrFolder(
+				await client.kyros.files_v0.renameFileOrFolder(
 					`${lastOperation.path}/${lastOperation.oldName}`.replace('//', '/'),
 					lastOperation.newName,
 				)
@@ -508,88 +697,65 @@ const redoLastOperation = async () => {
 	}
 }
 
-const handleCreateNewItem = async (name: string) => {
-	try {
-		const path = `${currentPath.value}/${name}`.replace('//', '/')
-		await props.server.fs?.createFileOrFolder(path, newItemType.value)
-
-		refreshList()
-
-		addNotification({
-			title: `${newItemType.value === 'directory' ? 'Folder' : 'File'} created`,
-			text: `New ${newItemType.value === 'directory' ? 'folder' : 'file'} ${name} has been created.`,
-			type: 'success',
-		})
-	} catch (error) {
-		handleCreateError(error)
-	}
+function handleCreateNewItem(name: string) {
+	const path = `${currentPath.value}/${name}`.replace('//', '/')
+	createMutation.mutate({ path, type: newItemType.value })
 }
 
-const handleRenameItem = async (newName: string) => {
-	try {
-		const path = `${currentPath.value}/${selectedItem.value.name}`.replace('//', '/')
-		await props.server.fs?.renameFileOrFolder(path, newName)
+function handleRenameItem(newName: string) {
+	const path = `${currentPath.value}/${selectedItem.value.name}`.replace('//', '/')
+	const item = selectedItem.value
 
-		redoStack.value = []
-		operationHistory.value.push({
-			type: 'rename',
-			itemType: selectedItem.value.type,
-			fileName: selectedItem.value.name,
-			path: currentPath.value,
-			oldName: selectedItem.value.name,
-			newName,
-		})
-
-		refreshList()
-
-		if (closeEditor.value) {
-			await props.server.refresh()
-			isEditing.value = false
-			editingFile.value = null
-			closeEditor.value = false
-			router.push({ query: { ...route.query, path: currentPath.value } })
-		}
-
-		addNotification({
-			title: `${selectedItem.value.type === 'directory' ? 'Folder' : 'File'} renamed`,
-			text: `${selectedItem.value.name} has been renamed to ${newName}`,
-			type: 'success',
-		})
-	} catch (error) {
-		console.error('Error renaming item:', error)
-		if (error instanceof ModrinthServersFetchError) {
-			if (error.statusCode === 400) {
-				addNotification({
-					title: 'Could not rename',
-					text: `An item named "${newName}" already exists in this location`,
-					type: 'error',
+	renameMutation.mutate(
+		{ path, newName },
+		{
+			onSuccess: async () => {
+				// track for undo
+				redoStack.value = []
+				operationHistory.value.push({
+					type: 'rename',
+					itemType: item.type,
+					fileName: item.name,
+					path: currentPath.value,
+					oldName: item.name,
+					newName,
 				})
-				return
-			}
-			addNotification({
-				title: 'Could not rename item',
-				text: 'An unexpected error occurred',
-				type: 'error',
-			})
-		}
-	}
+
+				if (closeEditor.value) {
+					await props.server.refresh()
+					isEditing.value = false
+					editingFile.value = null
+					closeEditor.value = false
+					router.push({ query: { ...route.query, path: currentPath.value } })
+				}
+			},
+		},
+	)
 }
 
-const extractItem = async (path: string) => {
-	try {
-		await props.server.fs?.extractFile(path, true, false)
-	} catch (error) {
-		console.error('Error extracting item:', error)
-		handleServersError(error, notifications)
-	}
+function extractItem(path: string) {
+	// add to queued ops for UI feedback
+	fsQueuedOps.value.push({ op: 'unarchive', src: path })
+	setTimeout(() => {
+		fsQueuedOps.value = fsQueuedOps.value.filter((x) => x.op !== 'unarchive' || x.src !== path)
+	}, 4000)
+
+	extractMutation.mutate(
+		{ path, override: true },
+		{
+			onError: () => {
+				fsQueuedOps.value = fsQueuedOps.value.filter((x) => x.op !== 'unarchive' || x.src !== path)
+			},
+		},
+	)
 }
 
-const handleExtractItem = async (item: { name: string; type: string; path: string }) => {
+async function handleExtractItem(item: { name: string; type: string; path: string }) {
 	try {
-		const dry = await props.server.fs?.extractFile(item.path, true, true, true)
+		const dry = await client.kyros.files_v0.extractFile(item.path, true, true)
 		if (dry) {
 			if (dry.conflicting_files.length === 0) {
-				await extractItem(item.path)
+				extractItem(item.path)
 			} else {
 				uploadConflictModal.value.show(item.path, dry.conflicting_files)
 			}
@@ -602,132 +768,90 @@ const handleExtractItem = async (item: { name: string; type: string; path: strin
 	}
 }
 
-const handleMoveItem = async (destination: string) => {
-	try {
-		const itemType = selectedItem.value.type
-		const sourcePath = currentPath.value
-		const newPath = `${destination}/${selectedItem.value.name}`.replace('//', '/')
+function handleMoveItem(destination: string) {
+	const item = selectedItem.value
+	const sourcePath = currentPath.value
+	const source = `${sourcePath}/${item.name}`.replace('//', '/')
+	const dest = `${destination}/${item.name}`.replace('//', '/')
 
-		await props.server.fs?.moveFileOrFolder(
-			`${sourcePath}/${selectedItem.value.name}`.replace('//', '/'),
-			newPath,
-		)
-
-		redoStack.value = []
-		operationHistory.value.push({
-			type: 'move',
-			sourcePath,
-			destinationPath: destination,
-			fileName: selectedItem.value.name,
-			itemType,
-		})
-
-		refreshList()
-		addNotification({
-			title: `${itemType === 'directory' ? 'Folder' : 'File'} moved`,
-			text: `${selectedItem.value.name} has been moved to ${newPath}`,
-			type: 'success',
-		})
-	} catch (error) {
-		console.error('Error moving item:', error)
-	}
+	moveMutation.mutate(
+		{ source, destination: dest },
+		{
+			onSuccess: () => {
+				// track for undo
+				redoStack.value = []
+				operationHistory.value.push({
+					type: 'move',
+					sourcePath,
+					destinationPath: destination,
+					fileName: item.name,
+					itemType: item.type,
+				})
+			},
+		},
+	)
 }
 
-const handleDirectMove = async (moveData: {
+function handleDirectMove(moveData: {
 	name: string
 	type: string
 	path: string
 	destination: string
-}) => {
-	try {
-		const newPath = `${moveData.destination}/${moveData.name}`.replace('//', '/')
-		const sourcePath = moveData.path.substring(0, moveData.path.lastIndexOf('/'))
+}) {
+	const dest = `${moveData.destination}/${moveData.name}`.replace('//', '/')
+	const sourcePath = moveData.path.substring(0, moveData.path.lastIndexOf('/'))
 
-		await props.server.fs?.moveFileOrFolder(moveData.path, newPath)
-
-		redoStack.value = []
-		operationHistory.value.push({
-			type: 'move',
-			sourcePath,
-			destinationPath: moveData.destination,
-			fileName: moveData.name,
-			itemType: moveData.type,
-		})
-
-		refreshList()
-		addNotification({
-			title: `${moveData.type === 'directory' ? 'Folder' : 'File'} moved`,
-			text: `${moveData.name} has been moved to ${newPath}`,
-			type: 'success',
-		})
-	} catch (error) {
-		console.error('Error moving item:', error)
-	}
+	moveMutation.mutate(
+		{ source: moveData.path, destination: dest },
+		{
+			onSuccess: () => {
+				// track for undo
+				redoStack.value = []
+				operationHistory.value.push({
+					type: 'move',
+					sourcePath,
+					destinationPath: moveData.destination,
+					fileName: moveData.name,
+					itemType: moveData.type,
+				})
+			},
+		},
+	)
 }
 
-const handleDeleteItem = async () => {
-	try {
-		const path = `${currentPath.value}/${selectedItem.value.name}`.replace('//', '/')
-		await props.server.fs?.deleteFileOrFolder(path, selectedItem.value.type === 'directory')
-
-		refreshList()
-		addNotification({
-			title: 'File deleted',
-			text: 'Your file has been deleted.',
-			type: 'success',
-		})
-	} catch (error) {
-		console.error('Error deleting item:', error)
-	}
+function handleDeleteItem() {
+	const path = `${currentPath.value}/${selectedItem.value.name}`.replace('//', '/')
+	deleteMutation.mutate({ path, recursive: selectedItem.value.type === 'directory' })
 }
 
-const showCreateModal = (type: 'file' | 'directory') => {
+function showCreateModal(type: 'file' | 'directory') {
 	newItemType.value = type
 	createItemModal.value?.show()
 }
 
-const showUnzipFromUrlModal = (cf: boolean) => {
+function showUnzipFromUrlModal(cf: boolean) {
 	uploadZipModal.value?.show(cf)
 }
 
-const showRenameModal = (item: any) => {
+function showRenameModal(item: any) {
 	selectedItem.value = item
 	renameItemModal.value?.show(item)
 	contextMenuInfo.value.item = null
 }
 
-const showMoveModal = (item: any) => {
+function showMoveModal(item: any) {
 	selectedItem.value = item
 	moveItemModal.value?.show()
 	contextMenuInfo.value.item = null
 }
 
-const showDeleteModal = (item: any) => {
+function showDeleteModal(item: any) {
 	selectedItem.value = item
 	deleteItemModal.value?.show()
 	contextMenuInfo.value.item = null
 }
 
-const handleCreateError = (error: any) => {
-	console.error('Error creating item:', error)
-	if (error instanceof ModrinthServersFetchError) {
-		if (error.statusCode === 400) {
-			addNotification({
-				title: 'Error creating item',
-				text: 'Invalid file',
-				type: 'error',
-			})
-		} else if (error.statusCode === 500) {
-			addNotification({
-				title: 'Error creating item',
-				text: 'Something went wrong. The file may already exist.',
-				type: 'error',
-			})
-		}
-	}
-}
-
-const handleSort = (field: string) => {
+function handleSort(field: string) {
 	if (sortMethod.value === field) {
 		sortDesc.value = !sortDesc.value
 	} else {
@@ -736,7 +860,7 @@ const handleSort = (field: string) => {
 	}
 }
 
-const applySort = (items: DirectoryItem[]) => {
+function applySort(items: Kyros.Files.v0.DirectoryItem[]) {
 	let result = [...items]
 
 	switch (viewFilter.value) {
@@ -748,7 +872,7 @@ const applySort = (items: DirectoryItem[]) => {
 			break
 	}
 
-	const compareItems = (a: DirectoryItem, b: DirectoryItem) => {
+	function compareItems(a: Kyros.Files.v0.DirectoryItem, b: Kyros.Files.v0.DirectoryItem) {
 		if (viewFilter.value === 'all') {
 			if (a.type === 'directory' && b.type !== 'directory') return -1
 			if (a.type !== 'directory' && b.type === 'directory') return 1
@@ -783,44 +907,12 @@ const filteredItems = computed(() => {
 	return applySort(result)
 })
 
-const { reset } = useInfiniteScroll(
-	scrollContainer,
-	async () => {
-		if (status.value === 'pending') return
-
-		try {
-			const totalPages = directoryData.value?.total || 0
-
-			if (currentPage.value < totalPages) {
-				currentPage.value++
-				const newData = await fetchDirectoryContents()
-
-				if (newData && newData.items) {
-					directoryData.value = {
-						items: [...directoryData.value.items, ...newData.items],
-						total: newData.total,
-					}
-				}
-			}
-		} catch (error) {
-			console.error('Error during infinite scroll:', error)
-		}
-	},
-	{ distance: 1000 },
-)
-
-const handleLoadMore = async () => {
-	if (status.value === 'pending') return
-
-	const totalPages = directoryData.value?.total || 0
-
-	if (currentPage.value < totalPages) {
-		currentPage.value++
-		await refreshData()
-	}
+async function handleLoadMore() {
+	if (isFetchingNextPage.value || !hasNextPage.value) return
+	await fetchNextPage()
 }
 
-const onInit = (editor: any) => {
+function onInit(editor: any) {
 	editor.commands.addCommand({
 		name: 'saveFile',
 		bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
@@ -828,7 +920,7 @@ const onInit = (editor: any) => {
 	})
 }
 
-const showContextMenu = async (item: any, x: number, y: number) => {
+async function showContextMenu(item: any, x: number, y: number) {
 	contextMenuInfo.value = { item, x, y }
 	selectedItem.value = item
 	await nextTick()
@@ -838,7 +930,7 @@ const showContextMenu = async (item: any, x: number, y: number) => {
 	isAtBottom.value = ctxRect.bottom > screenHeight
 }
 
-const onAnywhereClicked = (e: MouseEvent) => {
+function onAnywhereClicked(e: MouseEvent) {
 	if (!(e.target as HTMLElement).closest('#item-context-menu')) {
 		contextMenuInfo.value.item = null
 	}
@@ -846,10 +938,10 @@ const onAnywhereClicked = (e: MouseEvent) => {
 
 const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp']
 
-const editFile = async (item: { name: string; type: string; path: string }) => {
+async function editFile(item: { name: string; type: string; path: string }) {
 	try {
 		const path = `${currentPath.value}/${item.name}`.replace('//', '/')
-		const content = (await props.server.fs?.downloadFile(path, true)) as any
+		const content = await client.kyros.files_v0.downloadFile(path)
 		window.scrollTo(0, 0)
 
 		fileContent.value = await content.text()
@@ -866,8 +958,8 @@ const editFile = async (item: { name: string; type: string; path: string }) => {
 	}
 }
 
-const initializeFileEdit = async () => {
-	if (!route.query.editing || !props.server.fs) return
+async function initializeFileEdit() {
+	if (!route.query.editing) return
 
 	const filePath = route.query.editing as string
 	await editFile({
@@ -904,7 +996,7 @@ onMounted(async () => {
 		}
 	})
 
-	props.server.fs?.clearQueuedOps()
+	fsQueuedOps.value = []
 })
 
 onUnmounted(() => {
@@ -913,17 +1005,23 @@ onUnmounted(() => {
 	document.removeEventListener('keydown', () => {})
 })
 
-const clientSideQueued = computed<FSQueuedOp[]>(() => props.server.fs?.queuedOps ?? [])
-
 type QueuedOpWithState = FSQueuedOp & { state: 'queued' }
 
 const ops = computed<(QueuedOpWithState | FilesystemOp)[]>(() => [
-	...clientSideQueued.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
-	...(props.server.fs?.ops ?? []),
+	...fsQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
+	...fsOps.value,
 ])
 
+async function dismissOrCancelOp(opId: string, action: 'dismiss' | 'cancel') {
+	try {
+		await client.kyros.files_v0.modifyOperation(opId, action)
+	} catch (error) {
+		console.error(`Failed to ${action} operation:`, error)
+	}
+}
+
 watch(
-	() => props.server.fs?.ops,
+	() => fsOps.value,
 	() => {
 		refreshList()
 	},
@@ -931,30 +1029,26 @@ watch(
 
 watch(
 	() => route.query,
-	async (newQuery) => {
-		currentPage.value = 1
-		searchQuery.value = ''
-		viewFilter.value = 'all'
-		sortMethod.value = 'name'
-		sortDesc.value = false
-
-		currentPath.value = Array.isArray(newQuery.path) ? newQuery.path.join('') : newQuery.path || '/'
+	async (newQuery, oldQuery) => {
+		if (newQuery.path !== oldQuery?.path) {
+			searchQuery.value = ''
+			viewFilter.value = 'all'
+			sortMethod.value = 'name'
+			sortDesc.value = false
+		}
 
 		if (newQuery.editing) {
 			await editFile({
-				name: newQuery.editing as string,
+				name: (newQuery.editing as string).split('/').pop() || '',
 				type: 'file',
 				path: newQuery.editing as string,
 			})
-		} else {
+		} else if (oldQuery?.editing && !newQuery.editing) {
 			isEditing.value = false
 			editingFile.value = null
 		}
-
-		await refreshData()
-		reset()
 	},
-	{ immediate: true, deep: true },
+	{ deep: true },
 )
 
 const breadcrumbSegments = computed(() => {
@@ -964,7 +1058,7 @@ const breadcrumbSegments = computed(() => {
 	return []
 })
 
-const navigateToSegment = (index: number) => {
+function navigateToSegment(index: number) {
 	const newPath = breadcrumbSegments.value.slice(0, index + 1).join('/')
 	router.push({ query: { ...route.query, path: newPath } })
 	if (isEditing.value) {
@@ -982,7 +1076,7 @@ const navigateToSegment = (index: number) => {
 //   router.push({ query: { path: currentPath.value } });
 // };
 
-const requestShareLink = async () => {
+async function requestShareLink() {
 	try {
 		const response = (await $fetch('https://api.mclo.gs/1/log', {
 			method: 'POST',
@@ -1005,7 +1099,7 @@ const requestShareLink = async () => {
 	}
 }
 
-const handleDroppedFiles = (files: File[]) => {
+function handleDroppedFiles(files: File[]) {
 	if (isEditing.value) return
 
 	files.forEach((file) => {
@@ -1013,7 +1107,7 @@ const handleDroppedFiles = (files: File[]) => {
 	})
 }
 
-const initiateFileUpload = () => {
+function initiateFileUpload() {
 	const input = document.createElement('input')
 	input.type = 'file'
 	input.multiple = true
@@ -1027,11 +1121,11 @@ const initiateFileUpload = () => {
 	input.click()
 }
 
-const downloadFile = async (item: any) => {
+async function downloadFile(item: any) {
 	if (item.type === 'file') {
 		try {
 			const path = `${currentPath.value}/${item.name}`.replace('//', '/')
-			const fileData = await props.server.fs?.downloadFile(path)
+			const fileData = await client.kyros.files_v0.downloadFile(path)
 			if (fileData) {
 				const blob = new Blob([fileData], { type: 'application/octet-stream' })
 				const link = document.createElement('a')
@@ -1049,11 +1143,11 @@ const downloadFile = async (item: any) => {
 	}
 }
 
-const saveFileContent = async (exit: boolean = true) => {
+async function saveFileContent(exit: boolean = true) {
 	if (!editingFile.value) return
 
 	try {
-		await props.server.fs?.updateFile(editingFile.value.path, fileContent.value)
+		await client.kyros.files_v0.updateFile(editingFile.value.path, fileContent.value)
 		if (exit) {
 			await props.server.refresh()
 			isEditing.value = false
@@ -1071,7 +1165,7 @@ const saveFileContent = async (exit: boolean = true) => {
 	}
 }
 
-const saveFileContentRestart = async () => {
+async function saveFileContentRestart() {
 	await saveFileContent()
 	await props.server.general?.power('Restart')
 
@@ -1082,13 +1176,13 @@ const saveFileContentRestart = async () => {
 	})
 }
 
-const saveFileContentAs = async () => {
+async function saveFileContentAs() {
 	await saveFileContent(false)
 	closeEditor.value = true
 	showRenameModal(editingFile.value)
 }
 
-const cancelEditing = () => {
+function cancelEditing() {
 	isEditing.value = false
 	editingFile.value = null
 	fileContent.value = ''
@@ -1100,7 +1194,7 @@ const cancelEditing = () => {
 	router.replace({ query: newQuery })
 }
 
-const onScroll = () => {
+function onScroll() {
 	if (contextMenuInfo.value.item) {
 		contextMenuInfo.value.y = Math.max(0, contextMenuInfo.value.y - window.scrollY)
 	}

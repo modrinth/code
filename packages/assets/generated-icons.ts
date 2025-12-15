@@ -142,6 +142,7 @@ import _PackageIcon from './icons/package.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
 import _PaintbrushIcon from './icons/paintbrush.svg?component'
+import _PaletteIcon from './icons/palette.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
 import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
@@ -359,6 +360,7 @@ export const PackageClosedIcon = _PackageClosedIcon
 export const PackageOpenIcon = _PackageOpenIcon
 export const PackageIcon = _PackageIcon
 export const PaintbrushIcon = _PaintbrushIcon
+export const PaletteIcon = _PaletteIcon
 export const PickaxeIcon = _PickaxeIcon
 export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon

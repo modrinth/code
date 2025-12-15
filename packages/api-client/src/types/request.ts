@@ -73,6 +73,13 @@ export type RequestOptions = {
 	 * @default false
 	 */
 	skipAuth?: boolean
+
+	/**
+	 * Use node authentication for this request.
+	 * When true, NodeAuthFeature will handle auth injection and URL building.
+	 * @default false
+	 */
+	useNodeAuth?: boolean
 }
 
 /**

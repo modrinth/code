@@ -2,13 +2,7 @@ import type { AbstractWebNotificationManager } from '@modrinth/ui'
 import type { JWTAuth, ModuleError, ModuleName } from '@modrinth/utils'
 import { ModrinthServerError } from '@modrinth/utils'
 
-import {
-	ContentModule,
-	FSModule,
-	GeneralModule,
-	NetworkModule,
-	StartupModule,
-} from './modules/index.ts'
+import { ContentModule, GeneralModule, NetworkModule, StartupModule } from './modules/index.ts'
 import { useServersFetch } from './servers-fetch.ts'
 
 export function handleServersError(err: any, notifications: AbstractWebNotificationManager) {
@@ -36,7 +30,6 @@ export class ModrinthServer {
 	readonly content: ContentModule
 	readonly network: NetworkModule
 	readonly startup: StartupModule
-	readonly fs: FSModule
 
 	constructor(serverId: string) {
 		this.serverId = serverId
@@ -45,24 +38,6 @@ export class ModrinthServer {
 		this.content = new ContentModule(this)
 		this.network = new NetworkModule(this)
 		this.startup = new StartupModule(this)
-		this.fs = new FSModule(this)
-	}
-
-	async createMissingFolders(path: string): Promise<void> {
-		if (path.startsWith('/')) {
-			path = path.substring(1)
-		}
-		const folders = path.split('/')
-		let currentPath = ''
-
-		for (const folder of folders) {
-			currentPath += '/' + folder
-			try {
-				await this.fs.createFileOrFolder(currentPath, 'directory')
-			} catch {
-				// Folder might already exist, ignore error
-			}
-		}
 	}
 
 	async fetchConfigFile(fileName: string): Promise<any> {
@@ -234,9 +209,7 @@ export class ModrinthServer {
 		},
 	): Promise<void> {
 		const modulesToRefresh =
-			modules.length > 0
-				? modules
-				: (['general', 'content', 'network', 'startup', 'fs'] as ModuleName[])
+			modules.length > 0 ? modules : (['general', 'content', 'network', 'startup'] as ModuleName[])
 
 		for (const module of modulesToRefresh) {
 			this.errors[module] = undefined
@@ -274,13 +247,10 @@ export class ModrinthServer {
 					case 'startup':
 						await this.startup.fetch()
 						break
-					case 'fs':
-						await this.fs.fetch()
-						break
 				}
 			} catch (error) {
 				if (error instanceof ModrinthServerError) {
-					if (error.statusCode === 404 && ['fs', 'content'].includes(module)) {
+					if (error.statusCode === 404 && module === 'content') {
 						console.debug(`Optional ${module} resource not found:`, error.message)
 						continue
 					}
