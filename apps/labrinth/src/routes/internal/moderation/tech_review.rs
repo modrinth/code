@@ -419,6 +419,9 @@ async fn search_projects(
                                 WHERE dr.file_id = f.id
                             )
                         ))
+                        FROM versions v
+                        INNER JOIN files f ON f.version_id = v.id
+                        WHERE v.mod_id = m.id
                     )
                 ) AS report
             FROM mods m
@@ -488,7 +491,6 @@ async fn search_projects(
     let db_threads = DBThread::get_many(&thread_ids, &**pool)
         .await
         .wrap_internal_err("failed to fetch threads")?;
-    tracing::info!("db threads = {db_threads:?}");
     let thread_author_ids = db_threads
         .iter()
         .flat_map(|thread| {
@@ -498,7 +500,6 @@ async fn search_projects(
                 .filter_map(|message| message.author_id)
         })
         .collect::<Vec<_>>();
-    tracing::info!("thread author ids = {thread_author_ids:?}");
     let thread_authors =
         DBUser::get_many_ids(&thread_author_ids, &**pool, &redis)
             .await
