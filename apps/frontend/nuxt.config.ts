@@ -31,7 +31,7 @@ const favicons = {
  * Preferably only the locales that reach a certain threshold of complete
  * translations would be included in this array.
  */
-const enabledLocales: string[] = []
+// const enabledLocales: string[] = []
 
 /**
  * Overrides for the categories of the certain locales.
@@ -179,7 +179,7 @@ export default defineNuxtConfig({
 		async 'vintl:extendOptions'(opts) {
 			opts.locales ??= []
 
-			const isProduction = getDomain() === 'https://modrinth.com'
+			// const isProduction = getDomain() === 'https://modrinth.com'
 
 			const resolveCompactNumberDataImport = await (async () => {
 				const compactNumberLocales: string[] = []
