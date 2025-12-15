@@ -1,4 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
+import type { UploadHandle, UploadProgress } from '../../../types/upload'
 
 export class KyrosFilesV0Module extends AbstractModule {
 	public getModuleID(): string {
@@ -24,29 +25,38 @@ export class KyrosFilesV0Module extends AbstractModule {
 	}
 
 	/**
-	 * Upload a file to a server's filesystem
+	 * Upload a file to a server's filesystem with progress tracking
 	 *
-	 * @param nodeInstance - Node instance URL
+	 * @param nodeInstance - Node instance URL (e.g., "node-xyz.modrinth.com/modrinth/v0/fs")
 	 * @param nodeToken - JWT token from getFilesystemAuth
 	 * @param path - Destination path (e.g., "/server-icon.png")
 	 * @param file - File to upload
+	 * @param options - Optional progress callback and feature overrides
+	 * @returns UploadHandle with promise, onProgress, and cancel
 	 */
-	public async uploadFile(
+	public uploadFile(
 		nodeInstance: string,
 		nodeToken: string,
 		path: string,
 		file: File,
-	): Promise<void> {
-		return this.client.request<void>(`/fs/create`, {
-			api: `https://${nodeInstance.replace('v0/fs', '')}`,
-			method: 'POST',
+		options?: {
+			onProgress?: (progress: UploadProgress) => void
+			retry?: boolean | number
+		},
+	): UploadHandle<void> {
+		const baseUrl = `https://${nodeInstance.replace('v0/fs', '')}`
+
+		return this.client.upload<void>('/fs/create', {
+			api: baseUrl,
 			version: 'v0',
+			file,
 			params: { path, type: 'file' },
 			headers: {
 				Authorization: `Bearer ${nodeToken}`,
-				'Content-Type': 'application/octet-stream',
 			},
-			body: file,
+			onProgress: options?.onProgress,
+			retry: options?.retry,
+			skipAuth: true, // Use nodeToken, not main auth
 		})
 	}
 }
