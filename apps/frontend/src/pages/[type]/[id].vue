@@ -445,14 +445,32 @@
 			<div class="normal-page__header relative my-4">
 				<ProjectHeader :project="project" :member="!!currentMember">
 					<template #actions>
+						<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
+							<nuxt-link
+								v-tooltip="formatMessage(commonMessages.settingsLabel)"
+								:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+								class="!font-bold"
+							>
+								<SettingsIcon aria-hidden="true" />
+								Edit project
+							</nuxt-link>
+						</ButtonStyled>
+
 						<div class="hidden sm:contents">
 							<ButtonStyled
 								size="large"
-								:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+								:color="
+									(auth.user && currentMember) || route.name === 'type-id-version-version'
+										? `standard`
+										: `brand`
+								"
+								:circular="auth.user && currentMember"
 							>
 								<button @click="(event) => downloadModal.show(event)">
 									<DownloadIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.downloadButton) }}
+									{{
+										auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
+									}}
 								</button>
 							</ButtonStyled>
 						</div>
@@ -639,14 +657,7 @@
 								<BookmarkIcon aria-hidden="true" />
 							</nuxt-link>
 						</ButtonStyled>
-						<ButtonStyled v-if="auth.user && currentMember" size="large" circular>
-							<nuxt-link
-								v-tooltip="formatMessage(commonMessages.settingsLabel)"
-								:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-							>
-								<SettingsIcon aria-hidden="true" />
-							</nuxt-link>
-						</ButtonStyled>
+
 						<ButtonStyled size="large" circular type="transparent">
 							<OverflowMenu
 								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
