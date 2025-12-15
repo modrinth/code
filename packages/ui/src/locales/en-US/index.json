@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Servers"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
@@ -551,6 +551,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projects"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {project} other {projects}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Resource Pack} other {Resource Packs}}"
   },
@@ -559,6 +565,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {resource pack} other {resource packs}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Server} other {Servers}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servers"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, one {server} other {servers}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
@@ -842,6 +857,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Backup schedule"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Creating backup..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Failed to create backup"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Failed to restore from backup"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Manual backup"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Backup queued"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Restore queued"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Rename"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Restore"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Restoring from backup..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Retry"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Dismiss"
   },
@@ -930,7 +981,7 @@
     "defaultMessage": "Where would you like your server to be located?"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Servers next!</link>"
+    "defaultMessage": "Region not listed? <link>Let us know where you'd like to see Modrinth Hosting next!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "Southeast Asia"

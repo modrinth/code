@@ -2,11 +2,12 @@ use ariadne::ids::UserId;
 use chrono::Utc;
 use eyre::{Result, eyre};
 use futures::{StreamExt, TryFutureExt, stream::FuturesUnordered};
-use muralpay::{MuralError, MuralPay, TokenFeeRequest};
+use modrinth_util::decimal::Decimal2dp;
+use muralpay::{MuralError, TokenFeeRequest};
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use tracing::{info, warn};
+use tracing::{info, trace, warn};
 
 use crate::{
     database::models::DBPayoutId,
@@ -35,7 +36,7 @@ pub enum MuralPayoutRequest {
 impl PayoutsQueue {
     pub async fn compute_muralpay_fees(
         &self,
-        amount: Decimal,
+        amount: Decimal2dp,
         fiat_and_rail_code: muralpay::FiatAndRailCode,
     ) -> Result<muralpay::TokenPayoutFee, ApiError> {
         let muralpay = self.muralpay.load();
@@ -48,7 +49,7 @@ impl PayoutsQueue {
             .get_fees_for_token_amount(&[TokenFeeRequest {
                 amount: muralpay::TokenAmount {
                     token_symbol: muralpay::USDC.into(),
-                    token_amount: amount,
+                    token_amount: amount.get(),
                 },
                 fiat_and_rail_code,
             }])
@@ -65,10 +66,10 @@ impl PayoutsQueue {
         &self,
         payout_id: DBPayoutId,
         user_id: UserId,
-        gross_amount: Decimal,
+        gross_amount: Decimal2dp,
         fees: PayoutFees,
         payout_details: MuralPayoutRequest,
-        recipient_info: muralpay::PayoutRecipientInfo,
+        recipient_info: muralpay::CreatePayoutRecipientInfo,
         gotenberg: &GotenbergClient,
     ) -> Result<muralpay::PayoutRequest, ApiError> {
         let muralpay = self.muralpay.load();
@@ -107,9 +108,9 @@ impl PayoutsQueue {
 
         let recipient_address = recipient_info.physical_address();
         let recipient_email = recipient_info.email().to_string();
-        let gross_amount_cents = gross_amount * Decimal::from(100);
-        let net_amount_cents = net_amount * Decimal::from(100);
-        let fees_cents = fees.total_fee() * Decimal::from(100);
+        let gross_amount_cents = gross_amount.get() * Decimal::from(100);
+        let net_amount_cents = net_amount.get() * Decimal::from(100);
+        let fees_cents = fees.total_fee().get() * Decimal::from(100);
         let address_line_3 = format!(
             "{}, {}, {}",
             recipient_address.city,
@@ -153,7 +154,7 @@ impl PayoutsQueue {
 
         let payout = muralpay::CreatePayout {
             amount: muralpay::TokenAmount {
-                token_amount: sent_to_method,
+                token_amount: sent_to_method.get(),
                 token_symbol: muralpay::USDC.into(),
             },
             payout_details,
@@ -176,42 +177,33 @@ impl PayoutsQueue {
             )
             .await
             .map_err(|err| match err {
-                MuralError::Api(err) => ApiError::Request(err.into()),
+                MuralError::Api(err) => ApiError::Mural(Box::new(err)),
                 err => ApiError::Internal(
                     eyre!(err).wrap_err("failed to create payout request"),
                 ),
             })?;
 
-        // try to immediately execute the payout request...
-        // use a poor man's try/catch block using this `async move {}`
-        // to catch any errors within this block
-        let result = async move {
-            muralpay
-                .client
-                .execute_payout_request(payout_request.id)
-                .await
-                .wrap_internal_err("failed to execute payout request")?;
-            eyre::Ok(())
-        }
-        .await;
-
-        // and if it fails, make sure to immediately cancel it -
-        // we don't want floating payout requests
-        if let Err(err) = result {
-            muralpay
-                .client
-                .cancel_payout_request(payout_request.id)
-                .await
-                .wrap_internal_err_with(|| {
-                    eyre!("failed to cancel unexecuted payout request\noriginal error: {err:#?}")
-                })?;
-            return Err(ApiError::Internal(err));
-        }
-
         Ok(payout_request)
     }
 
-    pub async fn cancel_muralpay_payout_request(
+    pub async fn execute_mural_payout_request(
+        &self,
+        id: muralpay::PayoutRequestId,
+    ) -> Result<(), ApiError> {
+        let muralpay = self.muralpay.load();
+        let muralpay = muralpay
+            .as_ref()
+            .wrap_internal_err("Mural Pay client not available")?;
+
+        muralpay
+            .client
+            .execute_payout_request(id)
+            .await
+            .wrap_internal_err("failed to execute payout request")?;
+        Ok(())
+    }
+
+    pub async fn cancel_mural_payout_request(
         &self,
         id: muralpay::PayoutRequestId,
     ) -> Result<()> {
@@ -262,7 +254,7 @@ impl PayoutsQueue {
 /// Mural state, and updates the payout status.
 pub async fn sync_pending_payouts_from_mural(
     db: &PgPool,
-    mural: &MuralPay,
+    mural: &muralpay::Client,
     limit: u32,
 ) -> eyre::Result<()> {
     #[derive(Debug)]
@@ -368,9 +360,13 @@ pub async fn sync_pending_payouts_from_mural(
 
 /// Queries Mural for canceled or failed payouts, and updates the corresponding
 /// Labrinth payouts' statuses.
+///
+/// This will update:
+/// - Mural payout requests which are failed or canceled
+/// - Mural payout requests where all of the payouts are failed or canceled
 pub async fn sync_failed_mural_payouts_to_labrinth(
     db: &PgPool,
-    mural: &MuralPay,
+    mural: &muralpay::Client,
     limit: u32,
 ) -> eyre::Result<()> {
     info!("Syncing failed Mural payouts to Labrinth");
@@ -379,12 +375,7 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
     loop {
         let search_resp = mural
             .search_payout_requests(
-                Some(muralpay::PayoutStatusFilter::PayoutStatus {
-                    statuses: vec![
-                        muralpay::PayoutStatus::Canceled,
-                        muralpay::PayoutStatus::Failed,
-                    ],
-                }),
+                None,
                 Some(muralpay::SearchParams {
                     limit: Some(u64::from(limit)),
                     next_id,
@@ -394,37 +385,54 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
             .wrap_internal_err(
                 "failed to fetch failed payout requests from Mural",
             )?;
-        next_id = search_resp.next_id;
         if search_resp.results.is_empty() {
             break;
         }
+        next_id = search_resp.next_id;
 
-        info!(
-            "Found {} canceled or failed Mural payouts",
-            search_resp.results.len()
-        );
+        let mut payout_platform_ids = Vec::<String>::new();
+        let mut payout_new_statuses = Vec::<String>::new();
 
-        let mut payout_platform_id = Vec::<String>::new();
-        let mut payout_new_status = Vec::<String>::new();
+        for payout_request in search_resp.results {
+            let payout_platform_id = payout_request.id;
 
-        for payout_req in search_resp.results {
-            let new_payout_status = match payout_req.status {
-                muralpay::PayoutStatus::Canceled => PayoutStatus::Cancelled,
-                muralpay::PayoutStatus::Failed => PayoutStatus::Failed,
-                _ => {
-                    warn!(
-                        "Found payout {} with status {:?}, which should have been filtered out by our Mural request - Mural bug",
-                        payout_req.id, payout_req.status
+            let new_payout_status = match payout_request.status {
+                muralpay::PayoutStatus::Canceled => {
+                    trace!(
+                        "- Payout request {payout_platform_id} set to {} because it is cancelled in Mural",
+                        PayoutStatus::Cancelled
                     );
-                    continue;
+                    Some(PayoutStatus::Cancelled)
                 }
+                muralpay::PayoutStatus::Failed => {
+                    trace!(
+                        "- Payout request {payout_platform_id} set to {} because it is failed in Mural",
+                        PayoutStatus::Failed
+                    );
+                    Some(PayoutStatus::Failed)
+                }
+                // this will also fail any payout request which has no payouts
+                _ if payout_request
+                    .payouts
+                    .iter()
+                    .all(payout_should_be_failed) =>
+                {
+                    trace!(
+                        "- Payout request {payout_platform_id} set to {} because all of its payouts are failed",
+                        PayoutStatus::Failed
+                    );
+                    Some(PayoutStatus::Failed)
+                }
+                _ => None,
             };
 
-            payout_platform_id.push(payout_req.id.to_string());
-            payout_new_status.push(new_payout_status.to_string());
+            if let Some(new_payout_status) = new_payout_status {
+                payout_platform_ids.push(payout_platform_id.to_string());
+                payout_new_statuses.push(new_payout_status.to_string());
+            }
         }
 
-        sqlx::query!(
+        let result = sqlx::query!(
             "
             UPDATE payouts
             SET status = u.status
@@ -433,8 +441,8 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
                 payouts.method = $3
                 AND payouts.platform_id = u.platform_id
             ",
-            &payout_platform_id,
-            &payout_new_status,
+            &payout_platform_ids,
+            &payout_new_statuses,
             PayoutMethodType::MuralPay.as_str(),
         )
         .execute(db)
@@ -442,8 +450,9 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
         .wrap_internal_err("failed to update payout statuses")?;
 
         info!(
-            "Updated {} payouts in database from Mural info",
-            payout_platform_id.len()
+            "Attempted to update {} payouts in database from Mural info, {} rows affected",
+            payout_platform_ids.len(),
+            result.rows_affected()
         );
 
         if next_id.is_none() {
@@ -454,6 +463,17 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
     Ok(())
 }
 
+fn payout_should_be_failed(payout: &muralpay::Payout) -> bool {
+    matches!(
+        payout.details,
+        muralpay::PayoutDetails::Fiat(muralpay::FiatPayoutDetails {
+            fiat_payout_status: muralpay::FiatPayoutStatus::Failed { .. }
+                | muralpay::FiatPayoutStatus::Refunded { .. },
+            ..
+        })
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -461,8 +481,8 @@ mod tests {
         api_v3::ApiV3,
         environment::{TestEnvironment, with_test_environment},
     };
-    use muralpay::MuralPay;
-    use muralpay::mock::MuralPayMock;
+    use muralpay::MuralPayMock;
+    use rust_decimal::dec;
 
     fn create_mock_payout_request(
         id: &str,
@@ -478,12 +498,51 @@ mod tests {
             transaction_hash: None,
             memo: None,
             status,
-            payouts: vec![],
+            payouts: vec![Payout {
+                id: PayoutId(uuid::Uuid::new_v4()),
+                created_at: chrono::Utc::now(),
+                updated_at: chrono::Utc::now(),
+                amount: TokenAmount {
+                    token_amount: dec!(10.00),
+                    token_symbol: "USDC".into(),
+                },
+                details: PayoutDetails::Fiat(FiatPayoutDetails {
+                    fiat_and_rail_code: FiatAndRailCode::Usd,
+                    fiat_payout_status: FiatPayoutStatus::Pending {
+                        initiated_at: chrono::Utc::now(),
+                    },
+                    fiat_amount: FiatAmount {
+                        fiat_amount: dec!(10.00),
+                        fiat_currency_code: CurrencyCode::Usd,
+                    },
+                    transaction_fee: TokenAmount {
+                        token_amount: dec!(1.00),
+                        token_symbol: "USDC".into(),
+                    },
+                    exchange_fee_percentage: dec!(0.0),
+                    exchange_rate: dec!(1.0),
+                    fee_total: TokenAmount {
+                        token_amount: dec!(1.00),
+                        token_symbol: "USDC".into(),
+                    },
+                    developer_fee: None,
+                }),
+                recipient_info: PayoutRecipientInfo::Inline {
+                    name: "John Smith".into(),
+                    details: InlineRecipientDetails::Fiat {
+                        details: InlineFiatRecipientDetails {
+                            fiat_currency_code: CurrencyCode::Usd,
+                            bank_name: "Foo Bank".into(),
+                            truncated_bank_account_number: "1234".into(),
+                        },
+                    },
+                },
+            }],
         }
     }
 
-    fn create_mock_muralpay() -> MuralPay {
-        MuralPay::from_mock(MuralPayMock {
+    fn create_mock_muralpay() -> muralpay::Client {
+        muralpay::Client::from_mock(MuralPayMock {
             get_payout_request: Box::new(|_id| {
                 Err(muralpay::MuralError::Api(muralpay::ApiError {
                     error_instance_id: uuid::Uuid::new_v4(),
@@ -627,7 +686,7 @@ mod tests {
                 })
             });
 
-            let mock_client = MuralPay::from_mock(mock);
+            let mock_client = muralpay::Client::from_mock(mock);
 
             // Run the function
             let result =
@@ -740,7 +799,7 @@ mod tests {
                 })
             });
 
-            let mock_client = MuralPay::from_mock(mock);
+            let mock_client = muralpay::Client::from_mock(mock);
 
             // Run the function
             let result =
@@ -802,7 +861,7 @@ mod tests {
                 })
             });
 
-            let mock_client = MuralPay::from_mock(mock);
+            let mock_client = muralpay::Client::from_mock(mock);
 
             // Run the function - should handle this gracefully
             sync_failed_mural_payouts_to_labrinth(

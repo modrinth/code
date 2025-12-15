@@ -22,12 +22,13 @@ use chrono::{DateTime, Duration, Utc};
 use eyre::eyre;
 use hex::ToHex;
 use hmac::{Hmac, Mac};
+use modrinth_util::decimal::Decimal2dp;
 use reqwest::Method;
-use rust_decimal::Decimal;
+use rust_decimal::{Decimal, RoundingStrategy};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Sha256;
-use sqlx::PgPool;
+use sqlx::{PgPool, PgTransaction};
 use std::collections::HashMap;
 use tokio_stream::StreamExt;
 use tracing::error;
@@ -423,8 +424,7 @@ pub async fn tremendous_webhook(
 
 #[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Withdrawal {
-    #[serde(with = "rust_decimal::serde::float")]
-    amount: Decimal,
+    amount: Decimal2dp,
     #[serde(flatten)]
     method: PayoutMethodRequest,
     method_id: String,
@@ -432,7 +432,7 @@ pub struct Withdrawal {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WithdrawalFees {
-    pub fee: Decimal,
+    pub fee: Decimal2dp,
     pub exchange_rate: Option<Decimal>,
 }
 
@@ -583,7 +583,8 @@ pub async fn create_payout(
 
     let fees = payouts_queue
         .calculate_fees(&body.method, &body.method_id, body.amount)
-        .await?;
+        .await
+        .wrap_internal_err("failed to compute fees")?;
 
     // fees are a bit complicated here, since we have 2 types:
     // - method fees - this is what Tremendous, Mural, etc. will take from us
@@ -595,14 +596,18 @@ pub async fn create_payout(
     // then we issue a payout request with `amount - platform fees`
 
     let amount_minus_fee = body.amount - fees.total_fee();
-    if amount_minus_fee.round_dp(2) <= Decimal::ZERO {
+    if amount_minus_fee <= Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You need to withdraw more to cover the fee!".to_string(),
         ));
     }
 
-    let sent_to_method = (body.amount - fees.platform_fee).round_dp(2);
-    assert!(sent_to_method > Decimal::ZERO);
+    let sent_to_method = body.amount - fees.platform_fee;
+    if sent_to_method <= Decimal::ZERO {
+        return Err(ApiError::InvalidInput(
+            "You need to withdraw more to cover the fee!".to_string(),
+        ));
+    }
 
     let payout_id = generate_payout_id(&mut transaction)
         .await
@@ -618,29 +623,22 @@ pub async fn create_payout(
         total_fee: fees.total_fee(),
         sent_to_method,
         payouts_queue: &payouts_queue,
+        db: PgPool::clone(&pool),
+        transaction,
     };
 
-    let payout_item = match &body.method {
+    match &body.method {
         PayoutMethodRequest::PayPal | PayoutMethodRequest::Venmo => {
-            paypal_payout(payout_cx).await?
+            paypal_payout(payout_cx).await?;
         }
         PayoutMethodRequest::Tremendous { method_details } => {
-            tremendous_payout(payout_cx, method_details).await?
+            tremendous_payout(payout_cx, method_details).await?;
         }
         PayoutMethodRequest::MuralPay { method_details } => {
-            mural_pay_payout(payout_cx, method_details, &gotenberg).await?
+            mural_pay_payout(payout_cx, method_details, &gotenberg).await?;
         }
-    };
+    }
 
-    payout_item
-        .insert(&mut transaction)
-        .await
-        .wrap_internal_err("failed to insert payout")?;
-
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("failed to commit transaction")?;
     crate::database::models::DBUser::clear_caches(&[(user.id, None)], &redis)
         .await
         .wrap_internal_err("failed to clear user caches")?;
@@ -648,19 +646,20 @@ pub async fn create_payout(
     Ok(())
 }
 
-#[derive(Clone, Copy)]
 struct PayoutContext<'a> {
     body: &'a Withdrawal,
     user: &'a DBUser,
     payout_id: DBPayoutId,
-    gross_amount: Decimal,
+    gross_amount: Decimal2dp,
     fees: PayoutFees,
     /// Set as the [`DBPayout::amount`] field.
-    amount_minus_fee: Decimal,
+    amount_minus_fee: Decimal2dp,
     /// Set as the [`DBPayout::fee`] field.
-    total_fee: Decimal,
-    sent_to_method: Decimal,
+    total_fee: Decimal2dp,
+    sent_to_method: Decimal2dp,
     payouts_queue: &'a PayoutsQueue,
+    db: PgPool,
+    transaction: PgTransaction<'a>,
 }
 
 fn get_verified_email(user: &DBUser) -> Result<&str, ApiError> {
@@ -687,12 +686,14 @@ async fn tremendous_payout(
         total_fee,
         sent_to_method,
         payouts_queue,
+        db: _,
+        mut transaction,
     }: PayoutContext<'_>,
     TremendousDetails {
         delivery_email,
         currency,
     }: &TremendousDetails,
-) -> Result<DBPayout, ApiError> {
+) -> Result<(), ApiError> {
     let user_email = get_verified_email(user)?;
 
     #[derive(Deserialize)]
@@ -721,7 +722,10 @@ async fn tremendous_payout(
             forex.forex.get(&currency_code).wrap_internal_err_with(|| {
                 eyre!("no Tremendous forex data for {currency}")
             })?;
-        (sent_to_method * *exchange_rate, Some(currency_code))
+        (
+            sent_to_method.mul_round(*exchange_rate, RoundingStrategy::ToZero),
+            Some(currency_code),
+        )
     } else {
         (sent_to_method, None)
     };
@@ -765,18 +769,28 @@ async fn tremendous_payout(
 
     let platform_id = res.order.rewards.first().map(|reward| reward.id.clone());
 
-    Ok(DBPayout {
+    DBPayout {
         id: payout_id,
         user_id: user.id,
         created: Utc::now(),
         status: PayoutStatus::InTransit,
-        amount: amount_minus_fee,
-        fee: Some(total_fee),
+        amount: amount_minus_fee.get(),
+        fee: Some(total_fee.get()),
         method: Some(PayoutMethodType::Tremendous),
         method_id: Some(body.method_id.clone()),
         method_address: Some(user_email.to_string()),
         platform_id,
-    })
+    }
+    .insert(&mut transaction)
+    .await
+    .wrap_internal_err("failed to insert payout")?;
+
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
+
+    Ok(())
 }
 
 async fn mural_pay_payout(
@@ -790,11 +804,34 @@ async fn mural_pay_payout(
         total_fee,
         sent_to_method: _,
         payouts_queue,
+        db,
+        mut transaction,
     }: PayoutContext<'_>,
     details: &MuralPayDetails,
     gotenberg: &GotenbergClient,
-) -> Result<DBPayout, ApiError> {
+) -> Result<(), ApiError> {
     let user_email = get_verified_email(user)?;
+
+    let method_id = match &details.payout_details {
+        MuralPayoutRequest::Blockchain { .. } => {
+            "blockchain-usdc-polygon".to_string()
+        }
+        MuralPayoutRequest::Fiat {
+            fiat_and_rail_details,
+            ..
+        } => fiat_and_rail_details.code().to_string(),
+    };
+
+    // Once the Mural payout request has been created successfully,
+    // then we *must* commit the payout into the DB,
+    // to link the Mural payout request to the `payout` row.
+    // Even if we can't execute the payout.
+    // For this, we immediately insert and commit the txn.
+    // Otherwise if we don't put it into the DB, we've got a ghost Mural
+    // payout with no related database entry.
+    //
+    // However, this doesn't mean that the payout will definitely go through.
+    // For this, we need to execute it, and handle errors.
 
     let payout_request = payouts_queue
         .create_muralpay_payout_request(
@@ -808,30 +845,75 @@ async fn mural_pay_payout(
         )
         .await?;
 
-    let method_id = match &details.payout_details {
-        MuralPayoutRequest::Blockchain { .. } => {
-            "blockchain-usdc-polygon".to_string()
-        }
-        MuralPayoutRequest::Fiat {
-            fiat_and_rail_details,
-            ..
-        } => fiat_and_rail_details.code().to_string(),
-    };
-
-    Ok(DBPayout {
+    let payout = DBPayout {
         id: payout_id,
         user_id: user.id,
         created: Utc::now(),
         // after the payout has been successfully executed,
         // we wait for Mural's confirmation that the funds have been delivered
+        // done in `SyncPayoutStatuses` background task
         status: PayoutStatus::InTransit,
-        amount: amount_minus_fee,
-        fee: Some(total_fee),
+        amount: amount_minus_fee.get(),
+        fee: Some(total_fee.get()),
         method: Some(PayoutMethodType::MuralPay),
         method_id: Some(method_id),
         method_address: Some(user_email.to_string()),
         platform_id: Some(payout_request.id.to_string()),
-    })
+    };
+    payout
+        .insert(&mut transaction)
+        .await
+        .wrap_internal_err("failed to insert payout")?;
+
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit payout insert transaction")?;
+
+    // try to immediately execute the payout request...
+    // use a poor man's try/catch block using this `async move {}`
+    // to catch any errors within this block
+    let result = async move {
+        payouts_queue
+            .execute_mural_payout_request(payout_request.id)
+            .await
+            .wrap_internal_err("failed to execute payout request")?;
+        eyre::Ok(())
+    }
+    .await;
+
+    // and if it fails, make sure to immediately cancel it -
+    // we don't want floating payout requests
+    if let Err(err) = result {
+        if let Err(err) = sqlx::query!(
+            "
+            UPDATE payouts
+            SET status = $1
+            WHERE id = $2
+            ",
+            PayoutStatus::Failed.as_str(),
+            payout.id as _,
+        )
+        .execute(&db)
+        .await
+        {
+            error!(
+                "Created a Mural payout request, but failed to execute it, \
+                and failed to mark the payout as failed: {err:#?}"
+            );
+        }
+
+        payouts_queue
+            .cancel_mural_payout_request(payout_request.id)
+            .await
+            .wrap_internal_err_with(|| {
+                eyre!("failed to cancel unexecuted payout request\noriginal error: {err:#?}")
+            })?;
+
+        return Err(ApiError::Internal(err));
+    }
+
+    Ok(())
 }
 
 async fn paypal_payout(
@@ -845,8 +927,10 @@ async fn paypal_payout(
         total_fee,
         sent_to_method,
         payouts_queue,
+        db: _,
+        mut transaction,
     }: PayoutContext<'_>,
-) -> Result<DBPayout, ApiError> {
+) -> Result<(), ApiError> {
     let (wallet, wallet_type, address, display_address) =
         if matches!(body.method, PayoutMethodRequest::Venmo) {
             if let Some(venmo) = &user.venmo_handle {
@@ -957,18 +1041,28 @@ async fn paypal_payout(
 
     let platform_id = Some(data.payout_item_id.clone());
 
-    Ok(DBPayout {
+    DBPayout {
         id: payout_id,
         user_id: user.id,
         created: Utc::now(),
         status: PayoutStatus::InTransit,
-        amount: amount_minus_fee,
-        fee: Some(total_fee),
+        amount: amount_minus_fee.get(),
+        fee: Some(total_fee.get()),
         method: Some(body.method.method_type()),
         method_id: Some(body.method_id.clone()),
         method_address: Some(display_address.clone()),
         platform_id,
-    })
+    }
+    .insert(&mut transaction)
+    .await
+    .wrap_internal_err("failed to insert payout")?;
+
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
+
+    Ok(())
 }
 
 /// User performing a payout-related action.
@@ -1193,7 +1287,7 @@ pub async fn cancel_payout(
                             .parse::<muralpay::PayoutRequestId>()
                             .wrap_request_err("invalid payout request ID")?;
                         payouts
-                            .cancel_muralpay_payout_request(payout_request_id)
+                            .cancel_mural_payout_request(payout_request_id)
                             .await
                             .wrap_internal_err(
                                 "failed to cancel payout request",

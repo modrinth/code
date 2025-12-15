@@ -416,7 +416,7 @@
 					</AutomaticAccordion>
 					<ServersPromo
 						v-if="flags.showProjectPageDownloadModalServersPromo"
-						:link="`/servers#plan`"
+						:link="`/hosting#plan`"
 						@close="
 							() => {
 								flags.showProjectPageDownloadModalServersPromo = false
@@ -501,7 +501,7 @@
 							<ButtonStyled size="large" circular>
 								<nuxt-link
 									v-tooltip="formatMessage(messages.createServerTooltip)"
-									:to="`/servers?project=${project.id}#plan`"
+									:to="`/hosting?project=${project.id}#plan`"
 									@click="
 										() => {
 											flags.showProjectPageCreateServersTooltip = false
@@ -1324,7 +1324,7 @@ const messages = defineMessages({
 	},
 	serversPromoDescription: {
 		id: 'project.actions.servers-promo.description',
-		defaultMessage: 'Modrinth Servers is the easiest way to play with your friends without hassle!',
+		defaultMessage: 'Modrinth Hosting is the easiest way to play with your friends without hassle!',
 	},
 	serversPromoPricing: {
 		id: 'project.actions.servers-promo.pricing',
@@ -1757,10 +1757,10 @@ async function patchProject(resData, quiet = false) {
 
 		await updateProjectRoute()
 
-		if (resData.license_id) {
+		if ('license_id' in resData) {
 			project.value.license.id = resData.license_id
 		}
-		if (resData.license_url) {
+		if ('license_url' in resData) {
 			project.value.license.url = resData.license_url
 		}
 

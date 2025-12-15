@@ -365,20 +365,26 @@
   "auth.welcome.title": {
     "message": "Welcome"
   },
-  "collection.button.delete-icon": {
-    "message": "Delete icon"
-  },
   "collection.button.edit-icon": {
     "message": "Edit icon"
   },
+  "collection.button.remove-icon": {
+    "message": "Remove icon"
+  },
   "collection.button.remove-project": {
     "message": "Remove project"
+  },
+  "collection.button.replace-icon": {
+    "message": "Replace icon"
+  },
+  "collection.button.select-icon": {
+    "message": "Select icon"
   },
   "collection.button.unfollow-project": {
     "message": "Unfollow project"
   },
   "collection.delete-modal.description": {
-    "message": "This will remove this collection forever. This action cannot be undone."
+    "message": "This will permanently delete this collection. This action cannot be undone."
   },
   "collection.delete-modal.title": {
     "message": "Are you sure you want to delete this collection?"
@@ -389,11 +395,11 @@
   "collection.description.following": {
     "message": "Auto-generated collection of all the projects you're following."
   },
+  "collection.editing": {
+    "message": "Editing collection"
+  },
   "collection.error.not-found": {
     "message": "Collection not found"
-  },
-  "collection.label.collection": {
-    "message": "Collection"
   },
   "collection.label.created-at": {
     "message": "Created {ago}"
@@ -401,20 +407,26 @@
   "collection.label.curated-by": {
     "message": "Curated by"
   },
+  "collection.label.description": {
+    "message": "Description"
+  },
+  "collection.label.details": {
+    "message": "Details"
+  },
   "collection.label.no-projects": {
-    "message": "This collection has no projects!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "You don't have any projects.\nWould you like to <create-link>add one</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Owner"
+    "message": "No projects in collection yet"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
+    "message": "{count, plural, =0 {No projects yet} one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Updated {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Your collections"
+  },
+  "collection.return-link.user": {
+    "message": "{user}'s profile"
   },
   "collection.title": {
     "message": "{name} - Collection"
@@ -1359,7 +1371,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Resources"
@@ -1781,6 +1793,9 @@
   "profile.details.label.email": {
     "message": "Email"
   },
+  "profile.details.label.email-verified": {
+    "message": "Email verified"
+  },
   "profile.details.label.has-password": {
     "message": "Has password"
   },
@@ -2001,7 +2016,7 @@
     "message": "Review project"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Servers is the easiest way to play with your friends without hassle!"
+    "message": "Modrinth Hosting is the easiest way to play with your friends without hassle!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Starting at {price}<small> / month</small>"
@@ -2558,47 +2573,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Backup creation in progress"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup restore in progress"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automated"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Creating backup..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Failed to create backup"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Failed to restore from backup"
-  },
-  "servers.backups.item.lock": {
-    "message": "Lock"
-  },
-  "servers.backups.item.locked": {
-    "message": "Locked"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "Queued for backup"
-  },
-  "servers.backups.item.rename": {
-    "message": "Rename"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restore"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restoring from backup..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Retry"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Unlock"
   },
   "servers.notice.actions": {
     "message": "Actions"

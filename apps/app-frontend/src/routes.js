@@ -29,7 +29,7 @@ export default new createRouter({
 			},
 		},
 		{
-			path: '/servers/manage/',
+			path: '/hosting/manage/',
 			name: 'Servers',
 			component: ServersManagePageIndex,
 			meta: {

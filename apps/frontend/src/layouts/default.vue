@@ -204,7 +204,7 @@
 			<template #description>
 				{{
 					formatMessage(failedToBuildBannerMessages.description, {
-						errors: generatedStateErrors,
+						errors: JSON.stringify(generatedStateErrors),
 						url: config.public.apiBaseUrl,
 					})
 				}}
@@ -237,12 +237,12 @@
 				<template v-if="flags.projectTypesPrimaryNav">
 					<ButtonStyled
 						type="transparent"
-						:highlighted="route.name === 'search-mods' || route.path.startsWith('/mod/')"
+						:highlighted="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
 						:highlighted-style="
-							route.name === 'search-mods' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-mods' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/mods">
+						<nuxt-link to="/discover/mods">
 							<BoxIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.mod) }}
 						</nuxt-link>
@@ -250,61 +250,63 @@
 					<ButtonStyled
 						type="transparent"
 						:highlighted="
-							route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
+							route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
 						"
 						:highlighted-style="
-							route.name === 'search-resourcepacks' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-resourcepacks' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/resourcepacks">
+						<nuxt-link to="/discover/resourcepacks">
 							<PaintbrushIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
-						:highlighted="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
+						:highlighted="
+							route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
+						"
 						:highlighted-style="
-							route.name === 'search-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-datapacks' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/datapacks">
+						<nuxt-link to="/discover/datapacks">
 							<BracesIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.datapack) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
-						:highlighted="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
+						:highlighted="route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')"
 						:highlighted-style="
-							route.name === 'search-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-modpacks' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/modpacks">
+						<nuxt-link to="/discover/modpacks">
 							<PackageOpenIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
-						:highlighted="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
+						:highlighted="route.name === 'discover-shaders' || route.path.startsWith('/shader/')"
 						:highlighted-style="
-							route.name === 'search-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-shaders' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/shaders">
+						<nuxt-link to="/discover/shaders">
 							<GlassesIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.shader) }}
 						</nuxt-link>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
-						:highlighted="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
+						:highlighted="route.name === 'discover-plugins' || route.path.startsWith('/plugin/')"
 						:highlighted-style="
-							route.name === 'search-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'discover-plugins' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/plugins">
+						<nuxt-link to="/discover/plugins">
 							<PlugIcon aria-hidden="true" />
 							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
 						</nuxt-link>
@@ -320,55 +322,66 @@
 							:options="[
 								{
 									id: 'mods',
-									action: '/mods',
+									action: '/discover/mods',
 								},
 								{
 									id: 'resourcepacks',
-									action: '/resourcepacks',
+									action: '/discover/resourcepacks',
 								},
 								{
 									id: 'datapacks',
-									action: '/datapacks',
+									action: '/discover/datapacks',
 								},
 								{
 									id: 'shaders',
-									action: '/shaders',
+									action: '/discover/shaders',
 								},
 								{
 									id: 'modpacks',
-									action: '/modpacks',
+									action: '/discover/modpacks',
 								},
 								{
 									id: 'plugins',
-									action: '/plugins',
+									action: '/discover/plugins',
+								},
+								{
+									id: 'servers',
+									action: '/discover/servers',
+									shown: flags.serverDiscovery,
 								},
 							]"
 							hoverable
 						>
 							<BoxIcon
-								v-if="route.name === 'search-mods' || route.path.startsWith('/mod/')"
+								v-if="route.name === 'discover-mods' || route.path.startsWith('/mod/')"
 								aria-hidden="true"
 							/>
 							<PaintbrushIcon
 								v-else-if="
-									route.name === 'search-resourcepacks' || route.path.startsWith('/resourcepack/')
+									route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
 								"
 								aria-hidden="true"
 							/>
 							<BracesIcon
-								v-else-if="route.name === 'search-datapacks' || route.path.startsWith('/datapack/')"
+								v-else-if="
+									route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
+								"
 								aria-hidden="true"
 							/>
 							<PackageOpenIcon
-								v-else-if="route.name === 'search-modpacks' || route.path.startsWith('/modpack/')"
+								v-else-if="route.name === 'discover-modpacks' || route.path.startsWith('/modpack/')"
 								aria-hidden="true"
 							/>
 							<GlassesIcon
-								v-else-if="route.name === 'search-shaders' || route.path.startsWith('/shader/')"
+								v-else-if="route.name === 'discover-shaders' || route.path.startsWith('/shader/')"
 								aria-hidden="true"
 							/>
 							<PlugIcon
-								v-else-if="route.name === 'search-plugins' || route.path.startsWith('/plugin/')"
+								v-else-if="route.name === 'discover-plugins' || route.path.startsWith('/plugin/')"
+								aria-hidden="true"
+							/>
+							<ServerIcon
+								v-else-if="route.name === 'discover-servers' || route.path.startsWith('/server/')"
 								aria-hidden="true"
 							/>
 							<CompassIcon v-else aria-hidden="true" />
@@ -402,19 +415,23 @@
 								<PackageOpenIcon aria-hidden="true" />
 								{{ formatMessage(commonProjectTypeCategoryMessages.modpack) }}
 							</template>
+							<template #servers>
+								<ServerIcon aria-hidden="true" />
+								{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
+							</template>
 						</TeleportOverflowMenu>
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
 						:highlighted="
-							route.name?.startsWith('servers') ||
-							(route.name?.startsWith('search-') && route.query.sid)
+							route.name?.startsWith('hosting') ||
+							(route.name?.startsWith('discover-') && !!route.query.sid)
 						"
 						:highlighted-style="
-							route.name === 'servers' ? 'main-nav-primary' : 'main-nav-secondary'
+							route.name === 'hosting' ? 'main-nav-primary' : 'main-nav-secondary'
 						"
 					>
-						<nuxt-link to="/servers">
+						<nuxt-link to="/hosting">
 							<ServerIcon aria-hidden="true" />
 							{{ formatMessage(navMenuMessages.hostAServer) }}
 						</nuxt-link>
@@ -683,7 +700,7 @@
 							<LibraryIcon class="icon" />
 							{{ formatMessage(commonMessages.collectionsLabel) }}
 						</NuxtLink>
-						<NuxtLink class="iconified-button" to="/servers/manage">
+						<NuxtLink class="iconified-button" to="/hosting/manage">
 							<ServerIcon class="icon" />
 							{{ formatMessage(commonMessages.serversLabel) }}
 						</NuxtLink>
@@ -1328,27 +1345,27 @@ const navRoutes = computed(() => [
 	{
 		id: 'mods',
 		label: formatMessage(getProjectTypeMessage('mod', true)),
-		href: '/mods',
+		href: '/discover/mods',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('plugin', true)),
-		href: '/plugins',
+		href: '/discover/plugins',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('datapack', true)),
-		href: '/datapacks',
+		href: '/discover/datapacks',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('shader', true)),
-		href: '/shaders',
+		href: '/discover/shaders',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('resourcepack', true)),
-		href: '/resourcepacks',
+		href: '/discover/resourcepacks',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('modpack', true)),
-		href: '/modpacks',
+		href: '/discover/modpacks',
 	},
 ])
 
@@ -1366,7 +1383,7 @@ const userMenuOptions = computed(() => {
 		},
 		{
 			id: 'servers',
-			link: '/servers/manage',
+			link: '/hosting/manage',
 		},
 		{
 			id: 'flags',
@@ -1439,7 +1456,7 @@ const userMenuOptions = computed(() => {
 })
 
 const isDiscovering = computed(
-	() => route.name && route.name.startsWith('search-') && !route.query.sid,
+	() => route.name && route.name.startsWith('discover-') && !route.query.sid,
 )
 
 const isDiscoveringSubpage = computed(
@@ -1455,7 +1472,7 @@ const disableRandomProjects = ref(false)
 
 const disableRandomProjectsForRoute = computed(
 	() =>
-		route.name.startsWith('servers') ||
+		route.name.startsWith('hosting') ||
 		route.name.includes('settings') ||
 		route.name.includes('admin'),
 )
@@ -1685,11 +1702,11 @@ const footerLinks = [
 				),
 			},
 			{
-				href: '/servers',
+				href: '/hosting',
 				label: formatMessage(
 					defineMessage({
 						id: 'layout.footer.products.servers',
-						defaultMessage: 'Modrinth Servers',
+						defaultMessage: 'Modrinth Hosting',
 					}),
 				),
 			},

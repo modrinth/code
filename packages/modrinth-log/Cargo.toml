@@ -1,0 +1,15 @@
+[package]
+name = "modrinth-log"
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+dotenvy = { workspace = true }
+eyre = { workspace = true }
+tracing = { workspace = true }
+tracing-ecs = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[lints]
+workspace = true

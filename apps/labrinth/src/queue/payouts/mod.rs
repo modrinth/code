@@ -20,10 +20,10 @@ use chrono::{DateTime, Datelike, Duration, NaiveTime, TimeZone, Utc};
 use dashmap::DashMap;
 use eyre::{Result, eyre};
 use futures::TryStreamExt;
-use muralpay::MuralPay;
+use modrinth_util::decimal::Decimal2dp;
 use reqwest::Method;
 use rust_decimal::prelude::ToPrimitive;
-use rust_decimal::{Decimal, dec};
+use rust_decimal::{Decimal, RoundingStrategy, dec};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -35,6 +35,11 @@ use tracing::{error, info, warn};
 
 pub mod mural;
 
+mod affiliate;
+pub use affiliate::{
+    process_affiliate_payouts, remove_payouts_for_refunded_charges,
+};
+
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
     payout_options: RwLock<Option<PayoutMethods>>,
@@ -42,7 +47,7 @@ pub struct PayoutsQueue {
 }
 
 pub struct MuralPayConfig {
-    pub client: MuralPay,
+    pub client: muralpay::Client,
     pub source_account_id: muralpay::AccountId,
 }
 
@@ -71,11 +76,11 @@ impl Default for PayoutsQueue {
     }
 }
 
-pub fn create_muralpay_client() -> Result<MuralPay> {
+pub fn create_muralpay_client() -> Result<muralpay::Client> {
     let api_url = env_var("MURALPAY_API_URL")?;
     let api_key = env_var("MURALPAY_API_KEY")?;
     let transfer_api_key = env_var("MURALPAY_TRANSFER_API_KEY")?;
-    Ok(MuralPay::new(api_url, api_key, Some(transfer_api_key)))
+    Ok(muralpay::Client::new(api_url, api_key, transfer_api_key))
 }
 
 pub fn create_muralpay() -> Result<MuralPayConfig> {
@@ -618,7 +623,7 @@ impl PayoutsQueue {
         &self,
         request: &PayoutMethodRequest,
         method_id: &str,
-        amount: Decimal,
+        amount: Decimal2dp,
     ) -> Result<PayoutFees, ApiError> {
         const MURAL_FEE: Decimal = dec!(0.01);
 
@@ -641,8 +646,9 @@ impl PayoutsQueue {
                         ..
                     },
             } => PayoutFees {
-                method_fee: dec!(0),
-                platform_fee: amount * MURAL_FEE,
+                method_fee: Decimal2dp::ZERO,
+                platform_fee: amount
+                    .mul_round(MURAL_FEE, RoundingStrategy::AwayFromZero),
                 exchange_rate: None,
             },
             PayoutMethodRequest::MuralPay {
@@ -667,8 +673,14 @@ impl PayoutsQueue {
                         fee_total,
                         ..
                     } => PayoutFees {
-                        method_fee: fee_total.token_amount,
-                        platform_fee: amount * MURAL_FEE,
+                        method_fee: Decimal2dp::rounded(
+                            fee_total.token_amount,
+                            RoundingStrategy::AwayFromZero,
+                        ),
+                        platform_fee: amount.mul_round(
+                            MURAL_FEE,
+                            RoundingStrategy::AwayFromZero,
+                        ),
                         exchange_rate: Some(exchange_rate),
                     },
                     muralpay::TokenPayoutFee::Error { message, .. } => {
@@ -680,16 +692,22 @@ impl PayoutsQueue {
             }
             PayoutMethodRequest::PayPal | PayoutMethodRequest::Venmo => {
                 let method = get_method.await?;
-                let fee = method.fee.compute_fee(amount);
+                let fee = Decimal2dp::rounded(
+                    method.fee.compute_fee(amount),
+                    RoundingStrategy::AwayFromZero,
+                );
                 PayoutFees {
                     method_fee: fee,
-                    platform_fee: dec!(0),
+                    platform_fee: Decimal2dp::ZERO,
                     exchange_rate: None,
                 }
             }
             PayoutMethodRequest::Tremendous { method_details } => {
                 let method = get_method.await?;
-                let fee = method.fee.compute_fee(amount);
+                let fee = Decimal2dp::rounded(
+                    method.fee.compute_fee(amount),
+                    RoundingStrategy::AwayFromZero,
+                );
 
                 let forex: TremendousForexResponse = self
                     .make_tremendous_request(Method::GET, "forex", None::<()>)
@@ -718,7 +736,7 @@ impl PayoutsQueue {
                 // we send the request to Tremendous. Afterwards, the method
                 // (Tremendous) will take 0% off the top of our $10.
                 PayoutFees {
-                    method_fee: dec!(0),
+                    method_fee: Decimal2dp::ZERO,
                     platform_fee: fee,
                     exchange_rate,
                 }
@@ -736,19 +754,19 @@ pub struct PayoutFees {
     /// For example, if a user withdraws $10.00 and the method takes a
     /// 10% cut, then we submit a payout request of $10.00 to the method,
     /// and only $9.00 will be sent to the recipient.
-    pub method_fee: Decimal,
+    pub method_fee: Decimal2dp,
     /// Fee which we keep and don't pass to the underlying method.
     ///
     /// For example, if a user withdraws $10.00 and the method takes a
     /// 10% cut, then we submit a payout request of $9.00, and the $1.00 stays
     /// in our account.
-    pub platform_fee: Decimal,
+    pub platform_fee: Decimal2dp,
     /// How much is 1 USD worth in the target currency?
     pub exchange_rate: Option<Decimal>,
 }
 
 impl PayoutFees {
-    pub fn total_fee(&self) -> Decimal {
+    pub fn total_fee(&self) -> Decimal2dp {
         self.method_fee + self.platform_fee
     }
 }

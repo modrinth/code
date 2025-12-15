@@ -8,7 +8,7 @@
 		>
 			<MedalBackgroundImage />
 			<AutoLink
-				:to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`"
+				:to="status === 'suspended' ? '' : `/hosting/manage/${props.server_id}`"
 				class="z-10 flex flex-grow flex-row items-center overflow-x-hidden"
 				:class="status !== 'suspended' && 'active:scale-95'"
 			>
@@ -128,7 +128,8 @@
 </template>
 
 <script setup lang="ts">
-import { type Archon, NuxtModrinthClient } from '@modrinth/api-client'
+import type { Archon } from '@modrinth/api-client'
+import { NuxtModrinthClient } from '@modrinth/api-client'
 import {
 	ChevronRightIcon,
 	LoaderCircleIcon,
@@ -152,7 +153,23 @@ import MedalBackgroundImage from './MedalBackgroundImage.vue'
 
 dayjs.extend(dayjsDuration)
 
-const props = defineProps<Partial<Archon.Servers.v0.Server>>()
+type MedalServerListingProps = {
+	server_id: string
+	name: string
+	status: Archon.Servers.v0.Status
+	suspension_reason?: Archon.Servers.v0.SuspensionReason | null
+	game?: Archon.Servers.v0.Game
+	mc_version?: string | null
+	loader?: Archon.Servers.v0.Loader | null
+	loader_version?: string | null
+	net?: Archon.Servers.v0.Net
+	upstream?: Archon.Servers.v0.Upstream | null
+	flows?: Archon.Servers.v0.Flows
+	medal_expires?: string
+}
+
+const props = defineProps<MedalServerListingProps>()
+
 const emit = defineEmits<{ (e: 'upgrade'): void }>()
 
 const client = injectModrinthClient()

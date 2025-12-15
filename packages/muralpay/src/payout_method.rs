@@ -1,90 +1,104 @@
-use std::str::FromStr;
-
-use chrono::{DateTime, Utc};
-use derive_more::{Deref, Display, Error};
-use serde::{Deserialize, Serialize};
-use serde_with::DeserializeFromStr;
-use uuid::Uuid;
-
-use crate::{
-    ArsSymbol, BobSymbol, BrlSymbol, ClpSymbol, CopSymbol, CounterpartyId,
-    CrcSymbol, DocumentType, EurSymbol, FiatAccountType, MuralError, MuralPay,
-    MxnSymbol, PenSymbol, SearchParams, SearchResponse, UsdSymbol,
-    WalletDetails, ZarSymbol, util::RequestExt,
+use {
+    crate::{
+        ArsSymbol, BobSymbol, BrlSymbol, ClpSymbol, CopSymbol, CounterpartyId, CrcSymbol,
+        DocumentType, EurSymbol, FiatAccountType, MxnSymbol, PenSymbol, UsdSymbol, WalletDetails,
+        ZarSymbol,
+    },
+    chrono::{DateTime, Utc},
+    derive_more::{Deref, Display, Error},
+    serde::{Deserialize, Serialize},
+    serde_with::DeserializeFromStr,
+    std::str::FromStr,
+    uuid::Uuid,
 };
 
-impl MuralPay {
-    pub async fn search_payout_methods(
-        &self,
-        counterparty_id: CounterpartyId,
-        params: Option<SearchParams<PayoutMethodId>>,
-    ) -> Result<SearchResponse<PayoutMethodId, PayoutMethod>, MuralError> {
-        mock!(self, search_payout_methods(counterparty_id, params));
+#[cfg(feature = "client")]
+const _: () = {
+    use crate::{MuralError, RequestExt, SearchParams, SearchResponse};
 
-        self.http_post(|base| {
-            format!(
-                "{base}/api/counterparties/{counterparty_id}/payout-methods/search"
-            )
-        })
-        .query(&params.map(|p| p.to_query()).unwrap_or_default())
-        .send_mural()
-        .await
-    }
+    impl crate::Client {
+        pub async fn search_payout_methods(
+            &self,
+            counterparty_id: CounterpartyId,
+            params: Option<SearchParams<PayoutMethodId>>,
+        ) -> Result<SearchResponse<PayoutMethodId, PayoutMethod>, MuralError> {
+            maybe_mock!(self, search_payout_methods(counterparty_id, params));
 
-    pub async fn get_payout_method(
-        &self,
-        counterparty_id: CounterpartyId,
-        payout_method_id: PayoutMethodId,
-    ) -> Result<PayoutMethod, MuralError> {
-        mock!(self, get_payout_method(counterparty_id, payout_method_id));
-
-        self.http_get(|base| format!("{base}/api/counterparties/{counterparty_id}/payout-methods/{payout_method_id}"))
+            self.http_post(|base| {
+                format!("{base}/api/counterparties/{counterparty_id}/payout-methods/search")
+            })
+            .query(&params.map(|p| p.to_query()).unwrap_or_default())
             .send_mural()
             .await
-    }
-
-    pub async fn create_payout_method(
-        &self,
-        counterparty_id: CounterpartyId,
-        alias: impl AsRef<str>,
-        payout_method: &PayoutMethodDetails,
-    ) -> Result<PayoutMethod, MuralError> {
-        mock!(self, create_payout_method(counterparty_id, alias.as_ref(), payout_method));
-
-        #[derive(Debug, Serialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Body<'a> {
-            alias: &'a str,
-            payout_method: &'a PayoutMethodDetails,
         }
 
-        let body = Body {
-            alias: alias.as_ref(),
-            payout_method,
-        };
+        pub async fn get_payout_method(
+            &self,
+            counterparty_id: CounterpartyId,
+            payout_method_id: PayoutMethodId,
+        ) -> Result<PayoutMethod, MuralError> {
+            maybe_mock!(self, get_payout_method(counterparty_id, payout_method_id));
 
-        self.http_post(|base| {
-            format!(
-                "{base}/api/counterparties/{counterparty_id}/payout-methods"
-            )
-        })
-        .json(&body)
-        .send_mural()
-        .await
-    }
-
-    pub async fn delete_payout_method(
-        &self,
-        counterparty_id: CounterpartyId,
-        payout_method_id: PayoutMethodId,
-    ) -> Result<(), MuralError> {
-        mock!(self, delete_payout_method(counterparty_id, payout_method_id));
-
-        self.http_delete(|base| format!("{base}/api/counterparties/{counterparty_id}/payout-methods/{payout_method_id}"))
+            self.http_get(|base| {
+                format!(
+                    "{base}/api/counterparties/{counterparty_id}/payout-methods/{payout_method_id}"
+                )
+            })
             .send_mural()
             .await
+        }
+
+        pub async fn create_payout_method(
+            &self,
+            counterparty_id: CounterpartyId,
+            alias: impl AsRef<str>,
+            payout_method: &PayoutMethodDetails,
+        ) -> Result<PayoutMethod, MuralError> {
+            #[derive(Debug, Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct Body<'a> {
+                alias: &'a str,
+                payout_method: &'a PayoutMethodDetails,
+            }
+
+            maybe_mock!(
+                self,
+                create_payout_method(counterparty_id, alias.as_ref(), payout_method)
+            );
+
+            let body = Body {
+                alias: alias.as_ref(),
+                payout_method,
+            };
+
+            self.http_post(|base| {
+                format!("{base}/api/counterparties/{counterparty_id}/payout-methods")
+            })
+            .json(&body)
+            .send_mural()
+            .await
+        }
+
+        pub async fn delete_payout_method(
+            &self,
+            counterparty_id: CounterpartyId,
+            payout_method_id: PayoutMethodId,
+        ) -> Result<(), MuralError> {
+            maybe_mock!(
+                self,
+                delete_payout_method(counterparty_id, payout_method_id)
+            );
+
+            self.http_delete(|base| {
+                format!(
+                    "{base}/api/counterparties/{counterparty_id}/payout-methods/{payout_method_id}"
+                )
+            })
+            .send_mural()
+            .await
+        }
     }
-}
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
@@ -107,18 +121,7 @@ pub enum PayoutMethodPixAccountType {
     BankAccount,
 }
 
-#[derive(
-    Debug,
-    Display,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
-    Deref,
-    Serialize,
-    Deserialize,
-)]
+#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, Deref, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[display("{}", _0.hyphenated())]
 pub struct PayoutMethodId(pub Uuid);

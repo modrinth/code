@@ -7,6 +7,18 @@ export class ArchonServersV0Module extends AbstractModule {
 	}
 
 	/**
+	 * Get a specific server by ID
+	 * GET /modrinth/v0/servers/:id
+	 */
+	public async get(serverId: string): Promise<Archon.Servers.v0.Server> {
+		return this.client.request<Archon.Servers.v0.Server>(`/servers/${serverId}`, {
+			api: 'archon',
+			method: 'GET',
+			version: 'modrinth/v0',
+		})
+	}
+
+	/**
 	 * Get list of servers for the authenticated user
 	 * GET /modrinth/v0/servers
 	 */
@@ -49,6 +61,18 @@ export class ArchonServersV0Module extends AbstractModule {
 	 */
 	public async getFilesystemAuth(serverId: string): Promise<Archon.Servers.v0.JWTAuth> {
 		return this.client.request<Archon.Servers.v0.JWTAuth>(`/servers/${serverId}/fs`, {
+			api: 'archon',
+			version: 'modrinth/v0',
+			method: 'GET',
+		})
+	}
+
+	/**
+	 * Get WebSocket authentication credentials for a server
+	 * GET /modrinth/v0/servers/:id/ws
+	 */
+	public async getWebSocketAuth(serverId: string): Promise<Archon.Websocket.v0.WSAuth> {
+		return this.client.request<Archon.Websocket.v0.WSAuth>(`/servers/${serverId}/ws`, {
 			api: 'archon',
 			version: 'modrinth/v0',
 			method: 'GET',

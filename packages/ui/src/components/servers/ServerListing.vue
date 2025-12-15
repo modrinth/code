@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NuxtLink :to="status === 'suspended' ? '' : `/servers/manage/${props.server_id}`">
+		<NuxtLink :to="status === 'suspended' ? '' : `/hosting/manage/${props.server_id}`">
 			<div
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon, ProjectV2 } from '@modrinth/api-client'
+import type { Archon } from '@modrinth/api-client'
 import {
 	ChevronRightIcon,
 	LoaderCircleIcon,
@@ -144,7 +144,22 @@ export type PendingChange = {
 	verb: string
 }
 
-const props = defineProps<Partial<Archon.Servers.v0.Server> & { pendingChange?: PendingChange }>()
+type ServerListingProps = {
+	server_id: string
+	name: string
+	status: Archon.Servers.v0.Status
+	suspension_reason?: Archon.Servers.v0.SuspensionReason | null
+	game?: Archon.Servers.v0.Game
+	mc_version?: string | null
+	loader?: Archon.Servers.v0.Loader | null
+	loader_version?: string | null
+	net?: Archon.Servers.v0.Net
+	upstream?: Archon.Servers.v0.Upstream | null
+	flows?: Archon.Servers.v0.Flows
+	pendingChange?: PendingChange
+}
+
+const props = defineProps<ServerListingProps>()
 
 const { archon, kyros, labrinth } = injectModrinthClient()
 
@@ -153,7 +168,7 @@ const showLoaderLabel = computed(() => !!props.loader)
 
 const { data: projectData } = useQuery({
 	queryKey: ['project', props.upstream?.project_id] as const,
-	queryFn: async (): Promise<ProjectV2 | null> => {
+	queryFn: async () => {
 		if (!props.upstream?.project_id) return null
 		return await labrinth.projects_v2.get(props.upstream.project_id)
 	},

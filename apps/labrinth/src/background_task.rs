@@ -3,13 +3,13 @@ use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
     PayoutsQueue, index_payouts_notifications,
-    insert_bank_balances_and_webhook, process_payout,
+    insert_bank_balances_and_webhook, process_affiliate_payouts,
+    process_payout, remove_payouts_for_refunded_charges,
 };
 use crate::search::indexing::index_projects;
 use crate::util::anrok;
 use crate::{database, search};
 use clap::ValueEnum;
-use muralpay::MuralPay;
 use sqlx::Postgres;
 use tracing::{error, info, warn};
 
@@ -38,7 +38,7 @@ impl BackgroundTask {
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
-        mural_client: MuralPay,
+        mural_client: muralpay::Client,
     ) {
         use BackgroundTask::*;
         match self {
@@ -185,18 +185,31 @@ pub async fn payouts(
     info!("Started running payouts");
     let result = process_payout(&pool, &clickhouse).await;
     if let Err(e) = result {
-        warn!("Payouts run failed: {:?}", e);
+        warn!("Payouts run failed: {e:#?}");
     }
 
     let result = index_payouts_notifications(&pool, &redis_pool).await;
     if let Err(e) = result {
-        warn!("Payouts notifications indexing failed: {:?}", e);
+        warn!("Payouts notifications indexing failed: {e:#?}");
+    }
+
+    let result = process_affiliate_payouts(&pool).await;
+    if let Err(e) = result {
+        warn!("Affiliate payouts run failed: {e:#?}");
+    }
+
+    let result = remove_payouts_for_refunded_charges(&pool).await;
+    if let Err(e) = result {
+        warn!("Removing affiliate payouts for refunded charges failed: {e:#?}");
     }
 
     info!("Done running payouts");
 }
 
-pub async fn sync_payout_statuses(pool: sqlx::Pool<Postgres>, mural: MuralPay) {
+pub async fn sync_payout_statuses(
+    pool: sqlx::Pool<Postgres>,
+    mural: muralpay::Client,
+) {
     // Mural sets a max limit of 100 for search payouts endpoint
     const LIMIT: u32 = 100;
 

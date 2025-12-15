@@ -135,6 +135,6 @@ const emit = defineEmits<{
 
 const goHome = () => {
 	emit('cancel')
-	router.push({ path: '/servers/manage/' + route.params.id + '/files' })
+	router.push({ path: '/hosting/manage/' + route.params.id + '/files' })
 }
 </script>

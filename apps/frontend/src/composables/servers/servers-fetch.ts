@@ -1,3 +1,4 @@
+import { PANEL_VERSION } from '@modrinth/api-client'
 import type { V1ErrorInfo } from '@modrinth/utils'
 import { ModrinthServerError, ModrinthServersFetchError } from '@modrinth/utils'
 import { $fetch, FetchError } from 'ofetch'
@@ -27,7 +28,7 @@ export async function useServersFetch<T>(
 
 	if (!authToken && !options.bypassAuth) {
 		const error = new ModrinthServersFetchError(
-			'[Modrinth Servers] Cannot fetch without auth',
+			'[Modrinth Hosting] Cannot fetch without auth',
 			10000,
 		)
 		throw new ModrinthServerError('Missing auth token', 401, error, module, undefined, undefined)
@@ -49,7 +50,7 @@ export async function useServersFetch<T>(
 	const now = Date.now()
 	if (failureCount.value >= 3 && now - lastFailureTime.value < 30000) {
 		const error = new ModrinthServersFetchError(
-			'[Modrinth Servers] Circuit breaker open - too many recent failures',
+			'[Modrinth Hosting] Circuit breaker open - too many recent failures',
 			503,
 		)
 		throw new ModrinthServerError(
@@ -73,7 +74,7 @@ export async function useServersFetch<T>(
 
 	if (!base) {
 		const error = new ModrinthServersFetchError(
-			'[Modrinth Servers] Cannot fetch without base url. Make sure to set a PYRO_BASE_URL in environment variables',
+			'[Modrinth Hosting] Cannot fetch without base url. Make sure to set a PYRO_BASE_URL in environment variables',
 			10001,
 		)
 		throw new ModrinthServerError(
@@ -103,6 +104,7 @@ export async function useServersFetch<T>(
 	const headers: Record<string, string> = {
 		'User-Agent': 'Modrinth/1.0 (https://modrinth.com)',
 		'X-Archon-Request': 'true',
+		'X-Panel-Version': String(PANEL_VERSION),
 		Vary: 'Accept, Origin',
 	}
 
@@ -183,12 +185,12 @@ export async function useServersFetch<T>(
 					console.error('Fetch error:', error)
 
 					const fetchError = new ModrinthServersFetchError(
-						`[Modrinth Servers] ${error.message}`,
+						`[Modrinth Hosting] ${error.message}`,
 						statusCode,
 						error,
 					)
 					throw new ModrinthServerError(
-						`[Modrinth Servers] ${message}`,
+						`[Modrinth Hosting] ${message}`,
 						statusCode,
 						fetchError,
 						module,
@@ -206,7 +208,7 @@ export async function useServersFetch<T>(
 
 			console.error('Unexpected fetch error:', error)
 			const fetchError = new ModrinthServersFetchError(
-				'[Modrinth Servers] An unexpected error occurred during the fetch operation.',
+				'[Modrinth Hosting] An unexpected error occurred during the fetch operation.',
 				undefined,
 				error as Error,
 			)

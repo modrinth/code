@@ -5,4 +5,6 @@ use serde::{Deserialize, Serialize};
 pub struct ApiError<'a> {
     pub error: &'a str,
     pub description: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 }

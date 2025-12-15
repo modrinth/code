@@ -94,6 +94,7 @@ import _Heading2Icon from './icons/heading-2.svg?component'
 import _Heading3Icon from './icons/heading-3.svg?component'
 import _HeartIcon from './icons/heart.svg?component'
 import _HeartHandshakeIcon from './icons/heart-handshake.svg?component'
+import _HeartMinusIcon from './icons/heart-minus.svg?component'
 import _HistoryIcon from './icons/history.svg?component'
 import _HomeIcon from './icons/home.svg?component'
 import _ImageIcon from './icons/image.svg?component'
@@ -204,6 +205,7 @@ import _UploadIcon from './icons/upload.svg?component'
 import _UserIcon from './icons/user.svg?component'
 import _UserCogIcon from './icons/user-cog.svg?component'
 import _UserPlusIcon from './icons/user-plus.svg?component'
+import _UserRoundIcon from './icons/user-round.svg?component'
 import _UserSearchIcon from './icons/user-search.svg?component'
 import _UserXIcon from './icons/user-x.svg?component'
 import _UsersIcon from './icons/users.svg?component'
@@ -309,6 +311,7 @@ export const Heading1Icon = _Heading1Icon
 export const Heading2Icon = _Heading2Icon
 export const Heading3Icon = _Heading3Icon
 export const HeartHandshakeIcon = _HeartHandshakeIcon
+export const HeartMinusIcon = _HeartMinusIcon
 export const HeartIcon = _HeartIcon
 export const HistoryIcon = _HistoryIcon
 export const HomeIcon = _HomeIcon
@@ -419,6 +422,7 @@ export const UpdatedIcon = _UpdatedIcon
 export const UploadIcon = _UploadIcon
 export const UserCogIcon = _UserCogIcon
 export const UserPlusIcon = _UserPlusIcon
+export const UserRoundIcon = _UserRoundIcon
 export const UserSearchIcon = _UserSearchIcon
 export const UserXIcon = _UserXIcon
 export const UserIcon = _UserIcon
