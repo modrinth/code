@@ -1,5 +1,5 @@
-import type { ExtendedReport } from '../types/reports'
 import type { QuickReply } from '../types/quick-reply'
+import type { ExtendedReport } from '../types/reports'
 
 export default [
 	{
