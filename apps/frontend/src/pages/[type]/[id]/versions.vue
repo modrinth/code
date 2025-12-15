@@ -9,6 +9,36 @@
 		@proceed="deleteVersion()"
 	/>
 	<section class="experimental-styles-within overflow-visible">
+		<Admonition v-if="!hideVersionsAdmonition" type="info" class="mb-4">
+			Managing project versions has moved! You can now add and edit versions in the
+			<NuxtLink to="settings/versions" class="font-medium text-blue hover:underline"
+				>project settings</NuxtLink
+			>.
+			<template #actions>
+				<div class="flex gap-2">
+					<ButtonStyled color="blue">
+						<button
+							@click="() => router.push('settings/versions')"
+							aria-label="Project Settings"
+							class="!shadow-none"
+						>
+							<SettingsIcon />
+							Project Settings
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="transparent">
+						<button
+							@click="() => (hideVersionsAdmonition = true)"
+							aria-label="Dismiss"
+							class="!shadow-none"
+						>
+							Dismiss
+						</button>
+					</ButtonStyled>
+				</div>
+			</template>
+		</Admonition>
+
 		<ProjectPageVersions
 			v-if="versions.length"
 			:project="project"
@@ -171,11 +201,18 @@ import {
 	LinkIcon,
 	MoreVerticalIcon,
 	ReportIcon,
+	SettingsIcon,
 	ShareIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, ConfirmModal, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
-
+import {
+	Admonition,
+	ButtonStyled,
+	ConfirmModal,
+	OverflowMenu,
+	ProjectPageVersions,
+} from '@modrinth/ui'
+import { useLocalStorage } from '@vueuse/core'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const props = defineProps({
@@ -203,6 +240,10 @@ const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
+const hideVersionsAdmonition = useLocalStorage(
+	'hideVersionsHasMovedAdmonition',
+	!props.versions.length,
+)
 const deleteVersionModal = ref()
 const selectedVersion = ref(null)
 

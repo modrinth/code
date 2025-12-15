@@ -195,6 +195,35 @@
 				</div>
 			</div>
 		</div>
+		<Admonition v-if="!hideGalleryAdmonition" type="info" class="mb-4">
+			Managing gallery has moved! You can now add and edit gallery images in the
+			<NuxtLink to="settings/gallery" class="font-medium text-blue hover:underline"
+				>project settings</NuxtLink
+			>.
+			<template #actions>
+				<div class="flex gap-2">
+					<ButtonStyled color="blue">
+						<button
+							@click="() => $router.push('settings/gallery')"
+							aria-label="Project Settings"
+							class="!shadow-none"
+						>
+							<SettingsIcon />
+							Project Settings
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="transparent">
+						<button
+							@click="() => (hideGalleryAdmonition = true)"
+							aria-label="Dismiss"
+							class="!shadow-none"
+						>
+							Dismiss
+						</button>
+					</ButtonStyled>
+				</div>
+			</template>
+		</Admonition>
 		<div class="items" v-if="project.gallery.length">
 			<div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
 				<a class="gallery-thumbnail" @click="expandImage(item, index)">
@@ -244,11 +273,20 @@ import {
 	PlusIcon,
 	RightArrowIcon,
 	SaveIcon,
+	SettingsIcon,
 	StarIcon,
 	TransferIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ConfirmModal, FileInput, injectNotificationManager, NewModal as Modal } from '@modrinth/ui'
+import {
+	Admonition,
+	ButtonStyled,
+	ConfirmModal,
+	FileInput,
+	injectNotificationManager,
+	NewModal as Modal,
+} from '@modrinth/ui'
+import { useLocalStorage } from '@vueuse/core'
 
 const props = defineProps({
 	project: {
@@ -279,6 +317,11 @@ useSeoMeta({
 	ogTitle: title,
 	ogDescription: description,
 })
+
+const hideGalleryAdmonition = useLocalStorage(
+	'hideGalleryHasMovedAdmonition',
+	!props.project.gallery.length,
+)
 </script>
 
 <script>
