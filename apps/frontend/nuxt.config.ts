@@ -234,7 +234,9 @@ export default defineNuxtConfig({
 
 			for await (const localeDir of globIterate('src/locales/*/', { posix: true })) {
 				const tag = basename(localeDir)
-				if (isProduction && !enabledLocales.includes(tag) && opts.defaultLocale !== tag) continue
+
+				// NOTICE: temporarily disabled all locales except en-US
+				if (opts.defaultLocale !== tag) continue
 
 				const locale =
 					opts.locales.find((locale) => locale.tag === tag) ??
