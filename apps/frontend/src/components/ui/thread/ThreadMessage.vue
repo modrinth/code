@@ -75,6 +75,10 @@
 			</template>
 			<span v-else-if="message.body.type === 'thread_closure'">closed the thread.</span>
 			<span v-else-if="message.body.type === 'thread_reopen'">reopened the thread.</span>
+			<span v-else-if="message.body.type === 'tech_review'">
+				completed technical review and marked project as
+				<Badge :type="message.body.verdict" />.
+			</span>
 		</div>
 		<span class="message__date">
 			<span v-tooltip="$dayjs(message.created).format('MMMM D, YYYY [at] h:mm A')">
