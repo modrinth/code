@@ -1,4 +1,4 @@
-use crate::database::models::DelphiReportIssueId;
+use crate::database::models::DelphiReportIssueDetailsId;
 use crate::file_hosting::FileHostingError;
 use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
@@ -167,8 +167,10 @@ pub enum ApiError {
     Delphi(reqwest::Error),
     #[error(transparent)]
     Mural(#[from] Box<muralpay::ApiError>),
-    #[error("report still has {} issues with no verdict", issues.len())]
-    TechReviewIssuesWithNoVerdict { issues: Vec<DelphiReportIssueId> },
+    #[error("report still has {} issue detailss with no verdict", details.len())]
+    TechReviewDetailsWithNoVerdict {
+        details: Vec<DelphiReportIssueDetailsId>,
+    },
 }
 
 impl ApiError {
@@ -211,7 +213,7 @@ impl ApiError {
                 Self::Slack(..) => "slack_error",
                 Self::Delphi(..) => "delphi_error",
                 Self::Mural(..) => "mural_error",
-                Self::TechReviewIssuesWithNoVerdict { .. } => {
+                Self::TechReviewDetailsWithNoVerdict { .. } => {
                     "tech_review_issues_with_no_verdict"
                 }
             },
@@ -223,11 +225,11 @@ impl ApiError {
             },
             details: match self {
                 Self::Mural(err) => serde_json::to_value(err.clone()).ok(),
-                Self::TechReviewIssuesWithNoVerdict { issues } => {
-                    let issues = serde_json::to_value(issues)
-                        .expect("issues should never fail to serialize");
+                Self::TechReviewDetailsWithNoVerdict { details } => {
+                    let details = serde_json::to_value(details)
+                        .expect("details should never fail to serialize");
                     Some(json!({
-                        "issues": issues
+                        "issue_details": details
                     }))
                 }
                 _ => None,
@@ -275,7 +277,7 @@ impl actix_web::ResponseError for ApiError {
             Self::Slack(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Delphi(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Mural(..) => StatusCode::BAD_REQUEST,
-            Self::TechReviewIssuesWithNoVerdict { .. } => {
+            Self::TechReviewDetailsWithNoVerdict { .. } => {
                 StatusCode::BAD_REQUEST
             }
         }

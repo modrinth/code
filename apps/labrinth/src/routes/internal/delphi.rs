@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fmt::Write, sync::LazyLock, time::Instant};
 
-use actix_web::{HttpRequest, HttpResponse, get, post, put, web};
+use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
@@ -16,8 +16,8 @@ use crate::{
             DBFileId, DelphiReportId, DelphiReportIssueDetailsId,
             DelphiReportIssueId,
             delphi_report_item::{
-                DBDelphiReport, DBDelphiReportIssue, DelphiReportIssueStatus,
-                DelphiReportListOrder, DelphiSeverity, ReportIssueDetail,
+                DBDelphiReport, DBDelphiReportIssue, DelphiSeverity,
+                DelphiStatus, ReportIssueDetail,
             },
         },
         redis::RedisPool,
@@ -37,8 +37,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(ingest_report)
             .service(_run)
             .service(version)
-            .service(issues)
-            .service(update_issue)
             .service(issue_type_schema),
     );
 }
@@ -192,7 +190,6 @@ async fn ingest_report_deserialized(
             id: DelphiReportIssueId(0), // This will be set by the database
             report_id,
             issue_type,
-            status: DelphiReportIssueStatus::Pending,
         }
         .upsert(&mut transaction)
         .await?;
@@ -213,6 +210,7 @@ async fn ingest_report_deserialized(
                 decompiled_source: decompiled_source.cloned().flatten(),
                 data: issue_detail.data,
                 severity: issue_detail.severity,
+                status: DelphiStatus::Pending,
             }
             .insert(&mut transaction)
             .await?;
@@ -306,93 +304,6 @@ async fn version(
             .fetch_one(&**pool)
             .await?,
     ))
-}
-
-#[derive(Deserialize)]
-struct DelphiIssuesSearchOptions {
-    #[serde(rename = "type")]
-    ty: Option<String>,
-    status: Option<DelphiReportIssueStatus>,
-    order_by: Option<DelphiReportListOrder>,
-    count: Option<u16>,
-    offset: Option<u64>,
-}
-
-#[get("issues")]
-async fn issues(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    web::Query(search_options): web::Query<DelphiIssuesSearchOptions>,
-) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await?;
-
-    Ok(HttpResponse::Ok().json(
-        DBDelphiReportIssue::find_all_by(
-            search_options.ty,
-            search_options.status,
-            search_options.order_by,
-            search_options.count,
-            search_options
-                .offset
-                .map(|offset| offset.try_into())
-                .transpose()
-                .map_err(|err| {
-                    ApiError::InvalidInput(format!("Invalid offset: {err}"))
-                })?,
-            &**pool,
-        )
-        .await?,
-    ))
-}
-
-#[put("issue/{issue_id}")]
-async fn update_issue(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    issue_id: web::Path<DelphiReportIssueId>,
-    web::Json(update_data): web::Json<DBDelphiReportIssue>,
-) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::PROJECT_READ,
-    )
-    .await?;
-
-    let new_id = issue_id.into_inner();
-
-    let mut transaction = pool.begin().await?;
-
-    let modified_same_issue = (DBDelphiReportIssue {
-        id: new_id, // Doesn't matter, upsert done for values of other fields
-        report_id: update_data.report_id,
-        issue_type: update_data.issue_type,
-        status: update_data.status,
-    })
-    .upsert(&mut transaction)
-    .await?
-        == new_id;
-
-    transaction.commit().await?;
-
-    if modified_same_issue {
-        Ok(HttpResponse::NoContent().finish())
-    } else {
-        Ok(HttpResponse::Created().finish())
-    }
 }
 
 #[get("issue_type/schema")]
