@@ -114,6 +114,7 @@ pub struct FileReport {
     /// URL to download the flagged file.
     pub download_url: String,
     /// What issues appeared in the file.
+    #[serde(default)]
     pub issues: Vec<FileIssue>,
 }
 
@@ -134,6 +135,7 @@ pub struct FileIssue {
     pub issue_type: String,
     /// Details of why this issue might have been raised, such as what file it
     /// was found in.
+    #[serde(default)]
     pub details: Vec<ReportIssueDetail>,
 }
 
@@ -291,8 +293,9 @@ pub struct ProjectReport {
     pub project_id: ProjectId,
     /// Highest severity of any report of any file of any version under this
     /// project.
-    pub max_severity: DelphiSeverity,
+    pub max_severity: Option<DelphiSeverity>,
     /// Reports for this project's versions.
+    #[serde(default)]
     pub versions: Vec<VersionReport>,
 }
 
@@ -302,6 +305,7 @@ pub struct VersionReport {
     /// ID of the project version this report is for.
     pub version_id: VersionId,
     /// Reports for this version's files.
+    #[serde(default)]
     pub files: Vec<FileReport>,
 }
 
@@ -315,6 +319,7 @@ pub struct ProjectModerationInfo {
     /// Project name.
     pub name: String,
     /// The aggregated project typos of the versions of this project
+    #[serde(default)]
     pub project_types: Vec<String>,
     /// The URL of the icon of the project
     pub icon_url: Option<String>,
@@ -374,11 +379,11 @@ async fn search_projects(
                     'max_severity', MAX(dr.severity),
                     -- TODO: replace with `json_array` in Postgres 16
                     'versions', (
-                        SELECT json_agg(jsonb_build_object(
+                        SELECT coalesce(jsonb_agg(jsonb_build_object(
                             'version_id', to_base62(v.id),
                             -- TODO: replace with `json_array` in Postgres 16
                             'files', (
-                                SELECT json_agg(jsonb_build_object(
+                                SELECT coalesce(jsonb_agg(jsonb_build_object(
                                     'report_id', dr.id,
                                     'file_id', to_base62(f.id),
                                     'created', dr.created,
@@ -389,12 +394,12 @@ async fn search_projects(
                                     'download_url', f.url,
                                     -- TODO: replace with `json_array` in Postgres 16
                                     'issues', (
-                                        SELECT json_agg(
+                                        SELECT coalesce(jsonb_agg(
                                             to_jsonb(dri)
                                             || jsonb_build_object(
                                                 -- TODO: replace with `json_array` in Postgres 16
                                                 'details', (
-                                                    SELECT json_agg(
+                                                    SELECT coalesce(jsonb_agg(
                                                         jsonb_build_object(
                                                             'id', drid.id,
                                                             'issue_id', drid.issue_id,
@@ -405,20 +410,20 @@ async fn search_projects(
                                                             'severity', drid.severity,
                                                             'status', drid.status
                                                         )
-                                                    )
+                                                    ), '[]'::jsonb)
                                                     FROM delphi_report_issue_details drid
                                                     WHERE drid.issue_id = dri.id
                                                 )
                                             )
-                                        )
+                                        ), '[]'::jsonb)
                                         FROM delphi_report_issues dri
                                         WHERE dri.report_id = dr.id
                                     )
-                                ))
+                                )), '[]'::jsonb)
                                 FROM delphi_reports dr
                                 WHERE dr.file_id = f.id
                             )
-                        ))
+                        )), '[]'::jsonb)
                         FROM versions v
                         INNER JOIN files f ON f.version_id = v.id
                         WHERE v.mod_id = m.id
