@@ -46,7 +46,7 @@ const { projectId, name, icon, dependencyType, versionName } = defineProps<{
 	projectId: string
 	name?: string
 	icon?: string
-	dependencyType: Labrinth.Versions.v3.DependencyType
+	dependencyType: Labrinth.Versions.v2.DependencyType
 	versionName?: string
 }>()
 

@@ -111,7 +111,7 @@ const errorNotification = (err: any) => {
 }
 
 const newDependencyProjectId = ref<string>()
-const newDependencyType = ref<Labrinth.Versions.v3.DependencyType>('required')
+const newDependencyType = ref<Labrinth.Versions.v2.DependencyType>('required')
 const newDependencyVersionId = ref<string | null>(null)
 
 const newDependencyVersions = ref<DropdownOption<string>[]>([])

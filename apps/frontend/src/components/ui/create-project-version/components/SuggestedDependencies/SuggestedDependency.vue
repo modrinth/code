@@ -44,7 +44,7 @@ const emit = defineEmits<{
 const { name, icon, dependencyType, versionName } = defineProps<{
 	name?: string
 	icon?: string
-	dependencyType: Labrinth.Versions.v3.DependencyType
+	dependencyType: Labrinth.Versions.v2.DependencyType
 	versionName?: string
 }>()
 
