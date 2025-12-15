@@ -23,7 +23,7 @@
 							class="!shadow-none"
 						>
 							<SettingsIcon />
-							Project Settings
+							Edit versions
 						</button>
 					</ButtonStyled>
 					<ButtonStyled type="transparent">

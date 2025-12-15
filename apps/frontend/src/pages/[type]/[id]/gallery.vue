@@ -209,7 +209,7 @@
 							class="!shadow-none"
 						>
 							<SettingsIcon />
-							Project Settings
+							Edit gallery
 						</button>
 					</ButtonStyled>
 					<ButtonStyled type="transparent">
