@@ -99,14 +99,18 @@ const addDetectedData = async () => {
 	}
 }
 
+// add detected data when the primary file changes
+watch(
+	() => filesToAdd.value[0]?.file,
+	() => addDetectedData(),
+)
+
 function handleNewFiles(newFiles: File[]) {
 	newFiles.forEach((file) => filesToAdd.value.push({ file }))
-	addDetectedData()
 }
 
 function handleRemoveFile(index: number) {
 	filesToAdd.value.splice(index, 1)
-	addDetectedData()
 }
 
 function handleRemoveExistingFile(sha1: string) {
@@ -118,7 +122,6 @@ function handleRemoveExistingFile(sha1: string) {
 
 function handleSetPrimaryFile(index: number) {
 	setPrimaryFile(index)
-	addDetectedData()
 }
 
 const hasSupplementaryFiles = computed(() => filesToAdd.value.length > 1)
