@@ -3,7 +3,7 @@
 		class="flex items-center justify-between gap-2 rounded-xl bg-button-bg px-4 py-2 text-button-text"
 	>
 		<div class="flex items-center gap-2 overflow-hidden">
-			<div class="grid h-5 w-5 place-content-center rounded-full bg-green">
+			<div class="grid h-5 min-h-5 w-5 min-w-5 place-content-center rounded-full bg-green">
 				<CheckIcon class="text-sm text-black" />
 			</div>
 			<span v-tooltip="name" class="overflow-hidden text-ellipsis whitespace-nowrap font-medium">
