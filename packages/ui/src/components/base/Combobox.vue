@@ -199,6 +199,7 @@ const dropdownRef = ref<HTMLElement>()
 const searchInputRef = ref<HTMLInputElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const optionRefs = ref<(HTMLElement | null)[]>([])
+const rafId = ref<number | null>(null)
 
 const dropdownStyle = ref({
 	top: '0px',
@@ -363,11 +364,13 @@ async function openDropdown() {
 
 	setInitialFocus()
 	focusSearchInput()
+	startPositionTracking()
 }
 
 function closeDropdown() {
 	if (!isOpen.value) return
 
+	stopPositionTracking()
 	isOpen.value = false
 	searchQuery.value = ''
 	focusedIndex.value = -1
@@ -509,6 +512,21 @@ function handleWindowResize() {
 	}
 }
 
+function startPositionTracking() {
+	function track() {
+		updateDropdownPosition()
+		rafId.value = requestAnimationFrame(track)
+	}
+	rafId.value = requestAnimationFrame(track)
+}
+
+function stopPositionTracking() {
+	if (rafId.value !== null) {
+		cancelAnimationFrame(rafId.value)
+		rafId.value = null
+	}
+}
+
 onClickOutside(
 	dropdownRef,
 	() => {
@@ -523,6 +541,7 @@ onMounted(() => {
 
 onUnmounted(() => {
 	window.removeEventListener('resize', handleWindowResize)
+	stopPositionTracking()
 })
 
 watch(isOpen, (value) => {
