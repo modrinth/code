@@ -270,7 +270,7 @@
 import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
 import { Compartment, EditorState } from '@codemirror/state'
-import { placeholder as cm_placeholder, EditorView, keymap } from '@codemirror/view'
+import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
 import {
 	AlignLeftIcon,
 	BoldIcon,

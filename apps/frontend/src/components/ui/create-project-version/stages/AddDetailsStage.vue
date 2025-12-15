@@ -46,9 +46,9 @@
 
 					<ButtonStyled type="transparent" size="standard">
 						<button
-							@click="editLoaders"
-							:disabled="isModpack"
 							v-tooltip="isModpack ? 'Modpack versions cannot be edited' : undefined"
+							:disabled="isModpack"
+							@click="editLoaders"
 						>
 							<EditIcon />
 							Edit
@@ -91,9 +91,9 @@
 
 					<ButtonStyled type="transparent" size="standard">
 						<button
-							@click="editVersions"
-							:disabled="isModpack"
 							v-tooltip="isModpack ? 'Modpack versions cannot be edited' : undefined"
+							:disabled="isModpack"
+							@click="editVersions"
 						>
 							<EditIcon />
 							Edit
@@ -157,7 +157,7 @@
 
 <script lang="ts" setup>
 import { EditIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, TagItem, type MultiStageModal } from '@modrinth/ui'
+import { ButtonStyled, Chips, type MultiStageModal, TagItem } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 
 import { useGeneratedState } from '~/composables/generated'

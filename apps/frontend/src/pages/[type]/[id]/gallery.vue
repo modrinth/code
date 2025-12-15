@@ -204,9 +204,9 @@
 				<div class="flex gap-2">
 					<ButtonStyled color="blue">
 						<button
-							@click="() => $router.push('settings/gallery')"
 							aria-label="Project Settings"
 							class="!shadow-none"
+							@click="() => $router.push('settings/gallery')"
 						>
 							<SettingsIcon />
 							Edit gallery
@@ -214,9 +214,9 @@
 					</ButtonStyled>
 					<ButtonStyled type="transparent">
 						<button
-							@click="() => (hideGalleryAdmonition = true)"
 							aria-label="Dismiss"
 							class="!shadow-none"
+							@click="() => (hideGalleryAdmonition = true)"
 						>
 							Dismiss
 						</button>
@@ -224,7 +224,7 @@
 				</div>
 			</template>
 		</Admonition>
-		<div class="items" v-if="project.gallery.length">
+		<div v-if="project.gallery.length" class="items">
 			<div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
 				<a class="gallery-thumbnail" @click="expandImage(item, index)">
 					<img

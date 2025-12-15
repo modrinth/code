@@ -6,7 +6,7 @@
 			<div class="grid h-5 w-5 place-content-center rounded-full bg-green">
 				<CheckIcon class="text-sm text-black" />
 			</div>
-			<span class="overflow-hidden text-ellipsis whitespace-nowrap font-medium" v-tooltip="name">
+			<span v-tooltip="name" class="overflow-hidden text-ellipsis whitespace-nowrap font-medium">
 				{{ name }}
 			</span>
 			<div
@@ -46,7 +46,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, Combobox } from '@modrinth/ui'
-import { type DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
+import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
 const emit = defineEmits<{
 	(e: 'setPrimaryFile'): void

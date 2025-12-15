@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { LeftArrowIcon, PlusIcon, RightArrowIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
 	injectModrinthClient,
@@ -14,7 +15,6 @@ import { provide } from 'vue'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
 
-import type { Labrinth } from '@modrinth/api-client'
 import AddChangelogStage from './stages/AddChangelogStage.vue'
 import AddDependenciesStage from './stages/AddDependenciesStage.vue'
 import AddDetailsStage from './stages/AddDetailsStage.vue'

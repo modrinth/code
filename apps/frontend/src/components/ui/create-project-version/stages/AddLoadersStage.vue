@@ -3,7 +3,7 @@
 		<LoaderPicker
 			v-model="draftVersion.loaders"
 			:loaders="generatedState.loaders"
-			:toggleLoader="toggleLoader"
+			:toggle-loader="toggleLoader"
 		/>
 
 		<div v-if="draftVersion.loaders.length" class="space-y-1">

@@ -22,25 +22,25 @@
 						:key="versionFile.filename"
 						:name="versionFile.filename"
 						:is-primary="versionFile.primary"
-						:initialFileType="versionFile.file_type"
-						:editingVersion="editingVersion"
-						@set-file-type="(type) => (versionFile.file_type = type)"
-						:onRemove="
+						:initial-file-type="versionFile.file_type"
+						:editing-version="editingVersion"
+						:on-remove="
 							versionFile.primary
 								? undefined
 								: () => handleRemoveExistingFile(versionFile.hashes.sha1 || '')
 						"
+						@set-file-type="(type) => (versionFile.file_type = type)"
 					/>
 					<VersionFileRow
 						v-for="(versionFile, idx) in filesToAdd"
 						:key="versionFile.file.name"
 						:name="versionFile.file.name"
 						:is-primary="idx === 0 && !draftVersion.existing_files?.some((f) => f.primary)"
-						:initialFileType="versionFile.fileType"
-						:editingVersion="editingVersion"
+						:initial-file-type="versionFile.fileType"
+						:editing-version="editingVersion"
+						:on-remove="() => handleRemoveFile(idx)"
 						@set-primary-file="handleSetPrimaryFile(idx)"
 						@set-file-type="(type) => (versionFile.fileType = type)"
-						:onRemove="() => handleRemoveFile(idx)"
 					/>
 				</div>
 				<span>
@@ -52,12 +52,12 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { Admonition, DropzoneFileInput, injectProjectPageContext } from '@modrinth/ui'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 
 import { useManageVersion } from '~/composables/versions/manage-version'
 
-import type { Labrinth } from '@modrinth/api-client'
 import VersionFileRow from '../components/VersionFileRow.vue'
 
 const { projectV2 } = injectProjectPageContext()

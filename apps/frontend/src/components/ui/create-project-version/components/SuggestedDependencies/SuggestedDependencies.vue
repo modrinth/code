@@ -11,7 +11,7 @@
 					:icon="dependency.icon"
 					:dependency-type="dependency.dependency_type"
 					:version-name="dependency.versionName"
-					@onAddSuggestion="
+					@on-add-suggestion="
 						() =>
 							handleAddSuggestion({
 								dependency_type: dependency.dependency_type,
@@ -27,7 +27,9 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+
 import { useManageVersion } from '~/composables/versions/manage-version'
+
 import SuggestedDependency from './SuggestedDependency.vue'
 
 export interface SuggestedDependency extends Labrinth.Versions.v3.Dependency {

@@ -5,7 +5,7 @@
 		<div class="grid max-w-[75%] grid-cols-[auto_1fr_auto] items-center gap-2">
 			<Avatar v-if="icon" :src="icon" alt="dependency-icon" size="20px" :no-shadow="true" />
 
-			<span class="truncate font-semibold text-contrast" v-tooltip="name || projectId">
+			<span v-tooltip="name || projectId" class="truncate font-semibold text-contrast">
 				{{ name || 'Unknown Project' }}
 			</span>
 
@@ -16,8 +16,8 @@
 
 		<span
 			v-if="versionName"
-			class="max-w-[35%] truncate whitespace-nowrap font-medium"
 			v-tooltip="versionName"
+			class="max-w-[35%] truncate whitespace-nowrap font-medium"
 		>
 			{{ versionName }}
 		</span>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import type { EnvironmentV3 } from '@modrinth/utils'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
-import type { EnvironmentV3 } from '@modrinth/utils'
 import { commonProjectSettingsMessages } from '../../../../utils'
 import LargeRadioButton from '../../../base/LargeRadioButton.vue'
 

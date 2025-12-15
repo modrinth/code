@@ -18,9 +18,9 @@
 				<div class="flex gap-2">
 					<ButtonStyled color="blue">
 						<button
-							@click="() => router.push('settings/versions')"
 							aria-label="Project Settings"
 							class="!shadow-none"
+							@click="() => router.push('settings/versions')"
 						>
 							<SettingsIcon />
 							Edit versions
@@ -28,9 +28,9 @@
 					</ButtonStyled>
 					<ButtonStyled type="transparent">
 						<button
-							@click="() => (hideVersionsAdmonition = true)"
 							aria-label="Dismiss"
 							class="!shadow-none"
+							@click="() => (hideVersionsAdmonition = true)"
 						>
 							Dismiss
 						</button>
@@ -213,6 +213,7 @@ import {
 	ProjectPageVersions,
 } from '@modrinth/ui'
 import { useLocalStorage } from '@vueuse/core'
+
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const props = defineProps({

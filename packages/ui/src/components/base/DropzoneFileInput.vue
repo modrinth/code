@@ -1,12 +1,12 @@
 <template>
 	<label
-		@dragover.prevent="onDragOver"
-		@dragleave.prevent="onDragLeave"
-		@drop.prevent="handleDrop"
 		:class="[
 			'flex flex-col items-center justify-center gap-4 cursor-pointer p-8 rounded-3xl border-2 border-dashed bg-surface-4 text-contrast transition-colors',
 			isDragOver ? 'border-purple' : 'border-surface-5',
 		]"
+		@dragover.prevent="onDragOver"
+		@dragleave.prevent="onDragLeave"
+		@drop.prevent="handleDrop"
 	>
 		<div
 			class="h-14 w-14 grid place-content-center rounded-2xl text-brand border-brand border-solid border bg-highlight-green"

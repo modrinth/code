@@ -56,8 +56,8 @@
 		</div>
 
 		<SuggestedDependencies
-			:suggestedDependencies="suggestedDependencies"
-			@onAddSuggestion="handleAddSuggestedDependency"
+			:suggested-dependencies="suggestedDependencies"
+			@on-add-suggestion="handleAddSuggestedDependency"
 		/>
 
 		<div v-if="addedDependencies.length" class="flex flex-col gap-4">
@@ -67,7 +67,7 @@
 					<AddedDependencyRow
 						v-if="dependency"
 						:key="index"
-						:projectId="dependency.projectId"
+						:project-id="dependency.projectId"
 						:name="dependency.name"
 						:icon="dependency.icon"
 						:dependency-type="dependency.dependencyType"
@@ -90,7 +90,6 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 } from '@modrinth/ui'
-
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
 import ModSelect from '~/components/ui/create-project-version/components/ModSelect.vue'
