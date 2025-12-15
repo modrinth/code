@@ -138,10 +138,6 @@ export function useManageVersion() {
 			tags.value.gameVersions,
 		)) as InferredVersionInfo
 
-		inferredVersionData.value = inferred
-
-		projectType.value = await setProjectType(project, file)
-
 		try {
 			const versions = await labrinth.versions_v3.getProjectVersions(project.id, {
 				loaders: inferred.loaders ?? [],
@@ -155,6 +151,9 @@ export function useManageVersion() {
 		} catch (error) {
 			console.error('Error fetching versions for environment inference:', error)
 		}
+
+		inferredVersionData.value = inferred
+		projectType.value = await setProjectType(project, file)
 
 		return inferred
 	}
