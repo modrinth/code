@@ -73,15 +73,16 @@ const addMcVersionsNextDisabled = computed(() => draftVersion.value.game_version
 const addEnvironmentNextDisabled = computed(() => !draftVersion.value.environment)
 
 const hideAddLoadersStage = computed(
-	() => noLoadersProject.value || detectedLoaders.value || editingVersion.value === true,
+	() => noLoadersProject.value || detectedLoaders.value || editingVersion.value,
 )
 
-const hideAddMcVersionsStage = computed(
-	() => detectedVersions.value || editingVersion.value === true,
-)
+const hideAddMcVersionsStage = computed(() => detectedVersions.value || editingVersion.value)
 
 const hideAddEnvironmentStage = computed(
-	() => noEnvironmentProject.value || !!detectedEnvironment.value || editingVersion.value === true,
+	() =>
+		noEnvironmentProject.value ||
+		(!editingVersion.value && !!detectedEnvironment.value) ||
+		(editingVersion.value && !!draftVersion.value.environment),
 )
 
 const hideAddDependenciesStage = computed(() => noDependenciesProject.value)

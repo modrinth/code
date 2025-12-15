@@ -146,7 +146,7 @@ export function useManageVersion() {
 			if (versions.length > 0) {
 				const mostRecentVersion = versions[0]
 				const version = await labrinth.versions_v3.getVersion(mostRecentVersion.id)
-				inferred.environment = version.environment
+				inferred.environment = version.environment !== 'unknown' ? version.environment : undefined
 			}
 		} catch (error) {
 			console.error('Error fetching versions for environment inference:', error)

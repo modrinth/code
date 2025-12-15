@@ -119,7 +119,13 @@
 			</div>
 		</template>
 
-		<template v-if="!noEnvironmentProject && (inferredVersionData?.environment || editingVersion)">
+		<template
+			v-if="
+				!noEnvironmentProject &&
+				((!editingVersion && inferredVersionData?.environment) ||
+					(editingVersion && draftVersion.environment))
+			"
+		>
 			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
 					<span class="font-semibold text-contrast">
@@ -254,8 +260,17 @@ const environmentCopy = computed(() => {
 			title: 'Client and server',
 			description: 'Has some functionality on both the client and server, even if only partially.',
 		},
+		unknown: {
+			title: 'Unknown environment',
+			description: 'The environment for this version could not be determined.',
+		},
 	}
 
-	return envCopy[draftVersion.value.environment] || emptyMessage
+	return (
+		envCopy[draftVersion.value.environment] || {
+			title: 'Unknown environment',
+			description: `The environment: "${draftVersion.value.environment}" is not recognized.`,
+		}
+	)
 })
 </script>
