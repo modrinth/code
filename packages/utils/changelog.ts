@@ -11,6 +11,39 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-12-11T17:00:00-08:00`,
+		product: 'app',
+		version: '0.10.22',
+		body: `## Improvements
+- Updated Modrinth Servers branding to new Modrinth Hosting branding.
+- Fixed server pinging blocking the app from loading.
+- Fixed instance overrides for window and Java settings not being able to be disabled.`,
+	},
+	{
+		date: `2025-12-11T16:15:00-08:00`,
+		product: 'hosting',
+		body: `## Improvements
+- Fixed some issues with the content list when disabling content.
+- Improved the design of server notices.`,
+	},
+	{
+		date: `2025-12-11T16:15:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Moved search pages to /discover/<type>.
+- Updated collections page design to be more modern.
+- Fixed some inconsistencies with collection icons around the site.
+- Fixed some issues with the revenue balance bar.
+- Fixed the width of news articles on the landing page.
+- Made game versions automatically update.`,
+	},
+	{
+		date: `2025-12-08T10:30:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed license URL being unable to remove from projects.`,
+	},
+	{
 		date: `2025-12-05T12:00:00-08:00`,
 		product: 'hosting',
 		body: `## Improvements

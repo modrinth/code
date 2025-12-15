@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import '@modrinth/ui/src/styles/tailwind-utilities.css';
+
 @font-face {
 	font-family: 'bundled-minecraft-font-mrapp';
 	font-style: normal;

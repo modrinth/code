@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { DropdownIcon } from '@modrinth/assets'
-import { computed, ref, useSlots } from 'vue'
+import { computed, ref, useSlots, watch } from 'vue'
 
 const props = withDefaults(
 	defineProps<{
@@ -55,6 +55,16 @@ const isOpen = computed(() => toggledOpen.value || props.forceOpen)
 const emit = defineEmits(['onOpen', 'onClose'])
 
 const slots = useSlots()
+
+watch(
+	() => props.openByDefault,
+	(newValue) => {
+		if (newValue !== toggledOpen.value) {
+			toggledOpen.value = newValue
+		}
+	},
+	{ immediate: true },
+)
 
 function open() {
 	toggledOpen.value = true

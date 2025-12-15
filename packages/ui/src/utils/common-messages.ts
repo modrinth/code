@@ -433,6 +433,14 @@ export const commonProjectTypeCategoryMessages = defineMessages({
 		id: 'project-type.shader.category',
 		defaultMessage: 'Shaders',
 	},
+	server: {
+		id: 'project-type.server.category',
+		defaultMessage: 'Servers',
+	},
+	project: {
+		id: 'project-type.project.category',
+		defaultMessage: 'Projects',
+	},
 })
 
 export const commonProjectTypeTitleMessages = defineMessages({
@@ -460,6 +468,14 @@ export const commonProjectTypeTitleMessages = defineMessages({
 		id: 'project-type.shader.capital',
 		defaultMessage: '{count, plural, one {Shader} other {Shaders}}',
 	},
+	server: {
+		id: 'project-type.server.capital',
+		defaultMessage: '{count, plural, one {Server} other {Servers}}',
+	},
+	project: {
+		id: 'project-type.project.lowercase',
+		defaultMessage: '{count, plural, one {Project} other {Projects}}',
+	},
 })
 
 export const commonProjectTypeSentenceMessages = defineMessages({
@@ -486,6 +502,14 @@ export const commonProjectTypeSentenceMessages = defineMessages({
 	shader: {
 		id: 'project-type.shader.lowercase',
 		defaultMessage: '{count, plural, one {shader} other {shaders}}',
+	},
+	server: {
+		id: 'project-type.server.lowercase',
+		defaultMessage: '{count, plural, one {server} other {servers}}',
+	},
+	project: {
+		id: 'project-type.project.lowercase',
+		defaultMessage: '{count, plural, one {project} other {projects}}',
 	},
 })
 

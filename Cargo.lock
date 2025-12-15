@@ -5057,6 +5057,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "modrinth-log"
+version = "0.0.0"
+dependencies = [
+ "dotenvy",
+ "eyre",
+ "tracing",
+ "tracing-ecs",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "modrinth-maxmind"
 version = "0.0.0"
 dependencies = [
@@ -5082,12 +5093,10 @@ dependencies = [
  "derive_more 2.0.1",
  "dotenvy",
  "eyre",
+ "modrinth-log",
  "rust_decimal",
  "serde",
  "serde_json",
- "tracing",
- "tracing-ecs",
- "tracing-subscriber",
  "utoipa",
 ]
 
@@ -5147,11 +5156,7 @@ dependencies = [
  "arc-swap",
  "bytes",
  "chrono",
- "clap",
- "color-eyre",
  "derive_more 2.0.1",
- "dotenvy",
- "eyre",
  "reqwest",
  "rust_decimal",
  "rust_iso3166",
@@ -5160,8 +5165,6 @@ dependencies = [
  "serde_json",
  "serde_with",
  "strum",
- "tokio",
- "tracing-subscriber",
  "utoipa",
  "uuid 1.18.1",
 ]

@@ -361,6 +361,193 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Versions {
+		export namespace v2 {
+			export type VersionType = 'release' | 'beta' | 'alpha'
+
+			export type VersionStatus =
+				| 'listed'
+				| 'archived'
+				| 'draft'
+				| 'unlisted'
+				| 'scheduled'
+				| 'unknown'
+
+			export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
+
+			export type FileType = 'required-resource-pack' | 'optional-resource-pack' | 'unknown'
+
+			export type VersionFile = {
+				hashes: Record<string, string>
+				url: string
+				filename: string
+				primary: boolean
+				size: number
+				file_type?: FileType
+			}
+
+			export type Dependency = {
+				file_name?: string
+				dependency_type: DependencyType
+			} & (
+				| {
+						project_id: string
+				  }
+				| {
+						version_id: string
+						project_id?: string
+				  }
+			)
+
+			export type Version = {
+				id: string
+				project_id: string
+				author_id: string
+				featured: boolean
+				name: string
+				version_number: string
+				changelog: string
+				changelog_url?: string | null
+				date_published: string
+				downloads: number
+				version_type: VersionType
+				status: VersionStatus
+				requested_status?: VersionStatus | null
+				files: VersionFile[]
+				dependencies: Dependency[]
+				game_versions: string[]
+				loaders: string[]
+			}
+		}
+
+		export namespace v3 {
+			export type VersionType = 'release' | 'beta' | 'alpha'
+
+			export type VersionStatus =
+				| 'listed'
+				| 'archived'
+				| 'draft'
+				| 'unlisted'
+				| 'scheduled'
+				| 'unknown'
+
+			export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
+
+			export type FileType = 'required-resource-pack' | 'optional-resource-pack' | 'unknown'
+
+			export type VersionFile = {
+				hashes: Record<string, string>
+				url: string
+				filename: string
+				primary: boolean
+				size: number
+				file_type?: FileType
+			}
+
+			export type Dependency = {
+				version_id?: string
+				project_id?: string
+				file_name?: string
+				dependency_type: DependencyType
+			}
+
+			export type Version = {
+				id: string
+				project_id: string
+				author_id: string
+				featured: boolean
+				name: string
+				version_number: string
+				project_types: string[]
+				games: string[]
+				changelog: string
+				date_published: string
+				downloads: number
+				version_type: VersionType
+				status: VersionStatus
+				requested_status?: VersionStatus | null
+				files: VersionFile[]
+				dependencies: Dependency[]
+				loaders: string[]
+				ordering?: number | null
+				game_versions?: string[]
+				mrpack_loaders?: string[]
+				environment?: string
+			}
+		}
+	}
+
+	export namespace Users {
+		namespace Common {
+			export type Role = 'developer' | 'moderator' | 'admin'
+
+			export type AuthProvider =
+				| 'github'
+				| 'discord'
+				| 'microsoft'
+				| 'gitlab'
+				| 'google'
+				| 'steam'
+				| 'paypal'
+
+			export type UserPayoutData = {
+				paypal_address?: string
+				paypal_country?: string
+				venmo_handle?: string
+				balance: number
+			}
+		}
+
+		export namespace v2 {
+			export type Role = Common.Role
+			export type AuthProvider = Common.AuthProvider
+			export type UserPayoutData = Common.UserPayoutData
+
+			export type User = {
+				id: string
+				username: string
+				name?: string
+				avatar_url?: string
+				bio?: string
+				created: string
+				role: Role
+				badges: number
+				auth_providers?: AuthProvider[]
+				email?: string
+				email_verified?: boolean
+				has_password?: boolean
+				has_totp?: boolean
+				payout_data?: UserPayoutData
+				github_id?: number
+			}
+		}
+
+		export namespace v3 {
+			export type Role = Common.Role
+			export type AuthProvider = Common.AuthProvider
+			export type UserPayoutData = Common.UserPayoutData
+
+			export type User = {
+				id: string
+				username: string
+				avatar_url?: string
+				bio?: string
+				created: string
+				role: Role
+				badges: number
+				auth_providers?: AuthProvider[]
+				email?: string
+				email_verified?: boolean
+				has_password?: boolean
+				has_totp?: boolean
+				payout_data?: UserPayoutData
+				stripe_customer_id?: string
+				allow_friend_requests?: boolean
+				github_id?: number
+			}
+		}
+	}
+
 	export namespace Tags {
 		export namespace v2 {
 			export interface Category {
@@ -422,6 +609,30 @@ export namespace Labrinth {
 				limit: number
 				total_hits: number
 			}
+		}
+	}
+
+	export namespace Collections {
+		export type CollectionStatus = 'listed' | 'unlisted' | 'private' | 'rejected' | 'unknown'
+
+		export type Collection = {
+			id: string
+			user: string
+			name: string
+			description: string | null
+			icon_url: string | null
+			color: number | null
+			status: CollectionStatus
+			created: string
+			updated: string
+			projects: string[]
+		}
+
+		export type EditCollectionRequest = {
+			name?: string
+			description?: string | null
+			status?: CollectionStatus
+			new_projects?: string[]
 		}
 	}
 
