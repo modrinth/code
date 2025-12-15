@@ -399,8 +399,10 @@ const {
 		await modulesLoaded
 		return client.kyros.files_v0.listDirectory(currentPath.value, pageParam, 100)
 	},
-	getNextPageParam: (lastPage, allPages) =>
-		allPages.length < lastPage.total ? allPages.length + 1 : undefined,
+	getNextPageParam: (lastPage, allPages) => {
+		const totalFetched = allPages.reduce((sum, page) => sum + page.items.length, 0)
+		return totalFetched < lastPage.total ? allPages.length + 1 : undefined
+	},
 	staleTime: 30_000,
 	initialPageParam: 1,
 })
@@ -413,7 +415,12 @@ function prefetchDirectory(path: string) {
 		queryKey: ['files', serverId.value, path],
 		queryFn: async () => {
 			await modulesLoaded
-			return client.kyros.files_v0.listDirectory(path, 1, 100)
+			try {
+				return await client.kyros.files_v0.listDirectory(path, 1, 100)
+			} catch {
+				// silently fail - folder may not exist yet (an optimistic update)
+				return { items: [], total: 0, current: 1 }
+			}
 		},
 		initialPageParam: 1,
 		staleTime: 30_000,
@@ -562,16 +569,24 @@ const createMutation = useMutation({
 		const previous = queryClient.getQueryData(queryKey)
 
 		const name = path.split('/').pop()!
-		const now = new Date().toISOString()
+		const now = Math.floor(Date.now() / 1000)
 
 		// optimistically add new item
+		const newItem = {
+			name,
+			path,
+			type,
+			modified: now,
+			created: now,
+			...(type === 'directory' ? { count: 0 } : { size: 0 }),
+		}
 		queryClient.setQueryData(queryKey, (old: any) => ({
 			...old,
 			pages: old?.pages?.map((page: any, i: number) =>
 				i === 0
 					? {
 							...page,
-							items: [{ name, path, type, size: 0, modified: now, created: now }, ...page.items],
+							items: [newItem, ...page.items],
 							total: page.total + 1,
 						}
 					: page,
@@ -880,13 +895,10 @@ function applySort(items: Kyros.Files.v0.DirectoryItem[]) {
 
 		switch (sortMethod.value) {
 			case 'modified':
-				return sortDesc.value
-					? new Date(a.modified).getTime() - new Date(b.modified).getTime()
-					: new Date(b.modified).getTime() - new Date(a.modified).getTime()
+				// modified/created are Unix timestamps (seconds), compare directly
+				return sortDesc.value ? a.modified - b.modified : b.modified - a.modified
 			case 'created':
-				return sortDesc.value
-					? new Date(a.created).getTime() - new Date(b.created).getTime()
-					: new Date(b.created).getTime() - new Date(a.created).getTime()
+				return sortDesc.value ? a.created - b.created : b.created - a.created
 			default:
 				return sortDesc.value ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name)
 		}
@@ -936,6 +948,17 @@ function onAnywhereClicked(e: MouseEvent) {
 	}
 }
 
+function onKeydown(e: KeyboardEvent) {
+	if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+		e.preventDefault()
+		undoLastOperation()
+	}
+	if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
+		e.preventDefault()
+		redoLastOperation()
+	}
+}
+
 const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp']
 
 async function editFile(item: { name: string; type: string; path: string }) {
@@ -944,17 +967,22 @@ async function editFile(item: { name: string; type: string; path: string }) {
 		const content = await client.kyros.files_v0.downloadFile(path)
 		window.scrollTo(0, 0)
 
-		fileContent.value = await content.text()
+		const extension = item.name.split('.').pop()?.toLowerCase()
 		editingFile.value = item
 		isEditing.value = true
-		const extension = item.name.split('.').pop()
+
+		// check if image before consuming the blob
 		if (item.type === 'file' && extension && imageExtensions.includes(extension)) {
 			isEditingImage.value = true
 			imagePreview.value = content
+		} else {
+			isEditingImage.value = false
+			fileContent.value = await content.text()
 		}
 		router.push({ query: { ...route.query, path: currentPath.value, editing: item.path } })
 	} catch (error) {
 		console.error('Error fetching file content:', error)
+		addNotification({ title: 'Failed to open file', text: 'Could not load file contents.', type: 'error' })
 	}
 }
 
@@ -985,16 +1013,7 @@ onMounted(async () => {
 	document.addEventListener('click', onAnywhereClicked)
 	window.addEventListener('scroll', onScroll)
 
-	document.addEventListener('keydown', (e) => {
-		if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
-			e.preventDefault()
-			undoLastOperation()
-		}
-		if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
-			e.preventDefault()
-			redoLastOperation()
-		}
-	})
+	document.addEventListener('keydown', onKeydown)
 
 	fsQueuedOps.value = []
 })
@@ -1002,7 +1021,7 @@ onMounted(async () => {
 onUnmounted(() => {
 	document.removeEventListener('click', onAnywhereClicked)
 	window.removeEventListener('scroll', onScroll)
-	document.removeEventListener('keydown', () => {})
+	document.removeEventListener('keydown', onKeydown)
 })
 
 type QueuedOpWithState = FSQueuedOp & { state: 'queued' }
@@ -1037,7 +1056,7 @@ watch(
 			sortDesc.value = false
 		}
 
-		if (newQuery.editing) {
+		if (newQuery.editing && editingFile.value?.path !== newQuery.editing) {
 			await editFile({
 				name: (newQuery.editing as string).split('/').pop() || '',
 				type: 'file',
@@ -1096,6 +1115,7 @@ async function requestShareLink() {
 		}
 	} catch (error) {
 		console.error('Error sharing file:', error)
+		addNotification({ title: 'Failed to share file', text: 'Could not upload to mclo.gs.', type: 'error' })
 	}
 }
 
@@ -1138,6 +1158,7 @@ async function downloadFile(item: any) {
 			}
 		} catch (error) {
 			console.error('Error downloading file:', error)
+			addNotification({ title: 'Download failed', text: 'Could not download the file.', type: 'error' })
 		}
 		contextMenuInfo.value.item = null
 	}
@@ -1162,6 +1183,7 @@ async function saveFileContent(exit: boolean = true) {
 		})
 	} catch (error) {
 		console.error('Error saving file content:', error)
+		addNotification({ title: 'Save failed', text: 'Could not save the file.', type: 'error' })
 	}
 }
 

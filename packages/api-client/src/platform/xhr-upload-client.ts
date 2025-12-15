@@ -11,24 +11,11 @@ import type {
 /**
  * Abstract client with XHR-based upload implementation
  *
- * Provides upload() with progress tracking for browser environments.
- * Uses XMLHttpRequest because fetch doesn't support upload progress in Firefox/Safari.
- *
- * Uploads go through the feature chain (auth, retry, circuit-breaker, etc.)
- * just like regular requests.
- *
  * Platform-specific clients should extend this instead of AbstractModrinthClient
  * to inherit the XHR upload implementation.
  */
 export abstract class XHRUploadClient extends AbstractModrinthClient {
-	/**
-	 * Upload a file with progress tracking
-	 *
-	 * Goes through the feature chain (auth, retry, etc.)
-	 * Retry is disabled by default to prevent re-uploading large files.
-	 */
 	upload<T = void>(path: string, options: UploadRequestOptions): UploadHandle<T> {
-		// Build URL like request() does
 		let baseUrl: string
 		if (options.api === 'labrinth') {
 			baseUrl = this.config.labrinthBaseUrl!
@@ -40,9 +27,8 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 
 		const url = this.buildUrl(path, baseUrl, options.version)
 
-		// Merge with defaults - retry defaults to false for uploads
 		const mergedOptions: UploadRequestOptions = {
-			retry: false, // Default: don't retry uploads
+			retry: false, // default: don't retry uploads
 			...options,
 			headers: {
 				...this.buildDefaultHeaders(),
@@ -53,19 +39,16 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 
 		const context = this.buildUploadContext(url, path, mergedOptions)
 
-		// Setup progress callbacks and abort controller
 		const progressCallbacks: Array<(p: UploadProgress) => void> = []
 		if (mergedOptions.onProgress) {
 			progressCallbacks.push(mergedOptions.onProgress)
 		}
 		const abortController = new AbortController()
 
-		// Link external signal if provided
 		if (mergedOptions.signal) {
 			mergedOptions.signal.addEventListener('abort', () => abortController.abort())
 		}
 
-		// Build the handle - promise goes through feature chain
 		const handle: UploadHandle<T> = {
 			promise: this.executeUploadFeatureChain<T>(context, progressCallbacks, abortController)
 				.then(async (result) => {
@@ -87,9 +70,6 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 		return handle
 	}
 
-	/**
-	 * Execute the actual XHR upload (called at end of feature chain)
-	 */
 	protected executeXHRUpload<T>(
 		context: RequestContext,
 		progressCallbacks: Array<(p: UploadProgress) => void>,
@@ -125,7 +105,7 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 			xhr.addEventListener('error', () => reject(new ModrinthApiError('Upload failed')))
 			xhr.addEventListener('abort', () => reject(new ModrinthApiError('Upload cancelled')))
 
-			// Build URL with params (unlike $fetch, XHR doesn't handle params automatically)
+			// build URL with params (unlike $fetch, XHR doesn't handle params automatically)
 			let url = context.url
 			if (context.options.params) {
 				const queryString = new URLSearchParams(
@@ -136,7 +116,7 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 
 			xhr.open('POST', url)
 
-			// Apply headers from context (features may have modified them)
+			// apply headers from context (features may have modified them)
 			for (const [key, value] of Object.entries(context.options.headers ?? {})) {
 				xhr.setRequestHeader(key, value)
 			}

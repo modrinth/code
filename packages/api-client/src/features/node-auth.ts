@@ -28,7 +28,7 @@ export interface NodeAuthConfig extends FeatureConfig {
  * Handles authentication for Kyros node fs requests:
  * - Automatically injects Authorization header
  * - Builds the correct URL from node instance
- * - Handles 401 errors by refreshing and retrying
+ * - Handles 401 errors by refreshing and retrying (max 3 times)
  *
  * Only applies to requests with `useNodeAuth: true` in options.
  *

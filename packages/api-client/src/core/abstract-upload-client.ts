@@ -13,10 +13,6 @@ import type { UploadHandle, UploadRequestOptions } from '../types/upload'
 export abstract class AbstractUploadClient {
 	/**
 	 * Upload a file with progress tracking
-	 *
-	 * Features (auth, retry, etc.) are applied to uploads.
-	 * Retry is disabled by default to prevent re-uploading large files.
-	 *
 	 * @param path - API path (e.g., '/fs/create')
 	 * @param options - Upload options including file, api, version
 	 * @returns UploadHandle with promise, onProgress chain, and cancel method
