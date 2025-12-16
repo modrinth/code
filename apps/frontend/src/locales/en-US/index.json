@@ -992,9 +992,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Please complete tax form"
   },
-  "discover.title": {
-    "message": "Discover"
-  },
   "error.collection.404.list_item.1": {
     "message": "You may have mistyped the collection's URL."
   },

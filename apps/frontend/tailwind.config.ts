@@ -10,6 +10,7 @@ const config: Config = {
 		'./src/error.vue',
 		// monorepo - TODO: migrate this to its own package
 		'../../packages/**/*.{js,vue,ts}',
+		'!../../packages/**/node_modules/**',
 	],
 	theme: {
 		extend: {

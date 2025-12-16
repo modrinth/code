@@ -90,7 +90,7 @@
 						<ButtonStyled color="brand">
 							<nuxt-link
 								class="w-full text-nowrap sm:w-fit"
-								:to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
+								:to="`/discover/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
 							>
 								<PlusIcon />
 								Add {{ type.toLocaleLowerCase() }}
@@ -302,7 +302,7 @@
 							<ButtonStyled color="brand">
 								<nuxt-link
 									class="w-full text-nowrap sm:w-fit"
-									:to="`/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
+									:to="`/discover/${type.toLocaleLowerCase()}s?sid=${props.server.serverId}`"
 								>
 									<PlusIcon />
 									Add {{ type.toLocaleLowerCase() }}
@@ -320,7 +320,7 @@
 					</p>
 					<div class="flex flex-row items-center gap-4">
 						<ButtonStyled class="mt-8">
-							<NuxtLink :to="`/modpacks?sid=${props.server.serverId}`">
+							<NuxtLink :to="`/discover/modpacks?sid=${props.server.serverId}`">
 								<CompassIcon />
 								Find a modpack
 							</NuxtLink>

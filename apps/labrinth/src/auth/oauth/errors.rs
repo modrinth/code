@@ -105,6 +105,7 @@ impl actix_web::ResponseError for OAuthError {
             HttpResponse::build(self.status_code()).json(ApiError {
                 error: &self.error_type.error_name(),
                 description: self.error_type.to_string(),
+                details: None,
             })
         }
     }
