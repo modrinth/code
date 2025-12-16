@@ -270,9 +270,10 @@ function getHighestSeverity(review: {
 	reports: Labrinth.TechReview.Internal.FileReport[]
 }): string {
 	const severities = review.reports
-		.flatMap((r) => r.issues)
-		.flatMap((i) => i.details)
+		.flatMap((r) => r.issues ?? [])
+		.flatMap((i) => i.details ?? [])
 		.map((d) => d.severity)
+		.filter((s): s is Labrinth.TechReview.Internal.DelphiSeverity => !!s)
 
 	const order = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
 	return severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] || 'low'

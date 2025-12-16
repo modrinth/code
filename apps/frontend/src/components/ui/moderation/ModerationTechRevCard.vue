@@ -148,9 +148,10 @@ const severityOrder = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string
 
 const highestSeverity = computed(() => {
 	const severities = props.item.reports
-		.flatMap((r) => r.issues)
-		.flatMap((i) => i.details)
+		.flatMap((r) => r.issues ?? [])
+		.flatMap((i) => i.details ?? [])
 		.map((d) => d.severity)
+		.filter((s): s is Labrinth.TechReview.Internal.DelphiSeverity => !!s)
 
 	return severities.sort((a, b) => (severityOrder[b] ?? 0) - (severityOrder[a] ?? 0))[0] || 'low'
 })
