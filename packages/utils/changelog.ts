@@ -11,6 +11,20 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-12-16T13:15:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed collection pages requiring auth.`,
+	},
+	{
+		date: `2025-12-16T13:15:00-08:00`,
+		product: 'app',
+		version: '0.10.23',
+		body: `## Improvements
+- Fixed installation of newer NeoForge versions.
+- Added Java 25 support to settings for Minecraft 26.1.`,
+	},
+	{
 		date: `2025-12-11T17:00:00-08:00`,
 		product: 'app',
 		version: '0.10.22',
