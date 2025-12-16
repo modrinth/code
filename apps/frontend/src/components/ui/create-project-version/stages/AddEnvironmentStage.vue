@@ -2,10 +2,10 @@
 	<ProjectSettingsEnvSelector v-model="draftVersion.environment" />
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ProjectSettingsEnvSelector } from '@modrinth/ui'
 
-import { useManageVersion } from '~/composables/versions/manage-version'
+import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
-const { draftVersion } = useManageVersion()
+const { draftVersion } = injectManageVersionContext()
 </script>

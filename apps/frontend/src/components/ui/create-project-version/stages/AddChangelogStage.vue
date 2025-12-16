@@ -10,9 +10,9 @@
 import { MarkdownEditor } from '@modrinth/ui'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
-import { useManageVersion } from '~/composables/versions/manage-version'
+import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
-const { draftVersion } = useManageVersion()
+const { draftVersion } = injectManageVersionContext()
 
 async function onImageUpload(file: File) {
 	const response = await useImageUpload(file, { context: 'version' })

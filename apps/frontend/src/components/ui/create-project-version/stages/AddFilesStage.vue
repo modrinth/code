@@ -51,12 +51,12 @@
 	</div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import { Admonition, DropzoneFileInput, injectProjectPageContext } from '@modrinth/ui'
 import { acceptFileFromProjectType } from '@modrinth/utils'
 
-import { useManageVersion } from '~/composables/versions/manage-version'
+import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 import VersionFileRow from '../components/VersionFileRow.vue'
 
@@ -71,7 +71,7 @@ const {
 	setInferredVersionData,
 	editingVersion,
 	projectType,
-} = useManageVersion()
+} = injectManageVersionContext()
 
 const addDetectedData = async () => {
 	if (editingVersion.value) return

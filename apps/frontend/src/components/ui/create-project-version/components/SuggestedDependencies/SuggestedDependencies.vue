@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 
-import { useManageVersion } from '~/composables/versions/manage-version'
+import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 import SuggestedDependency from './SuggestedDependency.vue'
 
@@ -42,7 +42,7 @@ const props = defineProps<{
 	suggestedDependencies: SuggestedDependency[]
 }>()
 
-const { draftVersion } = useManageVersion()
+const { draftVersion } = injectManageVersionContext()
 
 const visibleDependencies = computed<SuggestedDependency[]>(() =>
 	props.suggestedDependencies

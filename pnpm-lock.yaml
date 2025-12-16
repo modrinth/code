@@ -177,6 +177,9 @@ importers:
       vite:
         specifier: ^5.4.6
         version: 5.4.11(@types/node@22.4.1)(sass@1.77.6)(terser@5.44.1)
+      vue-component-type-helpers:
+        specifier: ^3.1.8
+        version: 3.1.8
       vue-tsc:
         specifier: ^2.1.6
         version: 2.1.6(typescript@5.5.4)
@@ -387,6 +390,9 @@ importers:
       vite-svg-loader:
         specifier: ^5.1.0
         version: 5.1.0(vue@3.5.13(typescript@5.5.4))
+      vue-component-type-helpers:
+        specifier: ^3.1.8
+        version: 3.1.8
       vue-tsc:
         specifier: ^2.0.24
         version: 2.1.6(typescript@5.5.4)
@@ -650,6 +656,9 @@ importers:
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.5.4)
+      vue-component-type-helpers:
+        specifier: ^3.1.8
+        version: 3.1.8
       vue-router:
         specifier: 4.3.0
         version: 4.3.0(vue@3.5.13(typescript@5.5.4))
@@ -8238,6 +8247,9 @@ packages:
   vue-bundle-renderer@2.1.1:
     resolution: {integrity: sha512-+qALLI5cQncuetYOXp4yScwYvqh8c6SMXee3B+M7oTZxOgtESP0l4j/fXdEJoZ+EdMxkGWIj+aSEyjXkOdmd7g==}
 
+  vue-component-type-helpers@3.1.8:
+    resolution: {integrity: sha512-oaowlmEM6BaYY+8o+9D9cuzxpWQWHqHTMKakMxXu0E+UCIOMTljyIPO15jcnaCwJtZu/zWDotK7mOIHvWD9mcw==}
+
   vue-confetti-explosion@1.0.2:
     resolution: {integrity: sha512-80OboM3/6BItIoZ6DpNcZFqGpF607kjIVc5af56oKgtFmt5yWehvJeoYhkzYlqxrqdBe0Ko4Ie3bWrmLau+dJw==}
     engines: {node: '>=12'}
@@ -14068,7 +14080,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 22.4.1
+      '@types/node': 20.14.11
       merge-stream: 2.0.0
       supports-color: 8.1.1
     optional: true
@@ -17505,6 +17517,8 @@ snapshots:
   vue-bundle-renderer@2.1.1:
     dependencies:
       ufo: 1.5.4
+
+  vue-component-type-helpers@3.1.8: {}
 
   vue-confetti-explosion@1.0.2(vue@3.5.13(typescript@5.5.4)):
     dependencies:

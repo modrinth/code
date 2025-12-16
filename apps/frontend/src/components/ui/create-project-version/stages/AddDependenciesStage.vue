@@ -93,7 +93,7 @@ import {
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
 import ModSelect from '~/components/ui/create-project-version/components/ModSelect.vue'
-import { useManageVersion } from '~/composables/versions/manage-version'
+import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 import AddedDependencyRow from '../components/AddedDependencyRow.vue'
 import SuggestedDependencies from '../components/SuggestedDependencies/SuggestedDependencies.vue'
@@ -141,7 +141,7 @@ watch(newDependencyProjectId, async () => {
 })
 
 const { draftVersion, dependencyProjects, dependencyVersions, getProject, getVersion } =
-	useManageVersion()
+	injectManageVersionContext()
 const { projectV2: project } = injectProjectPageContext()
 
 const getSuggestedDependencies = async () => {

@@ -45,7 +45,7 @@ import { XIcon } from '@modrinth/assets'
 import { ButtonStyled, injectProjectPageContext, TagItem } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 
-import { useManageVersion } from '~/composables/versions/manage-version'
+import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 import LoaderPicker from '../components/LoaderPicker.vue'
 
@@ -54,7 +54,7 @@ const generatedState = useGeneratedState()
 const { projectV2 } = injectProjectPageContext()
 const loaders = computed(() => generatedState.value.loaders)
 
-const { draftVersion, setProjectType } = useManageVersion()
+const { draftVersion, setProjectType } = injectManageVersionContext()
 
 const toggleLoader = (loader: string) => {
 	if (draftVersion.value.loaders.includes(loader)) {

@@ -9,25 +9,19 @@
 	>
 		<template #title>
 			<div class="flex flex-wrap items-center gap-1 text-secondary">
-				<span class="text-lg font-bold text-contrast sm:text-xl">{{ currentStage.title }}</span>
+				<span class="text-lg font-bold text-contrast sm:text-xl">{{ resolvedTitle }}</span>
 			</div>
 		</template>
 
 		<progress
-			v-if="currentStage.nonProgressStage !== true"
-			:value="
-				(stages
-					.slice(0, currentStageIndex + 1)
-					.filter((stage) => !stage.nonProgressStage && !stage.skip).length /
-					stages.filter((stage) => !stage.nonProgressStage && !stage.skip).length) *
-				100
-			"
+			v-if="currentStage?.nonProgressStage !== true"
+			:value="progressValue"
 			max="100"
 			class="w-full h-1 appearance-none border-none absolute top-0 left-0"
 		></progress>
 
 		<div class="sm:w-[512px]">
-			<component :is="currentStage.stageContent" />
+			<component :is="currentStage?.stageContent" />
 		</div>
 
 		<template #actions>
@@ -62,34 +56,44 @@
 	</NewModal>
 </template>
 
-<script setup lang="ts">
-import { ButtonStyled, NewModal } from '@modrinth/ui'
+<script lang="ts">
 import type { Component } from 'vue'
-import { computed, ref, useTemplateRef } from 'vue'
 
-const { stages } = defineProps<{
-	stages: ModalStage[]
-}>()
-
-export interface ButtonConfig {
-	icon?: Component | null
+export interface StageButtonConfig {
 	label?: string
-	onClick?: () => void
-	disabled?: boolean
+	icon?: Component | null
+	iconPosition?: 'before' | 'after'
 	color?: InstanceType<typeof ButtonStyled>['$props']['color']
+	disabled?: boolean
 	iconClass?: string | null
-	iconPosition?: 'after' | 'before'
+	onClick?: () => void
 }
 
-export interface ModalStage {
-	title: string
+export type MaybeCtxFn<T, R> = R | ((ctx: T) => R)
+
+export interface StageConfigInput<T> {
 	id: string
 	stageContent: Component
-	leftButtonConfig: ButtonConfig | null
-	rightButtonConfig: ButtonConfig | null
+	title: MaybeCtxFn<T, string>
+	skip?: MaybeCtxFn<T, boolean>
 	nonProgressStage?: boolean
-	skip?: boolean
+	leftButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
+	rightButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 }
+
+export function resolveCtxFn<T, R>(value: MaybeCtxFn<T, R>, ctx: T): R {
+	return typeof value === 'function' ? (value as (ctx: T) => R)(ctx) : value
+}
+</script>
+
+<script setup lang="ts" generic="T">
+import { ButtonStyled, NewModal } from '@modrinth/ui'
+import { computed, ref, useTemplateRef } from 'vue'
+
+const props = defineProps<{
+	stages: StageConfigInput<T>[]
+	context: T
+}>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const currentStageIndex = ref<number>(0)
@@ -106,27 +110,31 @@ const setStage = (indexOrId: number | string) => {
 	let index: number = 0
 	if (typeof indexOrId === 'number') {
 		index = indexOrId
-		if (index < 0 || index >= stages.length) return
+		if (index < 0 || index >= props.stages.length) return
 	} else {
-		index = stages.findIndex((stage) => stage.id === indexOrId)
+		index = props.stages.findIndex((stage) => stage.id === indexOrId)
 		if (index === -1) return
 	}
-	while (index < stages.length && stages[index]?.skip) {
+	while (index < props.stages.length) {
+		const skip = props.stages[index]?.skip
+		if (!skip || !resolveCtxFn(skip, props.context)) break
 		index++
 	}
-	if (index < stages.length) {
+	if (index < props.stages.length) {
 		currentStageIndex.value = index
 	}
 }
 
 const nextStage = () => {
 	if (currentStageIndex.value === -1) return
-	if (currentStageIndex.value >= stages.length - 1) return
+	if (currentStageIndex.value >= props.stages.length - 1) return
 	let nextIndex = currentStageIndex.value + 1
-	while (nextIndex < stages.length && stages[nextIndex]?.skip) {
+	while (nextIndex < props.stages.length) {
+		const skip = props.stages[nextIndex]?.skip
+		if (!skip || !resolveCtxFn(skip, props.context)) break
 		nextIndex++
 	}
-	if (nextIndex < stages.length) {
+	if (nextIndex < props.stages.length) {
 		currentStageIndex.value = nextIndex
 	}
 }
@@ -134,7 +142,9 @@ const nextStage = () => {
 const prevStage = () => {
 	if (currentStageIndex.value <= 0) return
 	let prevIndex = currentStageIndex.value - 1
-	while (prevIndex >= 0 && stages[prevIndex]?.skip) {
+	while (prevIndex >= 0) {
+		const skip = props.stages[prevIndex]?.skip
+		if (!skip || !resolveCtxFn(skip, props.context)) break
 		prevIndex--
 	}
 	if (prevIndex >= 0) {
@@ -142,14 +152,45 @@ const prevStage = () => {
 	}
 }
 
-const currentStage = computed(() => stages[currentStageIndex.value])
+const currentStage = computed(() => props.stages[currentStageIndex.value])
+
+const resolvedTitle = computed(() => {
+	const stage = currentStage.value
+	if (!stage) return ''
+	return resolveCtxFn(stage.title, props.context)
+})
+
+const resolvedSkip = computed(() => {
+	const stage = currentStage.value
+	if (!stage?.skip) return false
+	return resolveCtxFn(stage.skip, props.context)
+})
 
 const leftButtonConfig = computed(() => {
-	return currentStage.value?.leftButtonConfig
+	const stage = currentStage.value
+	if (!stage) return null
+	return resolveCtxFn(stage.leftButtonConfig, props.context)
 })
 
 const rightButtonConfig = computed(() => {
-	return currentStage.value?.rightButtonConfig
+	const stage = currentStage.value
+	if (!stage) return null
+	return resolveCtxFn(stage.rightButtonConfig, props.context)
+})
+
+const progressValue = computed(() => {
+	const isProgressStage = (stage: StageConfigInput<T>) => {
+		if (stage.nonProgressStage) return false
+		const skip = stage.skip ? resolveCtxFn(stage.skip, props.context) : false
+		return !skip
+	}
+
+	const completedCount = props.stages
+		.slice(0, currentStageIndex.value + 1)
+		.filter(isProgressStage).length
+	const totalCount = props.stages.filter(isProgressStage).length
+
+	return totalCount > 0 ? (completedCount / totalCount) * 100 : 0
 })
 
 const emit = defineEmits<{

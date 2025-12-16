@@ -36,14 +36,14 @@
 import { XIcon } from '@modrinth/assets'
 import { ButtonStyled, TagItem } from '@modrinth/ui'
 
-import { useManageVersion } from '~/composables/versions/manage-version'
+import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 import McVersionPicker from '../components/McVersionPicker.vue'
 
 const generatedState = useGeneratedState()
 const gameVersions = generatedState.value.gameVersions
 
-const { draftVersion } = useManageVersion()
+const { draftVersion } = injectManageVersionContext()
 
 const toggleVersion = (version: string) => {
 	if (draftVersion.value.game_versions.includes(version)) {

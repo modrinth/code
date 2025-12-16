@@ -157,11 +157,11 @@
 
 <script lang="ts" setup>
 import { EditIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips, type MultiStageModal, TagItem } from '@modrinth/ui'
+import { ButtonStyled, Chips, TagItem } from '@modrinth/ui'
 import { formatCategory } from '@modrinth/utils'
 
 import { useGeneratedState } from '~/composables/generated'
-import { useManageVersion } from '~/composables/versions/manage-version'
+import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 const {
 	draftVersion,
@@ -170,22 +170,21 @@ const {
 	editingVersion,
 	noLoadersProject,
 	noEnvironmentProject,
-} = useManageVersion()
+	modal,
+} = injectManageVersionContext()
 
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
 const isModpack = computed(() => projectType.value === 'modpack')
 
-const createVersionModal = inject<Ref<InstanceType<typeof MultiStageModal>>>('createVersionModal')
-
 const editLoaders = () => {
-	createVersionModal?.value?.setStage('edit-loaders')
+	modal.value?.setStage('edit-loaders')
 }
 const editVersions = () => {
-	createVersionModal?.value?.setStage('edit-mc-versions')
+	modal.value?.setStage('edit-mc-versions')
 }
 const editEnvironment = () => {
-	createVersionModal?.value?.setStage('edit-environment')
+	modal.value?.setStage('edit-environment')
 }
 
 const usingDetectedVersions = computed(() => {
