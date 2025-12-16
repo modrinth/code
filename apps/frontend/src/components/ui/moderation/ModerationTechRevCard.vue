@@ -53,6 +53,7 @@ const props = defineProps<{
 		reports: FlattenedFileReport[]
 	}
 	loadingIssues: Set<string>
+	decompiledSources: Map<string, string>
 }>()
 
 const { addNotification } = injectNotificationManager()
@@ -199,11 +200,12 @@ function getSeverityBadgeColor(severity: Labrinth.TechReview.Internal.DelphiSeve
 		case 'severe':
 			return 'border-red/60 border bg-highlight-red text-red'
 		case 'high':
-		case 'medium':
 			return 'border-orange/60 border bg-highlight-orange text-orange'
+		case 'medium':
+			return 'border-green/60 border bg-highlight-green text-green'
 		case 'low':
 		default:
-			return 'border-green/60 border bg-highlight-green text-green'
+			return 'border-blue/60 border bg-highlight-blue text-blue'
 	}
 }
 
@@ -214,10 +216,10 @@ const severityColor = computed(() => {
 		case 'high':
 			return 'text-orange bg-highlight-orange border-solid border-[1px] border-orange'
 		case 'medium':
-			return 'text-blue bg-highlight-blue border-solid border-[1px] border-blue'
+			return 'text-green bg-highlight-green border-solid border-[1px] border-green'
 		case 'low':
 		default:
-			return 'text-green bg-highlight-green border-solid border-[1px] border-green'
+			return 'text-blue bg-highlight-blue border-solid border-[1px] border-blue'
 	}
 })
 
@@ -939,7 +941,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 							</div>
 
 							<div
-								v-if="classItem.flags[0]?.detail.decompiled_source"
+								v-if="props.decompiledSources.get(classItem.flags[0]?.detail.id)"
 								class="relative overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
 							>
 								<ButtonStyled circular type="transparent">
@@ -948,7 +950,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 										class="absolute right-2 top-2 border-[1px]"
 										@click="
 											copyToClipboard(
-												classItem.flags[0].detail.decompiled_source!,
+												props.decompiledSources.get(classItem.flags[0].detail.id)!,
 												classItem.filePath,
 											)
 										"
@@ -961,7 +963,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								<div class="overflow-x-auto bg-surface-3 py-3">
 									<div
 										v-for="(line, n) in highlightCodeLines(
-											classItem.flags[0].detail.decompiled_source!,
+											props.decompiledSources.get(classItem.flags[0].detail.id)!,
 											'java',
 										)"
 										:key="n"
