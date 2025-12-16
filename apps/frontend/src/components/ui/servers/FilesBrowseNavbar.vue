@@ -20,6 +20,7 @@
 							type="button"
 							class="mr-2 grid h-12 w-10 place-content-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							@click="$emit('navigate', -1)"
+							@mouseenter="$emit('prefetch-home')"
 						>
 							<span
 								class="grid size-8 place-content-center rounded-full bg-button-bg p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
@@ -183,7 +184,7 @@ const props = defineProps<{
 defineEmits<{
 	(e: 'navigate', index: number): void
 	(e: 'create', type: 'file' | 'directory'): void
-	(e: 'upload' | 'upload-zip'): void
+	(e: 'upload' | 'upload-zip' | 'prefetch-home'): void
 	(e: 'unzip-from-url', cf: boolean): void
 	(e: 'update:searchQuery' | 'filter', value: string): void
 }>()

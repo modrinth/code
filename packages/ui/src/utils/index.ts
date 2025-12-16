@@ -1,4 +1,5 @@
 export * from './common-messages'
+export * from './file-extensions'
 export * from './game-modes'
 export * from './notices'
 export * from './savable'

@@ -78,10 +78,18 @@ import {
 	RightArrowIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	getFileExtension,
+	isArchiveFile,
+	isCodeFile,
+	isEditableFile as isEditableFileExt,
+	isImageFile,
+	isTextFile,
+} from '@modrinth/ui'
 import { computed, ref, shallowRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { renderToString } from 'vue/server-renderer'
+import { useRoute, useRouter } from 'vue-router'
 
 import {
 	UiServersIconsCodeFileIcon,
@@ -117,36 +125,6 @@ const emit = defineEmits<{
 const isDragOver = ref(false)
 const isDragging = ref(false)
 
-const codeExtensions = Object.freeze([
-	'json',
-	'json5',
-	'jsonc',
-	'java',
-	'kt',
-	'kts',
-	'sh',
-	'bat',
-	'ps1',
-	'yml',
-	'yaml',
-	'toml',
-	'js',
-	'ts',
-	'py',
-	'rb',
-	'php',
-	'html',
-	'css',
-	'cpp',
-	'c',
-	'h',
-	'rs',
-	'go',
-])
-
-const textExtensions = Object.freeze(['txt', 'md', 'log', 'cfg', 'conf', 'properties', 'ini', 'sk'])
-const imageExtensions = Object.freeze(['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'])
-const supportedArchiveExtensions = Object.freeze(['zip'])
 const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])
 
 const route = shallowRef(useRoute())
@@ -158,7 +136,7 @@ const containerClasses = computed(() => [
 	isDragOver.value ? 'bg-brand-highlight' : '',
 ])
 
-const fileExtension = computed(() => props.name.split('.').pop()?.toLowerCase() || '')
+const fileExtension = computed(() => getFileExtension(props.name))
 
 const isZip = computed(() => fileExtension.value === 'zip')
 
@@ -201,10 +179,10 @@ const iconComponent = computed(() => {
 	}
 
 	const ext = fileExtension.value
-	if (codeExtensions.includes(ext)) return UiServersIconsCodeFileIcon
-	if (textExtensions.includes(ext)) return UiServersIconsTextFileIcon
-	if (imageExtensions.includes(ext)) return UiServersIconsImageFileIcon
-	if (supportedArchiveExtensions.includes(ext)) return FileArchiveIcon
+	if (isCodeFile(ext)) return UiServersIconsCodeFileIcon
+	if (isTextFile(ext)) return UiServersIconsTextFileIcon
+	if (isImageFile(ext)) return UiServersIconsImageFileIcon
+	if (isArchiveFile(ext)) return FileArchiveIcon
 	return FileIcon
 })
 
@@ -244,12 +222,7 @@ const formattedCreationDate = computed(() => {
 const isEditableFile = computed(() => {
 	if (props.type === 'file') {
 		const ext = fileExtension.value
-		return (
-			!props.name.includes('.') ||
-			textExtensions.includes(ext) ||
-			codeExtensions.includes(ext) ||
-			imageExtensions.includes(ext)
-		)
+		return !props.name.includes('.') || isEditableFileExt(ext) || isImageFile(ext)
 	}
 	return false
 })
@@ -270,9 +243,7 @@ function openContextMenu(event: MouseEvent) {
 }
 
 function handleMouseEnter() {
-	if (props.type === 'directory') {
-		emit('hover', { name: props.name, type: props.type, path: props.path })
-	}
+	emit('hover', { name: props.name, type: props.type, path: props.path })
 }
 
 function navigateToFolder() {
@@ -301,32 +272,8 @@ function selectItem() {
 }
 
 async function getDragIcon() {
-	let iconToUse
-
-	if (props.type === 'directory') {
-		if (props.name === 'config') {
-			iconToUse = UiServersIconsCogFolderIcon
-		} else if (props.name === 'world') {
-			iconToUse = UiServersIconsEarthIcon
-		} else if (props.name === 'resourcepacks') {
-			iconToUse = PaletteIcon
-		} else {
-			iconToUse = FolderOpenIcon
-		}
-	} else {
-		const ext = fileExtension.value
-		if (codeExtensions.includes(ext)) {
-			iconToUse = UiServersIconsCodeFileIcon
-		} else if (textExtensions.includes(ext)) {
-			iconToUse = UiServersIconsTextFileIcon
-		} else if (imageExtensions.includes(ext)) {
-			iconToUse = UiServersIconsImageFileIcon
-		} else {
-			iconToUse = FileIcon
-		}
-	}
-
-	return await renderToString(h(iconToUse))
+	// Reuse iconComponent computed for consistency
+	return await renderToString(h(iconComponent.value))
 }
 
 async function handleDragStart(event: DragEvent) {

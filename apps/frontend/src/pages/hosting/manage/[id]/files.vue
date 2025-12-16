@@ -1,5 +1,5 @@
 <template>
-	<div data-pyro-file-manager-root class="contents">
+	<div class="contents">
 		<FilesCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 		<FilesUploadZipUrlModal ref="uploadZipModal" />
 		<FilesUploadConflictModal ref="uploadConflictModal" @proceed="extractItem" />
@@ -19,7 +19,7 @@
 			class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
 			@files-dropped="handleDroppedFiles"
 		>
-			<div ref="mainContent" class="relative isolate flex w-full flex-col">
+			<div class="relative isolate flex w-full flex-col">
 				<div v-if="!isEditing" class="contents">
 					<FilesBrowseNavbar
 						:breadcrumb-segments="breadcrumbSegments"
@@ -33,6 +33,7 @@
 						@unzip-from-url="showUnzipFromUrlModal"
 						@filter="handleFilter"
 						@update:search-query="searchQuery = $event"
+						@prefetch-home="handlePrefetchHome"
 					/>
 					<FilesLabelBar :sort-field="sortMethod" :sort-desc="sortDesc" @sort="handleSort" />
 					<div
@@ -152,48 +153,17 @@
 						@upload-complete="refreshList()"
 					/>
 				</div>
-				<FilesEditingNavbar
+				<FilesEditor
 					v-else
-					:file-name="editingFile?.name"
-					:is-image="isEditingImage"
-					:file-path="editingFile?.path"
+					:file="editingFile"
 					:breadcrumb-segments="breadcrumbSegments"
-					@cancel="cancelEditing"
-					@save="() => saveFileContent(true)"
-					@save-as="saveFileContentAs"
-					@save-restart="saveFileContentRestart"
-					@share="requestShareLink"
+					@close="handleEditorClose"
 					@navigate="navigateToSegment"
 				/>
-
-				<div v-if="isEditing" class="h-full w-full flex-grow">
-					<component
-						:is="VAceEditor"
-						v-if="!isEditingImage"
-						v-model:value="fileContent"
-						:lang="
-							(() => {
-								const ext = editingFile?.name?.split('.')?.pop()?.toLowerCase() ?? ''
-								return ext === 'json'
-									? 'json'
-									: ext === 'toml'
-										? 'toml'
-										: ext === 'sh'
-											? 'sh'
-											: ['yml', 'yaml'].includes(ext)
-												? 'yaml'
-												: 'text'
-							})()
-						"
-						theme="one_dark"
-						:print-margin="false"
-						style="height: 750px; font-size: 1rem"
-						class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
-						@init="onInit"
-					/>
-					<FilesImageViewer v-else :image-blob="imagePreview" />
-				</div>
-				<div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
+				<div
+					v-if="!isEditing && items.length > 0"
+					class="h-full w-full overflow-hidden rounded-b-2xl"
+				>
 					<FileVirtualList
 						:items="filteredItems"
 						@extract="handleExtractItem"
@@ -267,9 +237,11 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	getFileExtension,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	isEditableFile,
 	ProgressBar,
 } from '@modrinth/ui'
 import type { FilesystemOp, FSQueuedOp } from '@modrinth/utils'
@@ -282,8 +254,7 @@ import FilesBrowseNavbar from '~/components/ui/servers/FilesBrowseNavbar.vue'
 import FilesContextMenu from '~/components/ui/servers/FilesContextMenu.vue'
 import FilesCreateItemModal from '~/components/ui/servers/FilesCreateItemModal.vue'
 import FilesDeleteItemModal from '~/components/ui/servers/FilesDeleteItemModal.vue'
-import FilesEditingNavbar from '~/components/ui/servers/FilesEditingNavbar.vue'
-import FilesImageViewer from '~/components/ui/servers/FilesImageViewer.vue'
+import FilesEditor from '~/components/ui/servers/FilesEditor.vue'
 import FilesLabelBar from '~/components/ui/servers/FilesLabelBar.vue'
 import FilesMoveItemModal from '~/components/ui/servers/FilesMoveItemModal.vue'
 import FilesRenameItemModal from '~/components/ui/servers/FilesRenameItemModal.vue'
@@ -292,14 +263,13 @@ import FilesUploadDragAndDrop from '~/components/ui/servers/FilesUploadDragAndDr
 import FilesUploadDropdown from '~/components/ui/servers/FilesUploadDropdown.vue'
 import FilesUploadZipUrlModal from '~/components/ui/servers/FilesUploadZipUrlModal.vue'
 import FileVirtualList from '~/components/ui/servers/FileVirtualList.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { handleServersError } from '~/composables/servers/modrinth-servers.ts'
 
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const client = injectModrinthClient()
 const serverContext = injectModrinthServerContext()
-const { fsOps, fsQueuedOps } = serverContext
+const { fsOps, fsQueuedOps, serverId, server } = serverContext
 const flags = useFeatureFlags()
 const baseId = useId()
 const queryClient = useQueryClient()
@@ -325,17 +295,11 @@ interface RenameOperation extends BaseOperation {
 
 type Operation = MoveOperation | RenameOperation
 
-const props = defineProps<{
-	server: ModrinthServer
-}>()
-
 const modulesLoaded = inject<Promise<void>>('modulesLoaded')
 
 const route = useRoute()
 const router = useRouter()
 
-const VAceEditor = ref()
-const mainContent = ref<HTMLElement | null>(null)
 const contextMenu = ref()
 const operationHistory = ref<Operation[]>([])
 const redoStack = ref<Operation[]>([])
@@ -344,7 +308,6 @@ const searchQuery = ref('')
 const sortMethod = ref('name')
 const sortDesc = ref(false)
 
-const serverId = computed(() => props.server.serverId)
 const currentPath = computed(() => (typeof route.query.path === 'string' ? route.query.path : '/'))
 
 const isAtBottom = ref(false)
@@ -359,19 +322,13 @@ const uploadConflictModal = ref()
 
 const newItemType = ref<'file' | 'directory'>('file')
 const selectedItem = ref<any>(null)
-const fileContent = ref('')
 
 const isEditing = ref(false)
 const editingFile = ref<any>(null)
-const closeEditor = ref(false)
-const isEditingImage = ref(false)
-const imagePreview = ref()
 
 const isDragging = ref(false)
 
 const uploadDropdownRef = ref()
-
-const data = computed(() => props.server.general)
 
 const viewFilter = ref('all')
 
@@ -382,7 +339,7 @@ function handleFilter(type: string) {
 }
 
 useHead({
-	title: computed(() => `Files - ${data.value?.name ?? 'Server'} - Modrinth`),
+	title: computed(() => `Files - ${server.value?.name ?? 'Server'} - Modrinth`),
 })
 
 const {
@@ -393,9 +350,8 @@ const {
 	hasNextPage,
 	isFetchingNextPage,
 } = useInfiniteQuery({
-	queryKey: computed(() => ['files', serverId.value, currentPath.value]),
+	queryKey: computed(() => ['files', serverId, currentPath.value]),
 	queryFn: async ({ pageParam = 1 }) => {
-		console.log('[query] fetching with currentPath:', currentPath.value, '| key:', ['files', serverId.value, currentPath.value])
 		await modulesLoaded
 		return client.kyros.files_v0.listDirectory(currentPath.value, pageParam, 100)
 	},
@@ -412,7 +368,7 @@ const items = computed(() => directoryData.value?.pages.flatMap((page) => page.i
 // prefetch directory contents on hover (150ms debounce)
 function prefetchDirectory(path: string) {
 	queryClient.prefetchInfiniteQuery({
-		queryKey: ['files', serverId.value, path],
+		queryKey: ['files', serverId, path],
 		queryFn: async () => {
 			await modulesLoaded
 			try {
@@ -428,6 +384,34 @@ function prefetchDirectory(path: string) {
 }
 
 let prefetchTimeout: ReturnType<typeof setTimeout> | null = null
+let prefetchHomeTimeout: ReturnType<typeof setTimeout> | null = null
+
+function handlePrefetchHome() {
+	if (prefetchHomeTimeout) {
+		clearTimeout(prefetchHomeTimeout)
+		prefetchHomeTimeout = null
+	}
+
+	prefetchHomeTimeout = setTimeout(() => {
+		prefetchDirectory('/')
+	}, 150)
+}
+
+function prefetchFileContent(path: string) {
+	queryClient.prefetchQuery({
+		queryKey: ['file-content', serverId, path],
+		queryFn: async () => {
+			await modulesLoaded
+			try {
+				const blob = await client.kyros.files_v0.downloadFile(path)
+				return await blob.text()
+			} catch {
+				return null
+			}
+		},
+		staleTime: 30_000,
+	})
+}
 
 function handleItemHover(item: { type: string; path: string; name: string }) {
 	if (prefetchTimeout) {
@@ -441,14 +425,20 @@ function handleItemHover(item: { type: string; path: string; name: string }) {
 			const navPath = routePath.endsWith('/')
 				? `${routePath}${item.name}`
 				: `${routePath}/${item.name}`
-			console.log('[prefetch] navPath:', navPath)
 			prefetchDirectory(navPath)
 		}, 150)
+	} else if (item.type === 'file') {
+		const ext = getFileExtension(item.name)
+		if (isEditableFile(ext)) {
+			prefetchTimeout = setTimeout(() => {
+				prefetchFileContent(item.path)
+			}, 150)
+		}
 	}
 }
 
 function getQueryKey() {
-	return ['files', serverId.value, currentPath.value]
+	return ['files', serverId, currentPath.value]
 }
 
 const deleteMutation = useMutation({
@@ -482,7 +472,7 @@ const deleteMutation = useMutation({
 	},
 
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
 	},
 })
 
@@ -520,7 +510,7 @@ const renameMutation = useMutation({
 	},
 
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
 	},
 })
 
@@ -555,7 +545,7 @@ const moveMutation = useMutation({
 	},
 
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
 	},
 })
 
@@ -610,7 +600,7 @@ const createMutation = useMutation({
 	},
 
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
 	},
 })
 
@@ -628,12 +618,12 @@ const extractMutation = useMutation({
 	},
 
 	onSettled: () => {
-		queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+		queryClient.invalidateQueries({ queryKey: ['files', serverId] })
 	},
 })
 
 function refreshList() {
-	queryClient.invalidateQueries({ queryKey: ['files', serverId.value] })
+	queryClient.invalidateQueries({ queryKey: ['files', serverId] })
 }
 
 async function undoLastOperation() {
@@ -724,7 +714,7 @@ function handleRenameItem(newName: string) {
 	renameMutation.mutate(
 		{ path, newName },
 		{
-			onSuccess: async () => {
+			onSuccess: () => {
 				// track for undo
 				redoStack.value = []
 				operationHistory.value.push({
@@ -735,14 +725,6 @@ function handleRenameItem(newName: string) {
 					oldName: item.name,
 					newName,
 				})
-
-				if (closeEditor.value) {
-					await props.server.refresh()
-					isEditing.value = false
-					editingFile.value = null
-					closeEditor.value = false
-					router.push({ query: { ...route.query, path: currentPath.value } })
-				}
 			},
 		},
 	)
@@ -924,14 +906,6 @@ async function handleLoadMore() {
 	await fetchNextPage()
 }
 
-function onInit(editor: any) {
-	editor.commands.addCommand({
-		name: 'saveFile',
-		bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
-		exec: () => saveFileContent(false),
-	})
-}
-
 async function showContextMenu(item: any, x: number, y: number) {
 	contextMenuInfo.value = { item, x, y }
 	selectedItem.value = item
@@ -959,60 +933,39 @@ function onKeydown(e: KeyboardEvent) {
 	}
 }
 
-const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp']
-
-async function editFile(item: { name: string; type: string; path: string }) {
-	try {
-		const path = `${currentPath.value}/${item.name}`.replace('//', '/')
-		const content = await client.kyros.files_v0.downloadFile(path)
-		window.scrollTo(0, 0)
-
-		const extension = item.name.split('.').pop()?.toLowerCase()
-		editingFile.value = item
-		isEditing.value = true
-
-		// check if image before consuming the blob
-		if (item.type === 'file' && extension && imageExtensions.includes(extension)) {
-			isEditingImage.value = true
-			imagePreview.value = content
-		} else {
-			isEditingImage.value = false
-			fileContent.value = await content.text()
-		}
-		router.push({ query: { ...route.query, path: currentPath.value, editing: item.path } })
-	} catch (error) {
-		console.error('Error fetching file content:', error)
-		addNotification({ title: 'Failed to open file', text: 'Could not load file contents.', type: 'error' })
-	}
+function editFile(item: { name: string; type: string; path: string }) {
+	editingFile.value = item
+	isEditing.value = true
+	router.push({ query: { ...route.query, path: currentPath.value, editing: item.path } })
 }
 
-async function initializeFileEdit() {
+function initializeFileEdit() {
 	if (!route.query.editing) return
 
 	const filePath = route.query.editing as string
-	await editFile({
+	editingFile.value = {
 		name: filePath.split('/').pop() || '',
 		type: 'file',
 		path: filePath,
-	})
+	}
+	isEditing.value = true
+}
+
+function handleEditorClose() {
+	isEditing.value = false
+	editingFile.value = null
+	const newQuery = { ...route.query }
+	delete newQuery.editing
+	router.replace({ query: newQuery })
 }
 
 onMounted(async () => {
 	await modulesLoaded
 
-	await initializeFileEdit()
+	initializeFileEdit()
 
-	await import('ace-builds')
-	await import('ace-builds/src-noconflict/mode-json')
-	await import('ace-builds/src-noconflict/mode-yaml')
-	await import('ace-builds/src-noconflict/mode-toml')
-	await import('ace-builds/src-noconflict/mode-sh')
-	await import('ace-builds/src-noconflict/theme-one_dark')
-	await import('ace-builds/src-noconflict/ext-searchbox')
-	VAceEditor.value = markRaw((await import('vue3-ace-editor')).VAceEditor)
 	document.addEventListener('click', onAnywhereClicked)
 	window.addEventListener('scroll', onScroll)
-
 	document.addEventListener('keydown', onKeydown)
 
 	fsQueuedOps.value = []
@@ -1048,7 +1001,7 @@ watch(
 
 watch(
 	() => route.query,
-	async (newQuery, oldQuery) => {
+	(newQuery, oldQuery) => {
 		if (newQuery.path !== oldQuery?.path) {
 			searchQuery.value = ''
 			viewFilter.value = 'all'
@@ -1057,11 +1010,12 @@ watch(
 		}
 
 		if (newQuery.editing && editingFile.value?.path !== newQuery.editing) {
-			await editFile({
+			editingFile.value = {
 				name: (newQuery.editing as string).split('/').pop() || '',
 				type: 'file',
 				path: newQuery.editing as string,
-			})
+			}
+			isEditing.value = true
 		} else if (oldQuery?.editing && !newQuery.editing) {
 			isEditing.value = false
 			editingFile.value = null
@@ -1083,39 +1037,10 @@ function navigateToSegment(index: number) {
 	if (isEditing.value) {
 		isEditing.value = false
 		editingFile.value = null
-		closeEditor.value = false
 
 		const newQuery = { ...route.query }
 		delete newQuery.editing
 		router.replace({ query: newQuery })
-	}
-}
-
-// const navigateToPage = () => {
-//   router.push({ query: { path: currentPath.value } });
-// };
-
-async function requestShareLink() {
-	try {
-		const response = (await $fetch('https://api.mclo.gs/1/log', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: new URLSearchParams({ content: fileContent.value }),
-		})) as any
-
-		if (response.success) {
-			await navigator.clipboard.writeText(response.url)
-			addNotification({
-				title: 'Log URL copied',
-				text: 'Your log file URL has been copied to your clipboard.',
-				type: 'success',
-			})
-		} else {
-			throw new Error(response.error)
-		}
-	} catch (error) {
-		console.error('Error sharing file:', error)
-		addNotification({ title: 'Failed to share file', text: 'Could not upload to mclo.gs.', type: 'error' })
 	}
 }
 
@@ -1158,62 +1083,14 @@ async function downloadFile(item: any) {
 			}
 		} catch (error) {
 			console.error('Error downloading file:', error)
-			addNotification({ title: 'Download failed', text: 'Could not download the file.', type: 'error' })
+			addNotification({
+				title: 'Download failed',
+				text: 'Could not download the file.',
+				type: 'error',
+			})
 		}
 		contextMenuInfo.value.item = null
 	}
-}
-
-async function saveFileContent(exit: boolean = true) {
-	if (!editingFile.value) return
-
-	try {
-		await client.kyros.files_v0.updateFile(editingFile.value.path, fileContent.value)
-		if (exit) {
-			await props.server.refresh()
-			isEditing.value = false
-			editingFile.value = null
-			router.push({ query: { ...route.query, path: currentPath.value } })
-		}
-
-		addNotification({
-			title: 'File saved',
-			text: 'Your file has been saved.',
-			type: 'success',
-		})
-	} catch (error) {
-		console.error('Error saving file content:', error)
-		addNotification({ title: 'Save failed', text: 'Could not save the file.', type: 'error' })
-	}
-}
-
-async function saveFileContentRestart() {
-	await saveFileContent()
-	await props.server.general?.power('Restart')
-
-	addNotification({
-		title: 'Server restarted',
-		text: 'Your server has been restarted.',
-		type: 'success',
-	})
-}
-
-async function saveFileContentAs() {
-	await saveFileContent(false)
-	closeEditor.value = true
-	showRenameModal(editingFile.value)
-}
-
-function cancelEditing() {
-	isEditing.value = false
-	editingFile.value = null
-	fileContent.value = ''
-	isEditingImage.value = false
-	imagePreview.value = null
-	router.push({ query: { ...route.query, path: currentPath.value } })
-	const newQuery = { ...route.query }
-	delete newQuery.editing
-	router.replace({ query: newQuery })
 }
 
 function onScroll() {
