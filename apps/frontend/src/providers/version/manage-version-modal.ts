@@ -4,7 +4,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
-	MultiStageModal,
+	type MultiStageModal,
 	resolveCtxFn,
 	type StageConfigInput,
 } from '@modrinth/ui'
