@@ -1,7 +1,6 @@
 <template>
 	<li
 		role="button"
-		data-pyro-file
 		:class="[
 			containerClasses,
 			isDragOver && type === 'directory' ? 'bg-brand-highlight' : '',
@@ -20,10 +19,7 @@
 		@dragleave.prevent="handleDragLeave"
 		@drop.prevent="handleDrop"
 	>
-		<div
-			data-pyro-file-metadata
-			class="pointer-events-none flex w-full items-center gap-4 truncate"
-		>
+		<div class="pointer-events-none flex w-full items-center gap-4 truncate">
 			<div
 				class="pointer-events-none flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand group-focus:bg-brand-highlight group-focus:text-brand"
 				:class="isEditableFile ? 'group-active:scale-[0.8]' : ''"
@@ -41,10 +37,7 @@
 				</span>
 			</div>
 		</div>
-		<div
-			data-pyro-file-actions
-			class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 md:gap-12"
-		>
+		<div class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 md:gap-12">
 			<span class="hidden w-[160px] text-nowrap font-mono text-sm text-secondary md:flex">
 				{{ formattedCreationDate }}
 			</span>
@@ -307,7 +300,7 @@ async function handleDragStart(event: DragEvent) {
 	})
 
 	event.dataTransfer.setData(
-		'application/pyro-file-move',
+		'application/modrinth-file-move',
 		JSON.stringify({
 			name: props.name,
 			type: props.type,
@@ -344,7 +337,7 @@ function handleDrop(event: DragEvent) {
 	if (props.type !== 'directory' || !event.dataTransfer) return
 
 	try {
-		const dragData = JSON.parse(event.dataTransfer.getData('application/pyro-file-move'))
+		const dragData = JSON.parse(event.dataTransfer.getData('application/modrinth-file-move'))
 
 		if (dragData.path === props.path) return
 

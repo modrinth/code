@@ -1,11 +1,10 @@
 <template>
-	<div ref="listContainer" data-pyro-files-virtual-list-root class="relative w-full">
+	<div ref="listContainer" class="relative w-full">
 		<div
 			:style="{
 				position: 'relative',
 				minHeight: `${totalHeight}px`,
 			}"
-			data-pyro-files-virtual-height-watcher
 		>
 			<ul
 				class="list-none"
@@ -16,7 +15,6 @@
 					margin: 0,
 					padding: 0,
 				}"
-				data-pyro-files-virtual-list
 			>
 				<FileItem
 					v-for="item in visibleItems"

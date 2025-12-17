@@ -1,11 +1,10 @@
 <template>
-	<div ref="pyroFilesSentinel" class="sentinel" data-pyro-files-sentinel />
+	<div ref="modrinthFilesSentinel" class="sentinel" data-modrinth-files-sentinel />
 	<header
 		:class="[
 			'duration-20 top-0 flex select-none flex-col justify-between gap-2 bg-table-alternateRow p-3 transition-[border-radius] sm:h-12 sm:flex-row',
 			!isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
 		]"
-		data-pyro-files-state="browsing"
 		aria-label="File navigation"
 	>
 		<nav
@@ -189,11 +188,11 @@ defineEmits<{
 	(e: 'update:searchQuery' | 'filter', value: string): void
 }>()
 
-const pyroFilesSentinel = ref<HTMLElement | null>(null)
+const modrinthFilesSentinel = ref<HTMLElement | null>(null)
 const isStuck = ref(false)
 
 useIntersectionObserver(
-	pyroFilesSentinel,
+	modrinthFilesSentinel,
 	([{ isIntersecting }]) => {
 		isStuck.value = !isIntersecting
 	},
