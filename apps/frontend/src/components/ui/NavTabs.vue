@@ -43,7 +43,14 @@
 						'text-secondary': currentActiveIndex !== index || subpageSelected,
 					}"
 				/>
-				<span class="text-nowrap text-contrast">{{ link.label }}</span>
+				<span
+					class="text-nowrap"
+					:class="{
+						'text-brand': currentActiveIndex === index && !subpageSelected,
+						'text-contrast': currentActiveIndex !== index || subpageSelected,
+					}"
+					>{{ link.label }}</span
+				>
 			</div>
 		</template>
 		<div

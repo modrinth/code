@@ -113,7 +113,7 @@ type Tab = 'Thread' | 'Files' | 'File'
 const tabs: readonly ('Thread' | 'Files')[] = ['Thread', 'Files']
 const currentTab = ref<Tab>('Thread')
 
-const isThreadCollapsed = ref(false)
+const isThreadCollapsed = ref(true)
 
 const remainingMessageCount = computed(() => {
 	if (!props.item.thread?.messages) return 0
