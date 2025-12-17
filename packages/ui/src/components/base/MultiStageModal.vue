@@ -215,6 +215,11 @@ defineExpose({
 </script>
 
 <style scoped>
+progress {
+	@apply bg-surface-3;
+	background-color: var(--surface-3, rgb(30, 30, 30));
+}
+
 progress::-webkit-progress-bar {
 	@apply bg-surface-3;
 }
