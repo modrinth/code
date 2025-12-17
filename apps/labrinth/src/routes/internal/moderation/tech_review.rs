@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fmt};
 
-use actix_web::{HttpRequest, get, patch, post, web};
+use actix_web::{HttpRequest, get, patch, post, put, web};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -12,10 +12,12 @@ use crate::{
     database::{
         DBProject,
         models::{
-            DBProjectId, DBThread, DBThreadId, DBUser, DelphiReportId,
-            DelphiReportIssueDetailsId, DelphiReportIssueId, ProjectTypeId,
+            DBFileId, DBProjectId, DBThread, DBThreadId, DBUser,
+            DelphiReportId, DelphiReportIssueDetailsId, DelphiReportIssueId,
+            ProjectTypeId,
             delphi_report_item::{
-                DelphiSeverity, DelphiStatus, DelphiVerdict, ReportIssueDetail,
+                DBDelphiReport, DelphiSeverity, DelphiStatus, DelphiVerdict,
+                ReportIssueDetail,
             },
             thread_item::ThreadMessageBuilder,
         },
@@ -31,13 +33,15 @@ use crate::{
     routes::{ApiError, internal::moderation::Ownership},
     util::error::Context,
 };
+use eyre::eyre;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(search_projects)
         .service(get_report)
         .service(get_issue)
         .service(submit_report)
-        .service(update_issue_detail);
+        .service(update_issue_detail)
+        .service(add_report);
 }
 
 /// Arguments for searching project technical reviews.
@@ -775,4 +779,75 @@ async fn update_issue_detail(
         .wrap_internal_err("failed to commit transaction")?;
 
     Ok(())
+}
+
+/// See [`add_report`].
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AddReport {
+    pub file_id: FileId,
+}
+
+/// Adds a file to the technical review queue by adding an empty report, if one
+/// does not already exist for it.
+#[utoipa::path]
+#[put("/report")]
+async fn add_report(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    web::Json(add_report): web::Json<AddReport>,
+) -> Result<web::Json<DelphiReportId>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await?;
+    let file_id = add_report.file_id;
+
+    let mut txn = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin transaction")?;
+
+    let record = sqlx::query!(
+        r#"
+        SELECT
+            f.url,
+            COUNT(dr.id) AS "report_count!"
+        FROM files f
+        LEFT JOIN delphi_reports dr ON dr.file_id = f.id
+        WHERE f.id = $1
+        GROUP BY f.url
+        "#,
+        DBFileId::from(file_id) as _,
+    )
+    .fetch_one(&mut *txn)
+    .await
+    .wrap_internal_err("failed to fetch file")?;
+
+    if record.report_count > 0 {
+        return Err(ApiError::Request(eyre!("file already has reports")));
+    }
+
+    let report_id = DBDelphiReport {
+        id: DelphiReportId(0),
+        file_id: Some(file_id.into()),
+        delphi_version: -1, // TODO
+        artifact_url: record.url,
+        created: Utc::now(),
+        severity: DelphiSeverity::Low, // TODO
+    }
+    .upsert(&mut txn)
+    .await
+    .wrap_internal_err("failed to insert report")?;
+
+    txn.commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
+
+    Ok(web::Json(report_id))
 }

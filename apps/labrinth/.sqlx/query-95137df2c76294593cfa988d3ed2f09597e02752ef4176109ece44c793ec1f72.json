@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id\n        FROM (\n            SELECT DISTINCT ON (m.id)\n                m.id,\n                m.queued\n            FROM mods m\n\n            -- exclude projects in tech review queue\n            LEFT JOIN versions v ON v.mod_id = m.id\n            LEFT JOIN files f ON f.version_id = v.id\n            LEFT JOIN delphi_reports dr ON dr.file_id = f.id\n            LEFT JOIN delphi_report_issues dri ON dri.report_id = dr.id\n            LEFT JOIN delphi_report_issue_details drid\n                ON drid.issue_id = dri.id AND drid.status = 'pending'\n\n            WHERE\n                m.status = $1\n                AND drid.status IS NULL\n\n            GROUP BY m.id\n        ) t\n\n        ORDER BY queued ASC\n        OFFSET $3\n        LIMIT $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "95137df2c76294593cfa988d3ed2f09597e02752ef4176109ece44c793ec1f72"
+}
