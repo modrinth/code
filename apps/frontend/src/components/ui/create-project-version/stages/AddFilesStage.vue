@@ -103,6 +103,7 @@ const {
 	existingFilesToDelete,
 	setPrimaryFile,
 	setInferredVersionData,
+	setProjectType,
 	editingVersion,
 	projectType,
 } = injectManageVersionContext()
@@ -124,6 +125,8 @@ const addDetectedData = async () => {
 			...draftVersion.value,
 			...mappedInferredData,
 		}
+
+		setProjectType(projectV2.value, primaryFile)
 	} catch (err) {
 		console.error('Error parsing version file data', err)
 	}

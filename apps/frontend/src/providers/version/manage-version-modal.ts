@@ -161,20 +161,20 @@ export function createManageVersionContext(
 		}
 
 		try {
-			if (!file) return undefined
+			if (file) {
+				const jszip = await JSZip.loadAsync(file)
 
-			const jszip = await JSZip.loadAsync(file)
+				const hasMcmeta = Object.keys(jszip.files).some(
+					(f) => f.toLowerCase() === 'pack.mcmeta' || f.toLowerCase().endsWith('/pack.mcmeta'),
+				)
+				const hasAssetsDir = Object.keys(jszip.files).some(
+					(f) => f.toLowerCase() === 'assets/' || f.toLowerCase().startsWith('assets/'),
+				)
 
-			const hasMcmeta = Object.keys(jszip.files).some(
-				(f) => f.toLowerCase() === 'pack.mcmeta' || f.toLowerCase().endsWith('/pack.mcmeta'),
-			)
-			const hasAssetsDir = Object.keys(jszip.files).some(
-				(f) => f.toLowerCase() === 'assets/' || f.toLowerCase().startsWith('assets/'),
-			)
-
-			if (hasMcmeta && hasAssetsDir) {
-				projectType.value = 'resourcepack'
-				return projectType.value
+				if (hasMcmeta && hasAssetsDir) {
+					projectType.value = 'resourcepack'
+					return projectType.value
+				}
 			}
 		} catch {
 			// not a zip
@@ -261,6 +261,8 @@ export function createManageVersionContext(
 		const files = toRaw(filesToAdd.value)
 		isSubmitting.value = true
 
+		if (noEnvironmentProject.value) version.environment = undefined
+
 		try {
 			await labrinth.versions_v3.createVersion(version, files)
 			modal.value?.hide()
@@ -286,6 +288,8 @@ export function createManageVersionContext(
 		const filesToDelete = toRaw(existingFilesToDelete.value)
 
 		isSubmitting.value = true
+
+		if (noEnvironmentProject.value) version.environment = undefined
 
 		try {
 			if (!version.version_id) throw new Error('Version ID is required to save edits.')
