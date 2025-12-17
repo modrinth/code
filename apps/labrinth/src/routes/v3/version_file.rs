@@ -3,6 +3,7 @@ use crate::auth::checks::{filter_visible_versions, is_visible_version};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
+use crate::file_hosting::UseAltCdn;
 use crate::models::ids::VersionId;
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
@@ -674,6 +675,7 @@ pub async fn download_version(
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
@@ -704,6 +706,15 @@ pub async fn download_version(
             database::models::DBVersion::get(file.version_id, &**pool, &redis)
                 .await?;
 
+        let url = if use_alt_cdn {
+            let cdn_url = dotenvy::var("CDN_URL").unwrap();
+            let cdn_alt_url = dotenvy::var("CDN_ALT_URL").unwrap();
+
+            file.url.replace(&cdn_url, &cdn_alt_url)
+        } else {
+            file.url.clone()
+        };
+
         if let Some(version) = version {
             if !is_visible_version(&version.inner, &user_option, &pool, &redis)
                 .await?
@@ -712,8 +723,8 @@ pub async fn download_version(
             }
 
             Ok(HttpResponse::TemporaryRedirect()
-                .append_header(("Location", &*file.url))
-                .json(DownloadRedirect { url: file.url }))
+                .append_header(("Location", &*url))
+                .json(DownloadRedirect { url }))
         } else {
             Err(ApiError::NotFound)
         }

@@ -1,6 +1,7 @@
 use super::ApiError;
 use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
+use crate::file_hosting::UseAltCdn;
 use crate::models::projects::{Project, Version, VersionType};
 use crate::models::v2::projects::{LegacyProject, LegacyVersion};
 use crate::queue::session::AuthQueue;
@@ -69,6 +70,7 @@ pub async fn download_version(
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     // Returns TemporaryRedirect, so no need to convert to V2
     v3::version_file::download_version(
@@ -78,6 +80,7 @@ pub async fn download_version(
         redis,
         hash_query,
         session_queue,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)

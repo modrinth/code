@@ -12,9 +12,10 @@ path = "src/main.rs"
 [dependencies]
 actix-cors = { workspace = true }
 actix-files = { workspace = true }
-actix-http = { workspace = true, optional = true }
+actix-http = { workspace = true }
 actix-multipart = { workspace = true }
 actix-rt = { workspace = true }
+actix-utils = { workspace = true }
 actix-web = { workspace = true }
 actix-web-prom = { workspace = true, features = ["process"] }
 actix-ws = { workspace = true }
@@ -150,7 +151,7 @@ tikv-jemallocator = { workspace = true, features = [
 ] }
 
 [features]
-test = ["dep:actix-http"]
+test = []
 
 [lints]
 workspace = true
