@@ -1,7 +1,8 @@
 use crate::database::models::categories::LinkPlatform;
 use crate::database::models::{project_item, version_item};
 use crate::database::redis::RedisPool;
-use crate::file_hosting::FileHost;
+use crate::file_hosting::{CdnChoice, CdnConfig};
+use crate::file_hosting::{FileHost, UseAltCdn};
 use crate::models::projects::{
     Link, MonetizationStatus, Project, ProjectStatus, SearchRequest, Version,
 };
@@ -267,6 +268,8 @@ pub async fn dependency_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     // TODO: tests, probably
     let response = v3::projects::dependency_list(
@@ -275,6 +278,8 @@ pub async fn dependency_list(
         pool.clone(),
         redis.clone(),
         session_queue,
+        cdn_config,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -546,7 +551,7 @@ pub async fn project_edit(
             version_item::DBVersion::get_many(&version_ids, &**pool, &redis)
                 .await?;
         for version in versions {
-            let version = Version::from(version);
+            let version = Version::from(version, &CdnChoice::Default);
             let mut fields = version.fields;
             let (current_client_side, current_server_side) =
                 v2_reroute::convert_v3_side_types_to_v2_side_types(

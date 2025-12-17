@@ -4,6 +4,7 @@ use std::mem;
 use crate::database::models::loader_fields::VersionField;
 use crate::database::models::project_item::{LinkUrl, ProjectQueryResult};
 use crate::database::models::version_item::VersionQueryResult;
+use crate::file_hosting::CdnChoice;
 use crate::models::ids::{
     OrganizationId, ProjectId, TeamId, ThreadId, VersionId,
 };
@@ -702,8 +703,8 @@ where
     Ok(map)
 }
 
-impl From<VersionQueryResult> for Version {
-    fn from(data: VersionQueryResult) -> Version {
+impl Version {
+    pub fn from(data: VersionQueryResult, cdn_choice: &CdnChoice) -> Self {
         let v = data.inner;
         Version {
             id: v.id.into(),
@@ -731,7 +732,7 @@ impl From<VersionQueryResult> for Version {
                 .files
                 .into_iter()
                 .map(|f| VersionFile {
-                    url: f.url,
+                    url: cdn_choice.transform_file_url(f.url),
                     filename: f.filename,
                     hashes: f.hashes,
                     primary: f.primary,

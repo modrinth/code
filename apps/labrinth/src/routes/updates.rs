@@ -9,6 +9,7 @@ use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
+use crate::file_hosting::{CdnConfig, UseAltCdn};
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::queue::session::AuthQueue;
@@ -37,6 +38,8 @@ pub async fn forge_updates(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     const ERROR: &str = "The specified project does not exist!";
 
@@ -82,6 +85,7 @@ pub async fn forge_updates(
         &user_option,
         &pool,
         &redis,
+        &cdn_config.make_choice(use_alt_cdn),
     )
     .await?;
 

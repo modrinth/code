@@ -3,7 +3,7 @@ use crate::auth::checks::{filter_visible_versions, is_visible_version};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
-use crate::file_hosting::UseAltCdn;
+use crate::file_hosting::{CdnConfig, UseAltCdn};
 use crate::models::ids::VersionId;
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
@@ -42,6 +42,8 @@ pub async fn get_version_from_hash(
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
@@ -76,8 +78,10 @@ pub async fn get_version_from_hash(
                 return Err(ApiError::NotFound);
             }
 
-            Ok(HttpResponse::Ok()
-                .json(models::projects::Version::from(version)))
+            Ok(HttpResponse::Ok().json(models::projects::Version::from(
+                version,
+                &cdn_config.make_choice(use_alt_cdn),
+            )))
         } else {
             Err(ApiError::NotFound)
         }
@@ -128,6 +132,8 @@ pub async fn get_update_from_hash(
     hash_query: web::Query<HashQuery>,
     update_data: web::Json<UpdateData>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
@@ -196,9 +202,12 @@ pub async fn get_update_from_hash(
                 return Err(ApiError::NotFound);
             }
 
-            return Ok(
-                HttpResponse::Ok().json(models::projects::Version::from(first))
-            );
+            return Ok(HttpResponse::Ok().json(
+                models::projects::Version::from(
+                    first,
+                    &cdn_config.make_choice(use_alt_cdn),
+                ),
+            ));
         }
     }
     Err(ApiError::NotFound)
@@ -217,6 +226,8 @@ pub async fn get_versions_from_hashes(
     redis: web::Data<RedisPool>,
     file_data: web::Json<FileHashes>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
@@ -249,6 +260,7 @@ pub async fn get_versions_from_hashes(
         &user_option,
         &pool,
         &redis,
+        &cdn_config.make_choice(use_alt_cdn),
     )
     .await?;
 
@@ -336,6 +348,8 @@ pub async fn update_files(
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
+    cdn_config: web::Data<CdnConfig>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let algorithm = update_data
         .algorithm
@@ -393,10 +407,11 @@ pub async fn update_files(
             .find(|x| x.inner.project_id == file.project_id)
             && let Some(hash) = file.hashes.get(&algorithm)
         {
-            response.insert(
-                hash.clone(),
-                models::projects::Version::from(version.clone()),
+            let version = models::projects::Version::from(
+                version.clone(),
+                &cdn_config.make_choice(use_alt_cdn),
             );
+            response.insert(hash.clone(), version);
         }
     }
 
@@ -423,6 +438,8 @@ pub async fn update_individual_files(
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyFileUpdateData>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
@@ -525,10 +542,11 @@ pub async fn update_individual_files(
                     )
                     .await?
                 {
-                    response.insert(
-                        hash.clone(),
-                        models::projects::Version::from(version.clone()),
+                    let version = models::projects::Version::from(
+                        version.clone(),
+                        &cdn_config.make_choice(use_alt_cdn),
                     );
+                    response.insert(hash.clone(), version);
                 }
             }
         }

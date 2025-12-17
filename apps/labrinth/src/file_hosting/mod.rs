@@ -1,15 +1,12 @@
-use std::convert::Infallible;
-
-use actix_http::header::HeaderName;
-use actix_utils::future::{Ready, ready};
-use actix_web::FromRequest;
 use async_trait::async_trait;
 use thiserror::Error;
 
+mod cdn;
 mod mock;
 mod s3_host;
 
 use bytes::Bytes;
+pub use cdn::*;
 pub use mock::MockHost;
 pub use s3_host::{S3BucketConfig, S3Host};
 
@@ -67,25 +64,4 @@ pub trait FileHost {
         file_name: &str,
         file_publicity: FileHostPublicity,
     ) -> Result<DeleteFileData, FileHostingError>;
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct UseAltCdn(pub bool);
-
-const HEADER_NAME: HeaderName = HeaderName::from_static("labrinth-alt-cdn");
-
-impl FromRequest for UseAltCdn {
-    type Error = Infallible;
-    type Future = Ready<Result<Self, Self::Error>>;
-
-    fn from_request(
-        req: &actix_web::HttpRequest,
-        _payload: &mut actix_http::Payload,
-    ) -> Self::Future {
-        let Some(use_alt_cdn) = req.headers().get(HEADER_NAME) else {
-            return ready(Ok(Self(false)));
-        };
-        let use_alt_cdn = use_alt_cdn.as_bytes() == b"true";
-        ready(Ok(Self(use_alt_cdn)))
-    }
 }
