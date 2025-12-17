@@ -139,7 +139,21 @@ export function createManageVersionContext(
 
 		if (
 			draftVersion.value.loaders?.some((loader) =>
-				['fabric', 'forge', 'quilt', 'neoforge'].includes(loader),
+				[
+					'fabric',
+					'neoforge',
+					'forge',
+					'quilt',
+					'liteloader',
+					'rift',
+					'ornithe',
+					'nilloader',
+					'legacy-fabric',
+					'bta-babric',
+					'babric',
+					'modloader',
+					'java-agent',
+				].includes(loader),
 			)
 		) {
 			projectType.value = 'mod'

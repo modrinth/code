@@ -11,7 +11,7 @@
 		/>
 
 		<div
-			class="flex flex-1 flex-col gap-4 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3"
+			class="flex min-h-[150px] flex-1 flex-col gap-4 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3"
 		>
 			<div v-if="groupedLoaders[loaderGroup].length" class="flex flex-col gap-1.5">
 				<div class="flex flex-wrap gap-2">

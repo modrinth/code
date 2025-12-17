@@ -447,7 +447,6 @@
 					<template #actions>
 						<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
 							<nuxt-link
-								v-tooltip="formatMessage(commonMessages.settingsLabel)"
 								:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
 								class="!font-bold"
 							>
@@ -465,6 +464,9 @@
 										: `brand`
 								"
 								:circular="auth.user && currentMember"
+								v-tooltip="
+									auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
+								"
 							>
 								<button @click="(event) => downloadModal.show(event)">
 									<DownloadIcon aria-hidden="true" />

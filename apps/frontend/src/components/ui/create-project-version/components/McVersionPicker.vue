@@ -18,7 +18,7 @@
 			<input v-model="searchQuery" type="text" placeholder="Search versions" />
 		</div>
 		<div
-			class="flex max-h-72 select-none flex-col gap-3 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
+			class="flex h-72 select-none flex-col gap-3 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
 		>
 			<div v-for="group in groupedGameVersions" :key="group.key" class="space-y-1.5">
 				<span class="font-semibold">{{ group.key }}</span>
