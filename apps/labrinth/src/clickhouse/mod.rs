@@ -144,7 +144,12 @@ pub async fn init_client_with_database(
                 domain String,
 
                 user_id UInt64,
-                affiliate_code_id UInt64
+                affiliate_code_id UInt64,
+
+                ip IPv6,
+                country String,
+                user_agent String,
+                headers Array(Tuple(String, String))
             )
             ENGINE = {engine}
             {ttl}

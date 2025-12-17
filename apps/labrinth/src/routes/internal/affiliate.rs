@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{collections::HashMap, net::Ipv4Addr, sync::Arc};
 
 use crate::{
     auth::get_user_from_headers,
@@ -11,6 +11,7 @@ use crate::{
         users::Badges, v3::affiliate_code::AffiliateCode,
     },
     queue::{analytics::AnalyticsQueue, session::AuthQueue},
+    routes::analytics::FILTERED_HEADERS,
     util::{
         date::get_current_tenths_of_ms, env::parse_strings_from_var,
         error::Context,
@@ -61,6 +62,7 @@ async fn ingest_click(
     .await
     .map(|(_, user)| user)
     .ok();
+    let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
 
     let url = ingest_click.url;
     let domain = url.host_str().ok_or_else(|| {
@@ -80,11 +82,55 @@ async fn ingest_click(
         ));
     }
 
+    let exists = sqlx::query!(
+        "
+        SELECT 1 AS exists FROM affiliate_codes WHERE id = $1
+        ",
+        DBAffiliateCodeId::from(ingest_click.affiliate_code_id) as _
+    )
+    .fetch_optional(&**pool)
+    .await
+    .wrap_internal_err("failed to check if code exists")?;
+    if exists.is_none() {
+        // don't allow enumerating affiliate codes
+        return Ok(());
+    }
+
+    let headers = req
+        .headers()
+        .into_iter()
+        .map(|(key, val)| {
+            (
+                key.to_string().to_lowercase(),
+                val.to_str().unwrap_or_default().to_string(),
+            )
+        })
+        .collect::<HashMap<String, String>>();
+
+    let ip = crate::util::ip::convert_to_ip_v6(
+        if let Some(header) = headers.get("cf-connecting-ip") {
+            header
+        } else {
+            conn_info.as_deref().unwrap_or_default()
+        },
+    )
+    .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
+
     let click = AffiliateCodeClick {
         recorded: get_current_tenths_of_ms(),
         domain: domain.to_string(),
         user_id: user.map(|user| user.id.0).unwrap_or_default(),
         affiliate_code_id: ingest_click.affiliate_code_id.0,
+        ip,
+        country: headers
+            .get("cf-ipcountry")
+            .map(|x| x.to_string())
+            .unwrap_or_default(),
+        user_agent: headers.get("user-agent").cloned().unwrap_or_default(),
+        headers: headers
+            .into_iter()
+            .filter(|x| !FILTERED_HEADERS.contains(&&*x.0))
+            .collect(),
     };
 
     trace!("Ingested affiliate code click {click:?}");
