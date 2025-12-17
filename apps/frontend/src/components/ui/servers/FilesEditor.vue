@@ -1,5 +1,5 @@
 <template>
-	<div class="flex h-full w-full flex-col">
+	<div class="flex h-full w-full flex-col gap-4">
 		<FilesRenameItemModal ref="renameModal" :item="file" @rename="handleRenameItem" />
 
 		<FilesEditingNavbar
@@ -15,24 +15,26 @@
 			@navigate="(index) => emit('navigate', index)"
 		/>
 
-		<div class="h-full w-full flex-grow">
-			<component
-				:is="props.editorComponent"
-				v-if="!isEditingImage && props.editorComponent"
-				v-model:value="fileContent"
-				:lang="editorLanguage"
-				theme="modrinth"
-				:print-margin="false"
-				style="height: 750px; font-size: 1rem"
-				class="ace-modrinth rounded-b-lg"
-				@init="onEditorInit"
-			/>
-			<FilesImageViewer v-else-if="isEditingImage && imagePreview" :image-blob="imagePreview" />
-			<div
-				v-else-if="isLoading || !props.editorComponent"
-				class="flex h-[750px] items-center justify-center rounded-b-lg bg-bg-raised"
-			>
-				<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
+		<div class="flex flex-col shadow-md">
+			<div class="h-full w-full flex-grow">
+				<component
+					:is="props.editorComponent"
+					v-if="!isEditingImage && props.editorComponent"
+					v-model:value="fileContent"
+					:lang="editorLanguage"
+					theme="modrinth"
+					:print-margin="false"
+					style="height: 750px; font-size: 1rem"
+					class="ace-modrinth rounded-[20px]"
+					@init="onEditorInit"
+				/>
+				<FilesImageViewer v-else-if="isEditingImage && imagePreview" :image-blob="imagePreview" />
+				<div
+					v-else-if="isLoading || !props.editorComponent"
+					class="flex h-[750px] items-center justify-center rounded-[20px] bg-bg-raised"
+				>
+					<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
+				</div>
 			</div>
 		</div>
 	</div>

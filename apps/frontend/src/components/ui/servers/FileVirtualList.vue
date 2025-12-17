@@ -17,7 +17,7 @@
 				}"
 			>
 				<FileItem
-					v-for="item in visibleItems"
+					v-for="(item, idx) in visibleItems"
 					:key="item.path"
 					:count="item.count"
 					:created="item.created"
@@ -26,6 +26,9 @@
 					:path="item.path"
 					:type="item.type"
 					:size="item.size"
+					:index="visibleRange.start + idx"
+					:is-last="visibleRange.start + idx === props.items.length - 1"
+					:selected="selectedItems.has(item.path)"
 					@delete="$emit('delete', item)"
 					@rename="$emit('rename', item)"
 					@extract="$emit('extract', item)"
@@ -35,6 +38,7 @@
 					@edit="$emit('edit', item)"
 					@hover="$emit('hover', item)"
 					@contextmenu="(x, y) => $emit('contextmenu', item, x, y)"
+					@toggle-select="$emit('toggle-select', item.path)"
 				/>
 			</ul>
 		</div>
@@ -48,6 +52,7 @@ import FileItem from './FileItem.vue'
 
 const props = defineProps<{
 	items: any[]
+	selectedItems: Set<string>
 }>()
 
 const emit = defineEmits<{
@@ -57,6 +62,7 @@ const emit = defineEmits<{
 	): void
 	(e: 'contextmenu', item: any, x: number, y: number): void
 	(e: 'loadMore'): void
+	(e: 'toggle-select', path: string): void
 }>()
 
 const ITEM_HEIGHT = 61

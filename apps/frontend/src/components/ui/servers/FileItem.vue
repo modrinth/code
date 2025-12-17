@@ -19,29 +19,32 @@
 		@dragleave.prevent="handleDragLeave"
 		@drop.prevent="handleDrop"
 	>
-		<div class="pointer-events-none flex w-full items-center gap-4 truncate">
-			<div
-				class="pointer-events-none flex size-8 items-center justify-center rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand group-focus:bg-brand-highlight group-focus:text-brand"
-				:class="isEditableFile ? 'group-active:scale-[0.8]' : ''"
-			>
-				<component :is="iconComponent" class="size-6" />
+		<div class="pointer-events-none flex flex-1 items-center gap-3 truncate">
+			<Checkbox
+				class="pointer-events-auto"
+				:model-value="selected"
+				@click.stop
+				@update:model-value="emit('toggle-select')"
+			/>
+			<div class="pointer-events-none flex size-5 items-center justify-center">
+				<component :is="iconComponent" class="size-5" />
 			</div>
-			<div class="pointer-events-none flex w-full flex-col truncate">
+			<div class="pointer-events-none flex flex-col truncate">
 				<span
-					class="pointer-events-none w-[98%] truncate font-bold group-hover:text-contrast group-focus:text-contrast"
+					class="pointer-events-none truncate group-hover:text-contrast group-focus:text-contrast"
 				>
 					{{ name }}
-				</span>
-				<span class="pointer-events-none text-xs text-secondary group-hover:text-primary">
-					{{ subText }}
 				</span>
 			</div>
 		</div>
 		<div class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 md:gap-12">
-			<span class="hidden w-[160px] text-nowrap font-mono text-sm text-secondary md:flex">
+			<span class="hidden w-[100px] text-nowrap text-sm text-secondary md:block">
+				{{ formattedSize }}
+			</span>
+			<span class="hidden w-[160px] text-nowrap text-sm text-secondary md:block">
 				{{ formattedCreationDate }}
 			</span>
-			<span class="w-[160px] text-nowrap font-mono text-sm text-secondary">
+			<span class="hidden w-[160px] text-nowrap text-sm text-secondary md:block">
 				{{ formattedModifiedDate }}
 			</span>
 			<ButtonStyled circular type="transparent">
@@ -73,6 +76,7 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	Checkbox,
 	getFileExtension,
 	isArchiveFile,
 	isCodeFile,
@@ -81,8 +85,8 @@ import {
 	isTextFile,
 } from '@modrinth/ui'
 import { computed, ref, shallowRef } from 'vue'
-import { renderToString } from 'vue/server-renderer'
 import { useRoute, useRouter } from 'vue-router'
+import { renderToString } from 'vue/server-renderer'
 
 import {
 	UiServersIconsCodeFileIcon,
@@ -102,6 +106,9 @@ interface FileItemProps {
 	modified: number
 	created: number
 	path: string
+	index: number
+	isLast: boolean
+	selected: boolean
 }
 
 const props = defineProps<FileItemProps>()
@@ -113,6 +120,7 @@ const emit = defineEmits<{
 	): void
 	(e: 'moveDirectTo', item: { name: string; type: string; path: string; destination: string }): void
 	(e: 'contextmenu', x: number, y: number): void
+	(e: 'toggle-select'): void
 }>()
 
 const isDragOver = ref(false)
@@ -124,9 +132,12 @@ const route = shallowRef(useRoute())
 const router = useRouter()
 
 const containerClasses = computed(() => [
-	'group m-0 p-0 focus:!outline-none flex w-full select-none items-center justify-between overflow-hidden border-0 border-b border-solid border-bg-raised p-3 last:border-none hover:bg-bg-raised focus:bg-bg-raised',
+	'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-3 px-4 py-3 focus:!outline-none',
+	props.index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-3',
+	props.isLast ? 'rounded-b-[20px] border-b' : '',
 	isEditableFile.value ? 'cursor-pointer' : props.type === 'directory' ? 'cursor-pointer' : '',
-	isDragOver.value ? 'bg-brand-highlight' : '',
+	isDragOver.value ? '!bg-brand-highlight' : '',
+	'hover:brightness-110 focus:brightness-110',
 ])
 
 const fileExtension = computed(() => getFileExtension(props.name))
@@ -179,13 +190,6 @@ const iconComponent = computed(() => {
 	return FileIcon
 })
 
-const subText = computed(() => {
-	if (props.type === 'directory') {
-		return `${props.count} ${props.count === 1 ? 'item' : 'items'}`
-	}
-	return formattedSize.value
-})
-
 const formattedModifiedDate = computed(() => {
 	const date = new Date(props.modified * 1000)
 	return `${date.toLocaleDateString('en-US', {
@@ -221,6 +225,10 @@ const isEditableFile = computed(() => {
 })
 
 const formattedSize = computed(() => {
+	if (props.type === 'directory') {
+		return `${props.count} ${props.count === 1 ? 'item' : 'items'}`
+	}
+
 	if (props.size === undefined) return ''
 	const bytes = props.size
 	if (bytes === 0) return '0 B'

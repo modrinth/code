@@ -15,11 +15,8 @@
 
 		<FilesDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 
-		<FilesUploadDragAndDrop
-			class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
-			@files-dropped="handleDroppedFiles"
-		>
-			<div class="relative isolate flex w-full flex-col">
+		<div class="relative -mt-2 flex w-full flex-col">
+			<div class="relative isolate flex w-full flex-col gap-2">
 				<div v-if="!isEditing" class="contents">
 					<FilesBrowseNavbar
 						:breadcrumb-segments="breadcrumbSegments"
@@ -35,123 +32,172 @@
 						@update:search-query="searchQuery = $event"
 						@prefetch-home="handlePrefetchHome"
 					/>
-					<FilesLabelBar :sort-field="sortMethod" :sort-desc="sortDesc" @sort="handleSort" />
-					<div
-						v-for="op in ops"
-						:key="`fs-op-${op.op}-${op.src}`"
-						class="sticky top-20 z-20 grid grid-cols-[auto_1fr_auto] items-center gap-2 border-0 border-b-[1px] border-solid border-button-bg bg-table-alternateRow px-4 py-2 md:grid-cols-[auto_1fr_1fr_2fr_auto]"
+					<div ref="labelBarSentinel" class="h-0 w-full" aria-hidden="true" />
+					<FilesUploadDragAndDrop
+						class="relative flex flex-col shadow-md"
+						@files-dropped="handleDroppedFiles"
 					>
-						<div>
-							<PackageOpenIcon class="h-5 w-5 text-secondary" />
-						</div>
-						<div class="flex flex-wrap gap-x-4 gap-y-1 md:contents">
-							<div class="flex items-center text-wrap break-all text-sm font-bold text-contrast">
-								Extracting
-								{{ op.src.includes('https://') ? 'modpack from URL' : op.src }}
+						<FilesLabelBar
+							:sort-field="sortMethod"
+							:sort-desc="sortDesc"
+							:all-selected="allSelected"
+							:some-selected="someSelected"
+							:is-stuck="isLabelBarStuck"
+							@sort="handleSort"
+							@toggle-all="toggleSelectAll"
+						/>
+						<div
+							v-for="op in ops"
+							:key="`fs-op-${op.op}-${op.src}`"
+							class="sticky top-20 z-20 grid grid-cols-[auto_1fr_auto] items-center gap-2 border-0 border-b-[1px] border-solid border-button-bg bg-table-alternateRow px-4 py-2 md:grid-cols-[auto_1fr_1fr_2fr_auto]"
+						>
+							<div>
+								<PackageOpenIcon class="h-5 w-5 text-secondary" />
 							</div>
-							<span
-								class="flex items-center gap-2 text-sm font-semibold"
-								:class="{
-									'text-green': op.state === 'done',
-									'text-red': op.state?.startsWith('fail'),
-									'text-orange': !op.state?.startsWith('fail') && op.state !== 'done',
-								}"
-							>
-								<template v-if="op.state === 'done'">
-									Done
-									<CheckIcon style="stroke-width: 3px" />
-								</template>
-								<template v-else-if="op.state?.startsWith('fail')">
-									Failed
-									<XIcon style="stroke-width: 3px" />
-								</template>
-								<template v-else-if="op.state === 'cancelled'">
-									<SpinnerIcon class="animate-spin" />
-									Cancelling
-								</template>
-								<template v-else-if="op.state === 'queued'">
-									<SpinnerIcon class="animate-spin" />
-									Queued...
-								</template>
-								<template v-else-if="op.state === 'ongoing'">
-									<SpinnerIcon class="animate-spin" />
-									Extracting...
-								</template>
-								<template v-else>
-									<UnknownIcon />
-									Unknown state: {{ op.state }}
-								</template>
-							</span>
-							<div class="col-span-2 flex grow flex-col gap-1 md:col-span-1 md:items-end">
-								<div class="text-xs font-semibold text-contrast opacity-80">
-									<span
-										:class="{
-											invisible: 'current_file' in op && !op.current_file,
-										}"
-									>
-										{{
-											'current_file' in op
-												? (op.current_file?.split('/')?.pop() ?? 'unknown')
-												: 'unknown'
-										}}
-									</span>
+							<div class="flex flex-wrap gap-x-4 gap-y-1 md:contents">
+								<div class="flex items-center text-wrap break-all text-sm font-bold text-contrast">
+									Extracting
+									{{ op.src.includes('https://') ? 'modpack from URL' : op.src }}
 								</div>
-								<ProgressBar
-									:progress="'progress' in op ? op.progress : 0"
-									:max="1"
-									:color="
-										op.state === 'done'
-											? 'green'
-											: op.state?.startsWith('fail')
-												? 'red'
-												: op.state === 'cancelled'
-													? 'gray'
-													: 'orange'
-									"
-									:waiting="op.state === 'queued' || !op.progress || op.progress === 0"
-								/>
-								<div
-									class="text-xs text-secondary opacity-80"
+								<span
+									class="flex items-center gap-2 text-sm font-semibold"
 									:class="{
-										invisible: 'bytes_processed' in op && !op.bytes_processed,
+										'text-green': op.state === 'done',
+										'text-red': op.state?.startsWith('fail'),
+										'text-orange': !op.state?.startsWith('fail') && op.state !== 'done',
 									}"
 								>
-									{{ 'bytes_processed' in op ? formatBytes(op.bytes_processed) : '0 B' }}
-									extracted
+									<template v-if="op.state === 'done'">
+										Done
+										<CheckIcon style="stroke-width: 3px" />
+									</template>
+									<template v-else-if="op.state?.startsWith('fail')">
+										Failed
+										<XIcon style="stroke-width: 3px" />
+									</template>
+									<template v-else-if="op.state === 'cancelled'">
+										<SpinnerIcon class="animate-spin" />
+										Cancelling
+									</template>
+									<template v-else-if="op.state === 'queued'">
+										<SpinnerIcon class="animate-spin" />
+										Queued...
+									</template>
+									<template v-else-if="op.state === 'ongoing'">
+										<SpinnerIcon class="animate-spin" />
+										Extracting...
+									</template>
+									<template v-else>
+										<UnknownIcon />
+										Unknown state: {{ op.state }}
+									</template>
+								</span>
+								<div class="col-span-2 flex grow flex-col gap-1 md:col-span-1 md:items-end">
+									<div class="text-xs font-semibold text-contrast opacity-80">
+										<span
+											:class="{
+												invisible: 'current_file' in op && !op.current_file,
+											}"
+										>
+											{{
+												'current_file' in op
+													? (op.current_file?.split('/')?.pop() ?? 'unknown')
+													: 'unknown'
+											}}
+										</span>
+									</div>
+									<ProgressBar
+										:progress="'progress' in op ? op.progress : 0"
+										:max="1"
+										:color="
+											op.state === 'done'
+												? 'green'
+												: op.state?.startsWith('fail')
+													? 'red'
+													: op.state === 'cancelled'
+														? 'gray'
+														: 'orange'
+										"
+										:waiting="op.state === 'queued' || !op.progress || op.progress === 0"
+									/>
+									<div
+										class="text-xs text-secondary opacity-80"
+										:class="{
+											invisible: 'bytes_processed' in op && !op.bytes_processed,
+										}"
+									>
+										{{ 'bytes_processed' in op ? formatBytes(op.bytes_processed) : '0 B' }}
+										extracted
+									</div>
 								</div>
 							</div>
-						</div>
 
-						<div>
-							<ButtonStyled circular>
-								<button
-									:disabled="!('id' in op) || !op.id"
-									class="radial-progress-animation-overlay"
-									:class="{ active: op.state === 'done' }"
-									@click="
-										() => {
-											if ('id' in op && op.id) {
-												dismissOrCancelOp(op.id, op.state === 'done' ? 'dismiss' : 'cancel')
+							<div>
+								<ButtonStyled circular>
+									<button
+										:disabled="!('id' in op) || !op.id"
+										class="radial-progress-animation-overlay"
+										:class="{ active: op.state === 'done' }"
+										@click="
+											() => {
+												if ('id' in op && op.id) {
+													dismissOrCancelOp(op.id, op.state === 'done' ? 'dismiss' : 'cancel')
+												}
 											}
-										}
-									"
-								>
-									<XIcon />
-								</button>
-							</ButtonStyled>
+										"
+									>
+										<XIcon />
+									</button>
+								</ButtonStyled>
+							</div>
+							<pre
+								v-if="flags.advancedDebugInfo"
+								class="markdown-body col-span-full m-0 rounded-xl bg-button-bg text-xs"
+								>{{ op }}</pre
+							>
 						</div>
-						<pre
-							v-if="flags.advancedDebugInfo"
-							class="markdown-body col-span-full m-0 rounded-xl bg-button-bg text-xs"
-							>{{ op }}</pre
+						<FilesUploadDropdown
+							ref="uploadDropdownRef"
+							class="border-0 border-t border-solid border-bg bg-table-alternateRow"
+							:current-path="currentPath"
+							@upload-complete="refreshList()"
+						/>
+						<div v-if="items.length > 0" class="h-full w-full overflow-hidden">
+							<FileVirtualList
+								:items="filteredItems"
+								:selected-items="selectedItems"
+								@extract="handleExtractItem"
+								@delete="showDeleteModal"
+								@rename="showRenameModal"
+								@download="downloadFile"
+								@move="showMoveModal"
+								@move-direct-to="handleDirectMove"
+								@edit="editFile"
+								@hover="handleItemHover"
+								@contextmenu="showContextMenu"
+								@load-more="handleLoadMore"
+								@toggle-select="toggleItemSelection"
+							/>
+						</div>
+						<div
+							v-else-if="!isLoading && items.length === 0 && !loadError"
+							class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
 						>
-					</div>
-					<FilesUploadDropdown
-						ref="uploadDropdownRef"
-						class="rounded-b-xl border-0 border-t border-solid border-bg bg-table-alternateRow"
-						:current-path="currentPath"
-						@upload-complete="refreshList()"
-					/>
+							<div class="flex flex-col items-center gap-4 text-center">
+								<FolderOpenIcon class="h-16 w-16 text-secondary" />
+								<h3 class="m-0 text-2xl font-bold text-contrast">This folder is empty</h3>
+								<p class="m-0 text-sm text-secondary">There are no files or folders.</p>
+							</div>
+						</div>
+						<FileManagerError
+							v-else-if="loadError"
+							class="rounded-b-[20px]"
+							title="Unable to load files"
+							message="The folder may not exist."
+							@refetch="refreshList"
+							@home="navigateToSegment(-1)"
+						/>
+					</FilesUploadDragAndDrop>
 				</div>
 				<FilesEditor
 					v-else
@@ -161,55 +207,8 @@
 					@close="handleEditorClose"
 					@navigate="navigateToSegment"
 				/>
-				<div
-					v-if="!isEditing && items.length > 0"
-					class="h-full w-full overflow-hidden rounded-b-2xl"
-				>
-					<FileVirtualList
-						:items="filteredItems"
-						@extract="handleExtractItem"
-						@delete="showDeleteModal"
-						@rename="showRenameModal"
-						@download="downloadFile"
-						@move="showMoveModal"
-						@move-direct-to="handleDirectMove"
-						@edit="editFile"
-						@hover="handleItemHover"
-						@contextmenu="showContextMenu"
-						@load-more="handleLoadMore"
-					/>
-				</div>
-
-				<div
-					v-else-if="!isLoading && items.length === 0 && !loadError"
-					class="flex h-full w-full items-center justify-center p-20"
-				>
-					<div class="flex flex-col items-center gap-4 text-center">
-						<FolderOpenIcon class="h-16 w-16 text-secondary" />
-						<h3 class="m-0 text-2xl font-bold text-contrast">This folder is empty</h3>
-						<p class="m-0 text-sm text-secondary">There are no files or folders.</p>
-					</div>
-				</div>
-
-				<FileManagerError
-					v-else-if="loadError"
-					title="Unable to load files"
-					message="The folder may not exist."
-					@refetch="refreshList"
-					@home="navigateToSegment(-1)"
-				/>
 			</div>
-
-			<div
-				v-if="isDragging"
-				class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black bg-opacity-50 text-white"
-			>
-				<div class="text-center">
-					<UploadIcon class="mx-auto h-16 w-16" />
-					<p class="mt-2 text-xl">Drop files here to upload</p>
-				</div>
-			</div>
-		</FilesUploadDragAndDrop>
+		</div>
 
 		<FilesContextMenu
 			ref="contextMenu"
@@ -222,6 +221,29 @@
 			@download="downloadFile"
 			@delete="showDeleteModal"
 		/>
+
+		<FloatingActionBar :shown="selectedItems.size > 0">
+			<ButtonStyled circular>
+				<button @click="deselectAll">
+					<XIcon class="h-4 w-4" />
+				</button>
+			</ButtonStyled>
+			<span class="text-sm font-medium text-contrast"> {{ selectedItems.size }} selected </span>
+			<div class="ml-auto flex items-center gap-2">
+				<ButtonStyled>
+					<button @click="showBulkMoveModal">
+						<RightArrowIcon class="h-4 w-4" />
+						Move
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="red">
+					<button @click="showBulkDeleteModal">
+						<TrashIcon class="h-4 w-4" />
+						Delete
+					</button>
+				</ButtonStyled>
+			</div>
+		</FloatingActionBar>
 	</div>
 </template>
 
@@ -231,13 +253,15 @@ import {
 	CheckIcon,
 	FolderOpenIcon,
 	PackageOpenIcon,
+	RightArrowIcon,
 	SpinnerIcon,
+	TrashIcon,
 	UnknownIcon,
-	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	FloatingActionBar,
 	getFileExtension,
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -309,6 +333,42 @@ const searchQuery = ref('')
 const sortMethod = ref('name')
 const sortDesc = ref(false)
 
+const selectedItems = ref<Set<string>>(new Set())
+
+function toggleItemSelection(path: string) {
+	const newSet = new Set(selectedItems.value)
+	if (newSet.has(path)) {
+		newSet.delete(path)
+	} else {
+		newSet.add(path)
+	}
+	selectedItems.value = newSet
+}
+
+function selectAll() {
+	selectedItems.value = new Set(filteredItems.value.map((i) => i.path))
+}
+
+function deselectAll() {
+	selectedItems.value = new Set()
+}
+
+function toggleSelectAll() {
+	if (allSelected.value) {
+		deselectAll()
+	} else {
+		selectAll()
+	}
+}
+
+const allSelected = computed(
+	() => filteredItems.value.length > 0 && selectedItems.value.size === filteredItems.value.length,
+)
+
+const someSelected = computed(
+	() => selectedItems.value.size > 0 && selectedItems.value.size < filteredItems.value.length,
+)
+
 const currentPath = computed(() => (typeof route.query.path === 'string' ? route.query.path : '/'))
 
 const isAtBottom = ref(false)
@@ -327,11 +387,13 @@ const selectedItem = ref<any>(null)
 const isEditing = ref(false)
 const editingFile = ref<any>(null)
 
-const isDragging = ref(false)
-
 const uploadDropdownRef = ref()
 
 const VAceEditor = ref()
+
+const labelBarSentinel = ref<HTMLDivElement>()
+const isLabelBarStuck = ref(false)
+let labelBarObserver: IntersectionObserver | null = null
 
 const viewFilter = ref('all')
 
@@ -851,6 +913,30 @@ function showDeleteModal(item: any) {
 	contextMenuInfo.value.item = null
 }
 
+async function showBulkMoveModal() {
+	// TODO: Implement bulk move modal
+	addNotification({
+		title: 'Bulk move',
+		text: `Moving ${selectedItems.value.size} items is not yet implemented`,
+		type: 'info',
+	})
+}
+
+async function showBulkDeleteModal() {
+	if (selectedItems.value.size === 0) return
+
+	const itemsToDelete = Array.from(selectedItems.value)
+
+	for (const path of itemsToDelete) {
+		const item = items.value.find((i) => i.path === path)
+		if (item) {
+			deleteMutation.mutate({ path, recursive: item.type === 'directory' })
+		}
+	}
+
+	deselectAll()
+}
+
 function handleSort(field: string) {
 	if (sortMethod.value === field) {
 		sortDesc.value = !sortDesc.value
@@ -884,6 +970,11 @@ function applySort(items: Kyros.Files.v0.DirectoryItem[]) {
 				return sortDesc.value ? a.modified - b.modified : b.modified - a.modified
 			case 'created':
 				return sortDesc.value ? a.created - b.created : b.created - a.created
+			case 'size': {
+				const aSize = 'size' in a ? a.size : 0
+				const bSize = 'size' in b ? b.size : 0
+				return sortDesc.value ? aSize - bSize : bSize - aSize
+			}
 			default:
 				return sortDesc.value ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name)
 		}
@@ -1003,6 +1094,17 @@ onMounted(async () => {
 	window.addEventListener('scroll', onScroll)
 	document.addEventListener('keydown', onKeydown)
 
+	// Set up IntersectionObserver for sticky header detection
+	if (labelBarSentinel.value) {
+		labelBarObserver = new IntersectionObserver(
+			([entry]) => {
+				isLabelBarStuck.value = !entry.isIntersecting
+			},
+			{ threshold: 0 },
+		)
+		labelBarObserver.observe(labelBarSentinel.value)
+	}
+
 	fsQueuedOps.value = []
 })
 
@@ -1010,6 +1112,7 @@ onUnmounted(() => {
 	document.removeEventListener('click', onAnywhereClicked)
 	window.removeEventListener('scroll', onScroll)
 	document.removeEventListener('keydown', onKeydown)
+	labelBarObserver?.disconnect()
 })
 
 type QueuedOpWithState = FSQueuedOp & { state: 'queued' }
@@ -1042,6 +1145,7 @@ watch(
 			viewFilter.value = 'all'
 			sortMethod.value = 'name'
 			sortDesc.value = false
+			deselectAll()
 		}
 
 		if (newQuery.editing && editingFile.value?.path !== newQuery.editing) {

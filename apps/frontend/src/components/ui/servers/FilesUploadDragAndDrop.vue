@@ -9,12 +9,12 @@
 		<div
 			v-if="isDragging"
 			:class="[
-				'bg-surface-1/80 absolute inset-0 flex items-center justify-center rounded-2xl text-contrast',
+				'absolute inset-0 flex items-center justify-center rounded-2xl bg-black/60 text-contrast shadow',
 				overlayClass,
 			]"
 		>
 			<div class="text-center">
-				<UploadIcon class="mx-auto h-16 w-16" />
+				<UploadIcon class="mx-auto h-16 w-16 shadow-2xl" />
 				<p class="mt-2 text-xl">
 					Drop {{ type ? type.toLocaleLowerCase() : 'file' }}s here to upload
 				</p>
@@ -24,8 +24,8 @@
 </template>
 
 <script setup lang="ts">
-import { UploadIcon } from '@modrinth/assets'
-import { ref } from 'vue'
+import { UploadIcon } from '@modrinth/assets';
+import { ref } from 'vue';
 
 const emit = defineEmits<{
 	(event: 'filesDropped', files: File[]): void
