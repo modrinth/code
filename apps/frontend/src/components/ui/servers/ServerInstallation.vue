@@ -56,7 +56,7 @@
 									Switch modpack
 								</button>
 							</template>
-							<nuxt-link v-else :to="`/modpacks?sid=${props.server.serverId}`">
+							<nuxt-link v-else :to="`/discover/modpacks?sid=${props.server.serverId}`">
 								<TransferIcon class="size-4" />
 								Switch modpack
 							</nuxt-link>
@@ -99,7 +99,7 @@
 							v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
 							:class="{ disabled: backupInProgress }"
 							class="!w-full sm:!w-auto"
-							:to="`/modpacks?sid=${props.server.serverId}`"
+							:to="`/discover/modpacks?sid=${props.server.serverId}`"
 						>
 							<CompassIcon class="size-4" /> Find a modpack
 						</nuxt-link>
