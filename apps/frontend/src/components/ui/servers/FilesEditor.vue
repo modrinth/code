@@ -16,19 +16,20 @@
 		/>
 
 		<div class="h-full w-full flex-grow">
-			<CodeEditor
-				v-if="!isEditingImage"
+			<component
+				:is="props.editorComponent"
+				v-if="!isEditingImage && props.editorComponent"
 				v-model:value="fileContent"
-				:language="editorLanguage"
-				theme="vs-dark"
-				:options="editorOptions"
-				height="750px"
-				class="overflow-hidden rounded-b-lg"
-				@editor-did-mount="onEditorInit"
+				:lang="editorLanguage"
+				theme="modrinth"
+				:print-margin="false"
+				style="height: 750px; font-size: 1rem"
+				class="ace-modrinth rounded-b-lg"
+				@init="onEditorInit"
 			/>
 			<FilesImageViewer v-else-if="isEditingImage && imagePreview" :image-blob="imagePreview" />
 			<div
-				v-else-if="isLoading"
+				v-else-if="isLoading || !props.editorComponent"
 				class="flex h-[750px] items-center justify-center rounded-b-lg bg-bg-raised"
 			>
 				<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
@@ -48,8 +49,6 @@ import {
 	isImageFile,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
-import * as monaco from 'monaco-editor'
-import { CodeEditor } from 'monaco-editor-vue3'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import FilesEditingNavbar from '~/components/ui/servers/FilesEditingNavbar.vue'
@@ -59,6 +58,7 @@ import FilesRenameItemModal from '~/components/ui/servers/FilesRenameItemModal.v
 const props = defineProps<{
 	file: { name: string; type: string; path: string } | null
 	breadcrumbSegments: string[]
+	editorComponent: any
 }>()
 
 const emit = defineEmits<{
@@ -83,16 +83,6 @@ const isLoading = ref(false)
 const renameModal = ref()
 const closeAfterRename = ref(false)
 const editorInstance = ref<any>(null)
-
-// Monaco editor options
-const editorOptions = {
-	fontSize: 16,
-	minimap: { enabled: false },
-	automaticLayout: true,
-	scrollBeyondLastLine: false,
-	wordWrap: 'on' as const,
-	tabSize: 4,
-}
 
 const editorLanguage = computed(() => {
 	const ext = getFileExtension(props.file?.name ?? '')
@@ -156,9 +146,11 @@ function resetState() {
 
 function onEditorInit(editor: any) {
 	editorInstance.value = editor
-	// Add Ctrl/Cmd+S save shortcut
-	editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-		saveFileContent(false)
+
+	editor.commands.addCommand({
+		name: 'save',
+		bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
+		exec: () => saveFileContent(false),
 	})
 }
 

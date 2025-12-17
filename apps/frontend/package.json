@@ -60,8 +60,7 @@
 		"js-yaml": "^4.1.0",
 		"jszip": "^3.10.1",
 		"markdown-it": "14.1.0",
-		"monaco-editor": "^0.55.1",
-		"monaco-editor-vue3": "^1.0.5",
+		"ace-builds": "^1.36.2",
 		"pathe": "^1.1.2",
 		"pinia": "^2.1.7",
 		"pinia-plugin-persistedstate": "^4.4.1",
@@ -72,6 +71,7 @@
 		"vue-confetti-explosion": "^1.0.2",
 		"vue-multiselect": "3.0.0-alpha.2",
 		"vue-typed-virtual-list": "^1.0.10",
+		"vue3-ace-editor": "^2.2.4",
 		"vue3-apexcharts": "^1.5.2",
 		"xss": "^1.0.14"
 	},

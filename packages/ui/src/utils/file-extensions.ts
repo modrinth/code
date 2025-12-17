@@ -90,11 +90,12 @@ export function isEditableFile(ext: string): boolean {
 }
 
 /**
- * Get Monaco editor language identifier for a file extension
+ * Get Ace editor language mode for a file extension
  */
 export function getEditorLanguage(ext: string): string {
 	const lowered = ext.toLowerCase()
 	switch (lowered) {
+		// Code files
 		case 'json':
 		case 'json5':
 		case 'jsonc':
@@ -102,9 +103,11 @@ export function getEditorLanguage(ext: string): string {
 		case 'toml':
 			return 'toml'
 		case 'sh':
+			return 'sh'
 		case 'bat':
+			return 'batchfile'
 		case 'ps1':
-			return 'shell'
+			return 'powershell'
 		case 'yml':
 		case 'yaml':
 			return 'yaml'
@@ -129,14 +132,21 @@ export function getEditorLanguage(ext: string): string {
 		case 'cpp':
 		case 'c':
 		case 'h':
-			return 'cpp'
+			return 'c_cpp'
 		case 'rs':
 			return 'rust'
 		case 'go':
-			return 'go'
+			return 'golang'
+		// Text files
 		case 'md':
 			return 'markdown'
+		case 'properties':
+			return 'properties'
+		case 'ini':
+		case 'cfg':
+		case 'conf':
+			return 'ini'
 		default:
-			return 'plaintext'
+			return 'text'
 	}
 }

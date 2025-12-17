@@ -157,6 +157,7 @@
 					v-else
 					:file="editingFile"
 					:breadcrumb-segments="breadcrumbSegments"
+					:editor-component="VAceEditor"
 					@close="handleEditorClose"
 					@navigate="navigateToSegment"
 				/>
@@ -329,6 +330,8 @@ const editingFile = ref<any>(null)
 const isDragging = ref(false)
 
 const uploadDropdownRef = ref()
+
+const VAceEditor = ref()
 
 const viewFilter = ref('all')
 
@@ -961,6 +964,38 @@ function handleEditorClose() {
 
 onMounted(async () => {
 	await modulesLoaded
+
+	// Preload ace editor for instant file editing
+	if (import.meta.client) {
+		const { VAceEditor: Ace } = await import('vue3-ace-editor')
+		// Import all modes for supported file extensions
+		await Promise.all([
+			import('ace-builds/src-noconflict/mode-json'),
+			import('ace-builds/src-noconflict/mode-yaml'),
+			import('ace-builds/src-noconflict/mode-toml'),
+			import('ace-builds/src-noconflict/mode-sh'),
+			import('ace-builds/src-noconflict/mode-batchfile'),
+			import('ace-builds/src-noconflict/mode-powershell'),
+			import('ace-builds/src-noconflict/mode-java'),
+			import('ace-builds/src-noconflict/mode-javascript'),
+			import('ace-builds/src-noconflict/mode-typescript'),
+			import('ace-builds/src-noconflict/mode-python'),
+			import('ace-builds/src-noconflict/mode-ruby'),
+			import('ace-builds/src-noconflict/mode-php'),
+			import('ace-builds/src-noconflict/mode-html'),
+			import('ace-builds/src-noconflict/mode-css'),
+			import('ace-builds/src-noconflict/mode-c_cpp'),
+			import('ace-builds/src-noconflict/mode-rust'),
+			import('ace-builds/src-noconflict/mode-golang'),
+			import('ace-builds/src-noconflict/mode-markdown'),
+			import('ace-builds/src-noconflict/mode-properties'),
+			import('ace-builds/src-noconflict/mode-ini'),
+			import('ace-builds/src-noconflict/mode-text'),
+			// Themes
+			import('@modrinth/ui/src/utils/ace-theme.ts'),
+		])
+		VAceEditor.value = Ace
+	}
 
 	initializeFileEdit()
 
