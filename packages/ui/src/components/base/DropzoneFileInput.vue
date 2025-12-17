@@ -2,7 +2,7 @@
 	<label
 		:class="[
 			'flex flex-col items-center justify-center  cursor-pointer rounded-3xl border-2 border-dashed bg-surface-4 text-contrast transition-colors',
-			size === 'small' ? 'p-5' : 'p-8',
+			size === 'small' ? 'p-5' : 'p-12',
 			size === 'small' ? 'gap-2' : 'gap-4',
 			isDragOver ? 'border-purple' : 'border-surface-5',
 		]"

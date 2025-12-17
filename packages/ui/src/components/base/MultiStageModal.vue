@@ -25,7 +25,10 @@
 		</div>
 
 		<template #actions>
-			<div class="mt-4 flex flex-col justify-end gap-2 sm:flex-row">
+			<div
+				class="flex flex-col justify-end gap-2 sm:flex-row"
+				:class="leftButtonConfig || rightButtonConfig ? 'mt-4' : ''"
+			>
 				<ButtonStyled v-if="leftButtonConfig" type="outlined">
 					<button
 						class="!border-surface-5"
