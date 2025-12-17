@@ -6,6 +6,7 @@
 			:file-name="file?.name"
 			:is-image="isEditingImage"
 			:file-path="file?.path"
+			class="-mt-2"
 			:breadcrumb-segments="breadcrumbSegments"
 			@cancel="handleCancel"
 			@save="() => saveFileContent(true)"
