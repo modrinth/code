@@ -305,22 +305,23 @@ export const fileIsValid = (file, validationOptions) => {
 }
 
 export const acceptFileFromProjectType = (projectType) => {
+	const commonTypes = '.sig,.asc,.gpg,application/pgp-signature,application/pgp-keys'
 	switch (projectType) {
 		case 'mod':
-			return '.jar,.zip,.litemod,application/java-archive,application/x-java-archive,application/zip'
+			return `.jar,.zip,.litemod,application/java-archive,application/x-java-archive,application/zip,${commonTypes}`
 		case 'plugin':
-			return '.jar,.zip,application/java-archive,application/x-java-archive,application/zip'
+			return `.jar,.zip,application/java-archive,application/x-java-archive,application/zip,${commonTypes}`
 		case 'resourcepack':
-			return '.zip,application/zip'
+			return `.zip,application/zip,${commonTypes}`
 		case 'shader':
-			return '.zip,application/zip'
+			return `.zip,application/zip,${commonTypes}`
 		case 'datapack':
-			return '.zip,application/zip'
+			return `.zip,application/zip,${commonTypes}`
 		case 'modpack':
-			return '.mrpack,application/x-modrinth-modpack+zip,application/zip'
+			return `.mrpack,application/x-modrinth-modpack+zip,application/zip,${commonTypes}`
 		default:
 			// all of the above
-			return '.jar,.zip,.litemod,.mrpack,application/java-archive,application/x-java-archive,application/zip,application/x-modrinth-modpack+zip'
+			return `.jar,.zip,.litemod,.mrpack,application/java-archive,application/x-java-archive,application/zip,application/x-modrinth-modpack+zip,${commonTypes}`
 	}
 }
 
