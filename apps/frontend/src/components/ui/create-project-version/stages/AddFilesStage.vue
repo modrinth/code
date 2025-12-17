@@ -140,11 +140,32 @@ watch(
 )
 
 function handleNewFiles(newFiles: File[]) {
+	// detect primary file if no primary file is set
+	const primaryFileIndex = primaryFile.value ? null : detectPrimaryFileIndex(newFiles)
+
 	newFiles.forEach((file) => filesToAdd.value.push({ file }))
+
+	if (primaryFileIndex !== null) {
+		if (primaryFileIndex) setPrimaryFile(primaryFileIndex)
+	}
 }
 
 function handleRemoveFile(index: number) {
 	filesToAdd.value.splice(index, 1)
+}
+
+function detectPrimaryFileIndex(files: File[]): number {
+	const extensionPriority = ['.jar', '.zip', '.litemod', '.mrpack', '.mrpack-primary']
+
+	for (const ext of extensionPriority) {
+		const matches = files.filter((file) => file.name.toLowerCase().endsWith(ext))
+		if (matches.length > 0) {
+			const shortest = matches.reduce((a, b) => (a.name.length < b.name.length ? a : b))
+			return files.indexOf(shortest)
+		}
+	}
+
+	return 0
 }
 
 function handleRemoveExistingFile(sha1: string) {
