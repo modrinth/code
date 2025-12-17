@@ -1,23 +1,44 @@
 <template>
-	<div class="mb-3 flex flex-wrap justify-between gap-2">
-		<VersionFilterControl
-			ref="versionFilters"
-			:versions="versions"
-			:game-versions="gameVersions"
-			:base-id="`${baseId}-filter`"
-			@update:query="updateQuery"
-		/>
+	<div class="flex flex-col gap-3 mb-3">
+		<div class="flex flex-wrap justify-between gap-2">
+			<VersionFilterControl
+				ref="versionFilters"
+				:versions="versions"
+				:game-versions="gameVersions"
+				:base-id="`${baseId}-filter`"
+				@update:query="updateQuery"
+			/>
 
-		<Pagination
-			:page="currentPage"
-			class="mt-auto"
-			:count="Math.ceil(filteredVersions.length / pageSize)"
-			@switch-page="switchPage"
-		/>
+			<ButtonStyled v-if="openModal" color="green">
+				<button @click="openModal"><PlusIcon /> Create version</button>
+			</ButtonStyled>
 
-		<ButtonStyled v-if="openModal" color="green">
-			<button @click="openModal"><PlusIcon /> Create version</button>
-		</ButtonStyled>
+			<Pagination
+				v-if="!openModal"
+				:page="currentPage"
+				class="mt-auto"
+				:count="Math.ceil(filteredVersions.length / pageSize)"
+				@switch-page="switchPage"
+			/>
+		</div>
+
+		<div
+			class="flex flex-wrap justify-between items-center gap-2"
+			v-if="openModal && filteredVersions.length > pageSize"
+		>
+			<span>
+				Showing {{ (currentPage - 1) * pageSize + 1 }} to
+				{{ Math.min(currentPage * pageSize, filteredVersions.length) }} of
+				{{ filteredVersions.length }}
+			</span>
+
+			<Pagination
+				:page="currentPage"
+				class="mt-auto"
+				:count="Math.ceil(filteredVersions.length / pageSize)"
+				@switch-page="switchPage"
+			/>
+		</div>
 	</div>
 	<div
 		v-if="versions.length > 0"
