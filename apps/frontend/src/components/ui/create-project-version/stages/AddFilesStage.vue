@@ -1,50 +1,84 @@
 <template>
 	<div class="flex w-full flex-col gap-4">
-		<DropzoneFileInput
-			aria-label="Upload additional file"
-			multiple
-			long-style
-			:accept="acceptFileFromProjectType(projectV2.project_type)"
-			:max-size="524288000"
-			@change="handleNewFiles"
-		/>
+		<template v-if="!(filesToAdd.length || draftVersion.existing_files?.length)">
+			<DropzoneFileInput
+				aria-label="Upload file"
+				multiple
+				:accept="acceptFileFromProjectType(projectV2.project_type)"
+				:max-size="524288000"
+				@change="handleNewFiles"
+			/>
+		</template>
 
-		<Admonition v-if="hasSupplementaryFiles" type="warning">
-			{{ formatMessage(messages.addFilesAdmonition) }}
-		</Admonition>
-
-		<template v-if="filesToAdd.length || draftVersion.existing_files?.length">
+		<template v-else>
 			<div class="flex flex-col gap-2">
-				<span class="text-base font-semibold text-contrast">Uploaded files</span>
+				<span class="text-base font-semibold text-contrast">Primary file</span>
 				<div class="flex flex-col gap-2.5">
 					<VersionFileRow
-						v-for="versionFile in draftVersion.existing_files"
-						:key="versionFile.filename"
-						:name="versionFile.filename"
-						:is-primary="versionFile.primary"
-						:initial-file-type="versionFile.file_type"
+						v-if="primaryFile"
+						:key="primaryFile.name"
+						:name="primaryFile.name"
+						:is-primary="true"
 						:editing-version="editingVersion"
-						:on-remove="
-							versionFile.primary
-								? undefined
-								: () => handleRemoveExistingFile(versionFile.hashes.sha1 || '')
+						:on-remove="undefined"
+						@set-primary-file="
+							(file) => {
+								if (file && !editingVersion) filesToAdd[0] = { file }
+							}
 						"
-						@set-file-type="(type) => (versionFile.file_type = type)"
-					/>
-					<VersionFileRow
-						v-for="(versionFile, idx) in filesToAdd"
-						:key="versionFile.file.name"
-						:name="versionFile.file.name"
-						:is-primary="idx === 0 && !draftVersion.existing_files?.some((f) => f.primary)"
-						:initial-file-type="versionFile.fileType"
-						:editing-version="editingVersion"
-						:on-remove="() => handleRemoveFile(idx)"
-						@set-primary-file="handleSetPrimaryFile(idx)"
-						@set-file-type="(type) => (versionFile.fileType = type)"
 					/>
 				</div>
 				<span>
 					The primary file is the default file a user downloads when installing the project.
+				</span>
+			</div>
+
+			<div class="flex flex-col gap-2">
+				<div class="flex flex-col gap-2">
+					<span class="text-base font-semibold text-contrast">Supplementary files</span>
+
+					<Admonition v-if="hasSupplementaryFiles" type="warning">
+						{{ formatMessage(messages.addFilesAdmonition) }}
+					</Admonition>
+
+					<DropzoneFileInput
+						aria-label="Upload additional file"
+						multiple
+						:accept="acceptFileFromProjectType(projectV2.project_type)"
+						:max-size="524288000"
+						size="small"
+						:primary-prompt="null"
+						secondary-prompt="Drag and drop files or click to browse"
+						@change="handleNewFiles"
+					/>
+
+					<div v-if="hasSupplementaryFiles" class="flex flex-col gap-2.5">
+						<VersionFileRow
+							v-for="versionFile in supplementaryExistingFiles"
+							:key="versionFile.filename"
+							:name="versionFile.filename"
+							:is-primary="false"
+							:initial-file-type="versionFile.file_type"
+							:editing-version="editingVersion"
+							:on-remove="() => handleRemoveExistingFile(versionFile.hashes.sha1 || '')"
+							@set-file-type="(type) => (versionFile.file_type = type)"
+						/>
+						<VersionFileRow
+							v-for="(versionFile, idx) in supplementaryNewFiles"
+							:key="versionFile.file.name"
+							:name="versionFile.file.name"
+							:is-primary="false"
+							:initial-file-type="versionFile.fileType"
+							:editing-version="editingVersion"
+							:on-remove="() => handleRemoveFile(idx + (primaryFile?.existing ? 0 : 1))"
+							@set-file-type="(type) => (versionFile.fileType = type)"
+							@set-primary-file="handleSetPrimaryFile(idx + (primaryFile?.existing ? 0 : 1))"
+						/>
+					</div>
+				</div>
+				<span>
+					You can optionally add supplementary files such as source code, documentation, or required
+					resource packs.
 				</span>
 			</div>
 		</template>
@@ -124,7 +158,53 @@ function handleSetPrimaryFile(index: number) {
 	setPrimaryFile(index)
 }
 
-const hasSupplementaryFiles = computed(() => filesToAdd.value.length > 1)
+interface PrimaryFile {
+	name: string
+	fileType?: string
+	existing?: boolean
+}
+
+const primaryFile = computed<PrimaryFile | null>(() => {
+	const existingPrimaryFile = draftVersion.value.existing_files?.[0]
+	if (existingPrimaryFile) {
+		return {
+			name: existingPrimaryFile.filename,
+			fileType: existingPrimaryFile.file_type,
+			existing: true,
+		}
+	}
+
+	const addedPrimaryFile = filesToAdd.value[0]
+	if (addedPrimaryFile) {
+		return {
+			name: addedPrimaryFile.file.name,
+			fileType: addedPrimaryFile.fileType,
+			existing: false,
+		}
+	}
+
+	return null
+})
+
+const supplementaryNewFiles = computed(() => {
+	if (primaryFile.value?.existing) {
+		return filesToAdd.value
+	} else {
+		return filesToAdd.value.slice(1)
+	}
+})
+
+const supplementaryExistingFiles = computed(() => {
+	if (primaryFile.value?.existing) {
+		return draftVersion.value.existing_files?.slice(1)
+	} else {
+		return draftVersion.value.existing_files
+	}
+})
+
+const hasSupplementaryFiles = computed(
+	() => filesToAdd.value.length + (draftVersion.value.existing_files?.length || 0) > 1,
+)
 
 const messages = defineMessages({
 	addFilesAdmonition: {

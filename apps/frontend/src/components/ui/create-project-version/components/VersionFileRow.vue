@@ -9,12 +9,6 @@
 			<span v-tooltip="name" class="overflow-hidden text-ellipsis whitespace-nowrap font-medium">
 				{{ name }}
 			</span>
-			<div
-				v-if="isPrimary"
-				class="rounded-full border border-solid border-brand bg-highlight-green px-2.5 py-1 text-sm font-medium text-brand"
-			>
-				Primary
-			</div>
 		</div>
 
 		<div class="flex items-center gap-1">
@@ -38,18 +32,49 @@
 					<XIcon aria-hidden="true" />
 				</button>
 			</ButtonStyled>
+			<ButtonStyled v-if="isPrimary" size="standard" :circular="true">
+				<button
+					aria-label="Change primary file"
+					class="!shadow-none"
+					@click="primaryFileInput?.click()"
+					v-tooltip="
+						editingVersion
+							? 'Primary file cannot be changed after version is uploaded'
+							: 'Replace primary file'
+					"
+					:disabled="editingVersion"
+				>
+					<ArrowLeftRightIcon aria-hidden="true" />
+					<input
+						ref="primaryFileInput"
+						class="hidden"
+						type="file"
+						:accept="acceptFileFromProjectType(projectV2.project_type)"
+						:disabled="editingVersion"
+						@change="
+							(e) => {
+								emit('setPrimaryFile', (e.target as HTMLInputElement)?.files?.[0])
+								;(e.target as HTMLInputElement).value = ''
+							}
+						"
+					/>
+				</button>
+			</ButtonStyled>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CheckIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, Combobox } from '@modrinth/ui'
+import { ArrowLeftRightIcon, CheckIcon, XIcon } from '@modrinth/assets'
+import { ButtonStyled, Combobox, injectProjectPageContext } from '@modrinth/ui'
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
+import { acceptFileFromProjectType } from '@modrinth/utils'
+
+const { projectV2 } = injectProjectPageContext()
 
 const emit = defineEmits<{
-	(e: 'setPrimaryFile'): void
+	(e: 'setPrimaryFile', file?: File): void
 	(e: 'setFileType', type: Labrinth.Versions.v3.FileType): void
 }>()
 
@@ -62,6 +87,7 @@ const { name, isPrimary, onRemove, initialFileType, editingVersion } = definePro
 }>()
 
 const selectedType = ref<Labrinth.Versions.v3.FileType | 'primary'>(initialFileType || 'unknown')
+const primaryFileInput = ref<HTMLInputElement>()
 
 const versionTypes = [
 	!editingVersion && { class: 'text-sm', value: 'primary', label: 'Primary' },

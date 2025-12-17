@@ -1,7 +1,9 @@
 <template>
 	<label
 		:class="[
-			'flex flex-col items-center justify-center gap-4 cursor-pointer p-8 rounded-3xl border-2 border-dashed bg-surface-4 text-contrast transition-colors',
+			'flex flex-col items-center justify-center  cursor-pointer rounded-3xl border-2 border-dashed bg-surface-4 text-contrast transition-colors',
+			size === 'small' ? 'p-5' : 'p-8',
+			size === 'small' ? 'gap-2' : 'gap-4',
 			isDragOver ? 'border-purple' : 'border-surface-5',
 		]"
 		@dragover.prevent="onDragOver"
@@ -9,18 +11,24 @@
 		@drop.prevent="handleDrop"
 	>
 		<div
-			class="h-14 w-14 grid place-content-center rounded-2xl text-brand border-brand border-solid border bg-highlight-green"
+			:class="[
+				'grid place-content-center  text-brand border-brand border-solid border bg-highlight-green',
+				size === 'small' ? 'w-10 h-10' : 'h-14 w-14',
+				size === 'small' ? 'rounded-xl' : 'rounded-2xl',
+			]"
 		>
-			<FolderUpIcon aria-hidden="true" class="text-brand w-8 h-8" />
+			<FolderUpIcon
+				aria-hidden="true"
+				:class="['text-brand', size === 'small' ? 'w-6 h-6' : 'w-8 h-8']"
+			/>
 		</div>
 
 		<div class="flex flex-col items-center justify-center gap-1 text-contrast text-center">
 			<div class="text-contrast font-medium text-pretty">
-				{{ prompt }}
+				{{ primaryPrompt }}
 			</div>
 			<span class="text-primary text-sm text-pretty">
-				You can try to drag files or folder or <br />
-				click this area to select it
+				{{ secondaryPrompt }}
 			</span>
 		</div>
 
@@ -50,17 +58,20 @@ const emit = defineEmits<{
 const props = withDefaults(
 	defineProps<{
 		prompt?: string
+		primaryPrompt?: string | null
+		secondaryPrompt?: string | null
 		multiple?: boolean
 		accept?: string
 		maxSize?: number | null
 		shouldAlwaysReset?: boolean
 		disabled?: boolean
+		size?: 'small' | 'standard'
 	}>(),
 	{
 		prompt: 'Drag and drop files or click to browse',
-		multiple: false,
-		accept: '*',
-		maxSize: null,
+		primaryPrompt: 'Drag and drop files or click to browse',
+		secondaryPrompt: 'You can try to drag files or folder or click this area to select it',
+		size: 'standard',
 	},
 )
 
