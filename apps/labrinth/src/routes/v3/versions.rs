@@ -14,6 +14,7 @@ use crate::database::models::version_item::{
 };
 use crate::database::models::{DBOrganization, image_item};
 use crate::database::redis::RedisPool;
+use crate::file_hosting::{CdnConfig, UseAltCdn};
 use crate::models;
 use crate::models::ids::VersionId;
 use crate::models::images::ImageContext;
@@ -61,16 +62,30 @@ pub async fn version_project_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let info = info.into_inner();
-    version_project_get_helper(req, info, pool, redis, session_queue).await
+    version_project_get_helper(
+        req,
+        info,
+        pool,
+        redis,
+        session_queue,
+        cdn_config,
+        use_alt_cdn,
+    )
+    .await
 }
+
 pub async fn version_project_get_helper(
     req: HttpRequest,
     id: (String, String),
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let result =
         database::models::DBProject::get(&id.0, &**pool, &redis).await?;
@@ -110,8 +125,12 @@ pub async fn version_project_get_helper(
             && is_visible_version(&version.inner, &user_option, &pool, &redis)
                 .await?
         {
-            return Ok(HttpResponse::Ok()
-                .json(models::projects::Version::from(version)));
+            return Ok(HttpResponse::Ok().json(
+                models::projects::Version::from(
+                    version,
+                    &cdn_config.make_choice(use_alt_cdn),
+                ),
+            ));
         }
     }
 
@@ -129,6 +148,8 @@ pub async fn versions_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let version_ids =
         serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
@@ -150,9 +171,14 @@ pub async fn versions_get(
     .map(|x| x.1)
     .ok();
 
-    let versions =
-        filter_visible_versions(versions_data, &user_option, &pool, &redis)
-            .await?;
+    let versions = filter_visible_versions(
+        versions_data,
+        &user_option,
+        &pool,
+        &redis,
+        &cdn_config.make_choice(use_alt_cdn),
+    )
+    .await?;
 
     Ok(HttpResponse::Ok().json(versions))
 }
@@ -163,9 +189,20 @@ pub async fn version_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-    version_get_helper(req, id, pool, redis, session_queue).await
+    version_get_helper(
+        req,
+        id,
+        pool,
+        redis,
+        session_queue,
+        cdn_config,
+        use_alt_cdn,
+    )
+    .await
 }
 
 pub async fn version_get_helper(
@@ -174,6 +211,8 @@ pub async fn version_get_helper(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let version_data =
         database::models::DBVersion::get(id.into(), &**pool, &redis).await?;
@@ -192,9 +231,10 @@ pub async fn version_get_helper(
     if let Some(data) = version_data
         && is_visible_version(&data.inner, &user_option, &pool, &redis).await?
     {
-        return Ok(
-            HttpResponse::Ok().json(models::projects::Version::from(data))
-        );
+        return Ok(HttpResponse::Ok().json(models::projects::Version::from(
+            data,
+            &cdn_config.make_choice(use_alt_cdn),
+        )));
     }
 
     Err(ApiError::NotFound)
@@ -724,6 +764,8 @@ pub async fn version_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
@@ -856,9 +898,14 @@ pub async fn version_list(
         });
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
-        let response =
-            filter_visible_versions(response, &user_option, &pool, &redis)
-                .await?;
+        let response = filter_visible_versions(
+            response,
+            &user_option,
+            &pool,
+            &redis,
+            &cdn_config.make_choice(use_alt_cdn),
+        )
+        .await?;
 
         Ok(HttpResponse::Ok().json(response))
     } else {

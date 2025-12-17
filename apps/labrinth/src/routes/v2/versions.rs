@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use super::ApiError;
 use crate::database::redis::RedisPool;
+use crate::file_hosting::{CdnConfig, UseAltCdn};
 use crate::models;
 use crate::models::ids::VersionId;
 use crate::models::projects::{
@@ -47,6 +48,8 @@ pub async fn version_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let loaders = if let Some(loaders) = filters.loaders {
         if let Ok(mut loaders) = serde_json::from_str::<Vec<String>>(&loaders) {
@@ -104,6 +107,8 @@ pub async fn version_list(
         pool,
         redis,
         session_queue,
+        cdn_config,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -129,6 +134,8 @@ pub async fn version_project_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner();
     let response = v3::versions::version_project_get_helper(
@@ -137,6 +144,8 @@ pub async fn version_project_get(
         pool,
         redis,
         session_queue,
+        cdn_config,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -162,6 +171,8 @@ pub async fn versions_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let ids = v3::versions::VersionIds { ids: ids.ids };
     let response = v3::versions::versions_get(
@@ -170,6 +181,8 @@ pub async fn versions_get(
         pool,
         redis,
         session_queue,
+        cdn_config,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -194,12 +207,21 @@ pub async fn version_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-    let response =
-        v3::versions::version_get_helper(req, id, pool, redis, session_queue)
-            .await
-            .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::versions::version_get_helper(
+        req,
+        id,
+        pool,
+        redis,
+        session_queue,
+        cdn_config,
+        use_alt_cdn,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
@@ -253,6 +275,8 @@ pub async fn version_edit(
     redis: web::Data<RedisPool>,
     new_version: web::Json<EditVersion>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let new_version = new_version.into_inner();
 
@@ -271,6 +295,8 @@ pub async fn version_edit(
         pool.clone(),
         redis.clone(),
         session_queue.clone(),
+        cdn_config,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;

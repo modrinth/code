@@ -4,6 +4,7 @@ use crate::database::models::version_item::VersionQueryResult;
 use crate::database::models::{DBCollection, DBOrganization, DBTeamMember};
 use crate::database::redis::RedisPool;
 use crate::database::{DBProject, DBVersion, models};
+use crate::file_hosting::CdnChoice;
 use crate::models::users::User;
 use crate::routes::ApiError;
 use futures::TryStreamExt;
@@ -195,6 +196,7 @@ pub async fn filter_visible_versions(
     user_option: &Option<User>,
     pool: &PgPool,
     redis: &RedisPool,
+    cdn_choice: &CdnChoice,
 ) -> Result<Vec<crate::models::projects::Version>, ApiError> {
     let filtered_version_ids = filter_visible_version_ids(
         versions.iter().map(|x| &x.inner).collect_vec(),
@@ -204,7 +206,10 @@ pub async fn filter_visible_versions(
     )
     .await?;
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
-    Ok(versions.into_iter().map(|x| x.into()).collect())
+    Ok(versions
+        .into_iter()
+        .map(|v| crate::models::projects::Version::from(v, cdn_choice))
+        .collect())
 }
 
 impl ValidateAuthorized for models::DBOAuthClient {

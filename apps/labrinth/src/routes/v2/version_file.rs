@@ -1,6 +1,7 @@
 use super::ApiError;
 use crate::database::ReadOnlyPgPool;
 use crate::database::redis::RedisPool;
+use crate::file_hosting::{CdnConfig, UseAltCdn};
 use crate::models::projects::{Project, Version, VersionType};
 use crate::models::v2::projects::{LegacyProject, LegacyVersion};
 use crate::queue::session::AuthQueue;
@@ -38,6 +39,8 @@ pub async fn get_version_from_hash(
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::version_file::get_version_from_hash(
         req,
@@ -46,6 +49,8 @@ pub async fn get_version_from_hash(
         redis,
         hash_query,
         session_queue,
+        cdn_config,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -69,6 +74,7 @@ pub async fn download_version(
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     // Returns TemporaryRedirect, so no need to convert to V2
     v3::version_file::download_version(
@@ -78,6 +84,7 @@ pub async fn download_version(
         redis,
         hash_query,
         session_queue,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
@@ -122,6 +129,8 @@ pub async fn get_update_from_hash(
     hash_query: web::Query<HashQuery>,
     update_data: web::Json<UpdateData>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let update_data = update_data.into_inner();
     let mut loader_fields = HashMap::new();
@@ -146,6 +155,8 @@ pub async fn get_update_from_hash(
         hash_query,
         web::Json(update_data),
         session_queue,
+        cdn_config,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -175,6 +186,8 @@ pub async fn get_versions_from_hashes(
     redis: web::Data<RedisPool>,
     file_data: web::Json<FileHashes>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let file_data = file_data.into_inner();
     let file_data = v3::version_file::FileHashes {
@@ -187,6 +200,8 @@ pub async fn get_versions_from_hashes(
         redis,
         web::Json(file_data),
         session_queue,
+        cdn_config,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -281,6 +296,8 @@ pub async fn update_files(
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let update_data = update_data.into_inner();
     let update_data = v3::version_file::ManyUpdateData {
@@ -291,10 +308,15 @@ pub async fn update_files(
         hashes: update_data.hashes,
     };
 
-    let response =
-        v3::version_file::update_files(pool, redis, web::Json(update_data))
-            .await
-            .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::version_file::update_files(
+        pool,
+        redis,
+        web::Json(update_data),
+        cdn_config,
+        use_alt_cdn,
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response)
@@ -335,6 +357,8 @@ pub async fn update_individual_files(
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyFileUpdateData>,
     session_queue: web::Data<AuthQueue>,
+    cdn_config: web::Data<CdnConfig>,
+    use_alt_cdn: UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let update_data = update_data.into_inner();
     let update_data = v3::version_file::ManyFileUpdateData {
@@ -368,6 +392,8 @@ pub async fn update_individual_files(
         redis,
         web::Json(update_data),
         session_queue,
+        cdn_config,
+        use_alt_cdn,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;

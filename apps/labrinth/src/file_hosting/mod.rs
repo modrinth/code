@@ -1,10 +1,12 @@
 use async_trait::async_trait;
 use thiserror::Error;
 
+mod cdn;
 mod mock;
 mod s3_host;
 
 use bytes::Bytes;
+pub use cdn::*;
 pub use mock::MockHost;
 pub use s3_host::{S3BucketConfig, S3Host};
 
