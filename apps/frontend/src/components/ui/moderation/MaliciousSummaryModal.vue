@@ -91,7 +91,7 @@ defineExpose({ show, hide })
 			<div v-if="unsafeFiles.length > 0" class="mb-4 flex flex-col gap-2">
 				<div class="flex items-center gap-2">
 					<span class="text-tertiary text-sm font-medium">Project:</span>
-					<span class="text-sm text-contrast">{{ unsafeFiles[0].projectName }}</span>
+					<CopyCode :text="unsafeFiles[0].projectName" />
 				</div>
 				<div class="flex items-center gap-2">
 					<span class="text-tertiary text-sm font-medium">Project ID:</span>

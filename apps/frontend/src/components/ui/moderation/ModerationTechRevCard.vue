@@ -820,9 +820,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 									</button>
 								</ButtonStyled>
 								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
-									<button @click="maliciousSummaryModalRef?.show()">
-										Debug Summary
-									</button>
+									<button @click="maliciousSummaryModalRef?.show()">Debug Summary</button>
 								</ButtonStyled>
 							</template>
 						</ThreadView>

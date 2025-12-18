@@ -562,6 +562,5 @@ watch(currentSortType, () => {
 				@switch-page="(num) => goToPage(num, true)"
 			/>
 		</div>
-
 	</div>
 </template>
