@@ -23,8 +23,8 @@
 		</div>
 
 		<div
-			class="flex flex-wrap justify-between items-center gap-2"
 			v-if="openModal && filteredVersions.length > pageSize"
+			class="flex flex-wrap justify-between items-center gap-2"
 		>
 			<span>
 				Showing {{ (currentPage - 1) * pageSize + 1 }} to

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
-import type { Labrinth } from '@modrinth/api-client'
 import { commonProjectSettingsMessages } from '../../../../utils'
 import LargeRadioButton from '../../../base/LargeRadioButton.vue'
 

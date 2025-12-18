@@ -457,6 +457,9 @@
 
 						<div class="hidden sm:contents">
 							<ButtonStyled
+								v-tooltip="
+									auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
+								"
 								size="large"
 								:color="
 									(auth.user && currentMember) || route.name === 'type-id-version-version'
@@ -464,9 +467,6 @@
 										: `brand`
 								"
 								:circular="auth.user && currentMember"
-								v-tooltip="
-									auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
-								"
 							>
 								<button @click="(event) => downloadModal.show(event)">
 									<DownloadIcon aria-hidden="true" />

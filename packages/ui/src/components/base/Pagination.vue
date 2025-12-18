@@ -34,15 +34,15 @@
 				<a
 					v-if="linkFunction"
 					:href="linkFunction(item)"
-					@click.prevent="page !== item ? switchPage(item) : null"
 					:class="page === item ? '!text-brand' : ''"
+					@click.prevent="page !== item ? switchPage(item) : null"
 				>
 					{{ item }}
 				</a>
 				<button
 					v-else
-					@click="page !== item ? switchPage(item) : null"
 					:class="page === item ? '!text-brand' : ''"
+					@click="page !== item ? switchPage(item) : null"
 				>
 					{{ item }}
 				</button>

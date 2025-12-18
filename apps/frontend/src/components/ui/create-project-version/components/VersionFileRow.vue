@@ -34,15 +34,15 @@
 			</ButtonStyled>
 			<ButtonStyled v-if="isPrimary" size="standard" :circular="true">
 				<button
-					aria-label="Change primary file"
-					class="!shadow-none"
-					@click="primaryFileInput?.click()"
 					v-tooltip="
 						editingVersion
 							? 'Primary file cannot be changed after version is uploaded'
 							: 'Replace primary file'
 					"
+					aria-label="Change primary file"
+					class="!shadow-none"
 					:disabled="editingVersion"
+					@click="primaryFileInput?.click()"
 				>
 					<ArrowLeftRightIcon aria-hidden="true" />
 					<input
