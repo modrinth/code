@@ -368,7 +368,7 @@ export function createManageVersionContext(
 			case 'add-loaders':
 				return editingVersion.value ? 'Edit loaders' : 'Set loaders'
 			case 'add-mc-versions':
-				return editingVersion.value ? 'Edit MC versions' : 'Set MC versions'
+				return editingVersion.value ? 'Edit game versions' : 'Set game versions'
 			case 'add-dependencies':
 				return editingVersion.value ? 'Edit dependencies' : 'Set dependencies'
 			case 'add-environment':

@@ -9,7 +9,7 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-mc-versions',
 	stageContent: markRaw(AddMcVersionsStage),
-	title: (ctx) => (ctx.editingVersion.value ? 'Edit Minecraft versions' : 'Add Minecraft versions'),
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit game versions' : 'Add game versions'),
 	skip: (ctx) =>
 		(ctx.inferredVersionData.value?.game_versions?.length ?? 0) > 0 || ctx.editingVersion.value,
 	leftButtonConfig: (ctx) => ({
@@ -29,7 +29,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 export const editStageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'edit-mc-versions',
 	stageContent: markRaw(AddMcVersionsStage),
-	title: 'Edit Minecraft versions',
+	title: 'Edit game versions',
 	nonProgressStage: true,
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',

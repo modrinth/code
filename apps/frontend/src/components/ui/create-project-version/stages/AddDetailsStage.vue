@@ -128,9 +128,7 @@
 		>
 			<div class="flex flex-col gap-1">
 				<div class="flex items-center justify-between">
-					<span class="font-semibold text-contrast">
-						{{ usingDetectedEnvironment ? 'Detected environment' : 'Environment' }}
-					</span>
+					<span class="font-semibold text-contrast"> Environment </span>
 
 					<ButtonStyled type="transparent" size="standard">
 						<button @click="editEnvironment">
