@@ -35,10 +35,14 @@ import {
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
+import MaliciousSummaryModal, {
+	type UnsafeFile,
+} from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
 
 const auth = await useAuth()
+const featureFlags = useFeatureFlags()
 
 type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
 	id: string
@@ -62,14 +66,6 @@ const emit = defineEmits<{
 	refetch: []
 	loadFileSources: [reportId: string]
 	markComplete: [projectId: string]
-	fileMarkedUnsafe: [
-		data: {
-			file: FlattenedFileReport
-			projectName: string
-			projectId: string
-			userId: string
-		},
-	]
 }>()
 
 const quickActions = computed<OverflowMenuOption[]>(() => {
@@ -324,7 +320,33 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 	try {
 		await client.labrinth.tech_review_internal.updateIssueDetail(detailId, { verdict })
 
-		detailDecisions.value.set(detailId, verdict === 'safe' ? 'safe' : 'malware')
+		const decision = verdict === 'safe' ? 'safe' : 'malware'
+
+		let detailKey: string | null = null
+		for (const report of props.item.reports) {
+			for (const issue of report.issues) {
+				const detail = issue.details.find((d) => d.id === detailId)
+				if (detail) {
+					detailKey = detail.key
+					break
+				}
+			}
+			if (detailKey) break
+		}
+
+		if (detailKey) {
+			for (const report of props.item.reports) {
+				for (const issue of report.issues) {
+					for (const detail of issue.details) {
+						if (detail.key === detailKey) {
+							detailDecisions.value.set(detail.id, decision)
+						}
+					}
+				}
+			}
+		} else {
+			detailDecisions.value.set(detailId, decision)
+		}
 
 		for (const classGroup of groupedByClass.value) {
 			const hasThisDetail = classGroup.flags.some((f) => f.detail.id === detailId)
@@ -449,6 +471,29 @@ const threadViewRef = ref<{
 	setReplyContent: (content: string) => void
 	getReplyContent: () => string
 } | null>(null)
+
+const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
+
+const unsafeFiles = computed<UnsafeFile[]>(() => {
+	return props.item.reports
+		.filter((report) =>
+			report.issues.some((issue) =>
+				issue.details.some((detail) => {
+					const detailWithStatus = detail as typeof detail & {
+						status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+					}
+					const decision = getDetailDecision(detailWithStatus.id, detailWithStatus.status)
+					return decision === 'malware'
+				}),
+			),
+		)
+		.map((report) => ({
+			file: report,
+			projectName: props.item.project.name,
+			projectId: props.item.project.id,
+			userId: props.item.project_owner.id,
+		}))
+})
 
 const reviewSummaryPreview = computed(() => {
 	interface FileDecisions {
@@ -612,14 +657,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 		})
 
 		if (verdict === 'unsafe') {
-			for (const report of props.item.reports) {
-				emit('fileMarkedUnsafe', {
-					file: report,
-					projectName: props.item.project.name,
-					projectId: props.item.project.id,
-					userId: props.item.project_owner.id,
-				})
-			}
+			maliciousSummaryModalRef.value?.show()
 		}
 	} catch (error: unknown) {
 		const err = error as { response?: { data?: { issues?: string[] } } }
@@ -779,6 +817,11 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 										@click="handleSubmitReview('unsafe')"
 									>
 										<BugIcon /> Unsafe
+									</button>
+								</ButtonStyled>
+								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
+									<button @click="maliciousSummaryModalRef?.show()">
+										Debug Summary
 									</button>
 								</ButtonStyled>
 							</template>
@@ -1038,6 +1081,8 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 				</div>
 			</template>
 		</div>
+
+		<MaliciousSummaryModal ref="maliciousSummaryModalRef" :unsafe-files="unsafeFiles" />
 	</div>
 </template>
 
