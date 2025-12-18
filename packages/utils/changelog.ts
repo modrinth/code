@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-12-18T11:20:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Added support for non-USD gift cards with Tremendous.
+- Fixed issue with subregions for crypto & bank withdrawals.`,
+	},
+	{
 		date: `2025-12-16T13:15:00-08:00`,
 		product: 'web',
 		body: `## Improvements
