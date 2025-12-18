@@ -13,6 +13,7 @@ use std::num::NonZeroU64;
 
 use actix_web::{HttpRequest, post, web};
 use chrono::{DateTime, TimeDelta, Utc};
+use eyre::eyre;
 use futures::StreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -22,16 +23,20 @@ use crate::{
     auth::{AuthenticationError, get_user_from_headers},
     database::{
         self, DBProject,
-        models::{DBProjectId, DBUser, DBUserId, DBVersionId},
+        models::{
+            DBAffiliateCode, DBAffiliateCodeId, DBProjectId, DBUser, DBUserId,
+            DBVersionId,
+        },
         redis::RedisPool,
     },
     models::{
-        ids::{ProjectId, VersionId},
+        ids::{AffiliateCodeId, ProjectId, VersionId},
         pats::Scopes,
         teams::ProjectPermissions,
     },
     queue::session::AuthQueue,
     routes::ApiError,
+    util::error::Context,
 };
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
@@ -93,7 +98,14 @@ pub struct ReturnMetrics {
     /// How long users have been playing a project.
     pub project_playtime: Option<Metrics<ProjectPlaytimeField>>,
     /// How much payout revenue a project has generated.
-    pub project_revenue: Option<Metrics<Unit>>,
+    pub project_revenue: Option<Metrics<ProjectRevenueField>>,
+    /// How many times an affiliate code has been clicked.
+    pub affiliate_code_clicks: Option<Metrics<AffiliateCodeClicksField>>,
+    /// How many times a product has been purchased with an affiliate code.
+    pub affiliate_code_conversions:
+        Option<Metrics<AffiliateCodeConversionsField>>,
+    /// How much payout revenue an affiliate code has generated.
+    pub affiliate_code_revenue: Option<Metrics<AffiliateCodeRevenueField>>,
 }
 
 /// Replacement for `()` because of a `utoipa` limitation.
@@ -176,6 +188,46 @@ pub enum ProjectPlaytimeField {
     GameVersion,
 }
 
+/// Fields for [`ReturnMetrics::project_revenue`].
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ProjectRevenueField {
+    /// Project ID.
+    ProjectId,
+}
+
+/// Fields for [`ReturnMetrics::affiliate_code_clicks`].
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum AffiliateCodeClicksField {
+    /// Affiliate code ID.
+    AffiliateCodeId,
+}
+
+/// Fields for [`ReturnMetrics::affiliate_code_conversions`].
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum AffiliateCodeConversionsField {
+    /// Affiliate code ID.
+    AffiliateCodeId,
+}
+
+/// Fields for [`ReturnMetrics::affiliate_code_revenue`].
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum AffiliateCodeRevenueField {
+    /// Affiliate code ID.
+    AffiliateCodeId,
+}
+
 /// Minimum width of a [`TimeSlice`], controlled by [`TimeRange::resolution`].
 pub const MIN_RESOLUTION: TimeDelta = TimeDelta::minutes(60);
 
@@ -203,24 +255,17 @@ pub struct TimeSlice(pub Vec<AnalyticsData>);
 pub enum AnalyticsData {
     /// Project metrics.
     Project(ProjectAnalytics),
-    // AffiliateCode(AffiliateCodeAnalytics),
+    AffiliateCode(AffiliateCodeAnalytics),
 }
 
 /// Project metrics.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectAnalytics {
     /// What project these metrics are for.
-    source_project: ProjectId,
+    pub source_project: ProjectId,
     /// Metrics collected.
     #[serde(flatten)]
-    metrics: ProjectMetrics,
-}
-
-impl ProjectAnalytics {
-    /// Get the project ID for these analytics.
-    pub fn project_id(&self) -> &ProjectId {
-        &self.source_project
-    }
+    pub metrics: ProjectMetrics,
 }
 
 /// Project metrics of a specific kind.
@@ -300,11 +345,55 @@ pub struct ProjectRevenue {
     revenue: Decimal,
 }
 
+/// Affiliate code metrics.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AffiliateCodeAnalytics {
+    /// What affiliate code these metrics are for.
+    pub source_affiliate_code: AffiliateCodeId,
+    /// Metrics collected.
+    #[serde(flatten)]
+    pub metrics: AffiliateCodeMetrics,
+}
+
+/// Affiliate code metrics of a specific kind.
+///
+/// If a field is not included in [`Metrics::bucket_by`], it will be [`None`].
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(rename_all = "snake_case", tag = "metric_kind")]
+pub enum AffiliateCodeMetrics {
+    Clicks(AffiliateCodeClicks),
+    Conversions(AffiliateCodeConversions),
+    Revenue(AffiliateCodeRevenue),
+}
+
+/// [`ReturnMetrics::affiliate_code_clicks`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AffiliateCodeClicks {
+    /// Total clicks for this bucket.
+    pub clicks: u64,
+}
+
+/// [`ReturnMetrics::affiliate_code_conversions`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AffiliateCodeConversions {
+    /// Total conversions for this bucket.
+    pub conversions: u64,
+}
+
+/// [`ReturnMetrics::affiliate_code_revenue`].
+#[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AffiliateCodeRevenue {
+    /// Total revenue for this bucket.
+    pub revenue: Decimal,
+}
+
 // logic
 
 /// Clickhouse queries - separate from [`sqlx`] queries.
 mod query {
-    use crate::database::models::{DBProjectId, DBVersionId};
+    use crate::database::models::{
+        DBAffiliateCodeId, DBProjectId, DBVersionId,
+    };
     use const_format::formatcp;
 
     const TIME_RANGE_START: &str = "{time_range_start: UInt64}";
@@ -346,8 +435,8 @@ mod query {
                 -- not the possibly-zero one,
                 -- by using `views.project_id` instead of `project_id`
                 AND views.project_id IN {PROJECT_IDS}
-            GROUP BY
-                bucket, project_id, domain, site_path, monetized, country"
+            GROUP BY bucket, project_id, domain, site_path, monetized, country
+            "
         )
     };
 
@@ -385,8 +474,7 @@ mod query {
                 -- not the possibly-zero one,
                 -- by using `downloads.project_id` instead of `project_id`
                 AND downloads.project_id IN {PROJECT_IDS}
-            GROUP BY
-                bucket, project_id, domain, site_path, version_id, country"
+            GROUP BY bucket, project_id, domain, site_path, version_id, country"
         )
     };
 
@@ -421,8 +509,34 @@ mod query {
                 -- not the possibly-zero one,
                 -- by using `playtime.project_id` instead of `project_id`
                 AND playtime.project_id IN {PROJECT_IDS}
-            GROUP BY
-                bucket, project_id, version_id, loader, game_version"
+            GROUP BY bucket, project_id, version_id, loader, game_version"
+        )
+    };
+
+    #[derive(Debug, clickhouse::Row, serde::Deserialize)]
+    pub struct AffiliateCodeClickRow {
+        pub bucket: u64,
+        pub affiliate_code_id: DBAffiliateCodeId,
+        pub clicks: u64,
+    }
+
+    pub const AFFILIATE_CODE_CLICKS: &str = {
+        const USE_AFFILIATE_CODE_ID: &str = "{use_affiliate_code_id: Bool}";
+        const AFFILIATE_CODE_IDS: &str = "{affiliate_code_ids: Array(UInt64)}";
+
+        formatcp!(
+            "SELECT
+                widthBucket(toUnixTimestamp(recorded), {TIME_RANGE_START}, {TIME_RANGE_END}, {TIME_SLICES}) AS bucket,
+                if({USE_AFFILIATE_CODE_ID}, affiliate_code_id, 0) AS affiliate_code_id,
+                COUNT(*) AS clicks
+            FROM affiliate_code_clicks
+            WHERE
+                recorded BETWEEN {TIME_RANGE_START} AND {TIME_RANGE_END}
+                -- make sure that the REAL affiliate code id is included,
+                -- not the possibly-zero one,
+                -- by using `affiliate_code_clicks.affiliate_code_id` instead of `project_id`
+                -- AND affiliate_code_clicks.affiliate_code_id IN {AFFILIATE_CODE_IDS}
+            GROUP BY bucket, affiliate_code_id"
         )
     };
 }
@@ -486,12 +600,12 @@ pub async fn fetch_analytics(
     };
 
     if num_time_slices > MAX_TIME_SLICES {
-        return Err(ApiError::InvalidInput(format!(
+        return Err(ApiError::Request(eyre!(
             "Resolution is too fine or range is too large - maximum of {MAX_TIME_SLICES} time slices, was {num_time_slices}"
         )));
     }
     if resolution < MIN_RESOLUTION {
-        return Err(ApiError::InvalidInput(format!(
+        return Err(ApiError::Request(eyre!(
             "Resolution must be at least {MIN_RESOLUTION}, was {resolution}",
         )));
     }
@@ -505,11 +619,19 @@ pub async fn fetch_analytics(
     let project_ids =
         filter_allowed_project_ids(&project_ids, &user, &pool, &redis).await?;
 
+    let affiliate_code_ids =
+        DBAffiliateCode::get_by_affiliate(user.id.into(), &**pool)
+            .await?
+            .into_iter()
+            .map(|code| code.id)
+            .collect::<Vec<_>>();
+
     let mut query_clickhouse_cx = QueryClickhouseContext {
         clickhouse: &clickhouse,
         req: &req,
         time_slices: &mut time_slices,
         project_ids: &project_ids,
+        affiliate_code_ids: &affiliate_code_ids,
     };
 
     if let Some(metrics) = &req.return_metrics.project_views {
@@ -617,7 +739,30 @@ pub async fn fetch_analytics(
         .await?;
     }
 
-    if req.return_metrics.project_revenue.is_some() {
+    if let Some(metrics) = &req.return_metrics.affiliate_code_clicks {
+        use AffiliateCodeClicksField as F;
+        let uses = |field| metrics.bucket_by.contains(&field);
+
+        tracing::info!("affiliate codes = {affiliate_code_ids:?}");
+
+        query_clickhouse::<query::AffiliateCodeClickRow>(
+            &mut query_clickhouse_cx,
+            query::AFFILIATE_CODE_CLICKS,
+            &[("use_affiliate_code_id", uses(F::AffiliateCodeId))],
+            |row| row.bucket,
+            |row| {
+                AnalyticsData::AffiliateCode(AffiliateCodeAnalytics {
+                    source_affiliate_code: row.affiliate_code_id.into(),
+                    metrics: AffiliateCodeMetrics::Clicks(
+                        AffiliateCodeClicks { clicks: row.clicks },
+                    ),
+                })
+            },
+        )
+        .await?;
+    }
+
+    if let Some(metrics) = &req.return_metrics.project_revenue {
         if !scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(AuthenticationError::InvalidCredentials.into());
         }
@@ -630,29 +775,29 @@ pub async fn fetch_analytics(
                     EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
                     $3::integer
                 ) AS bucket,
-                COALESCE(mod_id, 0) AS mod_id,
+                CASE WHEN $5 THEN mod_id ELSE 0 END AS mod_id,
                 SUM(amount) amount_sum
             FROM payouts_values
             WHERE
                 user_id = $4
+                -- only project revenue is counted here
+                -- for affiliate code revenue, see `affiliate_code_revenue``
+                AND payouts_values.mod_id IS NOT NULL
                 AND created BETWEEN $1 AND $2
             GROUP BY bucket, mod_id",
             req.time_range.start,
             req.time_range.end,
             num_time_slices as i64,
             DBUserId::from(user.id) as DBUserId,
+            metrics.bucket_by.contains(&ProjectRevenueField::ProjectId),
         )
         .fetch(&**pool);
         while let Some(row) = rows.next().await.transpose()? {
-            let bucket = row.bucket.ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "bucket should be non-null - query bug!".into(),
-                )
-            })?;
-            let bucket = usize::try_from(bucket).map_err(|_| {
-                ApiError::InvalidInput(
-                    "bucket value {bucket} does not fit into `usize` - query bug!".into(),
-                )
+            let bucket = row
+                .bucket
+                .wrap_internal_err("bucket should be non-null - query bug!")?;
+            let bucket = usize::try_from(bucket).wrap_internal_err_with(|| {
+                eyre!("bucket value {bucket} does not fit into `usize` - query bug!")
             })?;
 
             if let Some(source_project) =
@@ -670,6 +815,116 @@ pub async fn fetch_analytics(
                     }),
                 )?;
             }
+        }
+    }
+
+    if let Some(metrics) = &req.return_metrics.affiliate_code_conversions {
+        let mut rows = sqlx::query!(
+            "SELECT
+                WIDTH_BUCKET(
+                    EXTRACT(EPOCH FROM usa.created_at)::bigint,
+                    EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
+                    EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
+                    $3::integer
+                ) AS bucket,
+                CASE WHEN $5 THEN affiliate_code ELSE 0 END AS affiliate_code,
+                COUNT(*) AS conversions
+            FROM users_subscriptions_affiliations usa
+            INNER JOIN affiliate_codes ac ON ac.id = usa.affiliate_code
+            INNER JOIN users_subscriptions us ON us.id = usa.subscription_id
+            INNER JOIN charges c ON c.subscription_id = us.id
+            WHERE
+                ac.affiliate = $4
+                AND usa.created_at BETWEEN $1 AND $2
+                AND c.status = 'succeeded'
+            GROUP BY bucket, affiliate_code",
+            req.time_range.start,
+            req.time_range.end,
+            num_time_slices as i64,
+            DBUserId::from(user.id) as DBUserId,
+            metrics.bucket_by.contains(&AffiliateCodeConversionsField::AffiliateCodeId),
+        )
+        .fetch(&**pool);
+        while let Some(row) = rows.next().await.transpose()? {
+            let bucket = row
+                .bucket
+                .wrap_internal_err("bucket should be non-null - query bug!")?;
+            let bucket = usize::try_from(bucket).wrap_internal_err_with(|| {
+                eyre!("bucket value {bucket} does not fit into `usize` - query bug!")
+            })?;
+
+            let source_affiliate_code = AffiliateCodeId::from(
+                DBAffiliateCodeId(row.affiliate_code.unwrap_or_default()),
+            );
+            let conversions =
+                u64::try_from(row.conversions.unwrap_or_default())
+                    .unwrap_or(u64::MAX);
+
+            add_to_time_slice(
+                &mut time_slices,
+                bucket,
+                AnalyticsData::AffiliateCode(AffiliateCodeAnalytics {
+                    source_affiliate_code,
+                    metrics: AffiliateCodeMetrics::Conversions(
+                        AffiliateCodeConversions { conversions },
+                    ),
+                }),
+            )?;
+        }
+    }
+
+    if let Some(metrics) = &req.return_metrics.affiliate_code_revenue {
+        if !scopes.contains(Scopes::PAYOUTS_READ) {
+            return Err(AuthenticationError::InvalidCredentials.into());
+        }
+
+        let mut rows = sqlx::query!(
+            "SELECT
+                WIDTH_BUCKET(
+                    EXTRACT(EPOCH FROM created)::bigint,
+                    EXTRACT(EPOCH FROM $1::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
+                    EXTRACT(EPOCH FROM $2::timestamp with time zone AT TIME ZONE 'UTC')::bigint,
+                    $3::integer
+                ) AS bucket,
+                CASE WHEN $5 THEN affiliate_code_source ELSE 0 END AS affiliate_code_source,
+                SUM(amount) amount_sum
+            FROM payouts_values
+            WHERE
+                user_id = $4
+                AND payouts_values.affiliate_code_source IS NOT NULL
+                AND created BETWEEN $1 AND $2
+            GROUP BY bucket, affiliate_code_source",
+            req.time_range.start,
+            req.time_range.end,
+            num_time_slices as i64,
+            DBUserId::from(user.id) as DBUserId,
+            metrics.bucket_by.contains(&AffiliateCodeRevenueField::AffiliateCodeId),
+        )
+        .fetch(&**pool);
+        while let Some(row) = rows.next().await.transpose()? {
+            let bucket = row
+                .bucket
+                .wrap_internal_err("bucket should be non-null - query bug!")?;
+            let bucket = usize::try_from(bucket).wrap_internal_err_with(|| {
+                eyre!("bucket value {bucket} does not fit into `usize` - query bug!")
+            })?;
+
+            let source_affiliate_code =
+                AffiliateCodeId::from(DBAffiliateCodeId(
+                    row.affiliate_code_source.unwrap_or_default(),
+                ));
+            let revenue = row.amount_sum.unwrap_or_default();
+
+            add_to_time_slice(
+                &mut time_slices,
+                bucket,
+                AnalyticsData::AffiliateCode(AffiliateCodeAnalytics {
+                    source_affiliate_code,
+                    metrics: AffiliateCodeMetrics::Revenue(
+                        AffiliateCodeRevenue { revenue },
+                    ),
+                }),
+            )?;
         }
     }
 
@@ -698,6 +953,7 @@ struct QueryClickhouseContext<'a> {
     req: &'a GetRequest,
     time_slices: &'a mut [TimeSlice],
     project_ids: &'a [DBProjectId],
+    affiliate_code_ids: &'a [DBAffiliateCodeId],
 }
 
 async fn query_clickhouse<Row>(
@@ -717,7 +973,8 @@ where
         .param("time_range_start", cx.req.time_range.start.timestamp())
         .param("time_range_end", cx.req.time_range.end.timestamp())
         .param("time_slices", cx.time_slices.len())
-        .param("project_ids", cx.project_ids);
+        .param("project_ids", cx.project_ids)
+        .param("affiliate_code_ids", cx.affiliate_code_ids);
     for (param_name, used) in use_columns {
         query = query.param(param_name, used)
     }

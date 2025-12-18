@@ -452,35 +452,64 @@ where
     Ok(())
 }
 
-pub fn get_processor_arguments<T: AsRef<str>>(
+pub fn get_processor_arguments(
     libraries_path: &Path,
-    arguments: &[T],
+    arguments: &[impl AsRef<str>],
     data: &HashMap<String, SidedDataEntry>,
 ) -> crate::Result<Vec<String>> {
-    let mut new_arguments = Vec::new();
+    // We use iterator combinators to make sure that 1 input argument maps
+    // to exactly 1 output argument. Otherwise you might get issues that take
+    // days to debug *sigh*
+    //
+    // Arguments can be enclosed in square brackets [] if they are not taken
+    // literally, but are actually resolved to the path of a library we
+    // previously downloaded.
+    // For example, `[net.neoforged:neoform:1.21.10-20251010.172816:mappings@tsrg.lzma]`.
+    //
+    // Otherwise, arguments may contain `{KEY}` variable placeholders, which
+    // must be replaced with the corresponding value from `data`.
+    // Importantly, variables might not *just* be `{KEY}`, but may also be
+    // e.g. `{KEY}/some more values`. For example, `{ROOT}/libraries/`.
+    // Therefore, it is important that we don't just check if the variable is
+    // enclosed in `{}`s, but actually do a find-and-replace with all variables.
+    //
+    // Currently, we do it in a naive way where we iterate over every `data`
+    // entry and just `.replace()`, which is not efficient, but we shouldn't
+    // have a lot of entries in `data`, and this code is not run often anyway.
 
-    for argument in arguments {
-        let trimmed_arg = &argument.as_ref()[1..argument.as_ref().len() - 1];
-        if argument.as_ref().starts_with('{') {
-            if let Some(entry) = data.get(trimmed_arg) {
-                new_arguments.push(if entry.client.starts_with('[') {
-                    get_lib_path(
-                        libraries_path,
-                        &entry.client[1..entry.client.len() - 1],
-                        true,
-                    )?
-                } else {
-                    entry.client.clone()
-                })
+    arguments
+        .iter()
+        .map(|arg| {
+            let arg = arg.as_ref();
+            if let Some(arg) = arg.strip_prefix('[')
+                && let Some(lib_key) = arg.strip_suffix(']')
+            {
+                // this should resolve to the path of a library
+                get_lib_path(libraries_path, lib_key, true)
+            } else {
+                let mut arg = arg.to_string();
+
+                // replace variables like `{PATH}` to their real values
+                for (key, entry) in data {
+                    let replacement = if let Some(arg) =
+                        entry.client.strip_prefix('[')
+                        && let Some(lib_key) = arg.strip_suffix(']')
+                    {
+                        // if the value of `PATH` in `data` is also a library key,
+                        // it'll be enclosed in `[]`s, and we resolve it to a real lib path
+                        get_lib_path(libraries_path, lib_key, true)?
+                    } else {
+                        // otherwise we just take the value in `data` literally
+                        entry.client.clone()
+                    };
+
+                    arg = arg.replace(&format!("{{{key}}}"), &replacement);
+                }
+
+                Ok(arg)
             }
-        } else if argument.as_ref().starts_with('[') {
-            new_arguments.push(get_lib_path(libraries_path, trimmed_arg, true)?)
-        } else {
-            new_arguments.push(argument.as_ref().to_string())
-        }
-    }
-
-    Ok(new_arguments)
+        })
+        .collect::<crate::Result<Vec<_>>>()
 }
 
 pub async fn get_processor_main_class(

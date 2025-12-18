@@ -1,6 +1,8 @@
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
-use crate::models::analytics::{Download, PageView, Playtime};
+use crate::models::analytics::{
+    AffiliateCodeClick, Download, PageView, Playtime,
+};
 use crate::routes::ApiError;
 use dashmap::{DashMap, DashSet};
 use redis::cmd;
@@ -14,6 +16,7 @@ pub struct AnalyticsQueue {
     views_queue: DashMap<(u64, u64), Vec<PageView>>,
     downloads_queue: DashMap<(u64, u64), Download>,
     playtime_queue: DashSet<Playtime>,
+    affiliate_code_clicks_queue: DashMap<(u64, u64), Vec<AffiliateCodeClick>>,
 }
 
 impl Default for AnalyticsQueue {
@@ -29,6 +32,7 @@ impl AnalyticsQueue {
             views_queue: DashMap::with_capacity(1000),
             downloads_queue: DashMap::with_capacity(1000),
             playtime_queue: DashSet::with_capacity(1000),
+            affiliate_code_clicks_queue: DashMap::with_capacity(1000),
         }
     }
 
@@ -50,6 +54,13 @@ impl AnalyticsQueue {
         self.playtime_queue.insert(playtime);
     }
 
+    pub fn add_affiliate_code_click(&self, click: AffiliateCodeClick) {
+        self.affiliate_code_clicks_queue
+            .entry((click.user_id, click.affiliate_code_id))
+            .or_default()
+            .push(click);
+    }
+
     pub async fn index(
         &self,
         client: clickhouse::Client,
@@ -64,6 +75,24 @@ impl AnalyticsQueue {
 
         let playtime_queue = self.playtime_queue.clone();
         self.playtime_queue.clear();
+
+        let affiliate_code_clicks_queue =
+            self.affiliate_code_clicks_queue.clone();
+        self.affiliate_code_clicks_queue.clear();
+
+        if !affiliate_code_clicks_queue.is_empty() {
+            let mut insert_clicks = client
+                .insert::<AffiliateCodeClick>("affiliate_code_clicks")
+                .await?;
+
+            for (_, click_vec) in affiliate_code_clicks_queue {
+                for click in click_vec {
+                    insert_clicks.write(&click).await?;
+                }
+            }
+
+            insert_clicks.end().await?;
+        }
 
         if !playtime_queue.is_empty() {
             let mut playtimes = client.insert::<Playtime>("playtime").await?;

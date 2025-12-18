@@ -414,12 +414,6 @@ const router = useRouter()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
 
-if (route.params.id === 'following') {
-	definePageMeta({
-		middleware: 'auth',
-	})
-}
-
 const messages = defineMessages({
 	collectionDescription: {
 		id: 'collection.description',
