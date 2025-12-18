@@ -74,7 +74,7 @@ export interface ManageVersionContextValue {
 	noEnvironmentProject: ComputedRef<boolean>
 
 	// Stage helpers
-	getNextLabel: () => string
+	getNextLabel: (currentIndex?: number | null) => string
 
 	// Version methods
 	newDraftVersion: (projectId: string, version?: Labrinth.Versions.v3.DraftVersion | null) => void
@@ -347,8 +347,8 @@ export function createManageVersionContext(
 	)
 
 	// Dynamic next button label
-	function getNextLabel() {
-		const currentStageIndex = modal.value?.currentStageIndex || 0
+	function getNextLabel(currentIndex: number | null = null) {
+		const currentStageIndex = currentIndex ? currentIndex : modal.value?.currentStageIndex || 0
 
 		let nextIndex = currentStageIndex + 1
 		while (nextIndex < stageConfigs.length) {

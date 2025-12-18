@@ -38,7 +38,7 @@ export const editStageConfig: StageConfigInput<ManageVersionContextValue> = {
 		onClick: () => ctx.modal.value?.setStage('add-details'),
 	}),
 	rightButtonConfig: (ctx) => ({
-		label: 'Continue',
+		label: ctx.getNextLabel(2),
 		icon: RightArrowIcon,
 		iconPosition: 'after',
 		disabled: ctx.draftVersion.value.game_versions.length === 0,
