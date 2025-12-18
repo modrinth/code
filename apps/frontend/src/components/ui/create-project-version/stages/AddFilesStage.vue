@@ -35,11 +35,11 @@
 
 			<div class="flex flex-col gap-2">
 				<div class="flex flex-col gap-2">
-					<span class="text-base font-semibold text-contrast">Supplementary files</span>
-
 					<Admonition v-if="hasSupplementaryFiles" type="warning">
 						{{ formatMessage(messages.addFilesAdmonition) }}
 					</Admonition>
+
+					<span class="text-base font-semibold text-contrast">Supplementary files</span>
 
 					<DropzoneFileInput
 						aria-label="Upload additional file"

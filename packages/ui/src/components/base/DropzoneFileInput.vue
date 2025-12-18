@@ -1,9 +1,10 @@
 <template>
 	<label
 		:class="[
-			'flex flex-col items-center justify-center  cursor-pointer rounded-3xl border-2 border-dashed bg-surface-4 text-contrast transition-colors',
+			'flex flex-col items-center justify-center  cursor-pointer border-2 border-dashed bg-surface-4 text-contrast transition-colors',
 			size === 'small' ? 'p-5' : 'p-12',
 			size === 'small' ? 'gap-2' : 'gap-4',
+			size === 'small' ? 'rounded-2xl' : 'rounded-3xl',
 			isDragOver ? 'border-purple' : 'border-surface-5',
 		]"
 		@dragover.prevent="onDragOver"
