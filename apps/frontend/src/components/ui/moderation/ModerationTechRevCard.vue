@@ -62,6 +62,14 @@ const emit = defineEmits<{
 	refetch: []
 	loadFileSources: [reportId: string]
 	markComplete: [projectId: string]
+	fileMarkedUnsafe: [
+		data: {
+			file: FlattenedFileReport
+			projectName: string
+			projectId: string
+			userId: string
+		},
+	]
 }>()
 
 const quickActions = computed<OverflowMenuOption[]>(() => {
@@ -289,6 +297,25 @@ function isPreReviewed(
 
 function getMarkedFlagsCount(flags: ClassGroup['flags']): number {
 	return flags.filter((f) => getDetailDecision(f.detail.id, f.detail.status) !== 'pending').length
+}
+
+function getFileDetailCount(file: FlattenedFileReport): number {
+	return file.issues.reduce((sum, issue) => sum + issue.details.length, 0)
+}
+
+function getFileMarkedCount(file: FlattenedFileReport): number {
+	let count = 0
+	for (const issue of file.issues) {
+		for (const detail of issue.details) {
+			const detailWithStatus = detail as typeof detail & {
+				status: Labrinth.TechReview.Internal.DelphiReportIssueStatus
+			}
+			if (getDetailDecision(detailWithStatus.id, detailWithStatus.status) !== 'pending') {
+				count++
+			}
+		}
+	}
+	return count
 }
 
 async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') {
@@ -583,6 +610,17 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 			title: 'Review submitted',
 			text: 'Technical review completed successfully.',
 		})
+
+		if (verdict === 'unsafe') {
+			for (const report of props.item.reports) {
+				emit('fileMarkedUnsafe', {
+					file: report,
+					projectName: props.item.project.name,
+					projectId: props.item.project.id,
+					userId: props.item.project_owner.id,
+				})
+			}
+		}
 	} catch (error: unknown) {
 		const err = error as { response?: { data?: { issues?: string[] } } }
 		if (err.response?.data?.issues) {
@@ -762,8 +800,8 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					<div class="flex items-center gap-3">
 						<span
 							class="font-medium text-contrast"
-							:class="{ 'cursor-pointer hover:underline': file.issues.length > 0 }"
-							@click="file.issues.length > 0 && viewFileFlags(file)"
+							:class="{ 'cursor-pointer hover:underline': getFileDetailCount(file) > 0 }"
+							@click="getFileDetailCount(file) > 0 && viewFileFlags(file)"
 						>
 							{{ file.file_name }}
 						</span>
@@ -773,10 +811,19 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 							}}</span>
 						</div>
 						<div
-							v-if="file.issues.length > 0"
-							class="border-red/60 flex items-center gap-1 rounded-full border border-solid bg-highlight-red px-2.5 py-1 text-sm text-red"
+							v-if="getFileDetailCount(file) > 0"
+							class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1 text-sm"
+							:class="
+								getFileMarkedCount(file) === getFileDetailCount(file)
+									? 'border-green/60 bg-highlight-green text-green'
+									: 'border-red/60 bg-highlight-red text-red'
+							"
 						>
-							{{ file.issues.length }} {{ file.issues.length === 1 ? 'flag' : 'flags' }}
+							<CheckIcon
+								v-if="getFileMarkedCount(file) === getFileDetailCount(file)"
+								class="size-4"
+							/>
+							{{ getFileMarkedCount(file) }}/{{ getFileDetailCount(file) }} flags
 						</div>
 						<div
 							v-else-if="file.flag_reason === 'manual'"
@@ -793,7 +840,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					</div>
 
 					<div class="flex items-center gap-2">
-						<ButtonStyled v-if="file.issues.length > 0">
+						<ButtonStyled v-if="getFileDetailCount(file) > 0">
 							<button @click="viewFileFlags(file)">Flags</button>
 						</ButtonStyled>
 						<ButtonStyled type="outlined">

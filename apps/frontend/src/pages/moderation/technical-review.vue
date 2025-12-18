@@ -12,6 +12,9 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
+import MaliciousSummaryModal, {
+	type UnsafeFile,
+} from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
 const client = injectModrinthClient()
@@ -444,6 +447,21 @@ function handleMarkComplete(projectId: string) {
 	)
 }
 
+// Malicious file summary modal
+const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
+const allUnsafeFiles = ref<UnsafeFile[]>([])
+
+function handleFileMarkedUnsafe(unsafeFile: UnsafeFile) {
+	const exists = allUnsafeFiles.value.some((f) => f.file.file_id === unsafeFile.file.file_id)
+	if (!exists) {
+		allUnsafeFiles.value.push(unsafeFile)
+	} else {
+		const idx = allUnsafeFiles.value.findIndex((f) => f.file.file_id === unsafeFile.file.file_id)
+		allUnsafeFiles.value[idx] = unsafeFile
+	}
+	maliciousSummaryModalRef.value?.show()
+}
+
 watch(currentSortType, () => {
 	goToPage(1)
 	refetch()
@@ -551,6 +569,7 @@ watch(currentSortType, () => {
 					@refetch="refetch"
 					@load-file-sources="handleLoadFileSources"
 					@mark-complete="handleMarkComplete"
+					@file-marked-unsafe="handleFileMarkedUnsafe"
 				/>
 			</div>
 		</div>
@@ -562,5 +581,7 @@ watch(currentSortType, () => {
 				@switch-page="(num) => goToPage(num, true)"
 			/>
 		</div>
+
+		<MaliciousSummaryModal ref="maliciousSummaryModalRef" :unsafe-files="allUnsafeFiles" />
 	</div>
 </template>

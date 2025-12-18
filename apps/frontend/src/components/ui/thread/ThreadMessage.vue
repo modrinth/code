@@ -79,6 +79,13 @@
 				completed technical review and marked project as
 				<Badge :type="message.body.verdict" />.
 			</span>
+			<span v-else-if="message.body.type === 'tech_review_entered'">
+				Project has entered technical review queue.
+			</span>
+			<span v-else-if="message.body.type === 'tech_review_exit_file_deleted'">
+				Project has left technical review queue as all files pending review were deleted by the
+				user.
+			</span>
 		</div>
 		<span class="message__date">
 			<span v-tooltip="$dayjs(message.created).format('MMMM D, YYYY [at] h:mm A')">
