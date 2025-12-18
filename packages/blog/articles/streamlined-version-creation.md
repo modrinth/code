@@ -1,7 +1,7 @@
 ---
 title: 'Streamlined Version Creation'
 summary: 'Version creation is now dramatically more intelligent and easier for creators.'
-date: 2025-12-12T15:00:00-08:00
+date: 2025-12-18T12:50:00-08:00
 authors: [AJfd8YH6, 6EjnV9Uf, Dc7EYhxG]
 ---
 

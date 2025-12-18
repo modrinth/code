@@ -14,7 +14,7 @@ const VERSIONS: VersionEntry[] = [
 		date: `2025-12-18T12:30:00-08:00`,
 		product: 'web',
 		body: `## Improvements
-- Overhauled version creation to be more intelligent and easier to use.
+- [Overhauled version creation](/news/article/streamlined-version-creation) to be more intelligent and easier to use.
 - Versions and gallery images are now created and edited in project settings.`,
 	},
 	{
