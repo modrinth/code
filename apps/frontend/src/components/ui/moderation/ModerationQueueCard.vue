@@ -89,8 +89,8 @@
 							<ScaleIcon class="size-5" />
 						</button>
 					</ButtonStyled>
-					<ButtonStyled circular type="outlined">
-						<OverflowMenu :options="quickActions" class="!border-px !border-surface-4">
+					<ButtonStyled circular>
+						<OverflowMenu :options="quickActions">
 							<template #default>
 								<EllipsisVerticalIcon class="size-4" />
 							</template>

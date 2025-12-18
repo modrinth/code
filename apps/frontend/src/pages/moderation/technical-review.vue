@@ -24,6 +24,7 @@ const route = useRoute()
 const router = useRouter()
 
 const CACHE_TTL = 24 * 60 * 60 * 1000
+const CACHE_KEY_PREFIX = 'tech_review_source_'
 
 type CachedSource = {
 	source: string
@@ -32,14 +33,14 @@ type CachedSource = {
 
 function getCachedSource(detailId: string): string | null {
 	try {
-		const cached = localStorage.getItem(`tech_review_source_${detailId}`)
+		const cached = localStorage.getItem(`${CACHE_KEY_PREFIX}${detailId}`)
 		if (!cached) return null
 
 		const data: CachedSource = JSON.parse(cached)
 		const now = Date.now()
 
 		if (now - data.timestamp > CACHE_TTL) {
-			localStorage.removeItem(`tech_review_source_${detailId}`)
+			localStorage.removeItem(`${CACHE_KEY_PREFIX}${detailId}`)
 			return null
 		}
 
@@ -55,7 +56,7 @@ function setCachedSource(detailId: string, source: string): void {
 			source,
 			timestamp: Date.now(),
 		}
-		localStorage.setItem(`tech_review_source_${detailId}`, JSON.stringify(data))
+		localStorage.setItem(`${CACHE_KEY_PREFIX}${detailId}`, JSON.stringify(data))
 	} catch (error) {
 		console.error('Failed to cache source:', error)
 	}
@@ -67,7 +68,7 @@ function clearExpiredCache(): void {
 		const keys = Object.keys(localStorage)
 
 		for (const key of keys) {
-			if (key.startsWith('tech_review_source_')) {
+			if (key.startsWith(CACHE_KEY_PREFIX)) {
 				const cached = localStorage.getItem(key)
 				if (cached) {
 					const data: CachedSource = JSON.parse(cached)

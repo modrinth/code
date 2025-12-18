@@ -4,7 +4,7 @@
 		:class="{
 			'has-body': message.body.type === 'text' && !forceCompact,
 			'no-actions': noLinks,
-			private: message.body.private,
+			private: isPrivateMessage,
 		}"
 	>
 		<template v-if="members[message.author_id]">
@@ -23,7 +23,7 @@
 			</AutoLink>
 			<span :class="`message__author role-${members[message.author_id].role}`">
 				<LockIcon
-					v-if="message.body.private"
+					v-if="isPrivateMessage"
 					v-tooltip="'Only visible to moderators'"
 					class="private-icon"
 				/>
@@ -49,10 +49,21 @@
 			</span>
 		</template>
 		<template v-else>
-			<div class="message__icon backed-svg circle moderation-color" :class="{ raised: raised }">
+			<div
+				class="message__icon backed-svg circle moderation-color"
+				:class="{
+					raised: raised,
+					'system-message-icon': ['tech_review_entered', 'tech_review_exit_file_deleted'].includes(
+						message.body.type,
+					),
+				}"
+			>
 				<ScaleIcon />
 			</div>
-			<span class="message__author moderation-color">
+			<span
+				v-if="!['tech_review_entered', 'tech_review_exit_file_deleted'].includes(message.body.type)"
+				class="message__author moderation-color"
+			>
 				Moderator
 				<ScaleIcon v-tooltip="'Moderator'" />
 			</span>
@@ -80,11 +91,11 @@
 				<Badge :type="message.body.verdict" />.
 			</span>
 			<span v-else-if="message.body.type === 'tech_review_entered'">
-				Project has entered technical review queue.
+				The project has entered the technical review queue.
 			</span>
 			<span v-else-if="message.body.type === 'tech_review_exit_file_deleted'">
-				Project has left technical review queue as all files pending review were deleted by the
-				user.
+				The project has left the technical review queue as all files pending review were deleted by
+				the user.
 			</span>
 		</div>
 		<span class="message__date">
@@ -176,6 +187,15 @@ const formattedMessage = computed(() => {
 
 const formatRelativeTime = useRelativeTime()
 const timeSincePosted = ref(formatRelativeTime(props.message.created))
+
+const isPrivateMessage = computed(() => {
+	return (
+		props.message.body.private ||
+		['tech_review', 'tech_review_entered', 'tech_review_exit_file_deleted'].includes(
+			props.message.body.type,
+		)
+	)
+})
 
 async function deleteMessage() {
 	await useBaseFetch(`message/${props.message.id}`, {
@@ -349,5 +369,9 @@ a:active + .message__author a,
 
 .private {
 	color: var(--color-icon);
+}
+
+.system-message-icon {
+	--size: 2rem !important;
 }
 </style>

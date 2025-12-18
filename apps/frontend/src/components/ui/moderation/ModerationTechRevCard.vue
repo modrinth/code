@@ -49,6 +49,18 @@ type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
 	version_id: string
 }
 
+interface FileDecisions {
+	fileName: string
+	fileSize: number
+	decisions: Array<{
+		filePath: string
+		issueType: string
+		severity: string
+		decision: 'safe' | 'malware'
+	}>
+	maxSeverity: string
+}
+
 const props = defineProps<{
 	item: {
 		project: Labrinth.Projects.v3.Project
@@ -496,18 +508,6 @@ const unsafeFiles = computed<UnsafeFile[]>(() => {
 })
 
 const reviewSummaryPreview = computed(() => {
-	interface FileDecisions {
-		fileName: string
-		fileSize: number
-		decisions: Array<{
-			filePath: string
-			issueType: string
-			severity: string
-			decision: 'safe' | 'malware'
-		}>
-		maxSeverity: string
-	}
-
 	const fileDecisions = new Map<string, FileDecisions>()
 	let totalSafe = 0
 	let totalUnsafe = 0
@@ -922,9 +922,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								</button>
 							</ButtonStyled>
 
-							<span class="font-mono text-base font-semibold text-contrast">{{
-								classItem.filePath
-							}}</span>
+							<span class="font-mono font-semibold">{{ classItem.filePath }}</span>
 
 							<div
 								class="rounded-full border-solid px-2.5 py-1"
@@ -965,72 +963,70 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					</div>
 
 					<Collapsible :collapsed="!expandedClasses.has(classItem.filePath)">
-						<div class="flex flex-col gap-4 px-4 pb-4">
+						<div class="mt-2 flex flex-col gap-2 px-4 pb-4">
 							<div
-								v-for="(flag, flagIdx) in classItem.flags"
+								v-for="flag in classItem.flags"
 								:key="`${flag.issueId}-${flag.detail.id}`"
-								class="flex flex-col gap-2 rounded-lg p-2"
+								class="grid grid-cols-[1fr_auto_auto] items-center rounded-lg border-[1px] border-b border-solid border-surface-5 bg-surface-3 py-2 pl-4 last:border-b-0"
 								:class="{
-									'bg-[#E8E8E8] dark:bg-[#1A1C20]': flagIdx % 2 === 1,
 									'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
 								}"
 							>
-								<div class="flex items-center justify-between">
-									<div class="flex items-center gap-2">
-										<span class="text-base font-semibold text-contrast">{{
-											flag.issueType.replace(/_/g, ' ')
+								<span class="text-base font-semibold text-contrast">{{
+									flag.issueType.replace(/_/g, ' ')
+								}}</span>
+
+								<div class="flex w-20 justify-center">
+									<div
+										class="rounded-full border-solid px-2.5 py-1"
+										:class="getSeverityBadgeColor(flag.detail.severity)"
+									>
+										<span class="text-sm font-medium">{{
+											capitalizeString(flag.detail.severity)
 										}}</span>
-										<div
-											class="rounded-full border-solid px-2.5 py-1"
-											:class="getSeverityBadgeColor(flag.detail.severity)"
-										>
-											<span class="text-sm font-medium">{{
-												capitalizeString(flag.detail.severity)
-											}}</span>
-										</div>
 									</div>
+								</div>
 
-									<div class="flex items-center gap-2">
-										<ButtonStyled
-											color="brand"
-											:type="
-												getDetailDecision(flag.detail.id, flag.detail.status) === 'safe'
-													? undefined
-													: 'outlined'
-											"
+								<div class="flex w-40 items-center justify-center gap-2">
+									<ButtonStyled
+										color="brand"
+										:type="
+											getDetailDecision(flag.detail.id, flag.detail.status) === 'safe'
+												? undefined
+												: 'outlined'
+										"
+									>
+										<button
+											class="!border-[1px]"
+											:disabled="updatingDetails.has(flag.detail.id)"
+											@click="updateDetailStatus(flag.detail.id, 'safe')"
 										>
-											<button
-												class="!border-[1px]"
-												:disabled="updatingDetails.has(flag.detail.id)"
-												@click="updateDetailStatus(flag.detail.id, 'safe')"
-											>
-												Safe
-											</button>
-										</ButtonStyled>
+											Safe
+										</button>
+									</ButtonStyled>
 
-										<ButtonStyled
-											color="red"
-											:type="
-												getDetailDecision(flag.detail.id, flag.detail.status) === 'malware'
-													? undefined
-													: 'outlined'
-											"
+									<ButtonStyled
+										color="red"
+										:type="
+											getDetailDecision(flag.detail.id, flag.detail.status) === 'malware'
+												? undefined
+												: 'outlined'
+										"
+									>
+										<button
+											class="!border-[1px]"
+											:disabled="updatingDetails.has(flag.detail.id)"
+											@click="updateDetailStatus(flag.detail.id, 'unsafe')"
 										>
-											<button
-												class="!border-[1px]"
-												:disabled="updatingDetails.has(flag.detail.id)"
-												@click="updateDetailStatus(flag.detail.id, 'unsafe')"
-											>
-												Unsafe
-											</button>
-										</ButtonStyled>
-									</div>
+											Unsafe
+										</button>
+									</ButtonStyled>
 								</div>
 							</div>
 
 							<div
 								v-if="props.decompiledSources.get(classItem.flags[0]?.detail.id)"
-								class="relative overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
+								class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
 							>
 								<ButtonStyled circular type="transparent">
 									<button

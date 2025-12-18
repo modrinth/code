@@ -2,7 +2,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, LoaderCircleIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, CopyCode, NewModal } from '@modrinth/ui'
-import { ref } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 
 export type UnsafeFile = {
 	file: Labrinth.TechReview.Internal.FileReport & { version_id: string }
@@ -15,7 +15,7 @@ const props = defineProps<{
 	unsafeFiles: UnsafeFile[]
 }>()
 
-const modalRef = ref<InstanceType<typeof NewModal>>()
+const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
 
 const versionDataCache = ref<
 	Map<
