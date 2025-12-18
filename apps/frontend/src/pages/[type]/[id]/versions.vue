@@ -1,13 +1,4 @@
 <template>
-	<ConfirmModal
-		v-if="currentMember"
-		ref="deleteVersionModal"
-		title="Are you sure you want to delete this version?"
-		description="This will remove this version forever (like really forever)."
-		:has-to-type="false"
-		proceed-label="Delete"
-		@proceed="deleteVersion()"
-	/>
 	<section class="experimental-styles-within overflow-visible">
 		<Admonition v-if="!hideVersionsAdmonition" type="info" class="mb-4">
 			Managing project versions has moved! You can now add and edit versions in the
@@ -125,17 +116,6 @@
 								},
 								shown: flags.developerMode,
 							},
-							{ divider: true, shown: currentMember },
-							{
-								id: 'delete',
-								color: 'red',
-								hoverFilled: true,
-								action: () => {
-									selectedVersion = version.id
-									deleteVersionModal.show()
-								},
-								shown: currentMember,
-							},
 						]"
 						aria-label="More options"
 					>
@@ -159,14 +139,6 @@
 						<template #report>
 							<ReportIcon aria-hidden="true" />
 							Report
-						</template>
-						<template #edit>
-							<EditIcon aria-hidden="true" />
-							Edit
-						</template>
-						<template #delete>
-							<TrashIcon aria-hidden="true" />
-							Delete
 						</template>
 						<template #copy-id>
 							<ClipboardCopyIcon aria-hidden="true" />
@@ -196,22 +168,14 @@
 import {
 	ClipboardCopyIcon,
 	DownloadIcon,
-	EditIcon,
 	ExternalIcon,
 	LinkIcon,
 	MoreVerticalIcon,
 	ReportIcon,
 	SettingsIcon,
 	ShareIcon,
-	TrashIcon,
 } from '@modrinth/assets'
-import {
-	Admonition,
-	ButtonStyled,
-	ConfirmModal,
-	OverflowMenu,
-	ProjectPageVersions,
-} from '@modrinth/ui'
+import { Admonition, ButtonStyled, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
 import { useLocalStorage } from '@vueuse/core'
 
 import { reportVersion } from '~/utils/report-helpers.ts'
@@ -245,8 +209,6 @@ const hideVersionsAdmonition = useLocalStorage(
 	'hideVersionsHasMovedAdmonition',
 	!props.versions.length,
 )
-const deleteVersionModal = ref()
-const selectedVersion = ref(null)
 
 const emit = defineEmits(['onDownload', 'deleteVersion'])
 
@@ -260,10 +222,5 @@ function getPrimaryFile(version) {
 
 async function copyToClipboard(text) {
 	await navigator.clipboard.writeText(text)
-}
-
-function deleteVersion() {
-	emit('deleteVersion', selectedVersion.value)
-	selectedVersion.value = null
 }
 </script>
