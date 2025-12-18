@@ -11,6 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-12-18T13:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed non-members being informed of version and gallery editing having moved.
+- Fixed being able to de-select the project type in version settings, and then getting stuck.
+- Fixed some issues with non-USD gift card withdrawal.`,
+	},
+	{
 		date: `2025-12-18T12:30:00-08:00`,
 		product: 'web',
 		body: `## Improvements
