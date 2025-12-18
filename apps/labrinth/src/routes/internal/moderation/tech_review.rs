@@ -405,18 +405,18 @@ async fn search_projects(
                                                 'details', (
                                                     SELECT coalesce(jsonb_agg(
                                                         jsonb_build_object(
-                                                            'id', drid.id,
-                                                            'issue_id', drid.issue_id,
-                                                            'key', drid.key,
-                                                            'file_path', drid.file_path,
+                                                            'id', didws.id,
+                                                            'issue_id', didws.issue_id,
+                                                            'key', didws.key,
+                                                            'file_path', didws.file_path,
                                                             -- ignore `decompiled_source`
-                                                            'data', drid.data,
-                                                            'severity', drid.severity,
-                                                            'status', drid.status
+                                                            'data', didws.data,
+                                                            'severity', didws.severity,
+                                                            'status', didws.status
                                                         )
                                                     ), '[]'::jsonb)
-                                                    FROM delphi_report_issue_details drid
-                                                    WHERE drid.issue_id = dri.id
+                                                    FROM delphi_issue_details_with_statuses didws
+                                                    WHERE didws.issue_id = dri.id
                                                 )
                                             )
                                         ), '[]'::jsonb)
@@ -440,9 +440,8 @@ async fn search_projects(
 
             -- only return projects with at least 1 pending drid
             INNER JOIN delphi_reports dr ON dr.file_id = f.id
-            INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-            INNER JOIN delphi_report_issue_details drid
-                ON drid.issue_id = dri.id AND drid.status = 'pending'
+            INNER JOIN delphi_issue_details_with_statuses didws
+                ON didws.project_id = m.id AND didws.status = 'pending'
 
             -- filtering
             LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
@@ -603,19 +602,19 @@ async fn submit_report(
         .wrap_internal_err("failed to begin transaction")?;
 
     let pending_issue_details = sqlx::query!(
-        "
+        r#"
         SELECT
-            drid.id AS issue_detail_id
+            didws.id AS "issue_detail_id!"
         FROM mods m
         INNER JOIN versions v ON v.mod_id = m.id
         INNER JOIN files f ON f.version_id = v.id
         INNER JOIN delphi_reports dr ON dr.file_id = f.id
         INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-        INNER JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id
+        INNER JOIN delphi_issue_details_with_statuses didws ON didws.issue_id = dri.id
         WHERE
             m.id = $1
-            AND drid.status = 'pending'
-        ",
+            AND didws.status = 'pending'
+        "#,
         project_id as _,
     )
     .fetch_all(&mut *txn)
@@ -763,9 +762,16 @@ async fn update_issue_detail(
     };
     sqlx::query!(
         r#"
-        UPDATE delphi_report_issue_details drid
-        SET status = $1
-        WHERE drid.id = $2
+        INSERT INTO delphi_issue_detail_verdicts (
+            project_id,
+            detail_key,
+            verdict
+        )
+        VALUES (
+            (SELECT project_id FROM delphi_issue_details_with_statuses WHERE id = $2),
+            (SELECT key FROM delphi_report_issue_details WHERE id = $2),
+            $1
+        )
         "#,
         status as _,
         issue_detail_id as _,

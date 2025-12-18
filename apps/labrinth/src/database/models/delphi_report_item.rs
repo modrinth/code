@@ -236,8 +236,8 @@ impl ReportIssueDetail {
     ) -> Result<DelphiReportIssueDetailsId, DatabaseError> {
         Ok(DelphiReportIssueDetailsId(sqlx::query_scalar!(
             "
-            INSERT INTO delphi_report_issue_details (issue_id, key, file_path, decompiled_source, data, severity, status)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO delphi_report_issue_details (issue_id, key, file_path, decompiled_source, data, severity)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING id
             ",
             self.issue_id as DelphiReportIssueId,
@@ -246,7 +246,6 @@ impl ReportIssueDetail {
             self.decompiled_source,
             sqlx::types::Json(&self.data) as Json<&HashMap<String, serde_json::Value>>,
             self.severity as DelphiSeverity,
-            self.status as _,
         )
         .fetch_one(&mut **transaction)
         .await?))

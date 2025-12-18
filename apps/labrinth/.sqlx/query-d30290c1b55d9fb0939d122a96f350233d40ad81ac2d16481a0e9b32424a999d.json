@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id\n        FROM (\n            SELECT DISTINCT ON (m.id)\n                m.id,\n                m.queued\n            FROM mods m\n\n            -- exclude projects in tech review queue\n            LEFT JOIN delphi_issue_details_with_statuses didws\n                ON didws.project_id = m.id AND didws.status = 'pending'\n\n            WHERE\n                m.status = $1\n                AND didws.status IS NULL\n\n            GROUP BY m.id\n        ) t\n\n        ORDER BY queued ASC\n        OFFSET $3\n        LIMIT $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "d30290c1b55d9fb0939d122a96f350233d40ad81ac2d16481a0e9b32424a999d"
+}
