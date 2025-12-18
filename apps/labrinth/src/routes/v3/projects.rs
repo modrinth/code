@@ -9,7 +9,7 @@ use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{DBTeamMember, ids as db_ids, image_item};
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
-use crate::file_hosting::{CdnConfig, FileHost, FileHostPublicity, UseAltCdn};
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
@@ -1068,8 +1068,6 @@ pub async fn dependency_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    cdn_config: web::Data<CdnConfig>,
-    UseAltCdn(use_alt_cdn): UseAltCdn,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
@@ -1138,7 +1136,6 @@ pub async fn dependency_list(
             &user_option,
             &pool,
             &redis,
-            &cdn_config.make_choice(use_alt_cdn),
         )
         .await?;
 

@@ -4503,7 +4503,6 @@ dependencies = [
  "actix-http",
  "actix-multipart",
  "actix-rt",
- "actix-utils",
  "actix-web",
  "actix-web-prom",
  "actix-ws",
