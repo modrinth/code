@@ -133,6 +133,8 @@ const addDetectedData = async () => {
 
 	if (projectType.value === 'resourcepack') {
 		draftVersion.value.loaders = ['minecraft']
+	} else if (projectType.value === 'modpack' && draftVersion.value.loaders?.length === 0) {
+		draftVersion.value.loaders = ['minecraft']
 	}
 }
 

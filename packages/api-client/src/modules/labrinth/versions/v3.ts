@@ -179,9 +179,9 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			formData.append(fileParts[i], new Blob([file]), file.name)
 		})
 
-		return this.client.request<Labrinth.Versions.v3.Version>(`/version`, {
+		const newVersion = await this.client.request<Labrinth.Versions.v3.Version>(`/version`, {
 			api: 'labrinth',
-			version: 3,
+			version: 2,
 			method: 'POST',
 			body: formData,
 			timeout: 120000,
@@ -189,6 +189,12 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 				'Content-Type': '',
 			},
 		})
+
+		await this.modifyVersion(newVersion.id, {
+			environment: draftVersion.environment,
+		})
+
+		return newVersion
 	}
 
 	/**
