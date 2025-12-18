@@ -18,7 +18,6 @@ use util::gotenberg::GotenbergClient;
 
 use crate::background_task::update_versions;
 use crate::database::ReadOnlyPgPool;
-use crate::file_hosting::CdnConfig;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::util::anrok;
@@ -56,7 +55,6 @@ pub struct LabrinthConfig {
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
-    pub cdn_config: web::Data<CdnConfig>,
     pub maxmind: web::Data<MaxMind>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
@@ -277,7 +275,6 @@ pub fn app_setup(
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
-        cdn_config: web::Data::new(CdnConfig::from_env().unwrap()),
         maxmind: web::Data::new(maxmind),
         scheduler: Arc::new(scheduler),
         ip_salt,
@@ -319,7 +316,6 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
-    .app_data(labrinth_config.cdn_config.clone())
     .app_data(web::Data::new(labrinth_config.search_config.clone()))
     .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.session_queue.clone())
@@ -378,7 +374,6 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("SITE_URL");
     failed |= check_var::<String>("CDN_URL");
-    failed |= check_var::<String>("CDN_ALT_URL");
     failed |= check_var::<String>("LABRINTH_ADMIN_KEY");
     failed |= check_var::<String>("LABRINTH_EXTERNAL_NOTIFICATION_KEY");
     failed |= check_var::<String>("RATE_LIMIT_IGNORE_KEY");
