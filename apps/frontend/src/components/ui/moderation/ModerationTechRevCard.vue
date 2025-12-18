@@ -158,7 +158,9 @@ const client = injectModrinthClient()
 
 const severityOrder = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
 
-function getFileHighestSeverity(file: FlattenedFileReport): Labrinth.TechReview.Internal.DelphiSeverity {
+function getFileHighestSeverity(
+	file: FlattenedFileReport,
+): Labrinth.TechReview.Internal.DelphiSeverity {
 	const severities = file.issues
 		.flatMap((i) => i.details ?? [])
 		.map((d) => d.severity)
