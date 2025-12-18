@@ -1,34 +1,37 @@
 <template>
-	<ConfirmModal
-		v-if="currentMember"
-		ref="deleteVersionModal"
-		title="Are you sure you want to delete this version?"
-		description="This will remove this version forever (like really forever)."
-		:has-to-type="false"
-		proceed-label="Delete"
-		@proceed="deleteVersion()"
-	/>
 	<section class="experimental-styles-within overflow-visible">
-		<div
-			v-if="currentMember && isPermission(currentMember?.permissions, 1 << 0)"
-			class="card flex items-center gap-4"
-		>
-			<FileInput
-				:max-size="524288000"
-				:accept="acceptFileFromProjectType(project.project_type)"
-				prompt="Upload a version"
-				class="btn btn-primary"
-				aria-label="Upload a version"
-				@change="handleFiles"
-			>
-				<UploadIcon aria-hidden="true" />
-			</FileInput>
-			<span class="flex items-center gap-2">
-				<InfoIcon aria-hidden="true" /> Click to choose a file or drag one onto this page
-			</span>
-			<DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
-		</div>
+		<Admonition v-if="!hideVersionsAdmonition" type="info" class="mb-4">
+			Managing project versions has moved! You can now add and edit versions in the
+			<NuxtLink to="settings/versions" class="font-medium text-blue hover:underline"
+				>project settings</NuxtLink
+			>.
+			<template #actions>
+				<div class="flex gap-2">
+					<ButtonStyled color="blue">
+						<button
+							aria-label="Project Settings"
+							class="!shadow-none"
+							@click="() => router.push('settings/versions')"
+						>
+							<SettingsIcon />
+							Edit versions
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="transparent">
+						<button
+							aria-label="Dismiss"
+							class="!shadow-none"
+							@click="() => (hideVersionsAdmonition = true)"
+						>
+							Dismiss
+						</button>
+					</ButtonStyled>
+				</div>
+			</template>
+		</Admonition>
+
 		<ProjectPageVersions
+			v-if="versions.length"
 			:project="project"
 			:versions="versions"
 			:show-files="flags.showVersionFilesInTable"
@@ -113,24 +116,6 @@
 								},
 								shown: flags.developerMode,
 							},
-							{ divider: true, shown: currentMember },
-							{
-								id: 'edit',
-								link: `/${project.project_type}/${
-									project.slug ? project.slug : project.id
-								}/version/${encodeURI(version.displayUrlEnding)}/edit`,
-								shown: currentMember,
-							},
-							{
-								id: 'delete',
-								color: 'red',
-								hoverFilled: true,
-								action: () => {
-									selectedVersion = version.id
-									deleteVersionModal.show()
-								},
-								shown: currentMember,
-							},
 						]"
 						aria-label="More options"
 					>
@@ -155,14 +140,6 @@
 							<ReportIcon aria-hidden="true" />
 							Report
 						</template>
-						<template #edit>
-							<EditIcon aria-hidden="true" />
-							Edit
-						</template>
-						<template #delete>
-							<TrashIcon aria-hidden="true" />
-							Delete
-						</template>
 						<template #copy-id>
 							<ClipboardCopyIcon aria-hidden="true" />
 							Copy ID
@@ -175,6 +152,15 @@
 				</ButtonStyled>
 			</template>
 		</ProjectPageVersions>
+		<template v-else>
+			<p class="ml-2">
+				No versions in project. Visit
+				<NuxtLink to="settings/versions">
+					<span class="font-medium text-green hover:underline">project settings</span> to
+				</NuxtLink>
+				upload your first version.
+			</p>
+		</template>
 	</section>
 </template>
 
@@ -182,27 +168,16 @@
 import {
 	ClipboardCopyIcon,
 	DownloadIcon,
-	EditIcon,
 	ExternalIcon,
-	InfoIcon,
 	LinkIcon,
 	MoreVerticalIcon,
 	ReportIcon,
+	SettingsIcon,
 	ShareIcon,
-	TrashIcon,
-	UploadIcon,
 } from '@modrinth/assets'
-import {
-	ButtonStyled,
-	ConfirmModal,
-	DropArea,
-	FileInput,
-	OverflowMenu,
-	ProjectPageVersions,
-} from '@modrinth/ui'
+import { Admonition, ButtonStyled, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
+import { useLocalStorage } from '@vueuse/core'
 
-import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
-import { isPermission } from '~/utils/permissions.ts'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const props = defineProps({
@@ -230,8 +205,10 @@ const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
-const deleteVersionModal = ref()
-const selectedVersion = ref(null)
+const hideVersionsAdmonition = useLocalStorage(
+	'hideVersionsHasMovedAdmonition',
+	!props.versions.length,
+)
 
 const emit = defineEmits(['onDownload', 'deleteVersion'])
 
@@ -243,26 +220,7 @@ function getPrimaryFile(version) {
 	return version.files.find((x) => x.primary) || version.files[0]
 }
 
-async function handleFiles(files) {
-	await router.push({
-		name: 'type-id-version-version',
-		params: {
-			type: props.project.project_type,
-			id: props.project.slug ? props.project.slug : props.project.id,
-			version: 'create',
-		},
-		state: {
-			newPrimaryFile: files[0],
-		},
-	})
-}
-
 async function copyToClipboard(text) {
 	await navigator.clipboard.writeText(text)
-}
-
-function deleteVersion() {
-	emit('deleteVersion', selectedVersion.value)
-	selectedVersion.value = null
 }
 </script>

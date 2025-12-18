@@ -32,6 +32,7 @@
 		"tailwindcss": "^3.4.4",
 		"typescript": "^5.4.5",
 		"vite-svg-loader": "^5.1.0",
+		"vue-component-type-helpers": "^3.1.8",
 		"vue-tsc": "^2.0.24"
 	},
 	"dependencies": {

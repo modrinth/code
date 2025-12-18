@@ -141,7 +141,7 @@
 				</ButtonStyled>
 			</div>
 			<div v-else class="input-group">
-				<ButtonStyled v-if="primaryFile" color="brand">
+				<ButtonStyled v-if="primaryFile && !currentMember" color="brand">
 					<a
 						v-tooltip="primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'"
 						:href="primaryFile.url"
@@ -164,18 +164,6 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled>
-					<nuxt-link
-						v-if="currentMember"
-						class="action"
-						:to="`/${project.project_type}/${
-							project.slug ? project.slug : project.id
-						}/version/${encodeURI(version.displayUrlEnding)}/edit`"
-					>
-						<EditIcon aria-hidden="true" />
-						Edit
-					</nuxt-link>
-				</ButtonStyled>
-				<ButtonStyled>
 					<button
 						v-if="
 							currentMember &&
@@ -185,12 +173,6 @@
 					>
 						<BoxIcon aria-hidden="true" />
 						Package as mod
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button v-if="currentMember" @click="$refs.modal_confirm.show()">
-						<TrashIcon aria-hidden="true" />
-						Delete
 					</button>
 				</ButtonStyled>
 			</div>
@@ -1353,7 +1335,6 @@ export default defineNuxtComponent({
 			display: flex;
 			flex-wrap: wrap;
 			align-items: center;
-			margin-bottom: 1rem;
 			gap: var(--spacing-card-md);
 
 			h2,

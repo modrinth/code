@@ -172,6 +172,7 @@ export namespace Labrinth {
 				| 'shader'
 				| 'plugin'
 				| 'datapack'
+				| 'project'
 
 			export type GalleryImage = {
 				url: string
@@ -264,7 +265,7 @@ export namespace Labrinth {
 
 			export type ProjectSearchParams = {
 				query?: string
-				facets?: string[][]
+				facets?: string[][] // in the format of [["categories:forge"],["versions:1.17.1"]]
 				filters?: string
 				index?: 'relevance' | 'downloads' | 'follows' | 'newest' | 'updated'
 				offset?: number
@@ -420,23 +421,38 @@ export namespace Labrinth {
 			}
 		}
 
+		// TODO: consolidate duplicated types between v2 and v3 versions
 		export namespace v3 {
-			export type VersionType = 'release' | 'beta' | 'alpha'
+			export interface Dependency {
+				dependency_type: Labrinth.Versions.v2.DependencyType
+				project_id?: string
+				file_name?: string
+				version_id?: string
+			}
 
-			export type VersionStatus =
-				| 'listed'
-				| 'archived'
-				| 'draft'
-				| 'unlisted'
-				| 'scheduled'
+			export interface GetProjectVersionsParams {
+				game_versions?: string[]
+				loaders?: string[]
+			}
+
+			export type VersionChannel = 'release' | 'beta' | 'alpha'
+
+			export type FileType =
+				| 'required-resource-pack'
+				| 'optional-resource-pack'
+				| 'sources-jar'
+				| 'dev-jar'
+				| 'javadoc-jar'
+				| 'signature'
 				| 'unknown'
 
-			export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
+			export interface VersionFileHash {
+				sha512: string
+				sha1: string
+			}
 
-			export type FileType = 'required-resource-pack' | 'optional-resource-pack' | 'unknown'
-
-			export type VersionFile = {
-				hashes: Record<string, string>
+			interface VersionFile {
+				hashes: VersionFileHash
 				url: string
 				filename: string
 				primary: boolean
@@ -444,35 +460,75 @@ export namespace Labrinth {
 				file_type?: FileType
 			}
 
-			export type Dependency = {
-				version_id?: string
-				project_id?: string
-				file_name?: string
-				dependency_type: DependencyType
-			}
-
-			export type Version = {
+			export interface Version {
+				name: string
+				version_number: string
+				changelog?: string
+				dependencies: Dependency[]
+				game_versions: string[]
+				version_type: VersionChannel
+				loaders: string[]
+				featured: boolean
+				status: Labrinth.Versions.v2.VersionStatus
 				id: string
 				project_id: string
 				author_id: string
-				featured: boolean
-				name: string
-				version_number: string
-				project_types: string[]
-				games: string[]
-				changelog: string
 				date_published: string
 				downloads: number
-				version_type: VersionType
-				status: VersionStatus
-				requested_status?: VersionStatus | null
 				files: VersionFile[]
-				dependencies: Dependency[]
+				environment?: Labrinth.Projects.v3.Environment
+			}
+
+			export interface DraftVersionFile {
+				fileType?: FileType
+				file: File
+			}
+
+			export type DraftVersion = Omit<
+				Labrinth.Versions.v3.CreateVersionRequest,
+				'file_parts' | 'primary_file' | 'file_types'
+			> & {
+				existing_files?: VersionFile[]
+				version_id?: string
+				environment?: Labrinth.Projects.v3.Environment
+			}
+
+			export interface CreateVersionRequest {
+				name: string
+				version_number: string
+				changelog: string
+				dependencies?: Array<{
+					version_id?: string
+					project_id?: string
+					file_name?: string
+					dependency_type: Labrinth.Versions.v2.DependencyType
+				}>
+				game_versions: string[]
+				version_type: 'release' | 'beta' | 'alpha'
 				loaders: string[]
-				ordering?: number | null
-				game_versions?: string[]
-				mrpack_loaders?: string[]
-				environment?: string
+				featured?: boolean
+				status?: 'listed' | 'archived' | 'draft' | 'unlisted' | 'scheduled' | 'unknown'
+				requested_status?: 'listed' | 'archived' | 'draft' | 'unlisted' | null
+				project_id: string
+				file_parts: string[]
+				primary_file?: string
+				file_types?: Record<string, Labrinth.Versions.v3.FileType | null>
+				environment?: Labrinth.Projects.v3.Environment
+			}
+
+			export type ModifyVersionRequest = Partial<
+				Omit<CreateVersionRequest, 'project_id' | 'file_parts' | 'primary_file' | 'file_types'>
+			> & {
+				file_types?: {
+					algorithm: string
+					hash: string
+					file_type: Labrinth.Versions.v3.FileType | null
+				}[]
+			}
+
+			export type AddFilesToVersionRequest = {
+				file_parts: string[]
+				file_types?: Record<string, Labrinth.Versions.v3.FileType | null>
 			}
 		}
 	}
@@ -566,7 +622,7 @@ export namespace Labrinth {
 			export interface GameVersion {
 				version: string
 				version_type: string
-				date: string // RFC 3339 DateTime
+				date: string
 				major: boolean
 			}
 

@@ -22,23 +22,30 @@
 			}"
 			class="page-number-container"
 		>
-			<div v-if="item === '-'">
-				<GapIcon />
+			<div v-if="item === '-'" class="rotate-90 grid place-content-center">
+				<EllipsisVerticalIcon />
 			</div>
 			<ButtonStyled
 				v-else
 				circular
 				:color="page === item ? 'brand' : 'standard'"
-				:type="page === item ? 'standard' : 'transparent'"
+				:type="page === item ? 'highlight' : 'transparent'"
 			>
 				<a
 					v-if="linkFunction"
 					:href="linkFunction(item)"
+					:class="page === item ? '!text-brand' : ''"
 					@click.prevent="page !== item ? switchPage(item) : null"
 				>
 					{{ item }}
 				</a>
-				<button v-else @click="page !== item ? switchPage(item) : null">{{ item }}</button>
+				<button
+					v-else
+					:class="page === item ? '!text-brand' : ''"
+					@click="page !== item ? switchPage(item) : null"
+				>
+					{{ item }}
+				</button>
 			</ButtonStyled>
 		</div>
 
@@ -58,7 +65,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { ChevronLeftIcon, ChevronRightIcon, GapIcon } from '@modrinth/assets'
+import { ChevronLeftIcon, ChevronRightIcon, EllipsisVerticalIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import ButtonStyled from './ButtonStyled.vue'

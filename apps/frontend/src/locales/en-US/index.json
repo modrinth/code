@@ -437,6 +437,9 @@
   "common.yes": {
     "message": "Yes"
   },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Supplementary files are for supporting resources like source code, not for alternative versions or variants."
+  },
   "create.collection.cancel": {
     "message": "Cancel"
   },
@@ -2245,12 +2248,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project."
-  },
-  "project.version.all-versions": {
-    "message": "All versions"
-  },
-  "project.version.back-to-versions": {
-    "message": "Back to versions"
   },
   "project.versions.title": {
     "message": "Versions"
