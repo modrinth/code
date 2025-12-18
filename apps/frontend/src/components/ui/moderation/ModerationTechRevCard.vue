@@ -35,9 +35,7 @@ import {
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
-import MaliciousSummaryModal, {
-	type UnsafeFile,
-} from '~/components/ui/moderation/MaliciousSummaryModal.vue'
+import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
 
@@ -78,6 +76,7 @@ const emit = defineEmits<{
 	refetch: []
 	loadFileSources: [reportId: string]
 	markComplete: [projectId: string]
+	showMaliciousSummary: [unsafeFiles: UnsafeFile[]]
 }>()
 
 const quickActions = computed<OverflowMenuOption[]>(() => {
@@ -157,11 +156,24 @@ watch(selectedFile, (newFile) => {
 
 const client = injectModrinthClient()
 
-const allFiles = computed(() => {
-	return props.item.reports
-})
-
 const severityOrder = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
+
+function getFileHighestSeverity(file: FlattenedFileReport): Labrinth.TechReview.Internal.DelphiSeverity {
+	const severities = file.issues
+		.flatMap((i) => i.details ?? [])
+		.map((d) => d.severity)
+		.filter((s): s is Labrinth.TechReview.Internal.DelphiSeverity => !!s)
+
+	return severities.sort((a, b) => (severityOrder[b] ?? 0) - (severityOrder[a] ?? 0))[0] || 'low'
+}
+
+const allFiles = computed(() => {
+	return [...props.item.reports].sort((a, b) => {
+		const aSeverity = getFileHighestSeverity(a)
+		const bSeverity = getFileHighestSeverity(b)
+		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
+	})
+})
 
 const highestSeverity = computed(() => {
 	const severities = props.item.reports
@@ -484,8 +496,6 @@ const threadViewRef = ref<{
 	getReplyContent: () => string
 } | null>(null)
 
-const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
-
 const unsafeFiles = computed<UnsafeFile[]>(() => {
 	return props.item.reports
 		.filter((report) =>
@@ -657,7 +667,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 		})
 
 		if (verdict === 'unsafe') {
-			maliciousSummaryModalRef.value?.show()
+			emit('showMaliciousSummary', unsafeFiles.value)
 		}
 	} catch (error: unknown) {
 		const err = error as { response?: { data?: { issues?: string[] } } }
@@ -820,7 +830,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 									</button>
 								</ButtonStyled>
 								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
-									<button @click="maliciousSummaryModalRef?.show()">Debug Summary</button>
+									<button @click="emit('showMaliciousSummary', unsafeFiles)">Debug Summary</button>
 								</ButtonStyled>
 							</template>
 						</ThreadView>
@@ -853,6 +863,15 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 						</div>
 						<div
 							v-if="getFileDetailCount(file) > 0"
+							class="rounded-full border-solid px-2.5 py-1"
+							:class="getSeverityBadgeColor(getFileHighestSeverity(file))"
+						>
+							<span class="text-sm font-medium">{{
+								capitalizeString(getFileHighestSeverity(file))
+							}}</span>
+						</div>
+						<div
+							v-if="getFileDetailCount(file) > 0"
 							class="flex items-center gap-1 rounded-full border border-solid px-2.5 py-1 text-sm"
 							:class="
 								getFileMarkedCount(file) === getFileDetailCount(file)
@@ -866,8 +885,9 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 							/>
 							{{ getFileMarkedCount(file) }}/{{ getFileDetailCount(file) }} flags
 						</div>
+						<!-- TODO: remove toString when backend supports it properly -->
 						<div
-							v-else-if="file.flag_reason === 'manual'"
+							v-else-if="file.flag_reason.toString() === 'manual'"
 							class="border-blue/60 flex items-center gap-1 rounded-full border border-solid bg-highlight-blue px-2.5 py-1 text-sm text-blue"
 						>
 							Manual review
@@ -1075,8 +1095,6 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 				</div>
 			</template>
 		</div>
-
-		<MaliciousSummaryModal ref="maliciousSummaryModalRef" :unsafe-files="unsafeFiles" />
 	</div>
 </template>
 

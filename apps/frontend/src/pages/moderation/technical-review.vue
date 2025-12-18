@@ -8,17 +8,21 @@ import {
 	injectModrinthClient,
 	Pagination,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
+import MaliciousSummaryModal, {
+	type UnsafeFile,
+} from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 const currentPage = ref(1)
-const itemsPerPage = 15
+const API_PAGE_SIZE = 50
+const UI_PAGE_SIZE = 4
 const { formatMessage } = useVIntl()
 const route = useRoute()
 const router = useRouter()
@@ -208,13 +212,12 @@ const filterTypes = computed<ComboboxOption<string>[]>(() => {
 	return [...base, ...sortedTypes.map((type) => ({ value: type, label: type }))]
 })
 
-const currentSortType = ref('Oldest')
+const currentSortType = ref('Severe first')
 const sortTypes: ComboboxOption<string>[] = [
 	{ value: 'Oldest', label: 'Oldest' },
 	{ value: 'Newest', label: 'Newest' },
-	{ value: 'Pending', label: 'Pending' },
-	{ value: 'Severity ↑', label: 'Severity ↑' },
-	{ value: 'Severity ↓', label: 'Severity ↓' },
+	{ value: 'Severe first', label: 'Severe first' },
+	{ value: 'Severe last', label: 'Severe last' },
 ]
 
 const fuse = computed(() => {
@@ -255,64 +258,7 @@ const typeFiltered = computed(() => {
 	})
 })
 
-function getHighestSeverity(review: {
-	reports: Labrinth.TechReview.Internal.FileReport[]
-}): string {
-	const severities = review.reports
-		.flatMap((r) => r.issues ?? [])
-		.flatMap((i) => i.details ?? [])
-		.map((d) => d.severity)
-		.filter((s): s is Labrinth.TechReview.Internal.DelphiSeverity => !!s)
-
-	const order = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
-	return severities.sort((a, b) => (order[b] ?? 0) - (order[a] ?? 0))[0] || 'low'
-}
-
-function hasPendingIssues(review: { reports: Labrinth.TechReview.Internal.FileReport[] }): boolean {
-	return review.reports.some((report) => report.issues.some((issue) => issue.status === 'pending'))
-}
-
-function getEarliestDate(review: { reports: Labrinth.TechReview.Internal.FileReport[] }): number {
-	const dates = review.reports.map((r) => new Date(r.created).getTime())
-	return Math.min(...dates)
-}
-
-const filteredItems = computed(() => {
-	const filtered = [...typeFiltered.value]
-
-	switch (currentSortType.value) {
-		case 'Oldest':
-			filtered.sort((a, b) => getEarliestDate(a) - getEarliestDate(b))
-			break
-		case 'Newest':
-			filtered.sort((a, b) => getEarliestDate(b) - getEarliestDate(a))
-			break
-		case 'Pending': {
-			filtered.sort((a, b) => {
-				const aPending = hasPendingIssues(a) ? 0 : 1
-				const bPending = hasPendingIssues(b) ? 0 : 1
-				return aPending - bPending
-			})
-			break
-		}
-		case 'Severity ↑': {
-			const order = { low: 0, medium: 1, high: 2, severe: 3 } as Record<string, number>
-			filtered.sort(
-				(a, b) => (order[getHighestSeverity(a)] ?? 0) - (order[getHighestSeverity(b)] ?? 0),
-			)
-			break
-		}
-		case 'Severity ↓': {
-			const order = { low: 0, medium: 1, high: 2, severe: 3 } as Record<string, number>
-			filtered.sort(
-				(a, b) => (order[getHighestSeverity(b)] ?? 0) - (order[getHighestSeverity(a)] ?? 0),
-			)
-			break
-		}
-	}
-
-	return filtered
-})
+const filteredItems = computed(() => typeFiltered.value)
 
 const filteredIssuesCount = computed(() => {
 	return filteredItems.value.reduce((total, review) => {
@@ -332,11 +278,11 @@ const filteredIssuesCount = computed(() => {
 	}, 0)
 })
 
-const totalPages = computed(() => Math.ceil((filteredItems.value?.length || 0) / itemsPerPage))
+const totalPages = computed(() => Math.ceil((filteredItems.value?.length || 0) / UI_PAGE_SIZE))
 const paginatedItems = computed(() => {
 	if (!filteredItems.value) return []
-	const start = (currentPage.value - 1) * itemsPerPage
-	const end = start + itemsPerPage
+	const start = (currentPage.value - 1) * UI_PAGE_SIZE
+	const end = start + UI_PAGE_SIZE
 	return filteredItems.value.slice(start, end)
 })
 function goToPage(page: number, top = false) {
@@ -356,24 +302,66 @@ function toApiSort(label: string): Labrinth.TechReview.Internal.SearchProjectsSo
 		case 'Oldest':
 			return 'created_asc'
 		case 'Newest':
-		default:
 			return 'created_desc'
+		case 'Severe first':
+			return 'severity_desc'
+		case 'Severe last':
+			return 'severity_asc'
+		default:
+			return 'severity_desc'
 	}
 }
 
 const {
-	data: searchResponse,
+	data: infiniteData,
 	isLoading,
+	isFetchingNextPage,
+	fetchNextPage,
+	hasNextPage,
 	refetch,
-} = useQuery({
+} = useInfiniteQuery({
 	queryKey: ['tech-reviews', currentSortType],
-	queryFn: async () => {
+	queryFn: async ({ pageParam = 0 }) => {
 		return await client.labrinth.tech_review_internal.searchProjects({
-			limit: 350,
-			page: 0,
+			limit: API_PAGE_SIZE,
+			page: pageParam,
 			sort_by: toApiSort(currentSortType.value),
 		})
 	},
+	getNextPageParam: (lastPage, allPages) => {
+		// If we got a full page, there's probably more
+		return lastPage.project_reports.length >= API_PAGE_SIZE ? allPages.length : undefined
+	},
+	initialPageParam: 0,
+})
+
+watch(
+	[() => infiniteData.value, hasNextPage],
+	() => {
+		if (hasNextPage.value && !isFetchingNextPage.value) {
+			fetchNextPage()
+		}
+	},
+	{ immediate: true },
+)
+
+const mergedSearchResponse = computed(() => {
+	if (!infiniteData.value?.pages?.length) return null
+
+	return infiniteData.value.pages.reduce(
+		(merged, page) => ({
+			project_reports: [...merged.project_reports, ...page.project_reports],
+			projects: { ...merged.projects, ...page.projects },
+			threads: { ...merged.threads, ...page.threads },
+			ownership: { ...merged.ownership, ...page.ownership },
+		}),
+		{
+			project_reports: [] as Labrinth.TechReview.Internal.ProjectReport[],
+			projects: {} as Record<string, Labrinth.TechReview.Internal.ProjectModerationInfo>,
+			threads: {} as Record<string, Labrinth.TechReview.Internal.Thread>,
+			ownership: {} as Record<string, Labrinth.TechReview.Internal.Ownership>,
+		},
+	)
 })
 
 type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
@@ -382,11 +370,11 @@ type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
 }
 
 const reviewItems = computed(() => {
-	if (!searchResponse.value?.project_reports?.length) {
+	if (!mergedSearchResponse.value?.project_reports?.length) {
 		return []
 	}
 
-	const response = searchResponse.value
+	const response = mergedSearchResponse.value
 
 	return response.project_reports
 		.map((projectReport) => {
@@ -414,7 +402,7 @@ const reviewItems = computed(() => {
 			(
 				item,
 			): item is {
-				project: Labrinth.Projects.v3.Project
+				project: Labrinth.TechReview.Internal.ProjectModerationInfo
 				project_owner: Labrinth.TechReview.Internal.Ownership
 				thread: Labrinth.TechReview.Internal.Thread
 				reports: FlattenedFileReport[]
@@ -425,29 +413,43 @@ const reviewItems = computed(() => {
 function handleMarkComplete(projectId: string) {
 	queryClient.setQueryData(
 		['tech-reviews', currentSortType],
-		(oldData: Labrinth.TechReview.Internal.SearchResponse | undefined) => {
+		(
+			oldData:
+				| {
+						pages: Labrinth.TechReview.Internal.SearchResponse[]
+						pageParams: number[]
+				  }
+				| undefined,
+		) => {
 			if (!oldData) return oldData
-
-			const remainingProjectReports = oldData.project_reports.filter(
-				(pr) => pr.project_id !== projectId,
-			)
-
-			const { [projectId]: _removedProject, ...remainingProjects } = oldData.projects
-			const { [projectId]: _removedOwnership, ...remainingOwnership } = oldData.ownership
 
 			return {
 				...oldData,
-				project_reports: remainingProjectReports,
-				projects: remainingProjects,
-				ownership: remainingOwnership,
+				pages: oldData.pages.map((page) => ({
+					...page,
+					project_reports: page.project_reports.filter((pr) => pr.project_id !== projectId),
+					projects: Object.fromEntries(
+						Object.entries(page.projects).filter(([id]) => id !== projectId),
+					),
+					ownership: Object.fromEntries(
+						Object.entries(page.ownership).filter(([id]) => id !== projectId),
+					),
+				})),
 			}
 		},
 	)
 }
 
+const maliciousSummaryModalRef = ref<InstanceType<typeof MaliciousSummaryModal>>()
+const currentUnsafeFiles = ref<UnsafeFile[]>([])
+
+function handleShowMaliciousSummary(unsafeFiles: UnsafeFile[]) {
+	currentUnsafeFiles.value = unsafeFiles
+	maliciousSummaryModalRef.value?.show()
+}
+
 watch(currentSortType, () => {
 	goToPage(1)
-	refetch()
 })
 
 // TODO: Reimpl when backend is available
@@ -509,7 +511,7 @@ watch(currentSortType, () => {
 
 				<Combobox
 					v-model="currentSortType"
-					class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[150px]"
+					class="!w-full flex-grow sm:!w-[150px] sm:flex-grow-0 lg:!w-[175px]"
 					:options="sortTypes"
 					:placeholder="formatMessage(messages.sortBy)"
 					@select="goToPage(1)"
@@ -537,7 +539,7 @@ watch(currentSortType, () => {
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<div v-if="isLoading" class="universal-card h-24 animate-pulse"></div>
+			<div v-if="isLoading || isFetchingNextPage" class="universal-card h-24 animate-pulse"></div>
 			<div
 				v-else-if="paginatedItems.length === 0"
 				class="universal-card flex h-24 items-center justify-center text-secondary"
@@ -552,6 +554,7 @@ watch(currentSortType, () => {
 					@refetch="refetch"
 					@load-file-sources="handleLoadFileSources"
 					@mark-complete="handleMarkComplete"
+					@show-malicious-summary="handleShowMaliciousSummary"
 				/>
 			</div>
 		</div>
@@ -563,5 +566,7 @@ watch(currentSortType, () => {
 				@switch-page="(num) => goToPage(num, true)"
 			/>
 		</div>
+
+		<MaliciousSummaryModal ref="maliciousSummaryModalRef" :unsafe-files="currentUnsafeFiles" />
 	</div>
 </template>

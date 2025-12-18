@@ -679,7 +679,11 @@ export namespace Labrinth {
 				project_type?: string[]
 			}
 
-			export type SearchProjectsSort = 'created_asc' | 'created_desc'
+			export type SearchProjectsSort =
+				| 'created_asc'
+				| 'created_desc'
+				| 'severity_asc'
+				| 'severity_desc'
 
 			export type UpdateIssueRequest = {
 				verdict: 'safe' | 'unsafe'
@@ -692,14 +696,22 @@ export namespace Labrinth {
 
 			export type SearchResponse = {
 				project_reports: ProjectReport[]
-				projects: Record<string, Projects.v3.Project>
+				projects: Record<string, ProjectModerationInfo>
 				threads: Record<string, Thread>
 				ownership: Record<string, Ownership>
 			}
 
+			export type ProjectModerationInfo = {
+				id: string
+				thread_id: string
+				name: string
+				project_types: string[]
+				icon_url: string | null
+			} & Projects.v3.Project
+
 			export type ProjectReport = {
 				project_id: string
-				max_severity: DelphiSeverity
+				max_severity: DelphiSeverity | null
 				versions: VersionReport[]
 			}
 
@@ -724,7 +736,6 @@ export namespace Labrinth {
 				id: string
 				report_id: string
 				issue_type: string
-				status: DelphiReportIssueStatus
 				details: ReportIssueDetail[]
 			}
 
@@ -736,6 +747,7 @@ export namespace Labrinth {
 				decompiled_source: string | null
 				data: Record<string, unknown>
 				severity: DelphiSeverity
+				status: DelphiReportIssueStatus
 			}
 
 			export type Ownership =
@@ -823,7 +835,7 @@ export namespace Labrinth {
 				members: User[]
 			}
 
-			export type FlagReason = 'delphi' | 'manual'
+			export type FlagReason = 'delphi'
 
 			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
 
