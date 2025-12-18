@@ -161,24 +161,32 @@
 
 		<div class="flex flex-col gap-2.5">
 			<label>
-				<span class="text-md font-semibold text-contrast"
-					>{{ formatMessage(formFieldLabels.amount) }}
-					<template v-if="useDenominationSuggestions"> ({{ selectedMethodCurrencyCode }})</template>
-					<span class="text-red">*</span></span
-				>
+				<span class="text-md font-semibold text-contrast">
+					<template v-if="useDenominationSuggestions">
+						{{ formatMessage(messages.searchAmountLabel) }} ({{ selectedMethodCurrencyCode }})
+					</template>
+					<template v-else>
+						{{ formatMessage(formFieldLabels.amount) }}
+					</template>
+					<span class="text-red">*</span>
+				</span>
 			</label>
 
 			<div v-if="showGiftCardSelector && useFixedDenominations" class="flex flex-col gap-2.5">
 				<template v-if="useDenominationSuggestions">
-					<input
-						v-model.number="denominationSearchInput"
-						type="number"
-						step="0.01"
-						:min="0"
-						:placeholder="formatMessage(messages.enterDenominationPlaceholder)"
-						class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
-						@input="hasTouchedSuggestions = true"
-					/>
+					<div class="iconified-input w-full">
+						<SearchIcon aria-hidden="true" />
+						<input
+							v-model.number="denominationSearchInput"
+							type="number"
+							step="0.01"
+							:min="0"
+							:disabled="effectiveMinAmount > roundedMaxAmount"
+							:placeholder="formatMessage(messages.enterDenominationPlaceholder)"
+							class="!bg-surface-4"
+							@input="hasTouchedSuggestions = true"
+						/>
+					</div>
 					<Transition
 						enter-active-class="transition-opacity duration-200 ease-out"
 						enter-from-class="opacity-0"
@@ -187,8 +195,25 @@
 						leave-from-class="opacity-100"
 						leave-to-class="opacity-0"
 					>
-						<span v-if="!denominationSearchInput" class="text-sm text-secondary">
-							{{ formatMessage(messages.enterAmountHint) }}
+						<span
+							v-if="
+								!denominationSearchInput &&
+								selectedMethodCurrencyCode &&
+								selectedMethodCurrencyCode !== 'USD' &&
+								selectedMethodExchangeRate
+							"
+							class="text-sm text-secondary"
+						>
+							{{
+								formatMessage(messages.balanceWorthHint, {
+									usdBalance: formatMoney(roundedMaxAmount),
+									localBalance: formatAmountForDisplay(
+										roundedMaxAmount,
+										selectedMethodCurrencyCode,
+										selectedMethodExchangeRate,
+									),
+								})
+							}}
 						</span>
 					</Transition>
 				</template>
@@ -202,10 +227,18 @@
 					leave-to-class="opacity-0 max-h-0"
 				>
 					<div
-						v-if="!useDenominationSuggestions || displayedSuggestions.length > 0"
-						class="overflow-hidden"
-						:class="[useDenominationSuggestions ? 'p-[2px]' : '']"
+						v-if="
+							!useDenominationSuggestions ||
+							(denominationSearchInput && displayedSuggestions.length > 0)
+						"
+						class="overflow-hidden p-[2px] pt-0"
 					>
+						<span
+							v-if="useDenominationSuggestions"
+							class="mb-1 block text-sm font-medium text-secondary"
+						>
+							{{ formatMessage(messages.availableDenominationsLabel) }}
+						</span>
 						<Chips
 							v-model="selectedDenomination"
 							:items="useDenominationSuggestions ? displayedSuggestions : denominationOptions"
@@ -220,6 +253,32 @@
 							:never-empty="false"
 							:capitalize="false"
 						/>
+						<span
+							v-if="useDenominationSuggestions && hasTouchedSuggestions && !hasSelectedDenomination"
+							class="mt-2.5 block text-sm text-orange"
+						>
+							{{ formatMessage(messages.selectDenominationRequired) }}
+						</span>
+						<span
+							v-if="
+								!useDenominationSuggestions &&
+								selectedMethodCurrencyCode &&
+								selectedMethodCurrencyCode !== 'USD' &&
+								selectedMethodExchangeRate
+							"
+							class="mt-2 block text-sm text-secondary"
+						>
+							{{
+								formatMessage(messages.balanceWorthHint, {
+									usdBalance: formatMoney(roundedMaxAmount),
+									localBalance: formatAmountForDisplay(
+										roundedMaxAmount,
+										selectedMethodCurrencyCode,
+										selectedMethodExchangeRate,
+									),
+								})
+							}}
+						</span>
 					</div>
 				</Transition>
 
@@ -243,27 +302,6 @@
 					</span>
 				</Transition>
 
-				<Transition
-					enter-active-class="transition-opacity duration-200 ease-out"
-					enter-from-class="opacity-0"
-					enter-to-class="opacity-100"
-					leave-active-class="transition-opacity duration-150 ease-in"
-					leave-from-class="opacity-100"
-					leave-to-class="opacity-0"
-				>
-					<span
-						v-if="
-							useDenominationSuggestions &&
-							hasTouchedSuggestions &&
-							displayedSuggestions.length > 0 &&
-							!hasSelectedDenomination
-						"
-						class="text-sm text-orange"
-					>
-						{{ formatMessage(messages.selectDenominationRequired) }}
-					</span>
-				</Transition>
-
 				<span
 					v-if="!useDenominationSuggestions && denominationOptions.length === 0"
 					class="text-error text-sm"
@@ -284,12 +322,15 @@
 			</div>
 
 			<WithdrawFeeBreakdown
-				v-if="allRequiredFieldsFilled"
+				v-if="allRequiredFieldsFilled && formData.amount && formData.amount > 0"
 				:amount="formData.amount || 0"
 				:fee="calculatedFee"
 				:fee-loading="feeLoading"
-				:exchange-rate="giftCardExchangeRate"
-				:local-currency="giftCardCurrencyCode"
+				:exchange-rate="showGiftCardSelector ? selectedMethodExchangeRate : giftCardExchangeRate"
+				:local-currency="
+					showGiftCardSelector ? (selectedMethodCurrencyCode ?? undefined) : giftCardCurrencyCode
+				"
+				:is-gift-card="showGiftCardSelector"
 			/>
 
 			<Checkbox v-model="agreedTerms">
@@ -308,6 +349,7 @@
 </template>
 
 <script setup lang="ts">
+import { SearchIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Checkbox,
@@ -607,23 +649,23 @@ const useDenominationSuggestions = computed(() => {
 	if (!useFixedDenominations.value) return false
 	const interval = selectedMethodDetails.value?.interval
 	if (!interval?.fixed?.values) return false
-	return interval.fixed.values.length > 35
+	return interval.fixed.values.length > 10
 })
 
 const denominationSuggestions = computed(() => {
-	const input = denominationSearchInput.value
-	if (!input || input <= 0) return []
-
 	const allDenominations = denominationOptions.value
 	if (allDenominations.length === 0) return []
 
-	// convert local currency input to USD for filtering (denominations are stored in USD)
-	const exchangeRate = selectedMethodExchangeRate.value
-	const inputInUsd = exchangeRate ? input / exchangeRate : input
+	const input = denominationSearchInput.value
 
-	const rangeSize = inputInUsd * 0.2
-	let lowerBound = inputInUsd - rangeSize / 2
-	let upperBound = inputInUsd + rangeSize / 2
+	// When no search input, use the user's balance as the target
+	const exchangeRate = selectedMethodExchangeRate.value
+	const targetInUsd =
+		input && input > 0 ? (exchangeRate ? input / exchangeRate : input) : roundedMaxAmount.value
+
+	const rangeSize = targetInUsd * 0.2
+	let lowerBound = targetInUsd - rangeSize / 2
+	let upperBound = targetInUsd + rangeSize / 2
 
 	const minAvailable = allDenominations[0]
 	const maxAvailable = allDenominations[allDenominations.length - 1]
@@ -650,14 +692,15 @@ const displayedSuggestions = computed(() => {
 	if (all.length <= maxDisplayedSuggestions) return all
 
 	const input = denominationSearchInput.value
-	if (!input) return all.slice(0, maxDisplayedSuggestions)
-
 	const exchangeRate = selectedMethodExchangeRate.value
-	const inputInUsd = exchangeRate ? input / exchangeRate : input
 
-	// select values closest to input, then sort ascending for display
+	// Use balance as target when no search input
+	const targetInUsd =
+		input && input > 0 ? (exchangeRate ? input / exchangeRate : input) : roundedMaxAmount.value
+
+	// select values closest to target, then sort ascending for display
 	const closest = [...all]
-		.sort((a, b) => Math.abs(a - inputInUsd) - Math.abs(b - inputInUsd))
+		.sort((a, b) => Math.abs(a - targetInUsd) - Math.abs(b - targetInUsd))
 		.slice(0, maxDisplayedSuggestions)
 
 	return closest.sort((a, b) => a - b)
@@ -896,12 +939,28 @@ watch(
 
 watch(selectedGiftCardId, (newId, oldId) => {
 	if (oldId && newId !== oldId) {
-		// Reset denomination search when gift card changes
-		denominationSearchInput.value = undefined
+		// Reset state when gift card changes
 		hasTouchedSuggestions.value = false
 		formData.value.amount = undefined
+		// denominationSearchInput will be prefilled by the watch below
+		denominationSearchInput.value = undefined
 	}
 })
+
+// Prefill denomination search with balance in local currency when suggestions mode is enabled
+watch(
+	[useDenominationSuggestions, selectedMethodExchangeRate],
+	([showSuggestions, exchangeRate]) => {
+		if (showSuggestions && denominationSearchInput.value === undefined) {
+			const balanceInLocal = exchangeRate
+				? roundedMaxAmount.value * exchangeRate
+				: roundedMaxAmount.value
+			denominationSearchInput.value = Math.floor(balanceInLocal * 100) / 100
+			hasTouchedSuggestions.value = true
+		}
+	},
+	{ immediate: true },
+)
 
 async function switchToDirectPaypal() {
 	withdrawData.value.selection.country = {
@@ -985,7 +1044,19 @@ const messages = defineMessages({
 	},
 	enterAmountHint: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint',
-		defaultMessage: 'Enter an amount to see available gift card denominations',
+		defaultMessage: 'Find gift cards near this value.',
+	},
+	balanceWorthHint: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint',
+		defaultMessage: 'Your balance of {usdBalance} is currently worth {localBalance}.',
+	},
+	searchAmountLabel: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.search-amount-label',
+		defaultMessage: 'Search amount',
+	},
+	availableDenominationsLabel: {
+		id: 'dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label',
+		defaultMessage: 'Available denominations',
 	},
 	selectDenominationHint: {
 		id: 'dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint',

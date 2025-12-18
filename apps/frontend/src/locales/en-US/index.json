@@ -665,8 +665,14 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Fee"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Gift card value"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Net amount"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "USD equivalent"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Business entity"
@@ -812,8 +818,14 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Tax form required"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Available denominations"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Your balance of {usdBalance} is currently worth {localBalance}."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
-    "message": "Enter an amount to see available gift card denominations"
+    "message": "Find gift cards near this value."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Enter amount"
@@ -829,6 +841,9 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Rewards"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Search amount"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
     "message": "Select a denomination:"
