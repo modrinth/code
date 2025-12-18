@@ -18,7 +18,7 @@
 			<input
 				id="version-number"
 				v-model="draftVersion.version_number"
-				placeholder="Enter version number..."
+				placeholder="Enter version number, e.g. 1.2.3"
 				type="text"
 				autocomplete="off"
 				maxlength="32"
