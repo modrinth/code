@@ -157,8 +157,6 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			{},
 		)
 
-		// TODO DEV-595 need to properly pass draftVersion.environment into request body for creating and modifying a version
-
 		const data: Labrinth.Versions.v3.CreateVersionRequest = {
 			project_id: draftVersion.project_id,
 			version_number: draftVersion.version_number,
@@ -186,6 +184,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			version: 3,
 			method: 'POST',
 			body: formData,
+			timeout: 120000,
 			headers: {
 				'Content-Type': '',
 			},
@@ -274,6 +273,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			version: 2,
 			method: 'POST',
 			body: formData,
+			timeout: 120000,
 			headers: {
 				'Content-Type': '',
 			},
