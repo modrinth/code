@@ -197,7 +197,6 @@
 					>
 						<span
 							v-if="
-								!denominationSearchInput &&
 								selectedMethodCurrencyCode &&
 								selectedMethodCurrencyCode !== 'USD' &&
 								selectedMethodExchangeRate
