@@ -1,6 +1,6 @@
 <template>
 	<section class="experimental-styles-within overflow-visible">
-		<Admonition v-if="!hideVersionsAdmonition" type="info" class="mb-4">
+		<Admonition v-if="!hideVersionsAdmonition && currentMember" type="info" class="mb-4">
 			Managing project versions has moved! You can now add and edit versions in the
 			<NuxtLink to="settings/versions" class="font-medium text-blue hover:underline"
 				>project settings</NuxtLink
