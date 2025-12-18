@@ -5,7 +5,7 @@
 		<Chips
 			v-model="loaderGroup"
 			:items="groupLabels"
-			:never-empty="false"
+			:never-empty="true"
 			:capitalize="true"
 			size="small"
 		/>
