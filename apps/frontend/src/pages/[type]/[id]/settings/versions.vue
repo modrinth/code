@@ -27,7 +27,7 @@
 						project.slug ? project.slug : project.id
 					}/version/${encodeURI(version.displayUrlEnding)}`
 			"
-			:open-modal="openModal"
+			:open-modal="currentMember ? openModal : undefined"
 		>
 			<template #actions="{ version }">
 				<ButtonStyled circular type="transparent">
