@@ -14,7 +14,8 @@ const VERSIONS: VersionEntry[] = [
 		date: `2025-12-18T11:20:00-08:00`,
 		product: 'web',
 		body: `## Improvements
-- Added support for non-USD gift cards with Tremendous.
+- Added support for non-USD gift cards.
+- Fixed issue with gift cards with lots of denominations.
 - Fixed issue with subregions for crypto & bank withdrawals.`,
 	},
 	{
