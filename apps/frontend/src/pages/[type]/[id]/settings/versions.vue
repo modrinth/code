@@ -31,24 +31,59 @@
 		>
 			<template #actions="{ version }">
 				<ButtonStyled circular type="transparent">
-					<a
-						v-tooltip="`Download`"
-						:href="getPrimaryFile(version).url"
-						class="group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted"
-						aria-label="Download"
-						@click="emit('onDownload')"
-					>
-						<DownloadIcon aria-hidden="true" />
-					</a>
-				</ButtonStyled>
-				<ButtonStyled circular type="transparent">
-					<a
-						v-tooltip="`Edit version`"
-						aria-label="Edit"
-						@click="() => handleOpenEditVersionModal(version)"
+					<OverflowMenu
+						class="group-hover:!bg-button-bg"
+						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
+						:options="[
+							{
+								id: 'edit-details',
+								action: () => handleOpenEditVersionModal(version),
+							},
+							{
+								id: 'edit-changelog',
+								action: () => handleOpenEditVersionModal(version),
+							},
+							{
+								id: 'edit-dependencies',
+								action: () => handleOpenEditVersionModal(version),
+							},
+							{
+								id: 'edit-files',
+								action: () => handleOpenEditVersionModal(version),
+							},
+						]"
+						aria-label="Edit version"
 					>
 						<EditIcon aria-hidden="true" />
-					</a>
+						<template #edit-files>
+							<EditIcon aria-hidden="true" />
+							Files
+						</template>
+						<template #edit-details>
+							<EditIcon aria-hidden="true" />
+							Details
+						</template>
+						<template #edit-loaders>
+							<EditIcon aria-hidden="true" />
+							Loaders
+						</template>
+						<template #edit-game-versions>
+							<EditIcon aria-hidden="true" />
+							Game versions
+						</template>
+						<template #edit-environment>
+							<EditIcon aria-hidden="true" />
+							Environment
+						</template>
+						<template #edit-dependencies>
+							<EditIcon aria-hidden="true" />
+							Dependencies
+						</template>
+						<template #edit-changelog>
+							<EditIcon aria-hidden="true" />
+							Changelog
+						</template>
+					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
