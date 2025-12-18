@@ -230,7 +230,7 @@
 							!useDenominationSuggestions ||
 							(denominationSearchInput && displayedSuggestions.length > 0)
 						"
-						class="overflow-hidden p-[2px] pt-0"
+						class="overflow-hidden pt-0"
 					>
 						<span
 							v-if="useDenominationSuggestions"
@@ -238,20 +238,22 @@
 						>
 							{{ formatMessage(messages.availableDenominationsLabel) }}
 						</span>
-						<Chips
-							v-model="selectedDenomination"
-							:items="useDenominationSuggestions ? displayedSuggestions : denominationOptions"
-							:format-label="
-								(amt: number) =>
-									formatAmountForDisplay(
-										amt,
-										selectedMethodCurrencyCode,
-										selectedMethodExchangeRate,
-									)
-							"
-							:never-empty="false"
-							:capitalize="false"
-						/>
+						<div class="p-[2px]">
+							<Chips
+								v-model="selectedDenomination"
+								:items="useDenominationSuggestions ? displayedSuggestions : denominationOptions"
+								:format-label="
+									(amt: number) =>
+										formatAmountForDisplay(
+											amt,
+											selectedMethodCurrencyCode,
+											selectedMethodExchangeRate,
+										)
+								"
+								:never-empty="false"
+								:capitalize="false"
+							/>
+						</div>
 						<span
 							v-if="useDenominationSuggestions && hasTouchedSuggestions && !hasSelectedDenomination"
 							class="mt-2.5 block text-sm text-orange"
