@@ -209,10 +209,6 @@ const usingDetectedLoaders = computed(() => {
 	return loadersMatch
 })
 
-const usingDetectedEnvironment = computed(() => {
-	return draftVersion.value.environment === inferredVersionData.value?.environment
-})
-
 const environmentCopy = computed(() => {
 	const emptyMessage = {
 		title: 'No environment set',

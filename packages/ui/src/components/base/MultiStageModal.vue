@@ -60,7 +60,9 @@
 </template>
 
 <script lang="ts">
+import { ButtonStyled, NewModal } from '@modrinth/ui'
 import type { Component } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 
 export interface StageButtonConfig {
 	label?: string
@@ -90,9 +92,6 @@ export function resolveCtxFn<T, R>(value: MaybeCtxFn<T, R>, ctx: T): R {
 </script>
 
 <script setup lang="ts" generic="T">
-import { ButtonStyled, NewModal } from '@modrinth/ui'
-import { computed, ref, useTemplateRef } from 'vue'
-
 const props = defineProps<{
 	stages: StageConfigInput<T>[]
 	context: T
@@ -161,12 +160,6 @@ const resolvedTitle = computed(() => {
 	const stage = currentStage.value
 	if (!stage) return ''
 	return resolveCtxFn(stage.title, props.context)
-})
-
-const resolvedSkip = computed(() => {
-	const stage = currentStage.value
-	if (!stage?.skip) return false
-	return resolveCtxFn(stage.skip, props.context)
 })
 
 const leftButtonConfig = computed(() => {
