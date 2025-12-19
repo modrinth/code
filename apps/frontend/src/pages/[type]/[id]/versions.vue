@@ -16,7 +16,7 @@
 		/>
 
 		<Admonition v-if="!hideVersionsAdmonition && currentMember" type="info" class="mb-4">
-			Managing project versions has moved! You can now add and edit versions in the
+			Creating and editing project versions can now be done directly from the
 			<NuxtLink to="settings/versions" class="font-medium text-blue hover:underline"
 				>project settings</NuxtLink
 			>.
@@ -61,7 +61,6 @@
 					}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`
 			"
 			:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
-			:create-version-button-secondary="true"
 		>
 			<template #actions="{ version }">
 				<ButtonStyled circular type="transparent">
@@ -283,10 +282,12 @@
 <script setup>
 import {
 	AlignLeftIcon,
+	BoxIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
 	ExternalIcon,
+	FileIcon,
 	InfoIcon,
 	LinkIcon,
 	MoreVerticalIcon,
@@ -308,7 +309,6 @@ import {
 import { useLocalStorage } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
 
-import { BoxIcon, FileIcon } from '@modrinth/assets'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
 

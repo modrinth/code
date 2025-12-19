@@ -196,7 +196,7 @@
 			</div>
 		</div>
 		<Admonition v-if="!hideGalleryAdmonition && currentMember" type="info" class="mb-4">
-			Managing gallery has moved! You can now add and edit gallery images in the
+			Creating and editing gallery images can now be done directly from the
 			<NuxtLink to="settings/gallery" class="font-medium text-blue hover:underline"
 				>project settings</NuxtLink
 			>.
