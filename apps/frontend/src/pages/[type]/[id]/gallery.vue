@@ -195,7 +195,36 @@
 				</div>
 			</div>
 		</div>
-		<div v-if="currentMember" class="card header-buttons">
+		<Admonition v-if="!hideGalleryAdmonition && currentMember" type="info" class="mb-4">
+			Creating and editing gallery images can now be done directly from the
+			<NuxtLink to="settings/gallery" class="font-medium text-blue hover:underline"
+				>project settings</NuxtLink
+			>.
+			<template #actions>
+				<div class="flex gap-2">
+					<ButtonStyled color="blue">
+						<button
+							aria-label="Project Settings"
+							class="!shadow-none"
+							@click="() => $router.push('settings/gallery')"
+						>
+							<SettingsIcon />
+							Edit gallery
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="transparent">
+						<button
+							aria-label="Dismiss"
+							class="!shadow-none"
+							@click="() => (hideGalleryAdmonition = true)"
+						>
+							Dismiss
+						</button>
+					</ButtonStyled>
+				</div>
+			</template>
+		</Admonition>
+		<div v-if="currentMember && project.gallery.length" class="card header-buttons">
 			<FileInput
 				:max-size="5242880"
 				:accept="acceptFileTypes"
@@ -216,7 +245,7 @@
 				@change="handleFiles"
 			/>
 		</div>
-		<div class="items">
+		<div v-if="project.gallery.length" class="items">
 			<div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
 				<a class="gallery-thumbnail" @click="expandImage(item, index)">
 					<img
@@ -273,6 +302,15 @@
 				</div>
 			</div>
 		</div>
+		<template v-else>
+			<p class="ml-2">
+				No images in gallery. Visit
+				<NuxtLink to="settings/gallery">
+					<span class="font-medium text-green hover:underline">project settings</span> to
+				</NuxtLink>
+				upload images.
+			</p>
+		</template>
 	</div>
 </template>
 
@@ -289,6 +327,7 @@ import {
 	PlusIcon,
 	RightArrowIcon,
 	SaveIcon,
+	SettingsIcon,
 	StarIcon,
 	TransferIcon,
 	TrashIcon,
@@ -296,12 +335,15 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
+	ButtonStyled,
 	ConfirmModal,
 	DropArea,
 	FileInput,
 	injectNotificationManager,
 	NewModal as Modal,
 } from '@modrinth/ui'
+import { useLocalStorage } from '@vueuse/core'
 
 import { isPermission } from '~/utils/permissions.ts'
 
@@ -334,6 +376,11 @@ useSeoMeta({
 	ogTitle: title,
 	ogDescription: description,
 })
+
+const hideGalleryAdmonition = useLocalStorage(
+	'hideGalleryHasMovedAdmonition',
+	!props.project.gallery.length,
+)
 </script>
 
 <script>

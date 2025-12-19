@@ -45,5 +45,10 @@ pub fn utoipa_config(
         utoipa_actix_web::scope("/_internal/moderation")
             .wrap(default_cors())
             .configure(moderation::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/_internal/affiliate")
+            .wrap(default_cors())
+            .configure(affiliate::config),
     );
 }

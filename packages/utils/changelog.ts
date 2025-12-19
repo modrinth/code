@@ -11,6 +11,42 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-12-19T13:45:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Improved the version creation and editing from feedback we have received:
+	- Made it easier to edit exactly what you want to about a version.
+	- Restored the ability to create and edit versions and gallery images from the public pages.
+	- Changelog stage is now larger.
+	- Fixed modpack uploading.
+	- Fixed version subtitle being limited to 32 characters.
+	- Fixed version links after editing.
+	- Fixed dependency search only showing mod projects.`,
+	},
+	{
+		date: `2025-12-18T13:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed non-members being informed of version and gallery editing having moved.
+- Fixed being able to de-select the project type in version settings, and then getting stuck.
+- Fixed some issues with non-USD gift card withdrawal.`,
+	},
+	{
+		date: `2025-12-18T12:30:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- [Overhauled version creation](/news/article/streamlined-version-creation) to be more intelligent and easier to use.
+- Versions and gallery images are now created and edited in project settings.`,
+	},
+	{
+		date: `2025-12-18T11:20:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Added support for non-USD gift cards.
+- Fixed issue with gift cards with lots of denominations.
+- Fixed issue with subregions for crypto & bank withdrawals.`,
+	},
+	{
 		date: `2025-12-16T13:15:00-08:00`,
 		product: 'web',
 		body: `## Improvements

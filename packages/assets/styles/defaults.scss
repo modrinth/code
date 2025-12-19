@@ -235,3 +235,23 @@ h3 {
 	margin-block: var(--gap-md) var(--gap-md);
 	color: var(--color-contrast);
 }
+
+// Scrollbar styles
+::-webkit-scrollbar {
+	width: 0.75rem;
+	height: 0.75rem;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--color-button-bg);
+}
+
+// Firefox scrollbar
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--color-button-bg) transparent;
+}

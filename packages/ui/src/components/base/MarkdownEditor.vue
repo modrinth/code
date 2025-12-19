@@ -1,5 +1,5 @@
 <template>
-	<Modal ref="linkModal" header="Insert link">
+	<NewModal ref="linkModal" header="Insert link">
 		<div class="modal-insert">
 			<label class="label" for="insert-link-label">
 				<span class="label__title">Label</span>
@@ -59,8 +59,8 @@
 				>
 			</div>
 		</div>
-	</Modal>
-	<Modal ref="imageModal" header="Insert image">
+	</NewModal>
+	<NewModal ref="imageModal" header="Insert image">
 		<div class="modal-insert">
 			<label class="label" for="insert-image-alt">
 				<span class="label__title">Description (alt text)<span class="required">*</span></span>
@@ -147,8 +147,8 @@
 				</Button>
 			</div>
 		</div>
-	</Modal>
-	<Modal ref="videoModal" header="Insert YouTube video">
+	</NewModal>
+	<NewModal ref="videoModal" header="Insert YouTube video">
 		<div class="modal-insert">
 			<label class="label" for="insert-video-url">
 				<span class="label__title">YouTube video URL<span class="required">*</span></span>
@@ -201,7 +201,7 @@
 				</Button>
 			</div>
 		</div>
-	</Modal>
+	</NewModal>
 	<div class="resizable-textarea-wrapper">
 		<div class="editor-action-row">
 			<div class="editor-actions">
@@ -223,10 +223,10 @@
 						</Button>
 					</template>
 				</template>
-			</div>
-			<div class="preview">
-				<Toggle id="preview" v-model="previewMode" />
-				<label class="label" for="preview"> Preview </label>
+				<div class="preview">
+					<Toggle id="preview" v-model="previewMode" />
+					<label class="label" for="preview"> Preview </label>
+				</div>
 			</div>
 		</div>
 		<div ref="editorRef" :class="{ hide: previewMode }" />
@@ -292,11 +292,11 @@ import {
 	XIcon,
 	YouTubeIcon,
 } from '@modrinth/assets'
+import NewModal from '@modrinth/ui/src/components/modal/NewModal.vue'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlightjs'
 import { type Component, computed, onBeforeUnmount, onMounted, ref, toRef, watch } from 'vue'
 
-import Modal from '../modal/Modal.vue'
 import Button from './Button.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
@@ -756,9 +756,9 @@ const videoMarkdown = computed(() => {
 	return ''
 })
 
-const linkModal = ref<InstanceType<typeof Modal> | null>(null)
-const imageModal = ref<InstanceType<typeof Modal> | null>(null)
-const videoModal = ref<InstanceType<typeof Modal> | null>(null)
+const linkModal = ref<InstanceType<typeof NewModal> | null>(null)
+const imageModal = ref<InstanceType<typeof NewModal> | null>(null)
+const videoModal = ref<InstanceType<typeof NewModal> | null>(null)
 
 function resetModalStates() {
 	linkText.value = ''

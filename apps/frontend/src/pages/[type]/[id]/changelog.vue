@@ -47,7 +47,7 @@
 							>
 						</div>
 						<a
-							:href="version.primaryFile.url"
+							:href="version.primaryFile?.url"
 							class="iconified-button download"
 							:title="`Download ${version.name}`"
 						>
