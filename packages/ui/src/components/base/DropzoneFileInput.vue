@@ -71,7 +71,7 @@ const props = withDefaults(
 	{
 		prompt: 'Drag and drop files or click to browse',
 		primaryPrompt: 'Drag and drop files or click to browse',
-		secondaryPrompt: 'You can try to drag files or folder or click this area to select it',
+		secondaryPrompt: 'You can drag files or folders here, or click this area to select file(s) for upload.',
 		size: 'standard',
 	},
 )
