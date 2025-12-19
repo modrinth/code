@@ -297,7 +297,7 @@ export function createManageVersionContext(
 		try {
 			if (!version.version_id) throw new Error('Version ID is required to save edits.')
 
-			await labrinth.versions_v3.modifyVersion(version.version_id, {
+			const data: Labrinth.Versions.v3.ModifyVersionRequest = {
 				name: version.name || version.version_number,
 				version_number: version.version_number,
 				changelog: version.changelog,
@@ -313,7 +313,9 @@ export function createManageVersionContext(
 						hash: file.hashes.sha1,
 						file_type: file.file_type ?? null,
 					})),
-			})
+			}
+
+			await labrinth.versions_v3.modifyVersion(version.version_id, data)
 
 			if (files.length > 0) {
 				await labrinth.versions_v3.addFilesToVersion(version.version_id, files)
