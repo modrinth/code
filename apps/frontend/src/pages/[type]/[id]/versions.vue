@@ -77,6 +77,7 @@
 				</ButtonStyled>
 				<ButtonStyled v-if="currentMember" circular type="transparent">
 					<OverflowMenu
+						v-tooltip="'Edit version'"
 						class="hover:!bg-button-bg"
 						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
 						:options="[
@@ -134,6 +135,7 @@
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
+						v-tooltip="'More options'"
 						class="hover:!bg-button-bg"
 						:dropdown-id="`${baseDropdownId}-${version.id}`"
 						:options="[

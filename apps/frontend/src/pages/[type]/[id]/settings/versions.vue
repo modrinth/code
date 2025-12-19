@@ -35,6 +35,7 @@
 			<template #actions="{ version }">
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
+						v-tooltip="'Edit version'"
 						class="hover:!bg-button-bg [&>svg]:!text-green"
 						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
 						:options="[
@@ -92,6 +93,7 @@
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
+						v-tooltip="'More options'"
 						class="hover:!bg-button-bg"
 						:dropdown-id="`${baseDropdownId}-${version.id}`"
 						:options="[
@@ -206,19 +208,19 @@
 						</template>
 						<template #edit-details>
 							<EditIcon aria-hidden="true" />
-							Edit Details
+							Details
 						</template>
 						<template #edit-changelog>
 							<EditIcon aria-hidden="true" />
-							Edit Changelog
+							Changelog
 						</template>
 						<template #edit-dependencies>
 							<EditIcon aria-hidden="true" />
-							Edit Dependencies
+							Dependencies
 						</template>
 						<template #edit-files>
 							<EditIcon aria-hidden="true" />
-							Edit Files
+							Files
 						</template>
 						<template #delete>
 							<TrashIcon aria-hidden="true" />
