@@ -7,6 +7,7 @@
 		search-placeholder="Search by name, slug, or paste ID..."
 		:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
 		@search-input="(query) => handleSearch(query)"
+		:disableSearchFilter="true"
 	/>
 </template>
 
@@ -45,7 +46,13 @@ const search = async (query: string) => {
 			],
 		})
 
-		options.value = results.hits.map((hit) => ({
+		const resultsByProjectId = await labrinth.projects_v2.search({
+			query: '',
+			limit: 20,
+			facets: [[`project_id:${query}`]],
+		})
+
+		options.value = [...resultsByProjectId.hits, ...results.hits].map((hit) => ({
 			label: hit.title,
 			value: hit.project_id,
 			icon: defineAsyncComponent(() =>

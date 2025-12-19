@@ -170,6 +170,7 @@ const props = withDefaults(
 		triggerClass?: string
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
+		disableSearchFilter?: boolean
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -244,7 +245,7 @@ const optionsWithKeys = computed(() => {
 })
 
 const filteredOptions = computed(() => {
-	if (!searchQuery.value || !props.searchable) {
+	if (!searchQuery.value || !props.searchable || props.disableSearchFilter) {
 		return optionsWithKeys.value
 	}
 
