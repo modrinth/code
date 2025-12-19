@@ -6,7 +6,7 @@
 			</span>
 			<Chips
 				v-model="draftVersion.version_type"
-				:items="['release', 'alpha', 'beta']"
+				:items="['release', 'beta', 'alpha']"
 				:never-empty="true"
 				:capitalize="true"
 			/>
