@@ -5,7 +5,7 @@
 			<div class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 p-4">
 				<div class="grid gap-2.5">
 					<span class="font-semibold text-contrast">Project <span class="text-red">*</span></span>
-					<ModSelect v-model="newDependencyProjectId" />
+					<DependencySelect v-model="newDependencyProjectId" />
 				</div>
 
 				<template v-if="newDependencyProjectId">
@@ -92,7 +92,7 @@ import {
 } from '@modrinth/ui'
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
-import ModSelect from '~/components/ui/create-project-version/components/DependencySelect.vue'
+import DependencySelect from '~/components/ui/create-project-version/components/DependencySelect.vue'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 import AddedDependencyRow from '../components/AddedDependencyRow.vue'
