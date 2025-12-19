@@ -1,9 +1,11 @@
 <template>
-	<MarkdownEditor
-		v-model="draftVersion.changelog"
-		:on-image-upload="onImageUpload"
-		:max-height="500"
-	/>
+	<div class="w-full">
+		<MarkdownEditor
+			v-model="draftVersion.changelog"
+			:on-image-upload="onImageUpload"
+			:max-height="500"
+		/>
+	</div>
 </template>
 
 <script lang="ts" setup>

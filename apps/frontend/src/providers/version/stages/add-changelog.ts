@@ -1,4 +1,4 @@
-import { LeftArrowIcon, PlusIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { LeftArrowIcon, PlusIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import type { StageConfigInput } from '@modrinth/ui'
 import { markRaw } from 'vue'
 
@@ -24,7 +24,7 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 				},
 	rightButtonConfig: (ctx) => ({
 		label: ctx.editingVersion.value ? 'Save changes' : 'Create version',
-		icon: ctx.isSubmitting.value ? SpinnerIcon : ctx.editingVersion.value ? undefined : PlusIcon,
+		icon: ctx.isSubmitting.value ? SpinnerIcon : ctx.editingVersion.value ? SaveIcon : PlusIcon,
 		iconPosition: 'before',
 		iconClass: ctx.isSubmitting.value ? 'animate-spin' : undefined,
 		color: 'green',
