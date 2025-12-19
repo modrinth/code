@@ -259,7 +259,7 @@ fn find_file<'a>(
     }
 
     for fileext in fileexts {
-        if file.eq_ignore_ascii_case(format!("{}-{}.{}", &project_id, &vcoords, fileext)) {
+        if file.eq_ignore_ascii_case(&format!("{}-{}.{}", &project_id, &vcoords, fileext)) {
             return version
                 .files
                 .iter()
@@ -313,7 +313,7 @@ pub async fn version_file(
         return Err(ApiError::NotFound);
     }
 
-    if file.eq_ignore_ascii_case(format!("{}-{}.pom", &project_id, &vnum)) {
+    if file.eq_ignore_ascii_case(&format!("{}-{}.pom", &project_id, &vnum)) {
         let respdata = MavenPom {
             schema_location:
                 "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
