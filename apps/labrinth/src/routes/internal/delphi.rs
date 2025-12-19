@@ -223,7 +223,7 @@ async fn ingest_report_deserialized(
     }
 
     // TODO: Currently, the way we determine if an issue is in tech review or not
-    // is if it has any issue detials which are pending.
+    // is if it has any issue details which are pending.
     // If you mark all issue details are safe or not safe - even if you don't
     // submit the final report - the project will be taken out of tech review
     // queue, and into moderation queue.
