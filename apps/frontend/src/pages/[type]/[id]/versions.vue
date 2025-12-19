@@ -296,7 +296,7 @@ import {
 	ShareIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
+import { Admonition, ButtonStyled, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
 import { useLocalStorage } from '@vueuse/core'
 
 import {
