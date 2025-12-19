@@ -302,17 +302,15 @@ import {
 	ShareIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { Admonition, ButtonStyled, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
-import { useLocalStorage } from '@vueuse/core'
-
-import {
-	ConfirmModal,
+import { Admonition, ButtonStyled, 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+OverflowMenu, ProjectPageVersions ,
 } from '@modrinth/ui'
-
+import { useLocalStorage } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
+
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
 

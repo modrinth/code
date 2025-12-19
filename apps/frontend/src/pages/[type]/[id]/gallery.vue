@@ -344,6 +344,7 @@ import {
 	NewModal as Modal,
 } from '@modrinth/ui'
 import { useLocalStorage } from '@vueuse/core'
+
 import { isPermission } from '~/utils/permissions.ts'
 
 const props = defineProps({

@@ -331,8 +331,8 @@ import {
 	OverflowMenu,
 	ProjectPageVersions,
 } from '@modrinth/ui'
-
 import { useTemplateRef } from 'vue'
+
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
