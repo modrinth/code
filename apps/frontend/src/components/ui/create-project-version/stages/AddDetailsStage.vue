@@ -33,7 +33,7 @@
 				placeholder="Enter subtitle..."
 				type="text"
 				autocomplete="off"
-				maxlength="32"
+				maxlength="256"
 			/>
 		</div>
 
