@@ -92,6 +92,7 @@
 								id: 'edit-dependencies',
 								action: () =>
 									handleOpenEditVersionModal(version.id, project.id, 'add-dependencies'),
+								shown: project.project_type !== 'modpack',
 							},
 							{
 								id: 'edit-files',
@@ -204,7 +205,7 @@
 								id: 'edit-dependencies',
 								action: () =>
 									handleOpenEditVersionModal(version.id, project.id, 'add-dependencies'),
-								shown: !!currentMember,
+								shown: !!currentMember && project.project_type !== 'modpack',
 							},
 							{
 								id: 'edit-files',
