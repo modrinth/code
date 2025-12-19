@@ -32,7 +32,7 @@ async function openEditVersionModal(versionId: string, projectId: string, stageI
 	try {
 		const versionData = await labrinth.versions_v3.getVersion(versionId)
 
-		const draftVersionData = {
+		const draftVersionData: Labrinth.Versions.v3.DraftVersion = {
 			project_id: projectId,
 			version_id: versionId,
 			name: versionData.name ?? '',
@@ -46,8 +46,8 @@ async function openEditVersionModal(versionId: string, projectId: string, stageI
 			environment: versionData.environment,
 		}
 
-		if (projectV2.value.project_type === 'modpack') {
-			draftVersionData.loaders = versionData.mrpack_loaders ?? []
+		if (projectV2.value.project_type === 'modpack' && draftVersionData.loaders.includes('mrpack')) {
+			draftVersionData.loaders.push(...(versionData.mrpack_loaders ?? []))
 		}
 
 		openCreateVersionModal(draftVersionData, stageId)
