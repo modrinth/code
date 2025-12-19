@@ -259,7 +259,10 @@ async fn get_report(
                         )
                     )
                     FROM delphi_report_issues dri
-                    WHERE dri.report_id = dr.id
+                    WHERE
+                        dri.report_id = dr.id
+                        -- see delphi.rs todo comment
+                        AND dri.issue_type != '__dummy'
                 )
             ) AS "data!: sqlx::types::Json<FileReport>"
         FROM delphi_reports dr
@@ -421,7 +424,10 @@ async fn search_projects(
                                             )
                                         ), '[]'::jsonb)
                                         FROM delphi_report_issues dri
-                                        WHERE dri.report_id = dr.id
+                                        WHERE
+                                            dri.report_id = dr.id
+                                            -- see delphi.rs todo comment
+                                            AND dri.issue_type != '__dummy'
                                     )
                                 )), '[]'::jsonb)
                                 FROM delphi_reports dr
@@ -614,6 +620,8 @@ async fn submit_report(
         WHERE
             m.id = $1
             AND didws.status = 'pending'
+            -- see delphi.rs todo comment
+            AND dri.issue_type != '__dummy'
         "#,
         project_id as _,
     )

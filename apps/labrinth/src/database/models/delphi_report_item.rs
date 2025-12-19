@@ -177,7 +177,7 @@ pub struct DelphiReportIssueResult {
 }
 
 impl DBDelphiReportIssue {
-    pub async fn upsert(
+    pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<DelphiReportIssueId, DatabaseError> {
