@@ -139,6 +139,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 	public async createVersion(
 		draftVersion: Labrinth.Versions.v3.DraftVersion,
 		versionFiles: Labrinth.Versions.v3.DraftVersionFile[],
+		projectType: Labrinth.Projects.v2.ProjectType | null = null,
 	): Promise<Labrinth.Versions.v3.Version> {
 		const formData = new FormData()
 
@@ -164,13 +165,18 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			changelog: draftVersion.changelog,
 			dependencies: draftVersion.dependencies || [],
 			game_versions: draftVersion.game_versions,
-			loaders: draftVersion.loaders,
 			version_type: draftVersion.version_type,
 			featured: !!draftVersion.featured,
 			file_parts: fileParts,
 			file_types: fileTypeMap,
 			primary_file: fileParts[0],
 			environment: draftVersion.environment,
+			loaders: draftVersion.loaders,
+		}
+
+		if (projectType === 'modpack') {
+			data.mrpack_loaders = draftVersion.loaders
+			data.loaders = ['mrpack']
 		}
 
 		formData.append('data', JSON.stringify(data))
@@ -181,17 +187,13 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 
 		const newVersion = await this.client.request<Labrinth.Versions.v3.Version>(`/version`, {
 			api: 'labrinth',
-			version: 2,
+			version: 3,
 			method: 'POST',
 			body: formData,
 			timeout: 120000,
 			headers: {
 				'Content-Type': '',
 			},
-		})
-
-		await this.modifyVersion(newVersion.id, {
-			environment: draftVersion.environment,
 		})
 
 		return newVersion

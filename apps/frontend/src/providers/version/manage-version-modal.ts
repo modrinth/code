@@ -267,7 +267,7 @@ export function createManageVersionContext(
 		if (noEnvironmentProject.value) version.environment = undefined
 
 		try {
-			await labrinth.versions_v3.createVersion(version, files)
+			await labrinth.versions_v3.createVersion(version, files, projectType.value ?? null)
 			modal.value?.hide()
 			addNotification({
 				title: 'Project version created',
