@@ -165,7 +165,7 @@ const messages = defineMessages({
 	},
 	safeLabel: {
 		id: 'omorphia.component.badge.label.safe',
-		defaultMessage: 'Safe',
+		defaultMessage: 'Pass',
 	},
 	scheduledLabel: {
 		id: 'omorphia.component.badge.label.scheduled',
@@ -181,7 +181,7 @@ const messages = defineMessages({
 	},
 	unsafeLabel: {
 		id: 'omorphia.component.badge.label.unsafe',
-		defaultMessage: 'Unsafe',
+		defaultMessage: 'Fail',
 	},
 	withheldLabel: {
 		id: 'omorphia.component.badge.label.withheld',

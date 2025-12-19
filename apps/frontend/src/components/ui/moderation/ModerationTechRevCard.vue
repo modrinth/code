@@ -169,13 +169,22 @@ function getFileHighestSeverity(
 	return severities.sort((a, b) => (severityOrder[b] ?? 0) - (severityOrder[a] ?? 0))[0] || 'low'
 }
 
-const allFiles = computed(() => {
-	return [...props.item.reports].sort((a, b) => {
-		const aSeverity = getFileHighestSeverity(a)
-		const bSeverity = getFileHighestSeverity(b)
-		return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
-	})
-})
+const allFiles = ref<FlattenedFileReport[]>([])
+
+watch(
+	() => props.item.reports,
+	(reports) => {
+		allFiles.value = [...reports].sort((a, b) => {
+			const aComplete = getFileMarkedCount(a) === getFileDetailCount(a)
+			const bComplete = getFileMarkedCount(b) === getFileDetailCount(b)
+			if (aComplete !== bComplete) return aComplete ? 1 : -1
+			const aSeverity = getFileHighestSeverity(a)
+			const bSeverity = getFileHighestSeverity(b)
+			return (severityOrder[bSeverity] ?? 0) - (severityOrder[aSeverity] ?? 0)
+		})
+	},
+	{ immediate: true },
+)
 
 const highestSeverity = computed(() => {
 	const severities = props.item.reports
@@ -385,13 +394,13 @@ async function updateDetailStatus(detailId: string, verdict: 'safe' | 'unsafe') 
 		if (verdict === 'safe') {
 			addNotification({
 				type: 'success',
-				title: 'Issue marked as safe',
+				title: 'Issue marked as pass',
 				text: 'This issue has been marked as a false positive.',
 			})
 		} else {
 			addNotification({
 				type: 'success',
-				title: 'Issue marked as unsafe',
+				title: 'Issue marked as fail',
 				text: 'This issue has been flagged as malicious.',
 			})
 		}
@@ -483,6 +492,14 @@ function toggleClass(filePath: string) {
 	}
 }
 
+function getClassDecompiledSource(classItem: ClassGroup): string | undefined {
+	for (const flag of classItem.flags) {
+		const source = props.decompiledSources.get(flag.detail.id)
+		if (source) return source
+	}
+	return undefined
+}
+
 function handleThreadUpdate() {
 	emit('refetch')
 }
@@ -516,6 +533,7 @@ const unsafeFiles = computed<UnsafeFile[]>(() => {
 			projectName: props.item.project.name,
 			projectId: props.item.project.id,
 			userId: props.item.project_owner.id,
+			username: props.item.project_owner.name,
 		}))
 })
 
@@ -819,7 +837,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 										:disabled="!canSubmitReview"
 										@click="handleSubmitReview('safe')"
 									>
-										<ShieldCheckIcon /> Safe
+										<ShieldCheckIcon /> Pass
 									</button>
 								</ButtonStyled>
 								<ButtonStyled color="red">
@@ -828,7 +846,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 										:disabled="!canSubmitReview"
 										@click="handleSubmitReview('unsafe')"
 									>
-										<BugIcon /> Unsafe
+										<BugIcon /> Fail
 									</button>
 								</ButtonStyled>
 								<ButtonStyled v-if="featureFlags.developerMode" type="outlined">
@@ -1023,7 +1041,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 											:disabled="updatingDetails.has(flag.detail.id)"
 											@click="updateDetailStatus(flag.detail.id, 'safe')"
 										>
-											Safe
+											Pass
 										</button>
 									</ButtonStyled>
 
@@ -1040,14 +1058,14 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 											:disabled="updatingDetails.has(flag.detail.id)"
 											@click="updateDetailStatus(flag.detail.id, 'unsafe')"
 										>
-											Unsafe
+											Fail
 										</button>
 									</ButtonStyled>
 								</div>
 							</div>
 
 							<div
-								v-if="props.decompiledSources.get(classItem.flags[0]?.detail.id)"
+								v-if="getClassDecompiledSource(classItem)"
 								class="relative inset-0 overflow-hidden rounded-lg border border-solid border-surface-5 bg-surface-4"
 							>
 								<ButtonStyled circular type="transparent">
@@ -1055,10 +1073,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 										v-tooltip="`Copy code`"
 										class="absolute right-2 top-2 border-[1px]"
 										@click="
-											copyToClipboard(
-												props.decompiledSources.get(classItem.flags[0].detail.id)!,
-												classItem.filePath,
-											)
+											copyToClipboard(getClassDecompiledSource(classItem)!, classItem.filePath)
 										"
 									>
 										<CopyIcon v-if="!showCopyFeedback.get(classItem.filePath)" />
@@ -1069,7 +1084,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 								<div class="overflow-x-auto bg-surface-3 py-3">
 									<div
 										v-for="(line, n) in highlightCodeLines(
-											props.decompiledSources.get(classItem.flags[0].detail.id)!,
+											getClassDecompiledSource(classItem)!,
 											'java',
 										)"
 										:key="n"

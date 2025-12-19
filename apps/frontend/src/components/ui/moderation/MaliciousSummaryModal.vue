@@ -9,6 +9,7 @@ export type UnsafeFile = {
 	projectName: string
 	projectId: string
 	userId: string
+	username: string
 }
 
 const props = defineProps<{
@@ -36,11 +37,16 @@ async function fetchVersionHashes(versionIds: string[]) {
 		try {
 			// TODO: switch to api-client once truman's vers stuff is merged
 			const version = (await useBaseFetch(`version/${versionId}`)) as {
-				files: Array<{ filename: string; hashes: { sha512: string; sha1: string } }>
+				files: Array<{
+					filename: string
+					file_name?: string
+					hashes: { sha512: string; sha1: string }
+				}>
 			}
 			const filesMap = new Map<string, string>()
 			for (const file of version.files) {
-				filesMap.set(file.filename, file.hashes.sha512)
+				const name = file.file_name ?? file.filename
+				filesMap.set(name, file.hashes.sha512)
 			}
 			versionDataCache.value.set(versionId, { files: filesMap, loading: false })
 		} catch (error) {
@@ -92,13 +98,11 @@ defineExpose({ show, hide })
 				<div class="flex items-center gap-2">
 					<span class="text-tertiary text-sm font-medium">Project:</span>
 					<CopyCode :text="unsafeFiles[0].projectName" />
-				</div>
-				<div class="flex items-center gap-2">
-					<span class="text-tertiary text-sm font-medium">Project ID:</span>
 					<CopyCode :text="unsafeFiles[0].projectId" />
 				</div>
 				<div class="flex items-center gap-2">
-					<span class="text-tertiary text-sm font-medium">User ID:</span>
+					<span class="text-tertiary text-sm font-medium">User:</span>
+					<CopyCode :text="unsafeFiles[0].username" />
 					<CopyCode :text="unsafeFiles[0].userId" />
 				</div>
 			</div>
