@@ -58,6 +58,7 @@
 		"tailwindcss": "^3.4.4",
 		"typescript": "^5.5.4",
 		"vite": "^5.4.6",
+		"vue-component-type-helpers": "^3.1.8",
 		"vue-tsc": "^2.1.6"
 	},
 	"packageManager": "pnpm@9.4.0",

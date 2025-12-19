@@ -8,10 +8,21 @@
 		leave-to-class="opacity-0 max-h-0"
 	>
 		<div v-if="amount > 0" class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
-			<div class="flex items-center justify-between">
-				<span class="text-primary">{{ formatMessage(messages.feeBreakdownAmount) }}</span>
-				<span class="font-semibold text-contrast">{{ formatMoney(amount || 0) }}</span>
-			</div>
+			<template v-if="isGiftCard && shouldShowExchangeRate">
+				<div class="flex items-center justify-between">
+					<span class="text-primary">{{ formatMessage(messages.feeBreakdownGiftCardValue) }}</span>
+					<span class="font-semibold text-contrast"
+						>{{ formatMoney(amount || 0) }} ({{ formattedLocalCurrency }})</span
+					>
+				</div>
+			</template>
+			<template v-else>
+				<div class="flex items-center justify-between">
+					<span class="text-primary">{{ formatMessage(messages.feeBreakdownAmount) }}</span>
+					<span class="font-semibold text-contrast">{{ formatMoney(amount || 0) }}</span>
+				</div>
+			</template>
+
 			<div class="flex items-center justify-between">
 				<span class="text-primary">{{ formatMessage(messages.feeBreakdownFee) }}</span>
 				<span class="h-4 font-semibold text-contrast">
@@ -21,6 +32,7 @@
 					<template v-else>-{{ formatMoney(fee || 0) }}</template>
 				</span>
 			</div>
+
 			<div class="h-px bg-surface-5" />
 			<div class="flex items-center justify-between">
 				<span class="text-primary">{{ formatMessage(messages.feeBreakdownNetAmount) }}</span>
@@ -31,7 +43,7 @@
 					</template>
 				</span>
 			</div>
-			<template v-if="shouldShowExchangeRate">
+			<template v-if="shouldShowExchangeRate && !isGiftCard">
 				<div class="flex items-center justify-between text-sm">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownExchangeRate) }}</span>
 					<span class="text-secondary"
@@ -56,10 +68,12 @@ const props = withDefaults(
 		feeLoading: boolean
 		exchangeRate?: number | null
 		localCurrency?: string
+		isGiftCard?: boolean
 	}>(),
 	{
 		exchangeRate: null,
 		localCurrency: undefined,
+		isGiftCard: false,
 	},
 )
 
@@ -114,6 +128,14 @@ const messages = defineMessages({
 	feeBreakdownExchangeRate: {
 		id: 'dashboard.creator-withdraw-modal.fee-breakdown-exchange-rate',
 		defaultMessage: 'FX rate',
+	},
+	feeBreakdownGiftCardValue: {
+		id: 'dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value',
+		defaultMessage: 'Gift card value',
+	},
+	feeBreakdownUsdEquivalent: {
+		id: 'dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent',
+		defaultMessage: 'USD equivalent',
 	},
 })
 </script>

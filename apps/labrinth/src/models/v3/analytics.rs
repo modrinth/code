@@ -45,6 +45,21 @@ pub struct PageView {
     pub headers: Vec<(String, String)>,
 }
 
+#[derive(Debug, Row, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
+pub struct AffiliateCodeClick {
+    pub recorded: i64,
+    pub domain: String,
+
+    // Modrinth User ID for logged in users
+    pub user_id: u64,
+    pub affiliate_code_id: u64,
+
+    pub ip: Ipv6Addr,
+    pub country: String,
+    pub user_agent: String,
+    pub headers: Vec<(String, String)>,
+}
+
 #[derive(Row, Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Playtime {
     pub recorded: i64,

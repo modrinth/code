@@ -39,7 +39,7 @@ export const coreNags: Nag[] = [
 		status: 'required',
 		shouldShow: (context: NagContext) => context.versions.length < 1,
 		link: {
-			path: 'versions',
+			path: 'settings/versions',
 			title: defineMessage({
 				id: 'nags.versions.title',
 				defaultMessage: 'Visit versions page',
@@ -126,7 +126,7 @@ export const coreNags: Nag[] = [
 			)
 		},
 		link: {
-			path: 'gallery',
+			path: 'settings/gallery',
 			title: defineMessage({
 				id: 'nags.gallery.title',
 				defaultMessage: 'Visit gallery page',
@@ -151,7 +151,7 @@ export const coreNags: Nag[] = [
 			return context.project?.gallery?.length === 0 || !featuredGalleryImage
 		},
 		link: {
-			path: 'gallery',
+			path: 'settings/gallery',
 			title: defineMessage({
 				id: 'nags.gallery.title',
 				defaultMessage: 'Visit gallery page',
@@ -209,46 +209,6 @@ export const coreNags: Nag[] = [
 				defaultMessage: 'Visit links settings',
 			}),
 			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
-		},
-	},
-	{
-		id: 'select-environments',
-		title: defineMessage({
-			id: 'nags.select-environments.title',
-			defaultMessage: 'Select environments',
-		}),
-		description: (context: NagContext) => {
-			const { formatMessage } = useVIntl()
-
-			return formatMessage(
-				defineMessage({
-					id: 'nags.select-environments.description',
-					defaultMessage: `Select the environments your {type, select, mod {mod} modpack {modpack} other {project}} functions on.`,
-				}),
-				{
-					type: context.project.project_type,
-				},
-			)
-		},
-		status: 'required',
-		shouldShow: (context: NagContext) => {
-			const excludedTypes = ['resourcepack', 'plugin', 'shader', 'datapack']
-			return (
-				context.project.versions.length > 0 &&
-				!excludedTypes.includes(context.project.project_type) &&
-				(context.project.client_side === 'unknown' ||
-					context.project.server_side === 'unknown' ||
-					(context.project.client_side === 'unsupported' &&
-						context.project.server_side === 'unsupported'))
-			)
-		},
-		link: {
-			path: 'settings/environment',
-			title: defineMessage({
-				id: 'nags.settings.environments.title',
-				defaultMessage: 'Visit environment settings',
-			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-environment',
 		},
 	},
 	{
