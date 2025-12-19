@@ -640,6 +640,25 @@ async fn submit_report(
         });
     }
 
+    sqlx::query!(
+        "
+        DELETE FROM delphi_report_issue_details drid
+        WHERE issue_id IN (
+            SELECT dri.id
+            FROM mods m
+            INNER JOIN versions v ON v.mod_id = m.id
+            INNER JOIN files f ON f.version_id = v.id
+            INNER JOIN delphi_reports dr ON dr.file_id = f.id
+            INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
+            WHERE m.id = $1 AND dri.issue_type = '__dummy'
+        )
+        ",
+        project_id as _,
+    )
+    .execute(&mut *txn)
+    .await
+    .wrap_internal_err("failed to delete dummy issue")?;
+
     let record = sqlx::query!(
         r#"
         SELECT t.id AS "thread_id: DBThreadId"
@@ -768,18 +787,23 @@ async fn update_issue_detail(
         DelphiVerdict::Safe => DelphiStatus::Safe,
         DelphiVerdict::Unsafe => DelphiStatus::Unsafe,
     };
-    sqlx::query!(
+    let results = sqlx::query!(
         r#"
         INSERT INTO delphi_issue_detail_verdicts (
             project_id,
             detail_key,
             verdict
         )
-        VALUES (
-            (SELECT project_id FROM delphi_issue_details_with_statuses WHERE id = $2),
-            (SELECT key FROM delphi_report_issue_details WHERE id = $2),
+        SELECT
+            didws.project_id,
+            didws.key,
             $1
-        )
+        FROM delphi_issue_details_with_statuses didws
+        INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+        WHERE
+            didws.id = $2
+            -- see delphi.rs todo comment
+            AND dri.issue_type != '__dummy'
         "#,
         status as _,
         issue_detail_id as _,
@@ -787,6 +811,9 @@ async fn update_issue_detail(
     .execute(&mut *txn)
     .await
     .wrap_internal_err("failed to update issue detail")?;
+    if results.rows_affected() == 0 {
+        return Err(ApiError::Request(eyre!("issue detail does not exist")));
+    }
 
     txn.commit()
         .await
