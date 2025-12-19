@@ -58,7 +58,7 @@
 				(version) =>
 					`/${project.project_type}/${
 						project.slug ? project.slug : project.id
-					}/version/${encodeURI(version.displayUrlEnding)}`
+					}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`
 			"
 			:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 			:create-version-button-secondary="true"
@@ -216,8 +216,8 @@
 								color: 'red',
 								hoverFilled: true,
 								action: () => {
-									selectedVersion.value = version.id
-									deleteVersionModal.value?.show()
+									selectedVersion = version.id
+									deleteVersionModal?.show()
 								},
 								shown: !!currentMember,
 							},

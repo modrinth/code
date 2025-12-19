@@ -373,7 +373,7 @@ const handleOpenEditVersionModal = (
 const versionsWithDisplayUrl = computed(() =>
 	versions.value.map((v) => ({
 		...v,
-		displayUrlEnding: v.version_number,
+		displayUrlEnding: v.id,
 	})),
 )
 
