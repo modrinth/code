@@ -224,6 +224,27 @@
 				</div>
 			</template>
 		</Admonition>
+		<div v-if="currentMember && project.gallery.length" class="card header-buttons">
+			<FileInput
+				:max-size="5242880"
+				:accept="acceptFileTypes"
+				prompt="Upload an image"
+				aria-label="Upload an image"
+				class="iconified-button brand-button"
+				:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
+				@change="handleFiles"
+			>
+				<UploadIcon aria-hidden="true" />
+			</FileInput>
+			<span class="indicator">
+				<InfoIcon aria-hidden="true" /> Click to choose an image or drag one onto this page
+			</span>
+			<DropArea
+				:accept="acceptFileTypes"
+				:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
+				@change="handleFiles"
+			/>
+		</div>
 		<div v-if="project.gallery.length" class="items">
 			<div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
 				<a class="gallery-thumbnail" @click="expandImage(item, index)">
@@ -247,6 +268,37 @@
 						<CalendarIcon aria-hidden="true" aria-label="Date created" />
 						{{ $dayjs(item.created).format('MMMM D, YYYY') }}
 					</div>
+					<div v-if="currentMember" class="gallery-buttons input-group">
+						<button
+							class="iconified-button"
+							@click="
+								() => {
+									resetEdit()
+									editIndex = index
+									editTitle = item.title
+									editDescription = item.description
+									editFeatured = item.featured
+									editOrder = item.ordering
+									$refs.modal_edit_item.show()
+								}
+							"
+						>
+							<EditIcon aria-hidden="true" />
+							Edit
+						</button>
+						<button
+							class="iconified-button"
+							@click="
+								() => {
+									deleteIndex = index
+									$refs.modal_confirm.show()
+								}
+							"
+						>
+							<TrashIcon aria-hidden="true" />
+							Remove
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -266,9 +318,11 @@
 import {
 	CalendarIcon,
 	ContractIcon,
+	EditIcon,
 	ExpandIcon,
 	ExternalIcon,
 	ImageIcon,
+	InfoIcon,
 	LeftArrowIcon,
 	PlusIcon,
 	RightArrowIcon,
@@ -276,17 +330,21 @@ import {
 	SettingsIcon,
 	StarIcon,
 	TransferIcon,
+	TrashIcon,
+	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
 	ButtonStyled,
 	ConfirmModal,
+	DropArea,
 	FileInput,
 	injectNotificationManager,
 	NewModal as Modal,
 } from '@modrinth/ui'
 import { useLocalStorage } from '@vueuse/core'
+import { isPermission } from '~/utils/permissions.ts'
 
 const props = defineProps({
 	project: {
