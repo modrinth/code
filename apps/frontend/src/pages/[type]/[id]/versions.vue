@@ -349,12 +349,12 @@ const selectedVersion = ref(null)
 const createProjectVersionModal = useTemplateRef('create-project-version-modal')
 
 const handleOpenCreateVersionModal = () => {
-	if (!currentMember) return
+	if (!props.currentMember) return
 	createProjectVersionModal.value?.openCreateVersionModal()
 }
 
 const handleOpenEditVersionModal = (versionId, projectId, stageId) => {
-	if (!currentMember) return
+	if (!props.currentMember) return
 	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
 }
 
