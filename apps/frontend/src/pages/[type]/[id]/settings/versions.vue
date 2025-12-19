@@ -32,7 +32,7 @@
 			<template #actions="{ version }">
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
-						class="group-hover:!bg-button-bg"
+						class="group-hover:!bg-highlight [&>svg]:!text-green"
 						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
 						:options="[
 							{

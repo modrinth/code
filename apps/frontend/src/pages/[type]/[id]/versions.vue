@@ -51,7 +51,7 @@
 					<a
 						v-tooltip="`Download`"
 						:href="getPrimaryFile(version).url"
-						class="group-hover:!bg-brand group-hover:[&>svg]:!text-brand-inverted"
+						class="group-hover:!bg-highlight [&>svg]:!text-green"
 						aria-label="Download"
 						@click="emit('onDownload')"
 					>
