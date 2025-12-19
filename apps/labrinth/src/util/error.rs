@@ -19,7 +19,6 @@ pub trait Context<T, E>: Sized {
 
     /// Maps the error variant into an [`eyre::Report`] with the given message.
     #[inline]
-    #[track_caller]
     fn wrap_err<D>(self, msg: D) -> Result<T, eyre::Report>
     where
         D: Send + Sync + Debug + Display + 'static,
@@ -29,7 +28,6 @@ pub trait Context<T, E>: Sized {
 
     /// Maps the error variant into an [`ApiError::Internal`] using the closure to create the message.
     #[inline]
-    #[track_caller]
     fn wrap_internal_err_with<D>(
         self,
         f: impl FnOnce() -> D,
@@ -42,7 +40,6 @@ pub trait Context<T, E>: Sized {
 
     /// Maps the error variant into an [`ApiError::Internal`] with the given message.
     #[inline]
-    #[track_caller]
     fn wrap_internal_err<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
@@ -52,7 +49,6 @@ pub trait Context<T, E>: Sized {
 
     /// Maps the error variant into an [`ApiError::Request`] using the closure to create the message.
     #[inline]
-    #[track_caller]
     fn wrap_request_err_with<D>(
         self,
         f: impl FnOnce() -> D,
@@ -65,7 +61,6 @@ pub trait Context<T, E>: Sized {
 
     /// Maps the error variant into an [`ApiError::Request`] with the given message.
     #[inline]
-    #[track_caller]
     fn wrap_request_err<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
@@ -75,7 +70,6 @@ pub trait Context<T, E>: Sized {
 
     /// Maps the error variant into an [`ApiError::Auth`] using the closure to create the message.
     #[inline]
-    #[track_caller]
     fn wrap_auth_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
@@ -85,7 +79,6 @@ pub trait Context<T, E>: Sized {
 
     /// Maps the error variant into an [`ApiError::Auth`] with the given message.
     #[inline]
-    #[track_caller]
     fn wrap_auth_err<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
