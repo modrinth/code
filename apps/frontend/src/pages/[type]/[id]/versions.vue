@@ -299,14 +299,19 @@ import {
 	LinkIcon,
 	MoreVerticalIcon,
 	ReportIcon,
+	SettingsIcon,
 	ShareIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { Admonition, ButtonStyled, 	ConfirmModal,
+import {
+	Admonition,
+	ButtonStyled,
+	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
-OverflowMenu, ProjectPageVersions ,
+	OverflowMenu,
+	ProjectPageVersions,
 } from '@modrinth/ui'
 import { useLocalStorage } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
