@@ -180,7 +180,7 @@ const nonProgressStage = computed(() => {
 
 const progressValue = computed(() => {
 	const isProgressStage = (stage: StageConfigInput<T>) => {
-		if (nonProgressStage.value) return false
+		if (resolveCtxFn(stage.nonProgressStage, props.context)) return false
 		const skip = stage.skip ? resolveCtxFn(stage.skip, props.context) : false
 		return !skip
 	}
