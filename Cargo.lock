@@ -4541,7 +4541,6 @@ dependencies = [
  "labrinth",
  "lettre",
  "meilisearch-sdk",
- "modrinth-maxmind",
  "modrinth-util",
  "muralpay",
  "murmur2",
@@ -10349,6 +10348,7 @@ dependencies = [
  "quote",
  "regex",
  "syn 2.0.106",
+ "url",
  "uuid 1.18.1",
 ]
 

@@ -174,8 +174,6 @@ async fn main() -> std::io::Result<()> {
         return Ok(());
     }
 
-    let maxmind_reader = modrinth_maxmind::MaxMind::new().await;
-
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
         .endpoint("/metrics")
         .exclude_regex(r"^/api/v1/.*$")
@@ -204,7 +202,6 @@ async fn main() -> std::io::Result<()> {
         search_config.clone(),
         &mut clickhouse,
         file_host.clone(),
-        maxmind_reader.clone(),
         stripe_client,
         anrok_client.clone(),
         email_queue,
