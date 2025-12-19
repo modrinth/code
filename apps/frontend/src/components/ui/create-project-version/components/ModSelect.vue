@@ -4,7 +4,7 @@
 		placeholder="Select project"
 		:options="options"
 		:searchable="true"
-		search-placeholder="Search by name, slug, or paste ID..."
+		search-placeholder="Search by name or paste ID..."
 		:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
 		@search-input="(query) => handleSearch(query)"
 		:disableSearchFilter="true"
