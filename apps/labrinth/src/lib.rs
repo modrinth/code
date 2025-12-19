@@ -491,9 +491,6 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("CLICKHOUSE_PASSWORD");
     failed |= check_var::<String>("CLICKHOUSE_DATABASE");
 
-    failed |= check_var::<String>("MAXMIND_ACCOUNT_ID");
-    failed |= check_var::<String>("MAXMIND_LICENSE_KEY");
-
     failed |= check_var::<String>("FLAME_ANVIL_URL");
 
     failed |= check_var::<String>("GOTENBERG_URL");
