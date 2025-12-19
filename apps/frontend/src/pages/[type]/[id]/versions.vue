@@ -1,5 +1,17 @@
 <template>
 	<section class="experimental-styles-within overflow-visible">
+		<CreateProjectVersionModal v-if="currentMember" ref="modal"></CreateProjectVersionModal>
+
+		<ConfirmModal
+			v-if="currentMember"
+			ref="deleteVersionModal"
+			title="Are you sure you want to delete this version?"
+			description="This will remove this version forever (like really forever)."
+			:has-to-type="false"
+			proceed-label="Delete"
+			@proceed="deleteVersion()"
+		/>
+
 		<Admonition v-if="!hideVersionsAdmonition && currentMember" type="info" class="mb-4">
 			Managing project versions has moved! You can now add and edit versions in the
 			<NuxtLink to="settings/versions" class="font-medium text-blue hover:underline"
@@ -45,6 +57,8 @@
 						project.slug ? project.slug : project.id
 					}/version/${encodeURI(version.displayUrlEnding)}`
 			"
+			:open-modal="currentMember ? openModal : undefined"
+			:create-version-button-secondary="true"
 		>
 			<template #actions="{ version }">
 				<ButtonStyled circular type="transparent">
@@ -57,6 +71,61 @@
 					>
 						<DownloadIcon aria-hidden="true" />
 					</a>
+				</ButtonStyled>
+				<ButtonStyled v-if="currentMember" circular type="transparent">
+					<OverflowMenu
+						class="hover:!bg-button-bg"
+						:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
+						:options="[
+							{
+								id: 'edit-details',
+								action: () => handleOpenEditVersionModal(version, 'add-details'),
+							},
+							{
+								id: 'edit-changelog',
+								action: () => handleOpenEditVersionModal(version, 'add-changelog'),
+							},
+							{
+								id: 'edit-dependencies',
+								action: () => handleOpenEditVersionModal(version, 'add-dependencies'),
+							},
+							{
+								id: 'edit-files',
+								action: () => handleOpenEditVersionModal(version, 'add-files'),
+							},
+						]"
+						aria-label="Edit version"
+					>
+						<EditIcon aria-hidden="true" />
+						<template #edit-files>
+							<EditIcon aria-hidden="true" />
+							Files
+						</template>
+						<template #edit-details>
+							<EditIcon aria-hidden="true" />
+							Details
+						</template>
+						<template #edit-loaders>
+							<EditIcon aria-hidden="true" />
+							Loaders
+						</template>
+						<template #edit-game-versions>
+							<EditIcon aria-hidden="true" />
+							Game versions
+						</template>
+						<template #edit-environment>
+							<EditIcon aria-hidden="true" />
+							Environment
+						</template>
+						<template #edit-dependencies>
+							<EditIcon aria-hidden="true" />
+							Dependencies
+						</template>
+						<template #edit-changelog>
+							<EditIcon aria-hidden="true" />
+							Changelog
+						</template>
+					</OverflowMenu>
 				</ButtonStyled>
 				<ButtonStyled circular type="transparent">
 					<OverflowMenu
@@ -116,6 +185,37 @@
 								},
 								shown: flags.developerMode,
 							},
+							{ divider: true, shown: !!currentMember },
+							{
+								id: 'edit-details',
+								action: () => handleOpenEditVersionModal(version, 'add-details'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'edit-changelog',
+								action: () => handleOpenEditVersionModal(version, 'add-changelog'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'edit-dependencies',
+								action: () => handleOpenEditVersionModal(version, 'add-dependencies'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'edit-files',
+								action: () => handleOpenEditVersionModal(version, 'add-files'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'delete',
+								color: 'red',
+								hoverFilled: true,
+								action: () => {
+									selectedVersion.value = version.id
+									deleteVersionModal.value?.show()
+								},
+								shown: !!currentMember,
+							},
 						]"
 						aria-label="More options"
 					>
@@ -139,6 +239,26 @@
 						<template #report>
 							<ReportIcon aria-hidden="true" />
 							Report
+						</template>
+						<template #edit-details>
+							<EditIcon aria-hidden="true" />
+							Edit Details
+						</template>
+						<template #edit-changelog>
+							<EditIcon aria-hidden="true" />
+							Edit Changelog
+						</template>
+						<template #edit-dependencies>
+							<EditIcon aria-hidden="true" />
+							Edit Dependencies
+						</template>
+						<template #edit-files>
+							<EditIcon aria-hidden="true" />
+							Edit Files
+						</template>
+						<template #delete>
+							<TrashIcon aria-hidden="true" />
+							Delete
 						</template>
 						<template #copy-id>
 							<ClipboardCopyIcon aria-hidden="true" />
@@ -168,16 +288,25 @@
 import {
 	ClipboardCopyIcon,
 	DownloadIcon,
+	EditIcon,
 	ExternalIcon,
 	LinkIcon,
 	MoreVerticalIcon,
 	ReportIcon,
-	SettingsIcon,
 	ShareIcon,
+	TrashIcon,
 } from '@modrinth/assets'
-import { Admonition, ButtonStyled, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
+import { ButtonStyled, OverflowMenu, ProjectPageVersions } from '@modrinth/ui'
 import { useLocalStorage } from '@vueuse/core'
 
+import {
+	ConfirmModal,
+	injectModrinthClient,
+	injectNotificationManager,
+	injectProjectPageContext,
+} from '@modrinth/ui'
+
+import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const props = defineProps({
@@ -205,6 +334,18 @@ const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
 
+const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
+const { refreshVersions } = injectProjectPageContext()
+
+const modal = ref()
+const deleteVersionModal = ref()
+const selectedVersion = ref(null)
+
+function openModal() {
+	modal.value?.show?.()
+}
+
 const hideVersionsAdmonition = useLocalStorage(
 	'hideVersionsHasMovedAdmonition',
 	!props.versions.length,
@@ -222,5 +363,62 @@ function getPrimaryFile(version) {
 
 async function copyToClipboard(text) {
 	await navigator.clipboard.writeText(text)
+}
+
+async function deleteVersion() {
+	const id = selectedVersion.value
+	if (!id) return
+
+	startLoading()
+
+	try {
+		await client.labrinth.versions_v3.deleteVersion(id)
+
+		addNotification({
+			title: 'Version deleted',
+			text: 'The version has been successfully deleted.',
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
+
+	refreshVersions()
+	selectedVersion.value = null
+
+	stopLoading()
+}
+
+async function handleOpenEditVersionModal(version, stageId = null) {
+	selectedVersion.value = version.id
+	try {
+		const versionData = await client.labrinth.versions_v3.getVersion(version.id)
+		modal.value?.show(
+			{
+				project_id: props.project.id,
+				version_id: version.id,
+				name: versionData.name ?? '',
+				version_number: versionData.version_number ?? '',
+				changelog: versionData.changelog ?? '',
+				game_versions: versionData.game_versions ?? [],
+				version_type: versionData.version_type ?? 'release',
+				loaders: versionData.loaders ?? [],
+				dependencies: versionData.dependencies ?? [],
+				existing_files: versionData.files ?? [],
+				environment: versionData.environment,
+			},
+			stageId,
+		)
+	} catch (err) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
 }
 </script>
