@@ -104,32 +104,20 @@
 					>
 						<EditIcon aria-hidden="true" />
 						<template #edit-files>
-							<EditIcon aria-hidden="true" />
-							Files
+							<FileIcon aria-hidden="true" />
+							Edit files
 						</template>
 						<template #edit-details>
-							<EditIcon aria-hidden="true" />
-							Details
-						</template>
-						<template #edit-loaders>
-							<EditIcon aria-hidden="true" />
-							Loaders
-						</template>
-						<template #edit-game-versions>
-							<EditIcon aria-hidden="true" />
-							Game versions
-						</template>
-						<template #edit-environment>
-							<EditIcon aria-hidden="true" />
-							Environment
+							<InfoIcon aria-hidden="true" />
+							Edit details
 						</template>
 						<template #edit-dependencies>
-							<EditIcon aria-hidden="true" />
-							Dependencies
+							<BoxIcon aria-hidden="true" />
+							Edit dependencies
 						</template>
 						<template #edit-changelog>
-							<EditIcon aria-hidden="true" />
-							Changelog
+							<AlignLeftIcon aria-hidden="true" />
+							Edit changelog
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -248,21 +236,21 @@
 							<ReportIcon aria-hidden="true" />
 							Report
 						</template>
-						<template #edit-details>
-							<EditIcon aria-hidden="true" />
-							Edit Details
+						<template #edit-files>
+							<FileIcon aria-hidden="true" />
+							Edit files
 						</template>
-						<template #edit-changelog>
-							<EditIcon aria-hidden="true" />
-							Edit Changelog
+						<template #edit-details>
+							<InfoIcon aria-hidden="true" />
+							Edit details
 						</template>
 						<template #edit-dependencies>
-							<EditIcon aria-hidden="true" />
-							Edit Dependencies
+							<BoxIcon aria-hidden="true" />
+							Edit dependencies
 						</template>
-						<template #edit-files>
-							<EditIcon aria-hidden="true" />
-							Edit Files
+						<template #edit-changelog>
+							<AlignLeftIcon aria-hidden="true" />
+							Edit changelog
 						</template>
 						<template #delete>
 							<TrashIcon aria-hidden="true" />
@@ -294,10 +282,12 @@
 
 <script setup>
 import {
+	AlignLeftIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
 	ExternalIcon,
+	InfoIcon,
 	LinkIcon,
 	MoreVerticalIcon,
 	ReportIcon,
@@ -318,6 +308,7 @@ import {
 import { useLocalStorage } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
 
+import { BoxIcon, FileIcon } from '@modrinth/assets'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
 

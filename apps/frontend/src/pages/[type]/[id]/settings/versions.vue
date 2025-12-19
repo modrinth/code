@@ -62,32 +62,20 @@
 					>
 						<EditIcon aria-hidden="true" />
 						<template #edit-files>
-							<EditIcon aria-hidden="true" />
-							Files
+							<FileIcon aria-hidden="true" />
+							Edit files
 						</template>
 						<template #edit-details>
-							<EditIcon aria-hidden="true" />
-							Details
-						</template>
-						<template #edit-loaders>
-							<EditIcon aria-hidden="true" />
-							Loaders
-						</template>
-						<template #edit-game-versions>
-							<EditIcon aria-hidden="true" />
-							Game versions
-						</template>
-						<template #edit-environment>
-							<EditIcon aria-hidden="true" />
-							Environment
+							<InfoIcon aria-hidden="true" />
+							Edit details
 						</template>
 						<template #edit-dependencies>
-							<EditIcon aria-hidden="true" />
-							Dependencies
+							<BoxIcon aria-hidden="true" />
+							Edit dependencies
 						</template>
 						<template #edit-changelog>
-							<EditIcon aria-hidden="true" />
-							Changelog
+							<AlignLeftIcon aria-hidden="true" />
+							Edit changelog
 						</template>
 					</OverflowMenu>
 				</ButtonStyled>
@@ -206,21 +194,21 @@
 							<ReportIcon aria-hidden="true" />
 							Report
 						</template>
-						<template #edit-details>
-							<EditIcon aria-hidden="true" />
-							Details
+						<template #edit-files>
+							<FileIcon aria-hidden="true" />
+							Edit files
 						</template>
-						<template #edit-changelog>
-							<EditIcon aria-hidden="true" />
-							Changelog
+						<template #edit-details>
+							<InfoIcon aria-hidden="true" />
+							Edit details
 						</template>
 						<template #edit-dependencies>
-							<EditIcon aria-hidden="true" />
-							Dependencies
+							<BoxIcon aria-hidden="true" />
+							Edit dependencies
 						</template>
-						<template #edit-files>
-							<EditIcon aria-hidden="true" />
-							Files
+						<template #edit-changelog>
+							<AlignLeftIcon aria-hidden="true" />
+							Edit changelog
 						</template>
 						<template #delete>
 							<TrashIcon aria-hidden="true" />
@@ -313,10 +301,14 @@
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	AlignLeftIcon,
+	BoxIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
 	ExternalIcon,
+	FileIcon,
+	InfoIcon,
 	LinkIcon,
 	MoreVerticalIcon,
 	PlusIcon,
