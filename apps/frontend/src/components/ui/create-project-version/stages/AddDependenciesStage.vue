@@ -92,7 +92,7 @@ import {
 } from '@modrinth/ui'
 import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 
-import ModSelect from '~/components/ui/create-project-version/components/ModSelect.vue'
+import ModSelect from '~/components/ui/create-project-version/components/DependencySelect.vue'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
 import AddedDependencyRow from '../components/AddedDependencyRow.vue'

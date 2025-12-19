@@ -4,9 +4,10 @@
 		placeholder="Select project"
 		:options="options"
 		:searchable="true"
-		search-placeholder="Search by name, slug, or paste ID..."
+		search-placeholder="Search by name or paste ID..."
 		:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
 		@search-input="(query) => handleSearch(query)"
+		:disableSearchFilter="true"
 	/>
 </template>
 
@@ -34,10 +35,24 @@ const search = async (query: string) => {
 		const results = await labrinth.projects_v2.search({
 			query: query,
 			limit: 20,
-			facets: [['project_type:mod']],
+			facets: [
+				[
+					'project_type:mod',
+					'project_type:plugin',
+					'project_type:shader ',
+					'project_type:resourcepack',
+					'project_type:datapack',
+				],
+			],
 		})
 
-		options.value = results.hits.map((hit) => ({
+		const resultsByProjectId = await labrinth.projects_v2.search({
+			query: '',
+			limit: 20,
+			facets: [[`project_id:${query}`]],
+		})
+
+		options.value = [...resultsByProjectId.hits, ...results.hits].map((hit) => ({
 			label: hit.title,
 			value: hit.project_id,
 			icon: defineAsyncComponent(() =>
