@@ -1,5 +1,7 @@
 <template>
-	<ProjectSettingsEnvSelector v-model="draftVersion.environment" />
+	<div class="sm:w-[512px]">
+		<ProjectSettingsEnvSelector v-model="draftVersion.environment" />
+	</div>
 </template>
 
 <script lang="ts" setup>

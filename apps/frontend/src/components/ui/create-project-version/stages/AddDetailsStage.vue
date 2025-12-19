@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-6">
+	<div class="flex flex-col gap-6 sm:w-[512px]">
 		<div class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">
 				Version type <span class="text-red">*</span>
@@ -33,7 +33,7 @@
 				placeholder="Enter subtitle..."
 				type="text"
 				autocomplete="off"
-				maxlength="32"
+				maxlength="256"
 			/>
 		</div>
 
@@ -102,7 +102,7 @@
 				</div>
 
 				<div
-					class="flex flex-col gap-1.5 gap-y-4 rounded-xl border border-solid border-surface-5 p-3 py-4"
+					class="flex max-h-56 flex-col gap-1.5 gap-y-4 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
 				>
 					<div class="flex flex-wrap gap-2">
 						<TagItem
@@ -176,13 +176,13 @@ const loaders = computed(() => generatedState.value.loaders)
 const isModpack = computed(() => projectType.value === 'modpack')
 
 const editLoaders = () => {
-	modal.value?.setStage('edit-loaders')
+	modal.value?.setStage('from-details-loaders')
 }
 const editVersions = () => {
-	modal.value?.setStage('edit-mc-versions')
+	modal.value?.setStage('from-details-mc-versions')
 }
 const editEnvironment = () => {
-	modal.value?.setStage('edit-environment')
+	modal.value?.setStage('from-details-environment')
 }
 
 const usingDetectedVersions = computed(() => {

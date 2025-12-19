@@ -9,7 +9,7 @@
 				@update:query="updateQuery"
 			/>
 
-			<ButtonStyled v-if="openModal" color="green">
+			<ButtonStyled v-if="openModal" :color="createVersionButtonSecondary ? 'standard' : 'green'">
 				<button @click="openModal"><PlusIcon /> Create version</button>
 			</ButtonStyled>
 
@@ -238,6 +238,7 @@ const props = withDefaults(
 		gameVersions: GameVersionTag[]
 		versionLink?: (version: Version) => string
 		openModal?: () => void
+		createVersionButtonSecondary?: boolean
 	}>(),
 	{
 		baseId: undefined,

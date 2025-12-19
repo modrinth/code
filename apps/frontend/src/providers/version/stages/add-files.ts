@@ -15,6 +15,13 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 			ctx.filesToAdd.value.length !== 0 ||
 			(ctx.draftVersion.value.existing_files?.length ?? 0) !== 0
 
+		if (ctx.editingVersion.value)
+			return {
+				label: 'Cancel',
+				icon: XIcon,
+				onClick: () => ctx.modal.value?.hide(),
+			}
+
 		if (!hasFiles) return null
 
 		return {
@@ -28,6 +35,13 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 			ctx.filesToAdd.value.length !== 0 ||
 			(ctx.draftVersion.value.existing_files?.length ?? 0) !== 0
 
+		if (ctx.editingVersion.value)
+			return {
+				...ctx.saveButtonConfig(),
+				label: 'Save files',
+				disabled: ctx.isSubmitting.value,
+			}
+
 		if (!hasFiles) return null
 
 		return {
@@ -38,4 +52,5 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 			onClick: () => ctx.modal.value?.nextStage(),
 		}
 	},
+	nonProgressStage: (ctx) => ctx.editingVersion.value,
 }
