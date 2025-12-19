@@ -28,8 +28,8 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	}),
 }
 
-export const editStageConfig: StageConfigInput<ManageVersionContextValue> = {
-	id: 'edit-loaders',
+export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {
+	id: 'from-details-loaders',
 	stageContent: markRaw(AddLoadersStage),
 	title: 'Edit loaders',
 	nonProgressStage: true,
@@ -39,11 +39,17 @@ export const editStageConfig: StageConfigInput<ManageVersionContextValue> = {
 		disabled: ctx.draftVersion.value.loaders.length === 0,
 		onClick: () => ctx.modal.value?.setStage('add-details'),
 	}),
-	rightButtonConfig: (ctx) => ({
-		label: ctx.getNextLabel(2),
-		icon: RightArrowIcon,
-		iconPosition: 'after',
-		disabled: ctx.draftVersion.value.loaders.length === 0,
-		onClick: () => ctx.modal.value?.setStage(2),
-	}),
+	rightButtonConfig: (ctx) =>
+		ctx.editingVersion.value
+			? {
+					...ctx.saveButtonConfig(),
+					disabled: ctx.draftVersion.value.loaders.length === 0,
+				}
+			: {
+					label: ctx.getNextLabel(2),
+					icon: RightArrowIcon,
+					iconPosition: 'after',
+					disabled: ctx.draftVersion.value.loaders.length === 0,
+					onClick: () => ctx.modal.value?.setStage(2),
+				},
 }

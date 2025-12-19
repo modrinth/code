@@ -81,7 +81,7 @@ export interface StageConfigInput<T> {
 	stageContent: Component
 	title: MaybeCtxFn<T, string>
 	skip?: MaybeCtxFn<T, boolean>
-	nonProgressStage?: boolean
+	nonProgressStage?: MaybeCtxFn<T, boolean>
 	leftButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	rightButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 }
@@ -176,7 +176,7 @@ const rightButtonConfig = computed(() => {
 
 const progressValue = computed(() => {
 	const isProgressStage = (stage: StageConfigInput<T>) => {
-		if (stage.nonProgressStage) return false
+		if (resolveCtxFn(stage.nonProgressStage, props.context)) return false
 		const skip = stage.skip ? resolveCtxFn(stage.skip, props.context) : false
 		return !skip
 	}

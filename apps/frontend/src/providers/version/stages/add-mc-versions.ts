@@ -26,8 +26,8 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	}),
 }
 
-export const editStageConfig: StageConfigInput<ManageVersionContextValue> = {
-	id: 'edit-mc-versions',
+export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue> = {
+	id: 'from-details-mc-versions',
 	stageContent: markRaw(AddMcVersionsStage),
 	title: 'Edit game versions',
 	nonProgressStage: true,
@@ -37,11 +37,17 @@ export const editStageConfig: StageConfigInput<ManageVersionContextValue> = {
 		disabled: ctx.draftVersion.value.game_versions.length === 0,
 		onClick: () => ctx.modal.value?.setStage('add-details'),
 	}),
-	rightButtonConfig: (ctx) => ({
-		label: ctx.getNextLabel(2),
-		icon: RightArrowIcon,
-		iconPosition: 'after',
-		disabled: ctx.draftVersion.value.game_versions.length === 0,
-		onClick: () => ctx.modal.value?.setStage(2),
-	}),
+	rightButtonConfig: (ctx) =>
+		ctx.editingVersion.value
+			? {
+					...ctx.saveButtonConfig(),
+					disabled: ctx.draftVersion.value.game_versions.length === 0,
+				}
+			: {
+					label: ctx.getNextLabel(2),
+					icon: RightArrowIcon,
+					iconPosition: 'after',
+					disabled: ctx.draftVersion.value.game_versions.length === 0,
+					onClick: () => ctx.modal.value?.setStage(2),
+				},
 }

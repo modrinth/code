@@ -1,4 +1,4 @@
-import { LeftArrowIcon, RightArrowIcon } from '@modrinth/assets'
+import { LeftArrowIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
 import type { StageConfigInput } from '@modrinth/ui'
 import { markRaw } from 'vue'
 
@@ -11,15 +11,26 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	stageContent: markRaw(AddDependenciesStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit dependencies' : 'Add dependencies'),
 	skip: (ctx) => ctx.projectType.value === 'modpack',
-	leftButtonConfig: (ctx) => ({
-		label: 'Back',
-		icon: LeftArrowIcon,
-		onClick: () => ctx.modal.value?.prevStage(),
-	}),
-	rightButtonConfig: (ctx) => ({
-		label: ctx.getNextLabel(),
-		icon: RightArrowIcon,
-		iconPosition: 'after',
-		onClick: () => ctx.modal.value?.nextStage(),
-	}),
+	leftButtonConfig: (ctx) =>
+		ctx.editingVersion.value
+			? {
+					label: 'Cancel',
+					icon: XIcon,
+					onClick: () => ctx.modal.value?.hide(),
+				}
+			: {
+					label: 'Back',
+					icon: LeftArrowIcon,
+					onClick: () => ctx.modal.value?.prevStage(),
+				},
+	rightButtonConfig: (ctx) =>
+		ctx.editingVersion.value
+			? ctx.saveButtonConfig()
+			: {
+					label: ctx.getNextLabel(),
+					icon: RightArrowIcon,
+					iconPosition: 'after',
+					onClick: () => ctx.modal.value?.nextStage(),
+				},
+	nonProgressStage: (ctx) => ctx.editingVersion.value,
 }

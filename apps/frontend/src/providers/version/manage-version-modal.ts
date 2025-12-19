@@ -1,4 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	createContext,
 	injectModrinthClient,
@@ -6,6 +7,7 @@ import {
 	injectProjectPageContext,
 	type MultiStageModal,
 	resolveCtxFn,
+	type StageButtonConfig,
 	type StageConfigInput,
 } from '@modrinth/ui'
 import JSZip from 'jszip'
@@ -49,9 +51,9 @@ export type VersionStage =
 	| 'add-environment'
 	| 'add-dependencies'
 	| 'add-changelog'
-	| 'edit-loaders'
-	| 'edit-mc-versions'
-	| 'edit-environment'
+	| 'from-details-loaders'
+	| 'from-details-mc-versions'
+	| 'from-details-environment'
 
 export interface ManageVersionContextValue {
 	// State
@@ -75,6 +77,7 @@ export interface ManageVersionContextValue {
 
 	// Stage helpers
 	getNextLabel: (currentIndex?: number | null) => string
+	saveButtonConfig: () => StageButtonConfig
 
 	// Version methods
 	newDraftVersion: (projectId: string, version?: Labrinth.Versions.v3.DraftVersion | null) => void
@@ -380,6 +383,16 @@ export function createManageVersionContext(
 		}
 	}
 
+	const saveButtonConfig = (): StageButtonConfig => ({
+		label: 'Save changes',
+		icon: isSubmitting.value ? SpinnerIcon : SaveIcon,
+		iconPosition: 'before',
+		iconClass: isSubmitting.value ? 'animate-spin' : undefined,
+		color: 'green',
+		disabled: isSubmitting.value,
+		onClick: () => handleSaveVersionEdits(),
+	})
+
 	const contextValue: ManageVersionContextValue = {
 		// State
 		draftVersion,
@@ -402,6 +415,7 @@ export function createManageVersionContext(
 
 		// Stage helpers
 		getNextLabel,
+		saveButtonConfig,
 
 		// Methods
 		newDraftVersion,

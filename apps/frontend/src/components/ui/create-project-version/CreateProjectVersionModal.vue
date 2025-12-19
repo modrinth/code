@@ -21,10 +21,13 @@ const { newDraftVersion, setProjectType } = ctx
 
 const { projectV2 } = injectProjectPageContext()
 
-function showCreateVersionModal(version: Labrinth.Versions.v3.DraftVersion | null = null) {
+function showCreateVersionModal(
+	version: Labrinth.Versions.v3.DraftVersion | null = null,
+	stageId: string | null = null,
+) {
 	newDraftVersion(projectV2.value.id, version)
 	setProjectType(projectV2.value)
-	modal.value?.setStage(0)
+	modal.value?.setStage(stageId ?? 0)
 	modal.value?.show()
 }
 

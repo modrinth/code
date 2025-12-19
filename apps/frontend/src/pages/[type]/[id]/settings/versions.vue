@@ -37,19 +37,19 @@
 						:options="[
 							{
 								id: 'edit-details',
-								action: () => handleOpenEditVersionModal(version),
+								action: () => handleOpenEditVersionModal(version, 'add-details'),
 							},
 							{
 								id: 'edit-changelog',
-								action: () => handleOpenEditVersionModal(version),
+								action: () => handleOpenEditVersionModal(version, 'add-changelog'),
 							},
 							{
 								id: 'edit-dependencies',
-								action: () => handleOpenEditVersionModal(version),
+								action: () => handleOpenEditVersionModal(version, 'add-dependencies'),
 							},
 							{
 								id: 'edit-files',
-								action: () => handleOpenEditVersionModal(version),
+								action: () => handleOpenEditVersionModal(version, 'add-files'),
 							},
 						]"
 						aria-label="Edit version"
@@ -145,8 +145,23 @@
 							},
 							{ divider: true, shown: !!currentMember },
 							{
-								id: 'edit',
-								action: () => handleOpenEditVersionModal(version),
+								id: 'edit-details',
+								action: () => handleOpenEditVersionModal(version, 'add-details'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'edit-changelog',
+								action: () => handleOpenEditVersionModal(version, 'add-changelog'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'edit-dependencies',
+								action: () => handleOpenEditVersionModal(version, 'add-dependencies'),
+								shown: !!currentMember,
+							},
+							{
+								id: 'edit-files',
+								action: () => handleOpenEditVersionModal(version, 'add-files'),
 								shown: !!currentMember,
 							},
 							{
@@ -183,9 +198,21 @@
 							<ReportIcon aria-hidden="true" />
 							Report
 						</template>
-						<template #edit>
+						<template #edit-details>
 							<EditIcon aria-hidden="true" />
-							Edit
+							Edit Details
+						</template>
+						<template #edit-changelog>
+							<EditIcon aria-hidden="true" />
+							Edit Changelog
+						</template>
+						<template #edit-dependencies>
+							<EditIcon aria-hidden="true" />
+							Edit Dependencies
+						</template>
+						<template #edit-files>
+							<EditIcon aria-hidden="true" />
+							Edit Files
 						</template>
 						<template #delete>
 							<TrashIcon aria-hidden="true" />
@@ -373,23 +400,29 @@ async function deleteVersion() {
 	stopLoading()
 }
 
-async function handleOpenEditVersionModal(version: Labrinth.Versions.v3.Version) {
+async function handleOpenEditVersionModal(
+	version: Labrinth.Versions.v3.Version,
+	stageId: string | null = null,
+) {
 	selectedVersion.value = version.id
 	try {
 		const versionData = await client.labrinth.versions_v3.getVersion(version.id)
-		modal.value?.show({
-			project_id: project.id,
-			version_id: version.id,
-			name: versionData.name ?? '',
-			version_number: versionData.version_number ?? '',
-			changelog: versionData.changelog ?? '',
-			game_versions: versionData.game_versions ?? [],
-			version_type: versionData.version_type ?? 'release',
-			loaders: versionData.loaders ?? [],
-			dependencies: versionData.dependencies ?? [],
-			existing_files: versionData.files ?? [],
-			environment: versionData.environment,
-		})
+		modal.value?.show(
+			{
+				project_id: project.id,
+				version_id: version.id,
+				name: versionData.name ?? '',
+				version_number: versionData.version_number ?? '',
+				changelog: versionData.changelog ?? '',
+				game_versions: versionData.game_versions ?? [],
+				version_type: versionData.version_type ?? 'release',
+				loaders: versionData.loaders ?? [],
+				dependencies: versionData.dependencies ?? [],
+				existing_files: versionData.files ?? [],
+				environment: versionData.environment,
+			},
+			stageId,
+		)
 	} catch (err: any) {
 		addNotification({
 			title: 'An error occurred',
