@@ -477,6 +477,7 @@ export namespace Labrinth {
 				downloads: number
 				files: VersionFile[]
 				environment?: Labrinth.Projects.v3.Environment
+				mrpack_loaders?: string[]
 			}
 
 			export interface DraftVersionFile {

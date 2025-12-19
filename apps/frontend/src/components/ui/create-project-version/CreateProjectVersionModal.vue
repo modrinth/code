@@ -4,7 +4,12 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { injectProjectPageContext, MultiStageModal } from '@modrinth/ui'
+import {
+	injectModrinthClient,
+	injectNotificationManager,
+	injectProjectPageContext,
+	MultiStageModal,
+} from '@modrinth/ui'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import {
@@ -20,8 +25,42 @@ provideManageVersionContext(ctx)
 const { newDraftVersion, setProjectType } = ctx
 
 const { projectV2 } = injectProjectPageContext()
+const { addNotification } = injectNotificationManager()
+const { labrinth } = injectModrinthClient()
 
-function showCreateVersionModal(
+async function openEditVersionModal(versionId: string, projectId: string, stageId?: string | null) {
+	try {
+		const versionData = await labrinth.versions_v3.getVersion(versionId)
+
+		const draftVersionData = {
+			project_id: projectId,
+			version_id: versionId,
+			name: versionData.name ?? '',
+			version_number: versionData.version_number ?? '',
+			changelog: versionData.changelog ?? '',
+			game_versions: versionData.game_versions ?? [],
+			version_type: versionData.version_type ?? 'release',
+			loaders: versionData.loaders ?? [],
+			dependencies: versionData.dependencies ?? [],
+			existing_files: versionData.files ?? [],
+			environment: versionData.environment,
+		}
+
+		if (projectV2.value.project_type === 'modpack') {
+			draftVersionData.loaders = versionData.mrpack_loaders ?? []
+		}
+
+		openCreateVersionModal(draftVersionData, stageId)
+	} catch (err: any) {
+		addNotification({
+			title: 'An error occurred',
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
+}
+
+function openCreateVersionModal(
 	version: Labrinth.Versions.v3.DraftVersion | null = null,
 	stageId: string | null = null,
 ) {
@@ -32,6 +71,7 @@ function showCreateVersionModal(
 }
 
 defineExpose({
-	show: showCreateVersionModal,
+	openEditVersionModal,
+	openCreateVersionModal,
 })
 </script>

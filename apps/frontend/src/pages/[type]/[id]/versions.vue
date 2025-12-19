@@ -1,6 +1,9 @@
 <template>
 	<section class="experimental-styles-within overflow-visible">
-		<CreateProjectVersionModal v-if="currentMember" ref="modal"></CreateProjectVersionModal>
+		<CreateProjectVersionModal
+			v-if="currentMember"
+			ref="create-project-version-modal"
+		></CreateProjectVersionModal>
 
 		<ConfirmModal
 			v-if="currentMember"
@@ -57,7 +60,7 @@
 						project.slug ? project.slug : project.id
 					}/version/${encodeURI(version.displayUrlEnding)}`
 			"
-			:open-modal="currentMember ? openModal : undefined"
+			:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 			:create-version-button-secondary="true"
 		>
 			<template #actions="{ version }">
@@ -79,19 +82,20 @@
 						:options="[
 							{
 								id: 'edit-details',
-								action: () => handleOpenEditVersionModal(version, 'add-details'),
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
 							},
 							{
 								id: 'edit-changelog',
-								action: () => handleOpenEditVersionModal(version, 'add-changelog'),
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-changelog'),
 							},
 							{
 								id: 'edit-dependencies',
-								action: () => handleOpenEditVersionModal(version, 'add-dependencies'),
+								action: () =>
+									handleOpenEditVersionModal(version.id, project.id, 'add-dependencies'),
 							},
 							{
 								id: 'edit-files',
-								action: () => handleOpenEditVersionModal(version, 'add-files'),
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
 							},
 						]"
 						aria-label="Edit version"
@@ -188,22 +192,23 @@
 							{ divider: true, shown: !!currentMember },
 							{
 								id: 'edit-details',
-								action: () => handleOpenEditVersionModal(version, 'add-details'),
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
 								shown: !!currentMember,
 							},
 							{
 								id: 'edit-changelog',
-								action: () => handleOpenEditVersionModal(version, 'add-changelog'),
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-changelog'),
 								shown: !!currentMember,
 							},
 							{
 								id: 'edit-dependencies',
-								action: () => handleOpenEditVersionModal(version, 'add-dependencies'),
+								action: () =>
+									handleOpenEditVersionModal(version.id, project.id, 'add-dependencies'),
 								shown: !!currentMember,
 							},
 							{
 								id: 'edit-files',
-								action: () => handleOpenEditVersionModal(version, 'add-files'),
+								action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
 								shown: !!currentMember,
 							},
 							{
@@ -306,6 +311,7 @@ import {
 	injectProjectPageContext,
 } from '@modrinth/ui'
 
+import { useTemplateRef } from 'vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
@@ -338,12 +344,18 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { refreshVersions } = injectProjectPageContext()
 
-const modal = ref()
 const deleteVersionModal = ref()
 const selectedVersion = ref(null)
+const createProjectVersionModal = useTemplateRef('create-project-version-modal')
 
-function openModal() {
-	modal.value?.show?.()
+const handleOpenCreateVersionModal = () => {
+	if (!currentMember) return
+	createProjectVersionModal.value?.openCreateVersionModal()
+}
+
+const handleOpenEditVersionModal = (versionId, projectId, stageId) => {
+	if (!currentMember) return
+	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
 }
 
 const hideVersionsAdmonition = useLocalStorage(
@@ -391,34 +403,5 @@ async function deleteVersion() {
 	selectedVersion.value = null
 
 	stopLoading()
-}
-
-async function handleOpenEditVersionModal(version, stageId = null) {
-	selectedVersion.value = version.id
-	try {
-		const versionData = await client.labrinth.versions_v3.getVersion(version.id)
-		modal.value?.show(
-			{
-				project_id: props.project.id,
-				version_id: version.id,
-				name: versionData.name ?? '',
-				version_number: versionData.version_number ?? '',
-				changelog: versionData.changelog ?? '',
-				game_versions: versionData.game_versions ?? [],
-				version_type: versionData.version_type ?? 'release',
-				loaders: versionData.loaders ?? [],
-				dependencies: versionData.dependencies ?? [],
-				existing_files: versionData.files ?? [],
-				environment: versionData.environment,
-			},
-			stageId,
-		)
-	} catch (err) {
-		addNotification({
-			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
-	}
 }
 </script>
