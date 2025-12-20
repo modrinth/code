@@ -417,7 +417,7 @@
     "defaultMessage": "Returned"
   },
   "omorphia.component.badge.label.safe": {
-    "defaultMessage": "Safe"
+    "defaultMessage": "Pass"
   },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Scheduled"
@@ -429,7 +429,7 @@
     "defaultMessage": "Unlisted"
   },
   "omorphia.component.badge.label.unsafe": {
-    "defaultMessage": "Unsafe"
+    "defaultMessage": "Fail"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Withheld"
