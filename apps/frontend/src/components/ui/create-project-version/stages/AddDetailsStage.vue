@@ -6,7 +6,7 @@
 			</span>
 			<Chips
 				v-model="draftVersion.version_type"
-				:items="['release', 'alpha', 'beta']"
+				:items="['release', 'beta', 'alpha']"
 				:never-empty="true"
 				:capitalize="true"
 			/>
@@ -61,7 +61,7 @@
 				>
 					<div class="flex flex-wrap gap-2">
 						<template
-							v-for="loader in draftVersion.loaders.map((selectedLoader) =>
+							v-for="loader in draftVersionLoaders.map((selectedLoader) =>
 								loaders.find((loader) => selectedLoader === loader.name),
 							)"
 						>
@@ -174,6 +174,12 @@ const {
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
 const isModpack = computed(() => projectType.value === 'modpack')
+
+const draftVersionLoaders = computed(() =>
+	[
+		...new Set([...draftVersion.value.loaders, ...(draftVersion.value.mrpack_loaders ?? [])]),
+	].filter((loader) => loader !== 'mrpack'),
+)
 
 const editLoaders = () => {
 	modal.value?.setStage('from-details-loaders')

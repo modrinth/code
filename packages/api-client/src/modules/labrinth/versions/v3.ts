@@ -190,7 +190,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			version: 3,
 			method: 'POST',
 			body: formData,
-			timeout: 120000,
+			timeout: 60 * 5 * 1000,
 			headers: {
 				'Content-Type': '',
 			},
@@ -281,7 +281,7 @@ export class LabrinthVersionsV3Module extends AbstractModule {
 			version: 2,
 			method: 'POST',
 			body: formData,
-			timeout: 120000,
+			timeout: 60 * 5 * 1000,
 			headers: {
 				'Content-Type': '',
 			},

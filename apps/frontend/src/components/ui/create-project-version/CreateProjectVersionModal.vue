@@ -44,10 +44,7 @@ async function openEditVersionModal(versionId: string, projectId: string, stageI
 			dependencies: versionData.dependencies ?? [],
 			existing_files: versionData.files ?? [],
 			environment: versionData.environment,
-		}
-
-		if (projectV2.value.project_type === 'modpack' && draftVersionData.loaders.includes('mrpack')) {
-			draftVersionData.loaders.push(...(versionData.mrpack_loaders ?? []))
+			mrpack_loaders: versionData.mrpack_loaders,
 		}
 
 		openCreateVersionModal(draftVersionData, stageId)
