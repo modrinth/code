@@ -68,26 +68,18 @@
 import {
 	DownloadIcon,
 	EditIcon,
-	FileArchiveIcon,
-	FileIcon,
 	FolderOpenIcon,
 	MoreHorizontalIcon,
 	PackageOpenIcon,
 	RightArrowIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+import { ButtonStyled, getFileExtensionIcon } from '@modrinth/ui'
 import { computed, ref, shallowRef } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { useRoute, useRouter } from 'vue-router'
 
-import {
-	UiServersIconsCodeFileIcon,
-	UiServersIconsCogFolderIcon,
-	UiServersIconsEarthIcon,
-	UiServersIconsImageFileIcon,
-	UiServersIconsTextFileIcon,
-} from '#components'
+import { UiServersIconsCogFolderIcon, UiServersIconsEarthIcon } from '#components'
 import PaletteIcon from '~/assets/icons/palette.svg?component'
 
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
@@ -116,36 +108,7 @@ const emit = defineEmits<{
 const isDragOver = ref(false)
 const isDragging = ref(false)
 
-const codeExtensions = Object.freeze([
-	'json',
-	'json5',
-	'jsonc',
-	'java',
-	'kt',
-	'kts',
-	'sh',
-	'bat',
-	'ps1',
-	'yml',
-	'yaml',
-	'toml',
-	'js',
-	'ts',
-	'py',
-	'rb',
-	'php',
-	'html',
-	'css',
-	'cpp',
-	'c',
-	'h',
-	'rs',
-	'go',
-])
-
 const textExtensions = Object.freeze(['txt', 'md', 'log', 'cfg', 'conf', 'properties', 'ini', 'sk'])
-const imageExtensions = Object.freeze(['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'])
-const supportedArchiveExtensions = Object.freeze(['zip'])
 const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])
 
 const route = shallowRef(useRoute())
@@ -199,12 +162,7 @@ const iconComponent = computed(() => {
 		return FolderOpenIcon
 	}
 
-	const ext = fileExtension.value
-	if (codeExtensions.includes(ext)) return UiServersIconsCodeFileIcon
-	if (textExtensions.includes(ext)) return UiServersIconsTextFileIcon
-	if (imageExtensions.includes(ext)) return UiServersIconsImageFileIcon
-	if (supportedArchiveExtensions.includes(ext)) return FileArchiveIcon
-	return FileIcon
+	return getFileExtensionIcon(fileExtension.value)
 })
 
 const subText = computed(() => {

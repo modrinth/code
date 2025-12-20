@@ -4,10 +4,15 @@ export { finalPermissionMessages } from './data/modpack-permissions-stage'
 export { default as nags } from './data/nags'
 export * from './data/nags/index'
 export { default as reportQuickReplies } from './data/report-quick-replies'
+export {
+	type TechReviewContext,
+	default as techReviewQuickReplies,
+} from './data/tech-review-quick-replies'
 export * from './types/actions'
 export * from './types/keybinds'
 export * from './types/messages'
 export * from './types/nags'
+export * from './types/quick-reply'
 export * from './types/reports'
 export * from './types/stage'
 export * from './utils'
