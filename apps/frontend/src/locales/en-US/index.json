@@ -1281,10 +1281,13 @@
     "message": "New project"
   },
   "layout.action.reports": {
-    "message": "Reports"
+    "message": "Review reports"
   },
   "layout.action.review-projects": {
-    "message": "Review projects"
+    "message": "Project review"
+  },
+  "layout.action.tech-review": {
+    "message": "Tech review"
   },
   "layout.avatar.alt": {
     "message": "Your avatar"
@@ -1522,9 +1525,6 @@
   },
   "moderation.sort.by": {
     "message": "Sort by"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Search tech reviews..."
   },
   "muralpay.account-type.checking": {
     "message": "Checking"

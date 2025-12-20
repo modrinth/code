@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            didws.id AS \"issue_detail_id!\"\n        FROM mods m\n        INNER JOIN versions v ON v.mod_id = m.id\n        INNER JOIN files f ON f.version_id = v.id\n        INNER JOIN delphi_reports dr ON dr.file_id = f.id\n        INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id\n        INNER JOIN delphi_issue_details_with_statuses didws ON didws.issue_id = dri.id\n        WHERE\n            m.id = $1\n            AND didws.status = 'pending'\n            -- see delphi.rs todo comment\n            AND dri.issue_type != '__dummy'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "issue_detail_id!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "52ef6d02f8d533fc4e4ceb141d07a2eb115dc88da24735fffeca3eb1c269ad53"
+}
