@@ -26,7 +26,8 @@ const options = ref<DropdownOption<string>[]>([])
 const { labrinth } = injectModrinthClient()
 
 const search = async (query: string) => {
-	if (!query.trim()) {
+	query = query.trim()
+	if (!query) {
 		searchLoading.value = false
 		return
 	}
@@ -49,7 +50,7 @@ const search = async (query: string) => {
 		const resultsByProjectId = await labrinth.projects_v2.search({
 			query: '',
 			limit: 20,
-			facets: [[`project_id:${query}`]],
+			facets: [[`project_id:${query.replace(/[^a-zA-Z0-9]/g, '')}`]], // remove any non-alphanumeric characters
 		})
 
 		options.value = [...resultsByProjectId.hits, ...results.hits].map((hit) => ({
