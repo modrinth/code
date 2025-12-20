@@ -158,6 +158,9 @@ const client = injectModrinthClient()
 
 const severityOrder = { severe: 3, high: 2, medium: 1, low: 0 } as Record<string, number>
 
+const detailDecisions = ref<Map<string, 'safe' | 'malware'>>(new Map())
+const updatingDetails = ref<Set<string>>(new Set())
+
 function getFileHighestSeverity(
 	file: FlattenedFileReport,
 ): Labrinth.TechReview.Internal.DelphiSeverity {
@@ -302,9 +305,6 @@ async function copyToClipboard(code: string, detailId: string) {
 		console.error('Failed to copy code:', error)
 	}
 }
-
-const detailDecisions = ref<Map<string, 'safe' | 'malware'>>(new Map())
-const updatingDetails = ref<Set<string>>(new Set())
 
 function getDetailDecision(
 	detailId: string,

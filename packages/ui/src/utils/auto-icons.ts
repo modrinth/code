@@ -88,7 +88,7 @@ const BLOCKCHAIN_CONFIG: Record<string, { icon: Component; color: string }> = {
 	polygon: { icon: PolygonIcon, color: 'text-purple' },
 }
 
-const CODE_EXTENSIONS: string[] = [
+export const CODE_EXTENSIONS: readonly string[] = [
 	'json',
 	'json5',
 	'jsonc',
@@ -115,7 +115,7 @@ const CODE_EXTENSIONS: string[] = [
 	'go',
 ] as const
 
-const TEXT_EXTENSIONS: string[] = [
+export const TEXT_EXTENSIONS: readonly string[] = [
 	'txt',
 	'md',
 	'log',
@@ -125,7 +125,7 @@ const TEXT_EXTENSIONS: string[] = [
 	'ini',
 	'sk',
 ] as const
-const IMAGE_EXTENSIONS: string[] = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'] as const
+export const IMAGE_EXTENSIONS: readonly string[] = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'] as const
 const ARCHIVE_EXTENSIONS: string[] = ['zip', 'jar', 'tar', 'gz', 'rar', '7z'] as const
 
 export function getProjectTypeIcon(projectType: ProjectType): Component {
