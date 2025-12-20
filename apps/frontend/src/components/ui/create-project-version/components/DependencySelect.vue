@@ -6,14 +6,14 @@
 		:searchable="true"
 		search-placeholder="Search by name or paste ID..."
 		:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
+		:disable-search-filter="true"
 		@search-input="(query) => handleSearch(query)"
-		:disableSearchFilter="true"
 	/>
 </template>
 
 <script lang="ts" setup>
+import type { ComboboxOption } from '@modrinth/ui'
 import { Combobox, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
-import type { DropdownOption } from '@modrinth/ui/src/components/base/Combobox.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { defineAsyncComponent, h } from 'vue'
 
@@ -21,7 +21,7 @@ const { addNotification } = injectNotificationManager()
 const projectId = defineModel<string>()
 
 const searchLoading = ref(false)
-const options = ref<DropdownOption<string>[]>([])
+const options = ref<ComboboxOption<string>[]>([])
 
 const { labrinth } = injectModrinthClient()
 

@@ -74,8 +74,14 @@ import {
 	RightArrowIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, getFileExtensionIcon } from '@modrinth/ui'
-import { computed, ref, shallowRef } from 'vue'
+import {
+	ButtonStyled,
+	CODE_EXTENSIONS,
+	getFileExtensionIcon,
+	IMAGE_EXTENSIONS,
+	TEXT_EXTENSIONS,
+} from '@modrinth/ui'
+import { computed, h, ref, shallowRef } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -108,7 +114,6 @@ const emit = defineEmits<{
 const isDragOver = ref(false)
 const isDragging = ref(false)
 
-const textExtensions = Object.freeze(['txt', 'md', 'log', 'cfg', 'conf', 'properties', 'ini', 'sk'])
 const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])
 
 const route = shallowRef(useRoute())
@@ -203,9 +208,9 @@ const isEditableFile = computed(() => {
 		const ext = fileExtension.value
 		return (
 			!props.name.includes('.') ||
-			textExtensions.includes(ext) ||
-			codeExtensions.includes(ext) ||
-			imageExtensions.includes(ext)
+			TEXT_EXTENSIONS.includes(ext) ||
+			CODE_EXTENSIONS.includes(ext) ||
+			IMAGE_EXTENSIONS.includes(ext)
 		)
 	}
 	return false
@@ -252,32 +257,7 @@ const selectItem = () => {
 }
 
 const getDragIcon = async () => {
-	let iconToUse
-
-	if (props.type === 'directory') {
-		if (props.name === 'config') {
-			iconToUse = UiServersIconsCogFolderIcon
-		} else if (props.name === 'world') {
-			iconToUse = UiServersIconsEarthIcon
-		} else if (props.name === 'resourcepacks') {
-			iconToUse = PaletteIcon
-		} else {
-			iconToUse = FolderOpenIcon
-		}
-	} else {
-		const ext = fileExtension.value
-		if (codeExtensions.includes(ext)) {
-			iconToUse = UiServersIconsCodeFileIcon
-		} else if (textExtensions.includes(ext)) {
-			iconToUse = UiServersIconsTextFileIcon
-		} else if (imageExtensions.includes(ext)) {
-			iconToUse = UiServersIconsImageFileIcon
-		} else {
-			iconToUse = FileIcon
-		}
-	}
-
-	return await renderToString(h(iconToUse))
+	return await renderToString(h(iconComponent.value))
 }
 
 const handleDragStart = async (event: DragEvent) => {
