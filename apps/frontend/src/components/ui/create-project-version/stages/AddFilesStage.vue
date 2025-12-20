@@ -103,9 +103,7 @@ const {
 	existingFilesToDelete,
 	setPrimaryFile,
 	setInferredVersionData,
-	setProjectType,
 	editingVersion,
-	projectType,
 } = injectManageVersionContext()
 
 const addDetectedData = async () => {
@@ -125,16 +123,8 @@ const addDetectedData = async () => {
 			...draftVersion.value,
 			...mappedInferredData,
 		}
-
-		setProjectType(projectV2.value, primaryFile)
 	} catch (err) {
 		console.error('Error parsing version file data', err)
-	}
-
-	if (projectType.value === 'resourcepack') {
-		draftVersion.value.loaders = ['minecraft']
-	} else if (projectType.value === 'modpack' && draftVersion.value.loaders?.length === 0) {
-		draftVersion.value.loaders = ['minecraft']
 	}
 }
 

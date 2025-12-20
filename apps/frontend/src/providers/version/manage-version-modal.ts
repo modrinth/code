@@ -86,10 +86,6 @@ export interface ManageVersionContextValue {
 		file: File,
 		project: Labrinth.Projects.v2.Project,
 	) => Promise<InferredVersionInfo>
-	setProjectType: (
-		project: Labrinth.Projects.v2.Project,
-		file?: File | null,
-	) => Promise<Labrinth.Projects.v2.ProjectType | undefined>
 	getProject: (projectId: string) => Promise<Labrinth.Projects.v3.Project>
 	getVersion: (versionId: string) => Promise<Labrinth.Versions.v3.Version>
 
@@ -97,6 +93,40 @@ export interface ManageVersionContextValue {
 	handleCreateVersion: () => Promise<void>
 	handleSaveVersionEdits: () => Promise<void>
 }
+
+const PROJECT_TYPE_LOADERS: Record<string, readonly string[]> = {
+	mod: [
+		'fabric',
+		'neoforge',
+		'forge',
+		'quilt',
+		'liteloader',
+		'rift',
+		'ornithe',
+		'nilloader',
+		'risugami',
+		'legacy-fabric',
+		'bta-babric',
+		'babric',
+		'modloader',
+		'java-agent',
+	],
+	shader: ['optifine', 'iris', 'canvas', 'vanilla'],
+	plugin: [
+		'paper',
+		'purpur',
+		'spigot',
+		'bukkit',
+		'sponge',
+		'folia',
+		'bungeecord',
+		'velocity',
+		'waterfall',
+		'geyser',
+	],
+	datapack: ['datapack'],
+	resourcepack: ['minecraft'],
+} as const
 
 export const [injectManageVersionContext, provideManageVersionContext] =
 	createContext<ManageVersionContextValue>('CreateProjectVersionModal')
@@ -113,79 +143,42 @@ export function createManageVersionContext(
 	const filesToAdd = ref<Labrinth.Versions.v3.DraftVersionFile[]>([])
 	const existingFilesToDelete = ref<Labrinth.Versions.v3.VersionFileHash['sha1'][]>([])
 	const inferredVersionData = ref<InferredVersionInfo>()
-	const projectType = ref<Labrinth.Projects.v2.ProjectType>()
 	const dependencyProjects = ref<Record<string, Labrinth.Projects.v3.Project>>({})
 	const dependencyVersions = ref<Record<string, Labrinth.Versions.v3.Version>>({})
 	const isSubmitting = ref(false)
 
+	const projectType = computed<Labrinth.Projects.v2.ProjectType>(() => {
+		const primaryFile = filesToAdd.value[0]?.file
+		if (
+			(primaryFile && primaryFile.name.toLowerCase().endsWith('.mrpack')) ||
+			(primaryFile && primaryFile.name.toLowerCase().endsWith('.mrpack-primary'))
+		) {
+			return 'modpack'
+		}
+
+		const loaders = draftVersion.value.loaders || []
+
+		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.datapack.includes(loader))) {
+			return 'datapack'
+		}
+		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.resourcepack.includes(loader))) {
+			return 'resourcepack'
+		}
+		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.shader.includes(loader))) {
+			return 'shader'
+		}
+		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.plugin.includes(loader))) {
+			return 'plugin'
+		}
+		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.mod.includes(loader))) {
+			return 'mod'
+		}
+
+		return 'project'
+	})
+
 	// Computed state
 	const editingVersion = computed(() => Boolean(draftVersion.value.version_id))
-
-	// Helper functions for project type detection
-	// TODO: move to infer.js
-	async function setProjectType(
-		project: Labrinth.Projects.v2.Project,
-		file: File | null = null,
-	): Promise<Labrinth.Projects.v2.ProjectType | undefined> {
-		if (project.project_type && project.project_type !== 'project') {
-			projectType.value = project.project_type
-			return projectType.value
-		}
-
-		if (
-			(file && file.name.toLowerCase().endsWith('.mrpack')) ||
-			(file && file.name.toLowerCase().endsWith('.mrpack-primary'))
-		) {
-			projectType.value = 'modpack'
-			return projectType.value
-		}
-
-		if (
-			draftVersion.value.loaders?.some((loader) =>
-				[
-					'fabric',
-					'neoforge',
-					'forge',
-					'quilt',
-					'liteloader',
-					'rift',
-					'ornithe',
-					'nilloader',
-					'legacy-fabric',
-					'bta-babric',
-					'babric',
-					'modloader',
-					'java-agent',
-				].includes(loader),
-			)
-		) {
-			projectType.value = 'mod'
-			return projectType.value
-		}
-
-		try {
-			if (file) {
-				const jszip = await JSZip.loadAsync(file)
-
-				const hasMcmeta = Object.keys(jszip.files).some(
-					(f) => f.toLowerCase() === 'pack.mcmeta' || f.toLowerCase().endsWith('/pack.mcmeta'),
-				)
-				const hasAssetsDir = Object.keys(jszip.files).some(
-					(f) => f.toLowerCase() === 'assets/' || f.toLowerCase().startsWith('assets/'),
-				)
-
-				if (hasMcmeta && hasAssetsDir) {
-					projectType.value = 'resourcepack'
-					return projectType.value
-				}
-			}
-		} catch {
-			// not a zip
-		}
-
-		projectType.value = undefined
-		return undefined
-	}
 
 	// Version management methods
 	function newDraftVersion(
@@ -197,7 +190,7 @@ export function createManageVersionContext(
 		filesToAdd.value = []
 		existingFilesToDelete.value = []
 		inferredVersionData.value = undefined
-		projectType.value = undefined
+		// projectType.value = undefined
 	}
 
 	function setPrimaryFile(index: number) {
@@ -209,6 +202,33 @@ export function createManageVersionContext(
 	}
 
 	const tags = useGeneratedState()
+
+	const hasFile = (entries: string[], name: string) =>
+		entries.some((f) => f === name || f.endsWith(`/${name}`))
+
+	const hasDir = (entries: string[], dir: string) => entries.some((f) => f.startsWith(`${dir}/`))
+
+	async function checkIsResourcePack(file: File): Promise<boolean> {
+		try {
+			const zip = await JSZip.loadAsync(file)
+			const entries = Object.keys(zip.files).map((f) => f.toLowerCase())
+
+			return hasFile(entries, 'pack.mcmeta') && hasDir(entries, 'assets')
+		} catch {
+			return false
+		}
+	}
+
+	async function checkIsDataPack(file: File): Promise<boolean> {
+		try {
+			const zip = await JSZip.loadAsync(file)
+			const entries = Object.keys(zip.files).map((f) => f.toLowerCase())
+
+			return hasFile(entries, 'pack.mcmeta') && hasDir(entries, 'data')
+		} catch {
+			return false
+		}
+	}
 
 	async function setInferredVersionData(
 		file: File,
@@ -234,8 +254,21 @@ export function createManageVersionContext(
 			console.error('Error fetching versions for environment inference:', error)
 		}
 
+		const noLoaders = inferred.loaders?.length === 0
+
+		if (noLoaders && (await checkIsResourcePack(file))) {
+			inferred.loaders = ['minecraft']
+		}
+
+		if (noLoaders && (await checkIsDataPack(file))) {
+			inferred.loaders = ['datapack']
+		}
+
+		if (noLoaders && projectType.value === 'modpack') {
+			inferred.loaders = ['minecraft']
+		}
+
 		inferredVersionData.value = inferred
-		projectType.value = await setProjectType(project, file)
 
 		return inferred
 	}
@@ -423,7 +456,6 @@ export function createManageVersionContext(
 		newDraftVersion,
 		setPrimaryFile,
 		setInferredVersionData,
-		setProjectType,
 		getProject,
 		getVersion,
 		handleCreateVersion,
