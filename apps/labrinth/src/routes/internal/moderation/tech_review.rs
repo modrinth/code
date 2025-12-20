@@ -259,7 +259,10 @@ async fn get_report(
                         )
                     )
                     FROM delphi_report_issues dri
-                    WHERE dri.report_id = dr.id
+                    WHERE
+                        dri.report_id = dr.id
+                        -- see delphi.rs todo comment
+                        AND dri.issue_type != '__dummy'
                 )
             ) AS "data!: sqlx::types::Json<FileReport>"
         FROM delphi_reports dr
@@ -405,23 +408,26 @@ async fn search_projects(
                                                 'details', (
                                                     SELECT coalesce(jsonb_agg(
                                                         jsonb_build_object(
-                                                            'id', drid.id,
-                                                            'issue_id', drid.issue_id,
-                                                            'key', drid.key,
-                                                            'file_path', drid.file_path,
+                                                            'id', didws.id,
+                                                            'issue_id', didws.issue_id,
+                                                            'key', didws.key,
+                                                            'file_path', didws.file_path,
                                                             -- ignore `decompiled_source`
-                                                            'data', drid.data,
-                                                            'severity', drid.severity,
-                                                            'status', drid.status
+                                                            'data', didws.data,
+                                                            'severity', didws.severity,
+                                                            'status', didws.status
                                                         )
                                                     ), '[]'::jsonb)
-                                                    FROM delphi_report_issue_details drid
-                                                    WHERE drid.issue_id = dri.id
+                                                    FROM delphi_issue_details_with_statuses didws
+                                                    WHERE didws.issue_id = dri.id
                                                 )
                                             )
                                         ), '[]'::jsonb)
                                         FROM delphi_report_issues dri
-                                        WHERE dri.report_id = dr.id
+                                        WHERE
+                                            dri.report_id = dr.id
+                                            -- see delphi.rs todo comment
+                                            AND dri.issue_type != '__dummy'
                                     )
                                 )), '[]'::jsonb)
                                 FROM delphi_reports dr
@@ -440,9 +446,8 @@ async fn search_projects(
 
             -- only return projects with at least 1 pending drid
             INNER JOIN delphi_reports dr ON dr.file_id = f.id
-            INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-            INNER JOIN delphi_report_issue_details drid
-                ON drid.issue_id = dri.id AND drid.status = 'pending'
+            INNER JOIN delphi_issue_details_with_statuses didws
+                ON didws.project_id = m.id AND didws.status = 'pending'
 
             -- filtering
             LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
@@ -603,19 +608,21 @@ async fn submit_report(
         .wrap_internal_err("failed to begin transaction")?;
 
     let pending_issue_details = sqlx::query!(
-        "
+        r#"
         SELECT
-            drid.id AS issue_detail_id
+            didws.id AS "issue_detail_id!"
         FROM mods m
         INNER JOIN versions v ON v.mod_id = m.id
         INNER JOIN files f ON f.version_id = v.id
         INNER JOIN delphi_reports dr ON dr.file_id = f.id
         INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
-        INNER JOIN delphi_report_issue_details drid ON drid.issue_id = dri.id
+        INNER JOIN delphi_issue_details_with_statuses didws ON didws.issue_id = dri.id
         WHERE
             m.id = $1
-            AND drid.status = 'pending'
-        ",
+            AND didws.status = 'pending'
+            -- see delphi.rs todo comment
+            AND dri.issue_type != '__dummy'
+        "#,
         project_id as _,
     )
     .fetch_all(&mut *txn)
@@ -632,6 +639,25 @@ async fn submit_report(
                 .collect(),
         });
     }
+
+    sqlx::query!(
+        "
+        DELETE FROM delphi_report_issue_details drid
+        WHERE issue_id IN (
+            SELECT dri.id
+            FROM mods m
+            INNER JOIN versions v ON v.mod_id = m.id
+            INNER JOIN files f ON f.version_id = v.id
+            INNER JOIN delphi_reports dr ON dr.file_id = f.id
+            INNER JOIN delphi_report_issues dri ON dri.report_id = dr.id
+            WHERE m.id = $1 AND dri.issue_type = '__dummy'
+        )
+        ",
+        project_id as _,
+    )
+    .execute(&mut *txn)
+    .await
+    .wrap_internal_err("failed to delete dummy issue")?;
 
     let record = sqlx::query!(
         r#"
@@ -761,11 +787,23 @@ async fn update_issue_detail(
         DelphiVerdict::Safe => DelphiStatus::Safe,
         DelphiVerdict::Unsafe => DelphiStatus::Unsafe,
     };
-    sqlx::query!(
+    let results = sqlx::query!(
         r#"
-        UPDATE delphi_report_issue_details drid
-        SET status = $1
-        WHERE drid.id = $2
+        INSERT INTO delphi_issue_detail_verdicts (
+            project_id,
+            detail_key,
+            verdict
+        )
+        SELECT
+            didws.project_id,
+            didws.key,
+            $1
+        FROM delphi_issue_details_with_statuses didws
+        INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id
+        WHERE
+            didws.id = $2
+            -- see delphi.rs todo comment
+            AND dri.issue_type != '__dummy'
         "#,
         status as _,
         issue_detail_id as _,
@@ -773,6 +811,9 @@ async fn update_issue_detail(
     .execute(&mut *txn)
     .await
     .wrap_internal_err("failed to update issue detail")?;
+    if results.rows_affected() == 0 {
+        return Err(ApiError::Request(eyre!("issue detail does not exist")));
+    }
 
     txn.commit()
         .await

@@ -177,6 +177,9 @@ importers:
       vite:
         specifier: ^5.4.6
         version: 5.4.11(@types/node@22.4.1)(sass@1.77.6)(terser@5.44.1)
+      vue-component-type-helpers:
+        specifier: ^3.1.8
+        version: 3.1.8
       vue-tsc:
         specifier: ^2.1.6
         version: 2.1.6(typescript@5.5.4)
@@ -287,6 +290,9 @@ importers:
       highlight.js:
         specifier: ^11.7.0
         version: 11.9.0
+      iso-3166-2:
+        specifier: 1.0.0
+        version: 1.0.0
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.0
@@ -345,6 +351,9 @@ importers:
       '@types/dompurify':
         specifier: ^3.0.5
         version: 3.0.5
+      '@types/iso-3166-2':
+        specifier: ^1.0.4
+        version: 1.0.4
       '@types/node':
         specifier: ^20.1.0
         version: 20.14.11
@@ -387,6 +396,9 @@ importers:
       vite-svg-loader:
         specifier: ^5.1.0
         version: 5.1.0(vue@3.5.13(typescript@5.5.4))
+      vue-component-type-helpers:
+        specifier: ^3.1.8
+        version: 3.1.8
       vue-tsc:
         specifier: ^2.0.24
         version: 2.1.6(typescript@5.5.4)
@@ -653,6 +665,9 @@ importers:
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.5.4)
+      vue-component-type-helpers:
+        specifier: ^3.1.8
+        version: 3.1.8
       vue-router:
         specifier: 4.3.0
         version: 4.3.0(vue@3.5.13(typescript@5.5.4))
@@ -2797,6 +2812,9 @@ packages:
 
   '@types/http-proxy@1.17.15':
     resolution: {integrity: sha512-25g5atgiVNTIv0LBDTg1H74Hvayx0ajtJPLLcYE3whFv75J0pWNtOBzaXJQgDTmrX1bx5U9YC2w/n65BN1HwRQ==}
+
+  '@types/iso-3166-2@1.0.4':
+    resolution: {integrity: sha512-tXaeT4FDobC8rAy6LoFvbGA4vhOQQNIdSRC5DAoYfT3D9ohnKHkDFxHzSln6WqTKVeKLrnMiMQubM8m3fqNp/w==}
 
   '@types/js-yaml@4.0.9':
     resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
@@ -5362,6 +5380,9 @@ packages:
 
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
+
+  iso-3166-2@1.0.0:
+    resolution: {integrity: sha512-xLAazfKZzwlsg/Zz/GQGQk3jJez5/2ORrjD3TjSuqz/arMht/xTK49c0GOE3afO/gEd9tHtBVVlfBla01unUng==}
 
   jackspeak@3.4.0:
     resolution: {integrity: sha512-JVYhQnN59LVPFCEcVa2C3CrEKYacvjRfqIQl+h8oi91aLYQVWRYbxjPcv1bUiUy/kLmQaANrYfNMCO3kuEDHfw==}
@@ -8241,6 +8262,9 @@ packages:
   vue-bundle-renderer@2.1.1:
     resolution: {integrity: sha512-+qALLI5cQncuetYOXp4yScwYvqh8c6SMXee3B+M7oTZxOgtESP0l4j/fXdEJoZ+EdMxkGWIj+aSEyjXkOdmd7g==}
 
+  vue-component-type-helpers@3.1.8:
+    resolution: {integrity: sha512-oaowlmEM6BaYY+8o+9D9cuzxpWQWHqHTMKakMxXu0E+UCIOMTljyIPO15jcnaCwJtZu/zWDotK7mOIHvWD9mcw==}
+
   vue-confetti-explosion@1.0.2:
     resolution: {integrity: sha512-80OboM3/6BItIoZ6DpNcZFqGpF607kjIVc5af56oKgtFmt5yWehvJeoYhkzYlqxrqdBe0Ko4Ie3bWrmLau+dJw==}
     engines: {node: '>=12'}
@@ -10774,6 +10798,8 @@ snapshots:
   '@types/http-proxy@1.17.15':
     dependencies:
       '@types/node': 20.14.11
+
+  '@types/iso-3166-2@1.0.4': {}
 
   '@types/js-yaml@4.0.9': {}
 
@@ -14063,6 +14089,8 @@ snapshots:
 
   isexe@2.0.0: {}
 
+  iso-3166-2@1.0.0: {}
+
   jackspeak@3.4.0:
     dependencies:
       '@isaacs/cliui': 8.0.2
@@ -14071,7 +14099,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 22.4.1
+      '@types/node': 20.14.11
       merge-stream: 2.0.0
       supports-color: 8.1.1
     optional: true
@@ -17508,6 +17536,8 @@ snapshots:
   vue-bundle-renderer@2.1.1:
     dependencies:
       ufo: 1.5.4
+
+  vue-component-type-helpers@3.1.8: {}
 
   vue-confetti-explosion@1.0.2(vue@3.5.13(typescript@5.5.4)):
     dependencies:

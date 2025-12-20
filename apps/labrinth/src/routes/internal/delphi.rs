@@ -13,18 +13,20 @@ use crate::{
     auth::check_is_moderator_from_headers,
     database::{
         models::{
-            DBFileId, DelphiReportId, DelphiReportIssueDetailsId,
-            DelphiReportIssueId,
+            DBFileId, DBProjectId, DBThreadId, DelphiReportId,
+            DelphiReportIssueDetailsId, DelphiReportIssueId,
             delphi_report_item::{
                 DBDelphiReport, DBDelphiReportIssue, DelphiSeverity,
                 DelphiStatus, ReportIssueDetail,
             },
+            thread_item::ThreadMessageBuilder,
         },
         redis::RedisPool,
     },
     models::{
         ids::{ProjectId, VersionId},
         pats::Scopes,
+        threads::MessageBody,
     },
     queue::session::AuthQueue,
     routes::ApiError,
@@ -185,13 +187,80 @@ async fn ingest_report_deserialized(
         "Delphi found issues in file",
     );
 
+    let record = sqlx::query!(
+        r#"
+        SELECT
+            EXISTS(
+                SELECT 1 FROM delphi_issue_details_with_statuses didws
+                WHERE didws.project_id = $1 AND didws.status = 'pending'
+            ) AS "pending_issue_details_exist!",
+            t.id AS "thread_id: DBThreadId"
+        FROM mods m
+        INNER JOIN threads t ON t.mod_id = $1
+        "#,
+        DBProjectId::from(report.project_id) as _,
+    )
+    .fetch_one(&mut *transaction)
+    .await
+    .wrap_internal_err("failed to check if pending issue details exist")?;
+
+    if record.pending_issue_details_exist {
+        info!(
+            "File's project already has pending issue details, is not entering tech review queue"
+        );
+    } else {
+        info!("File's project is entering tech review queue");
+
+        ThreadMessageBuilder {
+            author_id: None,
+            body: MessageBody::TechReviewEntered,
+            thread_id: record.thread_id,
+            hide_identity: false,
+        }
+        .insert(&mut transaction)
+        .await
+        .wrap_internal_err("failed to add entering tech review message")?;
+    }
+
+    // TODO: Currently, the way we determine if an issue is in tech review or not
+    // is if it has any issue details which are pending.
+    // If you mark all issue details are safe or not safe - even if you don't
+    // submit the final report - the project will be taken out of tech review
+    // queue, and into moderation queue.
+    //
+    // This is undesirable, but we can't rework the database schema to fix it
+    // right now. As a hack, we add a dummy report issue which blocks the
+    // project from exiting the tech review queue.
+    {
+        let dummy_issue_id = DBDelphiReportIssue {
+            id: DelphiReportIssueId(0), // This will be set by the database
+            report_id,
+            issue_type: "__dummy".into(),
+        }
+        .insert(&mut transaction)
+        .await?;
+
+        ReportIssueDetail {
+            id: DelphiReportIssueDetailsId(0), // This will be set by the database
+            issue_id: dummy_issue_id,
+            key: "".into(),
+            file_path: "".into(),
+            decompiled_source: None,
+            data: HashMap::new(),
+            severity: DelphiSeverity::Low,
+            status: DelphiStatus::Pending,
+        }
+        .insert(&mut transaction)
+        .await?;
+    }
+
     for (issue_type, issue_details) in report.issues {
         let issue_id = DBDelphiReportIssue {
             id: DelphiReportIssueId(0), // This will be set by the database
             report_id,
             issue_type,
         }
-        .upsert(&mut transaction)
+        .insert(&mut transaction)
         .await?;
 
         // This is required to handle the case where the same Delphi version is re-run on the same file

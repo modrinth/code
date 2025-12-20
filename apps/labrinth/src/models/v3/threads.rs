@@ -46,6 +46,8 @@ pub enum MessageBody {
     TechReview {
         verdict: DelphiVerdict,
     },
+    TechReviewEntered,
+    TechReviewExitFileDeleted,
     ThreadClosure,
     ThreadReopen,
     Deleted {
@@ -58,7 +60,9 @@ impl MessageBody {
     pub fn is_private(&self) -> bool {
         match self {
             Self::Text { private, .. } | Self::Deleted { private } => *private,
-            Self::TechReview { .. } => true,
+            Self::TechReview { .. }
+            | Self::TechReviewEntered
+            | Self::TechReviewExitFileDeleted => true,
             Self::StatusChange { .. }
             | Self::ThreadClosure
             | Self::ThreadReopen => false,

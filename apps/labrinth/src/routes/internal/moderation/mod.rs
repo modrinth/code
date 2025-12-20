@@ -119,16 +119,12 @@ pub async fn get_projects_internal(
             FROM mods m
 
             -- exclude projects in tech review queue
-            LEFT JOIN versions v ON v.mod_id = m.id
-            LEFT JOIN files f ON f.version_id = v.id
-            LEFT JOIN delphi_reports dr ON dr.file_id = f.id
-            LEFT JOIN delphi_report_issues dri ON dri.report_id = dr.id
-            LEFT JOIN delphi_report_issue_details drid
-                ON drid.issue_id = dri.id AND drid.status = 'pending'
+            LEFT JOIN delphi_issue_details_with_statuses didws
+                ON didws.project_id = m.id AND didws.status = 'pending'
 
             WHERE
                 m.status = $1
-                AND drid.status IS NULL
+                AND didws.status IS NULL
 
             GROUP BY m.id
         ) t

@@ -167,7 +167,7 @@ pub enum ApiError {
     Delphi(reqwest::Error),
     #[error(transparent)]
     Mural(#[from] Box<muralpay::ApiError>),
-    #[error("report still has {} issue detailss with no verdict", details.len())]
+    #[error("report still has {} issue details with no verdict", details.len())]
     TechReviewDetailsWithNoVerdict {
         details: Vec<DelphiReportIssueDetailsId>,
     },

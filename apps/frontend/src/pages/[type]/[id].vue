@@ -32,10 +32,7 @@
 				:versions="versions"
 				:current-member="currentMember"
 				:is-settings="route.name.startsWith('type-id-settings')"
-				:route-name="route.name"
 				:set-processing="setProcessing"
-				:collapsed="collapsedChecklist"
-				:toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 				:all-members="allMembers"
 				:update-members="updateMembers"
 				:auth="auth"
@@ -55,6 +52,7 @@
 				:patch-project="patchProject"
 				:patch-icon="patchIcon"
 				:reset-project="resetProject"
+				:reset-versions="resetVersions"
 				:reset-organization="resetOrganization"
 				:reset-members="resetMembers"
 				:route="route"
@@ -447,14 +445,34 @@
 			<div class="normal-page__header relative my-4">
 				<ProjectHeader :project="project" :member="!!currentMember">
 					<template #actions>
+						<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
+							<nuxt-link
+								:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+								class="!font-bold"
+							>
+								<SettingsIcon aria-hidden="true" />
+								Edit project
+							</nuxt-link>
+						</ButtonStyled>
+
 						<div class="hidden sm:contents">
 							<ButtonStyled
+								v-tooltip="
+									auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
+								"
 								size="large"
-								:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+								:color="
+									(auth.user && currentMember) || route.name === 'type-id-version-version'
+										? `standard`
+										: `brand`
+								"
+								:circular="auth.user && currentMember"
 							>
 								<button @click="(event) => downloadModal.show(event)">
 									<DownloadIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.downloadButton) }}
+									{{
+										auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
+									}}
 								</button>
 							</ButtonStyled>
 						</div>
@@ -641,14 +659,7 @@
 								<BookmarkIcon aria-hidden="true" />
 							</nuxt-link>
 						</ButtonStyled>
-						<ButtonStyled v-if="auth.user && currentMember" size="large" circular>
-							<nuxt-link
-								v-tooltip="formatMessage(commonMessages.settingsLabel)"
-								:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-							>
-								<SettingsIcon aria-hidden="true" />
-							</nuxt-link>
-						</ButtonStyled>
+
 						<ButtonStyled size="large" circular type="transparent">
 							<OverflowMenu
 								:tooltip="formatMessage(commonMessages.moreOptionsButton)"
@@ -903,6 +914,7 @@
 					v-model:organization="organization"
 					:current-member="currentMember"
 					:reset-project="resetProject"
+					:reset-versions="resetVersions"
 					:reset-organization="resetOrganization"
 					:reset-members="resetMembers"
 					:route="route"
@@ -1446,6 +1458,7 @@ let project,
 	resetMembers,
 	dependencies,
 	versions,
+	resetVersions,
 	organization,
 	resetOrganization,
 	projectV2Error,
@@ -1459,7 +1472,7 @@ try {
 		{ data: projectV3, error: projectV3Error, refresh: resetProjectV3 },
 		{ data: allMembers, error: membersError, refresh: resetMembers },
 		{ data: dependencies, error: dependenciesError },
-		{ data: versions, error: versionsError },
+		{ data: versions, error: versionsError, refresh: resetVersions },
 		{ data: organization, refresh: resetOrganization },
 	] = await Promise.all([
 		useAsyncData(`project/${projectId.value}`, () => useBaseFetch(`project/${projectId.value}`), {
@@ -1917,6 +1930,7 @@ provideProjectPageContext({
 	projectV2: project,
 	projectV3,
 	refreshProject: resetProject,
+	refreshVersions: resetVersions,
 	currentMember,
 })
 </script>

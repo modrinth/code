@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
@@ -7,7 +8,7 @@ import LargeRadioButton from '../../../base/LargeRadioButton.vue'
 
 const { formatMessage } = useVIntl()
 
-const value = defineModel<string | undefined>({ required: true })
+const value = defineModel<Labrinth.Projects.v3.Environment | undefined>({ required: true })
 
 withDefaults(
 	defineProps<{
@@ -134,7 +135,7 @@ type SubOptionKey = ValidKeys<(typeof OUTER_OPTIONS)[keyof typeof OUTER_OPTIONS]
 const currentOuterOption = ref<OuterOptionKey>()
 const currentSubOption = ref<SubOptionKey>()
 
-const computedOption = computed<string>(() => {
+const computedOption = computed<Labrinth.Projects.v3.Environment>(() => {
 	switch (currentOuterOption.value) {
 		case 'client':
 			return 'client_only'
@@ -169,7 +170,7 @@ const computedOption = computed<string>(() => {
 	}
 })
 
-function loadEnvironmentValues(env?: EnvironmentV3) {
+function loadEnvironmentValues(env?: Labrinth.Projects.v3.Environment) {
 	switch (env) {
 		case 'client_and_server':
 			currentOuterOption.value = 'client_and_server'
