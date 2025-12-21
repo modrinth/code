@@ -360,7 +360,9 @@ import {
 	expandVariables,
 	finalPermissionMessages,
 	findMatchingVariant,
+	flattenProjectV3PartialVariables,
 	flattenProjectVariables,
+	flattenStaticVariables,
 	getActionIdForStage,
 	getActionMessage,
 	getVisibleInputs,
@@ -389,6 +391,7 @@ import {
 	type ModerationModpackItem,
 	type Project,
 	type ProjectStatus,
+	type ProjectV3Partial,
 	renderHighlightedString,
 } from '@modrinth/utils'
 import { computedAsync, useLocalStorage } from '@vueuse/core'
@@ -405,13 +408,18 @@ const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 
 const props = defineProps<{
 	project: Project
+	projectV3Partial: ProjectV3Partial
 	collapsed: boolean
 }>()
 
 const moderationStore = useModerationStore()
 
 const variables = computed(() => {
-	return flattenProjectVariables(props.project)
+	return {
+		...flattenStaticVariables(),
+		...flattenProjectVariables(props.project),
+		...flattenProjectV3PartialVariables(props.projectV3Partial),
+	}
 })
 
 const modpackPermissionsComplete = ref(false)
@@ -477,7 +485,12 @@ const stageTextExpanded = computedAsync(async () => {
 	const stage = checklist[stageIndex]
 	if (stage.text) {
 		return renderHighlightedString(
-			expandVariables(await stage.text(props.project), props.project, variables.value),
+			expandVariables(
+				await stage.text(props.project, props.projectV3Partial),
+				props.project,
+				props.projectV3Partial,
+				variables.value,
+			),
 		)
 	}
 	return null
@@ -895,6 +908,7 @@ async function assembleFullMessage() {
 			.filter((content) => content.trim().length > 0)
 			.join('\n\n'),
 		props.project,
+		props.projectV3Partial,
 	)
 
 	return finalMessage
@@ -1048,7 +1062,7 @@ function shouldShowStage(stage: Stage): boolean {
 	}
 
 	if (typeof stage.shouldShow === 'function') {
-		return stage.shouldShow(props.project)
+		return stage.shouldShow(props.project, props.projectV3Partial)
 	}
 
 	return true

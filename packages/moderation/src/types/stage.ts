@@ -1,4 +1,4 @@
-import type { Project } from '@modrinth/utils'
+import type { Project, ProjectV3Partial } from '@modrinth/utils'
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
 import type { Action } from './actions'
@@ -15,7 +15,7 @@ export interface Stage {
 	/**
 	 * An optional description or additional text for the stage.
 	 */
-	text?: (project: Project) => Promise<string>
+	text?: (project: Project, projectV3Partial?: ProjectV3Partial) => Promise<string>
 
 	/**
 	 * Optional id for the stage, used for identification in the checklist. Will be used in the stage list as well instead of the title.
@@ -49,5 +49,5 @@ export interface Stage {
 	 *
 	 * By default, it returns `true`, meaning the stage is always shown.
 	 */
-	shouldShow?: (project: Project) => boolean
+	shouldShow?: (project: Project, projectV3Partial?: ProjectV3Partial) => boolean
 }

@@ -1,4 +1,4 @@
-import type { Project } from '@modrinth/utils'
+import type { Project, ProjectV3Partial } from '@modrinth/utils'
 
 import type {
 	Action,
@@ -211,10 +211,13 @@ export function getVisibleInputs(
 export function expandVariables(
 	template: string,
 	project: Project,
+	projectV3Partial: ProjectV3Partial,
 	variables?: Record<string, string>,
 ): string {
-	if (!variables) {
-		variables = flattenProjectVariables(project)
+	variables ??= {
+		...flattenStaticVariables(),
+		...flattenProjectVariables(project),
+		...flattenProjectV3PartialVariables(projectV3Partial),
 	}
 
 	return Object.entries(variables).reduce((result, [key, value]) => {
@@ -232,6 +235,27 @@ export function kebabToTitleCase(input: string): string {
 
 export function arrayOrNone(arr: string[]): string {
 	return arr.length > 0 ? arr.join(', ') : 'None'
+}
+
+export function flattenStaticVariables(): Record<string, string> {
+	const vars: Record<string, string> = {}
+
+	vars[`RULES`] = `[Modrinth's Content Rules](https://modrinth.com/legal/rules)`
+	vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
+	vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
+	vars[`SUPPORT`] =
+		`please visit the [Modrinth Help Center](https://support.modrinth.com/) and click the blue bubble to contact support.`
+	vars[`MODPACK_PERMISSIONS_GUIDE`] =
+		`our guide to [Obtaining Modpack Permissions](https://support.modrinth.com/en/articles/8797527-obtaining-modpack-permissions)`
+	vars[`MODPACKS_ON_MODRINTH`] =
+		`[Modpacks on Modrinth](https://support.modrinth.com/en/articles/8802250-modpacks-on-modrinth)`
+	vars[`ADVANCED_MARKDOWN`] =
+		`[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting)`
+	vars[`LICENSING_GUIDE`] =
+		`our guide to [Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
+	vars[`NEW_ENVIRONMENTS_LINK`] = `https://modrinth.com/news/article/new-environments`
+
+	return vars
 }
 
 export function flattenProjectVariables(project: Project): Record<string, string> {
@@ -299,22 +323,6 @@ export function flattenProjectVariables(project: Project): Record<string, string
 		vars[`PROJECT_GALLERY_${index}_FEATURED`] = image.featured.toString()
 	})
 
-	// Static time saving stuff
-	vars[`RULES`] = `[Modrinth's Content Rules](https://modrinth.com/legal/rules)`
-	vars[`TOS`] = `[Terms of Use](https://modrinth.com/legal/terms)`
-	vars[`COPYRIGHT_POLICY`] = `[Copyright Policy](https://modrinth.com/legal/copyright)`
-	vars[`SUPPORT`] =
-		`please visit the [Modrinth Help Center](https://support.modrinth.com/) and click the blue bubble to contact support.`
-	vars[`MODPACK_PERMISSIONS_GUIDE`] =
-		`our guide to [Obtaining Modpack Permissions](https://support.modrinth.com/en/articles/8797527-obtaining-modpack-permissions)`
-	vars[`MODPACKS_ON_MODRINTH`] =
-		`[Modpacks on Modrinth](https://support.modrinth.com/en/articles/8802250-modpacks-on-modrinth)`
-	vars[`ADVANCED_MARKDOWN`] =
-		`[Markdown Formatting Guide](https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting)`
-	vars[`LICENSING_GUIDE`] =
-		`our guide to [Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
-	vars[`NEW_ENVIRONMENTS_LINK`] = `https://modrinth.com/news/article/new-environments`
-
 	// Navigation related variables
 	vars[`PROJECT_PERMANENT_LINK`] = `https://modrinth.com/project/${project.id}`
 	vars[`PROJECT_SETTINGS_LINK`] = `https://modrinth.com/project/${project.id}/settings`
@@ -322,6 +330,7 @@ export function flattenProjectVariables(project: Project): Record<string, string
 	vars[`PROJECT_TITLE_FLINK`] = `[Name](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SLUG_FLINK`] = `[URL](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SUMMARY_FLINK`] = `[Summary](https://modrinth.com/project/${project.id}/settings)`
+	// Depreciated
 	vars[`PROJECT_ENVIRONMENT_FLINK`] =
 		`[Environment Information](https://modrinth.com/project/${project.id}/settings/environment)`
 	vars[`PROJECT_TAGS_LINK`] = `https://modrinth.com/project/${project.id}/settings/tags`
@@ -330,18 +339,37 @@ export function flattenProjectVariables(project: Project): Record<string, string
 		`https://modrinth.com/project/${project.id}/settings/description`
 	vars[`PROJECT_DESCRIPTION_FLINK`] =
 		`[Description](https://modrinth.com/project/${project.id}/settings/description)`
-	vars[`PROJECT_LICENSE_LINK`] = `https://modrinth.com/project/${project.id}/license`
-	vars[`PROJECT_LICENSE_FLINK`] = `[License](https://modrinth.com/project/${project.id}/license)`
+	vars[`PROJECT_LICENSE_LINK`] = `https://modrinth.com/project/${project.id}/settings/license`
+	vars[`PROJECT_LICENSE_FLINK`] =
+		`[License](https://modrinth.com/project/${project.id}/settings/license)`
 	vars[`PROJECT_LINKS_LINK`] = `https://modrinth.com/project/${project.id}/settings/links`
 	vars[`PROJECT_LINKS_FLINK`] =
 		`[External Links](https://modrinth.com/project/${project.id}/settings/links)`
 	vars[`PROJECT_GALLERY_LINK`] = `https://modrinth.com/project/${project.id}/gallery`
-	vars[`PROJECT_GALLERY_FLINK`] = `[Gallery](https://modrinth.com/project/${project.id}/gallery)`
+	vars[`PROJECT_GALLERY_FLINK`] =
+		`[Gallery](https://modrinth.com/project/${project.id}/settings/gallery)`
 	vars[`PROJECT_VERSIONS_LINK`] = `https://modrinth.com/project/${project.id}/versions`
-	vars[`PROJECT_VERSIONS_FLINK`] = `[Versions](https://modrinth.com/project/${project.id}/versions)`
+	vars[`PROJECT_VERSIONS_FLINK`] =
+		`[Versions](https://modrinth.com/project/${project.id}/settings/versions)`
 	vars[`PROJECT_MODERATION_LINK`] = `https://modrinth.com/project/${project.id}/moderation`
 	vars[`PROJECT_MODERATION_FLINK`] =
 		`[moderation tab](https://modrinth.com/project/${project.id}/moderation)`
+
+	return vars
+}
+
+export function flattenProjectV3PartialVariables(
+	projectV3Partial: ProjectV3Partial,
+): Record<string, string> {
+	const vars: Record<string, string> = {}
+
+	vars['PROJECT_ENVIRONMENT_COUNT'] = projectV3Partial.environment.length.toString()
+
+	vars['ALL_PROJECT_ENVIRONMENTS'] = projectV3Partial.environment.join(', ')
+
+	projectV3Partial.environment.forEach((env, index) => {
+		vars[`PROJECT_ENVIRONMENT_${index}`] = env
+	})
 
 	return vars
 }

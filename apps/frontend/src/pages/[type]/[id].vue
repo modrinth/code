@@ -931,6 +931,7 @@
 	>
 		<ModerationChecklist
 			:project="project"
+			:project-v3-partial="projectV3"
 			:collapsed="collapsedModerationChecklist"
 			@exit="showModerationChecklist = false"
 			@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
