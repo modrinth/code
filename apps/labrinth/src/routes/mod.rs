@@ -1,3 +1,4 @@
+use crate::database::models::DelphiReportIssueDetailsId;
 use crate::file_hosting::FileHostingError;
 use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
@@ -7,6 +8,7 @@ use actix_files::Files;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, web};
 use futures::FutureExt;
+use serde_json::json;
 
 pub mod internal;
 pub mod v2;
@@ -161,8 +163,14 @@ pub enum ApiError {
     RateLimitError(u128, u32),
     #[error("Error while interacting with payment processor: {0}")]
     Stripe(#[from] stripe::StripeError),
+    #[error("Error while interacting with Delphi: {0}")]
+    Delphi(reqwest::Error),
     #[error(transparent)]
     Mural(#[from] Box<muralpay::ApiError>),
+    #[error("report still has {} issue details with no verdict", details.len())]
+    TechReviewDetailsWithNoVerdict {
+        details: Vec<DelphiReportIssueDetailsId>,
+    },
 }
 
 impl ApiError {
@@ -203,7 +211,11 @@ impl ApiError {
                 Self::Stripe(..) => "stripe_error",
                 Self::TaxProcessor(..) => "tax_processor_error",
                 Self::Slack(..) => "slack_error",
+                Self::Delphi(..) => "delphi_error",
                 Self::Mural(..) => "mural_error",
+                Self::TechReviewDetailsWithNoVerdict { .. } => {
+                    "tech_review_issues_with_no_verdict"
+                }
             },
             description: match self {
                 Self::Internal(e) => format!("{e:#?}"),
@@ -213,6 +225,13 @@ impl ApiError {
             },
             details: match self {
                 Self::Mural(err) => serde_json::to_value(err.clone()).ok(),
+                Self::TechReviewDetailsWithNoVerdict { details } => {
+                    let details = serde_json::to_value(details)
+                        .expect("details should never fail to serialize");
+                    Some(json!({
+                        "issue_details": details
+                    }))
+                }
                 _ => None,
             },
         }
@@ -256,7 +275,11 @@ impl actix_web::ResponseError for ApiError {
             Self::Stripe(..) => StatusCode::FAILED_DEPENDENCY,
             Self::TaxProcessor(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Slack(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::Delphi(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Mural(..) => StatusCode::BAD_REQUEST,
+            Self::TechReviewDetailsWithNoVerdict { .. } => {
+                StatusCode::BAD_REQUEST
+            }
         }
     }
 

@@ -17,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+import { FolderIcon, ReportIcon, ShieldCheckIcon } from '@modrinth/assets'
 import { Chips } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
 
@@ -46,9 +47,13 @@ const messages = defineMessages({
 })
 
 const moderationLinks = [
-	{ label: formatMessage(messages.projectsTitle), href: '/moderation' },
-	{ label: formatMessage(messages.technicalReviewTitle), href: '/moderation/technical-review' },
-	{ label: formatMessage(messages.reportsTitle), href: '/moderation/reports' },
+	{ label: formatMessage(messages.projectsTitle), href: '/moderation', icon: FolderIcon },
+	{
+		label: formatMessage(messages.technicalReviewTitle),
+		href: '/moderation/technical-review',
+		icon: ShieldCheckIcon,
+	},
+	{ label: formatMessage(messages.reportsTitle), href: '/moderation/reports', icon: ReportIcon },
 ]
 
 const mobileNavOptions = [

@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO delphi_issue_detail_verdicts (\n            project_id,\n            detail_key,\n            verdict\n        )\n        SELECT\n            didws.project_id,\n            didws.key,\n            $1\n        FROM delphi_issue_details_with_statuses didws\n        INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id\n        WHERE\n            didws.id = $2\n            -- see delphi.rs todo comment\n            AND dri.issue_type != '__dummy'\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        {
+          "Custom": {
+            "name": "delphi_report_issue_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "safe",
+                "unsafe"
+              ]
+            }
+          }
+        },
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cfe6c9e2abba8e9c1cd7aa799a6a95f2732f1a7611ea6f7ce49cd7e077761ebf"
+}

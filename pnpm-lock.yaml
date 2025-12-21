@@ -479,6 +479,9 @@ importers:
 
   packages/moderation:
     dependencies:
+      '@modrinth/api-client':
+        specifier: workspace:*
+        version: link:../api-client
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../assets
