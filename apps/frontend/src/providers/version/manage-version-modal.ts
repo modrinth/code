@@ -1,4 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
+import { SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	createContext,
 	injectModrinthClient,
@@ -6,6 +7,7 @@ import {
 	injectProjectPageContext,
 	type MultiStageModal,
 	resolveCtxFn,
+	type StageButtonConfig,
 	type StageConfigInput,
 } from '@modrinth/ui'
 import JSZip from 'jszip'
@@ -49,9 +51,9 @@ export type VersionStage =
 	| 'add-environment'
 	| 'add-dependencies'
 	| 'add-changelog'
-	| 'edit-loaders'
-	| 'edit-mc-versions'
-	| 'edit-environment'
+	| 'from-details-loaders'
+	| 'from-details-mc-versions'
+	| 'from-details-environment'
 
 export interface ManageVersionContextValue {
 	// State
@@ -75,6 +77,7 @@ export interface ManageVersionContextValue {
 
 	// Stage helpers
 	getNextLabel: (currentIndex?: number | null) => string
+	saveButtonConfig: () => StageButtonConfig
 
 	// Version methods
 	newDraftVersion: (projectId: string, version?: Labrinth.Versions.v3.DraftVersion | null) => void
@@ -264,7 +267,7 @@ export function createManageVersionContext(
 		if (noEnvironmentProject.value) version.environment = undefined
 
 		try {
-			await labrinth.versions_v3.createVersion(version, files)
+			await labrinth.versions_v3.createVersion(version, files, projectType.value ?? null)
 			modal.value?.hide()
 			addNotification({
 				title: 'Project version created',
@@ -294,7 +297,7 @@ export function createManageVersionContext(
 		try {
 			if (!version.version_id) throw new Error('Version ID is required to save edits.')
 
-			await labrinth.versions_v3.modifyVersion(version.version_id, {
+			const data: Labrinth.Versions.v3.ModifyVersionRequest = {
 				name: version.name || version.version_number,
 				version_number: version.version_number,
 				changelog: version.changelog,
@@ -310,7 +313,9 @@ export function createManageVersionContext(
 						hash: file.hashes.sha1,
 						file_type: file.file_type ?? null,
 					})),
-			})
+			}
+
+			await labrinth.versions_v3.modifyVersion(version.version_id, data)
 
 			if (files.length > 0) {
 				await labrinth.versions_v3.addFilesToVersion(version.version_id, files)
@@ -380,6 +385,16 @@ export function createManageVersionContext(
 		}
 	}
 
+	const saveButtonConfig = (): StageButtonConfig => ({
+		label: 'Save changes',
+		icon: isSubmitting.value ? SpinnerIcon : SaveIcon,
+		iconPosition: 'before',
+		iconClass: isSubmitting.value ? 'animate-spin' : undefined,
+		color: 'green',
+		disabled: isSubmitting.value,
+		onClick: () => handleSaveVersionEdits(),
+	})
+
 	const contextValue: ManageVersionContextValue = {
 		// State
 		draftVersion,
@@ -402,6 +417,7 @@ export function createManageVersionContext(
 
 		// Stage helpers
 		getNextLabel,
+		saveButtonConfig,
 
 		// Methods
 		newDraftVersion,

@@ -1,5 +1,5 @@
 <template>
-	<div class="space-y-6">
+	<div class="space-y-6 sm:w-[512px]">
 		<LoaderPicker
 			v-model="draftVersion.loaders"
 			:loaders="generatedState.loaders"

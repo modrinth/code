@@ -1,5 +1,5 @@
 <template>
-	<div class="flex w-full flex-col gap-4">
+	<div class="flex w-full flex-col gap-4 sm:w-[512px]">
 		<template v-if="!(filesToAdd.length || draftVersion.existing_files?.length)">
 			<DropzoneFileInput
 				aria-label="Upload file"

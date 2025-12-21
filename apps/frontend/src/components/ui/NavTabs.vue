@@ -1,23 +1,58 @@
 <template>
 	<nav
 		ref="scrollContainer"
-		class="card-shadow experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
+		class="experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
+		:class="[mode === 'navigation' ? 'card-shadow' : undefined]"
 	>
-		<NuxtLink
-			v-for="(link, index) in filteredLinks"
-			v-show="link.shown === undefined ? true : link.shown"
-			:key="index"
-			ref="tabLinkElements"
-			:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
-			class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
-			:class="{
-				'text-button-textSelected': activeIndex === index && !subpageSelected,
-				'text-contrast': activeIndex === index && subpageSelected,
-			}"
-		>
-			<component :is="link.icon" v-if="link.icon" class="size-5" />
-			<span class="text-nowrap">{{ link.label }}</span>
-		</NuxtLink>
+		<template v-if="mode === 'navigation'">
+			<NuxtLink
+				v-for="(link, index) in filteredLinks"
+				v-show="link.shown === undefined ? true : link.shown"
+				:key="link.href"
+				ref="tabLinkElements"
+				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
+				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
+			>
+				<component
+					:is="link.icon"
+					v-if="link.icon"
+					class="size-5"
+					:class="{
+						'text-brand': currentActiveIndex === index && !subpageSelected,
+						'text-secondary': currentActiveIndex !== index || subpageSelected,
+					}"
+				/>
+				<span class="text-nowrap text-contrast">{{ link.label }}</span>
+			</NuxtLink>
+		</template>
+		<template v-else>
+			<div
+				v-for="(link, index) in filteredLinks"
+				v-show="link.shown === undefined ? true : link.shown"
+				:key="link.href"
+				ref="tabLinkElements"
+				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 hover:cursor-pointer focus:rounded-full"
+				@click="emit('tabClick', index, link)"
+			>
+				<component
+					:is="link.icon"
+					v-if="link.icon"
+					class="size-5"
+					:class="{
+						'text-brand': currentActiveIndex === index && !subpageSelected,
+						'text-secondary': currentActiveIndex !== index || subpageSelected,
+					}"
+				/>
+				<span
+					class="text-nowrap"
+					:class="{
+						'text-brand': currentActiveIndex === index && !subpageSelected,
+						'text-contrast': currentActiveIndex !== index || subpageSelected,
+					}"
+					>{{ link.label }}</span
+				>
+			</div>
+		</template>
 		<div
 			:class="`navtabs-transition pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1 ${
 				subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected'
@@ -27,7 +62,8 @@
 				top: sliderTopPx,
 				right: sliderRightPx,
 				bottom: sliderBottomPx,
-				opacity: sliderLeft === 4 && sliderLeft === sliderRight ? 0 : activeIndex === -1 ? 0 : 1,
+				opacity:
+					sliderLeft === 4 && sliderLeft === sliderRight ? 0 : currentActiveIndex === -1 ? 0 : 1,
 			}"
 			aria-hidden="true"
 		></div>
@@ -35,7 +71,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import type { Component } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 const route = useNativeRoute()
 
@@ -43,13 +80,26 @@ interface Tab {
 	label: string
 	href: string
 	shown?: boolean
-	icon?: string
+	icon?: Component
 	subpages?: string[]
 }
 
-const props = defineProps<{
-	links: Tab[]
-	query?: string
+const props = withDefaults(
+	defineProps<{
+		links: Tab[]
+		query?: string
+		mode?: 'navigation' | 'local'
+		activeIndex?: number
+	}>(),
+	{
+		mode: 'navigation',
+		query: undefined,
+		activeIndex: undefined,
+	},
+)
+
+const emit = defineEmits<{
+	tabClick: [index: number, tab: Tab]
 }>()
 
 const scrollContainer = ref<HTMLElement | null>(null)
@@ -58,7 +108,7 @@ const sliderLeft = ref(4)
 const sliderTop = ref(4)
 const sliderRight = ref(4)
 const sliderBottom = ref(4)
-const activeIndex = ref(-1)
+const currentActiveIndex = ref(-1)
 const subpageSelected = ref(false)
 
 const filteredLinks = computed(() =>
@@ -74,30 +124,36 @@ const tabLinkElements = ref()
 function pickLink() {
 	let index = -1
 	subpageSelected.value = false
-	for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
-		const link = filteredLinks.value[i]
-		if (props.query) {
-			if (route.query[props.query] === link.href || (!route.query[props.query] && !link.href)) {
+
+	if (props.mode === 'local' && props.activeIndex !== undefined) {
+		index = Math.min(props.activeIndex, filteredLinks.value.length - 1)
+	} else {
+		for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
+			const link = filteredLinks.value[i]
+			if (props.query) {
+				if (route.query[props.query] === link.href || (!route.query[props.query] && !link.href)) {
+					index = i
+					break
+				}
+			} else if (decodeURIComponent(route.path) === link.href) {
 				index = i
 				break
+			} else if (
+				decodeURIComponent(route.path).includes(link.href) ||
+				(link.subpages &&
+					link.subpages.some((subpage) => decodeURIComponent(route.path).includes(subpage)))
+			) {
+				index = i
+				subpageSelected.value = true
+				break
 			}
-		} else if (decodeURIComponent(route.path) === link.href) {
-			index = i
-			break
-		} else if (
-			decodeURIComponent(route.path).includes(link.href) ||
-			(link.subpages &&
-				link.subpages.some((subpage) => decodeURIComponent(route.path).includes(subpage)))
-		) {
-			index = i
-			subpageSelected.value = true
-			break
 		}
 	}
-	activeIndex.value = index
 
-	if (activeIndex.value !== -1) {
-		startAnimation()
+	currentActiveIndex.value = index
+
+	if (currentActiveIndex.value !== -1) {
+		nextTick(() => startAnimation())
 	} else {
 		sliderLeft.value = 0
 		sliderRight.value = 0
@@ -105,7 +161,12 @@ function pickLink() {
 }
 
 function startAnimation() {
-	const el = tabLinkElements.value[activeIndex.value]?.$el
+	// In navigation mode, elements are NuxtLinks with $el property
+	// In local mode, elements are plain divs
+	const el =
+		props.mode === 'navigation'
+			? tabLinkElements.value[currentActiveIndex.value]?.$el
+			: tabLinkElements.value[currentActiveIndex.value]
 
 	if (!el || !el.offsetParent) return
 
@@ -156,7 +217,29 @@ onMounted(() => {
 
 watch(
 	() => [route.path, route.query],
-	() => pickLink(),
+	() => {
+		if (props.mode === 'navigation') {
+			pickLink()
+		}
+	},
+)
+
+watch(
+	() => props.activeIndex,
+	() => {
+		if (props.mode === 'local') {
+			pickLink()
+		}
+	},
+)
+
+watch(
+	() => props.links,
+	() => {
+		// Re-trigger animation when links change
+		pickLink()
+	},
+	{ deep: true },
 )
 </script>
 

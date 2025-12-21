@@ -11,6 +11,19 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2025-12-19T13:45:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Improved the version creation and editing from feedback we have received:
+	- Made it easier to edit exactly what you want to about a version.
+	- Restored the ability to create and edit versions and gallery images from the public pages.
+	- Changelog stage is now larger.
+	- Fixed modpack uploading.
+	- Fixed version subtitle being limited to 32 characters.
+	- Fixed version links after editing.
+	- Fixed dependency search only showing mod projects.`,
+	},
+	{
 		date: `2025-12-18T13:40:00-08:00`,
 		product: 'web',
 		body: `## Improvements

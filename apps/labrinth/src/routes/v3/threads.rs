@@ -380,7 +380,25 @@ pub async fn thread_send_message(
     .await?
     .1;
 
-    let string: database::models::DBThreadId = info.into_inner().0.into();
+    thread_send_message_internal(
+        &user,
+        info.into_inner().0,
+        &pool,
+        new_message.into_inner(),
+        &redis,
+    )
+    .await?;
+    Ok(HttpResponse::NoContent().finish())
+}
+
+pub async fn thread_send_message_internal(
+    user: &User,
+    thread_id: ThreadId,
+    pool: &PgPool,
+    new_message: NewThreadMessage,
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    let string: database::models::DBThreadId = thread_id.into();
 
     let is_private: bool;
 
@@ -406,7 +424,7 @@ pub async fn thread_send_message(
         if let Some(replying_to) = replying_to {
             let thread_message = database::models::DBThreadMessage::get(
                 (*replying_to).into(),
-                &**pool,
+                pool,
             )
             .await?;
 
@@ -431,10 +449,10 @@ pub async fn thread_send_message(
         ));
     }
 
-    let result = database::models::DBThread::get(string, &**pool).await?;
+    let result = database::models::DBThread::get(string, pool).await?;
 
     if let Some(thread) = result {
-        if !is_authorized_thread(&thread, &user, &pool).await? {
+        if !is_authorized_thread(&thread, user, pool).await? {
             return Err(ApiError::NotFound);
         }
 
@@ -450,10 +468,9 @@ pub async fn thread_send_message(
         .await?;
 
         if let Some(project_id) = thread.project_id {
-            let project = database::models::DBProject::get_id(
-                project_id, &**pool, &redis,
-            )
-            .await?;
+            let project =
+                database::models::DBProject::get_id(project_id, pool, redis)
+                    .await?;
 
             if let Some(project) = project
                 && project.inner.status != ProjectStatus::Processing
@@ -463,8 +480,8 @@ pub async fn thread_send_message(
                 let members =
                     database::models::DBTeamMember::get_from_team_full(
                         project.inner.team_id,
-                        &**pool,
-                        &redis,
+                        pool,
+                        redis,
                     )
                     .await?;
 
@@ -479,7 +496,7 @@ pub async fn thread_send_message(
                 .insert_many(
                     members.iter().map(|x| x.user_id).collect(),
                     &mut transaction,
-                    &redis,
+                    redis,
                 )
                 .await?;
 
@@ -491,15 +508,14 @@ pub async fn thread_send_message(
                 .insert_many(
                     members.iter().map(|x| x.user_id).collect(),
                     &mut transaction,
-                    &redis,
+                    redis,
                 )
                 .await?;
             }
         } else if let Some(report_id) = thread.report_id {
-            let report = database::models::report_item::DBReport::get(
-                report_id, &**pool,
-            )
-            .await?;
+            let report =
+                database::models::report_item::DBReport::get(report_id, pool)
+                    .await?;
 
             if let Some(report) = report {
                 if report.closed && !user.role.is_mod() {
@@ -517,7 +533,7 @@ pub async fn thread_send_message(
                             report_id: Some(report.id.into()),
                         },
                     }
-                    .insert(report.reporter, &mut transaction, &redis)
+                    .insert(report.reporter, &mut transaction, redis)
                     .await?;
                 }
             }
@@ -531,7 +547,7 @@ pub async fn thread_send_message(
                 if let Some(db_image) = image_item::DBImage::get(
                     (*image_id).into(),
                     &mut *transaction,
-                    &redis,
+                    redis,
                 )
                 .await?
                 {
@@ -558,7 +574,7 @@ pub async fn thread_send_message(
                     .execute(&mut *transaction)
                     .await?;
 
-                    image_item::DBImage::clear_cache(image.id.into(), &redis)
+                    image_item::DBImage::clear_cache(image.id.into(), redis)
                         .await?;
                 } else {
                     return Err(ApiError::InvalidInput(format!(
@@ -570,7 +586,7 @@ pub async fn thread_send_message(
 
         transaction.commit().await?;
 
-        Ok(HttpResponse::NoContent().body(""))
+        Ok(())
     } else {
         Err(ApiError::NotFound)
     }
@@ -630,14 +646,7 @@ pub async fn message_delete(
                 .await?;
         }
 
-        let private = if let MessageBody::Text { private, .. } = thread.body {
-            private
-        } else if let MessageBody::Deleted { private, .. } = thread.body {
-            private
-        } else {
-            false
-        };
-
+        let private = thread.body.is_private();
         database::models::DBThreadMessage::remove_full(
             thread.id,
             private,

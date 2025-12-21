@@ -14,15 +14,13 @@
 		</template>
 
 		<progress
-			v-if="currentStage?.nonProgressStage !== true"
+			v-if="nonProgressStage !== true"
 			:value="progressValue"
 			max="100"
 			class="w-full h-1 appearance-none border-none absolute top-0 left-0"
 		></progress>
 
-		<div class="sm:w-[512px]">
-			<component :is="currentStage?.stageContent" />
-		</div>
+		<component :is="currentStage?.stageContent" />
 
 		<template #actions>
 			<div
@@ -81,7 +79,7 @@ export interface StageConfigInput<T> {
 	stageContent: Component
 	title: MaybeCtxFn<T, string>
 	skip?: MaybeCtxFn<T, boolean>
-	nonProgressStage?: boolean
+	nonProgressStage?: MaybeCtxFn<T, boolean>
 	leftButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 	rightButtonConfig: MaybeCtxFn<T, StageButtonConfig | null>
 }
@@ -174,9 +172,15 @@ const rightButtonConfig = computed(() => {
 	return resolveCtxFn(stage.rightButtonConfig, props.context)
 })
 
+const nonProgressStage = computed(() => {
+	const stage = currentStage.value
+	if (!stage) return false
+	return resolveCtxFn(stage.nonProgressStage, props.context)
+})
+
 const progressValue = computed(() => {
 	const isProgressStage = (stage: StageConfigInput<T>) => {
-		if (stage.nonProgressStage) return false
+		if (resolveCtxFn(stage.nonProgressStage, props.context)) return false
 		const skip = stage.skip ? resolveCtxFn(stage.skip, props.context) : false
 		return !skip
 	}

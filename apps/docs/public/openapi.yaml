@@ -394,15 +394,26 @@ components:
           description: The hash of the file you're editing
           example: aaaabbbbccccddddeeeeffffgggghhhhiiiijjjj
         file_type:
-          type: string
-          enum: [required-resource-pack, optional-resource-pack]
-          description: The hash algorithm of the file you're editing
-          example: required-resource-pack
-          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/FileTypeEnum'
+            - nullable: true
+              description: The hash algorithm of the file you're editing
       required:
         - algorithm
         - hash
         - file_type
+    # https://github.com/modrinth/code/blob/main/apps/labrinth/src/models/v3/projects.rs#L981-990
+    FileTypeEnum:
+      type: string
+      enum:
+        - required-resource-pack
+        - optional-resource-pack
+        - sources-jar
+        - dev-jar
+        - javadoc-jar
+        - unknown
+        - signature
+      example: required-resource-pack
     # https://github.com/modrinth/labrinth/blob/master/src/routes/version_creation.rs#L27-L57
     CreatableVersion:
       allOf:
@@ -506,11 +517,10 @@ components:
           example: 1097270
           description: The size of the file in bytes
         file_type:
-          type: string
-          enum: [required-resource-pack, optional-resource-pack]
-          description: The type of the additional file, used mainly for adding resource packs to datapacks
-          example: required-resource-pack
-          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/FileTypeEnum'
+            - nullable: true
+              description: The type of the additional file, used mainly for adding resource packs to datapacks
       required:
         - hashes
         - url

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT id FROM mods\n        WHERE status = $1\n        ORDER BY queued ASC\n        OFFSET $3\n        LIMIT $2\n        ",
+  "query": "\n                INSERT INTO delphi_report_issues (report_id, issue_type)\n                VALUES ($1, $2)\n                RETURNING id\n                ",
   "describe": {
     "columns": [
       {
@@ -11,14 +11,13 @@
     ],
     "parameters": {
       "Left": [
-        "Text",
         "Int8",
-        "Int8"
+        "Text"
       ]
     },
     "nullable": [
       false
     ]
   },
-  "hash": "ccb0315ff52ea4402f53508334a7288fc9f8e77ffd7bce665441ff682384cbf9"
+  "hash": "33f26ce7e262d7c5707d05fe926390683636bbde53a51ee61fa18ef49cea8c3a"
 }
