@@ -21,11 +21,7 @@ path-util = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
-tauri = { workspace = true, features = [
-  "devtools",
-  "macos-private-api",
-  "protocol-asset",
-] }
+tauri = { workspace = true, features = ["devtools", "macos-private-api", "protocol-asset"] }
 tauri-plugin-deep-link = { workspace = true }
 tauri-plugin-dialog = { workspace = true }
 tauri-plugin-http = { workspace = true }

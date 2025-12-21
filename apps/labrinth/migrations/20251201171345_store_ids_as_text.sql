@@ -2,7 +2,8 @@
 -- but with `IMMUTABLE` so we can use them in generated columns
 
 CREATE OR REPLACE FUNCTION from_base62(input VARCHAR)
-RETURNS BIGINT AS $$
+RETURNS BIGINT
+AS $$
 DECLARE
     base INT := 62;
     chars VARCHAR := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -22,10 +23,13 @@ BEGIN
 
     RETURN result;
 END;
-$$ LANGUAGE plpgsql IMMUTABLE;
+$$
+LANGUAGE plpgsql
+IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION to_base62(input BIGINT)
-RETURNS VARCHAR AS $$
+RETURNS VARCHAR
+AS $$
 DECLARE
     base INT := 62;
     chars VARCHAR := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -40,12 +44,14 @@ BEGIN
 
     RETURN result;
 END;
-$$ LANGUAGE plpgsql IMMUTABLE;
+$$
+LANGUAGE plpgsql
+IMMUTABLE;
 
 ALTER TABLE mods
-	ADD COLUMN text_id TEXT GENERATED ALWAYS AS (to_base62(id)) STORED,
-	ADD COLUMN text_id_lower TEXT GENERATED ALWAYS AS (lower(to_base62(id))) STORED;
+ADD COLUMN text_id TEXT GENERATED ALWAYS AS (to_base62(id)) STORED,
+ADD COLUMN text_id_lower TEXT GENERATED ALWAYS AS (lower(to_base62(id))) STORED;
 
 ALTER TABLE organizations
-	ADD COLUMN text_id TEXT GENERATED ALWAYS AS (to_base62(id)) STORED,
-	ADD COLUMN text_id_lower TEXT GENERATED ALWAYS AS (lower(to_base62(id))) STORED;
+ADD COLUMN text_id TEXT GENERATED ALWAYS AS (to_base62(id)) STORED,
+ADD COLUMN text_id_lower TEXT GENERATED ALWAYS AS (lower(to_base62(id))) STORED;
