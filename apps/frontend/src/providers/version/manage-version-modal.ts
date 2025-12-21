@@ -259,7 +259,7 @@ export function createManageVersionContext(
 			console.error('Error fetching versions for environment inference:', error)
 		}
 
-		const noLoaders = inferred.loaders?.length === 0
+		const noLoaders = !inferred.loaders?.length
 
 		if (noLoaders && (await checkIsResourcePack(file))) {
 			inferred.loaders = ['minecraft']
