@@ -191,9 +191,20 @@ async fn get_issue(
             || jsonb_build_object(
                 -- TODO: replace with `json_array` in Postgres 16
                 'details', (
-                    SELECT json_agg(to_jsonb(drid))
-                    FROM delphi_report_issue_details drid
-                    WHERE drid.issue_id = dri.id
+                    SELECT coalesce(jsonb_agg(
+                        jsonb_build_object(
+                            'id', didws.id,
+                            'issue_id', didws.issue_id,
+                            'key', didws.key,
+                            'file_path', didws.file_path,
+                            'decompiled_source', didws.decompiled_source,
+                            'data', didws.data,
+                            'severity', didws.severity,
+                            'status', didws.status
+                        )
+                    ), '[]'::jsonb)
+                    FROM delphi_issue_details_with_statuses didws
+                    WHERE didws.issue_id = dri.id
                 )
             ) AS "data!: sqlx::types::Json<FileIssue>"
         FROM delphi_report_issues dri
@@ -238,6 +249,7 @@ async fn get_report(
         SELECT DISTINCT ON (dr.id)
             to_jsonb(dr)
             || jsonb_build_object(
+                'report_id', dr.id,
                 'file_id', to_base62(f.id),
                 'version_id', to_base62(v.id),
                 'project_id', to_base62(v.mod_id),
@@ -252,9 +264,20 @@ async fn get_report(
                         || jsonb_build_object(
                             -- TODO: replace with `json_array` in Postgres 16
                             'details', (
-                                SELECT json_agg(to_jsonb(drid))
-                                FROM delphi_report_issue_details drid
-                                WHERE drid.issue_id = dri.id
+                                SELECT coalesce(jsonb_agg(
+                                    jsonb_build_object(
+                                        'id', didws.id,
+                                        'issue_id', didws.issue_id,
+                                        'key', didws.key,
+                                        'file_path', didws.file_path,
+                                        'decompiled_source', didws.decompiled_source,
+                                        'data', didws.data,
+                                        'severity', didws.severity,
+                                        'status', didws.status
+                                    )
+                                ), '[]'::jsonb)
+                                FROM delphi_issue_details_with_statuses didws
+                                WHERE didws.issue_id = dri.id
                             )
                         )
                     )
