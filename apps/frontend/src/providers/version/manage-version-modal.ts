@@ -126,6 +126,7 @@ const PROJECT_TYPE_LOADERS: Record<string, readonly string[]> = {
 	],
 	datapack: ['datapack'],
 	resourcepack: ['minecraft'],
+	modpack: ['mrpack'],
 } as const
 
 export const [injectManageVersionContext, provideManageVersionContext] =
@@ -157,6 +158,10 @@ export function createManageVersionContext(
 		}
 
 		const loaders = draftVersion.value.loaders || []
+
+		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.modpack.includes(loader))) {
+			return 'modpack'
+		}
 
 		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.datapack.includes(loader))) {
 			return 'datapack'
