@@ -125,7 +125,14 @@ export const TEXT_EXTENSIONS: readonly string[] = [
 	'ini',
 	'sk',
 ] as const
-export const IMAGE_EXTENSIONS: readonly string[] = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'] as const
+export const IMAGE_EXTENSIONS: readonly string[] = [
+	'png',
+	'jpg',
+	'jpeg',
+	'gif',
+	'svg',
+	'webp',
+] as const
 const ARCHIVE_EXTENSIONS: string[] = ['zip', 'jar', 'tar', 'gz', 'rar', '7z'] as const
 
 export function getProjectTypeIcon(projectType: ProjectType): Component {
