@@ -27,7 +27,9 @@ impl FileHost for MockHost {
         file_publicity: FileHostPublicity,
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError> {
-        let path = get_file_path(file_name, file_publicity);
+        let file_name = urlencoding::decode(file_name)
+            .map_err(|_| FileHostingError::InvalidFilename)?;
+        let path = get_file_path(&file_name, file_publicity);
         std::fs::create_dir_all(
             path.parent().ok_or(FileHostingError::InvalidFilename)?,
         )?;

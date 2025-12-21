@@ -28,6 +28,7 @@ import _BoxIcon from './icons/box.svg?component'
 import _BoxImportIcon from './icons/box-import.svg?component'
 import _BracesIcon from './icons/braces.svg?component'
 import _BrushCleaningIcon from './icons/brush-cleaning.svg?component'
+import _BugIcon from './icons/bug.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
 import _CardIcon from './icons/card.svg?component'
 import _ChangeSkinIcon from './icons/change-skin.svg?component'
@@ -35,6 +36,7 @@ import _ChartIcon from './icons/chart.svg?component'
 import _CheckIcon from './icons/check.svg?component'
 import _CheckCheckIcon from './icons/check-check.svg?component'
 import _CheckCircleIcon from './icons/check-circle.svg?component'
+import _ChevronDownIcon from './icons/chevron-down.svg?component'
 import _ChevronLeftIcon from './icons/chevron-left.svg?component'
 import _ChevronRightIcon from './icons/chevron-right.svg?component'
 import _CircleUserIcon from './icons/circle-user.svg?component'
@@ -69,9 +71,12 @@ import _EyeIcon from './icons/eye.svg?component'
 import _EyeOffIcon from './icons/eye-off.svg?component'
 import _FileIcon from './icons/file.svg?component'
 import _FileArchiveIcon from './icons/file-archive.svg?component'
+import _FileCodeIcon from './icons/file-code.svg?component'
+import _FileImageIcon from './icons/file-image.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
 import _FilterXIcon from './icons/filter-x.svg?component'
+import _FolderIcon from './icons/folder.svg?component'
 import _FolderArchiveIcon from './icons/folder-archive.svg?component'
 import _FolderOpenIcon from './icons/folder-open.svg?component'
 import _FolderSearchIcon from './icons/folder-search.svg?component'
@@ -114,6 +119,7 @@ import _LinkIcon from './icons/link.svg?component'
 import _ListIcon from './icons/list.svg?component'
 import _ListBulletedIcon from './icons/list-bulleted.svg?component'
 import _ListEndIcon from './icons/list-end.svg?component'
+import _ListFilterIcon from './icons/list-filter.svg?component'
 import _ListOrderedIcon from './icons/list-ordered.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _LoaderCircleIcon from './icons/loader-circle.svg?component'
@@ -170,6 +176,8 @@ import _ServerPlusIcon from './icons/server-plus.svg?component'
 import _SettingsIcon from './icons/settings.svg?component'
 import _ShareIcon from './icons/share.svg?component'
 import _ShieldIcon from './icons/shield.svg?component'
+import _ShieldAlertIcon from './icons/shield-alert.svg?component'
+import _ShieldCheckIcon from './icons/shield-check.svg?component'
 import _SignalIcon from './icons/signal.svg?component'
 import _SkullIcon from './icons/skull.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
@@ -246,6 +254,7 @@ export const BoxImportIcon = _BoxImportIcon
 export const BoxIcon = _BoxIcon
 export const BracesIcon = _BracesIcon
 export const BrushCleaningIcon = _BrushCleaningIcon
+export const BugIcon = _BugIcon
 export const CalendarIcon = _CalendarIcon
 export const CardIcon = _CardIcon
 export const ChangeSkinIcon = _ChangeSkinIcon
@@ -253,6 +262,7 @@ export const ChartIcon = _ChartIcon
 export const CheckCheckIcon = _CheckCheckIcon
 export const CheckCircleIcon = _CheckCircleIcon
 export const CheckIcon = _CheckIcon
+export const ChevronDownIcon = _ChevronDownIcon
 export const ChevronLeftIcon = _ChevronLeftIcon
 export const ChevronRightIcon = _ChevronRightIcon
 export const CircleUserIcon = _CircleUserIcon
@@ -286,6 +296,8 @@ export const ExternalIcon = _ExternalIcon
 export const EyeOffIcon = _EyeOffIcon
 export const EyeIcon = _EyeIcon
 export const FileArchiveIcon = _FileArchiveIcon
+export const FileCodeIcon = _FileCodeIcon
+export const FileImageIcon = _FileImageIcon
 export const FileTextIcon = _FileTextIcon
 export const FileIcon = _FileIcon
 export const FilterXIcon = _FilterXIcon
@@ -293,6 +305,7 @@ export const FilterIcon = _FilterIcon
 export const FolderArchiveIcon = _FolderArchiveIcon
 export const FolderOpenIcon = _FolderOpenIcon
 export const FolderSearchIcon = _FolderSearchIcon
+export const FolderIcon = _FolderIcon
 export const FolderUpIcon = _FolderUpIcon
 export const GameIcon = _GameIcon
 export const GapIcon = _GapIcon
@@ -331,6 +344,7 @@ export const LightBulbIcon = _LightBulbIcon
 export const LinkIcon = _LinkIcon
 export const ListBulletedIcon = _ListBulletedIcon
 export const ListEndIcon = _ListEndIcon
+export const ListFilterIcon = _ListFilterIcon
 export const ListOrderedIcon = _ListOrderedIcon
 export const ListIcon = _ListIcon
 export const LoaderCircleIcon = _LoaderCircleIcon
@@ -387,6 +401,8 @@ export const ServerPlusIcon = _ServerPlusIcon
 export const ServerIcon = _ServerIcon
 export const SettingsIcon = _SettingsIcon
 export const ShareIcon = _ShareIcon
+export const ShieldAlertIcon = _ShieldAlertIcon
+export const ShieldCheckIcon = _ShieldCheckIcon
 export const ShieldIcon = _ShieldIcon
 export const SignalIcon = _SignalIcon
 export const SkullIcon = _SkullIcon

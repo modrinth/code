@@ -8,12 +8,7 @@
 				iconClasses[variant],
 			]"
 		>
-			<IssuesIcon
-				v-if="variant === 'warning' || variant === 'error'"
-				aria-hidden="true"
-				class="w-6 h-6 flex-shrink-0"
-			/>
-			<InfoIcon v-if="variant === 'info'" aria-hidden="true" class="w-6 h-6 flex-shrink-0" />
+			<component :is="getSeverityIcon(variant)" aria-hidden="true" class="w-6 h-6 flex-shrink-0" />
 			<slot name="title" />
 		</div>
 
@@ -32,7 +27,7 @@
 </template>
 
 <script lang="ts" setup>
-import { InfoIcon, IssuesIcon } from '@modrinth/assets'
+import { getSeverityIcon } from '../../utils'
 
 defineProps<{
 	variant: 'error' | 'warning' | 'info'

@@ -1,8 +1,7 @@
 use super::ApiError;
 use crate::database;
-use crate::database::models::{DBOrganization, DBTeamId, DBTeamMember, DBUser};
 use crate::database::redis::RedisPool;
-use crate::models::ids::{OrganizationId, TeamId};
+use crate::models::ids::OrganizationId;
 use crate::models::projects::{Project, ProjectStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
@@ -10,15 +9,22 @@ use crate::util::error::Context;
 use crate::{auth::check_is_moderator_from_headers, models::pats::Scopes};
 use actix_web::{HttpRequest, get, post, web};
 use ariadne::ids::{UserId, random_base62};
-use eyre::eyre;
+use ownership::get_projects_ownership;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;
 
+mod ownership;
+mod tech_review;
+
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(get_projects)
         .service(get_project_meta)
-        .service(set_project_meta);
+        .service(set_project_meta)
+        .service(
+            utoipa_actix_web::scope("/tech-review")
+                .configure(tech_review::config),
+        );
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
@@ -47,7 +53,7 @@ pub struct FetchedProject {
 }
 
 /// Fetched information on who owns a project.
-#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema)]
+#[derive(Debug, Serialize, Deserialize, utoipa::ToSchema, Clone)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum Ownership {
     /// Project is owned by a team, and this is the team owner.
@@ -105,8 +111,24 @@ pub async fn get_projects_internal(
 
     let project_ids = sqlx::query!(
         "
-        SELECT id FROM mods
-        WHERE status = $1
+        SELECT id
+        FROM (
+            SELECT DISTINCT ON (m.id)
+                m.id,
+                m.queued
+            FROM mods m
+
+            -- exclude projects in tech review queue
+            LEFT JOIN delphi_issue_details_with_statuses didws
+                ON didws.project_id = m.id AND didws.status = 'pending'
+
+            WHERE
+                m.status = $1
+                AND didws.status IS NULL
+
+            GROUP BY m.id
+        ) t
+
         ORDER BY queued ASC
         OFFSET $3
         LIMIT $2
@@ -129,73 +151,20 @@ pub async fn get_projects_internal(
             .map(crate::models::projects::Project::from)
             .collect::<Vec<_>>();
 
-    let team_ids = projects
-        .iter()
-        .map(|project| project.team_id)
-        .map(DBTeamId::from)
-        .collect::<Vec<_>>();
-    let org_ids = projects
-        .iter()
-        .filter_map(|project| project.organization)
-        .collect::<Vec<_>>();
-
-    let team_members =
-        DBTeamMember::get_from_team_full_many(&team_ids, &**pool, &redis)
-            .await
-            .wrap_internal_err("failed to fetch team members")?;
-    let users = DBUser::get_many_ids(
-        &team_members
-            .iter()
-            .map(|member| member.user_id)
-            .collect::<Vec<_>>(),
-        &**pool,
-        &redis,
-    )
-    .await
-    .wrap_internal_err("failed to fetch user data of team members")?;
-    let orgs = DBOrganization::get_many(&org_ids, &**pool, &redis)
+    let ownerships = get_projects_ownership(&projects, &pool, &redis)
         .await
-        .wrap_internal_err("failed to fetch organizations")?;
+        .wrap_internal_err("failed to fetch project ownerships")?;
 
-    let map_project = |project: Project| -> Result<FetchedProject, ApiError> {
-        let project_id = project.id;
-        let ownership = if let Some(org_id) = project.organization {
-            let org = orgs
-                    .iter()
-                    .find(|org| OrganizationId::from(org.id) == org_id)
-                    .wrap_internal_err_with(|| {
-                        eyre!(
-                            "project {project_id} is owned by an invalid organization {org_id}"
-                        )
-                    })?;
-
-            Ownership::Organization {
-                id: OrganizationId::from(org.id),
-                name: org.name.clone(),
-                icon_url: org.icon_url.clone(),
-            }
-        } else {
-            let team_id = project.team_id;
-            let team_owner = team_members.iter().find(|member| TeamId::from(member.team_id) == team_id && member.is_owner)
-                .wrap_internal_err_with(|| eyre!("project {project_id} is owned by a team {team_id} which has no valid owner"))?;
-            let team_owner_id = team_owner.user_id;
-            let user = users.iter().find(|user| user.id == team_owner_id)
-                .wrap_internal_err_with(|| eyre!("project {project_id} is owned by a team {team_id} which has owner {} which does not exist", UserId::from(team_owner_id)))?;
-
-            Ownership::User {
-                id: UserId::from(user.id),
-                name: user.username.clone(),
-                icon_url: user.avatar_url.clone(),
-            }
+    let map_project =
+        |(project, ownership): (Project, Ownership)| -> FetchedProject {
+            FetchedProject { ownership, project }
         };
-
-        Ok(FetchedProject { ownership, project })
-    };
 
     let projects = projects
         .into_iter()
+        .zip(ownerships)
         .map(map_project)
-        .collect::<Result<Vec<_>, _>>()?;
+        .collect::<Vec<_>>();
 
     Ok(web::Json(projects))
 }

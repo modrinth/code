@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            f.url,\n            COUNT(dr.id) AS \"report_count!\"\n        FROM files f\n        LEFT JOIN delphi_reports dr ON dr.file_id = f.id\n        WHERE f.id = $1\n        GROUP BY f.url\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "report_count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "cd630ba950611b387fb5b04999a061d930ff06a8a928ff1cea6a723bb37c1b75"
+}

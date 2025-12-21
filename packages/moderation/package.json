@@ -11,6 +11,7 @@
 	"dependencies": {
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/utils": "workspace:*",
+		"@modrinth/api-client": "workspace:*",
 		"vue": "^3.5.13"
 	},
 	"devDependencies": {
