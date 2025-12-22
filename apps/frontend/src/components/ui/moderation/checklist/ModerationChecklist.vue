@@ -84,8 +84,8 @@
 				<div v-else-if="isModpackPermissionsStage">
 					<ModpackPermissionsFlow
 						v-model="modpackJudgements"
-						:project-id="project.id"
-						:project-updated="project.updated"
+						:project-id="projectV2.id"
+						:project-updated="projectV2.updated"
 						@complete="handleModpackPermissionsComplete"
 					/>
 				</div>
@@ -282,7 +282,7 @@
 								</button>
 							</ButtonStyled>
 							<ButtonStyled color="green">
-								<button @click="sendMessage(project.requested_status ?? 'approved')">
+								<button @click="sendMessage(projectV2.requested_status ?? 'approved')">
 									<CheckIcon aria-hidden="true" />
 									Approve
 								</button>
@@ -360,7 +360,7 @@ import {
 	expandVariables,
 	finalPermissionMessages,
 	findMatchingVariant,
-	flattenProjectV3PartialVariables,
+	flattenProjectV3Variables,
 	flattenProjectVariables,
 	flattenStaticVariables,
 	getActionIdForStage,
@@ -382,6 +382,7 @@ import {
 	Collapsible,
 	DropdownSelect,
 	injectNotificationManager,
+	injectProjectPageContext,
 	MarkdownEditor,
 	OverflowMenu,
 	type OverflowMenuOption,
@@ -389,9 +390,7 @@ import {
 import {
 	type ModerationJudgements,
 	type ModerationModpackItem,
-	type Project,
 	type ProjectStatus,
-	type ProjectV3Partial,
 	renderHighlightedString,
 } from '@modrinth/utils'
 import { computedAsync, useLocalStorage } from '@vueuse/core'
@@ -407,18 +406,18 @@ const { addNotification } = notifications
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
 
 const props = defineProps<{
-	project: Project
-	projectV3Partial: ProjectV3Partial
 	collapsed: boolean
 }>()
+
+const { projectV2, projectV3 } = injectProjectPageContext()
 
 const moderationStore = useModerationStore()
 
 const variables = computed(() => {
 	return {
 		...flattenStaticVariables(),
-		...flattenProjectVariables(props.project),
-		...flattenProjectV3PartialVariables(props.projectV3Partial),
+		...flattenProjectVariables(projectV2.value),
+		...flattenProjectV3Variables(projectV3.value),
 	}
 })
 
@@ -453,12 +452,12 @@ function resetProgress() {
 	message.value = ''
 	loadingMessage.value = false
 
-	localStorage.removeItem(`modpack-permissions-${props.project.id}`)
-	localStorage.removeItem(`modpack-permissions-index-${props.project.id}`)
+	localStorage.removeItem(`modpack-permissions-${projectV2.value.id}`)
+	localStorage.removeItem(`modpack-permissions-index-${projectV2.value.id}`)
 
-	sessionStorage.removeItem(`modpack-permissions-data-${props.project.id}`)
-	sessionStorage.removeItem(`modpack-permissions-permanent-no-${props.project.id}`)
-	sessionStorage.removeItem(`modpack-permissions-updated-${props.project.id}`)
+	sessionStorage.removeItem(`modpack-permissions-data-${projectV2.value.id}`)
+	sessionStorage.removeItem(`modpack-permissions-permanent-no-${projectV2.value.id}`)
+	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
 
 	modpackPermissionsComplete.value = false
 	modpackJudgements.value = {}
@@ -476,7 +475,7 @@ function findFirstValidStage(): number {
 }
 
 const currentStageObj = computed(() => checklist[currentStage.value])
-const currentStage = useLocalStorage(`moderation-stage-${props.project.slug}`, () =>
+const currentStage = useLocalStorage(`moderation-stage-${projectV2.value.slug}`, () =>
 	findFirstValidStage(),
 )
 
@@ -486,9 +485,9 @@ const stageTextExpanded = computedAsync(async () => {
 	if (stage.text) {
 		return renderHighlightedString(
 			expandVariables(
-				await stage.text(props.project, props.projectV3Partial),
-				props.project,
-				props.projectV3Partial,
+				await stage.text(projectV2.value, projectV3.value),
+				projectV2.value,
+				projectV3.value,
 				variables.value,
 			),
 		)
@@ -502,7 +501,7 @@ interface ActionState {
 }
 
 const persistedActionStates = useLocalStorage(
-	`moderation-actions-${props.project.slug}`,
+	`moderation-actions-${projectV2.value.slug}`,
 	{},
 	{
 		serializer: {
@@ -515,7 +514,7 @@ const persistedActionStates = useLocalStorage(
 const router = useRouter()
 
 const persistedTextInputs = useLocalStorage(
-	`moderation-inputs-${props.project.slug}`,
+	`moderation-inputs-${projectV2.value.slug}`,
 	{} as Record<string, string>,
 )
 
@@ -543,7 +542,7 @@ function handleKeybinds(event: KeyboardEvent) {
 	handleKeybind(
 		event,
 		{
-			project: props.project,
+			project: projectV2.value,
 			state: {
 				currentStage: currentStage.value,
 				totalStages: checklist.length,
@@ -575,7 +574,7 @@ function handleKeybinds(event: KeyboardEvent) {
 				tryResetProgress: resetProgress,
 				tryExitModeration: () => emit('exit'),
 
-				tryApprove: () => sendMessage(props.project.requested_status),
+				tryApprove: () => sendMessage(projectV2.value.requested_status ?? 'approved'),
 				tryReject: () => sendMessage('rejected'),
 				tryWithhold: () => sendMessage('withheld'),
 				tryEditMessage: goBackToStages,
@@ -669,7 +668,7 @@ watch(
 	(newIndex) => {
 		const stage = checklist[newIndex]
 		if (stage?.navigate) {
-			router.push(`/${props.project.project_type}/${props.project.slug}${stage.navigate}`)
+			router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}${stage.navigate}`)
 		}
 
 		initializeCurrentStage()
@@ -871,11 +870,11 @@ function getModpackFilesFromStorage(): {
 	permanentNo: ModerationModpackItem[]
 } {
 	try {
-		const sessionData = sessionStorage.getItem(`modpack-permissions-data-${props.project.id}`)
+		const sessionData = sessionStorage.getItem(`modpack-permissions-data-${projectV2.value.id}`)
 		const interactive = sessionData ? (JSON.parse(sessionData) as ModerationModpackItem[]) : []
 
 		const permanentNoData = sessionStorage.getItem(
-			`modpack-permissions-permanent-no-${props.project.id}`,
+			`modpack-permissions-permanent-no-${projectV2.value.id}`,
 		)
 		const permanentNo = permanentNoData
 			? (JSON.parse(permanentNoData) as ModerationModpackItem[])
@@ -907,8 +906,8 @@ async function assembleFullMessage() {
 			.map((part) => part.content)
 			.filter((content) => content.trim().length > 0)
 			.join('\n\n'),
-		props.project,
-		props.projectV3Partial,
+		projectV2.value,
+		projectV3.value,
 	)
 
 	return finalMessage
@@ -1062,7 +1061,7 @@ function shouldShowStage(stage: Stage): boolean {
 	}
 
 	if (typeof stage.shouldShow === 'function') {
-		return stage.shouldShow(props.project, props.projectV3Partial)
+		return stage.shouldShow(projectV2.value, projectV3.value)
 	}
 
 	return true
@@ -1070,7 +1069,7 @@ function shouldShowStage(stage: Stage): boolean {
 
 function shouldShowAction(action: Action): boolean {
 	if (typeof action.shouldShow === 'function') {
-		return action.shouldShow(props.project)
+		return action.shouldShow(projectV2.value)
 	}
 
 	return true
@@ -1079,7 +1078,7 @@ function shouldShowAction(action: Action): boolean {
 function getVisibleDropdownOptions(action: DropdownAction) {
 	return action.options.filter((option) => {
 		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(props.project)
+			return option.shouldShow(projectV2.value)
 		}
 		return true
 	})
@@ -1088,7 +1087,7 @@ function getVisibleDropdownOptions(action: DropdownAction) {
 function getVisibleMultiSelectOptions(action: MultiSelectChipsAction) {
 	return action.options.filter((option) => {
 		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(props.project)
+			return option.shouldShow(projectV2.value)
 		}
 		return true
 	})
@@ -1155,13 +1154,13 @@ async function generateMessage() {
 
 	loadingMessage.value = true
 
-	router.push(`/${props.project.project_type}/${props.project.slug}/moderation`)
+	router.push(`/${projectV2.value.project_type}/${projectV2.value.slug}/moderation`)
 
 	try {
 		const baseMessage = await assembleFullMessage()
 		let fullMessage = baseMessage
 
-		if (props.project.project_type === 'modpack') {
+		if (projectV2.value.project_type === 'modpack') {
 			const modpackFilesData = getModpackFilesFromStorage()
 
 			if (modpackFilesData.interactive.length > 0 || modpackFilesData.permanentNo.length > 0) {
@@ -1253,7 +1252,7 @@ function generateModpackMessage(allFiles: {
 const hasNextProject = ref(false)
 async function sendMessage(status: ProjectStatus) {
 	try {
-		await useBaseFetch(`project/${props.project.id}`, {
+		await useBaseFetch(`project/${projectV2.value.id}`, {
 			method: 'PATCH',
 			body: {
 				status,
@@ -1261,7 +1260,7 @@ async function sendMessage(status: ProjectStatus) {
 		})
 
 		if (message.value) {
-			await useBaseFetch(`thread/${props.project.thread_id}`, {
+			await useBaseFetch(`thread/${projectV2.value.thread_id}`, {
 				method: 'POST',
 				body: {
 					body: {
@@ -1273,7 +1272,7 @@ async function sendMessage(status: ProjectStatus) {
 		}
 
 		if (
-			props.project.project_type === 'modpack' &&
+			projectV2.value.project_type === 'modpack' &&
 			Object.keys(modpackJudgements.value).length > 0
 		) {
 			await useBaseFetch(`moderation/project`, {
@@ -1286,7 +1285,7 @@ async function sendMessage(status: ProjectStatus) {
 		done.value = true
 
 		hasNextProject.value = await moderationStore.completeCurrentProject(
-			props.project.id,
+			projectV2.value.id,
 			'completed',
 		)
 	} catch (error) {
@@ -1340,21 +1339,21 @@ async function endChecklist(status?: string) {
 }
 
 async function skipCurrentProject() {
-	hasNextProject.value = await moderationStore.completeCurrentProject(props.project.id, 'skipped')
+	hasNextProject.value = await moderationStore.completeCurrentProject(projectV2.value.id, 'skipped')
 
 	await endChecklist('skipped')
 }
 
 function clearProjectLocalStorage() {
-	localStorage.removeItem(`modpack-permissions-${props.project.id}`)
-	localStorage.removeItem(`modpack-permissions-index-${props.project.id}`)
-	localStorage.removeItem(`moderation-actions-${props.project.slug}`)
-	localStorage.removeItem(`moderation-inputs-${props.project.slug}`)
-	localStorage.removeItem(`moderation-stage-${props.project.slug}`)
+	localStorage.removeItem(`modpack-permissions-${projectV2.value.id}`)
+	localStorage.removeItem(`modpack-permissions-index-${projectV2.value.id}`)
+	localStorage.removeItem(`moderation-actions-${projectV2.value.slug}`)
+	localStorage.removeItem(`moderation-inputs-${projectV2.value.slug}`)
+	localStorage.removeItem(`moderation-stage-${projectV2.value.slug}`)
 
-	sessionStorage.removeItem(`modpack-permissions-data-${props.project.id}`)
-	sessionStorage.removeItem(`modpack-permissions-permanent-no-${props.project.id}`)
-	sessionStorage.removeItem(`modpack-permissions-updated-${props.project.id}`)
+	sessionStorage.removeItem(`modpack-permissions-data-${projectV2.value.id}`)
+	sessionStorage.removeItem(`modpack-permissions-permanent-no-${projectV2.value.id}`)
+	sessionStorage.removeItem(`modpack-permissions-updated-${projectV2.value.id}`)
 
 	actionStates.value = {}
 }

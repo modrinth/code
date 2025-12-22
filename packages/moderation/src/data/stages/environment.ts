@@ -9,8 +9,8 @@ const environment: Stage = {
 	navigate: '/settings/environment',
 	icon: GlobeIcon,
 	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
-	text: async (project, projectV3Partial) => {
-		if (projectV3Partial?.environment.length === 1) {
+	text: async (project, projectV3) => {
+		if ((projectV3?.environment?.length ?? 0) === 1) {
 			return (await import('../messages/checklist-text/environment/environment.md?raw')).default
 		} else {
 			return (await import('../messages/checklist-text/environment/environment-multiple.md?raw'))

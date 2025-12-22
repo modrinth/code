@@ -1,4 +1,4 @@
-import type { Project, ProjectV3Partial } from '@modrinth/utils'
+import type { Labrinth } from '@modrinth/api-client'
 
 import type {
 	Action,
@@ -210,14 +210,14 @@ export function getVisibleInputs(
 
 export function expandVariables(
 	template: string,
-	project: Project,
-	projectV3Partial: ProjectV3Partial,
+	project: Labrinth.Projects.v2.Project,
+	projectV3: Labrinth.Projects.v3.Project,
 	variables?: Record<string, string>,
 ): string {
 	variables ??= {
 		...flattenStaticVariables(),
 		...flattenProjectVariables(project),
-		...flattenProjectV3PartialVariables(projectV3Partial),
+		...flattenProjectV3Variables(projectV3),
 	}
 
 	return Object.entries(variables).reduce((result, [key, value]) => {
@@ -258,7 +258,9 @@ export function flattenStaticVariables(): Record<string, string> {
 	return vars
 }
 
-export function flattenProjectVariables(project: Project): Record<string, string> {
+export function flattenProjectVariables(
+	project: Labrinth.Projects.v2.Project,
+): Record<string, string> {
 	const vars: Record<string, string> = {}
 
 	vars['PROJECT_ID'] = project.id
@@ -358,18 +360,21 @@ export function flattenProjectVariables(project: Project): Record<string, string
 	return vars
 }
 
-export function flattenProjectV3PartialVariables(
-	projectV3Partial: ProjectV3Partial,
+export function flattenProjectV3Variables(
+	projectV3: Labrinth.Projects.v3.Project,
 ): Record<string, string> {
 	const vars: Record<string, string> = {}
 
-	vars['PROJECT_ENVIRONMENT_COUNT'] = projectV3Partial.environment.length.toString()
+	const environment = projectV3.environment ?? []
+	vars['PROJECT_V3_ENVIRONMENT_COUNT'] = environment.length.toString()
+	vars['PROJECT_V3_ALL_ENVIRONMENTS'] = environment.join(', ')
 
-	vars['ALL_PROJECT_ENVIRONMENTS'] = projectV3Partial.environment.join(', ')
-
-	projectV3Partial.environment.forEach((env, index) => {
-		vars[`PROJECT_ENVIRONMENT_${index}`] = env
+	environment.forEach((env, index) => {
+		vars[`PROJECT_V3_ENVIRONMENT_${index}`] = env
 	})
+
+	vars['PROJECT_V3_REVIEW_STATUS'] = projectV3.side_types_migration_review_status
+	vars['PROJECT_V3_TYPES'] = projectV3.project_types.join(', ')
 
 	return vars
 }
