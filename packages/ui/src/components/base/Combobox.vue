@@ -4,7 +4,7 @@
 			ref="triggerRef"
 			role="button"
 			tabindex="0"
-			class="max-h-[36px] relative cursor-pointer flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left transition-all duration-200 text-button-text hover:bg-button-bgHover active:bg-button-bgActive"
+			class="relative cursor-pointer flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left transition-all duration-200 text-button-text hover:bg-button-bgHover active:bg-button-bgActive"
 			:class="[
 				triggerClasses,
 				{
@@ -61,6 +61,7 @@
 							:placeholder="searchPlaceholder"
 							class=""
 							@keydown.stop="handleSearchKeydown"
+							@input="emit('searchInput', searchQuery)"
 						/>
 					</div>
 				</div>
@@ -107,7 +108,7 @@
 				</div>
 
 				<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
-					No results found
+					{{ noOptionsMessage }}
 				</div>
 			</div>
 		</Teleport>
@@ -128,7 +129,7 @@ import {
 	watch,
 } from 'vue'
 
-export interface DropdownOption<T> {
+export interface ComboboxOption<T> {
 	value: T
 	label: string
 	icon?: Component
@@ -144,19 +145,19 @@ const DROPDOWN_VIEWPORT_MARGIN = 8
 const DEFAULT_MAX_HEIGHT = 300
 
 function isDropdownOption<T>(
-	opt: DropdownOption<T> | { type: 'divider' },
-): opt is DropdownOption<T> {
+	opt: ComboboxOption<T> | { type: 'divider' },
+): opt is ComboboxOption<T> {
 	return 'value' in opt
 }
 
-function isDivider<T>(opt: DropdownOption<T> | { type: 'divider' }): opt is { type: 'divider' } {
+function isDivider<T>(opt: ComboboxOption<T> | { type: 'divider' }): opt is { type: 'divider' } {
 	return opt.type === 'divider'
 }
 
 const props = withDefaults(
 	defineProps<{
 		modelValue?: T
-		options: (DropdownOption<T> | { type: 'divider' })[]
+		options: (ComboboxOption<T> | { type: 'divider' })[]
 		placeholder?: string
 		disabled?: boolean
 		searchable?: boolean
@@ -168,6 +169,8 @@ const props = withDefaults(
 		extraPosition?: 'top' | 'bottom'
 		triggerClass?: string
 		forceDirection?: 'up' | 'down'
+		noOptionsMessage?: string
+		disableSearchFilter?: boolean
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -178,14 +181,16 @@ const props = withDefaults(
 		showChevron: true,
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		extraPosition: 'bottom',
+		noOptionsMessage: 'No results found',
 	},
 )
 
 const emit = defineEmits<{
 	'update:modelValue': [value: T]
-	select: [option: DropdownOption<T>]
+	select: [option: ComboboxOption<T>]
 	open: []
 	close: []
+	searchInput: [query: string]
 }>()
 
 const slots = useSlots()
@@ -199,6 +204,7 @@ const dropdownRef = ref<HTMLElement>()
 const searchInputRef = ref<HTMLInputElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const optionRefs = ref<(HTMLElement | null)[]>([])
+const rafId = ref<number | null>(null)
 
 const dropdownStyle = ref({
 	top: '0px',
@@ -220,9 +226,9 @@ const triggerClasses = computed(() => {
 	return classes
 })
 
-const selectedOption = computed<DropdownOption<T> | undefined>(() => {
+const selectedOption = computed<ComboboxOption<T> | undefined>(() => {
 	return props.options.find(
-		(opt): opt is DropdownOption<T> => isDropdownOption(opt) && opt.value === props.modelValue,
+		(opt): opt is ComboboxOption<T> => isDropdownOption(opt) && opt.value === props.modelValue,
 	)
 })
 
@@ -240,7 +246,7 @@ const optionsWithKeys = computed(() => {
 })
 
 const filteredOptions = computed(() => {
-	if (!searchQuery.value || !props.searchable) {
+	if (!searchQuery.value || !props.searchable || props.disableSearchFilter) {
 		return optionsWithKeys.value
 	}
 
@@ -254,7 +260,7 @@ const filteredOptions = computed(() => {
 const shouldRoundBottomCorners = computed(() => isOpen.value && openDirection.value === 'down')
 const shouldRoundTopCorners = computed(() => isOpen.value && openDirection.value === 'up')
 
-function getOptionClasses(item: DropdownOption<T> & { key: string }, index: number) {
+function getOptionClasses(item: ComboboxOption<T> & { key: string }, index: number) {
 	return [
 		item.class,
 		{
@@ -363,11 +369,13 @@ async function openDropdown() {
 
 	setInitialFocus()
 	focusSearchInput()
+	startPositionTracking()
 }
 
 function closeDropdown() {
 	if (!isOpen.value) return
 
+	stopPositionTracking()
 	isOpen.value = false
 	searchQuery.value = ''
 	focusedIndex.value = -1
@@ -386,7 +394,7 @@ function handleTriggerClick() {
 	}
 }
 
-function handleOptionClick(option: DropdownOption<T>, index: number) {
+function handleOptionClick(option: ComboboxOption<T>, index: number) {
 	if (option.disabled || option.type === 'divider') return
 
 	focusedIndex.value = index
@@ -509,6 +517,21 @@ function handleWindowResize() {
 	}
 }
 
+function startPositionTracking() {
+	function track() {
+		updateDropdownPosition()
+		rafId.value = requestAnimationFrame(track)
+	}
+	rafId.value = requestAnimationFrame(track)
+}
+
+function stopPositionTracking() {
+	if (rafId.value !== null) {
+		cancelAnimationFrame(rafId.value)
+		rafId.value = null
+	}
+}
+
 onClickOutside(
 	dropdownRef,
 	() => {
@@ -523,6 +546,7 @@ onMounted(() => {
 
 onUnmounted(() => {
 	window.removeEventListener('resize', handleWindowResize)
+	stopPositionTracking()
 })
 
 watch(isOpen, (value) => {

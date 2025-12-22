@@ -6,7 +6,7 @@ import {
 	PayPalColorIcon,
 	VenmoColorIcon,
 } from '@modrinth/assets'
-import { createContext, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
+import { createContext, getCurrencyIcon, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
 import type { MessageDescriptor } from '@vintl/vintl'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
@@ -58,6 +58,8 @@ export interface PayoutMethod {
 		fiat?: string | null
 		blockchain?: string[]
 	}
+	currency_code?: string | null
+	exchange_rate?: number | null
 }
 
 export interface PaymentOption {
@@ -284,9 +286,12 @@ interface PayoutPayload {
 }
 
 function buildPayoutPayload(data: WithdrawData): PayoutPayload {
+	// Round amount to 2 decimal places for API
+	const amount = Math.round(data.calculation.amount * 100) / 100
+
 	if (data.selection.provider === 'paypal' || data.selection.provider === 'venmo') {
 		return {
-			amount: data.calculation.amount,
+			amount,
 			method: data.selection.provider,
 			method_id: data.selection.methodId!,
 		}
@@ -301,7 +306,7 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 			methodDetails.currency = data.providerData.currency
 		}
 		return {
-			amount: data.calculation.amount,
+			amount,
 			method: 'tremendous',
 			method_id: data.selection.methodId!,
 			method_details: methodDetails,
@@ -317,7 +322,7 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 
 		if (rail.type === 'crypto') {
 			return {
-				amount: data.calculation.amount,
+				amount,
 				method: 'muralpay',
 				method_id: data.selection.methodId!,
 				method_details: {
@@ -346,7 +351,7 @@ function buildPayoutPayload(data: WithdrawData): PayoutPayload {
 			}
 
 			return {
-				amount: data.calculation.amount,
+				amount,
 				method: 'muralpay',
 				method_id: data.selection.methodId!,
 				method_details: {
@@ -480,7 +485,7 @@ export function createWithdrawContext(
 				label: paymentMethodMessages.paypalInternational,
 				icon: PayPalColorIcon,
 				methodId: internationalPaypalMethod.id,
-				fee: '≈ 3.84%',
+				fee: '≈ 3.84%, min $0.25',
 				type: 'tremendous',
 			})
 		}
@@ -642,12 +647,16 @@ export function createWithdrawContext(
 				)
 
 				if (selectedMethod?.interval) {
+					const userMax = Math.floor(maxWithdrawAmount.value * 100) / 100
 					if (selectedMethod.interval.standard) {
 						const { min, max } = selectedMethod.interval.standard
-						if (amount < min || amount > max) return false
+						const effectiveMax = Math.min(userMax, max)
+						const effectiveMin = Math.min(min, effectiveMax)
+						if (amount < effectiveMin || amount > effectiveMax) return false
 					}
 					if (selectedMethod.interval.fixed) {
-						if (!selectedMethod.interval.fixed.values.includes(amount)) return false
+						const validValues = selectedMethod.interval.fixed.values.filter((v) => v <= userMax)
+						if (!validValues.includes(amount)) return false
 					}
 				}
 
@@ -711,7 +720,11 @@ export function createWithdrawContext(
 				)
 				if (selectedMethod?.interval?.standard) {
 					const { min, max } = selectedMethod.interval.standard
-					if (amount < min || amount > max) return false
+					// Use effective limits that account for user's available balance
+					const userMax = Math.floor(maxWithdrawAmount.value * 100) / 100
+					const effectiveMax = Math.min(userMax, max)
+					const effectiveMin = Math.min(min, effectiveMax)
+					if (amount < effectiveMin || amount > effectiveMax) return false
 				}
 
 				const accountDetails = withdrawData.value.providerData.accountDetails
@@ -736,7 +749,11 @@ export function createWithdrawContext(
 				)
 				if (selectedMethod?.interval?.standard) {
 					const { min, max } = selectedMethod.interval.standard
-					if (amount < min || amount > max) return false
+					// Use effective limits that account for user's available balance
+					const userMax = Math.floor(maxWithdrawAmount.value * 100) / 100
+					const effectiveMax = Math.min(userMax, max)
+					const effectiveMin = Math.min(min, effectiveMax)
+					if (amount < effectiveMin || amount > effectiveMax) return false
 				}
 
 				return !!withdrawData.value.stageValidation?.paypalDetails

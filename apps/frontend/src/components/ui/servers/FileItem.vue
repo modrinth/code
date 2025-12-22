@@ -65,8 +65,6 @@
 import {
 	DownloadIcon,
 	EditIcon,
-	FileArchiveIcon,
-	FileIcon,
 	FolderOpenIcon,
 	MoreHorizontalIcon,
 	PackageOpenIcon,
@@ -78,23 +76,15 @@ import {
 	ButtonStyled,
 	Checkbox,
 	getFileExtension,
-	isArchiveFile,
-	isCodeFile,
+	getFileExtensionIcon,
 	isEditableFile as isEditableFileExt,
 	isImageFile,
-	isTextFile,
 } from '@modrinth/ui'
-import { computed, ref, shallowRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, h, ref, shallowRef } from 'vue'
 import { renderToString } from 'vue/server-renderer'
+import { useRoute, useRouter } from 'vue-router'
 
-import {
-	UiServersIconsCodeFileIcon,
-	UiServersIconsCogFolderIcon,
-	UiServersIconsEarthIcon,
-	UiServersIconsImageFileIcon,
-	UiServersIconsTextFileIcon,
-} from '#components'
+import { UiServersIconsCogFolderIcon, UiServersIconsEarthIcon } from '#components'
 
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
@@ -182,12 +172,7 @@ const iconComponent = computed(() => {
 		return FolderOpenIcon
 	}
 
-	const ext = fileExtension.value
-	if (isCodeFile(ext)) return UiServersIconsCodeFileIcon
-	if (isTextFile(ext)) return UiServersIconsTextFileIcon
-	if (isImageFile(ext)) return UiServersIconsImageFileIcon
-	if (isArchiveFile(ext)) return FileArchiveIcon
-	return FileIcon
+	return getFileExtensionIcon(fileExtension.value)
 })
 
 const formattedModifiedDate = computed(() => {

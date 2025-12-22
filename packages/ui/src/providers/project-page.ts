@@ -9,6 +9,7 @@ export interface ProjectPageContext {
 	projectV2: Ref<Labrinth.Projects.v2.Project>
 	projectV3: Ref<Labrinth.Projects.v3.Project>
 	refreshProject: () => Promise<void>
+	refreshVersions: () => Promise<void>
 	currentMember: Ref<TeamMember>
 }
 

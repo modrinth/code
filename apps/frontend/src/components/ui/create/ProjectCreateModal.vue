@@ -247,13 +247,7 @@ async function createProject() {
 		})
 
 		modal.value.hide()
-		await router.push({
-			name: 'type-id',
-			params: {
-				type: 'project',
-				id: slug.value,
-			},
-		})
+		await router.push(`/project/${slug.value}/settings`)
 	} catch (err) {
 		addNotification({
 			title: formatMessage(messages.errorTitle),

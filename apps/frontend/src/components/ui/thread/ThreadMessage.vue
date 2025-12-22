@@ -4,7 +4,7 @@
 		:class="{
 			'has-body': message.body.type === 'text' && !forceCompact,
 			'no-actions': noLinks,
-			private: message.body.private,
+			private: isPrivateMessage,
 		}"
 	>
 		<template v-if="members[message.author_id]">
@@ -23,7 +23,7 @@
 			</AutoLink>
 			<span :class="`message__author role-${members[message.author_id].role}`">
 				<LockIcon
-					v-if="message.body.private"
+					v-if="isPrivateMessage"
 					v-tooltip="'Only visible to moderators'"
 					class="private-icon"
 				/>
@@ -40,13 +40,30 @@
 					v-tooltip="'Reporter'"
 					class="reporter-icon"
 				/>
+				<span
+					v-if="message.preview"
+					class="border-blue/60 rounded-full border border-solid bg-highlight-blue px-2 py-0.5 text-xs font-semibold text-blue"
+				>
+					Preview
+				</span>
 			</span>
 		</template>
 		<template v-else>
-			<div class="message__icon backed-svg circle moderation-color" :class="{ raised: raised }">
+			<div
+				class="message__icon backed-svg circle moderation-color"
+				:class="{
+					raised: raised,
+					'system-message-icon': ['tech_review_entered', 'tech_review_exit_file_deleted'].includes(
+						message.body.type,
+					),
+				}"
+			>
 				<ScaleIcon />
 			</div>
-			<span class="message__author moderation-color">
+			<span
+				v-if="!['tech_review_entered', 'tech_review_exit_file_deleted'].includes(message.body.type)"
+				class="message__author moderation-color"
+			>
 				Moderator
 				<ScaleIcon v-tooltip="'Moderator'" />
 			</span>
@@ -69,6 +86,17 @@
 			</template>
 			<span v-else-if="message.body.type === 'thread_closure'">closed the thread.</span>
 			<span v-else-if="message.body.type === 'thread_reopen'">reopened the thread.</span>
+			<span v-else-if="message.body.type === 'tech_review'">
+				completed technical review and marked project as
+				<Badge :type="message.body.verdict" />.
+			</span>
+			<span v-else-if="message.body.type === 'tech_review_entered'">
+				The project has entered the technical review queue.
+			</span>
+			<span v-else-if="message.body.type === 'tech_review_exit_file_deleted'">
+				The project has left the technical review queue as all files pending review were deleted by
+				the user.
+			</span>
 		</div>
 		<span class="message__date">
 			<span v-tooltip="$dayjs(message.created).format('MMMM D, YYYY [at] h:mm A')">
@@ -159,6 +187,15 @@ const formattedMessage = computed(() => {
 
 const formatRelativeTime = useRelativeTime()
 const timeSincePosted = ref(formatRelativeTime(props.message.created))
+
+const isPrivateMessage = computed(() => {
+	return (
+		props.message.body.private ||
+		['tech_review', 'tech_review_entered', 'tech_review_exit_file_deleted'].includes(
+			props.message.body.type,
+		)
+	)
+})
 
 async function deleteMessage() {
 	await useBaseFetch(`message/${props.message.id}`, {
@@ -332,5 +369,9 @@ a:active + .message__author a,
 
 .private {
 	color: var(--color-icon);
+}
+
+.system-message-icon {
+	--size: 2rem !important;
 }
 </style>

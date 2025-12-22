@@ -1520,7 +1520,7 @@ pub enum ChargeRequestType {
 }
 
 #[derive(Deserialize, Serialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub struct PaymentRequestMetadata {
     #[serde(flatten)]
     pub kind: PaymentRequestMetadataKind,

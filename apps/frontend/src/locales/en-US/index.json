@@ -437,6 +437,9 @@
   "common.yes": {
     "message": "Yes"
   },
+  "create-project-version.create-modal.stage.add-files.admonition": {
+    "message": "Supplementary files are for supporting resources like source code, not for alternative versions or variants."
+  },
   "create.collection.cancel": {
     "message": "Cancel"
   },
@@ -665,8 +668,14 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Fee"
   },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Gift card value"
+  },
   "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
     "message": "Net amount"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "USD equivalent"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Business entity"
@@ -812,6 +821,18 @@
   "dashboard.creator-withdraw-modal.tax-form-required.header": {
     "message": "Tax form required"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "Available denominations"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "Your balance of {usdBalance} is currently worth {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Find gift cards near this value."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Enter amount"
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
     "message": "Payment method"
   },
@@ -823,6 +844,15 @@
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
     "message": "Rewards"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "Search amount"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "Select a denomination:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "Please select a denomination to continue"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
     "message": "Unverified email"
@@ -1251,10 +1281,13 @@
     "message": "New project"
   },
   "layout.action.reports": {
-    "message": "Reports"
+    "message": "Review reports"
   },
   "layout.action.review-projects": {
-    "message": "Review projects"
+    "message": "Project review"
+  },
+  "layout.action.tech-review": {
+    "message": "Tech review"
   },
   "layout.avatar.alt": {
     "message": "Your avatar"
@@ -1492,9 +1525,6 @@
   },
   "moderation.sort.by": {
     "message": "Sort by"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Search tech reviews..."
   },
   "muralpay.account-type.checking": {
     "message": "Checking"
@@ -2233,12 +2263,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} has been archived. {title} will not receive any further updates unless the author decides to unarchive the project."
-  },
-  "project.version.all-versions": {
-    "message": "All versions"
-  },
-  "project.version.back-to-versions": {
-    "message": "Back to versions"
   },
   "project.versions.title": {
     "message": "Versions"

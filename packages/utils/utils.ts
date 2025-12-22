@@ -134,11 +134,29 @@ export const formatWallet = (name) => {
 	return capitalizeString(name)
 }
 
-export const formatProjectType = (name) => {
+export const formatProjectType = (name, short = false) => {
+	if (short) {
+		if (name === 'resourcepack') {
+			return 'RPK'
+		} else if (name === 'mod') {
+			return 'MOD'
+		} else if (name === 'modpack') {
+			return 'MPK'
+		} else if (name === 'shader') {
+			return 'SHD'
+		} else if (name === 'plugin') {
+			return 'PLG'
+		} else if (name === 'datapack') {
+			return 'DPK'
+		}
+	}
+
 	if (name === 'resourcepack') {
 		return 'Resource Pack'
 	} else if (name === 'datapack') {
 		return 'Data Pack'
+	} else if (name === 'modpack') {
+		return 'Modpack'
 	}
 
 	return capitalizeString(name)
@@ -305,21 +323,23 @@ export const fileIsValid = (file, validationOptions) => {
 }
 
 export const acceptFileFromProjectType = (projectType) => {
+	const commonTypes = '.sig,.asc,.gpg,application/pgp-signature,application/pgp-keys'
 	switch (projectType) {
 		case 'mod':
-			return '.jar,.zip,.litemod,application/java-archive,application/x-java-archive,application/zip'
+			return `.jar,.zip,.litemod,application/java-archive,application/x-java-archive,application/zip,${commonTypes}`
 		case 'plugin':
-			return '.jar,.zip,application/java-archive,application/x-java-archive,application/zip'
+			return `.jar,.zip,application/java-archive,application/x-java-archive,application/zip,${commonTypes}`
 		case 'resourcepack':
-			return '.zip,application/zip'
+			return `.zip,application/zip,${commonTypes}`
 		case 'shader':
-			return '.zip,application/zip'
+			return `.zip,application/zip,${commonTypes}`
 		case 'datapack':
-			return '.zip,application/zip'
+			return `.zip,application/zip,${commonTypes}`
 		case 'modpack':
-			return '.mrpack,application/x-modrinth-modpack+zip,application/zip'
+			return `.mrpack,application/x-modrinth-modpack+zip,application/zip,${commonTypes}`
 		default:
-			return '*'
+			// all of the above
+			return `.jar,.zip,.litemod,.mrpack,application/java-archive,application/x-java-archive,application/zip,application/x-modrinth-modpack+zip,${commonTypes}`
 	}
 }
 

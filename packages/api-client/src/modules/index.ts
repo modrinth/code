@@ -7,11 +7,13 @@ import { ArchonServersV0Module } from './archon/servers/v0'
 import { ArchonServersV1Module } from './archon/servers/v1'
 import { ISO3166Module } from './iso3166'
 import { KyrosFilesV0Module } from './kyros/files/v0'
+import { LabrinthVersionsV3Module } from './labrinth'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
 import { LabrinthStateModule } from './labrinth/state'
+import { LabrinthTechReviewInternalModule } from './labrinth/tech-review/internal'
 
 type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
 
@@ -37,6 +39,8 @@ export const MODULE_REGISTRY = {
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,
 	labrinth_state: LabrinthStateModule,
+	labrinth_tech_review_internal: LabrinthTechReviewInternalModule,
+	labrinth_versions_v3: LabrinthVersionsV3Module,
 } as const satisfies Record<string, ModuleConstructor>
 
 export type ModuleID = keyof typeof MODULE_REGISTRY

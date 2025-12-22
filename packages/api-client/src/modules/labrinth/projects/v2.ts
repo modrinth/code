@@ -68,7 +68,10 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 			api: 'labrinth',
 			version: 2,
 			method: 'GET',
-			params: params as Record<string, unknown>,
+			params: {
+				...params,
+				facets: params.facets ? JSON.stringify(params.facets) : undefined,
+			},
 		})
 	}
 

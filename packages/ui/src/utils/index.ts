@@ -1,3 +1,4 @@
+export * from './auto-icons'
 export * from './common-messages'
 export * from './file-extensions'
 export * from './game-modes'

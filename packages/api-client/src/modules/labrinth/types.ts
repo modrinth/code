@@ -13,7 +13,7 @@ export namespace Labrinth {
 				price_id: string
 				interval: PriceDuration
 				status: SubscriptionStatus
-				created: string // ISO datetime string
+				created: string
 				metadata?: SubscriptionMetadata
 			}
 
@@ -40,8 +40,8 @@ export namespace Labrinth {
 				amount: number
 				currency_code: string
 				status: ChargeStatus
-				due: string // ISO datetime string
-				last_attempt: string | null // ISO datetime string
+				due: string
+				last_attempt: string | null
 				type: ChargeType
 				subscription_id: string | null
 				subscription_interval: PriceDuration | null
@@ -172,6 +172,7 @@ export namespace Labrinth {
 				| 'shader'
 				| 'plugin'
 				| 'datapack'
+				| 'project'
 
 			export type GalleryImage = {
 				url: string
@@ -264,7 +265,7 @@ export namespace Labrinth {
 
 			export type ProjectSearchParams = {
 				query?: string
-				facets?: string[][]
+				facets?: string[][] // in the format of [["categories:forge"],["versions:1.17.1"]]
 				filters?: string
 				index?: 'relevance' | 'downloads' | 'follows' | 'newest' | 'updated'
 				offset?: number
@@ -336,6 +337,10 @@ export namespace Labrinth {
 				monetization_status: v2.MonetizationStatus
 				side_types_migration_review_status: 'reviewed' | 'pending'
 				environment?: Environment[]
+
+				/**
+				 * @deprecated Not recommended to use.
+				 **/
 				[key: string]: unknown
 			}
 
@@ -420,23 +425,38 @@ export namespace Labrinth {
 			}
 		}
 
+		// TODO: consolidate duplicated types between v2 and v3 versions
 		export namespace v3 {
-			export type VersionType = 'release' | 'beta' | 'alpha'
+			export interface Dependency {
+				dependency_type: Labrinth.Versions.v2.DependencyType
+				project_id?: string
+				file_name?: string
+				version_id?: string
+			}
 
-			export type VersionStatus =
-				| 'listed'
-				| 'archived'
-				| 'draft'
-				| 'unlisted'
-				| 'scheduled'
+			export interface GetProjectVersionsParams {
+				game_versions?: string[]
+				loaders?: string[]
+			}
+
+			export type VersionChannel = 'release' | 'beta' | 'alpha'
+
+			export type FileType =
+				| 'required-resource-pack'
+				| 'optional-resource-pack'
+				| 'sources-jar'
+				| 'dev-jar'
+				| 'javadoc-jar'
+				| 'signature'
 				| 'unknown'
 
-			export type DependencyType = 'required' | 'optional' | 'incompatible' | 'embedded'
+			export interface VersionFileHash {
+				sha512: string
+				sha1: string
+			}
 
-			export type FileType = 'required-resource-pack' | 'optional-resource-pack' | 'unknown'
-
-			export type VersionFile = {
-				hashes: Record<string, string>
+			interface VersionFile {
+				hashes: VersionFileHash
 				url: string
 				filename: string
 				primary: boolean
@@ -444,35 +464,77 @@ export namespace Labrinth {
 				file_type?: FileType
 			}
 
-			export type Dependency = {
-				version_id?: string
-				project_id?: string
-				file_name?: string
-				dependency_type: DependencyType
-			}
-
-			export type Version = {
+			export interface Version {
+				name: string
+				version_number: string
+				changelog?: string
+				dependencies: Dependency[]
+				game_versions: string[]
+				version_type: VersionChannel
+				loaders: string[]
+				featured: boolean
+				status: Labrinth.Versions.v2.VersionStatus
 				id: string
 				project_id: string
 				author_id: string
-				featured: boolean
-				name: string
-				version_number: string
-				project_types: string[]
-				games: string[]
-				changelog: string
 				date_published: string
 				downloads: number
-				version_type: VersionType
-				status: VersionStatus
-				requested_status?: VersionStatus | null
 				files: VersionFile[]
-				dependencies: Dependency[]
-				loaders: string[]
-				ordering?: number | null
-				game_versions?: string[]
+				environment?: Labrinth.Projects.v3.Environment
 				mrpack_loaders?: string[]
-				environment?: string
+			}
+
+			export interface DraftVersionFile {
+				fileType?: FileType
+				file: File
+			}
+
+			export type DraftVersion = Omit<
+				Labrinth.Versions.v3.CreateVersionRequest,
+				'file_parts' | 'primary_file' | 'file_types'
+			> & {
+				existing_files?: VersionFile[]
+				version_id?: string
+				environment?: Labrinth.Projects.v3.Environment
+			}
+
+			export interface CreateVersionRequest {
+				name: string
+				version_number: string
+				changelog: string
+				dependencies?: Array<{
+					version_id?: string
+					project_id?: string
+					file_name?: string
+					dependency_type: Labrinth.Versions.v2.DependencyType
+				}>
+				game_versions: string[]
+				version_type: 'release' | 'beta' | 'alpha'
+				loaders: string[]
+				featured?: boolean
+				status?: 'listed' | 'archived' | 'draft' | 'unlisted' | 'scheduled' | 'unknown'
+				requested_status?: 'listed' | 'archived' | 'draft' | 'unlisted' | null
+				project_id: string
+				file_parts: string[]
+				primary_file?: string
+				file_types?: Record<string, Labrinth.Versions.v3.FileType | null>
+				environment?: Labrinth.Projects.v3.Environment
+				mrpack_loaders?: string[]
+			}
+
+			export type ModifyVersionRequest = Partial<
+				Omit<CreateVersionRequest, 'project_id' | 'file_parts' | 'primary_file' | 'file_types'>
+			> & {
+				file_types?: {
+					algorithm: string
+					hash: string
+					file_type: Labrinth.Versions.v3.FileType | null
+				}[]
+			}
+
+			export type AddFilesToVersionRequest = {
+				file_parts: string[]
+				file_types?: Record<string, Labrinth.Versions.v3.FileType | null>
 			}
 		}
 	}
@@ -566,7 +628,7 @@ export namespace Labrinth {
 			export interface GameVersion {
 				version: string
 				version_type: string
-				date: string // RFC 3339 DateTime
+				date: string
 				major: boolean
 			}
 
@@ -659,6 +721,183 @@ export namespace Labrinth {
 			subdivisions: Record<string, ISO3166.Subdivision[]>
 
 			errors: unknown[]
+		}
+	}
+
+	export namespace TechReview {
+		export namespace Internal {
+			export type SearchProjectsRequest = {
+				limit?: number
+				page?: number
+				filter?: SearchProjectsFilter
+				sort_by?: SearchProjectsSort
+			}
+
+			export type SearchProjectsFilter = {
+				project_type?: string[]
+			}
+
+			export type SearchProjectsSort =
+				| 'created_asc'
+				| 'created_desc'
+				| 'severity_asc'
+				| 'severity_desc'
+
+			export type UpdateIssueRequest = {
+				verdict: 'safe' | 'unsafe'
+			}
+
+			export type SubmitProjectRequest = {
+				verdict: 'safe' | 'unsafe'
+				message?: string
+			}
+
+			export type SearchResponse = {
+				project_reports: ProjectReport[]
+				projects: Record<string, ProjectModerationInfo>
+				threads: Record<string, Thread>
+				ownership: Record<string, Ownership>
+			}
+
+			export type ProjectModerationInfo = {
+				id: string
+				thread_id: string
+				name: string
+				project_types: string[]
+				icon_url: string | null
+			} & Projects.v3.Project
+
+			export type ProjectReport = {
+				project_id: string
+				max_severity: DelphiSeverity | null
+				versions: VersionReport[]
+			}
+
+			export type VersionReport = {
+				version_id: string
+				files: FileReport[]
+			}
+
+			export type FileReport = {
+				report_id: string
+				file_id: string
+				created: string
+				flag_reason: FlagReason
+				severity: DelphiSeverity
+				file_name: string
+				file_size: number
+				download_url: string
+				issues: FileIssue[]
+			}
+
+			export type FileIssue = {
+				id: string
+				report_id: string
+				issue_type: string
+				details: ReportIssueDetail[]
+			}
+
+			export type ReportIssueDetail = {
+				id: string
+				issue_id: string
+				key: string
+				file_path: string
+				decompiled_source: string | null
+				data: Record<string, unknown>
+				severity: DelphiSeverity
+				status: DelphiReportIssueStatus
+			}
+
+			export type Ownership =
+				| {
+						kind: 'user'
+						id: string
+						name: string
+						icon_url?: string
+				  }
+				| {
+						kind: 'organization'
+						id: string
+						name: string
+						icon_url?: string
+				  }
+
+			export type DBThread = {
+				id: string
+				project_id?: string
+				report_id?: string
+				type_: ThreadType
+				messages: DBThreadMessage[]
+				members: string[]
+			}
+
+			export type DBThreadMessage = {
+				id: string
+				thread_id: string
+				author_id?: string
+				body: MessageBody
+				created: string
+				hide_identity: boolean
+			}
+
+			export type MessageBody =
+				| {
+						type: 'text'
+						body: string
+						private?: boolean
+						replying_to?: string
+						associated_images?: string[]
+				  }
+				| {
+						type: 'status_change'
+						new_status: Projects.v2.ProjectStatus
+						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'thread_closure'
+				  }
+				| {
+						type: 'thread_reopen'
+				  }
+				| {
+						type: 'deleted'
+						private?: boolean
+				  }
+
+			export type ThreadType = 'report' | 'project' | 'direct_message'
+
+			export type User = {
+				id: string
+				username: string
+				avatar_url: string
+				role: string
+				badges: number
+				created: string
+				bio?: string
+			}
+
+			export type ThreadMessage = {
+				id: string | null
+				author_id: string | null
+				body: MessageBody
+				created: string
+				hide_identity: boolean
+			}
+
+			export type Thread = {
+				id: string
+				type: ThreadType
+				project_id: string | null
+				report_id: string | null
+				messages: ThreadMessage[]
+				members: User[]
+			}
+
+			export type FlagReason = 'delphi'
+
+			export type DelphiSeverity = 'low' | 'medium' | 'high' | 'severe'
+
+			export type DelphiReportIssueStatus = 'pending' | 'safe' | 'unsafe'
 		}
 	}
 }

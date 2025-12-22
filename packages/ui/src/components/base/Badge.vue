@@ -69,6 +69,14 @@
 			<XIcon aria-hidden="true" /> {{ formatMessage(messages.closedLabel) }}
 		</template>
 
+		<!-- Technical review verdicts -->
+		<template v-else-if="type === 'safe'">
+			<ShieldCheckIcon aria-hidden="true" /> {{ formatMessage(messages.safeLabel) }}
+		</template>
+		<template v-else-if="type === 'unsafe'">
+			<BugIcon aria-hidden="true" /> {{ formatMessage(messages.unsafeLabel) }}
+		</template>
+
 		<!-- Other -->
 		<template v-else> <span class="circle" /> {{ capitalizeString(type) }} </template>
 	</span>
@@ -78,6 +86,7 @@
 import {
 	ArchiveIcon,
 	BoxIcon,
+	BugIcon,
 	CalendarIcon,
 	CheckIcon,
 	EyeOffIcon,
@@ -86,6 +95,7 @@ import {
 	LockIcon,
 	ModrinthIcon,
 	ScaleIcon,
+	ShieldCheckIcon,
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -153,6 +163,10 @@ const messages = defineMessages({
 		id: 'omorphia.component.badge.label.returned',
 		defaultMessage: 'Returned',
 	},
+	safeLabel: {
+		id: 'omorphia.component.badge.label.safe',
+		defaultMessage: 'Pass',
+	},
 	scheduledLabel: {
 		id: 'omorphia.component.badge.label.scheduled',
 		defaultMessage: 'Scheduled',
@@ -164,6 +178,10 @@ const messages = defineMessages({
 	unlistedLabel: {
 		id: 'omorphia.component.badge.label.unlisted',
 		defaultMessage: 'Unlisted',
+	},
+	unsafeLabel: {
+		id: 'omorphia.component.badge.label.unsafe',
+		defaultMessage: 'Fail',
 	},
 	withheldLabel: {
 		id: 'omorphia.component.badge.label.withheld',
@@ -204,6 +222,7 @@ defineProps<{
 	&.type--rejected,
 	&.type--returned,
 	&.type--failed,
+	&.type--unsafe,
 	&.red {
 		--badge-color: var(--color-red);
 	}
@@ -220,6 +239,7 @@ defineProps<{
 	&.type--admin,
 	&.type--processed,
 	&.type--approved-general,
+	&.type--safe,
 	&.green {
 		--badge-color: var(--color-green);
 	}
