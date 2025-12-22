@@ -1448,7 +1448,7 @@ try {
 			useBaseFetch(`project/${projectId.value}/dependencies`, {}),
 		),
 		useAsyncData(`project/${projectId.value}/version`, () =>
-			useBaseFetch(`project/${projectId.value}/version`, { apiVersion: 3 }),
+			useBaseFetch(`project/${projectId.value}/version`),
 		),
 		useAsyncData(`project/${projectId.value}/organization`, () =>
 			useBaseFetch(`project/${projectId.value}/organization`, { apiVersion: 3 }),

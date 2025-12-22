@@ -563,7 +563,7 @@
 				<div v-if="!isEditing && version.environment">
 					<h4>Environment</h4>
 					<span>
-						{{ ENVIRONMENTS_COPY[version.environment]?.title || version.environment }}
+						{{ environmentTitle }}
 					</span>
 				</div>
 				<div v-if="!isEditing">
@@ -824,6 +824,12 @@ export default defineNuxtComponent({
 			if (!version) {
 				version = props.versions.find((x) => x.displayUrlEnding === route.params.version)
 			}
+
+			const versionV3 = await useBaseFetch(
+				`project/${props.project.id}/version/${route.params.version}`,
+				{ apiVersion: 3 },
+			)
+			if (versionV3) version.environment = versionV3.environment
 		}
 
 		if (!version) {
@@ -938,6 +944,11 @@ export default defineNuxtComponent({
 			const order = ['required', 'optional', 'incompatible', 'embedded']
 			return [...this.version.dependencies].sort(
 				(a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type),
+			)
+		},
+		environmentTitle() {
+			return (
+				ENVIRONMENTS_COPY[this.version.environment]?.title || this.version.environment || 'Unknown'
 			)
 		},
 	},
