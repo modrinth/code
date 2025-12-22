@@ -1,7 +1,7 @@
 import { GlobeIcon } from '@modrinth/assets'
 
-import type { ButtonAction } from '../../types/actions'
-import type { Stage } from '../../types/stage'
+import type { ButtonAction } from '../../../types/actions'
+import type { Stage } from '../../../types/stage'
 
 const environment: Stage = {
 	title: "Is the project's environment information accurate?",
@@ -9,15 +9,9 @@ const environment: Stage = {
 	navigate: '/settings/environment',
 	icon: GlobeIcon,
 	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
-	text: async (project, projectV3) => {
-		if ((projectV3?.environment?.length ?? 0) === 1) {
-			return (await import('../messages/checklist-text/environment/environment.md?raw')).default
-		} else {
-			return (await import('../messages/checklist-text/environment/environment-multiple.md?raw'))
-				.default
-		}
-	},
-	shouldShow: () => true,
+	text: async () =>
+		(await import('../../messages/checklist-text/environment/environment.md?raw')).default,
+	shouldShow: (project, projectV3) => (projectV3?.environment?.length ?? 0) === 1,
 	actions: [
 		{
 			id: 'side_types_inaccurate',
@@ -27,7 +21,7 @@ const environment: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'low',
 			shouldShow: (project) => project.project_type === 'mod' || project.project_type === 'modpack',
-			message: async () => (await import('../messages/environment/inaccurate.md?raw')).default,
+			message: async () => (await import('../../messages/environment/inaccurate.md?raw')).default,
 		} as ButtonAction,
 	],
 }
