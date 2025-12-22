@@ -3,7 +3,7 @@
     "message": "Paphai"
   },
   "app-marketing.download.description": {
-    "message": "Magamit ang among desktop nga aplikasyon sa magkalahi-lahi nga pantawan, pamili sa imong giganahan nga bersiyon."
+    "message": "Magamit ang among desktop nga aplikasyon sa magkalahi-lahi nga pantawan, pamili sa imong giganahan nga hubad."
   },
   "app-marketing.download.download-appimage": {
     "message": "Karganugi ang AppImage"
@@ -21,7 +21,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "<issues-link>Ila nga naay suliranin</issues-link> ang Linux nga bersiyon sa Modrinth App sa pipila nga mga sistema ug paghan-ay. Kung dili lig-on ang Modrinth App sa imong sistema, gidasig ka namo sa pagsulay sa uban nga mga aplikasyon sama sa <prism-link>Prism Launcher</prism-link> aron mapadali ang pagtaod sa sulod nga Modrinth."
+    "message": "<issues-link>Ila nga naay suliranin</issues-link> ang Linux nga hubad sa Modrinth App sa pipila nga mga sistema ug paghan-ay. Kung dili lig-on ang Modrinth App sa imong sistema, gidasig ka namo sa pagsulay sa uban nga mga aplikasyon sama sa <prism-link>Prism Launcher</prism-link> aron mapadali ang pagtaod sa sulod nga Modrinth."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -30,7 +30,7 @@
     "message": "Mga kapilian sa pagkarganug"
   },
   "app-marketing.download.terms": {
-    "message": "Sa pagkarganug sa Modrinth App, gauyon ka sa among <terms-link>Mga Termino</terms-link> ug <privacy-link>Palisiya sa Pribasiya</privacy-link>."
+    "message": "Sa pagkarganug sa Modrinth App, gauyon ka sa among <terms-link>Mga Kahimtang</terms-link> ug <privacy-link>Palisiya sa Pribasiya</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Karganugi ang Modrinth App (Beta)"
@@ -56,11 +56,17 @@
   "app-marketing.features.mod-management.search-mods": {
     "message": "Mangita og mga kausaban"
   },
+  "app-marketing.features.mod-management.version": {
+    "message": "Hubad"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Bukas nga tinubdan"
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
   },
   "app-marketing.features.performance.infinite-mb": {
     "message": "∞ MB"
@@ -83,8 +89,14 @@
   "app-marketing.features.play.description": {
     "message": "Gamita ang Modrinth App sa pagkarganug ug pagdula sa imong paborito nga mga kausaban ug putos sa kausaban."
   },
+  "app-marketing.features.sharing.modpack": {
+    "message": "Putos sa kausaban"
+  },
   "app-marketing.features.sharing.share-button": {
     "message": "Pag-ambit"
+  },
+  "app-marketing.features.sharing.title": {
+    "message": "Pag-ambit og mga putos sa kausaban"
   },
   "app-marketing.hero.download-button": {
     "message": "Karganugi ang Modrinth App"
@@ -98,23 +110,71 @@
   "app-marketing.hero.more-download-options": {
     "message": "Dugang nga Kapilian sa Pagkarganug"
   },
+  "auth.authorize.action.decline": {
+    "message": "Balibari"
+  },
+  "auth.reset-password.method-choice.description": {
+    "message": "Ibutang sa ubos ang imong dagiwat ug padal-an ka namo ug katayan sa pagpasig-uli aron mabawi nimo ang imong kaakohan."
+  },
   "auth.reset-password.method-choice.email-username.placeholder": {
     "message": "Dagiwat"
   },
+  "auth.reset-password.notification.email-sent.text": {
+    "message": "Usa ka dagiwat sa panudlo ang gipadala sa imo kon kaniadto natipig ang dagiwat sa kaakohan nimo."
+  },
+  "auth.reset-password.notification.password-reset.text": {
+    "message": "Mahimo nga makalogin naka sa imong kaakohan gamit ang imong tinago nga pulong."
+  },
+  "auth.reset-password.post-challenge.description": {
+    "message": "Ibutang sa ubos ang imong bag-ong tinago nga pulong aron makasulod sa imong kaakohan."
+  },
   "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Nalimtan ang tinago nga pulong?</forgot-password-link> • <create-account-link>Paghimo ug akawnt</create-account-link>"
+    "message": "<forgot-password-link>Nalimtan ang tinago nga pulong?</forgot-password-link> • <create-account-link>Paghimo og kaakohan</create-account-link>"
+  },
+  "auth.sign-in.sign-in-with": {
+    "message": "Pag-sign-in gamit ang"
+  },
+  "auth.sign-in.title": {
+    "message": "Pag-sign-in"
+  },
+  "auth.sign-up.action.create-account": {
+    "message": "Paghimo og kaakohan"
   },
   "auth.sign-up.email.label": {
     "message": "Dagiwat"
   },
+  "auth.sign-up.legal-dislaimer": {
+    "message": "Sa paghimo og kaakohan, gauyon ka sa <terms-link>Mga Kahimtang</terms-link> ug <privacy-policy-link>Palisiya sa Pribasiya</privacy-policy-link> sa Modrinth."
+  },
+  "auth.sign-up.sign-in-option.title": {
+    "message": "Naa na kay kaakohan?"
+  },
+  "auth.sign-up.title": {
+    "message": "Pag-sign-up"
+  },
+  "auth.sign-up.title.create-account": {
+    "message": "Kun paghimo sa imong kaugalingong kaakohan"
+  },
+  "auth.sign-up.title.sign-up-with": {
+    "message": "Pag-sign-up gamit ang"
+  },
   "auth.verify-email.action.account-settings": {
-    "message": "Mga himutangan sa akawnt"
+    "message": "Mga himutangan sa kaakohan"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Pag-sign-in"
   },
   "auth.verify-email.post-verification.description": {
     "message": "Malampusong napamatud-an ang padal-anan sa imong dagiwat!"
   },
   "auth.welcome.description": {
-    "message": "Lakip na ka karon sa niining makapahingangha nga dakbalangay sama sa mga magbubuhat ug manunuhid nga pagtukod, pagkarganug, ug pagsunod sa kapanahonan sa mga makapahibulong nga mga kausaban."
+    "message": "Lakip na ka karon sa niining makapahinganghang dakbalangay sama sa mga magbubuhat ug manunuhid nga nagatukod, nagakarganug, ug nagasunod sa kapanahonan sa mga makapahibulong nga mga kausaban."
+  },
+  "auth.welcome.label.tos": {
+    "message": "Sa paghimo og kaakohan, mouyon na ka sa <terms-link>Mga Kahimtang</terms-link> ug <privacy-policy-link>Palisiya sa Pribasiya</privacy-policy-link> sa Modrinth."
+  },
+  "auth.welcome.title": {
+    "message": "Maayong Pag-abot"
   },
   "collection.button.edit-icon": {
     "message": "Usba ang amoy"
@@ -122,14 +182,17 @@
   "collection.button.remove-project": {
     "message": "Tangtangi ang proyekto"
   },
-  "collection.delete-modal.description": {
-    "message": "Hangtod sa kahangturan nga matangtang kining gitipon. Kini nga aksyon dili mabawi."
+  "collection.delete-modal.title": {
+    "message": "Segurado kang gusto nimong mapam-as kining gitigom?"
   },
   "collection.error.not-found": {
-    "message": "Dili makit-i ang tinigom"
+    "message": "Dili makit-i ang gitigom"
   },
-  "collection.label.owner": {
-    "message": "Tag-iya"
+  "collection.label.created-at": {
+    "message": "Gihimo {ago}"
+  },
+  "collection.label.updated-at": {
+    "message": "Gipasibo {ago}"
   },
   "common.no": {
     "message": "Hindi"
@@ -143,11 +206,20 @@
   "create.collection.name-label": {
     "message": "Ngalan"
   },
+  "create.collection.summary-label": {
+    "message": "Kalangkoban"
+  },
+  "create.limit-alert.type-project": {
+    "message": "proyekto"
+  },
   "create.organization.cancel": {
     "message": "Paphai"
   },
   "create.organization.name-label": {
     "message": "Ngalan"
+  },
+  "create.organization.summary-label": {
+    "message": "Kalangkoban"
   },
   "create.organization.url-label": {
     "message": "URL"
@@ -158,14 +230,23 @@
   "create.project.name-label": {
     "message": "Ngalan"
   },
+  "create.project.summary-label": {
+    "message": "Kalangkoban"
+  },
   "create.project.url-label": {
     "message": "URL"
+  },
+  "create.project.visibility-private": {
+    "message": "Pribado"
   },
   "create.project.visibility-public": {
     "message": "Publiko"
   },
   "create.project.visibility-unlisted": {
     "message": "Wala malista"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Bakwia"
   },
   "dashboard.collections.label.search-input": {
     "message": "Mangita sa imong mga gitigom"
@@ -179,6 +260,99 @@
   "dashboard.creator-tax-form-modal.entity.question": {
     "message": "Usa ka ba nga pribado nga indibidwal o uban sa usa ka langyaw nga entidad?"
   },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Kinuti"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "Kantidad"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Pasingil"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-text": {
+    "message": "Dili makapangita og mga magamit nga pamaagi sa pagbayad. Palihug sa pagsulay usab unya."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.error-title": {
+    "message": "Napakyas ang pagkarga sa mga pamaagi sa pagbayad"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Bungto"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "Tag-iya sa kaakohan"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "Kunyo"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "Kaakohan"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "Bugtoi ang kaakohan"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "Pamaagi sa pagbayad"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "Kaakohan sa PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Kutayi ang imong kaakohan sa PayPal aron lakdorang makadawat sa bayad."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-button": {
+    "message": "Pagtipig"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.saved-button": {
+    "message": "Natipig"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Pag-sign-in gamit ang PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@ngalansatiggamit"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Pamaagi"
+  },
+  "dashboard.creator-withdraw-modal.stage.muralpay-details": {
+    "message": "Kinuti sa Kaakohan"
+  },
+  "dashboard.creator-withdraw-modal.stage.tremendous-details": {
+    "message": "Kinuti"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Pamaagi sa pagbayad"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Ganti"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Mga Ganti"
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "Kaakohan"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "Kantidad"
+  },
+  "dashboard.withdraw.completion.close-button": {
+    "message": "Tak-opi"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Petsa"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "Singil"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "Pamaagi"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "Pitaka"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Dili matinuod ang imong gihatag nga kinuti sa kaakohan. Mahimong pamatud-i sa ang imong kasayoran."
+  },
   "error.collection.404.list_title": {
     "message": "Ngano?"
   },
@@ -191,11 +365,20 @@
   "error.project.404.list_title": {
     "message": "Ngano?"
   },
+  "error.user.404.list_item.2": {
+    "message": "Mahimong naglahi og ngalan o gitangtang sa tag-iya ang ilang kaakohan."
+  },
+  "error.user.404.list_item.3": {
+    "message": "Mahimong girawot ang kaakohan niya tungod sa paglabag sa <tou-link>Mga Kahimtang sa Paggamit</tou-link> sa Modrinth."
+  },
   "error.user.404.list_title": {
     "message": "Ngano?"
   },
   "frog.altText": {
     "message": "Usa ka matinuod nga pamintal sa labirintong palaka"
+  },
+  "frog.sinceOpened": {
+    "message": "Giablihan ang panid {ago}"
   },
   "frog.title": {
     "message": "Baki"
@@ -210,19 +393,37 @@
     "message": "Makadawat og detalyado nga pagtaho sa mga paglantaw og panid, ihap sa pagkarganug, ug kinitaan"
   },
   "landing.feature.launcher.description": {
-    "message": "Ang bukas nga tinubdan nga API sa Modrinth nagtugot sa mga tiglansad nga makadugang sa lawom nga panagsama sa Modrinth. Mahimo nimong magamit ang Modrinth pinaagi sa <link>among aplikasyon</link> ug sa pipila nga labing inila nga mga tiglansad sama sa ATLauncher, MultiMC, ug Prism Launcher."
+    "message": "Ang bukas nga tinubdan nga API sa Modrinth nagtugot sa mga tiglunsad nga makadugang sa lawom nga panagsama sa Modrinth. Mahimo nimong magamit ang Modrinth pinaagi sa <link>among aplikasyon</link> ug sa pipila nga labing inila nga mga tiglunsad sama sa ATLauncher, MultiMC, ug Prism Launcher."
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "Dapit alang sa Minecraft nga {content}"
   },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "mga putos sa kalap"
+  },
+  "landing.heading.the-place-for-minecraft.modpacks": {
+    "message": "mga putos sa kausaban"
+  },
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "mga kausaban"
+  },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "mga pagsukip"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
     "message": "mga putos sa kahinguhaan"
   },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "mga magsisilbi"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "mga tigpandong"
+  },
   "landing.notifications.has-been-updated": {
     "message": "Napasibo ang {title}!"
+  },
+  "landing.notifications.version-released": {
+    "message": "Gimantala alang sa {gameVersion} ang hubad nga {version}"
   },
   "landing.search.label": {
     "message": "Mangita"
@@ -237,19 +438,16 @@
     "message": "Pagkaplag, pagdula, ug pagbahin og mga Minecraft nga kontento sa among bukas nga tinubdan nga pantawan nga gihimo alang sa dakbalangay."
   },
   "layout.action.create-new": {
-    "message": "Pagbuhat og bag-o..."
-  },
-  "layout.action.reports": {
-    "message": "Mga pagtaho"
+    "message": "Paghimo og bag-o..."
   },
   "layout.banner.account-action": {
-    "message": "Gakinahanglan og akawnt"
+    "message": "Gakinahanglan og kaakohan"
   },
   "layout.banner.add-email.button": {
-    "message": "Duawi ang mga himutangan sa akawnt"
+    "message": "Duawi ang mga himutangan sa kaakohan"
   },
   "layout.banner.add-email.description": {
-    "message": "Tungod sa mga hinungdan sa kahilwasan, manginahanglan ang Modrinth nga morehistro ka og padad-anan sa dagiwat sa imong akawnt."
+    "message": "Tungod sa mga hinungdan sa kahilwasan, manginahanglan ang Modrinth nga morehistro ka og padad-anan sa dagiwat sa imong kaakohan."
   },
   "layout.banner.build-fail.description": {
     "message": "Napakyas sa pagmugna og kahimtang gikan sa API kining pagkatap sa frontend sa Modrinth. Basin tungod sa pagkabalda o sayop sa paghan-ay. Paggama pag-usab kon magamit na ang API. Mga kalagdaan sa sayop: {errors}; Ang kasamtangan nga URL sa API: {url}"
@@ -257,8 +455,11 @@
   "layout.banner.build-fail.title": {
     "message": "Naay sayup sa pagmugna sa kahimtang gikan sa API samtang naggama."
   },
+  "layout.banner.subscription-payment-failed.description": {
+    "message": "Naay mga suskripsiyong napakyas sa paglab-as. Palihug sa pagpasibo sa imong pamaagi sa pagbayad aron dili mawala ang agi!"
+  },
   "layout.banner.verify-email.description": {
-    "message": "Tungod sa mga hinungdan sa kahilwasan, manginahanglan ang Modrinth nga mapamatud-an ang padad-anan sa dagiwat sa imong akawnt."
+    "message": "Tungod sa mga hinungdan sa kahilwasan, manginahanglan ang Modrinth nga mapamatud-an ang padad-anan sa dagiwat sa imong kaakohan."
   },
   "layout.footer.about": {
     "message": "Mahitungod"
@@ -311,9 +512,6 @@
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
-  "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
-  },
   "layout.footer.resources": {
     "message": "Mga Kahinguhaan"
   },
@@ -345,13 +543,16 @@
     "message": "X"
   },
   "layout.meta.description": {
-    "message": "Pagkarganug ug mga pagbag-o, pagsukip, putos sa lawsayod, tigpandong, putos sa kahinguhaan, ug putos sa pagbag-o sa Modrinth. Pagdiskobre ug pagmantala ug mga proyekto sa Modrinth nga adunay moderno, sayon gamiton nga dunggoanan ug API."
+    "message": "Pagkarganug ug mga pagbag-o, pagsukip, putos sa kalap, tigpandong, putos sa kahinguhaan, ug putos sa pagbag-o sa Modrinth. Pagdiskobre ug pagmantala og mga proyekto sa Modrinth nga adunay moderno, sayon gamiton nga dunggoanan ug API."
   },
   "layout.nav.home": {
     "message": "Puloy-anan"
   },
   "layout.nav.search": {
     "message": "Mangita"
+  },
+  "moderation.filter.by": {
+    "message": "Salaa pinaagi sa"
   },
   "moderation.page.projects": {
     "message": "Mga Proyekto"
@@ -365,6 +566,120 @@
   "moderation.search.placeholder": {
     "message": "Mangita..."
   },
+  "muralpay.country.at": {
+    "message": "Ostriya"
+  },
+  "muralpay.country.be": {
+    "message": "Belhika"
+  },
+  "muralpay.country.cy": {
+    "message": "Tsipre"
+  },
+  "muralpay.country.de": {
+    "message": "Alemanya"
+  },
+  "muralpay.country.ee": {
+    "message": "Estoniya"
+  },
+  "muralpay.country.es": {
+    "message": "Espanya"
+  },
+  "muralpay.country.fi": {
+    "message": "Pinlandya"
+  },
+  "muralpay.country.fr": {
+    "message": "Pransiya"
+  },
+  "muralpay.country.gr": {
+    "message": "Gresya"
+  },
+  "muralpay.country.ie": {
+    "message": "Irlanda"
+  },
+  "muralpay.country.it": {
+    "message": "Italya"
+  },
+  "muralpay.country.lt": {
+    "message": "Litwanya"
+  },
+  "muralpay.country.lu": {
+    "message": "Luksemburgo"
+  },
+  "muralpay.country.lv": {
+    "message": "Latwiya"
+  },
+  "muralpay.country.mt": {
+    "message": "Malta"
+  },
+  "muralpay.country.nl": {
+    "message": "Olandres"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugal"
+  },
+  "muralpay.country.sk": {
+    "message": "Eslobakya"
+  },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
+  "muralpay.document-type.tax-id": {
+    "message": "Tigpaila sa Buhis"
+  },
+  "muralpay.field.account-number": {
+    "message": "Numero sa kaakohan"
+  },
+  "muralpay.field.account-number-cbu-cvu": {
+    "message": "Numero sa kaakohan (CBU/CVU)"
+  },
+  "muralpay.field.account-number-cci": {
+    "message": "Numero sa kaakohan (CCI)"
+  },
+  "muralpay.field.account-number-type": {
+    "message": "Matang sa numero sa kaakohan"
+  },
+  "muralpay.field.account-type": {
+    "message": "Matang sa kaakohan"
+  },
+  "muralpay.field.bank-account-number": {
+    "message": "Numero sa kaakohan"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "Nasod"
+  },
+  "muralpay.field.iban": {
+    "message": "IBAN"
+  },
+  "muralpay.help.clabe": {
+    "message": "Clave Bancaria Estandarizada (Numero sa kaakohan sa Mehikong bangko)"
+  },
+  "muralpay.help.iban": {
+    "message": "Numero sa Kaakohan sa Internasyonal nga Bangko"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Kaakohan sa bangko"
+  },
+  "muralpay.pix-type.email": {
+    "message": "Dagiwat"
+  },
+  "muralpay.placeholder.account-number": {
+    "message": "Ibutang ang numero sa kaakohan"
+  },
+  "muralpay.placeholder.enter-account-number": {
+    "message": "Ibutang ang numero sa kaakohan"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
   "profile.bio.fallback.creator": {
     "message": "Usa ka magbubuhat sa Modrinth."
   },
@@ -374,8 +689,14 @@
   "profile.details.label.email": {
     "message": "Dagiwat"
   },
+  "profile.details.label.payment-methods": {
+    "message": "Mga pamaagi sa pagbayad"
+  },
   "profile.label.badges": {
     "message": "Tsapa"
+  },
+  "profile.label.details": {
+    "message": "Kinuti"
   },
   "profile.label.joined": {
     "message": "Miapil"
@@ -395,14 +716,23 @@
   "project-member-header.accept": {
     "message": "Dawati"
   },
+  "project-member-header.decline": {
+    "message": "Balibari"
+  },
   "project-member-header.error": {
     "message": "Kasaypanan"
   },
+  "project-type.collection.plural": {
+    "message": "Mga Gitigom"
+  },
+  "project-type.collection.singular": {
+    "message": "Gitigom"
+  },
   "project-type.datapack.plural": {
-    "message": "Mga Putos sa Lawsayod"
+    "message": "Mga Putos sa Kalap"
   },
   "project-type.datapack.singular": {
-    "message": "Putos sa Lawsayod"
+    "message": "Putos sa Kalap"
   },
   "project-type.mod.plural": {
     "message": "Mga Kausaban"
@@ -410,14 +740,32 @@
   "project-type.mod.singular": {
     "message": "Kausaban"
   },
+  "project-type.modpack.plural": {
+    "message": "Mga Putos sa Kausaban"
+  },
+  "project-type.modpack.singular": {
+    "message": "Putos sa Pagbag-o"
+  },
+  "project-type.plugin.plural": {
+    "message": "Mga Pagsukip"
+  },
   "project-type.plugin.singular": {
     "message": "Pagsukip"
+  },
+  "project-type.project.plural": {
+    "message": "Mga Proyekto"
+  },
+  "project-type.project.singular": {
+    "message": "Proyekto"
   },
   "project-type.resourcepack.plural": {
     "message": "Mga Putos sa Kahinguhaan"
   },
   "project-type.resourcepack.singular": {
     "message": "Putos sa Kahinguhaan"
+  },
+  "project-type.shader.plural": {
+    "message": "Mga Tigpandong"
   },
   "project-type.shader.singular": {
     "message": "Tigpandong"
@@ -426,7 +774,7 @@
     "message": "Nasibo {date}"
   },
   "project.download.game-version": {
-    "message": "Bersiyon sa dula: {version}"
+    "message": "Hubad sa dula: {version}"
   },
   "project.download.install-with-app": {
     "message": "Itaud gamit ang Modrint App"
@@ -438,16 +786,16 @@
     "message": "Pantawan: {platform}"
   },
   "project.download.search-game-versions": {
-    "message": "Mangita og mga bersiyon sa dula..."
+    "message": "Mangita og mga hubad sa dula..."
   },
   "project.download.select-game-version": {
-    "message": "Pilia tanang bersiyon sa dula"
+    "message": "Pilia tanang hubad sa dula"
   },
   "project.download.select-platform": {
     "message": "Pamili og pantawan"
   },
   "project.download.show-all-versions": {
-    "message": "Ipakita ang tanang bersiyon"
+    "message": "Ipakita ang tanang hubad"
   },
   "project.download.title": {
     "message": "Karganugi ang {title}"
@@ -497,21 +845,6 @@
   "scopes.performAnalytics.description": {
     "message": "Buhata ang mga kalihokan sa matukibon"
   },
-  "servers.backups.item.lock": {
-    "message": "Pagtrangka"
-  },
-  "servers.backups.item.locked": {
-    "message": "Nagtrangka"
-  },
-  "servers.backups.item.rename": {
-    "message": "Ilisdi ang ngalan"
-  },
-  "servers.backups.item.retry": {
-    "message": "Sulayi pag-usab"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Yabihan"
-  },
   "servers.notice.actions": {
     "message": "Mga Kalihokan"
   },
@@ -533,6 +866,24 @@
   "servers.plan.small.name": {
     "message": "Gagmay"
   },
+  "settings.billing.modal.delete.action": {
+    "message": "Tangtangi kining pamaagi sa pagbayad"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "Malungtaron niini tangtangon kining pamaagi sa pagbayad (hangtod sa kataposan sa panahon)."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Segurado kang gusto nimong matangtang kining pamaagi sa pagbayad?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Pagdugang og pamaagi sa pagbayad"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "Wala pa ka modugang og maskin usa ka pamaagi sa pagbayad."
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Mga pamaagi sa pagbayad"
+  },
   "settings.billing.payment_method_type.eftpos": {
     "message": "EFTPOS"
   },
@@ -552,19 +903,34 @@
     "message": "Magpagana o di-magpagana og tino nga mga panagway sa imong himan."
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Panid sa Mga Putos sa Lawsayod"
+    "message": "Panid sa Mga Putos sa Kalap"
   },
   "settings.display.project-list-layouts.description": {
     "message": "Pamili og imong gigusto nga paghan-ay alang sa matag panid nga mopakita sa mga listahan sa proyekto sa imong himan."
   },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Panid sa Mga Kausaban"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Panid sa Mga Putos sa Kausaban"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Panid sa Mga Pagsukip"
+  },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Panid sa Mga Putos sa Kahinguhaan"
   },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Panid sa Mga Tigpandong"
+  },
   "settings.display.project-list-layouts.title": {
-    "message": "Mga paghan-ay sa listahan sa proyekto"
+    "message": "Mga paghan-ay sa talaan sa proyekto"
   },
   "settings.display.theme.description": {
-    "message": "Pamili og imong gigusto nga hiligotanong kulay alang sa Modrinth sa kini nga himan."
+    "message": "Pamili og imong gigusto nga hilisgotanong kolor alang sa Modrinth sa kini nga himan."
+  },
+  "settings.display.theme.title": {
+    "message": "Hilisgotanong Kolor"
   },
   "settings.language.languages.search-field.placeholder": {
     "message": "Mangita og pinulongan..."
@@ -572,14 +938,23 @@
   "settings.pats.modal.create.name.label": {
     "message": "Ngalan"
   },
+  "settings.pats.token.expired-ago": {
+    "message": "Nahupas {ago}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Gigamit kaniadto {ago}"
+  },
   "settings.profile.bio.title": {
     "message": "Kagibuhi"
   },
   "settings.profile.profile-picture.reset": {
     "message": "Pag-usab"
   },
+  "settings.sessions.created-ago": {
+    "message": "Gihimo {ago}"
+  },
   "settings.sessions.description": {
-    "message": "Ania dini tanan ang mga himan nga karon nakalog-in sa imong akawnt sa Modrinth. Mahimo kang maglog-out sa matag usa.\n\nKung makakita ka og usa nga dili nimo mailhan, paglog-out sa maong himan ug usba dayon ang tinago nga pulong sa imong akawnt sa Modrinth."
+    "message": "Ania dini tanan ang mga himan nga karon nakalog-in sa imong kaakohan sa Modrinth. Mahimo kang maglog-out sa matag usa.\n\nKung makakita ka og usa nga dili nimo mailhan, paglog-out sa maong himan ug usba dayon ang tinago nga pulong sa imong kaakohan sa Modrinth."
   },
   "settings.sessions.unknown-os": {
     "message": "Diinilang OS"

@@ -107,9 +107,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selectează rezoluția corectă"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Selectează medii"
-  },
   "nags.select-license.title": {
     "defaultMessage": "Selectează o licență"
   },
@@ -121,9 +118,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Vizitează setările descrierii"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Vizitează setările mediului"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Vizitează setările licenței"

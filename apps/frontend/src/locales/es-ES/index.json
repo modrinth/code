@@ -365,9 +365,6 @@
   "auth.welcome.title": {
     "message": "Bienvenido"
   },
-  "collection.button.delete-icon": {
-    "message": "Eliminar icono"
-  },
   "collection.button.edit-icon": {
     "message": "Editar icono"
   },
@@ -376,9 +373,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "Dejar de seguir proyecto"
-  },
-  "collection.delete-modal.description": {
-    "message": "Esto eliminará esta colección para siempre. Esta acción no se puede revertir."
   },
   "collection.delete-modal.title": {
     "message": "¿Seguro que quieres eliminar esta colección?"
@@ -392,26 +386,11 @@
   "collection.error.not-found": {
     "message": "Colección no encontrada"
   },
-  "collection.label.collection": {
-    "message": "Colección"
-  },
   "collection.label.created-at": {
     "message": "Creado hace {ago}"
   },
   "collection.label.curated-by": {
     "message": "Mantenida por"
-  },
-  "collection.label.no-projects": {
-    "message": "¡Esta colección está vacía!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "No tienes proyectos subidos. ¿Te interesaría <create-link>añadir alguno</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Propietario"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural, one {<stat>{count}</stat> proyecto} other {<stat>{count}</stat> proyectos}}"
   },
   "collection.label.updated-at": {
     "message": "Actualizado hace {ago}"
@@ -971,12 +950,6 @@
   "layout.action.new-project": {
     "message": "Nuevo proyecto"
   },
-  "layout.action.reports": {
-    "message": "Informes"
-  },
-  "layout.action.review-projects": {
-    "message": "Revisar proyectos"
-  },
   "layout.avatar.alt": {
     "message": "Tu avatar"
   },
@@ -1090,9 +1063,6 @@
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
-  },
-  "layout.footer.products.servers": {
-    "message": "Servidores Modrinth"
   },
   "layout.footer.resources": {
     "message": "Recursos"
@@ -1210,9 +1180,6 @@
   },
   "moderation.sort.by": {
     "message": "Ordenar por"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Buscar reseñas tecnológicas..."
   },
   "muralpay.account-type.savings": {
     "message": "Guardando"
@@ -1532,9 +1499,6 @@
   "project.actions.review-project": {
     "message": "Revisar proyecto"
   },
-  "project.actions.servers-promo.description": {
-    "message": "¡Modrinth Servers es la forma más fácil de jugar con tus amigos sin complicaciones!"
-  },
   "project.actions.servers-promo.pricing": {
     "message": "A partir de {price}<small> / mes</small>"
   },
@@ -1711,12 +1675,6 @@
   },
   "project.settings.visit-dashboard": {
     "message": "Visita el panel de proyectos"
-  },
-  "project.version.all-versions": {
-    "message": "Todas las versiones"
-  },
-  "project.version.back-to-versions": {
-    "message": "Volver a las versiones"
   },
   "project.versions.title": {
     "message": "Versiones"
@@ -2042,47 +2000,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Copia de seguridad en curso"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauración de copia de seguridad en curso"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatizado"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Creando copia de seguridad..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "Error al crear la copia de seguridad"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Error al restaurar desde la copia de seguridad"
-  },
-  "servers.backups.item.lock": {
-    "message": "Bloquear"
-  },
-  "servers.backups.item.locked": {
-    "message": "Bloqueado"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "En cola para la copia de seguridad"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renombrar"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurar"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restaurando desde la copia de seguridad..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Reintentar"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Desbloquear"
   },
   "servers.notice.actions": {
     "message": "Acciones"

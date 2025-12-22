@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Les serveurs d'authentification de Minecraft sont peut-être actuellement hors ligne. Vérifiez votre connexion Internet et essayez à nouveau dans quelques instants."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Impossible de contacter les serveurs d'authentification"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Mode développeur activé."
   },

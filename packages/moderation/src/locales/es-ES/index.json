@@ -107,9 +107,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecciona la resolución correcta"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Seleccionar entornos"
-  },
   "nags.select-license.title": {
     "defaultMessage": "Seleccionar una licencia"
   },
@@ -121,9 +118,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Visitar la configuración de la descripción"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Visitar la configuración del entorno"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Visitar la configuración de la licencia"

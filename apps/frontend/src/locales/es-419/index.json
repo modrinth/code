@@ -365,9 +365,6 @@
   "auth.welcome.title": {
     "message": "Bienvenido"
   },
-  "collection.button.delete-icon": {
-    "message": "Eliminar ícono"
-  },
   "collection.button.edit-icon": {
     "message": "Editar ícono"
   },
@@ -376,9 +373,6 @@
   },
   "collection.button.unfollow-project": {
     "message": "Dejar de seguir proyecto"
-  },
-  "collection.delete-modal.description": {
-    "message": "Esto eliminará esta colección para siempre. Esta acción no se puede deshacer."
   },
   "collection.delete-modal.title": {
     "message": "¿Estás seguro de que quieres eliminar esta colección?"
@@ -392,26 +386,11 @@
   "collection.error.not-found": {
     "message": "Colección no encontrada"
   },
-  "collection.label.collection": {
-    "message": "Colección"
-  },
   "collection.label.created-at": {
     "message": "Creado hace {ago}"
   },
   "collection.label.curated-by": {
     "message": "Seleccionado por"
-  },
-  "collection.label.no-projects": {
-    "message": "¡Esta colección no tiene proyectos!"
-  },
-  "collection.label.no-projects-auth": {
-    "message": "No tienes ningún proyecto.\n¿Quieres <create-link>añadir uno</create-link>?"
-  },
-  "collection.label.owner": {
-    "message": "Propietario"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural,one {<stat>{count}</stat> proyecto} other {<stat>{count}</stat> proyectos}}"
   },
   "collection.label.updated-at": {
     "message": "Actualizado hace {ago}"
@@ -1235,12 +1214,6 @@
   "layout.action.new-project": {
     "message": "Nuevo proyecto"
   },
-  "layout.action.reports": {
-    "message": "Reportes"
-  },
-  "layout.action.review-projects": {
-    "message": "Revisar proyectos"
-  },
   "layout.avatar.alt": {
     "message": "Tu avatar"
   },
@@ -1356,7 +1329,7 @@
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth Servers"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "Recursos"
@@ -1477,9 +1450,6 @@
   },
   "moderation.sort.by": {
     "message": "Ordenar por"
-  },
-  "moderation.technical.search.placeholder": {
-    "message": "Buscar revisiones técnicas..."
   },
   "muralpay.account-type.checking": {
     "message": "Cuenta de cheques"
@@ -1992,7 +1962,7 @@
     "message": "Revisar proyecto"
   },
   "project.actions.servers-promo.description": {
-    "message": "¡Modrinth Servers es la forma más fácil de jugar con tus amigos sin complicaciones!"
+    "message": "¡Modrinth Hosting es la forma más fácil de jugar con tus amigos sin complicaciones!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "Desde {price}<small> / mes</small>"
@@ -2209,12 +2179,6 @@
   },
   "project.status.archived.message": {
     "message": "{title} se ha archivado. {title} no recibirá más actualizaciones hasta que el autor decida desarchivar el proyecto."
-  },
-  "project.version.all-versions": {
-    "message": "Todas las versiones"
-  },
-  "project.version.back-to-versions": {
-    "message": "Volver a versiones"
   },
   "project.versions.title": {
     "message": "Versiones"
@@ -2549,47 +2513,8 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
-  "servers.backup.create.in-progress.tooltip": {
-    "message": "Creación de respaldo en curso"
-  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Restauración del respaldo en curso"
-  },
-  "servers.backups.item.automated": {
-    "message": "Automatizado"
-  },
-  "servers.backups.item.creating-backup": {
-    "message": "Creando respaldo..."
-  },
-  "servers.backups.item.failed-to-create-backup": {
-    "message": "No se pudo crear el respaldo"
-  },
-  "servers.backups.item.failed-to-restore-backup": {
-    "message": "Error al restaurar desde el respaldo"
-  },
-  "servers.backups.item.lock": {
-    "message": "Bloquear"
-  },
-  "servers.backups.item.locked": {
-    "message": "Bloqueado"
-  },
-  "servers.backups.item.queued-for-backup": {
-    "message": "En cola para respaldo"
-  },
-  "servers.backups.item.rename": {
-    "message": "Renombrar"
-  },
-  "servers.backups.item.restore": {
-    "message": "Restaurar"
-  },
-  "servers.backups.item.restoring-backup": {
-    "message": "Restaurando desde el respaldo..."
-  },
-  "servers.backups.item.retry": {
-    "message": "Reintentar"
-  },
-  "servers.backups.item.unlock": {
-    "message": "Desbloquear"
   },
   "servers.notice.actions": {
     "message": "Acciones"

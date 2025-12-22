@@ -2,6 +2,9 @@
   "badge.beta": {
     "defaultMessage": "Beta"
   },
+  "badge.beta-release": {
+    "defaultMessage": "Lathalang Beta"
+  },
   "badge.new": {
     "defaultMessage": "Bago"
   },
@@ -41,6 +44,9 @@
   "button.follow": {
     "defaultMessage": "Sundan"
   },
+  "button.max": {
+    "defaultMessage": "Higdulan"
+  },
   "button.next": {
     "defaultMessage": "Susunod"
   },
@@ -75,10 +81,13 @@
     "defaultMessage": "Iniimbak"
   },
   "button.sign-in": {
-    "defaultMessage": "Magsignin"
+    "defaultMessage": "Mag-sign-in"
   },
   "button.sign-out": {
-    "defaultMessage": "Magsignout"
+    "defaultMessage": "Mag-sign-out"
+  },
+  "button.sign-up": {
+    "defaultMessage": "Mag-sign-up"
   },
   "button.stop": {
     "defaultMessage": "Maghinto"
@@ -95,14 +104,23 @@
   "changelog.product.app": {
     "defaultMessage": "App"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "Mga pansilbi"
-  },
   "changelog.product.web": {
     "defaultMessage": "Pahinarya"
   },
   "collection.label.private": {
     "defaultMessage": "Pribado"
+  },
+  "form.label.amount": {
+    "defaultMessage": "Halaga"
+  },
+  "form.label.city": {
+    "defaultMessage": "Lungsod"
+  },
+  "form.label.country": {
+    "defaultMessage": "Bansa"
+  },
+  "form.label.email": {
+    "defaultMessage": "Dagisulat"
   },
   "icon-select.edit": {
     "defaultMessage": "Baguhin ang lambana"
@@ -212,6 +230,12 @@
   "label.visit-your-profile": {
     "defaultMessage": "Bisitahin ang iyong profile"
   },
+  "modal.add-payment-method.action": {
+    "defaultMessage": "Magdagdag ng paraan ng pagbabayad"
+  },
+  "modal.add-payment-method.title": {
+    "defaultMessage": "Nagdaragdag ng paraan ng pagbabayad"
+  },
   "omorphia.component.badge.label.accepted": {
     "defaultMessage": "Tinanggap"
   },
@@ -320,6 +344,12 @@
   "omorphia.component.purchase_modal.payment_method_type.visa": {
     "defaultMessage": "Visa"
   },
+  "payment-method.charity": {
+    "defaultMessage": "Kawanggawa"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
   "project-type.all": {
     "defaultMessage": "Lahat"
   },
@@ -332,8 +362,50 @@
   "project-type.datapack.lowercase": {
     "defaultMessage": "{count, plural, one {balot ng malak} other {mga balot ng malak}}"
   },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Pambago} other {Mga Pambago}}"
+  },
   "project-type.mod.category": {
     "defaultMessage": "Mga Pambago"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {pambago} other {mga pambago}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Balot ng Pambago} other {Mga Balot ng Pambago}}"
+  },
+  "project-type.modpack.category": {
+    "defaultMessage": "Mga Balot ng Pambago"
+  },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {balot ng pambago} other {mga balot ng pambago}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Pansaksak} other {Mga Pansaksak}}"
+  },
+  "project-type.plugin.category": {
+    "defaultMessage": "Mga Pansaksak"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {pansaksak} other {mga pansaksak}}"
+  },
+  "project-type.resourcepack.capital": {
+    "defaultMessage": "{count, plural, one {Balot ng Mapagkukunan} other {Mga Balot ng Mapagkukunan}}"
+  },
+  "project-type.resourcepack.category": {
+    "defaultMessage": "Mga Balot ng Mapagkukunan"
+  },
+  "project-type.resourcepack.lowercase": {
+    "defaultMessage": "{count, plural, one {balot ng mapagkukunan} other {mga balot ng mapagkukunan}}"
+  },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Panlilom} other {Mga Panlilom}}"
+  },
+  "project-type.shader.category": {
+    "defaultMessage": "Mga Panlilom"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {panlilom} other {mga panlilom}}"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Pang-isahang laro"
@@ -356,6 +428,9 @@
   "project.about.details.published": {
     "defaultMessage": "Inilathala {date}"
   },
+  "project.about.details.title": {
+    "defaultMessage": "Kuntil-Butil"
+  },
   "project.about.details.updated": {
     "defaultMessage": "Naisapanahon {date}"
   },
@@ -372,13 +447,16 @@
     "defaultMessage": "Gagana rin sa pang-isahang laro"
   },
   "project.settings.environment.singleplayer.description": {
-    "defaultMessage": "Gagana lamang sa Pang-isahang laro o kung hindi nakakonekta sa isang pansilbing Pangmaramihang laro."
+    "defaultMessage": "Gagana lamang sa Pang-isahang laro o kung hindi nakahugpong sa isang pansilbing Pangmaramihang laro."
   },
   "project.settings.environment.singleplayer.title": {
     "defaultMessage": "Pang-isahang laro lamang"
   },
   "project.settings.environment.title": {
     "defaultMessage": "Kapaligiran"
+  },
+  "project.settings.gallery.title": {
+    "defaultMessage": "Tanghalan"
   },
   "project.settings.general.title": {
     "defaultMessage": "Pangkalahatan"
@@ -437,6 +515,9 @@
   "search.filter_type.environment": {
     "defaultMessage": "Kapaligiran"
   },
+  "search.filter_type.environment.client": {
+    "defaultMessage": "Kliyente"
+  },
   "search.filter_type.environment.server": {
     "defaultMessage": "Pansilbi"
   },
@@ -467,6 +548,12 @@
   "servers.notice.level.survey.name": {
     "defaultMessage": "Siyasig"
   },
+  "servers.purchase.step.payment.prompt": {
+    "defaultMessage": "Pumili ng paraan ng pagbabayad"
+  },
+  "servers.purchase.step.payment.title": {
+    "defaultMessage": "Paraan ng pagbabayad"
+  },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plano"
   },
@@ -476,11 +563,14 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Suriin"
   },
+  "settings.account.title": {
+    "defaultMessage": "Panagutan at Kaligtsan"
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "madilim"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Pumili ng iyong gugustohing paksang-kulay para sa Modrinth ng nitong pakasam."
+    "defaultMessage": "Pumili ng iyong gugustohing paksang kulay para sa Modrinth ng nitong pakasam."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Liwanag"
@@ -490,6 +580,9 @@
   },
   "settings.display.theme.retro": {
     "defaultMessage": "Retro"
+  },
+  "settings.display.theme.title": {
+    "defaultMessage": "Paksang kulay"
   },
   "settings.profile.title": {
     "defaultMessage": "Publiko"

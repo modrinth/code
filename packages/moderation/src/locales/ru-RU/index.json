@@ -122,12 +122,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Укажите одно разрешение"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "Выберите среды, в которых работает {type, select, mod {мод} modpack {сборка} other {проект}}."
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "Укажите среду"
-  },
   "nags.select-license.description": {
     "defaultMessage": "Выберите лицензию, по которой распространяется {type, select, mod {мод} modpack {сборка} resourcepack {набор ресурсов} shader {шейдер} plugin {плагин} datapack {набор данных} other {проект}}."
   },
@@ -142,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Настроить описание"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Настроить среду"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Настроить лицензию"

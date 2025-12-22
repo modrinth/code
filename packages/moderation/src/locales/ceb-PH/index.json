@@ -32,17 +32,14 @@
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Pagpasundayag og galeriyang hulagway"
   },
-  "nags.select-environments.title": {
-    "defaultMessage": "Pagpili ug mga kalikopan"
+  "nags.multiple-resolution-tags.title": {
+    "defaultMessage": "Pilia ang husto nga resolusyon"
   },
   "nags.select-tags.title": {
     "defaultMessage": "Pagpili og mga timailhan"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Duawi ang mga himutangan sa paghulagway"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Duawi ang mga himutangan sa kalikopan"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Duawi ang mga himutangan sa lisensiya"
@@ -57,13 +54,13 @@
     "defaultMessage": "Duawi ang tinanan nga mga himutangan"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Dili mahimong mopareho ang imong kalangkoban sa Ngalan sa imong proyekto. Hinungdanon ang pagbuhat sa mapahibaloon ug madanihon nga Kalangkoban."
+    "defaultMessage": "Dili angay muawat ang imong kalangkoban sa Ngalan sa imong proyekto. Hinungdanon ang pagbuhat sa mapahibaloon ug madanihon nga Kalangkoban."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Pagsakarga og galeriyang hulagway"
   },
   "nags.upload-version.title": {
-    "defaultMessage": "Pagsakarga og bersiyon"
+    "defaultMessage": "Pagsakarga og hubad"
   },
   "nags.verify-external-links.title": {
     "defaultMessage": "Pamatud-i ang mga panggawas nga katayan"

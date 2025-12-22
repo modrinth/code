@@ -152,8 +152,8 @@
   "changelog.product.app": {
     "defaultMessage": "اڤليکاسي"
   },
-  "changelog.product.servers": {
-    "defaultMessage": "ڤلاين"
+  "changelog.product.hosting": {
+    "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
     "defaultMessage": "لامن سساوڠ"
@@ -204,7 +204,7 @@
     "defaultMessage": "Masukkan alamat"
   },
   "form.placeholder.address-2": {
-    "defaultMessage": "Apartmen, suite, dll."
+    "defaultMessage": "Apartmen, perumahan, dll."
   },
   "form.placeholder.amount": {
     "defaultMessage": "Masukkan amaun"
@@ -551,6 +551,12 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, other {ڤمالم}}"
   },
+  "project-type.project.category": {
+    "defaultMessage": "Projek"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, other {projek}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, other {ڤيک سومبر}}"
   },
@@ -559,6 +565,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, other {ڤيک سومبر}}"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, other {Pelayan}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Pelayan"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural, other {pelayan}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, other {ڤمبايڠ}}"
@@ -842,6 +857,42 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "ڤموات"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.item.backup-schedule": {
+    "defaultMessage": "Jadual penyandaran"
+  },
+  "servers.backups.item.creating-backup": {
+    "defaultMessage": "Sedang mencipta sandaran..."
+  },
+  "servers.backups.item.failed-to-create-backup": {
+    "defaultMessage": "Gagal mencipta sandaran"
+  },
+  "servers.backups.item.failed-to-restore-backup": {
+    "defaultMessage": "Gagal memulihkan daripada sandaran"
+  },
+  "servers.backups.item.manual-backup": {
+    "defaultMessage": "Penyandaran manual"
+  },
+  "servers.backups.item.queued-for-backup": {
+    "defaultMessage": "Penyandaran dibariskan"
+  },
+  "servers.backups.item.queued-for-restore": {
+    "defaultMessage": "Pemulihan dibariskan"
+  },
+  "servers.backups.item.rename": {
+    "defaultMessage": "Namakan semula"
+  },
+  "servers.backups.item.restore": {
+    "defaultMessage": "Pulihkan"
+  },
+  "servers.backups.item.restoring-backup": {
+    "defaultMessage": "Sedang memulihkan daripada sandaran..."
+  },
+  "servers.backups.item.retry": {
+    "defaultMessage": "Cuba semula"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "کتڤيکن"
   },
@@ -930,7 +981,7 @@
     "defaultMessage": "دمانکه اندا ماهو ڤلاين اندا دتمڤتکن؟"
   },
   "servers.region.region-unsupported": {
-    "defaultMessage": "رنتاو تيدق دسنارايکن؟ <link>بريتاهو کامي دمان اندا ايڠين مليهت Modrinth Servers ستروسڽ!</link>"
+    "defaultMessage": "Rantau tidak disenaraikan? <link>Beritahu kami di mana anda ingin melihat Modrinth Hosting tersedia!</link>"
   },
   "servers.region.southeast-asia": {
     "defaultMessage": "اسيا تڠݢارا"

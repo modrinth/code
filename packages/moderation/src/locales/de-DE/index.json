@@ -122,12 +122,6 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Richtige Auflösung auswählen"
   },
-  "nags.select-environments.description": {
-    "defaultMessage": "Wähle die Umgebungen aus, in denen dein {type, select, mod {Mod} modpack {Modpack} other {Projekt}} funktioniert."
-  },
-  "nags.select-environments.title": {
-    "defaultMessage": "Umgebung auswählen"
-  },
   "nags.select-license.description": {
     "defaultMessage": "Wähle die Lizenz aus, unter der dein {type, select, mod {Mod} modpack {Modpack} resourcepack {Ressourcenpaket} shader {Shader} plugin {Plugin} datapack {Datenpaket} other {Projekt}} veröffentlicht wird."
   },
@@ -142,9 +136,6 @@
   },
   "nags.settings.description.title": {
     "defaultMessage": "Beschreibungseinstellungen ansehen"
-  },
-  "nags.settings.environments.title": {
-    "defaultMessage": "Umgebungseinstellungen ansehen"
   },
   "nags.settings.license.title": {
     "defaultMessage": "Lizenzeinstellungen ansehen"

@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Serwery uwierzytelniania Minecraft mogą aktualnie nie działać. Sprawdź swoje połączenie z internetem i spróbuj ponownie później."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Nie udało się połączyć się z serwerami uwierzytelniania"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Tryb dewelopera włączony."
   },
@@ -60,7 +66,7 @@
     "message": "Pobierz aktualizację"
   },
   "app.update.downloading-update": {
-    "message": "Instalacja aktualizacji ({percent}%)"
+    "message": "Pobieranie aktualizacji ({percent}%)"
   },
   "app.update.reload-to-update": {
     "message": "Załaduj ponownie, aby zainstalować aktualizację"
@@ -327,7 +333,7 @@
     "message": "Nie można pobrać powiązanych szczegółów paczki modów. Sprawdź swoje połączenie internetowe."
   },
   "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} nie jest dostępny dla Minecraft {version}. Spróbuj inny."
+    "message": "{loader} nie jest dostępny dla wersji Minecraft {version}. Spróbuj inny."
   },
   "instance.settings.tabs.installation.no-modpack-found": {
     "message": "Ta instancja jest połączona z paczką modów, ale nie udało się znaleźć tej paczki modów na Modrinth."
