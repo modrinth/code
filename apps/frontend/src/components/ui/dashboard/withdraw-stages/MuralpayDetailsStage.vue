@@ -209,6 +209,8 @@ import {
 	formFieldPlaceholders,
 	getBlockchainColor,
 	getBlockchainIcon,
+	getCurrencyColor,
+	getCurrencyIcon,
 	normalizeChildren,
 } from '@modrinth/ui'
 import { defineMessages, useVIntl } from '@vintl/vintl'
