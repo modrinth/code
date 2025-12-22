@@ -560,6 +560,12 @@
 					</template>
 					<span v-else>{{ $formatVersion(version.game_versions) }}</span>
 				</div>
+				<div v-if="!isEditing && version.environment">
+					<h4>Environment</h4>
+					<span>
+						{{ ENVIRONMENTS_COPY[version.environment]?.title || version.environment }}
+					</span>
+				</div>
 				<div v-if="!isEditing">
 					<h4>Downloads</h4>
 					<span>{{ version.downloads }}</span>
@@ -635,6 +641,7 @@ import {
 	Checkbox,
 	ConfirmModal,
 	CopyCode,
+	ENVIRONMENTS_COPY,
 	injectNotificationManager,
 	MarkdownEditor,
 } from '@modrinth/ui'
