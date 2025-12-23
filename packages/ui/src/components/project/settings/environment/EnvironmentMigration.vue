@@ -3,10 +3,10 @@ import { CheckIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	commonProjectSettingsMessages,
+	EnvironmentSelector,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
-	ProjectSettingsEnvSelector,
 	UnsavedChangesPopup,
 	useSavable,
 } from '@modrinth/ui'
@@ -155,7 +155,7 @@ const messages = defineMessages({
 					:body="formatMessage(messages.reviewOptionsDescription)"
 					class="mb-3"
 				/>
-				<ProjectSettingsEnvSelector
+				<EnvironmentSelector
 					v-model="current.environment"
 					:disabled="!hasPermission || (projectV3?.environment?.length ?? 0) > 1"
 				/>
