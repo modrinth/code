@@ -32,15 +32,6 @@ async function openEditVersionModal(versionId: string, projectId: string, stageI
 	try {
 		const versionData = await labrinth.versions_v3.getVersion(versionId)
 
-		// migrate any non "mrpack" loaders into mrpack_loaders. modpack loader field is always only "mrpack"
-		if (projectV2.value.project_type === 'modpack') {
-			const nonMrpackLoaders = versionData.loaders?.filter((loader) => loader !== 'mrpack') ?? []
-			versionData.mrpack_loaders = [
-				...new Set([...nonMrpackLoaders, ...(versionData.mrpack_loaders ?? [])]), // set to avoid duplicates
-			]
-			versionData.loaders = ['mrpack']
-		}
-
 		const draftVersionData: Labrinth.Versions.v3.DraftVersion = {
 			project_id: projectId,
 			version_id: versionId,
