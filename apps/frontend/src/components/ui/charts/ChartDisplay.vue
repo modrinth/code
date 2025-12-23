@@ -9,9 +9,10 @@
 			</div>
 		</div>
 		<div v-else-if="!isInitialized || analytics.loading.value" class="universal-card">
-			<h2>
+			<div class="flex items-center justify-center gap-2">
+				<SpinnerIcon class="h-6 w-6 animate-spin" />
 				<span class="label__title">Loading analytics...</span>
-			</h2>
+			</div>
 		</div>
 		<div v-else class="graphs">
 			<div class="graphs__vertical-bar">
@@ -309,7 +310,7 @@
 </template>
 
 <script setup lang="ts">
-import { DownloadIcon, UpdatedIcon } from '@modrinth/assets'
+import { DownloadIcon, SpinnerIcon, UpdatedIcon } from '@modrinth/assets'
 import { Button, Card, DropdownSelect } from '@modrinth/ui'
 import { formatCategoryHeader, formatMoney, formatNumber } from '@modrinth/utils'
 import dayjs from 'dayjs'
@@ -837,10 +838,6 @@ const defaultRanges: RangeObject[] = [
 }
 
 .graphs {
-	// Pages clip so we need to add a margin
-	margin-left: 0.25rem;
-	margin-top: 0.25rem;
-
 	display: flex;
 	flex-direction: column;
 
