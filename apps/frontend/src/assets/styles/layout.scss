@@ -82,6 +82,7 @@
 		column-gap: 0.75rem;
 
 		grid-template:
+			'header header' auto
 			'sidebar content' auto
 			'info content' auto
 			'dummy content' 1fr
@@ -89,6 +90,7 @@
 
 		&.alt-layout {
 			grid-template:
+				'header header' auto
 				'content sidebar' auto
 				'content info' auto
 				'content dummy' 1fr
