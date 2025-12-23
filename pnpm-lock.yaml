@@ -435,8 +435,8 @@ importers:
         specifier: ^2.4.2
         version: 2.4.2
       lucide-static:
-        specifier: ^0.469.0
-        version: 0.469.0
+        specifier: ^0.562.0
+        version: 0.562.0
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.3)
@@ -5629,8 +5629,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-static@0.469.0:
-    resolution: {integrity: sha512-ravTgZodIVLO53rJyjIq0iuCRHs+kjd3dAfOcTbA41KCDfdy0Pt6Me8akkhda3jRpbIxjKe1PpYZOg2eQnI/lA==}
+  lucide-static@0.562.0:
+    resolution: {integrity: sha512-TM2vNVOEsO3+ijmno7n/VmxUo0Shr9OXC/UqZc5n4xEVyXX4E4NVvXoRPAZiSsIsdvlQ7alGOcIC/QGtR+OgUQ==}
 
   magic-string-ast@0.6.2:
     resolution: {integrity: sha512-oN3Bcd7ZVt+0VGEs7402qR/tjgjbM7kPlH/z7ufJnzTLVBzXJITRHOJiwMmmYMgZfdoWQsfQcY+iKlxiBppnMA==}
@@ -14333,7 +14333,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-static@0.469.0: {}
+  lucide-static@0.562.0: {}
 
   magic-string-ast@0.6.2:
     dependencies:
