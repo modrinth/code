@@ -60,11 +60,13 @@
 				"NEXTEST_*"
 			]
 		},
-		"fix": {
-			"cache": false
-		},
+		"fix": {},
 		"fix:ancillary": {
 			"cache": false
+		},
+		"intl:extract": {},
+		"prepr": {
+			"dependsOn": ["^prepr", "fix", "intl:extract"]
 		}
 	}
 }
