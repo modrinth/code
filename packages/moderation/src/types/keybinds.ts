@@ -1,4 +1,4 @@
-import type { Project } from '@modrinth/utils'
+import type { Labrinth } from '@modrinth/api-client'
 
 export interface ModerationActions {
 	tryGoNext: () => void
@@ -44,7 +44,7 @@ export interface ModerationState {
 }
 
 export interface ModerationContext {
-	project: Project
+	project: Labrinth.Projects.v2.Project
 	state: ModerationState
 	actions: ModerationActions
 }
