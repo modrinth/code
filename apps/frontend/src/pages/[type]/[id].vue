@@ -746,6 +746,43 @@
 					:auth="auth"
 					:tags="tags"
 				/>
+				<Admonition
+					v-if="
+						currentMember &&
+						projectV3.side_types_migration_review_status === 'pending' &&
+						projectV3.environment?.length === 1 &&
+						projectV3.environment[0] !== 'unknown'
+					"
+					type="warning"
+					:header="
+						formatMessage(
+							hasEditDetailsPermission
+								? messages.environmentMigrationTitle
+								: messages.environmentMigrationNoPermissionTitle,
+						)
+					"
+					class="mt-3"
+				>
+					{{
+						formatMessage(
+							hasEditDetailsPermission
+								? messages.environmentMigrationMessage
+								: messages.environmentMigrationNoPermissionMessage,
+						)
+					}}
+					<nuxt-link
+						to="/news/article/new-environments"
+						target="_blank"
+						class="mt-1 block w-fit font-semibold text-orange hover:underline"
+					>
+						{{ formatMessage(messages.environmentMigrationLink) }}
+					</nuxt-link>
+					<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
+						<button v-on:click="() => projectEnvironmentModal.show()" class="mt-3 w-fit">
+							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
+						</button>
+					</ButtonStyled>
+				</Admonition>
 				<MessageBanner v-if="project.status === 'archived'" message-type="warning" class="my-4">
 					{{ formatMessage(messages.archivedMessage, { title: project.title }) }}
 				</MessageBanner>
@@ -899,6 +936,10 @@
 			@toggle-collapsed="collapsedModerationChecklist = !collapsedModerationChecklist"
 		/>
 	</div>
+
+	<template v-if="hasEditDetailsPermission">
+		<ProjectEnvironmentModal ref="projectEnvironmentModal" />
+	</template>
 </template>
 
 <script setup>
@@ -929,6 +970,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Admonition,
 	Avatar,
 	ButtonStyled,
 	Checkbox,
@@ -938,6 +980,7 @@ import {
 	OverflowMenu,
 	PopoutMenu,
 	ProjectBackgroundGradient,
+	ProjectEnvironmentModal,
 	ProjectHeader,
 	ProjectSidebarCompatibility,
 	ProjectSidebarCreators,
@@ -957,6 +1000,7 @@ import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 
 import { navigateTo } from '#app'
+import { useTemplateRef } from 'vue'
 import Accordion from '~/components/ui/Accordion.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
@@ -997,6 +1041,8 @@ const showAllVersions = ref(false)
 const gameVersionFilterInput = ref()
 
 const versionFilter = ref('')
+
+const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
 const baseId = useId()
 
@@ -1144,6 +1190,28 @@ const messages = defineMessages({
 		id: 'project.error.loading',
 		defaultMessage: 'Error loading project data{message}',
 	},
+	environmentMigrationMessage: {
+		id: 'project.environment.migration.message',
+		defaultMessage:
+			"We've just overhauled the Environments system on Modrinth and new options are now available. Please verify that the metadata is correct.",
+	},
+	environmentMigrationTitle: {
+		id: 'project.environment.migration.title',
+		defaultMessage: 'Please review environment metadata',
+	},
+	environmentMigrationNoPermissionMessage: {
+		id: 'project.environment.migration-no-permission.message',
+		defaultMessage:
+			"We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified.",
+	},
+	environmentMigrationNoPermissionTitle: {
+		id: 'project.environment.migration-no-permission.title',
+		defaultMessage: 'Environment metadata needs to be reviewed',
+	},
+	environmentMigrationLink: {
+		id: 'project.environment.migration.learn-more',
+		defaultMessage: 'Learn more about this change',
+	},
 	followersStat: {
 		id: 'project.stats.followers-label',
 		defaultMessage: 'follower{count, plural, one {} other {s}}',
@@ -1239,6 +1307,10 @@ const messages = defineMessages({
 	projectUpdatedMessage: {
 		id: 'project.notification.updated.message',
 		defaultMessage: 'Your project has been updated.',
+	},
+	reviewEnvironmentSettings: {
+		id: 'project.environment.migration.review-button',
+		defaultMessage: 'Review environment settings',
 	},
 	reviewProject: {
 		id: 'project.actions.review-project',
@@ -1580,6 +1652,11 @@ const currentMember = computed(() => {
 	}
 
 	return val
+})
+
+const hasEditDetailsPermission = computed(() => {
+	const EDIT_DETAILS = 1 << 2
+	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
 })
 
 versions.value = data.$computeVersions(versions.value, allMembers.value)
