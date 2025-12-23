@@ -34,33 +34,6 @@
 			'modrinth-parent__no-modal-blurs': !cosmetics.advancedRendering,
 		}"
 	>
-		<PagewideBanner variant="error">
-			<template #title>
-				<span>Modrinth is experiencing downtime</span>
-			</template>
-			<template #description>
-				<p class="m-0">
-					Our service provider is performing emergency power maintenance. This outage will last up
-					to 2 hours and affects the website, API (503 errors), and Modrinth Hosting servers/control
-					panel in US East (133 nodes). Other regions are unaffected but the control panel may be
-					unavailable. Affected users will be credited. We apologize for the short notice.
-				</p>
-			</template>
-			<template #actions>
-				<div class="mt-2 flex w-fit gap-2">
-					<ButtonStyled color="red">
-						<a href="https://status.modrinth.com" target="_blank" rel="noopener">
-							<IssuesIcon aria-hidden="true" /> View status page
-						</a>
-					</ButtonStyled>
-					<ButtonStyled color="red">
-						<a href="https://status.modrinth.com" target="_blank" rel="noopener">
-							<ExternalIcon aria-hidden="true" /> Modrinth Discord
-						</a>
-					</ButtonStyled>
-				</div>
-			</template>
-		</PagewideBanner>
 		<PagewideBanner v-if="isRussia && !flags.hideRussiaCensorshipBanner" variant="error">
 			<template #title>
 				<div class="flex flex-col gap-1 text-contrast">
@@ -224,7 +197,6 @@
 				</Button>
 			</template>
 		</PagewideBanner>
-		<!-- Hiding generated state errors during outage
 		<PagewideBanner v-if="generatedStateErrors?.length" variant="error">
 			<template #title>
 				<span>{{ formatMessage(failedToBuildBannerMessages.title) }}</span>
@@ -238,7 +210,6 @@
 				}}
 			</template>
 		</PagewideBanner>
-		-->
 
 		<CreatorTaxFormModal
 			ref="taxFormModalRef"
@@ -955,7 +926,6 @@ import {
 	DiscordIcon,
 	DownloadIcon,
 	DropdownIcon,
-	ExternalIcon,
 	FileIcon,
 	FileTextIcon,
 	GithubIcon,
@@ -1007,6 +977,7 @@ import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateMo
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import CreatorTaxFormModal from '~/components/ui/dashboard/CreatorTaxFormModal.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
+import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
 const country = useUserCountry()
