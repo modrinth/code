@@ -1582,11 +1582,6 @@ const currentMember = computed(() => {
 	return val
 })
 
-const hasEditDetailsPermission = computed(() => {
-	const EDIT_DETAILS = 1 << 2
-	return (currentMember.value?.permissions & EDIT_DETAILS) === EDIT_DETAILS
-})
-
 versions.value = data.$computeVersions(versions.value, allMembers.value)
 
 const projectTypeDisplay = computed(() =>
