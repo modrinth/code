@@ -1,94 +1,85 @@
 <template>
-	<div>
-		<section class="universal-card">
-			<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-				<span class="text-xl font-semibold text-contrast md:text-2xl">{{
-					formatMessage(messages.transactionsHeader)
-				}}</span>
-				<div class="flex w-full flex-row gap-2 sm:max-w-[250px] md:items-center">
-					<Combobox
-						v-model="selectedYear"
-						:options="yearOptions"
-						:display-value="selectedYear === 'all' ? 'All years' : String(selectedYear)"
-						listbox
-					/>
-					<ButtonStyled circular>
-						<button
-							v-tooltip="formatMessage(messages.downloadCsv)"
-							:disabled="buildingCsv"
-							@click="onDownloadCSV"
-						>
-							<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
-							<DownloadIcon v-else />
-						</button>
-					</ButtonStyled>
-				</div>
+	<div class="mb-20 flex flex-col gap-4 lg:pl-8">
+		<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+			<span class="text-xl font-semibold text-contrast md:text-2xl">{{
+				formatMessage(messages.transactionsHeader)
+			}}</span>
+			<div class="flex w-full flex-row gap-2 sm:max-w-[250px] md:items-center">
+				<Combobox
+					v-model="selectedYear"
+					:options="yearOptions"
+					:display-value="selectedYear === 'all' ? 'All years' : String(selectedYear)"
+					listbox
+				/>
+				<ButtonStyled circular>
+					<button
+						v-tooltip="formatMessage(messages.downloadCsv)"
+						:disabled="buildingCsv"
+						@click="onDownloadCSV"
+					>
+						<SpinnerIcon v-if="buildingCsv" class="animate-spin" />
+						<DownloadIcon v-else />
+					</button>
+				</ButtonStyled>
 			</div>
-		</section>
-
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-			<section class="universal-card">
-				<div class="flex flex-col gap-3">
-					<div class="flex w-full justify-between">
-						<span class="my-auto font-medium">{{ formatMessage(messages.received) }}</span>
-						<ArrowDownLeftIcon class="size-6" />
-					</div>
-					<span class="text-2xl font-semibold text-contrast md:text-4xl">{{
-						formatMoney(totalReceived)
-					}}</span>
-				</div>
-			</section>
-			<section class="universal-card">
-				<div class="flex flex-col gap-3">
-					<div class="flex w-full justify-between">
-						<span class="my-auto font-medium">{{ formatMessage(messages.withdrawn) }}</span>
-						<ArrowUpRightIcon class="size-6" />
-					</div>
-					<span class="text-2xl font-semibold text-contrast md:text-4xl">{{
-						formatMoney(totalWithdrawn)
-					}}</span>
-				</div>
-			</section>
-			<section class="universal-card">
-				<div class="flex flex-col gap-3">
-					<div class="flex w-full justify-between">
-						<span class="my-auto font-medium">{{ formatMessage(messages.transactions) }}</span>
-						<GenericListIcon class="size-6" />
-					</div>
-					<span class="text-2xl font-semibold text-contrast md:text-4xl">{{
-						filteredTransactions.length
-					}}</span>
-				</div>
-			</section>
 		</div>
-
-		<section class="universal-card">
-			<div v-if="Object.keys(groupedTransactions).length > 0" class="flex flex-col gap-5 md:gap-6">
-				<div
-					v-for="(transactions, period) in groupedTransactions"
-					:key="period"
-					class="flex flex-col"
-				>
-					<h3 class="text-base font-medium text-primary md:text-lg">{{ period }}</h3>
-					<div class="flex flex-col gap-3 md:gap-4">
-						<RevenueTransaction
-							v-for="transaction in transactions"
-							:key="transaction.id || transaction.created"
-							:transaction="transaction"
-							@cancelled="refresh"
-						/>
-					</div>
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+			<div class="flex flex-col gap-3 rounded-2xl bg-surface-3 p-5">
+				<div class="flex w-full justify-between">
+					<span class="my-auto font-medium">{{ formatMessage(messages.received) }}</span>
+					<ArrowDownLeftIcon class="size-6" />
+				</div>
+				<span class="text-2xl font-semibold text-contrast md:text-4xl">{{
+					formatMoney(totalReceived)
+				}}</span>
+			</div>
+			<div class="flex flex-col gap-3 rounded-2xl bg-surface-3 p-5">
+				<div class="flex w-full justify-between">
+					<span class="my-auto font-medium">{{ formatMessage(messages.withdrawn) }}</span>
+					<ArrowUpRightIcon class="size-6" />
+				</div>
+				<span class="text-2xl font-semibold text-contrast md:text-4xl">{{
+					formatMoney(totalWithdrawn)
+				}}</span>
+			</div>
+			<div class="flex flex-col gap-3 rounded-2xl bg-surface-3 p-5">
+				<div class="flex w-full justify-between">
+					<span class="my-auto font-medium">{{ formatMessage(messages.transactions) }}</span>
+					<GenericListIcon class="size-6" />
+				</div>
+				<span class="text-2xl font-semibold text-contrast md:text-4xl">{{
+					filteredTransactions.length
+				}}</span>
+			</div>
+		</div>
+		<div
+			v-if="Object.keys(groupedTransactions).length > 0"
+			class="-mt-2 flex flex-col gap-5 md:gap-6"
+		>
+			<div
+				v-for="(transactions, period) in groupedTransactions"
+				:key="period"
+				class="flex flex-col"
+			>
+				<h3 class="text-base font-medium text-primary md:text-lg">{{ period }}</h3>
+				<div class="flex flex-col gap-3 md:gap-4">
+					<RevenueTransaction
+						v-for="transaction in transactions"
+						:key="transaction.id || transaction.created"
+						:transaction="transaction"
+						@cancelled="refresh"
+					/>
 				</div>
 			</div>
-			<div v-else class="mx-auto flex flex-col justify-center gap-2 p-6 text-center">
-				<span class="text-lg text-contrast md:text-xl">{{
-					formatMessage(messages.noTransactions)
-				}}</span>
-				<span class="text-base text-secondary md:text-lg">{{
-					formatMessage(messages.noTransactionsDesc)
-				}}</span>
-			</div>
-		</section>
+		</div>
+		<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
+			<span class="text-lg text-contrast md:text-xl">{{
+				formatMessage(messages.noTransactions)
+			}}</span>
+			<span class="max-w-[256px] text-base text-secondary md:text-lg">{{
+				formatMessage(messages.noTransactionsDesc)
+			}}</span>
+		</div>
 	</div>
 </template>
 <script setup>
