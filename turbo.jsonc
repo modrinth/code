@@ -1,6 +1,9 @@
 {
 	"$schema": "./node_modules/turbo/schema.json",
 	"concurrency": "100%",
+	"globalDependencies": [
+		"packages/tooling-config/**"
+	],
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
