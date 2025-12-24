@@ -204,7 +204,7 @@ Interactive controls:
 	}
 
 	if (added > 0) {
-		console.log(`\n📦 Added ${added} icon(s). Run 'pnpm icons:generate' to update exports.`)
+		console.log(`\n📦 Added ${added} icon(s). Run 'pnpm prepr:frontend:lib' to update exports.`)
 	}
 }
 
