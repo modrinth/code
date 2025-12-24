@@ -323,8 +323,8 @@ import {
 	SortAscIcon,
 	SortDescIcon,
 	TrashIcon,
-	XIcon,
 	TriangleAlertIcon,
+	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,

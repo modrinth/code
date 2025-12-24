@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { useTemplateRef, onMounted } from 'vue'
+import { onMounted, useTemplateRef } from 'vue'
 
 import { NewModal } from '../../../modal'
 import EnvironmentMigration from './EnvironmentMigration.vue'

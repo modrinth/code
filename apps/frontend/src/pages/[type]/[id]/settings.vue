@@ -3,13 +3,13 @@ import {
 	AlignLeftIcon,
 	BookTextIcon,
 	ChartIcon,
+	GlobeIcon,
 	ImageIcon,
 	InfoIcon,
 	LinkIcon,
 	TagsIcon,
 	UsersIcon,
 	VersionIcon,
-	GlobeIcon,
 } from '@modrinth/assets'
 import {
 	commonMessages,
