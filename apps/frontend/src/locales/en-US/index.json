@@ -2117,6 +2117,24 @@
   "project.download.title": {
     "message": "Download {title}"
   },
+  "project.environment.migration-no-permission.message": {
+    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. You don't have permission to modify these settings, but please let another member of the project know that the environment metadata needs to be verified."
+  },
+  "project.environment.migration-no-permission.title": {
+    "message": "Environment metadata needs to be reviewed"
+  },
+  "project.environment.migration.learn-more": {
+    "message": "Learn more about this change"
+  },
+  "project.environment.migration.message": {
+    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please verify that the metadata is correct."
+  },
+  "project.environment.migration.review-button": {
+    "message": "Review environment settings"
+  },
+  "project.environment.migration.title": {
+    "message": "Please review environment metadata"
+  },
   "project.error.loading": {
     "message": "Error loading project data{message}"
   },
@@ -2155,36 +2173,6 @@
   },
   "project.notification.updated.title": {
     "message": "Project updated"
-  },
-  "project.settings.environment.notice.missing-env.description": {
-    "message": "Your project is missing environment metadata, please select the appropriate option below."
-  },
-  "project.settings.environment.notice.missing-env.title": {
-    "message": "Please select an environment for your project"
-  },
-  "project.settings.environment.notice.multiple-environments.description": {
-    "message": "Different versions of your project have different environments selected, so you can't edit them globally at this time."
-  },
-  "project.settings.environment.notice.multiple-environments.title": {
-    "message": "Your project has multiple environments"
-  },
-  "project.settings.environment.notice.review-options.description": {
-    "message": "We've just overhauled the Environments system on Modrinth and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!"
-  },
-  "project.settings.environment.notice.review-options.title": {
-    "message": "Please review the options below"
-  },
-  "project.settings.environment.notice.wrong-project-type.description": {
-    "message": "Only mod or modpack projects can have environment metadata."
-  },
-  "project.settings.environment.notice.wrong-project-type.title": {
-    "message": "This project type does not support environment metadata"
-  },
-  "project.settings.environment.verification.verify-button": {
-    "message": "Verify"
-  },
-  "project.settings.environment.verification.verify-text": {
-    "message": "Verify that this project's environment is set correctly."
   },
   "project.settings.general.name.description": {
     "message": "Avoid prefixes, suffixes, parentheticals, or added descriptions—just the project's actual name."

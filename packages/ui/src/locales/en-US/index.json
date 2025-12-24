@@ -710,6 +710,30 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Client-side only"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Your project is missing environment metadata, please select the appropriate option below."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Please select an environment for your project"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Different versions of your project have different environments selected, so you can't edit them globally at this time."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Your project has multiple environments"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "We've just overhauled the Environments system on Modrinth and new options are now available. Please ensure the correct option is selected below and then click 'Verify' when you're done!"
+  },
+  "project.settings.environment.notice.review-options.title": {
+    "defaultMessage": "Please review the options below"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Only mod or modpack projects can have environment metadata."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "This project type does not support environment metadata"
+  },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Dedicated server only"
   },
@@ -736,6 +760,12 @@
   },
   "project.settings.environment.title": {
     "defaultMessage": "Environment"
+  },
+  "project.settings.environment.verification.verify-button": {
+    "defaultMessage": "Verify"
+  },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Verify that this project's environment is set correctly."
   },
   "project.settings.gallery.title": {
     "defaultMessage": "Gallery"
