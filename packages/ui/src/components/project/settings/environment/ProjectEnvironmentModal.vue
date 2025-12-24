@@ -26,8 +26,8 @@ function hide() {
 }
 
 onMounted(() => {
-	const urlParams = new URLSearchParams(window.location.search)
-	if (urlParams.get('showEnvironmentMigrationWarning') === 'true') {
+	const route = useRoute()
+	if (route.query.showEnvironmentMigrationWarning === 'true') {
 		show()
 	}
 })

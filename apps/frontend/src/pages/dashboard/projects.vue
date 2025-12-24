@@ -281,7 +281,11 @@
 						</div>
 
 						<div class="flex !flex-row items-center !justify-end gap-2">
-							<ButtonStyled v-if="true" circular color="orange">
+							<ButtonStyled
+								v-if="projectsWithMigrationWarning.includes(project.id)"
+								circular
+								color="orange"
+							>
 								<nuxt-link
 									v-tooltip="'Please review environment metadata'"
 									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
