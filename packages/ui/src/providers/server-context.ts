@@ -32,7 +32,7 @@ export interface ModrinthServerContext {
 	readonly backupsState: Reactive<BackupsState>
 	markBackupCancelled: (backupId: string) => void
 
-	// Filesystem state (lazy-loaded when files page mounts)
+	// Filesystem state
 	readonly fsAuth: Ref<FilesystemAuth | null>
 	readonly fsOps: Ref<Archon.Websocket.v0.FilesystemOperation[]>
 	readonly fsQueuedOps: Ref<Archon.Websocket.v0.QueuedFilesystemOp[]>

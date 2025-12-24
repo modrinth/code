@@ -281,8 +281,6 @@ import {
 import { getFileExtension, isEditableFile as isEditableFileCheck } from '../../../utils/file-extensions'
 
 const props = defineProps<{
-	fsOps: Archon.Websocket.v0.FilesystemOperation[]
-	fsQueuedOps: Archon.Websocket.v0.QueuedFilesystemOp[]
 	showDebugInfo?: boolean
 }>()
 
@@ -290,7 +288,7 @@ const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const client = injectModrinthClient()
 const serverContext = injectModrinthServerContext()
-const { serverId } = serverContext
+const { serverId, fsOps, fsQueuedOps } = serverContext
 const queryClient = useQueryClient()
 
 interface BaseOperation {
@@ -1075,8 +1073,8 @@ type QueuedOpWithState = Archon.Websocket.v0.QueuedFilesystemOp & { state: 'queu
 
 const ops = computed<(QueuedOpWithState | Archon.Websocket.v0.FilesystemOperation)[]>(() => [
 	...localQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
-	...props.fsQueuedOps.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
-	...props.fsOps,
+	...fsQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
+	...fsOps.value,
 ])
 
 async function dismissOrCancelOp(opId: string, action: 'dismiss' | 'cancel') {
@@ -1088,7 +1086,7 @@ async function dismissOrCancelOp(opId: string, action: 'dismiss' | 'cancel') {
 }
 
 watch(
-	() => props.fsOps,
+	() => fsOps.value,
 	() => {
 		refreshList()
 	},
