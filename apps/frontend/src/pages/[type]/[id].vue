@@ -43,16 +43,16 @@
 			<NuxtPage
 				v-model:project="project"
 				v-model:project-v3="projectV3"
+				v-model:members="members"
+				v-model:all-members="allMembers"
+				v-model:dependencies="dependencies"
+				v-model:organization="organization"
 				:versions="
 					versions.map((v) => ({
 						...v,
 						environment: versionsV3.value.find((v3) => v3.id === v.id)?.environment,
 					}))
 				"
-				v-model:members="members"
-				v-model:all-members="allMembers"
-				v-model:dependencies="dependencies"
-				v-model:organization="organization"
 				:current-member="currentMember"
 				:patch-project="patchProject"
 				:patch-icon="patchIcon"
@@ -783,7 +783,7 @@
 						{{ formatMessage(messages.environmentMigrationLink) }}
 					</nuxt-link>
 					<ButtonStyled v-if="hasEditDetailsPermission" color="orange">
-						<button v-on:click="() => projectEnvironmentModal.show()" class="mt-3 w-fit">
+						<button class="mt-3 w-fit" @click="() => projectEnvironmentModal.show()">
 							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
 						</button>
 					</ButtonStyled>
@@ -1003,9 +1003,9 @@ import { IntlFormatted } from '@vintl/vintl/components'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
+import { useTemplateRef } from 'vue'
 
 import { navigateTo } from '#app'
-import { useTemplateRef } from 'vue'
 import Accordion from '~/components/ui/Accordion.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
