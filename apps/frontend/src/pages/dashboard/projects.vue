@@ -281,6 +281,16 @@
 						</div>
 
 						<div class="flex !flex-row items-center !justify-end gap-2">
+							<ButtonStyled v-if="true" circular color="orange">
+								<nuxt-link
+									v-tooltip="'Please review environment metadata'"
+									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
+										project.slug ? project.slug : project.id
+									}?showEnvironmentMigrationWarning=true`"
+								>
+									<TriangleAlertIcon />
+								</nuxt-link>
+							</ButtonStyled>
 							<ButtonStyled circular>
 								<nuxt-link
 									v-tooltip="formatMessage(commonMessages.settingsLabel)"
@@ -310,6 +320,7 @@ import {
 	SortDescIcon,
 	TrashIcon,
 	XIcon,
+	TriangleAlertIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,

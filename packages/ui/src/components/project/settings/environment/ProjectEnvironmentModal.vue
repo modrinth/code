@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
+import { useTemplateRef, onMounted } from 'vue'
 
 import { NewModal } from '../../../modal'
 import EnvironmentMigration from './EnvironmentMigration.vue'
@@ -24,6 +24,13 @@ function show() {
 function hide() {
 	modal.value?.hide()
 }
+
+onMounted(() => {
+	const urlParams = new URLSearchParams(window.location.search)
+	if (urlParams.get('showEnvironmentMigrationWarning') === 'true') {
+		show()
+	}
+})
 
 defineExpose({
 	show,
