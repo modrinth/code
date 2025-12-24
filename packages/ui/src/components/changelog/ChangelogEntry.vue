@@ -42,9 +42,9 @@
 </template>
 
 <script setup lang="ts">
+import { defineMessages, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { renderHighlightedString } from '@modrinth/utils'
 import type { VersionEntry } from '@modrinth/utils/changelog'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 

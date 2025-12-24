@@ -1,4 +1,4 @@
-import { defineMessage, type MessageDescriptor } from '@vintl/vintl'
+import { defineMessage, type MessageDescriptor } from '~/utils/i18n-vintl'
 
 export type FieldType = 'text' | 'select' | 'email' | 'tel' | 'date'
 

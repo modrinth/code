@@ -13,7 +13,6 @@ import {
 	useSearch,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import type { Ref } from 'vue'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
@@ -28,6 +27,7 @@ import { get_search_results } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()

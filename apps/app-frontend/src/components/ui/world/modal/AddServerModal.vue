@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { PlayIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, injectNotificationManager } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { ref } from 'vue'
 
 import InstanceModalTitlePrefix from '@/components/ui/modal/InstanceModalTitlePrefix.vue'
@@ -9,6 +8,7 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
 import type { GameInstance } from '@/helpers/types'
 import { add_server_to_profile, type ServerPackStatus, type ServerWorld } from '@/helpers/worlds.ts'
+import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()

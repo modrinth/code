@@ -207,12 +207,12 @@
 import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import { Button, injectNotificationManager, normalizeChildren, ThemeSelector } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 
+import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import type { DisplayLocation } from '~/plugins/cosmetics'
 import { isDarkTheme, type Theme } from '~/plugins/theme/index.ts'
+import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 useHead({
 	title: 'Display settings - Modrinth',

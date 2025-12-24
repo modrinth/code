@@ -157,7 +157,7 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import { defineMessages, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { computed, ref } from 'vue'
 
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'

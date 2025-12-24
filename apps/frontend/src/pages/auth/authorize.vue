@@ -88,11 +88,11 @@ import {
 	injectNotificationManager,
 	normalizeChildren,
 } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
 
 import { useAuth } from '@/composables/auth.js'
 import { useScopes } from '@/composables/auth/scopes.ts'
 import { useBaseFetch } from '@/composables/fetch.js'
+import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

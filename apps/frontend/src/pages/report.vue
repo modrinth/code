@@ -291,10 +291,10 @@ import {
 	RadioButtons,
 } from '@modrinth/ui'
 import type { Project, Report, User, Version } from '@modrinth/utils'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 
+import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { defineMessages, type MessageDescriptor, useVIntl } from '~/utils/i18n-vintl'
 
 const { addNotification } = injectNotificationManager()
 

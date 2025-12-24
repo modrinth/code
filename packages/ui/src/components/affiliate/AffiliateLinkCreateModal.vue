@@ -64,7 +64,7 @@
 <script lang="ts"></script>
 <script setup lang="ts">
 import { AffiliateIcon, PlusIcon, SpinnerIcon, UserIcon, XIcon } from '@modrinth/assets'
-import { defineMessages, useVIntl } from '@vintl/vintl'
+import { defineMessages, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { AutoBrandIcon, Button, ButtonStyled, NewModal } from '../index.ts'

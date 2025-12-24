@@ -284,7 +284,6 @@ import type { ContentItem } from '@modrinth/ui/src/components/content/ContentLis
 import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import type { ComputedRef } from 'vue'
@@ -317,6 +316,7 @@ import {
 import type { CacheBehaviour, ContentFile, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { installVersionDependencies } from '@/store/install'
+import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 const { handleError } = injectNotificationManager()
 

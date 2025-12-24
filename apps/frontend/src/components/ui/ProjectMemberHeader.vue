@@ -26,10 +26,10 @@
 import { CheckIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager } from '@modrinth/ui'
 import type { Project, User, Version } from '@modrinth/utils'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
+import { defineMessages, type MessageDescriptor, useVIntl } from '~/utils/i18n-vintl'
 
 const { addNotification } = injectNotificationManager()
 

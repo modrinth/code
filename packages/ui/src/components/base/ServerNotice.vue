@@ -33,8 +33,8 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
+import { defineMessages, type MessageDescriptor, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { renderString } from '@modrinth/utils'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
 import Admonition from './Admonition.vue'

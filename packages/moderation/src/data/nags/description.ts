@@ -1,5 +1,5 @@
+import { defineMessage, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { renderHighlightedString } from '@modrinth/utils'
-import { defineMessage, useVIntl } from '@vintl/vintl'
 
 import type { Nag, NagContext } from '../../types/nags'
 

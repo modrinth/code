@@ -213,8 +213,6 @@ import {
 	getCurrencyIcon,
 	normalizeChildren,
 } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
@@ -223,6 +221,8 @@ import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown
 import { useGeneratedState } from '@/composables/generated'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 import { getRailConfig } from '@/utils/muralpay-rails'
+import IntlFormatted from '~/components/ui/IntlFormatted.vue'
+import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees } = useWithdrawContext()
 const { formatMessage } = useVIntl()

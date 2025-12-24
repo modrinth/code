@@ -92,10 +92,10 @@ import {
 } from '@modrinth/assets'
 import { ButtonStyled, Combobox } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
+import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 

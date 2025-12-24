@@ -276,12 +276,12 @@ import {
 } from '@modrinth/ui'
 import { NOTICE_LEVELS } from '@modrinth/ui/src/utils/notices.ts'
 import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import AssignNoticeModal from '~/components/ui/servers/notice/AssignNoticeModal.vue'
 import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
+import { useVIntl } from '~/utils/i18n-vintl'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

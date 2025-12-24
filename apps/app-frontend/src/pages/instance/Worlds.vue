@@ -133,7 +133,6 @@ import {
 	RadialHeader,
 } from '@modrinth/ui'
 import type { Version } from '@modrinth/utils'
-import { defineMessages } from '@vintl/vintl'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -169,6 +168,7 @@ import {
 	start_join_singleplayer_world,
 	type World,
 } from '@/helpers/worlds.ts'
+import { defineMessages } from '@/utils/i18n-vintl'
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()

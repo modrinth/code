@@ -3,8 +3,8 @@
 </template>
 
 <script setup lang="ts">
+import { defineMessage, type MessageDescriptor, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import type { ProjectStatus } from '@modrinth/utils'
-import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
 import { PROJECT_STATUS_ICONS } from '../../utils'

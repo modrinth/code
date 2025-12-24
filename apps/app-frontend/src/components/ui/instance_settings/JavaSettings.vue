@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { CheckCircleIcon, XCircleIcon } from '@modrinth/assets'
 import { Checkbox, injectNotificationManager, Slider } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, readonly, ref, watch } from 'vue'
 
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import useMemorySlider from '@/composables/useMemorySlider'
 import { edit, get_optimal_jre_key } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
+import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 import type { AppSettings, InstanceSettingsTabProps } from '../../../helpers/types'
 

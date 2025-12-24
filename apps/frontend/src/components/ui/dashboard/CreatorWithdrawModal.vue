@@ -117,7 +117,6 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, injectNotificationManager, NewModal } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import {
@@ -127,6 +126,7 @@ import {
 	TAX_THRESHOLD_ACTUAL,
 	type WithdrawStage,
 } from '@/providers/creator-withdraw.ts'
+import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
 import CompletionStage from './withdraw-stages/CompletionStage.vue'

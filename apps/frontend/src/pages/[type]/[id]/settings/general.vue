@@ -8,7 +8,8 @@ import {
 	UnsavedChangesPopup,
 	useSavable,
 } from '@modrinth/ui'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+
+import { defineMessages, type MessageDescriptor, useVIntl } from '~/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+import { defineMessage, type MessageDescriptor, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { computed, ref, watch } from 'vue'
 
 import { commonProjectSettingsMessages } from '../../../../utils'

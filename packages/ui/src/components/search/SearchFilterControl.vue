@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { BanIcon, LockIcon, XCircleIcon, XIcon } from '@modrinth/assets'
-import { defineMessage, type MessageDescriptor, useVIntl } from '@vintl/vintl'
+import { defineMessage, type MessageDescriptor, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { computed, type ComputedRef } from 'vue'
 
 import type { FilterOption, FilterType, FilterValue } from '../../utils/search'

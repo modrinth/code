@@ -212,8 +212,8 @@ import {
 	injectNotificationManager,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
 
+import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import Modal from '~/components/ui/Modal.vue'
 import {
 	getScopeValue,

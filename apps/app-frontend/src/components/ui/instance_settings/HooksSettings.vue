@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Checkbox, injectNotificationManager } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { computed, ref, watch } from 'vue'
 
 import { edit } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
+import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 import type { AppSettings, Hooks, InstanceSettingsTabProps } from '../../../helpers/types'
 

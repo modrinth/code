@@ -1,6 +1,7 @@
 export * from './auto-icons'
 export * from './common-messages'
 export * from './game-modes'
+export * from './i18n'
 export * from './notices'
 export * from './savable'
 export * from './search'

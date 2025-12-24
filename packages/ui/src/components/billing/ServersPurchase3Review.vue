@@ -10,8 +10,8 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { formatPrice, getPingLevel } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import type Stripe from 'stripe'
 import { computed } from 'vue'

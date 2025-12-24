@@ -440,16 +440,16 @@ import {
 	SearchIcon,
 } from '@modrinth/assets'
 import { Avatar, ButtonStyled, commonMessages, useRelativeTime } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { ref } from 'vue'
 import { Multiselect } from 'vue-multiselect'
 
 import ATLauncherLogo from '~/assets/images/external/atlauncher.svg?component'
 import PrismLauncherLogo from '~/assets/images/external/prism.svg?component'
+import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 import LatestNewsRow from '~/components/ui/news/LatestNewsRow.vue'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { homePageNotifs, homePageProjects, homePageSearch } from '~/generated/state.json'
+import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const formatRelativeTime = useRelativeTime()
 

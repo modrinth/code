@@ -2,10 +2,10 @@
 import { DownloadIcon, ExternalIcon, RefreshCwIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, commonMessages, ProgressBar } from '@modrinth/ui'
 import { formatBytes } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import { ref } from 'vue'
 
 import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
+import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 

@@ -96,7 +96,8 @@
 <script setup>
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import { ButtonStyled, Chips, injectNotificationManager, NewModal } from '@modrinth/ui'
-import { defineMessages } from '@vintl/vintl'
+
+import { defineMessages } from '~/utils/i18n-vintl'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
 

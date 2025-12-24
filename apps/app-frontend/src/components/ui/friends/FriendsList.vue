@@ -7,11 +7,10 @@ import {
 	injectNotificationManager,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
 import FriendsSection from '@/components/ui/friends/FriendsSection.vue'
+import IntlFormatted from '@/components/ui/IntlFormatted.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { friend_listener } from '@/helpers/events'
 import {
@@ -22,6 +21,7 @@ import {
 	transformFriends,
 } from '@/helpers/friends.ts'
 import type { ModrinthCredentials } from '@/helpers/mr_auth'
+import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 

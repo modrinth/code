@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useVIntl } from '@vintl/vintl'
+import { useVIntl } from '@modrinth/ui/src/utils/i18n'
 import type Stripe from 'stripe'
 
 import { commonMessages, getPaymentMethodIcon, paymentMethodMessages } from '../../utils'

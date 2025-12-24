@@ -16,12 +16,12 @@ import {
 	injectNotificationManager,
 } from '@modrinth/ui'
 import type { Project, ProjectV3Partial } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import { useLocalStorage, useScroll } from '@vueuse/core'
 import { computed } from 'vue'
 
 import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import NavStack from '~/components/ui/NavStack.vue'
+import { useVIntl } from '~/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 

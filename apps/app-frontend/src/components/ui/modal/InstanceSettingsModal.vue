@@ -9,7 +9,6 @@ import {
 } from '@modrinth/assets'
 import { Avatar, TabbedModal, type TabbedModalTab } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { defineMessage, useVIntl } from '@vintl/vintl'
 import { ref } from 'vue'
 
 import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.vue'
@@ -18,6 +17,7 @@ import InstallationSettings from '@/components/ui/instance_settings/Installation
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { defineMessage, useVIntl } from '@/utils/i18n-vintl'
 
 import type { InstanceSettingsTabProps } from '../../../helpers/types'
 

@@ -25,7 +25,6 @@ import {
 	type Project,
 	type Version,
 } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, type ComputedRef, type Ref, ref, shallowRef, watch } from 'vue'
 
@@ -36,6 +35,7 @@ import { get_project, get_version_many } from '@/helpers/cache'
 import { get_loader_versions } from '@/helpers/metadata'
 import { edit, install, update_repair_modrinth } from '@/helpers/profile'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { defineMessages, useVIntl } from '@/utils/i18n-vintl'
 
 import type {
 	InstanceSettingsTabProps,

@@ -198,6 +198,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { CalendarIcon, DownloadIcon, PlusIcon, StarIcon } from '@modrinth/assets'
 import { ButtonStyled } from '@modrinth/ui'
+import { useVIntl } from '@modrinth/ui/src/utils/i18n'
 import {
 	formatBytes,
 	formatCategory,
@@ -206,7 +207,6 @@ import {
 	type GameVersionTag,
 	type Version,
 } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import { SignalIcon, SpinnerIcon } from '@modrinth/assets'
+import { useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { getPingLevel } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
 import { regionOverrides } from '../../utils/regions'

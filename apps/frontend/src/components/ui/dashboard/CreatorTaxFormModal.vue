@@ -166,10 +166,10 @@ import {
 	NewModal,
 	normalizeChildren,
 } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 
 import { type FormRequestResponse, useAvalara1099 } from '@/composables/avalara1099'
+import IntlFormatted from '~/components/ui/IntlFormatted.vue'
+import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const props = withDefaults(
 	defineProps<{

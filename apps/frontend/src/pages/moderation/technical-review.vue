@@ -9,13 +9,13 @@ import {
 	Pagination,
 } from '@modrinth/ui'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/vue-query'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import Fuse from 'fuse.js'
 
 import MaliciousSummaryModal, {
 	type UnsafeFile,
 } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ModerationTechRevCard from '~/components/ui/moderation/ModerationTechRevCard.vue'
+import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()

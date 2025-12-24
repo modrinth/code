@@ -44,8 +44,9 @@
 import { MessageIcon } from '@modrinth/assets'
 import { Admonition, ButtonStyled } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
-import { defineMessages } from '@vintl/vintl'
 import { computed, watch } from 'vue'
+
+import { defineMessages } from '~/utils/i18n-vintl'
 
 const { formatMessage } = useVIntl()
 

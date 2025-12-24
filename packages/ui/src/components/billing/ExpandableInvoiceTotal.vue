@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
+import { useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { formatPrice } from '@modrinth/utils'
-import { useVIntl } from '@vintl/vintl'
 import { computed } from 'vue'
 
 import Accordion from '../base/Accordion.vue'

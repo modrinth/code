@@ -111,8 +111,6 @@ import {
 	formFieldLabels,
 	normalizeChildren,
 } from '@modrinth/ui'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -120,6 +118,8 @@ import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
 import { getAuthUrl, removeAuthProvider, useAuth } from '@/composables/auth.js'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import IntlFormatted from '~/components/ui/IntlFormatted.vue'
+import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees, saveStateToStorage } =
 	useWithdrawContext()

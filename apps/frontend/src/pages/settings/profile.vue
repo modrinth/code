@@ -92,7 +92,8 @@
 <script setup>
 import { SaveIcon, TrashIcon, UndoIcon, UploadIcon, UserIcon, XIcon } from '@modrinth/assets'
 import { Avatar, Button, commonMessages, FileInput, injectNotificationManager } from '@modrinth/ui'
-import { IntlFormatted } from '@vintl/vintl/components'
+
+import IntlFormatted from '~/components/ui/IntlFormatted.vue'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()

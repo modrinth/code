@@ -91,9 +91,10 @@ import type { Nag, NagContext, NagStatus } from '@modrinth/moderation'
 import { nags } from '@modrinth/moderation'
 import { ButtonStyled } from '@modrinth/ui'
 import type { Project, User, Version } from '@modrinth/utils'
-import { defineMessages, type MessageDescriptor, useVIntl } from '@vintl/vintl'
 import type { Component } from 'vue'
 import { computed } from 'vue'
+
+import { defineMessages, type MessageDescriptor, useVIntl } from '~/utils/i18n-vintl'
 
 interface Tags {
 	rejectedStatuses: string[]

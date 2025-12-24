@@ -364,8 +364,6 @@ import {
 	useDebugLogger,
 } from '@modrinth/ui'
 import { formatMoney } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
-import { IntlFormatted } from '@vintl/vintl/components'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -374,6 +372,8 @@ import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown
 import { useAuth } from '@/composables/auth.js'
 import { useBaseFetch } from '@/composables/fetch.js'
 import { type PayoutMethod, useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import IntlFormatted from '~/components/ui/IntlFormatted.vue'
+import { defineMessages, useVIntl } from '~/utils/i18n-vintl'
 
 const debug = useDebugLogger('TremendousDetailsStage')
 const {

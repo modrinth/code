@@ -541,8 +541,8 @@ import {
 	UnknownIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { defineMessages, useVIntl } from '@modrinth/ui/src/utils/i18n'
 import { calculateSavings, createStripeElements, formatPrice, getCurrency } from '@modrinth/utils'
-import { defineMessages, useVIntl } from '@vintl/vintl'
 import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Multiselect } from 'vue-multiselect'
